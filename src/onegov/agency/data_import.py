@@ -41,6 +41,7 @@ def get_phone(string):
         return string.replace('00', '+', 1)
     if not string.startswith('+'):
         return string.replace('0', '+41 ', 1)
+    return string
 
 
 def p(text):
@@ -51,18 +52,24 @@ def br(text):
     return text + '<br>'
 
 
+def split_address_on_new_line(address, newline=False):
+    new_addr = '<br>'.join(part.strip() for part in address.split(','))
+    new_addr = new_addr + '<br>' if newline else new_addr
+    return new_addr
+
+
 def get_address(line):
-    # Todo: Split addresses using plz and place a line down below
     stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
     if stao_addr and post_addr:
         if stao_addr == post_addr:
-            return br(stao_addr)
+            return br(split_address_on_new_line(stao_addr))
         else:
-            return br(stao_addr) + br(post_addr)
+            return br(split_address_on_new_line(stao_addr, True)) +\
+                   br(split_address_on_new_line(post_addr))
     elif stao_addr:
-        return br(stao_addr)
+        return br(split_address_on_new_line(stao_addr))
     if post_addr:
-        return br(post_addr)
+        return br(split_address_on_new_line(post_addr))
 
 
 def get_agency_portrait(line):
@@ -111,6 +118,12 @@ def import_bs_agencies(csvfile, session, app):
         line.verzorgeinheitid for line in csvfile.lines
         if line.verzvorfahreoeid not in lines_by_id.keys()
     )
+    if len(treat_as_root) == 1:
+        # Use the first level as root
+        treat_as_root = tuple(
+            line.verzorgeinheitid for line in csvfile.lines
+            if line.verzvorfahreoeid in treat_as_root
+        )
     added_agencies = {}
     children = defaultdict(list)
     roots = []
@@ -134,7 +147,8 @@ def import_bs_agencies(csvfile, session, app):
             title=line.bezeichnung.strip(),
             description=None,
             portrait=portrait,
-            order=numeric_priority(v_(line.anzeigeprio))
+            order=numeric_priority(v_(line.anzeigeprio)),
+            export_fields=["person.title", "person.phone"]
         )
         added_agencies[line.verzorgeinheitid] = agency
         return agency
@@ -200,16 +214,14 @@ def import_bs_persons(csvfile, agencies, session, app):
         if agency_id:
             agency = agencies.get(agency_id)
             if agency:
-                agency.memberships.append(ExtendedAgencyMembership(
-                    person_id=person_.id,
+                agency.add_person(
+                    person_.id,
                     title='',
                     since=None,
                     prefix=None,
                     addition=None,
                     note=None,
-                    order_within_agency=0,
-                    order_within_person=0
-                ))
+                )
 
             else:
                 print(f'agency id {agency_id} not found in agencies')
@@ -226,5 +238,8 @@ def import_bs_data(agency_file, person_file, request, app):
     session = request.session
     agencies = import_bs_agencies(agency_file, session, app)
     persons = import_bs_persons(person_file, agencies, session, app)
+
+    for agency in agencies.values():
+        agency.sort_relationships()
 
     return agencies, persons
