@@ -3,7 +3,6 @@ from datetime import datetime
 
 from onegov.agency.collections import ExtendedAgencyCollection, \
     ExtendedPersonCollection
-from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
