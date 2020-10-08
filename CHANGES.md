@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.75`
+
+> commits: **6 / [43da3b652f...70aa31552c](https://github.com/OneGov/onegov-cloud/compare/43da3b652f^...70aa31552c)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.75)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds options to set title left side of header/link**
+
+New options for the header section are introduced in /header-settings
+
+**`Feature`** | **[43da3b652f](https://github.com/onegov/onegov-cloud/commit/43da3b652f0eff36b2edeb800806c917bd1255b0)**
+
 ## Release `2020.74`
 
-> commits: **3 / [67fdaff5dc...d26fc0c0ac](https://github.com/OneGov/onegov-cloud/compare/67fdaff5dc^...d26fc0c0ac)**  
+> released: **2020-10-06 22:38**<br>
+> commits: **4 / [67fdaff5dc...8a47113319](https://github.com/OneGov/onegov-cloud/compare/67fdaff5dc^...8a47113319)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.74)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
