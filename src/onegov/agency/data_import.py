@@ -40,7 +40,8 @@ def get_phone(string):
     if string.startswith('00'):
         return string.replace('00', '+', 1)
     if not string.startswith('+'):
-        return string.replace('0', '+41 ', 1)
+        if len(string.replace(' ', '')) == 10:  # be sure #digits fit CH
+            return string.replace('0', '+41 ', 1)
     return string
 
 
