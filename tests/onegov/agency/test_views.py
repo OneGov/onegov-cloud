@@ -1,4 +1,6 @@
 from io import BytesIO
+
+import pytest
 from PyPDF2 import PdfFileReader
 
 from onegov.org.models import Organisation
@@ -494,3 +496,37 @@ def test_excel_export_not_logged_in(client):
     page = client.get(
         '/people/people-xlsx', expect_errors=True).maybe_follow()
     assert page.status == '403 Forbidden'
+
+
+@pytest.mark.flaky(reruns=3)
+def test_basic_search(client_with_es):
+    client = client_with_es
+    client.login_admin()
+    new = client.get('/people').click("Person", href='new')
+    new.form['academic_title'] = "Dr."
+    new.form['first_name'] = "Nick"
+    new.form['last_name'] = "Rivera"
+    page = new.form.submit().follow()
+
+    client.app.es_client.indices.refresh(index='_all')
+
+    client = client.spawn()
+    search_page = client.get('/search?q=Nick')
+
+
+def test_footer_settings_custom_links(client):
+    client.login_admin()
+
+    # footer settings custom links
+    settings = client.get('/footer-settings')
+    custom_url = 'https://custom.com/1'
+    custom_name = 'Custom1'
+
+    settings.form['custom_link_1_name'] = custom_name
+    settings.form['custom_link_1_url'] = custom_url
+    settings.form['custom_link_2_name'] = 'Custom2'
+    settings.form['custom_link_2_url'] = None
+
+    page = settings.form.submit().follow()
+    assert f'<a href="{custom_url}">{custom_name}</a>' in page
+    assert 'Custom2' not in page

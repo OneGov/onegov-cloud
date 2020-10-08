@@ -77,7 +77,16 @@
         <header>
           <div class="globals">
             <div class="row">
-              <div class="columns small-12">
+              <div class="columns small-12"
+              tal:define="header_options request.app.org.header_options or {}"
+              >
+                  <div class="global-header" tal:condition="header_options['left_header_name']|nothing" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+                      <h4><a
+                              href="${header_options.get('left_header_url', '#')}"
+                              style="color:${color or '#fff'}; font-size: ${rem_size}rem">
+                              ${header_options['left_header_name']}
+                      </a></h4>
+                  </div>
                 <ul tal:condition="global_tools|nothing">
                   <li tal:repeat="tool global_tools">
                     <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
