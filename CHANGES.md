@@ -1,8 +1,14 @@
 # Changes
 
+## Release `2020.76`
+
+> commits: **6 / [b9fc08c984...026013d26b](https://github.com/OneGov/onegov-cloud/compare/b9fc08c984^...026013d26b)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.76)](https://buildkite.com/seantis/onegov-cloud)
+
 ## Release `2020.75`
 
-> commits: **6 / [43da3b652f...70aa31552c](https://github.com/OneGov/onegov-cloud/compare/43da3b652f^...70aa31552c)**  
+> released: **2020-10-08 15:26**<br>
+> commits: **7 / [43da3b652f...836f4b0ae7](https://github.com/OneGov/onegov-cloud/compare/43da3b652f^...836f4b0ae7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.75)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
