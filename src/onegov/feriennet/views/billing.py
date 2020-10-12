@@ -1,6 +1,9 @@
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
+
+from lxml.etree import LxmlError
+
 from onegov.activity import Invoice, InvoiceItem, InvoiceCollection
 from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.core.custom import json
@@ -423,9 +426,14 @@ def view_billing_import(self, request, form):
             request.alert(_("The submitted xml data could not be decoded"))
             return request.redirect(request.link(self))
 
-        transactions = list(
-            match_iso_20022_to_usernames(
-                xml, request.session, period_id=cache['invoice']))
+        try:
+            transactions = list(
+                match_iso_20022_to_usernames(
+                    xml, request.session, period_id=cache['invoice']))
+        except LxmlError:
+            request.alert(_('The submitted xml data could not be parsed. '
+                            'Please check the file integrity'))
+            return request.redirect(request.link(self))
 
         if not transactions:
             del request.browser_session['account-statement']
