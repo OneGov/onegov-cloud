@@ -259,11 +259,16 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     """
 
     def execute(request, app):
+        admin_group = 'cn=onegovcloud_admin,ou=uebersetzerverz,o=appl'
+        editor_group = 'cn=onegovcloud_edit,ou=uebersetzerverz,o=appl'
         fetch_users(
             app,
             request.session,
             ldap_server,
             ldap_username,
-            ldap_password)
+            ldap_password,
+            admin_group,
+            editor_group
+        )
 
     return execute
