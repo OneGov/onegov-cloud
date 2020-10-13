@@ -38,9 +38,10 @@ def delete_attendee_title(context):
 @upgrade_task('Add attendee permissions col')
 def add_attendee_permissions_col(context):
     if not context.has_column('fsi_attendees', 'permissions'):
-        context.operations.add_column(
+        context.add_column_with_defaults(
             'fsi_attendees',
-            Column('permissions', ARRAY(Text), default=list)
+            Column('permissions', ARRAY(Text), default=list),
+            default=lambda x: []
         )
 
 
