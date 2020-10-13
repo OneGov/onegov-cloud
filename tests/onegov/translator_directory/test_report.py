@@ -1,4 +1,4 @@
-import os
+import pytest
 
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.report import TranslatorVoucher
@@ -6,6 +6,7 @@ from tests.onegov.translator_directory.shared import translator_data
 from tests.shared.utils import open_in_excel
 
 
+@pytest.mark.skip('In development')
 def test_translator_voucher(client):
 
     translator = Translator(**translator_data)
