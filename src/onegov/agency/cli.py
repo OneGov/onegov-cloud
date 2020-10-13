@@ -62,6 +62,8 @@ def import_bs_data_files(agency_file, people_file, dry_run, clean):
             session.flush()
             click.secho(
                 'All Memberships, Agencies and Persons removed', fg='green')
+            click.secho('Exiting...')
+            return
 
         agencies, people = import_bs_data(
             agency_file, people_file, request, app)

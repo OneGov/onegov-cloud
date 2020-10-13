@@ -36,8 +36,7 @@
                 <ul class="memberships" data-sortable data-sortable-url="${layout.move_membership_within_agency_url_template}">
                     <tal:block tal:repeat="membership memberships">
                         <li tal:condition="(membership.access == 'public' and membership.person.access == 'public') or request.is_logged_in" data-sortable-id="${membership.id}">
-                            <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>,
-                            <a style="text" href="${request.link(membership)}">${membership.title}</a>
+                            <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong><a tal:condition="membership.title" style="text" href="${request.link(membership)}">, ${membership.title}</a>
                             <span tal:condition="membership.prefix|None">${membership.prefix}</span>
                         </li>
                     </tal:block>
@@ -246,5 +245,57 @@
             <dd>${message}</dd>
         </dl>
     </metal:display_person_mutation>
+
+    <metal:agency_nav_item define-macro="agency_nav_item_content" i18n:domain="onegov.agency">
+          <tal:b tal:define="memberships agency.memberships; children agency.children">
+            <div class="details">
+                <a href="${request.link(agency)}" i18n:translate="">Show agency</a>
+            </div>
+            <ul class="memberships" tal:condition="memberships">
+               <li class="person" tal:repeat="membership memberships">
+                   <tal:b tal:define="person membership.person">
+                       <a href="${request.link(person)}">${person.title}</a>
+                   </tal:b>
+               </li>
+            </ul>
+            <ul class="children" tal:condition="children">
+                <tal:block tal:repeat="child children">
+                    <li class="child" tal:condition="child.access == 'public' or request.is_logged_in">
+                        <tal:b metal:use-macro="layout.macros.agency_nav_item" tal:define="agency child; content_only False"/>
+                    </li>
+                </tal:block>
+            </ul>
+        </tal:b>
+    </metal:agency_nav_item
+
+    <metal:agency_nav_item define-macro="agency_nav_item" i18n:domain="onegov.agency">
+        <tal:b tal:define="agency_id str(agency.id)">
+            <div
+                tal:condition="not: content_only|False"
+                class="collapsible"
+                id="trigger-${agency_id}"
+                ic-action="toggleClass:active">
+
+                <a class="title" href="javascript:;">${agency.title}</a>
+            </div>
+            <div
+                id="content-${agency_id}"
+                style="display: none"
+                ic-trigger-from="#trigger-${agency_id}"
+                ic-trigger-on="click"
+                ic-get-from="${layout.nav_item_url(agency)}"
+                ic-action="toggle"
+            >
+            </div>
+        </tal:b>
+    </metal:agency_nav_item>
+
+    <metal:agency_nav_tree define-macro="agency_nav_tree" i18n:domain="onegov.agency">
+        <ul class="agency-nav">
+            <li tal:repeat="agency agencies">
+                <tal:b metal:use-macro="layout.macros.agency_nav_item"/>
+            </li>
+        </ul>
+    </metal:agency_nav_tree>
 
 </body>

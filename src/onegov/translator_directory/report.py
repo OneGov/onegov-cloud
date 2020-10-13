@@ -164,7 +164,7 @@ class TranslatorVoucher(object):
 
     def add_formats(self, formats, use_default=True):
         return self.wb.add_format(self.coerce_fmts(formats, use_default))
-    
+
     def merge_range(self, position, data, fmt=None):
         return self.ws.merge_range(position, data, fmt)
 
@@ -341,16 +341,16 @@ class TranslatorVoucher(object):
         self.spacer_row(row + 9)
 
         headers(row + 10, 'Dolmetschertätigkeit bei ausserordentlich '
-                         'schwierigen Übersetzungen  - '
-                         '(§ 15 Abs. 1 lit. c, 06:00-20:00 Uhr)')
+                          'schwierigen Übersetzungen  - '
+                          '(§ 15 Abs. 1 lit. c, 06:00-20:00 Uhr)')
 
         subheaders(row + 11, 0, subtitles)
         input_block(row + 12, 0, numrows=3, formats=date_time_fmts)
 
         headers(row + 15, 'Dolmetschertätigkeit bei ausserordentlich '
-                         'schwierigen Übersetzungen - '
-                         'zuschlagsberechtigter Zeitraum +25 % - '
-                         '(§ 15 Abs. 1 lit. b, 20:00-06:00)')
+                          'schwierigen Übersetzungen - '
+                          'zuschlagsberechtigter Zeitraum +25 % - '
+                          '(§ 15 Abs. 1 lit. b, 20:00-06:00)')
         input_block(row + 16, 0, numrows=3, formats=date_time_fmts)
         self.spacer_row(row + 19)
         headers(row + 20, 'Wegpauschale - (§ 15 Abs. 1 lit.g)')

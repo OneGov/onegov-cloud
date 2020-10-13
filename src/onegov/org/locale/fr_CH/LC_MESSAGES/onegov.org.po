@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-07 13:24+0200\n"
+"POT-Creation-Date: 2020-10-07 17:24+0200\n"
 "PO-Revision-Date: 2020-05-10 10:58+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -983,6 +983,21 @@ msgstr "Troisième partenaire"
 
 msgid "Fourth Partner"
 msgstr "Quatrième partenaire"
+
+msgid "Title header left side"
+msgstr "Titre dans en-tête, face gauche"
+
+msgid "Optional"
+msgstr "Facultatif"
+
+msgid "Font color"
+msgstr "Couleur de la police"
+
+msgid "Relative font size"
+msgstr "Taille de police relative"
+
+msgid "Color could not be converted"
+msgstr "Erreur lors de la conversion de la couleur"
 
 msgid "Homepage Image #1"
 msgstr "Image n°1 de page d'accueil"
@@ -3892,6 +3907,9 @@ msgstr "Recherche non disponible"
 msgid "Footer"
 msgstr "Bas de page"
 
+msgid "Header"
+msgstr "En-tête"
+
 msgid "Modules"
 msgstr "Modules"
 
@@ -4070,6 +4088,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Header font color"
+#~ msgstr "Couleur de la police d'en-tête"
 
 #~ msgid "E-Mail Reply Address"
 #~ msgstr "Adresse e-mail de réponse"

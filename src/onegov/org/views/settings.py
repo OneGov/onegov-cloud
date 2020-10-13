@@ -13,7 +13,7 @@ from onegov.org.forms import HolidaySettingsForm
 from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
-from onegov.org.forms.settings import OrgTicketSettingsForm
+from onegov.org.forms.settings import OrgTicketSettingsForm, HeaderSettingsForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.models import Organisation
@@ -80,6 +80,14 @@ def handle_general_settings(self, request, form):
     icon='fa-home', order=-900)
 def handle_homepage_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Homepage"))
+
+
+@OrgApp.form(
+    model=Organisation, name='header-settings', template='form.pt',
+    permission=Secret, form=HeaderSettingsForm, setting=_("Header"),
+    icon='fa-window-maximize', order=-810)
+def handle_header_settings(self, request, form):
+    return handle_generic_settings(self, request, form, _("Header"))
 
 
 @OrgApp.form(

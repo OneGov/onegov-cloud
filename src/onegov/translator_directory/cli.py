@@ -6,7 +6,7 @@ import click
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
 from onegov.fsi.cli import fetch_users
-from onegov.translator_directory.constants import GENDERS, CERTIFICATES
+from onegov.translator_directory.constants import CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
 from onegov.translator_directory.models.language import Language
@@ -85,10 +85,10 @@ def import_certifcates(csvfile, session):
 
 def parse_gender(field):
     if not field:
-        return GENDERS[-1]
+        return 'N'
     if field == 'Männlich':
-        return GENDERS[0]
-    return GENDERS[1]
+        return 'M'
+    return 'F'
 
 
 def parse_date(field):
@@ -260,11 +260,16 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     """
 
     def execute(request, app):
+        admin_group = 'cn=onegovcloud_admin,ou=uebersetzerverz,o=appl'
+        editor_group = 'cn=onegovcloud_edit,ou=uebersetzerverz,o=appl'
         fetch_users(
             app,
             request.session,
             ldap_server,
             ldap_username,
-            ldap_password)
+            ldap_password,
+            admin_group,
+            editor_group
+        )
 
     return execute

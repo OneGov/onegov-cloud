@@ -38,7 +38,7 @@ from webtest import Upload
 from yubico_client import Yubico
 
 from tests.shared.utils import decode_map_value, \
-    encode_map_value
+    encode_map_value, open_in_browser
 
 
 def test_view_permissions():
@@ -3334,6 +3334,17 @@ def test_settings(client):
 
     settings = client.get('/analytics-settings')
     assert '<script>alert("Hi!");</script>' in settings.text
+
+    color = '#006fbb'
+    settings = client.get('/header-settings')
+    settings.form['left_header_name'] = 'Homepage of Govikon'
+    settings.form['left_header_url'] = 'https://govikon.ch'
+    settings.form['left_header_rem'] = 2.5
+    settings.form['left_header_color'] = color
+    page = settings.form.submit().follow()
+
+    assert f'<a href="https://govikon.ch" ' \
+           f'style="color:{color}; font-size: 2.5rem">' in page
 
 
 def test_registration_honeypot(client):

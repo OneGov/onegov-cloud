@@ -22,7 +22,7 @@ def hash_password(password):
     assert "\0" not in password
 
     # like bcrypt, but with the ability to support any password length
-    return bcrypt_sha256.encrypt(password)
+    return bcrypt_sha256.hash(password)
 
 
 def verify_password(password, hash):

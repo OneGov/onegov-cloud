@@ -231,7 +231,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
     if origin == 'internal':
 
         # if the messages is sent to the outside, we always send an e-mail
-        receivers = (ticket.handler.email, )
+        receivers = (ticket.snapshot.get('email') or ticket.handler.email, )
         reply_to = request.current_username
 
     else:

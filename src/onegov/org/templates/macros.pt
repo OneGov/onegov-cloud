@@ -111,7 +111,8 @@
                        facebook layout.org.meta.facebook_url|nothing;
                        twitter layout.org.meta.twitter_url|nothing;
                        instagram layout.org.meta.instagram_url|nothing;
-                       youtube layout.org.meta.youtube_url|nothing;">
+                       youtube layout.org.meta.youtube_url|nothing;
+                       custom_links layout.custom_links|nothing;">
         <div class="row footer-columns" tal:condition="any((
             contact,
             contact_url,
@@ -121,6 +122,7 @@
             twitter,
             instagram,
             youtube,
+            custom_links
         ))">
             <div class="small-12 medium-3 columns">
                 <metal:b use-macro="layout.macros['footer_contact']" />
@@ -139,7 +141,7 @@
 </metal:footer_columns>
 
 <metal:footer_custom_links define-macro="footer_custom_links">
-    <tal:b define="custom_links layout.custom_links">
+    <tal:b>
         <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
             <h2 class="custom-links"><a href="${link[1]}">${link[0]}</a></h2>
         </tal:b>

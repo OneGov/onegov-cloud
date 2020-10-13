@@ -92,9 +92,10 @@ def test_user_delete(session):
 def test_user_password(session):
 
     users = UserCollection(session)
+    hash_start = '$bcrypt-sha256$v=2'
     user = users.add('AzureDiamond', 'hunter2', 'irc-user')
-    assert user.password.startswith('$bcrypt-sha256$2')
-    assert user.password_hash.startswith('$bcrypt-sha256$2')
+    assert user.password.startswith(hash_start)
+    assert user.password_hash.startswith(hash_start)
 
     def may_login(username, password):
         return bool(users.by_username_and_password(username, password))
@@ -104,15 +105,15 @@ def test_user_password(session):
     assert not may_login('AzureDiamon', 'hunter2')
 
     user.password = 'test'
-    assert user.password.startswith('$bcrypt-sha256$2')
-    assert user.password_hash.startswith('$bcrypt-sha256$2')
+    assert user.password.startswith(hash_start)
+    assert user.password_hash.startswith(hash_start)
     assert may_login('AzureDiamond', 'test')
 
     # this is an exception, we allow for empty passwords, but we will not
     # query for them by default, see usercollection class
     user.password = ''
-    assert user.password.startswith('$bcrypt-sha256$2')
-    assert user.password_hash.startswith('$bcrypt-sha256$2')
+    assert user.password.startswith(hash_start)
+    assert user.password_hash.startswith(hash_start)
     assert not may_login('AzureDiamon', '')
 
 
