@@ -8,9 +8,7 @@ from sqlalchemy import Column, ARRAY, Text, Boolean
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
-from onegov.fsi.models import CourseAttendee
 from onegov.fsi.models.course_attendee import external_attendee_org
-from onegov.user import User
 
 
 @upgrade_task('Remove department column')
@@ -142,21 +140,25 @@ def change_refresh_interval(context):
 
 @upgrade_task('Adds organisation to external attendees')
 def add_org_to_external_attendee(context):
-    query = context.session.query(CourseAttendee).filter(
-        CourseAttendee.user_id == None)
-
-    for attendee in query:
-        attendee.organisation = external_attendee_org
+    context.session.execute(textwrap.dedent(f"""\
+        UPDATE fsi_attendees
+        SET organisation = '{external_attendee_org}'
+        WHERE fsi_attendees.user_id IS NULL;
+    """))
 
 
 @upgrade_task('Adds permission for external attendees to role editor')
 def append_org_to_external_attendee(context):
-    query = context.session.query(CourseAttendee).join(User).filter(
-        User.role == 'editor')
-
-    for att in query:
-        if att.user_id and att.user.role == 'editor':
-            if not att.permissions:
-                att.permissions = [external_attendee_org]
-            elif external_attendee_org not in att.permissions:
-                att.permissions.append(external_attendee_org)
+    if not context.has_column('fsi_attendees', 'permissions'):
+        return
+    context.session.execute(textwrap.dedent(f"""
+        UPDATE fsi_attendees
+        SET permissions = array_append(permissions, '{external_attendee_org}')
+        WHERE fsi_attendees.id IN (
+                SELECT a.id
+                FROM fsi_attendees a
+                JOIN users u on a.user_id = u.id
+                WHERE u.role = 'editor'
+                AND NOT a.permissions @> ARRAY ['{external_attendee_org}']
+            );
+    """))
