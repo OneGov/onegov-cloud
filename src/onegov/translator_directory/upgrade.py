@@ -10,6 +10,8 @@ from onegov.core.upgrade import upgrade_task
 
 @upgrade_task('Change withholding tax column to boolean')
 def change_withholding_tax_column_type(context):
+    if not context.has_table('translators'):
+        return
     if context.has_column('translators', 'withholding_tax'):
         context.operations.execute(
             'ALTER TABLE translators '
@@ -20,6 +22,8 @@ def change_withholding_tax_column_type(context):
 
 @upgrade_task('Adds meta and content columns')
 def add_meta_content_columns(context):
+    if not context.has_table('translators'):
+        return
     table = 'translators'
     new_cols = ('meta', 'content')
     for col_name in new_cols:
@@ -33,6 +37,8 @@ def add_meta_content_columns(context):
 
 @upgrade_task('Adds imported tag for translators')
 def add_imported_column(context):
+    if not context.has_table('translators'):
+        return
     if not context.has_column('translators', 'imported'):
         context.add_column_with_defaults(
             table='translators',
