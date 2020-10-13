@@ -32,11 +32,6 @@ class TranslatorVoucher(object):
         'font_size': font_size,
         'align': 'vcenter'
     }
-    """
-    write a number ws.write_number
-    ws.write_boolean
-    ws.write_row    
-    """
 
     def __init__(self, request, translator):
         self.request = request
@@ -56,16 +51,16 @@ class TranslatorVoucher(object):
         })
 
         self.thead_blue = self.add_format({
-                'bold': True,
-                'font_size': self.subheader_font_size,
-                'font_color': self.white,
-                'bg_color': self.blue
+            'bold': True,
+            'font_size': self.subheader_font_size,
+            'font_color': self.white,
+            'bg_color': self.blue
         })
         self.thead_green = self.add_format({
-                'bold': True,
-                'font_size': self.subheader_font_size,
-                'font_color': self.white,
-                'bg_color': self.green
+            'bold': True,
+            'font_size': self.subheader_font_size,
+            'font_color': self.white,
+            'bg_color': self.green
         })
 
         self.thead_lightgreen = self.add_format({
@@ -138,19 +133,19 @@ class TranslatorVoucher(object):
     def coerce_fmts(self, raw_formats, use_default=True):
         if len(raw_formats) == 1 and not use_default:
             return raw_formats[0]
-        default_fmt = use_default and self.default_fmt.copy() or \
-                      raw_formats.pop(0)
+
+        default = use_default and self.default_fmt.copy() or raw_formats.pop(0)
 
         for fmt in raw_formats:
-            default_fmt.update(fmt)
-        return default_fmt
+            default.update(fmt)
+        return default
 
     def add_format(self, format, use_default=True):
         return self.wb.add_format(self.coerce_fmts([format], use_default))
 
     def add_formats(self, formats, use_default=True):
         return self.wb.add_format(self.coerce_fmts(formats, use_default))
-    
+
     def merge_range(self, position, data, fmt=None):
         return self.ws.merge_range(position, data, fmt)
 
@@ -221,9 +216,9 @@ class TranslatorVoucher(object):
                          '- (§ 15 Abs. 1 lit. b, 20:00-06:00)')
 
         headers(row + 8, 'Dolmetschertätigkeit bei ausserordentlich '
-                             'schwierigen Übersetzungen - '
-                             'zuschlagsberechtigter Zeitraum +25 % - '
-                             '(§ 15 Abs. 1 lit. b, 20:00-06:00)')
+                         'schwierigen Übersetzungen - '
+                         'zuschlagsberechtigter Zeitraum +25 % - '
+                         '(§ 15 Abs. 1 lit. b, 20:00-06:00)')
 
         subheaders(row + 13, 0, (
             'Datum', 'Reiseweg in km', '', '', 'Wegpauschale', '', '',
@@ -241,6 +236,3 @@ class TranslatorVoucher(object):
         self.wb.close()
         self.file.seek(0)
         return self.file
-
-
-
