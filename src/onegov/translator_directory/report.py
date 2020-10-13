@@ -18,7 +18,7 @@ class TranslatorVoucher(object):
     title_font_size = 12
     font_size = 10
     subheader_font_size = 10
-    default_row_height = 20     # 4.5mm
+    default_row_height = 12.7     # 4.5mm
     edit_color = 'ffffcc'
     blue = '0066cc'
     green = '008000'
@@ -30,13 +30,8 @@ class TranslatorVoucher(object):
         'font_name': 'Arial',
         'locked': True,
         'font_size': font_size,
-        'align': 'vcenter'
+        'valign': 'vcenter'
     }
-    """
-    write a number ws.write_number
-    ws.write_boolean
-    ws.write_row    
-    """
 
     def __init__(self, request, translator):
         self.request = request
@@ -56,31 +51,48 @@ class TranslatorVoucher(object):
         })
 
         self.thead_blue = self.add_format({
-                'bold': True,
-                'font_size': self.subheader_font_size,
-                'font_color': self.white,
-                'bg_color': self.blue
+            'bold': True,
+            'font_size': self.subheader_font_size,
+            'font_color': self.white,
+            'bg_color': self.blue
         })
         self.thead_green = self.add_format({
-                'bold': True,
-                'font_size': self.subheader_font_size,
-                'font_color': self.white,
-                'bg_color': self.green
+            'bold': True,
+            'font_size': self.subheader_font_size,
+            'font_color': self.white,
+            'bg_color': self.green
         })
 
         self.thead_lightgreen = self.add_format({
-            'bold': True,
             'font_size': self.subheader_font_size,
             'bg_color': self.light_green
         })
 
         self.tsubhead = self.add_format({'bg_color': self.lila})
-        self.tsubhead_italic = self.add_format({'bg_color': self.lila})
+        input_centered = {'bg_color': self.edit_color, 'align': 'center'}
 
         self.input_time_fmt = self.add_format(
-            {'num_format': 'HH:MM', 'bg_color': self.edit_color})
+            {'num_format': 'HH:MM', **input_centered})
         self.input_date_fmt = self.add_format(
-            {'num_format': 'TT.MM.JJJJ', 'bg_color': self.edit_color})
+            {'num_format': 'TT.MM.JJJJ', **input_centered})
+        self.number_fmt = self.add_format(
+            {'num_format': '0', 'align': 'center'}
+        )
+        self.input_dt_fmt = self.add_format(
+            {'num_format': 'H:MM', **input_centered}
+        )
+        self.float_fmt = self.add_format(
+            {'num_format': '0.00', 'align': 'center'}
+        )
+        self.input_float_fmt = self.add_format(
+            {'num_format': '0.00', **input_centered}
+        )
+        self.input_int_fmt = self.add_format(
+            {'num_format': '0', **input_centered}
+        )
+        self.bg_white_fmt = self.add_format(
+            {'bg_color': 'white'}
+        )
 
     def to_width(self, value):
         """Input value or list of values in mm"""
@@ -138,8 +150,10 @@ class TranslatorVoucher(object):
     def coerce_fmts(self, raw_formats, use_default=True):
         if len(raw_formats) == 1 and not use_default:
             return raw_formats[0]
-        default_fmt = use_default and self.default_fmt.copy() or \
-                      raw_formats.pop(0)
+        if use_default:
+            default_fmt = self.default_fmt.copy()
+        else:
+            default_fmt = raw_formats.pop(0)
 
         for fmt in raw_formats:
             default_fmt.update(fmt)
@@ -165,6 +179,9 @@ class TranslatorVoucher(object):
         """
         pass
 
+    def spacer_row(self, rownum):
+        return self.ws.set_row(rownum, 1.3 * 2.54)
+
     def create_header(self):
         self.write('A8', self.title, self.title_fmt)
         amt_fmt = self.add_format({
@@ -183,64 +200,273 @@ class TranslatorVoucher(object):
         self.merge_range('C13:E13', None, self.editable_fmt)
 
         self.write('F10', 'Übersetzende/r')
-        self.write('F10', 'Personalnummer')
-        self.write('F10', 'Übers. Sprache')
-        self.write('F10', 'Quellensteuer')
+        self.write('F11', 'Personalnummer')
+        self.write('F12', 'Übers. Sprache')
+        self.write('F13', 'Quellensteuer')
 
         self.merge_range('G10:H10', None, self.editable_fmt)
         self.merge_range('G11:H11', None, self.editable_fmt)
         self.merge_range('G12:H12', None, self.editable_fmt)
+        self.merge_range('G13:H13', None, self.editable_fmt)
+
+    def write_formulas(self):
+        # static and hidden fields
+        self.write('N17', 12, self.number_fmt)
+        self.ws.write_formula('N18', '=CEILING.XCL(C17-B17,1/(24*N17))')
+        for row in range(17, 33 + 1):
+            self.ws.write_formula(
+                f'M{row}',
+                f'=IF(C{row}=0,"00:00",IF(AND(C{row}-B{row})<=0.04,"01:00",'
+                f'IF(AND(C{row}-B{row}),CEILING.XCL(C{row}-B{row},'
+                f'1/(24*$N$17)))))')
+
+        fields_for_total = []
+
+        for row in range(17, 19 + 1):
+            self.ws.write_formula(
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
+            self.ws.write_formula(f'G{row}', f'=D{row}*24')
+            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*75)*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(21, 23 + 1):
+            self.ws.write_formula(
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
+            self.ws.write_formula(f'G{row}', f'=D{row}*24*1.25')
+            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*75)*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(27, 29 + 1):
+            self.ws.write_formula(
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
+            self.ws.write_formula(f'G{row}', f'=D{row}*24')
+            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*95')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(31, 33 + 1):
+            self.ws.write_formula(
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
+            self.ws.write_formula(f'G{row}', f'=D{row}*24*1.25')
+            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*95)*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        def distance_flatrate_formula(row):
+            return f'=IF(B{row}=0,0,IF(B{row}<=20,40,' \
+                   f'IF(AND(B{row}>20,B{row}<=40),50,' \
+                f'IF(AND(B{row}>40,B{row}<=60),60,' \
+                f'IF(AND(B{row}>60,B{row}<=80),70,' \
+                f'IF(AND(B{row}>80,B{row}<=100),80,' \
+                f'IF(AND(B{row}<100),80,"n. Vereinbarung")))))))'
+
+        for row in range(37, 39 + 1):
+            self.ws.write_formula(f'E{row}',distance_flatrate_formula(row))
+            self.ws.write_formula(f'H{row}', f'=E{row}')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(43, 45 + 1):
+            self.ws.write_formula(f'D{row}', f'=C{row}')
+            self.ws.write_formula(f'E{row}', distance_flatrate_formula(row))
+            self.ws.write_formula(f'G{row}', f'=D{row}*24')
+            self.ws.write_formula(
+                f'H{row}', f'=ROUND(((F{row}*G{row})+E{row})*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(49, 51 + 1):
+            self.ws.write_formula(f'D{row}', f'=CEILING.XCL(B{row},0.5)')
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*75)*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(53, 55 + 1):
+            self.ws.write_formula(f'D{row}', f'=B{row}')
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*75*1.25)*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(59, 61 + 1):
+            self.ws.write_formula(f'D{row}', f'=B{row}')
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(63, 65 + 1):
+            self.ws.write_formula(f'D{row}', f'=B{row}')
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        for row in range(69, 71 + 1):
+            self.ws.write_formula(
+                f'D{row}', f'=CEILING.XCL(C{row}-B{row},1/96)')
+            self.ws.write_formula(f'G{row}', f'=D{row}*24')
+            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*E{row})*2,1)/2')
+            fields_for_total.append(f'H{row}')
+
+        self.ws.write_formula(
+            'H74', f'=ROUND(({"+".join(fields_for_total)})*2,1)/2'
+        )
 
     def create_table(self, row):
 
         subtitles = (
-            'Datum', 'von', 'bis', 'Total', '', '', 'Indstrieminuten',
+            'Datum', 'von', 'bis', 'Total', '', '', 'Industrieminuten',
             'Zwischentotal'
         )
 
-        def headers(row, text):
-            self.merge_range(f'A{row+1}:H{row+1}', text, self.thead_blue)
+        def headers(row, text, format_=None):
+            if not format_:
+                format_ = self.thead_blue
+            self.merge_range(f'A{row+1}:H{row+1}', text, format_)
 
-        def subheaders(row, col, subtitles):
-            for col_ix, text in enumerate(subtitles, col):
+        def subheaders(row, col, subtitles, fmt=None):
+            if not fmt:
                 fmt = self.tsubhead
-                if text == 'Zwischentotal':
-                    fmt = self.tsubhead_italic
+            for col_ix, text in enumerate(subtitles, col):
                 self.ws.write(row, col_ix, text, fmt)
 
-        def input_block(start_col, start_row):
-            self.ws.write_blank(start_row, start_col, self.input_date_fmt)
-            # self.ws.write_blank(start_row, start_col, self.input_date_fmt)
+        def input_block(start_row, start_col, numrows, formats):
+            for ix in range(numrows):
+                for yx, format in enumerate(formats):
+                    self.ws.write(
+                        start_row + ix, start_col + yx, None, format)
 
         headers(row, 'Dolmetschertätigkeit - '
                      '(§ 15 Abs. 1 lit. a, 06:00-20:00 Uhr)')
         subheaders(row + 1, 0, subtitles)
+        date_time_fmts = [
+            self.input_date_fmt, self.input_time_fmt, self.input_time_fmt]
+
+        input_block(row + 2, 0, numrows=3, formats=date_time_fmts)
 
         headers(row + 5, 'Dolmetschertätigkeit - zuschlagsberechtigter '
                          'Zeitraum +25 %   '
                          '- (§ 15 Abs. 1 lit. b, 20:00-06:00)')
+        input_block(row + 6, 0, numrows=3, formats=date_time_fmts)
+        self.spacer_row(row + 9)
 
-        headers(row + 8, 'Dolmetschertätigkeit bei ausserordentlich '
-                             'schwierigen Übersetzungen - '
-                             'zuschlagsberechtigter Zeitraum +25 % - '
-                             '(§ 15 Abs. 1 lit. b, 20:00-06:00)')
+        headers(row + 10, 'Dolmetschertätigkeit bei ausserordentlich '
+                         'schwierigen Übersetzungen  - '
+                         '(§ 15 Abs. 1 lit. c, 06:00-20:00 Uhr)')
 
-        subheaders(row + 13, 0, (
+        subheaders(row + 11, 0, subtitles)
+        input_block(row + 12, 0, numrows=3, formats=date_time_fmts)
+
+        headers(row + 15, 'Dolmetschertätigkeit bei ausserordentlich '
+                         'schwierigen Übersetzungen - '
+                         'zuschlagsberechtigter Zeitraum +25 % - '
+                         '(§ 15 Abs. 1 lit. b, 20:00-06:00)')
+        input_block(row + 16, 0, numrows=3, formats=date_time_fmts)
+        self.spacer_row(row + 19)
+        headers(row + 20, 'Wegpauschale - (§ 15 Abs. 1 lit.g)')
+
+        subheaders(row + 21, 0, (
             'Datum', 'Reiseweg in km', '', '', 'Wegpauschale', '', '',
             'Zwischentotal'))
 
-        # subheaders(row + 6, 0, subtitles)
+        input_block(row + 22, 0, numrows=3, formats=[
+            self.input_date_fmt, self.input_int_fmt, self.input_dt_fmt])
+        self.spacer_row(row + 25)
+
+        headers(row + 26, 'Besondere Dringlichkeit - (§ 15 Abs. 1 lit. f - '
+                          'Wegpauschale+Reisezeit - Std.- Ansatz CHF 75.00)')
+        subheaders(row + 27, 0, ('Datum', 'Reiseweg in km', 'Reisezeit',
+                                 'Total', 'Wegpauschale', '1/2 Ansatz',
+                                 'Industrieminuten', 'Zwischentotal'))
+        input_block(row + 28, 0, numrows=3, formats=[
+            self.input_date_fmt, self.input_int_fmt, self.input_dt_fmt])
+        self.ws.write_number(row + 28, 5, 37.50, self.float_fmt)
+        self.ws.write_number(row + 29, 5, 37.50, self.float_fmt)
+        self.ws.write_number(row + 30, 5, 37.50, self.float_fmt)
+        self.spacer_row(row + 31)
+
+        # Begin of green table
+        headers(
+            row + 32,
+            'Übersetzungstätigkeit - (§ 15 Abs. 2 lit. a)',
+            self.thead_green
+        )
+        subtitles = ('Datum', 'Anzahl Seiten', '', 'Total', '', '', '',
+                     'Zwischentotal')
+        subheaders(row + 33, 0, subtitles, fmt=self.thead_lightgreen)
+        input_block(row + 34, 0, numrows=3, formats=[
+            self.input_date_fmt, self.input_int_fmt])
+
+        headers(
+            row + 37,
+            'Übersetzungstätigkeit - zuschlagsberechtigter Zeitraum +25 % - '
+            '(§ 15 Abs. 2 lit. c)',
+            self.thead_green
+        )
+        input_block(row + 38, 0, numrows=3, formats=[
+            self.input_date_fmt, self.input_int_fmt
+        ])
+        self.spacer_row(row + 41)
+        headers(row+42, 'Übersetzungstätigkeit bei ausserordentlich '
+                        'schwierigen Übersetzungen - (§ 15 Abs. 2 lit. b)',
+                self.thead_green)
+        subheaders(row + 43, 0, subtitles, fmt=self.thead_lightgreen)
+        input_block(row + 44, 0, numrows=3, formats=[
+            self.input_date_fmt, self.input_int_fmt
+        ])
+        headers(
+            row + 47,
+            'Übersetzungstätigkeit bei ausserordentlich schwierigen '
+            'Übersetzungen - zuschlagsberechtigter Zeitraum +25 % - '
+            '(§ 15 Abs. 2 lit. c)',
+            self.thead_green
+        )
+        input_block(row + 48, 0, numrows=3, formats=[
+            self.input_date_fmt, self.input_int_fmt
+        ])
+        self.spacer_row(row + 51)
+        headers(row + 52, 'Einsätze nach Vereinbarung (§ 15 Abs. 1 lit. d '
+                        'oder e / § 15 Abs. 2 lit. d)'
+                )
+        subheaders(row + 53, 0, (
+            'Datum', 'von', 'bis', 'Total', 'Vereinb. Ansatz', '',
+            'Industrieminuten', 'Zwischentotal'))
+        input_block(row + 54, 0, numrows=3, formats=(
+            self.input_date_fmt, self.input_time_fmt, self.input_time_fmt))
+        input_block(row + 54, 4, numrows=3, formats=[self.input_float_fmt])
+        self.spacer_row(row + 57)
+
+        # Main Total
+        self.merge_range(
+            f'A{row + 59}:G{row + 59}', 'Gesamttotal', self.thead_blue)
+        self.ws.write(f'H{row + 59}', None, self.thead_blue)
+        self.spacer_row(row + 59)
+        return row + 59
+
+    def create_footer(self, start_row):
+        row_span = 5
+        for ix in range(row_span + 1):
+            self.ws.set_row(start_row + ix, cell_format=self.bg_white_fmt)
+        self.write(f'A{start_row + 1}', 'Visum Auftraggebende Person')
+        self.write(f'C{start_row + 1}', 'Visum Übersetzende/r')
+
+        self.write(f'A{start_row + 3}', 'Datum')
+        self.write(f'C{start_row + 3}', 'Datum')
+        self.write(f'B{start_row + 3 }', None, self.input_date_fmt)
+        self.write(f'D{start_row + 3 }', None, self.input_date_fmt)
+        self.write(f'A{start_row + 4}', 'Original:')
+        self.write(f'A{start_row + 5}', 'Kopie:')
+        self.write(
+            f'B{start_row + 4}',
+            'Amtsleiter oder Finanzverantwortlicher (zwecks Kontierung der '
+            'Zahlungsanweisung an Personalamt)'
+        )
+        self.write(f'B{start_row + 5}', 'Übersetzende/r')
+        self.write(f'B{start_row + 6}', 'Auftraggebende Person')
+
+    def create_off_page_content(self):
+        self.write('I13', 'Auszug aus der Übersetzungsverordnung (BGS 161.15)')
 
     def create_document(self, protect_pw=None):
         self.set_page_layout()
+        self.write_formulas()
         self.create_header()
-        self.create_table(15)
+        current_row = self.create_table(row=14)
+        self.create_footer(start_row=current_row + 1)
+        self.create_off_page_content()
 
         if protect_pw:
             self.protect_with(protect_pw)
         self.wb.close()
         self.file.seek(0)
         return self.file
-
-
-
