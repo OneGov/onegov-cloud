@@ -194,21 +194,24 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     """
 
     def execute(request, app):
+        admin_group = 'cn=acc_onegovcloud_admin,ou=kursverwaltung,o=appl'
+        editor_group = 'cn=acc_onegovcloud_edit,ou=kursverwaltung,o=appl'
         fetch_users(
             app,
             request.session,
             ldap_server,
             ldap_username,
-            ldap_password)
+            ldap_password,
+            admin_group,
+            editor_group
+        )
 
     return execute
 
 
-def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
+def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
+                admin_group=None, editor_group=None):
     """ Implements the fetch-users cli command. """
-
-    admin_group = 'cn=acc_onegovcloud_admin,ou=kursverwaltung,o=appl'
-    editor_group = 'cn=acc_onegovcloud_edit,ou=kursverwaltung,o=appl'
 
     mapping = {
         'uid': 'source_id',

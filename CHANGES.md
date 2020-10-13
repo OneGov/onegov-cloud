@@ -1,8 +1,70 @@
 # Changes
 
+## Release `2020.76`
+
+> commits: **6 / [b9fc08c984...026013d26b](https://github.com/OneGov/onegov-cloud/compare/b9fc08c984^...026013d26b)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.76)](https://buildkite.com/seantis/onegov-cloud)
+
+## Release `2020.75`
+
+> released: **2020-10-08 15:26**<br>
+> commits: **7 / [43da3b652f...836f4b0ae7](https://github.com/OneGov/onegov-cloud/compare/43da3b652f^...836f4b0ae7)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.75)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds options to set title left side of header/link**
+
+New options for the header section are introduced in /header-settings
+
+**`Feature`** | **[43da3b652f](https://github.com/onegov/onegov-cloud/commit/43da3b652f0eff36b2edeb800806c917bd1255b0)**
+
+## Release `2020.74`
+
+> released: **2020-10-06 22:38**<br>
+> commits: **4 / [67fdaff5dc...8a47113319](https://github.com/OneGov/onegov-cloud/compare/67fdaff5dc^...8a47113319)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.74)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+✨ **Adds navigation tree incl. people**
+
+The whole organisation tree can be viewed on `/organisation` including memberships.
+
+**`Other`** | **[67fdaff5dc](https://github.com/onegov/onegov-cloud/commit/67fdaff5dc89e43011cfd692ec0b126120d6947e)**
+
+## Release `2020.73`
+
+> released: **2020-10-05 10:16**<br>
+> commits: **5 / [add5c37f89...9ffb45cc10](https://github.com/OneGov/onegov-cloud/compare/add5c37f89^...9ffb45cc10)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.73)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Adds agency setting to customize search results**
+
+Adds customization of search results (/search) for display of not only the membership organisation, but also its parents of Level 1, 2 or 3.
+
+**`Feature`** | **[e143c55016](https://github.com/onegov/onegov-cloud/commit/e143c55016ef64234fd6ff7e9061ec5f3c0361b1)**
+
+### Feriennet
+
+🐞 **Skips manual payouts from payment sync**
+
+**`Bugfix`** | **[add5c37f89](https://github.com/onegov/onegov-cloud/commit/add5c37f89dec0c1c47002a1c44220ca4faf204e)**
+
+### Gis
+
+🐞 **Updates leaflet integration for mapbox.streets api**
+
+Migrating to the modern Static Tiles API using vector tiles.
+
+**`Bugfix`** | **[52c33925fc](https://github.com/onegov/onegov-cloud/commit/52c33925fcd3c53dbdab192d1901f2f34ee7c6dd)**
+
 ## Release `2020.72`
 
-> commits: **16 / [49ede628a7...296c5a9266](https://github.com/OneGov/onegov-cloud/compare/49ede628a7^...296c5a9266)**  
+> released: **2020-09-21 16:51**<br>
+> commits: **17 / [49ede628a7...147a21ad9e](https://github.com/OneGov/onegov-cloud/compare/49ede628a7^...147a21ad9e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.72)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core

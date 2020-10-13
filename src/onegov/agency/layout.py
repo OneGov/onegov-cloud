@@ -46,6 +46,11 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
                     url=self.request.link(self.model, 'create-pdf'),
                     attrs={'class': 'create-pdf'}
                 ),
+                Link(
+                    text=_("Sort root agencies"),
+                    url=self.request.link(self.model, 'sort'),
+                    attrs={'class': 'sort'}
+                ),
                 LinkGroup(
                     title=_("Add"),
                     links=[
@@ -60,6 +65,9 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
                     ]
                 ),
             ]
+
+    def nav_item_url(self, agency):
+        return self.request.link(agency.proxy(), 'as-nav-item')
 
 
 class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):

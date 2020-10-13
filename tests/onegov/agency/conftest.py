@@ -40,9 +40,13 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
     return cfg_path
 
 
-@fixture(scope='function')
-def agency_app(request):
-    app = create_app(AgencyApp, request, use_smtp=True)
+def create_agency_app(request, use_elasticsearch=False):
+    app = create_app(
+        AgencyApp,
+        request,
+        use_smtp=True,
+        use_elasticsearch=use_elasticsearch
+    )
     org = create_new_organisation(app, name="Govikon")
     org.meta['reply_to'] = 'mails@govikon.ch'
     org.meta['locales'] = 'de_CH'
@@ -66,7 +70,19 @@ def agency_app(request):
 
     commit()
     session.close_all()
+    return app
 
+
+@fixture(scope='function')
+def agency_app(request):
+    app = create_agency_app(request, use_elasticsearch=False)
+    yield app
+    app.session_manager.dispose()
+
+
+@fixture(scope='function')
+def es_agency_app(request):
+    app = create_agency_app(request, use_elasticsearch=True)
     yield app
     app.session_manager.dispose()
 
@@ -74,6 +90,14 @@ def agency_app(request):
 @fixture(scope='function')
 def client(agency_app):
     client = Client(agency_app)
+    client.skip_first_form = True
+    client.use_intercooler = True
+    return client
+
+
+@fixture(scope='function')
+def client_with_es(es_agency_app):
+    client = Client(es_agency_app)
     client.skip_first_form = True
     client.use_intercooler = True
     return client

@@ -80,6 +80,7 @@ def test_agency_collection_layout():
     layout = AgencyCollectionLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'ExtendedAgencyCollection/create-pdf',
+        'ExtendedAgencyCollection/sort',
         'ExtendedAgencyCollection/new'
     ]
 

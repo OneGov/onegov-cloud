@@ -112,6 +112,9 @@ class Organisation(Base, TimestampMixin):
     # n levels as indexes of agency.ancestors, type: list of integers
     agency_display_levels = meta_property()
 
+    # Header settings that go into the div.globals
+    header_options = meta_property(default=dict)
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the
