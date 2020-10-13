@@ -4,12 +4,12 @@ from io import BytesIO
 from xlsxwriter import Workbook
 
 from onegov.translator_directory import _
-from onegov.core.security import Secret, Personal
+from onegov.core.security import Secret, Personal, Private
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.forms.translator import TranslatorForm, \
-    TranslatorSearchForm
+    TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
 from onegov.translator_directory.models.translator import Translator
@@ -60,7 +60,8 @@ def view_translators(self, request, form):
         'model': self,
         'title': layout.title,
         'form': form,
-        'results': self.batch
+        'results': self.batch,
+        'button_text': _('Submit Search')
     }
 
 
@@ -134,7 +135,7 @@ def export_translator_directory(self, request):
             trs.bank_address or '',
             trs.account_owner or '',
             trs.email or '',
-            trs.withholding_tax or '',
+            trs.withholding_tax and 1 or 0,
             trs.tel_private or '',
             trs.tel_mobile or '',
             trs.tel_office or '',
@@ -179,7 +180,7 @@ def view_translator(self, request):
     return {
         'layout': layout,
         'model': self,
-        'title': self.full_name
+        'title': self.title
     }
 
 
@@ -202,6 +203,33 @@ def edit_translator(self, request, form):
             **{attr: form.get_ids(self, attr.split('_ids')[0])
                 for attr in form.special_fields}
         )
+    layout = EditTranslatorLayout(self, request)
+    return {
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'title': layout.title
+    }
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    template='form.pt',
+    name='edit-restricted',
+    form=EditorTranslatorForm,
+    permission=Private
+)
+def edit_translator_as_editor(self, request, form):
+
+    if request.is_admin:
+        self.request.redirect(self.request.link(self, name='edit'))
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self))
+    if not form.errors:
+        form.process(obj=self)
     layout = EditTranslatorLayout(self, request)
     return {
         'layout': layout,

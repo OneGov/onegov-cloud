@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from onegov.core.orm.mixins import ContentMixin, meta_property
 from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
@@ -44,14 +45,6 @@ class ESMixin(ORMSearchable):
     es_public = False
 
     @property
-    def es_suggestion(self):
-        return self.full_name
-
-    @property
-    def title(self):
-        return self.full_name
-
-    @property
     def lead(self):
         return ', '.join({
             *(la.name for la in self.written_languages or []),
@@ -59,7 +52,7 @@ class ESMixin(ORMSearchable):
         })
 
 
-class Translator(Base, TimestampMixin, DocumentsMixin):
+class Translator(Base, TimestampMixin, DocumentsMixin, ContentMixin):
 
     __tablename__ = 'translators'
 
@@ -79,7 +72,7 @@ class Translator(Base, TimestampMixin, DocumentsMixin):
     )
 
     # Quellensteuer
-    withholding_tax = Column(Text)
+    withholding_tax = Column(Boolean, default=False)
 
     gender = Column(Enum(*GENDERS, name='gender'))
     date_of_birth = Column(Date)
@@ -155,6 +148,19 @@ class Translator(Base, TimestampMixin, DocumentsMixin):
 
     # Besondere Hinweise Einsatzmöglichkeiten
     operation_comments = Column(Text)
+
+    # List of types of interpreting the interpreter can do
+    expertise_interpreting_types = meta_property(default=tuple)
+
+    # List of types of professional guilds
+    expertise_professional_guilds = meta_property(default=tuple)
+
+    # If entry was imported, for the form and the expertise fields
+    imported = Column(Boolean, default=False, nullable=False)
+
+    @property
+    def title(self):
+        return f'{self.last_name}, {self.first_name}'
 
     @property
     def full_name(self):

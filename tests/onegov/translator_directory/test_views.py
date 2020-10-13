@@ -8,7 +8,6 @@ from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 
 
-
 def test_view_new_translator(client):
     session = client.app.session()
     languages = create_languages(session)
@@ -27,14 +26,19 @@ def test_view_new_translator(client):
     assert 'Männlich' in page
     assert language_names[0] in page
     assert cert_names[0] in page
+    assert 'Simultandolmetschen' in page
+    assert 'Human- und Sozialwissenschaften' in page
 
+    page.form['pers_id'] = 978654
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
     page.form['social_sec_number'] = 'xxxx'
     page.form['zip_code'] = 'xxxx'
+    page.form['iban'] = 'xxxx'
     page = page.form.submit()
     assert "Ungültige AHV-Nummer" in page
     assert "Postleitzahl muss aus 4 Ziffern bestehen" in page
+    assert "Ungültige Eingabe" in page
 
     # input required fields
     page.form['social_sec_number'] = '756.1234.5678.97'
@@ -47,8 +51,10 @@ def test_view_new_translator(client):
     page.form['email'] = 'Test@test.com'
     page.form['spoken_languages_ids'] = [language_ids[0], language_ids[1]]
     page.form['written_languages_ids'] = [language_ids[2]]
+    page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
 
     page = page.form.submit().follow()
+    assert '978654' in page
     assert 'Uncle' in page
     assert 'Bob' in page
     # test lower-casing the user input
@@ -58,6 +64,7 @@ def test_view_new_translator(client):
     assert '756.1234.5678.97' in page
     assert 'All okay' in page
     assert '7890' in page
+    assert 'DE07 1234 1234 1234 1234 12' in page
 
     # Test mother tongue set to the first ordered option
     assert language_names[3] in page
@@ -69,6 +76,15 @@ def test_view_new_translator(client):
     # test written languages
     assert language_names[2] in page
 
+    # test editors access on the edit view
+    trs_url = page.request.url
+    editor = client.spawn()
+    editor.login_editor()
+    edit_page = editor.get(trs_url).click('Bearbeiten')
+    assert '978654' in page
+    edit_page.form['pers_id'] = 123456
+    edit_page.form.submit().follow()
+
     # edit some key attribute
     page = page.click('Bearbeiten')
     assert 'Zulassung' in page
@@ -76,7 +92,7 @@ def test_view_new_translator(client):
     tel_mobile = '044 123 50 50'
     page.form['pers_id'] = 123456
     page.form['admission'] = 'in_progress'
-    page.form['withholding_tax'] = 'ATAX'
+    page.form['withholding_tax'] = True
     page.form['gender'] = 'F'
     page.form['date_of_birth'] = '2019-01-01'
     page.form['nationality'] = 'PERU'
@@ -99,13 +115,13 @@ def test_view_new_translator(client):
     page.form['agency_references'] = 'Kt. ZG'
     page.form['education_as_interpreter'] = True
     page.form['comments'] = 'My Comments'
+    page.form['operation_comments'] = 'operational'
 
     # # Todo: self.content is nullable so I don't get it, in EventForm is works too
     # page.form['coordinates'] = encode_map_value({
     #     'lat': 47, 'lon': 8, 'zoom': 12
     # })
 
-    # Todo: uncomment below and you get 404 cause a new model is beeing created wtf
     page.form['for_admins_only'] = True
 
     # test removing all languages
@@ -117,7 +133,7 @@ def test_view_new_translator(client):
 
     assert '123456' in page
     assert 'im Zulassungsverfahren' in page
-    assert 'ATAX' in page
+    assert 'Ja' in page
     assert 'Weiblich' in page
     assert '01.01.2019' in page
     assert 'PERU' in page
@@ -138,12 +154,12 @@ def test_view_new_translator(client):
     assert 'ZHCW' in page
     assert 'Kt. ZG' in page
     assert 'My Comments' in page
+    assert 'operational' in page
 
     assert language_names[3] in page
     assert language_names[0] not in page
     assert language_names[1] not in page
     assert language_names[2] not in page
-    trs_url = page.request.url
 
     # # try adding another with same email
     page = client.get('/translators/new')

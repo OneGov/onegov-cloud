@@ -1,4 +1,3 @@
-
 from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.translator_directory.constants import full_text_max_chars
@@ -22,12 +21,16 @@ class TranslatorCollection(GenericCollection, Pagination):
             order_by=None,
             order_desc=False,
             user_role=None,
-            search=None
+            search=None,
+            guilds=None,
+            interpret_types=None
     ):
         super().__init__(session)
         self.page = page
         self.user_role = user_role
         self.search = self.truncate(search, maxchars=full_text_max_chars)
+        self.guilds = guilds or []
+        self.interpret_types = interpret_types or []
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
@@ -52,7 +55,9 @@ class TranslatorCollection(GenericCollection, Pagination):
             self.spoken_langs == other.spoken_langs,
             self.order_by == other.order_by,
             self.order_desc == other.order_desc,
-            self.search == other.search
+            self.search == other.search,
+            self.guilds == other.guilds,
+            self.interpret_types == other.interpret_types
         ))
 
     @staticmethod
@@ -96,6 +101,20 @@ class TranslatorCollection(GenericCollection, Pagination):
         cols = self.search_columns
         return tuple(col.ilike(f'%{word}%') for col in cols for word in words)
 
+    @property
+    def by_professional_guilds_expression(self):
+        return tuple(
+            Translator.meta['expertise_professional_guilds'].contains((v, ))
+            for v in self.guilds
+        )
+
+    @property
+    def by_interpreting_types_expression(self):
+        return tuple(
+            Translator.meta['expertise_interpreting_types'].contains((v,))
+            for v in self.interpret_types
+        )
+
     def page_by_index(self, index):
         return self.__class__(
             self.session,
@@ -127,6 +146,12 @@ class TranslatorCollection(GenericCollection, Pagination):
 
         if self.search:
             query = query.filter(or_(*self.by_search_term_expression))
+
+        if self.interpret_types:
+            query = query.filter(and_(*self.by_interpreting_types_expression))
+
+        if self.guilds:
+            query = query.filter(and_(*self.by_professional_guilds_expression))
 
         query = query.order_by(self.order_expression)
         return query

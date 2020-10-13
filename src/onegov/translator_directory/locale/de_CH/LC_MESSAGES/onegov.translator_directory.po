@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-12 09:40+0200\n"
+"POT-Creation-Date: 2020-09-28 17:36+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -28,11 +28,59 @@ msgstr "Männlich"
 msgid "feminin"
 msgstr "Weiblich"
 
+msgid "Nutrition and agriculture"
+msgstr "Ernährung und Landwirtschaft"
+
+msgid "Economy"
+msgstr "Wirtschaft"
+
+msgid "Art and leisure"
+msgstr "Kunst und Freizeit"
+
+msgid "Business economics"
+msgstr "Betriebswirtschaft"
+
+msgid "Banking and finance"
+msgstr "Banken und Finanzen"
+
+msgid "Social science"
+msgstr "Human- und Sozialwissenschaften"
+
+msgid "Industry and service sector"
+msgstr "Industrie und Dienstleistungssektor"
+
+msgid "Engineering"
+msgstr "Ingenieurwesen"
+
+msgid "International relations and organisations"
+msgstr "Internat. Beziehungen und internationale Organisationen"
+
+msgid "Law and insurance industry"
+msgstr "Recht und Versicherungswesen"
+
+msgid "Military"
+msgstr "Militär"
+
+msgid "Simultaneous interpreting"
+msgstr "Simultandolmetschen"
+
+msgid "Consecutive interpreting"
+msgstr "Konsektutivdolmetschen"
+
+msgid "Negotiation interpreting"
+msgstr "Verhandlungsdolmetschen"
+
+msgid "Whisper interpreting"
+msgstr "Flüsterdolmetschen"
+
+msgid "Written translations"
+msgstr "Schriftliche Übersetzungen"
+
 msgid "Logout"
 msgstr "Abmelden"
 
-msgid "Users"
-msgstr "Benutzer"
+msgid "Settings"
+msgstr "Einstellungen"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -62,11 +110,17 @@ msgstr "Personal Nr."
 msgid "Admission"
 msgstr "Zulassung"
 
-msgid "First name"
-msgstr "Vorname"
+msgid "Withholding tax"
+msgstr "Quellensteuer"
 
 msgid "Last name"
 msgstr "Nachname"
+
+msgid "Personal Information"
+msgstr "Persönliche Informationen"
+
+msgid "First name"
+msgstr "Vorname"
 
 msgid "Gender"
 msgstr "Geschlecht"
@@ -74,14 +128,14 @@ msgstr "Geschlecht"
 msgid "Date of birth"
 msgstr "Geburtsdatum"
 
-msgid "Personal Information"
-msgstr "Persönliche Informationen"
-
 msgid "Nationality"
 msgstr "Nationalität"
 
+msgid "Street and house number"
+msgstr "Strasse und Hausnummer"
+
 msgid "Address"
-msgstr "Addresse"
+msgstr "Anschrift"
 
 msgid "Zip Code"
 msgstr "PLZ"
@@ -90,10 +144,13 @@ msgid "City"
 msgstr "Ort"
 
 msgid "Drive distance"
-msgstr "Wegberechung"
+msgstr "Wegberechnung"
 
 msgid "Swiss social security number"
 msgstr "AHV-Nr."
+
+msgid "Identification / bank account"
+msgstr "Identifikation / Bankverbindung"
 
 msgid "Bank name"
 msgstr "Bank Name"
@@ -104,11 +161,14 @@ msgstr "Bank Adresse"
 msgid "Account owner"
 msgstr "Bank Konto lautend auf"
 
+msgid "IBAN"
+msgstr ""
+
 msgid "Email"
 msgstr ""
 
-msgid "Withholding tax"
-msgstr "Quellensteuer"
+msgid "Contact information"
+msgstr "Kontakt"
 
 msgid "Mobile Number"
 msgstr "Telefon Mobile"
@@ -122,11 +182,23 @@ msgstr "Telefon Geschäft"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
+msgid "Comments on possible field of application"
+msgstr "Besondere Hinweise Einsatzmöglichkeiten"
+
 msgid "Name revealing confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
+msgid "Legal information"
+msgstr "Rechtliches"
+
+msgid "Consent to the disclosure of the name to other persons and authorities"
+msgstr "Zustimmung zur Bekanntgabe des Namens an weitere Personen und Behörden"
+
 msgid "Date of application"
 msgstr "Bewerbung Datum"
+
+msgid "Admission to the directory"
+msgstr "Zulassung ins Verzeichnis"
 
 msgid "Date of decision"
 msgstr "Entscheid Datum"
@@ -134,11 +206,20 @@ msgstr "Entscheid Datum"
 msgid "Mother tongues"
 msgstr "Muttersprachen"
 
+msgid "Language training and expertise"
+msgstr "Sprachausbildung und Expertise"
+
 msgid "Spoken languages"
 msgstr "Sprachen Wort"
 
 msgid "Written languages"
 msgstr "Sprachen Schrift"
+
+msgid "Expertise by professional guild"
+msgstr "Fachkenntnisse nach Berufssparte"
+
+msgid "Expertise by interpreting type"
+msgstr "Fachkenntnisse nach Dolmetscherart"
 
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
@@ -210,7 +291,7 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 msgid "Edit translator"
-msgstr "Übersetzer/in"
+msgstr "Übersetzer/in bearbeiten"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
@@ -239,9 +320,6 @@ msgstr "Schreibende"
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
-msgid "Name reveal confirmation"
-msgstr "Zustimmung Namensbekanntgabe"
-
 msgid "Certificates"
 msgstr "Zertifikate"
 
@@ -269,13 +347,19 @@ msgid "Language successfully deleted"
 msgstr "Sprache erfolgreich gelöscht"
 
 msgid "E-Mail Address / Username / Shortcut"
-msgstr "E-Mail / Nutzername / Kürzel"
+msgstr "E-Mail / Benutzername / Kürzel"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
+msgid "Submit Search"
+msgstr "Suchen"
+
 msgid "Translator directory"
 msgstr "Übersetzerverzeichnis"
+
+msgid "Name reveal confirmation"
+msgstr "Zustimmung Namensbekanntgabe"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
@@ -283,11 +367,14 @@ msgstr "Ihre Änderungen wurden gespeichert"
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
 
+#~ msgid "Language training"
+#~ msgstr "Sprachausbildung"
+
+#~ msgid "Users"
+#~ msgstr "Benutzer"
+
 #~ msgid "Driving distance"
 #~ msgstr "Wegberechnung"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
 
 #~ msgid "Mother tongue"
 #~ msgstr "Muttersprache"

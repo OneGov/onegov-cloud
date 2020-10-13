@@ -1,6 +1,6 @@
-from onegov.fsi.views.login import FsiLoginForm
 from onegov.translator_directory import _
 from onegov.core.security import Public
+from onegov.fsi.views.login import FsiLoginForm
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.user import Auth
 from onegov.org.views.auth import handle_login as handle_login_base

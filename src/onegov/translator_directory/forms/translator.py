@@ -9,17 +9,18 @@ from wtforms.validators import (
 )
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField, MultiCheckboxField
 
 from onegov.form.validators import ValidPhoneNumber, \
-    ValidSwissSocialSecurityNumber, StrictOptional
+    ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
 from onegov.translator_directory.constants import (
-    full_text_max_chars, GENDERS, GENDERS_DESC, ADMISSIONS, ADMISSIONS_DESC
+    full_text_max_chars, GENDERS, ADMISSIONS,
+    INTERPRETING_TYPES, PROFESSIONAL_GUILDS
 )
 from onegov.translator_directory.models.translator import Translator, \
     mother_tongue_association_table, \
@@ -53,7 +54,7 @@ class FormChoicesMixin:
     def gender_choices(self):
         return tuple(
             (id_, self.request.translate(choice))
-            for id_, choice in zip(GENDERS, GENDERS_DESC)
+            for id_, choice in GENDERS.items()
         )
 
     @staticmethod
@@ -61,6 +62,31 @@ class FormChoicesMixin:
         return [
             str(item.id) for item in getattr(model, attr)
         ]
+
+    @cached_property
+    def interpret_types_choices(self):
+        return tuple(
+            (k, self.request.translate(v))
+            for k, v in INTERPRETING_TYPES.items()
+        )
+
+    @cached_property
+    def guilds_choices(self):
+        return tuple(
+            (k, self.request.translate(v))
+            for k, v in PROFESSIONAL_GUILDS.items()
+        )
+
+
+class EditorTranslatorForm(Form, FormChoicesMixin):
+
+    pers_id = IntegerField(
+        label=_('Personal ID'),
+        validators=[Optional()]
+    )
+
+    def update_model(self, model):
+        model.pers_id = self.pers_id.data or None
 
 
 class TranslatorForm(Form, FormChoicesMixin):
@@ -73,58 +99,73 @@ class TranslatorForm(Form, FormChoicesMixin):
     admission = RadioField(
         label=_('Admission'),
         choices=tuple(
-            (id_, label) for id_, label in zip(ADMISSIONS, ADMISSIONS_DESC)
+            (id_, label) for id_, label in ADMISSIONS.items()
         ),
-        default=ADMISSIONS[0]
+        default=list(ADMISSIONS)[0]
+    )
+
+    withholding_tax = BooleanField(
+        label=_('Withholding tax'),
+        default=False
+    )
+
+    last_name = StringField(
+        label=_('Last name'),
+        validators=[InputRequired()],
+        fieldset=_('Personal Information')
     )
 
     first_name = StringField(
         label=_('First name'),
         validators=[InputRequired()],
-    )
-
-    last_name = StringField(
-        label=_('Last name'),
-        validators=[InputRequired()]
+        fieldset=_('Personal Information')
     )
 
     gender = SelectField(
         label=_('Gender'),
         validators=[StrictOptional()],
-        choices=[]
+        choices=[],
+        fieldset=_('Personal Information')
     )
 
     date_of_birth = DateField(
         label=_('Date of birth'),
-        fieldset=_('Personal Information'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Personal Information')
     )
 
     nationality = StringField(
         label=_('Nationality'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Personal Information')
     )
 
     address = StringField(
-        label=_('Address'),
+        label=_('Street and house number'),
+        fieldset=_('Address')
     )
 
     zip_code = StringField(
         label=_('Zip Code'),
+        fieldset=_('Address')
     )
 
     city = StringField(
         label=_('City'),
+        fieldset=_('Address')
     )
 
     drive_distance = FloatField(
         label=_('Drive distance'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Address'),
+        render_kw={'disabled': True}
     )
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
         validators=[Optional(), ValidSwissSocialSecurityNumber()],
+        fieldset=_('Identification / bank account')
     )
 
     bank_name = StringField(
@@ -139,13 +180,15 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Account owner')
     )
 
+    iban = StringField(
+        label=_('IBAN'),
+        validators=[Optional(), Stdnum(format='iban')]
+    )
+
     email = EmailField(
         label=_('Email'),
         validators=[Optional(), Email()],
-    )
-
-    withholding_tax = StringField(
-        label=_('Withholding tax'),
+        fieldset=_('Contact information')
     )
 
     tel_mobile = StringField(
@@ -167,24 +210,34 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Availability'),
     )
 
+    operation_comments = TextAreaField(
+        label=_('Comments on possible field of application'),
+        render_kw={'rows': 3}
+    )
+
     confirm_name_reveal = BooleanField(
         label=_('Name revealing confirmation'),
+        fieldset=_('Legal information'),
+        description=_('Consent to the disclosure of the name '
+                      'to other persons and authorities')
     )
 
     date_of_application = DateField(
         label=_('Date of application'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Admission to the directory')
     )
 
     date_of_decision = DateField(
         label=_('Date of decision'),
-        validators=[Optional()]
+        validators=[Optional()],
     )
 
     mother_tongues_ids = ChosenSelectMultipleField(
         label=_('Mother tongues'),
         validators=[InputRequired()],
-        choices=[]
+        choices=[],
+        fieldset=_('Language training and expertise')
     )
 
     spoken_languages_ids = ChosenSelectMultipleField(
@@ -197,6 +250,20 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Written languages'),
         validators=[StrictOptional()],
         choices=[]
+    )
+
+    expertise_professional_guilds = MultiCheckboxField(
+        label=_('Expertise by professional guild'),
+        choices=[
+            (id_, label) for id_, label in PROFESSIONAL_GUILDS.items()
+        ]
+    )
+
+    expertise_interpreting_types = MultiCheckboxField(
+        label=_('Expertise by interpreting type'),
+        choices=[
+            (id_, label) for id_, label in INTERPRETING_TYPES.items()
+        ]
     )
 
     proof_of_preconditions = StringField(
@@ -269,6 +336,10 @@ class TranslatorForm(Form, FormChoicesMixin):
         self.written_languages_ids.choices = self.language_choices
         self.certificates_ids.choices = self.certificate_choices
 
+        if isinstance(self.model, Translator) and self.model.imported:
+            self.delete_field('expertise_interpreting_types')
+            self.delete_field('expertise_professional_guilds')
+
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
@@ -305,13 +376,9 @@ class TranslatorForm(Form, FormChoicesMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
-        """
-        We update the model by field explicitely, since using field names with
-        setattr or getattr creates new database instance of the model
-        """
         model.pers_id = self.pers_id.data or None
         model.admission = self.admission.data
-        model.withholding_tax = self.withholding_tax.data or None
+        model.withholding_tax = self.withholding_tax.data
         model.gender = self.gender.data
         model.date_of_birth = self.date_of_birth.data or None
         model.nationality = self.nationality.data or None
@@ -336,11 +403,18 @@ class TranslatorForm(Form, FormChoicesMixin):
         model.education_as_interpreter = self.education_as_interpreter.data
         model.comments = self.comments.data or None
         model.for_admins_only = self.for_admins_only.data
+        model.operation_comments = self.operation_comments.data or None
 
         self.update_association(model, 'mother_tongues', '_ids')
         self.update_association(model, 'spoken_languages', '_ids')
         self.update_association(model, 'written_languages', '_ids')
         self.update_association(model, 'certificates', '_ids')
+
+        if not self.model.imported:
+            model.expertise_professional_guilds = \
+                self.expertise_professional_guilds.data
+            model.expertise_interpreting_types = \
+                self.expertise_interpreting_types.data
 
 
 class TranslatorSearchForm(Form, FormChoicesMixin):
@@ -352,6 +426,16 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 
     written_langs = ChosenSelectMultipleField(
         label=_('Written languages'),
+        choices=[]
+    )
+
+    interpret_types = ChosenSelectMultipleField(
+        label=_('Expertise by interpreting type'),
+        choices=[]
+    )
+
+    guilds = ChosenSelectMultipleField(
+        label=_('Expertise by professional guild'),
         choices=[]
     )
 
@@ -388,6 +472,8 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.order_by.data = model.order_by
         self.order_desc.data = model.order_desc and '1' or '0'
         self.search.data = model.search
+        self.interpret_types.data = model.interpret_types or []
+        self.guilds.data = model.guilds or []
 
     def update_model(self, model):
         model.spoken_langs = self.spoken_langs.data
@@ -395,7 +481,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.order_by = self.order_by.data
         model.order_desc = self.order_desc.data == '1' and True or False
         model.search = self.search.data
+        model.interpret_types = self.interpret_types.data
+        model.guilds = self.guilds.data
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
         self.written_langs.choices = self.language_choices
+        self.guilds.choices = self.guilds_choices
+        self.interpret_types.choices = self.interpret_types_choices

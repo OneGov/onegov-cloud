@@ -7,7 +7,8 @@ from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import member_can_see, \
-    editor_can_see, GENDERS_DESC, GENDERS, ADMISSIONS_DESC, ADMISSIONS
+    editor_can_see, GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, \
+    INTERPRETING_TYPES
 
 
 class DefaultLayout(BaseLayout):
@@ -21,7 +22,7 @@ class DefaultLayout(BaseLayout):
         return ', '.join(sorted((lang.name for lang in languages or [])))
 
     def format_gender(self, gender):
-        return self.request.translate(GENDERS_DESC[GENDERS.index(gender)])
+        return self.request.translate(GENDERS[gender])
 
     @staticmethod
     def format_drive_distance(number):
@@ -34,7 +35,29 @@ class DefaultLayout(BaseLayout):
         return self.request.translate((_('Yes') if val else _('No')))
 
     def format_admission(self, val):
-        return self.request.translate(ADMISSIONS_DESC[ADMISSIONS.index(val)])
+        return self.request.translate(ADMISSIONS[val])
+
+    def show(self, attribute_name):
+        """Some attributes on the translator are hidden for less privileged
+        users"""
+        if self.request.is_member:
+            return attribute_name in member_can_see
+        if self.request.is_editor:
+            return attribute_name in editor_can_see
+        return True
+
+    def color_class(self, count):
+        """ Depending how rare a language is offered by translators,
+        apply a color code using the returned css class
+        """
+        if count <= 5:
+            return 'text-orange'
+
+    def format_prof_guild(self, key):
+        return self.request.translate(PROFESSIONAL_GUILDS[key])
+
+    def format_interpreting_type(self, key):
+        return self.request.translate(INTERPRETING_TYPES[key])
 
 
 class TranslatorLayout(DefaultLayout):
@@ -85,46 +108,28 @@ class TranslatorLayout(DefaultLayout):
                     )
                 )
             ]
+        elif self.request.is_editor:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(
+                        self.model, name='edit-restricted'
+                    ),
+                    attrs={'class': 'edit-link'}
+                )
+            ]
 
     @cached_property
     def breadcrumbs(self):
-        links = super().breadcrumbs
-        links.append(
+        links = super().breadcrumbs + [
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
-            )
-        )
+            ),
+            Link(text=self.model.title)
+        ]
+
         return links
-
-    def show(self, attribute_name):
-        """Some attributes on the translator are hidden for less privileged
-        users"""
-        if self.request.is_member:
-            return attribute_name in member_can_see
-        if self.request.is_editor:
-            return attribute_name in editor_can_see
-        return True
-
-    def format_gender(self, gender):
-        return self.request.translate(GENDERS_DESC[GENDERS.index(gender)])
-
-    @staticmethod
-    def format_drive_distance(number):
-        if not number:
-            return ''
-        return f'{number} km'
-
-    @staticmethod
-    def format_languages(languages):
-        return ', '.join(sorted((lang.name for lang in languages or [])))
-
-    def color_class(self, count):
-        """ Depending how rare a language is offered by translators,
-        apply a color code using the returned css class
-        """
-        if count <= 5:
-            return 'text-orange'
 
 
 class EditTranslatorLayout(TranslatorLayout):
@@ -139,28 +144,20 @@ class EditTranslatorLayout(TranslatorLayout):
         return links
 
 
-class AddTranslatorLayout(TranslatorLayout):
-
-    @cached_property
-    def title(self):
-        return _('Add translator')
-
-    @cached_property
-    def breadcrumbs(self):
-        links = super().breadcrumbs
-        links.append(Link(_('Add')))
-        return links
-
-    @property
-    def editbar_links(self):
-        return []
-
-
-class TranslatorCollectionLayout(TranslatorLayout):
+class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self):
         return _('Search for translators')
+
+    @cached_property
+    def breadcrumbs(self):
+        return super().breadcrumbs + [
+            Link(
+                text=_('Translators'),
+                url=self.request.class_link(TranslatorCollection)
+            )
+        ]
 
     @cached_property
     def editbar_links(self):
@@ -190,6 +187,23 @@ class TranslatorCollectionLayout(TranslatorLayout):
                     url=self.request.class_link(
                         TranslatorCollection, name='export'))
             ]
+
+
+class AddTranslatorLayout(TranslatorCollectionLayout):
+
+    @cached_property
+    def title(self):
+        return _('Add translator')
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Add')))
+        return links
+
+    @property
+    def editbar_links(self):
+        return []
 
 
 class LanguageCollectionLayout(DefaultLayout):

@@ -6,7 +6,7 @@ import click
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
 from onegov.fsi.cli import fetch_users
-from onegov.translator_directory.constants import GENDERS, CERTIFICATES
+from onegov.translator_directory.constants import CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
 from onegov.translator_directory.models.language import Language
@@ -85,10 +85,10 @@ def import_certifcates(csvfile, session):
 
 def parse_gender(field):
     if not field:
-        return GENDERS[-1]
+        return 'N'
     if field == 'Männlich':
-        return GENDERS[0]
-    return GENDERS[1]
+        return 'M'
+    return 'F'
 
 
 def parse_date(field):
@@ -204,6 +204,7 @@ def import_translators(csvfile, session):
         trs.written_languages = get_languages(
             tuple(parse_language_field(line.sprachen_wort)), session
         )
+        trs.imported = True
 
         session.add(trs)
         session.flush()

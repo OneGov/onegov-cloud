@@ -16,6 +16,10 @@
                                 <dt i18n:translate>Admission</dt>
                                 <dd>${layout.format_admission(model.admission)}</dd>
                             </dl>
+                             <dl class="field-display" tal:condition="model.withholding_tax and layout.show('withholding_tax')">
+                                <dt i18n:translate>Withholding tax</dt>
+                                <dd>${layout.format_boolean(model.withholding_tax)}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.gender and layout.show('gender')">
                                 <dt i18n:translate>Gender</dt>
                                 <dd>${layout.format_gender(model.gender)}</dd>
@@ -60,13 +64,13 @@
                                 <dt i18n:translate>Account owner</dt>
                                 <dd>${model.account_owner}</dd>
                             </dl>
+                            <dl class="field-display" tal:condition="model.iban and layout.show('iban')">
+                                <dt i18n:translate>IBAN</dt>
+                                <dd>${model.iban}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.email and layout.show('email')">
                                 <dt i18n:translate>Email</dt>
                                 <dd tal:content="structure layout.linkify(model.email)"></dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.withholding_tax and layout.show('withholding_tax')">
-                                <dt i18n:translate>Withholding tax</dt>
-                                <dd>${model.withholding_tax}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.tel_private and layout.show('tel_private')">
                                 <dt i18n:translate>Private Phone Number</dt>
@@ -84,9 +88,25 @@
                                 <dt i18n:translate>Availability</dt>
                                 <dd>${model.availability}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.confirm_name_reveal and layout.show('confirm_name_reveal')">
-                                <dt i18n:translate>Name reveal confirmation</dt>
-                                <dd>${layout.format_boolean(model.confirm_name_reveal)}</dd>
+                            <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
+                                <dt i18n:translate>Availability</dt>
+                                <dd>${model.availability}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.expertise_interpreting_types and layout.show('expertise_interpreting_types')">
+                                <dt i18n:translate>Expertise by interpreting type</dt>
+                                <dd>
+                                    <tal:b tal:repeat="expertise model.expertise_interpreting_types">${layout.format_interpreting_type(expertise)}<br></tal:b>
+                                </dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.expertise_professional_guilds and layout.show('expertise_professional_guilds')">
+                                <dt i18n:translate>Expertise by professional guild</dt>
+                                <dd>
+                                    <tal:b tal:repeat="expertise model.expertise_professional_guilds">${layout.format_prof_guild(expertise)}<br></tal:b>
+                                </dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.operation_comments and layout.show('operation_comments')">
+                                <dt i18n:translate>Comments on possible field of application</dt>
+                                <dd>${model.operation_comments}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.date_of_application and layout.show('date_of_application')">
                                 <dt i18n:translate>Date of application</dt>

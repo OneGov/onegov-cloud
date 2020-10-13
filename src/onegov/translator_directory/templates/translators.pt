@@ -29,7 +29,13 @@
                                 <tbody>
                                     <tr tal:repeat="translator results">
                                         <td tal:condition="layout.show('pers_id')">${translator.pers_id or ''}</td>
-                                        <td tal:condition="layout.show('withholding_tax')">${translator.withholding_tax or ''}</td>
+                                        <td tal:condition="layout.show('withholding_tax')" class="text-center">
+                                            <tal:b tal:switch="translator.withholding_tax">
+                                                <span tal:case="True" class="check-icon"></span>
+                                                <span tal:case="False">-</span>
+                                            </tal:b>
+
+                                            </td>
                                         <td><a href="${request.link(translator)}">${translator.full_name}</a></td>
                                         <td>
                                             <tal:b tal:repeat="language translator.written_languages">

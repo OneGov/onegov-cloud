@@ -13,8 +13,8 @@ translator_data = dict(
     first_name='Hugo',
     last_name='Benito',
     admission=None,
-    withholding_tax='tax',
-    gender=GENDERS[0],
+    withholding_tax=False,
+    gender=list(GENDERS.keys())[0],
     date_of_birth=date.today(),
     nationality='CH',
     address='Downing Street 5',
@@ -36,7 +36,9 @@ translator_data = dict(
     proof_of_preconditions='all okay',
     agency_references='Some ref',
     education_as_interpreter=False,
-    comments=None
+    comments=None,
+    expertise_professional_guilds=tuple(),
+    expertise_interpreting_types=tuple()
 )
 
 
