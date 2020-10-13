@@ -2,13 +2,10 @@ import os
 
 import pytest
 
-from onegov.core.utils import Bunch
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.report import TranslatorVoucher
 from tests.onegov.translator_directory.shared import translator_data
 from tests.shared.utils import open_in_excel
-from xlrd import open_workbook
-from xlutils.copy import copy
 
 
 @pytest.mark.skip('In development')
