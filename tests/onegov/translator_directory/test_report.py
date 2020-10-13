@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from onegov.core.utils import Bunch
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.report import TranslatorVoucher
@@ -9,6 +11,7 @@ from xlrd import open_workbook
 from xlutils.copy import copy
 
 
+@pytest.mark.skip('In development')
 def test_translator_voucher(client):
 
     translator = Translator(**translator_data)
