@@ -30,7 +30,7 @@ class TranslatorVoucher(object):
         'font_name': 'Arial',
         'locked': True,
         'font_size': font_size,
-        'align': 'center'
+        'align': 'vcenter'
     }
     """
     write a number ws.write_number
