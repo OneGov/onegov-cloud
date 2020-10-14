@@ -385,7 +385,7 @@ class TranslatorVoucher(object):
         subheaders(row + 11, 0, subtitles)
         input_block(row + 12, 0, numrows=3, formats=date_time_fmts)
 
-        headers(row + 15, 'Dolmetschertätigkeit bei ausserordentlich '
+        headers(row + 15, 'Bei ausserordentlich '
                           'schwierigen Übersetzungen - '
                           'zuschlagsberechtigter Zeitraum +25 % - '
                           '(§ 15 Abs. 1 lit. b, 20:00-06:00)')
