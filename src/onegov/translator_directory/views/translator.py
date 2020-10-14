@@ -222,7 +222,7 @@ def edit_translator(self, request, form):
 def edit_translator_as_editor(self, request, form):
 
     if request.is_admin:
-        self.request.redirect(self.request.link(self, name='edit'))
+        return request.redirect(request.link(self, name='edit'))
 
     if form.submitted(request):
         form.update_model(self)
