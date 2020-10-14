@@ -63,14 +63,29 @@ class TranslatorVoucher(object):
             'bg_color': self.green
         })
 
+        input_centered = {
+            'bg_color': self.edit_color, 'align': 'center', 'locked': False}
+        centered = {'align': 'center'}
+
         self.thead_lightgreen = self.add_format({
             'font_size': self.subheader_font_size,
-            'bg_color': self.light_green
+            'bg_color': self.light_green,
+            **centered
         })
 
-        self.tsubhead = self.add_format({'bg_color': self.lila})
-        input_centered = {'bg_color': self.edit_color, 'align': 'center'}
-        centered = {'align': 'center'}
+        self.thead_lightgreen_left = self.add_format({
+            'font_size': self.subheader_font_size,
+            'bg_color': self.light_green,
+            **centered
+        })
+
+        self.tsubhead = self.add_format({
+            'bg_color': self.lila,
+            'font_size': self.subheader_font_size,
+            **centered
+        })
+
+        self.tsubhead_left = self.add_format({'bg_color': self.lila})
 
         self.input_time_fmt = self.add_format(
             {'num_format': 'HH:MM', **input_centered})
@@ -101,6 +116,9 @@ class TranslatorVoucher(object):
         )
         self.bg_white_fmt = self.add_format(
             {'bg_color': 'white'}
+        )
+        self.hour_fmt = self.add_format(
+            {'num_format': 'h:mm', **centered}
         )
 
     def to_width(self, value):
@@ -133,7 +151,7 @@ class TranslatorVoucher(object):
                 'select_unlocked_cells': True,
             }
         """
-        options = {}
+        options = {'select_locked_cells': False}
         self.ws.protect(password, options)
 
     def set_col_widths(self, widths, start=0):
@@ -219,45 +237,40 @@ class TranslatorVoucher(object):
         self.merge_range('G13:H13', None, self.editable_fmt)
 
     def write_formulas(self):
-        # static and hidden fields
-        self.write('N17', 12, self.number_fmt)
-        self.ws.write_formula('N18', '=CEILING.XCL(C17-B17,1/(24*N17))')
-        for row in range(17, 33 + 1):
-            self.ws.write_formula(
-                f'M{row}',
-                f'=IF(C{row}=0,"00:00",IF(AND(C{row}-B{row})<=0.04,"01:00",'
-                f'IF(AND(C{row}-B{row}),CEILING.XCL(C{row}-B{row},'
-                f'1/(24*$N$17)))))')
-
         fields_for_total = []
 
+        def hour_diff(rw):
+            return f'=IF(ISBLANK(B{rw}), 0, IF(ISBLANK(C{rw}), 0, ' \
+                   f'IF((C{rw}-B{rw})<=0.04,0.04167, C{rw}-B{rw})))'
+
         for row in range(17, 19 + 1):
-            self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
+            self.ws.write_formula(f'D{row}', hour_diff(row), self.hour_fmt)
             self.ws.write_formula(f'G{row}', f'=D{row}*24', self.float_fmt)
             self.ws.write_formula(
                 f'H{row}', f'=ROUND((G{row}*75)*2,1)/2', self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(21, 23 + 1):
+            self.ws.write_formula(f'D{row}', hour_diff(row), self.hour_fmt)
             self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
-            self.ws.write_formula(f'G{row}', f'=D{row}*24*1.25')
-            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*75)*2,1)/2')
+                f'G{row}', f'=D{row}*24*1.25', self.float_fmt)
+            self.ws.write_formula(
+                f'H{row}', f'=ROUND((G{row}*75)*2,1)/2', self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(27, 29 + 1):
+            self.ws.write_formula(f'D{row}', hour_diff(row), self.hour_fmt)
+            self.ws.write_formula(f'G{row}', f'=D{row}*24', self.float_fmt)
             self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
-            self.ws.write_formula(f'G{row}', f'=D{row}*24')
-            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*95')
+                f'H{row}', f'=ROUND((G{row}*95', self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(31, 33 + 1):
+            self.ws.write_formula(f'D{row}', hour_diff(row), self.hour_fmt)
             self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
-            self.ws.write_formula(f'G{row}', f'=D{row}*24*1.25')
-            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*95)*2,1)/2')
+                f'G{row}', f'=D{row}*24*1.25', self.float_fmt)
+            self.ws.write_formula(
+                f'H{row}', f'=ROUND((G{row}*95)*2,1)/2', self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         def distance_flatrate_formula(row):
@@ -269,43 +282,56 @@ class TranslatorVoucher(object):
                 f'IF(AND(B{row}<100),80,"n. Vereinbarung")))))))'
 
         for row in range(37, 39 + 1):
-            self.ws.write_formula(f'E{row}',distance_flatrate_formula(row))
-            self.ws.write_formula(f'H{row}', f'=E{row}')
+            self.ws.write_formula(
+                f'E{row}', distance_flatrate_formula(row), self.float_fmt)
+            self.ws.write_formula(f'H{row}', f'=E{row}', self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(43, 45 + 1):
-            self.ws.write_formula(f'D{row}', f'=C{row}', self.time_fmt)
-            self.ws.write_formula(f'E{row}', distance_flatrate_formula(row))
-            self.ws.write_formula(f'G{row}', f'=D{row}*24')
+            self.ws.write_formula(f'D{row}', f'=C{row}', self.hour_fmt)
             self.ws.write_formula(
-                f'H{row}', f'=ROUND(((F{row}*G{row})+E{row})*2,1)/2')
+                f'E{row}', distance_flatrate_formula(row), self.float_fmt)
+            self.ws.write_formula(f'G{row}', f'=D{row}*24', self.float_fmt)
+            self.ws.write_formula(
+                f'H{row}',
+                f'=ROUND(((F{row}*G{row})+E{row})*2,1)/2',
+                self.subtotal_fmt
+            )
             fields_for_total.append(f'H{row}')
 
+        def round_pages_up(r):
+            return f'=IF(ISBLANK(B{r}),0,IF(AND(B{r}<0.5, B{r}>0),0.5,B{r}))'
+
         for row in range(49, 51 + 1):
-            self.ws.write_formula(f'D{row}', f'=CEILING.XCL(B{row},0.5)')
-            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*75)*2,1)/2')
+            self.ws.write_formula(
+                f'D{row}', round_pages_up(row), self.float_fmt)
+            self.ws.write_formula(
+                f'H{row}', f'=ROUND((D{row}*75)*2,1)/2', self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(53, 55 + 1):
-            self.ws.write_formula(f'D{row}', f'=B{row}')
-            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*75*1.25)*2,1)/2')
+            self.ws.write_formula(f'D{row}', f'=B{row}', self.float_fmt)
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*75*1.25)*2,1)/2',
+                                  self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(59, 61 + 1):
-            self.ws.write_formula(f'D{row}', f'=B{row}')
-            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2')
+            self.ws.write_formula(f'D{row}', f'=B{row}', self.float_fmt)
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2',
+                                  self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(63, 65 + 1):
-            self.ws.write_formula(f'D{row}', f'=B{row}')
-            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2')
+            self.ws.write_formula(f'D{row}', f'=B{row}', self.float_fmt)
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2',
+                                  self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(69, 71 + 1):
-            self.ws.write_formula(
-                f'D{row}', f'=CEILING.XCL(C{row}-B{row},1/96)')
-            self.ws.write_formula(f'G{row}', f'=D{row}*24')
-            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*E{row})*2,1)/2')
+            self.ws.write_formula(f'D{row}', hour_diff(row), self.float_fmt)
+            self.ws.write_formula(f'G{row}', f'=D{row}*24', self.float_fmt)
+            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*E{row})*2,1)/2',
+                                  self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         self.ws.write_formula(
@@ -318,6 +344,8 @@ class TranslatorVoucher(object):
             'Datum', 'von', 'bis', 'Total', '', '', 'Industrieminuten',
             'Zwischentotal'
         )
+        col_span = len(subtitles)
+        subheader_fmts = (self.tsubhead_left,) + col_span * (self.tsubhead, )
 
         def headers(row, text, format_=None):
             if not format_:
@@ -326,9 +354,9 @@ class TranslatorVoucher(object):
 
         def subheaders(row, col, subtitles, fmt=None):
             if not fmt:
-                fmt = self.tsubhead
-            for col_ix, text in enumerate(subtitles, col):
-                self.ws.write(row, col_ix, text, fmt)
+                fmt = subheader_fmts
+            for col_ix, (text, fmt_) in enumerate(zip(subtitles, fmt)):
+                self.ws.write(row, col_ix, text, fmt_)
 
         def input_block(start_row, start_col, numrows, formats):
             for ix in range(numrows):
@@ -393,9 +421,12 @@ class TranslatorVoucher(object):
         )
         subtitles = ('Datum', 'Anzahl Seiten', '', 'Total', '', '', '',
                      'Zwischentotal')
-        subheaders(row + 33, 0, subtitles, fmt=self.thead_lightgreen)
+        subheader_fmts = (self.thead_lightgreen_left,) + \
+                         col_span * (self.thead_lightgreen,)
+
+        subheaders(row + 33, 0, subtitles, fmt=subheader_fmts)
         input_block(row + 34, 0, numrows=3, formats=[
-            self.input_date_fmt, self.input_int_fmt])
+            self.input_date_fmt, self.input_float_fmt])
 
         headers(
             row + 37,
@@ -410,7 +441,7 @@ class TranslatorVoucher(object):
         headers(row+42, 'Übersetzungstätigkeit bei ausserordentlich '
                         'schwierigen Übersetzungen - (§ 15 Abs. 2 lit. b)',
                 self.thead_green)
-        subheaders(row + 43, 0, subtitles, fmt=self.thead_lightgreen)
+        subheaders(row + 43, 0, subtitles, fmt=subheader_fmts)
         input_block(row + 44, 0, numrows=3, formats=[
             self.input_date_fmt, self.input_int_fmt
         ])
@@ -430,7 +461,7 @@ class TranslatorVoucher(object):
                 )
         subheaders(row + 53, 0, (
             'Datum', 'von', 'bis', 'Total', 'Vereinb. Ansatz', '',
-            'Industrieminuten', 'Zwischentotal'))
+            'Industrieminuten', 'Zwischentotal'), subheader_fmts)
         input_block(row + 54, 0, numrows=3, formats=(
             self.input_date_fmt, self.input_time_fmt, self.input_time_fmt))
         input_block(row + 54, 4, numrows=3, formats=[self.input_float_fmt])
@@ -468,12 +499,12 @@ class TranslatorVoucher(object):
         self.write('I13', 'Auszug aus der Übersetzungsverordnung (BGS 161.15)')
 
     def create_document(self, protect_pw=None):
-        self.set_page_layout()
         self.write_formulas()
         self.create_header()
         current_row = self.create_table(row=14)
         self.create_footer(start_row=current_row + 1)
         self.create_off_page_content()
+        self.set_page_layout()
 
         if protect_pw:
             self.protect_with(protect_pw)
