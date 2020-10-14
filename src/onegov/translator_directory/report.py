@@ -70,13 +70,22 @@ class TranslatorVoucher(object):
 
         self.tsubhead = self.add_format({'bg_color': self.lila})
         input_centered = {'bg_color': self.edit_color, 'align': 'center'}
+        centered = {'align': 'center'}
 
         self.input_time_fmt = self.add_format(
             {'num_format': 'HH:MM', **input_centered})
+        self.time_fmt = self.add_format({
+            'num_format': 'HH:MM', **centered
+        })
         self.input_date_fmt = self.add_format(
             {'num_format': 'TT.MM.JJJJ', **input_centered})
+        self.date_fmt = self.add_format(
+            {'num_format': 'TT.MM.JJJJ', **centered})
         self.number_fmt = self.add_format(
             {'num_format': '0', 'align': 'center'}
+        )
+        self.subtotal_fmt = self.add_format(
+            {'num_format': '#,##0.00', 'italic': True, **centered}
         )
         self.input_dt_fmt = self.add_format(
             {'num_format': 'H:MM', **input_centered}
@@ -224,28 +233,29 @@ class TranslatorVoucher(object):
 
         for row in range(17, 19 + 1):
             self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
-            self.ws.write_formula(f'G{row}', f'=D{row}*24')
-            self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*75)*2,1)/2')
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
+            self.ws.write_formula(f'G{row}', f'=D{row}*24', self.float_fmt)
+            self.ws.write_formula(
+                f'H{row}', f'=ROUND((G{row}*75)*2,1)/2', self.subtotal_fmt)
             fields_for_total.append(f'H{row}')
 
         for row in range(21, 23 + 1):
             self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
             self.ws.write_formula(f'G{row}', f'=D{row}*24*1.25')
             self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*75)*2,1)/2')
             fields_for_total.append(f'H{row}')
 
         for row in range(27, 29 + 1):
             self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
             self.ws.write_formula(f'G{row}', f'=D{row}*24')
             self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*95')
             fields_for_total.append(f'H{row}')
 
         for row in range(31, 33 + 1):
             self.ws.write_formula(
-                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})')
+                f'D{row}', f'=IF(M{row}<0.04,"01:00",M{row})', self.time_fmt)
             self.ws.write_formula(f'G{row}', f'=D{row}*24*1.25')
             self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*95)*2,1)/2')
             fields_for_total.append(f'H{row}')
@@ -264,7 +274,7 @@ class TranslatorVoucher(object):
             fields_for_total.append(f'H{row}')
 
         for row in range(43, 45 + 1):
-            self.ws.write_formula(f'D{row}', f'=C{row}')
+            self.ws.write_formula(f'D{row}', f'=C{row}', self.time_fmt)
             self.ws.write_formula(f'E{row}', distance_flatrate_formula(row))
             self.ws.write_formula(f'G{row}', f'=D{row}*24')
             self.ws.write_formula(

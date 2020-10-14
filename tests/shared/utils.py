@@ -41,7 +41,7 @@ def open_in_excel(byte_string, exe='libreoffice'):
     with open(path, 'wb') as f:
         f.write(byte_string.read())
     cmd = exe + ' --calc -n' if exe == 'libreoffice' else exe
-    os.system(f'{cmd} {path}')
+    os.system(f'{cmd} {path} &')
 
 
 def create_image(width=50, height=50, output=None):
