@@ -222,6 +222,8 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
         'zgXAmtAbk': 'agency',
         'zgXAbteilung': 'department',
     }
+    admin_group = admin_group.lower()
+    editor_group = editor_group.lower()
 
     @lru_cache(maxsize=1)
     def match_school_domain(mail):
