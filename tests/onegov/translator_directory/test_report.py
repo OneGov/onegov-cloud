@@ -28,5 +28,5 @@ def test_translator_voucher(client):
         translator
     )
 
-    file = report.create_document('random_gen_password')
+    file = report.create_document()
     open_in_excel(file)
