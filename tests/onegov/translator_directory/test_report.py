@@ -1,4 +1,7 @@
+import os
 from io import BytesIO
+from uuid import uuid4
+
 import transaction
 
 from onegov.file import FileCollection
@@ -29,11 +32,14 @@ def test_translator_voucher(client):
         def include(self, value):
             pass
 
+    excerpt_path = os.path.join(app.static_files[0], 'law_zug.png')
+
     voucher = TranslatorVoucher(
         FakeRequest(),
         translator,
-        logo=BytesIO(file.reference.file.read())
+        logo=BytesIO(file.reference.file.read()),
+        law_excerpt_path=excerpt_path
     )
 
-    xlsx = voucher.create_document()
+    xlsx = voucher.create_document(protect_pw=str(uuid4()))
     open_in_excel(xlsx)

@@ -34,7 +34,7 @@ class TranslatorVoucher(object):
         'valign': 'vcenter'
     }
 
-    def __init__(self, request, translator, logo=None):
+    def __init__(self, request, translator, logo=None, law_excerpt_path=None):
         self.request = request
         self.translator = translator
         self.file = BytesIO()
@@ -42,6 +42,7 @@ class TranslatorVoucher(object):
         self.ws = self.wb.add_worksheet()
         self.layout = DefaultLayout(translator, request)
         self.logo = logo
+        self.law_excerpt = law_excerpt_path
 
         # Formats
         input_centered = {
@@ -801,13 +802,14 @@ class TranslatorVoucher(object):
 
     def create_off_page_content(self):
         self.write('I13', 'Auszug aus der Übersetzungsverordnung (BGS 161.15)')
+        self.ws.insert_image('I15', self.law_excerpt)
 
     def create_document(self, protect_pw=None):
         self.set_page_layout()
         self.set_logo()
         self.write_formulas()
         self.create_header()
-        current_row = self.create_table(row=14)
+        self.create_table(row=14)
         self.create_footer()
         self.create_off_page_content()
 
