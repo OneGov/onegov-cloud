@@ -34,13 +34,14 @@ class TranslatorVoucher(object):
         'valign': 'vcenter'
     }
 
-    def __init__(self, request, translator):
+    def __init__(self, request, translator, logo=None):
         self.request = request
         self.translator = translator
         self.file = BytesIO()
         self.wb = Workbook(self.file)
         self.ws = self.wb.add_worksheet()
         self.layout = DefaultLayout(translator, request)
+        self.logo = logo
 
         # Formats
         input_centered = {
@@ -337,10 +338,8 @@ class TranslatorVoucher(object):
         self.ws.write(position, data, fmt)
 
     def set_logo(self):
-        """
-        worksheet.set_header('&L&G', {'image_left': 'logo.jpg'})
-        """
-        pass
+        if self.logo:
+            self.ws.insert_image(0, 0, 'logo.png', {'image_data': self.logo})
 
     def spacer_row(self, rownum, fmt=None):
         return self.ws.set_row(rownum, 1.3 * 2.54, cell_format=fmt)
@@ -722,7 +721,6 @@ class TranslatorVoucher(object):
             f'A{row + 59}:G{row + 59}', 'Gesamttotal', self.total_fmt)
 
     def create_footer(self):
-        colspan = 7
         default = {
             'bg_color': self.white,
             'font_size': self.footer_font_size,
@@ -806,6 +804,7 @@ class TranslatorVoucher(object):
 
     def create_document(self, protect_pw=None):
         self.set_page_layout()
+        self.set_logo()
         self.write_formulas()
         self.create_header()
         current_row = self.create_table(row=14)

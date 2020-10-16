@@ -1,14 +1,20 @@
-import pytest
+from io import BytesIO
+import transaction
 
+from onegov.file import FileCollection
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.report import TranslatorVoucher
 from tests.onegov.translator_directory.shared import translator_data
-from tests.shared.utils import open_in_excel
+from tests.shared.utils import open_in_excel, create_image
 
 
 def test_translator_voucher(client):
-
+    app = client.app
     translator = Translator(**translator_data)
+    files = FileCollection(app.session())
+    file_id = files.add('logo.png', create_image()).id
+    transaction.commit()
+    file = files.by_id(file_id)
 
     class FakeRequest:
 
@@ -23,10 +29,11 @@ def test_translator_voucher(client):
         def include(self, value):
             pass
 
-    report = TranslatorVoucher(
+    voucher = TranslatorVoucher(
         FakeRequest(),
-        translator
+        translator,
+        logo=BytesIO(file.reference.file.read())
     )
 
-    file = report.create_document()
-    open_in_excel(file)
+    xlsx = voucher.create_document()
+    open_in_excel(xlsx)
