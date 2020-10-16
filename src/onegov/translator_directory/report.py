@@ -291,7 +291,7 @@ class TranslatorVoucher(object):
 
         self.ws.set_margins(
             left=mm_to_inch(20),
-            right=mm_to_inch(10),
+            right=mm_to_inch(15),
             bottom=mm_to_inch(10),
             top=mm_to_inch(17)
         )
