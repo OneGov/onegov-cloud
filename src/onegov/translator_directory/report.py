@@ -284,6 +284,17 @@ class TranslatorVoucher(object):
             self.ws.set_column(col, col, width)
 
     def set_page_layout(self):
+
+        def mm_to_inch(mm):
+            return mm / 25.4
+
+        self.ws.set_margins(
+            left=mm_to_inch(20),
+            right=mm_to_inch(10),
+            bottom=mm_to_inch(10),
+            top=mm_to_inch(17)
+        )
+
         self.ws.set_default_row(self.default_row_height)
         self.ws.set_row(72, 8 * 2.54)
         self.ws.set_paper(9)   # A4
