@@ -68,6 +68,14 @@ class TranslatorVoucher(object):
         self.title_fmt = self.add_format({
             'font_size': self.title_font_size, 'bold': True
         })
+        total_fmt = {
+            'bold': True,
+            'font_size': self.title_font_size - 1,
+            'font_color': self.white,
+            'bg_color': self.blue
+        }
+        self.total_fmt = self.add_format(total_fmt)
+        self.total_fmt_float = self.add_format({**total_fmt, **float_default})
 
         self.editable_fmt = self.add_format({
             'bg_color': self.edit_color, 'locked': False
@@ -276,14 +284,14 @@ class TranslatorVoucher(object):
 
     def set_page_layout(self):
         self.ws.set_default_row(self.default_row_height)
-        self.ws.set_row(72, 4.7 * 2.54)
+        self.ws.set_row(72, 8 * 2.54)
         self.ws.set_paper(9)   # A4
         # center fpr printing
         self.ws.center_horizontally()
 
         # set print area
-        self.ws.print_area('A1:H85')
-        # self.ws.fit_to_pages(1, 1)  # Fit to 1x1 pages.
+        self.ws.print_area('A1:H81')
+        self.ws.fit_to_pages(1, 1)  # Fit to 1x1 pages.
 
         # set col width as mm
         self.set_col_widths(self.to_width([
@@ -521,8 +529,10 @@ class TranslatorVoucher(object):
             self.empty_cell(f'F{row}', border_bottom=last)
             fields_for_total.append(f'H{row}')
 
-        self.ws.write_formula(
-            'H74', f'=ROUND(({"+".join(fields_for_total)})*2,1)/2'
+        self.ws.write(
+            'H73',
+            f'=ROUND(({"+".join(fields_for_total)})*2,1)/2',
+            self.total_fmt_float
         )
 
     def create_table(self, row):
@@ -697,10 +707,8 @@ class TranslatorVoucher(object):
         self.spacer_row(row + 57)
 
         # Main Total
-        # Todo adjust styles of total font size and row height
         self.merge_range(
-            f'A{row + 59}:G{row + 59}', 'Gesamttotal', self.thead_blue)
-        self.ws.write(f'H{row + 59}', None, self.thead_blue)
+            f'A{row + 59}:G{row + 59}', 'Gesamttotal', self.total_fmt)
         self.spacer_row(row + 59)
         return row + 59
 
