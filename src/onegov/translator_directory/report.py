@@ -302,7 +302,7 @@ class TranslatorVoucher(object):
         self.ws.center_horizontally()
 
         # set print area
-        self.ws.print_area('A1:H81')
+        self.ws.print_area('A1:H82')
         self.ws.fit_to_pages(1, 1)  # Fit to 1x1 pages.
 
         # set col width as mm
