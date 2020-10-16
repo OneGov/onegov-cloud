@@ -18,6 +18,7 @@ class TranslatorVoucher(object):
     title_font_size = 12
     font_size = 10
     subheader_font_size = 10
+    footer_font_size = 8
     default_row_height = 12.7     # 4.5mm
     edit_color = 'ffffcc'
     blue = '0066cc'
@@ -317,7 +318,7 @@ class TranslatorVoucher(object):
         return self.wb.add_format(self.coerce_fmts(formats, use_default))
 
     def merge_range(self, position, data, fmt=None):
-        return self.ws.merge_range(position, data, fmt)
+        return self.ws.merge_range(position, data, fmt or self.default_fmt)
 
     def write(self, position, data, fmt=None, use_default=True):
         if not fmt and use_default:
@@ -330,8 +331,8 @@ class TranslatorVoucher(object):
         """
         pass
 
-    def spacer_row(self, rownum):
-        return self.ws.set_row(rownum, 1.3 * 2.54)
+    def spacer_row(self, rownum, fmt=None):
+        return self.ws.set_row(rownum, 1.3 * 2.54, cell_format=fmt)
 
     def create_header(self):
         self.write('A8', self.title, self.title_fmt)
@@ -347,17 +348,16 @@ class TranslatorVoucher(object):
 
         self.merge_range('C10:E10', None, self.editable_fmt)
         self.merge_range('C11:E11', None, self.editable_fmt)
-        self.merge_range('C12:E12', None, self.editable_fmt)
-        self.merge_range('C13:E13', None, self.editable_fmt)
+        self.merge_range('C12:E13', None, self.editable_fmt)
 
         self.write('F10', 'Übersetzende/r')
         self.write('F11', 'Personalnummer')
-        self.write('F12', 'Übers. Sprache')
-        self.write('F13', 'Quellensteuer')
+        self.write('F12', 'Quellensteuer')
+        self.write('F13', 'Übers. Sprache')
 
-        self.merge_range('G10:H10', None, self.editable_fmt)
-        self.merge_range('G11:H11', None, self.editable_fmt)
-        self.merge_range('G12:H12', None, self.editable_fmt)
+        self.write('G10', self.translator.title)
+        self.write('G11', str(self.translator.pers_id))
+        self.write('G12', self.translator.withholding_tax and 'Ja' or 'Nein')
         self.merge_range('G13:H13', None, self.editable_fmt)
 
     def fmt(self, key, last=False, first=False, color='blue'):
@@ -709,29 +709,86 @@ class TranslatorVoucher(object):
         # Main Total
         self.merge_range(
             f'A{row + 59}:G{row + 59}', 'Gesamttotal', self.total_fmt)
-        self.spacer_row(row + 59)
-        return row + 59
 
-    def create_footer(self, start_row):
-        row_span = 5
-        for ix in range(row_span + 1):
-            self.ws.set_row(start_row + ix, cell_format=self.bg_white_fmt)
-        self.write(f'A{start_row + 1}', 'Visum Auftraggebende Person')
-        self.write(f'C{start_row + 1}', 'Visum Übersetzende/r')
+    def create_footer(self):
+        colspan = 7
+        default = {
+            'bg_color': self.white,
+            'font_size': self.footer_font_size,
+            'align': 'left'
+        }
+        input_ = {
+            'num_format': 'TT.MM.JJJJ',
+            'locked': False,
+            'bg_color': self.edit_color,
+            'align': 'center',
+            'font_size': self.footer_font_size
+        }
+        bottom = {'bottom': 1, 'bottom_color': self.blue}
+        top = {'top': 1, 'top_color': self.blue}
+        left = {'left': 1, 'left_color': self.blue}
+        right = {'right': 1, 'right_color': self.blue}
+        indented = {'indent': 1}
 
-        self.write(f'A{start_row + 3}', 'Datum')
-        self.write(f'C{start_row + 3}', 'Datum')
-        self.write(f'B{start_row + 3 }', None, self.input_date_fmt)
-        self.write(f'D{start_row + 3 }', None, self.input_date_fmt)
-        self.write(f'A{start_row + 4}', 'Original:')
-        self.write(f'A{start_row + 5}', 'Kopie:')
-        self.write(
-            f'B{start_row + 4}',
-            'Amtsleiter oder Finanzverantwortlicher (zwecks Kontierung der '
-            'Zahlungsanweisung an Personalamt)'
+        left_fmt = self.add_format({**default, **left})
+        left_fmt_indent = self.add_format({**default, **left, **indented})
+        right_fmt = self.add_format({**default, **right})
+        left_top = self.add_format({**top, **left, **default})
+        left_top_right = self.add_format({**top, **left, **right, **default})
+        left_top_right_indent = self.add_format({
+            **top, **left, **right, **default, **indented
+        })
+        default_fmt = self.add_format(default)
+        input_fmt = self.add_format(input_)
+        input_right = self.add_format({**input_, **right})
+        left_bottom_right = self.add_format(
+            {**default, **bottom, **left, **right}
         )
-        self.write(f'B{start_row + 5}', 'Übersetzende/r')
-        self.write(f'B{start_row + 6}', 'Auftraggebende Person')
+
+        left_right = self.add_format({**left, **right, **default})
+
+        self.spacer_row(73)
+        self.ws.set_row(74, 13.7)
+        self.ws.merge_range(
+            74, 0, 74, 1, 'Visum Auftraggebende Person', left_top_right)
+        self.ws.merge_range(
+            74, 2, 74, 4, 'Visum Übersetzende/r', left_top_right_indent
+        )
+        self.ws.merge_range(74, 5, 74, 7, '', left_top_right)
+
+        self.ws.merge_range(75, 0, 75, 1, '', left_right)
+        self.ws.merge_range(75, 2, 75, 4, '', left_right)
+        self.ws.merge_range(75, 5, 75, 7, '', left_right)
+
+        self.ws.write(76, 0, 'Datum', left_fmt)
+        self.ws.write(76, 1, '', input_right)
+        self.ws.write(76, 2, 'Datum', left_fmt_indent)
+        self.ws.write(76, 3, '', input_fmt)
+        self.ws.write(76, 4, '', right_fmt)
+        self.ws.merge_range(76, 5, 76, 7, '', left_right)
+        self.spacer_row(77)
+        self.ws.merge_range(77, 0, 77, 1, '', left_bottom_right)
+        self.ws.merge_range(77, 2, 77, 4, '', left_bottom_right)
+        self.ws.merge_range(77, 5, 77, 7, '', left_bottom_right)
+
+        self.ws.write(78, 0, 'Original:', left_top)
+        self.ws.merge_range(
+            78, 1, 78, 7,
+            'Amtsleiter oder Finanzverantwortlicher '
+            '(zwecks Kontierung der Zahlungsanweisung an Personalamt)',
+            right_fmt
+        )
+        self.ws.write(79, 0, 'Kopie:', left_fmt)
+        self.ws.merge_range(79, 1, 79, 2, 'Übersetzende/r', default_fmt)
+        self.ws.merge_range(79, 3, 79, 7, self.translator.title, right_fmt)
+
+        self.ws.write(80, 0, '', left_fmt)
+        self.ws.merge_range(80, 1, 80, 2, 'Auftraggebende Person', default_fmt)
+        self.ws.merge_range(
+            80, 3, 80, 7, '=IF(ISBLANK(C11), "", C11)', right_fmt)
+
+        self.spacer_row(81)
+        self.ws.merge_range(81, 0, 81, 7, '', left_bottom_right)
 
     def create_off_page_content(self):
         self.write('I13', 'Auszug aus der Übersetzungsverordnung (BGS 161.15)')
@@ -741,7 +798,7 @@ class TranslatorVoucher(object):
         self.write_formulas()
         self.create_header()
         current_row = self.create_table(row=14)
-        self.create_footer(start_row=current_row + 1)
+        self.create_footer()
         self.create_off_page_content()
 
         if protect_pw:
