@@ -57,6 +57,13 @@ class TranslatorVoucher(object):
         float_default = {'num_format': '0.00', 'align': 'center'}
 
         self.cell_fmt = self.wb.add_format(self.default_fmt)
+        self.cell_fmt_green_last = self.wb.add_format({
+            **self.default_fmt, **bottom_green
+        })
+
+        self.cell_fmt_blue_last = self.wb.add_format({
+            **self.default_fmt, **bottom_blue
+        })
 
         self.title_fmt = self.add_format({
             'font_size': self.title_font_size, 'bold': True
@@ -130,7 +137,7 @@ class TranslatorVoucher(object):
         self.input_float_fmt_blue_last = self.add_format(
             {'num_format': '0.00', **input_centered, **bottom_blue}
         )
-        self.input_float_fmt_blue_last = self.add_format(
+        self.input_float_fmt_green_last = self.add_format(
             {'num_format': '0.00', **input_centered, **bottom_green}
         )
         self.input_int_fmt = self.add_format(
@@ -353,6 +360,13 @@ class TranslatorVoucher(object):
             return getattr(self, f'{key}_{color}_last')
         return getattr(self, key)
 
+    def empty_cell(self, position, color='blue', border_bottom=True):
+        self.write(
+            position,
+            None,
+            fmt=self.fmt('cell_fmt', border_bottom, color)
+        )
+
     def write_formulas(self):
         fields_for_total = []
         fmt = self.fmt
@@ -365,12 +379,19 @@ class TranslatorVoucher(object):
             self.ws.write_formula(f'D{row}', hour_diff(row), fmt('hour_fmt'))
             self.ws.write_formula(f'G{row}', f'=D{row}*24', fmt('float_fmt'))
             self.ws.write_formula(
-                f'H{row}', f'=ROUND((G{row}*75)*2,1)/2', fmt('subtotal_fmt_blue'))
+                f'H{row}',
+                f'=ROUND((G{row}*75)*2,1)/2',
+                fmt('subtotal_fmt_blue')
+            )
             fields_for_total.append(f'H{row}')
 
         for row in range(21, 23 + 1):
             last = row == 23
-            self.ws.write_formula(f'D{row}', hour_diff(row), fmt('hour_fmt', last))
+            self.ws.write_formula(
+                f'D{row}',
+                hour_diff(row),
+                fmt('hour_fmt', last)
+            )
             self.ws.write_formula(
                 f'G{row}', f'=D{row}*24*1.25', fmt('float_fmt', last))
             self.ws.write_formula(
@@ -378,6 +399,9 @@ class TranslatorVoucher(object):
                 f'=ROUND((G{row}*75)*2,1)/2',
                 fmt('subtotal_fmt_blue', last)
             )
+            for col in ('E', 'F'):
+                self.empty_cell(f'{col}{row}', border_bottom=last)
+
             fields_for_total.append(f'H{row}')
 
         for row in range(27, 29 + 1):
@@ -398,6 +422,8 @@ class TranslatorVoucher(object):
                 f'=ROUND((G{row}*95)*2,1)/2',
                 fmt('subtotal_fmt_blue', last)
             )
+            for col in ('E', 'F'):
+                self.empty_cell(f'{col}{row}', border_bottom=last)
             fields_for_total.append(f'H{row}')
 
         def distance_flatrate_formula(row):
@@ -417,6 +443,8 @@ class TranslatorVoucher(object):
             )
             self.ws.write_formula(
                 f'H{row}', f'=E{row}', fmt('subtotal_fmt_blue', last))
+            for col in ('D', 'F', 'G'):
+                self.empty_cell(f'{col}{row}', border_bottom=last)
             fields_for_total.append(f'H{row}')
 
         for row in range(43, 45 + 1):
@@ -446,13 +474,20 @@ class TranslatorVoucher(object):
             self.ws.write_formula(
                 f'D{row}', round_pages_up(row), fmt('float_fmt'))
             self.ws.write_formula(
-                f'H{row}', f'=ROUND((D{row}*75)*2,1)/2', fmt('subtotal_fmt_green'))
+                f'H{row}',
+                f'=ROUND((D{row}*75)*2,1)/2',
+                fmt('subtotal_fmt_green')
+            )
             fields_for_total.append(f'H{row}')
 
         for row in range(53, 55 + 1):
-            self.ws.write_formula(f'D{row}', f'=B{row}', fmt('float_fmt'))
+            last = row == 55
+            self.ws.write_formula(
+                f'D{row}', f'=B{row}', fmt('float_fmt', last))
             self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*75*1.25)*2,1)/2',
-                                  fmt('subtotal_fmt_green'))
+                                  fmt('subtotal_fmt_green', last))
+            for col in ('C', 'E', 'F', 'G'):
+                self.empty_cell(f'{col}{row}', 'green', border_bottom=last)
             fields_for_total.append(f'H{row}')
 
         for row in range(59, 61 + 1):
@@ -462,9 +497,13 @@ class TranslatorVoucher(object):
             fields_for_total.append(f'H{row}')
 
         for row in range(63, 65 + 1):
-            self.ws.write_formula(f'D{row}', f'=B{row}', fmt('float_fmt'))
+            last = row == 65
+            self.ws.write_formula(
+                f'D{row}', f'=B{row}', fmt('float_fmt', last))
             self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2',
-                                  fmt('subtotal_fmt_green'))
+                                  fmt('subtotal_fmt_green', last))
+            for col in ('C', 'E', 'F', 'G'):
+                self.empty_cell(f'{col}{row}', 'green', border_bottom=last)
             fields_for_total.append(f'H{row}')
 
         for row in range(69, 71 + 1):
@@ -474,7 +513,8 @@ class TranslatorVoucher(object):
             self.ws.write_formula(
                 f'G{row}', f'=D{row}*24', fmt('float_fmt', last))
             self.ws.write_formula(f'H{row}', f'=ROUND((G{row}*E{row})*2,1)/2',
-                                  fmt('subtotal_fmt_green', last))
+                                  fmt('subtotal_fmt_blue', last))
+            self.empty_cell(f'F{row}', border_bottom=last)
             fields_for_total.append(f'H{row}')
 
         self.ws.write_formula(
@@ -626,15 +666,20 @@ class TranslatorVoucher(object):
         headers(row + 52, 'Einsätze nach Vereinbarung (§ 15 Abs. 1 lit. d '
                         'oder e / § 15 Abs. 2 lit. d)'
                 )
-        subheader_fmts = (self.thead_lightgreen_left,)
-        subheader_fmts += col_span * (self.thead_lightgreen,)
+        subheader_fmts = (self.tsubhead_left,)
+        subheader_fmts += col_span * (self.tsubhead,)
 
         subheaders(row + 53, 0, (
             'Datum', 'von', 'bis', 'Total', 'Vereinb. Ansatz', '',
             'Industrieminuten', 'Zwischentotal'), subheader_fmts)
 
-        input_block(row + 54, 0, numrows=3, formats=(
-            'input_date_fmt_green', 'input_time_fmt', 'input_time_fmt'))
+        input_block(
+            row + 54,
+            0, numrows=3,
+            formats=(
+            'input_date_fmt_blue', 'input_time_fmt', 'input_time_fmt'),
+            border_bottom=True
+        )
         input_block(
             row + 54,
             4,
