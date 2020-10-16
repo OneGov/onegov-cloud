@@ -194,8 +194,8 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     """
 
     def execute(request, app):
-        admin_group = 'cn=OneGovCloud_Admin,ou=kursverwaltung,o=appl'
-        editor_group = 'cn=OneGovCloud_edit,ou=kursverwaltung,o=appl'
+        admin_group = 'cn=ACC_OneGovCloud_admin,ou=kursverwaltung,o=appl'
+        editor_group = 'cn=ACC_OneGovCloud_edit,ou=kursverwaltung,o=appl'
         fetch_users(
             app,
             request.session,
