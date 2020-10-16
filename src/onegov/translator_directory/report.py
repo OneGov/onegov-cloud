@@ -94,13 +94,13 @@ class TranslatorVoucher(object):
             **centered
         })
 
-        self.thead_lightgreen_left = self.add_format({
+        self.thead_lightgreen_green_first = self.add_format({
             'font_size': self.subheader_font_size,
             'bg_color': self.light_green,
             **centered,
             **left_green
         })
-        self.thead_lightgreen_right = self.add_format({
+        self.thead_lightgreen_green_last = self.add_format({
             'font_size': self.subheader_font_size,
             'bg_color': self.light_green,
             'right': 1,
@@ -109,16 +109,16 @@ class TranslatorVoucher(object):
             **right_green
         })
 
-        self.tsubhead = self.add_format({
+        self.thead_lila = self.add_format({
             'bg_color': self.lila,
             'font_size': self.subheader_font_size,
             **centered,
         })
 
-        self.tsubhead_left = self.add_format(
+        self.thead_lila_blue_first = self.add_format(
             {'bg_color': self.lila, **left_blue})
 
-        self.tsubhead_right = self.add_format({
+        self.thead_lila_blue_last = self.add_format({
             'bg_color': self.lila, **centered, **right_blue
         })
 
@@ -352,19 +352,23 @@ class TranslatorVoucher(object):
         self.merge_range('G12:H12', None, self.editable_fmt)
         self.merge_range('G13:H13', None, self.editable_fmt)
 
-    def fmt(self, key, last=False, color='blue'):
+    def fmt(self, key, last=False, first=False, color='blue'):
         """Helper to get formats easier"""
         if last:
-            if 'green' in key or 'blue' in key:
+            if '_green' in key or '_blue' in key:
                 return getattr(self, f'{key}_last')
             return getattr(self, f'{key}_{color}_last')
+        elif first:
+            if '_green' in key or '_blue' in key:
+                return getattr(self, f'{key}_first')
+            return getattr(self, f'{key}_{color}_first')
         return getattr(self, key)
 
     def empty_cell(self, position, color='blue', border_bottom=True):
         self.write(
             position,
             None,
-            fmt=self.fmt('cell_fmt', border_bottom, color)
+            fmt=self.fmt('cell_fmt', border_bottom, color=color)
         )
 
     def write_formulas(self):
@@ -528,18 +532,19 @@ class TranslatorVoucher(object):
             'Zwischentotal'
         )
         col_span = len(subtitles)
-        subheader_fmts = (self.tsubhead_left,) + col_span * (self.tsubhead, )
+        subheader_fmts = (col_span + 1) * ('thead_lila', )
 
         def headers(row, text, format_=None):
             if not format_:
                 format_ = self.thead_blue
             self.merge_range(f'A{row+1}:H{row+1}', text, format_)
 
-        def subheaders(row, col, subtitles, fmt=None):
-            if not fmt:
-                fmt = subheader_fmts
+        def subheaders(row, subtitles, fmt, border_color='blue'):
             for col_ix, (text, fmt_) in enumerate(zip(subtitles, fmt)):
-                self.ws.write(row, col_ix, text, fmt_)
+                first = col_ix == 0
+                last = col_ix == len(subtitles) - 1
+                format_ = self.fmt(fmt_, last, first, border_color)
+                self.ws.write(row, col_ix, text, format_)
 
         def input_block(
                 start_row,
@@ -561,7 +566,7 @@ class TranslatorVoucher(object):
 
         headers(row, 'Dolmetschertätigkeit - '
                      '(§ 15 Abs. 1 lit. a, 06:00-20:00 Uhr)')
-        subheaders(row + 1, 0, subtitles)
+        subheaders(row + 1, subtitles, subheader_fmts)
         date_time_fmts = [
             'input_date_fmt_blue', 'input_time_fmt', 'input_time_fmt']
 
@@ -578,7 +583,7 @@ class TranslatorVoucher(object):
                           'schwierigen Übersetzungen  - '
                           '(§ 15 Abs. 1 lit. c, 06:00-20:00 Uhr)')
 
-        subheaders(row + 11, 0, subtitles)
+        subheaders(row + 11, subtitles, subheader_fmts)
         input_block(row + 12, 0, numrows=3, formats=date_time_fmts)
 
         headers(row + 15, 'Bei ausserordentlich '
@@ -590,9 +595,9 @@ class TranslatorVoucher(object):
         self.spacer_row(row + 19)
         headers(row + 20, 'Wegpauschale - (§ 15 Abs. 1 lit.g)')
 
-        subheaders(row + 21, 0, (
+        subheaders(row + 21, (
             'Datum', 'Reiseweg in km', '', '', 'Wegpauschale', '', '',
-            'Zwischentotal'))
+            'Zwischentotal'), subheader_fmts)
         input_fmts = ['input_date_fmt_blue', 'input_int_fmt', 'input_dt_fmt']
 
         input_block(
@@ -601,9 +606,11 @@ class TranslatorVoucher(object):
 
         headers(row + 26, 'Besondere Dringlichkeit - (§ 15 Abs. 1 lit. f - '
                           'Wegpauschale+Reisezeit - Std.- Ansatz CHF 75.00)')
-        subheaders(row + 27, 0, ('Datum', 'Reiseweg in km', 'Reisezeit',
+        subheaders(row + 27, ('Datum', 'Reiseweg in km', 'Reisezeit',
                                  'Total', 'Wegpauschale', '1/2 Ansatz',
-                                 'Industrieminuten', 'Zwischentotal'))
+                                 'Industrieminuten', 'Zwischentotal'),
+                   subheader_fmts
+                   )
         input_block(
             row + 28, 0, numrows=3, formats=input_fmts, border_bottom=True)
         self.ws.write_number(row + 28, 5, 37.50, fmt('float_fmt'))
@@ -619,11 +626,11 @@ class TranslatorVoucher(object):
         )
         subtitles = ('Datum', 'Anzahl Seiten', '', 'Total', '', '', '',
                      'Zwischentotal')
-        subheader_fmts = (self.thead_lightgreen_left,) + \
-                         col_span * (self.thead_lightgreen,)
+        subheader_fmts = (col_span + 1) * ('thead_lightgreen',)
 
         input_fmts = ['input_date_fmt_green', 'input_float_fmt']
-        subheaders(row + 33, 0, subtitles, fmt=subheader_fmts)
+        subheaders(
+            row + 33, subtitles, fmt=subheader_fmts, border_color='green')
         input_block(row + 34, 0, numrows=3, formats=input_fmts)
 
         headers(
@@ -645,7 +652,8 @@ class TranslatorVoucher(object):
         headers(row+42, 'Übersetzungstätigkeit bei ausserordentlich '
                         'schwierigen Übersetzungen - (§ 15 Abs. 2 lit. b)',
                 self.thead_green)
-        subheaders(row + 43, 0, subtitles, fmt=subheader_fmts)
+        subheaders(
+            row + 43, subtitles, fmt=subheader_fmts, border_color='green')
         input_block(row + 44, 0, numrows=3, formats=input_fmts)
         headers(
             row + 47,
@@ -666,10 +674,9 @@ class TranslatorVoucher(object):
         headers(row + 52, 'Einsätze nach Vereinbarung (§ 15 Abs. 1 lit. d '
                         'oder e / § 15 Abs. 2 lit. d)'
                 )
-        subheader_fmts = (self.tsubhead_left,)
-        subheader_fmts += col_span * (self.tsubhead,)
+        subheader_fmts = (col_span + 1) * ('thead_lila',)
 
-        subheaders(row + 53, 0, (
+        subheaders(row + 53, (
             'Datum', 'von', 'bis', 'Total', 'Vereinb. Ansatz', '',
             'Industrieminuten', 'Zwischentotal'), subheader_fmts)
 
