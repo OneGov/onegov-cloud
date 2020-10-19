@@ -666,7 +666,6 @@ class TranslatorVoucher(object):
             '(§ 15 Abs. 2 lit. c)',
             self.thead_green
         )
-        input_fmts = ['input_date_fmt_green', 'input_int_fmt']
         input_block(
             row + 38,
             0,
