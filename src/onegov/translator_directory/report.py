@@ -472,7 +472,7 @@ class TranslatorVoucher(object):
             )
             self.ws.write_formula(
                 f'H{row}', f'=E{row}', fmt('subtotal_fmt_blue', last))
-            for col in ('D', 'F', 'G'):
+            for col in ('C', 'D', 'F', 'G'):
                 self.empty_cell(f'{col}{row}', border_bottom=last)
             fields_for_total.append(f'H{row}')
 
@@ -625,10 +625,13 @@ class TranslatorVoucher(object):
         subheaders(row + 21, (
             'Datum', 'Reiseweg in km', '', '', 'Wegpauschale', '', '',
             'Zwischentotal'), subheader_fmts)
-        input_fmts = ['input_date_fmt_blue', 'input_int_fmt', 'input_dt_fmt']
 
         input_block(
-            row + 22, 0, numrows=3, formats=input_fmts, border_bottom=True)
+            row + 22,
+            0,
+            numrows=3,
+            formats=['input_date_fmt_blue', 'input_int_fmt'],
+            border_bottom=True)
         self.spacer_row(row + 25)
 
         headers(row + 26, 'Besondere Dringlichkeit - (§ 15 Abs. 1 lit. f - '
@@ -639,7 +642,11 @@ class TranslatorVoucher(object):
                    subheader_fmts
                    )
         input_block(
-            row + 28, 0, numrows=3, formats=input_fmts, border_bottom=True)
+            row + 28,
+            0,
+            numrows=3,
+            formats=['input_date_fmt_blue', 'input_int_fmt', 'input_dt_fmt'],
+            border_bottom=True)
         self.ws.write_number(row + 28, 5, 37.50, fmt('float_fmt'))
         self.ws.write_number(row + 29, 5, 37.50, fmt('float_fmt'))
         self.ws.write_number(row + 30, 5, 37.50, fmt('float_fmt', last=True))
@@ -708,9 +715,9 @@ class TranslatorVoucher(object):
 
         input_block(
             row + 54,
-            0, numrows=3,
-            formats=(
-            'input_date_fmt_blue', 'input_time_fmt', 'input_time_fmt'),
+            0,
+            3,
+            ('input_date_fmt_blue', 'input_time_fmt', 'input_time_fmt'),
             border_bottom=True
         )
         input_block(
