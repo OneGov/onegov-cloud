@@ -240,8 +240,7 @@ class AgencyPathMixin(object):
 
     def agency_path(self, agency, sep=' > ', with_item=True, levels=None):
         return sep.join((
-            self.request.translate(ln.text)
-            for ln in self.get_ancestors(agency, with_item, levels)
+            ln.text for ln in self.get_ancestors(agency, with_item, levels)
         ))
 
 
