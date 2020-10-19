@@ -5,6 +5,10 @@ $new-language-icon: '\f1ab';
 $orange-color: #eda815;
 $dark-orange:  #be860e;
 
+.edit-bar {
+    .create-excel::before { @include icon('\f1c3'); }
+}
+
 .mobile-phone {
     &::before { @include icon($mobile-phone-icon); }
 }
