@@ -35,7 +35,6 @@ class TranslatorVoucher(object):
     }
 
     def __init__(self, request, translator, logo=None, law_excerpt_path=None):
-        self.request = request
         self.translator = translator
         self.file = BytesIO()
         self.wb = Workbook(self.file)
@@ -638,8 +637,8 @@ class TranslatorVoucher(object):
         headers(row + 26, 'Besondere Dringlichkeit - (§ 15 Abs. 1 lit. f - '
                           'Wegpauschale+Reisezeit - Std.- Ansatz CHF 75.00)')
         subheaders(row + 27, ('Datum', 'Reiseweg in km', 'Reisezeit',
-                                 'Total', 'Wegpauschale', '1/2 Ansatz',
-                                 'Industrieminuten', 'Zwischentotal'),
+                              'Total', 'Wegpauschale', '1/2 Ansatz',
+                              'Industrieminuten', 'Zwischentotal'),
                    subheader_fmts
                    )
         input_block(
@@ -683,8 +682,8 @@ class TranslatorVoucher(object):
             color='green'
         )
         self.spacer_row(row + 41)
-        headers(row+42, 'Übersetzungstätigkeit bei ausserordentlich '
-                        'schwierigen Übersetzungen - (§ 15 Abs. 2 lit. b)',
+        headers(row + 42, 'Übersetzungstätigkeit bei ausserordentlich '
+                          'schwierigen Übersetzungen - (§ 15 Abs. 2 lit. b)',
                 self.thead_green)
         subheaders(
             row + 43, subtitles, fmt=subheader_fmts, border_color='green')
@@ -706,7 +705,7 @@ class TranslatorVoucher(object):
         )
         self.spacer_row(row + 51)
         headers(row + 52, 'Einsätze nach Vereinbarung (§ 15 Abs. 1 lit. d '
-                        'oder e / § 15 Abs. 2 lit. d)'
+                          'oder e / § 15 Abs. 2 lit. d)'
                 )
         subheader_fmts = (col_span + 1) * ('thead_lila',)
 
