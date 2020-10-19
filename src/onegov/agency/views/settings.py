@@ -53,6 +53,13 @@ class AgencySettingsForm(Form):
         choices=[]
     )
 
+    agency_path_display_on_people = BooleanField(
+        label=_('Show full agency path'),
+        description=_('Always show the full path of the memberships agency'),
+        fieldset=_('People detail page'),
+        default=False
+    )
+
     report_changes = BooleanField(
         label=_("Users may report corrections"),
         fieldset=_("Data"),
@@ -79,6 +86,8 @@ class AgencySettingsForm(Form):
         self.agency_display.data = [
             str(num) for num in obj.agency_display_levels or []
         ]
+        self.agency_path_display_on_people.data = \
+            obj.agency_path_display_on_people
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
@@ -89,6 +98,8 @@ class AgencySettingsForm(Form):
         obj.agency_display_levels = [
             int(num) for num in self.agency_display.data
         ]
+        obj.agency_path_display_on_people = \
+            self.agency_path_display_on_people.data
 
 
 @AgencyApp.form(
