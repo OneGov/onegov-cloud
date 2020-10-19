@@ -402,7 +402,8 @@ class TranslatorVoucher(object):
 
         def hour_diff(rw):
             return f'=IF(ISBLANK(B{rw}), 0, IF(ISBLANK(C{rw}), 0, ' \
-                   f'IF((C{rw}-B{rw})<=0.04,0.04167, C{rw}-B{rw})))'
+                   f'IF((C{rw}-B{rw})<=0.04,0.04167, ' \
+                   f'CEILING(C{rw}-B{rw},1/96))))'
 
         for row in range(17, 19 + 1):
             self.ws.write_formula(f'D{row}', hour_diff(row), fmt('hour_fmt'))
@@ -497,7 +498,7 @@ class TranslatorVoucher(object):
             fields_for_total.append(f'H{row}')
 
         def round_pages_up(r):
-            return f'=IF(ISBLANK(B{r}),0,IF(AND(B{r}<0.5, B{r}>0),0.5,B{r}))'
+            return f'=CEILING(B{r}, 0.5)'
 
         for row in range(49, 51 + 1):
             self.ws.write_formula(
