@@ -33,11 +33,12 @@ def test_translator_voucher(client):
             pass
 
     excerpt_path = os.path.join(app.static_files[0], 'law_zug.png')
+    logo_path = os.path.join(app.static_files[0], 'logo_abrechnungsexcel.png')
 
     voucher = TranslatorVoucher(
         FakeRequest(),
         translator,
-        logo=BytesIO(file.reference.file.read()),
+        logo=logo_path,
         law_excerpt_path=excerpt_path
     )
 

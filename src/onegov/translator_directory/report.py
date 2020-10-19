@@ -339,8 +339,14 @@ class TranslatorVoucher(object):
         self.ws.write(position, data, fmt)
 
     def set_logo(self):
+        options = {'x_scale': .4936, 'y_scale': .58}
         if self.logo:
-            self.ws.insert_image(0, 0, 'logo.png', {'image_data': self.logo})
+            if isinstance(self.logo, BytesIO):
+                self.ws.insert_image(
+                    0, 0, 'logo.png', {'image_data': self.logo, **options}
+                )
+            else:
+                self.ws.insert_image(0, 0, self.logo, options)
 
     def spacer_row(self, rownum, fmt=None):
         return self.ws.set_row(rownum, 1.3 * 2.54, cell_format=fmt)
