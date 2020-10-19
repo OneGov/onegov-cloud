@@ -324,6 +324,10 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
                 AgencyMembershipMoveWithinPerson.for_url_template())
         )
 
+    @property
+    def default_membership_title(self):
+        return self.request.translate(_('Member'))
+
 
 class AgencySearchLayout(DefaultLayout, AgencyPathMixin):
     pass
