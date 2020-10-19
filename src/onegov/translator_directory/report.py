@@ -521,7 +521,7 @@ class TranslatorVoucher(object):
 
         for row in range(59, 61 + 1):
             self.ws.write_formula(f'D{row}', f'=B{row}', fmt('float_fmt'))
-            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95*1.25)*2,1)/2',
+            self.ws.write_formula(f'H{row}', f'=ROUND((D{row}*95)*2,1)/2',
                                   fmt('subtotal_fmt_green'))
             fields_for_total.append(f'H{row}')
 
