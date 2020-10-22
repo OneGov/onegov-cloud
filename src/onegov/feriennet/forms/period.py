@@ -403,9 +403,10 @@ class PeriodForm(Form):
             self.pass_system_limit.data = model.max_bookings_per_attendee
             self.pass_system_cost.data = model.booking_cost
         else:
+            self.single_booking_cost.data = model.booking_cost
+
             if model.max_bookings_per_attendee is None:
                 self.pass_system.data = 'no'
-                self.single_booking_cost.data = model.booking_cost
             else:
                 self.pass_system.data = 'fixed'
                 self.fixed_system_limit.data = model.max_bookings_per_attendee
