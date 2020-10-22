@@ -20,7 +20,7 @@ from webtest import Upload
 from tests.shared.utils import open_in_browser
 
 
-def test_wwf_customisations(client, scenario):
+def test_wwf_fixed_pass_system(client, scenario):
     scenario.add_period(
         title='WWF Period',
         phase='wishlist',
@@ -28,25 +28,87 @@ def test_wwf_customisations(client, scenario):
         confirmable=True,
         finalizable=True,
     )
+    # Add booking user
+    scenario.add_user(
+        username='member@example.org',
+        role='member',
+        complete_profile=True
+    )
+    scenario.add_attendee(name='George', username='member@example.org')
 
-    # Test switching to the new pass system which is a mixed one
+    # Add activities
+    tags = ['Familienlager', 'Ferienlager']
+    scenario.add_activity(title='Surfing', state='accepted', tags=[tags[1]])
+    scenario.add_occasion(cost=250)
+    scenario.add_activity(title='Sailing', state='accepted', tags=[tags[1]])
+    scenario.add_occasion(cost=500)
+    scenario.add_activity(title='Fishing', state='accepted', tags=[tags[0]])
+    scenario.add_occasion(cost=50)
+
     scenario.commit()
+    scenario.refresh()
 
-    client.login_admin()
+    admin = client
+    admin.login_admin()
+
     # Edit the period
-    page = client.get('/periods').click('Bearbeiten')
-    # open_in_browser(page)
+    fixed_system_limit = 1
+    page = admin.get('/periods').click('Bearbeiten')
     page.form['pass_system'] = 'fixed'
-    page.form['fixed_system_limit'] = 2
+    page.form['fixed_system_limit'] = fixed_system_limit
     page.form['single_booking_cost'] = 11
     page.form.submit().follow()
 
     scenario.refresh()
     period = scenario.latest_period
+    booking_start = period.booking_start
     assert period.all_inclusive is False
-    assert period.max_bookings_per_attendee == 2
-    assert period.pay_organiser_directly is False
+    assert period.max_bookings_per_attendee == 1
     assert period.booking_cost == 11
+    assert period.pay_organiser_directly is False
+
+    def login_member(client):
+        login = client.get('/').click("Anmelden", index=1)
+        login.form['username'] = 'member@example.org'
+        login.form['password'] = 'hunter2'
+        login.form.submit().follow()
+        return client
+
+    member = login_member(client.spawn())
+
+    activities = member.get('/activities')
+
+    def register_for_activity(name):
+        # Register the first attendee available
+        page = activities.click(name).click('Anmelden').form.submit().follow()
+        assert 'Durchführung wurde zu Georges Wunschliste hinzugefügt' in page
+        return page
+
+    register_for_activity('Sailing')
+    page = register_for_activity('Fishing')
+
+    # We check his wishlist
+    wishlist = page.click('Wunschliste')
+
+    # We do not want a link to the limit view of the attendee
+    assert not wishlist.pyquery('div.booking-limit a')
+
+    book_limit_text = wishlist.pyquery('div.booking-limit span')[0].text
+    assert book_limit_text == f'Limitiert auf {fixed_system_limit} Buchungen'
+
+    page = admin.get('/matching')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'y'
+    page = page.form.submit()
+    assert 'Die Zuteilung wurde erfolgreich abgeschlossen' in page
+
+    # confirm period, proceed to booking phase
+    with freeze_time(booking_start + timedelta(days=1)):
+        page = member.get('/my-bookings')
+        assert 'Die Buchungsphase ist jetzt bis am' in page
+        assert 'Gebucht (1)' in page
+        assert 'Blockiert (1)' in page
+
 
 
 def test_view_permissions():
