@@ -286,7 +286,7 @@ class Period(Base, TimestampMixin):
     @property
     def booking_limit(self):
         """ Returns the max_bookings_per_attendee limit if it applies. """
-        return self.all_inclusive and self.max_bookings_per_attendee
+        return self.max_bookings_per_attendee
 
     def as_local_datetime(self, day):
         return sedate.standardize_date(
