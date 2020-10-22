@@ -17,6 +17,37 @@ from tests.shared import utils
 from psycopg2.extras import NumericRange
 from webtest import Upload
 
+from tests.shared.utils import open_in_browser
+
+
+def test_wwf_customisations(client, scenario):
+    scenario.add_period(
+        title='WWF Period',
+        phase='wishlist',
+        active=True,
+        confirmable=True,
+        finalizable=True,
+    )
+
+    # Test switching to the new pass system which is a mixed one
+    scenario.commit()
+
+    client.login_admin()
+    # Edit the period
+    page = client.get('/periods').click('Bearbeiten')
+    # open_in_browser(page)
+    page.form['pass_system'] = 'fixed'
+    page.form['fixed_system_limit'] = 2
+    page.form['single_booking_cost'] = 11
+    page.form.submit().follow()
+
+    scenario.refresh()
+    period = scenario.latest_period
+    assert period.all_inclusive is False
+    assert period.max_bookings_per_attendee == 2
+    assert period.pay_organiser_directly is False
+    assert period.booking_cost == 11
+
 
 def test_view_permissions():
     utils.assert_explicit_permissions(

@@ -140,6 +140,10 @@ class PeriodForm(Form):
                 "Each attendee may attend a limited number of activites "
                 "for a fixed price."
             )),
+            ('fixed', _(
+                "Each attendee may attend a fixed number of activites. "
+                "Each activity is billed separately."
+            )),
         ],
         default='no',
     )
@@ -152,6 +156,16 @@ class PeriodForm(Form):
             NumberRange(0, 100)
         ],
         depends_on=('pass_system', 'yes')
+    )
+
+    fixed_system_limit = IntegerField(
+        label=_("Maximum Number of Bookings per Attendee and period"),
+        fieldset=_("Execution"),
+        validators=[
+            Optional(),
+            NumberRange(0, 100)
+        ],
+        depends_on=('pass_system', 'fixed')
     )
 
     pass_system_cost = DecimalField(
@@ -171,7 +185,7 @@ class PeriodForm(Form):
             Optional(),
             NumberRange(0.00, 10000.00)
         ],
-        depends_on=('pass_system', 'no')
+        depends_on=('pass_system', '!yes')
     )
 
     pay_organiser_directly = RadioField(
@@ -343,8 +357,12 @@ class PeriodForm(Form):
             model.max_bookings_per_attendee = self.pass_system_limit.data
             model.booking_cost = self.pass_system_cost.data
             model.all_inclusive = True
-        else:
+        elif self.pass_system.data == 'no':
             model.max_bookings_per_attendee = None
+            model.booking_cost = self.single_booking_cost.data
+            model.all_inclusive = False
+        elif self.pass_system.data == 'fixed':
+            model.max_bookings_per_attendee = self.fixed_system_limit.data
             model.booking_cost = self.single_booking_cost.data
             model.all_inclusive = False
 
@@ -370,7 +388,7 @@ class PeriodForm(Form):
         else:
             model.alignment = None
 
-        if self.pass_system.data == 'no':
+        if self.pass_system.data in ('no', 'fixed'):
             model.pay_organiser_directly = False
         elif self.pay_organiser_directly.data == 'direct':
             model.pay_organiser_directly = True
@@ -385,8 +403,12 @@ class PeriodForm(Form):
             self.pass_system_limit.data = model.max_bookings_per_attendee
             self.pass_system_cost.data = model.booking_cost
         else:
-            self.pass_system.data = 'no'
-            self.single_booking_cost.data = model.booking_cost
+            if model.max_bookings_per_attendee is None:
+                self.pass_system.data = 'no'
+                self.single_booking_cost.data = model.booking_cost
+            else:
+                self.pass_system.data = 'fixed'
+                self.fixed_system_limit.data = model.max_bookings_per_attendee
 
         if model.deadline_days is None:
             self.deadline.data = 'fix'
