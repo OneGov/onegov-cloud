@@ -216,7 +216,7 @@ def import_bs_persons(csvfile, agencies, session, app):
             if agency:
                 agency.add_person(
                     person_.id,
-                    title='',
+                    title='Mitglied',
                     since=None,
                     prefix=None,
                     addition=None,
