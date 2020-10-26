@@ -729,20 +729,21 @@ class PdfGenerator():
                     pdf.h2(title)
 
             # Factoids
-            pdf.factoids(
-                [
-                    _('turnout_vote'),
-                    _('eligible_voters_vote'),
-                    _('Cast Ballots')
-                ],
-                [
-                    '{0:.2f}%'.format(ballot.turnout),
-                    ballot.eligible_voters,
-                    ballot.cast_ballots,
-                ]
-            )
-            pdf.spacer()
-            pdf.spacer()
+            if completed:
+                pdf.factoids(
+                    [
+                        _('turnout_vote'),
+                        _('eligible_voters_vote'),
+                        _('Cast Ballots')
+                    ],
+                    [
+                        '{0:.2f}%'.format(ballot.turnout),
+                        ballot.eligible_voters,
+                        ballot.cast_ballots,
+                    ]
+                )
+                pdf.spacer()
+                pdf.spacer()
 
             if not summarize:
                 # Only one entity
