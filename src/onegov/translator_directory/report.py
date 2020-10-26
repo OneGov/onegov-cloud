@@ -360,7 +360,7 @@ class TranslatorVoucher(object):
 
         self.write('A10', 'Einsatzgrund')
         self.write('A11', 'Auftraggebende Person')
-        self.write('A12', 'Geschäftskontrolle')
+        self.write('A12', 'Referenz-Nr.')
 
         self.merge_range('C10:E10', None, self.editable_fmt)
         self.merge_range('C11:E11', None, self.editable_fmt)
