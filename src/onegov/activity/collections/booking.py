@@ -210,6 +210,8 @@ class BookingCollection(GenericCollection):
 
         if booking.period.all_inclusive:
             limit = booking.period.booking_limit
+        elif booking.period.booking_limit:
+            limit = booking.period.booking_limit
         else:
             limit = booking.attendee.limit
 
