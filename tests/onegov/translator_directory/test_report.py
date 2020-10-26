@@ -1,5 +1,4 @@
 import os
-from io import BytesIO
 from uuid import uuid4
 
 import transaction
@@ -8,7 +7,7 @@ from onegov.file import FileCollection
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.report import TranslatorVoucher
 from tests.onegov.translator_directory.shared import translator_data
-from tests.shared.utils import open_in_excel, create_image
+from tests.shared.utils import create_image
 
 
 def test_translator_voucher(client):
@@ -43,4 +42,3 @@ def test_translator_voucher(client):
     )
 
     xlsx = voucher.create_document(protect_pw=str(uuid4()))
-    open_in_excel(xlsx)
