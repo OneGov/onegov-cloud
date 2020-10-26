@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 11:18+0100\n"
+"POT-Creation-Date: 2020-10-26 16:37+0100\n"
 "PO-Revision-Date: 2019-10-10 10:47+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -495,10 +495,6 @@ msgid "district_label_sg"
 msgstr "Distretto elettorale"
 
 #. Default: District
-msgid "district_label_sz_2020"
-msgstr "Distretto elettorale"
-
-#. Default: District
 msgid "district_label_sz"
 msgstr "Distretto elettorale"
 
@@ -512,10 +508,6 @@ msgstr "Regioni"
 
 #. Default: Constituencies
 msgid "districts_label_sg"
-msgstr "Distretti elettorali"
-
-#. Default: District
-msgid "districts_label_sz_2020"
 msgstr "Distretti elettorali"
 
 #. Default: Districts
@@ -1030,6 +1022,10 @@ msgstr "Schede bianche"
 msgid "Invalid Ballots"
 msgstr "Schede nulle"
 
+#, python-format
+msgid "Intermediate results: ${counted} of ${total} ${entities}"
+msgstr ""
+
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
 
@@ -1292,6 +1288,12 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "district_label_sz_2020"
+#~ msgstr "Distretto elettorale"
+
+#~ msgid "districts_label_sz_2020"
+#~ msgstr "Distretti elettorali"
 
 #~ msgid "Value of ausmittlungsstand not between 0 and 3"
 #~ msgstr "Valore di ausmittlungsstand non compreso tra 0 e 3"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 11:18+0100\n"
+"POT-Creation-Date: 2020-10-26 16:37+0100\n"
 "PO-Revision-Date: 2019-10-10 10:46+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -495,10 +495,6 @@ msgid "district_label_sg"
 msgstr "Circonscription électorale"
 
 #. Default: District
-msgid "district_label_sz_2020"
-msgstr "District électoral"
-
-#. Default: District
 msgid "district_label_sz"
 msgstr "District électoral"
 
@@ -513,10 +509,6 @@ msgstr "Régions"
 #. Default: Constituencies
 msgid "districts_label_sg"
 msgstr "Circonscriptions électorales"
-
-#. Default: District
-msgid "districts_label_sz_2020"
-msgstr "Districts électorales"
 
 #. Default: Districts
 msgid "districts_label_sz"
@@ -1033,6 +1025,10 @@ msgstr "Bulletins de vote vierges"
 msgid "Invalid Ballots"
 msgstr "Bulletins de vote non valides"
 
+#, python-format
+msgid "Intermediate results: ${counted} of ${total} ${entities}"
+msgstr "Résultats intermédiaires: ${counted} de ${total} ${entities}"
+
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
 
@@ -1295,6 +1291,15 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Intermediate results: ${counted} of ${total} entities"
+#~ msgstr "Résultats intermédiaires: ${counted} de ${total} "
+
+#~ msgid "district_label_sz_2020"
+#~ msgstr "District électoral"
+
+#~ msgid "districts_label_sz_2020"
+#~ msgstr "Districts électorales"
 
 #~ msgid "Value of ausmittlungsstand not between 0 and 3"
 #~ msgstr "Valeur de ausmittlungsstand pas entre 0 et 3"

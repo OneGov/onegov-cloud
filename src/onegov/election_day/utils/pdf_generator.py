@@ -677,8 +677,14 @@ class PdfGenerator():
 
         if not completed:
             counted, total = vote.progress
-            answer = _('Intermediate results: ${counted} of ${total} entities',
-                       mapping={'total': total, 'counted': counted})
+            answer = _(
+                'Intermediate results: ${counted} of ${total} ${entities}',
+                mapping={
+                    'total': total,
+                    'counted': counted,
+                    'entities': pdf.translate(principal.label('entities'))
+                }
+            )
         else:
             if vote.answer == 'accepted':
                 answer = _('Accepted')
