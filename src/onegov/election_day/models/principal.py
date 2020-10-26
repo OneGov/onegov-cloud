@@ -28,6 +28,29 @@ class Principal(object):
     canton) and supports different types of domains (typically all higher
     domains).
 
+    hidden_elements: Used to optionally show and hide certain charts on
+    the defined views.
+
+    Example config in a yaml file:
+
+        hidden_elements:
+                  always:
+                    candidate-by-entity:
+                      chart_percentages: true
+                  intermediate_results:
+                    connections:
+                      chart: false
+                    candidates:
+                      chart: false
+    publish_intermediate_results: Optionally renders svg and pdf for
+    intermediate results. Example:
+
+        publish_intermediate_results:
+            vote: true
+            election: true
+            election_compound: true
+
+    Defaults to false if nothing specified
     """
 
     def __init__(
@@ -52,6 +75,7 @@ class Principal(object):
         pdf_signing=None,
         open_data=None,
         hidden_elements=None,
+        publish_intermediate_results=None,
         **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -75,6 +99,11 @@ class Principal(object):
         self.pdf_signing = pdf_signing or {}
         self.open_data = open_data or {}
         self.hidden_elements = hidden_elements or {}
+        self.publish_intermediate_results = publish_intermediate_results or {
+            'vote': False,
+            'election': False,
+            'election_compound': False
+        }
 
     @classmethod
     def from_yaml(cls, yaml_source):
