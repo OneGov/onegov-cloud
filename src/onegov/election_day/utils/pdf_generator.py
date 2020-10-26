@@ -648,6 +648,8 @@ class PdfGenerator():
             pdf.pagebreak()
 
     def add_vote(self, principal, vote, pdf, locale):
+        completed = vote.completed
+        nan = '-'
 
         def format_name(item):
             if hasattr(item, 'entity_id'):
@@ -656,6 +658,17 @@ class PdfGenerator():
             if item.name:
                 return item.name
             return pdf.translate(_("Expats"))
+
+        def format_accepted(result):
+            accepted = result.accepted
+            if accepted is None:
+                return _('Intermediate results')
+            return accepted and _('Accepted') or _('Rejected')
+
+        def format_value(result, attr, fmt=lambda x: '{0:.2f}%'.format):
+            if result.accepted is None:
+                return nan
+            return fmt(getattr(result, attr))
 
         summarize = vote.proposal.results.count() != 1
 
