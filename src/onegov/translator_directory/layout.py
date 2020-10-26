@@ -106,6 +106,11 @@ class TranslatorLayout(DefaultLayout):
                             )
                         )
                     )
+                ),
+                Link(
+                    _('Voucher template'),
+                    self.request.link(self.model, name='voucher'),
+                    attrs={'class': 'create-excel'}
                 )
             ]
         elif self.request.is_editor:

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-28 17:36+0200\n"
+"POT-Creation-Date: 2020-10-19 20:15+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -27,6 +27,9 @@ msgstr "Männlich"
 
 msgid "feminin"
 msgstr "Weiblich"
+
+msgid "neutral"
+msgstr "Neutral"
 
 msgid "Nutrition and agriculture"
 msgstr "Ernährung und Landwirtschaft"
@@ -290,6 +293,9 @@ msgstr "Übersetzer/in löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+msgid "Voucher template"
+msgstr "Abrechnungsvorlage"
+
 msgid "Edit translator"
 msgstr "Übersetzer/in bearbeiten"
 
@@ -405,6 +411,3 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 
 #~ msgid "Unknown"
 #~ msgstr "Unbekannt"
-
-#~ msgid "neutral"
-#~ msgstr "Neutral"

@@ -16,7 +16,7 @@
                                 <dt i18n:translate>Admission</dt>
                                 <dd>${layout.format_admission(model.admission)}</dd>
                             </dl>
-                             <dl class="field-display" tal:condition="model.withholding_tax and layout.show('withholding_tax')">
+                             <dl class="field-display" tal:condition="layout.show('withholding_tax')">
                                 <dt i18n:translate>Withholding tax</dt>
                                 <dd>${layout.format_boolean(model.withholding_tax)}</dd>
                             </dl>
