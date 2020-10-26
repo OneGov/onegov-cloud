@@ -240,8 +240,7 @@ class AgencyPathMixin(object):
 
     def agency_path(self, agency, sep=' > ', with_item=True, levels=None):
         return sep.join((
-            self.request.translate(ln.text)
-            for ln in self.get_ancestors(agency, with_item, levels)
+            ln.text for ln in self.get_ancestors(agency, with_item, levels)
         ))
 
 
@@ -324,6 +323,10 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
             self.request.link(
                 AgencyMembershipMoveWithinPerson.for_url_template())
         )
+
+    @property
+    def default_membership_title(self):
+        return self.request.translate(_('Member'))
 
 
 class AgencySearchLayout(DefaultLayout, AgencyPathMixin):

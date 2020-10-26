@@ -194,8 +194,8 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     """
 
     def execute(request, app):
-        admin_group = 'cn=acc_onegovcloud_admin,ou=kursverwaltung,o=appl'
-        editor_group = 'cn=acc_onegovcloud_edit,ou=kursverwaltung,o=appl'
+        admin_group = 'cn=ACC_OneGovCloud_admin,ou=kursverwaltung,o=appl'
+        editor_group = 'cn=ACC_OneGovCloud_edit,ou=kursverwaltung,o=appl'
         fetch_users(
             app,
             request.session,
@@ -222,6 +222,8 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
         'zgXAmtAbk': 'agency',
         'zgXAbteilung': 'department',
     }
+    admin_group = admin_group.lower()
+    editor_group = editor_group.lower()
 
     @lru_cache(maxsize=1)
     def match_school_domain(mail):

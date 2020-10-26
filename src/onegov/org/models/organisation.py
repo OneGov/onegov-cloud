@@ -115,6 +115,9 @@ class Organisation(Base, TimestampMixin):
     # Header settings that go into the div.globals
     header_options = meta_property(default=dict)
 
+    # Setting if show full agency path on people detail view
+    agency_path_display_on_people = meta_property(default=False)
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

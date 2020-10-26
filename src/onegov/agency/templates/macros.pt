@@ -145,9 +145,10 @@
                         <dd>
                             <ul data-sortable data-sortable-url="${layout.move_membership_within_person_url_template}">
                                 <tal:block tal:repeat="membership memberships">
-                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership" data-sortable-id="${membership.id}">
-                                        <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)|None}">${membership.agency.title}</a> -
-                                        <a href="${request.link(membership)}">${membership.title}</a>
+                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership" data-sortable-id="${membership.id}"
+                                            tal:define="agency_path layout.agency_path(membership.agency)|None; full_path request.app.org.agency_path_display_on_people">
+                                        <a tal:define="full_path_ full_path and agency_path" href="${request.link(membership.agency)}" title="${agency_path if not full_path else ''}">${membership.agency.title if not full_path_ else agency_path}</a> -
+                                        <a tal:define="title membership.title or layout.default_membership_title" href="${request.link(membership)}">${title}</a>
                                     </li>
                                 </tal:block>
                             </ul>
