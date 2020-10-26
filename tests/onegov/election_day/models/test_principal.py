@@ -53,6 +53,9 @@ def test_principal_load_canton():
     assert principal.pdf_signing == {}
     assert principal.open_data == {}
     assert principal.hidden_elements == {}
+    assert principal.publish_intermediate_results == {
+        'vote': False, 'election': False, 'election_compound': False
+    }
 
 
 def test_principal_load_municipality_with_static_data():
