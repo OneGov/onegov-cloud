@@ -761,15 +761,15 @@ class PdfGenerator():
                         '{} / {:.2f}%'.format(
                             result.yeas or '0',
                             result.yeas_percentage
-                        ),
+                        ) if completed else f'{nan} / {nan}',
                         '{} / {:.2f}%'.format(
                             result.nays or '0',
                             result.nays_percentage
-                        ),
+                        ) if completed else f'{nan} / {nan}',
                         '{} / {}'.format(
                             result.empty or '0',
                             result.invalid or '0',
-                        )
+                        ) if completed else f'{nan} / {nan}'
                     ],
                 )
                 pdf.pagebreak()
