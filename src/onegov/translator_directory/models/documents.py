@@ -3,7 +3,7 @@ from onegov.file import File
 
 class ApplicationFile(File):
     """ Anträge """
-    __mapper_args__ = {'polymorphic_identity': 'tapplication'}
+    __mapper_args__ = {'polymorphic_identity': 'application'}
 
 
 class CertificateFile(File):
