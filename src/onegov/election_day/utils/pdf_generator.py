@@ -674,25 +674,34 @@ class PdfGenerator():
 
         # Answer
         answer = _('Rejected')
-        if vote.answer == 'accepted':
-            answer = _('Accepted')
-        if vote.type == 'complex':
-            proposal = vote.proposal.accepted
-            counter_proposal = vote.counter_proposal.accepted
-            if not proposal and not counter_proposal:
-                answer = _('Proposal and counter proposal rejected')
-            if proposal and not counter_proposal:
-                answer = _('Proposal accepted')
-            if not proposal and counter_proposal:
-                answer = _('Counter proposal accepted')
-            if proposal and counter_proposal:
-                if vote.tie_breaker.accepted:
-                    answer = _('Tie breaker in favor of the proposal')
-                else:
-                    answer = _(
-                        'Tie breaker in favor of the counter proposal'
-                    )
-        pdf.p(pdf.translate(answer))
+
+        if not completed:
+            counted, total = vote.progress
+            answer = _('Intermediate results: ${counted} of ${total} entities',
+                       mapping={'total': total, 'counted': counted})
+        else:
+            if vote.answer == 'accepted':
+                answer = _('Accepted')
+            if vote.type == 'complex':
+                proposal = vote.proposal.accepted
+                counter_proposal = vote.counter_proposal.accepted
+                if not proposal and not counter_proposal:
+                    answer = _('Proposal and counter proposal rejected')
+                if proposal and not counter_proposal:
+                    answer = _('Proposal accepted')
+                if not proposal and counter_proposal:
+                    answer = _('Counter proposal accepted')
+                if proposal and counter_proposal:
+                    if vote.tie_breaker.accepted:
+                        answer = _('Tie breaker in favor of the proposal')
+                    else:
+                        answer = _(
+                            'Tie breaker in favor of the counter proposal'
+                        )
+        if completed:
+            pdf.p(pdf.translate(answer))
+        else:
+            pdf.h3(pdf.translate(answer))
         pdf.spacer()
 
         ballots = ((None, vote.proposal),)
