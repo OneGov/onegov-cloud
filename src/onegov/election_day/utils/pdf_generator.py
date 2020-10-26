@@ -957,6 +957,22 @@ class PdfGenerator():
             fs.makedir(self.pdf_dir)
         existing = fs.listdir(self.pdf_dir)
 
+        def render_item(item):
+            completed = item.completed
+            if completed:
+                return True
+            publish = self.app.publish_intermediate_results
+            if not publish:
+                return False
+            if isinstance(item, Vote) and publish.get('vote'):
+                return True
+            if isinstance(item, Election) and publish.get('election'):
+                raise NotImplementedError
+            if isinstance(item, ElectionCompound):
+                if publish.get('election_compound'):
+                    raise NotImplementedError
+            return False
+
         # Generate the PDFs
         created = []
         for locale in self.app.locales:
@@ -966,7 +982,7 @@ class PdfGenerator():
                     item, locale, last_modified=last_modified
                 )
                 created.append(filename.split('.')[0])
-                if filename not in existing and item.completed:
+                if filename not in existing and render_item(item):
                     path = '{}/{}'.format(self.pdf_dir, filename)
                     if fs.exists(path):
                         fs.remove(path)
