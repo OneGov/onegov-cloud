@@ -791,16 +791,14 @@ class PdfGenerator():
                         ],
                         [[
                             format_name(result),
-                            pdf.translate(_('Accepted')) if result.accepted
-                            else pdf.translate(_('Rejected')),
-                            '{0:.2f}%'.format(result.yeas_percentage),
-                            '{0:.2f}%'.format(result.nays_percentage),
+                            pdf.translate(format_accepted(result)),
+                            format_value(result, 'yeas_percentage'),
+                            format_value(result, 'nays_percentage'),
                         ] for result in ballot.results] + [[
                             pdf.translate(_('Total')),
-                            pdf.translate(_('Accepted')) if ballot.accepted
-                            else pdf.translate(_('Rejected')),
-                            '{0:.2f}%'.format(ballot.yeas_percentage),
-                            '{0:.2f}%'.format(ballot.nays_percentage),
+                            pdf.translate(format_accepted(ballot)),
+                            format_value(ballot, 'yeas_percentage'),
+                            format_value(ballot, 'nays_percentage'),
                         ]],
                         [None, 2.3 * cm, 2 * cm, 2 * cm],
                         pdf.style.table_results_2
@@ -844,17 +842,15 @@ class PdfGenerator():
                         [[
                             format_name(result),
                             result.district,
-                            pdf.translate(_('Accepted')) if result.accepted
-                            else pdf.translate(_('Rejected')),
-                            '{0:.2f}%'.format(result.yeas_percentage),
-                            '{0:.2f}%'.format(result.nays_percentage),
+                            pdf.translate(format_accepted(result)),
+                            format_value(result, 'yeas_percentage'),
+                            format_value(result, 'nays_percentage'),
                         ] for result in ballot.results] + [[
                             pdf.translate(_('Total')),
                             '',
-                            pdf.translate(_('Accepted')) if ballot.accepted
-                            else pdf.translate(_('Rejected')),
-                            '{0:.2f}%'.format(ballot.yeas_percentage),
-                            '{0:.2f}%'.format(ballot.nays_percentage),
+                            pdf.translate(format_accepted(ballot)),
+                            format_value(ballot, 'yeas_percentage'),
+                            format_value(ballot, 'nays_percentage'),
                         ]],
                         [None, None, 2.3 * cm, 2 * cm, 2 * cm],
                         pdf.style.table_results_2
@@ -916,16 +912,14 @@ class PdfGenerator():
                         ],
                         [[
                             format_name(result),
-                            pdf.translate(_('Accepted')) if result.accepted
-                            else pdf.translate(_('Rejected')),
-                            '{0:.2f}%'.format(result.yeas_percentage),
-                            '{0:.2f}%'.format(result.nays_percentage),
+                            pdf.translate(format_accepted(result)),
+                            format_value(result, 'yeas_percentage'),
+                            format_value(result, 'nays_percentage'),
                         ] for result in ballot.results_by_district] + [[
                             pdf.translate(_('Total')),
-                            pdf.translate(_('Accepted')) if ballot.accepted
-                            else pdf.translate(_('Rejected')),
-                            '{0:.2f}%'.format(ballot.yeas_percentage),
-                            '{0:.2f}%'.format(ballot.nays_percentage),
+                            pdf.translate(format_accepted(ballot)),
+                            format_value(ballot, 'yeas_percentage'),
+                            format_value(ballot, 'nays_percentage'),
                         ]],
                         [None, 2.3 * cm, 2 * cm, 2 * cm],
                         pdf.style.table_results_2
