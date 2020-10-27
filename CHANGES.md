@@ -1,9 +1,68 @@
 # Changes
 
+## Release `2020.78`
+
+> commits: **12 / [86025c8fdc...41fdea2f1c](https://github.com/OneGov/onegov-cloud/compare/86025c8fdc^...41fdea2f1c)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.78)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Enables display of full agency path on person detail view**
+
+Implements a user settings to display the full path of people's membership organisations.
+
+**`Feature`** | **[54c960a26f](https://github.com/onegov/onegov-cloud/commit/54c960a26fe94388fdf885850a1c3301695789a6)**
+
+🎉 **Adds consolidation script for double entries based on email or other field.**
+
+**`Feature`** | **[8633a43466](https://github.com/onegov/onegov-cloud/commit/8633a43466da4b6fe377479ca9da593291442bc0)**
+
+### Electionday
+
+🎉 **Adds setting to render pdf for intermediate vote results**
+
+The principal gets a new settings to render votes if not completed.
+
+**`Feature`** | **[fe2ed7c1b8](https://github.com/onegov/onegov-cloud/commit/fe2ed7c1b85f85b25bc38b5bf659568150ec96c8)**
+
+### Feriennet
+
+🎉 **Adds fixed pass system**
+
+Introduces pass system with separate billing and fixed maximum number of bookings per attendee.
+
+**`Feature`** | **[41fdea2f1c](https://github.com/onegov/onegov-cloud/commit/41fdea2f1cdd65f81be48d03a023866a22064eee)**
+
+### Translatordirectory
+
+🎉 **Adds translator voucher report**
+
+**`Feature`** | **[389009ea5b](https://github.com/onegov/onegov-cloud/commit/389009ea5bcd150a8c390c0ecd77b3daab9cf93a)**
+
 ## Release `2020.77`
 
-> commits: **5 / [e4fef90b04...84d647f2fe](https://github.com/OneGov/onegov-cloud/compare/e4fef90b04^...84d647f2fe)**  
+> released: **2020-10-14 09:34**<br>
+> commits: **6 / [e4fef90b04...3181962e2c](https://github.com/OneGov/onegov-cloud/compare/e4fef90b04^...3181962e2c)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.77)](https://buildkite.com/seantis/onegov-cloud)
+
+### Translatordirectory
+
+🎉 **Adds features of sprint2**
+
+- Adapt translator.title, remove translator.fullname
+- Improving the forms with fieldsets
+- Adjust positioning of formfields
+- Change withholding tax to boolean
+- Adds checkmark in translator table for withholding_tax
+- Adds Iban that got forgotton
+- Limits Managment link to show only the users, hide /settings
+- Implements correct login for with teacher domains same as in fsi
+- Adds the expertise columns to the translator
+- Adds field 'operation comments' on translator
+- Increases label size in form slightly
+- Adds filterting translator after professional guilds and interpreting type
+
+**`Feature`** | **[e4fef90b04](https://github.com/onegov/onegov-cloud/commit/e4fef90b040afa67dedc46b25e2628710796046d)**
 
 ## Release `2020.76`
 
@@ -119,6 +178,14 @@ Adds '--clear' flag to revert imported teacher data. Adds cli to clean duplicate
 > released: **2020-09-15 11:16**<br>
 > commits: **6 / [01f2217fae...5609d31d78](https://github.com/OneGov/onegov-cloud/compare/01f2217fae^...5609d31d78)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.71)](https://buildkite.com/seantis/onegov-cloud)
+
+### Translatordirectory
+
+🎉 **Adding core application features**
+
+Create. edit and search translators. Restrict access to certain fields of translators for less privileged roles.
+
+**`Feature`** | **[01f2217fae](https://github.com/onegov/onegov-cloud/commit/01f2217fae7038aab8f0d02ebb51b6356ee7996a)**
 
 ### Wtfs
 
