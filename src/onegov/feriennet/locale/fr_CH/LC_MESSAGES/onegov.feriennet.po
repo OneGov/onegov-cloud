@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-12 11:04+0200\n"
+"POT-Creation-Date: 2020-10-27 08:15+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -516,6 +516,12 @@ msgstr "Théâtre"
 msgid "Trade"
 msgstr "Commerce"
 
+msgid "Holiday Camp"
+msgstr ""
+
+msgid "Family Camp"
+msgstr ""
+
 msgid "Title"
 msgstr "Titre"
 
@@ -1003,8 +1009,18 @@ msgstr ""
 "Chaque participant peut réserver un nombre limité d'activités pour un prix "
 "forfaitaire."
 
+msgid ""
+"Each attendee may attend a fixed number of activites. Each activity is "
+"billed separately."
+msgstr ""
+"Chaque participant peut réserver un nombre limité d'activités. Chaque "
+"activité est facturée séparément."
+
 msgid "Maximum Number of Activities per Attendee"
 msgstr "Nombre maximum d'activités par participants"
+
+msgid "Maximum Number of Bookings per Attendee and period"
+msgstr ""
 
 msgid "Cost of the Pass"
 msgstr "Prix du passeport"
@@ -2012,6 +2028,11 @@ msgstr ""
 "individuelles peuvent faire l'objet d'un supplément."
 
 msgid ""
+"A booking costs ${amount} CHF per child. Individual activities may incur "
+"additional charges."
+msgstr ""
+
+msgid ""
 "Between each booking we enforce ${minutes} minutes of block-time in which no "
 "other booking is permitted."
 msgstr ""
@@ -2537,7 +2558,9 @@ msgstr "Les données xml soumises n'ont pas pu être décodées"
 
 msgid ""
 "The submitted xml data could not be parsed. Please check the file integrity"
-msgstr "Les données xml soumises n'ont pas pu être lu. Veuillez vérifier l'intégrité du xml"
+msgstr ""
+"Les données xml soumises n'ont pas pu être lu. Veuillez vérifier l'intégrité "
+"du xml"
 
 msgid "No transactions were found in the given file"
 msgstr "Aucune transaction n'a été trouvée dans le fichier donné"

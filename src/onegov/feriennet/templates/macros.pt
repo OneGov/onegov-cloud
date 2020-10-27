@@ -590,7 +590,7 @@
             Last-minute cancellations are possible up to <tal:b i18n:name="days">${period.cancellation_days}</tal:b> days before each occasion.
     </div>
 
-    <div tal:condition="period.all_inclusive and period.max_bookings_per_attendee"
+    <div tal:condition="period.max_bookings_per_attendee"
          class="hint hint-max-activities" i18n:translate>
             Each child is assigned up to <tal:b i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> activities. To ensure a good matching you can signup for more activities than those.
     </div>
@@ -598,6 +598,10 @@
     <div tal:condition="period.all_inclusive and period.booking_cost"
          class="hint hint-costs" i18n:translate>
             The passport costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
+    </div>
+    <div tal:condition="not: period.all_inclusive and period.booking_cost"
+         class="hint hint-costs" i18n:translate>
+            A booking costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
     </div>
 
     <div tal:condition="period.minutes_between"

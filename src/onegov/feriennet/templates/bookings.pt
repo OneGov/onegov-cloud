@@ -90,7 +90,12 @@
                                             <tal:b i18n:name="number">${period.max_bookings_per_attendee}</tal:b>
                                         bookings
                                     </span>
-                                    <a i18n:translate tal:condition="not period.all_inclusive and attendee.limit" href="${request.link(attendee, 'limit')}">
+                                    <span i18n:translate tal:condition="not period.all_inclusive and period.max_bookings_per_attendee">
+                                        Limited to
+                                            <tal:b i18n:name="number">${period.max_bookings_per_attendee}</tal:b>
+                                        bookings
+                                    </span>
+                                    <a i18n:translate tal:condition="not period.all_inclusive and not period.max_bookings_per_attendee and attendee.limit" href="${request.link(attendee, 'limit')}">
                                         Limited to
                                             <tal:b i18n:name="number">${attendee.limit or 100}</tal:b>
                                         bookings
@@ -98,7 +103,7 @@
                                     <span i18n:translate tal:condition="period.all_inclusive and not period.max_bookings_per_attendee">
                                         Unlimited bookings
                                     </span>
-                                    <a i18n:translate tal:condition="not period.all_inclusive and not attendee.limit" href="${request.link(attendee, 'limit')}">
+                                    <a i18n:translate tal:condition="not period.all_inclusive and not period.max_bookings_per_attendee and not attendee.limit" href="${request.link(attendee, 'limit')}">
                                         Unlimited bookings
                                     </a>
                                 </div>

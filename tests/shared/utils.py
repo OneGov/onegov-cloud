@@ -26,7 +26,7 @@ def open_in_browser(response, browser='firefox'):
     if not shutil.which(browser):
         print(f'{browser} is not installed, skipping...')
         return
-    path = '/tmp/test.html'
+    path = f'/tmp/test-{str(uuid4())}.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
     os.system(f'{browser} {path} &')
