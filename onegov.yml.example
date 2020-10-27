@@ -132,6 +132,17 @@ configuration: &global-config
 
   # Alternative login providers
   # authentication_providers:
+#    msal:
+#      tenants:
+#        "onegov_agency-xx":
+#          tenant_id: ''
+#          client_id: ''
+#          client_secret: ''
+#      roles:
+#        "onegov_agency-xx":
+#          admins: 'admin'
+#          editors: 'editor'
+#          members: 'member'
 
 #    # Login with LDAP, using Kerberos as authentication
 #    ldap_kerberos:
