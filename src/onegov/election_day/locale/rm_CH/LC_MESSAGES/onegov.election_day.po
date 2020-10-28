@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-26 16:37+0100\n"
+"POT-Creation-Date: 2020-10-28 09:42+0100\n"
 "PO-Revision-Date: 2019-10-15 09:19+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1028,6 +1028,9 @@ msgstr "Cedels electorals vids"
 
 msgid "Invalid Ballots"
 msgstr "Cedels electorals nunvalaivels"
+
+msgid "Intermediate results abbrev"
+msgstr ""
 
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"

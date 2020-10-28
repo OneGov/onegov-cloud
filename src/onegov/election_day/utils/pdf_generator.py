@@ -662,7 +662,7 @@ class PdfGenerator():
         def format_accepted(result):
             accepted = result.accepted
             if accepted is None:
-                return _('Intermediate results')
+                return _('Intermediate results abbrev')
             return accepted and _('Accepted') or _('Rejected')
 
         def format_percentage(number):

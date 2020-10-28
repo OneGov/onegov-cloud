@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-26 16:37+0100\n"
+"POT-Creation-Date: 2020-10-28 09:42+0100\n"
 "PO-Revision-Date: 2020-03-13 11:14+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1024,6 +1024,9 @@ msgstr "Leere Wahlzettel"
 
 msgid "Invalid Ballots"
 msgstr "Ungültige Wahlzettel"
+
+msgid "Intermediate results abbrev"
+msgstr "Zwischenerg."
 
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
