@@ -665,7 +665,10 @@ class PdfGenerator():
                 return _('Intermediate results')
             return accepted and _('Accepted') or _('Rejected')
 
-        def format_value(result, attr, fmt=lambda x: '{0:.2f}%'.format):
+        def format_percentage(number):
+            return '{0:.2f}%'.format(number)
+
+        def format_value(result, attr, fmt=format_percentage):
             if result.accepted is None:
                 return nan
             return fmt(getattr(result, attr))
