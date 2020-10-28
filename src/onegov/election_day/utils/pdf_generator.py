@@ -984,7 +984,7 @@ class PdfGenerator():
             completed = item.completed
             if completed:
                 return True
-            publish = self.app.publish_intermediate_results
+            publish = self.app.principal.publish_intermediate_results
             if not publish:
                 return False
             if isinstance(item, Vote) and publish.get('vote'):
