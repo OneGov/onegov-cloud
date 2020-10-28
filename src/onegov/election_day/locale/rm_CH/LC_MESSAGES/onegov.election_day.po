@@ -1030,11 +1030,11 @@ msgid "Invalid Ballots"
 msgstr "Cedels electorals nunvalaivels"
 
 msgid "Intermediate results abbrev"
-msgstr ""
+msgstr "Resultats interm."
 
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
-msgstr ""
+msgstr "resultats intermediars: ${counted} da ${total} ${entities}"
 
 msgid "Wrong username or password"
 msgstr ""

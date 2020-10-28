@@ -1023,11 +1023,11 @@ msgid "Invalid Ballots"
 msgstr "Schede nulle"
 
 msgid "Intermediate results abbrev"
-msgstr ""
+msgstr "Risultati prov."
 
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
-msgstr ""
+msgstr "Risultati provvisori: ${counted} de ${total} ${entities}"
 
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
