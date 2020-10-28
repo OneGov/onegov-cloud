@@ -103,6 +103,9 @@ configuration: &global-config
   # To test mapbox integration, a mapbox token has to be provided
   # mapbox_token:
 
+  # Install https://github.com/seantis/d3-renderer
+#  d3_renderer: 'http://localhost:1337'
+
    # For Swissvotes, the Museum für Gestatlung has an api
   # mfg_api_token:
 
