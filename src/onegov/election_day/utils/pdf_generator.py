@@ -987,6 +987,9 @@ class PdfGenerator():
             completed = item.completed
             if completed:
                 return True
+            counted, total = item.progress
+            if counted == 0:
+                return False
             publish = self.app.principal.publish_intermediate_results
             if not publish:
                 return False
