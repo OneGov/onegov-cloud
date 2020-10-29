@@ -32,6 +32,12 @@ def get_base_tools(request):
         if request.is_admin:
             links.append(
                 Link(
+                    _("Files"), request.class_link(GeneralFileCollection),
+                    attrs={'class': 'files'}
+                )
+            )
+            links.append(
+                Link(
                     _("Settings"), request.link(
                         request.app.org, 'settings'
                     ), attrs={'class': 'settings'}
