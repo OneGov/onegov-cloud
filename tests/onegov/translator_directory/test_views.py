@@ -270,3 +270,22 @@ def test_view_search_translator(client):
     page = page.form.submit().follow()
     assert 'Sitkova Lavrova' in page
     assert 'Hugentobler' not in page
+
+
+def test_file_security(client):
+    session = client.app.session()
+    translators = TranslatorCollection(session)
+    trs_id = translators.add(**translator_data).id
+    transaction.commit()
+
+    forbidden = 403
+
+    client.login_admin()
+    page = client.get(f'/translator/{trs_id}')
+    assert 'Dokumente' in page
+
+    client.login_editor()
+    page = client.get(f'/translator/{trs_id}')
+    assert 'Dokumente' not in page
+    client.get(f'/documents/{trs_id}', status=forbidden)
+    client.get('/files', status=forbidden)
