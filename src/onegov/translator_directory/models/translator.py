@@ -1,37 +1,21 @@
 from uuid import uuid4
 
 from onegov.core.orm.mixins import ContentMixin, meta_property
+from onegov.file import AssociatedFiles
 from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
-from onegov.core.orm.abstract import associated
 from onegov.core.orm.types import UUID
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
 from onegov.translator_directory.models.certificate import \
     certificate_association_table
-from onegov.translator_directory.models.documents import CertificateFile, \
-    ApplicationFile, ClarificationFile, ConfirmationFile, ComplaintFile, \
-    CorrespondenceFile, MiscFile
+
 from onegov.translator_directory.models.language import \
     mother_tongue_association_table, spoken_association_table, \
     written_association_table
-
-
-class DocumentsMixin(object):
-    # Associated files
-    certificates = associated(CertificateFile, 'certificates', 'one-to-many')
-    applications = associated(ApplicationFile, 'applications', 'one-to-many')
-    clarifications = associated(
-        ClarificationFile, 'clarifications', 'one-to-many')
-    confirmations = associated(
-        ConfirmationFile, 'confirmations', 'one-to-many')
-    complaints = associated(ComplaintFile, 'complaints', 'one-to-many')
-    correspondences = associated(
-        CorrespondenceFile, 'correspondences', 'one-to-many')
-    other_files = associated(MiscFile, 'other_files', 'one-to-many')
 
 
 class ESMixin(ORMSearchable):
@@ -52,7 +36,7 @@ class ESMixin(ORMSearchable):
         })
 
 
-class Translator(Base, TimestampMixin, DocumentsMixin, ContentMixin):
+class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin):
 
     __tablename__ = 'translators'
 
