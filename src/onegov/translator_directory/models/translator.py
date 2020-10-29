@@ -165,3 +165,7 @@ class Translator(Base, TimestampMixin, DocumentsMixin, ContentMixin):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def unique_categories(self):
+        return sorted({f.note for f in self.files})
