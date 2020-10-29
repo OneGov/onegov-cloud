@@ -1,0 +1,73 @@
+from onegov.translator_directory import _
+from onegov.core.security import Secret
+from onegov.core.templates import render_macro
+from onegov.file import File
+from onegov.file.utils import extension_for_content_type
+from onegov.org.views.files import view_upload_file
+from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.translator_directory.collections.documents import \
+    TranslatorDocumentCollection
+from onegov.translator_directory.layout import TranslatorDocumentsLayout, \
+    DefaultLayout
+
+
+@TranslatorDirectoryApp.html(
+    model=TranslatorDocumentCollection,
+    permission=Secret,
+    template='documents.pt'
+)
+def view_translator_documents(self, request):
+    request.include('common')
+    request.include('upload')
+    request.include('prompt')
+
+    layout = TranslatorDocumentsLayout(self, request)
+
+    return {
+        'layout': layout,
+        'model': self,
+        'grouped': self.files_by_category,
+        'title': _('Documents'),
+        'categories': self.unique_categories,
+        'format_date': lambda dt: layout.format_date(dt, 'datetime'),
+        'actions_url': lambda file_id: request.class_link(
+            File, name="details", variables={'id': file_id}
+        ),
+        'extension': lambda file: extension_for_content_type(
+            file.reference.content_type,
+            file.name
+        )
+    }
+
+
+@TranslatorDirectoryApp.html(
+    model=TranslatorDocumentCollection,
+    name='upload',
+    request_method='POST',
+    permission=Secret
+)
+def view_upload_file_translator(self, request):
+    file = view_upload_file(self, request, return_file=True)
+
+    # File could be a new file or duplicate
+    created_before = file.note
+    if not created_before:
+        self.translator.files.append(file)
+
+    file.published = False
+    # If duplicate, we change the category
+    category = request.params.get('category')
+    file.note = category
+
+    layout = DefaultLayout(self, request)
+    return render_macro(layout.macros['file-info'], request, {
+        'file': file,
+        'format_date': lambda dt: layout.format_date(dt, 'datetime'),
+        'actions_url': lambda file_id: request.class_link(
+            File, name="details", variables={'id': file_id}
+        ),
+        'extension': lambda file: extension_for_content_type(
+            file.reference.content_type,
+            file.name
+        )
+    })

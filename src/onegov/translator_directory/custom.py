@@ -1,4 +1,5 @@
 from onegov.core.elements import Link
+from onegov.org.models import GeneralFileCollection
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \

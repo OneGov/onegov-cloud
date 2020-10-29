@@ -1,8 +1,12 @@
 from cached_property import cached_property
+from purl import URL
+
 from onegov.translator_directory import _
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.translator_directory.collections.documents import \
+    TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
@@ -63,6 +67,14 @@ class DefaultLayout(BaseLayout):
 class TranslatorLayout(DefaultLayout):
 
     @cached_property
+    def file_collection(self):
+        return TranslatorDocumentCollection(
+            self.request.session,
+            translator_id=self.model.id,
+            category=None
+        )
+
+    @cached_property
     def editbar_links(self):
         if self.request.is_admin:
             return [
@@ -111,7 +123,12 @@ class TranslatorLayout(DefaultLayout):
                     _('Voucher template'),
                     self.request.link(self.model, name='voucher'),
                     attrs={'class': 'create-excel'}
-                )
+                ),
+                Link(
+                    _('Documents'),
+                    self.request.link(self.file_collection),
+                    attrs={'class': 'documents'}
+                ),
             ]
         elif self.request.is_editor:
             return [
@@ -209,6 +226,35 @@ class AddTranslatorLayout(TranslatorCollectionLayout):
     @property
     def editbar_links(self):
         return []
+
+
+class TranslatorDocumentsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return super().breadcrumbs + [
+            Link(
+                text=_('Translators'),
+                url=self.request.class_link(TranslatorCollection)
+            ),
+            Link(
+                text=self.model.translator.title,
+                url=self.request.link(self.model.translator)
+            ),
+            Link(text=_('Documents'))
+        ]
+
+    @cached_property
+    def upload_url(self):
+        url = URL(self.request.link(self.model, name='upload'))
+        url = url.query_param('category', self.model.category)
+        return self.csrf_protected_url(url.as_string())
+
+    def link_for(self, category):
+        return self.request.class_link(
+            self.model.__class__,
+            {'translator_id': self.model.translator_id, 'category': category}
+        )
 
 
 class LanguageCollectionLayout(DefaultLayout):
