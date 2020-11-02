@@ -194,7 +194,11 @@ def view_logout(self, request):
 
         return self.logout_to(request, to)
 
-    if isinstance(self.app, UserApp):
+    user = request.current_user
+    if not user:
+        do_logout(request)
+
+    if isinstance(self.app, UserApp) and user.source:
         for provider in self.app.providers:
             if isinstance(provider, OauthProvider):
                 if request.url == provider.logout_redirect_uri(request):
