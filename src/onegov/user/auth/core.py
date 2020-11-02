@@ -134,6 +134,8 @@ class Auth(object):
 
         if isinstance(self.app, UserApp) and not skip_providers:
             for provider in self.app.providers:
+                if not provider.available(self.app):
+                    continue
                 if provider.kind == 'integrated':
                     user = provider.authenticate_user(
                         request=request,
