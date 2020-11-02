@@ -21,7 +21,7 @@ TEST_TENANT = os.environ.get(
 
 
 @pytest.fixture(scope='function')
-def app(request, postgres_dsn, temporary_path, redis_url, keytab):
+def app(postgres_dsn, redis_url):
 
     class App(Framework, UserApp):
         pass
@@ -35,41 +35,45 @@ def app(request, postgres_dsn, temporary_path, redis_url, keytab):
         redis_url=redis_url,
     )
 
-    client_id = os.environ.get('MSAL_TEST_CLIENT_ID')
-    client_secret = os.environ.get('MSAL_TEST_CLIENT_SECRET')
-
-    app_id = 'msal/test'
-    config = textwrap.dedent(f"""
-    authentication_providers:
-      msal:
-        tenants:
-          "{app_id}":
-            tenant_id: '{TEST_TENANT}'
-            client_id: '{client_id}'
-            client_secret: '{client_secret}'
-            validate_authority: false    
-            #attributes:
-            #  source_id: 'sub'
-            #  username: 'email'
-            #  groups: 'groups'
-            #  first_name: 'given_name'
-            #  last_name: 'family_name'
-        roles:
-          "{app_id}":
-            admins: 'ads'
-            editors: 'eds'
-            members: 'mems'
-    """)
-
-    app.configure_authentication_providers(**yaml.safe_load(config))
-
-    app.namespace = 'msal'
-    app.set_application_id(app_id)
-
     return app
 
 
+def configure_provider(app, app_id):
+    client_id = os.environ.get('MSAL_TEST_CLIENT_ID')
+    client_secret = os.environ.get('MSAL_TEST_CLIENT_SECRET')
+    config = textwrap.dedent(f"""
+        authentication_providers:
+          msal:
+            tenants:
+              "{app_id}":
+                tenant_id: '{TEST_TENANT}'
+                client_id: '{client_id}'
+                client_secret: '{client_secret}'
+                validate_authority: false    
+                #attributes:
+                #  source_id: 'sub'
+                #  username: 'email'
+                #  groups: 'groups'
+                #  first_name: 'given_name'
+                #  last_name: 'family_name'
+            roles:
+              "{app_id}":
+                admins: 'ads'
+                editors: 'eds'
+                members: 'mems'
+        """)
+
+    app.configure_authentication_providers(**yaml.safe_load(config))
+
+
 def test_msal_configuration(app):
+
+    namespace = 'msal'
+    app_id = f'{namespace}/test'
+    app.namespace = namespace
+    app.set_application_id(app_id)
+    configure_provider(app, app_id)
+
     provider = app.providers[0]
     client = provider.tenants.client(app)
     assert not client.validate_authority
