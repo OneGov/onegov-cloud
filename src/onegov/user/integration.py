@@ -146,7 +146,7 @@ def handle_authentication(self, request):
 
 @UserApp.view(
     model=AuthenticationProvider,
-    permisssion=Public,
+    permission=Public,
     name='redirect'
 )
 def handle_provider_authorisation(self, request):
@@ -174,7 +174,7 @@ def handle_provider_authorisation(self, request):
 
 @UserApp.view(
     model=AuthenticationProvider,
-    permisssion=Public,
+    permission=Public,
     name='logout'
 )
 def handle_provider_logout(self, request):
