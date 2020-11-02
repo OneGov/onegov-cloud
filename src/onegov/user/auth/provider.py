@@ -114,6 +114,12 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         return cls()
 
+    def available(self, app):
+        """Returns the the authentication provider is available for the current
+        app. Since there are tenant specific connections, we might want to
+        check, if for the tenant of the app, there is an available client."""
+        return True
+
 
 @attrs()
 class SeparateAuthenticationProvider(AuthenticationProvider):
@@ -898,3 +904,6 @@ class AzureADProvider(
         return Success(user, _("Successfully logged in as «${user}»", mapping={
             'user': user.username
         }))
+
+    def available(self, app):
+        return self.tenants.client(app) and True or False
