@@ -185,24 +185,27 @@ def view_logout(self, request):
 
     from onegov.user.integration import UserApp  # circular import
 
+    def do_logout(request, to=None):
+        # the message has to be set after the log out code has run, since that
+        # clears all existing messages from the session
+        @request.after
+        def show_hint(response):
+            request.success(_("You have been logged out."))
+
+        return self.logout_to(request, to)
+
     if isinstance(self.app, UserApp):
         for provider in self.app.providers:
             if isinstance(provider, OauthProvider):
                 if request.url == provider.logout_redirect_uri(request):
-                    return self.logout_to(
+                    return do_logout(
                         request,
                         to=request.browser_session.pop('logout_to', '/')
                     )
                 request.browser_session['logout_to'] = self.to
                 return morepath.redirect(provider.logout_url(request))
 
-    # the message has to be set after the log out code has run, since that
-    # clears all existing messages from the session
-    @request.after
-    def show_hint(response):
-        request.success(_("You have been logged out."))
-
-    return self.logout_to(request)
+    return do_logout(request)
 
 
 @OrgApp.form(model=Auth, name='request-password', template='form.pt',
