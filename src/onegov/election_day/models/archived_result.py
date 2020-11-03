@@ -125,6 +125,9 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: True, if the vote or election has been completed.
     completed = meta_property('completed', default=False)
 
+    #: Turnout (vote/elections)
+    turnout = meta_property('turnout')
+
     #: The local results (municipal results if fetched from cantonal instance)
     local = meta_property('local')
 

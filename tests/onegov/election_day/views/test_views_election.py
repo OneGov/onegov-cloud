@@ -568,6 +568,7 @@ def test_view_election_summary(election_day_app_gr):
             'title': {'de_CH': 'Majorz Election'},
             'type': 'election',
             'url': 'http://localhost/election/majorz-election',
+            'turnout': 44.642857142857146
         }
 
         response = client.get('/election/proporz-election/summary')
@@ -582,6 +583,7 @@ def test_view_election_summary(election_day_app_gr):
             'title': {'de_CH': 'Proporz Election'},
             'type': 'election',
             'url': 'http://localhost/election/proporz-election',
+            'turnout': 57.14285714285714
         }
 
 

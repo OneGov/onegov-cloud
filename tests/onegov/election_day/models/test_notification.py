@@ -146,7 +146,8 @@ def test_webhook_notification(session):
                 'progress': {'counted': 0, 'total': 0},
                 'title': {'de_CH': 'Election'},
                 'type': 'election',
-                'url': 'Election/election'
+                'url': 'Election/election',
+                'turnout': 0
             }
 
             notification.trigger(request, vote)
@@ -169,7 +170,8 @@ def test_webhook_notification(session):
                 'title': {'de_CH': 'Vote'},
                 'type': 'vote',
                 'url': 'Vote/vote',
-                'yeas_percentage': None
+                'yeas_percentage': None,
+                'turnout': 0
             }
 
 
