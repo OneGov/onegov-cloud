@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="row" tal:condition="providers">
-            <tal:b define="separate [p for p in providers if p.kind == 'separate']" condition="separate">
+            <tal:b define="separate [p for p in providers if p.kind == 'separate' and p.available(request.app)]" condition="separate">
                 <div class="small-12 medium-7 large-5 columns alternatives">
                     <h2 i18n:translate>Alternatives</h2>
                     <div tal:repeat="provider separate" class="provider-login">

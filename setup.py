@@ -102,6 +102,7 @@ setup(
         'more.webassets',
         'more_itertools',
         'morepath',
+        'msal',
         'ordered-set',
         'passlib',
         'pdfdocument',

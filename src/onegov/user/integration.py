@@ -1,9 +1,10 @@
+import morepath
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from onegov.core.cache import lru_cache
 from onegov.core.security import Public
 from onegov.user.auth.core import Auth
-from onegov.user.auth.provider import AUTHENTICATION_PROVIDERS
+from onegov.user.auth.provider import AUTHENTICATION_PROVIDERS, AzureADProvider
 from onegov.user.auth.provider import AuthenticationProvider
 from onegov.user.auth.provider import Conclusion
 from onegov.user.auth.provider import provider_by_name
@@ -141,6 +142,50 @@ def handle_authentication(self, request):
 
     # the provider returned something illegal
     raise RuntimeError(f"Invalid response from {self.name}: {response}")
+
+
+@UserApp.view(
+    model=AuthenticationProvider,
+    permission=Public,
+    name='redirect'
+)
+def handle_provider_authorisation(self, request):
+    response = self.request_authorisation(request)
+
+    if isinstance(response, Response):
+        return response
+
+    if isinstance(response, Conclusion):
+        # catching the success conclusion with the ensured user
+        if response:
+            return Auth.from_request(request, to=self.to) \
+                .complete_login(user=response.user, request=request)
+        else:
+            request.alert(request.translate(response.note))
+            login_to = request.browser_session.pop('login_to')
+            # On failure we take `to` and bring the user to the url where he
+            # started his authentication process.
+            return request.redirect(
+                request.class_link(Auth, {'to': login_to}, name='login')
+            )
+
+    raise RuntimeError(f"Invalid response from {self.name}: {response}")
+
+
+@UserApp.view(
+    model=AuthenticationProvider,
+    permission=Public,
+    name='logout'
+)
+def handle_provider_logout(self, request):
+    """ We contact Microsoft that the user wants to log out and redirecting
+    him to our main logout view. """
+
+    if isinstance(self, AzureADProvider):
+        request.browsser_session['logout_to'] = self.to
+        return morepath.redirect(self.logout_url(request))
+
+    raise NotImplementedError
 
 
 @UserApp.webasset_path()

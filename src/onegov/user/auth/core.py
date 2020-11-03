@@ -134,6 +134,8 @@ class Auth(object):
 
         if isinstance(self.app, UserApp) and not skip_providers:
             for provider in self.app.providers:
+                if not provider.available(self.app):
+                    continue
                 if provider.kind == 'integrated':
                     user = provider.authenticate_user(
                         request=request,
@@ -252,8 +254,8 @@ class Auth(object):
 
         return response
 
-    def logout_to(self, request):
-        """ Logs the current user out and redirects to ``self.to``.
+    def logout_to(self, request, to=None):
+        """ Logs the current user out and redirects to ``to`` or ``self.to``.
 
         :return: A response redirecting to ``self.to`` with the identity
         forgotten.
@@ -263,7 +265,7 @@ class Auth(object):
         user = self.by_identity(request.identity)
         user and user.remove_current_session(request)
 
-        response = self.redirect(request, self.to)
+        response = self.redirect(request, to or self.to)
         request.app.forget_identity(response, request)
 
         return response
