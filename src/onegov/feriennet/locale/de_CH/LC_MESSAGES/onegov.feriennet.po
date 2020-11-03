@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-03 08:53+0100\n"
+"POT-Creation-Date: 2020-11-03 09:13+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -165,6 +165,9 @@ msgstr "Buchung Priorität"
 
 msgid "Booking Cost"
 msgstr "Buchung Kosten"
+
+msgid "Booking Date"
+msgstr "Buchungsdatum"
 
 msgid "Attendee First Name"
 msgstr "Teilnehmer Vorname"
