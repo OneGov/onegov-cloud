@@ -30,7 +30,7 @@ def hide_translator_for_non_admins(app, identity, model, permission):
 
 @TranslatorDirectoryApp.permission_rule(
     model=GeneralFileCollection, permission=object)
-def restrict_general_file_access(app, identity, model, permission):
+def restrict_general_file_collection_access(app, identity, model, permission):
     return identity.role == 'admin'
 
 
@@ -42,11 +42,11 @@ def restrict_general_file_access(app, identity, model, permission):
 
 @TranslatorDirectoryApp.permission_rule(
     model=File, permission=object)
-def restrict_general_file_access(app, identity, model, permission):
+def restrict_file_access(app, identity, model, permission):
     return identity.role == 'admin'
 
 
 @TranslatorDirectoryApp.permission_rule(
     model=TranslatorDocumentCollection, permission=object)
-def restrict_general_file_access(app, identity, model, permission):
+def restrict_translator_docs_coll_access(app, identity, model, permission):
     return identity.role == 'admin'
