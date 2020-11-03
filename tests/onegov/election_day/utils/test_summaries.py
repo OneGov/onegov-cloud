@@ -37,6 +37,7 @@ def test_get_election_summary(session):
             'title': {'de_CH': 'Election'},
             'type': 'election',
             'url': 'Election/election',
+            'turnout': 0
         }
         assert expected == get_election_summary(election, request)
         assert expected == get_election_summary(result, None,
@@ -117,6 +118,7 @@ def test_get_vote_summary(session):
             'type': 'vote',
             'url': 'Vote/vote',
             'yeas_percentage': None,
+            'turnout': 0
         }
         assert expected == get_vote_summary(vote, request)
         assert expected == get_vote_summary(result, None, request.link(vote))

@@ -25,6 +25,7 @@ def test_archived_result(session):
     result.yeas_percentage = 79.5
     result.counted = True
     result.completed = True
+    result.turnout = 50
 
     session.add(result)
     session.flush()
@@ -63,7 +64,8 @@ def test_archived_result(session):
         'counted': True,
         'completed': True,
         'elected_candidates': [('Joe', 'Quimby')],
-        'elections': ['https://localhost/1', 'https://localhost/1']
+        'elections': ['https://localhost/1', 'https://localhost/1'],
+        'turnout': 50
     }
 
     # Test progress
@@ -126,7 +128,8 @@ def test_archived_result(session):
         'counted': True,
         'completed': True,
         'elected_candidates': [('Joe', 'Quimby')],
-        'elections': ['https://localhost/1', 'https://localhost/1']
+        'elections': ['https://localhost/1', 'https://localhost/1'],
+        'turnout': 50
     }
     assert copied.shortcode == 'shortcode'
 

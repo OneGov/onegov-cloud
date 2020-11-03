@@ -116,6 +116,7 @@ def test_view_vote_summary(election_day_app):
             'type': 'vote',
             'url': 'http://localhost/vote/vote',
             'yeas_percentage': 37.21191933741448,
+            'turnout': 61.34161218251847
         }
 
 
