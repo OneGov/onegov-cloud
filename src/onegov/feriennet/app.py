@@ -16,7 +16,7 @@ from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
 from onegov.org.app import get_public_ticket_messages \
     as default_public_ticket_messages
 from onegov.user import User, UserCollection
-
+from onegov.feriennet import _
 
 BANNER_TEMPLATE = """
 <div class="sponsor-banner">
@@ -34,6 +34,7 @@ BANNER_TEMPLATE = """
                  "
                  alt="Advertisement">
     </div>
+    <br><p class="banner-info">{info}</p>
 </div>
 """
 
@@ -103,7 +104,8 @@ class FeriennetApp(OrgApp):
             id=id,
             src=winner.url_for(request, winner.banners[id]['src']),
             url=winner.banners[id]['url'],
-            tracker=winner.banners[id].get('tracker', '')
+            tracker=winner.banners[id].get('tracker', ''),
+            info=request.translate(_('Partner of Pro Juventute'))
         )
 
     def configure_organisation(self, **cfg):

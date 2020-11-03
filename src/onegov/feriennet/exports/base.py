@@ -99,6 +99,7 @@ class FeriennetExport(Export):
         yield _("Booking State"), BOOKING_STATES[state]
         yield _("Booking Priority"), booking.priority
         yield _("Booking Cost"), booking.cost
+        yield _("Booking Date"), booking.created.date()
 
     def attendee_fields(self, attendee):
         first_name, last_name = decode_name(attendee.name)

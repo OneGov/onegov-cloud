@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-27 08:15+0100\n"
+"POT-Creation-Date: 2020-11-03 09:13+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -13,6 +13,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.3\n"
+
+msgid "Partner of Pro Juventute"
+msgstr "Partenaire Pro Juventute"
 
 msgid "No active period"
 msgstr "Pas de période active"
@@ -163,6 +166,9 @@ msgstr "Priorité de la réservation"
 
 msgid "Booking Cost"
 msgstr "Coût de la réservation"
+
+msgid "Booking Date"
+msgstr "Date de réservation"
 
 msgid "Attendee First Name"
 msgstr "Prénom du participant"
@@ -516,11 +522,20 @@ msgstr "Théâtre"
 msgid "Trade"
 msgstr "Commerce"
 
-msgid "Holiday Camp"
-msgstr ""
+msgid "Camp"
+msgstr "Camps"
+
+msgid "Camp in House"
+msgstr "Camps en maison de vacances"
+
+msgid "Tent Camp"
+msgstr "Camps en camping"
 
 msgid "Family Camp"
-msgstr ""
+msgstr "Camps de famille"
+
+msgid "Trecking Camp"
+msgstr "Camps en randonnée"
 
 msgid "Title"
 msgstr "Titre"
