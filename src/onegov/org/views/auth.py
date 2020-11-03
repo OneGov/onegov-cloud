@@ -179,37 +179,44 @@ def handle_activation(self, request):
     return morepath.redirect(request.link(request.app.org))
 
 
-@OrgApp.html(model=Auth, name='logout', permission=Personal)
-def view_logout(self, request):
-    """ Handles the logout requests. """
+def do_logout(self, request, to=None):
+    # the message has to be set after the log out code has run, since that
+    # clears all existing messages from the session
+    @request.after
+    def show_hint(response):
+        request.success(_("You have been logged out."))
 
+    return self.logout_to(request, to)
+
+
+def do_logout_with_external_provider(self, request):
+    """ Use this function if you want to go the way to the external auth
+    provider first and then logout on redirect. """
     from onegov.user.integration import UserApp  # circular import
-
-    def do_logout(request, to=None):
-        # the message has to be set after the log out code has run, since that
-        # clears all existing messages from the session
-        @request.after
-        def show_hint(response):
-            request.success(_("You have been logged out."))
-
-        return self.logout_to(request, to)
 
     user = request.current_user
     if not user:
-        do_logout(request)
+        do_logout(self, request)
 
     if isinstance(self.app, UserApp) and user.source:
         for provider in self.app.providers:
             if isinstance(provider, OauthProvider):
                 if request.url == provider.logout_redirect_uri(request):
                     return do_logout(
+                        self,
                         request,
                         to=request.browser_session.pop('logout_to', '/')
                     )
                 request.browser_session['logout_to'] = self.to
                 return morepath.redirect(provider.logout_url(request))
 
-    return do_logout(request)
+
+@OrgApp.html(model=Auth, name='logout', permission=Personal)
+def view_logout(self, request):
+    """ Handles the logout requests. We do not logout over external auth
+    providers, since we anyway have like a hybrid login (using id_token to
+    establish our own login session with different expiration). """
+    return do_logout(self, request)
 
 
 @OrgApp.form(model=Auth, name='request-password', template='form.pt',
