@@ -1021,7 +1021,7 @@ msgid "Maximum Number of Activities per Attendee"
 msgstr "Maximale Anzahl Angebote pro Teilnehmer"
 
 msgid "Maximum Number of Bookings per Attendee and period"
-msgstr "Maximale Anzahl Buchungen per Teilnehmer und Periode"
+msgstr "Maximale Anzahl Buchungen per Teilnehmer und Zeitraum"
 
 msgid "Cost of the Pass"
 msgstr "Kosten des Passes"
@@ -2518,7 +2518,7 @@ msgid "Create Bills"
 msgstr "Rechnungen erstellen"
 
 msgid "The period must be active in order to reset billing"
-msgstr "Die Periode muss aktiv sein, um die Fakturierung zurückzusetzen"
+msgstr "Der Zeitraum muss aktiv sein, um die Fakturierung zurückzusetzen"
 
 msgid "The billing was successfully reset"
 msgstr "Die Fakturierung wurde erfolgreich zurückgesetzt"
@@ -2694,11 +2694,11 @@ msgid "This donation has already been paid"
 msgstr "Die Spende wurde bereits bezahlt"
 
 msgid "Can not do matchings for an inactive period"
-msgstr "Zuteilungen können nur in einer aktiven Periode durchgeführt werden"
+msgstr "Zuteilungen können nur in einem aktiven Zeitraum durchgeführt werden"
 
 msgid "Can not do matchings for an confirmed period"
 msgstr ""
-"Zuteilungen können nur in einer nicht bestätigten Periode durchgeführt werden"
+"Zuteilungen können nur in einem nicht bestätigten Zeitraum durchgeführt werden"
 
 msgid "The matching was confirmed successfully"
 msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
