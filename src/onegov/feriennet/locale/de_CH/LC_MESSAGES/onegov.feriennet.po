@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-03 08:08+0100\n"
+"POT-Creation-Date: 2020-11-03 08:53+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,9 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.12\n"
+
+msgid "Partner of Pro Juventute"
+msgstr "Partner von Pro Juventute"
 
 msgid "No active period"
 msgstr "Kein aktiver Zeitraum"
