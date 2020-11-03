@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-27 08:15+0100\n"
+"POT-Creation-Date: 2020-11-03 08:08+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -514,11 +514,20 @@ msgstr "Theater"
 msgid "Trade"
 msgstr "Handwerk"
 
-msgid "Holiday Camp"
-msgstr "Ferienlager"
+msgid "Camp"
+msgstr "Lager"
+
+msgid "Camp in House"
+msgstr "Hauslager"
+
+msgid "Tent Camp"
+msgstr "Zeltlager"
 
 msgid "Family Camp"
 msgstr "Familienlager"
+
+msgid "Trecking Camp"
+msgstr "Treckinglager"
 
 msgid "Title"
 msgstr "Titel"
@@ -2961,6 +2970,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Holiday Camp"
+#~ msgstr "Ferienlager"
 
 #~ msgid "The minium age cannot be higher than the maximum age"
 #~ msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"

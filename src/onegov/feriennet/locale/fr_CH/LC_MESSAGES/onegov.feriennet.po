@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-27 08:15+0100\n"
+"POT-Creation-Date: 2020-11-03 08:08+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -516,11 +516,20 @@ msgstr "Théâtre"
 msgid "Trade"
 msgstr "Commerce"
 
-msgid "Holiday Camp"
-msgstr ""
+msgid "Camp"
+msgstr "Camps"
+
+msgid "Camp in House"
+msgstr "Camps en maison de vacances"
+
+msgid "Tent Camp"
+msgstr "Camps en camping"
 
 msgid "Family Camp"
-msgstr ""
+msgstr "Camps de famille"
+
+msgid "Trecking Camp"
+msgstr "Camps en randonnée"
 
 msgid "Title"
 msgstr "Titre"

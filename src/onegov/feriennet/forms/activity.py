@@ -35,8 +35,11 @@ TAGS = tuple((tag, tag) for tag in (
     _("Styling"),
     _("Theater"),
     _("Trade"),
-    _("Holiday Camp"),
+    _("Camp"),
+    _("Camp in House"),
+    _("Tent Camp"),
     _("Family Camp"),
+    _("Trecking Camp"),
 ))
 
 
