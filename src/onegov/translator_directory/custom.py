@@ -1,4 +1,5 @@
 from onegov.core.elements import Link
+from onegov.org.models import GeneralFileCollection
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
@@ -30,6 +31,12 @@ def get_base_tools(request):
         links = []
 
         if request.is_admin:
+            links.append(
+                Link(
+                    _("Files"), request.class_link(GeneralFileCollection),
+                    attrs={'class': 'files'}
+                )
+            )
             links.append(
                 Link(
                     _("Settings"), request.link(

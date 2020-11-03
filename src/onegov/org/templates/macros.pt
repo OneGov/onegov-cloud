@@ -1544,11 +1544,11 @@
                 </div>
             </tal:b>
 
-            <h3 i18n:translate>Publication</h3>
+            <h3 i18n:translate tal:condition="not: hide_publication|False">Publication</h3>
             <div class="publication" tal:define="
                 post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
                 publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
-            ">
+            " tal:condition="not: hide_publication|False">
                 <div tal:condition="file.published" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
                        ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"

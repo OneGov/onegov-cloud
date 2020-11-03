@@ -26,9 +26,7 @@ def test_translator(session):
     assert written.writers == [translator]
     assert written.writers_count == 1
     assert translator.written_languages == [written]
-    assert not translator.certificates
-    assert not translator.applications
-    assert not translator.certificates
+    assert not translator.files
 
     cert = LanguageCertificateCollection(session).add(name='TestCert')
     translator.certificates.append(cert)

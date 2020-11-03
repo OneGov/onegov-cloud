@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-19 20:15+0200\n"
+"POT-Creation-Date: 2020-10-28 21:19+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -296,6 +296,9 @@ msgstr "Abbrechen"
 msgid "Voucher template"
 msgstr "Abrechnungsvorlage"
 
+msgid "Documents"
+msgstr "Dokumente"
+
 msgid "Edit translator"
 msgstr "Übersetzer/in bearbeiten"
 
@@ -307,6 +310,27 @@ msgstr "Sprache hinzufügen"
 
 msgid "Export Excel"
 msgstr "Export Excel"
+
+msgid "Upload"
+msgstr "Hochladen"
+
+msgid "Chose document category for upload:"
+msgstr "Wählen Sie die Dokument-Kategorie für das Hochladen:"
+
+msgid "Just Uploaded"
+msgstr "Gerade hochgeladen"
+
+msgid "Extension"
+msgstr "Dateityp"
+
+msgid "Upload Date"
+msgstr "Hochlade-Datum"
+
+msgid "Files by category"
+msgstr "Dateien nach Kategorie"
+
+msgid "No files uploaded yet"
+msgstr "Noch keine Dateien hochgeladen"
 
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
@@ -372,6 +396,15 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+#~ msgid "Uncategorized"
+#~ msgstr "Unkategorisiert"
+
+#~ msgid "File"
+#~ msgstr "Datei"
+
+#~ msgid "Category"
+#~ msgstr "Kategorie"
 
 #~ msgid "Language training"
 #~ msgstr "Sprachausbildung"

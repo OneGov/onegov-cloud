@@ -1,4 +1,6 @@
 from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.translator_directory.collections.documents import \
+    TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
@@ -47,3 +49,10 @@ def get_language(app, id):
 )
 def get_language_collection(app, page=0, letter=None):
     return LanguageCollection(app.session(), page, letter)
+
+
+@TranslatorDirectoryApp.path(
+    model=TranslatorDocumentCollection, path='/documents/{translator_id}'
+)
+def get_translator_documents(app, translator_id, category=None):
+    return TranslatorDocumentCollection(app.session(), translator_id, category)
