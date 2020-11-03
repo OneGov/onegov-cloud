@@ -1,8 +1,46 @@
 # Changes
 
+## Release `2020.79`
+
+> commits: **13 / [f30937ed4f...ac1039f312](https://github.com/OneGov/onegov-cloud/compare/f30937ed4f^...ac1039f312)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.79)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🎉 **Includes turnout in json endpoints**
+
+Adds turnout to the ArchivedResult model and to the summeries of those results.
+
+**`Feature`** | **[200f8d295d](https://github.com/onegov/onegov-cloud/commit/200f8d295d09327fcda620fa758f36bc67060ac4)**
+
+### Feriennet
+
+🎉 **Banner Info, Booking Date in Exports, Activity Tags**
+
+Adds banner info, booking date to exports and couple of new activity tags.
+
+**`Feature`** | **[68d67ce540](https://github.com/onegov/onegov-cloud/commit/68d67ce5402fb23a06f0a906ec9f2b627bcd1038)**
+
+### Translatordirectory
+
+🎉 **Adds files and files categorized files for translator**
+
+Adds documents for translator via AssociatedFiles mixin. Keep it simply by categorizing files of a translator by `File.note`. Also adds the GeneralFileCollection to dump general files. Restrict access to all files to admins.
+
+**`Feature`** | **[c813d935e7](https://github.com/onegov/onegov-cloud/commit/c813d935e78e3bccdabd34ccd61f32d245766dcf)**
+
+### User
+
+🎉 **Adds OpenID Connect with AzureAD**
+
+Adds authentication and authorisation based on `onegov.user` using the browser session and `msal`.
+
+**`Feature`** | **[0a86d2c44b](https://github.com/onegov/onegov-cloud/commit/0a86d2c44b0f899d3d34dae4582a1d4cb70ebdd9)**
+
 ## Release `2020.78`
 
-> commits: **12 / [86025c8fdc...41fdea2f1c](https://github.com/OneGov/onegov-cloud/compare/86025c8fdc^...41fdea2f1c)**  
+> released: **2020-10-27 09:22**<br>
+> commits: **13 / [86025c8fdc...ab440cc97f](https://github.com/OneGov/onegov-cloud/compare/86025c8fdc^...ab440cc97f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.78)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
