@@ -1,24 +1,42 @@
 import requests
 from purl import URL
 
-from onegov.gis import Coordinates
-
 
 class MapboxRequests():
 
-    endpoints = ('places', )
+    host = 'https://api.mapbox.com'
+    endpoints = ('directions', 'geocoding')
+    geocode_profiles = ('places', )
+    directions_profiles = ('driving-traffic', 'driving', 'walking', 'cycling')
 
-    def __init__(self, access_token, locale=None):
-        self.access_token = access_token
-
-    def base_url(self, endpoint):
+    def __init__(
+            self,
+            access_token,
+            endpoint='geocoding',
+            profile='mapbox.places',
+            api_version='v5'
+    ):
         assert endpoint in self.endpoints
-        url = URL(f'https://api.mapbox.com/geocoding/v5/mapbox.{endpoint}')
+        if endpoint == 'directions':
+            assert profile in self.directions_profiles
+            profile = f'mapbox/{profile}'
+        if endpoint == 'geocoding':
+            assert profile in self.geocode_profiles
+            profile = f'mapbox.{profile}'
+
+        self.access_token = access_token
+        self.endpoint = endpoint
+        self.profile = profile
+        self.api_version = api_version
+
+    @property
+    def base_url(self):
+        url = URL(f'{self.host}/{self.endpoint}/{self.api_version}/{self.profile}')
         url = url.query_param('access_token', self.access_token)
         return url
 
-    def geocode_address_url(self, text=None, street=None, zip_code=None, city=None,
-                        ctry=None, locale=None):
+    def geocode(self, text=None, street=None, zip_code=None, city=None,
+                        ctry=None, locale=None, as_url=False):
         if not ctry:
             ctry = 'Schweiz'
 
@@ -29,39 +47,24 @@ class MapboxRequests():
 
         address = text or f'{street}, {zip_code} {city}, {ctry}'
 
-        url = self.base_url('places')
+        url = self.base_url
         url = url.add_path_segment(f'{address}.json')
         url = url.query_param('types', 'address')
 
         locale = locale and locale.replace('_CH', '')
         if locale:
             url = url.query_param('language', locale)
-        return url
+        if as_url:
+            return url
+        return requests.get(url.as_string())
 
-    def geocode_address(self, text=None, street=None, zip_code=None, city=None,
-                        ctry=None, locale=None):
-
-        url = self.geocode_address_url(
-            text, street, zip_code, city, ctry, locale)
-
-        result = requests.get(url.as_string())
-
-        if result.status_code != 200:
-            return
-
-        data = result.json()
-        coordinates = None
-        for feature in data['features']:
-            matched_place = feature.get('matching_place_name')
-            if not matched_place:
-                continue
-            place_types = feature['place_type']
-            if 'address' not in place_types:
-                continue
-            if zip_code and str(zip_code) not in matched_place:
-                continue
-            x, y = feature['geometry']['coordinates']
-            return Coordinates(lat=x, lon=y)
-
-        return coordinates
-
+    def directions(self, coordinates, as_url=False):
+        """
+        coordinates: iterable of tuples of (lat, lon)
+        """
+        url = self.base_url.add_path_segment(
+            ';'.join(f'{c[0]},{c[1]}' for c in coordinates)
+        )
+        if as_url:
+            return url
+        return requests.get(url.as_string())
