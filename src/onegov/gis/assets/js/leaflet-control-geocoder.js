@@ -571,7 +571,6 @@ this.L.Control.Geocoder = (function (L) {
               var id = loc.context[j].id.split('.')[0];
               properties[id] = loc.context[j].text;
             }
-
             results[i] = {
               name: loc.place_name,
               bbox: latLngBounds,
@@ -580,7 +579,6 @@ this.L.Control.Geocoder = (function (L) {
             };
           }
         }
-
         cb.call(context, results);
       });
     },
@@ -1587,6 +1585,7 @@ this.L.Control.Geocoder = (function (L) {
     },
 
     _geocodeResultSelected: function(result) {
+      this._input.value = result.name;
       this.fire('markgeocode', { geocode: result });
     },
 
