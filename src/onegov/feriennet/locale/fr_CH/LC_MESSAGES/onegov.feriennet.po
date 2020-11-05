@@ -1035,7 +1035,7 @@ msgid "Maximum Number of Activities per Attendee"
 msgstr "Nombre maximum d'activités par participants"
 
 msgid "Maximum Number of Bookings per Attendee and period"
-msgstr ""
+msgstr "Nombre maximum d'activités par participants et period"
 
 msgid "Cost of the Pass"
 msgstr "Prix du passeport"
