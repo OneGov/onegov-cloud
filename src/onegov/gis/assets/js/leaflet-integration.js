@@ -140,7 +140,27 @@ function asMarkerMap(map, input) {
     var coordinates = getCoordinates(input);
     var icon = L.VectorMarkers.icon(getMarkerOptions(input));
 
-    function addMarker(position, zoom) {
+    function fillAddressFormFields (geocode_result) {
+        // Will fill in your form fields with the fetched geocoded address result.
+        // Can be used in combination with the CoordinatesField that uses a marker map to store the address at the same
+        // time as the coordinates
+        var addrInput = $('input#address');
+        var zipCodeInput = $('input#zip_code')
+        var cityInput = $('input#city')
+        var countryInput = $('input#country')
+
+        if (addrInput.length && zipCodeInput.length && cityInput.length) {
+            var properties = geocode_result.properties;
+            addrInput.val([properties.text || '', properties.address || ''].join(' ').trim());
+            zipCodeInput.val(properties.postcode || '');
+            cityInput.val(properties.place || '');
+            if(countryInput.length) {
+                countryInput.val(properties.country || '');
+            }
+        }
+    }
+
+    function addMarker(position, zoom, title) {
         position = position || map.getCenter();
         zoom = zoom || map.getZoom();
         title = title || '';
@@ -201,6 +221,7 @@ function asMarkerMap(map, input) {
             removeMarker();
         }
         addMarker(null, null, result.geocode.name);
+        fillAddressFormFields(result.geocode);
         pointButton.state('remove-point');
     });
 
