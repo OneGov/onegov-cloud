@@ -280,7 +280,7 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
 @cli.command(name='geocode', context_settings={'singular': True})
 @click.option('--dry-run', is_flag=True)
 @click.option('--only-empty', is_flag=True, default=True)
-def do_import(dry_run, only_empty):
+def do_geocode(dry_run, only_empty):
 
     def same_coords(this, other):
         return this.lat == other.lat and this.lon == other.lon
