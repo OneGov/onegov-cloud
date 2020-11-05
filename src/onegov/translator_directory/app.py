@@ -1,4 +1,5 @@
 from onegov.core import utils
+from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
@@ -20,6 +21,13 @@ class TranslatorDirectoryApp(OrgApp):
         cfg.setdefault('enable_yubikey', False)
         cfg.setdefault('disable_password_reset', False)
         super().configure_organisation(**cfg)
+
+    def configure_home_address(self, **cfg):
+        """ Configures the home address to calculate the distance of a
+         translators home address to this home address. """
+        home = cfg.get('translator_directory_home', None)
+        assert home, 'This app needs home coordinates for the routing api'
+        self.coordinates = Coordinates(lat=home['lat'], lon=home['lon'])
 
 
 @TranslatorDirectoryApp.template_directory()
