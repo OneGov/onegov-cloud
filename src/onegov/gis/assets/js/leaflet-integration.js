@@ -143,8 +143,9 @@ function asMarkerMap(map, input) {
     function addMarker(position, zoom) {
         position = position || map.getCenter();
         zoom = zoom || map.getZoom();
+        title = title || '';
 
-        marker = L.marker(position, {icon: icon, draggable: true});
+        marker = L.marker(position, {icon: icon, draggable: true, title});
         marker.addTo(map);
         map.setZoom(zoom);
 
@@ -195,12 +196,11 @@ function asMarkerMap(map, input) {
         pointButton.state('remove-point');
     }
 
-    map.on('geocode-marked', function() {
+    map.on('geocode-marked', function(result) {
         if (hasMarker()) {
             removeMarker();
         }
-
-        addMarker();
+        addMarker(null, null, result.geocode.name);
         pointButton.state('remove-point');
     });
 
