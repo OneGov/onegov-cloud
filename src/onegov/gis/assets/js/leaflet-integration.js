@@ -139,6 +139,10 @@ function asMarkerMap(map, input) {
     var marker;
     var coordinates = getCoordinates(input);
     var icon = L.VectorMarkers.icon(getMarkerOptions(input));
+    var draggableMarker = true;
+    if (input.data('undraggable') !== undefined) {
+        draggableMarker = false;
+    }
 
     function fillAddressFormFields (geocode_result) {
         // Will fill in your form fields with the fetched geocoded address result.
@@ -164,8 +168,7 @@ function asMarkerMap(map, input) {
         position = position || map.getCenter();
         zoom = zoom || map.getZoom();
         title = title || '';
-
-        marker = L.marker(position, {icon: icon, draggable: true, title});
+        marker = L.marker(position, {icon: icon, draggable: draggableMarker, title});
         marker.addTo(map);
         map.setZoom(zoom);
 
