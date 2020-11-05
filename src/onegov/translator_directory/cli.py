@@ -2,10 +2,12 @@ import re
 from datetime import datetime
 
 import click
+import transaction
 
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
 from onegov.fsi.cli import fetch_users
+from onegov.gis.utils import MapboxRequests
 from onegov.translator_directory.constants import CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
@@ -273,3 +275,70 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
         )
 
     return execute
+
+
+@cli.command(name='geocode', context_settings={'singular': True})
+@click.option('--dry-run', is_flag=True)
+@click.option('--only-empty', is_flag=True, default=True)
+def do_import(dry_run, only_empty):
+
+    def same_coords(this, other):
+        return this.lat == other.lat and this.lon == other.lon
+
+    def geocode_translator_addresses(request, app):
+
+        if not app.mapbox_token:
+            click.secho('No mapbox token found, aborting...', fg='yellow')
+            return
+
+        api = MapboxRequests(app.mapbox_token)
+        total = 0
+        geocoded = 0
+        skipped = 0
+        coords_not_found = []
+
+        trs_total = request.session.query(Translator).count()
+
+        for trs in request.session.query(Translator).filter(
+            Translator.city != None,
+            Translator.address != None,
+            Translator.zip_code != None
+        ):
+
+            if only_empty and trs.coordinates:
+                skipped += 1
+                continue
+
+            # Might still be empty
+            if not all((trs.city, trs.address, trs.zip_code)):
+                continue
+
+            total += 1
+            coordinates = api.geocode_address(
+                street=trs.address,
+                zip_code=trs.zip_code,
+                city=trs.city,
+                ctry='Schweiz'
+            )
+            if coordinates:
+                if not same_coords(trs.coordinates, coordinates):
+                    trs.coordinates.lat = coordinates.lat
+                    trs.coordinates.lon = coordinates.lon
+                    geocoded += 1
+            else:
+                coords_not_found.append(trs)
+
+        click.secho(f'{total} translators of {trs_total} have an address')
+        click.secho(f'Changed: {geocoded}/{total}, skipped: {skipped}/{total}',
+                    fg='green')
+        click.secho(f'Coordinates not found: {len(coords_not_found)}',
+                    fg='yellow')
+
+        click.secho('Listing all translators whose address could not be found')
+        for trs in coords_not_found:
+            click.secho(f'- {request.link(trs)}')
+
+        if dry_run:
+            transaction.abort()
+
+    return geocode_translator_addresses
