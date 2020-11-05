@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from onegov.core.orm.mixins import ContentMixin, meta_property
 from onegov.file import AssociatedFiles
+from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
@@ -36,7 +37,8 @@ class ESMixin(ORMSearchable):
         })
 
 
-class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin):
+class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
+                 CoordinatesMixin):
 
     __tablename__ = 'translators'
 
