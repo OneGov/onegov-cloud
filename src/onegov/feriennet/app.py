@@ -33,8 +33,8 @@ BANNER_TEMPLATE = """
                     && this.parentNode.parentNode.remove()
                  "
                  alt="Advertisement">
+        <p class="banner-info">{info}</p>
     </div>
-    <br><p class="banner-info">{info}</p>
 </div>
 """
 
