@@ -287,12 +287,19 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     default=0.1,
     type=float
 )
-def drive_distances_cli(dry_run, only_empty, tolerance_factor):
+@click.option(
+    'max-tolerance',
+    type=int,
+    help='Tolerate this maximum deviation (km) from an old saved distance',
+    default=10
+)
+def drive_distances_cli(dry_run, only_empty, tolerance_factor, max_tolerance):
 
     def get_distances(request, app):
 
         tot, routes_found, distance_changed, no_routes, tolerance_failed = \
-            update_distances(request, only_empty, tolerance_factor)
+            update_distances(
+                request, only_empty, tolerance_factor, max_tolerance)
 
         click.secho(f'Directions not found: {len(no_routes)}/{tot}',
                     fg='yellow')

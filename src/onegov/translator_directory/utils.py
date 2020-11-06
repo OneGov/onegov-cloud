@@ -11,11 +11,22 @@ def found_route(response):
     return response.status_code == 200 and response.json()['code'] == 'Ok'
 
 
-def out_of_tolerance(old_distance, new_distance, tolerance_factor):
+def out_of_tolerance(old_distance, new_distance, tolerance_factor,
+                     max_tolerance=None):
+    """Checks if distances are off by +- a factor, but returns False if a
+    set max_tolerance is not exceeded. """
+
     if not old_distance or not new_distance:
         return False
+
     too_big = new_distance > old_distance + old_distance * tolerance_factor
     too_sml = new_distance < old_distance - old_distance * tolerance_factor
+
+    if too_big or too_sml:
+        if max_tolerance:
+            if old_distance * tolerance_factor < max_tolerance:
+                return False
+
     return too_big or too_sml
 
 
@@ -50,7 +61,12 @@ def same_coords(this, other):
     return this.lat == other.lat and this.lon == other.lon
 
 
-def update_distances(request, only_empty, tolerance_factor):
+def update_distances(request, only_empty, tolerance_factor=0.1,
+                     max_tolerance=None):
+    """
+    Handles updating Translator.driving_distance. Can be used in a cli or view.
+
+    """
     no_routes = []
     tol_failed = []
     distance_changed = 0
@@ -78,7 +94,7 @@ def update_distances(request, only_empty, tolerance_factor):
             routes_found += 1
             dist = parse_directions_result(response)
             if not out_of_tolerance(
-                    trs.drive_distance, dist, tolerance_factor):
+                    trs.drive_distance, dist, tolerance_factor, max_tolerance):
                 trs.drive_distance = dist
                 distance_changed += 1
             else:
