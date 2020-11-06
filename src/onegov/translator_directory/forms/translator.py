@@ -432,9 +432,12 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     def ensure_updated_driving_distance(self):
 
+        if not self.coordinates.data:
+            return
         # also includes the zoom...
-        if self.model.coordinates == self.coordinates.data:
-            return True
+        if isinstance(self.model, Translator) and \
+                self.model.coordinates == self.coordinates.data:
+            return
 
         def to_tuple(coordinate):
             return coordinate.lat, coordinate.lon
