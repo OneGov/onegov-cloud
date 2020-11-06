@@ -49,6 +49,7 @@ def parse_directions_result(response):
 def same_coords(this, other):
     return this.lat == other.lat and this.lon == other.lon
 
+
 def update_distances(request, only_empty, tolerance_factor):
     no_routes = []
     tol_failed = []

@@ -7,14 +7,13 @@ import transaction
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
 from onegov.fsi.cli import fetch_users
-from onegov.gis.utils import MapboxRequests
 from onegov.translator_directory.constants import CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.utils import parse_geocode_result, \
-    update_distances, geocode_translator_addresses
+from onegov.translator_directory.utils import update_distances, \
+    geocode_translator_addresses
 
 cli = command_group()
 
