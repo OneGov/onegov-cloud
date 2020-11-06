@@ -280,7 +280,7 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
 @cli.command(name='geocode', context_settings={'singular': True})
 @click.option('--dry-run', is_flag=True)
 @click.option('--only-empty', is_flag=True, default=True)
-def do_geocode(dry_run, only_empty):
+def geocode_cli(dry_run, only_empty):
 
     def same_coords(this, other):
         return this.lat == other.lat and this.lon == other.lon
@@ -314,12 +314,13 @@ def do_geocode(dry_run, only_empty):
                 continue
 
             total += 1
-            coordinates = api.geocode_address(
+            response = api.geocode(
                 street=trs.address,
                 zip_code=trs.zip_code,
                 city=trs.city,
                 ctry='Schweiz'
             )
+            coordinates = parse_geocode_result(response, trs.zip_code)
             if coordinates:
                 if not same_coords(trs.coordinates, coordinates):
                     trs.coordinates.lat = coordinates.lat
@@ -336,7 +337,7 @@ def do_geocode(dry_run, only_empty):
 
         click.secho('Listing all translators whose address could not be found')
         for trs in coords_not_found:
-            click.secho(f'- {request.link(trs)}')
+            click.secho(f'- {request.link(trs, name="edit")}')
 
         if dry_run:
             transaction.abort()
