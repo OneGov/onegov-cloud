@@ -284,14 +284,14 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
 @click.option(
     '--tolerance-factor',
     help='Do not overwrite existing distances if off by +- a factor',
-    default=0.1,
+    default=0.3,
     type=float
 )
 @click.option(
     '--max-tolerance',
     type=int,
     help='Tolerate this maximum deviation (km) from an old saved distance',
-    default=10
+    default=15
 )
 @click.option(
     '--max-distance',
