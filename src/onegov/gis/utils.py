@@ -13,7 +13,7 @@ class MapboxRequests():
             self,
             access_token,
             endpoint='geocoding',
-            profile='mapbox.places',
+            profile='places',
             api_version='v5'
     ):
         assert endpoint in self.endpoints
