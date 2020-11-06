@@ -322,11 +322,15 @@ def geocode_cli(dry_run, only_empty):
                 city=trs.city,
                 ctry='Schweiz'
             )
-            coordinates = parse_geocode_result(response, trs.zip_code)
+            coordinates = parse_geocode_result(
+                response,
+                trs.zip_code,
+                trs.coordinates.zoom
+            )
             if coordinates:
                 if not same_coords(trs.coordinates, coordinates):
-                    trs.coordinates.lat = coordinates.lat
-                    trs.coordinates.lon = coordinates.lon
+                    trs.coordinates = coordinates
+                    request.session.flush()
                     geocoded += 1
             else:
                 coords_not_found.append(trs)
