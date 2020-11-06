@@ -29,6 +29,16 @@ class TranslatorDirectoryApp(OrgApp):
         assert home, 'This app needs home coordinates for the routing api'
         self.coordinates = Coordinates(lat=home['lat'], lon=home['lon'])
 
+    def configure_geocode_bounding_box(self, **cfg):
+        bbox = cfg.get('geocode_bbox')
+        assert bbox, 'This app needs a bounding box to validate ' \
+                     'routes from directions api'
+        assert len(bbox) == 2, 'Provide two coordinate pairs ' \
+                               'lat,lon as bounding box'
+        self.geocode_bbox = tuple(
+            Coordinates(lat=point['lat'], lon=point['lon']) for point in bbox
+        )
+
 
 @TranslatorDirectoryApp.template_directory()
 def get_template_directory():
