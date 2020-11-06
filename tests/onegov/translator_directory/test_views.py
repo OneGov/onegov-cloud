@@ -1,11 +1,22 @@
 import copy
+from unittest import mock
 
 import transaction
 
+from onegov.gis import Coordinates
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
+from tests.shared.utils import decode_map_value, encode_map_value
+
+class FakeResponse:
+    def __init__(self, json_data=None, status_code=200):
+        self.status_code = status_code
+        self.json_data = json_data or {}
+
+    def json(self):
+        return self.json_data
 
 
 def test_view_new_translator(client):
@@ -28,6 +39,7 @@ def test_view_new_translator(client):
     assert cert_names[0] in page
     assert 'Simultandolmetschen' in page
     assert 'Human- und Sozialwissenschaften' in page
+    assert not decode_map_value(page.form['coordinates'].value)
 
     page.form['pers_id'] = 978654
     page.form['first_name'] = 'Uncle'
@@ -52,8 +64,18 @@ def test_view_new_translator(client):
     page.form['spoken_languages_ids'] = [language_ids[0], language_ids[1]]
     page.form['written_languages_ids'] = [language_ids[2]]
     page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
+    page.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    drive_distance = 111.11
+    with mock.patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok',
+                'routes': [{'distance': drive_distance * 1000}]})
+    ):
+        page = page.form.submit().follow()
 
-    page = page.form.submit().follow()
     assert '978654' in page
     assert 'Uncle' in page
     assert 'Bob' in page
@@ -65,6 +87,7 @@ def test_view_new_translator(client):
     assert 'All okay' in page
     assert '7890' in page
     assert 'DE07 1234 1234 1234 1234 12' in page
+    assert str(round(drive_distance, 1)) in page
 
     # Test mother tongue set to the first ordered option
     assert language_names[3] in page
@@ -88,6 +111,10 @@ def test_view_new_translator(client):
     # edit some key attribute
     page = page.click('Bearbeiten')
     assert 'Zulassung' in page
+    assert decode_map_value(page.form['coordinates'].value) == Coordinates(
+        lat=46, lon=7, zoom=12
+    )
+    drive_distance = 60.01
 
     tel_mobile = '044 123 50 50'
     page.form['pers_id'] = 123456
@@ -99,7 +126,7 @@ def test_view_new_translator(client):
     page.form['address'] = 'Somestreet'
     page.form['zip_code'] = '4052'
     page.form['city'] = 'Somecity'
-    page.form['drive_distance'] = 60.01
+    page.form['drive_distance'] = drive_distance
     page.form['social_sec_number'] = '756.1111.1111.11'
     page.form['bank_name'] = 'Abank'
     page.form['bank_address'] = 'AB Address'
@@ -116,19 +143,25 @@ def test_view_new_translator(client):
     page.form['education_as_interpreter'] = True
     page.form['comments'] = 'My Comments'
     page.form['operation_comments'] = 'operational'
-
-    # # Todo: self.content is nullable so I don't get it, in EventForm is works too
-    # page.form['coordinates'] = encode_map_value({
-    #     'lat': 47, 'lon': 8, 'zoom': 12
-    # })
-
     page.form['for_admins_only'] = True
 
     # test removing all languages
     page.form['spoken_languages_ids'] = []
     page.form['written_languages_ids'] = []
 
-    page = page.form.submit().follow()
+    new_drive_distance = 250.666
+    # when old and new coords are not same, we update the driving_distance
+    page.form['coordinates'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 12
+    })
+    with mock.patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok',
+                'routes': [{'distance': new_drive_distance * 1000}]})
+    ):
+        page = page.form.submit().follow()
+
     assert 'Ihre Änderungen wurden gespeichert' in page
 
     assert '123456' in page
@@ -140,7 +173,8 @@ def test_view_new_translator(client):
     assert 'Somestreet' in page
     assert '4052' in page
     assert 'Somecity' in page
-    assert '60.01' in page
+    assert str(round(new_drive_distance, 1)) in page
+    assert str(drive_distance) not in page
     assert '756.1111.1111.11' in page
     assert 'Abank' in page
     assert 'AB Address' in page
