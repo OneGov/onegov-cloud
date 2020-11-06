@@ -1,4 +1,7 @@
-from onegov.gis.utils import MapboxRequests
+import pytest
+
+from onegov.gis import Coordinates
+from onegov.gis.utils import MapboxRequests, outside_bbox
 
 valid_address = 'Pilatusstrasse 3, 6003 Luzern, Schweiz'
 luzern = (47.04575, 8.309)
@@ -29,3 +32,18 @@ def test_mapbox_requests():
            f'{luzern_2[0]},{luzern_2[1]}?access_token={token}'.\
                replace(',', '%2C').replace(';', '%3B')
 
+
+@pytest.mark.parametrize('coord,outcome', [
+    (Coordinates(lat=0.99, lon=1), True),
+    (Coordinates(lat=1, lon=1), False),
+    (Coordinates(lat=2, lon=2), False),
+    (Coordinates(lat=1.5, lon=2.1), True),
+    (Coordinates(lat=1.1, lon=1.9), False)
+])
+def test_outside_bbox(coord, outcome):
+    bbox = [
+        Coordinates(lat=1, lon=1),
+        Coordinates(lat=2, lon=2),
+        Coordinates(lat=1.5, lon=1.5)   # ignored by the implementation
+    ]
+    assert outside_bbox(coord, bbox) == outcome

@@ -1,6 +1,8 @@
 import requests
 from purl import URL
 
+from onegov.gis import Coordinates
+
 
 class MapboxRequests():
 
@@ -68,3 +70,17 @@ class MapboxRequests():
         if as_url:
             return url
         return requests.get(url.as_string())
+
+
+def outside_bbox(coordinate, bbox):
+    """Checks if the Coordinates instance is inside the bounding box defined
+    by the most outward sitting points in an iterable of two+ Coordinates.
+    """
+    if not isinstance(coordinate, Coordinates):
+        raise NotImplementedError
+    assert len(bbox) >= 2
+
+    return not all((
+        max(c.lat for c in bbox) >= coordinate.lat >= min(c.lat for c in bbox),
+        max(c.lon for c in bbox) >= coordinate.lon >= min(c.lon for c in bbox)
+    ))
