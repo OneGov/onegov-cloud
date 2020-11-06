@@ -76,6 +76,8 @@ def outside_bbox(coordinate, bbox):
     """Checks if the Coordinates instance is inside the bounding box defined
     by the most outward sitting points in an iterable of two+ Coordinates.
     """
+    if not coordinate or not bbox:
+        return False
     if not isinstance(coordinate, Coordinates):
         raise NotImplementedError
     assert len(bbox) >= 2
