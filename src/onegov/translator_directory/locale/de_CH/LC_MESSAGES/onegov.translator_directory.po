@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-28 21:19+0100\n"
+"POT-Creation-Date: 2020-11-06 10:08+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -82,6 +82,9 @@ msgstr "Schriftliche Übersetzungen"
 msgid "Logout"
 msgstr "Abmelden"
 
+msgid "Files"
+msgstr "Allg. Dateiablage"
+
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -134,11 +137,20 @@ msgstr "Geburtsdatum"
 msgid "Nationality"
 msgstr "Nationalität"
 
-msgid "Street and house number"
-msgstr "Strasse und Hausnummer"
+msgid "Location"
+msgstr "Standort"
+
+msgid ""
+"Search for the exact address to set a marker. The address fields beneath are "
+"filled out automatically."
+msgstr "Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. "
+"Die Address-Felder unterhalb werden automatisch ausgefüllt."
 
 msgid "Address"
 msgstr "Anschrift"
+
+msgid "Street and house number"
+msgstr "Strasse und Hausnummer"
 
 msgid "Zip Code"
 msgstr "PLZ"
@@ -247,6 +259,16 @@ msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 
 msgid "A translator with this email already exists"
 msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
+
+#, python-format
+msgid "Error in requesting directions from Mapbox (${status})"
+msgstr "Fehler bei der Anfrage nach einer Route bei Mapbox (${status})"
+
+msgid "Could not find a route. Check the address again"
+msgstr "Konnte keine Route finden. Überprüfen Sie den Standort nochmals"
+
+msgid "Check if the location of the translator is near a road"
+msgstr "Überprüfen Sie, ob der sich Standort in der Nähe einer Strasse befindet"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -393,6 +415,9 @@ msgstr "Zustimmung Namensbekanntgabe"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "Translator is lacking location and address."
+msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
