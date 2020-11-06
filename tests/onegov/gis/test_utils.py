@@ -28,8 +28,8 @@ def test_mapbox_requests():
     url = api.directions([luzern, luzern_2], as_url=True)
     print(url.as_string())
     assert url.as_string() == \
-           f'{host}/directions/v5/mapbox/driving/{luzern[0]},{luzern[1]};' \
-           f'{luzern_2[0]},{luzern_2[1]}?access_token={token}'.\
+           f'{host}/directions/v5/mapbox/driving/{luzern[1]},{luzern[0]};' \
+           f'{luzern_2[1]},{luzern_2[0]}?access_token={token}'.\
                replace(',', '%2C').replace(';', '%3B')
 
 
