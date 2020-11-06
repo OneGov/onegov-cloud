@@ -1,5 +1,6 @@
 from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
+from onegov.gis import Coordinates
 from onegov.translator_directory.constants import full_text_max_chars
 from onegov.translator_directory.models.translator import Translator
 
@@ -59,6 +60,13 @@ class TranslatorCollection(GenericCollection, Pagination):
             self.guilds == other.guilds,
             self.interpret_types == other.interpret_types
         ))
+
+    def add(self, **kwargs):
+        coordinates = kwargs.pop('coordinates', Coordinates())
+        item = super().add(**kwargs)
+        item.coordinates = coordinates
+        self.session.flush()
+        return item
 
     @staticmethod
     def truncate(text, maxchars=25):
