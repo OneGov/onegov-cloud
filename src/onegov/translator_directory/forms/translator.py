@@ -169,7 +169,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Drive distance'),
         validators=[Optional()],
         fieldset=_('Address'),
-        render_kw={'disabled': True}
+        render_kw={'disabled': True},
     )
 
     social_sec_number = StringField(
