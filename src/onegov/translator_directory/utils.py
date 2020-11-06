@@ -1,6 +1,22 @@
 from onegov.gis import Coordinates
 
 
+def to_tuple(coordinate):
+    return coordinate.lat, coordinate.lon
+
+
+def found_route(response):
+    return response.status_code == 200 and response.json()['code'] == 'Ok'
+
+
+def out_of_tolerance(old_distance, new_distance):
+    if not old_distance or not new_distance:
+        return False
+    too_big = new_distance > old_distance + old_distance * tolerance_factor
+    too_sml = new_distance < old_distance - old_distance * tolerance_factor
+    return too_big or too_sml
+
+
 def parse_geocode_result(response, zip_code, zoom=None):
 
     if response.status_code != 200:

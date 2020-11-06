@@ -14,7 +14,7 @@ from onegov.translator_directory.models.certificate import \
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import parse_geocode_result, \
-    parse_directions_result
+    parse_directions_result, to_tuple, found_route, out_of_tolerance
 
 cli = command_group()
 
@@ -289,19 +289,6 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     type=float
 )
 def drive_distances_cli(dry_run, only_empty, tolerance_factor):
-
-    def to_tuple(coordinate):
-        return coordinate.lat, coordinate.lon
-
-    def found_route(response):
-        return response.status_code == 200 and response.json()['code'] == 'Ok'
-
-    def out_of_tolerance(old_distance, new_distance):
-        if not old_distance or not new_distance:
-            return False
-        too_big = new_distance > old_distance + old_distance * tolerance_factor
-        too_sml = new_distance < old_distance - old_distance * tolerance_factor
-        return too_big or too_sml
 
     def get_distances(request, app):
         routes_not_found = []
