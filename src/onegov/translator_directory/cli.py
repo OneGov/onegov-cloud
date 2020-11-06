@@ -304,6 +304,7 @@ def geocode_cli(dry_run, only_empty):
             Translator.address != None,
             Translator.zip_code != None
         ):
+            total += 1
 
             if only_empty and trs.coordinates:
                 skipped += 1
@@ -311,6 +312,7 @@ def geocode_cli(dry_run, only_empty):
 
             # Might still be empty
             if not all((trs.city, trs.address, trs.zip_code)):
+                skipped += 1
                 continue
 
             total += 1
@@ -332,7 +334,8 @@ def geocode_cli(dry_run, only_empty):
         click.secho(f'{total} translators of {trs_total} have an address')
         click.secho(f'Changed: {geocoded}/{total}, skipped: {skipped}/{total}',
                     fg='green')
-        click.secho(f'Coordinates not found: {len(coords_not_found)}',
+        click.secho(f'Coordinates not found: '
+                    f'{len(coords_not_found)}/{total-skipped}',
                     fg='yellow')
 
         click.secho('Listing all translators whose address could not be found')
