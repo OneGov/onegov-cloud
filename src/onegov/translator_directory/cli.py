@@ -336,7 +336,8 @@ def geocode_cli(dry_run, only_empty):
                 coords_not_found.append(trs)
 
         click.secho(f'{total} translators of {trs_total} have an address')
-        click.secho(f'Changed: {geocoded}/{total}, skipped: {skipped}/{total}',
+        click.secho(f'Changed: {geocoded}/{total-skipped}, '
+                    f'skipped: {skipped}/{total}',
                     fg='green')
         click.secho(f'Coordinates not found: '
                     f'{len(coords_not_found)}/{total-skipped}',
