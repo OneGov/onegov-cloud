@@ -33,12 +33,21 @@ class MapboxRequests():
 
     @property
     def base_url(self):
-        url = URL(f'{self.host}/{self.endpoint}/{self.api_version}/{self.profile}')
+        url = URL(
+            f'{self.host}/{self.endpoint}/{self.api_version}/{self.profile}')
         url = url.query_param('access_token', self.access_token)
         return url
 
-    def geocode(self, text=None, street=None, zip_code=None, city=None,
-                        ctry=None, locale=None, as_url=False):
+    def geocode(
+            self,
+            text=None,
+            street=None,
+            zip_code=None,
+            city=None,
+            ctry=None,
+            locale=None,
+            as_url=False
+    ):
         if not ctry:
             ctry = 'Schweiz'
 
