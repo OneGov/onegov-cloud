@@ -140,6 +140,16 @@ class TranslatorForm(Form, FormChoicesMixin):
         fieldset=_('Personal Information')
     )
 
+    coordinates = CoordinatesField(
+        label=_("Location"),
+        description=_(
+            "Search for the exact address to set a marker. The address fields "
+            "beneath are filled out automatically."
+        ),
+        fieldset=_("Address"),
+        render_kw={'data-map-type': 'marker', 'data-undraggable': 1}
+    )
+
     address = StringField(
         label=_('Street and house number'),
         fieldset=_('Address')
