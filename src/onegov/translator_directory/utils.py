@@ -1,7 +1,7 @@
 import json
 
 from onegov.gis import Coordinates
-from onegov.gis.utils import MapboxRequests
+from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
 from onegov.translator_directory.models.translator import Translator
 
@@ -38,7 +38,7 @@ def out_of_tolerance(old_distance, new_distance, tolerance_factor,
     return too_big or too_sml
 
 
-def parse_geocode_result(response, zip_code, zoom=None):
+def validate_geocode_result(response, zip_code, zoom=None, bbox=None):
 
     if response.status_code != 200:
         return
@@ -54,15 +54,18 @@ def parse_geocode_result(response, zip_code, zoom=None):
         if zip_code and str(zip_code) not in matched_place:
             continue
         y, x = feature['geometry']['coordinates']
-        return Coordinates(lat=x, lon=y, zoom=zoom)
-
+        coordinates = Coordinates(lat=x, lon=y, zoom=zoom)
+        if outside_bbox(coordinates, bbox=bbox):
+            continue
+        return coordinates
     return
 
 
 def parse_directions_result(response):
     assert response.status_code == 200
     data = response.json()
-    return round(data['routes'][0]['distance'] / 1000, 1)
+    km = round(data['routes'][0]['distance'] / 1000, 1)
+    return km
 
 
 def same_coords(this, other):
@@ -73,7 +76,8 @@ def update_drive_distances(
         request,
         only_empty,
         tolerance_factor=0.1,
-        max_tolerance=None
+        max_tolerance=None,
+        max_distance=None
 ):
     """
     Handles updating Translator.driving_distance. Can be used in a cli or view.
@@ -105,18 +109,20 @@ def update_drive_distances(
         if found_route(response):
             routes_found += 1
             dist = parse_directions_result(response)
-            if not out_of_tolerance(
+            if out_of_tolerance(
                     trs.drive_distance, dist, tolerance_factor, max_tolerance):
+                tol_failed.append((trs, dist))
+            elif max_distance and dist > max_distance:
+                tol_failed.append((trs, dist))
+            else:
                 trs.drive_distance = dist
                 distance_changed += 1
-            else:
-                tol_failed.append(trs)
         else:
             no_routes.append(trs)
-        return total, routes_found, distance_changed, no_routes, tol_failed
+    return total, routes_found, distance_changed, no_routes, tol_failed
 
 
-def geocode_translator_addresses(request, only_empty):
+def geocode_translator_addresses(request, only_empty, bbox=None):
 
     api = MapboxRequests(request.app.mapbox_token)
     total = 0
@@ -148,16 +154,18 @@ def geocode_translator_addresses(request, only_empty):
             city=trs.city,
             ctry='Schweiz'
         )
-        coordinates = parse_geocode_result(
+        coordinates = validate_geocode_result(
             response,
             trs.zip_code,
-            trs.coordinates.zoom
+            trs.coordinates.zoom,
+            bbox
         )
         if coordinates:
-            if not same_coords(trs.coordinates, coordinates):
-                trs.coordinates = coordinates
-                request.session.flush()
-                geocoded += 1
+            if same_coords(trs.coordinates, coordinates):
+                continue
+            trs.coordinates = coordinates
+            request.session.flush()
+            geocoded += 1
         else:
             coords_not_found.append(trs)
 

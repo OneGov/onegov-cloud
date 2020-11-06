@@ -279,8 +279,8 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
 
 
 @cli.command(name='update-drive-distance', context_settings={'singular': True})
-@click.option('--dry-run', is_flag=True)
-@click.option('--only-empty', is_flag=True, default=True)
+@click.option('--dry-run/-no-dry-run', default=False)
+@click.option('--only-empty/--all', default=True)
 @click.option(
     '--tolerance-factor',
     help='Do not overwrite existing distances if off by +- a factor',
@@ -288,18 +288,30 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     type=float
 )
 @click.option(
-    'max-tolerance',
+    '--max-tolerance',
     type=int,
     help='Tolerate this maximum deviation (km) from an old saved distance',
     default=10
 )
-def drive_distances_cli(dry_run, only_empty, tolerance_factor, max_tolerance):
+@click.option(
+    '--max-distance',
+    type=int,
+    help='Do accept routes longer than this distance (km)',
+    default=300
+)
+def drive_distances_cli(
+        dry_run, only_empty, tolerance_factor, max_tolerance, max_distance):
 
     def get_distances(request, app):
 
         tot, routes_found, distance_changed, no_routes, tolerance_failed = \
             update_drive_distances(
-                request, only_empty, tolerance_factor, max_tolerance)
+                request,
+                only_empty,
+                tolerance_factor,
+                max_tolerance,
+                max_distance
+            )
 
         click.secho(f'Directions not found: {len(no_routes)}/{tot}',
                     fg='yellow')
@@ -317,8 +329,9 @@ def drive_distances_cli(dry_run, only_empty, tolerance_factor, max_tolerance):
             click.secho(
                 'Listing all translators who failed distance check')
 
-            for trs in tolerance_failed:
+            for trs, new_dist in tolerance_failed:
                 click.secho(f'- {request.link(trs, name="edit")}')
+                click.secho(f'  old: {trs.drive_distance}; new: {new_dist}')
 
         if dry_run:
             transaction.abort()
@@ -327,8 +340,8 @@ def drive_distances_cli(dry_run, only_empty, tolerance_factor, max_tolerance):
 
 
 @cli.command(name='geocode', context_settings={'singular': True})
-@click.option('--dry-run', is_flag=True)
-@click.option('--only-empty', is_flag=True, default=True)
+@click.option('--dry-run/-no-dry-run', default=False)
+@click.option('--only-empty/--all', default=True)
 def geocode_cli(dry_run, only_empty):
 
     def do_geocode(request, app):
@@ -338,7 +351,10 @@ def geocode_cli(dry_run, only_empty):
             return
 
         trs_total, total, geocoded, skipped, not_found = \
-            geocode_translator_addresses(request, only_empty)
+            geocode_translator_addresses(
+                request, only_empty,
+                bbox=app.geocode_bbox
+            )
 
         click.secho(f'{total} translators of {trs_total} have an address')
         click.secho(f'Changed: {geocoded}/{total-skipped}, '
