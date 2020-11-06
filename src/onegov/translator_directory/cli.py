@@ -12,7 +12,7 @@ from onegov.translator_directory.models.certificate import \
     LanguageCertificate
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.utils import update_distances, \
+from onegov.translator_directory.utils import update_drive_distances, \
     geocode_translator_addresses
 
 cli = command_group()
@@ -298,7 +298,7 @@ def drive_distances_cli(dry_run, only_empty, tolerance_factor, max_tolerance):
     def get_distances(request, app):
 
         tot, routes_found, distance_changed, no_routes, tolerance_failed = \
-            update_distances(
+            update_drive_distances(
                 request, only_empty, tolerance_factor, max_tolerance)
 
         click.secho(f'Directions not found: {len(no_routes)}/{tot}',

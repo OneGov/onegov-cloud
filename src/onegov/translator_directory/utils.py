@@ -61,8 +61,12 @@ def same_coords(this, other):
     return this.lat == other.lat and this.lon == other.lon
 
 
-def update_distances(request, only_empty, tolerance_factor=0.1,
-                     max_tolerance=None):
+def update_drive_distances(
+        request,
+        only_empty,
+        tolerance_factor=0.1,
+        max_tolerance=None
+):
     """
     Handles updating Translator.driving_distance. Can be used in a cli or view.
 
