@@ -1,5 +1,8 @@
+import json
+
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests
+from onegov.translator_directory import log
 from onegov.translator_directory.models.translator import Translator
 
 
@@ -8,7 +11,10 @@ def to_tuple(coordinate):
 
 
 def found_route(response):
-    return response.status_code == 200 and response.json()['code'] == 'Ok'
+    found = response.status_code == 200 and response.json()['code'] == 'Ok'
+    if not found:
+        log.warning(json.dumps(response.json(), indent=2))
+    return found
 
 
 def out_of_tolerance(old_distance, new_distance, tolerance_factor,
