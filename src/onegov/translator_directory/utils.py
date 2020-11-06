@@ -21,11 +21,13 @@ def out_of_tolerance(old_distance, new_distance, tolerance_factor,
 
     too_big = new_distance > old_distance + old_distance * tolerance_factor
     too_sml = new_distance < old_distance - old_distance * tolerance_factor
+    exceed_max = abs(new_distance - old_distance) > max_tolerance \
+        if max_tolerance is not None else False
 
-    if too_big or too_sml:
-        if max_tolerance:
-            if old_distance * tolerance_factor < max_tolerance:
-                return False
+    if exceed_max:
+        return True
+    elif too_big or too_sml:
+        return False
 
     return too_big or too_sml
 
