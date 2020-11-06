@@ -65,7 +65,7 @@ class MapboxRequests():
         coordinates: iterable of tuples of (lat, lon)
         """
         url = self.base_url.add_path_segment(
-            ';'.join(f'{c[0]},{c[1]}' for c in coordinates)
+            ';'.join(f'{c[1]},{c[0]}' for c in coordinates)
         )
         if as_url:
             return url
