@@ -14,7 +14,7 @@ from onegov.translator_directory.models.certificate import \
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import parse_geocode_result, \
-    parse_directions_result, to_tuple, found_route, out_of_tolerance
+    update_distances
 
 cli = command_group()
 
@@ -291,50 +291,20 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
 def drive_distances_cli(dry_run, only_empty, tolerance_factor):
 
     def get_distances(request, app):
-        routes_not_found = []
-        tolerance_failed = []
-        distance_changed = 0
-        routes_found = 0
-        total = 0
 
-        directions_api = MapboxRequests(
-            app.mapbox_token,
-            endpoint='directions',
-            profile='driving'
-        )
-        query = request.session.query(Translator)
-        if only_empty:
-            query = query.filter(Translator.drive_distance == None)
+        tot, routes_found, distance_changed, no_routes, tolerance_failed = \
+            update_distances(request, only_empty, tolerance_factor)
 
-        for trs in query:
-            if not trs.coordinates:
-                continue
-            total += 1
-            response = directions_api.directions([
-                to_tuple(app.coordinates),
-                to_tuple(trs.coordinates)
-            ])
-            if found_route(response):
-                routes_found += 1
-                dist = parse_directions_result(response)
-                if not out_of_tolerance(trs.drive_distance, dist):
-                    trs.drive_distance = dist
-                    distance_changed += 1
-                else:
-                    tolerance_failed.append(trs)
-            else:
-                routes_not_found.append(trs)
-
-        click.secho(f'Directions not found: {len(routes_not_found)}/{total}',
+        click.secho(f'Directions not found: {len(no_routes)}/{tot}',
                     fg='yellow')
 
         click.secho(f'Over tolerance: {len(tolerance_failed)}/{routes_found}',
                     fg='yellow')
 
-        if routes_not_found:
+        if no_routes:
             click.secho(
                 'Listing all translators whose directions could not be found')
-            for trs in routes_not_found:
+            for trs in no_routes:
                 click.secho(f'- {request.link(trs, name="edit")}')
 
         if tolerance_failed:
