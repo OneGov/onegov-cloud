@@ -46,6 +46,9 @@ def parse_directions_result(response):
     return round(data['routes'][0]['distance'] / 1000, 1)
 
 
+def same_coords(this, other):
+    return this.lat == other.lat and this.lon == other.lon
+
 def update_distances(request, only_empty, tolerance_factor):
     no_routes = []
     tol_failed = []
@@ -82,3 +85,51 @@ def update_distances(request, only_empty, tolerance_factor):
         else:
             no_routes.append(trs)
         return total, routes_found, distance_changed, no_routes, tol_failed
+
+
+def geocode_translator_addresses(request, only_empty):
+
+    api = MapboxRequests(request.app.mapbox_token)
+    total = 0
+    geocoded = 0
+    skipped = 0
+    coords_not_found = []
+
+    trs_total = request.session.query(Translator).count()
+
+    for trs in request.session.query(Translator).filter(
+        Translator.city != None,
+        Translator.address != None,
+        Translator.zip_code != None
+    ):
+        total += 1
+
+        if only_empty and trs.coordinates:
+            skipped += 1
+            continue
+
+        # Might still be empty
+        if not all((trs.city, trs.address, trs.zip_code)):
+            skipped += 1
+            continue
+
+        response = api.geocode(
+            street=trs.address,
+            zip_code=trs.zip_code,
+            city=trs.city,
+            ctry='Schweiz'
+        )
+        coordinates = parse_geocode_result(
+            response,
+            trs.zip_code,
+            trs.coordinates.zoom
+        )
+        if coordinates:
+            if not same_coords(trs.coordinates, coordinates):
+                trs.coordinates = coordinates
+                request.session.flush()
+                geocoded += 1
+        else:
+            coords_not_found.append(trs)
+
+    return trs_total, total, geocoded, skipped, coords_not_found
