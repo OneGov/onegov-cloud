@@ -57,6 +57,7 @@ class TranslatorVoucher(object):
         bottom_blue = {'bottom': 1, 'bottom_color': self.blue}
         subtotal_default = {'num_format': '#,##0.00', 'italic': True}
         float_default = {'num_format': '0.00', 'align': 'center'}
+        left_align = {'align': 'left'}
 
         self.cell_fmt = self.wb.add_format(self.default_fmt)
         self.cell_fmt_green_last = self.wb.add_format({
@@ -624,7 +625,7 @@ class TranslatorVoucher(object):
         headers(row + 20, 'Wegpauschale - (§ 15 Abs. 1 lit.g)')
 
         subheaders(row + 21, (
-            'Datum', 'Reiseweg in km', '', '', 'Wegpauschale', '', '',
+            'Datum', 'Reiseweg (km)', '', '', 'Wegpauschale', '', '',
             'Zwischentotal'), subheader_fmts)
 
         input_block(
@@ -637,7 +638,7 @@ class TranslatorVoucher(object):
 
         headers(row + 26, 'Besondere Dringlichkeit - (§ 15 Abs. 1 lit. f - '
                           'Wegpauschale+Reisezeit - Std.- Ansatz CHF 75.00)')
-        subheaders(row + 27, ('Datum', 'Reiseweg in km', 'Reisezeit',
+        subheaders(row + 27, ('Datum', 'Reiseweg (km)', 'Reisezeit',
                               'Total', 'Wegpauschale', '1/2 Ansatz',
                               'Industrieminuten', 'Zwischentotal'),
                    subheader_fmts
