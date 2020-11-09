@@ -8,6 +8,8 @@ from sedate import utcnow
 from sqlalchemy import desc
 
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent
+from onegov.fsi.models.course_notification_template import InfoTemplate, \
+    SubscriptionTemplate, CancellationTemplate, ReminderTemplate
 from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.user import User
 from onegov.fsi import FsiApp
@@ -300,7 +302,7 @@ class FsiScenario(BaseScenario):
         user.data['emergency'] = f'123 456 789 ({self.faker.name()})'
         return user
 
-    def add_course(self, **columns):
+    def add_course(self, add_templates=False, **columns):
         columns.setdefault('name', f"Course {len(self.courses)}")
         columns.setdefault('description', 'default description')
         self.courses.append(self.add(
@@ -308,7 +310,17 @@ class FsiScenario(BaseScenario):
             **columns,
             id=uuid4()
         ))
-        return self.courses[-1].id
+        latest = self.courses[-1]
+        if add_templates:
+            data = dict(course_event_id=latest.id)
+            self.session.add_all((
+                InfoTemplate(**data),
+                SubscriptionTemplate(**data),
+                CancellationTemplate(**data),
+                ReminderTemplate(**data)
+            ))
+
+        return latest.id
 
     def add_course_event(self, course, **columns):
         columns['course_id'] = course.id
