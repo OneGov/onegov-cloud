@@ -49,12 +49,21 @@ def client_with_es(es_translator_app):
     return Client(es_translator_app)
 
 
-def create_translator_app(request, use_elasticsearch, hashed_password, mock_db=False):
+def create_translator_app(request, use_elasticsearch, hashed_password):
 
     app = create_app(
         app_class=TranslatorDirectoryApp,
         request=request,
-        use_elasticsearch=use_elasticsearch)
+        use_elasticsearch=use_elasticsearch,
+        geocode_bbox=(
+            dict(lat=0, lon=0),
+            dict(lat=0, lon=0)
+        ),
+        translator_directory_home={
+            'lat': 0,
+            'lon': 0
+        }
+    )
 
     session = app.session()
 

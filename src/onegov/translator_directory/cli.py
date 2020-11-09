@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 
 import click
+import transaction
 
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
@@ -11,6 +12,8 @@ from onegov.translator_directory.models.certificate import \
     LanguageCertificate
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.utils import update_drive_distances, \
+    geocode_translator_addresses
 
 cli = command_group()
 
@@ -273,3 +276,99 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
         )
 
     return execute
+
+
+@cli.command(name='update-drive-distance', context_settings={'singular': True})
+@click.option('--dry-run/-no-dry-run', default=False)
+@click.option('--only-empty/--all', default=True)
+@click.option(
+    '--tolerance-factor',
+    help='Do not overwrite existing distances if off by +- a factor',
+    default=0.3,
+    type=float
+)
+@click.option(
+    '--max-tolerance',
+    type=int,
+    help='Tolerate this maximum deviation (km) from an old saved distance',
+    default=15
+)
+@click.option(
+    '--max-distance',
+    type=int,
+    help='Do accept routes longer than this distance (km)',
+    default=300
+)
+def drive_distances_cli(
+        dry_run, only_empty, tolerance_factor, max_tolerance, max_distance):
+
+    def get_distances(request, app):
+
+        tot, routes_found, distance_changed, no_routes, tolerance_failed = \
+            update_drive_distances(
+                request,
+                only_empty,
+                tolerance_factor,
+                max_tolerance,
+                max_distance
+            )
+
+        click.secho(f'Directions not found: {len(no_routes)}/{tot}',
+                    fg='yellow')
+
+        click.secho(f'Over tolerance: {len(tolerance_failed)}/{routes_found}',
+                    fg='yellow')
+
+        if no_routes:
+            click.secho(
+                'Listing all translators whose directions could not be found')
+            for trs in no_routes:
+                click.secho(f'- {request.link(trs, name="edit")}')
+
+        if tolerance_failed:
+            click.secho(
+                'Listing all translators who failed distance check')
+
+            for trs, new_dist in tolerance_failed:
+                click.secho(f'- {request.link(trs, name="edit")}')
+                click.secho(f'  old: {trs.drive_distance}; new: {new_dist}')
+
+        if dry_run:
+            transaction.abort()
+
+    return get_distances
+
+
+@cli.command(name='geocode', context_settings={'singular': True})
+@click.option('--dry-run/-no-dry-run', default=False)
+@click.option('--only-empty/--all', default=True)
+def geocode_cli(dry_run, only_empty):
+
+    def do_geocode(request, app):
+
+        if not app.mapbox_token:
+            click.secho('No mapbox token found, aborting...', fg='yellow')
+            return
+
+        trs_total, total, geocoded, skipped, not_found = \
+            geocode_translator_addresses(
+                request, only_empty,
+                bbox=app.geocode_bbox
+            )
+
+        click.secho(f'{total} translators of {trs_total} have an address')
+        click.secho(f'Changed: {geocoded}/{total-skipped}, '
+                    f'skipped: {skipped}/{total}',
+                    fg='green')
+        click.secho(f'Coordinates not found: '
+                    f'{len(not_found)}/{total-skipped}',
+                    fg='yellow')
+
+        click.secho('Listing all translators whose address could not be found')
+        for trs in not_found:
+            click.secho(f'- {request.link(trs, name="edit")}')
+
+        if dry_run:
+            transaction.abort()
+
+    return do_geocode

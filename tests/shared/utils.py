@@ -81,7 +81,7 @@ def random_namespace():
 def create_app(app_class, request, use_elasticsearch=False,
                reuse_filestorage=True, use_smtp=True,
                depot_backend='depot.io.local.LocalFileStorage',
-               depot_storage_path=None):
+               depot_storage_path=None, **kwargs):
 
     # filestorage can be reused between tries as it is nowadays mainly (if not
     # exclusively) used by the theme compiler
@@ -136,7 +136,8 @@ def create_app(app_class, request, use_elasticsearch=False,
         redis_url=request.getfixturevalue('redis_url'),
         yubikey_client_id='foo',
         yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
-        signing_services=str(signing_services)
+        signing_services=str(signing_services),
+        **kwargs
     )
 
     app.set_application_id(app.namespace + '/test')

@@ -34,3 +34,14 @@ def test_translator(session):
     assert translator.certificates
     translator.drive_distance = 60.5
     session.flush()
+
+
+def test_translator_collection(session):
+    translators = TranslatorCollection(session)
+    trs = translators.add(
+        **translator_data,
+        coordinates=Coordinates()
+    )
+    # somehow, the instance has to be created in order to have deferred content
+    # def add() would not have been overwritten
+    assert trs.coordinates == Coordinates()

@@ -109,6 +109,15 @@ configuration: &global-config
    # For Swissvotes, the Museum für Gestatlung has an api
   # mfg_api_token:
 
+#   translator_directory_home:
+#     lat: 46.17045
+#     lon: 8.51205
+#   geocode_bbox:
+#     - lat: 47.902
+#       lon: 10.525
+#     - lat: 45.714
+#       lon: 5.955
+
   # for org app, disable the password reset view (case the users have their own auth providers)
   # disable_password_reset: true
 

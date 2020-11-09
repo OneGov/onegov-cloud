@@ -209,6 +209,12 @@ def edit_translator(self, request, form):
                 for attr in form.special_fields}
         )
     layout = EditTranslatorLayout(self, request)
+
+    if not self.coordinates:
+        request.warning(
+            _('Translator is lacking location and address.')
+        )
+
     return {
         'layout': layout,
         'model': self,
