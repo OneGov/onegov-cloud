@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-02 10:20+0100\n"
+"POT-Creation-Date: 2020-11-09 12:25+0100\n"
 "PO-Revision-Date: 2017-06-22 16:02+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: French\n"
@@ -52,6 +52,13 @@ msgstr "L'autorisation a échoué en raison d'une erreur"
 
 msgid "Your login has expired"
 msgstr "Votre login a expiré"
+
+msgid ""
+"Can't login because your user has no groups. Contact your AzureAD system "
+"administrator"
+msgstr ""
+"Vous ne pouvez pas vous connecter car votre utilisateur n'a pas de groupes. "
+"Contactez votre administrateur système AzureAD."
 
 msgid "Name"
 msgstr "Nom"

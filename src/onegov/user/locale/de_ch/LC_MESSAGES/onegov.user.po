@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-02 10:20+0100\n"
+"POT-Creation-Date: 2020-11-09 12:25+0100\n"
 "PO-Revision-Date: 2017-06-22 08:50+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -54,6 +54,13 @@ msgstr "Authorisierung fehlgeschlagen"
 
 msgid "Your login has expired"
 msgstr "Ihr Login ist verfallen"
+
+msgid ""
+"Can't login because your user has no groups. Contact your AzureAD system "
+"administrator"
+msgstr ""
+"Login fehlgeschlagen, da ihr Nutzer keine Gruppenzugehörigkeiten hat. "
+"Kontaktieren Sie ihren Azure AD System-Administrator"
 
 msgid "Name"
 msgstr "Name"
@@ -114,3 +121,8 @@ msgstr "30 Tage"
 
 msgid "Number of Signups"
 msgstr "Anzahl Anmeldungen"
+
+#~ msgid ""
+#~ "Can't login because user has no groups. Contact your AzureAD system "
+#~ "administrator"
+#~ msgstr "Login fehlgeschlagen, da der Nutzer keine Gruppen hat"

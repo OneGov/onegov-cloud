@@ -880,7 +880,8 @@ class AzureADProvider(
 
         if not groups:
             log.info(f"No groups found for {username}")
-            return Failure(_('Authorisation failed due to an error'))
+            return Failure(_("Can't login because your user has no groups. "
+                             "Contact your AzureAD system administrator"))
 
         role = self.roles.match(roles, groups)
 
