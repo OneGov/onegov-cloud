@@ -874,8 +874,13 @@ class AzureADProvider(
             log.info("No username found in authorisation step")
             return Failure(_('Authorisation failed due to an error'))
 
-        assert source_id
-        assert groups
+        if not source_id:
+            log.info(f"No source_id found for {username}")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not groups:
+            log.info(f"No groups found for {username}")
+            return Failure(_('Authorisation failed due to an error'))
 
         role = self.roles.match(roles, groups)
 
