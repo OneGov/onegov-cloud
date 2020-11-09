@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-06 16:31+0200\n"
+"POT-Creation-Date: 2020-11-09 11:58+0100\n"
 "PO-Revision-Date: 2019-08-29 09:16+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -182,6 +182,9 @@ msgstr "Mitgliedschaft löschen"
 
 msgid "Create Excel"
 msgstr "Excel erstellen"
+
+msgid "Member"
+msgstr "Mitglied"
 
 msgid "Mutation"
 msgstr "Mutation"
@@ -373,6 +376,15 @@ msgid "Level 1 represents the root agencies, Level 2 their children"
 msgstr ""
 "Ebene 1 entspricht der obersten Organisationebene, Ebene 2 deren "
 "Unterorganisationen"
+
+msgid "Show full agency path"
+msgstr "Zeige ganzen Organisationspfad"
+
+msgid "Always show the full path of the memberships agency"
+msgstr "Zeige immer den gesamten Pfad für die Organisation der Mitgliedschaft"
+
+msgid "People detail page"
+msgstr "Detailseite Personen"
 
 msgid "Users may report corrections"
 msgstr "Benutzer können Mutationen melden"
