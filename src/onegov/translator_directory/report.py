@@ -107,7 +107,6 @@ class TranslatorVoucher(object):
         self.thead_lightgreen_green_first = self.add_format({
             'font_size': self.subheader_font_size,
             'bg_color': self.light_green,
-            **centered,
             **left_green
         })
         self.thead_lightgreen_green_last = self.add_format({
