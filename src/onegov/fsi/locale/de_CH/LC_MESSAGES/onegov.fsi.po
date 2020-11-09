@@ -607,7 +607,7 @@ msgstr "iZug/Fachstelle Sicherheit"
 msgid ""
 "We unsubscribed you from the following course event which, will not take "
 "place:"
-msgstr "Sie wurden von der folgenden Veranstaltung abgemeldet:"
+msgstr "Sie wurden von der folgendenq Veranstaltung abgemeldet:"
 
 msgid "Available event dates can be found at:"
 msgstr "Verfügbare Kurstermine finden Sie unter:"
