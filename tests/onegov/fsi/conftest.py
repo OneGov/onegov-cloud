@@ -8,6 +8,8 @@ from sedate import utcnow
 from sqlalchemy import desc
 
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent
+from onegov.fsi.models.course_notification_template import InfoTemplate, \
+    SubscriptionTemplate, CancellationTemplate, ReminderTemplate
 from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.user import User
 from onegov.fsi import FsiApp
@@ -300,7 +302,7 @@ class FsiScenario(BaseScenario):
         user.data['emergency'] = f'123 456 789 ({self.faker.name()})'
         return user
 
-    def add_course(self, **columns):
+    def add_course(self, add_templates=False, **columns):
         columns.setdefault('name', f"Course {len(self.courses)}")
         columns.setdefault('description', 'default description')
         self.courses.append(self.add(
@@ -308,7 +310,17 @@ class FsiScenario(BaseScenario):
             **columns,
             id=uuid4()
         ))
-        return self.courses[-1].id
+        latest = self.courses[-1]
+        if add_templates:
+            data = dict(course_event_id=latest.id)
+            self.session.add_all((
+                InfoTemplate(**data),
+                SubscriptionTemplate(**data),
+                CancellationTemplate(**data),
+                ReminderTemplate(**data)
+            ))
+
+        return latest.id
 
     def add_course_event(self, course, **columns):
         columns['course_id'] = course.id
@@ -348,21 +360,29 @@ class FsiScenario(BaseScenario):
         ))
         return self.subscriptions[-1]
 
-    def add_notification_template(self, all_types=True, **columns):
-        columns.setdefault('type', 'reservation')
-        columns.setdefault('subject', columns['type'].upper())
+    def add_notification_template(self, event, all_types=True, **columns):
         columns.setdefault('text', )
+        columns.setdefault('course_event_id', event.id)
 
         types = TEMPLATE_MODEL_MAPPING.keys()
         if not all_types:
+            columns.setdefault('type', 'reservation')
+            columns.setdefault('subject', columns['type'].upper())
             types = (columns['type'], )
-
-        for t in types:
             self.templates.append(self.add(
-                TEMPLATE_MODEL_MAPPING[t],
+                TEMPLATE_MODEL_MAPPING[columns['type']],
                 **columns,
                 id=uuid4()
             ))
+        else:
+            columns.pop('subject', None)
+            for t in types:
+                self.templates.append(self.add(
+                    TEMPLATE_MODEL_MAPPING[t],
+                    subject=t.upper(),
+                    **columns,
+                    id=uuid4()
+                ))
         return self.templates[-len(types)::]
 
     def first_user(self, role='admin'):

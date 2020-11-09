@@ -249,9 +249,10 @@ def view_add_from_course_event(self, request):
 )
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
+    is_placeholder = self.is_placeholder
     SubscriptionsCollection(
         request.session, auth_attendee=request.attendee).delete(self)
-    if not self.is_placeholder:
+    if not is_placeholder and not self.course_event.is_past:
         request = handle_send_email(
             self.course_event.cancellation_template,
             request,
