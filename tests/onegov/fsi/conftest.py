@@ -360,21 +360,29 @@ class FsiScenario(BaseScenario):
         ))
         return self.subscriptions[-1]
 
-    def add_notification_template(self, all_types=True, **columns):
-        columns.setdefault('type', 'reservation')
-        columns.setdefault('subject', columns['type'].upper())
+    def add_notification_template(self, event, all_types=True, **columns):
         columns.setdefault('text', )
+        columns.setdefault('course_event_id', event.id)
 
         types = TEMPLATE_MODEL_MAPPING.keys()
         if not all_types:
+            columns.setdefault('type', 'reservation')
+            columns.setdefault('subject', columns['type'].upper())
             types = (columns['type'], )
-
-        for t in types:
             self.templates.append(self.add(
-                TEMPLATE_MODEL_MAPPING[t],
+                TEMPLATE_MODEL_MAPPING[columns['type']],
                 **columns,
                 id=uuid4()
             ))
+        else:
+            columns.pop('subject', None)
+            for t in types:
+                self.templates.append(self.add(
+                    TEMPLATE_MODEL_MAPPING[t],
+                    subject=t.upper(),
+                    **columns,
+                    id=uuid4()
+                ))
         return self.templates[-len(types)::]
 
     def first_user(self, role='admin'):
