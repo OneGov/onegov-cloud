@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2020.80`
+
+> commits: **11 / [b3c432f736...af325c3192](https://github.com/OneGov/onegov-cloud/compare/b3c432f736^...af325c3192)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.80)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Makes deleting of subscriptions from past events possible**
+
+- Updates translations for cancellation template (Issue FSI-43)
+- Concern delete links in subscriptions table `/subscriptions`
+
+**`Feature`** | **[af325c3192](https://github.com/onegov/onegov-cloud/commit/af325c319249941728c052cdc07afad18faf036c)**
+
+### Translatordirectory
+
+🎉 **Adds translator Coordinates and geocoding/directions**
+
+- Adds coordinates field to translator
+- Adds distance calculation with mapbox directions api as part of form validation
+- Adapt the location name inside the address input of the CoordinatesField when results selected
+- Adds cli to geocode
+- adds cli to recalculate distances
+- adds home address and geocode bounding box to app configuration
+- GIS: adds possibility to make marker non-draggable for CoordinatesField
+- GIS: Adds the location name to the marker once set (marker map/CoordiatesField)
+
+**`Feature`** | **[5350f3cb75](https://github.com/onegov/onegov-cloud/commit/5350f3cb75e6da6859a493e48ec5a15d5989f012)**
+
 ## Release `2020.79`
 
-> commits: **13 / [f30937ed4f...ac1039f312](https://github.com/OneGov/onegov-cloud/compare/f30937ed4f^...ac1039f312)**  
+> released: **2020-11-03 17:35**<br>
+> commits: **14 / [f30937ed4f...f7f2d2ec1e](https://github.com/OneGov/onegov-cloud/compare/f30937ed4f^...f7f2d2ec1e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.79)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
