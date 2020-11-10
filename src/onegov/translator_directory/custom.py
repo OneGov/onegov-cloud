@@ -44,6 +44,13 @@ def get_base_tools(request):
                     ), attrs={'class': 'settings'}
                 )
             )
+            links.append(
+                Link(
+                    _("Location Settings"), request.link(
+                        request.app.org, 'location-settings'
+                    ), attrs={'class': 'location-settings'}
+                )
+            )
             yield LinkGroup(_("Management"), classes=('management',),
                             links=links)
 

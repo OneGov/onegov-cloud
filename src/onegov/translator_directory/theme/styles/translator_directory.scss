@@ -10,6 +10,10 @@ $dark-orange:  #be860e;
     .documents::before { @include icon('\f016')}
 }
 
+.location-settings {
+    &::before { @include icon('\f041')}
+}
+
 .mobile-phone {
     &::before { @include icon($mobile-phone-icon); }
 }
