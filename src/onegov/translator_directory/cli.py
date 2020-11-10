@@ -353,7 +353,7 @@ def geocode_cli(dry_run, only_empty):
         trs_total, total, geocoded, skipped, not_found = \
             geocode_translator_addresses(
                 request, only_empty,
-                bbox=app.geocode_bbox
+                bbox=None
             )
 
         click.secho(f'{total} translators of {trs_total} have an address')
