@@ -6,7 +6,7 @@ from onegov.translator_directory import _
 class LocationSettingsForm(Form):
 
     coordinates = CoordinatesField(
-        label=_("Home Location"),
+        fieldset=_("Home Location"),
         render_kw={'data-map-type': 'marker', 'data-undraggable': 1},
     )
 

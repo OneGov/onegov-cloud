@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-10 18:57+0100\n"
+"POT-Creation-Date: 2020-11-10 20:21+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -87,6 +87,9 @@ msgstr "Allg. Dateiablage"
 
 msgid "Settings"
 msgstr "Einstellungen"
+
+msgid "Location Settings"
+msgstr "Standorteinstellungen"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -414,9 +417,6 @@ msgstr "E-Mail / Benutzername / Kürzel"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
-
-msgid "Location Settings"
-msgstr "Standorteinstellungen"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
