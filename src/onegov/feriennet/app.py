@@ -23,6 +23,7 @@ BANNER_TEMPLATE = """
     <div class="sponsor-banner-{id}">
         <a href="{url}">
             <img src="{src}">
+            <p class="banner-info">{info}</p>
         </a>
         <img src="{tracker}"
                  border="0"
@@ -33,7 +34,6 @@ BANNER_TEMPLATE = """
                     && this.parentNode.parentNode.remove()
                  "
                  alt="Advertisement">
-        <p class="banner-info">{info}</p>
     </div>
 </div>
 """

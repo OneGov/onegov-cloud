@@ -2481,22 +2481,22 @@ $booking-left-margin: 2rem;
     div > img,
     div > a > img, {
         border-radius: 2px;
-        margin-bottom: .5rem;
     }
 
     a {
         bottom: 0;
+        color: $body-font-color;
         display: block;
         left: 0;
         position: absolute;
         right: 0;
+        text-decoration: none;
         top: 0;
     }
 
     p.banner-info {
-        bottom: 0;
         font-style: italic;
-        position: absolute;
+        margin: .25rem 0;
     }
 }
 
