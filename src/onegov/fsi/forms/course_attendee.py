@@ -87,6 +87,10 @@ class CourseAttendeeForm(Form):
                 (p.code, p.code)
                 for p in self.unique_permission_codes() if p.code
             ]
+        if self.model.user_id or not self.request.is_manager:
+            self.delete_field('organisation')
+        else:
+            self.set_organisation_choices()
 
 
 class AddExternalAttendeeForm(CourseAttendeeForm):
