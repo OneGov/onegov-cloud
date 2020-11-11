@@ -81,7 +81,7 @@ def test_view_new_translator(client):
     ):
         page = page.form.submit()
         assert 'Der eigene Standort ist nicht konfiguriert' in page
-        settings = client.get('/location-settings')
+        settings = client.get('/directory-settings')
         settings.form['coordinates'] = encode_map_value({
             'lat': 46, 'lon': 7, 'zoom': 12
         })
