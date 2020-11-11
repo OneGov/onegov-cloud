@@ -67,13 +67,12 @@ class CourseAttendeeForm(Form):
         if self.request.is_admin:
             organisations = tuple(
                 p.code for p in self.unique_permission_codes() if p.code)
-            if external_attendee_org not in organisations:
-                organisations = (external_attendee_org,) + organisations
+
         else:
             organisations = tuple(self.request.attendee.permissions)
-            if not organisations:
-                self.delete_field('organisation')
-                return
+
+        if external_attendee_org not in organisations:
+            organisations = (external_attendee_org,) + organisations
 
         self.organisation.choices = [(org, org) for org in organisations]
 

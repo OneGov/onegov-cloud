@@ -73,10 +73,11 @@ def test_add_edit_external_attendee(client, scenario):
     client.login_editor()
     new = client.get('/fsi/attendees/').click('Externen Teilnehmer hinzufügen')
     options = [opt[2] for opt in new.form['organisation'].options]
-    # Limit options to his permissions
-    assert options == [real_org]
 
-    assert new.form['organisation'].value == real_org
+    # Limit options to his permissions
+    assert options == [external_attendee_org, real_org]
+
+    assert new.form['organisation'].value == external_attendee_org
     new.form['first_name'] = 'New FN'
     new.form['last_name'] = 'New LN'
     new.form['email'] = 'external@example.org'
@@ -84,15 +85,16 @@ def test_add_edit_external_attendee(client, scenario):
     page = new.form.submit().follow()
     assert 'Neuer externer Teilnehmer hinzugefügt' in page
     assert 'external@example.org' in page
-    assert real_org in page
+    assert external_attendee_org in page
 
     # Edit by logging in as admin
     admin = client.spawn()
     admin.login_admin()
     page = admin.get(page.request.url).click('Profil bearbeiten')
-    assert page.form['organisation'].value == real_org
-    page.form['organisation'] = external_attendee_org
-    page.form.submit().follow()
+    assert page.form['organisation'].value == external_attendee_org
+    page.form['organisation'] = real_org
+    page = page.form.submit().follow()
+    assert real_org in page
 
     # Test adding twice
     page = client.get(view)
