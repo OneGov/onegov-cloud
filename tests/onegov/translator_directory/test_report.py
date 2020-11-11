@@ -7,7 +7,7 @@ from onegov.file import FileCollection
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.report import TranslatorVoucher
 from tests.onegov.translator_directory.shared import translator_data
-from tests.shared.utils import create_image, open_in_excel
+from tests.shared.utils import create_image
 
 
 def test_translator_voucher(client):
@@ -42,4 +42,3 @@ def test_translator_voucher(client):
     )
 
     xlsx = voucher.create_document()
-    open_in_excel(xlsx)

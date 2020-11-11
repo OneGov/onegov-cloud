@@ -22,22 +22,13 @@ class TranslatorDirectoryApp(OrgApp):
         cfg.setdefault('disable_password_reset', False)
         super().configure_organisation(**cfg)
 
-    def configure_home_address(self, **cfg):
-        """ Configures the home address to calculate the distance of a
-         translators home address to this home address. """
-        home = cfg.get('translator_directory_home', None)
-        assert home, 'This app needs home coordinates for the routing api'
-        self.coordinates = Coordinates(lat=home['lat'], lon=home['lon'])
+    @property
+    def coordinates(self):
+        return self.org.meta.get('translator_directory_home') or Coordinates()
 
-    def configure_geocode_bounding_box(self, **cfg):
-        bbox = cfg.get('geocode_bbox')
-        assert bbox, 'This app needs a bounding box to validate ' \
-                     'routes from directions api'
-        assert len(bbox) == 2, 'Provide two coordinate pairs ' \
-                               'lat,lon as bounding box'
-        self.geocode_bbox = tuple(
-            Coordinates(lat=point['lat'], lon=point['lon']) for point in bbox
-        )
+    @coordinates.setter
+    def coordinates(self, value):
+        self.org.meta['translator_directory_home'] = value or {}
 
 
 @TranslatorDirectoryApp.template_directory()

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-06 14:37+0100\n"
+"POT-Creation-Date: 2020-11-10 20:21+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -88,6 +88,9 @@ msgstr "Allg. Dateiablage"
 msgid "Settings"
 msgstr "Einstellungen"
 
+msgid "Location Settings"
+msgstr "Standorteinstellungen"
+
 msgid "Management"
 msgstr "Verwaltung"
 
@@ -109,6 +112,9 @@ msgstr "Dieses Feld wird benötigt."
 #, python-format
 msgid "${language} already exists"
 msgstr "${language} existiert bereits"
+
+msgid "Home Location"
+msgstr "Eigener Standort"
 
 msgid "Personal ID"
 msgstr "Personal Nr."
@@ -261,6 +267,12 @@ msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 msgid "A translator with this email already exists"
 msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
 
+msgid ""
+"Home location is not configured. Please complete location settings first"
+msgstr ""
+"Der eigene Standort ist nicht konfiguriert. Bitte vervollständigen Sie die "
+"Standorteinstellungen"
+
 #, python-format
 msgid "Error in requesting directions from Mapbox (${status})"
 msgstr "Fehler bei der Anfrage nach einer Route bei Mapbox (${status})"
@@ -403,6 +415,9 @@ msgstr "Sprache erfolgreich gelöscht"
 msgid "E-Mail Address / Username / Shortcut"
 msgstr "E-Mail / Benutzername / Kürzel"
 
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
@@ -414,9 +429,6 @@ msgstr "Übersetzerverzeichnis"
 
 msgid "Name reveal confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
-
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Translator is lacking location and address."
 msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."

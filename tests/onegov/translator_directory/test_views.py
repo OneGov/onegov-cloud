@@ -74,6 +74,13 @@ def test_view_new_translator(client):
                 'code': 'Ok',
                 'routes': [{'distance': drive_distance * 1000}]})
     ):
+        page = page.form.submit()
+        assert 'Der eigene Standort ist nicht konfiguriert' in page
+        settings = client.get('/location-settings')
+        settings.form['coordinates'] = encode_map_value({
+            'lat': 46, 'lon': 7, 'zoom': 12
+        })
+        settings.form.submit()
         page = page.form.submit().follow()
 
     assert '978654' in page
@@ -323,3 +330,25 @@ def test_file_security(client):
     assert 'Dokumente' not in page
     client.get(f'/documents/{trs_id}', status=forbidden)
     client.get('/files', status=forbidden)
+
+
+def test_geocode_location_settings(client):
+    client.login_admin()
+    settings = client.get('/location-settings')
+
+    def map_value(page):
+        return decode_map_value(page.form['coordinates'].value)
+
+    assert not map_value(settings)
+
+    settings = client.get('/location-settings')
+    assert map_value(settings) == Coordinates()
+
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+
+    page = settings.form.submit().follow()
+    assert 'Ihre Änderungen wurden gespeichert' in page
+    settings = client.get('/location-settings')
+    assert map_value(settings) == Coordinates(lat=46, lon=7, zoom=12)

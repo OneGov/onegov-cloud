@@ -442,6 +442,13 @@ class TranslatorForm(Form, FormChoicesMixin):
         def to_tuple(coordinate):
             return coordinate.lat, coordinate.lon
 
+        if not self.request.app.coordinates:
+            self.drive_distance.errors.append(
+                _("Home location is not configured. "
+                  "Please complete location settings first")
+            )
+            return False
+
         response = self.directions_api.directions([
             to_tuple(self.request.app.coordinates),
             to_tuple(self.coordinates.data)
