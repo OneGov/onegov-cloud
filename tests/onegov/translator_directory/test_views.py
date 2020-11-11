@@ -1,11 +1,16 @@
 import copy
+from datetime import datetime
+from io import BytesIO
 from unittest import mock
 
 import transaction
+from webtest import Upload
+from xlsxwriter import Workbook
 
 from onegov.gis import Coordinates
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
@@ -332,23 +337,40 @@ def test_file_security(client):
     client.get('/files', status=forbidden)
 
 
-def test_geocode_location_settings(client):
+def test_translator_directory_settings(client):
     client.login_admin()
-    settings = client.get('/location-settings')
+    client.get('/voucher-template', status=404)
+    settings = client.get('/').click('Verzeichniseinstellungen')
 
     def map_value(page):
         return decode_map_value(page.form['coordinates'].value)
 
     assert not map_value(settings)
 
-    settings = client.get('/location-settings')
+    settings = client.get('/directory-settings')
     assert map_value(settings) == Coordinates()
 
     settings.form['coordinates'] = encode_map_value({
         'lat': 46, 'lon': 7, 'zoom': 12
     })
 
+    file = BytesIO()
+    wb = Workbook(file)
+    wb.add_worksheet()
+    wb.close()
+    file.seek(0)
+
+    settings.form['voucher_excel'] = Upload(
+        'example.xlsx', file.read(), tuple(ALLOWED_MIME_TYPES)[0])
+
     page = settings.form.submit().follow()
     assert 'Ihre Änderungen wurden gespeichert' in page
-    settings = client.get('/location-settings')
+    settings = client.get('/directory-settings')
     assert map_value(settings) == Coordinates(lat=46, lon=7, zoom=12)
+    year = datetime.now().year
+    filename = f'abrechnungsvorlage_{year}.xlsx'
+    assert filename in settings
+
+    # Get the file
+    file_page = client.get('/voucher')
+    assert filename in file_page.content_disposition

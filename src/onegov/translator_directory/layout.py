@@ -121,7 +121,7 @@ class TranslatorLayout(DefaultLayout):
                 ),
                 Link(
                     _('Voucher template'),
-                    self.request.link(self.model, name='voucher'),
+                    self.request.link(self.request.app.org, name='voucher'),
                     attrs={'class': 'create-excel'}
                 ),
                 Link(
@@ -207,7 +207,12 @@ class TranslatorCollectionLayout(DefaultLayout):
                 Link(
                     _('Export Excel'),
                     url=self.request.class_link(
-                        TranslatorCollection, name='export'))
+                        TranslatorCollection, name='export')),
+                Link(
+                    _('Voucher template'),
+                    self.request.link(self.request.app.org, name='voucher'),
+                    attrs={'class': 'create-excel'}
+                )
             ]
 
 

@@ -46,9 +46,9 @@ def get_base_tools(request):
             )
             links.append(
                 Link(
-                    _("Location Settings"), request.link(
-                        request.app.org, 'location-settings'
-                    ), attrs={'class': 'location-settings'}
+                    _("Settings translator directory"), request.link(
+                        request.app.org, 'directory-settings'
+                    ), attrs={'class': 'settings'}
                 )
             )
             yield LinkGroup(_("Management"), classes=('management',),
