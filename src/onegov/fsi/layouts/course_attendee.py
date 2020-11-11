@@ -17,7 +17,7 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_admin:
+        if not self.request.is_manager:
             return []
         return [
             Link(
