@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2020.81`
+
+> commits: **6 / [893fe9b26e...1ec101e4a5](https://github.com/OneGov/onegov-cloud/compare/893fe9b26e^...1ec101e4a5)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.81)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds organisation field to external attendee form**
+
+Editor Role can create external attendees and set the organisation based on their permissions.
+
+**`Feature`** | **[59b71241e2](https://github.com/onegov/onegov-cloud/commit/59b71241e260ce573538d632bb9b64307546dc3a)**
+
+### Translatordirectory
+
+🎉 **Change home address app configuration**
+
+Changes app settings for home address to be managed by the tenant.
+
+**`Feature`** | **[c2ff52042c](https://github.com/onegov/onegov-cloud/commit/c2ff52042c0f4cd50bf61442509433708db71ae0)**
+
+🎉 **Changes voucher excel to be a static file**
+
+Adds excel upload to directory-settings view. We drop the excel creation mechanism.
+
+**`Feature`** | **[1ec101e4a5](https://github.com/onegov/onegov-cloud/commit/1ec101e4a51ea76a5ebcc9eb0bd93b7f7e5ddec6)**
+
 ## Release `2020.80`
 
-> commits: **11 / [b3c432f736...af325c3192](https://github.com/OneGov/onegov-cloud/compare/b3c432f736^...af325c3192)**  
+> released: **2020-11-10 09:21**<br>
+> commits: **12 / [b3c432f736...72f33b5bc9](https://github.com/OneGov/onegov-cloud/compare/b3c432f736^...72f33b5bc9)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.80)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
