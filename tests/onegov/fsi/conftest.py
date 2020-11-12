@@ -259,10 +259,15 @@ class FsiScenario(BaseScenario):
         exclude = ('organisation', 'permissions')
 
         if not external:
-            user = self.add_user(
-                **{k: v for k, v in columns.items() if k not in exclude}
-            )
-            columns.setdefault('user_id', user.id)
+            if not columns.get('user_id'):
+                user = self.add_user(
+                    **{k: v for k, v in columns.items() if k not in exclude}
+                )
+                columns['user_id'] = user.id
+            else:
+                user = self.session.query(User).filter_by(
+                    id=columns['user_id']).one()
+
             columns.setdefault('source_id', user.source_id)
         else:
             columns.setdefault('_email', columns['username'])

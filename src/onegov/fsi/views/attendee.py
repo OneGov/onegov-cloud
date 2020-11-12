@@ -89,7 +89,7 @@ def view_att_external_attendee(self, request, form):
 
     if form.submitted(request):
         attendee = self.add(**form.get_useful_data())
-        request.success(_("Added a new course event"))
+        request.success(_("Added a new external attendee"))
         return request.redirect(request.link(attendee))
 
     return {

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-09 15:33+0100\n"
+"POT-Creation-Date: 2020-11-11 14:09+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -111,6 +111,9 @@ msgstr "Email"
 
 msgid "Permissions"
 msgstr "Berechtigungen"
+
+msgid "Organisation"
+msgstr "Organisation"
 
 msgid "An attendee with this email already exists"
 msgstr "Ein Teilnehmer mit dieser E-Mail existiert bereits"
@@ -479,9 +482,6 @@ msgstr "Keine Teilnehmer in der Datenbank"
 msgid "Family name, surname"
 msgstr "Nachname, Vorname"
 
-msgid "Organisation"
-msgstr "Organisation"
-
 msgid "True"
 msgstr "Ja"
 
@@ -682,8 +682,8 @@ msgstr "Sende Info-Email"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "Added a new course event"
-msgstr "Eine neue Durchführung wurde hinzugefügt"
+msgid "Added a new external attendee"
+msgstr "Neuer externer Teilnehmer hinzugefügt"
 
 msgid "External attendee successfully deleted"
 msgstr "Externer Teilnehmer erfolgreich gelöscht"
@@ -721,6 +721,9 @@ msgstr "Kurs erfolgreich gelöscht"
 msgid "This course has events and can not be deleted"
 msgstr ""
 "Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden"
+
+msgid "Added a new course event"
+msgstr "Eine neue Durchführung wurde hinzugefügt"
 
 msgid "This event has registrations and can not be deleted"
 msgstr ""
