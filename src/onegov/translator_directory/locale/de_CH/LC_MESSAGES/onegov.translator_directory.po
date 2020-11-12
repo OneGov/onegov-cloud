@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-10 20:21+0100\n"
+"POT-Creation-Date: 2020-11-11 11:49+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -88,8 +88,8 @@ msgstr "Allg. Dateiablage"
 msgid "Settings"
 msgstr "Einstellungen"
 
-msgid "Location Settings"
-msgstr "Standorteinstellungen"
+msgid "Settings translator directory"
+msgstr "Verzeichniseinstellungen"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -115,6 +115,12 @@ msgstr "${language} existiert bereits"
 
 msgid "Home Location"
 msgstr "Eigener Standort"
+
+msgid "Voucher template"
+msgstr "Abrechnungsvorlage"
+
+msgid "Templates"
+msgstr "Vorlagen"
 
 msgid "Personal ID"
 msgstr "Personal Nr."
@@ -329,9 +335,6 @@ msgstr "Übersetzer/in löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "Voucher template"
-msgstr "Abrechnungsvorlage"
-
 msgid "Documents"
 msgstr "Dokumente"
 
@@ -435,6 +438,9 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+#~ msgid "Location Settings"
+#~ msgstr "Standorteinstellungen"
 
 #~ msgid "Uncategorized"
 #~ msgstr "Unkategorisiert"

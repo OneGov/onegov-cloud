@@ -1,11 +1,10 @@
-import os
 from datetime import datetime
 from io import BytesIO
-from uuid import uuid4
 
+from webob.exc import HTTPNotFound
 from xlsxwriter import Workbook
 
-from onegov.core.utils import normalize_for_url
+from onegov.org.models import Organisation
 from onegov.translator_directory import _
 from onegov.core.security import Secret, Personal, Private
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -17,8 +16,6 @@ from onegov.translator_directory.layout import AddTranslatorLayout, \
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
 from onegov.translator_directory.models.translator import Translator
 from morepath.request import Response
-
-from onegov.translator_directory.report import TranslatorVoucher
 
 
 @TranslatorDirectoryApp.form(
@@ -263,27 +260,19 @@ def delete_course_event(self, request):
 
 
 @TranslatorDirectoryApp.view(
-    model=Translator,
+    model=Organisation,
     permission=Private,
     name='voucher'
 )
-def export_voucher_xlsx(self, request):
-    excerpt_path = os.path.join(
-        request.app.static_files[0], 'law_zug.png')
-    logo_path = os.path.join(
-        request.app.static_files[0], 'logo_abrechnungsexcel.png')
+def get_static_excel_file(self, request):
+    file = request.app.voucher_excel_file
+    if not file:
+        return HTTPNotFound()
 
-    voucher = TranslatorVoucher(
-        request,
-        self,
-        logo=logo_path,
-        law_excerpt_path=excerpt_path
-    )
-    filename = f'abrechnung_{normalize_for_url(self.title)}'
     return Response(
-        voucher.create_document(protect_pw=str(uuid4())).read(),
+        file.read(),
         content_type=(
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ),
-        content_disposition=f'inline; filename={filename}.xlsx'
+        content_disposition=f'inline; filename={file.filename}'
     )
