@@ -732,6 +732,11 @@ form {
         min-height: 30em;
     }
 
+    // This is a hack, since the scrollingContainer of quill does work without setting height (in onegov)
+    .ql-container {
+        height: 30em;
+    }
+
 }
 
 .manage-notices form {
