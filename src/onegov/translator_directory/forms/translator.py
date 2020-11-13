@@ -151,7 +151,7 @@ class TranslatorForm(Form, FormChoicesMixin):
             "beneath are filled out automatically."
         ),
         fieldset=_("Address"),
-        render_kw={'data-map-type': 'marker', 'data-undraggable': 1}
+        render_kw={'data-map-type': 'marker'}
     )
 
     address = StringField(
