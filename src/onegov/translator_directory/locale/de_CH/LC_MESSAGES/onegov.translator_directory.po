@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-11 11:49+0100\n"
+"POT-Creation-Date: 2020-11-13 14:36+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -171,8 +171,8 @@ msgstr "PLZ"
 msgid "City"
 msgstr "Ort"
 
-msgid "Drive distance"
-msgstr "Wegberechnung"
+msgid "Drive distance (km)"
+msgstr "Fahrdistanz (km)"
 
 msgid "Swiss social security number"
 msgstr "AHV-Nr."
@@ -292,6 +292,9 @@ msgstr ""
 
 msgid "Order by"
 msgstr "Sortiere nach"
+
+msgid "Drive distance"
+msgstr "Wegberechnung"
 
 msgid "Order direction"
 msgstr "Sortierung"

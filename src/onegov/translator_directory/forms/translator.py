@@ -170,7 +170,7 @@ class TranslatorForm(Form, FormChoicesMixin):
     )
 
     drive_distance = FloatField(
-        label=_('Drive distance'),
+        label=_('Drive distance (km)'),
         validators=[Optional()],
         fieldset=_('Address'),
     )
