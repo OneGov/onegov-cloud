@@ -50,8 +50,7 @@ class TranslatorDirectoryApp(OrgApp):
     def voucher_excel_file(self, value):
         content_type = extension_for_content_type(
             content_type_from_fileobj(value)
-        )
-        print(content_type)
+        ) or 'xls'
         year = datetime.now().year
         filename = f'abrechnungsvorlage_{year}.{content_type}'
         if self.voucher_excel:
