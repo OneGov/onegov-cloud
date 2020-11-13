@@ -2,7 +2,8 @@ import pytest
 import transaction
 
 from datetime import date, timedelta
-from onegov.form import FormCollection, FormExtension, FormSubmission
+from onegov.form import FormCollection, FormExtension, FormSubmission, \
+    FormRegistrationWindow
 from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from webob.multidict import MultiDict
@@ -565,3 +566,25 @@ def test_registration_submission_state(session):
     submission.disclaim()
     assert submission.registration_state == 'cancelled'
     assert query_registration_state() == 'cancelled'
+
+    # test deletion cascading to registration windows
+    assert session.query(FormRegistrationWindow).first()
+
+    forms = FormCollection(session)
+    assert session.query(FormSubmission).first()
+
+    with pytest.raises(IntegrityError):
+        forms.definitions.delete(
+            summer.name,
+            with_submissions=False,
+            with_registration_windows=True)
+
+    transaction.begin()
+
+    forms.definitions.delete(
+        summer.name,
+        with_submissions=True,
+        with_registration_windows=True)
+
+    assert not session.query(FormRegistrationWindow).first()
+    assert not session.query(FormSubmission).first()

@@ -102,4 +102,4 @@ def delete_form_definition(self, request):
         raise exc.HTTPMethodNotAllowed()
 
     FormCollection(request.session).definitions.delete(
-        self.name, with_submissions=False)
+        self.name, with_submissions=False, with_registration_windows=True)
