@@ -20,7 +20,7 @@ def get_css_path():
 
 
 @QuillApp.webasset('quill')
-def get_leaflet_asset():
+def get_quill_asset():
     yield 'quill.snow.css'
     yield 'custom.css'
     yield 'quill.js'
