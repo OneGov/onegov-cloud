@@ -591,7 +591,7 @@ def view_zip_file(self, request):
 
     with NamedTemporaryFile() as f:
         archive = DirectoryZipArchive(f.name + '.zip', format, transform)
-        archive.write(self.directory)
+        archive.write(self.directory, entry_filter=request.exclude_invisible)
 
         response = render_file(str(archive.path), request)
 
