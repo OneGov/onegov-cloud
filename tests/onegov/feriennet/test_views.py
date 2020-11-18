@@ -1412,6 +1412,22 @@ def test_deadline(client, scenario):
     scenario.commit()
     scenario.refresh()
 
+    # Test visibility of booking button right after day change
+    period = scenario.latest_period
+    now = period.as_local_datetime(period.prebooking_start)
+    with freeze_time(
+            now + timedelta(minutes=30)):
+        assert period.is_prebooking_in_past is False
+        page = client.get('/activity/foo')
+        assert 'Anmelden</a>' in page
+
+    with freeze_time(
+            now - timedelta(minutes=30)):
+        assert period.is_prebooking_in_past is True
+        page = client.get('/activity/foo')
+        open_in_browser(page)
+        assert 'Anmelden</a>' not in page
+
     with freeze_time(scenario.latest_period.booking_end + timedelta(days=1)):
 
         # show no 'enroll' for ordinary users past the deadline
