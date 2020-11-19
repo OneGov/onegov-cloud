@@ -358,21 +358,21 @@ class Period(Base, TimestampMixin):
 
     @property
     def is_prebooking_in_future(self):
-        today = sedate.utcnow()
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
 
-        return today < start
+        return now < start
 
     @property
     def is_currently_prebooking(self):
         if not self.wishlist_phase:
             return False
 
-        today = sedate.utcnow()
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
         end = self.as_local_datetime(self.prebooking_end)
 
-        return start <= today <= end
+        return start <= now <= end
 
     @property
     def is_prebooking_in_past(self):
@@ -389,39 +389,39 @@ class Period(Base, TimestampMixin):
 
     @property
     def is_booking_in_future(self):
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
 
-        return today < start
+        return now < start
 
     @property
     def is_currently_booking(self):
         if not self.booking_phase:
             return False
 
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
         end = self.as_local_datetime(self.booking_end)
 
-        return start <= today <= end
+        return start <= now <= end
 
     @property
     def is_booking_in_past(self):
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
         end = self.as_local_datetime(self.booking_end)
 
-        if today > end:
+        if now > end:
             return True
 
-        return start <= today and not self.booking_phase
+        return start <= now and not self.booking_phase
 
     @property
     def is_execution_in_past(self):
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         end = self.as_local_datetime(self.execution_end)
 
-        return today > end
+        return now > end
 
     @property
     def scoring(self):
