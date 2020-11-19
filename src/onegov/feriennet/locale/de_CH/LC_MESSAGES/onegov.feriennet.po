@@ -533,7 +533,7 @@ msgid "Family Camp"
 msgstr "Familienlager"
 
 msgid "Trecking Camp"
-msgstr "Treckinglager"
+msgstr "Trekkinglager"
 
 msgid "Title"
 msgstr "Titel"
