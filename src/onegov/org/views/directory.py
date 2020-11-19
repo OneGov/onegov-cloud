@@ -551,10 +551,14 @@ def delete_directory_entry(self, request):
     request.success(_("The entry was deleted"))
 
 
+
 @OrgApp.form(model=ExtendedDirectoryEntryCollection,
-             permission=Private, name='export',
+             permission=Public, name='export',
              template='export.pt', form=ExportForm)
 def view_export(self, request, form):
+
+    if not request.is_visible(self.directory):
+        return HTTPForbidden()
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
@@ -579,8 +583,12 @@ def view_export(self, request, form):
 
 
 @OrgApp.view(model=ExtendedDirectoryEntryCollection,
-             permission=Private, name='zip')
+             permission=Public, name='zip')
 def view_zip_file(self, request):
+
+    if not request.is_visible(self.directory):
+        return HTTPForbidden()
+
     layout = DirectoryEntryCollectionLayout(self, request)
 
     format = request.params.get('format', 'json')
