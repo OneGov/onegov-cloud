@@ -603,7 +603,7 @@ def view_activity(self, request):
         if occasion.period.phase not in acceptable_phases:
             return False
 
-        if occasion.is_past_deadline(date.today()):
+        if occasion.is_past_deadline(sedate.utcnow()):
             return False
 
         if occasion.period.is_prebooking_in_past:
