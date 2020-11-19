@@ -2034,14 +2034,14 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
     def editbar_links(self):
 
         export_link = Link(
-                    text=_("Export"),
-                    url=self.request.class_link(
-                        ExtendedDirectoryEntryCollection, {
-                            'directory_name': self.model.directory_name
-                        }, name='+export'
-                    ),
-                    attrs={'class': 'export-link'}
-                )
+            text=_("Export"),
+            url=self.request.class_link(
+                ExtendedDirectoryEntryCollection, {
+                    'directory_name': self.model.directory_name
+                }, name='+export'
+            ),
+            attrs={'class': 'export-link'}
+        )
 
         def links():
 
