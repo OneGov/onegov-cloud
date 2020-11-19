@@ -4345,9 +4345,11 @@ def test_directory_change_requests(client):
     page.form['name'] = 'Diana Ross Playground'
     page.form['submitter'] = 'user@example.org'
     page.form['comment'] = 'This is better'
+    assert len(client.app.smtp.outbox) == 0
     page.form.submit().follow().form.submit().follow()
 
     # check the ticket
+    assert len(client.app.smtp.outbox) == 1
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     assert '<del>Central Park</del><ins>Diana Ross Playground</ins>' in page
     assert 'This is better' in page
@@ -4358,6 +4360,8 @@ def test_directory_change_requests(client):
 
     # apply the changes
     page.click("Übernehmen")
+    # User gets confirmation email
+    assert len(client.app.smtp.outbox) == 2
     page = client.get(page.request.url)
     assert 'Central Park' not in page
     assert 'Diana Ross Playground' in page
