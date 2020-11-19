@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2020.82`
+
+> commits: **7 / [aeb0810c8d...82dc099f31](https://github.com/OneGov/onegov-cloud/compare/aeb0810c8d^...82dc099f31)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.82)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🐞 **Fix double linkifying phone numbers**
+
+Fixes `linkify_phone` function that caused double linkification of phone numbers.
+
+**`Bugfix`** | **[654006edfe](https://github.com/onegov/onegov-cloud/commit/654006edfe198baada83a532d80ddbe7415816c4)**
+
+### Gazette
+
+🎉 **Makes quill editor scrollable**
+
+For the RTF Editor used for the gazette notices, the form field is not scrollable in order to reach the format toolbar always.
+
+**`Feature`** | **[ZW-280](https://kanton-zug.atlassian.net/browse/ZW-280)** | **[88761c53ba](https://github.com/onegov/onegov-cloud/commit/88761c53ba06e31a4eecb8b6d3ccaa45b3aa81a1)**
+
+### Org
+
+🐞 **Fixes error when deleting form with FormRegistrationWindows**
+
+Fixes cascading to delete FormRegistratronWindows of a form.
+
+**`Bugfix`** | **[d04482db3c](https://github.com/onegov/onegov-cloud/commit/d04482db3c9e533910472dcc07d96c16f2b359dc)**
+
 ## Release `2020.81`
 
-> commits: **6 / [893fe9b26e...1ec101e4a5](https://github.com/OneGov/onegov-cloud/compare/893fe9b26e^...1ec101e4a5)**  
+> released: **2020-11-12 09:38**<br>
+> commits: **7 / [893fe9b26e...9ef2aa8e4c](https://github.com/OneGov/onegov-cloud/compare/893fe9b26e^...9ef2aa8e4c)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.81)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
