@@ -2033,6 +2033,16 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
     @cached_property
     def editbar_links(self):
 
+        export_link = Link(
+                    text=_("Export"),
+                    url=self.request.class_link(
+                        ExtendedDirectoryEntryCollection, {
+                            'directory_name': self.model.directory_name
+                        }, name='+export'
+                    ),
+                    attrs={'class': 'export-link'}
+                )
+
         def links():
 
             if self.request.is_admin:
@@ -2043,15 +2053,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                 )
 
             if self.request.is_manager:
-                yield Link(
-                    text=_("Export"),
-                    url=self.request.class_link(
-                        ExtendedDirectoryEntryCollection, {
-                            'directory_name': self.model.directory_name
-                        }, name='+export'
-                    ),
-                    attrs={'class': 'export-link'}
-                )
+                yield export_link
 
                 yield Link(
                     text=_("Import"),
@@ -2105,6 +2107,9 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                         )
                     ]
                 )
+
+            if not self.request.is_logged_in:
+                yield export_link
 
         return list(links())
 
