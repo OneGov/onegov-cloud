@@ -349,10 +349,6 @@ class TranslatorForm(Form, FormChoicesMixin):
         self.written_languages_ids.choices = self.language_choices
         self.certificates_ids.choices = self.certificate_choices
 
-        if isinstance(self.model, Translator) and self.model.imported:
-            self.delete_field('expertise_interpreting_types')
-            self.delete_field('expertise_professional_guilds')
-
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
