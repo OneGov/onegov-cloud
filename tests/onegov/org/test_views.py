@@ -5445,7 +5445,7 @@ def test_zipcode_block(client):
 
 def test_bug_semicolons_in_choices_with_filters(client):
     session = client.app.session()
-    test_label = "A: with semicolon"
+    test_label = "Z: with semicolon"
 
     structure = f"""    
     Name *= ___
@@ -5486,3 +5486,7 @@ def test_bug_semicolons_in_choices_with_filters(client):
     url = page.pyquery('.blank-label > a')[0].attrib['href']
     page = client.get(url)
     assert 'Choices' in page
+
+    # Test that ordering is as defined by form and not alphabetically
+    tags = page.pyquery('ul.tags a')
+    assert [t.text for t in tags] == [f'{test_label} (1)', 'B (0)', 'C (0)']
