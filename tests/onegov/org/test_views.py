@@ -4346,7 +4346,11 @@ def test_directory_change_requests(client):
     page.form['submitter'] = 'user@example.org'
     page.form['comment'] = 'This is better'
     assert len(client.app.smtp.outbox) == 0
-    page.form.submit().follow().form.submit().follow()
+    form_preview = page.form.submit().follow()
+    assert 'Bitte geben Sie mindestens eine Änderung ein' in form_preview
+    form_preview.form['comment'] = 'This is better'
+    form_preview.form['name'] = 'Diana Ross Playground'
+    page = form_preview.form.submit().form.submit().follow()
 
     # check the ticket
     assert len(client.app.smtp.outbox) == 1
