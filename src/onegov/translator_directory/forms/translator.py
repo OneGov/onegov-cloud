@@ -420,11 +420,10 @@ class TranslatorForm(Form, FormChoicesMixin):
         self.update_association(model, 'written_languages', '_ids')
         self.update_association(model, 'certificates', '_ids')
 
-        if not self.model.imported:
-            model.expertise_professional_guilds = \
-                self.expertise_professional_guilds.data
-            model.expertise_interpreting_types = \
-                self.expertise_interpreting_types.data
+        model.expertise_professional_guilds = \
+            self.expertise_professional_guilds.data
+        model.expertise_interpreting_types = \
+            self.expertise_interpreting_types.data
 
     def ensure_updated_driving_distance(self):
 
