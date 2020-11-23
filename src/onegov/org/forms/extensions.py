@@ -94,8 +94,9 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 # upload fields differ if they are not empty
                 if isinstance(field, UploadField):
                     return field.data and True or False
-
-                return self.target.values.get(field.id) != field.data
+                stored = self.target.values.get(field.id) or None
+                field_data = field.data or None
+                return stored != field_data
 
             def render_original(self, field):
                 prev = field.data
