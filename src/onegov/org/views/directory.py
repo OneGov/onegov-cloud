@@ -47,11 +47,11 @@ def get_directory_entry_form_class(model, request):
 
 
 def get_submission_form_class(model, request):
-    return model.directory.form_class_for_submissions(include_private=True)
+    return model.directory.form_class_for_submissions(change_request=False)
 
 
 def get_change_request_form_class(model, request):
-    return model.directory.form_class_for_submissions(include_private=False)
+    return model.directory.form_class_for_submissions(change_request=True)
 
 
 @OrgApp.html(

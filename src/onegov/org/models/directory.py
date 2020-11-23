@@ -11,6 +11,7 @@ from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.fields import UploadField
+from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
@@ -233,31 +234,15 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     def es_public(self):
         return self.access == 'public'
 
-    def form_class_for_submissions(self, include_private):
+    def form_class_for_submissions(self, change_request=False):
         """ Generates the form_class used for user submissions and change
         requests. The resulting form always includes a submitter field and all
-        fields (when submitting) or only public fields (when requesting a
-        change).
+        fields. When doing a change request, removes input required validators
+        from UploadFields.
 
         """
-
         form_class = self.extend_form_class(self.form_class, self.extensions)
-
-        # force all upload fields to be simple, we do not support the more
-        # complex add/keep/replace widget, which is hard to properly support
-        # and is not super useful in submissions
-        def is_upload(attribute):
-            if not hasattr(attribute, 'field_class'):
-                return None
-
-            return issubclass(attribute.field_class, UploadField)
-
-        for name, field in inspect.getmembers(form_class, predicate=is_upload):
-            if 'render_kw' not in field.kwargs:
-                field.kwargs['render_kw'] = {}
-
-            field.kwargs['render_kw']['force_simple'] = True
-
+        form_class = prepare_for_submission(form_class, change_request)
         return form_class
 
     @property

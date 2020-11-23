@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
 from onegov.form.fields import UploadField
+from onegov.form.submissions import prepare_for_submission
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from wtforms.fields import TextAreaField
@@ -57,6 +58,7 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
 
         # XXX circular import
         from onegov.org.models.directory import ExtendedDirectoryEntry
+        prepare_for_submission(self.form_class, for_change_request=True)
 
         class ChangeRequestForm(self.form_class):
 
