@@ -1,3 +1,4 @@
+
 import babel.dates
 import onegov.core
 import onegov.org
@@ -4330,21 +4331,22 @@ def test_directory_change_requests(client):
     page.form['title'] = "Playgrounds"
     page.form['structure'] = """
         Name *= ___
+        Pic *= *.jpg|*.png|*.gif
     """
     page.form['enable_change_requests'] = True
     page.form['title_format'] = '[Name]'
+    page.form['content_fields'] = 'Name\nPic'
     page = page.form.submit().follow()
 
     # create an entry
     page = page.click('Eintrag')
     page.form['name'] = 'Central Park'
+    page.form['pic'] = Upload('test.jpg', utils.create_image().read())
     page = page.form.submit().follow()
 
-    # ask for a change
+    # ask for a change, completely empty
     page = page.click("Änderung vorschlagen")
-    page.form['name'] = 'Diana Ross Playground'
     page.form['submitter'] = 'user@example.org'
-    page.form['comment'] = 'This is better'
     assert len(client.app.smtp.outbox) == 0
     form_preview = page.form.submit().follow()
     assert 'Bitte geben Sie mindestens eine Änderung ein' in form_preview
