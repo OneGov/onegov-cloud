@@ -4343,6 +4343,7 @@ def test_directory_change_requests(client):
     page.form['name'] = 'Central Park'
     page.form['pic'] = Upload('test.jpg', utils.create_image().read())
     page = page.form.submit().follow()
+    img_url = page.pyquery('.field-display img').attr('href')
 
     # ask for a change, completely empty
     page = page.click("Änderung vorschlagen")
@@ -4374,8 +4375,10 @@ def test_directory_change_requests(client):
     assert 'This is better' in page
 
     # check if they were applied (the id won't have changed)
-    assert 'Diana Ross Playground' in \
-        client.get('/directories/playgrounds/central-park')
+    page = client.get('/directories/playgrounds/central-park')
+    assert 'Diana Ross Playground' in page
+    # ensure the picture was not deleted
+    assert page.pyquery('.field-display img').attr('href') == img_url
 
 
 def test_dependent_number_form(client):
