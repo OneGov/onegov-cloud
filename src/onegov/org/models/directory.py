@@ -1,4 +1,3 @@
-import inspect
 import sedate
 
 from cached_property import cached_property
@@ -10,7 +9,6 @@ from onegov.directory import Directory, DirectoryEntry
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
-from onegov.form.fields import UploadField
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
 from onegov.org.models.extensions import CoordinatesExtension
