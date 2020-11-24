@@ -4,7 +4,8 @@ from onegov.core.utils import linkify, normalize_for_url
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
-from onegov.org.forms.extensions import CoordinatesFormExtension
+from onegov.org.forms.extensions import CoordinatesFormExtension, \
+    PublicationFormExtension
 from onegov.people import Person, PersonCollection
 from sqlalchemy.orm import object_session
 from wtforms import BooleanField, RadioField, StringField, TextAreaField, \
@@ -377,3 +378,8 @@ class ResourceValidationExtension(ContentExtension):
                     )
 
         return WithResourceValidation
+
+
+class PublicationExtension(ContentExtension):
+    def extend_form(self, form_class, request):
+        return PublicationFormExtension(form_class).create()
