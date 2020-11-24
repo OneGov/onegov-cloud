@@ -208,6 +208,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     enable_map = meta_property()
     enable_submissions = meta_property()
     enable_change_requests = meta_property()
+    enable_publication = meta_property()
 
     submissions_guideline = content_property()
     change_requests_guideline = content_property()
@@ -245,9 +246,12 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
 
     @property
     def extensions(self):
+        extensions = ['coordinates', 'submitter', 'comment', 'publication']
         if self.enable_map == 'no':
-            return 'submitter', 'comment'
-        return 'coordinates', 'submitter', 'comment'
+            extensions.pop(extensions.index('coordinates'))
+        if self.enable_publication == 'no':
+            extensions.pop(extensions.index('publication'))
+        return tuple(extensions)
 
     @property
     def actual_price(self):
