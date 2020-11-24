@@ -250,7 +250,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
         extensions = ['coordinates', 'submitter', 'comment', 'publication']
         if self.enable_map == 'no':
             extensions.pop(extensions.index('coordinates'))
-        if self.enable_publication == 'no':
+        if not self.enable_publication:
             extensions.pop(extensions.index('publication'))
         return tuple(extensions)
 
