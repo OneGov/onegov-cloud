@@ -4353,6 +4353,7 @@ def test_directory_change_requests(client):
     page = page.click("Änderung vorschlagen")
     page.form['submitter'] = 'user@example.org'
     assert len(client.app.smtp.outbox) == 0
+    assert 'publication_start' not in page.form.fields
     form_preview = page.form.submit().follow()
     assert 'Bitte geben Sie mindestens eine Änderung ein' in form_preview
     form_preview.form['comment'] = 'This is better'
