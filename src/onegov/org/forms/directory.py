@@ -245,6 +245,11 @@ class DirectoryBaseForm(Form):
         fieldset=_("Change requests"),
         depends_on=('enable_change_requests', 'y'))
 
+    enable_publication = BooleanField(
+        label=_("Enables publication dates for entries"),
+        fieldset=_("Publication"),
+        default=False)
+
     @cached_property
     def known_field_ids(self):
         try:
