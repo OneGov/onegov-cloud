@@ -162,9 +162,9 @@ class PublicationFormExtension(FormExtension, name='publication'):
             )
 
             def ensure_publication_start_end(self):
-                if not self.publication_start.data:
-                    if not self.publication_end.data:
-                        return
+                if not self.publication_start.data or \
+                        not self.publication_end.data:
+                    return
 
                 if self.publication_end.data <= self.publication_start.data:
                     self.errors['global-errors'].append(
