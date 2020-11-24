@@ -167,6 +167,7 @@ class PublicationFormExtension(FormExtension, name='publication'):
                     return
 
                 if self.publication_end.data <= self.publication_start.data:
+                    self.errors.setdefault('global-errors', [])
                     self.errors['global-errors'].append(
                         _("Publication start must be prior to end"))
 
