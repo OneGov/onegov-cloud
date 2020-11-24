@@ -4345,6 +4345,7 @@ def test_directory_change_requests(client):
     page = page.click('Eintrag')
     page.form['name'] = 'Central Park'
     page.form['pic'] = Upload('test.jpg', utils.create_image().read())
+    assert 'publication_start' not in page.form.fields
     page = page.form.submit().follow()
     img_url = page.pyquery('.field-display img').attr('href')
 
