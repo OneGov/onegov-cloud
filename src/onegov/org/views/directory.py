@@ -38,12 +38,16 @@ def get_directory_entry_form_class(model, request):
     form_class = ExtendedDirectoryEntry().with_content_extensions(
         model.directory.form_class, request)
 
-    class OptionalMapForm(form_class):
+    class OptionalMapPublicationForm(form_class):
         def on_request(self):
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
-    return OptionalMapForm
+            if not model.directory.enable_publication:
+                self.delete_field('publication_start')
+                self.delete_field('publication_end')
+
+    return OptionalMapPublicationForm
 
 
 def get_submission_form_class(model, request):
