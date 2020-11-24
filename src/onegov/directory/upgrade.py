@@ -41,16 +41,3 @@ def make_external_link_visible_by_default(context):
     for directory in context.session.query(Directory):
         directory.configuration.link_visible = True
 
-
-@upgrade_task('Adds publication dates to directory entries')
-def add_publication_dates_to_dir_entries(context):
-    if not context.has_column('directory_entries', 'publication_start'):
-        context.operations.add_column(
-            'directory_entries',
-            Column('publication_start', UTCDateTime, nullable=True)
-        )
-    if not context.has_column('directory_entries', 'publication_end'):
-        context.operations.add_column(
-            'directory_entries',
-            Column('publication_end', UTCDateTime, nullable=True)
-        )

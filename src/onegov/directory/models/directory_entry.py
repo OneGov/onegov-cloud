@@ -57,10 +57,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: Describes the entry briefly
     lead = Column(Text, nullable=True)
 
-    #: Optional publication dates
-    publication_start = Column(UTCDateTime, nullable=True)
-    publication_end = Column(UTCDateTime, nullable=True)
-
     #: All keywords defined for this entry (indexed)
     _keywords = Column(
         MutableDict.as_mutable(HSTORE), nullable=True, name='keywords'

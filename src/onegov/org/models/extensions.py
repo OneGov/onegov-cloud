@@ -381,5 +381,9 @@ class ResourceValidationExtension(ContentExtension):
 
 
 class PublicationExtension(ContentExtension):
+
+    publication_start = content_property()
+    publication_end = content_property()
+
     def extend_form(self, form_class, request):
         return PublicationFormExtension(form_class).create()
