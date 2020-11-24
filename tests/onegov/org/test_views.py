@@ -1,3 +1,4 @@
+
 import babel.dates
 import onegov.core
 import onegov.org
@@ -4330,23 +4331,29 @@ def test_directory_change_requests(client):
     page.form['title'] = "Playgrounds"
     page.form['structure'] = """
         Name *= ___
+        Pic *= *.jpg|*.png|*.gif
     """
     page.form['enable_change_requests'] = True
     page.form['title_format'] = '[Name]'
+    page.form['content_fields'] = 'Name\nPic'
     page = page.form.submit().follow()
 
     # create an entry
     page = page.click('Eintrag')
     page.form['name'] = 'Central Park'
+    page.form['pic'] = Upload('test.jpg', utils.create_image().read())
     page = page.form.submit().follow()
+    img_url = page.pyquery('.field-display img').attr('href')
 
-    # ask for a change
+    # ask for a change, completely empty
     page = page.click("Änderung vorschlagen")
-    page.form['name'] = 'Diana Ross Playground'
     page.form['submitter'] = 'user@example.org'
-    page.form['comment'] = 'This is better'
     assert len(client.app.smtp.outbox) == 0
-    page.form.submit().follow().form.submit().follow()
+    form_preview = page.form.submit().follow()
+    assert 'Bitte geben Sie mindestens eine Änderung ein' in form_preview
+    form_preview.form['comment'] = 'This is better'
+    form_preview.form['name'] = 'Diana Ross Playground'
+    page = form_preview.form.submit().form.submit().follow()
 
     # check the ticket
     assert len(client.app.smtp.outbox) == 1
@@ -4368,8 +4375,10 @@ def test_directory_change_requests(client):
     assert 'This is better' in page
 
     # check if they were applied (the id won't have changed)
-    assert 'Diana Ross Playground' in \
-        client.get('/directories/playgrounds/central-park')
+    page = client.get('/directories/playgrounds/central-park')
+    assert 'Diana Ross Playground' in page
+    # ensure the picture was not deleted
+    assert page.pyquery('.field-display img').attr('href') == img_url
 
 
 def test_dependent_number_form(client):

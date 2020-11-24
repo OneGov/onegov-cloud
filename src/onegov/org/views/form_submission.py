@@ -134,7 +134,7 @@ def handle_pending_submission(self, request):
     user to turn the submission into a complete submission, once all data
     is valid.
 
-    This view has two states, a completeable state where the form values
+    This view has two states, a completable state where the form values
     are displayed without a form and an edit state, where a form is rendered
     to change the values.
 
