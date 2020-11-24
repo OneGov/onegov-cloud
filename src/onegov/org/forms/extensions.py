@@ -170,5 +170,6 @@ class PublicationFormExtension(FormExtension, name='publication'):
                     self.errors.setdefault('global-errors', [])
                     self.errors['global-errors'].append(
                         _("Publication start must be prior to end"))
+                    return False
 
         return PublicationForm
