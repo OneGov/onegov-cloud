@@ -246,7 +246,9 @@ class DirectoryBaseForm(Form):
         depends_on=('enable_change_requests', 'y'))
 
     enable_publication = BooleanField(
-        label=_("Enables publication dates for entries"),
+        label=_("Enable publication dates"),
+        description=_("Users may suggest publication start and/or end "
+                      "of the entry on submissions and change requests"),
         fieldset=_("Publication"),
         default=False)
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-07 17:24+0200\n"
+"POT-Creation-Date: 2020-11-25 19:00+0100\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -330,6 +330,19 @@ msgstr "Benutzer können Änderungen vorschlagen"
 msgid "Change requests"
 msgstr "Änderungsvorschläge"
 
+msgid "Enable publication dates"
+msgstr "Publikationsdaten aktivieren"
+
+msgid ""
+"Users may suggest publication start and/or end of the entry on submissions "
+"and change requests"
+msgstr ""
+"Benutzer können Start und/oder Ende der Publikation des Eintrags bei "
+"Änderungsvorschlägen und Eingaben setzen"
+
+msgid "Publication"
+msgstr "Publikation"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
@@ -547,6 +560,12 @@ msgstr "Kommentar"
 
 msgid "Please provide at least one change"
 msgstr "Bitte geben Sie mindestens eine Änderung ein"
+
+msgid "Publication end must be in the future"
+msgstr "Das Publikationsende muss in der Zukunft liegen"
+
+msgid "Publication start must be prior to end"
+msgstr "Der Start der Publikation muss vor ihrem Ende liegen"
 
 msgid "Describes what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
@@ -2293,9 +2312,6 @@ msgstr "Ausbezahlt"
 msgid "Digital Signature"
 msgstr "Digitale Signatur"
 
-msgid "Publication"
-msgstr "Publikation"
-
 msgid "Private"
 msgstr "Privat"
 
@@ -3883,11 +3899,11 @@ msgstr "${count} Resultate"
 msgid "Search Unavailable"
 msgstr "Suche Nicht Verfügbar"
 
-msgid "Footer"
-msgstr "Fusszeile"
-
 msgid "Header"
 msgstr "Kopfzeile"
+
+msgid "Footer"
+msgstr "Fusszeile"
 
 msgid "Modules"
 msgstr "Module"

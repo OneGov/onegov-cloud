@@ -4358,7 +4358,7 @@ def test_directory_publication(client):
     page.form['publication_start'] = dt_for_form(now)
     page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
     page = page.form.submit()
-    assert 'Publication end must be in the future' in page
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
     # we have to submit the file again, can't evade that
     page.form['pic'] = Upload('annual.jpg', utils.create_image().read())
     page.form['publication_end'] = dt_for_form(now + timedelta(days=1))
@@ -4389,7 +4389,7 @@ def test_directory_publication(client):
     submission.form['submitter'] = 'user@example.org'
     submission.form['publication_end'] = dt_for_form(now)
     submission = submission.form.submit()
-    assert 'Publication end must be in the future' in submission
+    assert 'Das Publikationsende muss in der Zukunft liegen' in submission
     submission.form['pic'] = Upload('monthly.jpg', utils.create_image().read())
     submission.form['publication_end'] = dt_for_form(now + timedelta(minutes=2))
 
