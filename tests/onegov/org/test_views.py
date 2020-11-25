@@ -24,6 +24,7 @@ from onegov.directory import DirectoryEntry, DirectoryCollection, \
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmission, FormFile
+from onegov.form.display import DateTimeLocalFieldRenderer
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.org.models import ExtendedDirectoryEntry
@@ -4336,6 +4337,9 @@ def test_directory_publication(client):
         """2020-11-25 12:29:00"""
         return dt.strftime('%Y-%m-%d %H:%M:%S')
 
+    def dt_repr(dt):
+        return dt.strftime(DateTimeLocalFieldRenderer.date_format)
+
     client.login_admin()
     page = client.get('/directories').click('Verzeichnis')
     page.form['title'] = "Meetings"
@@ -4361,15 +4365,16 @@ def test_directory_publication(client):
     assert 'Das Publikationsende muss in der Zukunft liegen' in page
     # we have to submit the file again, can't evade that
     page.form['pic'] = Upload('annual.jpg', utils.create_image().read())
-    page.form['publication_end'] = dt_for_form(now + timedelta(days=1))
+    annual_end = now + timedelta(days=1)
+    page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
 
     entry_db = client.app.session().query(ExtendedDirectoryEntry).one()
-    # timezone unaware but converted to utc before
+    # timezone unaware and not converted to utc before
     # contains publications relevant info
     assert 'timezone' in entry_db.content
     assert 'publication_start' in entry_db.content
-    assert entry_db.publication_end.tzinfo == UTC
+    assert not entry_db.publication_end.tzinfo
 
     # check change request publication start deactivated
     page = entry.click('Änderung vorschlagen')
@@ -4399,10 +4404,29 @@ def test_directory_publication(client):
     assert 'Publication' not in preview
     preview.form.submit().follow()
 
+    def accecpt_latest_submission():
+        page = client.get('/tickets/ALL/open').click(
+            "Annehmen", index=0).follow()
+        accept_url = page.pyquery('.accept-link').attr('ic-post-to')
+        client.post(accept_url)
+
     # Accept the new submission
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-    accept_url = page.pyquery('.accept-link').attr('ic-post-to')
-    client.post(accept_url)
+    accecpt_latest_submission()
+    # test change requests for annual
+    page = entry.click('Änderung vorschlagen')
+    page.form['submitter'] = 'user@example.org'
+    assert page.form['publication_start'].value == dt_for_form(now)
+    assert page.form['publication_end'].value == dt_for_form(
+        now + timedelta(days=1))
+    form_preview = page.form.submit().follow()
+    assert 'Bitte geben Sie mindestens eine Änderung ein' in form_preview
+    new_end = now + timedelta(days=9, minutes=5)
+    form_preview.form['publication_end'] = dt_for_form(new_end)
+    changes = form_preview.form.submit()
+    assert changes.pyquery('.diff del')[0].text == dt_repr(annual_end)
+    assert changes.pyquery('.diff ins')[0].text == dt_repr(new_end)
+    page = changes.form.submit().follow()
+    accecpt_latest_submission()
 
 
 def test_directory_change_requests(client):
