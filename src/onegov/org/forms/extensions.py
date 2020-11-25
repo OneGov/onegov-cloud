@@ -3,6 +3,7 @@ from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
 from onegov.form.submissions import prepare_for_submission
 from onegov.form.fields import UploadField, TimezoneDateTimeField
+from onegov.form.validators import StrictOptional
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from wtforms.fields import TextAreaField
@@ -152,13 +153,15 @@ class PublicationFormExtension(FormExtension, name='publication'):
             publication_start = TimezoneDateTimeField(
                 label=_('Start'),
                 timezone=timezone,
-                fieldset=_('Publication')
+                fieldset=_('Publication'),
+                validators=[StrictOptional()]
             )
 
             publication_end = TimezoneDateTimeField(
                 label=_('End'),
                 timezone=timezone,
-                fieldset=_('Publication')
+                fieldset=_('Publication'),
+                validators=[StrictOptional()]
             )
 
             def ensure_publication_start_end(self):
