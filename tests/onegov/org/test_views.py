@@ -1,5 +1,7 @@
 
 import babel.dates
+from pytz import UTC
+
 import onegov.core
 import onegov.org
 import pytest
@@ -24,6 +26,7 @@ from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmission, FormFile
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
+from onegov.org.models import ExtendedDirectoryEntry
 from onegov.org.theme.org_theme import HELVETICA
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection
@@ -4323,6 +4326,83 @@ def test_directory_submissions(client, postgres):
 
     assert '\n' not in desc
     transaction.abort()
+
+
+def test_directory_publication(client):
+
+    now = datetime.now()
+
+    def dt_for_form(dt):
+        """2020-11-25 12:29:00"""
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+    client.login_admin()
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Meetings"
+    page.form['structure'] = """
+            Name *= ___
+            Pic *= *.jpg|*.png|*.gif
+        """
+    page.form['content_fields'] = 'Name\nPic'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_map'] = 'entry'
+    page.form['enable_publication'] = False
+    page.form['enable_change_requests'] = True
+    page.form['enable_submissions'] = True
+    meetings = page.form.submit().follow()
+
+    # create one entry as admin, publications is still available for admin
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', utils.create_image().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = page.form.submit()
+    assert 'Publication end must be in the future' in page
+    # we have to submit the file again, can't evade that
+    page.form['pic'] = Upload('annual.jpg', utils.create_image().read())
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=1))
+    entry = page.form.submit().follow()
+
+    entry_db = client.app.session().query(ExtendedDirectoryEntry).one()
+    # timezone unaware but converted to utc before
+    # contains publications relevant info
+    assert 'timezone' in entry_db.content
+    assert 'publication_start' in entry_db.content
+    assert entry_db.publication_end.tzinfo == UTC
+
+    # check change request publication start deactivated
+    page = entry.click('Änderung vorschlagen')
+    assert 'publication_start' not in page.form.fields
+    # check new submission
+    page = meetings.click('Eintrag', index=1)
+    assert 'publication_start' not in page.form.fields
+
+    edit = meetings.click('Konfigurieren')
+    edit.form['enable_publication'] = True
+    edit.form.submit().follow()
+
+    # create a submission
+    submission = meetings.click('Eintrag', index=1)
+    submission.form['name'] = 'Monthly'
+    submission.form['pic'] = Upload('monthly.jpg', utils.create_image().read())
+    submission.form['submitter'] = 'user@example.org'
+    submission.form['publication_end'] = dt_for_form(now)
+    submission = submission.form.submit()
+    assert 'Publication end must be in the future' in submission
+    submission.form['pic'] = Upload('monthly.jpg', utils.create_image().read())
+    submission.form['publication_end'] = dt_for_form(now + timedelta(minutes=2))
+
+    preview = submission.form.submit().follow()
+    # We retrieve the form form structure only, so Coordinates/Publication
+    # is not visible in the preview
+    assert 'Publication' not in preview
+    preview.form.submit().follow()
+
+    # Accept the new submission
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    accept_url = page.pyquery('.accept-link').attr('ic-post-to')
+    client.post(accept_url)
 
 
 def test_directory_change_requests(client):
