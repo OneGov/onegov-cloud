@@ -1,4 +1,6 @@
 from cached_property import cached_property
+from sedate import utcnow, to_timezone
+
 from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
 from onegov.form.submissions import prepare_for_submission
@@ -6,7 +8,7 @@ from onegov.form.fields import UploadField, TimezoneDateTimeField
 from onegov.form.validators import StrictOptional
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from wtforms.fields import TextAreaField
+from wtforms.fields import TextAreaField, HiddenField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
@@ -148,21 +150,25 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
 class PublicationFormExtension(FormExtension, name='publication'):
 
     def create(self, timezone='Europe/Zurich'):
+        tz = timezone
+
         class PublicationForm(self.form_class):
 
             publication_start = TimezoneDateTimeField(
                 label=_('Start'),
-                timezone=timezone,
+                timezone=tz,
                 fieldset=_('Publication'),
                 validators=[StrictOptional()]
             )
 
             publication_end = TimezoneDateTimeField(
                 label=_('End'),
-                timezone=timezone,
+                timezone=tz,
                 fieldset=_('Publication'),
                 validators=[StrictOptional()]
             )
+
+            timezone = HiddenField(default=tz)
 
             def ensure_publication_start_end(self):
                 start = self.publication_start
