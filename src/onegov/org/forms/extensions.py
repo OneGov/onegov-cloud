@@ -99,6 +99,16 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 # upload fields differ if they are not empty
                 if isinstance(field, UploadField):
                     return field.data and True or False
+
+                # like coordinates, provided through extension
+                if field.id == 'timezone':
+                    return field.data != self.target.timezone
+                if field.id in ('publication_start', 'publication_end'):
+                    if not field.data:
+                        return False
+                    return to_timezone(field.data, 'UTC') != \
+                        getattr(self.target, field.id)
+
                 stored = self.target.values.get(field.id) or None
                 field_data = field.data or None
                 return stored != field_data
