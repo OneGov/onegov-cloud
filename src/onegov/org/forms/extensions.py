@@ -9,7 +9,7 @@ from onegov.form.validators import StrictOptional
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from wtforms.fields import TextAreaField, HiddenField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import EmailField, DateTimeLocalField
 from wtforms.validators import DataRequired
 
 
@@ -113,11 +113,12 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 field_data = field.data or None
                 return stored != field_data
 
-            def render_original(self, field):
+            def render_original(self, field, from_content=False):
                 prev = field.data
 
                 try:
-                    field.data = self.target.values.get(field.id)
+                    field.data = self.target.content.get(field.id) if \
+                        from_content else self.target.values.get(field.id)
                     return super().render_display(field)
                 finally:
                     field.data = prev
@@ -131,6 +132,10 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
 
                     if field.id in ('csrf_token', 'coordinates'):
                         return proposed
+
+                    if field.id in ('publication_start', 'publication_end'):
+                        original = self.render_original(field, True)
+                        return render_html_diff(original, proposed)
 
                     if field.id not in self.target.values:
                         return proposed
