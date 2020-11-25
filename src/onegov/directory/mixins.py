@@ -2,9 +2,12 @@ from sedate import to_timezone, standardize_date
 from onegov.core.orm.mixins import content_property
 
 
-class PublicationMixin:
-    """Mixin that stores and retrieves dates the same way as
-    UTCDateTime type decorator. Always use it with timezone aware datetimes """
+class TimezonePublicationMixin:
+    """ Defines publication relevant information including timezone.
+    Dates are stored unaware of timezone and retrieved as utc.
+
+    Concerning forms, this mixin is working with TimezoneDateTimeField
+    """
 
     timezone = content_property(default='Europe/Zurich')
 

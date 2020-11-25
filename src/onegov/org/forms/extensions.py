@@ -162,7 +162,7 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
         return ChangeRequestForm
 
 
-class PublicationFormExtension(FormExtension, name='publication'):
+class TimezonePublicationFormExtension(FormExtension, name='publication'):
 
     def create(self, timezone='Europe/Zurich'):
         tz = timezone

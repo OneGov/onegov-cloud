@@ -1,12 +1,12 @@
 from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify, normalize_for_url
-from onegov.directory.mixins import PublicationMixin
+from onegov.directory.mixins import TimezonePublicationMixin
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms.extensions import CoordinatesFormExtension, \
-    PublicationFormExtension
+    TimezonePublicationFormExtension
 from onegov.people import Person, PersonCollection
 from sqlalchemy.orm import object_session
 from wtforms import BooleanField, RadioField, StringField, TextAreaField, \
@@ -381,7 +381,7 @@ class ResourceValidationExtension(ContentExtension):
         return WithResourceValidation
 
 
-class PublicationExtension(ContentExtension, PublicationMixin):
+class PublicationExtension(ContentExtension, TimezonePublicationMixin):
 
     def extend_form(self, form_class, request):
-        return PublicationFormExtension(form_class).create()
+        return TimezonePublicationFormExtension(form_class).create()
