@@ -162,12 +162,14 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
         return ChangeRequestForm
 
 
-class TimezonePublicationFormExtension(FormExtension, name='publication'):
+class TimezonePublicationFormExtension(FormExtension, name='tz-publication'):
+    """Can be used with TimezonePublicationMixin or UTCDateTime type decorator.
+    """
 
     def create(self, timezone='Europe/Zurich'):
         tz = timezone
 
-        class PublicationForm(self.form_class):
+        class TimezonePublicationForm(self.form_class):
 
             publication_start = TimezoneDateTimeField(
                 label=_('Start'),
@@ -203,4 +205,4 @@ class TimezonePublicationFormExtension(FormExtension, name='publication'):
                         _("Publication start must be prior to end"))
                     return False
 
-        return PublicationForm
+        return TimezonePublicationForm
