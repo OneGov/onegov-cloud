@@ -25,7 +25,7 @@ class PublicationMixin:
 
     @property
     def publication_end(self):
-        value = self.content.get('publication_start')
+        value = self.content.get('publication_end')
         if value:
             value = standardize_date(value, timezone='UTC')
         return value
