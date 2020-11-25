@@ -6,8 +6,6 @@ class PublicationMixin:
     """Mixin that stores and retrieves dates the same way as
     UTCDateTime type decorator. Always use it with timezone aware datetimes """
 
-    # publication_start = meta_property()
-    # publication_end = meta_property()
     timezone = content_property(default='Europe/Zurich')
 
     @property
