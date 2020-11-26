@@ -4375,8 +4375,7 @@ def test_directory_publication(client):
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
-
-    entry_db = client.app.session().query(ExtendedDirectoryEntry).one()
+    entry_db = dir_query(client).one()
     # timezone unaware and not converted to utc before
     # contains publications relevant info
     assert 'timezone' in entry_db.content
@@ -4403,7 +4402,8 @@ def test_directory_publication(client):
     submission = submission.form.submit()
     assert 'Das Publikationsende muss in der Zukunft liegen' in submission
     submission.form['pic'] = Upload('monthly.jpg', utils.create_image().read())
-    submission.form['publication_end'] = dt_for_form(now + timedelta(minutes=2))
+    monthly_end = now + timedelta(minutes=2)
+    submission.form['publication_end'] = dt_for_form(monthly_end)
 
     preview = submission.form.submit().follow()
     # We retrieve the form form structure only, so Coordinates/Publication
@@ -4419,6 +4419,12 @@ def test_directory_publication(client):
 
     # Accept the new submission
     accecpt_latest_submission()
+
+    monthly_entry = dir_query(client).order_by(
+        ExtendedDirectoryEntry.created.desc()).first()
+    assert monthly_entry.name == 'monthly'
+    assert monthly_entry.publication_end == strip_ms(monthly_end)
+
     # test change requests for annual
     page = entry.click('Änderung vorschlagen')
     page.form['submitter'] = 'user@example.org'
@@ -4434,6 +4440,30 @@ def test_directory_publication(client):
     assert changes.pyquery('.diff ins')[0].text == dt_repr(new_end)
     page = changes.form.submit().follow()
     accecpt_latest_submission()
+    annual_entry = dir_query(client).first()
+    assert annual_entry.name == 'annual'
+    assert annual_entry.publication_end == strip_ms(new_end)
+
+    monthly_entry = dir_query(client).order_by(
+        ExtendedDirectoryEntry.created.desc()).first()
+
+    # check the entry from submission
+    assert monthly_entry.name == 'monthly'
+    assert monthly_entry.publication_end == strip_ms(monthly_end)
+    assert monthly_entry.published
+    # print(monthly_entry.content)
+
+    meetings = client.get(meetings.request.url)
+    assert 'Monthly' in meetings
+
+    with freeze_time(now + timedelta(minutes=5)):
+        assert monthly_entry.published is False
+        meetings = client.get(meetings.request.url)
+        assert 'Monthly' not in meetings
+
+    with freeze_time(now - timedelta(minutes=1)):
+        meetings = client.get(meetings.request.url)
+        assert 'Annual' not in meetings
 
 
 def test_directory_change_requests(client):
