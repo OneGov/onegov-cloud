@@ -4451,7 +4451,6 @@ def test_directory_publication(client):
     assert monthly_entry.name == 'monthly'
     assert monthly_entry.publication_end == strip_ms(monthly_end)
     assert monthly_entry.published
-    # print(monthly_entry.content)
 
     meetings = client.get(meetings.request.url)
     assert 'Monthly' in meetings
