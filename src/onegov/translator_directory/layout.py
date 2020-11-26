@@ -219,6 +219,14 @@ class TranslatorCollectionLayout(DefaultLayout):
                     attrs={'class': 'create-excel'}
                 )
             ]
+        elif self.request.is_editor:
+            return [
+                Link(
+                    _('Voucher template'),
+                    self.request.link(self.request.app.org, name='voucher'),
+                    attrs={'class': 'create-excel'}
+                )
+            ]
 
 
 class AddTranslatorLayout(TranslatorCollectionLayout):
