@@ -1,4 +1,6 @@
-from sedate import to_timezone, standardize_date
+from sedate import to_timezone, standardize_date, utcnow
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm.mixins import content_property
 
 
@@ -15,11 +17,23 @@ class PublicationMixin:
 
     @property
     def utc_publication_start(self):
-        return standardize_date(self.publication_start, self.timezone)
+        return self.publication_start and standardize_date(
+            self.publication_start, self.timezone)
 
     @property
     def utc_publication_end(self):
-        return standardize_date(self.publication_start, self.timezone)
+        return self.publication_end and standardize_date(
+            self.publication_end, self.timezone)
+
+    @hybrid_property
+    def published(self):
+        started = True
+        not_ended = True
+        if self.publication_start:
+            started = self.utc_publication_start >= utcnow()
+        if self.publication_end:
+            not_ended = self.utc_publication_end > utcnow()
+        return started and not_ended
 
 
 class TimezonePublicationMixin:

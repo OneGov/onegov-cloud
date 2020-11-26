@@ -499,6 +499,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             if model.access == 'secret':
                 return False
 
+        if hasattr(model, 'published') and model.published is False:
+            return False
+
         return True
 
     def is_public(self, model):
