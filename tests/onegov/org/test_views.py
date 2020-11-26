@@ -4340,6 +4340,13 @@ def test_directory_publication(client):
     def dt_repr(dt):
         return dt.strftime(DateTimeLocalFieldRenderer.date_format)
 
+    def dir_query(client):
+        return client.app.session().query(ExtendedDirectoryEntry)
+
+    def strip_ms(dt):
+        return datetime(
+            dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+
     client.login_admin()
     page = client.get('/directories').click('Verzeichnis')
     page.form['title'] = "Meetings"
