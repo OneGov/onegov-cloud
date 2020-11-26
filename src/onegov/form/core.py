@@ -3,6 +3,8 @@ import weakref
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
+
+from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.validators import StrictOptional
 from onegov.pay import Price
@@ -553,6 +555,15 @@ class Form(BaseForm):
 
                 if callable(member):
                     yield member
+
+    @staticmethod
+    def as_maybe_markdown(raw_text):
+        md = render_md(raw_text)
+        stripped = md.strip().replace('<p>', '').replace('</p>', '')
+        # has markdown elements
+        if stripped != raw_text:
+            return md, True
+        return raw_text, False
 
 
 class Fieldset(object):

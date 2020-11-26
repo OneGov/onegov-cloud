@@ -22,10 +22,14 @@ def parse(expr, text):
     return expr.parseString(text)
 
 
-def test_help_field_identifier():
+@pytest.mark.parametrize('comment,output', [
+    ('<< Some text >>', 'Some text'),
+    ('<< [Z](www.co.me) >>', '[Z](www.co.me)')
+])
+def test_help_field_identifier(comment, output):
 
-    parsed_result = parse(field_help_identifier(), '<< Some text >>')
-    assert parsed_result.message == 'Some text'
+    parsed_result = parse(field_help_identifier(), comment)
+    assert parsed_result.message == output
 
 
 def test_parse_text():
