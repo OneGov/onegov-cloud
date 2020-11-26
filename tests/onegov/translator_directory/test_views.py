@@ -15,6 +15,7 @@ from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
 
+
 class FakeResponse:
     def __init__(self, json_data=None, status_code=200):
         self.status_code = status_code
@@ -117,6 +118,7 @@ def test_view_new_translator(client):
     editor.login_editor()
     edit_page = editor.get(trs_url).click('Bearbeiten')
     assert '978654' in page
+    assert 'Abrechnungsvorlage' in page
     edit_page.form['pers_id'] = 123456
     edit_page.form.submit().follow()
 

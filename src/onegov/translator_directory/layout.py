@@ -138,7 +138,12 @@ class TranslatorLayout(DefaultLayout):
                         self.model, name='edit-restricted'
                     ),
                     attrs={'class': 'edit-link'}
-                )
+                ),
+                Link(
+                    _('Voucher template'),
+                    self.request.link(self.request.app.org, name='voucher'),
+                    attrs={'class': 'create-excel'}
+                ),
             ]
 
     @cached_property
