@@ -4120,6 +4120,7 @@ def test_directory_visibility(client):
 
     page = page.click('Verzeichnis')
     page.form['title'] = "Clubs"
+    page.form['lead'] = 'The famous club directory'
     page.form['structure'] = """
         Name *= ___
     """
@@ -4133,7 +4134,9 @@ def test_directory_visibility(client):
 
     anon = client.spawn()
     assert "Clubs" in anon.get('/directories')
-    assert "Soccer" in anon.get('/directories/clubs')
+    page = anon.get('/directories/clubs')
+    assert "Soccer" in page
+    assert 'The famous club directory' in page
     assert "Soccer" in anon.get('/directories/clubs/soccer-club')
 
     page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
