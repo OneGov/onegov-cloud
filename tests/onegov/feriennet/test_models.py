@@ -1,3 +1,8 @@
+from datetime import timedelta, date
+
+from freezegun import freeze_time
+from sedate import utcnow
+
 from onegov.core.utils import Bunch
 from onegov.feriennet.models.notification_template import TemplateVariables
 from uuid import uuid4
@@ -46,3 +51,44 @@ def test_template_variables():
         == 'Go to <a href="VacationActivityCollection">ACTIVITIES</a>'
     assert t.render("Go to [HOMEPAGE]") \
         == 'Go to <a href="MockRequest">HOMEPAGE</a>'
+
+
+def test_period(scenario):
+    scenario.add_period()
+    scenario.commit()
+    scenario.refresh()
+
+    period = scenario.latest_period
+    prebook = period.prebooking_start
+    endbook = period.prebooking_end
+
+    def local_(date):
+        return period.as_local_datetime(date)
+
+    midnight = local_(prebook)
+
+    with freeze_time(midnight):
+        # We can see that the timezone already comes to play here leading
+        # to a bug that cost one persons sleep
+        assert local_(date.today()) != midnight
+        # so we replaced it with utcnow() to fix the error
+        assert utcnow() == midnight
+        assert period.phase == 'wishlist'
+        assert period.is_currently_prebooking
+        # assert not period.is_prebooking_in_past
+
+    with freeze_time(midnight - timedelta(minutes=1)):
+        assert period.phase == 'inactive'
+        assert not period.wishlist_phase
+        assert not period.is_currently_prebooking
+
+    with freeze_time(endbook + timedelta(minutes=1)):
+        assert not period.is_currently_prebooking
+        assert period.is_prebooking_in_past
+
+    # exactly midnight in thet chosen timezone
+    with freeze_time(local_(endbook)):
+        assert period.wishlist_phase
+        assert period.is_currently_prebooking
+        assert not period.is_prebooking_in_past
+

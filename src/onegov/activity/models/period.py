@@ -289,6 +289,7 @@ class Period(Base, TimestampMixin):
         return self.max_bookings_per_attendee
 
     def as_local_datetime(self, day):
+        """ Returns the moment of midnight in terms of the timezone it UTC """
         return sedate.standardize_date(
             datetime(day.year, day.month, day.day, 0, 0),
             self.timezone
@@ -297,30 +298,30 @@ class Period(Base, TimestampMixin):
     @property
     def phase(self):
         local = self.as_local_datetime
-        today = local(date.today())
+        now = sedate.utcnow()
 
-        if not self.active or today < local(self.prebooking_start):
+        if not self.active or now < local(self.prebooking_start):
             return 'inactive'
 
         if not self.confirmed:
             return 'wishlist'
 
-        if today < local(self.booking_start):
+        if now < local(self.booking_start):
             return 'inactive'
 
-        if not self.finalized and local(self.booking_end) < today:
+        if not self.finalized and local(self.booking_end) < now:
             return 'inactive'
 
         if not self.finalized:
             return 'booking'
 
-        if today < local(self.execution_start):
+        if now < local(self.execution_start):
             return 'payment'
 
-        if local(self.execution_start) <= today <= local(self.execution_end):
+        if local(self.execution_start) <= now <= local(self.execution_end):
             return 'execution'
 
-        if today > local(self.execution_end):
+        if now > local(self.execution_end):
             return 'archive'
 
     def confirm_and_start_booking_phase(self):
@@ -357,68 +358,70 @@ class Period(Base, TimestampMixin):
 
     @property
     def is_prebooking_in_future(self):
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
 
-        return today < start
+        return now < start
 
     @property
     def is_currently_prebooking(self):
         if not self.wishlist_phase:
             return False
 
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
         end = self.as_local_datetime(self.prebooking_end)
 
-        return start <= today <= end
+        return start <= now <= end
 
     @property
     def is_prebooking_in_past(self):
-        today = self.as_local_datetime(date.today())
+        """Returns true if current date is after start of booking phase or if
+        current date is after prebooking end. """
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
         end = self.as_local_datetime(self.prebooking_end)
 
-        if today > end:
+        if now > end:
             return True
 
-        return start <= today and not self.wishlist_phase
+        return start <= now and not self.wishlist_phase
 
     @property
     def is_booking_in_future(self):
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
 
-        return today < start
+        return now < start
 
     @property
     def is_currently_booking(self):
         if not self.booking_phase:
             return False
 
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
         end = self.as_local_datetime(self.booking_end)
 
-        return start <= today <= end
+        return start <= now <= end
 
     @property
     def is_booking_in_past(self):
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
         end = self.as_local_datetime(self.booking_end)
 
-        if today > end:
+        if now > end:
             return True
 
-        return start <= today and not self.booking_phase
+        return start <= now and not self.booking_phase
 
     @property
     def is_execution_in_past(self):
-        today = self.as_local_datetime(date.today())
+        now = sedate.utcnow()
         end = self.as_local_datetime(self.execution_end)
 
-        return today > end
+        return now > end
 
     @property
     def scoring(self):
