@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections.abc import Iterable
 from onegov.core.crypto import random_token
 from onegov.core.utils import toggle
 from onegov.user import log
