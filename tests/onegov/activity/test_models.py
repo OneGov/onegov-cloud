@@ -4,6 +4,8 @@ import transaction
 
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
+from sedate import standardize_date
+
 from onegov.activity import ActivityCollection, OccasionNeed, Volunteer
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee
@@ -2465,10 +2467,14 @@ def test_prebooking_phases():
     period.prebooking_end = date(2017, 5, 2)
     period.booking_start = date(2017, 5, 3)
 
-    with freeze_time('2017-04-30 23:59:59'):
+    def standardize(string):
+        dt = datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
+        return standardize_date(dt, 'Europe/Zurich')
+
+    with freeze_time(standardize('2017-04-30 23:59:59')):
         assert period.is_prebooking_in_future
 
-    with freeze_time('2017-05-01 00:00:00'):
+    with freeze_time(standardize('2017-05-01 00:00:00')):
         assert not period.is_prebooking_in_future
 
         period.active = False
@@ -2477,12 +2483,12 @@ def test_prebooking_phases():
         period.active = True
         assert period.is_currently_prebooking
 
-    with freeze_time('2017-05-05 00:00:00'):
+    with freeze_time(standardize('2017-05-05 00:00:00')):
         assert not period.is_prebooking_in_future
         assert not period.is_currently_prebooking
         assert period.is_prebooking_in_past
 
-    with freeze_time('2017-05-02 23:59:59'):
+    with freeze_time(standardize('2017-05-02 23:59:59')):
         assert period.is_currently_prebooking
 
         period.confirmed = True

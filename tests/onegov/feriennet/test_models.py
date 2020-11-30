@@ -75,18 +75,21 @@ def test_period(scenario):
         assert utcnow() == midnight
         assert period.phase == 'wishlist'
         assert period.is_currently_prebooking
-        # assert not period.is_prebooking_in_past
 
     with freeze_time(midnight - timedelta(minutes=1)):
         assert period.phase == 'inactive'
         assert not period.wishlist_phase
         assert not period.is_currently_prebooking
 
-    with freeze_time(endbook + timedelta(minutes=1)):
+    with freeze_time(local_(endbook) + timedelta(hours=23, minutes=59)):
+        assert period.is_currently_prebooking
+        assert period.is_prebooking_in_past
+
+    with freeze_time(local_(endbook) + timedelta(days=1)):
         assert not period.is_currently_prebooking
         assert period.is_prebooking_in_past
 
-    # exactly midnight in thet chosen timezone
+    # exactly midnight in the chosen timezone
     with freeze_time(local_(endbook)):
         assert period.wishlist_phase
         assert period.is_currently_prebooking

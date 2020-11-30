@@ -288,10 +288,17 @@ class Period(Base, TimestampMixin):
         """ Returns the max_bookings_per_attendee limit if it applies. """
         return self.max_bookings_per_attendee
 
-    def as_local_datetime(self, day):
+    def as_local_datetime(self, day, end_of_day=False):
         """ Returns the moment of midnight in terms of the timezone it UTC """
         return sedate.standardize_date(
-            datetime(day.year, day.month, day.day, 0, 0),
+            datetime(
+                day.year,
+                day.month,
+                day.day,
+                23 if end_of_day else 0,
+                59 if end_of_day else 0,
+                59 if end_of_day else 0
+            ),
             self.timezone
         )
 
@@ -370,7 +377,7 @@ class Period(Base, TimestampMixin):
 
         now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
-        end = self.as_local_datetime(self.prebooking_end)
+        end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
 
         return start <= now <= end
 
@@ -401,7 +408,7 @@ class Period(Base, TimestampMixin):
 
         now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
-        end = self.as_local_datetime(self.booking_end)
+        end = self.as_local_datetime(self.booking_end, end_of_day=True)
 
         return start <= now <= end
 
