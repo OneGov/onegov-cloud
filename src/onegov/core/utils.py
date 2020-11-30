@@ -16,7 +16,7 @@ import shutil
 import sqlalchemy
 import urllib.request
 
-from collections import Iterable
+from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
