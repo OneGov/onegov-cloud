@@ -73,7 +73,7 @@ setup(
         'editdistance',
         'elasticsearch>=7.0.0,<8.0.0',
         'elasticsearch-dsl>=7.0.0,<8.0.0',
-        'faker',
+        'faker<=4.17.1',
         'fastcache',
         'filedepot',
         'fs',
