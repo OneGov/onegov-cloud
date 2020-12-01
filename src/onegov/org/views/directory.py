@@ -69,7 +69,7 @@ def view_directories(self, request):
         'layout': DirectoryCollectionLayout(self, request),
         'directories': request.exclude_invisible(self.query()),
         'link': lambda directory: request.link(
-            DirectoryEntryCollection(directory)
+            ExtendedDirectoryEntryCollection(directory)
         )
     }
 

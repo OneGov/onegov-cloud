@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify, normalize_for_url
-from onegov.directory.mixins import PublicationMixin
+from onegov.directory.mixins import PublicationMixin, TimezonePublicationMixin
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
@@ -381,7 +381,7 @@ class ResourceValidationExtension(ContentExtension):
         return WithResourceValidation
 
 
-class PublicationExtension(ContentExtension, PublicationMixin):
+class PublicationExtension(ContentExtension, TimezonePublicationMixin):
 
     def extend_form(self, form_class, request):
         return PublicationFormExtension(form_class).create()

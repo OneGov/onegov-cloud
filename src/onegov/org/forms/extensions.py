@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from sedate import utcnow, to_timezone, standardize_date
+from sedate import utcnow, to_timezone, standardize_date, replace_timezone
 
 from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
@@ -216,22 +216,28 @@ class PublicationFormExtension(FormExtension, name='publication'):
 
         class PublicationForm(self.form_class):
 
-            publication_start = DateTimeLocalField(
+            publication_start = TimezoneDateTimeField(
                 label=_('Start'),
                 fieldset=_('Publication'),
-                validators=[StrictOptional()]
+                validators=[StrictOptional()],
+                timezone=tz
             )
 
-            publication_end = DateTimeLocalField(
+            publication_end = TimezoneDateTimeField(
                 label=_('End'),
                 fieldset=_('Publication'),
-                validators=[StrictOptional()]
+                validators=[StrictOptional()],
+                timezone=tz
             )
 
             timezone = HiddenField(default=tz)
 
             def standardize_date(self, date):
-                return standardize_date(date, self.timezone.data)
+                return to_timezone(date, 'UTC')
+                # return standardize_date(date, self.timezone.data)
+
+            def replace_tz(self, date):
+                to_timezone(date, 'UTC')
 
             def ensure_publication_start_end(self):
                 start = self.publication_start
