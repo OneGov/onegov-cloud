@@ -1,7 +1,16 @@
 from sedate import to_timezone, standardize_date, utcnow
+from sqlalchemy import Column
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.types import UTCDateTime
+
+
+class UTCPublicationMixin:
+
+    #: Optional publication dates
+    publication_start = Column(UTCDateTime, nullable=True)
+    publication_end = Column(UTCDateTime, nullable=True)
 
 
 class PublicationMixin:
