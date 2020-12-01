@@ -9,7 +9,6 @@ from onegov.core.converters import json_converter
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
-from onegov.directory import DirectoryEntryCollection
 from onegov.event import Event
 from onegov.event import EventCollection
 from onegov.event import Occurrence
@@ -55,6 +54,7 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -527,7 +527,7 @@ def get_directory(app, name):
 
 
 @OrgApp.path(
-    model=DirectoryEntryCollection,
+    model=ExtendedDirectoryEntryCollection,
     path='/directories/{directory_name}',
     converters={
         'keywords': keywords_converter,
@@ -547,7 +547,7 @@ def get_directory_entries(request, app, directory_name, keywords, page=0,
         searchwidget = None
 
     if directory:
-        collection = DirectoryEntryCollection(
+        collection = ExtendedDirectoryEntryCollection(
             directory=directory,
             type='extended',
             keywords=keywords,
@@ -567,7 +567,7 @@ def get_directory_entry(app, directory_name, name):
     directory = DirectoryCollection(app.session()).by_name(directory_name)
 
     if directory:
-        return DirectoryEntryCollection(
+        return ExtendedDirectoryEntryCollection(
             directory=directory,
             type='extended'
         ).by_name(name)

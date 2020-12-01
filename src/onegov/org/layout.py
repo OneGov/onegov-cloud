@@ -17,7 +17,6 @@ from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection
-from onegov.directory import DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
@@ -36,6 +35,7 @@ from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models import Search
 from onegov.org.models import SiteCollection
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.theme.org_theme import user_options
 from onegov.pay import PaymentCollection, PaymentProviderCollection
@@ -2024,7 +2024,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                 DirectoryCollection
             )),
             Link(_(self.model.directory.title), self.request.class_link(
-                DirectoryEntryCollection, {
+                ExtendedDirectoryEntryCollection, {
                     'directory_name': self.model.directory_name
                 }
             ))
@@ -2046,7 +2046,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                 yield Link(
                     text=_("Export"),
                     url=self.request.class_link(
-                        DirectoryEntryCollection, {
+                        ExtendedDirectoryEntryCollection, {
                             'directory_name': self.model.directory_name
                         }, name='+export'
                     ),
@@ -2056,7 +2056,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                 yield Link(
                     text=_("Import"),
                     url=self.request.class_link(
-                        DirectoryEntryCollection, {
+                        ExtendedDirectoryEntryCollection, {
                             'directory_name': self.model.directory_name
                         }, name='+import'
                     ),
@@ -2133,7 +2133,7 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
                 DirectoryCollection
             )),
             Link(_(self.model.directory.title), self.request.class_link(
-                DirectoryEntryCollection, {
+                ExtendedDirectoryEntryCollection, {
                     'directory_name': self.model.directory.name
                 }
             )),
@@ -2170,7 +2170,8 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
                         Intercooler(
                             request_method='DELETE',
                             redirect_after=self.request.link(
-                                DirectoryEntryCollection(self.model.directory)
+                                ExtendedDirectoryEntryCollection(
+                                    self.model.directory)
                             )
                         )
                     )

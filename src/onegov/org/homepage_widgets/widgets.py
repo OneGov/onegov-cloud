@@ -1,5 +1,5 @@
 from collections import namedtuple
-from onegov.directory import DirectoryCollection, DirectoryEntryCollection
+from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
@@ -8,6 +8,8 @@ from onegov.org.layout import EventBaseLayout
 from onegov.org.models import ImageSet, ImageFile, News
 from onegov.file.models.fileset import file_to_set_associations
 from sqlalchemy import func
+
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
 @OrgApp.homepage_widget(tag='row')
@@ -103,7 +105,7 @@ class DirectoriesWidget(object):
             Link(
                 text=d.title,
                 url=layout.request.class_link(
-                    DirectoryEntryCollection, {'directory_name': d.name}
+                    ExtendedDirectoryEntryCollection, {'directory_name': d.name}
                 ),
                 subtitle=(
                     d.count == 1

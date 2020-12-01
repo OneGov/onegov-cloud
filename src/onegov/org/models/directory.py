@@ -5,7 +5,8 @@ from copy import copy
 from datetime import timedelta
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
-from onegov.directory import Directory, DirectoryEntry
+from onegov.directory import Directory, DirectoryEntry, \
+    DirectoryEntryCollection
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
@@ -347,3 +348,21 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
                 field for field in form._fields.values()
                 if field.id in content_config and field.data
             )
+
+
+class ExtendedDirectoryEntryCollection(DirectoryEntryCollection):
+
+    def __init__(self, directory, type='*', keywords=None, page=0,
+                 searchwidget=None, published_only=None, past_only=None):
+        super().__init__(directory, type, keywords, page, searchwidget)
+        self.published_only = published_only
+        self.past_only = past_only
+
+    def query(self):
+        query = super().query()
+        # if self.published_only:
+        #     query = query.filter(
+        #         or_(self.model_class.publication_start == None,
+        #             self.model_class.publication_start > sedate.utcnow())
+        #     )
+        return query
