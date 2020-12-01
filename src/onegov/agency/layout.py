@@ -4,7 +4,7 @@ from onegov.agency.collections import ExtendedAgencyCollection, \
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMove
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
-from onegov.core.elements import Confirm
+from onegov.core.elements import Confirm, Block
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
@@ -23,6 +23,7 @@ class PersonLayout(OrgDefaultLayout):
     @cached_property
     def editbar_links(self):
         links = []
+        no_delete = self.request.app.org.prevent_delete_person_with_memberships
         if self.request.is_manager:
             links = [
                 Link(
@@ -33,6 +34,29 @@ class PersonLayout(OrgDefaultLayout):
 
             ]
         if self.request.is_admin:
+            no_delete = no_delete and bool(self.model.memberships)
+            if no_delete:
+                traits = (
+                    Block(
+                        _(
+                            "This person has memberships and can't be deleted"
+                        ),
+                        no=_("Cancel")
+                    ),
+                )
+            else:
+                traits = (
+                    Confirm(
+                        _("Do you really want to delete this person?"),
+                        _("This cannot be undone."),
+                        _("Delete person"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.collection)
+                    )
+                )
             links.append(
                 Link(
                     text=_("Delete"),
@@ -40,18 +64,7 @@ class PersonLayout(OrgDefaultLayout):
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to delete this person?"),
-                            _("This cannot be undone."),
-                            _("Delete person"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(self.collection)
-                        )
-                    )
+                    traits=traits
                 )
             )
         return links
