@@ -238,4 +238,9 @@ def edit_person(self, request, form):
     request_method='DELETE',
     permission=Secret)
 def handle_delete_person(self, request):
+
+    if request.app.org.prevent_delete_person_with_memberships and\
+            self.memberships:
+        request.warning(_("People with memberships can't be deleted"))
+        return
     return org_handle_delete_person(self, request)
