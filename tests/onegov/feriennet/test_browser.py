@@ -1,10 +1,8 @@
 import time
 
-import pytest
 from psycopg2.extras import NumericRange
 
 
-@pytest.mark.skip('Fake needs update, need to deploy now')
 def test_browse_matching(browser, scenario):
     scenario.add_period(title="Ferienpass 2016")
 
@@ -73,7 +71,6 @@ def test_browse_matching(browser, scenario):
     assert 'finished prebooking' in browser.html
 
 
-@pytest.mark.skip('Fake needs update, need to deploy now')
 def test_browse_billing(browser, scenario, postgres):
     scenario.add_period(title="Ferienpass 2016", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
@@ -213,7 +210,6 @@ def test_browse_billing(browser, scenario, postgres):
     assert not admin.is_element_present_by_css('.remove-manual')
 
 
-@pytest.mark.skip('Fake needs update, need to deploy now')
 def test_volunteers(browser, scenario):
     scenario.add_period(title="Ferienpass 2019", active=True, confirmed=True)
     scenario.add_activity(title="Zoo", state='accepted')
