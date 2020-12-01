@@ -1,8 +1,48 @@
 # Changes
 
+## Release `2020.83`
+
+> commits: **16 / [7c8d87d16e...7ed30c8522](https://github.com/OneGov/onegov-cloud/compare/7c8d87d16e^...7ed30c8522)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.83)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes not showing enroll button at midnight**
+
+Fixes issue not getting midnight time with `date.today()` and ensure enroll button is present at midnight in CET timezone.
+
+**`Bugfix`** | **[FER-874](https://issues.seantis.ch/browse/FER-874)** | **[906f603e19](https://github.com/onegov/onegov-cloud/commit/906f603e193d7b1b5d70372bb23f3086551512b7)**
+
+### Org
+
+🎉 **Improves submission and change request flow for directories module**
+
+Upon change requests, users had to submit files for UploadFields again (required or not by the directory). For new submissions, required files are required, for change requests they are never required. Also fixes a bug in the ChangeRequestFormExtension in `is_different` where empty string and None would have been different not triggering the validation.
+
+**`Feature`** | **[56cbf90725](https://github.com/onegov/onegov-cloud/commit/56cbf907251a12cbfc946f8c6b399cf8f362f193)**
+
+🎉 **Adds directory lead to the directory view**
+
+Shows directory lead on `/directories/{name}` on top of all the entries.
+
+**`Feature`** | **[ZW-281](https://kanton-zug.atlassian.net/browse/ZW-281)** | **[6c0ca4f21e](https://github.com/onegov/onegov-cloud/commit/6c0ca4f21e0b4c5687cda8fe0abd47e736704dc7)**
+
+🎉 **Enables field description in forms to be rendered as markdown**
+
+Every field description is checked if it contains markdown and if so will be rendered to `div.long-field-help` as well as descriptions that are longer than a certain amount of characters.
+
+**`Feature`** | **[ZW-293](https://kanton-zug.atlassian.net/browse/ZW-293)** | **[99ed1b44e5](https://github.com/onegov/onegov-cloud/commit/99ed1b44e53ce68984a036bdae4ca54bd7a74946)**
+
+🎉 **Display directory filters in order how they are defined in the structure**
+
+By alphabetical sorting of the filters in directories, users can now influece the sorting by the directory structure.
+
+**`Feature`** | **[ZW-288](https://kanton-zug.atlassian.net/browse/ZW-288)** | **[5efb6381a8](https://github.com/onegov/onegov-cloud/commit/5efb6381a8f28eb119b28716b4c4acaaa1acfca6)**
+
 ## Release `2020.82`
 
-> commits: **7 / [aeb0810c8d...82dc099f31](https://github.com/OneGov/onegov-cloud/compare/aeb0810c8d^...82dc099f31)**  
+> released: **2020-11-19 09:52**<br>
+> commits: **8 / [aeb0810c8d...2129f7f69b](https://github.com/OneGov/onegov-cloud/compare/aeb0810c8d^...2129f7f69b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.82)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
