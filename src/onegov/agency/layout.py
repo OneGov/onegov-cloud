@@ -9,7 +9,7 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.org import _
-from onegov.org.layout import AdjacencyListLayout, PersonLayout, \
+from onegov.org.layout import AdjacencyListLayout, \
     PersonCollectionLayout
 
 from onegov.org.layout import DefaultLayout as OrgDefaultLayout
@@ -17,6 +17,44 @@ from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 
 class DefaultLayout(OrgDefaultLayout):
     pass
+
+
+class PersonLayout(OrgDefaultLayout):
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_manager:
+            links = [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+
+            ]
+        if self.request.is_admin:
+            links.append(
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this person?"),
+                            _("This cannot be undone."),
+                            _("Delete person"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
+                )
+            )
+        return links
 
 
 class MoveAgencyMixin(object):
