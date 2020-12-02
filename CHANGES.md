@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.84`
+
+> commits: **2 / [51f199055b...76505b126b](https://github.com/OneGov/onegov-cloud/compare/51f199055b^...76505b126b)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.84)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Restricts (cascading) deletion of people and agencies for non-admins**
+
+Deactivates deletion of agencies with children or memberships or of people with memberships if the user is not an admin.
+
+**`Feature`** | **[76505b126b](https://github.com/onegov/onegov-cloud/commit/76505b126b74586b930ce9b92778a63e793ef176)**
+
 ## Release `2020.83`
 
-> commits: **16 / [7c8d87d16e...7ed30c8522](https://github.com/OneGov/onegov-cloud/compare/7c8d87d16e^...7ed30c8522)**  
+> released: **2020-12-01 11:46**<br>
+> commits: **17 / [7c8d87d16e...aefb07f2ca](https://github.com/OneGov/onegov-cloud/compare/7c8d87d16e^...aefb07f2ca)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.83)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
