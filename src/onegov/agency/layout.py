@@ -129,17 +129,17 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
         if self.request.is_manager:
             if self.model.deletable(self.request):
                 delete_traits = (
-                        Confirm(
-                            _("Do you really want to delete this agency?"),
-                            _("This cannot be undone."),
-                            _("Delete agency"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(self.collection)
-                        )
+                    Confirm(
+                        _("Do you really want to delete this agency?"),
+                        _("This cannot be undone."),
+                        _("Delete agency"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.collection)
                     )
+                )
             else:
                 delete_traits = (
                     Block(
