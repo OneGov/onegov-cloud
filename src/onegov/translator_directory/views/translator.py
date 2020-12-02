@@ -261,7 +261,7 @@ def delete_course_event(self, request):
 
 @TranslatorDirectoryApp.view(
     model=Organisation,
-    permission=Private,
+    permission=Personal,
     name='voucher'
 )
 def get_static_excel_file(self, request):

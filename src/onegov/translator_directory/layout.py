@@ -145,6 +145,14 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'create-excel'}
                 ),
             ]
+        elif self.request.is_member:
+            return [
+                Link(
+                    _('Voucher template'),
+                    self.request.link(self.request.app.org, name='voucher'),
+                    attrs={'class': 'create-excel'}
+                )
+            ]
 
     @cached_property
     def breadcrumbs(self):
@@ -219,7 +227,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                     attrs={'class': 'create-excel'}
                 )
             ]
-        elif self.request.is_editor:
+        elif self.request.is_editor or self.request.is_member:
             return [
                 Link(
                     _('Voucher template'),
