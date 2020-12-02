@@ -2108,6 +2108,32 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
         return list(links())
 
+    def get_pub_link(self, text, filter=None, toggle_active=True):
+        filter_data = {}
+        classes = ['button secondary']
+        if filter:
+            filter_data[filter] = True
+            classes.append(filter)
+            if toggle_active and filter in self.request.params:
+                classes.append('active')
+        return Link(
+            text=text,
+            url=self.request.class_link(
+                ExtendedDirectoryEntryCollection,
+                {**filter_data, 'directory_name': self.directory.name}
+            ),
+            attrs={'class': classes}
+        )
+
+    @property
+    def publication_links(self):
+        return (
+            self.get_pub_link(_('Published'), 'published_only'),
+            self.get_pub_link(_("All")),
+            self.get_pub_link(_("Upcoming", 'upcoming_only')),
+            self.get_pub_link(_("Past"), 'past_only')
+        )
+
 
 class DirectoryEntryLayout(DirectoryEntryBaseLayout):
 
