@@ -330,6 +330,9 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                     lambda v: isinstance(v, InstrumentedAttribute)
                 )}
 
+                include = ('publication_start', 'publication_end')
+                exclude = {k for k in exclude if k not in include}
+
                 super().populate_obj(obj, exclude=exclude)
 
                 if directory_update:
