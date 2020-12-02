@@ -373,7 +373,9 @@ def create_agency_pdf(self, request, form):
     permission=Private
 )
 def delete_agency(self, request):
-
+    if not self.deletable(request):
+        request.warning(_("Agency with memberships can't be deleted"))
+        return
     request.assert_valid_csrf_token()
     ExtendedAgencyCollection(request.session).delete(self)
 
