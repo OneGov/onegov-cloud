@@ -22,25 +22,11 @@ class DefaultLayout(OrgDefaultLayout):
 class PersonLayout(OrgDefaultLayout):
     @cached_property
     def editbar_links(self):
-        links = []
-        no_delete = self.request.app.org.prevent_delete_person_with_memberships
         if self.request.is_manager:
-            links = [
-                Link(
-                    text=_("Edit"),
-                    url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
-                ),
-
-            ]
-        if self.request.is_admin:
-            no_delete = no_delete and bool(self.model.memberships)
-            if no_delete:
+            if not self.model.deletable(self.request):
                 traits = (
                     Block(
-                        _(
-                            "This person has memberships and can't be deleted"
-                        ),
+                        _("This person has memberships and can't be deleted"),
                         no=_("Cancel")
                     ),
                 )
@@ -57,7 +43,12 @@ class PersonLayout(OrgDefaultLayout):
                         redirect_after=self.request.link(self.collection)
                     )
                 )
-            links.append(
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
                 Link(
                     text=_("Delete"),
                     url=self.csrf_protected_url(
@@ -66,8 +57,7 @@ class PersonLayout(OrgDefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=traits
                 )
-            )
-        return links
+            ]
 
 
 class MoveAgencyMixin(object):
@@ -141,6 +131,26 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
+            if self.model.deletable(self.request):
+                delete_traits = (
+                        Confirm(
+                            _("Do you really want to delete this agency?"),
+                            _("This cannot be undone."),
+                            _("Delete agency"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
+            else:
+                delete_traits = (
+                    Block(
+                        _("This agency can't be deleted"),
+                        no=_("Cancel")
+                    ),
+                )
             return [
                 Link(
                     text=_("Edit"),
@@ -158,18 +168,7 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to delete this agency?"),
-                            _("This cannot be undone."),
-                            _("Delete agency"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(self.collection)
-                        )
-                    )
+                    traits=delete_traits
                 ),
                 Link(
                     text=_("Create PDF"),
