@@ -24,3 +24,10 @@ class ExtendedPerson(Person, AccessExtension):
         return '<p>{}</p>'.format(
             '<br>'.join((self.notes or '').splitlines())
         )
+
+    def deletable(self, request):
+        if request.is_admin:
+            return True
+        if bool(self.memberships):
+            return False
+        return True
