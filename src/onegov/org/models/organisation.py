@@ -118,9 +118,6 @@ class Organisation(Base, TimestampMixin):
     # Setting if show full agency path on people detail view
     agency_path_display_on_people = meta_property(default=False)
 
-    # Security setting to prevent deleting person with memberships
-    prevent_delete_person_with_memberships = meta_property(default=False)
-
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

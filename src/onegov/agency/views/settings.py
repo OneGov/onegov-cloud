@@ -102,15 +102,6 @@ class AgencySettingsForm(Form):
             self.agency_path_display_on_people.data
 
 
-class PersonSettingsForm(Form):
-
-    prevent_delete_person_with_memberships = BooleanField(
-        label=_("People with memberships can't be deleted"),
-        fieldset=_("Security"),
-        default=False,
-    )
-
-
 @AgencyApp.form(
     model=Organisation,
     name='agency-settings',
@@ -122,16 +113,3 @@ class PersonSettingsForm(Form):
 )
 def handle_pdf_layout_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Agencies"))
-
-
-@AgencyApp.form(
-    model=Organisation,
-    name='person-settings',
-    template='form.pt',
-    permission=Secret,
-    form=PersonSettingsForm,
-    setting=_("People"),
-    icon='fa-university'
-)
-def handle_pdf_layout_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("People"))
