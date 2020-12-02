@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from depot.io.utils import FileIntent
 from io import BytesIO
 from onegov.core.crypto import random_token
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import dictionary_to_binary
 from onegov.core.utils import normalize_for_url
@@ -142,3 +142,17 @@ def add_registration_window_columns(context):
         column=Column('spots', Integer, nullable=False),
         default=0
     )
+
+
+@upgrade_task('Adds publication dates to submissions')
+def add_publication_dates_to_submissions(context):
+    if not context.has_column('submissions', 'publication_start'):
+        context.operations.add_column(
+            'submissions',
+            Column('publication_start', UTCDateTime, nullable=True)
+        )
+    if not context.has_column('submissions', 'publication_end'):
+        context.operations.add_column(
+            'submissions',
+            Column('publication_end', UTCDateTime, nullable=True)
+        )

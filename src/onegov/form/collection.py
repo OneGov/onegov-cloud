@@ -200,6 +200,10 @@ class FormSubmissionCollection(object):
             or definition and definition.payment_method
             or 'manual'
         )
+        if form.publication_start:
+            submission.publication_start = form.publication_start.data
+        if form.publication_end:
+            submission.publication_end = form.publication_end.data
 
         # extensions are inherited from definitions
         if definition:

@@ -7,6 +7,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.extensions import Extendable
+from onegov.form.mixins import UTCPublicationMixin
 from onegov.form.parser import parse_form
 from onegov.form.utils import extract_text_from_html, hash_definition
 from onegov.pay import Payable
@@ -26,7 +27,7 @@ from wtforms.fields.html5 import EmailField
 
 
 class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
-                     Extendable):
+                     UTCPublicationMixin, Extendable):
     """ Defines a submitted form in the database. """
 
     __tablename__ = 'submissions'
