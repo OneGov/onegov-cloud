@@ -109,6 +109,13 @@ class ExtendedAgency(Agency, AccessExtension):
         for order, membership in enumerate(self.memberships):
             membership.order_within_agency = order
 
+    def deletable(self, request):
+        if request.is_admin:
+            return True
+        if bool(self.memberships) or bool(self.children):
+            return False
+        return True
+
 
 class AgencyProxy(object):
     """ A proxy/alias for an agency.
