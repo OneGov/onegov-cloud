@@ -117,7 +117,7 @@ class DateTimeLocalFieldRenderer(DateFieldRenderer):
 
 
 @registry.register_for('TimezoneDateTimeField')
-class TimezoneDateTimeField(DateFieldRenderer):
+class TimezoneDateTimeFieldRenderer(DateFieldRenderer):
     date_format = '%d.%m.%Y %H:%M %Z'
 
 
