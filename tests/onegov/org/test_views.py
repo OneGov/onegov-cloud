@@ -24,7 +24,7 @@ from onegov.directory import DirectoryEntry, DirectoryCollection, \
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmission, FormFile
-from onegov.form.display import DateTimeLocalFieldRenderer
+from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.org.models import ExtendedDirectoryEntry
@@ -4338,7 +4338,7 @@ def test_directory_publication(client):
         return dt.strftime('%Y-%m-%d %H:%M:%S')
 
     def dt_repr(dt):
-        return dt.strftime(DateTimeLocalFieldRenderer.date_format)
+        return dt.strftime(TimezoneDateTimeFieldRenderer.date_format)
 
     def dir_query(client):
         return client.app.session().query(ExtendedDirectoryEntry)
@@ -4438,8 +4438,10 @@ def test_directory_publication(client):
     new_end = now + timedelta(days=9, minutes=5)
     form_preview.form['publication_end'] = dt_for_form(new_end)
     changes = form_preview.form.submit()
-    # assert changes.pyquery('.diff del')[0].text == dt_repr(annual_end)
-    # assert changes.pyquery('.diff ins')[0].text == dt_repr(new_end)
+    assert changes.pyquery('.diff ins')[0].text == dt_repr(replace_timezone(new_end, 'CET'))
+    assert changes.pyquery('.diff del')[0].text == dt_repr(
+        standardize_date(replace_timezone(annual_end, 'Europe/Zurich'), 'UTC'))
+
     page = changes.form.submit().follow()
     accecpt_latest_submission()
     annual_entry = dir_query(client).first()
