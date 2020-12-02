@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-09 11:58+0100\n"
+"POT-Creation-Date: 2020-12-02 09:25+0100\n"
 "PO-Revision-Date: 2019-08-29 09:16+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -109,6 +109,27 @@ msgstr "E-Mail"
 msgid "Message"
 msgstr "Nachricht"
 
+msgid "This person has memberships and can't be deleted"
+msgstr "Diese Person hat Mitgliedschaften und kann nicht gelöscht werden"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Do you really want to delete this person?"
+msgstr ""
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete person"
+msgstr ""
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -124,26 +145,17 @@ msgstr "Hinzufügen"
 msgid "Agency"
 msgstr "Organisation"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Move"
-msgstr "Verschieben"
-
-msgid "Delete"
-msgstr "Löschen"
-
 msgid "Do you really want to delete this agency?"
 msgstr "Möchten Sie die Organisation wirklich löschen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Delete agency"
 msgstr "Organisation löschen"
 
-msgid "Cancel"
-msgstr "Abbrechen"
+msgid "This agency can't be deleted"
+msgstr "Diese Organisation kann nicht gelöscht werden"
+
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Membership"
 msgstr "Mitgliedschaft"
@@ -318,6 +330,9 @@ msgstr ""
 "Ein PDF dieser Organisation und all ihrer Unterorganisationen erstellen. "
 "Kann je nach Anzahl Unterorganisationen einige Minuten dauern."
 
+msgid "Agency with memberships can't be deleted"
+msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"
+
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
 
@@ -341,6 +356,9 @@ msgstr "Eine neue Person wurde hinzugefügt"
 
 msgid "New person"
 msgstr "Neue Person"
+
+msgid "People with memberships can't be deleted"
+msgstr "Personen mit Mitgliedschaften können nicht gelöscht werden"
 
 msgid "PDF Layout"
 msgstr "PDF Layout"
@@ -395,6 +413,9 @@ msgstr "Daten"
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+msgid "Security"
+msgstr ""
 
 #~ msgid "Chose levels in the agency tree"
 #~ msgstr "Wähle Lage innerhalb des Organistionsbaums"

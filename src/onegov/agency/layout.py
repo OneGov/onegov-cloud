@@ -4,19 +4,56 @@ from onegov.agency.collections import ExtendedAgencyCollection, \
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMove
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
-from onegov.core.elements import Confirm
+from onegov.core.elements import Confirm, Block
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.org import _
-from onegov.org.layout import AdjacencyListLayout, PersonLayout, \
-    PersonCollectionLayout
+from onegov.org.layout import AdjacencyListLayout, \
+    PersonCollectionLayout, DefaultLayout
 
-from onegov.org.layout import DefaultLayout as OrgDefaultLayout
+from onegov.org.layout import PersonLayout as OrgPersonLayout
 
 
-class DefaultLayout(OrgDefaultLayout):
-    pass
+class PersonLayout(OrgPersonLayout):
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            if not self.model.deletable(self.request):
+                traits = (
+                    Block(
+                        _("This person has memberships and can't be deleted"),
+                        no=_("Cancel")
+                    ),
+                )
+            else:
+                traits = (
+                    Confirm(
+                        _("Do you really want to delete this person?"),
+                        _("This cannot be undone."),
+                        _("Delete person"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.collection)
+                    )
+                )
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=traits
+                )
+            ]
 
 
 class MoveAgencyMixin(object):
@@ -90,6 +127,26 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
+            if self.model.deletable(self.request):
+                delete_traits = (
+                    Confirm(
+                        _("Do you really want to delete this agency?"),
+                        _("This cannot be undone."),
+                        _("Delete agency"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.collection)
+                    )
+                )
+            else:
+                delete_traits = (
+                    Block(
+                        _("This agency can't be deleted"),
+                        no=_("Cancel")
+                    ),
+                )
             return [
                 Link(
                     text=_("Edit"),
@@ -107,18 +164,7 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                         self.request.link(self.model)
                     ),
                     attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to delete this agency?"),
-                            _("This cannot be undone."),
-                            _("Delete agency"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(self.collection)
-                        )
-                    )
+                    traits=delete_traits
                 ),
                 Link(
                     text=_("Create PDF"),

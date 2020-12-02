@@ -22,6 +22,7 @@ class DummyRequest(object):
     locale = 'en'
     is_logged_in = False
     is_manager = False
+    is_admin = False
     session = None
 
     def __init__(self):

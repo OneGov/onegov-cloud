@@ -181,21 +181,18 @@ def test_views_1(client):
     new_membership.form['title'] = "Zweiter Ständerat für Zug"
     new_membership.form['person_id'].select(text="Aeschi Thomas")
     agency = new_membership.form.submit().follow()
-
-    # Todo: Fix pyquery for strong tag
-    # assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
-    #     'Eder Joachim', 'Ständerat für Zug',
-    #     'Aeschi Thomas', 'Zweiter Ständerat für Zug',
-    # ]
+    assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
+        'Eder Joachim', ', Ständerat für Zug',
+        'Aeschi Thomas', ', Zweiter Ständerat für Zug',
+    ]
 
     agency.click("Mitgliedschaften", href='sort')
     agency = client.get(agency.request.url)
 
-    # Todo: Fix pyquery for strong tag
-    # assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
-    #     'Aeschi Thomas', 'Zweiter Ständerat für Zug',
-    #     'Eder Joachim', 'Ständerat für Zug',
-    # ]
+    assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
+        'Aeschi Thomas', ', Zweiter Ständerat für Zug',
+        'Eder Joachim', ', Ständerat für Zug',
+    ]
 
     agency.click("Zweiter Ständerat für Zug").click("Löschen")
 
@@ -248,6 +245,7 @@ def test_views_1(client):
         .click("Nationalrat").click("Aeschi Thomas")
 
     # Delete agency
+    client.login_admin()
     bund = client.get(sr_url)
     agencies = bund.click("Löschen")
     assert "noch keine Organisationen" in client.get('/organizations')
@@ -372,7 +370,7 @@ def test_view_pdf_settings(client):
 
 def test_view_report_change(client):
     # Add data
-    client.login_editor()
+    client.login_admin()
 
     new = client.get('/people').click("Person", href='new')
     new.form['academic_title'] = "Dr."
