@@ -533,11 +533,17 @@ def get_directory(app, name):
         'keywords': keywords_converter,
         'search_query': json_converter,
         'published_only': bool,
-        'past_only': bool
+        'past_only': bool,
+        'upcoming_only': bool
     })
 def get_directory_entries(
         request, app, directory_name, keywords, page=0,
-        search=None, search_query=None, published_only=False, past_only=False):
+        search=None,
+        search_query=None,
+        published_only=None,
+        past_only=None,
+        upcoming_only=None
+):
     directory = DirectoryCollection(app.session()).by_name(directory_name)
 
     if not search:
@@ -557,7 +563,8 @@ def get_directory_entries(
             page=page,
             searchwidget=searchwidget,
             published_only=published_only,
-            past_only=past_only
+            past_only=past_only,
+            upcoming_only=upcoming_only
         )
 
         collection.access = directory.access
