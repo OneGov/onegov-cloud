@@ -111,12 +111,12 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 field_data = field.data or None
                 return stored != field_data
 
-            def render_original(self, field, from_content=False):
+            def render_original(self, field, from_model=False):
                 prev = field.data
 
                 try:
-                    field.data = self.target.content.get(field.id) if \
-                        from_content else self.target.values.get(field.id)
+                    field.data = self.target.values.get(field.id) if \
+                        not from_model else getattr(self.target, field.id)
                     return super().render_display(field)
                 finally:
                     field.data = prev
@@ -132,7 +132,7 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                         return proposed
 
                     if field.id in ('publication_start', 'publication_end'):
-                        original = self.render_original(field, True)
+                        original = self.render_original(field, from_model=True)
                         return render_html_diff(original, proposed)
 
                     if field.id not in self.target.values:
