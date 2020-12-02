@@ -37,7 +37,7 @@ from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
 from tests.shared import utils
 from purl import URL
-from sedate import replace_timezone, standardize_date, utcnow
+from sedate import replace_timezone, standardize_date, utcnow, to_timezone
 from unittest.mock import patch
 from webtest import Upload
 from yubico_client import Yubico
@@ -4331,7 +4331,8 @@ def test_directory_submissions(client, postgres):
 
 def test_directory_publication(client):
 
-    now = datetime.now()
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
 
     def dt_for_form(dt):
         """2020-11-25 12:29:00"""
@@ -4439,8 +4440,7 @@ def test_directory_publication(client):
     form_preview.form['publication_end'] = dt_for_form(new_end)
     changes = form_preview.form.submit()
     assert changes.pyquery('.diff ins')[0].text == dt_repr(replace_timezone(new_end, 'CET'))
-    assert changes.pyquery('.diff del')[0].text == dt_repr(
-        standardize_date(replace_timezone(annual_end, 'Europe/Zurich'), 'UTC'))
+    assert changes.pyquery('.diff del')[0].text == dt_repr(standardize_date(annual_end, 'UTC'))
 
     page = changes.form.submit().follow()
     accecpt_latest_submission()
@@ -4463,7 +4463,7 @@ def test_directory_publication(client):
     meetings = client.get(meetings.request.url)
     assert 'Monthly' in meetings
 
-    with freeze_time(standardize_date(now + timedelta(minutes=5), 'Europe/Zurich')):
+    with freeze_time(utc_now + timedelta(minutes=5)):
         assert monthly_entry.publication_started is True
         assert monthly_entry.published is False
 
@@ -4472,7 +4472,7 @@ def test_directory_publication(client):
         # meetings = client.get(meetings.request.url)
         # assert 'Monthly' not in meetings
 
-    with freeze_time(standardize_date(now - timedelta(minutes=121), 'Europe/Zurich')):
+    with freeze_time(utc_now - timedelta(minutes=121)):
         assert annual_entry.publication_start > utcnow()
         assert annual_entry.publication_started is False
         assert annual_entry.publication_ended is False
