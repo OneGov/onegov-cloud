@@ -105,7 +105,8 @@ class DirectoriesWidget(object):
             Link(
                 text=d.title,
                 url=layout.request.class_link(
-                    ExtendedDirectoryEntryCollection, {'directory_name': d.name}
+                    ExtendedDirectoryEntryCollection,
+                    {'directory_name': d.name}
                 ),
                 subtitle=(
                     d.count == 1
