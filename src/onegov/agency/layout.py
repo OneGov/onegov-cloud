@@ -10,16 +10,12 @@ from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.org import _
 from onegov.org.layout import AdjacencyListLayout, \
-    PersonCollectionLayout
+    PersonCollectionLayout, DefaultLayout
 
-from onegov.org.layout import DefaultLayout as OrgDefaultLayout
-
-
-class DefaultLayout(OrgDefaultLayout):
-    pass
+from onegov.org.layout import PersonLayout as OrgPersonLayout
 
 
-class PersonLayout(OrgDefaultLayout):
+class PersonLayout(OrgPersonLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
