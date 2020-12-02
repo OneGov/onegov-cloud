@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from sedate import utcnow, to_timezone, standardize_date, replace_timezone
+from sedate import utcnow, to_timezone
 
 from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
@@ -8,8 +8,8 @@ from onegov.form.fields import UploadField, TimezoneDateTimeField
 from onegov.form.validators import StrictOptional
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from wtforms.fields import TextAreaField, HiddenField
-from wtforms.fields.html5 import EmailField, DateTimeLocalField
+from wtforms.fields import TextAreaField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
 
@@ -101,12 +101,11 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                     return field.data and True or False
 
                 # like coordinates, provided through extension
-                if field.id in (
-                        'publication_start', 'publication_end', 'timezone'
-                ):
+                if field.id in ('publication_start', 'publication_end'):
                     if not field.data:
                         return False
-                    return field.data != getattr(self.target, field.id)
+                    return to_timezone(field.data, 'UTC') != \
+                        getattr(self.target, field.id)
 
                 stored = self.target.values.get(field.id) or None
                 field_data = field.data or None
@@ -161,14 +160,14 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
         return ChangeRequestForm
 
 
-class TimezonePublicationFormExtension(FormExtension, name='tz-publication'):
+class PublicationFormExtension(FormExtension, name='publication'):
     """Can be used with TimezonePublicationMixin or UTCDateTime type decorator.
     """
 
     def create(self, timezone='Europe/Zurich'):
         tz = timezone
 
-        class TimezonePublicationForm(self.form_class):
+        class PublicationForm(self.form_class):
 
             publication_start = TimezoneDateTimeField(
                 label=_('Start'),
@@ -183,8 +182,6 @@ class TimezonePublicationFormExtension(FormExtension, name='tz-publication'):
                 fieldset=_('Publication'),
                 validators=[StrictOptional()]
             )
-
-            timezone = HiddenField(default=tz)
 
             def ensure_publication_start_end(self):
                 start = self.publication_start
@@ -195,61 +192,6 @@ class TimezonePublicationFormExtension(FormExtension, name='tz-publication'):
                     self.publication_end.errors.append(
                         _("Publication end must be in the future"))
                     return False
-                if not start.data or not end.data:
-                    return
-
-                if end.data <= start.data:
-                    self.errors.setdefault('global-errors', [])
-                    self.errors['global-errors'].append(
-                        _("Publication start must be prior to end"))
-                    return False
-
-        return TimezonePublicationForm
-
-
-class PublicationFormExtension(FormExtension, name='publication'):
-    """ Can be used with PublicationMixin or DateTime type decorator.
-    """
-
-    def create(self, timezone='Europe/Zurich'):
-        tz = timezone
-
-        class PublicationForm(self.form_class):
-
-            publication_start = TimezoneDateTimeField(
-                label=_('Start'),
-                fieldset=_('Publication'),
-                validators=[StrictOptional()],
-                timezone=tz
-            )
-
-            publication_end = TimezoneDateTimeField(
-                label=_('End'),
-                fieldset=_('Publication'),
-                validators=[StrictOptional()],
-                timezone=tz
-            )
-
-            timezone = HiddenField(default=tz)
-
-            def standardize_date(self, date):
-                return to_timezone(date, 'UTC')
-                # return standardize_date(date, self.timezone.data)
-
-            def replace_tz(self, date):
-                to_timezone(date, 'UTC')
-
-            def ensure_publication_start_end(self):
-                start = self.publication_start
-                end = self.publication_end
-                if not start or not end:
-                    return
-                if end.data and self.timezone.data:
-                    if self.standardize_date(end.data) <= utcnow():
-                        self.publication_end.errors.append(
-                            _("Publication end must be in the future"))
-                        return False
-
                 if not start.data or not end.data:
                     return
 

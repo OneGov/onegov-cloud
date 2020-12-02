@@ -1948,3 +1948,16 @@ def test_unaccent_expression(postgres_dsn):
 
     query = session.query(Test).order_by(unaccent(Test.text))
     assert [r.text for r in query] == ['Deutschland', 'Österreich', 'Schweiz']
+
+
+def test_postgres_timezone(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+    assert mgr.session().execute('show timezone;').scalar() == 'UTC', """
+    Run 
+    
+        ALTER DATABASE onegov SET timezone TO 'UTC';
+    
+    to change the default timezone, then restart postgres service.
+    """
