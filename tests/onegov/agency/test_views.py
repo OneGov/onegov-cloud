@@ -245,6 +245,7 @@ def test_views_1(client):
         .click("Nationalrat").click("Aeschi Thomas")
 
     # Delete agency
+    client.login_admin()
     bund = client.get(sr_url)
     agencies = bund.click("Löschen")
     assert "noch keine Organisationen" in client.get('/organizations')
@@ -369,7 +370,7 @@ def test_view_pdf_settings(client):
 
 def test_view_report_change(client):
     # Add data
-    client.login_editor()
+    client.login_admin()
 
     new = client.get('/people').click("Person", href='new')
     new.form['academic_title'] = "Dr."
