@@ -1951,13 +1951,16 @@ def test_unaccent_expression(postgres_dsn):
 
 
 def test_postgres_timezone(postgres_dsn):
+    """ We need to set the timezone when creating the test database for local
+    development. Servers are configured having GMT as default timezone.
+    This test will fail locally until we find the solution. """
+
     Base = declarative_base(cls=ModelBase)
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
-    assert mgr.session().execute('show timezone;').scalar() == 'UTC', """
+    session = mgr.session()
+    assert session.execute('show timezone;').scalar() in ('UTC', 'GMT'), """
     Run 
-    
-        ALTER DATABASE onegov SET timezone TO 'UTC';
-    
+        ALTER DATABASE onegov SET timezone TO 'UTC';    
     to change the default timezone, then restart postgres service.
     """
