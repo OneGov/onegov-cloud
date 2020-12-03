@@ -46,11 +46,6 @@ def test_extended_directory_entry_collection(
         publication_end=end,
     ))
 
-    def query_for(filter):
-        kwargs = {}
-        kwargs[filter] = True
-        return ExtendedDirectoryEntryCollection(directory, **kwargs).query()
-
     collection = ExtendedDirectoryEntryCollection(directory)
 
     assert collection.query().count() == 1
