@@ -352,17 +352,23 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
 
 class ExtendedDirectoryEntryCollection(DirectoryEntryCollection):
 
-    def __init__(self, directory, type='*', keywords=None, page=0,
-                 searchwidget=None, published_only=None, past_only=None):
+    def __init__(self, directory, type='extended', keywords=None, page=0,
+                 searchwidget=None, published_only=None, past_only=None,
+                 upcoming_only=None):
         super().__init__(directory, type, keywords, page, searchwidget)
         self.published_only = published_only
         self.past_only = past_only
+        self.upcoming_only = upcoming_only
 
     def query(self):
         query = super().query()
-        # if self.published_only:
-        #     query = query.filter(
-        #         or_(self.model_class.publication_start == None,
-        #             self.model_class.publication_start > sedate.utcnow())
-        #     )
+        if self.published_only:
+            query = query.filter(
+                self.model_class.publication_started == True,
+                self.model_class.publication_ended == False
+            )
+        elif self.past_only:
+            query = query.filter(self.model_class.publication_ended == True)
+        elif self.upcoming_only:
+            query = query.filter(self.model_class.publication_started == False)
         return query
