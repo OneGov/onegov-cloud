@@ -125,9 +125,6 @@ class DirectorySubmissionAction(object):
     def create_new_entry(self, request, data):
         entry = self.directory.add(data)
         entry.coordinates = data.get('coordinates')
-        entry.timezone = data.get('timezone')
-        entry.publication_start = data.get('publication_start')
-        entry.publication_end = data.get('publication_end')
 
         self.send_mail_if_enabled(
             request=request,
@@ -155,12 +152,11 @@ class DirectorySubmissionAction(object):
 
         # not stored in content but captured by form.is_different in order
         # to show the user the changes since he can modify them
-        content_properties = (
-            'publication_start', 'publication_end', 'timezone')
+        publication_properties = ('publication_start', 'publication_end')
 
         for name, field in form._fields.items():
             if form.is_different(field):
-                if name in content_properties and \
+                if name in publication_properties and \
                         self.directory.enable_publication:
                     setattr(entry, name, data.get(name))
                     changed.append(name)
