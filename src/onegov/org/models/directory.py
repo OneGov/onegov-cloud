@@ -294,8 +294,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
             session.delete(submission)
 
 
-class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
-                             AccessExtension, PublicationExtension):
+class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
+                             CoordinatesExtension, AccessExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directory_entries'
