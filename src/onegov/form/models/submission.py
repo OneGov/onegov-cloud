@@ -117,9 +117,6 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     @property
     def form_obj(self):
         """ Returns a form instance containing the submission data. """
-        if 'publication' in self.meta.get('extensions', []):
-            assert 'publication_start' in self.data
-            assert 'publication_end' in self.data
         return self.form_class(data=self.data)
 
     @hybrid_property
