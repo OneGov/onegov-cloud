@@ -5974,3 +5974,20 @@ h2 + div.timeline {
         width: 100%;
     }
 }
+
+/*
+    Publications of Directories
+*/
+
+.publication-nav {
+
+    a.active {
+        background-color: $primary-color;
+        color: $primary-fg-color;
+    }
+
+    button {
+        text-align: left;
+        width: 100%;
+    }
+}
