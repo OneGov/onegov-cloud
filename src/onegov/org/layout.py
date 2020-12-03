@@ -2110,12 +2110,12 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
     def get_pub_link(self, text, filter=None, toggle_active=True):
         filter_data = {}
-        classes = ['button secondary']
+        classes = []
         if filter:
             filter_data[filter] = True
-            classes.append(filter)
             if toggle_active and filter in self.request.params:
                 classes.append('active')
+
         return Link(
             text=text,
             url=self.request.class_link(
@@ -2126,12 +2126,28 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
     @property
+    def publication_filters(self):
+        return dict(
+            published_only=_('Published'),
+            upcoming_only=_("Upcoming"),
+            past_only=_("Past"),
+        )
+
+    @property
+    def publication_filter_title(self):
+        default_title = self.request.translate(_("Publication"))
+        for filter in self.publication_filters:
+            if filter in self.request.params:
+                applied_title = self.request.translate(
+                    self.publication_filters[filter])
+                return f'{default_title}: {applied_title}'
+        return default_title
+
+    @property
     def publication_links(self):
         return (
-            self.get_pub_link(_('Published'), 'published_only'),
-            self.get_pub_link(_("All")),
-            self.get_pub_link(_("Upcoming", 'upcoming_only')),
-            self.get_pub_link(_("Past"), 'past_only')
+            self.get_pub_link(text, filter_kw)
+            for filter_kw, text in self.publication_filters.items()
         )
 
 
