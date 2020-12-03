@@ -43,7 +43,3 @@ class UTCPublicationMixin:
     @hybrid_property
     def published(self):
         return self.publication_started and not self.publication_ended
-
-    @published.expression
-    def published(self):
-        return and_(self.publication_start, not self.publication_ended)
