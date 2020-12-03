@@ -1,5 +1,5 @@
 from sedate import utcnow
-from sqlalchemy import Column, case, func, and_
+from sqlalchemy import Column, case, func
 from sqlalchemy.ext.hybrid import hybrid_property
 from onegov.core.orm.types import UTCDateTime
 
