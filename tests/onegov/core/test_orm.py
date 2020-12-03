@@ -1955,11 +1955,13 @@ def test_postgres_timezone(postgres_dsn):
     development. Servers are configured having GMT as default timezone.
     This test will fail locally until we find the solution. """
 
+    valid_timezones = ('UTC', 'GMT', 'Etc/UTC')
+
     Base = declarative_base(cls=ModelBase)
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
     session = mgr.session()
-    assert session.execute('show timezone;').scalar() in ('UTC', 'GMT'), """
+    assert session.execute('show timezone;').scalar() in valid_timezones, """
     Run 
         ALTER DATABASE onegov SET timezone TO 'UTC';    
     to change the default timezone, then restart postgres service.
