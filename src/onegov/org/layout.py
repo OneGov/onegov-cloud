@@ -2141,7 +2141,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                 applied_title = self.request.translate(
                     self.publication_filters[filter])
                 return f'{default_title}: {applied_title}'
-        return default_title
+        return f'{default_title}: {self.request.translate(_("Choose filter"))}'
 
     @property
     def publication_links(self):

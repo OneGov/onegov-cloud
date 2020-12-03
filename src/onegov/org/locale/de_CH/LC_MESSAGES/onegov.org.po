@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-25 19:00+0100\n"
+"POT-Creation-Date: 2020-12-03 17:30+0100\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1483,6 +1483,18 @@ msgstr "Verzeichnis löschen"
 msgid "Entry"
 msgstr "Eintrag"
 
+msgid "Published"
+msgstr "Veröffentlicht"
+
+msgid "Upcoming"
+msgstr "Demnächst"
+
+msgid "Past"
+msgstr "Vergangen"
+
+msgid "Choose filter"
+msgstr "Filter wählen"
+
 msgid "Delete entry"
 msgstr "Eintrag löschen"
 
@@ -2173,9 +2185,6 @@ msgstr "Initiiert"
 
 msgid "Submitted"
 msgstr "Gemeldet"
-
-msgid "Published"
-msgstr "Veröffentlicht"
 
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
