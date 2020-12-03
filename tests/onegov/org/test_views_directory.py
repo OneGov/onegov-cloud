@@ -14,6 +14,170 @@ from onegov.org.models import ExtendedDirectoryEntry
 from tests.shared.utils import create_image, open_in_browser
 
 
+def dt_for_form(dt):
+    """2020-11-25 12:29:00"""
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+
+def dt_repr(dt):
+    return dt.strftime(TimezoneDateTimeFieldRenderer.date_format)
+
+
+def dir_query(client):
+    return client.app.session().query(ExtendedDirectoryEntry)
+
+
+def strip_ms(dt, timezone=None):
+    dt = datetime(
+        dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+    if not timezone:
+        return dt
+    return standardize_date(dt, timezone)
+
+
+def create_directory(client, publication=True, change_reqs=True):
+    client.login_admin()
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Meetings"
+    page.form['structure'] = """
+                    Name *= ___
+                    Pic *= *.jpg|*.png|*.gif
+                """
+    page.form['content_fields'] = 'Name\nPic'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_map'] = 'entry'
+    page.form['enable_publication'] = publication
+    page.form['enable_change_requests'] = change_reqs
+    page.form['enable_submissions'] = True
+    meetings = page.form.submit().follow()
+    return meetings
+
+
+def accecpt_latest_submission(client):
+    page = client.get('/tickets/ALL/open').click(
+        "Annehmen", index=0).follow()
+    accept_url = page.pyquery('.accept-link').attr('ic-post-to')
+    client.post(accept_url)
+
+
+def test_publication_added_by_admin(client):
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=False)
+
+    # create one entry as admin, publications is still available for admin
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = page.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+    # we have to submit the file again, can't evade that
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    annual_end = now + timedelta(days=1)
+    page.form['publication_end'] = dt_for_form(annual_end)
+    entry = page.form.submit().follow()
+    entry_db = dir_query(client).one()
+    # timezone unaware and not converted to utc before
+    # contains publications relevant info
+    assert entry_db.publication_end.tzinfo == UTC
+
+    # check change request publication start deactivated
+    page = entry.click('Änderung vorschlagen')
+    assert 'publication_start' not in page.form.fields
+    # check new submission
+    page = meetings.click('Eintrag', index=1)
+    assert 'publication_start' not in page.form.fields
+
+
+def test_publication_with_submission(client):
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+    meetings = create_directory(client, publication=True)
+
+    # create a submission
+    submission = meetings.click('Eintrag', index=1)
+    submission.form['name'] = 'Monthly'
+    submission.form['pic'] = Upload('monthly.jpg', create_image().read())
+    submission.form['submitter'] = 'user@example.org'
+    submission.form['publication_end'] = dt_for_form(now)
+    submission = submission.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in submission
+    submission.form['pic'] = Upload('monthly.jpg', create_image().read())
+    assert submission.form['publication_end'].value
+
+    monthly_end = now + timedelta(minutes=2)
+    submission.form['publication_end'] = dt_for_form(monthly_end)
+    preview = submission.form.submit().follow()
+    submission = client.app.session().query(FormSubmission).one()
+    assert 'publication_end' in submission.data
+    # is visible in the preview like coordinates
+    assert 'Publikation' in preview
+    assert dt_repr(monthly_end) in preview
+
+    edit = preview.click('Bearbeiten')
+    assert edit.form['publication_end'].value
+
+    preview.form.submit().follow()
+
+    submission = client.app.session().query(FormSubmission).one()
+    assert 'publication_end' in submission.data
+
+    # Accept the new submission
+    accecpt_latest_submission(client)
+
+    monthly_entry = dir_query(client).one()
+    assert monthly_entry.name == 'monthly'
+    assert not monthly_entry.publication_start
+    assert monthly_entry.publication_end == strip_ms(
+        monthly_end, timezone='Europe/Zurich')
+
+    assert monthly_entry.publication_started
+    assert not monthly_entry.publication_ended
+    assert monthly_entry.published
+
+    meetings = client.get(meetings.request.url)
+    assert 'Monthly' in meetings
+
+
+def test_directory_publication_change_request(client):
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+    meetings = create_directory(client, publication=True)
+    end = now + timedelta(days=1)
+
+    # create entry
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(end)
+    entry = page.form.submit().follow()
+
+    # make change requests
+    page = entry.click('Änderung vorschlagen')
+    page.form['submitter'] = 'user@example.org'
+    assert page.form['publication_start'].value == dt_for_form(now)
+    assert page.form['publication_end'].value == dt_for_form(
+        now + timedelta(days=1))
+    form_preview = page.form.submit().follow()
+    assert 'Bitte geben Sie mindestens eine Änderung ein' in form_preview
+    new_end = now + timedelta(days=9, minutes=5)
+    form_preview.form['publication_end'] = dt_for_form(new_end)
+    changes = form_preview.form.submit()
+    assert changes.pyquery('.diff ins')[0].text == dt_repr(replace_timezone(new_end, 'CET'))
+    assert changes.pyquery('.diff del')[0].text == dt_repr(standardize_date(end, 'UTC'))
+
+    page = changes.form.submit().follow()
+    accecpt_latest_submission(client)
+    annual_entry = dir_query(client).first()
+    assert annual_entry.name == 'annual'
+    assert annual_entry.publication_end == strip_ms(new_end, timezone='Europe/Zurich')
+    assert annual_entry.publication_start == strip_ms(now, timezone='Europe/Zurich')
+
+
 def test_directory_change_requests(client):
 
     client.login_admin()
