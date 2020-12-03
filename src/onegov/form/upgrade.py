@@ -142,17 +142,3 @@ def add_registration_window_columns(context):
         column=Column('spots', Integer, nullable=False),
         default=0
     )
-
-
-@upgrade_task('Adds publication dates to submissions')
-def add_publication_dates_to_submissions(context):
-    if not context.has_column('submissions', 'publication_start'):
-        context.operations.add_column(
-            'submissions',
-            Column('publication_start', UTCDateTime, nullable=True)
-        )
-    if not context.has_column('submissions', 'publication_end'):
-        context.operations.add_column(
-            'submissions',
-            Column('publication_end', UTCDateTime, nullable=True)
-        )

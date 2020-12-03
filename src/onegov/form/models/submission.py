@@ -27,7 +27,7 @@ from wtforms.fields.html5 import EmailField
 
 
 class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
-                     UTCPublicationMixin, Extendable):
+                     Extendable):
     """ Defines a submitted form in the database. """
 
     __tablename__ = 'submissions'
