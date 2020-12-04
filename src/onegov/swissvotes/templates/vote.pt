@@ -328,7 +328,7 @@
                         <th i18n:translate>Media coverage: fög analysis</th>
                         <td>
                             <a href="${foeg_analysis}" target="_blank" class="foeg-analysis">PDF</a> /
-                            <a href="${layout.foeg_static_url}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="https://www.foeg.uzh.ch/de/forschung/Projekte/Abstimmungsmonitor.html" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>

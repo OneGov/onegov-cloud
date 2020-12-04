@@ -44,10 +44,6 @@ class VoteLayout(DefaultLayout):
             return 'https://www.voto.swiss/fr/voto'
         return 'https://www.voto.swiss/voto'
 
-    @property
-    def foeg_static_url(self):
-        return 'https://foeg.uzh.ch/de/abstimmungsmonitor.html'
-
     def get_file_url(self, name):
 
         mapping = {
