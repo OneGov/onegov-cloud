@@ -26,7 +26,7 @@ class AttachmentsForm(Form):
         label=_("Voting text"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -34,7 +34,7 @@ class AttachmentsForm(Form):
         label=_("Brief description Swissvotes"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -42,7 +42,7 @@ class AttachmentsForm(Form):
         label=_("Federal council message"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -50,7 +50,7 @@ class AttachmentsForm(Form):
         label=_("Parliamentary debate"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -58,7 +58,7 @@ class AttachmentsForm(Form):
         label=_("Voting booklet"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -66,7 +66,7 @@ class AttachmentsForm(Form):
         label=_("Resolution"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -74,7 +74,7 @@ class AttachmentsForm(Form):
         label=_("Realization"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -82,7 +82,7 @@ class AttachmentsForm(Form):
         label=_("Advertisment analysis"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -90,7 +90,7 @@ class AttachmentsForm(Form):
         label=_("Fög Analysis"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -98,7 +98,7 @@ class AttachmentsForm(Form):
         label=_("Post-vote poll"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -106,7 +106,7 @@ class AttachmentsForm(Form):
         label=_("Preliminary examination"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
@@ -114,7 +114,7 @@ class AttachmentsForm(Form):
         label=_("Result by canton, district and municipality"),
         validators=[
             WhitelistedMimeType(XLSX_MIME_TYPES),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(120 * 1024 * 1024)
         ]
     )
 
