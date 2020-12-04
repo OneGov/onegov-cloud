@@ -1,17 +1,12 @@
-# This file was generated from translations/Uebersetzungstabelle 2019-05-24.xlsx
+# This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"POT-Creation-Date: 2020-04-22 21:49+0200\n"
-"PO-Revision-Date: 2019-12-14 14:49+0100\n"
-"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2020-12-04 14:54+0100\n"
+"PO-Revision-Date: 2020-12-04 15:22+0100\n"
 "Language: fr_CH\n"
-"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.4\n"
 
 msgid "Not a valid XLSX file."
 msgstr "Aucun fichier-XLSX valide"
@@ -674,7 +669,7 @@ msgid "actor-vsa-label"
 msgstr "Fédération des sociétés suisses d'employés"
 
 msgid "d-1-1"
-msgstr "Ordre public"
+msgstr "Régime politique"
 
 msgid "d-2-11"
 msgstr "Identité nationale"
@@ -713,7 +708,7 @@ msgid "d-2-14"
 msgstr "Droits populaires"
 
 msgid "d-3-141"
-msgstr "Initiative populaire"
+msgstr "Initiative"
 
 msgid "d-3-142"
 msgstr "Référendum"
@@ -734,7 +729,7 @@ msgid "d-3-153"
 msgstr "Répartition des tâches"
 
 msgid "d-2-16"
-msgstr "Droit, ordre public et juridique"
+msgstr "Système juridique"
 
 msgid "d-3-161"
 msgstr "Droit international"
@@ -791,7 +786,7 @@ msgid "d-3-231"
 msgstr "ONU"
 
 msgid "d-3-232"
-msgstr "Autres institutions"
+msgstr "Autres institutions internationales"
 
 msgid "d-2-24"
 msgstr "Coopération au développement"
@@ -845,22 +840,23 @@ msgid "d-3-324"
 msgstr "Installations militaires"
 
 msgid "d-3-325"
-msgstr "Refus de servir, service civil"
+msgstr "Refus de servir – service civil"
 
+#, fuzzy
 msgid "d-3-326"
-msgstr "Suppression de l'armée"
+msgstr "Armée (aspects généraux)"
 
 msgid "d-3-327"
-msgstr "Formation militaire"
+msgstr "Abolition de l’armée"
 
 msgid "d-3-328"
-msgstr "Engagements à l'étranger"
+msgstr "Formation militaire"
 
 msgid "d-2-33"
 msgstr "Approvisionnement du pays"
 
 msgid "d-1-4"
-msgstr "Economie"
+msgstr "Économie"
 
 msgid "d-2-41"
 msgstr "Politique économique"
@@ -914,10 +910,10 @@ msgid "d-3-441"
 msgstr "Tourisme"
 
 msgid "d-3-442"
-msgstr "Hôtellerie"
+msgstr "Hôtellerie et restauration"
 
 msgid "d-3-443"
-msgstr "Loteries, jeux, casinos"
+msgstr "Jeux d'argent"
 
 msgid "d-1-5"
 msgstr "Agriculture"
@@ -935,7 +931,7 @@ msgid "d-2-54"
 msgstr "Sylviculture"
 
 msgid "d-2-55"
-msgstr "Pêche, chasse, animaux domestiques"
+msgstr "Pêche – chasse – animaux domestiques"
 
 msgid "d-1-6"
 msgstr "Finances publiques"
@@ -944,7 +940,7 @@ msgid "d-2-61"
 msgstr "Impôts"
 
 msgid "d-3-611"
-msgstr "Politique fiscale (aspects généraux)"
+msgstr "Politique fiscale"
 
 msgid "d-3-612"
 msgstr "Système fiscal"
@@ -956,7 +952,7 @@ msgid "d-3-614"
 msgstr "Impôts indirects"
 
 msgid "d-2-62"
-msgstr "Ordre financier"
+msgstr "Régime financier"
 
 msgid "d-2-63"
 msgstr "Dépenses publiques"
@@ -965,22 +961,22 @@ msgid "d-2-64"
 msgstr "Mesures d'économie, mesures d'assainissement"
 
 msgid "d-1-7"
-msgstr "Energie"
+msgstr "Énergie"
 
 msgid "d-2-71"
 msgstr "Politique énergétique"
 
 msgid "d-2-72"
-msgstr "Energie nucléaire"
+msgstr "Énergie nucléaire"
 
 msgid "d-2-73"
-msgstr "Energie hydro-électrique"
+msgstr "Énergie hydro-électrique"
 
 msgid "d-2-74"
-msgstr "Energies alternatives"
+msgstr "Énergies alternatives"
 
 msgid "d-2-75"
-msgstr "Produits pétroliers et gaz"
+msgstr "Pétrole et gaz"
 
 msgid "d-1-8"
 msgstr "Transports et infrastructures"
@@ -995,16 +991,16 @@ msgid "d-3-812"
 msgstr "Trafic de transit"
 
 msgid "d-2-82"
-msgstr "Trafic routier"
+msgstr "Transport routier"
 
 msgid "d-3-821"
-msgstr "Constructions routières"
+msgstr "Construction des routes"
 
 msgid "d-3-822"
 msgstr "Trafic poids lourds"
 
 msgid "d-2-83"
-msgstr "Chemins de fer"
+msgstr "Transport ferroviaire"
 
 msgid "d-3-831"
 msgstr "Trafic marchandises"
@@ -1013,7 +1009,7 @@ msgid "d-3-832"
 msgstr "Trafic voyageurs"
 
 msgid "d-2-84"
-msgstr "Trafic aérien"
+msgstr "Transport aérien"
 
 msgid "d-2-85"
 msgstr "Navigation"
@@ -1025,7 +1021,7 @@ msgid "d-2-87"
 msgstr "Télécommunications"
 
 msgid "d-1-9"
-msgstr "Environnement"
+msgstr "Environnement naturel et bâti"
 
 msgid "d-2-91"
 msgstr "Sol"
@@ -1043,7 +1039,7 @@ msgid "d-3-921"
 msgstr "Loyers et location"
 
 msgid "d-3-922"
-msgstr "Construction de logements et propriété"
+msgstr "Construction de logements et propriété immobilière"
 
 msgid "d-2-93"
 msgstr "Environnement"
@@ -1061,13 +1057,13 @@ msgid "d-3-934"
 msgstr "Protection des eaux"
 
 msgid "d-3-935"
-msgstr "Sols"
+msgstr "Protection des sols"
 
 msgid "d-3-936"
 msgstr "Déchets"
 
 msgid "d-3-937"
-msgstr "Protection des sites et de la nature"
+msgstr "Protection de la nature et du paysage"
 
 msgid "d-3-938"
 msgstr "Protection des animaux"
@@ -1097,7 +1093,7 @@ msgid "d-2-102"
 msgstr "Assurances sociales"
 
 msgid "d-3-1021"
-msgstr "Assurance-vieillesse"
+msgstr "Assurance-vieillesse et survivants"
 
 msgid "d-3-1022"
 msgstr "Assurance-invalidité"
@@ -1124,7 +1120,7 @@ msgid "d-2-103"
 msgstr "Groupes sociaux"
 
 msgid "d-3-1031"
-msgstr "Politique à l'égard des étrangers"
+msgstr "Politique des étrangers"
 
 msgid "d-3-1032"
 msgstr "Réfugiés"
@@ -1142,7 +1138,7 @@ msgid "d-3-1036"
 msgstr "Personnes âgées"
 
 msgid "d-3-1037"
-msgstr "Invalides"
+msgstr "Handicapés"
 
 msgid "d-3-1038"
 msgstr "Homosexuels"
@@ -1151,10 +1147,10 @@ msgid "d-1-11"
 msgstr "Formation et recherche"
 
 msgid "d-2-111"
-msgstr "Système d'éducation et de formation"
+msgstr "Système d'éducation"
 
 msgid "d-2-112"
-msgstr "Ecoles"
+msgstr "Écoles"
 
 msgid "d-2-113"
 msgstr "Hautes écoles"
@@ -1181,7 +1177,7 @@ msgid "d-2-122"
 msgstr "Politique linguistique"
 
 msgid "d-2-123"
-msgstr "Religion, églises"
+msgstr "Religion – Églises"
 
 msgid "d-2-124"
 msgstr "Sport"
@@ -1196,7 +1192,7 @@ msgid "d-3-1252"
 msgstr "Presse"
 
 msgid "d-3-1253"
-msgstr "Radio et télévision, nouvelles technologies"
+msgstr "Radio et télévision, médias électroniques"
 
 msgid "d-3-1254"
 msgstr "Liberté de la presse"
@@ -1413,6 +1409,11 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
 "rouge."
+
+msgid ""
+"This webpage is best viewed with a modern Browser. Consider to use Chrome, "
+"Firefox or Edge. <dynamic element>"
+msgstr ""
 
 msgid "Logout"
 msgstr "Se déconnecter"
@@ -1797,7 +1798,9 @@ msgstr "Il manque une clé api valide"
 
 #, python-format
 msgid "Poster image urls updated (${added} added, ${updated} updated)"
-msgstr "Mise à jour des liens pour les affiches (${added} nouveau, ${updated} actualisé)"
+msgstr ""
+"Mise à jour des liens pour les affiches (${added} nouveau, ${updated} "
+"actualisé)"
 
 #, python-format
 msgid "Poster image urls failed: ${failed}"
@@ -1817,47 +1820,3 @@ msgstr "Toutes les votations ont été supprimées."
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"
-
-#~ msgid "for the counter proposal"
-#~ msgstr "pour le contre-projet"
-
-#~ msgid "for the initative"
-#~ msgstr "pour l'initiative"
-
-#~ msgid "Overview of voting result by the Confederation"
-#~ msgstr "Tableau récapitulatif de la Confédération"
-
-#~ msgid "Unknown"
-#~ msgstr "Inconnu"
-
-#~ msgid ""
-#~ "Number of days between the start of collecting signatures and their "
-#~ "filing by the initiators."
-#~ msgstr ""
-#~ "Durée entre le début de la récolte des signatures et le dépôt des "
-#~ "signatures."
-
-#~ msgid ""
-#~ "Number of days between the Federal Council dispatch and the Parliament’s "
-#~ "final vote."
-#~ msgstr "Durée entre le message du Conseil Fédéral at l’arrêté du Parlement."
-
-#~ msgid ""
-#~ "Number of days between the Parliament’s final vote and the decree to "
-#~ "declare the success of the referendum."
-#~ msgstr ""
-#~ "Durée entre l’arrêté du Parlement et l’arrêté constatant l’aboutissement "
-#~ "du référendum."
-
-#~ msgid ""
-#~ "Cumulated electoral share of the parties which recommend to vote Yes."
-#~ msgstr "Poids électoral cumulé des partis en faveur de oui."
-
-#~ msgid "Without / Unknown"
-#~ msgstr "Aucune / Inconnue"
-
-#~ msgid "Yes Camp"
-#~ msgstr "Camp du oui"
-
-#~ msgid "Vague"
-#~ msgstr "Indéterminé"

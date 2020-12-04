@@ -165,11 +165,11 @@ def test_view_vote(swissvotes_app):
         "Wirtschaft &gt; Arbeit und Beschäftigung &gt; Arbeitsbedingungen"
     ) in page
     assert (
-        "Soziale Fragen – Sozialpolitik &gt; Soziale Gruppen &gt; "
+        "Sozialpolitik &gt; Soziale Gruppen &gt; "
         "Kinder und Jugendliche"
     ) in page
     assert (
-        "Soziale Fragen – Sozialpolitik &gt; Soziale Gruppen &gt; "
+        "Sozialpolitik &gt; Soziale Gruppen &gt; "
         "Stellung der Frau"
     ) in page
     assert "anneepolitique" in page

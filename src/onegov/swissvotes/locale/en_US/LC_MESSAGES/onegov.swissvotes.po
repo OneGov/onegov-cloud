@@ -1,17 +1,12 @@
-# This file was generated from translations/Uebersetzungstabelle 2019-05-24.xlsx
+# This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"POT-Creation-Date: 2020-04-22 21:49+0200\n"
-"PO-Revision-Date: 2019-08-18 15:10+0200\n"
-"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2020-12-04 14:54+0100\n"
+"PO-Revision-Date: 2020-12-04 15:22+0100\n"
 "Language: en_US\n"
-"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.3\n"
 
 msgid "Not a valid XLSX file."
 msgstr "Not a valid XLSX file."
@@ -665,103 +660,103 @@ msgid "actor-vsa-label"
 msgstr "Vereinigung schweizerischer Angestelltenverbände"
 
 msgid "d-1-1"
-msgstr "Staatsordnung"
+msgstr "State organisation"
 
 msgid "d-2-11"
-msgstr "Nationale Identität"
+msgstr "National identity"
 
 msgid "d-2-12"
-msgstr "Politisches System"
+msgstr "Political system"
 
 msgid "d-3-121"
-msgstr "Bundesverfassung"
+msgstr "Constitution"
 
 msgid "d-3-122"
-msgstr "Verfassungsgebungsverfahren"
+msgstr "Procedure for constitutional reform"
 
 msgid "d-3-123"
-msgstr "Gesetzgebungsverfahren"
+msgstr "Legislative procedure"
 
 msgid "d-3-124"
-msgstr "Wahlsystem"
+msgstr "Electoral system"
 
 msgid "d-2-13"
-msgstr "Institutionen"
+msgstr "Institutions"
 
 msgid "d-3-131"
-msgstr "Regierung, Verwaltung"
+msgstr "Government, administration"
 
 msgid "d-3-132"
-msgstr "Parlament"
+msgstr "Parliament"
 
 msgid "d-3-133"
-msgstr "Gerichte"
+msgstr "Courts"
 
 msgid "d-3-134"
-msgstr "Nationalbank"
+msgstr "National Bank"
 
 msgid "d-2-14"
-msgstr "Volksrechte"
+msgstr "People’s rights"
 
 msgid "d-3-141"
-msgstr "Initiative"
+msgstr "Popular initiative"
 
 msgid "d-3-142"
 msgstr "Referendum"
 
 msgid "d-3-143"
-msgstr "Stimmrecht"
+msgstr "Voting rights"
 
 msgid "d-2-15"
-msgstr "Föderalismus"
+msgstr "Federalism"
 
 msgid "d-3-151"
-msgstr "Territorialfragen"
+msgstr "Territorial questions"
 
 msgid "d-3-152"
-msgstr "Beziehung Bund-Kanton"
+msgstr "Intergovernmental relations"
 
 msgid "d-3-153"
-msgstr "Aufgabenteilung"
+msgstr "Division of tasks"
 
 msgid "d-2-16"
-msgstr "Rechtsordnung"
+msgstr "Legal system"
 
 msgid "d-3-161"
-msgstr "Internationales Recht"
+msgstr "International law"
 
 msgid "d-3-162"
-msgstr "Grundrechte"
+msgstr "Fundamental rights"
 
 msgid "d-3-163"
-msgstr "Bürgerrecht"
+msgstr "Citizenship"
 
 msgid "d-3-164"
-msgstr "Privatrecht"
+msgstr "Private law"
 
 msgid "d-3-165"
-msgstr "Strafrecht"
+msgstr "Criminal law"
 
 msgid "d-3-166"
-msgstr "Datenschutz"
+msgstr "Data protection"
 
 msgid "d-1-2"
-msgstr "Aussenpolitik"
+msgstr "Foreign policy"
 
 msgid "d-2-21"
-msgstr "Aussenpolitische Grundhaltung"
+msgstr "General direction of foreign policy"
 
 msgid "d-3-211"
-msgstr "Neutralität"
+msgstr "Neutrality"
 
 msgid "d-3-212"
-msgstr "Unabhängigkeit"
+msgstr "Independence"
 
 msgid "d-3-213"
-msgstr "Gute Dienste"
+msgstr "Good offices"
 
 msgid "d-2-22"
-msgstr "Europapolitik"
+msgstr "European policy"
 
 msgid "d-3-221"
 msgstr "EFTA"
@@ -770,427 +765,430 @@ msgid "d-3-222"
 msgstr "EU"
 
 msgid "d-3-223"
-msgstr "EWR"
+msgstr "EEA"
 
 msgid "d-3-224"
-msgstr "Andere Organisationen"
+msgstr "Other European organisations"
 
 msgid "d-2-23"
-msgstr "Internationale Organisationen"
+msgstr "International organisations"
 
 msgid "d-3-231"
-msgstr "UNO"
+msgstr "UN"
 
 msgid "d-3-232"
-msgstr "Andere Organisationen"
+msgstr "Other international organisations"
 
 msgid "d-2-24"
-msgstr "Entwicklungszusammenarbeit"
+msgstr "Development cooperation"
 
 msgid "d-2-25"
-msgstr "Staatsverträge mit einzelnen Staaten"
+msgstr "Bilateral treaties"
 
 msgid "d-2-26"
-msgstr "Aussenwirtschaftspolitik"
+msgstr "Foreign trade policy"
 
 msgid "d-3-261"
-msgstr "Exportförderung"
+msgstr "Export promotion"
 
 msgid "d-3-262"
-msgstr "Zollwesen"
+msgstr "Customs"
 
 msgid "d-2-27"
-msgstr "Diplomatie"
+msgstr "Diplomacy"
 
 msgid "d-2-28"
-msgstr "Auslandschweizer"
+msgstr "Swiss abroad"
 
 msgid "d-1-3"
-msgstr "Sicherheitspolitik"
+msgstr "Security policy"
 
 msgid "d-2-31"
-msgstr "Öffentliche Sicherheit"
+msgstr "Public security"
 
 msgid "d-3-311"
-msgstr "Bevölkerungsschutz"
+msgstr "Civil protection"
 
 msgid "d-3-312"
-msgstr "Staatsschutz"
+msgstr "State security"
 
 msgid "d-3-313"
-msgstr "Polizei"
+msgstr "Police"
 
 msgid "d-2-32"
-msgstr "Armee"
+msgstr "Armed forces"
 
 msgid "d-3-321"
-msgstr "Armee (allgemein)"
+msgstr "Armed forces - general"
 
 msgid "d-3-322"
-msgstr "Militärorganisation"
+msgstr "Military organisation"
 
 msgid "d-3-323"
-msgstr "Rüstung"
+msgstr "Armament"
 
 msgid "d-3-324"
-msgstr "Militäranlagen"
+msgstr "Military facilities"
 
 msgid "d-3-325"
-msgstr "Dienstverweigerung – Zivildienst"
+msgstr "Conscientious objection, Civilian service"
 
+#, fuzzy
 msgid "d-3-326"
-msgstr "Armeebeschaffung"
+msgstr "Armed forces - general"
 
 msgid "d-3-327"
-msgstr "Militärische Ausbildung"
+msgstr "Abolition of the armed forces"
 
 msgid "d-3-328"
-msgstr "Internationale Einsätze"
+msgstr "Military training"
 
 msgid "d-2-33"
-msgstr "Landesversorgung"
+msgstr "National economic supply"
 
 msgid "d-1-4"
-msgstr "Wirtschaft"
+msgstr "Economy"
 
 msgid "d-2-41"
-msgstr "Wirtschaftspolitik"
+msgstr "Economic policy"
 
 msgid "d-3-411"
-msgstr "Konjunkturpolitik"
+msgstr "Short-term economic policy"
 
 msgid "d-3-412"
-msgstr "Wettbewerbspolitik"
+msgstr "Competition policy"
 
 msgid "d-3-413"
-msgstr "Strukturpolitik"
+msgstr "Structural policy"
 
 msgid "d-3-414"
-msgstr "Preispolitik"
+msgstr "Pricing policy"
 
 msgid "d-3-415"
-msgstr "Konsumentenschutz"
+msgstr "Consumer protection"
 
 msgid "d-3-416"
-msgstr "Gesellschaftsrecht"
+msgstr "Company law"
 
 msgid "d-2-42"
-msgstr "Arbeit und Beschäftigung"
+msgstr "Employment"
 
 msgid "d-3-421"
-msgstr "Arbeitsbedingungen"
+msgstr "Employment conditions"
 
 msgid "d-3-422"
-msgstr "Arbeitszeit"
+msgstr "Working hours"
 
 msgid "d-3-423"
-msgstr "Sozialpartnerschaft"
+msgstr "Industrial relations"
 
 msgid "d-3-424"
-msgstr "Beschäftigungspolitik"
+msgstr "Employment policy"
 
 msgid "d-2-43"
-msgstr "Finanzwesen"
+msgstr "Finance"
 
 msgid "d-3-431"
-msgstr "Geld- und Währungspolitik"
+msgstr "Monetary policy"
 
 msgid "d-3-432"
-msgstr "Banken, Börsen, Versicherungen"
+msgstr "Banks, stock exchanges, insurance"
 
 msgid "d-2-44"
-msgstr "Freizeit und Tourismus"
+msgstr "Tourism and leisure"
 
 msgid "d-3-441"
-msgstr "Fremdenverkehr"
+msgstr "Tourism"
 
 msgid "d-3-442"
-msgstr "Hotellerie und Gastgewerbe"
+msgstr "Hospitality"
 
 msgid "d-3-443"
-msgstr "Spielbanken – Kursaal – Kasino"
+msgstr "Lotteries and gambling"
 
 msgid "d-1-5"
-msgstr "Landwirtschaft"
+msgstr "Agriculture"
 
 msgid "d-2-51"
-msgstr "Agrarpolitik"
+msgstr "Agricultural policy"
 
 msgid "d-2-52"
-msgstr "Tierische Produktion"
+msgstr "Livestock"
 
 msgid "d-2-53"
-msgstr "Pflanzliche Produktion"
+msgstr "Plant and crop production"
 
 msgid "d-2-54"
-msgstr "Forstwirtschaft"
+msgstr "Forestry"
 
 msgid "d-2-55"
-msgstr "Fischerei – Jagd – Haustiere"
+msgstr "Fishing, hunting and pets"
 
 msgid "d-1-6"
-msgstr "Öffentliche Finanzen"
+msgstr "Public finance"
 
 msgid "d-2-61"
-msgstr "Steuerwesen"
+msgstr "Taxation"
 
 msgid "d-3-611"
-msgstr "Steuerpolitik"
+msgstr "Tax policy"
 
 msgid "d-3-612"
-msgstr "Steuersystem"
+msgstr "Tax system"
 
 msgid "d-3-613"
-msgstr "Direkte Steuern"
+msgstr "Direct taxation"
 
 msgid "d-3-614"
-msgstr "Indirekte Steuern"
+msgstr "Indirect taxation"
 
 msgid "d-2-62"
-msgstr "Finanzordnung"
+msgstr "Financial system"
 
 msgid "d-2-63"
-msgstr "Ausgabenordnung"
+msgstr "Public expenditure"
 
 msgid "d-2-64"
-msgstr "Sparmassnahmen – Sanierungsmassnahmen"
+msgstr "Budget cuts and remediation measures"
 
 msgid "d-1-7"
-msgstr "Energie"
+msgstr "Energy"
 
 msgid "d-2-71"
-msgstr "Energiepolitik"
+msgstr "Energy policy"
 
 msgid "d-2-72"
-msgstr "Kernenergie"
+msgstr "Nuclear energy"
 
 msgid "d-2-73"
-msgstr "Wasserkraft"
+msgstr "Hydro-electric power"
 
 msgid "d-2-74"
-msgstr "Alternativenergien"
+msgstr "Alternative energy"
 
 msgid "d-2-75"
-msgstr "Erdöl – Gas"
+msgstr "Oil and gas"
 
 msgid "d-1-8"
-msgstr "Verkehr und Infrastruktur"
+msgstr "Transport and infrastructure"
 
 msgid "d-2-81"
-msgstr "Verkehrspolitik"
+msgstr "Transport policy"
 
 msgid "d-3-811"
-msgstr "Agglomerationsverkehr"
+msgstr "Urban transport"
 
 msgid "d-3-812"
-msgstr "Transitverkehr"
+msgstr "Transit traffic"
 
 msgid "d-2-82"
-msgstr "Strassenverkehr"
+msgstr "Road transport"
 
 msgid "d-3-821"
-msgstr "Strassenbau"
+msgstr "Road construction"
 
 msgid "d-3-822"
-msgstr "Schwerverkehr"
+msgstr "Heavy traffic"
 
 msgid "d-2-83"
-msgstr "Schienenverkehr"
+msgstr "Rail transport"
 
 msgid "d-3-831"
-msgstr "Güterverkehr"
+msgstr "Goods traffic"
 
 msgid "d-3-832"
-msgstr "Personenverkehr"
+msgstr "Passenger traffic"
 
 msgid "d-2-84"
-msgstr "Luftverkehr"
+msgstr "Air transport"
 
 msgid "d-2-85"
-msgstr "Schifffahrt"
+msgstr "Shipping"
 
 msgid "d-2-86"
 msgstr "Post"
 
 msgid "d-2-87"
-msgstr "Telekommunikation"
+msgstr "Telecommunications"
 
 msgid "d-1-9"
-msgstr "Umwelt und Lebensraum"
+msgstr "Environment and living space"
 
 msgid "d-2-91"
-msgstr "Boden"
+msgstr "Soil"
 
 msgid "d-3-911"
-msgstr "Raumplanung"
+msgstr "Spatial planning"
 
 msgid "d-3-912"
-msgstr "Bodenrecht"
+msgstr "Land law"
 
 msgid "d-2-92"
-msgstr "Wohnen"
+msgstr "Housing"
 
 msgid "d-3-921"
-msgstr "Mietwesen"
+msgstr "Tenancy issues"
 
 msgid "d-3-922"
-msgstr "Wohnungsbau – Wohneigentum"
+msgstr "Building of residential housing, property ownership"
 
 msgid "d-2-93"
-msgstr "Umwelt"
+msgstr "Environment"
 
 msgid "d-3-931"
-msgstr "Umweltpolitik"
+msgstr "Environmental policy"
 
 msgid "d-3-932"
-msgstr "Lärmschutz"
+msgstr "Noise protection"
 
 msgid "d-3-933"
-msgstr "Luftreinhaltung"
+msgstr "Air quality control"
 
 msgid "d-3-934"
-msgstr "Gewässerschutz"
+msgstr "Water pollution control"
 
 msgid "d-3-935"
-msgstr "Boden"
+msgstr "Soil protection"
 
 msgid "d-3-936"
-msgstr "Abfälle"
+msgstr "Waste"
 
 msgid "d-3-937"
-msgstr "Natur- und Heimatschutz"
+msgstr "Protection of nature and cultural heritage"
 
 msgid "d-3-938"
-msgstr "Tierschutz"
+msgstr "Animal protection"
 
 msgid "d-1-10"
-msgstr "Soziale Fragen – Sozialpolitik"
+msgstr "Social policy"
 
 msgid "d-2-101"
-msgstr "Gesundheit"
+msgstr "Health"
 
 msgid "d-3-1011"
-msgstr "Gesundheitspolitik"
+msgstr "Health policy"
 
 msgid "d-3-1012"
-msgstr "Medizinforschung und -technik"
+msgstr "Medical research and technology"
 
 msgid "d-3-1013"
-msgstr "Medikamente"
+msgstr "Medicines"
 
 msgid "d-3-1014"
-msgstr "Suchtmittel"
+msgstr "Addictive substances"
 
 msgid "d-3-1015"
-msgstr "Fortpflanzungsmedizin"
+msgstr "Reproductive medicine"
 
 msgid "d-2-102"
-msgstr "Sozialversicherungen"
+msgstr "Social security"
 
 msgid "d-3-1021"
-msgstr "Alters- und Hinterbliebenenversicherung"
+msgstr "Old-age and survivors' insurance"
 
 msgid "d-3-1022"
-msgstr "Invalidenversicherung"
+msgstr "Invalidity insurance"
 
 msgid "d-3-1023"
-msgstr "Berufliche Vorsorge"
+msgstr "Occupational benefits provision"
 
 msgid "d-3-1024"
-msgstr "Kranken- und Unfallversicherung"
+msgstr "Health and accident insurance"
 
 msgid "d-3-1025"
-msgstr "Mutterschaftsversicherung"
+msgstr "Maternity insurance"
 
 msgid "d-3-1026"
-msgstr "Arbeitslosenversicherung"
+msgstr "Unemployment insurance"
 
 msgid "d-3-1027"
-msgstr "Erwerbsersatzordnung"
+msgstr ""
+"Compensation for loss of earnings for persons on military service or civil "
+"protection duty"
 
 msgid "d-3-1028"
-msgstr "Fürsorge"
+msgstr "Welfare"
 
 msgid "d-2-103"
-msgstr "Soziale Gruppen"
+msgstr "Social groups"
 
 msgid "d-3-1031"
-msgstr "Ausländerpolitik"
+msgstr "Immigration policy"
 
 msgid "d-3-1032"
-msgstr "Flüchtlinge"
+msgstr "Refugees"
 
 msgid "d-3-1033"
-msgstr "Stellung der Frau"
+msgstr "Status of women"
 
 msgid "d-3-1034"
-msgstr "Familienpolitik"
+msgstr "Family policy"
 
 msgid "d-3-1035"
-msgstr "Kinder und Jugendliche"
+msgstr "Children and young people"
 
 msgid "d-3-1036"
-msgstr "Seniorinnen und Senioren"
+msgstr "Senior citizens"
 
 msgid "d-3-1037"
-msgstr "Invalide"
+msgstr "Persons with disabilities"
 
 msgid "d-3-1038"
-msgstr "Homosexuelle"
+msgstr "Homosexuals"
 
 msgid "d-1-11"
-msgstr "Bildung und Forschung"
+msgstr "Education and research"
 
 msgid "d-2-111"
-msgstr "Bildungspolitik"
+msgstr "Education policy"
 
 msgid "d-2-112"
-msgstr "Schulen"
+msgstr "Schools"
 
 msgid "d-2-113"
-msgstr "Hochschulen"
+msgstr "Universities"
 
 msgid "d-2-114"
-msgstr "Forschung"
+msgstr "Research"
 
 msgid "d-3-1141"
-msgstr "Gentechnologie"
+msgstr "Genetic engineering"
 
 msgid "d-3-1142"
-msgstr "Tierversuche"
+msgstr "Animal testing"
 
 msgid "d-2-115"
-msgstr "Berufsbildung"
+msgstr "Professional and vocational education"
 
 msgid "d-1-12"
-msgstr "Kultur, Religion, Medien"
+msgstr "Culture, religion and media"
 
 msgid "d-2-121"
-msgstr "Kulturpolitik"
+msgstr "Cultural policy"
 
 msgid "d-2-122"
-msgstr "Sprachpolitik"
+msgstr "Language policy"
 
 msgid "d-2-123"
-msgstr "Religion – Kirchen"
+msgstr "Religion - churches"
 
 msgid "d-2-124"
 msgstr "Sport"
 
 msgid "d-2-125"
-msgstr "Medien und Kommunikation"
+msgstr "Media and communication"
 
 msgid "d-3-1251"
-msgstr "Medienpolitik"
+msgstr "Media policy"
 
 msgid "d-3-1252"
-msgstr "Presse"
+msgstr "Press"
 
 msgid "d-3-1253"
-msgstr "Radio, Fernsehen, Elektronische Medien"
+msgstr "Radio, television and electronic media"
 
 msgid "d-3-1254"
-msgstr "Medienfreiheit"
+msgstr "Freedom of the media"
 
 msgid "canton-ag-label"
 msgstr "Aargau"
@@ -1399,6 +1397,11 @@ msgstr "Upload"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr "The form contains errors. Please check the fields marked in red."
+
+msgid ""
+"This webpage is best viewed with a modern Browser. Consider to use Chrome, "
+"Firefox or Edge. <dynamic element>"
+msgstr ""
 
 msgid "Logout"
 msgstr "Logout"
@@ -1804,41 +1807,3 @@ msgstr "All votes have been deleted"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
-
-#~ msgid "Unknown"
-#~ msgstr "Unknown"
-
-#~ msgid ""
-#~ "Number of days between the start of collecting signatures and their "
-#~ "filing by the initiators."
-#~ msgstr ""
-#~ "Number of days between the start of collecting signatures and their "
-#~ "filing by the initiators."
-
-#~ msgid ""
-#~ "Number of days between the Federal Council dispatch and the Parliament’s "
-#~ "final vote."
-#~ msgstr ""
-#~ "Number of days between the Federal Council dispatch and the Parliament’s "
-#~ "final vote."
-
-#~ msgid ""
-#~ "Number of days between the Parliament’s final vote and the decree to "
-#~ "declare the success of the referendum."
-#~ msgstr ""
-#~ "Number of days between the Parliament’s final vote and the decree to "
-#~ "declare the success of the referendum."
-
-#~ msgid ""
-#~ "Cumulated electoral share of the parties which recommend to vote Yes."
-#~ msgstr ""
-#~ "Cumulated electoral share of the parties which recommend to vote Yes."
-
-#~ msgid "Without / Unknown"
-#~ msgstr "none / unknown"
-
-#~ msgid "Yes Camp"
-#~ msgstr "\"Yes\" camp"
-
-#~ msgid "Vague"
-#~ msgstr "Vague"

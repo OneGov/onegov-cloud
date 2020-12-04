@@ -1,17 +1,12 @@
-# This file was generated from translations/Uebersetzungstabelle 2019-05-24.xlsx
+# This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"POT-Creation-Date: 2020-04-22 21:49+0200\n"
-"PO-Revision-Date: 2019-12-14 14:10+0100\n"
-"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2020-12-04 14:54+0100\n"
+"PO-Revision-Date: 2020-12-04 15:22+0100\n"
 "Language: de_CH\n"
-"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.4\n"
 
 msgid "Not a valid XLSX file."
 msgstr "Keine gültige XLSX-Datei."
@@ -722,7 +717,7 @@ msgid "d-3-151"
 msgstr "Territorialfragen"
 
 msgid "d-3-152"
-msgstr "Beziehung Bund-Kanton"
+msgstr "Beziehungen zwischen Bund und Kantonen"
 
 msgid "d-3-153"
 msgstr "Aufgabenteilung"
@@ -776,7 +771,7 @@ msgid "d-3-223"
 msgstr "EWR"
 
 msgid "d-3-224"
-msgstr "Andere Organisationen"
+msgstr "Andere europäische Organisationen"
 
 msgid "d-2-23"
 msgstr "Internationale Organisationen"
@@ -785,7 +780,7 @@ msgid "d-3-231"
 msgstr "UNO"
 
 msgid "d-3-232"
-msgstr "Andere Organisationen"
+msgstr "Andere internationale Organisationen"
 
 msgid "d-2-24"
 msgstr "Entwicklungszusammenarbeit"
@@ -806,7 +801,7 @@ msgid "d-2-27"
 msgstr "Diplomatie"
 
 msgid "d-2-28"
-msgstr "Auslandschweizer"
+msgstr "Auslandschweizerinnen und Auslandschweizer"
 
 msgid "d-1-3"
 msgstr "Sicherheitspolitik"
@@ -841,14 +836,15 @@ msgstr "Militäranlagen"
 msgid "d-3-325"
 msgstr "Dienstverweigerung – Zivildienst"
 
+#, fuzzy
 msgid "d-3-326"
-msgstr "Armeebeschaffung"
+msgstr "Armee (allgemein)"
 
 msgid "d-3-327"
-msgstr "Militärische Ausbildung"
+msgstr "Armeeabschaffung"
 
 msgid "d-3-328"
-msgstr "Internationale Einsätze"
+msgstr "Militärische Ausbildung"
 
 msgid "d-2-33"
 msgstr "Landesversorgung"
@@ -911,7 +907,7 @@ msgid "d-3-442"
 msgstr "Hotellerie und Gastgewerbe"
 
 msgid "d-3-443"
-msgstr "Spielbanken – Kursaal – Kasino"
+msgstr "Geldspiele "
 
 msgid "d-1-5"
 msgstr "Landwirtschaft"
@@ -953,10 +949,10 @@ msgid "d-2-62"
 msgstr "Finanzordnung"
 
 msgid "d-2-63"
-msgstr "Ausgabenordnung"
+msgstr "Öffentliche Ausgaben"
 
 msgid "d-2-64"
-msgstr "Sparmassnahmen – Sanierungsmassnahmen"
+msgstr "Spar- und Sanierungsmassnahmen"
 
 msgid "d-1-7"
 msgstr "Energie"
@@ -1055,7 +1051,7 @@ msgid "d-3-934"
 msgstr "Gewässerschutz"
 
 msgid "d-3-935"
-msgstr "Boden"
+msgstr "Bodenschutz"
 
 msgid "d-3-936"
 msgstr "Abfälle"
@@ -1067,7 +1063,7 @@ msgid "d-3-938"
 msgstr "Tierschutz"
 
 msgid "d-1-10"
-msgstr "Soziale Fragen – Sozialpolitik"
+msgstr "Sozialpolitik"
 
 msgid "d-2-101"
 msgstr "Gesundheit"
@@ -1136,7 +1132,7 @@ msgid "d-3-1036"
 msgstr "Seniorinnen und Senioren"
 
 msgid "d-3-1037"
-msgstr "Invalide"
+msgstr "Behinderte"
 
 msgid "d-3-1038"
 msgstr "Homosexuelle"
@@ -1406,6 +1402,11 @@ msgstr "Hochladen"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid ""
+"This webpage is best viewed with a modern Browser. Consider to use Chrome, "
+"Firefox or Edge. <dynamic element>"
+msgstr ""
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -1816,49 +1817,3 @@ msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
-
-#~ msgid "for the counter proposal"
-#~ msgstr "für den Gegenentwurf"
-
-#~ msgid "for the initative"
-#~ msgstr "für die Initiative"
-
-#~ msgid "Overview of voting result by the Confederation"
-#~ msgstr "Ergebnisübersicht Bundeskanzlei"
-
-#~ msgid "Unknown"
-#~ msgstr "Unbekannt"
-
-#~ msgid ""
-#~ "Number of days between the start of collecting signatures and their "
-#~ "filing by the initiators."
-#~ msgstr "Anzahl Tage vom Sammelbeginn bis zur Einreichung."
-
-#~ msgid ""
-#~ "Number of days between the Federal Council dispatch and the Parliament’s "
-#~ "final vote."
-#~ msgstr ""
-#~ "Anzahl Tage von der Verabschiedung der bundesrätlichen Botschaft bis zum "
-#~ "Parlamentsbeschluss."
-
-#~ msgid ""
-#~ "Number of days between the Parliament’s final vote and the decree to "
-#~ "declare the success of the referendum."
-#~ msgstr ""
-#~ "Anzahl Tage vom Parlamentsbeschluss bis zum Beschluss über das "
-#~ "Zustandekommen."
-
-#~ msgid ""
-#~ "Cumulated electoral share of the parties which recommend to vote Yes."
-#~ msgstr ""
-#~ "Kumulierter Wähleranteil der Parteien, die die Ja-Parole zur Vorlage "
-#~ "gefasst haben."
-
-#~ msgid "Without / Unknown"
-#~ msgstr "Ohne / Unbekannt"
-
-#~ msgid "Yes Camp"
-#~ msgstr "Ja-Lager"
-
-#~ msgid "Vague"
-#~ msgstr "Unbestimmt"
