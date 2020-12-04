@@ -470,6 +470,7 @@ def upload_vote_attachments(self, request, form):
     return {
         'layout': layout,
         'form': form,
+        'button_text': _("Upload"),
         'cancel': request.link(self)
     }
 
