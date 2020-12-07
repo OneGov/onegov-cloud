@@ -3,11 +3,12 @@ from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.views.vote import view_vote_percentages
 from psycopg2.extras import NumericRange
+from pytest import mark
+from re import findall
 from transaction import commit
+from translationstring import TranslationString
 from webtest import TestApp as Client
 from webtest.forms import Upload
-from translationstring import TranslationString
-import re
 
 
 def test_view_vote(swissvotes_app, sample_vote):
@@ -103,7 +104,7 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert "25.2%" in page
     assert "26.2%" in page
     assert "27.2%" in page
-    assert len(re.findall(r'28\.2\%', str(page))) == 2
+    assert len(findall(r'28\.2\%', str(page))) == 2
     assert "1.1%" in page
     assert "2.1%" in page
     assert "3.1%" in page
@@ -536,3 +537,48 @@ def test_vote_chart(session):
             'Parties preferring the counter-proposal 3.4%'
         ),
     }
+
+
+@mark.parametrize('lang', ('de', 'fr'))
+def test_vote_static_attachment_links(swissvotes_app, sample_vote,
+                                      attachments, lang):
+    locale = f'{lang}_CH'
+    names = [
+        f'abstimmungstext-{lang}.pdf',
+        f'botschaft-{lang}.pdf',
+        f'brochure-{lang}.pdf',
+        f'erwahrung-{lang}.pdf',
+        f'zustandekommen-{lang}.pdf',
+        f'nachbefragung-{lang}.pdf',
+        f'vorpruefung-{lang}.pdf',
+    ] + ([
+        'kurzbeschreibung.pdf',
+        'parlamentsberatung.pdf',
+        'inserateanalyse.pdf',
+        'staatsebenen.xlsx',
+        'medienanalyse.pdf',
+    ] if lang == 'de' else [])
+
+    session = swissvotes_app.session()
+    session.add(sample_vote)
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = page.click("Details")
+
+    # No attachments yet
+    for name in names:
+        assert client.get(f'{page.request.url}/{name}', status=404)
+
+    vote = session.query(SwissVote).first()
+    vote.session_manager.current_locale = locale
+    for name, attachment in attachments.items():
+        setattr(vote, name, attachment)
+    commit()
+
+    for name in names:
+        test = client.get(f'{page.request.url}/{name}')
+        print(name, test.status)

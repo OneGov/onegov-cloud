@@ -14,6 +14,7 @@ from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import Actor
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
+from webob.exc import HTTPNotFound
 
 
 @SwissvotesApp.html(
@@ -60,16 +61,16 @@ def view_vote(self, request):
     }
 
 
-# Static paths for files
 @SwissvotesApp.view(
     model=SwissVote,
     permission=Public,
     name='kurzbeschreibung.pdf'
 )
 def brief_description_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('brief_description', request))
-    )
+    file = self.get_file('brief_description', request)
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -78,9 +79,10 @@ def brief_description_static(self, request):
     name='abstimmungstext-de.pdf'
 )
 def voting_text_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_text', 'de_CH'))
-    )
+    file = self.get_file_by_locale('voting_text', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -89,9 +91,10 @@ def voting_text_de_static(self, request):
     name='abstimmungstext-fr.pdf'
 )
 def voting_text_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_text', 'fr_CH'))
-    )
+    file = self.get_file_by_locale('voting_text', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -100,10 +103,10 @@ def voting_text_fr_static(self, request):
     name='botschaft-de.pdf'
 )
 def federal_council_message_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale(
-            'federal_council_message', 'de_CH'))
-    )
+    file = self.get_file_by_locale('federal_council_message', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -112,10 +115,10 @@ def federal_council_message_de_static(self, request):
     name='botschaft-fr.pdf'
 )
 def federal_council_message_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale(
-            'federal_council_message', 'fr_CH'))
-    )
+    file = self.get_file_by_locale('federal_council_message', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -124,9 +127,10 @@ def federal_council_message_fr_static(self, request):
     name='parlamentsberatung.pdf'
 )
 def parliamentary_debate_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('parliamentary_debate', request))
-    )
+    file = self.get_file('parliamentary_debate', request)
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -135,9 +139,10 @@ def parliamentary_debate_static(self, request):
     name='brochure-de.pdf'
 )
 def voting_booklet_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_booklet', 'de_CH'))
-    )
+    file = self.get_file_by_locale('voting_booklet', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -146,9 +151,10 @@ def voting_booklet_de_static(self, request):
     name='brochure-fr.pdf'
 )
 def voting_booklet_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_booklet', 'fr_CH'))
-    )
+    file = self.get_file_by_locale('voting_booklet', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -157,9 +163,10 @@ def voting_booklet_fr_static(self, request):
     name='erwahrung-de.pdf'
 )
 def resultion_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('resolution', 'de_CH'))
-    )
+    file = self.get_file_by_locale('resolution', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -168,9 +175,10 @@ def resultion_de_static(self, request):
     name='erwahrung-fr.pdf'
 )
 def resolution_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('resolution', 'fr_CH'))
-    )
+    file = self.get_file_by_locale('resolution', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -179,9 +187,10 @@ def resolution_fr_static(self, request):
     name='zustandekommen-de.pdf'
 )
 def realization_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('realization', 'de_CH'))
-    )
+    file = self.get_file_by_locale('realization', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -190,9 +199,10 @@ def realization_de_static(self, request):
     name='zustandekommen-fr.pdf'
 )
 def realization_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('realization', 'fr_CH'))
-    )
+    file = self.get_file_by_locale('realization', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -201,9 +211,10 @@ def realization_fr_static(self, request):
     name='inserateanalyse.pdf'
 )
 def ad_analysis_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('ad_analysis', request))
-    )
+    file = self.get_file('ad_analysis', request)
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -212,9 +223,10 @@ def ad_analysis_static(self, request):
     name='staatsebenen.xlsx'
 )
 def results_by_domain_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('results_by_domain', request))
-    )
+    file = self.get_file('results_by_domain', request)
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -223,9 +235,10 @@ def results_by_domain_static(self, request):
     name='medienanalyse.pdf'
 )
 def foeg_analysis_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('foeg_analysis', request))
-    )
+    file = self.get_file('foeg_analysis', request)
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -234,9 +247,10 @@ def foeg_analysis_static(self, request):
     name='nachbefragung-de.pdf'
 )
 def post_vote_poll_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('post_vote_poll', 'de_CH'))
-    )
+    file = self.get_file_by_locale('post_vote_poll', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -245,9 +259,10 @@ def post_vote_poll_de_static(self, request):
     name='nachbefragung-fr.pdf'
 )
 def post_vote_poll_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('post_vote_poll', 'fr_CH'))
-    )
+    file = self.get_file_by_locale('post_vote_poll', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -256,9 +271,10 @@ def post_vote_poll_fr_static(self, request):
     name='vorpruefung-de.pdf'
 )
 def preliminary_exam_de_static(self, request):
-    return request.redirect(
-        request.link(
-            self.get_file_by_locale('preliminary_examination', 'de_CH')))
+    file = self.get_file_by_locale('preliminary_examination', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(
@@ -267,9 +283,10 @@ def preliminary_exam_de_static(self, request):
     name='vorpruefung-fr.pdf'
 )
 def preliminary_exam_fr_static(self, request):
-    return request.redirect(
-        request.link(
-            self.get_file_by_locale('preliminary_examination', 'fr_CH')))
+    file = self.get_file_by_locale('preliminary_examination', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
 
 
 @SwissvotesApp.json(
