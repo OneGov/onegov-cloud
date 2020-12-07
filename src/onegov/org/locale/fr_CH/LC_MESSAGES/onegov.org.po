@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-07 17:24+0200\n"
+"POT-Creation-Date: 2020-12-03 17:30+0100\n"
 "PO-Revision-Date: 2020-05-10 10:58+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -331,6 +331,19 @@ msgstr "Les utilisateurs peuvent envoyer des demandes de modifications"
 msgid "Change requests"
 msgstr "Demandes de modifications"
 
+msgid "Enable publication dates"
+msgstr "Activer les dates de publication"
+
+msgid ""
+"Users may suggest publication start and/or end of the entry on submissions "
+"and change requests"
+msgstr ""
+"Les utilisateurs peuvent suggérer le début et/ou la fin de la publication de "
+"l'entrée sur les soumissions et les demandes de changement"
+
+msgid "Publication"
+msgstr "Publication"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Les champs suivants sont inconnus : ${fields}"
@@ -550,6 +563,12 @@ msgstr "Commentaire"
 
 msgid "Please provide at least one change"
 msgstr "Veuillez apporter au moins une modification"
+
+msgid "Publication end must be in the future"
+msgstr "La fin de la publication doit être dans le futur"
+
+msgid "Publication start must be prior to end"
+msgstr "Le début de la publication doit être antérieur à la fin"
 
 msgid "Describes what this form is about"
 msgstr "Décrit le contenu de ce formulaire"
@@ -1467,6 +1486,18 @@ msgstr "Supprimer le dossier"
 msgid "Entry"
 msgstr "Entrée"
 
+msgid "Published"
+msgstr "Publié"
+
+msgid "Upcoming"
+msgstr "A l'anvenir"
+
+msgid "Past"
+msgstr "Passé"
+
+msgid "Choose filter"
+msgstr "Sélectionner un filtre"
+
 msgid "Delete entry"
 msgstr "Supprimer l'entrée"
 
@@ -2162,9 +2193,6 @@ msgstr "Initié"
 msgid "Submitted"
 msgstr "Soumis"
 
-msgid "Published"
-msgstr "Publié"
-
 msgid "Withdrawn"
 msgstr "Retiré"
 
@@ -2298,9 +2326,6 @@ msgstr "Décaissé"
 
 msgid "Digital Signature"
 msgstr "Signature électronique"
-
-msgid "Publication"
-msgstr "Publication"
 
 msgid "Private"
 msgstr "Privé"
@@ -3904,11 +3929,11 @@ msgstr "${count} résultats"
 msgid "Search Unavailable"
 msgstr "Recherche non disponible"
 
-msgid "Footer"
-msgstr "Bas de page"
-
 msgid "Header"
 msgstr "En-tête"
+
+msgid "Footer"
+msgstr "Bas de page"
 
 msgid "Modules"
 msgstr "Modules"

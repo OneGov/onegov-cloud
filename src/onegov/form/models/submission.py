@@ -116,7 +116,6 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     @property
     def form_obj(self):
         """ Returns a form instance containing the submission data. """
-
         return self.form_class(data=self.data)
 
     @hybrid_property

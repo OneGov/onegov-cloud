@@ -2,6 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.form.mixins import UTCPublicationMixin
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
@@ -15,7 +16,7 @@ from uuid import uuid4
 
 
 class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
-                     SearchableContent, AssociatedFiles):
+                     SearchableContent, AssociatedFiles, UTCPublicationMixin):
     """ A single entry of a directory. """
 
     __tablename__ = 'directory_entries'

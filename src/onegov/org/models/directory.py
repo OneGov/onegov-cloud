@@ -5,13 +5,15 @@ from copy import copy
 from datetime import timedelta
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
-from onegov.directory import Directory, DirectoryEntry
+from onegov.directory import Directory, DirectoryEntry, \
+    DirectoryEntryCollection
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
-from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import CoordinatesExtension, \
+    PublicationExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.pay import Price
@@ -148,8 +150,18 @@ class DirectorySubmissionAction(object):
         form.request = request
         form.model = self.submission
 
+        # not stored in content but captured by form.is_different in order
+        # to show the user the changes since he can modify them
+        publication_properties = ('publication_start', 'publication_end')
+
         for name, field in form._fields.items():
             if form.is_different(field):
+                if name in publication_properties and \
+                        self.directory.enable_publication:
+                    setattr(entry, name, data.get(name))
+                    changed.append(name)
+                    continue
+
                 values[name] = form.data[name]
                 changed.append(name)
 
@@ -208,6 +220,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     enable_map = meta_property()
     enable_submissions = meta_property()
     enable_change_requests = meta_property()
+    enable_publication = meta_property()
 
     submissions_guideline = content_property()
     change_requests_guideline = content_property()
@@ -245,9 +258,12 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
 
     @property
     def extensions(self):
+        extensions = ['coordinates', 'submitter', 'comment', 'publication']
         if self.enable_map == 'no':
-            return 'submitter', 'comment'
-        return 'coordinates', 'submitter', 'comment'
+            extensions.pop(extensions.index('coordinates'))
+        if not self.enable_publication:
+            extensions.pop(extensions.index('publication'))
+        return tuple(extensions)
 
     @property
     def actual_price(self):
@@ -278,8 +294,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
             session.delete(submission)
 
 
-class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
-                             AccessExtension):
+class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
+                             CoordinatesExtension, AccessExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directory_entries'
@@ -328,3 +344,27 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
                 field for field in form._fields.values()
                 if field.id in content_config and field.data
             )
+
+
+class ExtendedDirectoryEntryCollection(DirectoryEntryCollection):
+
+    def __init__(self, directory, type='extended', keywords=None, page=0,
+                 searchwidget=None, published_only=None, past_only=None,
+                 upcoming_only=None):
+        super().__init__(directory, type, keywords, page, searchwidget)
+        self.published_only = published_only
+        self.past_only = past_only
+        self.upcoming_only = upcoming_only
+
+    def query(self):
+        query = super().query()
+        if self.published_only:
+            query = query.filter(
+                self.model_class.publication_started == True,
+                self.model_class.publication_ended == False
+            )
+        elif self.past_only:
+            query = query.filter(self.model_class.publication_ended == True)
+        elif self.upcoming_only:
+            query = query.filter(self.model_class.publication_started == False)
+        return query

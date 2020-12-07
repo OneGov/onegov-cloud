@@ -51,6 +51,14 @@
             </div>
 
             <div class="columns medium-4">
+
+                <div class="publication-nav" tal:condition="directory.enable_publication">
+                    <button href="#" data-dropdown="pubnav" aria-controls="pubnav" aria-expanded="false" class="button small secondary dropdown" i18n:translate>${layout.publication_filter_title}</button><br>
+                    <ul id="pubnav" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                        <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                    </ul>
+                </div>
+
                 <div class="row" tal:condition="searchwidget">
                     <div class="columns medium-12">
                         <tal:b replace="structure searchwidget.html(layout)" />
