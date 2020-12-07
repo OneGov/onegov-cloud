@@ -7,7 +7,6 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.extensions import Extendable
-from onegov.form.mixins import UTCPublicationMixin
 from onegov.form.parser import parse_form
 from onegov.form.utils import extract_text_from_html, hash_definition
 from onegov.pay import Payable

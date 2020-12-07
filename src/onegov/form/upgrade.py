@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from depot.io.utils import FileIntent
 from io import BytesIO
 from onegov.core.crypto import random_token
-from onegov.core.orm.types import JSON, UUID, UTCDateTime
+from onegov.core.orm.types import JSON, UUID
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import dictionary_to_binary
 from onegov.core.utils import normalize_for_url
