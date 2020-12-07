@@ -21,7 +21,9 @@ member_can_see = (
     'availability',
     'mother_tongues',
     'languages_written',
-    'languages_spoken'
+    'languages_spoken',
+    'expertise_interpreting_types',
+    'expertise_professional_guilds'
 )
 
 editor_can_see = member_can_see + (
