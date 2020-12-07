@@ -9,7 +9,8 @@ from onegov.org.views.search import suggestions as suggestions_view
 @AgencyApp.html(model=Search, template='search.pt', permission=Public)
 def search(self, request):
     data = search_view(self, request)
-    data['layout'] = AgencySearchLayout(self, request)
+    if isinstance(data, dict):
+        data['layout'] = AgencySearchLayout(self, request)
     return data
 
 
