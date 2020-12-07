@@ -88,10 +88,6 @@
                                 <dt i18n:translate>Availability</dt>
                                 <dd>${model.availability}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
-                                <dt i18n:translate>Availability</dt>
-                                <dd>${model.availability}</dd>
-                            </dl>
                             <dl class="field-display" tal:condition="model.expertise_interpreting_types and layout.show('expertise_interpreting_types')">
                                 <dt i18n:translate>Expertise by interpreting type</dt>
                                 <dd>
