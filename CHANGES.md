@@ -1,8 +1,50 @@
 # Changes
 
+## Release `2020.85`
+
+> commits: **13 / [f5f6655050...14b91f772f](https://github.com/OneGov/onegov-cloud/compare/f5f6655050^...14b91f772f)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.85)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds publication dates to directories**
+
+Adds publication dates in forms for new directory entries. Adds user setting to enable publication dates on submission or change request and integrates it with the ticket system.
+
+**`Feature`** | **[ZW-287](https://kanton-zug.atlassian.net/browse/ZW-287)** | **[62511893ce](https://github.com/onegov/onegov-cloud/commit/62511893cece92f0f3c41f0109bd174e3c522553)**
+
+🎉 **Adds public directory export**
+
+Make the directory export public. Filters exported entries by the access property and the role of the user (`request.exclude_invisible`).
+
+**`Feature`** | **[ZW-289](https://kanton-zug.atlassian.net/browse/ZW-289)** | **[5b7eb3188c](https://github.com/onegov/onegov-cloud/commit/5b7eb3188c500de98357ed1e599b07dc84993e5a)**
+
+### Swissvotes
+
+🐞 **Fixes upload button label.**
+
+**`Bugfix`** | **[VOTES-81](https://issues.seantis.ch/browse/VOTES-81)** | **[841d55c6b7](https://github.com/onegov/onegov-cloud/commit/841d55c6b7bda594b4acc14fd0138509cae09637)**
+
+🐞 **Fixes foeg url.**
+
+**`Bugfix`** | **[VOTES-80](https://issues.seantis.ch/browse/VOTES-80)** | **[154b880c01](https://github.com/onegov/onegov-cloud/commit/154b880c012716b93f96525f0d538926acffc51f)**
+
+🐞 **Increases attachment file size limit to 120M.**
+
+**`Bugfix`** | **[VOTES-73](https://issues.seantis.ch/browse/VOTES-73)** | **[1c2451752b](https://github.com/onegov/onegov-cloud/commit/1c2451752b8420003ba578e4592ca90cb08ae475)**
+
+🐞 **Update policy area translations.**
+
+**`Bugfix`** | **[VOTES-76](https://issues.seantis.ch/browse/VOTES-76)** | **[d520949a16](https://github.com/onegov/onegov-cloud/commit/d520949a16f727047485645163708691ecdcba6e)**
+
+🐞 **Fix static attachment links throwing an error when missing.**
+
+**`Bugfix`** | **[VOTES-83](https://issues.seantis.ch/browse/VOTES-83)** | **[e6fdef2c8e](https://github.com/onegov/onegov-cloud/commit/e6fdef2c8e6fb6a64391fc62ae9ac2f125cefb5c)**
+
 ## Release `2020.84`
 
-> commits: **2 / [51f199055b...76505b126b](https://github.com/OneGov/onegov-cloud/compare/51f199055b^...76505b126b)**  
+> released: **2020-12-02 17:34**<br>
+> commits: **3 / [51f199055b...c2bf3283b4](https://github.com/OneGov/onegov-cloud/compare/51f199055b^...c2bf3283b4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.84)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
