@@ -10,12 +10,15 @@ from onegov.core.security import Secret, Personal, Private
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
+    INTERPRETING_TYPES, ADMISSIONS, GENDERS
 from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
 from onegov.translator_directory.models.translator import Translator
 from morepath.request import Response
+from onegov.core.custom import json
 
 
 @TranslatorDirectoryApp.form(
@@ -87,13 +90,38 @@ def export_translator_directory(self, request):
     def format_languages(langs):
         return format_iterable((la.name for la in langs))
 
+    def format_guilds(guilds):
+        return format_iterable(
+            (request.translate(PROFESSIONAL_GUILDS[s]) for s in guilds)
+        )
+
+    def format_interpreting_types(types):
+        return format_iterable(
+            (request.translate(INTERPRETING_TYPES[t]) for t in types)
+        )
+
+    def format_admission(admission):
+        if not admission:
+            return ''
+        return request.translate(ADMISSIONS[admission])
+
+    def format_gender(gender):
+        if not gender:
+            return ''
+        return request.translate(GENDERS[gender])
+
     worksheet = workbook.add_worksheet()
     worksheet.name = request.translate(_("Translator directory"))
     worksheet.write_row(0, 0, (
         request.translate(_("Personal ID")),
         request.translate(_("Admission")),
+        request.translate(_("Withholding tax")),
+        request.translate(_("Last name")),
+        request.translate(_("First name")),
+        request.translate(_("Gender")),
         request.translate(_("Date of birth")),
         request.translate(_("Nationality")),
+        request.translate(_("Location")),
         request.translate(_("Address")),
         request.translate(_("Zip Code")),
         request.translate(_("City")),
@@ -102,18 +130,21 @@ def export_translator_directory(self, request):
         request.translate(_("Bank name")),
         request.translate(_("Bank address")),
         request.translate(_("Account owner")),
+        request.translate(_("IBAN")),
         request.translate(_("Email")),
-        request.translate(_("Withholding tax")),
         request.translate(_("Private Phone Number")),
         request.translate(_("Mobile Phone Number")),
         request.translate(_("Office Phone Number")),
         request.translate(_("Availability")),
+        request.translate(_("Comments on possible field of application")),
         request.translate(_("Name reveal confirmation")),
         request.translate(_("Date of application")),
         request.translate(_("Date of decision")),
         request.translate(_("Mother tongues")),
         request.translate(_("Spoken languages")),
         request.translate(_("Written languages")),
+        request.translate(_("Expertise by professional guild")),
+        request.translate(_("Expertise by interpreting type")),
         request.translate(_("Proof of preconditions")),
         request.translate(_("Agency references")),
         request.translate(_("Education as interpreter")),
@@ -125,9 +156,14 @@ def export_translator_directory(self, request):
     for ix, trs in enumerate(self.query()):
         worksheet.write_row(ix + 1, 0, (
             trs.pers_id or '',
-            trs.admission,
+            format_admission(trs.admission),
+            trs.withholding_tax and 1 or 0,
+            trs.last_name,
+            trs.first_name,
+            format_gender(trs.gender),
             format_date(trs.date_of_birth),
             trs.nationality or '',
+            json.dumps(trs.coordinates),
             trs.address or '',
             trs.zip_code or '',
             trs.city or '',
@@ -136,18 +172,21 @@ def export_translator_directory(self, request):
             trs.bank_name or '',
             trs.bank_address or '',
             trs.account_owner or '',
+            trs.iban or '',
             trs.email or '',
-            trs.withholding_tax and 1 or 0,
             trs.tel_private or '',
             trs.tel_mobile or '',
             trs.tel_office or '',
             trs.availability or '',
+            trs.operation_comments or '',
             trs.confirm_name_reveal and 1 or 0,
             format_date(trs.date_of_application),
             format_date(trs.date_of_decision),
             format_languages(trs.mother_tongues),
             format_languages(trs.spoken_languages),
             format_languages(trs.written_languages),
+            format_guilds(trs.expertise_professional_guilds),
+            format_interpreting_types(trs.expertise_interpreting_types),
             trs.proof_of_preconditions or '',
             trs.agency_references or '',
             trs.education_as_interpreter and 1 or 0,
