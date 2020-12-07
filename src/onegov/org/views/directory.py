@@ -551,7 +551,6 @@ def delete_directory_entry(self, request):
     request.success(_("The entry was deleted"))
 
 
-
 @OrgApp.form(model=ExtendedDirectoryEntryCollection,
              permission=Public, name='export',
              template='export.pt', form=ExportForm)
