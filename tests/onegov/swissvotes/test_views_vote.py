@@ -9,144 +9,9 @@ from webtest.forms import Upload
 from translationstring import TranslationString
 import re
 
-test_vote_data = dict(
-    bfs_number=Decimal('100.1'),
-    date=date(1990, 6, 2),
-    legislation_number=4,
-    legislation_decade=NumericRange(1990, 1994),
-    title_de="Vote DE",
-    title_fr="Vote FR",
-    short_title_de="V D",
-    short_title_fr="V F",
-    keyword="Keyword",
-    votes_on_same_day=2,
-    _legal_form=1,
-    initiator="Initiator",
-    anneepolitique="anneepolitique",
-    curia_vista_de='cv_de',
-    curia_vista_fr='cv_fr',
-    bkresults_de='bkr_de',
-    bkresults_fr='bkr_fr',
-    bkchrono_de='bkc_de',
-    bkchrono_fr='bkc_fr',
-    posters_yes='https://yes.com/objects/1 https://yes.com/objects/2',
-    posters_no='https://no.com/objects/1 https://no.com/objects/2',
-    posters_yes_imgs={'https://yes.com/objects/1': 'img_url'},
-    descriptor_1_level_1=Decimal('4'),
-    descriptor_1_level_2=Decimal('4.2'),
-    descriptor_1_level_3=Decimal('4.21'),
-    descriptor_2_level_1=Decimal('10'),
-    descriptor_2_level_2=Decimal('10.3'),
-    descriptor_2_level_3=Decimal('10.35'),
-    descriptor_3_level_1=Decimal('10'),
-    descriptor_3_level_2=Decimal('10.3'),
-    descriptor_3_level_3=Decimal('10.33'),
-    _result=1,
-    result_eligible_voters=2,
-    result_votes_empty=3,
-    result_votes_invalid=4,
-    result_votes_valid=5,
-    result_votes_total=6,
-    result_turnout=Decimal('20.01'),
-    _result_people_accepted=1,
-    result_people_yeas=8,
-    result_people_nays=9,
-    result_people_yeas_p=Decimal('40.01'),
-    _result_cantons_accepted=1,
-    result_cantons_yeas=Decimal('1.5'),
-    result_cantons_nays=Decimal('24.5'),
-    result_cantons_yeas_p=Decimal('60.01'),
-    _department_in_charge=1,
-    procedure_number=Decimal('24.557'),
-    _position_federal_council=1,
-    _position_parliament=1,
-    _position_national_council=1,
-    position_national_council_yeas=10,
-    position_national_council_nays=20,
-    _position_council_of_states=1,
-    position_council_of_states_yeas=30,
-    position_council_of_states_nays=40,
-    duration_federal_assembly=30,
-    duration_post_federal_assembly=31,
-    duration_initative_collection=32,
-    duration_initative_federal_council=33,
-    duration_initative_total=34,
-    duration_referendum_collection=35,
-    duration_referendum_total=36,
-    signatures_valid=40,
-    signatures_invalid=41,
-    recommendations={
-        'fdp': 1,
-        'cvp': 1,
-        'sps': 1,
-        'svp': 1,
-        'lps': 2,
-        'ldu': 2,
-        'evp': 2,
-        'csp': 3,
-        'pda': 3,
-        'poch': 3,
-        'gps': 4,
-        'sd': 4,
-        'rep': 4,
-        'edu': 5,
-        'fps': 5,
-        'lega': 5,
-        'kvp': 66,
-        'glp': 66,
-        'bdp': None,
-        'mcg': 9999,
-        'sav': 1,
-        'eco': 2,
-        'sgv': 3,
-        'sbv-usp': 3,
-        'sgb': 3,
-        'travs': 3,
-        'vsa': 9999,
-    },
-    recommendations_other_yes="Pro Velo",
-    recommendations_other_no=None,
-    recommendations_other_free="Pro Natura, Greenpeace",
-    recommendations_divergent={
-        'fdp-fr_ch': 2,
-        'jcvp_ch': 2,
-    },
-    national_council_election_year=1990,
-    national_council_share_fdp=Decimal('01.10'),
-    national_council_share_cvp=Decimal('02.10'),
-    national_council_share_sp=Decimal('03.10'),
-    national_council_share_svp=Decimal('04.10'),
-    national_council_share_lps=Decimal('05.10'),
-    national_council_share_ldu=Decimal('06.10'),
-    national_council_share_evp=Decimal('07.10'),
-    national_council_share_csp=Decimal('08.10'),
-    national_council_share_pda=Decimal('09.10'),
-    national_council_share_poch=Decimal('10.10'),
-    national_council_share_gps=Decimal('11.10'),
-    national_council_share_sd=Decimal('12.10'),
-    national_council_share_rep=Decimal('13.10'),
-    national_council_share_edu=Decimal('14.10'),
-    national_council_share_fps=Decimal('15.10'),
-    national_council_share_lega=Decimal('16.10'),
-    national_council_share_kvp=Decimal('17.10'),
-    national_council_share_glp=Decimal('18.10'),
-    national_council_share_bdp=Decimal('19.10'),
-    national_council_share_mcg=Decimal('20.20'),
-    national_council_share_ubrige=Decimal('21.20'),
-    national_council_share_yeas=Decimal('22.20'),
-    national_council_share_nays=Decimal('23.20'),
-    national_council_share_neutral=Decimal('24.20'),
-    national_council_share_none=Decimal('25.20'),
-    national_council_share_empty=Decimal('26.20'),
-    national_council_share_free_vote=Decimal('27.20'),
-    national_council_share_unknown=Decimal('28.20')
-)
 
-
-def test_view_vote(swissvotes_app):
-    swissvotes_app.session().add(
-        SwissVote(**test_vote_data)
-    )
+def test_view_vote(swissvotes_app, sample_vote):
+    swissvotes_app.session().add(sample_vote)
     commit()
 
     client = Client(swissvotes_app)
@@ -154,7 +19,6 @@ def test_view_vote(swissvotes_app):
 
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
-    print(page)
     assert "100.1" in page
     assert "Vote DE" in page
     assert "V D" in page
@@ -333,14 +197,11 @@ def test_view_vote(swissvotes_app):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_deciding_question(swissvotes_app):
-    data = test_vote_data
-    del data['posters_yes_imgs']
-    data['_legal_form'] = 5
+def test_view_deciding_question(swissvotes_app, sample_vote):
+    del sample_vote.posters_yes_imgs
+    sample_vote._legal_form = 5
 
-    swissvotes_app.session().add(
-        SwissVote(**data)
-    )
+    swissvotes_app.session().add(sample_vote)
     commit()
 
     client = Client(swissvotes_app)
@@ -403,7 +264,6 @@ def test_vote_upload(swissvotes_app, attachments):
     for name in names:
         name = name.replace('_', '-')
         url = manage.pyquery(f'a.{name}')[0].attrib['href']
-        print(url)
         page = client.get(
             url).maybe_follow()
         assert page.content_type in (

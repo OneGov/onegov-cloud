@@ -142,6 +142,12 @@ def sample_vote():
     vote.posters_yes_imgs = {
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
+    vote.curia_vista_de = 'cv_de'
+    vote.curia_vista_fr = 'cv_fr'
+    vote.bkresults_de = 'bkr_de'
+    vote.bkresults_fr = 'bkr_fr'
+    vote.bkchrono_de = 'bkc_de'
+    vote.bkchrono_fr = 'bkc_fr'
     vote.swissvoteslink = 'https://example.com/122.0'
     vote.descriptor_1_level_1 = Decimal('4')
     vote.descriptor_1_level_2 = Decimal('4.2')

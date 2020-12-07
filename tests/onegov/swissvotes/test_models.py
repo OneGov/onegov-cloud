@@ -1036,7 +1036,6 @@ def test_recommendations_parties(sample_vote):
 
 def test_sorted_actors_list(sample_vote):
     sorted_actors = sample_vote.sorted_actors_list
-    print(sorted_actors)
     assert sorted_actors
     for i in range(len(sorted_actors) - 2):
         actor = sorted_actors[i]

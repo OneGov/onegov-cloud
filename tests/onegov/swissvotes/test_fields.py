@@ -121,7 +121,6 @@ class Test_swisscotes_dataset_field:
         worksheet.write_row(0, 0, columns)
         worksheet.write_row(1, 0, columns)
         workbook.close()
-        workbook.close()
         file.seek(0)
 
         field_storage = self.get_field_storage()
