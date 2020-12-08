@@ -145,9 +145,9 @@
                     <tr><th colspan="2" i18n:translate>Parliamentary phase</th></tr>
                 </thead>
                 <tbody>
-                    <tr tal:condition="vote.procedure_number is not None">
+                    <tr tal:condition="vote.procedure_number">
                         <th class="column-30" i18n:translate>Procedure number</th>
-                        <td>${layout.format_procedure_number(vote.procedure_number)}</td>
+                        <td>${vote.procedure_number}</td>
                     </tr>
                     <tr tal:condition="parliamentary_debate or curiavista">
                         <th class="column-30" i18n:translate>Parliamentary debate</th>

@@ -381,7 +381,7 @@ def sample_vote():
     vote.result_zh_nays = 107
     vote.result_zh_yeas_p = Decimal('10.80')
     vote._department_in_charge = 1
-    vote.procedure_number = Decimal('24.557')
+    vote.procedure_number = '24.557'
     vote._position_federal_council = 1
     vote._position_parliament = 1
     vote._position_national_council = 1

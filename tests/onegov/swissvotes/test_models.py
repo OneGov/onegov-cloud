@@ -601,7 +601,7 @@ def test_vote(session, sample_vote):
     assert vote._department_in_charge == 1
     assert vote.department_in_charge == \
         "Federal Department of Foreign Affairs (FDFA)"
-    assert vote.procedure_number == Decimal('24.557')
+    assert vote.procedure_number == '24.557'
     assert vote._position_federal_council == 1
     assert vote.position_federal_council == "Accepting"
     assert vote._position_parliament == 1

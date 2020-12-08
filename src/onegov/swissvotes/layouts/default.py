@@ -163,18 +163,3 @@ class DefaultLayout(ChameleonLayout):
         decimal, group = self.number_symbols(locale)
         result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
         return result.translate({ord(','): group, ord('.'): decimal})
-
-    def format_procedure_number(self, number):
-        """ There are two different formats for the procedure number: a plain
-        sequence number before 1974/75 and a sequence number prefixed with the
-        year.
-
-        The first one is in the range (1, ~12500) and stored as decimal without
-        a decimal place. The second one is in the range (~74000, n) and stored
-        as decimal / 1000.
-        """
-        if number is None:
-            return ''
-        if number.to_integral_value() == number:
-            return str(number.to_integral_value())
-        return self.format_number(number, 3, '06')

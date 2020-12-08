@@ -597,7 +597,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     # Authorities
     _department_in_charge = Column('department_in_charge', Integer)
     department_in_charge = encoded_property()
-    procedure_number = Column(Numeric(8, 3))
+    procedure_number = Column(Text)
     _position_federal_council = Column('position_federal_council', Integer)
     position_federal_council = encoded_property()
     _position_parliament = Column('position_parliament', Integer)

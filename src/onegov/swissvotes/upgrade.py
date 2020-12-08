@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from decimal import Decimal
 from onegov.core.orm import as_selectable
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
@@ -344,3 +345,22 @@ def add_swissvoteslink(context):
         context.operations.add_column(
             'swissvotes', Column('swissvoteslink', Text())
         )
+
+
+@upgrade_task('Changes procedure number type to text')
+def change_procedure_number_type(context):
+    def format_procedure_number(number):
+        if not number:
+            return ''
+        if '_' in number:
+            return number
+        number = Decimal(number)
+        if number.to_integral_value() == number:
+            return str(number.to_integral_value())
+        return '{:06,.3f}'.format(number)
+
+    context.operations.execute(
+        'ALTER TABLE swissvotes ALTER COLUMN procedure_number TYPE TEXT'
+    )
+    for vote in context.app.session().query(SwissVote):
+        vote.procedure_number = format_procedure_number(vote.procedure_number)

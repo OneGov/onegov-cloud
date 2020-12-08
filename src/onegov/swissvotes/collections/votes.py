@@ -281,7 +281,8 @@ class SwissVoteCollection(Pagination):
                 if part.replace('.', '').isnumeric():
                     number = Decimal(part)
                     result.append(SwissVote.bfs_number == number)
-                    result.append(SwissVote.procedure_number == number)
+                if part.replace('.', '').replace('_', '').isnumeric():
+                    result.append(SwissVote.procedure_number == part)
 
         return result
 

@@ -215,24 +215,33 @@ def test_votes_term_filter(swissvotes_app):
     c_text_de = 'swissvotes."searchable_text_de_CH"'
     c_text_fr = 'swissvotes."searchable_text_fr_CH"'
 
-    assert compiled(term='100') == [
-        'swissvotes.bfs_number = 100',
-        'swissvotes.procedure_number = 100',
-        f"{c_title_de} @@ to_tsquery('german', '100')",
-        f"{c_title_fr} @@ to_tsquery('french', '100')",
-        f"{c_short_title_de} @@ to_tsquery('german', '100')",
-        f"{c_short_title_fr} @@ to_tsquery('french', '100')",
-        f"{c_keyword} @@ to_tsquery('german', '100')",
+    assert compiled(term='987') == [
+        'swissvotes.bfs_number = 987',
+        "swissvotes.procedure_number = '987'",
+        f"{c_title_de} @@ to_tsquery('german', '987')",
+        f"{c_title_fr} @@ to_tsquery('french', '987')",
+        f"{c_short_title_de} @@ to_tsquery('german', '987')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '987')",
+        f"{c_keyword} @@ to_tsquery('german', '987')",
     ]
 
-    assert compiled(term='100.1') == [
-        'swissvotes.bfs_number = 100.1',
-        'swissvotes.procedure_number = 100.1',
-        f"{c_title_de} @@ to_tsquery('german', '100.1')",
-        f"{c_title_fr} @@ to_tsquery('french', '100.1')",
-        f"{c_short_title_de} @@ to_tsquery('german', '100.1')",
-        f"{c_short_title_fr} @@ to_tsquery('french', '100.1')",
-        f"{c_keyword} @@ to_tsquery('german', '100.1')",
+    assert compiled(term='17.060') == [
+        'swissvotes.bfs_number = 17.060',
+        "swissvotes.procedure_number = '17.060'",
+        f"{c_title_de} @@ to_tsquery('german', '17.060')",
+        f"{c_title_fr} @@ to_tsquery('french', '17.060')",
+        f"{c_short_title_de} @@ to_tsquery('german', '17.060')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '17.060')",
+        f"{c_keyword} @@ to_tsquery('german', '17.060')",
+    ]
+
+    assert compiled(term='1893_002') == [
+        "swissvotes.procedure_number = '1893_002'",
+        f"{c_title_de} @@ to_tsquery('german', '1893002')",
+        f"{c_title_fr} @@ to_tsquery('french', '1893002')",
+        f"{c_short_title_de} @@ to_tsquery('german', '1893002')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '1893002')",
+        f"{c_keyword} @@ to_tsquery('german', '1893002')",
     ]
 
     assert compiled(term='abc') == [
@@ -1055,7 +1064,7 @@ def test_votes_export(swissvotes_app):
     vote.result_zh_yeas_p = Decimal('10.80')
     vote._result_zh_accepted = 0
     vote._department_in_charge = 1
-    vote.procedure_number = Decimal('24.557')
+    vote.procedure_number = '24.557'
     vote._position_federal_council = 1
     vote._position_parliament = 1
     vote._position_national_council = 1
@@ -1806,7 +1815,7 @@ def test_votes_export(swissvotes_app):
         'zh-nein': '107',
         'zh-stimmen': '103',
         'dep': '1',
-        'gesch_nr': '24,557',
+        'gesch_nr': '24.557',
         'br-pos': '1',
         'bv-pos': '1',
         'nr-pos': '1',
@@ -2556,7 +2565,7 @@ def test_votes_export(swissvotes_app):
         'zh-nein': 107.0,
         'zh-stimmen': 103.0,
         'dep': 1.0,
-        'gesch_nr': 24.557,
+        'gesch_nr': '24.557',
         'br-pos': 1.0,
         'bv-pos': 1.0,
         'nr-pos': 1.0,
