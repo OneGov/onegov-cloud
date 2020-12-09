@@ -94,14 +94,16 @@ class SharedMethods(object):
 
         return uuid5(self.id, request.browser_session.libres_session_id.hex)
 
-    def reservations_with_tickets_query(self, start, end):
+    def reservations_with_tickets_query(self, start=None, end=None):
         """ Returns a query which joins this resource's reservations between
         start and end with the tickets table.
 
         """
         query = self.scheduler.managed_reservations()
-        query = query.filter(start <= Reservation.start)
-        query = query.filter(Reservation.end <= end)
+        if start:
+            query = query.filter(start <= Reservation.start)
+        if end:
+            query = query.filter(Reservation.end <= end)
 
         query = query.join(
             Ticket, Reservation.token == cast(Ticket.handler_id, UUID))
