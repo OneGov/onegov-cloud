@@ -1109,6 +1109,66 @@ def test_resources(client):
     assert client.delete(delete_link, status=200)
 
 
+def add_reservation(
+        resource,
+        client,
+        start,
+        end,
+        email=None,
+        partly_available=True,
+        reserve=True,
+        approve=True,
+        add_ticket=True
+):
+    if not email:
+        email = f'{resource.name}@example.org'
+
+    allocation = resource.scheduler.allocate(
+        (start, end),
+        partly_available=partly_available,
+    )[0]
+
+    if reserve:
+        resource_token = resource.scheduler.reserve(
+            email,
+            (allocation.start, allocation.end),
+        )
+
+    if reserve and approve:
+        resource.scheduler.approve_reservations(resource_token)
+        if add_ticket:
+            with client.app.session().no_autoflush:
+                tickets = TicketCollection(client.app.session())
+                ticket = tickets.open_ticket(
+                    handler_code='RSV', handler_id=resource_token.hex
+                )
+    return resource
+
+
+def test_resource_room_deletion(client):
+
+    # TicketMessage.create(ticket, request, 'opened')
+    resources = ResourceCollection(client.app.libres_context)
+    foyer = resources.add('Foyer', 'Europe/Zurich', type='room')
+
+    # Adds allocations and reservations in the past
+    add_reservation(
+        foyer, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+    assert foyer.deletable
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/resources').click('Foyer')
+    delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
+    assert delete_link
+    assert client.delete(delete_link, status=200)
+
+    # check if the tickets have been closed
+    tickets = TicketCollection(client.app.session())
+    ticket = tickets.query().one()
+    assert ticket.state == 'closed'
+
+
 def test_reserved_resources_fields(client):
     client.login_admin()
 
