@@ -3,6 +3,7 @@ import transaction
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
+from onegov.org.models.resource import RoomResource
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
@@ -177,8 +178,9 @@ def test_ticket_statistics(org_app, smtp, handlers):
 
 def test_daily_reservation_overview(org_app, smtp):
     resources = ResourceCollection(org_app.libres_context)
-    gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='rooms')
-    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypasses')
+    gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
+    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+    assert isinstance(gymnasium, RoomResource)
 
     gymnasium.definition = """
         Name = ___
