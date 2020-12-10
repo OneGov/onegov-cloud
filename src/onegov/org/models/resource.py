@@ -1,6 +1,9 @@
 import sedate
 
 from datetime import datetime
+
+from libres.db.models import ReservedSlot
+
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
@@ -172,3 +175,14 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
 
     # used to render the reservation title
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
+
+    @property
+    def deletable(self):
+        if self.future_managed_reserved_slots.first():
+            return False
+
+        if self.future_managed_reservations.first():
+            return False
+
+        return True
+
