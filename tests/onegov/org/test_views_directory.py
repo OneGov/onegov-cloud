@@ -465,5 +465,14 @@ def test_directory_visibility(client):
     session.flush()
     transaction.commit()
 
-    assert "Soccer" in client.get('/directories/clubs')
-    assert "Soccer" not in anon.get('/directories/clubs')
+    # tests the links in the view as well
+    page = client.get('/directories').click('Clubs')
+    assert "Soccer" in page
+    assert 'published_ony' not in page.request.url
+
+    page = anon.get('/directories').click('Clubs')
+    assert "Soccer" not in page
+    assert 'published_only=1' in page.request.url
+    # tests that we still trigger published_only to hide the entry
+    # not adding the url kwarg
+    assert 'Soccer' not in anon.get('/directories/clubs')
