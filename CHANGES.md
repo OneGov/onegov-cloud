@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2020.86`
+
+> commits: **13 / [8a4db45342...a111a069c4](https://github.com/OneGov/onegov-cloud/compare/8a4db45342^...a111a069c4)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.86)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Allows deleting room resources with past reservations**
+
+**`Feature`** | **[ZW-278](https://kanton-zug.atlassian.net/browse/ZW-278)** | **[4557a539e7](https://github.com/onegov/onegov-cloud/commit/4557a539e79216dac28fd7665a3746f26ad531e7)**
+
+### Swissvotes
+
+🎉 **Allow another procedure number format.**
+
+**`Feature`** | **[VOTES-77](https://issues.seantis.ch/browse/VOTES-77)** | **[c3229dcd8e](https://github.com/onegov/onegov-cloud/commit/c3229dcd8e9debae74785b294fa467bf5a8d91c4)**
+
 ## Release `2020.85`
 
-> commits: **13 / [f5f6655050...14b91f772f](https://github.com/OneGov/onegov-cloud/compare/f5f6655050^...14b91f772f)**  
+> released: **2020-12-07 11:58**<br>
+> commits: **14 / [f5f6655050...cf99c9d51f](https://github.com/OneGov/onegov-cloud/compare/f5f6655050^...cf99c9d51f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.85)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
