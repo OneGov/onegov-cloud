@@ -33,6 +33,16 @@ class SharedMethods(object):
         return True
 
     @property
+    def future_managed_reservations(self):
+        return self.scheduler.managed_reservations().filter(
+            Reservation.end >= sedate.utcnow())
+
+    @property
+    def future_managed_reserved_slots(self):
+        return self.scheduler.managed_reserved_slots().filter(
+            ReservedSlot.end >= sedate.utcnow())
+
+    @property
     def calendar_date_range(self):
         """ Returns the date range set by the fullcalendar specific params. """
 
