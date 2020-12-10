@@ -284,6 +284,7 @@ def test_directory_submissions(client, postgres):
     page = page.form.submit()
 
     assert "error" in page
+    assert len(client.app.smtp.outbox) == 0
 
     # add the missing field
     page.form['name'] = 'Washingtom Monument'
@@ -307,6 +308,7 @@ def test_directory_submissions(client, postgres):
     page = page.form.submit().follow()
 
     assert "DIR-" in page
+    assert len(client.app.smtp.outbox) == 1
 
     # the submission has not yet resulted in an entry
     assert 'Washington' not in client.get('/directories/points-of-interest')
@@ -327,6 +329,7 @@ def test_directory_submissions(client, postgres):
     accept_url = page.pyquery('.accept-link').attr('ic-post-to')
     client.post(accept_url)
     assert 'Washington' in client.get('/directories/points-of-interest')
+    assert len(client.app.smtp.outbox) == 2
 
     # When accepting the the entry, add a directory file with same reference
     formfile = client.app.session().query(FormFile).one()
