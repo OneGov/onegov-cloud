@@ -4115,55 +4115,6 @@ def test_switch_languages(client):
     assert 'Deutsch' not in page
 
 
-def test_directory_visibility(client):
-
-    client.login_admin()
-
-    page = client.get('/directories')
-    assert 'Noch keine Verzeichnisse' in page
-
-    page = page.click('Verzeichnis')
-    page.form['title'] = "Clubs"
-    page.form['lead'] = 'The famous club directory'
-    page.form['structure'] = """
-        Name *= ___
-    """
-    page.form['title_format'] = '[Name]'
-    page.form.submit()
-
-    page = client.get('/directories/clubs')
-    page = page.click('Eintrag', index=0)
-    page.form['name'] = 'Soccer Club'
-    page.form.submit()
-
-    anon = client.spawn()
-    assert "Clubs" in anon.get('/directories')
-    page = anon.get('/directories/clubs')
-    assert "Soccer" in page
-    assert 'The famous club directory' in page
-    assert "Soccer" in anon.get('/directories/clubs/soccer-club')
-
-    page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
-    page.form['access'] = 'private'
-    page.form.submit()
-
-    assert "Clubs" in anon.get('/directories')
-    assert "Soccer" not in anon.get('/directories/clubs')
-    assert anon.get('/directories/clubs/soccer-club', status=403)
-
-    page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
-    page.form['access'] = 'public'
-    page.form.submit()
-
-    page = client.get('/directories/clubs').click("Konfigurieren")
-    page.form['access'] = 'private'
-    page.form.submit()
-
-    assert "Clubs" not in anon.get('/directories')
-    assert anon.get('/directories/clubs', status=403)
-    assert anon.get('/directories/clubs/soccer-club')
-
-
 def test_dependent_number_form(client):
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
