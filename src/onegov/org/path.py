@@ -555,6 +555,9 @@ def get_directory_entries(
     else:
         searchwidget = None
 
+    if not published_only and not request.is_manager:
+        published_only = True
+
     if directory:
         collection = ExtendedDirectoryEntryCollection(
             directory=directory,
