@@ -161,8 +161,13 @@ class Auth(object):
 
         # only built-in users currently support second factors
         if source is None:
-            if not self.is_valid_second_factor(user, second_factor):
-                return fail()
+            try:
+                if not self.is_valid_second_factor(user, second_factor):
+                    return fail()
+            except Exception as e:
+                log.info(f'Second factor exception for user {user.username}: '
+                         f'{e.args[0]}')
+                return None
 
         # users from external authentication providers may not login using
         # a regular login - if for some reason the source is false (if the
