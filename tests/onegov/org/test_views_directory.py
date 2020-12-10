@@ -1,7 +1,6 @@
 from datetime import timedelta, datetime
 
 import transaction
-from freezegun import freeze_time
 from pytz import UTC
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from webtest import Upload
@@ -454,3 +453,17 @@ def test_directory_visibility(client):
     assert "Clubs" not in anon.get('/directories')
     assert anon.get('/directories/clubs', status=403)
     assert anon.get('/directories/clubs/soccer-club')
+
+    page = client.get('/directories/clubs').click("Konfigurieren")
+    page.form['access'] = 'public'
+    page.form.submit()
+
+    transaction.begin()
+    session = client.app.session()
+    entry = session.query(ExtendedDirectoryEntry).one()
+    entry.publication_end = (utcnow() - timedelta(minutes=5))
+    session.flush()
+    transaction.commit()
+
+    assert "Soccer" in client.get('/directories/clubs')
+    assert "Soccer" not in anon.get('/directories/clubs')
