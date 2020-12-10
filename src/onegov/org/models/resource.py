@@ -185,4 +185,3 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
             return False
 
         return True
-
