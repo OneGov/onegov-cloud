@@ -70,13 +70,15 @@ def swissvotes_app(request, temporary_path):
 def attachments(swissvotes_app):
     result = {}
     for name, content in (
-        ('preliminary_examination', "Voruntersuchung"),
-        ('post_vote_poll', "Nachbefragung"),
-        ('foeg_analysis', "Medienanalyse fög"),
         ('ad_analysis', "Inserateanalyse"),
         ('brief_description', "Kurschbeschreibung"),
         ('federal_council_message', "Message du Conseil fédéral"),
+        ('foeg_analysis', "Medienanalyse fög"),
         ('parliamentary_debate', "Parlamentdebatte"),
+        ('post_vote_poll_codebook', "Codebuch"),
+        ('post_vote_poll_methodology', "Methodenbeschrieb"),
+        ('post_vote_poll', "Nachbefragung"),
+        ('preliminary_examination', "Voruntersuchung"),
         ('realization', "Réalisation"),
         ('resolution', "Arrêté constatant le résultat"),
         ('voting_booklet', "Brochure explicative"),
@@ -93,9 +95,7 @@ def attachments(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
-    for name in (
-        'results_by_domain',
-    ):
+    for name in ('results_by_domain',):
         file = BytesIO()
         workbook = Workbook(file)
         worksheet = workbook.add_worksheet('DATA')
@@ -108,7 +108,50 @@ def attachments(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
+    for name in ('post_vote_poll_dataset',):
+        file = BytesIO()
+        file.write(b'a,b\n100,200')
+
+        attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
     yield result
+
+
+@fixture(scope="function")
+def attachment_urls():
+    yield {
+        'de_CH': {
+            'ad_analysis': 'inserateanalyse.pdf',
+            'brief_description': 'kurzbeschreibung.pdf',
+            'federal_council_message': 'botschaft-de.pdf',
+            'foeg_analysis': 'medienanalyse.pdf',
+            'parliamentary_debate': 'parlamentsberatung.pdf',
+            'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
+            'post_vote_poll_dataset': 'nachbefragung.csv',
+            'post_vote_poll_methodology': 'nachbefragung-methode-de.pdf',
+            'post_vote_poll': 'nachbefragung-de.pdf',
+            'preliminary_examination': 'vorpruefung-de.pdf',
+            'realization': 'zustandekommen-de.pdf',
+            'resolution': 'erwahrung-de.pdf',
+            'results_by_domain': 'staatsebenen.xlsx',
+            'voting_booklet': 'brochure-de.pdf',
+            'voting_text': 'abstimmungstext-de.pdf',
+        },
+        'fr_CH': {
+            'federal_council_message': 'botschaft-fr.pdf',
+            'post_vote_poll_codebook': 'nachbefragung-codebuch-fr.pdf',
+            'post_vote_poll_methodology': 'nachbefragung-methode-fr.pdf',
+            'post_vote_poll': 'nachbefragung-fr.pdf',
+            'preliminary_examination': 'vorpruefung-fr.pdf',
+            'realization': 'zustandekommen-fr.pdf',
+            'resolution': 'erwahrung-fr.pdf',
+            'voting_booklet': 'brochure-fr.pdf',
+            'voting_text': 'abstimmungstext-fr.pdf',
+        },
+        'en_US': {}
+    }
 
 
 @fixture(scope="function")
@@ -149,6 +192,9 @@ def sample_vote():
     vote.bkchrono_de = 'bkc_de'
     vote.bkchrono_fr = 'bkc_fr'
     vote.swissvoteslink = 'https://example.com/122.0'
+    vote.post_vote_poll_link_de = 'https://post.vote.poll/de'
+    vote.post_vote_poll_link_fr = 'https://post.vote.poll/fr'
+    vote.post_vote_poll_link_en = 'https://post.vote.poll/en'
     vote.descriptor_1_level_1 = Decimal('4')
     vote.descriptor_1_level_2 = Decimal('4.2')
     vote.descriptor_1_level_3 = Decimal('4.21')

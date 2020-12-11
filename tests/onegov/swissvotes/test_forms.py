@@ -111,6 +111,8 @@ def test_attachments_form(swissvotes_app, attachments):
         assert data['size']
         assert data['filename'] == name
         assert data['mimetype'] in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',
@@ -125,6 +127,8 @@ def test_attachments_form(swissvotes_app, attachments):
         assert file == attachments[name]
         assert file.reference.filename == name
         assert file.reference.content_type in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',

@@ -364,3 +364,15 @@ def change_procedure_number_type(context):
     )
     for vote in context.app.session().query(SwissVote):
         vote.procedure_number = format_procedure_number(vote.procedure_number)
+
+
+@upgrade_task('Adds post-vote poll links', always_run=True)
+def add_post_vote_poll_links(context):
+    columns = (
+        'post_vote_poll_link_de',
+        'post_vote_poll_link_fr',
+        'post_vote_poll_link_en'
+    )
+    for column in columns:
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text()))

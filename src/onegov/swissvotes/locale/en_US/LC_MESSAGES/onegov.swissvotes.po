@@ -1,7 +1,7 @@
 # This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-12-04 14:54+0100\n"
+"POT-Creation-Date: 2020-12-08 10:03+0100\n"
 "PO-Revision-Date: 2020-12-04 15:22+0100\n"
 "Language: en_US\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1629,6 +1629,21 @@ msgstr "Interactive map by the Swiss Federal Statistical Office"
 
 msgid "Display the map"
 msgstr "Display the map"
+
+msgid "Full analysis of post-vote poll results"
+msgstr "Full analysis of post-vote poll results"
+
+msgid "Cockpit with selected results"
+msgstr "Cockpit with selected results"
+
+msgid "Methodology of the post-vote poll"
+msgstr "Methodology description of the poll"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Dataset of the post-vote poll"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Codebook for the post-vote poll"
 
 msgid "Filter"
 msgstr "Filter"

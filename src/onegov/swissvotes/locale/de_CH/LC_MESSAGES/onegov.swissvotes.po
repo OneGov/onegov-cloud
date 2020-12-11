@@ -1,12 +1,17 @@
 # This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-12-04 14:54+0100\n"
-"PO-Revision-Date: 2020-12-04 15:22+0100\n"
+"POT-Creation-Date: 2020-12-08 10:03+0100\n"
+"PO-Revision-Date: 2020-12-08 10:13+0100\n"
 "Language: de_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+"Project-Id-Version: \n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"X-Generator: Poedit 2.4.2\n"
 
 msgid "Not a valid XLSX file."
 msgstr "Keine gültige XLSX-Datei."
@@ -907,7 +912,7 @@ msgid "d-3-442"
 msgstr "Hotellerie und Gastgewerbe"
 
 msgid "d-3-443"
-msgstr "Geldspiele "
+msgstr "Geldspiele"
 
 msgid "d-1-5"
 msgstr "Landwirtschaft"
@@ -1637,6 +1642,21 @@ msgstr "Interaktive Karte des Bundesamts für Statistik"
 
 msgid "Display the map"
 msgstr "Karte anzeigen"
+
+msgid "Full analysis of post-vote poll results"
+msgstr "Analysebericht Nachbefragung"
+
+msgid "Cockpit with selected results"
+msgstr "Cockpit mit Analyseergebnissen"
+
+msgid "Methodology of the post-vote poll"
+msgstr "Methodenbeschrieb zur Nachbefragung"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Datensatz der Nachbefragung"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Codebuch zur Nachbefragung"
 
 msgid "Filter"
 msgstr "Filtern"

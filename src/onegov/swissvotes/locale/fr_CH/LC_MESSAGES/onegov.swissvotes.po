@@ -1,7 +1,7 @@
 # This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-12-04 14:54+0100\n"
+"POT-Creation-Date: 2020-12-08 10:03+0100\n"
 "PO-Revision-Date: 2020-12-04 15:22+0100\n"
 "Language: fr_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1640,6 +1640,21 @@ msgstr "Carte interactive de l’Office fédéral de la statistique"
 
 msgid "Display the map"
 msgstr "Présenter la carte"
+
+msgid "Full analysis of post-vote poll results"
+msgstr "Rapport d'analyse de l'enquête post-votation"
+
+msgid "Cockpit with selected results"
+msgstr "Cockpit avec des résultats d'analyse"
+
+msgid "Methodology of the post-vote poll"
+msgstr "Description de la méthode de l'enquête"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Jeu de données de l'enquête"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Liste des codes de l’enquête"
 
 msgid "Filter"
 msgstr "Filtre de recherche"

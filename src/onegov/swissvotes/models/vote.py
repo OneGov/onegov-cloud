@@ -216,6 +216,20 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     posters_yes_imgs = meta_property()
     posters_no_imgs = meta_property()
 
+    # Post-vote poll
+    post_vote_poll_link_de = Column(Text)
+    post_vote_poll_link_fr = Column(Text)
+    post_vote_poll_link_en = Column(Text)
+
+    @property
+    def post_vote_poll_link(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.post_vote_poll_link_fr
+        elif self.session_manager.current_locale == 'en_US':
+            return self.post_vote_poll_link_en
+        else:
+            return self.post_vote_poll_link_de
+
     def poster_links(self, answer):
         assert answer in ('yes', 'no')
         if answer == 'yes':
@@ -257,15 +271,26 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         except ValueError:
             pass
 
-    def bk_results(self, locale):
-        return self.bkresults_fr if locale == 'fr_CH' else self.bkresults_de
+    @property
+    def bk_results(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.bkresults_fr
+        else:
+            return self.bkresults_de
 
-    def bk_chrono(self, locale):
-        return self.bkchrono_fr if locale == 'fr_CH' else self.bkchrono_de
+    @property
+    def bk_chrono(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.bkchrono_fr
+        else:
+            return self.bkchrono_de
 
-    def curiavista(self, locale):
-        return self.curia_vista_fr if locale == 'fr_CH' \
-            else self.curia_vista_de
+    @property
+    def curiavista(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.curia_vista_fr
+        else:
+            return self.curia_vista_de
 
     # Descriptor
     descriptor_1_level_1 = Column(Numeric(8, 4))
@@ -800,6 +825,9 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     results_by_domain = LocalizedFile()
     foeg_analysis = LocalizedFile()
     post_vote_poll = LocalizedFile()
+    post_vote_poll_methodology = LocalizedFile()
+    post_vote_poll_dataset = LocalizedFile()
+    post_vote_poll_codebook = LocalizedFile()
     preliminary_examination = LocalizedFile()
 
     # searchable attachment texts

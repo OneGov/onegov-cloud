@@ -292,13 +292,6 @@ def test_vote(session, sample_vote):
 
     assert vote.title == "Vote DE"
     assert vote.short_title == "V D"
-    vote.session_manager.current_locale = 'fr_CH'
-    assert vote.title == "Vote FR"
-    assert vote.short_title == "V F"
-    vote.session_manager.current_locale = 'en_US'
-    assert vote.title == "Vote DE"
-    assert vote.short_title == "V D"
-    vote.session_manager.current_locale = 'de_CH'
 
     assert vote.keyword == "Keyword"
     assert vote.votes_on_same_day == 2
@@ -336,6 +329,29 @@ def test_vote(session, sample_vote):
     }
     assert vote.posters_no_imgs is None
     assert vote.swissvoteslink == 'https://example.com/122.0'
+    assert vote.bk_chrono == 'bkc_de'
+    assert vote.bk_results == 'bkr_de'
+    assert vote.curiavista == 'cv_de'
+    assert vote.post_vote_poll_link == 'https://post.vote.poll/de'
+
+    # localized properties
+    vote.session_manager.current_locale = 'fr_CH'
+    assert vote.title == "Vote FR"
+    assert vote.short_title == "V F"
+    assert vote.bk_chrono == 'bkc_fr'
+    assert vote.bk_results == 'bkr_fr'
+    assert vote.curiavista == 'cv_fr'
+    assert vote.post_vote_poll_link == 'https://post.vote.poll/fr'
+
+    vote.session_manager.current_locale = 'en_US'
+    assert vote.title == "Vote DE"
+    assert vote.short_title == "V D"
+    assert vote.bk_chrono == 'bkc_de'
+    assert vote.bk_results == 'bkr_de'
+    assert vote.curiavista == 'cv_de'
+    assert vote.post_vote_poll_link == 'https://post.vote.poll/en'
+
+    vote.session_manager.current_locale = 'de_CH'
 
     assert vote.descriptor_1_level_1 == Decimal('4')
     assert vote.descriptor_1_level_2 == Decimal('4.2')
@@ -865,13 +881,21 @@ def test_vote_attachments(swissvotes_app, attachments):
     session.flush()
 
     vote = session.query(SwissVote).one()
-    assert vote.voting_text is None
+    assert vote.ad_analysis is None
+    assert vote.brief_description is None
     assert vote.federal_council_message is None
+    assert vote.foeg_analysis is None
     assert vote.parliamentary_debate is None
-    assert vote.voting_booklet is None
-    assert vote.resolution is None
+    assert vote.post_vote_poll is None
+    assert vote.post_vote_poll_codebook is None
+    assert vote.post_vote_poll_dataset is None
+    assert vote.post_vote_poll_methodology is None
+    assert vote.preliminary_examination is None
     assert vote.realization is None
+    assert vote.resolution is None
     assert vote.results_by_domain is None
+    assert vote.voting_booklet is None
+    assert vote.voting_text is None
     assert vote.files == []
     assert vote.searchable_text_de_CH is None
     assert vote.searchable_text_fr_CH is None

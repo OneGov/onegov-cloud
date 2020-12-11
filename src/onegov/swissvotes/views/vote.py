@@ -37,23 +37,6 @@ def view_vote(self, request):
 
     return {
         'layout': layout,
-        'brief_description': layout.get_file_url('brief_description'),
-        'voting_text': layout.get_file_url('voting_text'),
-        'federal_council_message': layout.get_file_url(
-            'federal_council_message'),
-        'parliamentary_debate': layout.get_file_url('parliamentary_debate'),
-        'voting_booklet': layout.get_file_url('voting_booklet'),
-        'resolution': layout.get_file_url('resolution'),
-        'realization': layout.get_file_url('realization'),
-        'ad_analysis': layout.get_file_url('ad_analysis'),
-        'foeg_analysis': layout.get_file_url('foeg_analysis'),
-        'post_vote_poll': layout.get_file_url('post_vote_poll'),
-        'preliminary_examination': layout.get_file_url(
-            'preliminary_examination'),
-        'bkchrono': self.bk_chrono(request.locale),
-        'bkresults': self.bk_results(request.locale),
-        'curiavista': self.curiavista(request.locale),
-        'results_by_domain': layout.get_file_url('results_by_domain'),
         'bfs_map': bfs_map,
         'prev': prev,
         'next': next,
@@ -260,6 +243,66 @@ def post_vote_poll_de_static(self, request):
 )
 def post_vote_poll_fr_static(self, request):
     file = self.get_file_by_locale('post_vote_poll', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='nachbefragung-methode-de.pdf'
+)
+def post_vote_poll_methodology_de_static(self, request):
+    file = self.get_file_by_locale('post_vote_poll_methodology', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='nachbefragung-methode-fr.pdf'
+)
+def post_vote_poll_methodology_fr_static(self, request):
+    file = self.get_file_by_locale('post_vote_poll_methodology', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='nachbefragung.csv'
+)
+def post_vote_poll_dataset_static(self, request):
+    file = self.get_file('post_vote_poll_dataset', request)
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='nachbefragung-codebuch-de.pdf'
+)
+def post_vote_poll_codebook_de_static(self, request):
+    file = self.get_file_by_locale('post_vote_poll_codebook', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='nachbefragung-codebuch-fr.pdf'
+)
+def post_vote_poll_codebook_fr_static(self, request):
+    file = self.get_file_by_locale('post_vote_poll_codebook', 'fr_CH')
     if not file:
         raise HTTPNotFound()
     return request.redirect(request.link(file))
@@ -531,22 +574,30 @@ def view_file(self, request):
     def set_filename(response):
         bfs_number = self.linked_swissvotes[0].bfs_number
         name = self.name.split('-')[0]
-        extension = {'results_by_domain': 'xlsx'}.get(name, 'pdf')
+        extension = {
+            'results_by_domain': 'xlsx',
+            'post_vote_poll_dataset': 'csv'
+        }.get(name, 'pdf')
         title = {
-            'voting_text': _("Voting text"),
-            'brief_description': _("Brief description Swissvotes"),
-            'realization': _("Realization"),
-            'federal_council_message': _("Federal council message"),
-            'parliamentary_debate': _("Parliamentary debate"),
-            'voting_booklet': _("Voting booklet"),
             'ad_analysis': _("Analysis of the advertising campaign"),
+            'brief_description': _("Brief description Swissvotes"),
+            'federal_council_message': _("Federal council message"),
             'foeg_analysis': _("Media coverage: fög analysis"),
-            'post_vote_poll': _("Post-vote poll"),
+            'parliamentary_debate': _("Parliamentary debate"),
+            'post_vote_poll_codebook': _("Codebook for the post-vote poll"),
+            'post_vote_poll_methodology': _(
+                "Methodology of the post-vote poll"
+            ),
+            'post_vote_poll_dataset': _("Dataset of the post-vote poll"),
+            'post_vote_poll': _("Full analysis of post-vote poll results"),
             'preliminary_examination': _("Preliminary examination"),
+            'realization': _("Realization"),
             'resolution': _("Resolution"),
             'results_by_domain': _(
                 "Result by canton, district and municipality"
-            )
+            ),
+            'voting_booklet': _("Voting booklet"),
+            'voting_text': _("Voting text"),
         }.get(name, '')
         title = normalize_for_url(request.translate(title))
         response.headers['Content-Disposition'] = (

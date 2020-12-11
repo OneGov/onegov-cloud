@@ -25,6 +25,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from psycopg2.extras import NumericRange
+from pytest import mark
 
 
 class DummyPrincipal(object):
@@ -408,6 +409,39 @@ def test_layout_vote(swissvotes_app):
         'SwissVote/upload',
         'SwissVote/delete',
     ]
+
+
+@mark.parametrize('locale', ('de_CH', 'fr_CH', 'en_US'))
+def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
+                               locale):
+    session = swissvotes_app.session()
+    request = DummyRequest()
+    request.app = swissvotes_app
+    model = SwissVote(
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="Vote D",
+        short_title_fr="Vote F",
+        bfs_number=Decimal('100'),
+        date=date(1990, 6, 2),
+        legislation_number=10,
+        legislation_decade=NumericRange(1990, 1994),
+        votes_on_same_day=2,
+        _legal_form=1
+    )
+    model.session_manager.current_locale = locale
+    for name, attachment in attachments.items():
+        setattr(model, name, attachment)
+    session.add(model)
+    session.flush()
+
+    layout = VoteLayout(model, request)
+    for attachment in attachments:
+        filename = (
+            attachment_urls.get(locale, {}).get(attachment)
+            or attachment_urls['de_CH'][attachment]  # fallback
+        )
+        assert layout.attachments[attachment] == f'SwissVote/{filename}'
 
 
 def test_layout_vote_strengths(swissvotes_app):

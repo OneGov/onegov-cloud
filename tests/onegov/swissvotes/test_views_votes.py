@@ -9,10 +9,8 @@ from xlrd import open_workbook
 from xlsxwriter.workbook import Workbook
 
 
-@mark.parametrize("file", [
-    module_path(
-        'tests.onegov.swissvotes',
-        'fixtures/votes_2020_04_05_mit_Plakaten.xlsx'),
+@mark.parametrize('file', [
+    module_path('tests.onegov.swissvotes', 'fixtures/dataset.xlsx'),
 ])
 def test_update_votes(swissvotes_app, file):
     client = Client(swissvotes_app)

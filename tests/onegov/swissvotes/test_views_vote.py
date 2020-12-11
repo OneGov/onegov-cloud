@@ -268,6 +268,8 @@ def test_vote_upload(swissvotes_app, attachments):
         page = client.get(
             url).maybe_follow()
         assert page.content_type in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',
@@ -287,6 +289,8 @@ def test_vote_upload(swissvotes_app, attachments):
         page = client.get(
             manage.pyquery(f'a.{name}')[0].attrib['href']).maybe_follow()
         assert page.content_type in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',
@@ -539,25 +543,9 @@ def test_vote_chart(session):
     }
 
 
-@mark.parametrize('lang', ('de', 'fr'))
+@mark.parametrize('locale', ('de_CH', 'fr_CH'))
 def test_vote_static_attachment_links(swissvotes_app, sample_vote,
-                                      attachments, lang):
-    locale = f'{lang}_CH'
-    names = [
-        f'abstimmungstext-{lang}.pdf',
-        f'botschaft-{lang}.pdf',
-        f'brochure-{lang}.pdf',
-        f'erwahrung-{lang}.pdf',
-        f'zustandekommen-{lang}.pdf',
-        f'nachbefragung-{lang}.pdf',
-        f'vorpruefung-{lang}.pdf',
-    ] + ([
-        'kurzbeschreibung.pdf',
-        'parlamentsberatung.pdf',
-        'inserateanalyse.pdf',
-        'staatsebenen.xlsx',
-        'medienanalyse.pdf',
-    ] if lang == 'de' else [])
+                                      attachments, attachment_urls, locale):
 
     session = swissvotes_app.session()
     session.add(sample_vote)
@@ -570,7 +558,7 @@ def test_vote_static_attachment_links(swissvotes_app, sample_vote,
     page = page.click("Details")
 
     # No attachments yet
-    for name in names:
+    for name in attachment_urls[locale].values():
         assert client.get(f'{page.request.url}/{name}', status=404)
 
     vote = session.query(SwissVote).first()
@@ -579,6 +567,6 @@ def test_vote_static_attachment_links(swissvotes_app, sample_vote,
         setattr(vote, name, attachment)
     commit()
 
-    for name in names:
+    for name in attachment_urls[locale].values():
         test = client.get(f'{page.request.url}/{name}')
         print(name, test.status)

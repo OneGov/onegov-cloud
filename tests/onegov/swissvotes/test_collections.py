@@ -853,7 +853,10 @@ def test_votes_export(swissvotes_app):
         result_cantons_nays=Decimal('24.5'),
         result_cantons_yeas_p=Decimal('60.01'),
         posters_no="https://museum.ch/objects/1 https://museum.ch/objects/1",
-        swissvoteslink='https://example.com/122.0'
+        swissvoteslink='https://example.com/122.0',
+        post_vote_poll_link_de='https://post.vote.poll/de',
+        post_vote_poll_link_fr='https://post.vote.poll/fr',
+        post_vote_poll_link_en='https://post.vote.poll/en',
     )
     vote.result_ag_eligible_voters = 101
     vote.result_ag_votes_valid = 102
@@ -1564,7 +1567,7 @@ def test_votes_export(swissvotes_app):
     rows = list(DictReader(file))
     assert len(rows) == 1
     csv = dict(rows[0])
-    assert csv == {
+    expected = {
         'anr': '100,1',
         'datum': '02.06.1990',
         'legislatur': '4',
@@ -2300,8 +2303,12 @@ def test_votes_export(swissvotes_app):
         'poster_nein': "https://museum.ch/objects/1 "
                        "https://museum.ch/objects/1",
         'poster_ja': '.',
-        'swissvoteslink': 'https://example.com/122.0'
+        'swissvoteslink': 'https://example.com/122.0',
+        'nach_cockpit_d': 'https://post.vote.poll/de',
+        'nach_cockpit_f': 'https://post.vote.poll/fr',
+        'nach_cockpit_e': 'https://post.vote.poll/en',
     }
+    assert csv == expected
 
     file = BytesIO()
     votes.export_xlsx(file)
@@ -2314,7 +2321,7 @@ def test_votes_export(swissvotes_app):
             [cell.value for cell in sheet.row(1)]
         )
     )
-    assert xlsx == {
+    expected = {
         'anr': 100.1,
         'datum': 33026.0,
         'legislatur': 4.0,
@@ -3051,7 +3058,11 @@ def test_votes_export(swissvotes_app):
         'poster_ja': '',
         'poster_nein': "https://museum.ch/objects/1 "
                        "https://museum.ch/objects/1",
-        'swissvoteslink': 'https://example.com/122.0'
+        'swissvoteslink': 'https://example.com/122.0',
+        'nach_cockpit_d': 'https://post.vote.poll/de',
+        'nach_cockpit_f': 'https://post.vote.poll/fr',
+        'nach_cockpit_e': 'https://post.vote.poll/en',
     }
+    assert xlsx == expected
 
     assert csv.keys() == xlsx.keys()
