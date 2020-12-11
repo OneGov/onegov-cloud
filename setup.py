@@ -148,7 +148,7 @@ setup(
         'webtest',
         'wtforms<=2.2.1',
         'wtforms-components',
-        'xlrd',
+        'xlrd<2',
         'xlsxwriter',
         'xtermcolor',
         'yubico-client',
