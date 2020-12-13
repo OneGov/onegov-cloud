@@ -19,7 +19,6 @@ from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
 
 
-# Static redirects
 @SwissvotesApp.html(
     model=TranslatablePage,
     permission=Public,
@@ -110,20 +109,20 @@ def codebook_us_static(self, request):
 def view_page(self, request):
     """ View a page. """
 
+    layout = PageLayout(self, request)
+
     files = [file for file in self.files if file.locale == request.locale]
     if 'DATASET' not in ",".join((f.filename for f in files)):
         dataset = [
             f for f in self.files
-            if 'DATASET' in f.filename and f.locale == request.default_locale]
+            if 'DATASET' in f.filename and f.locale == request.default_locale
+        ]
         files.extend(dataset)
-    layout = PageLayout(self, request)
-    files_data = [
-        (f.filename, layout.get_file_url(f)) for f in files
-    ]
+    files = sorted([(f.filename, layout.get_file_url(f)) for f in files])
 
     return {
         'layout': layout,
-        'files_data': files_data
+        'files': files
     }
 
 
