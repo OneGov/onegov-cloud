@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2020.87`
+
+> commits: **6 / [6bebcd6a59...37fb0e1e63](https://github.com/OneGov/onegov-cloud/compare/6bebcd6a59^...37fb0e1e63)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.87)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🎉 **Add post-vote poll phase.**
+
+**`Feature`** | **[VOTES-78](https://issues.seantis.ch/browse/VOTES-78)** | **[6bebcd6a59](https://github.com/onegov/onegov-cloud/commit/6bebcd6a592ee47163ac3ee25902eacca4533276)**
+
+🐞 **Fixes static page attachment URLS throwing errors if missing.**
+
+**`Bugfix`** | **[VOTES-84](https://issues.seantis.ch/browse/VOTES-84)** | **[37fb0e1e63](https://github.com/onegov/onegov-cloud/commit/37fb0e1e6370128b776a0daad603c7e2f1e4576f)**
+
 ## Release `2020.86`
 
-> commits: **13 / [8a4db45342...a111a069c4](https://github.com/OneGov/onegov-cloud/compare/8a4db45342^...a111a069c4)**  
+> released: **2020-12-10 14:45**<br>
+> commits: **14 / [8a4db45342...648fb4981b](https://github.com/OneGov/onegov-cloud/compare/8a4db45342^...648fb4981b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.86)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
