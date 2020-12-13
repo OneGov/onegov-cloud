@@ -198,7 +198,7 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_deciding_question(swissvotes_app, sample_vote):
+def test_view_vote_deciding_question(swissvotes_app, sample_vote):
     del sample_vote.posters_yes_imgs
     sample_vote._legal_form = 5
 
@@ -302,7 +302,7 @@ def test_vote_upload(swissvotes_app, attachments):
         assert page.content_disposition.startswith('inline; filename=100.1')
 
 
-def test_vote_pagination(swissvotes_app):
+def test_view_vote_pagination(swissvotes_app):
     for day, number in ((1, '100'), (2, '101.1'), (2, '101.2'), (3, '102')):
         swissvotes_app.session().add(
             SwissVote(
@@ -363,7 +363,7 @@ def test_vote_pagination(swissvotes_app):
     assert "<td>102</td>" in page
 
 
-def test_vote_chart(session):
+def test_view_vote_chart(session):
     class Request(object):
         def translate(self, text):
             if isinstance(text, TranslationString):
@@ -544,8 +544,9 @@ def test_vote_chart(session):
 
 
 @mark.parametrize('locale', ('de_CH', 'fr_CH'))
-def test_vote_static_attachment_links(swissvotes_app, sample_vote,
-                                      attachments, attachment_urls, locale):
+def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
+                                           attachments, attachment_urls,
+                                           locale):
 
     session = swissvotes_app.session()
     session.add(sample_vote)
@@ -559,7 +560,8 @@ def test_vote_static_attachment_links(swissvotes_app, sample_vote,
 
     # No attachments yet
     for name in attachment_urls[locale].values():
-        assert client.get(f'{page.request.url}/{name}', status=404)
+        view = client.get(f'{page.request.url}/{name}', status=404)
+        assert view.status_code == 404
 
     vote = session.query(SwissVote).first()
     vote.session_manager.current_locale = locale
@@ -568,5 +570,5 @@ def test_vote_static_attachment_links(swissvotes_app, sample_vote,
     commit()
 
     for name in attachment_urls[locale].values():
-        test = client.get(f'{page.request.url}/{name}')
-        print(name, test.status)
+        view = client.get(f'{page.request.url}/{name}')
+        assert view.status_code in (200, 301, 302)
