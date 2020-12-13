@@ -586,7 +586,7 @@ def view_file(self, request):
             'parliamentary_debate': _("Parliamentary debate"),
             'post_vote_poll_codebook': _("Codebook for the post-vote poll"),
             'post_vote_poll_methodology': _(
-                "Methodology of the post-vote poll"
+                "Questionnaire of the poll"
             ),
             'post_vote_poll_dataset': _("Dataset of the post-vote poll"),
             'post_vote_poll': _("Full analysis of post-vote poll results"),

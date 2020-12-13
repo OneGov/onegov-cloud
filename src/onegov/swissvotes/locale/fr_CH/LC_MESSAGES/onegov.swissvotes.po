@@ -1,7 +1,7 @@
 # This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-12-08 10:03+0100\n"
+"POT-Creation-Date: 2020-12-13 08:08+0100\n"
 "PO-Revision-Date: 2020-12-04 15:22+0100\n"
 "Language: fr_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,26 +39,41 @@ msgstr ""
 "Le téléchargement des pièces jointes peut prendre un certain temps en raison "
 "de l’indexation en texte intégral."
 
+msgid "Brief description Swissvotes"
+msgstr "Résumé Swissvotes"
+
+msgid "General"
+msgstr "Informations générales"
+
 msgid "Voting text"
 msgstr "Texte soumis au vote"
 
-msgid "Brief description Swissvotes"
-msgstr "Résumé Swissvotes"
+msgid "Preliminary examination"
+msgstr "Examen préliminaire"
+
+msgid "Submission"
+msgstr "Dépôt"
+
+msgid "Realization"
+msgstr "Aboutissement"
 
 msgid "Federal council message"
 msgstr "Message du Conseil fédéral"
 
+msgid "Pre-parliamentary phase"
+msgstr "Phase pré-parlementaire"
+
 msgid "Parliamentary debate"
 msgstr "Débat parlementaire"
+
+msgid "Parliamentary phase"
+msgstr "Au Parlement"
 
 msgid "Voting booklet"
 msgstr "Brochure explicative"
 
-msgid "Resolution"
-msgstr "Arrêté constatant le résultat"
-
-msgid "Realization"
-msgstr "Aboutissement"
+msgid "Voting campaign"
+msgstr "Campagne"
 
 msgid "Advertisment analysis"
 msgstr "Analyse des annonces de campagne"
@@ -66,14 +81,29 @@ msgstr "Analyse des annonces de campagne"
 msgid "Fög Analysis"
 msgstr "Analyse fög"
 
-msgid "Post-vote poll"
-msgstr "Enquête post-votation"
+msgid "Resolution"
+msgstr "Arrêté constatant le résultat"
 
-msgid "Preliminary examination"
-msgstr "Examen préliminaire"
+msgid "Vote"
+msgstr "Votation"
 
 msgid "Result by canton, district and municipality"
 msgstr "Résultats par canton, district, commune"
+
+msgid "Full analysis of post-vote poll results"
+msgstr "Rapport d'analyse de l'enquête post-votation"
+
+msgid "Post-vote poll"
+msgstr "Enquête post-votation"
+
+msgid "Questionnaire of the poll"
+msgstr "Description de la méthode de l'enquête"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Jeu de données de l'enquête"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Liste des codes de l’enquête"
 
 msgid "Title"
 msgstr "Titre"
@@ -1495,9 +1525,6 @@ msgstr "Votation précédente"
 msgid "Next vote"
 msgstr "Votation suivante"
 
-msgid "General"
-msgstr "Informations générales"
-
 msgid "Official title"
 msgstr "Titre officiel"
 
@@ -1522,9 +1549,6 @@ msgstr "Chronologie officielle"
 msgid "Related votes"
 msgstr "Objets apparentés"
 
-msgid "Submission"
-msgstr "Dépôt"
-
 msgid "Initiator"
 msgstr "Initiants"
 
@@ -1542,12 +1566,6 @@ msgstr ""
 
 msgid "Days"
 msgstr "jours"
-
-msgid "Pre-parliamentary phase"
-msgstr "Phase pré-parlementaire"
-
-msgid "Parliamentary phase"
-msgstr "Au Parlement"
 
 msgid "Procedure number"
 msgstr "Numéro d'objet"
@@ -1575,9 +1593,6 @@ msgid ""
 msgstr ""
 "Durée entre l’arrêté du Parlement et l’arrêté constatant l’aboutissement du "
 "référendum"
-
-msgid "Voting campaign"
-msgstr "Campagne"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"
@@ -1617,9 +1632,6 @@ msgstr "Analyse des annonces de campagne"
 msgid "Media coverage: fög analysis"
 msgstr "Couverture médiatique: analyse fög"
 
-msgid "Vote"
-msgstr "Votation"
-
 msgid "People"
 msgstr "Peuple"
 
@@ -1641,20 +1653,8 @@ msgstr "Carte interactive de l’Office fédéral de la statistique"
 msgid "Display the map"
 msgstr "Présenter la carte"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Rapport d'analyse de l'enquête post-votation"
-
 msgid "Cockpit with selected results"
 msgstr "Cockpit avec des résultats d'analyse"
-
-msgid "Methodology of the post-vote poll"
-msgstr "Description de la méthode de l'enquête"
-
-msgid "Dataset of the post-vote poll"
-msgstr "Jeu de données de l'enquête"
-
-msgid "Codebook for the post-vote poll"
-msgstr "Liste des codes de l’enquête"
 
 msgid "Filter"
 msgstr "Filtre de recherche"

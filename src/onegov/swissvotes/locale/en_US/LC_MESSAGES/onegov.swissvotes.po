@@ -1,7 +1,7 @@
 # This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-12-08 10:03+0100\n"
+"POT-Creation-Date: 2020-12-13 08:08+0100\n"
 "PO-Revision-Date: 2020-12-04 15:22+0100\n"
 "Language: en_US\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,26 +37,41 @@ msgstr "No results match"
 msgid "Uploading attachments may take some time due to full-text indexing."
 msgstr "Uploading attachments may take some time due to full-text indexing."
 
+msgid "Brief description Swissvotes"
+msgstr "Brief description by Swissvotes"
+
+msgid "General"
+msgstr "General information"
+
 msgid "Voting text"
 msgstr "Text subject to vote"
 
-msgid "Brief description Swissvotes"
-msgstr "Brief description by Swissvotes"
+msgid "Preliminary examination"
+msgstr ""
+
+msgid "Submission"
+msgstr "Submission"
+
+msgid "Realization"
+msgstr "Success"
 
 msgid "Federal council message"
 msgstr "Federal Council dispatch"
 
+msgid "Pre-parliamentary phase"
+msgstr "Pre-parliamentary phase"
+
 msgid "Parliamentary debate"
 msgstr "Parliamentary debate"
+
+msgid "Parliamentary phase"
+msgstr "Parliamentary phase"
 
 msgid "Voting booklet"
 msgstr "Explanatory brochure"
 
-msgid "Resolution"
-msgstr "Decree on voting result"
-
-msgid "Realization"
-msgstr "Success"
+msgid "Voting campaign"
+msgstr "Public campaign"
 
 msgid "Advertisment analysis"
 msgstr "Analysis of advertisement campaign"
@@ -64,14 +79,29 @@ msgstr "Analysis of advertisement campaign"
 msgid "Fög Analysis"
 msgstr ""
 
-msgid "Post-vote poll"
-msgstr ""
+msgid "Resolution"
+msgstr "Decree on voting result"
 
-msgid "Preliminary examination"
-msgstr ""
+msgid "Vote"
+msgstr "Vote"
 
 msgid "Result by canton, district and municipality"
 msgstr "Result by canton, district and municipality"
+
+msgid "Full analysis of post-vote poll results"
+msgstr "Full analysis of post-vote poll results"
+
+msgid "Post-vote poll"
+msgstr "Post-vote poll"
+
+msgid "Questionnaire of the poll"
+msgstr "Questionnaire of the poll"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Dataset of the post-vote poll"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Codebook for the post-vote poll"
 
 msgid "Title"
 msgstr "Title"
@@ -1481,9 +1511,6 @@ msgstr "Previous vote"
 msgid "Next vote"
 msgstr "Next vote"
 
-msgid "General"
-msgstr "General information"
-
 msgid "Official title"
 msgstr "Official title"
 
@@ -1508,9 +1535,6 @@ msgstr "Official Chronology"
 msgid "Related votes"
 msgstr "Related votes"
 
-msgid "Submission"
-msgstr "Submission"
-
 msgid "Initiator"
 msgstr "Initiators"
 
@@ -1529,12 +1553,6 @@ msgstr ""
 
 msgid "Days"
 msgstr "days"
-
-msgid "Pre-parliamentary phase"
-msgstr "Pre-parliamentary phase"
-
-msgid "Parliamentary phase"
-msgstr "Parliamentary phase"
 
 msgid "Procedure number"
 msgstr "Item Nº"
@@ -1564,9 +1582,6 @@ msgid ""
 msgstr ""
 "Number of days between the Parliament’s final vote and the decree to declare "
 "the success of the referendum"
-
-msgid "Voting campaign"
-msgstr "Public campaign"
 
 msgid "Recommendations of the Parties"
 msgstr "Recommendations by parties"
@@ -1606,9 +1621,6 @@ msgstr "Analysis of the advertising campaign"
 msgid "Media coverage: fög analysis"
 msgstr "Media coverage: fög analysis"
 
-msgid "Vote"
-msgstr "Vote"
-
 msgid "People"
 msgstr "People"
 
@@ -1630,20 +1642,8 @@ msgstr "Interactive map by the Swiss Federal Statistical Office"
 msgid "Display the map"
 msgstr "Display the map"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Full analysis of post-vote poll results"
-
 msgid "Cockpit with selected results"
 msgstr "Cockpit with selected results"
-
-msgid "Methodology of the post-vote poll"
-msgstr "Methodology description of the poll"
-
-msgid "Dataset of the post-vote poll"
-msgstr "Dataset of the post-vote poll"
-
-msgid "Codebook for the post-vote poll"
-msgstr "Codebook for the post-vote poll"
 
 msgid "Filter"
 msgstr "Filter"

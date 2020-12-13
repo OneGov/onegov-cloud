@@ -136,7 +136,7 @@ class AttachmentsForm(Form):
     )
 
     post_vote_poll_methodology = UploadField(
-        label=_("Methodology of the post-vote poll"),
+        label=_("Questionnaire of the poll"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(120 * 1024 * 1024)

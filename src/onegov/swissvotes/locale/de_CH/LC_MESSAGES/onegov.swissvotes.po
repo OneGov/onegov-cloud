@@ -1,16 +1,16 @@
 # This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2020-12-08 10:03+0100\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2020-12-13 08:08+0100\n"
 "PO-Revision-Date: 2020-12-08 10:13+0100\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
+"Language-Team: \n"
 "Language: de_CH\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"Project-Id-Version: \n"
-"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
-"Language-Team: \n"
-"MIME-Version: 1.0\n"
 "X-Generator: Poedit 2.4.2\n"
 
 msgid "Not a valid XLSX file."
@@ -44,26 +44,41 @@ msgstr ""
 "Das Hochladen von Anhängen kann aufgrund der Volltextindizierung einige Zeit "
 "in Anspruch nehmen."
 
+msgid "Brief description Swissvotes"
+msgstr "Kurzbeschreibung Swissvotes"
+
+msgid "General"
+msgstr "Allgemeines"
+
 msgid "Voting text"
 msgstr "Abstimmungstext"
 
-msgid "Brief description Swissvotes"
-msgstr "Kurzbeschreibung Swissvotes"
+msgid "Preliminary examination"
+msgstr "Vorprüfung"
+
+msgid "Submission"
+msgstr "Einreichung"
+
+msgid "Realization"
+msgstr "Zustandekommen"
 
 msgid "Federal council message"
 msgstr "Botschaft des Bundesrats"
 
+msgid "Pre-parliamentary phase"
+msgstr "Vorparlamentarische Phase"
+
 msgid "Parliamentary debate"
 msgstr "Parlamentsberatung"
+
+msgid "Parliamentary phase"
+msgstr "Im Parlament"
 
 msgid "Voting booklet"
 msgstr "Abstimmungsbüchlein"
 
-msgid "Resolution"
-msgstr "Erwahrungsbeschluss"
-
-msgid "Realization"
-msgstr "Zustandekommen"
+msgid "Voting campaign"
+msgstr "Abstimmungskampf"
 
 msgid "Advertisment analysis"
 msgstr "Inserateanalyse"
@@ -71,14 +86,29 @@ msgstr "Inserateanalyse"
 msgid "Fög Analysis"
 msgstr "Medienanalyse fög"
 
-msgid "Post-vote poll"
-msgstr "Nachbefragung"
+msgid "Resolution"
+msgstr "Erwahrungsbeschluss"
 
-msgid "Preliminary examination"
-msgstr "Vorprüfung"
+msgid "Vote"
+msgstr "Abstimmung"
 
 msgid "Result by canton, district and municipality"
 msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
+
+msgid "Full analysis of post-vote poll results"
+msgstr "Analysebericht Nachbefragung"
+
+msgid "Post-vote poll"
+msgstr "Nachbefragung"
+
+msgid "Questionnaire of the poll"
+msgstr "Fragebogen der Nachbefragung"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Datensatz der Nachbefragung"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Codebuch zur Nachbefragung"
 
 msgid "Title"
 msgstr "Titel"
@@ -1493,9 +1523,6 @@ msgstr "Vorherige Abstimmung"
 msgid "Next vote"
 msgstr "Nächste Abstimmung"
 
-msgid "General"
-msgstr "Allgemeines"
-
 msgid "Official title"
 msgstr "Offizieller Titel"
 
@@ -1520,9 +1547,6 @@ msgstr "Offizielle Chronologie"
 msgid "Related votes"
 msgstr "Verwandte Vorlagen"
 
-msgid "Submission"
-msgstr "Einreichung"
-
 msgid "Initiator"
 msgstr "Urheber"
 
@@ -1539,12 +1563,6 @@ msgstr "Anzahl Tage vom Sammelbeginn bis zur Einreichung"
 
 msgid "Days"
 msgstr "Tage"
-
-msgid "Pre-parliamentary phase"
-msgstr "Vorparlamentarische Phase"
-
-msgid "Parliamentary phase"
-msgstr "Im Parlament"
 
 msgid "Procedure number"
 msgstr "Geschäftsnummer"
@@ -1573,9 +1591,6 @@ msgid ""
 "the success of the referendum"
 msgstr ""
 "Anzahl Tage vom Parlamentsbeschluss bis zum Beschluss über das Zustandekommen"
-
-msgid "Voting campaign"
-msgstr "Abstimmungskampf"
 
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
@@ -1619,9 +1634,6 @@ msgstr "Analyse der Inseratekampagne"
 msgid "Media coverage: fög analysis"
 msgstr "Medienberichterstattung: Analyse des fög"
 
-msgid "Vote"
-msgstr "Abstimmung"
-
 msgid "People"
 msgstr "Volk"
 
@@ -1643,20 +1655,8 @@ msgstr "Interaktive Karte des Bundesamts für Statistik"
 msgid "Display the map"
 msgstr "Karte anzeigen"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Analysebericht Nachbefragung"
-
 msgid "Cockpit with selected results"
 msgstr "Cockpit mit Analyseergebnissen"
-
-msgid "Methodology of the post-vote poll"
-msgstr "Methodenbeschrieb zur Nachbefragung"
-
-msgid "Dataset of the post-vote poll"
-msgstr "Datensatz der Nachbefragung"
-
-msgid "Codebook for the post-vote poll"
-msgstr "Codebuch zur Nachbefragung"
 
 msgid "Filter"
 msgstr "Filtern"
