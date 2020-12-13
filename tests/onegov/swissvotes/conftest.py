@@ -1,17 +1,19 @@
-from io import BytesIO
-from decimal import Decimal
 from datetime import date
-from psycopg2.extras import NumericRange
-from tests.shared.utils import create_app
+from decimal import Decimal
+from io import BytesIO
 from onegov.core.crypto import hash_password
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
 from onegov.swissvotes import SwissvotesApp
-from onegov.swissvotes.models import Principal, SwissVote
+from onegov.swissvotes.models import Principal
+from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
+from onegov.swissvotes.models import TranslatablePageFile
 from onegov.user import User
+from psycopg2.extras import NumericRange
 from pytest import fixture
+from tests.shared.utils import create_app
 from transaction import commit
 from xlsxwriter.workbook import Workbook
 
@@ -151,6 +153,107 @@ def attachment_urls():
             'voting_text': 'abstimmungstext-fr.pdf',
         },
         'en_US': {}
+    }
+
+
+@fixture(scope='function')
+def page_attachments_filenames():
+    yield {
+        'de_CH': {
+            'CODEBOOK': 'CODEBOOK.pdf',
+            'DATASET CSV': 'DATASET CSV dd-mm-yyyy.csv',
+            'DATASET XLSX': 'DATASET XLSX dd-mm-yyyy.xlsx',
+            'REFERENCES': 'QUELLEN Kurzbeschreibungen.pdf',
+        },
+        'fr_CH': {
+            'CODEBOOK': 'CODEBOOK.pdf',
+            'DATASET CSV': 'DATASET CSV dd-mm-yyyy.csv',
+            'DATASET XLSX': 'DATASET XLSX dd-mm-yyyy.xlsx',
+            'REFERENCES': 'REFERENCES des descriptifs.pdf',
+        },
+        'en_US': {
+            'CODEBOOK': 'CODEBOOK.pdf',
+            'DATASET CSV': 'DATASET CSV dd-mm-yyyy.csv',
+            'DATASET XLSX': 'DATASET XLSX dd-mm-yyyy.xlsx',
+            'REFERENCES': 'REFERENCES for descriptions.pdf',
+        }
+    }
+
+
+@fixture(scope="function")
+def page_attachments(swissvotes_app, page_attachments_filenames):
+    result = {}
+
+    for locale in ('de_CH', 'fr_CH', 'en_US'):
+        result[locale] = {}
+        for name, content in (
+            ('REFERENCES', 'Quellen'),
+            ('CODEBOOK', 'Codebuch'),
+        ):
+            file = BytesIO()
+            pdf = Pdf(file)
+            pdf.init_report()
+            pdf.p(content)
+            pdf.generate()
+            file.seek(0)
+
+            filename = page_attachments_filenames[locale][name]
+            attachment = TranslatablePageFile(
+                id=random_token(),
+                name=f'{locale}-{filename}'
+            )
+            attachment.reference = as_fileintent(file, filename)
+            result[locale][name] = attachment
+
+        for name in ('DATASET XLSX',):
+            file = BytesIO()
+            workbook = Workbook(file)
+            worksheet = workbook.add_worksheet('DATA')
+            worksheet.write_row(0, 0, ['a', 'b'])
+            worksheet.write_row(1, 0, [100, 200])
+            workbook.close()
+            file.seek(0)
+
+            filename = page_attachments_filenames[locale][name]
+            attachment = TranslatablePageFile(
+                id=random_token(),
+                name=f'{locale}-{filename}'
+            )
+            attachment.reference = as_fileintent(file, filename)
+            result[locale][name] = attachment
+
+        for name in ('DATASET CSV',):
+            file = BytesIO()
+            file.write(b'a,b\n100,200')
+
+            filename = page_attachments_filenames[locale][name]
+            attachment = TranslatablePageFile(
+                id=random_token(),
+                name=f'{locale}-{filename}'
+            )
+            attachment.reference = as_fileintent(file, filename)
+            result[locale][name] = attachment
+
+    yield result
+
+
+@fixture(scope="function")
+def page_attachment_urls():
+    yield {
+        'de_CH': {
+            'CODEBOOK': 'codebook-de.pdf',
+            'DATASET CSV': 'swissvotes_dataset.csv',
+            'DATASET XLSX': 'swissvotes_dataset.xlsx',
+            'REFERENCES': 'kurzbeschreibung-de.pdf',
+        },
+        'fr_CH': {
+            'CODEBOOK': 'codebook-fr.pdf',
+            'REFERENCES': 'kurzbeschreibung-fr.pdf',
+        },
+        'en_US': {
+            'CODEBOOK': 'codebook-en.pdf',
+            'REFERENCES': 'kurzbeschreibung-en.pdf',
+        }
     }
 
 

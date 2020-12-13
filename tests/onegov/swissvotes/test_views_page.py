@@ -1,5 +1,7 @@
 from onegov.core.utils import module_path
+from onegov.swissvotes.models import TranslatablePage
 from pytest import mark
+from transaction import commit
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
@@ -113,3 +115,26 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     view = client.get('/page/about')
     assert "1.pdf" not in view
     assert "2.pdf" not in view
+
+
+@mark.parametrize('locale', ('de_CH', 'fr_CH', 'en_US'))
+def test_view_page_static_attachment_links(
+    swissvotes_app, page_attachments, page_attachment_urls,
+    locale
+):
+    client = Client(swissvotes_app)
+    url = client.get('/').maybe_follow().click('imprint').request.url
+
+    # No attachments yet
+    for name in page_attachment_urls[locale].values():
+        view = client.get(f'{url}/{name}', status=404)
+        assert view.status_code == 404
+
+    session = swissvotes_app.session()
+    page = session.query(TranslatablePage).filter_by(title='imprint').one()
+    page.files = list(page_attachments[locale].values())
+    commit()
+
+    for name in page_attachment_urls[locale].values():
+        view = client.get(f'{url}/{name}')
+        assert view.status_code in (200, 301, 302)

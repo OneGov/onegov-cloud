@@ -17,6 +17,7 @@ from onegov.swissvotes.layouts import PageLayout
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
+from webob.exc import HTTPNotFound
 
 
 @SwissvotesApp.html(
@@ -26,6 +27,8 @@ from onegov.swissvotes.models import TranslatablePageMove
 )
 def brief_desc_static_de(self, request):
     file = self.get_file_by_locale('QUELLEN', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -35,8 +38,9 @@ def brief_desc_static_de(self, request):
     name='kurzbeschreibung-fr.pdf'
 )
 def brief_desc_static_fr(self, request):
-    locale = 'fr_CH'
-    file = self.get_file_by_locale('REFERENCES des descriptifs', locale)
+    file = self.get_file_by_locale('REFERENCES des descriptifs', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -46,8 +50,9 @@ def brief_desc_static_fr(self, request):
     name='kurzbeschreibung-en.pdf'
 )
 def brief_desc_static_en(self, request):
-    locale = 'en_US'
-    file = self.get_file_by_locale('REFERENCES for descriptions', locale)
+    file = self.get_file_by_locale('REFERENCES for descriptions', 'en_US')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -58,6 +63,8 @@ def brief_desc_static_en(self, request):
 )
 def dataset_csv_static(self, request):
     file = self.get_file('DATASET CSV', request)
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -68,6 +75,8 @@ def dataset_csv_static(self, request):
 )
 def dataset_xlsx_static(self, request):
     file = self.get_file('DATASET XLSX', request)
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -78,6 +87,8 @@ def dataset_xlsx_static(self, request):
 )
 def codebook_de_static(self, request):
     file = self.get_file_by_locale('CODEBOOK', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -88,6 +99,8 @@ def codebook_de_static(self, request):
 )
 def codebook_fr_static(self, request):
     file = self.get_file_by_locale('CODEBOOK', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -98,6 +111,8 @@ def codebook_fr_static(self, request):
 )
 def codebook_us_static(self, request):
     file = self.get_file_by_locale('CODEBOOK', 'en_US')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
