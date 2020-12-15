@@ -2,7 +2,6 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from decimal import Decimal
 from onegov.core.orm import as_selectable
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
