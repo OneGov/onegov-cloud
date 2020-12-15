@@ -349,21 +349,9 @@ def add_swissvoteslink(context):
 
 @upgrade_task('Changes procedure number type to text')
 def change_procedure_number_type(context):
-    def format_procedure_number(number):
-        if not number:
-            return ''
-        if '_' in number:
-            return number
-        number = Decimal(number)
-        if number.to_integral_value() == number:
-            return str(number.to_integral_value())
-        return '{:06,.3f}'.format(number)
-
     context.operations.execute(
         'ALTER TABLE swissvotes ALTER COLUMN procedure_number TYPE TEXT'
     )
-    for vote in context.app.session().query(SwissVote):
-        vote.procedure_number = format_procedure_number(vote.procedure_number)
 
 
 @upgrade_task('Adds post-vote poll links')
