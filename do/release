@@ -96,7 +96,6 @@ function announce-release-on-sentry-io() {
     local current_commit="$2"
     local previous_commit="$3"
 
-    configure-sentry
     curl "https://sentry.io/api/0/organizations/${SENTRY_ORG}/releases/" \
         -X POST \
         -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" \
@@ -170,4 +169,5 @@ function release() {
     announce-release-on-sentry-io "onegov-cloud:${new}" "$current_commit" "$previous_commit"
 }
 
+configure-sentry
 release
