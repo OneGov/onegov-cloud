@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2020.88`
+
+> commits: **3 / [1e52e412c3...726b2eeccf](https://github.com/OneGov/onegov-cloud/compare/1e52e412c3^...726b2eeccf)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.88)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🐞 **Fixes adding subscription to hidden course not possible.**
+
+**`Bugfix`** | **[FSI-44](https://kanton-zug.atlassian.net/browse/FSI-44)** | **[726b2eeccf](https://github.com/onegov/onegov-cloud/commit/726b2eeccf056e6897ac32056c152a4483eafd78)**
+
+### Swissvotes
+
+🎉 **Add media ads and coverage.**
+
+**`Feature`** | **[VOTES-75](https://issues.seantis.ch/browse/VOTES-75)** | **[c98bde9959](https://github.com/onegov/onegov-cloud/commit/c98bde9959dfcc475e842e20962e6d51117419e8)**
+
 ## Release `2020.87`
 
-> commits: **6 / [6bebcd6a59...37fb0e1e63](https://github.com/OneGov/onegov-cloud/compare/6bebcd6a59^...37fb0e1e63)**  
+> released: **2020-12-13 10:36**<br>
+> commits: **7 / [6bebcd6a59...f748c5f930](https://github.com/OneGov/onegov-cloud/compare/6bebcd6a59^...f748c5f930)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.87)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
