@@ -114,15 +114,17 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
     worksheet.write_row(1, 0, [
         '100.1',  # anr
         '1.2.2008',  # datum
-        '1',  # legislatur
-        '2004-2008',  # legisjahr
         'kurztitel de',  # titel_kurz_d
         'kurztitel fr',  # titel_kurz_f
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
+        'link',  # swissvoteslink
         '2',  # anzahl
         '3',  # rechtsform
+        '',  # anneepolitique
+        '',  # bkchrono-de
+        '',  # bkchrono-fr
         '13',  # d1e1
         '',  # d1e2
         '',  # d1e3
@@ -132,6 +134,10 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
         '12',  # d3e1
         '12.5',  # d3e2
         '12.55',  # d3e3
+        '',  # dep
+        '',  # br-pos
+        '1',  # legislatur
+        '2004-2008',  # legisjahr
     ])
     workbook.close()
     file.seek(0)

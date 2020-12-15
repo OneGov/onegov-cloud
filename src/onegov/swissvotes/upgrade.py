@@ -366,7 +366,7 @@ def change_procedure_number_type(context):
         vote.procedure_number = format_procedure_number(vote.procedure_number)
 
 
-@upgrade_task('Adds post-vote poll links', always_run=True)
+@upgrade_task('Adds post-vote poll links')
 def add_post_vote_poll_links(context):
     columns = (
         'post_vote_poll_link_de',
@@ -376,3 +376,24 @@ def add_post_vote_poll_links(context):
     for column in columns:
         if not context.has_column('swissvotes', column):
             context.operations.add_column('swissvotes', Column(column, Text()))
+
+
+@upgrade_task('Adds media fields')
+def add_media_fields(context):
+    columns = (
+        ('media_ads_total', Integer()),
+        ('media_ads_per_issue', Numeric(13, 10)),
+        ('media_ads_yea', Integer()),
+        ('media_ads_nay', Integer()),
+        ('media_ads_neutral', Integer()),
+        ('media_ads_yea_p', Numeric(13, 10)),
+        ('media_coverage_articles_total', Integer()),
+        ('media_coverage_articles_d', Integer()),
+        ('media_coverage_articles_f', Integer()),
+        ('media_coverage_tonality_total', Integer()),
+        ('media_coverage_tonality_d', Integer()),
+        ('media_coverage_tonality_f', Integer()),
+    )
+    for column, type_ in columns:
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, type_))

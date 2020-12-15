@@ -446,17 +446,32 @@ def test_update_dataset_form(session):
     workbook.add_worksheet('CITATION')
     worksheet.write_row(0, 0, ColumnMapper().columns.values())
     worksheet.write_row(1, 0, [
-        100.1,  # anr / NUMERIC
+        '100.1',  # anr / NUMERIC
         '1.2.2008',  # datum / DATE
-        1,  # legislatur / INTEGER
-        '2004-2008',  # legisjahr / INT4RANGE
-        'kurztitel de',  # titel_kurz_d
-        'kurztitel fr',  # titel_kurz_f
-        'titel de',  # titel_off_d
-        'titel fr',  # titel_off_f
+        'titel_kurz_d',  # short_title_de / TEXT
+        'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_off_d',  # title_de / TEXT
+        'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
-        2,  # anzahl / INTEGER
-        3,  # rechtsform
+        'link',  # swissvoteslink / TEXT
+        '2',  # anzahl / INTEGER
+        '3',  # rechtsform / INTEGER
+        '',  # anneepolitique / TEXT
+        '',  # bkchrono-de / TEXT
+        '',  # bkchrono-fr / TEXT
+        '13',  # d1e1 / NUMERIC
+        '',  # d1e2 / NUMERIC
+        '',  # d1e3 / NUMERIC
+        '12',  # d2e1 / NUMERIC
+        '12.6',  # d2e2 / NUMERIC
+        '',  # d2e3 / NUMERIC
+        '12',  # d3e1 / NUMERIC
+        '12.5',  # d3e2 / NUMERIC
+        '12.55',  # d3e3 / NUMERIC
+        '',  # dep
+        '',  # br-pos
+        '1',  # legislatur / INTEGER
+        '2004-2008',  # legisjahr / INT4RANGE
     ])
     workbook.close()
     file.seek(0)

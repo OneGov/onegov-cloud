@@ -854,9 +854,6 @@ def test_votes_export(swissvotes_app):
         result_cantons_yeas_p=Decimal('60.01'),
         posters_no="https://museum.ch/objects/1 https://museum.ch/objects/1",
         swissvoteslink='https://example.com/122.0',
-        post_vote_poll_link_de='https://post.vote.poll/de',
-        post_vote_poll_link_fr='https://post.vote.poll/fr',
-        post_vote_poll_link_en='https://post.vote.poll/en',
     )
     vote.result_ag_eligible_voters = 101
     vote.result_ag_votes_valid = 102
@@ -1557,6 +1554,21 @@ def test_votes_export(swissvotes_app):
     vote.bkresults_fr = 'bkresults_fr'
     vote.bkchrono_de = 'bkchrono_de'
     vote.bkchrono_fr = 'bkchrono_fr'
+    vote.post_vote_poll_link_de = 'https://post.vote.poll/de'
+    vote.post_vote_poll_link_fr = 'https://post.vote.poll/fr'
+    vote.post_vote_poll_link_en = 'https://post.vote.poll/en'
+    vote.media_ads_total = 1001
+    vote.media_ads_per_issue = Decimal('10.02')
+    vote.media_ads_yea = 1003
+    vote.media_ads_nay = 1004
+    vote.media_ads_neutral = 1005
+    vote.media_ads_yea_p = Decimal('10.06')
+    vote.media_coverage_articles_total = 1007
+    vote.media_coverage_articles_d = 1008
+    vote.media_coverage_articles_f = 1009
+    vote.media_coverage_tonality_total = 1010
+    vote.media_coverage_tonality_d = 1011
+    vote.media_coverage_tonality_f = 1012
 
     votes.session.flush()
     votes.session.expire_all()
@@ -2307,6 +2319,18 @@ def test_votes_export(swissvotes_app):
         'nach_cockpit_d': 'https://post.vote.poll/de',
         'nach_cockpit_f': 'https://post.vote.poll/fr',
         'nach_cockpit_e': 'https://post.vote.poll/en',
+        'inserate-total': '1001',
+        'inserate-je-ausgabe': '10,02',
+        'inserate-ja': '1003',
+        'inserate-nein': '1004',
+        'inserate-neutral': '1005',
+        'inserate-jaanteil': '10,06',
+        'mediares-tot': '1007',
+        'mediares-d': '1008',
+        'mediares-f': '1009',
+        'mediaton-tot': '1010',
+        'mediaton-d': '1011',
+        'mediaton-f': '1012',
     }
     assert csv == expected
 
@@ -3062,6 +3086,18 @@ def test_votes_export(swissvotes_app):
         'nach_cockpit_d': 'https://post.vote.poll/de',
         'nach_cockpit_f': 'https://post.vote.poll/fr',
         'nach_cockpit_e': 'https://post.vote.poll/en',
+        'inserate-total': 1001,
+        'inserate-je-ausgabe': 10.02,
+        'inserate-ja': 1003,
+        'inserate-nein': 1004,
+        'inserate-neutral': 1005,
+        'inserate-jaanteil': 10.06,
+        'mediares-tot': 1007,
+        'mediares-d': 1008,
+        'mediares-f': 1009,
+        'mediaton-tot': 1010,
+        'mediaton-d': 1011,
+        'mediaton-f': 1012,
     }
     assert xlsx == expected
 

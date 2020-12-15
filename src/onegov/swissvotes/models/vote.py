@@ -196,10 +196,6 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     bfs_map_fr = Column(Text)
     swissvoteslink = Column(Text)
 
-    @property
-    def deciding_question(self):
-        return self._legal_form == 5
-
     # Additional links added late 2019
     curia_vista_de = Column(Text)
     curia_vista_fr = Column(Text)
@@ -221,26 +217,19 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     post_vote_poll_link_fr = Column(Text)
     post_vote_poll_link_en = Column(Text)
 
-    @property
-    def post_vote_poll_link(self):
-        if self.session_manager.current_locale == 'fr_CH':
-            return self.post_vote_poll_link_fr
-        elif self.session_manager.current_locale == 'en_US':
-            return self.post_vote_poll_link_en
-        else:
-            return self.post_vote_poll_link_de
-
-    def poster_links(self, answer):
-        assert answer in ('yes', 'no')
-        if answer == 'yes':
-            if not self.posters_yes_imgs or not self.posters_yes:
-                return None
-            sources = self.posters_yes.split(' ')
-            return ((url, self.posters_yes_imgs.get(url)) for url in sources)
-        if not self.posters_no_imgs or not self.posters_no:
-            return None
-        sources = self.posters_no.split(' ')
-        return ((url, self.posters_no_imgs.get(url)) for url in sources)
+    # Media
+    media_ads_total = Column(Integer)
+    media_ads_per_issue = deferred(Column(Numeric(13, 10)), group='dataset')
+    media_ads_yea = deferred(Column(Integer), group='dataset')
+    media_ads_nay = deferred(Column(Integer), group='dataset')
+    media_ads_neutral = deferred(Column(Integer), group='dataset')
+    media_ads_yea_p = Column(Numeric(13, 10))
+    media_coverage_articles_total = Column(Integer)
+    media_coverage_articles_d = deferred(Column(Integer), group='dataset')
+    media_coverage_articles_f = deferred(Column(Integer), group='dataset')
+    media_coverage_tonality_total = Column(Integer)
+    media_coverage_tonality_d = deferred(Column(Integer), group='dataset')
+    media_coverage_tonality_f = deferred(Column(Integer), group='dataset')
 
     @property
     def title(self):
@@ -272,6 +261,13 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
             pass
 
     @property
+    def curiavista(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.curia_vista_fr
+        else:
+            return self.curia_vista_de
+
+    @property
     def bk_results(self):
         if self.session_manager.current_locale == 'fr_CH':
             return self.bkresults_fr
@@ -285,12 +281,30 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         else:
             return self.bkchrono_de
 
+    def poster_links(self, answer):
+        assert answer in ('yes', 'no')
+        if answer == 'yes':
+            if not self.posters_yes_imgs or not self.posters_yes:
+                return None
+            sources = self.posters_yes.split(' ')
+            return ((url, self.posters_yes_imgs.get(url)) for url in sources)
+        if not self.posters_no_imgs or not self.posters_no:
+            return None
+        sources = self.posters_no.split(' ')
+        return ((url, self.posters_no_imgs.get(url)) for url in sources)
+
     @property
-    def curiavista(self):
+    def post_vote_poll_link(self):
         if self.session_manager.current_locale == 'fr_CH':
-            return self.curia_vista_fr
+            return self.post_vote_poll_link_fr
+        elif self.session_manager.current_locale == 'en_US':
+            return self.post_vote_poll_link_en
         else:
-            return self.curia_vista_de
+            return self.post_vote_poll_link_de
+
+    @property
+    def deciding_question(self):
+        return self._legal_form == 5
 
     # Descriptor
     descriptor_1_level_1 = Column(Numeric(8, 4))

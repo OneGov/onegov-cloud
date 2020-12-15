@@ -333,6 +333,18 @@ def test_vote(session, sample_vote):
     assert vote.bk_results == 'bkr_de'
     assert vote.curiavista == 'cv_de'
     assert vote.post_vote_poll_link == 'https://post.vote.poll/de'
+    assert vote.media_ads_total == 3001
+    assert vote.media_ads_per_issue == Decimal('30.02')
+    assert vote.media_ads_yea == 3003
+    assert vote.media_ads_nay == 3004
+    assert vote.media_ads_neutral == 3005
+    assert vote.media_ads_yea_p == Decimal('30.06')
+    assert vote.media_coverage_articles_total == 3007
+    assert vote.media_coverage_articles_d == 3008
+    assert vote.media_coverage_articles_f == 3009
+    assert vote.media_coverage_tonality_total == 3010
+    assert vote.media_coverage_tonality_d == 3011
+    assert vote.media_coverage_tonality_f == 3012
 
     # localized properties
     vote.session_manager.current_locale = 'fr_CH'
@@ -998,47 +1010,94 @@ def test_column_mapper():
     assert mapper.get_value(vote, '_legal_form') == 4
     assert mapper.get_value(vote, '!recommendations!fdp') == 66
 
-    assert list(mapper.get_values(vote))[:11] == [
+    assert list(mapper.get_values(vote))[:26] == [
         Decimal('100.1'),
         date(2019, 1, 1),
-        10,
-        NumericRange(1990, 1999, '[)'),
         'short title de',
         'short title fr',
         'title de',
         'title fr',
         'keyword',
         None,
-        4
+        None,
+        4,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        10,
+        NumericRange(1990, 1999, '[)')
     ]
-    assert list(mapper.get_items(vote))[:11] == [
+    assert list(mapper.get_items(vote))[:26] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
-        ('legislation_number', 10),
-        ('legislation_decade', NumericRange(1990, 1999)),
         ('short_title_de', 'short title de'),
         ('short_title_fr', 'short title fr'),
         ('title_de', 'title de'),
         ('title_fr', 'title fr'),
         ('keyword', 'keyword'),
+        ('swissvoteslink', None),
         ('votes_on_same_day', None),
-        ('_legal_form', 4)
+        ('_legal_form', 4),
+        ('anneepolitique', None),
+        ('bkchrono_de', None),
+        ('bkchrono_fr', None),
+        ('descriptor_1_level_1', None),
+        ('descriptor_1_level_2', None),
+        ('descriptor_1_level_3', None),
+        ('descriptor_2_level_1', None),
+        ('descriptor_2_level_2', None),
+        ('descriptor_2_level_3', None),
+        ('descriptor_3_level_1', None),
+        ('descriptor_3_level_2', None),
+        ('descriptor_3_level_3', None),
+        ('_department_in_charge', None),
+        ('_position_federal_council', None),
+        ('legislation_number', 10),
+        ('legislation_decade', NumericRange(1990, 1999, '[)'))
     ]
-    assert list(mapper.items())[:11] == [
+    assert list(mapper.items())[:26] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
-        ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
-        ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None),
         ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
         ('short_title_fr', 'titel_kurz_f', 'TEXT', False, None, None),
         ('title_de', 'titel_off_d', 'TEXT', False, None, None),
         ('title_fr', 'titel_off_f', 'TEXT', False, None, None),
         ('keyword', 'stichwort', 'TEXT', True, None, None),
+        ('swissvoteslink', 'swissvoteslink', 'TEXT', True, None, None),
         ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
-        ('_legal_form', 'rechtsform', 'INTEGER', False, None, None)
+        ('_legal_form', 'rechtsform', 'INTEGER', False, None, None),
+        ('anneepolitique', 'anneepolitique', 'TEXT', True, None, None),
+        ('bkchrono_de', 'bkchrono-de', 'TEXT', True, None, None),
+        ('bkchrono_fr', 'bkchrono-fr', 'TEXT', True, None, None),
+        ('descriptor_1_level_1', 'd1e1', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_1_level_2', 'd1e2', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_1_level_3', 'd1e3', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_2_level_1', 'd2e1', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_2_level_2', 'd2e2', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_2_level_3', 'd2e3', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_3_level_1', 'd3e1', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_3_level_2', 'd3e2', 'NUMERIC(8, 4)', True, 8, 4),
+        ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
+        ('_department_in_charge', 'dep', 'INTEGER', True, None, None),
+        ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
+        ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
+        ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None)
     ]
+
     assert list(mapper.items())[304] == (
-        '!recommendations!sodk', 'p-sodk', 'INTEGER', True, None, None
+        '!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER', True,
+        None, None
     )
 
 

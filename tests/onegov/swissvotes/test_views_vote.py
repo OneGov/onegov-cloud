@@ -79,6 +79,9 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
     assert "Kampagnenmaterial Ja" in page
+    assert "Offizielle Chronologie" in page
+    assert "Ergebnisübersicht Bundeskanzlei" in page
+    assert "(mehrheitlich befürwortend)" in page
 
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()
@@ -199,7 +202,6 @@ def test_view_vote(swissvotes_app, sample_vote):
 
 
 def test_view_vote_deciding_question(swissvotes_app, sample_vote):
-    del sample_vote.posters_yes_imgs
     sample_vote._legal_form = 5
 
     swissvotes_app.session().add(sample_vote)
@@ -211,15 +213,11 @@ def test_view_vote_deciding_question(swissvotes_app, sample_vote):
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
 
-    assert "Offizielle Chronologie" in page
-    assert "Ergebnisübersicht Bundeskanzlei" in page
-    assert "Ergebnisübersicht Bundeskanzlei" in page
-
     assert "Wähleranteil des Lagers für Bevorzugung der Initiative" in page
-    assert "Abgelehnt" not in page
-    assert "Angenommen"not in page
-    assert "Ja" not in page
-    assert "Nein" not in page
+    assert "(40.01% für die Initiative)" in page
+    assert "(1.5 für die Initiative, 24.5 für den Gegenentwurf)" in page
+    assert "(10 für die Initiative, 20 für den Gegenentwurf)" in page
+    assert "(30 für die Initiative, 40 für den Gegenentwurf)" in page
 
 
 def test_vote_upload(swissvotes_app, attachments):

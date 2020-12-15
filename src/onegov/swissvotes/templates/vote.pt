@@ -167,8 +167,8 @@
                     </tr>
                     <tr tal:condition="vote.duration_federal_assembly is not None">
                         <th class="column-30">
-                        <span i18n:translate>Duration in Parliament</span>
-                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the Federal Council dispatch and the Parliament’s final vote"><i class="fa fa-info" aria-hidden="true"></i></span>
+                          <span i18n:translate>Duration in Parliament</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the Federal Council dispatch and the Parliament’s final vote"><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td>${layout.format_number(vote.duration_federal_assembly)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
@@ -305,7 +305,20 @@
                             </dl>
                         </td>
                     </tr>
-                    <!--? Posters Museum für Gestaltung                    -->
+                    <tr tal:condition="vote.media_ads_total">
+                        <th class="column-30">
+                          <span i18n:translate>Number of adverts in print media</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Total number of adverts on the vote published in some 50 print media outlets in the last 8 weeks before voting day (intensity of the advertising campaign). For more details, see Année Politique Suisse's analysis of the advertising campaign."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_ads_total)}</td>
+                    </tr>
+                    <tr tal:condition="vote.media_ads_yea_p">
+                        <th class="column-30">
+                          <span i18n:translate>Percentage of adverts for a 'yes'</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Percentage of adverts canvassing a 'yes' vote. A figure of over 50% indicates that more adverts for a 'yes' than for a 'no' were placed. For more details, see the analysis of the advertising campaign by Année Politique Suisse."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_ads_yea_p, 0)}%</td>
+                    </tr>
                     <tr tal:condition="vote.posters_yes_imgs">
                         <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a Yes</th>
                         <td>
@@ -322,6 +335,23 @@
                         <th class="column-30" i18n:translate>Analysis of the advertising campaign</th>
                         <td><a href="${layout.attachments['ad_analysis']}" target="_blank" class="ad-analysis">PDF</a>
                         <span tal:condition="request.html_lang == 'en-US'">(in German)</span><span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="vote.media_coverage_articles_total">
+                        <th class="column-30">
+                          <span i18n:translate>Media coverage: number of articles</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of media articles on the vote that appeared in a selection of media outlets in the last 12 weeks before voting day. Hence, this indicator measures the intensity of media coverage of the vote. For more details, see the fög analysis report."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_coverage_articles_total)}</td>
+                    </tr>
+                    <tr tal:condition="vote.media_coverage_tonality_total">
+                        <th class="column-30">
+                          <span i18n:translate>Media coverage: tonality</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="A positive figure means that the ‘yes’ position was covered more broadly than the ‘no’ position in the analysed media outlets. A negative figure means that the ‘no’ position prevailed in the analysed media sample. The tonality indicator can range from -100 (all media coverage was negative) to +100 (all media coverage was positive). For more details, see the fög analysis report."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_coverage_tonality_total)}
+                          <span i18n:translate tal:condition="vote.media_coverage_tonality_total > 0">(predominantly positive)</span>
+                          <span i18n:translate tal:condition="vote.media_coverage_tonality_total < 0">(predominantly negative)</span>
                         </td>
                     </tr>
                     <tr tal:condition="layout.attachments['foeg_analysis']">
