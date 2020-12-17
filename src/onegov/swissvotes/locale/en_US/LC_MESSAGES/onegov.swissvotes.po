@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-12-15 07:39+0100\n"
+"POT-Creation-Date: 2020-12-17 16:51+0100\n"
 "PO-Revision-Date: 2020-12-15 07:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -869,13 +869,13 @@ msgid "d-3-325"
 msgstr "Conscientious objection, Civilian service"
 
 msgid "d-3-326"
-msgstr "Armed forces - general"
-
-msgid "d-3-327"
 msgstr "Abolition of the armed forces"
 
-msgid "d-3-328"
+msgid "d-3-327"
 msgstr "Military training"
+
+msgid "d-3-328"
+msgstr "International deployment"
 
 msgid "d-2-33"
 msgstr "National economic supply"

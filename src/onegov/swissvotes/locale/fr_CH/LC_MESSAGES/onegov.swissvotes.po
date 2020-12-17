@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-12-15 07:39+0100\n"
+"POT-Creation-Date: 2020-12-17 16:51+0100\n"
 "PO-Revision-Date: 2020-12-15 07:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -877,15 +877,14 @@ msgstr "Installations militaires"
 msgid "d-3-325"
 msgstr "Refus de servir – service civil"
 
-#, fuzzy
 msgid "d-3-326"
-msgstr "Armée (aspects généraux)"
-
-msgid "d-3-327"
 msgstr "Abolition de l’armée"
 
-msgid "d-3-328"
+msgid "d-3-327"
 msgstr "Formation militaire"
+
+msgid "d-3-328"
+msgstr "Engagements à l'étranger"
 
 msgid "d-2-33"
 msgstr "Approvisionnement du pays"
