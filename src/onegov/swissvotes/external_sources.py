@@ -79,19 +79,19 @@ def update_poster_urls(request):
     failed_total = 0
     for vote in request.session.query(SwissVote):
         changed, added, updated, failed = fetch_changed(
-            vote.posters_yes, vote.posters_yes_imgs, key)
+            vote.posters_mfg_yea, vote.posters_mfg_yea_imgs, key)
         updated_total += updated
         added_total += added
         failed_total += failed
         if changed:
-            vote.posters_yes_imgs = changed
+            vote.posters_mfg_yea_imgs = changed
 
         changed, added, updated, failed = fetch_changed(
-            vote.posters_no, vote.posters_no_imgs, key)
+            vote.posters_mfg_nay, vote.posters_mfg_nay_imgs, key)
         updated_total += updated
         added_total += added
         failed_total += failed
         if changed:
-            vote.posters_no_imgs = changed
+            vote.posters_mfg_nay_imgs = changed
 
     return added_total, updated_total, failed_total

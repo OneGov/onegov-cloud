@@ -526,8 +526,10 @@ class ColumnMapper(object):
             ('national_council_share_free_vote', 'freigabe-summe'),  # 5
             ('national_council_share_neutral', 'neutral-summe'),  # 66
             ('national_council_share_unknown', 'unbekannt-summe'),
-            ('posters_yes', 'poster_ja'),
-            ('posters_no', 'poster_nein'),
+            ('posters_mfg_yea', 'poster_ja_mfg'),
+            ('posters_mfg_nay', 'poster_nein_mfg'),
+            ('posters_sa_yea', 'poster_ja_sa'),
+            ('posters_sa_nay', 'poster_nein_sa'),
             ('_result_people_accepted', 'volk'),
             ('_result_cantons_accepted', 'stand'),
             ('_result', 'annahme'),
@@ -755,8 +757,6 @@ class ColumnMapper(object):
             ('bkresults_fr', 'bkresults-fr'),
             ('bfs_map_de', 'bfsmap-de'),
             ('bfs_map_fr', 'bfsmap-fr'),
-            # poster_ja_sa
-            # poster_nein_sa
             ('media_ads_total', 'inserate-total'),
             ('media_ads_per_issue', 'inserate-je-ausgabe'),
             ('media_ads_yea', 'inserate-ja'),

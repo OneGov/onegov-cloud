@@ -384,3 +384,24 @@ def add_media_fields(context):
     for column, type_ in columns:
         if not context.has_column('swissvotes', column):
             context.operations.add_column('swissvotes', Column(column, type_))
+
+
+@upgrade_task(
+    'Add additional poster links',
+    requires='onegov.swissvotes:Adds poster_yes and poster_no'
+)
+def add_additional_poster_links(context):
+    for old, new in (
+        ('posters_yes', 'posters_mfg_yea'),
+        ('posters_no', 'posters_mfg_nay')
+    ):
+        if (
+            context.has_column('swissvotes', old)
+            and not context.has_column('swissvotes', new)
+        ):
+            context.operations.alter_column(
+                'swissvotes', old, new_column_name=new
+            )
+    for column in ('posters_sa_yea', 'posters_sa_nay'):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text()))

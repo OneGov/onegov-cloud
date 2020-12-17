@@ -204,13 +204,15 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     bkchrono_de = Column(Text)
     bkchrono_fr = Column(Text)
 
-    # space-sep urls for Museum for Gestaltung, coming from the dataset
-    posters_yes = Column(Text)
-    posters_no = Column(Text)
+    # space-separated poster URLs coming from the dataset
+    posters_mfg_yea = Column(Text)
+    posters_mfg_nay = Column(Text)
+    posters_sa_yea = Column(Text)
+    posters_sa_nay = Column(Text)
 
     # Fetched list of image urls using MfG API
-    posters_yes_imgs = meta_property()
-    posters_no_imgs = meta_property()
+    posters_mfg_yea_imgs = meta_property()
+    posters_mfg_nay_imgs = meta_property()
 
     # Post-vote poll
     post_vote_poll_link_de = Column(Text)
@@ -282,16 +284,19 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
             return self.bkchrono_de
 
     def poster_links(self, answer):
+        # todo: make me a property!
         assert answer in ('yes', 'no')
         if answer == 'yes':
-            if not self.posters_yes_imgs or not self.posters_yes:
+            if not self.posters_mfg_yea_imgs or not self.posters_mfg_yea:
                 return None
-            sources = self.posters_yes.split(' ')
-            return ((url, self.posters_yes_imgs.get(url)) for url in sources)
-        if not self.posters_no_imgs or not self.posters_no:
+            sources = self.posters_mfg_yea.split(' ')
+            return (
+                (url, self.posters_mfg_yea_imgs.get(url)) for url in sources
+            )
+        if not self.posters_mfg_nay_imgs or not self.posters_mfg_nay:
             return None
-        sources = self.posters_no.split(' ')
-        return ((url, self.posters_no_imgs.get(url)) for url in sources)
+        sources = self.posters_mfg_nay.split(' ')
+        return ((url, self.posters_mfg_nay_imgs.get(url)) for url in sources)
 
     @property
     def post_vote_poll_link(self):

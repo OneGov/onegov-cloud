@@ -45,15 +45,6 @@ class VotesLayout(DefaultLayout):
                     )
                 )
             )
-            # result.append(
-            #     Link(
-            #         text=_("Update external resources"),
-            #         url=self.request.link(
-            #             self.model.default(),
-            #             name='update-external-resources'),
-            #         attrs={'class': 'update-icon'}
-            #     )
-            # )
             result.append(
                 Link(
                     text=_("Download dataset (CSV)"),

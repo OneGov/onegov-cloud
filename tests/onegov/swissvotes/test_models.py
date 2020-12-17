@@ -273,7 +273,7 @@ def test_principal(session):
     assert principal
 
 
-def test_vote(session, sample_vote):
+def test_vote1(session, sample_vote):
     session.add(sample_vote)
     session.flush()
     session.expunge_all()
@@ -317,17 +317,26 @@ def test_vote(session, sample_vote):
     assert vote.bfs_map_host('de_CH') == "https://www.atlas.bfs.admin.ch"
     assert vote.bfs_map_host('en_US') == "https://www.atlas.bfs.admin.ch"
     assert vote.bfs_map_host('fr_CH') == ""
-    assert vote.posters_yes == 'https://yes.com/objects/1 ' \
-                               'https://yes.com/objects/2'
-
-    assert vote.posters_no == 'https://no.com/objects/1 ' \
-                              'https://no.com/objects/2'
-
-    # Stored dictionaries with poster urls as keys
-    assert vote.posters_yes_imgs == {
+    assert vote.posters_mfg_yea == (
+        'https://yes.com/objects/1 '
+        'https://yes.com/objects/2'
+    )
+    assert vote.posters_mfg_nay == (
+        'https://no.com/objects/1 '
+        'https://no.com/objects/2'
+    )
+    assert vote.posters_sa_yea == (
+        'https://yes.com/objects/3 '
+        'https://yes.com/objects/4'
+    )
+    assert vote.posters_sa_nay == (
+        'https://no.com/objects/3 '
+        'https://no.com/objects/4'
+    )
+    assert vote.posters_mfg_yea_imgs == {
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
-    assert vote.posters_no_imgs is None
+    assert vote.posters_mfg_nay_imgs is None
     assert vote.swissvoteslink == 'https://example.com/122.0'
     assert vote.bk_chrono == 'bkc_de'
     assert vote.bk_results == 'bkr_de'
@@ -1112,8 +1121,6 @@ def test_recommendations_parties(sample_vote):
     # Remove entries in codes for unknown and actor no longer exists
     del codes[9999]
     del codes[None]
-    # print(grouped.keys())
-    # print(codes.values())
     assert list(grouped.keys()) == list(codes.values())
 
 

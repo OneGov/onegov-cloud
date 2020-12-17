@@ -283,11 +283,25 @@ def sample_vote():
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
     vote.bfs_map_fr = "htt(ps://www.ap/mapIdOnly/1815[e.html}"
-    vote.posters_yes = 'https://yes.com/objects/1 https://yes.com/objects/2'
-    vote.posters_no = 'https://no.com/objects/1 https://no.com/objects/2'
-    vote.posters_yes_imgs = {
+    vote.posters_mfg_yea = (
+        'https://yes.com/objects/1 '
+        'https://yes.com/objects/2'
+    )
+    vote.posters_mfg_nay = (
+        'https://no.com/objects/1 '
+        'https://no.com/objects/2'
+    )
+    vote.posters_mfg_yea_imgs = {
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
+    vote.posters_sa_yea = (
+        'https://yes.com/objects/3 '
+        'https://yes.com/objects/4'
+    )
+    vote.posters_sa_nay = (
+        'https://no.com/objects/3 '
+        'https://no.com/objects/4'
+    )
     vote.curia_vista_de = 'cv_de'
     vote.curia_vista_fr = 'cv_fr'
     vote.bkresults_de = 'bkr_de'

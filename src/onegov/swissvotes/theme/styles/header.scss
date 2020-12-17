@@ -122,6 +122,7 @@ header {
         .export-icon::before { @include icon('\f019'); }
         .page-icon::before { @include icon('\f0f6'); }
         .upload-icon::before { @include icon('\f0ee'); }
+        .update-icon::before { @include icon('\f021'); }
     }
 
     .breadcrumbs {

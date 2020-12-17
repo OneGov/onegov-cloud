@@ -852,7 +852,6 @@ def test_votes_export(swissvotes_app):
         result_cantons_yeas=Decimal('1.5'),
         result_cantons_nays=Decimal('24.5'),
         result_cantons_yeas_p=Decimal('60.01'),
-        posters_no="https://museum.ch/objects/1 https://museum.ch/objects/1",
         swissvoteslink='https://example.com/122.0',
     )
     vote.result_ag_eligible_voters = 101
@@ -1554,6 +1553,22 @@ def test_votes_export(swissvotes_app):
     vote.bkresults_fr = 'bkresults_fr'
     vote.bkchrono_de = 'bkchrono_de'
     vote.bkchrono_fr = 'bkchrono_fr'
+    vote.posters_mfg_yea = (
+        'https://museum.ch/objects/1 '
+        'https://museum.ch/objects/2'
+    )
+    vote.posters_mfg_nay = (
+        'https://museum.ch/objects/3 '
+        'https://museum.ch/objects/4'
+    )
+    vote.posters_sa_yea = (
+        'https://sozialarchiv.ch/objects/1 '
+        'https://sozialarchiv.ch/objects/2'
+    )
+    vote.posters_sa_nay = (
+        'https://sozialarchiv.ch/objects/3 '
+        'https://sozialarchiv.ch/objects/4'
+    )
     vote.post_vote_poll_link_de = 'https://post.vote.poll/de'
     vote.post_vote_poll_link_fr = 'https://post.vote.poll/fr'
     vote.post_vote_poll_link_en = 'https://post.vote.poll/en'
@@ -2312,9 +2327,22 @@ def test_votes_export(swissvotes_app):
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
-        'poster_nein': "https://museum.ch/objects/1 "
-                       "https://museum.ch/objects/1",
-        'poster_ja': '.',
+        'poster_ja_mfg': (
+            'https://museum.ch/objects/1 '
+            'https://museum.ch/objects/2'
+        ),
+        'poster_nein_mfg': (
+            'https://museum.ch/objects/3 '
+            'https://museum.ch/objects/4'
+        ),
+        'poster_ja_sa': (
+            'https://sozialarchiv.ch/objects/1 '
+            'https://sozialarchiv.ch/objects/2'
+        ),
+        'poster_nein_sa': (
+            'https://sozialarchiv.ch/objects/3 '
+            'https://sozialarchiv.ch/objects/4'
+        ),
         'swissvoteslink': 'https://example.com/122.0',
         'nach_cockpit_d': 'https://post.vote.poll/de',
         'nach_cockpit_f': 'https://post.vote.poll/fr',
@@ -3079,9 +3107,22 @@ def test_votes_export(swissvotes_app):
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
-        'poster_ja': '',
-        'poster_nein': "https://museum.ch/objects/1 "
-                       "https://museum.ch/objects/1",
+        'poster_ja_mfg': (
+            'https://museum.ch/objects/1 '
+            'https://museum.ch/objects/2'
+        ),
+        'poster_nein_mfg': (
+            'https://museum.ch/objects/3 '
+            'https://museum.ch/objects/4'
+        ),
+        'poster_ja_sa': (
+            'https://sozialarchiv.ch/objects/1 '
+            'https://sozialarchiv.ch/objects/2'
+        ),
+        'poster_nein_sa': (
+            'https://sozialarchiv.ch/objects/3 '
+            'https://sozialarchiv.ch/objects/4'
+        ),
         'swissvoteslink': 'https://example.com/122.0',
         'nach_cockpit_d': 'https://post.vote.poll/de',
         'nach_cockpit_f': 'https://post.vote.poll/fr',
