@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2020.91`
+
+> commits: **1 / [b54e09f9a8...b54e09f9a8](https://github.com/OneGov/onegov-cloud/compare/b54e09f9a8^...b54e09f9a8)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.91)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvote
+
+🎉 **Add poster columns.**
+
+**`Feature`** | **[VOTES-87](https://issues.seantis.ch/browse/VOTES-87)** | **[b54e09f9a8](https://github.com/onegov/onegov-cloud/commit/b54e09f9a8371d2f72f3d80e3b853148090f04e7)**
+
 ## Release `2020.90`
 
-> commits: **1 / [e38c9928a7...e38c9928a7](https://github.com/OneGov/onegov-cloud/compare/e38c9928a7^...e38c9928a7)**  
+> released: **2020-12-15 13:17**<br>
+> commits: **2 / [e38c9928a7...a2117c0bd2](https://github.com/OneGov/onegov-cloud/compare/e38c9928a7^...a2117c0bd2)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.90)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.89`
