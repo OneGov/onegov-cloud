@@ -351,7 +351,7 @@
                           <span i18n:translate>Media coverage: tonality</span>
                           <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="A positive figure means that the ‘yes’ position was covered more broadly than the ‘no’ position in the analysed media outlets. A negative figure means that the ‘no’ position prevailed in the analysed media sample. The tonality indicator can range from -100 (all media coverage was negative) to +100 (all media coverage was positive). For more details, see the fög analysis report."><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
-                        <td>${layout.format_number(vote.media_coverage_tonality_total)}
+                        <td>${layout.format_number(vote.media_coverage_tonality_total, 0)}
                           <span i18n:translate tal:condition="vote.media_coverage_tonality_total > 0">(predominantly positive)</span>
                           <span i18n:translate tal:condition="vote.media_coverage_tonality_total < 0">(predominantly negative)</span>
                         </td>
