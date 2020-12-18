@@ -1091,6 +1091,7 @@ def test_orm_signals(postgres_dsn):
     assert len(inserted) == 2
 
     session.query(Document).update({'body': 'hello world'})
+    session.expire_all()
     assert len(updated) == 2
     assert updated[0][0].body == 'hello world'
     assert updated[0][1] == 'foo'
