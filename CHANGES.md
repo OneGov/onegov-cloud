@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2020.92`
+
+> commits: **6 / [a1c4aeac92...342bec332b](https://github.com/OneGov/onegov-cloud/compare/a1c4aeac92^...342bec332b)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.92)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🎉 **Round decimal half way up/away from zero.**
+
+**`Feature`** | **[fe889c3fa9](https://github.com/onegov/onegov-cloud/commit/fe889c3fa9549422326ca859f1c20217a8325b3f)**
+
+🐞 **Updates translations.**
+
+**`Bugfix`** | **[VOTES-76](https://issues.seantis.ch/browse/VOTES-76)** | **[a1c4aeac92](https://github.com/onegov/onegov-cloud/commit/a1c4aeac9222365af238696c04c41f852cb40463)**
+
+🐞 **Change tonality columns to numeric.**
+
+**`Bugfix`** | **[VOTES-75](https://issues.seantis.ch/browse/VOTES-75)** | **[cd2ede0af3](https://github.com/onegov/onegov-cloud/commit/cd2ede0af39b25226308ff59524f6183ab2d6117)**
+
+🐞 **Update translations.**
+
+**`Bugfix`** | **[VOTES-75](https://issues.seantis.ch/browse/VOTES-75)** | **[4a1e073d82](https://github.com/onegov/onegov-cloud/commit/4a1e073d82ee4992d53d85d39ddf36c05e30c5bd)**
+
+🐞 **Round tonality to int.**
+
+**`Bugfix`** | **[VOTES-75](https://issues.seantis.ch/browse/VOTES-75)** | **[342bec332b](https://github.com/onegov/onegov-cloud/commit/342bec332bcda6345ad0c90e62a8824b9eb7911c)**
+
 ## Release `2020.91`
 
-> commits: **1 / [b54e09f9a8...b54e09f9a8](https://github.com/OneGov/onegov-cloud/compare/b54e09f9a8^...b54e09f9a8)**  
+> released: **2020-12-17 14:53**<br>
+> commits: **2 / [b54e09f9a8...06d0a07572](https://github.com/OneGov/onegov-cloud/compare/b54e09f9a8^...06d0a07572)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.91)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvote
