@@ -405,3 +405,19 @@ def add_additional_poster_links(context):
     for column in ('posters_sa_yea', 'posters_sa_nay'):
         if not context.has_column('swissvotes', column):
             context.operations.add_column('swissvotes', Column(column, Text()))
+
+
+@upgrade_task('Change media tonality types to numeric')
+def change_media_tonality_types(context):
+    context.operations.execute(
+        'ALTER TABLE swissvotes '
+        'ALTER COLUMN media_coverage_tonality_total TYPE NUMERIC(13, 10)'
+    )
+    context.operations.execute(
+        'ALTER TABLE swissvotes '
+        'ALTER COLUMN media_coverage_tonality_d TYPE NUMERIC(13, 10)'
+    )
+    context.operations.execute(
+        'ALTER TABLE swissvotes '
+        'ALTER COLUMN media_coverage_tonality_f TYPE NUMERIC(13, 10)'
+    )

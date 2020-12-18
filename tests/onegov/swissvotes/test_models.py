@@ -351,9 +351,9 @@ def test_vote1(session, sample_vote):
     assert vote.media_coverage_articles_total == 3007
     assert vote.media_coverage_articles_d == 3008
     assert vote.media_coverage_articles_f == 3009
-    assert vote.media_coverage_tonality_total == 3010
-    assert vote.media_coverage_tonality_d == 3011
-    assert vote.media_coverage_tonality_f == 3012
+    assert vote.media_coverage_tonality_total == Decimal('30.10')
+    assert vote.media_coverage_tonality_d == Decimal('30.11')
+    assert vote.media_coverage_tonality_f == Decimal('30.12')
 
     # localized properties
     vote.session_manager.current_locale = 'fr_CH'

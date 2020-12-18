@@ -321,9 +321,9 @@ def sample_vote():
     vote.media_coverage_articles_total = 3007
     vote.media_coverage_articles_d = 3008
     vote.media_coverage_articles_f = 3009
-    vote.media_coverage_tonality_total = 3010
-    vote.media_coverage_tonality_d = 3011
-    vote.media_coverage_tonality_f = 3012
+    vote.media_coverage_tonality_total = Decimal('30.10')
+    vote.media_coverage_tonality_d = Decimal('30.11')
+    vote.media_coverage_tonality_f = Decimal('30.12')
     vote.descriptor_1_level_1 = Decimal('4')
     vote.descriptor_1_level_2 = Decimal('4.2')
     vote.descriptor_1_level_3 = Decimal('4.21')

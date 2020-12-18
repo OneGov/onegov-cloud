@@ -1581,9 +1581,9 @@ def test_votes_export(swissvotes_app):
     vote.media_coverage_articles_total = 1007
     vote.media_coverage_articles_d = 1008
     vote.media_coverage_articles_f = 1009
-    vote.media_coverage_tonality_total = 1010
-    vote.media_coverage_tonality_d = 1011
-    vote.media_coverage_tonality_f = 1012
+    vote.media_coverage_tonality_total = Decimal('10.10')
+    vote.media_coverage_tonality_d = Decimal('10.11')
+    vote.media_coverage_tonality_f = Decimal('10.12')
 
     votes.session.flush()
     votes.session.expire_all()
@@ -2356,9 +2356,9 @@ def test_votes_export(swissvotes_app):
         'mediares-tot': '1007',
         'mediares-d': '1008',
         'mediares-f': '1009',
-        'mediaton-tot': '1010',
-        'mediaton-d': '1011',
-        'mediaton-f': '1012',
+        'mediaton-tot': '10,1',
+        'mediaton-d': '10,11',
+        'mediaton-f': '10,12',
     }
     assert csv == expected
 
@@ -3136,9 +3136,9 @@ def test_votes_export(swissvotes_app):
         'mediares-tot': 1007,
         'mediares-d': 1008,
         'mediares-f': 1009,
-        'mediaton-tot': 1010,
-        'mediaton-d': 1011,
-        'mediaton-f': 1012,
+        'mediaton-tot': 10.10,
+        'mediaton-d': 10.11,
+        'mediaton-f': 10.12,
     }
     assert xlsx == expected
 

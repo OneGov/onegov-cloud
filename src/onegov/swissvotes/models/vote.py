@@ -229,9 +229,11 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     media_coverage_articles_total = Column(Integer)
     media_coverage_articles_d = deferred(Column(Integer), group='dataset')
     media_coverage_articles_f = deferred(Column(Integer), group='dataset')
-    media_coverage_tonality_total = Column(Integer)
-    media_coverage_tonality_d = deferred(Column(Integer), group='dataset')
-    media_coverage_tonality_f = deferred(Column(Integer), group='dataset')
+    media_coverage_tonality_total = Column(Numeric(13, 10))
+    media_coverage_tonality_d = deferred(Column(Numeric(13, 10)),
+                                         group='dataset')
+    media_coverage_tonality_f = deferred(Column(Numeric(13, 10)),
+                                         group='dataset')
 
     @property
     def title(self):
