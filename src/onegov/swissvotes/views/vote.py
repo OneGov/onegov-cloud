@@ -579,7 +579,9 @@ def view_file(self, request):
             'post_vote_poll_dataset': 'csv'
         }.get(name, 'pdf')
         title = {
-            'ad_analysis': _("Analysis of the advertising campaign"),
+            'ad_analysis': _(
+                "Analysis of the advertising campaign by Année Politique"
+            ),
             'brief_description': _("Brief description Swissvotes"),
             'federal_council_message': _("Federal council message"),
             'foeg_analysis': _("Media coverage: fög analysis"),
