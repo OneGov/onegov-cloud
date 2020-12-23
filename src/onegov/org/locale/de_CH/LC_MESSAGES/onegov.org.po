@@ -2082,8 +2082,8 @@ msgstr ""
 
 msgid "corona_message"
 msgstr ""
-"Aufgrund der ausserordentlichen Lage verbietet der Bundesrat öffentliche und "
-"private Veranstaltungen. Alle Events sind damit abgesagt und finden nicht "
+"Zur Eindämmung des Coronavirus verbietet der Bundesrat öffentliche "
+"Veranstaltungen. Alle Veranstaltungen sind damit abgesagt und finden nicht "
 "statt."
 
 msgid "Don't have an account yet?"
