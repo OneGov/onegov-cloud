@@ -2089,9 +2089,9 @@ msgstr ""
 
 msgid "corona_message"
 msgstr ""
-"En raison de la situation exceptionnelle, le Conseil fédéral interdit les "
-"manifestations publiques et privées. Tous les événements sont donc annulés "
-"et n'auront pas lieu."
+"Dans le but de contenir le coronavirus, le Conseil fédéral interdit les "
+"manifestations publiques. Tous les événements sont donc annulés et n'auront "
+"pas lieu."
 
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
