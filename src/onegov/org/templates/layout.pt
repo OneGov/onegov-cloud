@@ -154,7 +154,7 @@
               <tal:b metal:use-macro="layout.macros['consume_messages']" />
                 <div data-alert class="alert-box homepage-warning"
                         tal:define="url_part request.path_info; app_id request.app.application_id"
-                        tal:condition="python: url_part == '/' and 'onegov_org' not in app_id and 'onegov_feriennet' not in app_id and 'onegov_winterthur' not in app_id"
+                        tal:condition="python: url_part.startswith('/event') and 'onegov_org' not in app_id and 'onegov_feriennet' not in app_id and 'onegov_winterthur' not in app_id"
                 >
                     <div class="icon"></div>
                     <div i18n:translate>
