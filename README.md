@@ -181,6 +181,18 @@ To configure your setup, copy the example configuration and adjust it to your ne
 
     cp onegov.yml.example onegov.yml
 
+## Create database for onegov
+
+Define a user `dev` and password `devpassword` using `dsn: postgresql://dev:devpassword@localhost:5432/onegov` 
+in `onegov.yml`:
+
+    sudo -u postgres psql
+    
+    CREATE USER dev WITH PASSWORD 'devpassword' LOGIN NOINHERIT;
+    ALTER USER dev WITH SUPERUSER;
+    CREATE DATABASE onegov;
+    GRANT ALL PRIVILEGES ON DATABASE onegov TO dev;
+
 Once you are happy, you can start your first organisation:
 
     onegov-org --select /onegov_org/govikon add "Gemeinde Govikon"
