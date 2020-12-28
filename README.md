@@ -192,6 +192,7 @@ in `onegov.yml`:
     ALTER USER dev WITH SUPERUSER;
     CREATE DATABASE onegov;
     GRANT ALL PRIVILEGES ON DATABASE onegov TO dev;
+    ALTER DATABASE onegov SET timezone TO 'UTC';
 
 Once you are happy, you can start your first organisation:
 
