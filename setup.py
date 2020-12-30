@@ -166,7 +166,7 @@ setup(
         ],
         'docs': [
             'alabaster',
-            'sphinx',
+            'sphinx<3.4.0',
         ],
         'test': [
             'Pillow!=5.4.0',
