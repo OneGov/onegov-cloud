@@ -11,6 +11,7 @@ rm /etc/apt/preferences
 install-packages \
     wget \
     apparmor \
+    curl \
     git-core \
     postgresql \
     redis \

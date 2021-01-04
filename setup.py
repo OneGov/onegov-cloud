@@ -185,6 +185,7 @@ setup(
             'psutil',
             'pyquery',
             'pytest',
+            'pytest-cov',
             'pytest-localserver',
             'pytest-redis',
             'pytest-rerunfailures',
