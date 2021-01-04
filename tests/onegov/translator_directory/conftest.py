@@ -29,12 +29,12 @@ def hashed_password():
     return _hashed_password
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def translator_app(request, hashed_password):
     yield create_translator_app(request, False, hashed_password)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_translator_app(request, hashed_password):
     yield create_translator_app(request, True, hashed_password)
 

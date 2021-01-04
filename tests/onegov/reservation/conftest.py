@@ -6,7 +6,7 @@ from onegov.reservation import LibresIntegration
 from uuid import uuid4
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def libres_context(session_manager):
 
     session_manager.bases.append(ORMBase)

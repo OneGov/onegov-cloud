@@ -27,12 +27,12 @@ def addresses_csv(fixtures):
         yield CSVFile(f)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def winterthur_app(request):
     yield create_winterthur_app(request, use_elasticsearch=False)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_winterthur_app(request):
     yield create_winterthur_app(request, use_elasticsearch=True)
 

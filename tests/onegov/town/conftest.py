@@ -11,24 +11,24 @@ from onegov.town.initial_content import create_new_organisation
 from onegov.user import User
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def handlers():
     yield onegov.ticket.handlers
     onegov.ticket.handlers.registry = {}
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def forms():
     yield list(builtin_form_definitions(
         module_path('onegov.town', 'forms/builtin')))
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def town_app(request):
     yield create_town_app(request, use_elasticsearch=False)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_town_app(request):
     yield create_town_app(request, use_elasticsearch=True)
 

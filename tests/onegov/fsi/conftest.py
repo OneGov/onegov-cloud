@@ -47,22 +47,22 @@ def hashed_password():
     return _hashed_password
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def fsi_app(request, hashed_password):
     yield create_fsi_app(request, False, hashed_password)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def fsi_app_mocked(request, hashed_password):
     yield create_fsi_app(request, False, hashed_password, mock_db=True)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_fsi_app(request, hashed_password):
     yield create_fsi_app(request, True, hashed_password)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_fsi_app_mocked(request, hashed_password):
     yield create_fsi_app(request, True, hashed_password, mock_db=True)
 

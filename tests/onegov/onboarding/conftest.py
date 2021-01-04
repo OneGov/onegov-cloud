@@ -8,7 +8,7 @@ from onegov.core.utils import scan_morepath_modules
 from uuid import uuid4
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url, redis_url):
 
     scan_morepath_modules(onegov.onboarding.OnboardingApp)
