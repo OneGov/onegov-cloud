@@ -1,7 +1,4 @@
-
 import babel.dates
-from pytz import UTC
-
 import onegov.core
 import onegov.org
 import pytest
@@ -19,15 +16,11 @@ from onegov.core import __version__
 from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
-from onegov.directory import DirectoryEntry, DirectoryCollection, \
-    DirectoryConfiguration
-from onegov.directory.models.directory import DirectoryFile
+from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.file import FileCollection
-from onegov.form import FormCollection, FormSubmission, FormFile
-from onegov.form.display import TimezoneDateTimeFieldRenderer
+from onegov.form import FormCollection, FormSubmission
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
-from onegov.org.models import ExtendedDirectoryEntry
 from onegov.org.theme.org_theme import HELVETICA
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection
@@ -35,15 +28,13 @@ from onegov.people import Person
 from onegov.reservation import ResourceCollection, Reservation
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
-from tests.shared import utils
 from purl import URL
-from sedate import replace_timezone, standardize_date, utcnow, to_timezone
+from sedate import replace_timezone
+from tests.shared import utils
+from tests.shared.utils import decode_map_value, encode_map_value
 from unittest.mock import patch
 from webtest import Upload
 from yubico_client import Yubico
-
-from tests.shared.utils import decode_map_value, \
-    encode_map_value, open_in_browser
 
 
 def test_view_permissions():
@@ -300,39 +291,25 @@ def test_pages(client):
 def test_news(client):
     client.login_admin().follow()
 
-    def text_without_version(page):
-        return page.text.replace(__version__, '')
-
     page = client.get('/news')
-    assert str(datetime.utcnow().year) not in text_without_version(page)
-
     page = page.click('Nachricht')
-
     page.form['title'] = "We have a new homepage"
     page.form['lead'] = "It is very good"
     page.form['text'] = "It is lots of fun"
-
     page = page.form.submit().follow()
 
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" in page.text
-    assert str(datetime.utcnow().year) not in text_without_version(page)
 
     page = client.get('/news')
-
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" not in page.text
 
-    # do not show the year in the news list if there's only one
-    assert str(datetime.utcnow().year) not in text_without_version(page)
-
     page = client.get('/news/we-have-a-new-homepage')
-
     client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
     page = client.get('/news')
-
     assert "We have a new homepage" not in page.text
     assert "It is very good" not in page.text
     assert "It is lots of fun" not in page.text
@@ -1102,7 +1079,6 @@ def test_resources(client):
     page = new.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
-
     resource = client.get('/resource/meeting-room')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
@@ -1139,7 +1115,7 @@ def add_reservation(
         if add_ticket:
             with client.app.session().no_autoflush:
                 tickets = TicketCollection(client.app.session())
-                ticket = tickets.open_ticket(
+                tickets.open_ticket(
                     handler_code='RSV', handler_id=resource_token.hex
                 )
     return resource
@@ -2078,16 +2054,16 @@ def test_reserve_session_separation(client):
     resource = client.app.libres_resources.by_name('meeting-room')
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
-    result = c1.get('/resource/meeting-room/reservations'.format(room)).json
+    result = c1.get('/resource/meeting-room/reservations').json
     assert len(result['reservations']) == 0
 
-    result = c1.get('/resource/gym/reservations'.format(room)).json
+    result = c1.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
 
-    result = c2.get('/resource/meeting-room/reservations'.format(room)).json
+    result = c2.get('/resource/meeting-room/reservations').json
     assert len(result['reservations']) == 1
 
-    result = c2.get('/resource/gym/reservations'.format(room)).json
+    result = c2.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
 
 
@@ -4682,7 +4658,7 @@ def test_allocation_rules_on_rooms(client):
         return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
 
     def run_cronjob():
-        client.get(f'/resource/room/process-rules')
+        client.get('/resource/room/process-rules')
 
     page = client.get('/resource/room').click("Regeln").click("Regel")
     page.form['title'] = 'Täglich'
@@ -4781,7 +4757,7 @@ def test_allocation_rules_on_daypasses(client):
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
     def run_cronjob():
-        client.get(f'/resource/daypass/process-rules')
+        client.get('/resource/daypass/process-rules')
 
     page = client.get('/resource/daypass').click("Regeln").click("Regel")
     page.form['title'] = 'Monatlich'
@@ -4848,7 +4824,7 @@ def test_allocation_rules_with_holidays(client):
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
     def run_cronjob():
-        client.get(f'/resource/daypass/process-rules')
+        client.get('/resource/daypass/process-rules')
 
     page = client.get('/resource/daypass').click("Regeln").click("Regel")
     page.form['title'] = 'Jährlich'
@@ -5250,9 +5226,9 @@ def test_bug_semicolons_in_choices_with_filters(client):
     session = client.app.session()
     test_label = "Z: with semicolon"
 
-    structure = f"""    
+    structure = f"""
     Name *= ___
-    Choice *= 
+    Choice *=
         (x) {test_label}
         ( ) B
         ( ) C
