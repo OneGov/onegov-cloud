@@ -85,7 +85,8 @@ def get_events_view(
         limit=limit,
         show_hidden=show_hidden,
         course_id=course_id,
-        sort_desc=sort_desc
+        sort_desc=sort_desc,
+        show_locked=True
     )
 
 
