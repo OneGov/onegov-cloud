@@ -450,7 +450,7 @@
                 </tbody>
             </table>
 
-            <table class="collapsible">
+            <table class="collapsible" tal:condition="layout.attachments['post_vote_poll'] or vote.post_vote_poll_link or layout.attachments['post_vote_poll_methodology'] or layout.attachments['post_vote_poll_dataset'] or layout.attachments['post_vote_poll_codebook']">
                 <thead>
                     <tr><th colspan="2" i18n:translate>Post-vote poll</th></tr>
                 </thead>
