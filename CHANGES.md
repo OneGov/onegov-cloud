@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2021.1`
+
+> commits: **5 / [5271b4b6cf...df3622befc](https://github.com/OneGov/onegov-cloud/compare/5271b4b6cf^...df3622befc)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.1)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvote
+
+🐞 **Reposition campaign material.**
+
+**`Bugfix`** | **[VOTES-90](https://issues.seantis.ch/browse/VOTES-90)** | **[5271b4b6cf](https://github.com/onegov/onegov-cloud/commit/5271b4b6cfda21e223a395e411023b0f30836dc2)**
+
+🐞 **Hide empty post-vote poll phases.**
+
+**`Bugfix`** | **[VOTES-90](https://issues.seantis.ch/browse/VOTES-90)** | **[f24d41d6f5](https://github.com/onegov/onegov-cloud/commit/f24d41d6f575076f32a4572480110f5d074a7dec)**
+
+🐞 **Improve XLS import of texts containing integers.**
+
+**`Bugfix`** | **[VOTES-90](https://issues.seantis.ch/browse/VOTES-90)** | **[544bf842e1](https://github.com/onegov/onegov-cloud/commit/544bf842e119c6030d33536cba4a79926f9dbf5f)**
+
+🐞 **Remove small tag from HTML meta title.**
+
+**`Bugfix`** | **[VOTES-90](https://issues.seantis.ch/browse/VOTES-90)** | **[5c791fa477](https://github.com/onegov/onegov-cloud/commit/5c791fa477a110806ad6f095ffd8513cdb022a46)**
+
 ## Release `2020.96`
 
-> commits: **6 / [5737df6696...99a85c47b5](https://github.com/OneGov/onegov-cloud/compare/5737df6696^...99a85c47b5)**  
+> released: **2020-12-30 13:22**<br>
+> commits: **7 / [5737df6696...211541f40b](https://github.com/OneGov/onegov-cloud/compare/5737df6696^...211541f40b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.96)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.95`
