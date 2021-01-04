@@ -8,7 +8,11 @@ from onegov.fsi.layouts.notification import MailLayout
 
 def send_scheduled_reminders(request):
 
-    events = CourseEventCollection(request.session).get_past_reminder_date()
+    events = CourseEventCollection(
+        request.session,
+        show_locked=True,
+        show_hidden=True
+    ).get_past_reminder_date()
 
     for course_event in events:
         if not course_event.attendees.count():
