@@ -53,7 +53,7 @@
             <div class="row">
                 <div class="columns small-12 medium-3">
                     <tal:b condition="request.locale.startswith('de')">
-                        <a href="https://feriennet.projuventute.ch/" class="pro-juventute-logo">
+                        <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet" class="pro-juventute-logo">
                             <img src="${layout.static_file_path('projuventute.svg')}"
                                  alt="Pro Juventute Logo"
                                  i18n:attributes="alt"
@@ -63,7 +63,7 @@
                         </a>
                     </tal:b>
                     <tal:b condition="request.locale.startswith('fr')">
-                        <a href="https://reseauvacances.projuventute.ch/" class="pro-juventute-logo">
+                        <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances" class="pro-juventute-logo">
                             <img src="${layout.static_file_path('projuventute.svg')}"
                                  alt="Pro Juventute Logo"
                                  i18n:attributes="alt"
@@ -80,39 +80,39 @@
                     <div class="platform-promotion">
                         <tal:b condition="request.locale.startswith('de')">
                             <div>
-                                <a href="https://feriennet.projuventute.ch">
+                                <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">
                                     Feriennet ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
                                 </a>
                                 <span>
-                                    Weitere Angebote der Stiftung finden Sie <a href="https://www.projuventute.ch/Programme.3232.0.html">hier</a>.
+                                    Weitere Angebote der Stiftung finden Sie <a href="https://www.projuventute.ch/de/angebote">hier</a>.
                                 </span>
                             </div>
 
                             <div>
-                                Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie hier <a href="https://www.projuventute.ch/Spenden.3233.0.html" class="donate-link">spenden</a>. Herzlichen Dank.
+                                Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie hier <a href="https://www.projuventute.ch/de/helfen/spenden" class="donate-link">spenden</a>. Herzlichen Dank.
                             </div>
 
                             <div>
-                                Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/Unsere-Partner.3789.0.html">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
+                                Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
                             </div>
                         </tal:b>
 
                         <tal:b condition="request.locale.startswith('fr')">
                             <div>
-                                <a href="https://reseauvacances.projuventute.ch">
+                                <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">
                                     Réseau vacances est une plateforme, développée par Pro Juventute, qui permet de mettre en ligne des passeports vacances et d’en assurer la gestion et l’utilisation complète.
                                 </a>
                                 <span>
-                                    Pour de plus amples informations sur les offres de la Fondation Pro Juventute : <a href="https://www.projuventute.ch/Programme.3232.0.html?L=1">Programmes</a>.
+                                    Pour de plus amples informations sur les offres de la Fondation Pro Juventute : <a href="https://www.projuventute.ch/fr/prestations">Programmes</a>.
                                 </span>
                             </div>
 
                             <div>
-                                Vous souhaitez soutenir notre travail auprès des enfants et des jeunes en Suisse? Pour faire un don : <a href="https://www.projuventute.ch/Dons.1720.0.html?&L=1" class="donate-link">Dons</a>. Nous vous remercions.
+                                Vous souhaitez soutenir notre travail auprès des enfants et des jeunes en Suisse? Pour faire un don : <a href="https://www.projuventute.ch/fr/soutenir/dons" class="donate-link">Dons</a>. Nous vous remercions.
                             </div>
 
                             <div>
-                                Cette plateforme a été réalisée grâce au soutien généreux de nos <a href="https://www.projuventute.ch/Unsere-Partner.3789.0.html?L=1">partenaires</a> et développée par <a href="https://www.seantis.ch">Seantis GmbH</a> et <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, avec le soutien de <a href="https://www.netcetera.com">Netcetera SA</a>.
+                                Cette plateforme a été réalisée grâce au soutien généreux de nos <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">partenaires</a> et développée par <a href="https://www.seantis.ch">Seantis GmbH</a> et <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, avec le soutien de <a href="https://www.netcetera.com">Netcetera SA</a>.
                             </div>
                         </tal:b>
                     </div>
