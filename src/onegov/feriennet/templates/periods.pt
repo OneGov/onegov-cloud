@@ -28,9 +28,9 @@
                                     ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
                                 </dd>
                             </div>
-                            <div>
+                            <div tal:define="p_finalized period.finalized if period.finalizable else period.is_booking_in_past">
                                 <dt i18n:translate>Booking</dt>
-                                <dd class="${period.finalized and 'finished booking'}">
+                                <dd class="${p_finalized and 'finished booking'}">
                                     ${layout.format_date_range(period.booking_start, period.booking_end)}
                                 </dd>
                             </div>
