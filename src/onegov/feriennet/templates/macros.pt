@@ -599,7 +599,7 @@
          class="hint hint-costs" i18n:translate>
             The passport costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
     </div>
-    <div tal:condition="not: period.all_inclusive and period.booking_cost"
+    <div tal:condition="period.all_inclusive is False and period.booking_cost"
          class="hint hint-costs" i18n:translate>
             A booking costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
     </div>

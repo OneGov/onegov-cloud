@@ -148,7 +148,6 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in admin.get('/activities')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
-    assert admin.get(url, status=200)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket.click("Veröffentlichen")
@@ -1088,6 +1087,7 @@ def test_direct_booking_and_storno(client, scenario):
     # in a confirmed period parents can book directly
     page = client.get('/activity/foobar')
     assert "1 Plätze frei" in page
+    assert "Eine Buchung kostet CHF pro Kind" not in page
 
     other = member.get('/activity/foobar').click('Anmelden')
 
