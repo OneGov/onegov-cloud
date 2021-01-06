@@ -1990,6 +1990,29 @@ def test_period_phases(session):
     with freeze_time('2016-12-01'):
         assert period.phase == 'archive'
 
+    # Periods without billing (finalizable=False) will always have finalized=False ?!
+    # An example is Domat-Ems period 2020
+    # Furthermore, Ferienpass Zürich used a booking period having the same end as the execution period
+    # I have no idea if this is not something that should not be done or that leads to unintended side effects
+    period.finalizable = False
+    period.finalized = False
+
+    with freeze_time('2016-10-31'):
+        # between end of booking phase and start of execution phase
+        assert period.phase == 'inactive'
+
+    with freeze_time('2016-11-01'):
+        # This does not make sense and has to be evaluated in the future when there is budget
+        assert period.phase == 'inactive'
+        # assert period.phase == 'execution'
+
+    with freeze_time('2016-12-01'):
+        # assert period.phase == 'archive'
+        assert period.phase == 'inactive'
+
+    ## The phase might also take into consideration the period.archived attribute for the phase
+
+
 
 def test_invoices(session, owner, prebooking_period, inactive_period):
     p1 = prebooking_period
