@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 import sqlalchemy
 import transaction
@@ -1944,27 +1946,38 @@ def test_period_phases(session):
         execution=(date(2016, 11, 1), date(2016, 11, 30)),
         active=False,
     )
-
+    assert period.finalizable
+    assert period.finalized is False
     assert period.phase == 'inactive'
 
     period.active = True
 
     with freeze_time('2016-08-31'):
         assert period.phase == 'inactive'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'inactive'
 
     with freeze_time('2016-09-01'):
         assert period.phase == 'wishlist'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'wishlist'
 
     with freeze_time('2016-09-15'):
         assert period.phase == 'wishlist'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'wishlist'
 
     period.confirmed = True
 
     with freeze_time('2016-09-14'):
         assert period.phase == 'inactive'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'inactive'
 
     with freeze_time('2016-09-15'):
         assert period.phase == 'booking'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'booking'
 
     period.finalized = True
 
