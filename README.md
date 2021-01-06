@@ -54,7 +54,7 @@ message (see below):
     git checkout ticket-101
     git rebase master
     git checkout master
-    git merge ticket-101 --edit
+    git merge ticket-101 --edit -no-ff
 
 ### Commit Messages
 
