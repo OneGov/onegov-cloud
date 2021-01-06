@@ -1771,7 +1771,7 @@ msgid ""
 "activities."
 msgstr ""
 "Melden Sie Ihr Kind kostenlos für eine Rega-Gönnerschaft während allen "
-"gebuchten Ferienaktivitäten 2020 an."
+"gebuchten Ferienaktivitäten an."
 
 msgid "Register here"
 msgstr "Hier anmelden"

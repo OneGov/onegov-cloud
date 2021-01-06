@@ -1793,7 +1793,7 @@ msgid ""
 "activities."
 msgstr ""
 "Affiliez gratuitement votre enfant à la Rega pour la durée de toutes les "
-"activités de vacances réservées pour 2020."
+"activités de vacances réservées."
 
 msgid "Register here"
 msgstr "Inscriptions ici"
