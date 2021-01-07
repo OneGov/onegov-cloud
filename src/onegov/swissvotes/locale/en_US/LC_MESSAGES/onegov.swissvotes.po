@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-12-18 08:17+0100\n"
-"PO-Revision-Date: 2020-12-18 08:11+0100\n"
+"POT-Creation-Date: 2021-01-07 09:11+0100\n"
+"PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -108,6 +108,21 @@ msgstr "Dataset of the post-vote poll"
 msgid "Codebook for the post-vote poll"
 msgstr "Codebook for the post-vote poll"
 
+msgid "Updating the external resources may take some time."
+msgstr "Updating the external resources may take some time."
+
+msgid "Resource"
+msgstr "Resource"
+
+msgid "eMuseum.ch"
+msgstr "eMuseum.ch"
+
+msgid "Social Archives"
+msgstr "Social Archives"
+
+msgid "No eMuseum API key available."
+msgstr "No eMuseum API key available."
+
 msgid "Title"
 msgstr "Title"
 
@@ -207,15 +222,6 @@ msgstr "Update dataset"
 
 msgid "Update external resources"
 msgstr "Update external resources"
-
-msgid "Update all external resources?"
-msgstr "Update all external resources?"
-
-msgid "This can take some time."
-msgstr "This can take some time."
-
-msgid "Cancel"
-msgstr "Cancel"
 
 msgid "Download dataset (CSV)"
 msgstr "Download dataset (CSV)"
@@ -1411,6 +1417,12 @@ msgstr "Organization no longer exists"
 msgid "unknown"
 msgstr "unknown"
 
+msgid "Link eMuseum.ch"
+msgstr "Link eMuseum.ch"
+
+msgid "Link Social Archives"
+msgstr "Link Social Archives"
+
 msgid "Attachment"
 msgstr "Attachment"
 
@@ -1457,6 +1469,9 @@ msgstr "Previous Page"
 msgid "Next Page"
 msgstr "Next Page"
 
+msgid "Cancel"
+msgstr "Cancel"
+
 msgid "Search"
 msgstr "Search"
 
@@ -1471,9 +1486,6 @@ msgstr "Toggle"
 
 msgid "Columns"
 msgstr "Columns"
-
-msgid "Link eMuseum.ch"
-msgstr "Link eMuseum.ch"
 
 msgid "Dear Sir or Madam,"
 msgstr "Dear Sir or Madam,"
@@ -1645,12 +1657,6 @@ msgstr ""
 "more details, see the analysis of the advertising campaign by Année "
 "Politique Suisse."
 
-msgid "Campaign material for a Yes"
-msgstr "Campaign material for a Yes"
-
-msgid "Campaign material for a No"
-msgstr "Campaign material for a No"
-
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analysis of the advertising campaign by Année Politique"
 
@@ -1694,6 +1700,12 @@ msgstr "(predominantly negative)"
 
 msgid "Media coverage: fög analysis"
 msgstr "Media coverage: fög analysis"
+
+msgid "Campaign material for a Yes"
+msgstr "Campaign material for a Yes"
+
+msgid "Campaign material for a No"
+msgstr "Campaign material for a No"
 
 msgid "People"
 msgstr "People"
@@ -1873,17 +1885,6 @@ msgstr "Attachments updated"
 msgid "Vote deleted"
 msgstr "Vote deleted"
 
-msgid "A valid api key is missing"
-msgstr "A valid api key is missing"
-
-#, python-format
-msgid "Poster image urls updated (${added} added, ${updated} updated)"
-msgstr "Poster image urls updated (${added} added, ${updated} updated)"
-
-#, python-format
-msgid "Poster image urls failed: ${failed}"
-msgstr "Poster image urls failed: ${failed}"
-
 #, python-format
 msgid "Dataset updated (${added} added, ${updated} updated)"
 msgstr "Dataset has been updated (${added} added, ${updated} updated)"
@@ -1891,6 +1892,18 @@ msgstr "Dataset has been updated (${added} added, ${updated} updated)"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "The dataset contains unknown descriptors: ${items}."
+
+#, python-format
+msgid ""
+"External resources updated (${added} added, ${updated} updated, ${removed} "
+"removed)"
+msgstr ""
+"External resources updated (${added} added, ${updated} updated, ${removed} "
+"removed)"
+
+#, python-format
+msgid "Some external resources could not be updated: ${failed}"
+msgstr "Some external resources could not be updated: ${failed}"
 
 msgid "All votes deleted"
 msgstr "All votes have been deleted"

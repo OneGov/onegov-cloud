@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-12-18 08:17+0100\n"
-"PO-Revision-Date: 2020-12-18 08:12+0100\n"
+"POT-Creation-Date: 2021-01-07 09:11+0100\n"
+"PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: de_CH\n"
@@ -110,6 +110,22 @@ msgstr "Datensatz der Nachbefragung"
 msgid "Codebook for the post-vote poll"
 msgstr "Codebuch zur Nachbefragung"
 
+msgid "Updating the external resources may take some time."
+msgstr ""
+"Die Aktualisierung der externen Quellen kann einige Zeit in Anspruch nehmen."
+
+msgid "Resource"
+msgstr "Quelle"
+
+msgid "eMuseum.ch"
+msgstr "eMuseum.ch"
+
+msgid "Social Archives"
+msgstr "Sozialarchiv"
+
+msgid "No eMuseum API key available."
+msgstr "Kein eMuseum API Schlüssel verfügbar."
+
 msgid "Title"
 msgstr "Titel"
 
@@ -210,15 +226,6 @@ msgstr "Datensatz aktualisieren"
 
 msgid "Update external resources"
 msgstr "Externe Quellen aktualisieren"
-
-msgid "Update all external resources?"
-msgstr "Alle externen Quellen aktualisieren?"
-
-msgid "This can take some time."
-msgstr "Dies kann eine Weile dauern."
-
-msgid "Cancel"
-msgstr "Abbrechen"
 
 msgid "Download dataset (CSV)"
 msgstr "Datensatz herunterladen (CSV)"
@@ -1415,6 +1422,12 @@ msgstr "Organisation existiert nicht mehr"
 msgid "unknown"
 msgstr "unbekannt"
 
+msgid "Link eMuseum.ch"
+msgstr "Link eMuseum.ch"
+
+msgid "Link Social Archives"
+msgstr "Link Sozialarchiv"
+
 msgid "Attachment"
 msgstr "Anhang"
 
@@ -1462,6 +1475,9 @@ msgstr "Vorherige Seite"
 msgid "Next Page"
 msgstr "Nächste Seite"
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
 msgid "Search"
 msgstr "Suchen"
 
@@ -1476,9 +1492,6 @@ msgstr "Auswahl"
 
 msgid "Columns"
 msgstr "Spalten"
-
-msgid "Link eMuseum.ch"
-msgstr "Link eMuseum.ch"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -1649,12 +1662,6 @@ msgstr ""
 "bedeutet, dass mehr Ja- als Nein-Inserate geschaltet wurden. Für Details "
 "siehe die APS-Analyse der Inseratekampagne."
 
-msgid "Campaign material for a Yes"
-msgstr "Kampagnenmaterial Ja"
-
-msgid "Campaign material for a No"
-msgstr "Kampagnenmaterial Nein"
-
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Inseratekampagne: Analyse von APS"
 
@@ -1698,6 +1705,12 @@ msgstr "(mehrheitlich ablehnend)"
 
 msgid "Media coverage: fög analysis"
 msgstr "Medienberichterstattung: Analyse des fög"
+
+msgid "Campaign material for a Yes"
+msgstr "Kampagnenmaterial Ja"
+
+msgid "Campaign material for a No"
+msgstr "Kampagnenmaterial Nein"
 
 msgid "People"
 msgstr "Volk"
@@ -1878,17 +1891,6 @@ msgstr "Anhänge aktualisiert"
 msgid "Vote deleted"
 msgstr "Abstimmung gelöscht."
 
-msgid "A valid api key is missing"
-msgstr "Ein gültiger Api-Key fehlt"
-
-#, python-format
-msgid "Poster image urls updated (${added} added, ${updated} updated)"
-msgstr "Bild-Urls aktualisiert (${added} neu, ${updated} aktualisiert)"
-
-#, python-format
-msgid "Poster image urls failed: ${failed}"
-msgstr "Fehlgeschlagene Bild-Url-Abfragen: ${failed}"
-
 #, python-format
 msgid "Dataset updated (${added} added, ${updated} updated)"
 msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
@@ -1896,6 +1898,18 @@ msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
+
+#, python-format
+msgid ""
+"External resources updated (${added} added, ${updated} updated, ${removed} "
+"removed)"
+msgstr ""
+"Externe Quellen aktualisiert (${added} hinzugefügt, ${updated} geändert, "
+"${removed} gelöscht)"
+
+#, python-format
+msgid "Some external resources could not be updated: ${failed}"
+msgstr "Einige externe Quellen konnten nicht aktualisiert werden: ${failed}"
 
 msgid "All votes deleted"
 msgstr "Alle Abstimmungen gelöscht"

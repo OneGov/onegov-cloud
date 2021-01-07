@@ -24,7 +24,7 @@ class DummyRequest(object):
         return text
 
 
-def test_actor():
+def test_model_actor():
     actor = Actor('csp')
     assert actor.name == 'csp'
     assert actor.abbreviation == 'actor-csp-abbreviation'
@@ -47,7 +47,7 @@ def test_actor():
     assert Actor('csp') != Actor('xxx')
 
 
-def test_canton():
+def test_model_canton():
     assert len(Region.cantons()) == 26
 
     canton = Region('lu')
@@ -72,7 +72,7 @@ def test_canton():
     assert Region('lu') != Region('xxx')
 
 
-def test_localized_file():
+def test_model_localized_file():
     class SessionManager(object):
         def __init__(self):
             self.current_locale = 'de_CH'
@@ -117,7 +117,7 @@ def test_localized_file():
     assert set(file.name for file in my.files) == {'file-de_CH'}
 
 
-def test_page(session):
+def test_model_page(session):
     session.add(
         TranslatablePage(
             id='page',
@@ -152,7 +152,7 @@ def test_page(session):
     assert [page.id for page in page.siblings] == ['page-2', 'page-1', 'page']
 
 
-def test_page_move(session):
+def test_model_page_move(session):
     # test URL template
     move = TranslatablePageMove(None, None, None, None).for_url_template()
     assert move.direction == '{direction}'
@@ -195,7 +195,7 @@ def test_page_move(session):
     assert ordering() == ['contact', 'dataset', 'about']
 
 
-def test_page_file(swissvotes_app):
+def test_model_page_file(swissvotes_app):
     session = swissvotes_app.session()
 
     page = TranslatablePage(
@@ -220,7 +220,7 @@ def test_page_file(swissvotes_app):
     assert file.locale == 'de_CH'
 
 
-def test_policy_area(session):
+def test_model_policy_area(session):
     policy_area = PolicyArea('1')
     assert repr(policy_area) == '1'
     assert policy_area.level == 1
@@ -268,12 +268,12 @@ def test_policy_area(session):
     assert PolicyArea('1.12.121') == PolicyArea([1, 12, 121])
 
 
-def test_principal(session):
+def test_model_principal(session):
     principal = Principal()
     assert principal
 
 
-def test_vote1(session, sample_vote):
+def test_model_vote(session, sample_vote):
     session.add(sample_vote)
     session.flush()
     session.expunge_all()
@@ -336,7 +336,11 @@ def test_vote1(session, sample_vote):
     assert vote.posters_mfg_yea_imgs == {
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
-    assert vote.posters_mfg_nay_imgs is None
+    assert vote.posters_mfg_nay_imgs == {}
+    assert vote.posters_sa_yea_imgs == {}
+    assert vote.posters_sa_nay_imgs == {
+        'https://no.com/objects/3': 'https://detail.com/3'
+    }
     assert vote.swissvoteslink == 'https://example.com/122.0'
     assert vote.bk_chrono == 'bkc_de'
     assert vote.bk_results == 'bkr_de'
@@ -866,8 +870,25 @@ def test_vote1(session, sample_vote):
 
     assert vote.has_national_council_share_data is True
 
+    assert vote.posters == {
+        'nay': [
+            (
+                'https://no.com/objects/3',
+                'https://detail.com/3',
+                'Link Social Archives'
+            )
+        ],
+        'yea': [
+            (
+                'https://yes.com/objects/1',
+                'https://detail.com/1',
+                'Link eMuseum.ch'
+            )
+        ]
+    }
 
-def test_vote_codes():
+
+def test_model_vote_codes():
     assert SwissVote.codes('legal_form')[2] == "Optional referendum"
     assert SwissVote.codes('result')[0] == "Rejected"
     assert SwissVote.codes('result_people_accepted')[0] == "Rejected"
@@ -882,7 +903,7 @@ def test_vote_codes():
     assert SwissVote.codes('recommendation')[5] == "Free vote"
 
 
-def test_vote_attachments(swissvotes_app, attachments):
+def test_model_vote_attachments(swissvotes_app, attachments):
     session = swissvotes_app.session()
     session.add(
         SwissVote(
@@ -978,7 +999,7 @@ def test_vote_attachments(swissvotes_app, attachments):
     assert "fédéral" in vote.searchable_text_fr_CH
 
 
-def test_column_mapper():
+def test_model_column_mapper():
     mapper = ColumnMapper()
     vote = SwissVote()
 
@@ -1110,12 +1131,12 @@ def test_column_mapper():
     )
 
 
-def test_recommendation_order():
+def test_model_recommendation_order():
     recommendations = SwissVote.codes('recommendation')
     assert list(recommendations.keys()) == [1, 2, 4, 5, 3, 66, 9999, None]
 
 
-def test_recommendations_parties(sample_vote):
+def test_model_recommendations_parties(sample_vote):
     grouped = sample_vote.recommendations_parties
     codes = SwissVote.codes('recommendation')
     # Remove entries in codes for unknown and actor no longer exists
@@ -1124,7 +1145,7 @@ def test_recommendations_parties(sample_vote):
     assert list(grouped.keys()) == list(codes.values())
 
 
-def test_sorted_actors_list(sample_vote):
+def test_model_sorted_actors_list(sample_vote):
     sorted_actors = sample_vote.sorted_actors_list
     assert sorted_actors
     for i in range(len(sorted_actors) - 2):

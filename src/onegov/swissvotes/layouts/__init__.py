@@ -11,6 +11,7 @@ from onegov.swissvotes.layouts.vote import UploadVoteAttachemtsLayout
 from onegov.swissvotes.layouts.vote import VoteLayout
 from onegov.swissvotes.layouts.vote import VoteStrengthsLayout
 from onegov.swissvotes.layouts.votes import DeleteVotesLayout
+from onegov.swissvotes.layouts.votes import UpdateExternalResourcesLayout
 from onegov.swissvotes.layouts.votes import UpdateVotesLayout
 from onegov.swissvotes.layouts.votes import VotesLayout
 
@@ -26,6 +27,7 @@ __all__ = (
     'MailLayout',
     'PageAttachmentsLayout',
     'PageLayout',
+    'UpdateExternalResourcesLayout',
     'UpdateVotesLayout',
     'UploadVoteAttachemtsLayout',
     'VoteLayout',

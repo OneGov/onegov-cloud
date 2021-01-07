@@ -9,14 +9,18 @@ from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
 from onegov.swissvotes.cli import cli
+from onegov.swissvotes.external_resources.posters import MfgPosters
+from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from pathlib import Path
 from psycopg2.extras import NumericRange
 from transaction import commit
+from unittest.mock import patch
 
 
-def write_config(path, postgres_dsn, temporary_directory, redis_url):
+def write_config(path, postgres_dsn, temporary_directory, redis_url,
+                 mfg_api_token=None):
     cfg = {
         'applications': [
             {
@@ -36,6 +40,7 @@ def write_config(path, postgres_dsn, temporary_directory, redis_url):
                         ),
                         'create': 'true'
                     },
+                    'mfg_api_token': mfg_api_token,
                 },
             }
         ]
@@ -56,7 +61,7 @@ def run_command(cfg_path, principal, commands, input=None):
     )
 
 
-def test_add_instance(postgres_dsn, temporary_directory, redis_url):
+def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -70,7 +75,7 @@ def test_add_instance(postgres_dsn, temporary_directory, redis_url):
     assert "This selector may not reference an existing path" in result.output
 
 
-def test_delete_instance(postgres_dsn, temporary_directory, redis_url):
+def test_cli_delete_instance(postgres_dsn, temporary_directory, redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -92,7 +97,8 @@ def test_delete_instance(postgres_dsn, temporary_directory, redis_url):
     assert "Selector doesn't match any paths, aborting." in result.output
 
 
-def test_import_attachments(session_manager, temporary_directory, redis_url):
+def test_cli_import_attachments(session_manager, temporary_directory,
+                                redis_url):
 
     def create_file(path, content='content'):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -225,7 +231,7 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
                 assert f'{number}{name}{lang}' in getattr(vote, name).extract
 
 
-def test_reindex(session_manager, temporary_directory, redis_url):
+def test_cli_reindex(session_manager, temporary_directory, redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
@@ -292,3 +298,54 @@ def test_reindex(session_manager, temporary_directory, redis_url):
 
     vote = session.query(SwissVote).one()
     assert "realisa" in vote.searchable_text_de_CH
+
+
+@patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, set((4, 5))))
+@patch.object(SaPosters, 'fetch', return_value=(6, 7, 8, set((9, ))))
+def test_cli_update_resources(
+    mfg, sa, session_manager, temporary_directory, redis_url, sample_vote
+):
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
+
+    result = run_command(cfg_path, 'govikon', ['add'])
+    assert result.exit_code == 0
+    assert "Instance was created successfully" in result.output
+
+    result = run_command(cfg_path, 'govikon', ['reindex'])
+    assert result.exit_code == 0
+
+    # Add vote
+    session_manager.ensure_schema_exists('onegov_swissvotes-govikon')
+    session_manager.set_current_schema('onegov_swissvotes-govikon')
+    session = session_manager.session()
+    session.add(sample_vote)
+    session.flush()
+    commit()
+
+    # No selection
+    result = run_command(cfg_path, 'govikon', ['update-resources'])
+    assert result.exit_code == 0
+    assert result.output == ''
+
+    # No token
+    result = run_command(cfg_path, 'govikon', ['update-resources', '--mfg'])
+    assert result.exit_code != 0
+    assert 'No token configured, aborting' in result.output
+
+    # All fine
+    write_config(
+        cfg_path, session_manager.dsn, temporary_directory, redis_url, 'x'
+    )
+    result = run_command(
+        cfg_path,
+        'govikon',
+        ['update-resources', '--mfg', '--sa', '--details']
+    )
+    assert result.exit_code == 0
+    assert 'Updating MfG posters' in result.output
+    assert 'Updating SA posters' in result.output
+    assert '1 added, 2 updated, 3 removed, 2 failed' in result.output
+    assert 'Failed: 4, 5\n' in result.output
+    assert '6 added, 7 updated, 8 removed, 1 failed' in result.output
+    assert 'Failed: 9\n' in result.output

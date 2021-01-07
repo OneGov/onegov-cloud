@@ -9,6 +9,8 @@ from onegov.core.cli import pass_group_context
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes.collections import SwissVoteCollection
+from onegov.swissvotes.external_resources import MfgPosters
+from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models.localized_file import LocalizedFile
@@ -29,7 +31,7 @@ def add(group_context):
 
     def add_instance(request, app):
         app.cache.invalidate()
-        click.echo("Instance was created successfully")
+        click.echo('Instance was created successfully')
 
     return add_instance
 
@@ -45,10 +47,10 @@ def delete(group_context):
 
     def delete_instance(request, app):
 
-        confirmation = "Do you really want to DELETE {}?".format(app.schema)
+        confirmation = 'Do you really want to DELETE {}?'.format(app.schema)
 
         if not click.confirm(confirmation):
-            abort("Deletion process aborted")
+            abort('Deletion process aborted')
 
         assert app.has_database_connection
         assert app.session_manager.is_valid_schema(app.schema)
@@ -62,7 +64,7 @@ def delete(group_context):
         engine.raw_connection().invalidate()
         engine.dispose()
 
-        click.echo("Instance was deleted successfully")
+        click.echo('Instance was deleted successfully')
 
     return delete_instance
 
@@ -97,7 +99,7 @@ def import_attachments(group_context, folder):
             ):
                 attachments[name] = os.path.join(folder, name)
             else:
-                click.secho(f"Ignoring /{name}", fg='yellow')
+                click.secho(f'Ignoring /{name}', fg='yellow')
 
         for attachment, attachment_folder in attachments.items():
             locales = {}
@@ -108,13 +110,13 @@ def import_attachments(group_context, folder):
                 ):
                     locales[name] = os.path.join(attachment_folder, name)
                 else:
-                    click.secho(f"Ignoring /{attachment}/{name}", fg='yellow')
+                    click.secho(f'Ignoring /{attachment}/{name}', fg='yellow')
 
             for locale, locale_folder in locales.items():
                 for name in sorted(os.listdir(locale_folder)):
                     if not (name.endswith('.pdf') or name.endswith('.xlsx')):
                         click.secho(
-                            f"Ignoring {attachment}/{locale}/{name}",
+                            f'Ignoring {attachment}/{locale}/{name}',
                             fg='yellow'
                         )
                         continue
@@ -125,7 +127,7 @@ def import_attachments(group_context, folder):
                         )
                     except InvalidOperation:
                         click.secho(
-                            f"Invalid name {attachment}/{locale}/{name}",
+                            f'Invalid name {attachment}/{locale}/{name}',
                             fg='red'
                         )
                         continue
@@ -133,8 +135,8 @@ def import_attachments(group_context, folder):
                     vote = votes.by_bfs_number(bfs_number)
                     if not vote:
                         click.secho(
-                            f"No matching vote {bfs_number} for "
-                            f"{attachment}/{locale}/{name}",
+                            f'No matching vote {bfs_number} for '
+                            f'{attachment}/{locale}/{name}',
                             fg='red'
                         )
                         continue
@@ -149,7 +151,7 @@ def import_attachments(group_context, folder):
                     )
 
                     click.secho(
-                        f"Added {attachment}/{locale}/{name}",
+                        f'Added {attachment}/{locale}/{name}',
                         fg='green'
                     )
 
@@ -165,6 +167,46 @@ def reindex_attachments(group_context):
         votes = SwissVoteCollection(app)
         for vote in votes.query():
             vote.vectorize_files()
-            click.secho(f"Reindexed vote {vote.bfs_number}", fg='green')
+            click.secho(f'Reindexed vote {vote.bfs_number}', fg='green')
 
     return _reindex
+
+
+@cli.command('update-resources')
+@click.option('--details', is_flag=True, default=False)
+@click.option('--mfg', is_flag=True, default=False)
+@click.option('--sa', is_flag=True, default=False)
+@pass_group_context
+def update_resources(group_context, details, sa, mfg):
+    """ Updates external resources. """
+
+    def _update_sources(request, app):
+        if mfg:
+            click.echo('Updating MfG posters')
+            if not app.mfg_api_token:
+                abort('No token configured, aborting')
+            posters = MfgPosters(app.mfg_api_token)
+            added, updated, removed, failed = posters.fetch(app.session())
+            click.secho(
+                f'{added} added, {updated} updated, {removed} removed, '
+                f'{len(failed)} failed',
+                fg='green' if not failed else 'yellow'
+            )
+            if failed and details:
+                failed = ', '.join((str(item) for item in sorted(failed)))
+                click.secho(f'Failed: {failed}', fg='yellow')
+
+        if sa:
+            click.echo('Updating SA posters')
+            posters = SaPosters()
+            added, updated, removed, failed = posters.fetch(app.session())
+            click.secho(
+                f'{added} added, {updated} updated, {removed} removed, '
+                f'{len(failed)} failed',
+                fg='green' if not failed else 'yellow'
+            )
+            if failed and details:
+                failed = ', '.join((str(item) for item in sorted(failed)))
+                click.secho(f'Failed: {failed}', fg='yellow')
+
+    return _update_sources

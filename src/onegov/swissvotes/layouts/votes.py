@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
 
@@ -24,25 +24,11 @@ class VotesLayout(DefaultLayout):
             result.append(
                 Link(
                     text=_("Update external resources"),
-                    url=self.csrf_protected_url(
-                        self.request.link(
-                            self.model.default(),
-                            name='update-external-resources'
-                        )
+                    url=self.request.link(
+                        self.model.default(),
+                        name='update-external-resources'
                     ),
-                    attrs={'class': 'update-icon'},
-                    traits=(
-                        Confirm(
-                            _("Update all external resources?"),
-                            _("This can take some time."),
-                            _("Update external resources"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='POST',
-                            redirect_after=self.request.link(self.model)
-                        )
-                    )
+                    attrs={'class': 'update-icon'}
                 )
             )
             result.append(
@@ -82,6 +68,21 @@ class UpdateVotesLayout(DefaultLayout):
     @cached_property
     def title(self):
         return _("Update dataset")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.title, '#'),
+        ]
+
+
+class UpdateExternalResourcesLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Update external resources")
 
     @cached_property
     def breadcrumbs(self):

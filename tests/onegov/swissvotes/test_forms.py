@@ -8,6 +8,7 @@ from onegov.swissvotes.forms import AttachmentsForm
 from onegov.swissvotes.forms import PageForm
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
+from onegov.swissvotes.forms import UpdateExternalResourcesForm
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import TranslatablePage
 from psycopg2.extras import NumericRange
@@ -19,9 +20,10 @@ class DummyPrincipal(object):
 
 
 class DummyApp(object):
-    def __init__(self, session, principal):
+    def __init__(self, session, principal, mfg_api_token=None):
         self._session = session
         self.principal = principal
+        self.mfg_api_token = None
 
     def session(self):
         return self._session
@@ -483,4 +485,27 @@ def test_update_dataset_form(session):
 
     form.dataset.process(DummyPostData({'dataset': field_storage}))
 
+    assert form.validate()
+
+
+def test_update_external_resources_form(session):
+    form = UpdateExternalResourcesForm()
+    form.request = DummyRequest(session, DummyPrincipal())
+
+    assert form.resources.choices == (
+        ('mfg', 'eMuseum.ch'),
+        ('sa', 'Social Archives')
+    )
+
+    # Validate
+    assert not form.validate()
+
+    form.resources.process(DummyPostData({'resources': ['sa']}))
+    assert form.validate()
+
+    form.resources.process(DummyPostData({'resources': ['mfg']}))
+    assert not form.validate()
+
+    form.request.app.mfg_api_token = 'token'
+    form.resources.process(DummyPostData({'resources': ['sa', 'mfg']}))
     assert form.validate()

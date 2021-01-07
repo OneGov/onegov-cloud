@@ -1,7 +1,9 @@
 from cached_property import cached_property
 from collections import OrderedDict
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin, ContentMixin, meta_property
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import meta_property
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.file import AssociatedFiles
 from onegov.file import File
@@ -196,45 +198,6 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     bfs_map_fr = Column(Text)
     swissvoteslink = Column(Text)
 
-    # Additional links added late 2019
-    curia_vista_de = Column(Text)
-    curia_vista_fr = Column(Text)
-    bkresults_de = Column(Text)
-    bkresults_fr = Column(Text)
-    bkchrono_de = Column(Text)
-    bkchrono_fr = Column(Text)
-
-    # space-separated poster URLs coming from the dataset
-    posters_mfg_yea = Column(Text)
-    posters_mfg_nay = Column(Text)
-    posters_sa_yea = Column(Text)
-    posters_sa_nay = Column(Text)
-
-    # Fetched list of image urls using MfG API
-    posters_mfg_yea_imgs = meta_property()
-    posters_mfg_nay_imgs = meta_property()
-
-    # Post-vote poll
-    post_vote_poll_link_de = Column(Text)
-    post_vote_poll_link_fr = Column(Text)
-    post_vote_poll_link_en = Column(Text)
-
-    # Media
-    media_ads_total = Column(Integer)
-    media_ads_per_issue = deferred(Column(Numeric(13, 10)), group='dataset')
-    media_ads_yea = deferred(Column(Integer), group='dataset')
-    media_ads_nay = deferred(Column(Integer), group='dataset')
-    media_ads_neutral = deferred(Column(Integer), group='dataset')
-    media_ads_yea_p = Column(Numeric(13, 10))
-    media_coverage_articles_total = Column(Integer)
-    media_coverage_articles_d = deferred(Column(Integer), group='dataset')
-    media_coverage_articles_f = deferred(Column(Integer), group='dataset')
-    media_coverage_tonality_total = Column(Numeric(13, 10))
-    media_coverage_tonality_d = deferred(Column(Numeric(13, 10)),
-                                         group='dataset')
-    media_coverage_tonality_f = deferred(Column(Numeric(13, 10)),
-                                         group='dataset')
-
     @property
     def title(self):
         if self.session_manager.current_locale == 'fr_CH':
@@ -265,6 +228,18 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
             pass
 
     @property
+    def deciding_question(self):
+        return self._legal_form == 5
+
+    # Additional links added late 2019
+    curia_vista_de = Column(Text)
+    curia_vista_fr = Column(Text)
+    bkresults_de = Column(Text)
+    bkresults_fr = Column(Text)
+    bkchrono_de = Column(Text)
+    bkchrono_fr = Column(Text)
+
+    @property
     def curiavista(self):
         if self.session_manager.current_locale == 'fr_CH':
             return self.curia_vista_fr
@@ -285,20 +260,41 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         else:
             return self.bkchrono_de
 
-    def poster_links(self, answer):
-        # todo: make me a property!
-        assert answer in ('yes', 'no')
-        if answer == 'yes':
-            if not self.posters_mfg_yea_imgs or not self.posters_mfg_yea:
-                return None
-            sources = self.posters_mfg_yea.split(' ')
-            return (
-                (url, self.posters_mfg_yea_imgs.get(url)) for url in sources
-            )
-        if not self.posters_mfg_nay_imgs or not self.posters_mfg_nay:
-            return None
-        sources = self.posters_mfg_nay.split(' ')
-        return ((url, self.posters_mfg_nay_imgs.get(url)) for url in sources)
+    # space-separated poster URLs coming from the dataset
+    posters_mfg_yea = Column(Text)
+    posters_mfg_nay = Column(Text)
+    posters_sa_yea = Column(Text)
+    posters_sa_nay = Column(Text)
+
+    # Fetched list of image urls using MfG API
+    posters_mfg_yea_imgs = meta_property(default=dict)
+    posters_mfg_nay_imgs = meta_property(default=dict)
+
+    # Fetched list of image urls using SA API
+    posters_sa_yea_imgs = meta_property(default=dict)
+    posters_sa_nay_imgs = meta_property(default=dict)
+
+    @cached_property
+    def posters(self):
+        result = {'yea': [], 'nay': []}
+        for key, attribute, label in (
+            ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
+            ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
+            ('yea', 'posters_sa_yea', _('Link Social Archives')),
+            ('nay', 'posters_sa_nay', _('Link Social Archives')),
+        ):
+            urls = getattr(self, attribute, None) or ''
+            images = getattr(self, f'{attribute}_imgs') or {}
+            for url in urls.strip().split(' '):
+                image_url = images.get(url)
+                if url and image_url:
+                    result[key].append((url, image_url, label))
+        return result
+
+    # Post-vote poll
+    post_vote_poll_link_de = Column(Text)
+    post_vote_poll_link_fr = Column(Text)
+    post_vote_poll_link_en = Column(Text)
 
     @property
     def post_vote_poll_link(self):
@@ -309,9 +305,21 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         else:
             return self.post_vote_poll_link_de
 
-    @property
-    def deciding_question(self):
-        return self._legal_form == 5
+    # Media
+    media_ads_total = Column(Integer)
+    media_ads_per_issue = deferred(Column(Numeric(13, 10)), group='dataset')
+    media_ads_yea = deferred(Column(Integer), group='dataset')
+    media_ads_nay = deferred(Column(Integer), group='dataset')
+    media_ads_neutral = deferred(Column(Integer), group='dataset')
+    media_ads_yea_p = Column(Numeric(13, 10))
+    media_coverage_articles_total = Column(Integer)
+    media_coverage_articles_d = deferred(Column(Integer), group='dataset')
+    media_coverage_articles_f = deferred(Column(Integer), group='dataset')
+    media_coverage_tonality_total = Column(Numeric(13, 10))
+    media_coverage_tonality_d = deferred(Column(Numeric(13, 10)),
+                                         group='dataset')
+    media_coverage_tonality_f = deferred(Column(Numeric(13, 10)),
+                                         group='dataset')
 
     # Descriptor
     descriptor_1_level_1 = Column(Numeric(8, 4))

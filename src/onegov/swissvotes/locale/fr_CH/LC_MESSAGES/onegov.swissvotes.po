@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-12-18 08:17+0100\n"
-"PO-Revision-Date: 2020-12-18 08:12+0100\n"
+"POT-Creation-Date: 2021-01-07 09:11+0100\n"
+"PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -110,6 +110,21 @@ msgstr "Jeu de données de l'enquête"
 msgid "Codebook for the post-vote poll"
 msgstr "Liste des codes de l’enquête"
 
+msgid "Updating the external resources may take some time."
+msgstr "La mise à jour des ressources externes peut prendre un certain temps."
+
+msgid "Resource"
+msgstr "Ressource"
+
+msgid "eMuseum.ch"
+msgstr "eMuseum.ch"
+
+msgid "Social Archives"
+msgstr "Archives Sociales"
+
+msgid "No eMuseum API key available."
+msgstr "Aucune clé API eMuseum n’est disponible."
+
 msgid "Title"
 msgstr "Titre"
 
@@ -210,15 +225,6 @@ msgstr "Actualiser la base de données"
 
 msgid "Update external resources"
 msgstr "Actualiser des resources externes"
-
-msgid "Update all external resources?"
-msgstr "Actualiser des resources externes?"
-
-msgid "This can take some time."
-msgstr "Cela peut prendre un certain temps."
-
-msgid "Cancel"
-msgstr "Annuler"
 
 msgid "Download dataset (CSV)"
 msgstr "Télécharger le fichier de données (CSV)"
@@ -1416,10 +1422,16 @@ msgid "Neutral"
 msgstr "Neutre"
 
 msgid "Organization no longer exists"
-msgstr "Cette formation n'existe plus."
+msgstr "Cette formation n'existe plus"
 
 msgid "unknown"
 msgstr "inconnu"
+
+msgid "Link eMuseum.ch"
+msgstr "Lien eMuseum.ch"
+
+msgid "Link Social Archives"
+msgstr "Lien Archives Sociales"
 
 msgid "Attachment"
 msgstr "Pièce jointe"
@@ -1469,6 +1481,9 @@ msgstr "Page précédente"
 msgid "Next Page"
 msgstr "Page suivante"
 
+msgid "Cancel"
+msgstr "Annuler"
+
 msgid "Search"
 msgstr "Rechercher"
 
@@ -1483,9 +1498,6 @@ msgstr "Toggle"
 
 msgid "Columns"
 msgstr "Columns"
-
-msgid "Link eMuseum.ch"
-msgstr "Lien eMuseum.ch"
 
 msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"
@@ -1654,12 +1666,6 @@ msgstr ""
 "été publiées. Pour plus de détails, voir l'analyse APS sur la campagne "
 "d'annonces."
 
-msgid "Campaign material for a Yes"
-msgstr "Matériel de campagne pour le oui"
-
-msgid "Campaign material for a No"
-msgstr "Matériel de campagne pour le non"
-
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analyse APS des annonces de campagne"
 
@@ -1703,6 +1709,12 @@ msgstr "(majoritairement en défaveur)"
 
 msgid "Media coverage: fög analysis"
 msgstr "Couverture médiatique: analyse fög"
+
+msgid "Campaign material for a Yes"
+msgstr "Matériel de campagne pour le oui"
+
+msgid "Campaign material for a No"
+msgstr "Matériel de campagne pour le non"
 
 msgid "People"
 msgstr "Peuple"
@@ -1769,7 +1781,7 @@ msgid "Access Denied"
 msgstr "Accès refusé"
 
 msgid "You are trying to open a page for which you are not authorized."
-msgstr "Accès non autorisé"
+msgstr "Accès non autorisé."
 
 msgid "Page not Found"
 msgstr "Page introuvable"
@@ -1778,10 +1790,10 @@ msgid "The page you are looking for could not be found."
 msgstr "La page que vous cherchez n’a pas pu être trouvée."
 
 msgid "Page added."
-msgstr "Page ajoutée"
+msgstr "Page ajoutée."
 
 msgid "Page modified."
-msgstr "Page modifiée"
+msgstr "Page modifiée."
 
 msgid "Update"
 msgstr "Mise à jour"
@@ -1797,10 +1809,10 @@ msgid "Attachments"
 msgstr "Pièces jointes"
 
 msgid "Attachment added."
-msgstr "Pièce jointe ajoutée"
+msgstr "Pièce jointe ajoutée."
 
 msgid "Attachment deleted."
-msgstr "Pièce jointe supprimée"
+msgstr "Pièce jointe supprimée."
 
 #, python-format
 msgid "${x}% yea"
@@ -1880,19 +1892,6 @@ msgstr "Pièces jointes mises à jour"
 msgid "Vote deleted"
 msgstr "Votation supprimée"
 
-msgid "A valid api key is missing"
-msgstr "Il manque une clé api valide"
-
-#, python-format
-msgid "Poster image urls updated (${added} added, ${updated} updated)"
-msgstr ""
-"Mise à jour des liens pour les affiches (${added} nouveau, ${updated} "
-"actualisé)"
-
-#, python-format
-msgid "Poster image urls failed: ${failed}"
-msgstr "Mise à jour des liens pour les affiches avec erreurs: ${failed}"
-
 #, python-format
 msgid "Dataset updated (${added} added, ${updated} updated)"
 msgstr ""
@@ -1902,8 +1901,21 @@ msgstr ""
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "La base de données contient des codes inconnus."
 
+#, python-format
+msgid ""
+"External resources updated (${added} added, ${updated} updated, ${removed} "
+"removed)"
+msgstr ""
+"Ressources externes mises à jour (${added} ajouté, ${updated} modifié, "
+"${removed} supprimé)"
+
+#, python-format
+msgid "Some external resources could not be updated: ${failed}"
+msgstr ""
+"Certaines ressources externes n’ont pas pu être mises à jour : {failed}"
+
 msgid "All votes deleted"
-msgstr "Toutes les votations ont été supprimées."
+msgstr "Toutes les votations ont été supprimées"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"

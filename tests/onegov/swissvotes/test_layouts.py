@@ -1,3 +1,4 @@
+
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
@@ -16,6 +17,7 @@ from onegov.swissvotes.layouts import EditPageLayout
 from onegov.swissvotes.layouts import MailLayout
 from onegov.swissvotes.layouts import PageAttachmentsLayout
 from onegov.swissvotes.layouts import PageLayout
+from onegov.swissvotes.layouts import UpdateExternalResourcesLayout
 from onegov.swissvotes.layouts import UpdateVotesLayout
 from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
 from onegov.swissvotes.layouts import VoteLayout
@@ -668,7 +670,7 @@ def test_layout_votes(swissvotes_app):
     layout = VotesLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVoteCollection/update',
-        'SwissVoteCollection/update-external-resources?csrf-token=x',
+        'SwissVoteCollection/update-external-resources',
         'SwissVoteCollection/csv',
         'SwissVoteCollection/xlsx',
     ]
@@ -678,7 +680,7 @@ def test_layout_votes(swissvotes_app):
     layout = VotesLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVoteCollection/update',
-        'SwissVoteCollection/update-external-resources?csrf-token=x',
+        'SwissVoteCollection/update-external-resources',
         'SwissVoteCollection/csv',
         'SwissVoteCollection/xlsx',
         'SwissVoteCollection/delete',
@@ -692,6 +694,27 @@ def test_layout_update_votes(swissvotes_app):
 
     layout = UpdateVotesLayout(model, request)
     assert layout.title == _("Update dataset")
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = UpdateVotesLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = UpdateVotesLayout(model, request)
+    assert layout.editbar_links == []
+
+
+def test_layout_update_external_resources(swissvotes_app):
+    request = DummyRequest()
+    request.app = swissvotes_app
+    model = SwissVoteCollection(swissvotes_app)
+
+    layout = UpdateExternalResourcesLayout(model, request)
+    assert layout.title == _('Update external resources')
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
