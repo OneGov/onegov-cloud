@@ -153,7 +153,8 @@ class Scenario(BaseScenario):
     def default_username(self):
         return self.latest_username or 'admin@example.org'
 
-    def date_offset(self, offset):
+    @staticmethod
+    def date_offset(offset):
         return (datetime.now() + timedelta(days=offset)).date()
 
     def add_period(self, phase='wishlist', **columns):
