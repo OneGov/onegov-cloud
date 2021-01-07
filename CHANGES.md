@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2021.2`
+
+> commits: **11 / [279ad674c6...23542c4d80](https://github.com/OneGov/onegov-cloud/compare/279ad674c6^...23542c4d80)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.2)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes showing empty booking cost on activity occasion**
+
+**`Bugfix`** | **[FER-923](https://issues.seantis.ch/browse/FER-923)** | **[f31aab8a0e](https://github.com/onegov/onegov-cloud/commit/f31aab8a0ed13b3f02df161179c1473c95607793)**
+
+🐞 **Fix showing need title in /activities/volunteer when no needs**
+
+**`Bugfix`** | **[FER-917](https://issues.seantis.ch/browse/FER-917)** | **[937ba08dfd](https://github.com/onegov/onegov-cloud/commit/937ba08dfd1e26aede5ad893fcf8f381bf6509dc)**
+
+🐞 **Show booking period as finished in /billing and /periods**
+
+This applies for periods without billing (finalizable=False)
+
+**`Bugfix`** | **[FER-901](https://issues.seantis.ch/browse/FER-901)** | **[930aa09d3c](https://github.com/onegov/onegov-cloud/commit/930aa09d3cfa817fecfe8f9cefabb33d09d55805)**
+
+### Swissvotes
+
+🎉 **Adds social archives posters.**
+
+**`Feature`** | **[VOTES-91](https://issues.seantis.ch/browse/VOTES-91)** | **[23542c4d80](https://github.com/onegov/onegov-cloud/commit/23542c4d80f924674e71cf5fdf40a7da10d9ccc5)**
+
 ## Release `2021.1`
 
-> commits: **5 / [5271b4b6cf...df3622befc](https://github.com/OneGov/onegov-cloud/compare/5271b4b6cf^...df3622befc)**  
+> released: **2021-01-04 11:36**<br>
+> commits: **6 / [5271b4b6cf...5236170486](https://github.com/OneGov/onegov-cloud/compare/5271b4b6cf^...5236170486)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.1)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvote
