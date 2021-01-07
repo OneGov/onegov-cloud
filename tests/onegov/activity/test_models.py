@@ -1795,7 +1795,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'accepted'
     assert b1.state == 'blocked'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'accepted'
     assert b2.state == 'cancelled'
@@ -1814,7 +1814,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'blocked'
     assert b3.state == 'open'
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
@@ -1834,7 +1834,7 @@ def test_cancel_booking(session, owner):
     assert b1.state == 'blocked'
     assert b2.state == 'accepted'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'denied'
     assert b2.state == 'cancelled'
@@ -1853,7 +1853,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'accepted'
     assert b3.state == 'open'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'accepted'
     assert b2.state == 'cancelled'
@@ -1872,7 +1872,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'open'
     assert b3.state == 'open'
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
@@ -1897,14 +1897,14 @@ def test_cancel_booking(session, owner):
     assert b3.state == 'blocked'
     assert b4.state == 'blocked'
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
     assert b3.state == 'blocked'
     assert b4.state == 'blocked'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'cancelled'
@@ -1929,7 +1929,7 @@ def test_cancel_booking(session, owner):
 
     session.flush()
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
@@ -2333,7 +2333,7 @@ def test_cancel_occasion(session, owner):
     o1.cancel()
 
     assert b1.state == 'cancelled'
-    assert b2.state == 'accepted'
+    assert b2.state == 'blocked'
     assert o1.cancelled
     assert not o2.cancelled
 

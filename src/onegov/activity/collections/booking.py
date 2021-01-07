@@ -156,7 +156,7 @@ class BookingCollection(GenericCollection):
         booking.cost = booking.occasion.total_cost
 
     def cancel_booking(self, booking,
-                       score_function=booking_order, cascade=True):
+                       score_function=booking_order, cascade=False):
         """ Cancels the given booking.
 
         If ``cascade`` is set to False, this amounts to a simple state change
