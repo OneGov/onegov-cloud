@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-03 09:13+0100\n"
+"POT-Creation-Date: 2021-01-07 20:45+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -223,6 +223,9 @@ msgstr "Nom du besoin "
 
 msgid "Need Description"
 msgstr "Description du besoin"
+
+msgid "Activity Tags"
+msgstr "Catégories de l'activity"
 
 msgid "User Login"
 msgstr "Identifiant de l'utilisateur"

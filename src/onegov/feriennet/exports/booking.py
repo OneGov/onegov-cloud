@@ -64,3 +64,4 @@ class BookingExport(FeriennetExport):
         yield from self.user_fields(booking.attendee.user)
         yield from self.organiser_fields(
             self.users[booking.occasion.activity.username])
+        yield from self.activity_tags(booking.occasion.activity.tags)
