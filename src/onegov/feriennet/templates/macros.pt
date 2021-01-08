@@ -145,7 +145,7 @@
 
 <metal:bosw_award define-macro="bosw_award" i18n:domain="onegov.feriennet">
     <tal:b condition="request.locale.startswith('de')">
-        <a href="https://www.projuventute.ch/Feriennet.4036.0.html" class="bosw-award">
+        <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet" class="bosw-award">
             <img src="${layout.static_file_path('bosw-award.png')}"
                  alt="Best of Swiss Web Award 2019"
                  i18n:attributes="alt"
@@ -153,7 +153,7 @@
         </a>
     </tal:b>
     <tal:b condition="request.locale.startswith('fr')">
-        <a href="https://www.projuventute.ch/Reseau-vacances.4036.0.html?&L=1" class="bosw-award">
+        <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances" class="bosw-award">
             <img src="${layout.static_file_path('bosw-award.png')}"
                  alt="Best of Swiss Web Award 2019"
                  i18n:attributes="alt"
@@ -164,7 +164,7 @@
 
 <metal:onegov_award define-macro="onegov_award" i18n:domain="onegov.feriennet">
     <tal:b condition="request.locale.startswith('de')">
-        <a href="https://www.projuventute.ch/Feriennet.4036.0.html" class="onegov-award">
+        <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet" class="onegov-award">
             <img src="${layout.static_file_path('onegov-award.png')}"
                  alt="OneGov.ch Award"
                  i18n:attributes="alt"
@@ -172,7 +172,7 @@
         </a>
     </tal:b>
     <tal:b condition="request.locale.startswith('fr')">
-        <a href="https://www.projuventute.ch/Reseau-vacances.4036.0.html?&L=1" class="onegov-award">
+        <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances" class="onegov-award">
             <img src="${layout.static_file_path('onegov-award.png')}"
                  alt="OneGov.ch Award"
                  i18n:attributes="alt"
