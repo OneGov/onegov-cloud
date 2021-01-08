@@ -13,7 +13,8 @@ from onegov.org.forms import HolidaySettingsForm
 from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
-from onegov.org.forms.settings import OrgTicketSettingsForm, HeaderSettingsForm
+from onegov.org.forms.settings import OrgTicketSettingsForm, \
+    HeaderSettingsForm, FaviconSettingsForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.models import Organisation
@@ -72,6 +73,14 @@ def handle_generic_settings(self, request, form, title):
     icon='fa-sliders', order=-1000)
 def handle_general_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("General"))
+
+
+@OrgApp.form(
+    model=Organisation, name='favicon-settings', template='form.pt',
+    permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
+    icon=' fa-external-link-square', order=--990)
+def handle_favicon_settings(self, request, form):
+    return handle_generic_settings(self, request, form, _("Favicon"))
 
 
 @OrgApp.form(

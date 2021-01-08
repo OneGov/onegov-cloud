@@ -278,6 +278,33 @@ class FooterSettingsForm(Form):
         fieldset=_("Fourth Partner"))
 
 
+class FaviconSettingsForm(Form):
+
+    favicon_win_url = StringField(
+        label=_("Icon 16x16 PNG (Windows)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_mac_url = StringField(
+        label=_("Icon 32x32 PNG (Mac)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_apple_touch_url = StringField(
+        label=_("Icon 57x57 PNG (iPhone, iPod, iPad)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_pinned_tab_safari_url = StringField(
+        label=_("Icon SVG 20x20 (Safari)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+
 class HeaderSettingsForm(Form):
 
     left_header_name = StringField(

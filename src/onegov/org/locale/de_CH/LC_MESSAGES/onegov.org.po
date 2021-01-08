@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-12-03 17:30+0100\n"
+"POT-Creation-Date: 2021-01-08 20:11+0100\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -998,20 +998,32 @@ msgstr "Dritter Partner"
 msgid "Fourth Partner"
 msgstr "Vierter Partner"
 
+msgid "Icon 16x16 PNG (Windows)"
+msgstr ""
+
+msgid "URL pointing to the icon"
+msgstr "Link zum Icon"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr ""
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr ""
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr ""
+
 msgid "Title header left side"
 msgstr "Titel Kopfzeile links"
 
 msgid "Optional"
-msgstr ""
+msgstr "Optional"
 
 msgid "Font color"
 msgstr "Schriftfarbe"
 
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
-
-msgid "Color could not be converted"
-msgstr "Fehler beim Konvertieren der Farbe"
 
 msgid "Homepage Image #1"
 msgstr "Startseiten Bild #1"
@@ -3908,6 +3920,9 @@ msgstr "${count} Resultate"
 msgid "Search Unavailable"
 msgstr "Suche Nicht Verfügbar"
 
+msgid "Favicon"
+msgstr ""
+
 msgid "Header"
 msgstr "Kopfzeile"
 
@@ -4094,6 +4109,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Color could not be converted"
+#~ msgstr "Fehler beim Konvertieren der Farbe"
 
 #~ msgid "Header font color"
 #~ msgstr "Farbe Kopfzeile"

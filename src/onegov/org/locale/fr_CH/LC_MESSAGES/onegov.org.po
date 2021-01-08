@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-12-03 17:30+0100\n"
+"POT-Creation-Date: 2021-01-08 20:11+0100\n"
 "PO-Revision-Date: 2020-05-10 10:58+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1003,6 +1003,21 @@ msgstr "Troisième partenaire"
 msgid "Fourth Partner"
 msgstr "Quatrième partenaire"
 
+msgid "Icon 16x16 PNG (Windows)"
+msgstr ""
+
+msgid "URL pointing to the icon"
+msgstr "URL pointant vers le Favicon"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr ""
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr ""
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr ""
+
 msgid "Title header left side"
 msgstr "Titre dans en-tête, face gauche"
 
@@ -1014,9 +1029,6 @@ msgstr "Couleur de la police"
 
 msgid "Relative font size"
 msgstr "Taille de police relative"
-
-msgid "Color could not be converted"
-msgstr "Erreur lors de la conversion de la couleur"
 
 msgid "Homepage Image #1"
 msgstr "Image n°1 de page d'accueil"
@@ -3929,6 +3941,9 @@ msgstr "${count} résultats"
 msgid "Search Unavailable"
 msgstr "Recherche non disponible"
 
+msgid "Favicon"
+msgstr "Favicon"
+
 msgid "Header"
 msgstr "En-tête"
 
@@ -4113,6 +4128,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Color could not be converted"
+#~ msgstr "Erreur lors de la conversion de la couleur"
 
 #~ msgid "Header font color"
 #~ msgstr "Couleur de la police d'en-tête"

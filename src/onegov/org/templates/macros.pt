@@ -6,9 +6,13 @@
       i18n:domain="onegov.org">
 <body>
 
-<metal:b define-macro="favicon">
-    <!--! To be overridden by other applications -->
-</metal:b>
+<metal:favicon define-macro="favicon">
+    <link tal:condition="layout.favicon_apple_touch_url|nothing" rel="apple-touch-icon" sizes="57x57" href="${layout.favicon_apple_touch_url}">
+    <link tal:condition="layout.favicon_win_url|nothing" rel="icon" type="image/png" href="${layout.favicon_win_url}" sizes="16x16">
+    <link tal:condition="layout.favicon_mac_url|nothing" rel="icon" type="image/png" href="${layout.favicon_mac_url}" sizes="32x32">
+    <link tal:condition="layout.favicon_pinned_tab_safari_url|nothing" rel="mask-icon" href="${layout.favicon_pinned_tab_safari_url}" color="${layout.primary_color}">
+    <meta name="theme-color" content="${layout.primary_color}">
+</metal:favicon>
 
 <metal:b define-macro="before_directory_entry_lead">
     <!--! To be override by other applications -->

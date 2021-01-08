@@ -118,6 +118,12 @@ class Organisation(Base, TimestampMixin):
     # Setting if show full agency path on people detail view
     agency_path_display_on_people = meta_property(default=False)
 
+    # Favicon urls for favicon macro
+    favicon_win_url = meta_property()
+    favicon_mac_url = meta_property()
+    favicon_apple_touch_url = meta_property()
+    favicon_pinned_tab_safari_url = meta_property()
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

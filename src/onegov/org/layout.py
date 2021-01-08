@@ -103,6 +103,22 @@ class Layout(ChameleonLayout):
             'primary-color', user_options['primary-color'])
 
     @cached_property
+    def favicon_apple_touch_url(self):
+        return self.app.org.favicon_apple_touch_url
+
+    @cached_property
+    def favicon_pinned_tab_safari_url(self):
+        return self.app.org.favicon_pinned_tab_safari_url
+
+    @cached_property
+    def favicon_win_url(self):
+        return self.app.org.favicon_win_url
+
+    @cached_property
+    def favicon_mac_url(self):
+        return self.app.org.favicon_mac_url
+
+    @cached_property
     def default_map_view(self):
         return self.org.default_map_view or {
             'lon': 8.30576869173879,
