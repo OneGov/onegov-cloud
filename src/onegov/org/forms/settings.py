@@ -306,18 +306,12 @@ class HeaderSettingsForm(Form):
         default=1
     )
 
-    def validate_left_header_color(self, field):
-        try:
-            field.data = field.data.get_hex()
-        except Exception:
-            raise ValidationError(_("Color could not be converted"))
-
     @property
     def header_options(self):
         return {
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
-            'left_header_color': self.left_header_color.data,
+            'left_header_color': self.left_header_color.data.get_hex(),
             'left_header_rem': self.left_header_rem.data
         }
 
