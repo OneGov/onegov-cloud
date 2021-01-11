@@ -4,7 +4,7 @@ from onegov.agency.models import ExtendedPerson
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from sqlalchemy import func
-from wtforms import StringField
+from wtforms import StringField, ValidationError
 from wtforms import validators
 
 
@@ -51,6 +51,10 @@ class MembershipForm(Form):
     prefix = StringField(
         label=_("Prefix"),
     )
+
+    def validate_title(self, field):
+        if field.data and not field.data.strip():
+            raise ValidationError(_("This field is required."))
 
     def on_request(self):
         self.request.include('common')
