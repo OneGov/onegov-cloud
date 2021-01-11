@@ -2,6 +2,12 @@
 var links = document.links;
 
 function is_external_link(link) {
+    if (link.href.startsWith('#')) {
+        return false
+    }
+    if (link.href.includes('javascript:')) {
+        return false
+    }
     if (link.href.includes('mailto:')) {
         return false
     }
