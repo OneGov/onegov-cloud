@@ -138,7 +138,7 @@ class FeriennetExport(Export):
     def activity_tags(self, tags):
         # A WWF feature, which uses one of the relevant tags for VAT.
         relevant = [
-            "Holiday Camp", "Family Camp", "Camp", "Camp in House",
+            "Family Camp", "Camp", "Camp in House",
             "Tent Camp", "Trecking Camp"
         ]
         tags = [t for t in tags or [] if t in relevant]
