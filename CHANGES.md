@@ -1,8 +1,52 @@
 # Changes
 
+## Release `2021.3`
+
+> commits: **14 / [f3ee7657c6...9aa7aeb1e4](https://github.com/OneGov/onegov-cloud/compare/f3ee7657c6^...9aa7aeb1e4)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.3)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds untranslated category in export of invvoice items and bookings**
+
+Filters for relevant categories (tags) in the export so that only one remain.
+
+**`Feature`** | **[FER-926](https://issues.seantis.ch/browse/FER-926)** | **[70527a618b](https://github.com/onegov/onegov-cloud/commit/70527a618b559b0daa8f88ee957397858aa40520)**
+
+🐞 **Disables automatically accepting blocked booking on occasion cancellation**
+
+**`Bugfix`** | **[FER-898](https://issues.seantis.ch/browse/FER-898)** | **[f3ee7657c6](https://github.com/onegov/onegov-cloud/commit/f3ee7657c699a071add0f81a02ce32c014005ac7)**
+
+🐞 **Fixes updating Occasion seeking volunteers on need deletion**
+
+**`Bugfix`** | **[FER-917](https://issues.seantis.ch/browse/FER-917)** | **[29f6f9350b](https://github.com/onegov/onegov-cloud/commit/29f6f9350b54dc726401c6c02b7396db4e503a43)**
+
+### Org
+
+🎉 **Adds favicon settings in header section**
+
+**`Feature`** | **[STAKABS-12](#STAKABS-12)** | **[4af6713dcb](https://github.com/onegov/onegov-cloud/commit/4af6713dcb6552a0e424b18ec4de7786fdeb3d82)**
+
+🎉 **Adds _blank.js to modify external links with target blank**
+
+**`Feature`** | **[95a6e577e7](https://github.com/onegov/onegov-cloud/commit/95a6e577e77968db56bebbdfdbd17457a3a56cf6)**
+
+🎉 **Adds settings to define footer column widths**
+
+Clients can define the width of all the footer sections for medium screen sizes.
+
+**`Feature`** | **[ZW-283](https://kanton-zug.atlassian.net/browse/ZW-283)** | **[559ef10cb8](https://github.com/onegov/onegov-cloud/commit/559ef10cb817ad71ce6b9505e0560f24785acc94)**
+
+### User
+
+🎉 **Add a CLI option to show sources of users.**
+
+**`Feature`** | **[2cdbbb758a](https://github.com/onegov/onegov-cloud/commit/2cdbbb758a72545bcef99f894dd0d1c09221af8f)**
+
 ## Release `2021.2`
 
-> commits: **11 / [279ad674c6...23542c4d80](https://github.com/OneGov/onegov-cloud/compare/279ad674c6^...23542c4d80)**  
+> released: **2021-01-07 12:17**<br>
+> commits: **12 / [279ad674c6...4313ff1e23](https://github.com/OneGov/onegov-cloud/compare/279ad674c6^...4313ff1e23)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.2)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
