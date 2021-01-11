@@ -124,6 +124,11 @@ class Organisation(Base, TimestampMixin):
     favicon_apple_touch_url = meta_property()
     favicon_pinned_tab_safari_url = meta_property()
 
+    # Footer column width settings
+    footer_left_width = meta_property(default=3)
+    footer_center_width = meta_property(default=5)
+    footer_right_width = meta_property(default=4)
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

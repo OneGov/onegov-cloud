@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-08 20:11+0100\n"
+"POT-Creation-Date: 2021-01-11 11:43+0100\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -901,6 +901,18 @@ msgstr "Deutsch"
 msgid "French"
 msgstr "Französisch"
 
+msgid "Column width left side"
+msgstr "Breite linke Seite"
+
+msgid "Footer Division"
+msgstr "Footer Aufteilung"
+
+msgid "Column width for the center"
+msgstr "Breite mittlerer Bereich"
+
+msgid "Column width right side"
+msgstr "Breite rechte Seite"
+
 msgid "Contact"
 msgstr "Kontakt"
 
@@ -997,6 +1009,12 @@ msgstr "Dritter Partner"
 
 msgid "Fourth Partner"
 msgstr "Vierter Partner"
+
+msgid "The width of the column must be greater than 0"
+msgstr "Die Breite der Kolonne muss grösser sein als 0"
+
+msgid "The sum of all the footer columns must be equal to 12"
+msgstr "Die Summe aller Breiten der Fusszeilenkolonnen muss 12 sein."
 
 msgid "Icon 16x16 PNG (Windows)"
 msgstr ""

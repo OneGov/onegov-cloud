@@ -19,7 +19,7 @@ from wtforms import BooleanField, StringField, TextAreaField, RadioField, \
     FloatField
 from wtforms import ValidationError
 from wtforms import validators
-from wtforms.fields.html5 import EmailField, URLField
+from wtforms.fields.html5 import EmailField, URLField, IntegerField
 from wtforms_components import ColorField
 
 from onegov.ticket import handlers
@@ -123,6 +123,27 @@ class GeneralSettingsForm(Form):
 
 
 class FooterSettingsForm(Form):
+
+    footer_left_width = IntegerField(
+        label=_("Column width left side"),
+        fieldset=_("Footer Division"),
+        default=3,
+        validators=[validators.InputRequired()]
+    )
+
+    footer_center_width = IntegerField(
+        label=_("Column width for the center"),
+        fieldset=_("Footer Division"),
+        default=5,
+        validators=[validators.InputRequired()]
+    )
+
+    footer_right_width = IntegerField(
+        label=_("Column width right side"),
+        fieldset=_("Footer Division"),
+        default=4,
+        validators=[validators.InputRequired()]
+    )
 
     contact = TextAreaField(
         label=_("Contact"),
@@ -276,6 +297,28 @@ class FooterSettingsForm(Form):
         label=_("Website"),
         description=_("The partner's website"),
         fieldset=_("Fourth Partner"))
+
+    def ensure_correct_footer_column_width(self):
+
+        for col in ('left', 'center', 'right'):
+            if getattr(self, f'footer_{col}_width').data <= 0:
+                field = getattr(self, f'footer_{col}_width')
+                field.errors.append(
+                    _('The width of the column must be greater than 0')
+                )
+                return False
+
+        summed_cols = sum([
+            self.footer_left_width.data,
+            self.footer_center_width.data,
+            self.footer_right_width.data
+        ])
+
+        if summed_cols != 12:
+            self.errors['global-errors'] = [(
+                _("The sum of all the footer columns must be equal to 12")
+            )]
+            return False
 
 
 class FaviconSettingsForm(Form):

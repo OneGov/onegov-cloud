@@ -128,15 +128,15 @@
             youtube,
             custom_links
         ))">
-            <div class="small-12 medium-3 columns">
+            <div class="small-12 columns medium-${request.app.org.footer_left_width}">
                 <metal:b use-macro="layout.macros['footer_contact']" />
             </div>
 
-            <div class="small-12 medium-5 columns">
+            <div class="small-12 columns medium-${request.app.org.footer_center_width}">
                 <metal:b use-macro="layout.macros['footer_opening_hours']" />
             </div>
 
-            <div class="small-12 medium-4 columns">
+            <div class="small-12 columns medium-${request.app.org.footer_right_width}">
                 <metal:b use-macro="layout.macros['footer_social_media']" />
                 <metal:b use-macro="layout.macros['footer_custom_links']" />
             </div>
