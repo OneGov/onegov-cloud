@@ -100,6 +100,14 @@ class Layout(ChameleonLayout):
         return self.dashboard_link
 
     @cached_property
+    def export_users_link(self):
+        return self.request.class_link(UserCollection, name='export-by-groups')
+
+    @cached_property
+    def export_categories_link(self):
+        return self.request.class_link(CategoryCollection, name='export')
+
+    @cached_property
     def login_link(self):
         if not self.request.is_logged_in:
             return self.request.link(
@@ -197,6 +205,30 @@ class Layout(ChameleonLayout):
                     and 'statistics' in self.request.url
                 ),
                 []
+            ))
+            export_links = [
+                (
+                    _('Users'),
+                    self.export_users_link,
+                    isinstance(self.model, UserCollection) and
+                    'export' in self.request.url,
+                    []
+                ),
+                (
+                    _('Categories'),
+                    self.export_categories_link,
+                    isinstance(self.model, CategoryCollection) and
+                    'export' in self.request.url,
+                    []
+                ),
+
+            ]
+            result.append((
+                _("Exports"),
+                None,
+                isinstance(self.model, UserCollection) and
+                'export' in self.request.url,
+                export_links
             ))
 
         elif self.request.is_personal(self.model):

@@ -1,9 +1,9 @@
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
 from onegov.form.fields import PhoneNumberField
 from onegov.form.validators import UniqueColumnValue
 from onegov.gazette import _
-from onegov.user import User
+from onegov.user import User, UserGroupCollection
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
@@ -78,3 +78,22 @@ class UserForm(Form):
         self.name.data = model.realname
         self.group.data = str(model.group_id or '')
         self.phone_number.data = model.phone_number
+
+
+class ExportUsersForm(Form):
+
+    group_names = ChosenSelectMultipleField(
+        label=_('Group Names'),
+        choices=[]
+    )
+
+    def populate_group_names(self):
+        groups = UserGroupCollection(self.request.session)
+        cls = groups.model_class
+        q = groups.query().with_entities(cls.id, cls.name)
+        self.group_names.choices = [
+            (str(entry.id), entry.name) for entry in q
+        ]
+
+    def on_request(self):
+        self.populate_group_names()

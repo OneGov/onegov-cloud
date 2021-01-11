@@ -284,18 +284,18 @@ def export_users(self, request):
             request.translate(_("E-Mail"))
         ))
 
-        editors = self.query().filter(User.role == role)
-        editors = editors.join(User.group, isouter=True)
-        editors = editors.order_by(
+        users = self.query().filter(User.role == role)
+        users = users.join(User.group, isouter=True)
+        users = users.order_by(
             UserGroup.name,
             User.realname,
             User.username
         )
-        for index, editor in enumerate(editors.all()):
+        for index, user in enumerate(users.all()):
             worksheet.write_row(index + 1, 0, (
-                editor.group.name if editor.group else '',
-                editor.realname or '',
-                editor.username or ''
+                user.group.name if user.group else '',
+                user.realname or '',
+                user.username or ''
             ))
 
     workbook.close()
