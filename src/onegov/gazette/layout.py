@@ -101,7 +101,15 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def export_users_link(self):
-        return self.request.class_link(UserCollection, name='export-by-groups')
+        return self.request.class_link(UserCollection, name='export')
+
+    @cached_property
+    def export_issues_link(self):
+        return self.request.class_link(IssueCollection, name='export')
+
+    @cached_property
+    def export_organisation_link(self):
+        return self.request.class_link(OrganizationCollection, name='export')
 
     @cached_property
     def export_categories_link(self):
@@ -157,7 +165,8 @@ class Layout(ChameleonLayout):
                 isinstance(self.model, IssueCollection)
                 or isinstance(self.model, OrganizationCollection)
                 or isinstance(self.model, CategoryCollection)
-                or isinstance(self.model, UserCollection)
+                or (isinstance(self.model, UserCollection)
+                    and 'export' not in self.request.url)
                 or isinstance(self.model, UserGroupCollection)
             )
             manage = [
@@ -208,17 +217,31 @@ class Layout(ChameleonLayout):
             ))
             export_links = [
                 (
-                    _('Users'),
-                    self.export_users_link,
-                    isinstance(self.model, UserCollection) and
-                    'export' in self.request.url,
+                    _('Issues'),
+                    self.export_issues_link,
+                    isinstance(self.model, IssueCollection)
+                    and 'export' in self.request.url,
+                    []
+                ),
+                (
+                    _('Organizations'),
+                    self.export_organisation_link,
+                    isinstance(self.model, OrganizationCollection)
+                    and 'export' in self.request.url,
                     []
                 ),
                 (
                     _('Categories'),
                     self.export_categories_link,
-                    isinstance(self.model, CategoryCollection) and
-                    'export' in self.request.url,
+                    isinstance(self.model, CategoryCollection)
+                    and 'export' in self.request.url,
+                    []
+                ),
+                (
+                    _('Users'),
+                    self.export_users_link,
+                    isinstance(self.model, UserCollection)
+                    and 'export' in self.request.url,
                     []
                 ),
 
@@ -226,7 +249,6 @@ class Layout(ChameleonLayout):
             result.append((
                 _("Exports"),
                 None,
-                isinstance(self.model, UserCollection) and
                 'export' in self.request.url,
                 export_links
             ))

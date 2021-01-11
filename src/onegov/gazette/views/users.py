@@ -10,6 +10,7 @@ from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import UserForm
+from onegov.gazette.forms.user import ExportUsersForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.user import User
@@ -259,56 +260,72 @@ def clear_user_sessions(self, request, form):
     }
 
 
-@GazetteApp.view(
+@GazetteApp.form(
     model=UserCollection,
     name='export',
-    permission=Private
+    permission=Private,
+    form=ExportUsersForm,
+    template='export.pt'
 )
-def export_users(self, request):
+def export_users(self, request, form):
     """ Export all users as XLSX. The exported file can be re-imported
     using the import-editors command line command.
 
     """
-    output = BytesIO()
-    workbook = Workbook(output)
+    if form.submitted(request):
+        output = BytesIO()
+        workbook = Workbook(output)
 
-    for role, name in (
-        ('member', request.translate(_("Editors"))),
-        ('editor', request.translate(_("Publishers")))
-    ):
-        worksheet = workbook.add_worksheet()
-        worksheet.name = name
-        worksheet.write_row(0, 0, (
-            request.translate(_("Group")),
-            request.translate(_("Name")),
-            request.translate(_("E-Mail"))
-        ))
-
-        users = self.query().filter(User.role == role)
-        users = users.join(User.group, isouter=True)
-        users = users.order_by(
-            UserGroup.name,
-            User.realname,
-            User.username
-        )
-        for index, user in enumerate(users.all()):
-            worksheet.write_row(index + 1, 0, (
-                user.group.name if user.group else '',
-                user.realname or '',
-                user.username or ''
+        for role, name in (
+            ('member', request.translate(_("Editors"))),
+            ('editor', request.translate(_("Publishers")))
+        ):
+            worksheet = workbook.add_worksheet()
+            worksheet.name = name
+            worksheet.write_row(0, 0, (
+                request.translate(_("Group")),
+                request.translate(_("Name")),
+                request.translate(_("E-Mail"))
             ))
 
-    workbook.close()
-    output.seek(0)
+            users = self.query().filter(User.role == role)
+            group_ids = form.group_names.data
+            if group_ids:
+                users = users.filter(User.group_id.in_(group_ids))
 
-    response = Response()
-    response.content_type = (
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
-        request.translate(_("Users")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
-    )
-    response.body = output.read()
+            users = users.join(User.group, isouter=True)
 
-    return response
+            users = users.order_by(
+                UserGroup.name,
+                User.realname,
+                User.username
+            )
+            for index, user in enumerate(users.all()):
+                worksheet.write_row(index + 1, 0, (
+                    user.group.name if user.group else '',
+                    user.realname or '',
+                    user.username or ''
+                ))
+
+        workbook.close()
+        output.seek(0)
+
+        response = Response()
+        response.content_type = (
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
+            request.translate(_("Users")).lower(),
+            datetime.utcnow().strftime('%Y%m%d%H%M')
+        )
+        response.body = output.read()
+        return response
+
+    return {
+        'form': form,
+        'layout': Layout(self, request),
+        'title': _('Export Users'),
+        'button_text': _('Export'),
+        'callout': _('Export users by groups or leave empty '
+                     'for un unfiltered export.')
+    }
