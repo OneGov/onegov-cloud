@@ -905,7 +905,7 @@ msgid "Column width left side"
 msgstr "Breite linke Seite"
 
 msgid "Footer Division"
-msgstr "Footer Aufteilung"
+msgstr "Aufteilung Fusszeile"
 
 msgid "Column width for the center"
 msgstr "Breite mittlerer Bereich"
