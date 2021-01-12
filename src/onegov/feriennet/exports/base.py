@@ -136,13 +136,7 @@ class FeriennetExport(Export):
         yield _("Need Description"), need.description
 
     def activity_tags(self, tags):
-        # A WWF feature, which uses one of the relevant tags for VAT.
-        relevant = [
-            "Family Camp", "Camp", "Camp in House",
-            "Tent Camp", "Trecking Camp"
-        ]
-        tags = [t for t in tags or [] if t in relevant]
-        yield _("Activity Tags"), "\n".join(sorted(tags))
+        yield _("Activity Tags"), "\n".join(sorted(tags or []))
 
     def user_fields(self, user):
         user_data = user.data or {}
