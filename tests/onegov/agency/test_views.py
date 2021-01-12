@@ -182,16 +182,16 @@ def test_views_1(client):
     new_membership.form['person_id'].select(text="Aeschi Thomas")
     agency = new_membership.form.submit().follow()
     assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
-        'Eder Joachim', ', Ständerat für Zug',
-        'Aeschi Thomas', ', Zweiter Ständerat für Zug',
+        'Eder Joachim', ', Ständerat für Zug', None,
+        'Aeschi Thomas', ', Zweiter Ständerat für Zug', None
     ]
 
     agency.click("Mitgliedschaften", href='sort')
     agency = client.get(agency.request.url)
 
     assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
-        'Aeschi Thomas', ', Zweiter Ständerat für Zug',
-        'Eder Joachim', ', Ständerat für Zug',
+        'Aeschi Thomas', ', Zweiter Ständerat für Zug', None,
+        'Eder Joachim', ', Ständerat für Zug', None
     ]
 
     agency.click("Zweiter Ständerat für Zug").click("Löschen")
