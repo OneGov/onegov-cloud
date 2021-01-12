@@ -8,7 +8,7 @@ from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import BytesIO
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.data_import import import_bs_data
+from onegov.agency.data_import import import_bs_data, import_membership_titles
 from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership, ExtendedPerson
 from onegov.core.cli import command_group
@@ -105,6 +105,31 @@ def consolidate_cli(based_on, ignore_case, dry_run, verbose):
             click.secho("Aborting transaction", fg='yellow')
 
     return do_consolidate
+
+
+@cli.command('import-bs-membership-title', context_settings={'singular': True})
+@click.argument('agency-file', type=click.Path(exists=True))
+@click.argument('people-file', type=click.Path(exists=True))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_bs_function(agency_file, people_file, dry_run):
+
+    def execute(request, app):
+        import_membership_titles(agency_file, people_file, request, app)
+
+        total_empty_titles = 0
+
+        for membership in request.session.query(ExtendedAgencyMembership):
+            title = membership.title
+            if not title.strip():
+                membership.title = 'Mitglied'
+                total_empty_titles += 1
+
+        print('Corrected remaining empty titles: ', total_empty_titles)
+
+        if dry_run:
+            transaction.abort()
+            click.secho("Aborting transaction", fg='yellow')
+    return execute
 
 
 @cli.command('import-bs-data', context_settings={'singular': True})
