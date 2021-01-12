@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2021.4`
+
+> commits: **6 / [587cf0f042...ab33eeea26](https://github.com/OneGov/onegov-cloud/compare/587cf0f042^...ab33eeea26)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.4)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Adds Edit-Icon to list of memberships in agency view**
+
+Visually improves access to the membership via an icon.
+
+**`Feature`** | **[STAKABS-18](#STAKABS-18)** | **[587cf0f042](https://github.com/onegov/onegov-cloud/commit/587cf0f04284fd292250411991598728dc5dafb5)**
+
+### Feriennet
+
+🐞 **Fixes notification sending for inactive users by role**
+
+**`Bugfix`** | **[FER-844](https://issues.seantis.ch/browse/FER-844)** | **[ab33eeea26](https://github.com/onegov/onegov-cloud/commit/ab33eeea26a358ab3d437a23980275297566d084)**
+
+### Gazette
+
+🎉 **Adds export tab and user export by group**
+
+Aggregates the export links in a new menu tab for quick access. Adds form to choose groups for User export.
+
+**`Feature`** | **[ZW-285](https://kanton-zug.atlassian.net/browse/ZW-285)** | **[e6de092682](https://github.com/onegov/onegov-cloud/commit/e6de092682b00462996d8075b50c439917acaebe)**
+
 ## Release `2021.3`
 
-> commits: **14 / [f3ee7657c6...9aa7aeb1e4](https://github.com/OneGov/onegov-cloud/compare/f3ee7657c6^...9aa7aeb1e4)**  
+> released: **2021-01-11 13:10**<br>
+> commits: **15 / [f3ee7657c6...3bb41feb38](https://github.com/OneGov/onegov-cloud/compare/f3ee7657c6^...3bb41feb38)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.3)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
