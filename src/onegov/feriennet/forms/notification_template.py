@@ -163,7 +163,6 @@ class NotificationTemplateSendForm(Form):
             return set()
 
         q = UserCollection(self.request.session).by_roles(*roles)
-        q = q.filter(User.active == True)
         q = q.with_entities(User.username)
 
         return {u.username for u in q}

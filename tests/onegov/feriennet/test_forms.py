@@ -407,3 +407,45 @@ def test_notification_template_send_form(session):
 
     form.request = request(admin=True)
     assert len(form.recipients_which_are_active_organisers()) == 2
+
+
+@pytest.mark.parametrize('recipient_count,roles,states', [
+    (2, ['admin', 'editor'], ['active']),
+    (4, ['admin', 'editor'], ['active', 'inactive']),
+    (1, ['editor'], ['inactive']),
+])
+def test_notification_send_template_by_role(
+        scenario, recipient_count, roles, states):
+    # Check by_role with inactive users
+    # in the beginning there are no recipients
+
+    session = scenario.session
+
+    users = UserCollection(session)
+    # add each role active and not active
+    for username in (
+            'admin@example.org',
+            'editor@example.org',
+    ):
+        role = username.split('@')[0]
+        users.add(username=username, password='foobar', role=role)
+        users.add(username=f'ex_{username}', password='foobar', role=role,
+                  active=False)
+
+    scenario.add_period()
+    scenario.commit()
+    scenario.refresh()
+    period = scenario.latest_period
+
+    form = NotificationTemplateSendForm(MultiDict([
+        ('send_to', 'by_role'),
+        *(('roles', role) for role in roles),
+        *(('state', s) for s in states)
+    ]))
+    assert form.send_to.data == 'by_role'
+    assert form.roles.data == roles
+    assert form.state.data == states
+
+    form.request = Bunch(session=session)
+    form.model = Bunch(period_id=period.id)
+    assert len(form.recipients) == recipient_count
