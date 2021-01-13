@@ -234,7 +234,7 @@
             <dd><span tal:repeat="ancestor agency.ancestors">${ancestor.title}</span> <span>${agency.title}</span></dd>
 
             <dt i18n:translate>Message</dt>
-            <dd>${message}</dd>
+            <dd tal:content="structure message"></dd>
         </dl>
     </metal:display_agency_mutation>
 
@@ -245,7 +245,7 @@
             <dd><a href="${request.link(person)}">${person.title}</a></dd>
 
             <dt i18n:translate>Message</dt>
-            <dd>${message}</dd>
+            <dd tal:content="structure message"></dd>
         </dl>
     </metal:display_person_mutation>
 

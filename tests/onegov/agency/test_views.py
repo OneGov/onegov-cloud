@@ -3,6 +3,7 @@ from io import BytesIO
 import pytest
 from PyPDF2 import PdfFileReader
 
+from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 
@@ -389,7 +390,15 @@ def test_view_report_change(client):
     # Report agency change
     change = agency.click("Mutation melden")
     change.form['email'] = "info@hospital-springfield.com"
-    change.form['message'] = "Please add our address."
+
+    long_message = """
+    I saw some errors. Check
+    - https://mywebsite.com
+    Contact me under +41 77 777 77 77
+    """.strip()
+    linkified = linkify(long_message).replace('\n', '<br>')
+
+    change.form['message'] = long_message
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
@@ -397,7 +406,7 @@ def test_view_report_change(client):
     ticket = client.get(ticket_number)
     assert "Mutationsmeldung" in ticket
     assert "Hospital Springfield" in ticket
-    assert "Please add our address." in ticket
+    assert linkified in ticket
     assert "info@hospital-springfield.com" in ticket
     ticket = ticket.click("Ticket annehmen").follow()
     ticket = ticket.click("Ticket abschliessen").follow()
@@ -408,7 +417,7 @@ def test_view_report_change(client):
     assert "Der hinterlegte Datensatz wurde entfernt." in ticket
     assert "Mutationsmeldung" in ticket
     assert "Hospital Springfield" in ticket
-    assert "Please add our address." in ticket
+    assert linkified in ticket
     assert "info@hospital-springfield.com" in ticket
 
     # Report person change
