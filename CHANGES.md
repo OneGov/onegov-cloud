@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2021.5`
+
+> commits: **5 / [4c96652e68...6bfc805e98](https://github.com/OneGov/onegov-cloud/compare/4c96652e68^...6bfc805e98)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.5)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Improve display of lead texts and autofill submitter email on new event**
+
+Preserve lead word wrap with forms and resources.
+
+**`Feature`** | **[SEA-82](https://linear.app/seantis/issue/SEA-82)** | **[e73344b7ab](https://github.com/onegov/onegov-cloud/commit/e73344b7abd7bce64fdadd513d7b4a1f476c031d)**
+
 ## Release `2021.4`
 
-> commits: **6 / [587cf0f042...ab33eeea26](https://github.com/OneGov/onegov-cloud/compare/587cf0f042^...ab33eeea26)**  
+> released: **2021-01-12 15:53**<br>
+> commits: **7 / [587cf0f042...4f1ffe3aae](https://github.com/OneGov/onegov-cloud/compare/587cf0f042^...4f1ffe3aae)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.4)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
