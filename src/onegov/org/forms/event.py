@@ -237,7 +237,8 @@ class EventForm(Form):
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
-        self.populate_submitter()
+        if not self.email.data:
+            self.populate_submitter()
 
     def sort_tags(self):
         self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))
