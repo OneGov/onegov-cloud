@@ -237,7 +237,7 @@
         <h2>${activity.title}</h2>
 
         <p>
-            <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
+            <span class="page-lead" tal:condition="activity.lead" tal:content="structure layout.paragraphify(layout.linkify(activity.lead))" />
             <span>${period.title}</span>
         </p>
 
