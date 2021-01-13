@@ -76,4 +76,4 @@ def test_exports(client, scenario):
         session=session
     )
     data = {k: v for k, v in list(items)[0]}
-    assert data['Activity Tags'] == "Family Camp"
+    assert data['Activity Tags'] == "CAMP\nFamily Camp"
