@@ -6,7 +6,6 @@ from collections import OrderedDict
 from itertools import groupby
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
-from onegov.core.utils import linkify
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.file import File
 from onegov.file.utils import name_without_extension
