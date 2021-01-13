@@ -117,7 +117,7 @@ setup(
         'pyparsing',
         'pyquery',
         'python-dateutil',
-        'python-magic',
+        'python-magic>=0.4.17',
         'python-stdnum',
         'pytz',
         'pyyaml',
