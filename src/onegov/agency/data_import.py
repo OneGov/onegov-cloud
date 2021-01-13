@@ -187,9 +187,6 @@ def import_bs_persons(csvfile, agencies, session, app):
             s for s in (bemerkung, notiz, sprechstunde) if s]
         )
 
-        if sprechstunde:
-            note += f"\n{sprechstunde}"
-
         agency_id = line.verzorgeinheitid
 
         person_ = people.add(
