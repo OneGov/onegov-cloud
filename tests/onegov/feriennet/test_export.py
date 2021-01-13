@@ -60,7 +60,7 @@ def test_exports(client, scenario):
         session=session
     )
     data = {k: v for k, v in list(rows)[0]}
-    assert data['Activity Tags'] == "Family Camp"
+    assert data['Activity Tags'] == "CAMP\nFamily Camp"
 
     # Create invoices
     bills = BillingCollection(
