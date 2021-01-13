@@ -499,6 +499,9 @@ class Layout(ChameleonLayout):
             self.request.class_link(Auth, name='reset-password')
         )
 
+    def linkify(self, text):
+        return linkify(text).replace('\n', '<br>') if text else text
+
 
 class DefaultLayout(Layout):
     """ The default layout meant for the public facing parts of the site. """
