@@ -15,7 +15,7 @@ from onegov.core.elements import Link, LinkGroup
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, paragraphify
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
@@ -586,6 +586,9 @@ class DefaultMailLayout(Layout):
                 salt='unsubscribe'
             )
         )
+
+    def paragraphify(self, text):
+        return paragraphify(text)
 
 
 class AdjacencyListMixin:

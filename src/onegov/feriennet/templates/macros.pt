@@ -237,7 +237,7 @@
         <h2>${activity.title}</h2>
 
         <p>
-            <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
+            <span class="page-lead" tal:condition="activity.lead" tal:content="structure layout.paragraphify(layout.linkify(activity.lead))" />
             <span>${period.title}</span>
         </p>
 
@@ -247,7 +247,7 @@
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
 
     <tal:b metal:use-macro="layout.macros.page_content"
-        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_side_panel True; highlight_contacts False; location activity.location">
+        tal:define="lead layout.paragraphify(layout.linkify(activity.lead)); text activity.text; coordinates activity.coordinates; people None; contact None; show_side_panel True; highlight_contacts False; location activity.location">
 
         <div metal:fill-slot="after-lead" tal:condition="activity.tags">
             <ul class="tags">
