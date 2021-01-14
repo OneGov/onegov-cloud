@@ -78,7 +78,7 @@ def handle_general_settings(self, request, form):
 @OrgApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
-    icon=' fa-external-link-square', order=--990)
+    icon=' fa-external-link-square', order=-990)
 def handle_favicon_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Favicon"))
 
