@@ -505,7 +505,7 @@ class Layout(ChameleonLayout):
     @property
     def file_link_target(self):
         """ Use with tal:attributes='target layout.file_link_target' """
-        return self.request.app.org.open_files_target_blank and '_blank' or None
+        return self.org.open_files_target_blank and '_blank' or None
 
 
 class DefaultLayout(Layout):
