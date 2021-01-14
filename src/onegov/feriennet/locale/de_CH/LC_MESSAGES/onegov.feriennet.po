@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-08 16:52+0100\n"
+"POT-Creation-Date: 2021-01-14 15:11+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -157,6 +157,9 @@ msgstr "Angebot Status"
 msgid "Activity Location"
 msgstr "Angebot Ort"
 
+msgid "Activity Tags"
+msgstr "Angebot Kategorien"
+
 msgid "Booking State"
 msgstr "Buchung Status"
 
@@ -222,9 +225,6 @@ msgstr "Bedarf Name"
 
 msgid "Need Description"
 msgstr "Bedarf Beschreibung"
-
-msgid "Activity Tags"
-msgstr "Angebot Kategorien"
 
 msgid "User Login"
 msgstr "Benutzer Login"

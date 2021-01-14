@@ -92,6 +92,7 @@ class FeriennetExport(Export):
         yield _("Activity Text (HTML)"), activity.text
         yield _("Activity Status"), ACTIVITY_STATES[activity.state]
         yield _("Activity Location"), activity.location
+        yield _("Activity Tags"), "\n".join(sorted(activity.tags or []))
 
     def booking_fields(self, booking):
         state = booking.period_bound_booking_state(booking.period)
