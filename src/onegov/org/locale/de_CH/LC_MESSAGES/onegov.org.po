@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-11 11:43+0100\n"
-"PO-Revision-Date: 2020-05-10 10:56+0200\n"
+"POT-Creation-Date: 2021-01-14 14:25+0100\n"
+"PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -1030,6 +1030,12 @@ msgstr ""
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr ""
+
+msgid "Open files in separate window"
+msgstr "Dateien in separatem Fenster öffnen"
+
+msgid "User will stay on the page when opening images and files"
+msgstr "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"
 
 msgid "Title header left side"
 msgstr "Titel Kopfzeile links"
@@ -3939,6 +3945,9 @@ msgid "Search Unavailable"
 msgstr "Suche Nicht Verfügbar"
 
 msgid "Favicon"
+msgstr ""
+
+msgid "Links"
 msgstr ""
 
 msgid "Header"

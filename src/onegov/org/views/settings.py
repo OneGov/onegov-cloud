@@ -14,7 +14,7 @@ from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
-    HeaderSettingsForm, FaviconSettingsForm
+    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.models import Organisation
@@ -78,9 +78,17 @@ def handle_general_settings(self, request, form):
 @OrgApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
-    icon=' fa-external-link-square', order=--990)
+    icon=' fa-external-link-square', order=-990)
 def handle_favicon_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Favicon"))
+
+
+@OrgApp.form(
+    model=Organisation, name='link-settings', template='form.pt',
+    permission=Secret, form=LinksSettingsForm, setting=_("Links"),
+    icon=' fa-link', order=-980)
+def handle_links_settings(self, request, form):
+    return handle_generic_settings(self, request, form, _("Links"))
 
 
 @OrgApp.form(

@@ -502,6 +502,11 @@ class Layout(ChameleonLayout):
     def linkify(self, text):
         return linkify(text).replace('\n', '<br>') if text else text
 
+    @property
+    def file_link_target(self):
+        """ Use with tal:attributes='target layout.file_link_target' """
+        return self.request.app.org.open_files_target_blank and '_blank' or None
+
 
 class DefaultLayout(Layout):
     """ The default layout meant for the public facing parts of the site. """
