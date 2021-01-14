@@ -124,6 +124,9 @@ class Organisation(Base, TimestampMixin):
     favicon_apple_touch_url = meta_property()
     favicon_pinned_tab_safari_url = meta_property()
 
+    # Links Settings
+    open_files_target_blank = meta_property(default=True)
+
     # Footer column width settings
     footer_left_width = meta_property(default=3)
     footer_center_width = meta_property(default=5)

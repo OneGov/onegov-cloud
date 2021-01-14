@@ -348,6 +348,14 @@ class FaviconSettingsForm(Form):
     )
 
 
+class LinksSettingsForm(Form):
+    open_files_target_blank = BooleanField(
+        label=_("Open files in separate window"),
+        description=_(
+            'User will stay on the page when opening images and files')
+    )
+
+
 class HeaderSettingsForm(Form):
 
     left_header_name = StringField(
