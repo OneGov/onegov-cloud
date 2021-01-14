@@ -1474,6 +1474,10 @@ def test_auto_accept_reservations(client):
     message = client.app.smtp.outbox[0]
     assert 'Ihre Reservationen wurden angenommen' in message.get('subject')
 
+    # close the ticket and check not email is sent
+    tickets = client.get('/tickets/ALL/closed')
+    assert 'RSV-' in tickets
+
 
 @freeze_time("2015-08-28")
 def test_reserve_allocation(client):
