@@ -95,9 +95,7 @@ class FeriennetExport(Export):
         yield _("Activity Tags"), "\n".join(sorted(activity.tags or []))
 
     def booking_fields(self, booking):
-        state = booking.period_bound_booking_state(booking.period)
-
-        yield _("Booking State"), BOOKING_STATES[state]
+        yield _("Booking State"), BOOKING_STATES[booking.state]
         yield _("Booking Priority"), booking.priority
         yield _("Booking Cost"), booking.cost
         yield _("Booking Date"), booking.created.date()
