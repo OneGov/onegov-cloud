@@ -1499,10 +1499,10 @@
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
     <div class="row">
         <div class="columns small-4">
-            <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
+            <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'" tal:attributes="target layout.file_link_target">
                 <img class="pdf-preview" src="${request.link(file, name='medium')}">
             </a>
-            <a class="file-preview" href="${request.link(file)}" tal:condition="extension != 'pdf'">
+            <a class="file-preview" href="${request.link(file)}" tal:condition="extension != 'pdf'" tal:attributes="target layout.file_link_target">
                 <svg width="204px" height="261px" viewBox="0 0 204 261" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:relative; left: -6px;">
                     <defs>
                         <filter x="-7.8%" y="-5.9%" width="120.0%" height="115.3%" filterUnits="objectBoundingBox" id="filter-1">
@@ -1774,7 +1774,7 @@
 
 <metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.org">
     <li id="image-${index}" class="image-box">
-        <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
+        <a href="${image.url}" tal:attributes="target layout.file_link_target" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
             <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
             <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
         </a>
