@@ -61,6 +61,9 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
         if opened and request.auto_accept(ticket):
             return
 
+        if ticket.state == 'closed' and request.auto_accept(ticket):
+            return
+
         if request.current_username in receivers:
             if len(receivers) == 1:
                 return
