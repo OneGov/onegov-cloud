@@ -67,42 +67,7 @@
                 </tal:b>
 
                 <tal:b repeat="ticket tickets">
-                    <tr tal:define="ticket_url request.link(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
-                        <td class="ticket-number-plain">
-                            <a href="${ticket_url}">
-                                ${ticket.number}
-                            </a>
-                        </td>
-                        <td class="ticket-group" colspan="2">
-                            <div>${translate(ticket.group)}</div>
-                            <div>${ticket.title}</div>
-                            <div>${ticket.subtitle}</div>
-                            <tal:b define="payment ticket.handler.payment" tal:condition="payment">
-                                <div class="payment-state payment-state-${payment.state}">
-                                    ${layout.format_number(payment.amount)} ${payment.currency}
-                                </div>
-                            </tal:b>
-                        </td>
-                        <td class="ticket-date">
-                            ${layout.format_date(ticket.created, 'relative')}
-                        </td>
-                        <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
-                            <a class="ticket-accept ticket-button" href="${request.link(ticket, 'accept')}" i18n:translate>
-                                Accept
-                            </a>
-                        </td>
-                        <td class="ticket-state" tal:condition="ticket.state != 'open'">
-                            <tal:b condition="ticket.state == 'pending'" i18n:translate>
-                                Pending
-                            </tal:b>
-                            <tal:b condition="ticket.state == 'closed'" i18n:translate>
-                                Closed
-                            </tal:b>
-                        </td>
-                        <td class="ticket-user" tal:condition="ticket.state != 'open'">
-                            <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
-                        </td>
-                    </tr>
+                  <div metal:use-macro="layout.macros['tickets_table_row']"/>
                 </tal:b>
             </tbody>
         </table>
