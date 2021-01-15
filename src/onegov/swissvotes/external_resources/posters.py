@@ -36,6 +36,8 @@ class ExternalSource():
         image_urls = image_urls if isinstance(image_urls, dict) else {}
 
         for url in poster_urls.split(' '):
+            if not url:
+                continue
             meta_data_url = self.meta_data_url(url)
             try:
                 response = get(meta_data_url)
