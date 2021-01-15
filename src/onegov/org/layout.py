@@ -81,6 +81,9 @@ class Layout(ChameleonLayout):
 
         super().__init__(*args, **kwargs)
 
+    def has_model_permission(self, permission):
+        return self.request.has_permission(self.model, permission)
+
     @property
     def name(self):
         """ Takes the class name of the layout and generates a name which
