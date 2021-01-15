@@ -49,7 +49,7 @@ def configure_provider(app, app_id):
                 tenant_id: '{TEST_TENANT}'
                 client_id: '{client_id}'
                 client_secret: '{client_secret}'
-                validate_authority: false    
+                validate_authority: false
                 #attributes:
                 #  source_id: 'sub'
                 #  username: 'email'
