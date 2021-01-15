@@ -8,6 +8,9 @@ from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import Person
+from onegov.user.models import RoleMapping
+from onegov.user.models import User
+from onegov.user.models import UserGroup
 
 
 def test_extended_agency(agency_app):
@@ -49,9 +52,11 @@ def test_extended_agency(agency_app):
     agency.access = 'private'
     assert agency.es_public is False
 
+    # todo: test deletable
+
 
 def test_extended_agency_add_person(session):
-    agency = ExtendedAgency(title="Agency", name="agency",)
+    agency = ExtendedAgency(title="Agency", name="agency")
     person = ExtendedPerson(first_name="A", last_name="Person")
     session.add(agency)
     session.add(person)
@@ -64,6 +69,43 @@ def test_extended_agency_add_person(session):
     assert membership.since == "2012"
     assert membership.note == "N"
     assert membership.prefix == "*"
+
+
+def test_extended_agency_role_mappings(session):
+    agency = ExtendedAgency(
+        title='Agency',
+        name='agency'
+    )
+    user = User(
+        username='user@example.org',
+        password_hash='password_hash',
+        role='member'
+    )
+    group = UserGroup(name='group')
+    session.add(agency)
+    session.add(user)
+    session.add(group)
+    session.flush()
+
+    user_mapping = RoleMapping(
+        username=user.username,
+        content_type='agencies',
+        content_id=str(agency.id),
+        role='admin'
+    )
+    group_mapping = RoleMapping(
+        group_id=group.id,
+        content_type='agencies',
+        content_id=str(agency.id),
+        role='editor'
+    )
+    session.add(user_mapping)
+    session.add(group_mapping)
+    session.flush()
+
+    assert {item.role for item in agency.role_mappings} == {'admin', 'editor'}
+    assert user.role_mappings.one().content_id == str(agency.id)
+    assert group.role_mappings.one().content_id == str(agency.id)
 
 
 def test_extended_person(session):
@@ -104,6 +146,8 @@ def test_extended_person(session):
 
     person.access = 'private'
     assert person.es_public is False
+
+    # todo: test deletable
 
 
 def test_extended_membership(session):

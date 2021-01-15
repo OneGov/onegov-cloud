@@ -7,7 +7,9 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.org.models.extensions import AccessExtension
 from onegov.people import Agency
+from onegov.user import RoleMapping
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import relationship
 
 
 class AgencyPdf(File):
@@ -35,6 +37,18 @@ class ExtendedAgency(Agency, AccessExtension):
 
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
+
+    role_mappings = relationship(
+        RoleMapping,
+        primaryjoin=(
+            "and_("
+            "foreign(RoleMapping.content_id) == cast(ExtendedAgency.id, TEXT),"
+            "RoleMapping.content_type == 'agencies'"
+            ")"
+        ),
+        viewonly=True,
+        lazy='dynamic'
+    )
 
     trait = 'agency'
 
@@ -112,7 +126,7 @@ class ExtendedAgency(Agency, AccessExtension):
     def deletable(self, request):
         if request.is_admin:
             return True
-        if bool(self.memberships) or bool(self.children):
+        if self.memberships.first() or self.children:
             return False
         return True
 

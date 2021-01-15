@@ -10,7 +10,7 @@ from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.layout import ExtendedPersonCollectionLayout
 from onegov.agency.layout import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
-from onegov.core.security import Private, Secret
+from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import Form
 from onegov.org.elements import Link
@@ -236,10 +236,10 @@ def edit_person(self, request, form):
 @AgencyApp.view(
     model=ExtendedPerson,
     request_method='DELETE',
-    permission=Secret)
+    permission=Private)
 def handle_delete_person(self, request):
 
-    if not self.deletable(request):
-        request.warning(_("People with memberships can't be deleted"))
+    if not self.deletable:
+        request.error(_("People with memberships can't be deleted"))
         return
     return org_handle_delete_person(self, request)

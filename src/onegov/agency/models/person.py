@@ -28,6 +28,6 @@ class ExtendedPerson(Person, AccessExtension):
     def deletable(self, request):
         if request.is_admin:
             return True
-        if bool(self.memberships):
+        if self.memberships.first():
             return False
         return True

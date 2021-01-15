@@ -244,10 +244,9 @@ def move_agency(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.success(_("Agency moved"))
-        return redirect(request.link(self))
+        return redirect(request.link(self.proxy()))
 
-    if not form.errors:
-        form.apply_model(self)
+    form.apply_model(self)
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_("Move"), '#'))
@@ -373,8 +372,10 @@ def create_agency_pdf(self, request, form):
     permission=Private
 )
 def delete_agency(self, request):
-    if not self.deletable(request):
-        request.warning(_("Agency with memberships can't be deleted"))
+    if not self.deletable:
+        request.error(
+            _("Agency with memberships or suborganizations can't be deleted")
+        )
         return
     request.assert_valid_csrf_token()
     ExtendedAgencyCollection(request.session).delete(self)

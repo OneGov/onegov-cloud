@@ -1,5 +1,25 @@
 $agn-handler-icon: '\f0e8';
 $per-handler-icon: '\f007';
+$ticket-icon: '\f145';
+
+
+.globals {
+    .tickets::before {
+        @include icon($ticket-icon);
+    }
+
+    .open-tickets::before {
+        @include icon($open-ticket-icon);
+    }
+
+    .pending-tickets::before {
+        @include icon($pending-ticket-icon);
+    }
+
+    .closed-tickets::before {
+        @include icon($closed-ticket-icon);
+    }
+}
 
 .AGN-link::before {
     @include icon($agn-handler-icon);

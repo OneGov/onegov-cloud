@@ -4,6 +4,7 @@ from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.utils import handle_empty_p_tags
+from onegov.core.security import Private
 from onegov.core.utils import linkify
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, HtmlField
@@ -12,7 +13,6 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from sqlalchemy import func
-from sqlalchemy import String
 from wtforms import StringField
 from wtforms import validators
 
@@ -133,13 +133,18 @@ class MoveAgencyForm(Form):
         self.request.include('common')
         self.request.include('chosen')
 
-        self.parent_id.choices = self.request.session.query(
-            ExtendedAgency.id.cast(String),
-            ExtendedAgency.title
-        ).order_by(func.unaccent(ExtendedAgency.title)).all()
-        self.parent_id.choices.insert(
-            0, ('root', self.request.translate(_("- Root -")))
-        )
+        agencies = ExtendedAgencyCollection(self.request.session)
+        self.parent_id.choices = [
+            (str(agency.id), agency.title)
+            for agency in agencies.query().order_by(None).order_by(
+                func.unaccent(ExtendedAgency.title)
+            )
+            if self.request.has_permission(agency, Private)
+        ]
+        if self.request.has_permission(agencies, Private):
+            self.parent_id.choices.insert(
+                0, ('root', self.request.translate(_("- Root -")))
+            )
 
     def update_model(self, model):
         session = self.request.session
@@ -155,9 +160,9 @@ class MoveAgencyForm(Form):
 
     def apply_model(self, model):
         def remove(item):
-            self.parent_id.choices.pop(
-                self.parent_id.choices.index((str(item.id), item.title))
-            )
+            item = (str(item.id), item.title)
+            if item in self.parent_id.choices:
+                self.parent_id.choices.remove(item)
 
         def remove_with_children(item):
             remove(item)

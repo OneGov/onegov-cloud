@@ -1,13 +1,12 @@
 from io import BytesIO
-
-import pytest
-from PyPDF2 import PdfFileReader
-
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
+from PyPDF2 import PdfFileReader
+from pytest import mark
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 
-def test_views_1(client):
+
+def test_views(client):
     client.login_admin()
     settings = client.get('/module-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
@@ -507,7 +506,7 @@ def test_excel_export_not_logged_in(client):
     assert page.status == '403 Forbidden'
 
 
-@pytest.mark.flaky(reruns=3)
+@mark.flaky(reruns=3)
 def test_basic_search(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -515,12 +514,12 @@ def test_basic_search(client_with_es):
     new.form['academic_title'] = "Dr."
     new.form['first_name'] = "Nick"
     new.form['last_name'] = "Rivera"
-    page = new.form.submit().follow()
+    new.form.submit().follow()
 
     client.app.es_client.indices.refresh(index='_all')
 
     client = client.spawn()
-    search_page = client.get('/search?q=Nick')
+    client.get('/search?q=Nick')
 
 
 def test_footer_settings_custom_links(client):
@@ -539,3 +538,6 @@ def test_footer_settings_custom_links(client):
     page = settings.form.submit().follow()
     assert f'<a href="{custom_url}">{custom_name}</a>' in page
     assert 'Custom2' not in page
+
+# todo: test user groups
+# todo: test tickets not visible if no permission

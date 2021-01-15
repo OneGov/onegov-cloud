@@ -2,12 +2,14 @@ from onegov.agency.app import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
+from onegov.agency.models import AgencyMembershipMoveWithinPerson
 from onegov.agency.models import AgencyMove
 from onegov.agency.models import AgencyProxy
-from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import AgencyMembershipCollection
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 from uuid import UUID
 
 
@@ -90,3 +92,20 @@ def get_membership_move_for_person(app, subject_id, direction, target_id):
         target_id,
         direction
     )
+
+
+@AgencyApp.path(
+    model=UserGroupCollection,
+    path='/usergroups',
+)
+def get_user_groups(app):
+    return UserGroupCollection(app.session())
+
+
+@AgencyApp.path(
+    model=UserGroup,
+    path='/user-groups/{id}',
+    converters=dict(id=UUID)
+)
+def get_user_group(app, id):
+    return UserGroupCollection(app.session()).by_id(id)

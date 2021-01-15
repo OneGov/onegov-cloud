@@ -1,28 +1,31 @@
 from cached_property import cached_property
-from onegov.agency.collections import ExtendedAgencyCollection, \
-    ExtendedPersonCollection
+from onegov.agency.collections import ExtendedAgencyCollection
+from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
+from onegov.agency.models import AgencyMembershipMoveWithinPerson
 from onegov.agency.models import AgencyMove
-from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
-from onegov.core.elements import Confirm, Block
+from onegov.core.elements import Block
+from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
+from onegov.core.security import Private
 from onegov.org import _
-from onegov.org.layout import AdjacencyListLayout, \
-    PersonCollectionLayout, DefaultLayout
-
+from onegov.org.layout import AdjacencyListLayout
+from onegov.org.layout import DefaultLayout
+from onegov.org.layout import PersonCollectionLayout
 from onegov.org.layout import PersonLayout as OrgPersonLayout
+from onegov.user import UserGroupCollection
 
 
 class PersonLayout(OrgPersonLayout):
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
+        if self.has_model_permission(Private):
             if not self.model.deletable(self.request):
                 traits = (
                     Block(
-                        _("This person has memberships and can't be deleted"),
+                        _("People with memberships can't be deleted"),
                         no=_("Cancel")
                     ),
                 )
@@ -76,7 +79,7 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
+        if self.has_model_permission(Private):
             return [
                 Link(
                     text=_("Create PDF"),
@@ -126,7 +129,7 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
+        if self.has_model_permission(Private):
             if self.model.deletable(self.request):
                 delete_traits = (
                     Confirm(
@@ -143,7 +146,10 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
             else:
                 delete_traits = (
                     Block(
-                        _("This agency can't be deleted"),
+                        _(
+                            "Agency with memberships or suborganizations "
+                            "can't be deleted"
+                        ),
                         no=_("Cancel")
                     ),
                 )
@@ -300,7 +306,7 @@ class MembershipLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
+        if self.has_model_permission(Private):
             return [
                 Link(
                     text=_("Edit"),
@@ -377,3 +383,75 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
 
 class AgencySearchLayout(DefaultLayout, AgencyPathMixin):
     pass
+
+
+class UserGroupCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('User groups'), self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        return [
+            LinkGroup(
+                title=_('Add'),
+                links=[
+                    Link(
+                        text=_('User Group'),
+                        url=self.request.link(
+                            self.model,
+                            name='new'
+                        ),
+                        attrs={'class': 'new-user'}
+                    )
+                ]
+            ),
+        ]
+
+
+class UserGroupLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self):
+        return UserGroupCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('User groups'), self.request.link(self.collection)),
+            Link(self.model.name, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        return [
+            Link(
+                text=_("Edit"),
+                url=self.request.link(self.model, 'edit'),
+                attrs={'class': 'edit-link'}
+            ),
+            Link(
+                text=_("Delete"),
+                url=self.csrf_protected_url(
+                    self.request.link(self.model)
+                ),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to delete this user group?"),
+                        _("This cannot be undone."),
+                        _("Delete user group"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.collection)
+                    )
+                )
+            )
+        ]
