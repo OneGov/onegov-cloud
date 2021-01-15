@@ -331,7 +331,7 @@ $globals-height: 2.5rem;
     .login::before { @include icon('\f090'); }
     .logout::before { @include icon('\f08b'); }
     .register::before { @include icon('\f234'); }
-    .user::before { @include icon('\f2bd'); }
+    .user::before { @include icon('\f007'); }
     .users::before { @include icon('\f0c0'); }
     .payment::before { @include icon('\f09d'); }
     .payment-provider::before { @include icon('\f283'); }
