@@ -1,8 +1,54 @@
 # Changes
 
+## Release `2021.6`
+
+> commits: **13 / [3c16311d82...40425ccecc](https://github.com/OneGov/onegov-cloud/compare/3c16311d82^...40425ccecc)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.6)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Adds experimental support for custom permissions.**
+
+Members can gain editor permissions in the context of specific agencies 
+by adding them to user groups.
+
+**`Feature`** | **[40425ccecc](https://github.com/onegov/onegov-cloud/commit/40425cceccb0c2f9170a07151dd0550ec4184dab)**
+
+### Feriennet
+
+🎉 **Exports true booking state if period is not confirmed**
+
+**`Feature`** | **[FER-869](https://issues.seantis.ch/browse/FER-869)** | **[e77b191d30](https://github.com/onegov/onegov-cloud/commit/e77b191d30c8653f5aa9ad79de02fdd259802b54)**
+
+### Org
+
+🎉 **Adds setting to open files and images in separate window**
+
+Changes default for opening file and image links in new tab (/files and /images).
+Settings can be changed in /link-settings.
+
+**`Feature`** | **[ONEGOV-16](#ONEGOV-16)** | **[b6be742f4d](https://github.com/onegov/onegov-cloud/commit/b6be742f4d519f34b9b7d913a8096d2b59e23901)**
+
+🎉 **Adds a method to check for model permission to the layout.**
+
+**`Feature`** | **[48fe5fd496](https://github.com/onegov/onegov-cloud/commit/48fe5fd49648a2c67d1688c60920d454eb1b855f)**
+
+### Swissvotes
+
+🐞 **Skip empty poster urls.**
+
+**`Bugfix`** | **[9df0ac739d](https://github.com/onegov/onegov-cloud/commit/9df0ac739def20a5947c8532dc9b16e252178d06)**
+
+### User
+
+🎉 **Add role mappings.**
+
+**`Feature`** | **[b262023628](https://github.com/onegov/onegov-cloud/commit/b2620236285a65341f1cb028d80df6a45fedd78d)**
+
 ## Release `2021.5`
 
-> commits: **5 / [4c96652e68...6bfc805e98](https://github.com/OneGov/onegov-cloud/compare/4c96652e68^...6bfc805e98)**  
+> released: **2021-01-13 13:20**<br>
+> commits: **6 / [4c96652e68...895b79a6a0](https://github.com/OneGov/onegov-cloud/compare/4c96652e68^...895b79a6a0)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.5)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -25,7 +71,7 @@ Preserve lead word wrap with forms and resources.
 
 Visually improves access to the membership via an icon.
 
-**`Feature`** | **[STAKABS-18](#STAKABS-18)** | **[587cf0f042](https://github.com/onegov/onegov-cloud/commit/587cf0f04284fd292250411991598728dc5dafb5)**
+**`Feature`** | **[STAKABS-18](https://kt-bs.atlassian.net/browse/STAKABS-18)** | **[587cf0f042](https://github.com/onegov/onegov-cloud/commit/587cf0f04284fd292250411991598728dc5dafb5)**
 
 ### Feriennet
 
@@ -67,7 +113,7 @@ Filters for relevant categories (tags) in the export so that only one remain.
 
 🎉 **Adds favicon settings in header section**
 
-**`Feature`** | **[STAKABS-12](#STAKABS-12)** | **[4af6713dcb](https://github.com/onegov/onegov-cloud/commit/4af6713dcb6552a0e424b18ec4de7786fdeb3d82)**
+**`Feature`** | **[STAKABS-12](https://kt-bs.atlassian.net/browse/STAKABS-12)** | **[4af6713dcb](https://github.com/onegov/onegov-cloud/commit/4af6713dcb6552a0e424b18ec4de7786fdeb3d82)**
 
 🎉 **Adds _blank.js to modify external links with target blank**
 
