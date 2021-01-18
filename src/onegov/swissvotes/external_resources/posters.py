@@ -12,6 +12,7 @@ class ExternalSource():
         self.nay_attribute = None
         self.yea_img_attribute = None
         self.nay_img_attribute = None
+        self.headers = {}
 
     def meta_data_url(self, url):
         raise NotImplementedError()
@@ -40,7 +41,7 @@ class ExternalSource():
                 continue
             meta_data_url = self.meta_data_url(url)
             try:
-                response = get(meta_data_url)
+                response = get(meta_data_url, headers=self.headers)
                 response.raise_for_status()
                 image_url = self.parse_xml(response)
                 image_url = image_url.replace('http:', 'https:')
@@ -109,12 +110,12 @@ class MfgPosters(ExternalSource):
         self.nay_attribute = 'posters_mfg_nay'
         self.yea_img_attribute = 'posters_mfg_yea_imgs'
         self.nay_img_attribute = 'posters_mfg_nay_imgs'
-        self.api_key = api_key
+        self.headers = {'X-API-KEY': api_key}
 
     def meta_data_url(self, url):
         base = 'https://www.emuseum.ch/objects/'
         object_id = url.split(base)[-1].rstrip('/')
-        return f'{base}{object_id}/xml?key={self.api_key}'
+        return f'{base}{object_id}/xml'
 
 
 class SaPosters(ExternalSource):
@@ -124,6 +125,7 @@ class SaPosters(ExternalSource):
         self.nay_attribute = 'posters_sa_nay'
         self.yea_img_attribute = 'posters_sa_yea_imgs'
         self.nay_img_attribute = 'posters_sa_nay_imgs'
+        self.headers = {}
 
     def meta_data_url(self, url):
         base = 'https://www.bild-video-ton.ch/bestand/objekt/'
