@@ -539,5 +539,6 @@ def test_footer_settings_custom_links(client):
     assert f'<a href="{custom_url}">{custom_name}</a>' in page
     assert 'Custom2' not in page
 
+# todo: test user group in usermanegement
 # todo: test user groups
 # todo: test tickets not visible if no permission

@@ -350,4 +350,18 @@
       </tr>
     </metal:tickets_table_row>
 
+    <metal:b define-macro="extra_usermanagement_fields">
+        <div>
+            <dt i18n:translate>User Group</dt>
+            <dd>
+                <tal:block tal:condition="user.group">
+                    ✔︎ <span>${user.group.name}</span>
+                </tal:block>
+                <tal:block tal:condition="not user.group">
+                    ✘︎ <span i18n:translate>None</span>
+                </tal:block>
+            </dd>
+        </div>
+    </metal:b>
+
 </body>
