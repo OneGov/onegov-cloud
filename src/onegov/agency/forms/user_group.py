@@ -39,10 +39,14 @@ class UserGroupForm(Form):
         ]
 
     def update_model(self, model):
+        users = UserCollection(self.request.session).query()
+        users = users.filter(User.id.in_(self.users.data)).all()
+        for user in users:
+            if user != self.request.current_user:
+                user.logout_all_sessions(self.request)
+
         model.name = self.name.data
-        model.users = UserCollection(self.request.session).query().filter(
-            User.id.in_(self.users.data)
-        ).all()
+        model.users = users
         model.role_mappings = [
             RoleMapping(
                 group_id=model.id,

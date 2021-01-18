@@ -39,6 +39,7 @@ def view_user_groups(self, request):
 def add_user_group(self, request, form):
     if form.submitted(request):
         user_group = self.add(name=form.name.data)
+        form.update_model(user_group)
         request.success(_('Added a new user group'))
         return redirect(request.link(user_group))
 
