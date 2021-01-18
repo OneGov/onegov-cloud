@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-18 08:01+0100\n"
-"PO-Revision-Date: 2021-01-18 08:02+0100\n"
+"POT-Creation-Date: 2021-01-18 08:20+0100\n"
+"PO-Revision-Date: 2021-01-18 08:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -308,6 +308,9 @@ msgstr ""
 
 msgid "Closed"
 msgstr ""
+
+msgid "None"
+msgstr "Keine"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
