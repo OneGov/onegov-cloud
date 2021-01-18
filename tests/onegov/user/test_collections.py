@@ -184,6 +184,19 @@ def test_user_lowercase(session):
     assert e.value.message == 'admin@foo.Bar'
 
 
+def test_user_sources(session):
+    users = UserCollection(session)
+
+    assert users.sources == tuple()
+
+    users.add('a@foo.bar', 'password', role='member').source = 'ldap'
+    users.add('b@foo.bar', 'password', role='member').source = 'ldap'
+    users.add('c@foo.bar', 'password', role='member').source = 'msal'
+    users.add('d@foo.bar', 'password', role='member')
+
+    assert users.sources == ('ldap', 'msal')
+
+
 def test_user_group(session):
     groups = UserGroupCollection(session)
 

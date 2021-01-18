@@ -15,6 +15,7 @@ from onegov.ticket import TicketCollection, Ticket
 from onegov.user import Auth, User, UserCollection
 from onegov.user.errors import ExistingUserError
 from onegov.user.forms import SignupLinkForm
+from webob.exc import HTTPForbidden
 from wtforms.validators import Optional
 
 
@@ -26,7 +27,7 @@ def view_usermanagement(self, request):
     layout = UserManagementLayout(self, request)
 
     users = defaultdict(list)
-    query = self.query().filter(User.source == None).order_by(User.username)
+    query = self.query().order_by(User.username)
 
     for user in query:
         users[user.role].append(user)
@@ -62,6 +63,18 @@ def view_usermanagement(self, request):
             active=tag in self.filters.get('tag', ()),
             url=request.link(self.for_filter(tag=tag))
         ) for tag in self.tags
+    ]
+
+    filters['source'] = [
+        Link(
+            text={
+                'ldap_kerberos': 'LDAP Kerberos',
+                'ldap': 'LDAP',
+                'msal': 'AzureAD',
+            }.get(value, value),
+            active=value in self.filters.get('source', ()),
+            url=request.link(self.for_filter(source=value))
+        ) for value in self.sources
     ]
 
     return {
@@ -174,6 +187,9 @@ def get_manage_user_form(self, request):
 @OrgApp.form(model=User, template='form.pt', form=get_manage_user_form,
              permission=Secret, name='edit')
 def handle_manage_user(self, request, form):
+
+    if self.source:
+        raise HTTPForbidden()
 
     # XXX the manage user form doesn't have access to the username
     # because it can't be edited, so we need to inject it here

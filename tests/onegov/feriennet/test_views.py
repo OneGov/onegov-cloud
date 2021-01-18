@@ -480,6 +480,7 @@ def test_organiser_info(client, scenario):
     # admin changes are reflected on the activity
     contact = admin.get('/usermanagement')\
         .click('Veranstalter')\
+        .click('Ansicht')\
         .click('Bearbeiten')
 
     contact.form['organisation'] = 'Admins Association'

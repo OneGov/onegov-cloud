@@ -16,7 +16,7 @@
                           <tr tal:repeat="group groups">
                               <td>${group.name}</td>
                               <td class="text-links">
-                                  <a href="${request.link(group)}" i18n:translate>View</a>&nbsp;<a href="${request.link(group, 'edit')}" i18n:translate>Edit</a>
+                                  <a href="${request.link(group)}" i18n:translate>View</a>
                               </td>
                           </tr>
                       </tbody>

@@ -131,6 +131,16 @@ class UserCollection(object):
         return tuple(r[0] for r in records)
 
     @property
+    def sources(self):
+        """ All available sources. """
+
+        records = self.session.query(User.source)
+        records = records.filter(User.source.isnot(None))
+        records = records.order_by(User.source).distinct()
+
+        return tuple(r[0] for r in records)
+
+    @property
     def usernames(self):
         """ All available usernames. """
         records = self.session.execute("""

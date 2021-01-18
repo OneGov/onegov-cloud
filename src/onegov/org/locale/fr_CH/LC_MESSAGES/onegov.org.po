@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-14 16:16+0100\n"
+"POT-Creation-Date: 2021-01-18 09:55+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2446,6 +2446,9 @@ msgstr "${name} a été signé numériquement le ${date}"
 msgid "${name} is not in our database"
 msgstr "${name} n'est pas dans notre base de données"
 
+msgid "Accept"
+msgstr "Accepter"
+
 msgid "Hello!"
 msgstr "Bonjour"
 
@@ -3155,9 +3158,6 @@ msgstr "Propriétaire :"
 msgid "Kind:"
 msgstr "Type :"
 
-msgid "Accept"
-msgstr "Accepter"
-
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -3171,6 +3171,9 @@ msgid ""
 msgstr ""
 "Vous n'êtes pas automatiquement redirigé afin que vous puissiez modifier ou "
 "supprimer ce lien."
+
+msgid "local"
+msgstr "local"
 
 msgid "No links found."
 msgstr "Aucun lien trouvé."
@@ -4156,42 +4159,3 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
-
-#~ msgid "Color could not be converted"
-#~ msgstr "Erreur lors de la conversion de la couleur"
-
-#~ msgid "Header font color"
-#~ msgstr "Couleur de la police d'en-tête"
-
-#~ msgid "E-Mail Reply Address"
-#~ msgstr "Adresse e-mail de réponse"
-
-#~ msgid "A room with this name already exists"
-#~ msgstr "Une resource portant le même nom existe déjà"
-
-#~ msgid ""
-#~ "The feature to automatically close tickets and accept their items is "
-#~ "experimental. It works for ${handler_codes}."
-#~ msgstr ""
-#~ "La fonction permettant de fermer automatiquement les tickets et "
-#~ "d'accepter leurs articles est expérimentale. Il fonctionne pour "
-#~ "${handler_codes}."
-
-#~ msgid "Lecture"
-#~ msgstr "Lecture"
-
-#~ msgid "Castle garden"
-#~ msgstr "Jardin du château"
-
-#~ msgid "This site is hidden from the general public"
-#~ msgstr "Ce site est caché pour le grand public"
-
-#~ msgid ""
-#~ "This site is hidden from the general public. To show it to everyone, edit "
-#~ "this page and disable \"Hide from public\"."
-#~ msgstr ""
-#~ "Ce site est caché du grand public. Pour le montrer à tout le monde, "
-#~ "modifiez cette page et désactivez « Cacher du public »."
-
-#~ msgid "Hide from the public"
-#~ msgstr "Cacher au public"

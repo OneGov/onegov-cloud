@@ -12,7 +12,6 @@ from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
-from onegov.core import __version__
 from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
@@ -3453,14 +3452,14 @@ def test_disable_users(client):
     assert 'admin@example.org' in users
     assert 'editor@example.org' in users
 
-    editor = users.click('Bearbeiten', index=1)
+    editor = users.click('Ansicht', index=1).click('Bearbeiten')
     editor.form['state'] = 'inactive'
     editor.form.submit()
 
     login = client.spawn().login_editor()
     assert login.status_code == 200
 
-    editor = users.click('Bearbeiten', index=1)
+    editor = users.click('Ansicht', index=1).click('Bearbeiten')
     editor.form['role'] = 'member'
     editor.form['state'] = 'active'
     editor.form.submit()
@@ -3474,7 +3473,8 @@ def test_change_role(client):
 
     client.app.enable_yubikey = True
 
-    editor = client.get('/usermanagement').click('Bearbeiten', index=1)
+    editor = client.get('/usermanagement').click('Ansicht', index=1)
+    editor = editor.click('Bearbeiten')
     assert "müssen zwingend einen YubiKey" in editor.form.submit()
 
     editor.form['role'] = 'member'
@@ -3496,14 +3496,35 @@ def test_change_role(client):
     assert editor.form.submit().status_code == 302
 
 
+def test_user_source(client):
+    client.login_admin()
+
+    page = client.get('/usermanagement')
+    assert 'Quellen' not in page
+    assert 'Bearbeiten' in page.click('Ansicht', index=1)
+
+    users = UserCollection(client.app.session())
+    user = users.by_username('editor@example.org')
+    user.source = 'msal'
+    user.source_id = '1234'
+    transaction.commit()
+
+    page = client.get('/usermanagement')
+    assert 'Herkunft' in page
+    page = page.click('Ansicht', index=1)
+    assert 'Bearbeiten' not in page
+    assert 'Azure' in page
+    assert '1234' in page
+
+
 def test_unique_yubikey(client):
     client.login_admin()
 
     client.app.enable_yubikey = True
 
     users = client.get('/usermanagement')
-    admin = users.click('Bearbeiten', index=0)
-    editor = users.click('Bearbeiten', index=1)
+    admin = users.click('Ansicht', index=0).click('Bearbeiten')
+    editor = users.click('Ansicht', index=1).click('Bearbeiten')
 
     admin.form['yubikey'] = 'cccccccdefgh'
     assert admin.form.submit().status_code == 302
@@ -3512,7 +3533,7 @@ def test_unique_yubikey(client):
     assert "bereits von admin@example.org verwendet" in editor.form.submit()
 
     # make sure the current owner can save its own yubikey
-    admin = users.click('Bearbeiten', index=0)
+    admin = users.click('Ansicht', index=0).click('Bearbeiten')
     assert admin.form.submit().status_code == 302
 
 
@@ -3586,7 +3607,8 @@ def test_edit_user_settings(client):
     users = UserCollection(client.app.session())
     assert not users.by_username('new@example.org').data
 
-    edit = client.get('/usermanagement').click('Bearbeiten', index=2)
+    edit = client.get('/usermanagement').click('Ansicht', index=2)
+    edit = edit.click('Bearbeiten')
     assert "new@example.org" in edit
 
     edit.form.get('daily_ticket_statistics').checked = False

@@ -1054,6 +1054,15 @@
     </tal:b>
 </metal:role_plural>
 
+<metal:user_source define-macro="user-source" i18n:domain="onegov.org">
+    <tal:b switch="source">
+        <tal:b case="'msal'">AzureAD</tal:b>
+        <tal:b case="'ldap'">LDAP</tal:b>
+        <tal:b case="'ldap_kerberos'">LDAP Kerberos</tal:b>
+        <tal:b case="default" i18n:translate>${source}</tal:b>
+    </tal:b>
+</metal:user_source>
+
 <metal:identicon define-macro="identicon" i18n:domain="onegov.org">
     <tal:b define="identicon_size size|'small'">
         <span class="user-initials-${identicon_size}" style="background-color: ${layout.get_user_color(username)}" title="${username}">

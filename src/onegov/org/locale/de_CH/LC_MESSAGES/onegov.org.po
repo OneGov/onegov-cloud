@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-14 16:16+0100\n"
+"POT-Creation-Date: 2021-01-18 09:55+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2439,6 +2439,9 @@ msgstr "${name} wurde am ${date} digital signiert"
 msgid "${name} is not in our database"
 msgstr "${name} ist nicht in unserer Datenbank"
 
+msgid "Accept"
+msgstr "Annehmen"
+
 msgid "Hello!"
 msgstr "Guten Tag"
 
@@ -3140,9 +3143,6 @@ msgstr "Besitzer:"
 msgid "Kind:"
 msgstr "Art:"
 
-msgid "Accept"
-msgstr "Annehmen"
-
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -3156,6 +3156,9 @@ msgid ""
 msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
 "den Verweis zu bearbeiten oder zu löschen."
+
+msgid "local"
+msgstr "lokal"
 
 msgid "No links found."
 msgstr "Keine Verknüpfungen gefunden."
@@ -4136,38 +4139,3 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Color could not be converted"
-#~ msgstr "Fehler beim Konvertieren der Farbe"
-
-#~ msgid "Header font color"
-#~ msgstr "Farbe Kopfzeile"
-
-#~ msgid "Header left side"
-#~ msgstr "Kopfzeile links"
-
-#~ msgid "Optional url to generate a link"
-#~ msgstr "Optionale URL"
-
-#~ msgid "Only withdrawn events or submitted events can be published"
-#~ msgstr "Nur abgelehnte oder "
-
-#~ msgid "E-Mail Reply Address"
-#~ msgstr "E-Mail Antwort Adresse"
-
-#~ msgid ""
-#~ "The feature to automatically close tickets and accept their items is "
-#~ "experimental. It works for ${handler_codes}."
-#~ msgstr ""
-#~ "Die Funktion für das automatische Schliessen der Tickets und das "
-#~ "Akzeptieren ihrer Objekte ist experimentall. Es funktioniert für "
-#~ "${handler_codes}."
-
-#~ msgid "Block email confirmation on ticket change"
-#~ msgstr "Keine Email-Benachrichtigung bei Änderung (aus"
-
-#~ msgid "Messages cannot be sent for imported tickets"
-#~ msgstr "Zu importierten Events können keine Nachrichten gesendet werden"
-
-#~ msgid "Lecture"
-#~ msgstr "Lesung"

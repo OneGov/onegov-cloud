@@ -30,6 +30,16 @@
                 </dd>
             </div>
 
+            <div>
+                <dt i18n:translate>Source</dt>
+                <dd tal:condition="layout.model.source">
+                    <metal:b use-macro="layout.macros['user_source']" tal:define="source layout.model.source" /> (${layout.model.source_id})
+                </dd>
+                <dd tal:condition="not: layout.model.source" i18n:translate>
+                    local
+                </dd>
+            </div>
+
             <metal:b use-macro="layout.macros['extra_usermanagement_fields']" tal:define="user layout.model" />
 
             <hr tal:condition="linkgroups">
