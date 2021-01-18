@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2021.7`
+
+> commits: **8 / [caa9c6ec0e...a3709ce673](https://github.com/OneGov/onegov-cloud/compare/caa9c6ec0e^...a3709ce673)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.7)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Show users with sources.**
+
+**`Feature`** | **[2184909da5](https://github.com/onegov/onegov-cloud/commit/2184909da5ad8aef15d39019ee6fdd77634c51aa)**
+
+### Swissvotes
+
+🎉 **Use authentication header instead of query parameter for eMuseum.**
+
+**`Feature`** | **[a3709ce673](https://github.com/onegov/onegov-cloud/commit/a3709ce673db90ffd6148b4990ea5896d20e0d10)**
+
 ## Release `2021.6`
 
-> commits: **13 / [3c16311d82...40425ccecc](https://github.com/OneGov/onegov-cloud/compare/3c16311d82^...40425ccecc)**  
+> released: **2021-01-15 16:48**<br>
+> commits: **14 / [3c16311d82...b852e119d7](https://github.com/OneGov/onegov-cloud/compare/3c16311d82^...b852e119d7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.6)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
