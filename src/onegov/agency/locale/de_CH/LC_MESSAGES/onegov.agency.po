@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-12 12:51+0100\n"
-"PO-Revision-Date: 2021-01-12 12:55+0100\n"
+"POT-Creation-Date: 2021-01-18 08:01+0100\n"
+"PO-Revision-Date: 2021-01-18 08:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -106,6 +106,9 @@ msgstr "Zusatz"
 msgid "Prefix"
 msgstr "Präfix"
 
+msgid "This field is required."
+msgstr ""
+
 msgid "E-Mail"
 msgstr "E-Mail"
 
@@ -115,20 +118,11 @@ msgstr "Nachricht"
 msgid "Name"
 msgstr "Name"
 
-msgid "Role"
-msgstr "Rolle"
-
-msgid "Editor"
-msgstr "Editor"
-
-msgid "Admin"
-msgstr "Administrator"
-
 msgid "Users"
 msgstr "Benutzer"
 
-msgid "This person has memberships and can't be deleted"
-msgstr "Diese Person hat Mitgliedschaften und kann nicht gelöscht werden"
+msgid "People with memberships can't be deleted"
+msgstr "Personen mit Mitgliedschaften können nicht gelöscht werden"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -169,8 +163,8 @@ msgstr "Möchten Sie die Organisation wirklich löschen?"
 msgid "Delete agency"
 msgstr "Organisation löschen"
 
-msgid "This agency can't be deleted"
-msgstr "Diese Organisation kann nicht gelöscht werden"
+msgid "Agency with memberships or suborganizations can't be deleted"
+msgstr ""
 
 msgid "Move"
 msgstr "Verschieben"
@@ -218,6 +212,12 @@ msgstr "Mitglied"
 
 msgid "User Group"
 msgstr "Benutzergruppe"
+
+msgid "Do you really want to delete this user group?"
+msgstr ""
+
+msgid "Delete user group"
+msgstr "Benutzergruppe löschen"
 
 msgid "Mutation"
 msgstr "Mutation"
@@ -300,6 +300,15 @@ msgstr "Pfad"
 msgid "Show agency"
 msgstr "Organisation anzeigen"
 
+msgid "Accept"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+msgid "Closed"
+msgstr ""
+
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
@@ -309,6 +318,9 @@ msgid ""
 msgstr ""
 "Sortieren sie die Hauptorganisationen per Drag & Drop. Um "
 "Unterorganisationen zu sortieren, klicken sie auf eine Hauptorganisation."
+
+msgid "All"
+msgstr "Alle"
 
 msgid "View"
 msgstr "Anzeigen"
@@ -354,9 +366,6 @@ msgstr ""
 "Ein PDF dieser Organisation und all ihrer Unterorganisationen erstellen. "
 "Kann je nach Anzahl Unterorganisationen einige Minuten dauern."
 
-msgid "Agency with memberships can't be deleted"
-msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"
-
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
 
@@ -380,9 +389,6 @@ msgstr "Eine neue Person wurde hinzugefügt"
 
 msgid "New person"
 msgstr "Neue Person"
-
-msgid "People with memberships can't be deleted"
-msgstr "Personen mit Mitgliedschaften können nicht gelöscht werden"
 
 msgid "PDF Layout"
 msgstr "PDF Layout"
@@ -449,6 +455,24 @@ msgstr "Neue Benutzergruppe"
 
 msgid "Edit user group"
 msgstr "Benutzergruppe bearbeiten"
+
+#~ msgid "Role"
+#~ msgstr "Rolle"
+
+#~ msgid "Editor"
+#~ msgstr "Editor"
+
+#~ msgid "Admin"
+#~ msgstr "Administrator"
+
+#~ msgid "This person has memberships and can't be deleted"
+#~ msgstr "Diese Person hat Mitgliedschaften und kann nicht gelöscht werden"
+
+#~ msgid "This agency can't be deleted"
+#~ msgstr "Diese Organisation kann nicht gelöscht werden"
+
+#~ msgid "Agency with memberships can't be deleted"
+#~ msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"
 
 #~ msgid "Chose levels in the agency tree"
 #~ msgstr "Wähle Lage innerhalb des Organistionsbaums"

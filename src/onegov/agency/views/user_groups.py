@@ -19,6 +19,9 @@ from onegov.user import UserGroupCollection
 def view_user_groups(self, request):
     layout = UserGroupCollectionLayout(self, request)
 
+    # todo: Add organization filter
+    # todo: Add user filter
+
     return {
         'layout': layout,
         'title': _('User Groups'),
@@ -103,8 +106,5 @@ def edit_user_group(self, request, form):
     permission=Secret
 )
 def delete_user_group(self, request):
-    # if not self.deletable(request):
-    #     request.warning(_("Agency with memberships can't be deleted"))
-    #     return
     request.assert_valid_csrf_token()
     UserGroupCollection(request.session).delete(self)

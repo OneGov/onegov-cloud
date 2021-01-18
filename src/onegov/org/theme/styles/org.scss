@@ -4027,7 +4027,8 @@ ul.search-results {
     color: lighten($body-font-color, 25%);
 }
 
-.usermanagement {
+.usermanagement,
+.user-groups {
     width: 100%;
 
     td:last-child {
