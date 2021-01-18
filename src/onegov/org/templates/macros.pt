@@ -20,7 +20,7 @@
 
 <metal:b define-macro="extra_usermanagement_fields">
     <!--! To be override by other applications -->
-</metal:b
+</metal:b>
 
 <metal:b define-macro="consume_messages" i18n:domain="onegov.org">
     <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
