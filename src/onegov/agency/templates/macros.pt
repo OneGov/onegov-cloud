@@ -38,7 +38,7 @@
                         <li tal:condition="(membership.access == 'public' and membership.person.access == 'public') or request.is_logged_in" data-sortable-id="${membership.id}">
                             <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>, <a href="${request.link(membership)}">${membership.title}</a>
                             <span tal:condition="membership.prefix|None">${membership.prefix}</span>
-                            <a tal:condition="request.is_manager" href="${request.link(membership, name='edit')}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                            <a tal:condition="request.is_manager_for_model(agency)" href="${request.link(membership, name='edit')}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                         </li>
                     </tal:block>
                 </ul>
