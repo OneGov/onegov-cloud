@@ -20,6 +20,7 @@ class AgencySettingsForm(Form):
             ('default', _("Default")),
             ('ar', "Kanton Appenzell Ausserrhoden"),
             ('zg', "Kanton Zug"),
+            ('bs', "Kanton Basel-Stadt"),
         ],
     )
 

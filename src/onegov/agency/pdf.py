@@ -282,3 +282,39 @@ class AgencyPdfAr(AgencyPdfDefault):
         kwargs['logo'] = filename
         kwargs['author'] = "Kanton Appenzell Ausserrhoden"
         super(AgencyPdfDefault, self).__init__(*args, **kwargs)
+
+
+class AgencyPdfBs(AgencyPdfDefault):
+
+    @staticmethod
+    def page_fn_header(canvas, doc):
+        """ A header with the logo, a footer with the print date and page
+        numbers.
+
+        """
+        height = 2 * cm
+        width = height * 1.6666
+
+        canvas.saveState()
+        canvas.drawImage(
+            doc.logo,
+            x=doc.leftMargin,
+            y=doc.pagesize[1] - 2.35 * cm,
+            height=height,
+            width=width,
+            mask='auto')
+        canvas.restoreState()
+        AgencyPdfAr.page_fn_footer(canvas, doc)
+
+    @property
+    def page_fn(self):
+        return self.page_fn_header
+
+    def __init__(self, *args, **kwargs):
+        filename = path.join(
+            module_path('onegov.agency', 'static/logos'),
+            'canton-bs.png'
+        )
+        kwargs['logo'] = filename
+        kwargs['author'] = "Kanton Basel-Stadt"
+        super(AgencyPdfDefault, self).__init__(*args, **kwargs)
