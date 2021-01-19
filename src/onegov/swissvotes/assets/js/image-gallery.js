@@ -1,5 +1,4 @@
 $('.image-container > img').each(function () {
-    // console.log(this);
     var modal = document.getElementById(this.id.replace('img', 'modal'));
     var modalImg = document.getElementById(this.id.replace('img', 'modal-img'));
     var close = document.getElementById(this.id.replace('img', 'close'));
@@ -10,4 +9,9 @@ $('.image-container > img').each(function () {
     $(close).on('click', function () {
         modal.style.display = "none";
     });
+});
+
+$('.image-gallery-toggle').click(function () {
+    $('.image-gallery-' + $(this).data('suffix') + ' .additional').show();
+    $(this).hide();
 });

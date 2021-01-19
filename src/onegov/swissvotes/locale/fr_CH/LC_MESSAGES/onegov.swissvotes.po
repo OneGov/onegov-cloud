@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-01-07 09:11+0100\n"
+"POT-Creation-Date: 2021-01-19 09:25+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1498,6 +1498,9 @@ msgstr "Toggle"
 
 msgid "Columns"
 msgstr "Columns"
+
+msgid "Show all"
+msgstr "Tout afficher"
 
 msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"

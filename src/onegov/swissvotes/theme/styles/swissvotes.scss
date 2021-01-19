@@ -268,6 +268,12 @@ $modal-padding-sm: 50px;
 $modal-padding: 25px;
 $modal-padding-md: 70px;
 
+.image-gallery-toggle {
+  display: block;
+  margin: 0 auto;
+  max-width: 50%;
+}
+
 .image-gallery {
 
     align-content: center;
@@ -283,6 +289,10 @@ $modal-padding-md: 70px;
     .image-container {
         box-sizing: border-box;
         margin-bottom: .5rem;
+
+        &.additional {
+            display: none;
+        }
 
         img {
             cursor: pointer;

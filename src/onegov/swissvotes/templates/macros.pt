@@ -185,19 +185,29 @@
         </script>
     </metal:tablesaw_translations>
 
-    <metal:image_gallery define-macro="image_gallery" i18n:domain="onegov.swissvotes">
-        <div class="image-gallery" tal:condition="items|nothing and id_suffix|nothing">
-            <div tal:repeat="item items" class="image-container">
-                <tal:block tal:define="index str(repeat.item.index); url item[0]; img_url item[1]; label item[2]">
-                    <img src="${img_url}" alt="" id="${'img-' + index + id_suffix}">
-                    <a href="${url}" target="_blank" i18n:translate="">${label}</a>
-                    <div class="modal" id="${'modal-' + index + id_suffix}">
-                        <span class="close" id="${'close-' + index + id_suffix}">&times;</span>
-                        <img alt="" id="${'modal-img-' + index + id_suffix}">
-                    </div>
-                </tal:block>
+    <metal:image_gallery_item define-macro="image_gallery_item" i18n:domain="onegov.swissvotes">
+        <div class="image-container ${additional|nothing}">
+            <img src="${img_url}" alt="" id="${'img-' + index + id_suffix}">
+            <a href="${url}" target="_blank" i18n:translate="">${label}</a>
+            <div class="modal" id="${'modal-' + index + id_suffix}">
+                <span class="close" id="${'close-' + index + id_suffix}">&times;</span>
+                <img alt="" id="${'modal-img-' + index + id_suffix}">
             </div>
         </div>
+    </metal:image_gallery_item>
+
+    <metal:image_gallery define-macro="image_gallery" i18n:domain="onegov.swissvotes">
+        <tal:block tal:condition="items|nothing and id_suffix|nothing">
+            <div class="image-gallery image-gallery-${id_suffix}">
+                <tal:block tal:repeat="item items[:6]">
+                    <tal:block metal:use-macro="layout.macros['image_gallery_item']" tal:define="index str(repeat.item.index); url item[0]; img_url item[1]; label item[2]" />
+                </tal:block>
+                <tal:block tal:repeat="item items[6:]">
+                    <tal:block metal:use-macro="layout.macros['image_gallery_item']" tal:define="index str(repeat.item.index); url item[0]; img_url item[1]; label item[2]; additional 'additional'" />
+                </tal:block>
+            </div>
+            <a tal:condition="len(items)>6" class="button secondary image-gallery-toggle" data-suffix="${id_suffix}" i18n:translate="">Show all</a>
+        </tal:block>
     </metal:image_gallery>
 
 </body>
