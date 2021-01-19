@@ -364,12 +364,13 @@ def match_person_membership_title(csvfile, agencies, request, app):
     print('Unique Agencies by name not found: ', len(agency_by_name_not_found))
     print('Updated memberships: ', len(updated_memberships))
 
-    log_file_path = os.path.expanduser('~/staka_bs_memberships_title.log')
+    log_file_path = '/var/lib/onegov-cloud/staka_bs_memberships_title.log'
     with open(str(log_file_path), 'w') as f:
         f.write('PEOPLE NOT FOUND\n')
         f.write("\n".join(person_not_found))
         f.write('\n\nAGENCIES NOT FOUND\n')
         f.write("\n".join((agency_by_name_not_found)))
+    print('Find the logfile in ' + log_file_path)
 
 
 def import_membership_titles(agency_file, person_file, request, app):
