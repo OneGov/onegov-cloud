@@ -235,6 +235,14 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_keyword} @@ to_tsquery('german', '17.060')",
     ]
 
+    assert compiled(term='17.12.2004') == [
+        f"{c_title_de} @@ to_tsquery('german', '17.12.2004')",
+        f"{c_title_fr} @@ to_tsquery('french', '17.12.2004')",
+        f"{c_short_title_de} @@ to_tsquery('german', '17.12.2004')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '17.12.2004')",
+        f"{c_keyword} @@ to_tsquery('german', '17.12.2004')",
+    ]
+
     assert compiled(term='1893_002') == [
         "swissvotes.procedure_number = '1893_002'",
         f"{c_title_de} @@ to_tsquery('german', '1893002')",

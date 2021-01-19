@@ -278,10 +278,10 @@ class SwissVoteCollection(Pagination):
         result = []
         if self.term:
             for part in self.term.split():
-                if part.replace('.', '').isnumeric():
+                if part.replace('.', '', 1).isnumeric():
                     number = Decimal(part)
                     result.append(SwissVote.bfs_number == number)
-                if part.replace('.', '').replace('_', '').isnumeric():
+                if part.replace('.', '', 1).replace('_', '', 1).isnumeric():
                     result.append(SwissVote.procedure_number == part)
 
         return result
