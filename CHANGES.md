@@ -1,8 +1,30 @@
 # Changes
 
+## Release `2021.8`
+
+> commits: **4 / [cc0332ba4a...9f4bfb8f91](https://github.com/OneGov/onegov-cloud/compare/cc0332ba4a^...9f4bfb8f91)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.8)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Adds cli to import membership titles**
+
+**`Feature`** | **[STAKABS-17](https://kt-bs.atlassian.net/browse/STAKABS-17)** | **[9f4bfb8f91](https://github.com/onegov/onegov-cloud/commit/9f4bfb8f91afd3a9483ed26d09c761c0f95fc50f)**
+
+### Swissvotes
+
+🎉 **Only show the first 6 posters by default.**
+
+**`Feature`** | **[VOTES-93](https://issues.seantis.ch/browse/VOTES-93)** | **[8b9a11391b](https://github.com/onegov/onegov-cloud/commit/8b9a11391b26962b3c12876205010df300f7e2cd)**
+
+🐞 **Fixes numeric term filter.**
+
+**`Bugfix`** | **[VOTES-92](https://issues.seantis.ch/browse/VOTES-92)** | **[cc0332ba4a](https://github.com/onegov/onegov-cloud/commit/cc0332ba4a36123890d6738d2875f8f25a2aea8a)**
+
 ## Release `2021.7`
 
-> commits: **8 / [caa9c6ec0e...a3709ce673](https://github.com/OneGov/onegov-cloud/compare/caa9c6ec0e^...a3709ce673)**  
+> released: **2021-01-18 16:00**<br>
+> commits: **9 / [caa9c6ec0e...02b7779d43](https://github.com/OneGov/onegov-cloud/compare/caa9c6ec0e^...02b7779d43)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.7)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
