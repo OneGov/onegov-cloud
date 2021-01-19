@@ -50,6 +50,7 @@ def view_agencies(self, request):
         self.root_pdf_modified = str(root_pdf_modified.timestamp())
         pdf_link = request.link(self, name='pdf')
     layout = AgencyCollectionLayout(self, request)
+    print(layout.browsed_agency_parents)
 
     return {
         'title': _("Agencies"),
@@ -95,6 +96,15 @@ def view_agency(self, request):
 )
 def view_agency_as_nav_item(self, request):
     layout = AgencyCollectionLayout(self, request)
+
+    @request.after
+    def push_history_state(response):
+        response.headers.add(
+            'X-IC-PushURL',
+            request.class_link(
+                ExtendedAgencyCollection, {'browse': str(self.id)})
+        )
+
     return render_macro(
         layout.macros['agency_nav_item_content'],
         request,

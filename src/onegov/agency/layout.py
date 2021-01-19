@@ -68,7 +68,33 @@ class MoveAgencyMixin(object):
         )
 
 
-class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
+class NavTreeMixin(object):
+
+    def nav_item_url(self, agency):
+        return self.request.link(agency.proxy(), 'as-nav-item')
+
+    @cached_property
+    def browsed_agency(self):
+        if isinstance(self.model, ExtendedAgencyCollection):
+            return self.model.browse and self.model.by_id(self.model.browse)
+
+    @cached_property
+    def browsed_agency_parents(self):
+        return self.browsed_agency and [
+            agency.id for agency in self.browsed_agency.ancestors
+        ] or []
+
+    def prerender_content(self, agency_id):
+        if not self.browsed_agency:
+            return False
+        agency_id = int(agency_id)
+        return any((
+            agency_id == self.browsed_agency.id,
+            agency_id in self.browsed_agency_parents
+        ))
+
+
+class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin, NavTreeMixin):
 
     @cached_property
     def breadcrumbs(self):
@@ -105,9 +131,6 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
                     ]
                 ),
             ]
-
-    def nav_item_url(self, agency):
-        return self.request.link(agency.proxy(), 'as-nav-item')
 
 
 class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):

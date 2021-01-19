@@ -27,8 +27,8 @@ def get_people(app, page=0, letter=None, agency=None, xlsx_modified=None):
     model=ExtendedAgencyCollection,
     path='/organizations',
 )
-def get_agencies(app, root_pdf_modified=None):
-    return ExtendedAgencyCollection(app.session(), root_pdf_modified)
+def get_agencies(app, root_pdf_modified=None, browse=None):
+    return ExtendedAgencyCollection(app.session(), root_pdf_modified, browse)
 
 
 @AgencyApp.path(

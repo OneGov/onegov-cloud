@@ -280,15 +280,23 @@
 
                 <a class="title" href="javascript:;">${agency.title}</a>
             </div>
-            <div
-                id="content-${agency_id}"
-                style="display: none"
-                ic-trigger-from="#trigger-${agency_id}"
-                ic-trigger-on="click"
-                ic-get-from="${layout.nav_item_url(agency)}"
-                ic-action="toggle"
-            >
-            </div>
+            <tal:b tal:switch="layout.prerender_content(agency_id)">
+                <tal:b tal:case="False">
+                    <div
+                        id="content-${agency_id}"
+                        style="display: none"
+                        ic-trigger-from="#trigger-${agency_id}"
+                        ic-trigger-on="click"
+                        ic-get-from="${layout.nav_item_url(agency)}"
+                        ic-action="toggle"
+                    >
+                    </div>
+                </tal:b>
+                <tal:b tal:case="True">
+                    <tal:b metal:use-macro="layout.macros.agency_nav_item_content"/>
+                </tal:b>
+            </tal:b>
+
         </tal:b>
     </metal:agency_nav_item>
 
