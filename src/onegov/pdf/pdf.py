@@ -70,6 +70,8 @@ class Pdf(PDFDocument):
         margin_right = kwargs.pop('margin_right', 2.5 * cm)
         margin_top = kwargs.pop('margin_top', 3 * cm)
         margin_bottom = kwargs.pop('margin_top', 3 * cm)
+        font_size = kwargs.get('font_size', 10)
+        font = kwargs.get('font_name', self.font_name)
 
         full_frame = Frame(
             margin_left,
@@ -91,13 +93,17 @@ class Pdf(PDFDocument):
         ])
         self.story.append(NextPageTemplate('Later'))
 
-        self.generate_style(font_size=10)
-        self.adjust_style(font_size=10)
+        # Todo: calling the same function twice, maybe a workaround?
+        self.generate_style(font_size=font_size, font_name=font)
+        self.adjust_style(font_size=font_size, font_name=font)
 
-    def adjust_style(self, font_size=10):
+    def adjust_style(self, font_size=10, font_name=None):
         """ Sets basic styling (borrowed from common browser defaults). """
 
-        self.generate_style(font_size=font_size)
+        self.generate_style(
+            font_name=font_name or self.font_name,
+            font_size=font_size
+        )
 
         self.style.heading1.fontSize = 2 * self.style.fontSize
         self.style.heading1.spaceBefore = 0.67 * self.style.heading1.fontSize
