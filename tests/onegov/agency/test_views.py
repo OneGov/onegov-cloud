@@ -190,8 +190,8 @@ def test_views(client):
     agency = client.get(agency.request.url)
 
     assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
-        'Aeschi Thomas', ', Zweiter Ständerat für Zug', None,
-        'Eder Joachim', ', Ständerat für Zug', None
+        'Aeschi Thomas', 'Zweiter Ständerat für Zug', None,
+        'Eder Joachim', 'Ständerat für Zug', None
     ]
 
     agency.click("Zweiter Ständerat für Zug").click("Löschen")
