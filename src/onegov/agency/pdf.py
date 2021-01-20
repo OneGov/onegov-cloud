@@ -289,9 +289,8 @@ class AgencyPdfAr(AgencyPdfDefault):
 
 
 class AgencyPdfBs(AgencyPdfDefault):
-
     """
-    The official styleguide of Kt. BS, p25 says:
+    Consult the styleguide from 2021.
 
     Page Settings are on page 25:
 
@@ -306,18 +305,12 @@ class AgencyPdfBs(AgencyPdfDefault):
     - Regular text Arial 11p
 
     """
-
-    def init_a4_portrait(self, page_fn=None, page_fn_later=None,
-                         **kwargs):
-        return super().init_a4_portrait(
-            page_fn=page_fn, page_fn_later=page_fn_later,
-            margin_top=2.2 * cm,
-            margin_bottom=2.4 * cm,
-            margin_left=2.2 * cm,
-            margin_right=2 * cm,
-            font_name="Helvetica",  # Arial not supported by now
-            font_size=11
-        )
+    margin_top = 2.2 * cm
+    margin_bottom = 2.4 * cm
+    margin_left = 2.2 * cm
+    margin_right = 2 * cm
+    font_name = "Helvetica"  # Arial not supported by now
+    font_size = 11
 
     @staticmethod
     def page_fn_header(canvas, doc):
@@ -366,6 +359,30 @@ class AgencyPdfBs(AgencyPdfDefault):
             module_path('onegov.agency', 'static/logos'),
             'canton-bs.png'
         )
+
         kwargs['logo'] = filename
         kwargs['author'] = "Kanton Basel-Stadt"
+
+        # These are not set like the frame and the table is indented by the
+        # difference of the default margin on init of self.doc and the set
+        # margin here. The combination of setting the same margins on the
+        # page templates (Frames) and on init made the table aligned with the
+        # margins set on init_a4_portrait.
+        kwargs['topMargin'] = self.margin_top
+        kwargs['topBottom'] = self.margin_bottom
+
+        kwargs['leftMargin'] = self.margin_left
+        kwargs['rightMargin'] = self.margin_right
+
         super(AgencyPdfDefault, self).__init__(*args, **kwargs)
+
+    def init_a4_portrait(self, page_fn=None, page_fn_later=None,
+                         **kwargs):
+        super(AgencyPdfBs, self).init_a4_portrait(
+            page_fn,
+            page_fn_later,
+            margin_top=self.margin_top,
+            margin_bottom=self.margin_bottom,
+            margin_left=self.margin_left,
+            margin_right=self.margin_right
+        )

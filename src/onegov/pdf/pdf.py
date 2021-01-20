@@ -66,20 +66,11 @@ class Pdf(PDFDocument):
 
         width = 21 * cm
         height = 29.7 * cm
-        margin_left = kwargs.pop('margin_left', 2.5 * cm)
-        margin_right = kwargs.pop('margin_right', 2.5 * cm)
-        margin_top = kwargs.pop('margin_top', 3 * cm)
-        margin_bottom = kwargs.pop('margin_bottom', 3 * cm)
         font_size = kwargs.get('font_size', 10)
-
-        if margin_left:
-            self.doc.leftMargin = margin_left
-        if margin_right:
-            self.doc.rightMargin = margin_right
-        if margin_bottom:
-            self.doc.bottomMargin = margin_bottom
-        if margin_top:
-            self.doc.topMargin = margin_top
+        margin_left = kwargs.get('margin_left', 2.5 * cm)
+        margin_right = kwargs.get('margin_right', 2.5 * cm)
+        margin_top = kwargs.get('margin_top', 3 * cm)
+        margin_bottom = kwargs.get('margin_bottom', 3 * cm)
 
         full_frame = Frame(
             margin_left,
