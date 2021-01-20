@@ -69,7 +69,7 @@ class Pdf(PDFDocument):
         margin_left = kwargs.pop('margin_left', 2.5 * cm)
         margin_right = kwargs.pop('margin_right', 2.5 * cm)
         margin_top = kwargs.pop('margin_top', 3 * cm)
-        margin_bottom = kwargs.pop('margin_top', 3 * cm)
+        margin_bottom = kwargs.pop('margin_bottom', 3 * cm)
         font_size = kwargs.get('font_size', 10)
         font = kwargs.get('font_name', self.font_name)
 
