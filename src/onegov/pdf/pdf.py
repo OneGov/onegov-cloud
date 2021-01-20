@@ -93,8 +93,6 @@ class Pdf(PDFDocument):
         ])
         self.story.append(NextPageTemplate('Later'))
 
-        # Todo: calling the same function twice, maybe a workaround?
-        self.generate_style(font_size=font_size, font_name=font)
         self.adjust_style(font_size=font_size, font_name=font)
 
     def adjust_style(self, font_size=10, font_name=None):
