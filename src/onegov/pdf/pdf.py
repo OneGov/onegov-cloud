@@ -54,7 +54,8 @@ class Pdf(PDFDocument):
         self.link_color = link_color
         self.underline_links = underline_links
 
-    def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None):
+    def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
+                         **kwargs):
         frame_kwargs = {
             'showBoundary': self.show_boundaries,
             'leftPadding': 0,
@@ -65,10 +66,10 @@ class Pdf(PDFDocument):
 
         width = 21 * cm
         height = 29.7 * cm
-        margin_left = 2.5 * cm
-        margin_right = 2.5 * cm
-        margin_top = 3 * cm
-        margin_bottom = 3 * cm
+        margin_left = kwargs.pop('margin_left', 2.5 * cm)
+        margin_right = kwargs.pop('margin_right', 2.5 * cm)
+        margin_top = kwargs.pop('margin_top', 3 * cm)
+        margin_bottom = kwargs.pop('margin_top', 3 * cm)
 
         full_frame = Frame(
             margin_left,
