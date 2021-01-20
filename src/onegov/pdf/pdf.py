@@ -71,7 +71,15 @@ class Pdf(PDFDocument):
         margin_top = kwargs.pop('margin_top', 3 * cm)
         margin_bottom = kwargs.pop('margin_bottom', 3 * cm)
         font_size = kwargs.get('font_size', 10)
-        font = kwargs.get('font_name', self.font_name)
+
+        if margin_left:
+            self.doc.leftMargin = margin_left
+        if margin_right:
+            self.doc.rightMargin = margin_right
+        if margin_bottom:
+            self.doc.bottomMargin = margin_bottom
+        if margin_top:
+            self.doc.topMargin = margin_top
 
         full_frame = Frame(
             margin_left,
