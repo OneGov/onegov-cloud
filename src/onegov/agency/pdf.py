@@ -64,16 +64,13 @@ class AgencyPdfDefault(Pdf):
         """ Adds the memberships of an agency as table. """
 
         data = []
+        with_title = 'membership.title' in agency.export_fields
         for membership in agency.memberships:
             if (
                 membership.access == 'private'
                 or membership.person.access == 'private'
             ):
                 continue
-
-            title = ''
-            if 'membership.title' in agency.export_fields:
-                title = membership.title
 
             description = []
             if membership.person:
@@ -90,16 +87,18 @@ class AgencyPdfDefault(Pdf):
                         description.append(getattr(membership.person, field))
             description = ', '.join([part for part in description if part])
 
-            data.append([
-                title,
-                membership.meta.get('prefix', ''),
-                description
-            ])
+            prefix = membership.meta.get('prefix', '') or ''
+            data.append(
+                [membership.title, prefix, description] if with_title else
+                [f'{prefix} {description}'.strip()]
+            )
 
         if data:
-            # Todo: This does not work for the customer when the membership
-            # title is not amongst the export fields
-            self.table(data, [5.5 * cm, 0.5 * cm, None])
+            # If the membership title is not exported, make a 1col table
+            self.table(
+                data,
+                [5.5 * cm, 0.5 * cm, None] if with_title else 'even'
+            )
 
     def agency(self, agency, exclude, level=1, content_so_far=False,
                skip_title=False, page_break_on_level=1,
