@@ -26,7 +26,8 @@ class AgencyPdfDefault(Pdf):
 
     @classmethod
     def from_agencies(cls,
-                      agencies, title, toc, exclude, page_break_on_level=1):
+                      agencies, title, toc, exclude, page_break_on_level=1,
+                      link_color=None, underline_links=False):
         """ Create an index PDF from a collection of notices. """
 
         result = BytesIO()
@@ -34,6 +35,8 @@ class AgencyPdfDefault(Pdf):
             result,
             title=title,
             created=f"{date.today():%d.%m.%Y}",
+            link_color=link_color or '#00538c',
+            underline_links=underline_links
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,
@@ -94,6 +97,8 @@ class AgencyPdfDefault(Pdf):
             ])
 
         if data:
+            # Todo: This does not work for the customer when the membership
+            # title is not amongst the export fields
             self.table(data, [5.5 * cm, 0.5 * cm, None])
 
     def agency(self, agency, exclude, level=1, content_so_far=False,

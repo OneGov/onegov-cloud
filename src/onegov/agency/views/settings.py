@@ -1,3 +1,5 @@
+from wtforms_components import ColorField
+
 from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret
@@ -46,6 +48,16 @@ class AgencySettingsForm(Form):
         default='1'
     )
 
+    link_color = ColorField(
+        label=_('PDF link color'),
+        fieldset=_("Layout")
+    )
+
+    underline_links = BooleanField(
+        label=_("Underline pdf links"),
+        fieldset=_("Layout")
+    )
+
     agency_display = ChosenSelectMultipleField(
         label=_('Show additional agencies to search results'),
         fieldset=_('Customize search results'),
@@ -90,6 +102,9 @@ class AgencySettingsForm(Form):
         self.agency_path_display_on_people.data = \
             obj.agency_path_display_on_people
 
+        self.underline_links.data = obj.pdf_underline_links
+        self.link_color.data = obj.pdf_link_color or '#00538c'
+
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
         obj.pdf_layout = self.pdf_layout.data
@@ -101,6 +116,8 @@ class AgencySettingsForm(Form):
         ]
         obj.agency_path_display_on_people = \
             self.agency_path_display_on_people.data
+        obj.pdf_underline_links = self.underline_links.data
+        obj.pdf_link_color = self.link_color.data.get_hex()
 
 
 @AgencyApp.form(
@@ -112,5 +129,5 @@ class AgencySettingsForm(Form):
     setting=_("Agencies"),
     icon='fa-university'
 )
-def handle_pdf_layout_settings(self, request, form):
+def handle_agency_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Agencies"))

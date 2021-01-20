@@ -103,6 +103,8 @@ class Organisation(Base, TimestampMixin):
 
     # PDF rendering options
     pdf_layout = meta_property()
+    pdf_link_color = meta_property()
+    pdf_underline_links = meta_property(default=False)
 
     # break points of pages after title of level x, type integer
     page_break_on_level_root_pdf = meta_property()

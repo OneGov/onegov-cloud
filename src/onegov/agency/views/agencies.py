@@ -50,7 +50,6 @@ def view_agencies(self, request):
         self.root_pdf_modified = str(root_pdf_modified.timestamp())
         pdf_link = request.link(self, name='pdf')
     layout = AgencyCollectionLayout(self, request)
-    print(layout.browsed_agency_parents)
 
     return {
         'title': _("Agencies"),
@@ -315,13 +314,16 @@ def create_root_pdf(self, request, form):
     page_break_level = int(org.meta.get(
         'page_break_on_level_root_pdf', 1))
 
+    org = request.app.org
     if form.submitted(request):
         request.app.root_pdf = request.app.pdf_class.from_agencies(
             agencies=self.roots,
-            title=request.app.org.name,
+            title=org.name,
             toc=True,
-            exclude=request.app.org.hidden_people_fields,
-            page_break_on_level=page_break_level
+            exclude=org.hidden_people_fields,
+            page_break_on_level=page_break_level,
+            link_color=org.meta.get('pdf_link_color'),
+            underline_links=org.meta.get('pdf_underline_links')
         )
         request.success(_("PDF created"))
         return redirect(request.link(self))
@@ -356,8 +358,10 @@ def create_agency_pdf(self, request, form):
             agencies=[self],
             title=self.title,
             toc=False,
-            exclude=request.app.org.hidden_people_fields,
-            page_break_on_level=page_break_level
+            exclude=org.hidden_people_fields,
+            page_break_on_level=page_break_level,
+            link_color=org.meta.get('pdf_link_color'),
+            underline_links=org.meta.get('pdf_underline_links')
         )
         request.success(_("PDF created"))
         return redirect(request.link(self))

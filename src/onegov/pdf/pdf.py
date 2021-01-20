@@ -31,10 +31,15 @@ from uuid import uuid4
 class Pdf(PDFDocument):
     """ A PDF document. """
 
+    default_link_color = '#00538c'
+
     def __init__(self, *args, **kwargs):
         toc_levels = kwargs.pop('toc_levels', 3)
         created = kwargs.pop('created', '')
         logo = kwargs.pop('logo', None)
+        link_color = kwargs.pop('link_color', self.default_link_color)
+        link_color = link_color or self.default_link_color
+        underline_links = kwargs.pop('underline_links', False) or False
 
         super(Pdf, self).__init__(*args, **kwargs)
 
@@ -46,6 +51,8 @@ class Pdf(PDFDocument):
         self.toc = None
         self.toc_numbering = {}
         self.toc_levels = toc_levels
+        self.link_color = link_color
+        self.underline_links = underline_links
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None):
         frame_kwargs = {
@@ -408,14 +415,21 @@ class Pdf(PDFDocument):
         filters = [whitespace_filter]
 
         if linkify:
+            link_color = self.link_color
+            underline_links = self.underline_links
+
             def colorize(attrs, new=False):
-                attrs[(None, u'color')] = '#00538c'
+                attrs[(None, u'color')] = link_color
+                if underline_links:
+                    attrs[(None, u'underline')] = '1'
+                    attrs[('a', u'underlineColor')] = link_color
                 return attrs
 
             tags.append('a')
             attributes['a'] = ('href',)
             filters.append(
-                partial(LinkifyFilter, parse_email=True, callbacks=[colorize])
+                partial(
+                    LinkifyFilter, parse_email=True, callbacks=[colorize])
             )
 
         cleaner = Cleaner(

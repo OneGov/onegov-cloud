@@ -22,6 +22,11 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension):
 
         return self.access == 'public'
 
+    # Todo: It is very unclear how this should be used. In the PDF rendering,
+    # it is placed a middle column with 0.5 cm after the title.
+    # On the agency, it is placed after the membership title, so not a prefix
+    # but rather a suffix and it looks. For 0.5cm, the form should validate the
+    # length of this, otherwise poeple complain about weird pdf
     #: The prefix character.
     prefix = meta_property()
 

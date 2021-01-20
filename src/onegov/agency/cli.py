@@ -446,8 +446,11 @@ def create_pdf(group_context, root, recursive):
                 toc=True,
                 exclude=app.org.hidden_people_fields,
                 page_break_on_level=int(app.org.meta.get(
-                    'page_break_on_level_root_pdf', 1))
+                    'page_break_on_level_root_pdf', 1)),
+                link_color=app.org.meta.get('pdf_link_color'),
+                underline_links=app.org.meta.get('pdf_underline_links')
             )
+
             click.secho("Root PDF created", fg='green')
 
         if recursive:
@@ -458,7 +461,9 @@ def create_pdf(group_context, root, recursive):
                     toc=False,
                     exclude=app.org.hidden_people_fields,
                     page_break_on_level=int(app.org.meta.get(
-                        'page_break_on_level_org_pdf', 1))
+                        'page_break_on_level_org_pdf', 1)),
+                    link_color=app.org.meta.get('pdf_link_color'),
+                    underline_links=app.org.meta.get('pdf_underline_links')
                 )
                 click.secho(f"Created PDF of '{agency.title}'", fg='green')
 
