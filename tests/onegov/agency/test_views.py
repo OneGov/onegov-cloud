@@ -338,9 +338,6 @@ def test_view_pdf_settings(client):
 
     client.login_admin()
 
-    assert client.get('/agency-settings')\
-        .form['pdf_layout'].value == 'default'
-
     assert get_pdf() == '1\nGovikon\n0\nPlaceholder for table of contents\n'
 
     settings = client.get('/agency-settings')
