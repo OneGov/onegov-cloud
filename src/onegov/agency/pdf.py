@@ -290,25 +290,72 @@ class AgencyPdfAr(AgencyPdfDefault):
 
 class AgencyPdfBs(AgencyPdfDefault):
 
+    """
+    The official styleguide of Kt. BS, p25 says:
+
+    Page Settings are on page 25:
+
+    Logo position to page margins, left most visual part of the logo:
+    - indent 10mm left
+    - 10mm beneath top
+    - Format A4: The Baslerstab must be 10mm high, total is 17.5mm with the |
+
+    p. 24
+    - Font Arial
+    - Footer: Arial pt, start approx 12mm beneath bottom margin
+    - Regular text Arial 11p
+
+    """
+
+    def init_a4_portrait(self, page_fn=None, page_fn_later=None,
+                         **kwargs):
+        return super().init_a4_portrait(
+            page_fn=page_fn, page_fn_later=page_fn_later,
+            margin_top=2.2 * cm,
+            margin_bottom=2.4 * cm,
+            margin_left=2.2 * cm,
+            margin_right=2 * cm,
+            font_name="Helvetica",  # Arial not supported by now
+            font_size=11
+        )
+
     @staticmethod
     def page_fn_header(canvas, doc):
         """ A header with the logo, a footer with the print date and page
         numbers.
 
         """
-        height = 2 * cm
-        width = height * 1.6666
+        height = 1.85 * cm
+        width = height * 2.77
 
         canvas.saveState()
+        # 0/0 is bottom left
         canvas.drawImage(
             doc.logo,
-            x=doc.leftMargin,
-            y=doc.pagesize[1] - 2.35 * cm,
+            x=1 * cm,
+            y=doc.pagesize[1] - (1 + 1.85) * cm,
             height=height,
             width=width,
             mask='auto')
         canvas.restoreState()
-        AgencyPdfAr.page_fn_footer(canvas, doc)
+        AgencyPdfBs.page_fn_footer(canvas, doc)
+
+    @staticmethod
+    def page_fn_footer(canvas, doc):
+
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        canvas.drawString(
+            doc.leftMargin,
+            doc.bottomMargin - 1.2 * cm,    # p.24
+            f'Druckdatum: {doc.created}'
+        )
+        canvas.drawRightString(
+            doc.pagesize[0] - doc.rightMargin,
+            doc.bottomMargin / 2,
+            f'{canvas._pageNumber}'
+        )
+        canvas.restoreState()
 
     @property
     def page_fn(self):
