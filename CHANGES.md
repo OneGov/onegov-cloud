@@ -1,8 +1,33 @@
 # Changes
 
+## Release `2021.9`
+
+> commits: **10 / [a4492f4a01...287f6f0f6f](https://github.com/OneGov/onegov-cloud/compare/a4492f4a01^...287f6f0f6f)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.9)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Adds customer pdf layout**
+
+**`Feature`** | **[STAKABS-19](https://kt-bs.atlassian.net/browse/STAKABS-19)** | **[e3e0a04ca1](https://github.com/onegov/onegov-cloud/commit/e3e0a04ca14f16250054c37ecec48509b96e9133)**
+
+🎉 **Improves organisation navigation with direct urls**
+
+Adds server side rendering of navigation tree to the browsed organisation.
+Pushes last browsed agency to the history client-side.
+
+**`Feature`** | **[STAKABS-21](https://kt-bs.atlassian.net/browse/STAKABS-21)** | **[36e3c045fc](https://github.com/onegov/onegov-cloud/commit/36e3c045fc822a8bfc83af095a54e3aec4e97ae4)**
+
+🎉 **Adds settings to influence links in pdf**
+
+Adds options in /agency-settings to choose color/underlined properties for PDF links.
+
+**`Feature`** | **[STAKABS-20](https://kt-bs.atlassian.net/browse/STAKABS-20)** | **[287f6f0f6f](https://github.com/onegov/onegov-cloud/commit/287f6f0f6ff1df88c4dc2f2bff7d23f37f7b9e64)**
+
 ## Release `2021.8`
 
-> commits: **4 / [cc0332ba4a...9f4bfb8f91](https://github.com/OneGov/onegov-cloud/compare/cc0332ba4a^...9f4bfb8f91)**  
+> released: **2021-01-19 13:06**<br>
+> commits: **5 / [cc0332ba4a...0588321087](https://github.com/OneGov/onegov-cloud/compare/cc0332ba4a^...0588321087)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.8)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
