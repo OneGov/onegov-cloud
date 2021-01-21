@@ -1,8 +1,28 @@
 # Changes
 
+## Release `2021.10`
+
+> commits: **13 / [b4de6dd221...13fcd8f649](https://github.com/OneGov/onegov-cloud/compare/b4de6dd221^...13fcd8f649)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.10)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🐞 **Fixes PDF rendering if membership title is not an export field**
+
+**`Bugfix`** | **[STAKABS-22](https://kt-bs.atlassian.net/browse/STAKABS-22)** | **[1233faca11](https://github.com/onegov/onegov-cloud/commit/1233faca11896a3f81fc792fcc73ca10cde4dc68)**
+
+### Pdf
+
+🎉 **Adds underline width option for mini_html**
+
+Fixes colorizing links that are not rendered as links in the pdf.
+
+**`Feature`** | **[STAKABS-19](https://kt-bs.atlassian.net/browse/STAKABS-19)** | **[0350fa9e90](https://github.com/onegov/onegov-cloud/commit/0350fa9e909a00d061e45c7f6fa4298679a99d0b)**
+
 ## Release `2021.9`
 
-> commits: **10 / [a4492f4a01...287f6f0f6f](https://github.com/OneGov/onegov-cloud/compare/a4492f4a01^...287f6f0f6f)**  
+> released: **2021-01-20 14:26**<br>
+> commits: **11 / [a4492f4a01...66b3a342a5](https://github.com/OneGov/onegov-cloud/compare/a4492f4a01^...66b3a342a5)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.9)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
