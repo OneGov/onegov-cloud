@@ -2476,6 +2476,11 @@ $booking-left-margin: 2rem;
         see https://stackoverflow.com/q/1495407
     */
     padding-bottom: 31.25%;
+
+    @-moz-document url-prefix() {
+        padding-bottom: 33%;
+     }
+
     position: relative;
 
     div > img,
