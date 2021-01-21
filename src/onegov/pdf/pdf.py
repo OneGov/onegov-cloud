@@ -40,6 +40,7 @@ class Pdf(PDFDocument):
         link_color = kwargs.pop('link_color', self.default_link_color)
         link_color = link_color or self.default_link_color
         underline_links = kwargs.pop('underline_links', False) or False
+        underline_width = str(kwargs.pop('underline_width', 0.5))
 
         super(Pdf, self).__init__(*args, **kwargs)
 
@@ -53,6 +54,7 @@ class Pdf(PDFDocument):
         self.toc_levels = toc_levels
         self.link_color = link_color
         self.underline_links = underline_links
+        self.underline_width = underline_width
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
                          **kwargs):
@@ -421,12 +423,17 @@ class Pdf(PDFDocument):
         if linkify:
             link_color = self.link_color
             underline_links = self.underline_links
+            underline_width = self.underline_width
 
             def colorize(attrs, new=False):
+                # phone numbers appear here but are escaped, skip...
+                if not attrs.get((None, 'href')):
+                    return
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'
                     attrs[('a', u'underlineColor')] = link_color
+                    attrs[('a', u'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')
@@ -443,6 +450,7 @@ class Pdf(PDFDocument):
             filters=filters
         )
         html = cleaner.clean(html)
+        # Todo: phone numbers with href="tel:.." are cleaned out
 
         # Walk the tree and convert the elements
         def strip(text):
