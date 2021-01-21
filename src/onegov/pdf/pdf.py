@@ -426,6 +426,9 @@ class Pdf(PDFDocument):
             underline_width = self.underline_width
 
             def colorize(attrs, new=False):
+                # phone numbers appear here but are escaped, skip...
+                if not attrs.get((None, 'href')):
+                    return
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'
@@ -447,6 +450,7 @@ class Pdf(PDFDocument):
             filters=filters
         )
         html = cleaner.clean(html)
+        # Todo: phone numbers with href="tel:.." are cleaned out
 
         # Walk the tree and convert the elements
         def strip(text):
