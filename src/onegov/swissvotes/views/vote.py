@@ -44,16 +44,34 @@ def view_vote(self, request):
     }
 
 
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='kurzbeschreibung.pdf'
-)
-def brief_description_static(self, request):
-    file = self.get_file('brief_description', request)
-    if not file:
-        raise HTTPNotFound()
-    return request.redirect(request.link(file))
+def create_static_view(name, file_name):
+    @SwissvotesApp.view(
+        model=SwissVote,
+        permission=Public,
+        name=name
+    )
+    def static_view(self, request):
+        file = self.get_file(file_name, request)
+        if not file:
+            raise HTTPNotFound()
+        return request.redirect(request.link(file))
+
+    return static_view
+
+
+create_static_view('kurzbeschreibung.pdf', 'brief_description')
+# todo: for name, file in SwissVote.localized_files().items():
+
+# @SwissvotesApp.view(
+#     model=SwissVote,
+#     permission=Public,
+#     name='kurzbeschreibung.pdf'
+# )
+# def brief_description_static(self, request):
+#     file = self.get_file('brief_description', request)
+#     if not file:
+#         raise HTTPNotFound()
+#     return request.redirect(request.link(file))
 
 
 @SwissvotesApp.view(

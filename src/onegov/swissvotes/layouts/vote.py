@@ -42,39 +42,23 @@ class VoteLayout(DefaultLayout):
     def attachments(self):
         """ Returns a dictionary with static URLS for attachments.
 
-        Note that not all file / locale combinations have a static URL!
+        Note that not ony file / locale combinations with a file_name
+        definition have a static URL!
         """
 
-        view_names = {
-            'voting_text': 'abstimmungstext-<lang>.pdf',
-            'brief_description': 'kurzbeschreibung.pdf',
-            'federal_council_message': 'botschaft-<lang>.pdf',
-            'parliamentary_debate': 'parlamentsberatung.pdf',
-            'voting_booklet': 'brochure-<lang>.pdf',
-            'resolution': 'erwahrung-<lang>.pdf',
-            'realization': 'zustandekommen-<lang>.pdf',
-            'ad_analysis': 'inserateanalyse.pdf',
-            'results_by_domain': 'staatsebenen.xlsx',
-            'foeg_analysis': 'medienanalyse.pdf',
-            'post_vote_poll': 'nachbefragung-<lang>.pdf',
-            'post_vote_poll_methodology': 'nachbefragung-methode-<lang>.pdf',
-            'post_vote_poll_codebook': 'nachbefragung-codebuch-<lang>.pdf',
-            'post_vote_poll_dataset': 'nachbefragung.csv',
-            'preliminary_examination': 'vorpruefung-<lang>.pdf',
+        return {
+            name: (
+                self.request.link(
+                    self.model,
+                    file.file_name.get(
+                        self.request.locale,
+                        file.file_name['de_CH']
+                    )
+                )
+                if getattr(self.model, name) else None
+            )
+            for name, file in self.model.localized_files().items()
         }
-
-        result = {}
-        for name in view_names:
-            attachment = self.model.get_file(name, self.request)
-            if attachment:
-                lang = attachment.name.split('-')[1].split('_')[0]
-                lang = lang if lang in ('de', 'fr') else 'de'
-                view_name = view_names[name].replace('<lang>', lang)
-                result[name] = self.request.link(self.model, name=view_name)
-            else:
-                result[name] = None
-
-        return result
 
 
 class VoteStrengthsLayout(DefaultLayout):

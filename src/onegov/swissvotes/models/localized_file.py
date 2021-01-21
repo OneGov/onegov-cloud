@@ -12,6 +12,9 @@ class LocalizedFile(object):
 
     """
 
+    def __init__(self, file_name):
+        self.file_name = file_name
+
     def __set_name__(self, owner, name):
         self.name = name
 
@@ -49,3 +52,14 @@ class LocalizedFile(object):
 
     def __delete__(self, instance):
         self.__delete_by_locale__(instance)
+
+
+class LocalizedFileListingMixin(object):
+
+    @classmethod
+    def localized_files(cls):
+        return {
+            name: attribute
+            for name, attribute in cls.__dict__.items()
+            if isinstance(attribute, LocalizedFile)
+        }

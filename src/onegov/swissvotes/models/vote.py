@@ -11,6 +11,7 @@ from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.localized_file import LocalizedFile
+from onegov.swissvotes.models.localized_file import LocalizedFileListingMixin
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
 from sqlalchemy import Column
@@ -57,7 +58,8 @@ class encoded_property(object):
         return instance.codes(self.name, instance.deciding_question).get(value)
 
 
-class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
+class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin,
+                LocalizedFileListingMixin):
 
     """ A single vote as defined by the code book.
 
@@ -843,21 +845,62 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         return False
 
     # attachments
-    voting_text = LocalizedFile()
-    brief_description = LocalizedFile()
-    federal_council_message = LocalizedFile()
-    parliamentary_debate = LocalizedFile()
-    voting_booklet = LocalizedFile()
-    resolution = LocalizedFile()
-    realization = LocalizedFile()
-    ad_analysis = LocalizedFile()
-    results_by_domain = LocalizedFile()
-    foeg_analysis = LocalizedFile()
-    post_vote_poll = LocalizedFile()
-    post_vote_poll_methodology = LocalizedFile()
-    post_vote_poll_dataset = LocalizedFile()
-    post_vote_poll_codebook = LocalizedFile()
-    preliminary_examination = LocalizedFile()
+    voting_text = LocalizedFile({
+        'de_CH': 'abstimmungstext-de.pdf',
+        'fr_CH': 'abstimmungstext-fr.pdf',
+    })
+    brief_description = LocalizedFile({
+        'de_CH': 'kurzbeschreibung.pdf',
+        'fr_CH': 'kurzbeschreibung.pdf',
+    })
+    federal_council_message = LocalizedFile({
+        'de_CH': 'botschaft-de.pdf',
+        'fr_CH': 'botschaft-fr.pdf',
+    })
+    parliamentary_debate = LocalizedFile({
+        'de_CH': 'parlamentsberatung.pdf',
+        'fr_CH': 'parlamentsberatung.pdf',
+    })
+    voting_booklet = LocalizedFile({
+        'de_CH': 'brochure-de.pdf',
+        'fr_CH': 'brochure-fr.pdf',
+    })
+    resolution = LocalizedFile({
+        'de_CH': 'erwahrung-de.pdf',
+        'fr_CH': 'erwahrung-fr.pdf',
+    })
+    realization = LocalizedFile({
+        'de_CH': 'zustandekommen-de.pdf',
+        'fr_CH': 'zustandekommen-fr.pdf',
+    })
+    ad_analysis = LocalizedFile({
+        'de_CH': 'inserateanalyse.pdf',
+    })
+    results_by_domain = LocalizedFile({
+        'de_CH': 'staatsebenen.xlsx',
+    })
+    foeg_analysis = LocalizedFile({
+        'de_CH': 'medienanalyse.pdf',
+    })
+    post_vote_poll = LocalizedFile({
+        'de_CH': 'nachbefragung-de.pdf',
+        'fr_CH': 'nachbefragung-fr.pdf',
+    })
+    post_vote_poll_methodology = LocalizedFile({
+        'de_CH': 'nachbefragung-methode-de.pdf',
+        'fr_CH': 'nachbefragung-methode-fr.pdf',
+    })
+    post_vote_poll_dataset = LocalizedFile({
+        'de_CH': 'nachbefragung.csv',
+    })
+    post_vote_poll_codebook = LocalizedFile({
+        'de_CH': 'nachbefragung-codebuch-de.pdf',
+        'fr_CH': 'nachbefragung-codebuch-fr.pdf',
+    })
+    preliminary_examination = LocalizedFile({
+        'de_CH': 'vorpruefung-de.pdf',
+        'fr_CH': 'vorpruefung-fr.pdf',
+    })
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))

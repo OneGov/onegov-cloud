@@ -544,6 +544,7 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
     session = swissvotes_app.session()
     request = DummyRequest()
     request.app = swissvotes_app
+    request.locale = locale
     model = SwissVote(
         title_de="Vote DE",
         title_fr="Vote FR",
