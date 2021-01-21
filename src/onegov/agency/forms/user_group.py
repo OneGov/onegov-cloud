@@ -39,8 +39,10 @@ class UserGroupForm(Form):
         ]
 
     def update_model(self, model):
+        user_ids = {str(r.id) for r in self.model.users.with_entities(User.id)}
+        user_ids |= set(self.users.data)
         users = UserCollection(self.request.session).query()
-        users = users.filter(User.id.in_(self.users.data)).all()
+        users = users.filter(User.id.in_(user_ids)).all()
         for user in users:
             if user != self.request.current_user:
                 user.logout_all_sessions(self.request)
