@@ -384,5 +384,6 @@ class AgencyPdfBs(AgencyPdfDefault):
             margin_top=self.margin_top,
             margin_bottom=self.margin_bottom,
             margin_left=self.margin_left,
-            margin_right=self.margin_right
+            margin_right=self.margin_right,
+            font_size=self.font_size
         )
