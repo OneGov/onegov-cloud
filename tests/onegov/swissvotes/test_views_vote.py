@@ -570,3 +570,6 @@ def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
     for name in attachment_urls[locale].values():
         view = client.get(f'{page.request.url}/{name}')
         assert view.status_code in (200, 301, 302)
+
+
+# todo: test additional campaing material

@@ -1,4 +1,11 @@
 from onegov.file import AssociatedFiles
+from onegov.file import File
+
+
+class SwissVoteFile(File):
+    """ An attachment to a vote. """
+
+    __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
 
 class LocalizedFile(object):

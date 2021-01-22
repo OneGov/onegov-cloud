@@ -12,7 +12,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
-from onegov.swissvotes.models.localized_file import LocalizedFile
+from onegov.swissvotes.models.file import LocalizedFile
 from psycopg2.extras import NumericRange
 from translationstring import TranslationString
 
@@ -1027,6 +1027,11 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert vote.get_file('resolution').name == 'resolution-fr_CH'
     assert vote.get_file('resolution', 'fr_CH').name == 'resolution-fr_CH'
     assert vote.get_file('resolution', 'de_CH') is None
+
+    # Additional campaing material
+    assert vote.campaign_material_yea == []
+    assert vote.campaign_material_nay == []
+    # todo:
 
 
 def test_model_column_mapper():

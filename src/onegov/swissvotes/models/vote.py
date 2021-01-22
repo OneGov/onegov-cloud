@@ -5,12 +5,12 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
-from onegov.file import File
 from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
-from onegov.swissvotes.models.localized_file import LocalizedFile
-from onegov.swissvotes.models.localized_file import LocalizedFiles
+from onegov.swissvotes.models.file import LocalizedFile
+from onegov.swissvotes.models.file import LocalizedFiles
+from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
 from sqlalchemy import Column
@@ -25,12 +25,6 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
-
-
-class SwissVoteFile(File):
-    """ An attachment to a vote. """
-
-    __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
 
 class encoded_property(object):
@@ -957,6 +951,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             'fr_CH': 'vorpruefung-fr.pdf',
         }
     )
+
+    campaign_material_yea = FileSubCollection()
+    campaign_material_nay = FileSubCollection()
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))
