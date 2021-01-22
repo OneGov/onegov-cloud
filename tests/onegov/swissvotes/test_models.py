@@ -78,7 +78,7 @@ def test_model_localized_file():
             self.current_locale = 'de_CH'
 
     class MyClass(object):
-        file = LocalizedFile()
+        file = LocalizedFile('pdf', 'title', {})
 
         def __init__(self):
             self.session_manager = SessionManager()
@@ -942,6 +942,24 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert vote.searchable_text_de_CH is None
     assert vote.searchable_text_fr_CH is None
 
+    assert set(vote.localized_files().keys()) == {
+        'ad_analysis',
+        'brief_description',
+        'federal_council_message',
+        'foeg_analysis',
+        'parliamentary_debate',
+        'post_vote_poll',
+        'post_vote_poll_codebook',
+        'post_vote_poll_dataset',
+        'post_vote_poll_methodology',
+        'preliminary_examination',
+        'realization',
+        'resolution',
+        'results_by_domain',
+        'voting_booklet',
+        'voting_text'
+    }
+
     assert vote.indexed_files == {
         'brief_description',
         'federal_council_message',
@@ -951,6 +969,7 @@ def test_model_vote_attachments(swissvotes_app, attachments):
         'preliminary_examination'
     }
 
+    # Upload de_CH
     vote.ad_analysis = attachments['ad_analysis']
     vote.brief_description = attachments['brief_description']
     vote.parliamentary_debate = attachments['parliamentary_debate']
@@ -967,6 +986,7 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert vote.searchable_text_fr_CH == ''
 
+    # Upload fr_CH
     swissvotes_app.session_manager.current_locale = 'fr_CH'
 
     vote.realization = attachments['realization']
@@ -997,6 +1017,16 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert "réalis" not in vote.searchable_text_fr_CH
     assert "conseil" in vote.searchable_text_fr_CH
     assert "fédéral" in vote.searchable_text_fr_CH
+
+    assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
+    assert vote.get_file('ad_analysis', 'fr_CH').name == 'ad_analysis-de_CH'
+    assert vote.get_file('ad_analysis', 'en_US').name == 'ad_analysis-de_CH'
+    assert vote.get_file('ad_analysis', fallback=False) is None
+    assert vote.get_file('ad_analysis', 'en_US', fallback=False) is None
+    assert vote.get_file('realization') is None
+    assert vote.get_file('resolution').name == 'resolution-fr_CH'
+    assert vote.get_file('resolution', 'fr_CH').name == 'resolution-fr_CH'
+    assert vote.get_file('resolution', 'de_CH') is None
 
 
 def test_model_column_mapper():

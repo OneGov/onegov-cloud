@@ -5,13 +5,12 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
-from onegov.file import AssociatedFiles
 from onegov.file import File
 from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.localized_file import LocalizedFile
-from onegov.swissvotes.models.localized_file import LocalizedFileListingMixin
+from onegov.swissvotes.models.localized_file import LocalizedFiles
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
 from sqlalchemy import Column
@@ -58,8 +57,7 @@ class encoded_property(object):
         return instance.codes(self.name, instance.deciding_question).get(value)
 
 
-class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin,
-                LocalizedFileListingMixin):
+class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     """ A single vote as defined by the code book.
 
@@ -845,62 +843,120 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         return False
 
     # attachments
-    voting_text = LocalizedFile({
-        'de_CH': 'abstimmungstext-de.pdf',
-        'fr_CH': 'abstimmungstext-fr.pdf',
-    })
-    brief_description = LocalizedFile({
-        'de_CH': 'kurzbeschreibung.pdf',
-        'fr_CH': 'kurzbeschreibung.pdf',
-    })
-    federal_council_message = LocalizedFile({
-        'de_CH': 'botschaft-de.pdf',
-        'fr_CH': 'botschaft-fr.pdf',
-    })
-    parliamentary_debate = LocalizedFile({
-        'de_CH': 'parlamentsberatung.pdf',
-        'fr_CH': 'parlamentsberatung.pdf',
-    })
-    voting_booklet = LocalizedFile({
-        'de_CH': 'brochure-de.pdf',
-        'fr_CH': 'brochure-fr.pdf',
-    })
-    resolution = LocalizedFile({
-        'de_CH': 'erwahrung-de.pdf',
-        'fr_CH': 'erwahrung-fr.pdf',
-    })
-    realization = LocalizedFile({
-        'de_CH': 'zustandekommen-de.pdf',
-        'fr_CH': 'zustandekommen-fr.pdf',
-    })
-    ad_analysis = LocalizedFile({
-        'de_CH': 'inserateanalyse.pdf',
-    })
-    results_by_domain = LocalizedFile({
-        'de_CH': 'staatsebenen.xlsx',
-    })
-    foeg_analysis = LocalizedFile({
-        'de_CH': 'medienanalyse.pdf',
-    })
-    post_vote_poll = LocalizedFile({
-        'de_CH': 'nachbefragung-de.pdf',
-        'fr_CH': 'nachbefragung-fr.pdf',
-    })
-    post_vote_poll_methodology = LocalizedFile({
-        'de_CH': 'nachbefragung-methode-de.pdf',
-        'fr_CH': 'nachbefragung-methode-fr.pdf',
-    })
-    post_vote_poll_dataset = LocalizedFile({
-        'de_CH': 'nachbefragung.csv',
-    })
-    post_vote_poll_codebook = LocalizedFile({
-        'de_CH': 'nachbefragung-codebuch-de.pdf',
-        'fr_CH': 'nachbefragung-codebuch-fr.pdf',
-    })
-    preliminary_examination = LocalizedFile({
-        'de_CH': 'vorpruefung-de.pdf',
-        'fr_CH': 'vorpruefung-fr.pdf',
-    })
+    voting_text = LocalizedFile(
+        label=_('Voting text'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'abstimmungstext-de.pdf',
+            'fr_CH': 'abstimmungstext-fr.pdf',
+        }
+    )
+    brief_description = LocalizedFile(
+        label=_('Brief description Swissvotes'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'kurzbeschreibung.pdf',
+        }
+    )
+    federal_council_message = LocalizedFile(
+        label=_('Federal council message'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'botschaft-de.pdf',
+            'fr_CH': 'botschaft-fr.pdf',
+        }
+    )
+    parliamentary_debate = LocalizedFile(
+        label=_('Parliamentary debate'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'parlamentsberatung.pdf',
+        }
+    )
+    voting_booklet = LocalizedFile(
+        label=_('Voting booklet'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'brochure-de.pdf',
+            'fr_CH': 'brochure-fr.pdf',
+        }
+    )
+    resolution = LocalizedFile(
+        label=_('Resolution'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'erwahrung-de.pdf',
+            'fr_CH': 'erwahrung-fr.pdf',
+        }
+    )
+    realization = LocalizedFile(
+        label=_('Realization'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'zustandekommen-de.pdf',
+            'fr_CH': 'zustandekommen-fr.pdf',
+        }
+    )
+    ad_analysis = LocalizedFile(
+        label=_('Analysis of the advertising campaign by Année Politique'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'inserateanalyse.pdf',
+        }
+    )
+    results_by_domain = LocalizedFile(
+        label=_('Result by canton, district and municipality'),
+        extension='xlsx',
+        static_views={
+            'de_CH': 'staatsebenen.xlsx',
+        }
+    )
+    foeg_analysis = LocalizedFile(
+        label=_('Media coverage: fög analysis'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'medienanalyse.pdf',
+        }
+    )
+    post_vote_poll = LocalizedFile(
+        label=_('Full analysis of post-vote poll results'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-de.pdf',
+            'fr_CH': 'nachbefragung-fr.pdf',
+        }
+    )
+    post_vote_poll_methodology = LocalizedFile(
+        label=_('Questionnaire of the poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-methode-de.pdf',
+            'fr_CH': 'nachbefragung-methode-fr.pdf',
+        }
+    )
+    post_vote_poll_dataset = LocalizedFile(
+        label=_('Dataset of the post-vote poll'),
+        extension='csv',
+        static_views={
+            'de_CH': 'nachbefragung.csv',
+        }
+    )
+    post_vote_poll_codebook = LocalizedFile(
+        label=_('Codebook for the post-vote poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-codebuch-de.pdf',
+            'fr_CH': 'nachbefragung-codebuch-fr.pdf',
+        }
+    )
+    preliminary_examination = LocalizedFile(
+        label=_('Preliminary examination'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'vorpruefung-de.pdf',
+            'fr_CH': 'vorpruefung-fr.pdf',
+        }
+    )
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))
@@ -939,16 +995,17 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     def files_observer(self, files):
         self.vectorize_files()
 
-    def get_file(self, name, request):
-        """ Returns the requested localized file, falls back to the default
-        locale.
+    def get_file(self, name, locale=None, fallback=True):
+        """ Returns the requested localized file.
+
+        Uses the current locale if no locale is given.
+
+        Falls back to the default locale if the file is not available in the
+        requested locale.
 
         """
-        fallback = SwissVote.__dict__.get(name).__get_by_locale__(
-            self, request.app.default_locale
-        )
-        return getattr(self, name, None) or fallback
-
-    def get_file_by_locale(self, name, locale):
-        return SwissVote.__dict__.get(name).__get_by_locale__(
-            self, locale)
+        get = SwissVote.__dict__.get(name).__get_by_locale__
+        default_locale = self.session_manager.default_locale
+        fallback = get(self, default_locale) if fallback else None
+        result = get(self, locale) if locale else getattr(self, name, None)
+        return result or fallback

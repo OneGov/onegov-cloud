@@ -1,3 +1,6 @@
+from onegov.file import AssociatedFiles
+
+
 class LocalizedFile(object):
     """ A helper for localized files.
 
@@ -12,8 +15,10 @@ class LocalizedFile(object):
 
     """
 
-    def __init__(self, file_name):
-        self.file_name = file_name
+    def __init__(self, extension, label, static_views):
+        self.extension = extension
+        self.label = label
+        self.static_views = static_views or {}
 
     def __set_name__(self, owner, name):
         self.name = name
@@ -54,7 +59,7 @@ class LocalizedFile(object):
         self.__delete_by_locale__(instance)
 
 
-class LocalizedFileListingMixin(object):
+class LocalizedFiles(AssociatedFiles):
 
     @classmethod
     def localized_files(cls):

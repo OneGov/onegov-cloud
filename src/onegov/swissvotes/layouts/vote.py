@@ -50,12 +50,12 @@ class VoteLayout(DefaultLayout):
             name: (
                 self.request.link(
                     self.model,
-                    file.file_name.get(
+                    file.static_views.get(
                         self.request.locale,
-                        file.file_name['de_CH']
+                        file.static_views['de_CH']
                     )
                 )
-                if getattr(self.model, name) else None
+                if self.model.get_file(name) else None
             )
             for name, file in self.model.localized_files().items()
         }
