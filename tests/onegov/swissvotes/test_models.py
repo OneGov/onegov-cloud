@@ -1031,7 +1031,19 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     # Additional campaing material
     assert vote.campaign_material_yea == []
     assert vote.campaign_material_nay == []
-    # todo:
+
+    vote.files.append(attachments['campaign_material_yea-1.png'])
+    vote.files.append(attachments['campaign_material_yea-2.png'])
+    vote.files.append(attachments['campaign_material_nay-1.png'])
+    vote.files.append(attachments['campaign_material_nay-2.png'])
+    session.flush()
+
+    assert {file.filename for file in vote.campaign_material_yea} == {
+        'campaign_material_yea-1.png', 'campaign_material_yea-2.png'
+    }
+    assert {file.filename for file in vote.campaign_material_nay} == {
+        'campaign_material_nay-1.png', 'campaign_material_nay-2.png'
+    }
 
 
 def test_model_column_mapper():
