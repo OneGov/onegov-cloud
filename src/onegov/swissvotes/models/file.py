@@ -7,6 +7,24 @@ class SwissVoteFile(File):
 
     __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
+    @property
+    def filename(self):
+        return self.reference.filename
+
+
+class FileSubCollection(object):
+    """ """
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        if instance:
+            return [
+                file for file in instance.files
+                if file.name.startswith(self.name)
+            ]
+
 
 class LocalizedFile(object):
     """ A helper for localized files.
