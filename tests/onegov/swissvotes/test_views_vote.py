@@ -572,7 +572,8 @@ def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
         assert view.status_code in (200, 301, 302)
 
 
-def test_view_vote_campaign_material(swissvotes_app, sample_vote, attachments):
+def test_view_vote_campaign_material(swissvotes_app, sample_vote,
+                                     campaign_material):
 
     session = swissvotes_app.session()
     session.add(sample_vote)
@@ -596,7 +597,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote, attachments):
     # ... upload
     manage.form['file'] = Upload(
         '1.png',
-        attachments['campaign_material_yea-1.png'].reference.file.read(),
+        campaign_material['campaign_material_yea-1.png'].reference.file.read(),
         'image/png'
     )
     manage = manage.form.submit().maybe_follow()
@@ -617,7 +618,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote, attachments):
     # ... upload
     manage.form['file'] = Upload(
         '1.png',
-        attachments['campaign_material_nay-1.png'].reference.file.read(),
+        campaign_material['campaign_material_nay-1.png'].reference.file.read(),
         'image/png'
     )
     manage = manage.form.submit().maybe_follow()

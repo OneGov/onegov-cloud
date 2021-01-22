@@ -119,6 +119,13 @@ def attachments(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
+    yield result
+
+
+@fixture(scope="function")
+def campaign_material(swissvotes_app):
+    result = {}
+
     for name in ('yea-1.png', 'yea-2.png', 'nay-1.png', 'nay-2.png'):
         name = f'campaign_material_{name}'
         file = create_image()

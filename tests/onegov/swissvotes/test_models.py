@@ -903,7 +903,8 @@ def test_model_vote_codes():
     assert SwissVote.codes('recommendation')[5] == "Free vote"
 
 
-def test_model_vote_attachments(swissvotes_app, attachments):
+def test_model_vote_attachments(swissvotes_app, attachments,
+                                campaign_material):
     session = swissvotes_app.session()
     session.add(
         SwissVote(
@@ -1032,10 +1033,10 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert vote.campaign_material_yea == []
     assert vote.campaign_material_nay == []
 
-    vote.files.append(attachments['campaign_material_yea-1.png'])
-    vote.files.append(attachments['campaign_material_yea-2.png'])
-    vote.files.append(attachments['campaign_material_nay-1.png'])
-    vote.files.append(attachments['campaign_material_nay-2.png'])
+    vote.files.append(campaign_material['campaign_material_yea-1.png'])
+    vote.files.append(campaign_material['campaign_material_yea-2.png'])
+    vote.files.append(campaign_material['campaign_material_nay-1.png'])
+    vote.files.append(campaign_material['campaign_material_nay-2.png'])
     session.flush()
 
     assert {file.filename for file in vote.campaign_material_yea} == {
