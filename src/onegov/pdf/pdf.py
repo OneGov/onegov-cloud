@@ -40,6 +40,7 @@ class Pdf(PDFDocument):
         link_color = kwargs.pop('link_color', self.default_link_color)
         link_color = link_color or self.default_link_color
         underline_links = kwargs.pop('underline_links', False) or False
+        underline_width = str(kwargs.pop('underline_width', 0.5))
 
         super(Pdf, self).__init__(*args, **kwargs)
 
@@ -53,8 +54,10 @@ class Pdf(PDFDocument):
         self.toc_levels = toc_levels
         self.link_color = link_color
         self.underline_links = underline_links
+        self.underline_width = underline_width
 
-    def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None):
+    def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
+                         **kwargs):
         frame_kwargs = {
             'showBoundary': self.show_boundaries,
             'leftPadding': 0,
@@ -65,10 +68,11 @@ class Pdf(PDFDocument):
 
         width = 21 * cm
         height = 29.7 * cm
-        margin_left = 2.5 * cm
-        margin_right = 2.5 * cm
-        margin_top = 3 * cm
-        margin_bottom = 3 * cm
+        font_size = kwargs.get('font_size', 10)
+        margin_left = kwargs.get('margin_left', 2.5 * cm)
+        margin_right = kwargs.get('margin_right', 2.5 * cm)
+        margin_top = kwargs.get('margin_top', 3 * cm)
+        margin_bottom = kwargs.get('margin_bottom', 3 * cm)
 
         full_frame = Frame(
             margin_left,
@@ -90,13 +94,15 @@ class Pdf(PDFDocument):
         ])
         self.story.append(NextPageTemplate('Later'))
 
-        self.generate_style(font_size=10)
-        self.adjust_style(font_size=10)
+        self.adjust_style(font_size=font_size)
 
     def adjust_style(self, font_size=10):
         """ Sets basic styling (borrowed from common browser defaults). """
 
-        self.generate_style(font_size=font_size)
+        self.generate_style(
+            font_name=self.font_name,
+            font_size=font_size
+        )
 
         self.style.heading1.fontSize = 2 * self.style.fontSize
         self.style.heading1.spaceBefore = 0.67 * self.style.heading1.fontSize
@@ -417,12 +423,17 @@ class Pdf(PDFDocument):
         if linkify:
             link_color = self.link_color
             underline_links = self.underline_links
+            underline_width = self.underline_width
 
             def colorize(attrs, new=False):
+                # phone numbers appear here but are escaped, skip...
+                if not attrs.get((None, 'href')):
+                    return
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'
                     attrs[('a', u'underlineColor')] = link_color
+                    attrs[('a', u'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')
@@ -439,6 +450,7 @@ class Pdf(PDFDocument):
             filters=filters
         )
         html = cleaner.clean(html)
+        # Todo: phone numbers with href="tel:.." are cleaned out
 
         # Walk the tree and convert the elements
         def strip(text):
