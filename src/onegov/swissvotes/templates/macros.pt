@@ -206,7 +206,7 @@
                     <tal:block metal:use-macro="layout.macros['image_gallery_item']" tal:define="index str(repeat.item.index); url item[0]; img_url item[1]; label item[2]; additional 'additional'" />
                 </tal:block>
             </div>
-            <a tal:condition="len(items)>6" class="button secondary image-gallery-toggle pull-right" data-suffix="${id_suffix}" i18n:translate="">Show all</a>
+            <a tal:condition="len(items)>6" class="button secondary image-gallery-toggle" data-suffix="${id_suffix}" i18n:translate="">Show all</a>
         </tal:block>
     </metal:image_gallery>
 

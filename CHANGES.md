@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.11`
+
+> commits: **1 / [81a83d3f9c...81a83d3f9c](https://github.com/OneGov/onegov-cloud/compare/81a83d3f9c^...81a83d3f9c)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.11)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🐞 **Style buttons.**
+
+**`Bugfix`** | **[VOTES-93](https://issues.seantis.ch/browse/VOTES-93)** | **[81a83d3f9c](https://github.com/onegov/onegov-cloud/commit/81a83d3f9c46ff1a69d173d2c637017b3c8a1019)**
+
 ## Release `2021.10`
 
-> commits: **13 / [b4de6dd221...13fcd8f649](https://github.com/OneGov/onegov-cloud/compare/b4de6dd221^...13fcd8f649)**  
+> released: **2021-01-21 15:36**<br>
+> commits: **14 / [b4de6dd221...fa7b4ea44f](https://github.com/OneGov/onegov-cloud/compare/b4de6dd221^...fa7b4ea44f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.10)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency

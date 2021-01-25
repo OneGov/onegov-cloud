@@ -246,6 +246,14 @@ svg text {
     BFS Map
 */
 .bfs-map {
+    .bfs-map-title {
+        font-weight: bold;
+        margin-bottom: .5rem;
+    }
+
+    .button {
+        display: block;
+    }
 
     iframe {
         border: 0;
@@ -262,6 +270,10 @@ svg text {
 $modal-padding-sm: 50px;
 $modal-padding: 25px;
 $modal-padding-md: 70px;
+
+.image-gallery-toggle {
+    display: block;
+}
 
 .image-gallery {
 
