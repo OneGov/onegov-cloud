@@ -27,6 +27,7 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Title</th>
+                            <th i18n:translate>Identifier</th>
                             <th i18n:translate>Shortcode</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Type</th>
@@ -38,6 +39,7 @@
                             <tal:block tal:repeat="vote group[1]">
                                 <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
                                     <td>${vote.title}</td>
+                                    <td>${vote.id}</td>
                                     <td><span class="shortcode" tal:condition="vote.shortcode">${vote.shortcode}</span></td>
                                     <td>${layout.format_date(vote.date, 'date')}</td>
                                     <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
