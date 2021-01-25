@@ -13,7 +13,7 @@ from onegov.swissvotes.external_resources import MfgPosters
 from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
-from onegov.swissvotes.models.localized_file import LocalizedFile
+from onegov.swissvotes.models.file import LocalizedFile
 from sqlalchemy import create_engine
 
 

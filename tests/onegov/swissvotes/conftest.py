@@ -14,6 +14,7 @@ from onegov.user import User
 from psycopg2.extras import NumericRange
 from pytest import fixture
 from tests.shared.utils import create_app
+from tests.shared.utils import create_image
 from transaction import commit
 from xlsxwriter.workbook import Workbook
 
@@ -115,6 +116,21 @@ def attachments(swissvotes_app):
         file.write(b'a,b\n100,200')
 
         attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    yield result
+
+
+@fixture(scope="function")
+def campaign_material(swissvotes_app):
+    result = {}
+
+    for name in ('yea-1.png', 'yea-2.png', 'nay-1.png', 'nay-2.png'):
+        name = f'campaign_material_{name}'
+        file = create_image()
+
+        attachment = SwissVoteFile(id=random_token(), name=name)
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 

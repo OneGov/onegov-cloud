@@ -6,7 +6,10 @@ from onegov.swissvotes.layouts.page import DeletePageLayout
 from onegov.swissvotes.layouts.page import EditPageLayout
 from onegov.swissvotes.layouts.page import PageAttachmentsLayout
 from onegov.swissvotes.layouts.page import PageLayout
+from onegov.swissvotes.layouts.vote import DeleteVoteAttachmentLayout
 from onegov.swissvotes.layouts.vote import DeleteVoteLayout
+from onegov.swissvotes.layouts.vote import ManageCampaingMaterialNayLayout
+from onegov.swissvotes.layouts.vote import ManageCampaingMaterialYeaLayout
 from onegov.swissvotes.layouts.vote import UploadVoteAttachemtsLayout
 from onegov.swissvotes.layouts.vote import VoteLayout
 from onegov.swissvotes.layouts.vote import VoteStrengthsLayout
@@ -21,10 +24,13 @@ __all__ = (
     'DefaultLayout',
     'DeletePageAttachmentLayout',
     'DeletePageLayout',
+    'DeleteVoteAttachmentLayout',
     'DeleteVoteLayout',
     'DeleteVotesLayout',
     'EditPageLayout',
     'MailLayout',
+    'ManageCampaingMaterialNayLayout',
+    'ManageCampaingMaterialYeaLayout',
     'PageAttachmentsLayout',
     'PageLayout',
     'UpdateExternalResourcesLayout',

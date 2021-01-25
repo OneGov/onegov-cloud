@@ -1,4 +1,3 @@
-
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
@@ -11,10 +10,13 @@ from onegov.swissvotes.layouts import AddPageLayout
 from onegov.swissvotes.layouts import DefaultLayout
 from onegov.swissvotes.layouts import DeletePageAttachmentLayout
 from onegov.swissvotes.layouts import DeletePageLayout
+from onegov.swissvotes.layouts import DeleteVoteAttachmentLayout
 from onegov.swissvotes.layouts import DeleteVoteLayout
 from onegov.swissvotes.layouts import DeleteVotesLayout
 from onegov.swissvotes.layouts import EditPageLayout
 from onegov.swissvotes.layouts import MailLayout
+from onegov.swissvotes.layouts import ManageCampaingMaterialNayLayout
+from onegov.swissvotes.layouts import ManageCampaingMaterialYeaLayout
 from onegov.swissvotes.layouts import PageAttachmentsLayout
 from onegov.swissvotes.layouts import PageLayout
 from onegov.swissvotes.layouts import UpdateExternalResourcesLayout
@@ -526,7 +528,9 @@ def test_layout_vote(swissvotes_app):
     layout = VoteLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVote/upload',
-        'SwissVote/delete',
+        'SwissVote/manage-campaign-material-yea',
+        'SwissVote/manage-campaign-material-nay',
+        'SwissVote/delete'
     ]
 
     # Log in as admin
@@ -534,7 +538,9 @@ def test_layout_vote(swissvotes_app):
     layout = VoteLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVote/upload',
-        'SwissVote/delete',
+        'SwissVote/manage-campaign-material-yea',
+        'SwissVote/manage-campaign-material-nay',
+        'SwissVote/delete'
     ]
 
 
@@ -544,6 +550,7 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
     session = swissvotes_app.session()
     request = DummyRequest()
     request.app = swissvotes_app
+    request.locale = locale
     model = SwissVote(
         title_de="Vote DE",
         title_fr="Vote FR",
@@ -729,6 +736,62 @@ def test_layout_update_external_resources(swissvotes_app):
     assert layout.editbar_links == []
 
 
+def test_layout_manage_campaign_material_yea(swissvotes_app):
+    request = DummyRequest()
+    request.app = swissvotes_app
+    model = SwissVote(
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
+    )
+
+    layout = ManageCampaingMaterialYeaLayout(model, request)
+    assert layout.title == _("Campaign material for a Yes")
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'Principal/SwissVoteCollection/SwissVote/#'
+    )
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = UploadVoteAttachemtsLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = UploadVoteAttachemtsLayout(model, request)
+    assert layout.editbar_links == []
+
+
+def test_layout_manage_campaign_material_nay(swissvotes_app):
+    request = DummyRequest()
+    request.app = swissvotes_app
+    model = SwissVote(
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
+    )
+
+    layout = ManageCampaingMaterialNayLayout(model, request)
+    assert layout.title == _("Campaign material for a No")
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'Principal/SwissVoteCollection/SwissVote/#'
+    )
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = UploadVoteAttachemtsLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = UploadVoteAttachemtsLayout(model, request)
+    assert layout.editbar_links == []
+
+
 def test_layout_delete_votes(swissvotes_app):
     request = DummyRequest()
     request.app = swissvotes_app
@@ -738,6 +801,36 @@ def test_layout_delete_votes(swissvotes_app):
     assert layout.title == _("Delete all votes")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = DeleteVotesLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = DeleteVotesLayout(model, request)
+    assert layout.editbar_links == []
+
+
+def test_layout_delete_vote_attachment(swissvotes_app, attachments):
+    request = DummyRequest()
+    request.app = swissvotes_app
+    vote = SwissVote(
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
+    )
+    vote.ad_analysis = attachments['ad_analysis']
+    model = vote.ad_analysis
+
+    layout = DeleteVoteAttachmentLayout(model, request)
+    assert layout.title == _("Delete attachment")
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'Principal/SwissVoteCollection/SwissVote/#'
+    )
 
     # Log in as editor
     request.roles = ['editor']

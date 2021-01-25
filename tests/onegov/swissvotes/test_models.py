@@ -12,7 +12,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
-from onegov.swissvotes.models.localized_file import LocalizedFile
+from onegov.swissvotes.models.file import LocalizedFile
 from psycopg2.extras import NumericRange
 from translationstring import TranslationString
 
@@ -22,6 +22,9 @@ class DummyRequest(object):
         if isinstance(text, TranslationString):
             return text.interpolate()
         return text
+
+    def link(self, target):
+        return str(target)
 
 
 def test_model_actor():
@@ -78,7 +81,7 @@ def test_model_localized_file():
             self.current_locale = 'de_CH'
 
     class MyClass(object):
-        file = LocalizedFile()
+        file = LocalizedFile('pdf', 'title', {})
 
         def __init__(self):
             self.session_manager = SessionManager()
@@ -870,18 +873,18 @@ def test_model_vote(session, sample_vote):
 
     assert vote.has_national_council_share_data is True
 
-    assert vote.posters == {
+    assert vote.posters(DummyRequest()) == {
         'nay': [
             (
-                'https://no.com/objects/3',
                 'https://detail.com/3',
+                'https://no.com/objects/3',
                 'Link Social Archives'
             )
         ],
         'yea': [
             (
-                'https://yes.com/objects/1',
                 'https://detail.com/1',
+                'https://yes.com/objects/1',
                 'Link eMuseum.ch'
             )
         ]
@@ -903,7 +906,8 @@ def test_model_vote_codes():
     assert SwissVote.codes('recommendation')[5] == "Free vote"
 
 
-def test_model_vote_attachments(swissvotes_app, attachments):
+def test_model_vote_attachments(swissvotes_app, attachments,
+                                campaign_material):
     session = swissvotes_app.session()
     session.add(
         SwissVote(
@@ -942,6 +946,24 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert vote.searchable_text_de_CH is None
     assert vote.searchable_text_fr_CH is None
 
+    assert set(vote.localized_files().keys()) == {
+        'ad_analysis',
+        'brief_description',
+        'federal_council_message',
+        'foeg_analysis',
+        'parliamentary_debate',
+        'post_vote_poll',
+        'post_vote_poll_codebook',
+        'post_vote_poll_dataset',
+        'post_vote_poll_methodology',
+        'preliminary_examination',
+        'realization',
+        'resolution',
+        'results_by_domain',
+        'voting_booklet',
+        'voting_text'
+    }
+
     assert vote.indexed_files == {
         'brief_description',
         'federal_council_message',
@@ -951,6 +973,7 @@ def test_model_vote_attachments(swissvotes_app, attachments):
         'preliminary_examination'
     }
 
+    # Upload de_CH
     vote.ad_analysis = attachments['ad_analysis']
     vote.brief_description = attachments['brief_description']
     vote.parliamentary_debate = attachments['parliamentary_debate']
@@ -967,6 +990,7 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert vote.searchable_text_fr_CH == ''
 
+    # Upload fr_CH
     swissvotes_app.session_manager.current_locale = 'fr_CH'
 
     vote.realization = attachments['realization']
@@ -997,6 +1021,42 @@ def test_model_vote_attachments(swissvotes_app, attachments):
     assert "réalis" not in vote.searchable_text_fr_CH
     assert "conseil" in vote.searchable_text_fr_CH
     assert "fédéral" in vote.searchable_text_fr_CH
+
+    assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
+    assert vote.get_file('ad_analysis', 'fr_CH').name == 'ad_analysis-de_CH'
+    assert vote.get_file('ad_analysis', 'en_US').name == 'ad_analysis-de_CH'
+    assert vote.get_file('ad_analysis', fallback=False) is None
+    assert vote.get_file('ad_analysis', 'en_US', fallback=False) is None
+    assert vote.get_file('realization') is None
+    assert vote.get_file('resolution').name == 'resolution-fr_CH'
+    assert vote.get_file('resolution', 'fr_CH').name == 'resolution-fr_CH'
+    assert vote.get_file('resolution', 'de_CH') is None
+
+    # Additional campaing material
+    assert vote.campaign_material_yea == []
+    assert vote.campaign_material_nay == []
+
+    vote.files.append(campaign_material['campaign_material_yea-1.png'])
+    vote.files.append(campaign_material['campaign_material_yea-2.png'])
+    vote.files.append(campaign_material['campaign_material_nay-1.png'])
+    vote.files.append(campaign_material['campaign_material_nay-2.png'])
+    session.flush()
+
+    assert {file.filename for file in vote.campaign_material_yea} == {
+        'campaign_material_yea-1.png', 'campaign_material_yea-2.png'
+    }
+    assert {file.filename for file in vote.campaign_material_nay} == {
+        'campaign_material_nay-1.png', 'campaign_material_nay-2.png'
+    }
+
+    assert set(vote.posters(DummyRequest())['yea']) == {
+        (str(file), None, 'Swissvotes database')
+        for file in vote.campaign_material_yea
+    }
+    assert set(vote.posters(DummyRequest())['nay']) == {
+        (str(file), None, 'Swissvotes database')
+        for file in vote.campaign_material_nay
+    }
 
 
 def test_model_column_mapper():

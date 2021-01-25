@@ -570,3 +570,64 @@ def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
     for name in attachment_urls[locale].values():
         view = client.get(f'{page.request.url}/{name}')
         assert view.status_code in (200, 301, 302)
+
+
+def test_view_vote_campaign_material(swissvotes_app, sample_vote,
+                                     campaign_material):
+
+    session = swissvotes_app.session()
+    session.add(sample_vote)
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    page = client.get('/').maybe_follow().click('Abstimmungen')
+    page = page.click('Details')
+
+    # Yea
+    manage = page.click('Kampagnenmaterial Ja')
+    assert 'Keine Anhänge.' in manage
+
+    # ... upload
+    manage.form['file'] = Upload(
+        '1.png',
+        campaign_material['campaign_material_yea-1.png'].reference.file.read(),
+        'image/png'
+    )
+    manage = manage.form.submit().maybe_follow()
+    assert manage.status_code == 200
+
+    manage = page.click('Kampagnenmaterial Ja')
+    assert '1.png' in manage
+    assert manage.click('1.png').content_type == 'image/png'
+
+    # ... delete
+    manage = manage.click('Löschen').form.submit().maybe_follow()
+    assert 'Keine Anhänge.' in manage
+
+    # Nay
+    manage = page.click('Kampagnenmaterial Nein')
+    assert 'Keine Anhänge.' in manage
+
+    # ... upload
+    manage.form['file'] = Upload(
+        '1.png',
+        campaign_material['campaign_material_nay-1.png'].reference.file.read(),
+        'image/png'
+    )
+    manage = manage.form.submit().maybe_follow()
+    assert manage.status_code == 200
+
+    manage = page.click('Kampagnenmaterial Nein')
+    assert '1.png' in manage
+    assert manage.click('1.png').content_type == 'image/png'
+
+    # ... delete
+    manage = manage.click('Löschen').form.submit().maybe_follow()
+    assert 'Keine Anhänge.' in manage

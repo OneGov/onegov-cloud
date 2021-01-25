@@ -347,16 +347,16 @@
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="vote.posters['yea']">
+                    <tr tal:condition="posters['yea']">
                         <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a Yes</th>
                         <td>
-                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.posters['yea']; id_suffix 'yea'" />
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['yea']; id_suffix 'yea'" />
                         </td>
                     </tr>
-                    <tr tal:condition="vote.posters['nay']">
+                    <tr tal:condition="posters['nay']">
                         <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a No</th>
                         <td>
-                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.posters['nay']; id_suffix 'nay'" />
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['nay']; id_suffix 'nay'" />
                         </td>
                     </tr>
                 </tbody>

@@ -1,3 +1,31 @@
+from onegov.file import AssociatedFiles
+from onegov.file import File
+
+
+class SwissVoteFile(File):
+    """ An attachment to a vote. """
+
+    __mapper_args__ = {'polymorphic_identity': 'swissvote'}
+
+    @property
+    def filename(self):
+        return self.reference.filename
+
+
+class FileSubCollection(object):
+    """ """
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        if instance:
+            return [
+                file for file in instance.files
+                if file.name.startswith(self.name)
+            ]
+
+
 class LocalizedFile(object):
     """ A helper for localized files.
 
@@ -11,6 +39,11 @@ class LocalizedFile(object):
             pdf = LocalizedFile()
 
     """
+
+    def __init__(self, extension, label, static_views):
+        self.extension = extension
+        self.label = label
+        self.static_views = static_views or {}
 
     def __set_name__(self, owner, name):
         self.name = name
@@ -49,3 +82,14 @@ class LocalizedFile(object):
 
     def __delete__(self, instance):
         self.__delete_by_locale__(instance)
+
+
+class LocalizedFiles(AssociatedFiles):
+
+    @classmethod
+    def localized_files(cls):
+        return {
+            name: attribute
+            for name, attribute in cls.__dict__.items()
+            if isinstance(attribute, LocalizedFile)
+        }

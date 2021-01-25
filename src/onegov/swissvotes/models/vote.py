@@ -5,12 +5,12 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
-from onegov.file import AssociatedFiles
-from onegov.file import File
 from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
-from onegov.swissvotes.models.localized_file import LocalizedFile
+from onegov.swissvotes.models.file import LocalizedFile
+from onegov.swissvotes.models.file import LocalizedFiles
+from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
 from sqlalchemy import Column
@@ -25,12 +25,6 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
-
-
-class SwissVoteFile(File):
-    """ An attachment to a vote. """
-
-    __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
 
 class encoded_property(object):
@@ -57,7 +51,7 @@ class encoded_property(object):
         return instance.codes(self.name, instance.deciding_question).get(value)
 
 
-class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
+class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     """ A single vote as defined by the code book.
 
@@ -274,21 +268,22 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     posters_sa_yea_imgs = meta_property(default=dict)
     posters_sa_nay_imgs = meta_property(default=dict)
 
-    @cached_property
-    def posters(self):
+    def posters(self, request):
         result = {'yea': [], 'nay': []}
         for key, attribute, label in (
-            ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
-            ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
-            ('yea', 'posters_sa_yea', _('Link Social Archives')),
-            ('nay', 'posters_sa_nay', _('Link Social Archives')),
+            ('yea', 'posters_mfg_yea_imgs', _('Link eMuseum.ch')),
+            ('nay', 'posters_mfg_nay_imgs', _('Link eMuseum.ch')),
+            ('yea', 'posters_sa_yea_imgs', _('Link Social Archives')),
+            ('nay', 'posters_sa_nay_imgs', _('Link Social Archives')),
         ):
-            urls = getattr(self, attribute, None) or ''
-            images = getattr(self, f'{attribute}_imgs') or {}
-            for url in urls.strip().split(' '):
-                image_url = images.get(url)
-                if url and image_url:
-                    result[key].append((url, image_url, label))
+            for url, image in getattr(self, attribute).items():
+                result[key].append((image, url, label))
+        for key, attribute, label in (
+            ('yea', 'campaign_material_yea', _('Swissvotes database')),
+            ('nay', 'campaign_material_nay', _('Swissvotes database')),
+        ):
+            for image in getattr(self, attribute):
+                result[key].append((request.link(image), None, label))
         return result
 
     # Post-vote poll
@@ -843,21 +838,123 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         return False
 
     # attachments
-    voting_text = LocalizedFile()
-    brief_description = LocalizedFile()
-    federal_council_message = LocalizedFile()
-    parliamentary_debate = LocalizedFile()
-    voting_booklet = LocalizedFile()
-    resolution = LocalizedFile()
-    realization = LocalizedFile()
-    ad_analysis = LocalizedFile()
-    results_by_domain = LocalizedFile()
-    foeg_analysis = LocalizedFile()
-    post_vote_poll = LocalizedFile()
-    post_vote_poll_methodology = LocalizedFile()
-    post_vote_poll_dataset = LocalizedFile()
-    post_vote_poll_codebook = LocalizedFile()
-    preliminary_examination = LocalizedFile()
+    voting_text = LocalizedFile(
+        label=_('Voting text'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'abstimmungstext-de.pdf',
+            'fr_CH': 'abstimmungstext-fr.pdf',
+        }
+    )
+    brief_description = LocalizedFile(
+        label=_('Brief description Swissvotes'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'kurzbeschreibung.pdf',
+        }
+    )
+    federal_council_message = LocalizedFile(
+        label=_('Federal council message'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'botschaft-de.pdf',
+            'fr_CH': 'botschaft-fr.pdf',
+        }
+    )
+    parliamentary_debate = LocalizedFile(
+        label=_('Parliamentary debate'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'parlamentsberatung.pdf',
+        }
+    )
+    voting_booklet = LocalizedFile(
+        label=_('Voting booklet'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'brochure-de.pdf',
+            'fr_CH': 'brochure-fr.pdf',
+        }
+    )
+    resolution = LocalizedFile(
+        label=_('Resolution'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'erwahrung-de.pdf',
+            'fr_CH': 'erwahrung-fr.pdf',
+        }
+    )
+    realization = LocalizedFile(
+        label=_('Realization'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'zustandekommen-de.pdf',
+            'fr_CH': 'zustandekommen-fr.pdf',
+        }
+    )
+    ad_analysis = LocalizedFile(
+        label=_('Analysis of the advertising campaign by Année Politique'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'inserateanalyse.pdf',
+        }
+    )
+    results_by_domain = LocalizedFile(
+        label=_('Result by canton, district and municipality'),
+        extension='xlsx',
+        static_views={
+            'de_CH': 'staatsebenen.xlsx',
+        }
+    )
+    foeg_analysis = LocalizedFile(
+        label=_('Media coverage: fög analysis'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'medienanalyse.pdf',
+        }
+    )
+    post_vote_poll = LocalizedFile(
+        label=_('Full analysis of post-vote poll results'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-de.pdf',
+            'fr_CH': 'nachbefragung-fr.pdf',
+        }
+    )
+    post_vote_poll_methodology = LocalizedFile(
+        label=_('Questionnaire of the poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-methode-de.pdf',
+            'fr_CH': 'nachbefragung-methode-fr.pdf',
+        }
+    )
+    post_vote_poll_dataset = LocalizedFile(
+        label=_('Dataset of the post-vote poll'),
+        extension='csv',
+        static_views={
+            'de_CH': 'nachbefragung.csv',
+        }
+    )
+    post_vote_poll_codebook = LocalizedFile(
+        label=_('Codebook for the post-vote poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-codebuch-de.pdf',
+            'fr_CH': 'nachbefragung-codebuch-fr.pdf',
+        }
+    )
+    preliminary_examination = LocalizedFile(
+        label=_('Preliminary examination'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'vorpruefung-de.pdf',
+            'fr_CH': 'vorpruefung-fr.pdf',
+        }
+    )
+
+    campaign_material_yea = FileSubCollection()
+    campaign_material_nay = FileSubCollection()
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))
@@ -896,16 +993,17 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     def files_observer(self, files):
         self.vectorize_files()
 
-    def get_file(self, name, request):
-        """ Returns the requested localized file, falls back to the default
-        locale.
+    def get_file(self, name, locale=None, fallback=True):
+        """ Returns the requested localized file.
+
+        Uses the current locale if no locale is given.
+
+        Falls back to the default locale if the file is not available in the
+        requested locale.
 
         """
-        fallback = SwissVote.__dict__.get(name).__get_by_locale__(
-            self, request.app.default_locale
-        )
-        return getattr(self, name, None) or fallback
-
-    def get_file_by_locale(self, name, locale):
-        return SwissVote.__dict__.get(name).__get_by_locale__(
-            self, locale)
+        get = SwissVote.__dict__.get(name).__get_by_locale__
+        default_locale = self.session_manager.default_locale
+        fallback = get(self, default_locale) if fallback else None
+        result = get(self, locale) if locale else getattr(self, name, None)
+        return result or fallback
