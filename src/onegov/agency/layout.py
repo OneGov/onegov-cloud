@@ -419,21 +419,22 @@ class UserGroupCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        return [
-            LinkGroup(
-                title=_('Add'),
-                links=[
-                    Link(
-                        text=_('User Group'),
-                        url=self.request.link(
-                            self.model,
-                            name='new'
-                        ),
-                        attrs={'class': 'new-user'}
-                    )
-                ]
-            ),
-        ]
+        if self.request.is_admin:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('User Group'),
+                            url=self.request.link(
+                                self.model,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-user'}
+                        )
+                    ]
+                ),
+            ]
 
 
 class UserGroupLayout(DefaultLayout):
@@ -452,29 +453,30 @@ class UserGroupLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        return [
-            Link(
-                text=_("Edit"),
-                url=self.request.link(self.model, 'edit'),
-                attrs={'class': 'edit-link'}
-            ),
-            Link(
-                text=_("Delete"),
-                url=self.csrf_protected_url(
-                    self.request.link(self.model)
+        if self.request.is_admin:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
                 ),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _("Do you really want to delete this user group?"),
-                        _("This cannot be undone."),
-                        _("Delete user group"),
-                        _("Cancel")
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
                     ),
-                    Intercooler(
-                        request_method='DELETE',
-                        redirect_after=self.request.link(self.collection)
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this user group?"),
+                            _("This cannot be undone."),
+                            _("Delete user group"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
                     )
                 )
-            )
-        ]
+            ]
