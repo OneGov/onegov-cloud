@@ -268,21 +268,22 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     posters_sa_yea_imgs = meta_property(default=dict)
     posters_sa_nay_imgs = meta_property(default=dict)
 
-    @cached_property
-    def posters(self):
+    def posters(self, request):
         result = {'yea': [], 'nay': []}
         for key, attribute, label in (
-            ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
-            ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
-            ('yea', 'posters_sa_yea', _('Link Social Archives')),
-            ('nay', 'posters_sa_nay', _('Link Social Archives')),
+            ('yea', 'posters_mfg_yea_imgs', _('Link eMuseum.ch')),
+            ('nay', 'posters_mfg_nay_imgs', _('Link eMuseum.ch')),
+            ('yea', 'posters_sa_yea_imgs', _('Link Social Archives')),
+            ('nay', 'posters_sa_nay_imgs', _('Link Social Archives')),
         ):
-            urls = getattr(self, attribute, None) or ''
-            images = getattr(self, f'{attribute}_imgs') or {}
-            for url in urls.strip().split(' '):
-                image_url = images.get(url)
-                if url and image_url:
-                    result[key].append((url, image_url, label))
+            for url, image in getattr(self, attribute).items():
+                result[key].append((image, url, label))
+        for key, attribute, label in (
+            ('yea', 'campaign_material_yea', _('Swissvotes database')),
+            ('nay', 'campaign_material_nay', _('Swissvotes database')),
+        ):
+            for image in getattr(self, attribute):
+                result[key].append((request.link(image), None, label))
         return result
 
     # Post-vote poll

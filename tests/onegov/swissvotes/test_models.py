@@ -23,6 +23,9 @@ class DummyRequest(object):
             return text.interpolate()
         return text
 
+    def link(self, target):
+        return str(target)
+
 
 def test_model_actor():
     actor = Actor('csp')
@@ -870,18 +873,18 @@ def test_model_vote(session, sample_vote):
 
     assert vote.has_national_council_share_data is True
 
-    assert vote.posters == {
+    assert vote.posters(DummyRequest()) == {
         'nay': [
             (
-                'https://no.com/objects/3',
                 'https://detail.com/3',
+                'https://no.com/objects/3',
                 'Link Social Archives'
             )
         ],
         'yea': [
             (
-                'https://yes.com/objects/1',
                 'https://detail.com/1',
+                'https://yes.com/objects/1',
                 'Link eMuseum.ch'
             )
         ]
@@ -1044,6 +1047,15 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     }
     assert {file.filename for file in vote.campaign_material_nay} == {
         'campaign_material_nay-1.png', 'campaign_material_nay-2.png'
+    }
+
+    assert set(vote.posters(DummyRequest())['yea']) == {
+        (str(file), None, 'Swissvotes database')
+        for file in vote.campaign_material_yea
+    }
+    assert set(vote.posters(DummyRequest())['nay']) == {
+        (str(file), None, 'Swissvotes database')
+        for file in vote.campaign_material_nay
     }
 
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-01-19 09:25+0100\n"
+"POT-Creation-Date: 2021-01-25 10:16+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -213,6 +213,12 @@ msgstr "Nouvelle page"
 
 msgid "Delete attachment"
 msgstr "Supprimer la pièce jointe"
+
+msgid "Campaign material for a Yes"
+msgstr "Matériel de campagne pour le oui"
+
+msgid "Campaign material for a No"
+msgstr "Matériel de campagne pour le non"
 
 msgid "Delete vote"
 msgstr "Supprimer cette votation"
@@ -1433,6 +1439,15 @@ msgstr "Lien eMuseum.ch"
 msgid "Link Social Archives"
 msgstr "Lien Archives Sociales"
 
+msgid "Swissvotes database"
+msgstr "Base de données Swissvotes"
+
+msgid "Analysis of the advertising campaign by Année Politique"
+msgstr "Analyse APS des annonces de campagne"
+
+msgid "Media coverage: fög analysis"
+msgstr "Couverture médiatique: analyse fög"
+
 msgid "Attachment"
 msgstr "Pièce jointe"
 
@@ -1669,9 +1684,6 @@ msgstr ""
 "été publiées. Pour plus de détails, voir l'analyse APS sur la campagne "
 "d'annonces."
 
-msgid "Analysis of the advertising campaign by Année Politique"
-msgstr "Analyse APS des annonces de campagne"
-
 msgid "Media coverage: number of articles"
 msgstr "Couverture médiatique: nombre d'articles"
 
@@ -1709,15 +1721,6 @@ msgstr "(majoritairement en faveur)"
 
 msgid "(predominantly negative)"
 msgstr "(majoritairement en défaveur)"
-
-msgid "Media coverage: fög analysis"
-msgstr "Couverture médiatique: analyse fög"
-
-msgid "Campaign material for a Yes"
-msgstr "Matériel de campagne pour le oui"
-
-msgid "Campaign material for a No"
-msgstr "Matériel de campagne pour le non"
 
 msgid "People"
 msgstr "Peuple"

@@ -48,6 +48,7 @@ def view_vote(self, request):
         'prev': prev,
         'next': next,
         'map_preview': request.link(StaticFile('images/map-preview.png')),
+        'posters': self.posters(request)
     }
 
 
