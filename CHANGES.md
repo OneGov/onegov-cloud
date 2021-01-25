@@ -1,8 +1,28 @@
 # Changes
 
+## Release `2021.12`
+
+> commits: **3 / [2846cafe60...1aa4a36cc5](https://github.com/OneGov/onegov-cloud/compare/2846cafe60^...1aa4a36cc5)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.12)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+✨ **Adds mapdata 2021**
+
+created with seantis.swiss-maps
+
+**`Other`** | **[1aa4a36cc5](https://github.com/onegov/onegov-cloud/commit/1aa4a36cc5928d28708783423c1a47111141ffd3)**
+
+### Swissvotes
+
+🐞 **Style buttons**
+
+**`Bugfix`** | **[VOTES-93](https://issues.seantis.ch/browse/VOTES-93)** | **[a0e3faddbc](https://github.com/onegov/onegov-cloud/commit/a0e3faddbc9869c9f3ddaee5f48428a3aff0d246)**
+
 ## Release `2021.11`
 
-> commits: **1 / [81a83d3f9c...81a83d3f9c](https://github.com/OneGov/onegov-cloud/compare/81a83d3f9c^...81a83d3f9c)**  
+> released: **2021-01-22 11:54**<br>
+> commits: **2 / [81a83d3f9c...d9b16784bd](https://github.com/OneGov/onegov-cloud/compare/81a83d3f9c^...d9b16784bd)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.11)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
