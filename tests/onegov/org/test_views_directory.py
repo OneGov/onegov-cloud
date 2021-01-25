@@ -423,6 +423,7 @@ def test_directory_visibility(client):
     page.form.submit()
 
     page = client.get('/directories/clubs')
+    assert len(page.pyquery('.publication-nav a')) == 3
     page = page.click('Eintrag', index=0)
     page.form['name'] = 'Soccer Club'
     page.form.submit()
@@ -433,6 +434,7 @@ def test_directory_visibility(client):
     assert "Soccer" in page
     assert 'The famous club directory' in page
     assert "Soccer" in anon.get('/directories/clubs/soccer-club')
+    assert not page.pyquery('.publication-nav')
 
     page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
     page.form['access'] = 'private'
@@ -468,11 +470,18 @@ def test_directory_visibility(client):
     # tests the links in the view as well
     page = client.get('/directories').click('Clubs')
     assert "Soccer" in page
-    assert 'published_ony' not in page.request.url
+    assert 'published_only=0' in page.request.url
 
     page = anon.get('/directories').click('Clubs')
     assert "Soccer" not in page
     assert 'published_only=1' in page.request.url
     # tests that we still trigger published_only to hide the entry
     # not adding the url kwarg
-    assert 'Soccer' not in anon.get('/directories/clubs')
+    page = anon.get('/directories/clubs')
+    assert 'Soccer' not in page
+    assert not page.pyquery('.publication-nav')
+
+    editor = client.spawn()
+    editor.login_editor()
+    page = editor.get('/directories').click('Clubs')
+    assert len(page.pyquery('.publication-nav a')) == 3

@@ -43,6 +43,9 @@ class Client(BaseClient):
     skip_first_form = True
     use_intercooler = True
 
+    def login_member(self, to=None):
+        return self.login('member@example.org', 'hunter2', to)
+
     def bound_reserve(self, allocation):
 
         default_start = '{:%H:%M}'.format(allocation.start)

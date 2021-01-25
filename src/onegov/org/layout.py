@@ -2162,9 +2162,16 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
     @property
     def publication_filters(self):
+        if not self.request.is_logged_in:
+            return {}
+        if self.request.is_manager:
+            return dict(
+                published_only=_('Published'),
+                upcoming_only=_("Upcoming"),
+                past_only=_("Past"),
+            )
         return dict(
             published_only=_('Published'),
-            upcoming_only=_("Upcoming"),
             past_only=_("Past"),
         )
 
