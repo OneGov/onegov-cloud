@@ -143,15 +143,26 @@ Intercooler.ready(function(element) {
 
 // lazy-loaded BFS map
 $(document).ready(function() {
-    $('.bfs-map.button').click(function(e) {
-        var btn = $(this);
-        var url = btn.attr('href');
+    $('.bfs-map .button').click(function(e) {
+        var title = $('.bfs-map th').text();
+        var titleBlock = $('<div class="bfs-map-title"/>');
+        titleBlock.text(title);
 
+        var url = $(this).attr('href');
         var map = $('<iframe />');
         map.attr('src', url);
+        var container = $('<div />');
+        container.append(map);
 
-        var container = $('<div class="bfs-map" />').append(map);
-        btn.replaceWith(container);
+        var row = $('<tr class="bfs-map" />');
+        var cell = $('<td />');
+        cell.attr('colspan', '2');
+        cell.append(titleBlock);
+        cell.append(container);
+
+        row.append(cell);
+        $('.bfs-map').replaceWith(row);
+
         e.preventDefault();
     });
 });
