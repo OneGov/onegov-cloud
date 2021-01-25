@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.13`
+
+> commits: **2 / [94fc57a659...a7a09ddb8e](https://github.com/OneGov/onegov-cloud/compare/94fc57a659^...a7a09ddb8e)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.13)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🎉 **Add additional campaign material.**
+
+**`Feature`** | **[VOTES-74](https://issues.seantis.ch/browse/VOTES-74)** | **[94fc57a659](https://github.com/onegov/onegov-cloud/commit/94fc57a6596bdbf436965e2be7523a9828dd0bd9)**
+
 ## Release `2021.12`
 
-> commits: **3 / [2846cafe60...1aa4a36cc5](https://github.com/OneGov/onegov-cloud/compare/2846cafe60^...1aa4a36cc5)**  
+> released: **2021-01-25 11:17**<br>
+> commits: **4 / [2846cafe60...6ddb46fe43](https://github.com/OneGov/onegov-cloud/compare/2846cafe60^...6ddb46fe43)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.12)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
