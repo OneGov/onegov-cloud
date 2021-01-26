@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.15`
+
+> commits: **3 / [fdf268b20b...f9cc038e3d](https://github.com/OneGov/onegov-cloud/compare/fdf268b20b^...f9cc038e3d)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.15)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes sponsor banner using flex**
+
+**`Bugfix`** | **[FER-939](https://issues.seantis.ch/browse/FER-939)** | **[38e00d10ee](https://github.com/onegov/onegov-cloud/commit/38e00d10ee18bcc8139606e24a08d55c061472e9)**
+
 ## Release `2021.14`
 
-> commits: **5 / [96b44db181...8ccc7ba2ca](https://github.com/OneGov/onegov-cloud/compare/96b44db181^...8ccc7ba2ca)**  
+> released: **2021-01-26 10:36**<br>
+> commits: **6 / [96b44db181...3bbbe1ee99](https://github.com/OneGov/onegov-cloud/compare/96b44db181^...3bbbe1ee99)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.14)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
