@@ -1,8 +1,30 @@
 # Changes
 
+## Release `2021.14`
+
+> commits: **5 / [96b44db181...8ccc7ba2ca](https://github.com/OneGov/onegov-cloud/compare/96b44db181^...8ccc7ba2ca)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.14)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Hides publication filter panel for members/anon users**
+
+**`Bugfix`** | **[SEA-93](https://linear.app/seantis/issue/SEA-93)** | **[96b44db181](https://github.com/onegov/onegov-cloud/commit/96b44db1816f4c66d57a4a641318b22d9a1cdda4)**
+
+### Swissvotes
+
+🎉 **Show ID in election and vote management tables.**
+
+**`Feature`** | **[e31ea2cfb2](https://github.com/onegov/onegov-cloud/commit/e31ea2cfb21e13e4334f6d360385956e07237162)**
+
+🎉 **Sort additional campaign material by filename.**
+
+**`Feature`** | **[VOTES-74](https://issues.seantis.ch/browse/VOTES-74)** | **[fa1851974c](https://github.com/onegov/onegov-cloud/commit/fa1851974cf1a3d60c76949025a0011d005b37b8)**
+
 ## Release `2021.13`
 
-> commits: **2 / [94fc57a659...a7a09ddb8e](https://github.com/OneGov/onegov-cloud/compare/94fc57a659^...a7a09ddb8e)**  
+> released: **2021-01-25 12:23**<br>
+> commits: **3 / [94fc57a659...6f4055edf7](https://github.com/OneGov/onegov-cloud/compare/94fc57a659^...6f4055edf7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.13)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
