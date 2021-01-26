@@ -348,13 +348,13 @@
                         </td>
                     </tr>
                     <tr tal:condition="posters['yea']">
-                        <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a Yes</th>
+                        <th class="column-30" i18n:translate="">Campaign material for a Yes</th>
                         <td>
                             <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['yea']; id_suffix 'yea'" />
                         </td>
                     </tr>
                     <tr tal:condition="posters['nay']">
-                        <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a No</th>
+                        <th class="column-30" i18n:translate="">Campaign material for a No</th>
                         <td>
                             <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['nay']; id_suffix 'nay'" />
                         </td>
