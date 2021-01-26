@@ -20,10 +20,10 @@ class FileSubCollection(object):
 
     def __get__(self, instance, owner):
         if instance:
-            return [
+            return sorted([
                 file for file in instance.files
                 if file.name.startswith(self.name)
-            ]
+            ], key=lambda file: file.name)
 
 
 class LocalizedFile(object):
