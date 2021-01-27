@@ -39,7 +39,7 @@ class UserGroupForm(Form):
         ]
 
     def update_model(self, model):
-        user_ids = {str(r.id) for r in self.model.users.with_entities(User.id)}
+        user_ids = {str(r.id) for r in model.users.with_entities(User.id)}
         user_ids |= set(self.users.data)
         users = UserCollection(self.request.session).query()
         users = users.filter(User.id.in_(user_ids)).all()
