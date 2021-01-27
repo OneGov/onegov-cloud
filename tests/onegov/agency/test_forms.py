@@ -5,11 +5,14 @@ from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.forms import MoveAgencyForm
 from onegov.agency.forms import MutationForm
+from onegov.agency.forms import UserGroupForm
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
+from onegov.user import UserCollection
+from onegov.user import UserGroupCollection
 from tempfile import TemporaryFile
-from pytest import mark
+from unittest.mock import MagicMock
 
 
 class DummyApp(object):
@@ -21,13 +24,16 @@ class DummyApp(object):
 
 
 class DummyRequest(object):
-    def __init__(self, session, principal=None, private=False, secret=False):
+    def __init__(self, session, principal=None, private=False, secret=False,
+                 permissions=None, current_user=None):
         self.app = DummyApp(session, principal)
         self.session = session
         self.private = private
         self.secret = secret
         self.locale = 'de_CH'
         self.time_zone = 'Europe/Zurich'
+        self.permissions = permissions or {}
+        self.current_user = current_user
 
     def is_private(self, model):
         return self.private
@@ -40,6 +46,10 @@ class DummyRequest(object):
 
     def translate(self, text):
         return text.interpolate()
+
+    def has_permission(self, model, permission):
+        permissions = self.permissions.get(model.__class__.__name__, [])
+        return permission.__name__ in permissions
 
 
 class DummyPostData(dict):
@@ -110,9 +120,11 @@ def test_extended_agency_form_choices():
         assert hasattr(models[model], attribute)
 
 
-@mark.skip('Fix me!')
 def test_move_agency_form(session):
-    # todo: test if agencies with no permission are remove properly
+    all_permissions = {
+        'ExtendedAgency': ['Private'],
+        'ExtendedAgencyCollection': ['Private']
+    }
 
     agencies = ExtendedAgencyCollection(session)
     agency_a = agencies.add_root(title="a")
@@ -124,7 +136,29 @@ def test_move_agency_form(session):
 
     # request
     form = MoveAgencyForm()
+
     form.request = DummyRequest(session)
+    form.on_request()
+    assert form.parent_id.choices == []
+
+    form.request = DummyRequest(session, permissions={
+        'ExtendedAgency': ['Private']
+    })
+    form.on_request()
+    assert form.parent_id.choices == [
+        ('1', 'a'), ('2', 'a.1'), ('3', 'a.2'), ('4', 'a.2.1'),
+        ('6', 'ç'), ('5', 'f')
+    ]
+
+    form.request = DummyRequest(session, permissions={
+        'ExtendedAgencyCollection': ['Private']
+    })
+    form.on_request()
+    assert form.parent_id.choices == [
+        ('root', '- Root -'),
+    ]
+
+    form.request = DummyRequest(session, permissions=all_permissions)
     form.on_request()
     assert form.parent_id.choices == [
         ('root', '- Root -'),
@@ -164,24 +198,24 @@ def test_move_agency_form(session):
     # update
     model = ExtendedAgency(title="Agency")
     form = MoveAgencyForm()
-    form.request = DummyRequest(session)
+    form.request = DummyRequest(session, permissions=all_permissions)
     form.update_model(model)
     assert model.parent_id == None
 
     form = MoveAgencyForm(DummyPostData({'parent_id': 'root'}))
-    form.request = DummyRequest(session)
+    form.request = DummyRequest(session, permissions=all_permissions)
     form.update_model(model)
     assert model.parent_id == None
 
     form = MoveAgencyForm(DummyPostData({'parent_id': '10'}))
-    form.request = DummyRequest(session)
+    form.request = DummyRequest(session, permissions=all_permissions)
     form.update_model(model)
     assert model.parent_id == 10
 
     # update with rename
     agency_a_2_2 = agencies.add(title="a.2", parent=agency_a_2)
     form = MoveAgencyForm(DummyPostData({'parent_id': agency_a_2.parent_id}))
-    form.request = DummyRequest(session)
+    form.request = DummyRequest(session, permissions=all_permissions)
     form.update_model(agency_a_2_2)
     session.flush()
 
@@ -256,4 +290,65 @@ def test_mutation_form():
     }
 
 
-# todo: UserGroupForm
+def test_user_group_form(session):
+    users = UserCollection(session)
+    user_a = users.add(username='a@example.org', password='a', role='member')
+    user_b = users.add(username='b@example.org', password='b', role='member')
+    user_c = users.add(username='c@example.org', password='c', role='member')
+    user_a.logout_all_sessions = MagicMock()
+    user_b.logout_all_sessions = MagicMock()
+    user_c.logout_all_sessions = MagicMock()
+
+    agencies = ExtendedAgencyCollection(session)
+    agency_a = agencies.add_root(title="a")
+    agency_a_1 = agencies.add(title="a.1", parent=agency_a)
+    agency_b = agencies.add_root(title="b")
+
+    request = DummyRequest(session)
+    form = UserGroupForm()
+    form.request = request
+    form.on_request()
+
+    # choices
+    assert sorted([x[1] for x in form.users.choices]) == [
+        'a@example.org', 'b@example.org', 'c@example.org',
+    ]
+    assert sorted([x[1] for x in form.agencies.choices]) == ['a', 'a.1', 'b']
+
+    # apply / update
+    groups = UserGroupCollection(session)
+    group = groups.add(name='A')
+
+    form.apply_model(group)
+    assert form.name.data == 'A'
+    assert form.users.data == []
+    assert form.agencies.data == []
+
+    form.name.data = 'A/B'
+    form.users.data = [str(user_a.id), str(user_b.id)]
+    form.agencies.data = [str(agency_a.id), str(agency_b.id)]
+    form.update_model(group)
+    assert group.users.count() == 2
+    assert group.role_mappings.count() == 2
+    assert user_a.logout_all_sessions.called is True
+    assert user_b.logout_all_sessions.called is True
+    assert user_c.logout_all_sessions.called is False
+
+    form.apply_model(group)
+    assert form.name.data == 'A/B'
+    assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
+    assert set(form.agencies.data) == {str(agency_a.id), str(agency_b.id)}
+
+    user_a.logout_all_sessions.reset_mock()
+    user_b.logout_all_sessions.reset_mock()
+    user_c.logout_all_sessions.reset_mock()
+
+    form.name.data = 'A.1'
+    form.users.data = [str(user_c.id)]
+    form.agencies.data = [str(agency_a_1.id)]
+    form.update_model(group)
+    assert group.users.one() == user_c
+    assert group.role_mappings.one().content_id == str(agency_a_1.id)
+    assert user_a.logout_all_sessions.called is True
+    assert user_b.logout_all_sessions.called is True
+    assert user_c.logout_all_sessions.called is True

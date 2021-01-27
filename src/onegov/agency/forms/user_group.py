@@ -47,6 +47,8 @@ class UserGroupForm(Form):
             if user != self.request.current_user:
                 user.logout_all_sessions(self.request)
 
+        users = UserCollection(self.request.session).query()
+        users = users.filter(User.id.in_(self.users.data)).all()
         model.name = self.name.data
         model.users = users
         model.role_mappings = [
@@ -61,5 +63,5 @@ class UserGroupForm(Form):
     def apply_model(self, model):
         mappings = model.role_mappings.all()
         self.name.data = model.name
-        self.users.data = [str(u.id) for u in self.model.users]
+        self.users.data = [str(u.id) for u in model.users]
         self.agencies.data = [m.content_id for m in mappings]
