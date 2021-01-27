@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2021.16`
+
+> commits: **2 / [7ae32f5cf1...740d0e1a1d](https://github.com/OneGov/onegov-cloud/compare/7ae32f5cf1^...740d0e1a1d)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.16)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🐞 **Fixes creating new user group throwing an error.**
+
+**`Bugfix`** | **[7ae32f5cf1](https://github.com/onegov/onegov-cloud/commit/7ae32f5cf182776559aebead77997f8e3269b3ce)**
+
+🐞 **Fixes user group not removing users.**
+
+**`Bugfix`** | **[740d0e1a1d](https://github.com/onegov/onegov-cloud/commit/740d0e1a1db6636cd555d6341cd0fe59e56b50d4)**
+
 ## Release `2021.15`
 
-> commits: **3 / [fdf268b20b...f9cc038e3d](https://github.com/OneGov/onegov-cloud/compare/fdf268b20b^...f9cc038e3d)**  
+> released: **2021-01-26 13:27**<br>
+> commits: **4 / [fdf268b20b...bbe5395fa2](https://github.com/OneGov/onegov-cloud/compare/fdf268b20b^...bbe5395fa2)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.15)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
