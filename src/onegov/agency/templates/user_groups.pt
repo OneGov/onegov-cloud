@@ -23,7 +23,6 @@
                 </table>
             </div>
             <div class="columns medium-3 filter-panel">
-              <!-- todo: filters -->
             </div>
         </div>
     </tal:b>

@@ -5,6 +5,7 @@ from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
+from onegov.core.utils import Bunch
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import Person
@@ -52,7 +53,19 @@ def test_extended_agency(agency_app):
     agency.access = 'private'
     assert agency.es_public is False
 
-    # todo: test deletable
+    assert agency.deletable(Bunch(is_admin=False)) is True
+    assert agency.deletable(Bunch(is_admin=True)) is True
+
+    session.add(
+        ExtendedAgency(
+            title="Sub Agency",
+            name="sub-agency",
+            parent=agency
+        )
+    )
+    session.flush()
+    assert agency.deletable(Bunch(is_admin=False)) is False
+    assert agency.deletable(Bunch(is_admin=True)) is True
 
 
 def test_extended_agency_add_person(session):
@@ -147,12 +160,13 @@ def test_extended_person(session):
     person.access = 'private'
     assert person.es_public is False
 
-    # todo: test deletable
+    assert person.deletable(Bunch(is_admin=False)) is True
+    assert person.deletable(Bunch(is_admin=True)) is True
 
 
 def test_extended_membership(session):
-    agency = Agency(title='agency', name='agency')
-    person = Person(first_name='a', last_name='person')
+    agency = ExtendedAgency(title='agency', name='agency')
+    person = ExtendedPerson(first_name='a', last_name='person')
     session.add(agency)
     session.add(person)
     session.flush()
@@ -200,6 +214,11 @@ def test_extended_membership(session):
     membership.agency.meta['access'] = 'public'
     membership.person.meta['access'] = 'private'
     assert membership.es_public is False
+
+    assert agency.deletable(Bunch(is_admin=False)) is False
+    assert agency.deletable(Bunch(is_admin=True)) is True
+    assert person.deletable(Bunch(is_admin=False)) is False
+    assert person.deletable(Bunch(is_admin=True)) is True
 
 
 def test_agency_move(session):

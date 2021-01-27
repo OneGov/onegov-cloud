@@ -3,7 +3,6 @@ from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from PyPDF2 import PdfFileReader
 from pytest import mark
-from onegov.pdf import Pdf
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 
 
@@ -397,6 +396,17 @@ def test_view_report_change(client):
     new = agency.click("Mitgliedschaft", href='new')
     new.form['title'] = "Doctor"
     new.form['person_id'].select(text="Rivera Nick")
+    new.form.submit().follow()
+
+    new = client.get('/organizations').click("Organisation", href='new')
+    new.form['title'] = "School"
+    new.form.submit().follow()
+
+    new = client.get('/usergroups').click("Benutzergruppe", href='new')
+    new.form['name'] = "School Editors"
+    new.form['users'].select_multiple(texts=["member@example.org"])
+    new.form['agencies'].select_multiple(texts=["School"])
+    new.form.submit().follow()
 
     # Report agency change
     change = agency.click("Mutation melden")
@@ -413,23 +423,14 @@ def test_view_report_change(client):
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
-    ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
-    ticket = client.get(ticket_number)
-    assert "Mutationsmeldung" in ticket
-    assert "Hospital Springfield" in ticket
-    assert linkified in ticket
-    assert "info@hospital-springfield.com" in ticket
-    ticket = ticket.click("Ticket annehmen").follow()
-    ticket = ticket.click("Ticket abschliessen").follow()
-
-    agency.click("Löschen")
-
-    ticket = client.get(ticket_number)
-    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
-    assert "Mutationsmeldung" in ticket
-    assert "Hospital Springfield" in ticket
-    assert linkified in ticket
-    assert "info@hospital-springfield.com" in ticket
+    agency_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
+    agency_ticket = client.get(agency_ticket_number)
+    assert "Mutationsmeldung" in agency_ticket
+    assert "Hospital Springfield" in agency_ticket
+    assert linkified in agency_ticket
+    assert "info@hospital-springfield.com" in agency_ticket
+    agency_ticket = agency_ticket.click("Ticket annehmen").follow()
+    agency_ticket = agency_ticket.click("Ticket abschliessen").follow()
 
     # Report person change
     change = person.click("Mutation melden")
@@ -438,18 +439,36 @@ def test_view_report_change(client):
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
-    ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
-    ticket = client.get(ticket_number)
-    assert "Mutationsmeldung" in ticket
-    assert "Rivera Nick" in ticket
-    assert "Dr. Rivera's retired." in ticket
-    assert "info@hospital-springfield.com" in ticket
-    ticket = ticket.click("Ticket annehmen").follow()
-    ticket = ticket.click("Ticket abschliessen").follow()
+    person_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
+    person_ticket = client.get(person_ticket_number)
+    assert "Mutationsmeldung" in person_ticket
+    assert "Rivera Nick" in person_ticket
+    assert "Dr. Rivera's retired." in person_ticket
+    assert "info@hospital-springfield.com" in person_ticket
+    person_ticket = person_ticket.click("Ticket annehmen").follow()
+    person_ticket = person_ticket.click("Ticket abschliessen").follow()
 
+    # Details not shown if missing permissions
+    client.login('member@example.org', 'hunter2')
+    client.get(agency_ticket_number, status=403)
+    client.get(person_ticket_number, status=403)
+    page = client.get('/tickets/ALL/closed')
+    assert 'ticket-number-plain' in page
+    assert 'ticket-state' not in page
+
+    # Deleted content
+    client.login_admin()
+    agency.click("Löschen")
     person.click("Löschen")
 
-    ticket = client.get(ticket_number)
+    ticket = client.get(agency_ticket_number)
+    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
+    assert "Mutationsmeldung" in ticket
+    assert "Hospital Springfield" in ticket
+    assert linkified in ticket
+    assert "info@hospital-springfield.com" in ticket
+
+    ticket = client.get(person_ticket_number)
     assert "Der hinterlegte Datensatz wurde entfernt." in ticket
     assert "Mutationsmeldung" in ticket
     assert "Rivera Nick" in ticket
@@ -551,6 +570,54 @@ def test_footer_settings_custom_links(client):
     assert f'<a href="{custom_url}">{custom_name}</a>' in page
     assert 'Custom2' not in page
 
-# todo: test user group in usermanegement
-# todo: test user groups
-# todo: test tickets not visible if no permission
+
+def test_view_user_groups(client):
+    client.login_admin()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Bundesbehörden'
+    manage.form.submit()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Kantonsrat'
+    manage.form.submit()
+
+    # create
+    manage = client.get('/usergroups').click('Benutzergruppe', href='new')
+    manage.form['name'] = 'Gruppe BB'
+    manage.form['users'].select_multiple(texts=['editor@example.org'])
+    manage.form['agencies'].select_multiple(texts=['Bundesbehörden'])
+    page = manage.form.submit().maybe_follow()
+    assert 'Gruppe BB' in page
+    assert 'editor@example.org' in page
+    assert 'Bundesbehörden' in page
+
+    page = client.get('/usermanagement').click('Anzeigen', index=1)
+    assert 'editor@example.org' in page
+    assert 'Gruppe BB' in page
+
+    # modify
+    manage = client.get('/usergroups').click('Anzeigen').click('Bearbeiten')
+    manage.form['name'] = 'Gruppe KR'
+    manage.form['users'].select_multiple(texts=['admin@example.org'])
+    manage.form['agencies'].select_multiple(texts=['Kantonsrat'])
+    page = manage.form.submit().maybe_follow()
+    assert 'Gruppe KR' in page
+    assert 'admin@example.org' in page
+    assert 'editor@example.org' not in page
+    assert 'Kantonsrat' in page
+    assert 'Bundesbehörden' not in page
+
+    page = client.get('/usermanagement').click('Anzeigen', index=0)
+    assert 'admin@example.org' in page
+    assert 'Gruppe BB' not in page
+    assert 'Gruppe KR' in page
+
+    page = client.get('/usermanagement').click('Anzeigen', index=1)
+    assert 'editor@example.org' in page
+    assert 'Gruppe BB' not in page
+    assert 'Gruppe KR' not in page
+
+    # delete
+    client.get('/usergroups').click('Anzeigen').click('Löschen')
+    assert 'Alle (0)' in client.get('/usergroups')

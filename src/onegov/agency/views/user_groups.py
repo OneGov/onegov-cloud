@@ -19,9 +19,6 @@ from onegov.user import UserGroupCollection
 def view_user_groups(self, request):
     layout = UserGroupCollectionLayout(self, request)
 
-    # todo: Add organization filter
-    # todo: Add user filter
-
     return {
         'layout': layout,
         'title': _('User Groups'),

@@ -67,6 +67,13 @@ def create_agency_app(request, use_elasticsearch=False):
             role='editor'
         )
     )
+    session.add(
+        User(
+            username='member@example.org',
+            password_hash=test_password,
+            role='member'
+        )
+    )
 
     commit()
     session.close_all()
