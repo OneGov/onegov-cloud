@@ -449,7 +449,7 @@ class DirectoryBaseForm(Form):
         self.content_fields.data = '\n'.join(cfg.display.get('content', ''))
         self.contact_fields.data = '\n'.join(cfg.display.get('contact', ''))
         self.keyword_fields.data = join('keywords')
-        self.order_direction = cfg.direction == 'desc' and 'desc' or 'asc'
+        self.order_direction.data = cfg.direction == 'desc' and 'desc' or 'asc'
         self.link_pattern.data = cfg.link_pattern
         self.link_title.data = cfg.link_title
         self.link_visible.data = cfg.link_visible

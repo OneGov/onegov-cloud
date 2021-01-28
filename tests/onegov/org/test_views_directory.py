@@ -420,6 +420,9 @@ def test_directory_visibility(client):
         Name *= ___
     """
     page.form['title_format'] = '[Name]'
+
+    assert page.form['order_direction'].value == 'asc'
+    page.form['order_direction'] = 'desc'
     page.form.submit()
 
     page = client.get('/directories/clubs')
@@ -450,6 +453,7 @@ def test_directory_visibility(client):
 
     page = client.get('/directories/clubs').click("Konfigurieren")
     page.form['access'] = 'private'
+    assert page.form['order_direction'].value == 'desc'
     page.form.submit()
 
     assert "Clubs" not in anon.get('/directories')
