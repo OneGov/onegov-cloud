@@ -24,12 +24,6 @@ def get_global_tools(request):
                 attrs={'class': 'hidden-contents'}
             ))
 
-        if title == 'Tickets':
-            item.classes = ('tickets', )
-            for link in item.links:
-                if 'with-count' in link.attrs['class']:
-                    link.attrs['class'].remove('with-count')
-
         yield item
 
 
