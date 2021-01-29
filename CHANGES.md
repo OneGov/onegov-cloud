@@ -1,8 +1,28 @@
 # Changes
 
+## Release `2021.17`
+
+> commits: **5 / [b770afabdd...4082a12b6f](https://github.com/OneGov/onegov-cloud/compare/b770afabdd^...4082a12b6f)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.17)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+✨ **Add missing translations.**
+
+**`Bugfix.`** | **[948089a475](https://github.com/onegov/onegov-cloud/commit/948089a47524537382000b58dc7f88ceae8202ad)**
+
+🐞 **Make permission check more robust.**
+
+**`Bugfix`** | **[149e7062e5](https://github.com/onegov/onegov-cloud/commit/149e7062e5a9e19617e89af635644f8b54cdf5c0)**
+
+✨ **Reenable global ticket counter.**
+
+**`Bugfix.`** | **[b1704bafca](https://github.com/onegov/onegov-cloud/commit/b1704bafcaa52aa83bef74ebb50c14f06853b945)**
+
 ## Release `2021.16`
 
-> commits: **2 / [7ae32f5cf1...740d0e1a1d](https://github.com/OneGov/onegov-cloud/compare/7ae32f5cf1^...740d0e1a1d)**  
+> released: **2021-01-27 09:01**<br>
+> commits: **3 / [7ae32f5cf1...ef79b6f8e7](https://github.com/OneGov/onegov-cloud/compare/7ae32f5cf1^...ef79b6f8e7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.16)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
