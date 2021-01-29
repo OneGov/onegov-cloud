@@ -112,10 +112,15 @@ def has_permission_agency_collection(app, identity, model, permission):
 
 @AgencyApp.permission_rule(model=AgencyMove, permission=object)
 def has_permission_agency_move(app, identity, model, permission):
-    return all((
-        has_permission_agency(app, identity, model.subject, permission),
-        has_permission_agency(app, identity, model.target, permission)
-    ))
+    if model.subject:
+        agency = model.subject
+        if not has_permission_agency(app, identity, agency, permission):
+            return False
+    if model.target:
+        agency = model.target
+        if not has_permission_agency(app, identity, agency, permission):
+            return False
+    return True
 
 
 @AgencyApp.permission_rule(
@@ -124,10 +129,15 @@ def has_permission_agency_move(app, identity, model, permission):
 def has_permission_agency_membership_move_within_agency(
     app, identity, model, permission
 ):
-    return all((
-        has_permission_agency(app, identity, model.subject.agency, permission),
-        has_permission_agency(app, identity, model.target.agency, permission)
-    ))
+    if model.subject and model.subject.agency:
+        agency = model.subject.agency
+        if not has_permission_agency(app, identity, agency, permission):
+            return False
+    if model.target and model.target.agency:
+        agency = model.target.agency
+        if not has_permission_agency(app, identity, agency, permission):
+            return False
+    return True
 
 
 @AgencyApp.permission_rule(
@@ -136,21 +146,30 @@ def has_permission_agency_membership_move_within_agency(
 def has_permission_agency_membership_move_within_person(
     app, identity, model, permission
 ):
-    return all((
-        has_permission_agency(app, identity, model.subject.agency, permission),
-        has_permission_agency(app, identity, model.target.agency, permission)
-    ))
+    if model.subject and model.subject.agency:
+        agency = model.subject.agency
+        if not has_permission_agency(app, identity, agency, permission):
+            return False
+    if model.target and model.target.agency:
+        agency = model.target.agency
+        if not has_permission_agency(app, identity, agency, permission):
+            return False
+    return True
 
 
 @AgencyApp.permission_rule(model=AgencyMutationTicket, permission=object)
 def has_permission_agency_mutation_ticket(app, identity, model, permission):
-    return has_permission_agency(
-        app, identity, model.handler.agency, permission
-    )
+    if model.handler and model.handler.agency:
+        agency = model.handler.agency
+        if not has_permission_agency(app, identity, agency, permission):
+            return False
+    return True
 
 
 @AgencyApp.permission_rule(model=PersonMutationTicket, permission=object)
 def has_permission_person_mutation_ticket(app, identity, model, permission):
-    return has_permission_person(
-        app, identity, model.handler.person, permission
-    )
+    if model.handler and model.handler.person:
+        person = model.handler.person
+        if not has_permission_person(app, identity, person, permission):
+            return False
+    return True
