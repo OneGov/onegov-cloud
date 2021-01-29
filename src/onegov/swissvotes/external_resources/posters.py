@@ -4,10 +4,9 @@ from requests import get
 from xml.etree import ElementTree
 
 
-class ExternalSource():
+class Posters():
 
     def __init__(self):
-        self.base_path = None
         self.yea_attribute = None
         self.nay_attribute = None
         self.yea_img_attribute = None
@@ -32,6 +31,7 @@ class ExternalSource():
         failed = set()
 
         if not poster_urls:
+            removed = len(image_urls)
             return result, added, updated, removed, failed
 
         image_urls = image_urls if isinstance(image_urls, dict) else {}
@@ -60,7 +60,9 @@ class ExternalSource():
                 else:
                     added += 1
 
-        removed = len(set(image_urls.keys()) - set(result.keys()))
+        if not failed:
+            removed = len(set(image_urls.keys()) - set(result.keys()))
+
         return result, added, updated, removed, failed
 
     def fetch(self, session):
@@ -103,7 +105,7 @@ class ExternalSource():
         return added_total, updated_total, removed_total, failed_total
 
 
-class MfgPosters(ExternalSource):
+class MfgPosters(Posters):
 
     def __init__(self, api_key):
         self.yea_attribute = 'posters_mfg_yea'
@@ -118,7 +120,7 @@ class MfgPosters(ExternalSource):
         return f'{base}{object_id}/xml'
 
 
-class SaPosters(ExternalSource):
+class SaPosters(Posters):
 
     def __init__(self):
         self.yea_attribute = 'posters_sa_yea'
