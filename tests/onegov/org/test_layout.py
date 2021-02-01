@@ -11,7 +11,7 @@ from onegov.core.elements import Link
 from onegov.org.layout import (
     EventBaseLayout,
     DefaultLayout,
-    PageLayout
+    PageLayout, Layout
 )
 from onegov.page import Page
 from webtest import TestApp as Client

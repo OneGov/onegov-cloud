@@ -560,8 +560,11 @@
 
                 </tal:b>
             </tal:b>
-            <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">
-                <tal:b replace="structure rendered" />
+            <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'" >
+                <tal:b tal:switch="linkify_display|False">
+                    <tal:b tal:case="True" replace="structure layout.linkify_field(field, rendered)" />
+                    <tal:b tal:case="False" replace="structure rendered" />
+                </tal:b>
             </tal:b>
         </dd>
         <div class="clearfix"></div>

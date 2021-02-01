@@ -505,6 +505,18 @@ class Layout(ChameleonLayout):
     def linkify(self, text):
         return linkify(text).replace('\n', '<br>') if text else text
 
+    def linkify_field(self, field, rendered):
+        include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
+        if field.render_kw:
+            if field.render_kw.get('data-editor') == 'markdown':
+                return rendered
+            # HtmlField
+            if field.render_kw.get('class_') == 'editor':
+                return rendered
+        if field.type in include:
+            return self.linkify(rendered.replace('<br>', '\n'))
+        return rendered
+
     @property
     def file_link_target(self):
         """ Use with tal:attributes='target layout.file_link_target' """

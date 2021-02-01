@@ -30,7 +30,8 @@ from onegov.user import UserCollection
 from purl import URL
 from sedate import replace_timezone
 from tests.shared import utils
-from tests.shared.utils import decode_map_value, encode_map_value
+from tests.shared.utils import decode_map_value, encode_map_value, \
+    open_in_browser
 from unittest.mock import patch
 from webtest import Upload
 from yubico_client import Yubico

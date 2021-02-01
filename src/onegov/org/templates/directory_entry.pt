@@ -26,6 +26,7 @@
                             allow_downloads True;
                             allow_views True;
                             form entry.directory.form_obj;
+                            linkify_display True;
                         "
                     />
                 </div>
