@@ -2,7 +2,7 @@ from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
 from onegov.form.fields import UploadField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
@@ -16,7 +16,6 @@ from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import DateTimeLocalField
 from wtforms.fields.html5 import DecimalField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.html5 import IntegerField

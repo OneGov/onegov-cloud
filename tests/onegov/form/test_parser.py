@@ -3,6 +3,7 @@ import pytest
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form.fields import DateTimeLocalField
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.pay import Price
 from textwrap import dedent
@@ -11,7 +12,6 @@ from wtforms import FileField
 from wtforms import validators
 from wtforms.fields.html5 import (
     DateField,
-    DateTimeLocalField,
     EmailField,
     URLField,
 )
