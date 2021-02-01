@@ -1,7 +1,6 @@
 from onegov.form.fields import MultiCheckboxField as MultiCheckboxFieldBase
 from onegov.form.widgets import MultiCheckboxWidget as MultiCheckboxWidgetBase
 from onegov.gazette import _
-from wtforms.fields.html5 import DateTimeLocalField as DateTimeLocalFieldBase
 
 
 class MultiCheckboxWidget(MultiCheckboxWidgetBase):
@@ -35,19 +34,3 @@ class MultiCheckboxField(MultiCheckboxFieldBase):
                 opt.render_kw = opt.render_kw or {}
                 opt.render_kw['disabled'] = self.render_kw['disabled']
             yield opt
-
-
-class DateTimeLocalField(DateTimeLocalFieldBase):
-    """ A custom implementation of the DateTimeLocalField to fix issues with
-    the format and the datetimepicker plugin.
-
-    """
-
-    def __init__(self, **kwargs):
-        kwargs['format'] = '%Y-%m-%dT%H:%M'
-        super(DateTimeLocalField, self).__init__(**kwargs)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            valuelist = [' '.join(valuelist).replace(' ', 'T')]
-        super(DateTimeLocalField, self).process_formdata(valuelist)

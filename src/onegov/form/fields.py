@@ -28,6 +28,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.fields.html5 import DateTimeField
 from wtforms_components import TimeField as DefaultTimeField
+from wtforms.fields.html5 import DateTimeLocalField as DateTimeLocalFieldBase
 
 
 class TimeField(DefaultTimeField):
@@ -306,3 +307,19 @@ class PanelField(Field):
 
     def populate_obj(self, obj, name):
         pass
+
+
+class DateTimeLocalField(DateTimeLocalFieldBase):
+    """ A custom implementation of the DateTimeLocalField to fix issues with
+    the format and the datetimepicker plugin.
+
+    """
+
+    def __init__(self, **kwargs):
+        kwargs['format'] = '%Y-%m-%dT%H:%M'
+        super(DateTimeLocalField, self).__init__(**kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            valuelist = [' '.join(valuelist).replace(' ', 'T')]
+        super(DateTimeLocalField, self).process_formdata(valuelist)
