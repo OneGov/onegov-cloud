@@ -933,7 +933,7 @@ def test_tickets(client):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
-    assert "Ihr Ticket wurde geschlossen" in message
+    assert "Ihre Anfrage wurde abgeschlossen" in message
     assert '/status' in message
 
     assert 'FRM-' in status_page
@@ -958,7 +958,7 @@ def test_tickets(client):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
-    assert "Ihr Ticket wurde wieder ge" in message
+    assert "Ihre Anfrage wurde wieder " in message
     assert '/status' in message
 
 
@@ -2714,7 +2714,7 @@ def test_submit_event(client, skip_opening_email):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
 
-    assert "Ihr Ticket wurde geschlossen" in message
+    assert "Ihre Anfrage wurde abgeschlossen" in message
 
 
 def test_edit_event(client):
@@ -3834,7 +3834,7 @@ def test_manual_form_payment(client):
     assert "35.00 CHF" in page
 
     page = page.form.submit().follow()
-    assert "Ticket Status" in page
+    assert "Referenz Anfrage" in page
 
     client.login_editor()
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
@@ -4420,7 +4420,7 @@ def test_registration_ticket_workflow(client):
     assert "ablehnen" in page
 
     msg = client.app.smtp.sent[-1]
-    assert "Ein neues Ticket wurde für Sie eröffnet" in msg
+    assert "Ihre Anfrage wurde unter der folgenden Referenz registriert" in msg
     assert "Foobar" in msg
 
     page = page.click("Anmeldung bestätigen").follow()
@@ -4440,7 +4440,7 @@ def test_registration_ticket_workflow(client):
     page = register('info@example.org', 'Foobar', include_data_in_email=False)
 
     msg = client.app.smtp.sent[-1]
-    assert "Ein neues Ticket wurde für Sie eröffnet" in msg
+    assert "Ihre Anfrage wurde unter der folgenden Referenz registriert" in msg
     assert "Foobar" not in msg
 
     page.click("Anmeldung ablehnen")

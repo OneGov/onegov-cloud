@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-18 09:55+0100\n"
+"POT-Creation-Date: 2021-02-03 16:41+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2572,8 +2572,8 @@ msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 msgid "Your directory submission has been adopted:"
 msgstr "Votre proposition de répertoire a été adoptée :"
 
-msgid "Check ticket status"
-msgstr "Vérifier l'état du ticket"
+msgid "Check request status"
+msgstr "Vérifier l'état de la demande"
 
 msgid "Your change request has been applied:"
 msgstr "Votre demande de modification a été effectuée :"
@@ -2636,19 +2636,19 @@ msgstr ""
 "Si vous ne souhaitez pas changer de mot de passe, vous pouvez ignorer cet e-"
 "mail."
 
-msgid "Your ticket has received a payment."
-msgstr "Votre ticket a reçu un paiement."
+msgid "Your request has received a payment."
+msgstr "Votre demande a reçu un paiement."
 
-msgid "Your ticket was marked as unpaid."
-msgstr "Votre ticket a été marqué non payé."
+msgid "Your request was marked as unpaid."
+msgstr "Votre demande a été marquée comme non payée."
 
 msgid ""
-"Your ticket's payment has been refunded. Note that it might take a few days "
+"Your request's payment has been refunded. Note that it might take a few days "
 "until your refunded amount is shown on your credit card bill."
 msgstr ""
-"Votre ticket vous a été remboursé. Notez qu'il peut se passer quelques jours "
-"avant que le montant du remboursement ne figure sur votre relevé de carte de "
-"crédit."
+"Le paiement de votre demande a été remboursé. Notez qu'il peut se passer "
+"quelques jours avant que le montant du remboursement ne figure sur votre "
+"relevé de carte de crédit."
 
 msgid "Amount:"
 msgstr "Montant :"
@@ -2680,44 +2680,44 @@ msgstr "Un message a été envoyé à propos de ${ref} :"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the ticket status page"
-#. Canonical text for ${link} is: "visit the ticket page"
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
 #. Used in sentence: "Please ${link} to reply."
-msgid "visit the ticket status page"
-msgstr "visitez la page de statut du ticket"
+msgid "visit the request status page"
+msgstr "visitez la page de statut de la demande"
 
 #. Used in sentence: "Please ${link} to reply."
-msgid "visit the ticket page"
-msgstr "visitez la page du ticket"
+msgid "visit the request page"
+msgstr "visitez la page de la demande"
 
-msgid "Your ticket has been closed."
-msgstr "Votre ticket a été fermé."
+msgid "Your request has been closed."
+msgstr "Votre demande a été complétée."
 
-msgid "Your ticket's timeline has been archived for future reference:"
+msgid "Your requests's timeline has been archived for future reference:"
 msgstr ""
-"L'historique de votre ticket a été archivé pour des références futures :"
+"L'historique de votre demande a été archivé pour des références futures :"
 
-msgid "Ticket Timeline"
-msgstr "Historique du ticket"
+msgid "Request Timeline"
+msgstr "Historique de la demande"
 
 msgid "Thank you for your request."
 msgstr "Merci pour votre requête."
 
-msgid "A new ticket has been opened:"
-msgstr "Un nouveau ticket a été ouvert :"
+msgid "Your request has been registered with the following reference:"
+msgstr "Votre demande a été enregistrée avec la référence suivante :"
 
 msgid ""
 "We will send another e-mail once your ticket has been completed. In the "
 "meantime you can check the status of your ticket at any time:"
 msgstr ""
-"Nous vous enverrons un autre e-mail dès que votre ticket aura été traité. "
-"Entre-temps, vous pouvez aller voir l'état de votre ticket à tout moment :"
+"Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
+"Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment :"
 
-msgid "Your ticket has been reopened"
-msgstr "Votre ticket a été ré-ouvert"
+msgid "Your request has been reopened"
+msgstr "Votre demande a été ré-ouverte"
 
 msgid "Directory entry adopted."
 msgstr "L'entrée de répertoire a été adoptée."
@@ -3134,8 +3134,8 @@ msgstr ""
 "Vous pouvez utiliser des liens/des adresses e-mail qui sont transformées en "
 "liens cliquables."
 
-msgid "Ticket Number"
-msgstr "Numéro du ticket"
+msgid "Request Reference"
+msgstr "Référence"
 
 msgid "Subject"
 msgstr "Sujet"
@@ -3144,7 +3144,7 @@ msgid ""
 "Forgot something or have a special request? Add a message to the ticket."
 msgstr ""
 "Vous avez oublié quelque chose ou avez une demande spéciale ? Ajoutez un "
-"message au ticket."
+"message a la demande."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
@@ -3532,8 +3532,8 @@ msgstr ""
 "ne sont pas publiés. Il n'ont aucuns droits à être publiés et les événements "
 "déjà publiés peuvent être supprimés de la page sans notification ni motif."
 
-msgid "Your ticket has been opened"
-msgstr "Votre ticket a été ouvert"
+msgid "Your request has been registered"
+msgstr "Yotre demande a été enregistrée."
 
 msgid "Your request could not be accepted automatically!"
 msgstr "Votre demande n'a pas pu être traitée automatiquement."
@@ -4099,6 +4099,9 @@ msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
 msgid "You have reopened ticket ${number}"
 msgstr "Vous avez réouvert ${number} ticket(s)"
 
+msgid "Your ticket has been reopened"
+msgstr "Votre ticket a été ré-ouvert"
+
 #, python-format
 msgid "You have disabled e-mails for ticket ${number}"
 msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
@@ -4130,6 +4133,12 @@ msgstr "Votre demande est actuellement en attente"
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
 
+msgid "Request Status"
+msgstr "Status Demand"
+
+msgid "The request has already been closed"
+msgstr "Votre demand a déjà été clòturée. "
+
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
 
@@ -4159,3 +4168,51 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Reservation Daypass"
+#~ msgstr "Réreservation Carte journalière"
+
+#~ msgid "Check ticket status"
+#~ msgstr "Vérifier l'état du ticket"
+
+#~ msgid "Your ticket has received a payment."
+#~ msgstr "Votre ticket a reçu un paiement."
+
+#~ msgid "Your ticket was marked as unpaid."
+#~ msgstr "Votre ticket a été marqué non payé."
+
+#~ msgid ""
+#~ "Your ticket's payment has been refunded. Note that it might take a few "
+#~ "days until your refunded amount is shown on your credit card bill."
+#~ msgstr ""
+#~ "Votre ticket vous a été remboursé. Notez qu'il peut se passer quelques "
+#~ "jours avant que le montant du remboursement ne figure sur votre relevé de "
+#~ "carte de crédit."
+
+#~ msgid "visit the ticket status page"
+#~ msgstr "visitez la page de statut du ticket"
+
+#~ msgid "visit the ticket page"
+#~ msgstr "visitez la page du ticket"
+
+#~ msgid "Your ticket has been closed."
+#~ msgstr "Votre ticket a été fermé."
+
+#~ msgid "Your ticket's timeline has been archived for future reference:"
+#~ msgstr ""
+#~ "L'historique de votre ticket a été archivé pour des références futures :"
+
+#~ msgid "Ticket Timeline"
+#~ msgstr "Historique du ticket"
+
+#~ msgid "A new ticket has been opened:"
+#~ msgstr "Un nouveau ticket a été ouvert :"
+
+#~ msgid "Request-ID"
+#~ msgstr "ID de la demande"
+
+#~ msgid "Your ticket has been opened"
+#~ msgstr "Votre ticket a été ouvert"
+
+#~ msgid "Ticket Number"
+#~ msgstr "Numéro du ticket"

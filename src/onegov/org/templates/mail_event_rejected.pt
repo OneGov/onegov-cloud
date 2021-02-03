@@ -8,6 +8,6 @@
 
         <tal:b metal:use-macro="layout.macros['event']"></tal:b>
 
-        <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
+        <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
     </tal:b>
 </div>

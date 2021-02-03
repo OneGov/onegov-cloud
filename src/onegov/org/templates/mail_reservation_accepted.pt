@@ -10,7 +10,7 @@
         <tal:b metal:use-macro="layout.macros['reservations']"></tal:b>
 
         <p>
-            <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>
     </tal:b>
 </div>
