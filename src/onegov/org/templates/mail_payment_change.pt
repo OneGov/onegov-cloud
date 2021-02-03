@@ -6,9 +6,9 @@
         <p i18n:translate>Hello!</p>
 
         <tal:b tal:switch="change">
-            <p tal:case="'marked-as-paid'" i18n:translate>Your ticket has received a payment.</p>
-            <p tal:case="'marked-as-unpaid'" i18n:translate>Your ticket was marked as unpaid.</p>
-            <p tal:case="'refunded'" i18n:translate>Your ticket's payment has been refunded. Note that it might take a few days until your refunded amount is shown on your credit card bill.</p>
+            <p tal:case="'marked-as-paid'" i18n:translate>Your request has received a payment.</p>
+            <p tal:case="'marked-as-unpaid'" i18n:translate>Your request was marked as unpaid.</p>
+            <p tal:case="'refunded'" i18n:translate>Your request's payment has been refunded. Note that it might take a few days until your refunded amount is shown on your credit card bill.</p>
         </tal:b>
 
         <p>
@@ -16,7 +16,7 @@
         </p>
 
         <p>
-            <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>
     </tal:b>
 </div>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-03 15:03+0100\n"
+"POT-Creation-Date: 2021-02-03 16:41+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -782,9 +782,6 @@ msgstr "Notizen"
 
 msgid "Public extra information about this person"
 msgstr "Öffentliche Extra Informationen zu dieser Person"
-
-msgid "Reservation Daypass"
-msgstr "Reservation Tageskarte"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
@@ -2572,8 +2569,8 @@ msgstr ""
 msgid "Your directory submission has been adopted:"
 msgstr "Ihr Verzeichniseintrag wurde übernommen:"
 
-msgid "Check ticket status"
-msgstr "Ticket Status abfragen"
+msgid "Check request status"
+msgstr "Anfragestatus überprüfen"
 
 msgid "Your change request has been applied:"
 msgstr "Ihr Änderungswunsch wurde übernommen:"
@@ -2635,18 +2632,19 @@ msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
 "möchten."
 
-msgid "Your ticket has received a payment."
-msgstr "Ihr Ticket hat eine Zahlung erhalten."
+msgid "Your request has received a payment."
+msgstr "Ihre Anfrage hat eine Zahlung erhalten."
 
-msgid "Your ticket was marked as unpaid."
-msgstr "Ihr Ticket wurde als unbezahlt markiert."
+msgid "Your request was marked as unpaid."
+msgstr "Ihre Anfrage wurde als unbezahlt markiert."
 
 msgid ""
-"Your ticket's payment has been refunded. Note that it might take a few days "
+"Your request's payment has been refunded. Note that it might take a few days "
 "until your refunded amount is shown on your credit card bill."
 msgstr ""
-"Ihre Ticket Zahlung wurde rückerstattet. Bitte beachten Sie dass es ein paar "
-"Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung erscheint."
+"Die Zahlung zu ihrer Anfrage wurde rückerstattet. Bitte beachten Sie dass es "
+"ein paar Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung "
+"erscheint."
 
 msgid "Amount:"
 msgstr "Betrag:"
@@ -2678,43 +2676,43 @@ msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the ticket status page"
-#. Canonical text for ${link} is: "visit the ticket page"
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
 #. Used in sentence: "Please ${link} to reply."
-msgid "visit the ticket status page"
-msgstr "öffnen Sie den Ticket Status"
+msgid "visit the request status page"
+msgstr "öffnen Sie den Anfragestatus"
 
 #. Used in sentence: "Please ${link} to reply."
-msgid "visit the ticket page"
-msgstr "öffnen Sie das Ticket"
+msgid "visit the request page"
+msgstr "öffnen Sie die Anfrage"
 
-msgid "Your ticket has been closed."
-msgstr "Ihr Ticket wurde geschlossen."
+msgid "Your request has been closed."
+msgstr "Ihre Anfrage wurde abgeschlossen"
 
-msgid "Your ticket's timeline has been archived for future reference:"
-msgstr "Der Verlauf ihres Tickets wurde als zukünftige Referenz archiviert:"
+msgid "Your requests's timeline has been archived for future reference:"
+msgstr "Der Anfrageverlauf wurde als zukünftige Referenz archiviert:"
 
-msgid "Ticket Timeline"
-msgstr "Ticket Verlauf"
+msgid "Request Timeline"
+msgstr "Anfrageverlauf"
 
 msgid "Thank you for your request."
 msgstr "Vielen Dank für Ihre Anfrage."
 
-msgid "A new ticket has been opened:"
-msgstr "Ein neues Ticket wurde für Sie eröffnet:"
+msgid "Your request has been registered with the following reference:"
+msgstr "Ihre Anfrage wurde unter der folgenden Referenz registriert:"
 
 msgid ""
 "We will send another e-mail once your ticket has been completed. In the "
 "meantime you can check the status of your ticket at any time:"
 msgstr ""
-"Sie erhalten ein weiteres E-Mail, sobald Ihr Ticket abgeschlossen wurde. In "
-"der Zwischenzeit sehen Sie den Status Ihres Tickets jederzeit hier:"
+"Sie erhalten ein weiteres E-Mail, sobald Ihre Anfrage abgeschlossen wurde. "
+"In der Zwischenzeit sehen Sie den Status Ihrer Anfrage jederzeit hier:"
 
-msgid "Your ticket has been reopened"
-msgstr "Ihr Ticket wurde wieder geöffnet"
+msgid "Your request has been reopened"
+msgstr "Ihre Anfrage wurde wieder eröffnet"
 
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
@@ -3122,8 +3120,8 @@ msgstr ""
 "Notizen sind privat und werden nur angemeldeten Benutzern angezeigt. E-Mail "
 "Adressen und Links werden klickbar gemacht."
 
-msgid "Request-ID"
-msgstr "Anfrage-ID"
+msgid "Request Reference"
+msgstr "Referenz Anfrage"
 
 msgid "Subject"
 msgstr "Betreff"
@@ -3516,8 +3514,8 @@ msgstr ""
 "Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
 "Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
 
-msgid "Your ticket has been opened"
-msgstr "Ihr Ticket wurde eröffnet"
+msgid "Your request has been registered"
+msgstr "Ihre Anfrage wurde erfasst"
 
 msgid "Your request could not be accepted automatically!"
 msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
@@ -4082,6 +4080,9 @@ msgstr ""
 msgid "You have reopened ticket ${number}"
 msgstr "Sie haben das Ticket ${number} wieder geöffnet"
 
+msgid "Your ticket has been reopened"
+msgstr "Ihr Ticket wurde wieder geöffnet"
+
 #, python-format
 msgid "You have disabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
@@ -4148,6 +4149,50 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Reservation Daypass"
+#~ msgstr "Reservation Tageskarte"
+
+#~ msgid "Check ticket status"
+#~ msgstr "Ticket Status abfragen"
+
+#~ msgid "Your ticket has received a payment."
+#~ msgstr "Ihr Ticket hat eine Zahlung erhalten."
+
+#~ msgid "Your ticket was marked as unpaid."
+#~ msgstr "Ihr Ticket wurde als unbezahlt markiert."
+
+#~ msgid ""
+#~ "Your ticket's payment has been refunded. Note that it might take a few "
+#~ "days until your refunded amount is shown on your credit card bill."
+#~ msgstr ""
+#~ "Ihre Ticket Zahlung wurde rückerstattet. Bitte beachten Sie dass es ein "
+#~ "paar Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung "
+#~ "erscheint."
+
+#~ msgid "visit the ticket status page"
+#~ msgstr "öffnen Sie den Ticket Status"
+
+#~ msgid "visit the ticket page"
+#~ msgstr "öffnen Sie das Ticket"
+
+#~ msgid "Your ticket has been closed."
+#~ msgstr "Ihr Ticket wurde geschlossen."
+
+#~ msgid "Your ticket's timeline has been archived for future reference:"
+#~ msgstr "Der Verlauf ihres Tickets wurde als zukünftige Referenz archiviert:"
+
+#~ msgid "Ticket Timeline"
+#~ msgstr "Ticket Verlauf"
+
+#~ msgid "A new ticket has been opened:"
+#~ msgstr "Ein neues Ticket wurde für Sie eröffnet:"
+
+#~ msgid "Request-ID"
+#~ msgstr "Anfrage-ID"
+
+#~ msgid "Your ticket has been opened"
+#~ msgstr "Ihr Ticket wurde eröffnet"
 
 #~ msgid "Ticket Number"
 #~ msgstr "Ticket Nummer"

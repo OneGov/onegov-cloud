@@ -285,8 +285,6 @@ def handle_reservation_form(self, request, form):
     title = _("New dates for ${title}", mapping={
         'title': self.title,
     })
-    if hasattr(form, 'form_title'):
-        title = form.form_title
 
     return {
         'layout': layout,
@@ -442,7 +440,7 @@ def finalize_reservation(self, request):
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
+            subject=_("Your request has been registered"),
             receivers=(reservations[0].email,),
             ticket=ticket,
             content={
