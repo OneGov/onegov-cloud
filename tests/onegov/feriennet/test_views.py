@@ -189,7 +189,8 @@ def test_activity_communication(client, scenario):
     editor.get('/activity/learn-python').click("Publikation beantragen")
 
     assert len(client.app.smtp.outbox) == 1
-    assert "Ein neues Ticket" in admin.get_email(0)
+    assert "Ihre Anfrage wurde unter der " \
+           "folgenden Referenz registriert" in admin.get_email(0)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
