@@ -511,16 +511,24 @@ def view_ticket_status(self, request, form):
     else:
         raise NotImplementedError
 
+    if request.is_logged_in:
+        status_text = _("Ticket Status")
+        closed_text = _("The ticket has already been closed")
+    else:
+        # We adjust the wording for users that do not know what a ticket is
+        status_text = _("Request Status")
+        closed_text = _("The request has already been closed")
+
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Ticket Status"), '#')
+        Link(status_text, '#')
     ]
 
     if form.submitted(request):
 
         if self.state == 'closed':
-            request.alert(_("The ticket has already been closed"))
+            request.alert(closed_text)
         else:
             message = TicketChatMessage.create(
                 self, request,

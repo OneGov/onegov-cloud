@@ -285,6 +285,8 @@ def handle_reservation_form(self, request, form):
     title = _("New dates for ${title}", mapping={
         'title': self.title,
     })
+    if hasattr(form, 'form_title'):
+        title = form.form_title
 
     return {
         'layout': layout,

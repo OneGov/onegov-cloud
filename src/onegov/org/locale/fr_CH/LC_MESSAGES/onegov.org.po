@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-18 09:55+0100\n"
+"POT-Creation-Date: 2021-02-03 15:03+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -786,6 +786,9 @@ msgstr "Notes"
 
 msgid "Public extra information about this person"
 msgstr "Informations publiques supplémentaires à propos de cette semaine"
+
+msgid "Reservation Daypass"
+msgstr "Réreservation Carte journalière"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Décrit en quoi consiste cette ressource de réservation"
@@ -3134,8 +3137,8 @@ msgstr ""
 "Vous pouvez utiliser des liens/des adresses e-mail qui sont transformées en "
 "liens cliquables."
 
-msgid "Ticket Number"
-msgstr "Numéro du ticket"
+msgid "Request-ID"
+msgstr "ID de la demande"
 
 msgid "Subject"
 msgstr "Sujet"
@@ -3144,7 +3147,7 @@ msgid ""
 "Forgot something or have a special request? Add a message to the ticket."
 msgstr ""
 "Vous avez oublié quelque chose ou avez une demande spéciale ? Ajoutez un "
-"message au ticket."
+"message a la demande."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
@@ -4130,6 +4133,12 @@ msgstr "Votre demande est actuellement en attente"
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
 
+msgid "Request Status"
+msgstr "Status Demand"
+
+msgid "The request has already been closed"
+msgstr "Votre demand a déjà été clòturée. "
+
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
 
@@ -4159,3 +4168,6 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Ticket Number"
+#~ msgstr "Numéro du ticket"

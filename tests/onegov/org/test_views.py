@@ -3834,7 +3834,7 @@ def test_manual_form_payment(client):
     assert "35.00 CHF" in page
 
     page = page.form.submit().follow()
-    assert "Ticket Status" in page
+    assert "Anfrage-ID" in page
 
     client.login_editor()
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()

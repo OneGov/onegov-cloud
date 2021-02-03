@@ -13,6 +13,10 @@ class ReservationForm(Form):
 
     reserved_fields = RESERVED_FIELDS
 
+    @property
+    def form_title(self):
+        return _('Reservation Daypass')
+
     email = EmailField(
         label=_("E-Mail"),
         validators=[InputRequired(), Email()]
