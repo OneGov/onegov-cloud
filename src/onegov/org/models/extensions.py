@@ -151,6 +151,19 @@ class ContactExtension(ContentExtension):
         return ContactPageForm
 
 
+class NewsletterExtension(ContentExtension):
+    text_in_newsletter = content_property(default=False)
+
+    def extend_form(self, form_class, request):
+        class NewsletterSettingsForm(form_class):
+            text_in_newsletter = BooleanField(
+                label=_('Use text instead of lead in the newsletter'),
+                fieldset=_('Newsletter'),
+                default=False
+            )
+        return NewsletterSettingsForm
+
+
 class PersonLinkExtension(ContentExtension):
     """ Extends any class that has a content dictionary field with the ability
     to reference people from :class:`onegov.people.PersonCollection`.

@@ -3082,13 +3082,19 @@ def test_newsletter_send(client):
     anon = client.spawn()
 
     client.login_editor()
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Testnews'
+    page.form['lead'] = 'My Lead Text'
+    page.form['text'] = '<p>My Html editor text</p>'
+    page.form['text_in_newsletter'] = True
+    page.form.submit().follow()
 
     # add a newsletter
     new = client.get('/newsletters').click('Newsletter')
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
-    new.select_checkbox("news", "Wir haben eine neue Webseite!")
+    new.select_checkbox("news", "Testnews")
     new.select_checkbox("occurrences", "150 Jahre Govikon")
     new.select_checkbox("occurrences", "Gemeinsames Turnen")
 
@@ -3157,9 +3163,12 @@ def test_newsletter_send(client):
     assert recipients.query().count() == 1
 
     # check content of mail
+    assert 'Like many of you,' in mail['text']
     assert '150 Jahre Govikon' in mail['text']
     assert 'Gemeinsames Turnen' in mail['text']
-    assert 'Wir haben eine neue Webseite!' in mail['text']
+    assert 'Testnews' in mail['text']
+    assert 'My Lead Text' not in mail['text']
+    assert 'My Html editor text' in mail['text']
 
 
 def test_newsletter_schedule(client):
