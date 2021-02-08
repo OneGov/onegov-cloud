@@ -472,10 +472,10 @@ def accept_reservation(self, request):
         reservations = resource.scheduler.reservations_by_token(self.token)
         reservations = reservations.order_by(Reservation.start)
 
-        tickets = TicketCollection(request.session)
-        ticket = tickets.by_handler_id(self.token.hex)
-
         token = self.token.hex
+        tickets = TicketCollection(request.session)
+        ticket = tickets.by_handler_id(token)
+
         forms = FormCollection(request.session)
         submission = forms.submissions.by_id(token)
 
