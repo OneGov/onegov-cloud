@@ -2636,7 +2636,7 @@ msgstr ""
 "möchten."
 
 msgid "Your request has received a payment."
-msgstr "Ihre Anfrage hat eine Zahlung erhalten."
+msgstr "Wir haben ihre Zahlung zu ihrer Anfrage erhalten."
 
 msgid "Your request was marked as unpaid."
 msgstr "Ihre Anfrage wurde als unbezahlt markiert."
