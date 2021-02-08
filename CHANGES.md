@@ -1,8 +1,45 @@
 # Changes
 
+## Release `2021.18`
+
+> commits: **10 / [fbda428801...122568e981](https://github.com/OneGov/onegov-cloud/compare/fbda428801^...122568e981)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.18)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🐞 **Fixes wrong membership paths throwing an error.**
+
+**`Bugfix`** | **[122568e981](https://github.com/onegov/onegov-cloud/commit/122568e981e57ee44f9321204507e00839e0f21b)**
+
+### Feriennet
+
+✨ **Fixes banner alt tag**
+
+Needed position absolute and z-index to place the
+image on top of the tracker. The tracker must be the link that is clickable when a tracker src is available.
+
+**`Other`** | **[fbda428801](https://github.com/onegov/onegov-cloud/commit/fbda42880162fdf5d61ad1c5cd67c57cbd2ec15c)**
+
+### Org
+
+🎉 **Linkifies directory field values on directory entry**
+
+**`Feature`** | **[SEA-93](https://linear.app/seantis/issue/SEA-93)** | **[e2e5447a7f](https://github.com/onegov/onegov-cloud/commit/e2e5447a7f9de6ffe4f539fe9330783d1ed6376c)**
+
+🐞 **Fixes not saving directory order in form**
+
+**`Bugfix`** | **[SEA-94](https://linear.app/seantis/issue/SEA-94)** | **[8981981191](https://github.com/onegov/onegov-cloud/commit/8981981191f3714a46c4d84089f96a0547294dbd)**
+
+✨ **Changes wording of emails and ticket status pages**
+
+Adapts the wording for ticket since not everyone is familiar with ticket systems.
+
+**`Other`** | **[SEA-114](https://linear.app/seantis/issue/SEA-114)** | **[d9e4a97071](https://github.com/onegov/onegov-cloud/commit/d9e4a97071cfd613a9fa7983fa55106ad42398c6)**
+
 ## Release `2021.17`
 
-> commits: **5 / [b770afabdd...4082a12b6f](https://github.com/OneGov/onegov-cloud/compare/b770afabdd^...4082a12b6f)**  
+> released: **2021-01-29 10:25**<br>
+> commits: **6 / [b770afabdd...fccbcb1cc4](https://github.com/OneGov/onegov-cloud/compare/b770afabdd^...fccbcb1cc4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.17)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
