@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-03 16:41+0100\n"
+"POT-Creation-Date: 2021-02-08 13:30+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1582,6 +1582,9 @@ msgstr "Auf der Startseite anzeigen"
 msgid "Visibility"
 msgstr "Sichtbarkeit"
 
+msgid "Use text instead of lead in the newsletter"
+msgstr "Text statt Einleitung im Newsletter benutzen"
+
 msgid "A resource with this name already exists"
 msgstr "Eine Resource mit diesem Namen existiert bereits"
 
@@ -3014,6 +3017,14 @@ msgstr "Dieser Newsletter wurde bereits von allen Abonnenten empfangen."
 
 msgid "The newsletter is scheduled to be sent on ${time}"
 msgstr "Der Newsletter wird am ${time} versendet"
+
+msgid ""
+"Check the email text. You can use the full news text instead of the leading "
+"if you want. You will find this setting in the edit menu of the news item."
+msgstr ""
+"Überprüfen Sie den E-Mail Text. Sie können den vollen Text einer Nachricht "
+"im Newsletter anzeigen anstelle der Einleitung. Sie finden die Einstellung "
+"im Bearbeitungs-Menu der einzelnen Nachricht."
 
 msgid "Delivery"
 msgstr "Versand"

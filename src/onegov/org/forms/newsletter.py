@@ -2,7 +2,7 @@ from datetime import timedelta
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, ChosenSelectField
 from onegov.newsletter import Recipient
 from onegov.org import _
 from sedate import replace_timezone, to_timezone, utcnow
@@ -206,7 +206,7 @@ class NewsletterTestForm(Form):
 
         class NewsletterSendFormWithRecipients(cls):
 
-            selected_recipient = RadioField(
+            selected_recipient = ChosenSelectField(
                 label=_("Recipient"),
                 choices=choices,
             )

@@ -5992,3 +5992,9 @@ h2 + div.timeline {
         width: 100%;
     }
 }
+
+/* Utils */
+
+.no-click {
+    pointer-events: none;
+}

@@ -42,6 +42,15 @@
                 </ul>
             </div>
         </div>
+
+        <div class="row">
+            <div class="small-12 columns">
+                <h2 i18n:translate>Preview</h2>
+                <p i18n:translate="">Check the email text. You can use the full news text instead of the leading if you want.
+                    You will find this setting in the edit menu of the news item.</p>
+                <iframe class="resizeable no-click" src="${request.link(newsletter, name='preview')}" frameborder="0" width="100%" onload="autoResize()"></iframe>
+            </div>
+        </div>
         <div class="row" tal:condition="open_recipients">
             <div class="small-12 medium-8 large-6 columns">
                 <h2 i18n:translate>Delivery</h2>
