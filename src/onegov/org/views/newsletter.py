@@ -371,3 +371,21 @@ def handle_test_newsletter(self, request, form):
             "Sends a test newsletter to the given address"
         )
     }
+
+
+@OrgApp.html(model=Newsletter,
+             template='mail_newsletter.pt', name='preview', permission=Private)
+def handle_preview_newsletter(self, request):
+    layout = DefaultMailLayout(self, request)
+
+    return {
+        'layout': layout,
+        'lead': layout.linkify(self.lead or ''),
+        'newsletter': self,
+        'title': self.title,
+        'unsubscribe': '#',
+        'news': news_by_newsletter(self, request),
+        'occurrences': occurrences_by_newsletter(self, request),
+        'publications': publications_by_newsletter(self, request),
+        'name_without_extension': name_without_extension
+    }
