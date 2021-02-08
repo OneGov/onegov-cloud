@@ -60,7 +60,8 @@ def get_agency_move(app, subject_id, direction, target_id):
 
 @AgencyApp.path(
     model=AgencyMembership,
-    path='/membership/{id}'
+    path='/membership/{id}',
+    converters=dict(id=UUID)
 )
 def get_membership(app, id):
     return AgencyMembershipCollection(app.session()).by_id(id)
