@@ -1473,8 +1473,9 @@ def test_auto_accept_reservations(client):
     assert 'Ihr Anliegen wurde abgeschlossen' in page
     assert 'Die Reservationen wurden angenommen' in page
     assert len(client.app.smtp.outbox) == 1
-    message = client.app.smtp.outbox[0]
-    assert 'Ihre Reservationen wurden angenommen' in message.get('subject')
+    message = get_mail(client.app.smtp.outbox, 0)
+    assert 'Ihre Reservationen wurden angenommen' in message['subject']
+    assert 'Foobar' in message['text']
 
     # close the ticket and check not email is sent
     tickets = client.get('/tickets/ALL/closed')

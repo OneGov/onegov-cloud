@@ -475,6 +475,18 @@ def accept_reservation(self, request):
         tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(self.token.hex)
 
+        token = self.token.hex
+        forms = FormCollection(request.session)
+        submission = forms.submissions.by_id(token)
+
+        if submission:
+            form = submission.form_obj
+        else:
+            form = None
+
+        # Include all the forms details to be able to print it out
+        show_submission = True
+
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
@@ -484,7 +496,9 @@ def accept_reservation(self, request):
             content={
                 'model': self,
                 'resource': resource,
-                'reservations': reservations
+                'reservations': reservations,
+                'show_submission': show_submission,
+                'form': form
             }
         )
 

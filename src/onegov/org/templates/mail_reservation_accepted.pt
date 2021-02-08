@@ -12,5 +12,9 @@
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>
+        <tal:b condition="show_submission|nothing">
+            <hr class="large">
+            <metal:b use-macro="layout.macros['display_form']"/>
+        </tal:b>
     </tal:b>
 </div>
