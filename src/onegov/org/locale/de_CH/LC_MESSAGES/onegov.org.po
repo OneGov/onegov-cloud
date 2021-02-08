@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-08 13:30+0100\n"
+"POT-Creation-Date: 2021-02-08 18:31+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -788,6 +788,17 @@ msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
 msgid "Used to group the resource in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
+
+msgid "Pick-Up"
+msgstr "Abholung"
+
+msgid ""
+"Describes how this resource can be picked up. This text is used on the "
+"ticket status page to inform the user"
+msgstr ""
+"Beschreibt, wie die Reservations-Resource abgeholt oder bezogen werden kann. "
+"Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
+"informieren"
 
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
@@ -4160,6 +4171,17 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid ""
+#~ "Describes how this resource has be be picked up. This text is used on the "
+#~ "ticket status page to inform the user"
+#~ msgstr ""
+#~ "Beschreibt, wie die Reservationsresource abholt oder bezogen werden kann. "
+#~ "Dieser Text auf der Ticket-Status-Seite genutzt, um den Nutzer zu "
+#~ "informieren."
+
+#~ msgid "Describes how this resource has be be picked up"
+#~ msgstr "Beschreibt, wie diese Reservations-Resource abgeholt werden kann"
 
 #~ msgid "Reservation Daypass"
 #~ msgstr "Reservation Tageskarte"

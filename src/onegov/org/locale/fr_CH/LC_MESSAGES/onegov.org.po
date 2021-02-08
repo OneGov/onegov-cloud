@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-08 13:30+0100\n"
+"POT-Creation-Date: 2021-02-08 18:31+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -792,6 +792,16 @@ msgstr "Décrit en quoi consiste cette ressource de réservation"
 
 msgid "Used to group the resource in the overview"
 msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
+
+msgid "Pick-Up"
+msgstr "Ramassage"
+
+msgid ""
+"Describes how this resource can be picked up. This text is used on the "
+"ticket status page to inform the user"
+msgstr ""
+"Décrit la manière dont cette ressource peut être récupérée. Ce texte est "
+"utilisé sur la page de statut du ticket pour informer le client"
 
 msgid "Extra Fields Definition"
 msgstr "Définition de champs supplémentaires"

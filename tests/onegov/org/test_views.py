@@ -1441,6 +1441,7 @@ def test_auto_accept_reservations(client):
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.definition = 'Note = ___'
+    resource.pick_up = 'You can pick it up at the counter'
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1480,6 +1481,11 @@ def test_auto_accept_reservations(client):
     # close the ticket and check not email is sent
     tickets = client.get('/tickets/ALL/closed')
     assert 'RSV-' in tickets
+
+    # Test display of status page of ticket
+    # Generic message, shown when ticket is open or closed
+    assert 'Falls Sie Dokumente über den Postweg' not in page
+    assert 'You can pick it up at the counter' in page
 
 
 @freeze_time("2015-08-28")
@@ -1660,7 +1666,7 @@ def test_reserve_allocation_partially(client):
 
 
 @freeze_time("2015-08-28")
-def test_reserve_no_definition(client):
+def test_reserve_no_definition_pick_up_hint(client):
 
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)

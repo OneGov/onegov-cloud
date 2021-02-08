@@ -110,6 +110,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: secret token to get anonymous access to calendar data
     access_token = content_property()
 
+    #: hint on how to get to the resource
+    pick_up = content_property()
+
     __mapper_args__ = {
         "polymorphic_on": 'type'
     }

@@ -548,6 +548,10 @@ def view_ticket_status(self, request, form):
         type=request.app.settings.org.public_ticket_messages
     )
 
+    pick_up_hint = None
+    if hasattr(self.handler, 'resource') and self.handler.resource:
+        pick_up_hint = self.handler.resource.pick_up
+
     return {
         'title': title,
         'layout': layout,
@@ -555,7 +559,8 @@ def view_ticket_status(self, request, form):
         'feed_data': messages and json.dumps(
             view_messages_feed(messages, request)
         ) or None,
-        'form': form
+        'form': form,
+        'pick_up_hint': pick_up_hint
     }
 
 
