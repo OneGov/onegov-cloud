@@ -29,6 +29,8 @@ from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
 from purl import URL
 from sedate import replace_timezone
+
+from tests.onegov.org.common import get_mail
 from tests.shared import utils
 from tests.shared.utils import decode_map_value, encode_map_value, \
     open_in_browser
@@ -3142,11 +3144,8 @@ def test_newsletter_send(client):
     # make sure the unconfirm link is different for each mail
     unconfirm_1 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
 
-    message = client.app.smtp.outbox[1]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
-
-    unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    mail = get_mail(client.app.smtp.outbox, 1)
+    unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', mail['text']).group(1)
 
     assert unconfirm_1 and unconfirm_2
     assert unconfirm_1 != unconfirm_2
