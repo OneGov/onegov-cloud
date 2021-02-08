@@ -3088,7 +3088,7 @@ def test_newsletter_send(client):
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
-    new.select_checkbox("news", "Willkommen bei OneGov")
+    new.select_checkbox("news", "Wir haben eine neue Webseite!")
     new.select_checkbox("occurrences", "150 Jahre Govikon")
     new.select_checkbox("occurrences", "Gemeinsames Turnen")
 
@@ -3156,6 +3156,11 @@ def test_newsletter_send(client):
 
     anon.get(unconfirm_2)
     assert recipients.query().count() == 1
+
+    # check content of mail
+    assert '150 Jahre Govikon' in mail['text']
+    assert 'Gemeinsames Turnen' in mail['text']
+    assert 'Wir haben eine neue Webseite!' in mail['text']
 
 
 def test_newsletter_schedule(client):
