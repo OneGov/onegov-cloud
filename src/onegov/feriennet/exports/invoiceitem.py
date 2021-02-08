@@ -26,7 +26,7 @@ class InvoiceItemExport(FeriennetExport):
     def query(self, session, period):
         q = session.query(InvoiceItem, Activity._tags)
         q = q.join(Invoice).join(User).join(InvoiceReference)
-        q = q.join(Activity, InvoiceItem.text == Activity.title)
+        q = q.join(Activity, InvoiceItem.text == Activity.title, isouter=True)
         q = q.options(
             contains_eager(InvoiceItem.invoice)
             .contains_eager(Invoice.user)
