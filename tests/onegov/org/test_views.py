@@ -3131,9 +3131,8 @@ def test_newsletter_send(client):
     # make sure the mail was sent correctly
     assert len(client.app.smtp.outbox) == 2
 
-    message = client.app.smtp.outbox[0]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
+    mail = get_mail(client.app.smtp.outbox, 0)
+    message = mail['text']
 
     assert "Our town is AWESOME" in message
     assert "Like many of you" in message
