@@ -17,6 +17,8 @@ from onegov.org.layout import TicketsLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
+from onegov.org.models.ticket import ticket_submitter
+from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
@@ -87,11 +89,7 @@ def view_ticket(self, request):
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
 
-    submitter = handler.deleted and self.snapshot.get('email') or handler.email
-
-    # case of EventSubmissionHandler for imported events
-    if handler.data.get('source'):
-        submitter = handler.data.get('user', submitter)
+    submitter = ticket_submitter(self)
 
     return {
         'title': self.number,
