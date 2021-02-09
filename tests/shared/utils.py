@@ -44,6 +44,17 @@ def open_in_excel(byte_string, exe='libreoffice'):
     os.system(f'{cmd} {path} &')
 
 
+def open_pdf(byte_string, exe='evince'):
+    if not shutil.which(exe):
+        print(f'{exe} is not installed, skipping...')
+        return
+    path = f'/tmp/test.pdf'
+    with open(path, 'wb') as f:
+        f.write(byte_string.read())
+    cmd = exe
+    os.system(f'{cmd} {path} &')
+
+
 def create_image(width=50, height=50, output=None):
     """ Generates a test image and returns it's file handle. """
 
