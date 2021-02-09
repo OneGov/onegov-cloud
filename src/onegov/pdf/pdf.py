@@ -401,6 +401,30 @@ class Pdf(PDFDocument):
 
         self.p(text, style=style or self.style.figcaption)
 
+    @staticmethod
+    # Walk the tree and convert the elements
+    def strip(text):
+        text = text.strip('\r\n')
+        prefix = ' ' if text.startswith(' ') else ''
+        postfix = ' ' if text.endswith(' ') else ''
+
+        # some characters cause issues in the Reportlab and pdfdocument
+        # library, so we need to escape them
+        text = text.replace(';', '&#59;')
+
+        return prefix + text.strip() + postfix
+
+    @staticmethod
+    def inner_html(element):
+        return '{}{}{}'.format(
+            Pdf.strip(element.text or ''),
+            ''.join((
+                Pdf.strip(etree.tostring(child, encoding='unicode'))
+                for child in element
+            )),
+            Pdf.strip(element.tail or '')
+        )
+
     def mini_html(self, html, linkify=False):
         """ Convert a small subset of HTML into ReportLab paragraphs.
 
@@ -452,37 +476,15 @@ class Pdf(PDFDocument):
         html = cleaner.clean(html)
         # Todo: phone numbers with href="tel:.." are cleaned out
 
-        # Walk the tree and convert the elements
-        def strip(text):
-            text = text.strip('\r\n')
-            prefix = ' ' if text.startswith(' ') else ''
-            postfix = ' ' if text.endswith(' ') else ''
-
-            # some characters cause issues in the Reportlab and pdfdocument
-            # library, so we need to escape them
-            text = text.replace(';', '&#59;')
-
-            return prefix + text.strip() + postfix
-
-        def inner_html(element):
-            return '{}{}{}'.format(
-                strip(element.text or ''),
-                ''.join((
-                    strip(etree.tostring(child, encoding='unicode'))
-                    for child in element
-                )),
-                strip(element.tail or '')
-            )
-
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         for element in tree.find('body'):
             if element.tag == 'p':
-                self.p_markup(inner_html(element), self.style.paragraph)
+                self.p_markup(self.inner_html(element), self.style.paragraph)
             elif element.tag in 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [
-                    MarkupParagraph(inner_html(item), style)
+                    MarkupParagraph(self.inner_html(item), style)
                     for item in element
                 ]
                 self.story.append(
@@ -501,7 +503,7 @@ class Pdf(PDFDocument):
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ul.leftIndent
                 items = [
-                    MarkupParagraph(inner_html(item), style)
+                    MarkupParagraph(self.inner_html(item), style)
                     for item in element
                 ]
                 self.story.append(
