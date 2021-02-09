@@ -10,7 +10,7 @@ from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import linkify_phone, _phone_ch
+from onegov.core.utils import Bunch, linkify_phone, _phone_ch
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
@@ -395,3 +395,25 @@ def test_paragraphify():
     assert utils.paragraphify('foo\n\nbar') == '<p>foo</p><p>bar</p>'
     assert utils.paragraphify('foo\r\nbar') == '<p>foo<br>bar</p>'
     assert utils.paragraphify('foo\r\n\r\nbar') == '<p>foo</p><p>bar</p>'
+
+
+def test_bunch():
+    bunch = Bunch(a=1, b=2)
+    assert bunch.a == 1
+    assert bunch.b == 2
+
+    assert (Bunch() == Bunch()) is True
+    assert (Bunch(x=1) == Bunch()) is False
+    assert (Bunch(x=1) == Bunch(x=1)) is True
+    assert (Bunch(x=1) == Bunch(x=2)) is False
+    assert (Bunch(x=1, y=2) == Bunch(x=1, y=2)) is True
+    assert (Bunch(x=1, y=2) == Bunch(x=2, y=2)) is False
+    assert (Bunch(x=1, y=2) == Bunch(x=1, y=3)) is False
+
+    assert (Bunch() != Bunch()) is False
+    assert (Bunch(x=1) != Bunch()) is True
+    assert (Bunch(x=1) != Bunch(x=1)) is False
+    assert (Bunch(x=1) != Bunch(x=2)) is True
+    assert (Bunch(x=1, y=2) != Bunch(x=1, y=2)) is False
+    assert (Bunch(x=1, y=2) != Bunch(x=2, y=2)) is True
+    assert (Bunch(x=1, y=2) != Bunch(x=1, y=3)) is True

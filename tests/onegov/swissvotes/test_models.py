@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
+from onegov.core.utils import Bunch
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes.models import Actor
 from onegov.swissvotes.models import ColumnMapper
@@ -23,8 +24,8 @@ class DummyRequest(object):
             return text.interpolate()
         return text
 
-    def link(self, target):
-        return str(target)
+    def link(self, target, suffix=None):
+        return f'{target}/{suffix}' if suffix else f'{target}'
 
 
 def test_model_actor():
@@ -875,17 +876,19 @@ def test_model_vote(session, sample_vote):
 
     assert vote.posters(DummyRequest()) == {
         'nay': [
-            (
-                'https://detail.com/3',
-                'https://no.com/objects/3',
-                'Link Social Archives'
+            Bunch(
+                thumbnail='https://detail.com/3',
+                image='https://detail.com/3',
+                url='https://no.com/objects/3',
+                label='Link Social Archives'
             )
         ],
         'yea': [
-            (
-                'https://detail.com/1',
-                'https://yes.com/objects/1',
-                'Link eMuseum.ch'
+            Bunch(
+                thumbnail='https://detail.com/1',
+                image='https://detail.com/1',
+                url='https://yes.com/objects/1',
+                label='Link eMuseum.ch'
             )
         ]
     }
@@ -1050,11 +1053,21 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     ]
 
     assert vote.posters(DummyRequest())['yea'] == [
-        (str(file), None, 'Swissvotes database')
+        Bunch(
+            thumbnail=f'{file}/thumbnail',
+            image=f'{file}',
+            url=None,
+            label='Swissvotes database'
+        )
         for file in vote.campaign_material_yea
     ]
     assert vote.posters(DummyRequest())['nay'] == [
-        (str(file), None, 'Swissvotes database')
+        Bunch(
+            thumbnail=f'{file}/thumbnail',
+            image=f'{file}',
+            url=None,
+            label='Swissvotes database'
+        )
         for file in vote.campaign_material_nay
     ]
 

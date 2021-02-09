@@ -187,9 +187,9 @@
 
     <metal:image_gallery_item define-macro="image_gallery_item" i18n:domain="onegov.swissvotes">
         <div class="image-container ${additional|nothing}">
-            <img src="${src}" alt="" id="${'img-' + index + id_suffix}">
-            <a tal:condition="link" href="${link}" target="_blank" i18n:translate="">${label}</a>
-            <span tal:condition="not: link" i18n:translate="">${label}</span>
+            <img src="${item.thumbnail}" data-src="${item.image}" alt="{item.label}" id="${'img-' + index + id_suffix}">
+            <a tal:condition="item.url" href="${item.url}" target="_blank" i18n:translate="">${item.label}</a>
+            <span tal:condition="not: item.url" i18n:translate="">${item.label}</span>
             <div class="modal" id="${'modal-' + index + id_suffix}">
                 <span class="close" id="${'close-' + index + id_suffix}">&times;</span>
                 <img alt="" id="${'modal-img-' + index + id_suffix}">
@@ -201,10 +201,10 @@
         <tal:block tal:condition="items|nothing and id_suffix|nothing">
             <div class="image-gallery image-gallery-${id_suffix}">
                 <tal:block tal:repeat="item items[:6]">
-                    <tal:block metal:use-macro="layout.macros['image_gallery_item']" tal:define="index str(repeat.item.index); src item[0]; link item[1]; label item[2]" />
+                    <tal:block metal:use-macro="layout.macros['image_gallery_item']" tal:define="index str(repeat.item.index)" />
                 </tal:block>
                 <tal:block tal:repeat="item items[6:]">
-                    <tal:block metal:use-macro="layout.macros['image_gallery_item']" tal:define="index str(repeat.item.index); src item[0]; link item[1]; label item[2]; additional 'additional'" />
+                    <tal:block metal:use-macro="layout.macros['image_gallery_item']" tal:define="index str(repeat.item.index); additional 'additional'" />
                 </tal:block>
             </div>
             <a tal:condition="len(items)>6" class="button secondary image-gallery-toggle" data-suffix="${id_suffix}" i18n:translate="">Show all</a>

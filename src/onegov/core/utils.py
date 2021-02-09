@@ -257,6 +257,14 @@ class Bunch(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 def render_file(file_path, request):
     """ Takes the given file_path (content) and renders it to the browser.

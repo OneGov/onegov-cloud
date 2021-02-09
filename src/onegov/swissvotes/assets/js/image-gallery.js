@@ -4,7 +4,7 @@ $('.image-container > img').each(function () {
     var close = document.getElementById(this.id.replace('img', 'close'));
     $(this).on('click', function () {
         modal.style.display = "block";
-        modalImg.src = this.src;
+        modalImg.src = this.dataset['src'];
     });
     $(close).on('click', function () {
         modal.style.display = "none";

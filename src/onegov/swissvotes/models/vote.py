@@ -5,12 +5,13 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
+from onegov.core.utils import Bunch
 from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
+from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
 from onegov.swissvotes.models.file import LocalizedFiles
-from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
 from sqlalchemy import Column
@@ -277,13 +278,27 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             ('nay', 'posters_sa_nay_imgs', _('Link Social Archives')),
         ):
             for url, image in getattr(self, attribute).items():
-                result[key].append((image, url, label))
+                result[key].append(
+                    Bunch(
+                        thumbnail=image,
+                        image=image,
+                        url=url,
+                        label=label
+                    )
+                )
         for key, attribute, label in (
             ('yea', 'campaign_material_yea', _('Swissvotes database')),
             ('nay', 'campaign_material_nay', _('Swissvotes database')),
         ):
             for image in getattr(self, attribute):
-                result[key].append((request.link(image), None, label))
+                result[key].append(
+                    Bunch(
+                        thumbnail=request.link(image, 'thumbnail'),
+                        image=request.link(image),
+                        url=None,
+                        label=label
+                    )
+                )
         return result
 
     # Post-vote poll
