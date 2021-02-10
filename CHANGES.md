@@ -1,8 +1,45 @@
 # Changes
 
+## Release `2021.19`
+
+> commits: **15 / [a1d6a50697...d3ea0464b2](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...d3ea0464b2)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.19)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Improves newsletter sending (for news)**
+
+Adds preview to newsletter sending form. Adds option to choose
+newsletter item text instead of the lead when sending a newsletter.
+
+**`Feature`** | **[SEA-109](https://linear.app/seantis/issue/SEA-109)** | **[67bacc49f9](https://github.com/onegov/onegov-cloud/commit/67bacc49f961c342442233b9cc7db69f500c543d)**
+
+🎉 **Adds the form data to confirmation email in reservations**
+
+**`Feature`** | **[SEA-112](https://linear.app/seantis/issue/SEA-112)** | **[c6527d2f71](https://github.com/onegov/onegov-cloud/commit/c6527d2f7100d4bb54559c1d06438fb0b2f932da)**
+
+🎉 **Enable pick up information display for resources**
+
+Shows pick up hint if available on /ticket/../status instead of general info.
+
+**`Feature`** | **[SEA-97](https://linear.app/seantis/issue/SEA-97)** | **[97d1a480ac](https://github.com/onegov/onegov-cloud/commit/97d1a480ac2aea93472c0c80af2327ab8a79b87a)**
+
+🎉 **Adds generic PDF's for tickets**
+
+Create PDF from (snapshotted) tickets and its messages. Does not iclude any files into the PDF.
+
+**`Feature`** | **[SEA-89](https://linear.app/seantis/issue/SEA-89)** | **[d3ea0464b2](https://github.com/onegov/onegov-cloud/commit/d3ea0464b2e4d32d70cf32107e7bc0bf8b4d8649)**
+
+### Swissvotes
+
+🎉 **Use thumbnails for additional poster material.**
+
+**`Feature`** | **[VOTES-74](https://issues.seantis.ch/browse/VOTES-74)** | **[3d7ba8e004](https://github.com/onegov/onegov-cloud/commit/3d7ba8e004d87082967c0556d66b12101879e2f4)**
+
 ## Release `2021.18`
 
-> commits: **10 / [fbda428801...122568e981](https://github.com/OneGov/onegov-cloud/compare/fbda428801^...122568e981)**  
+> released: **2021-02-08 10:32**<br>
+> commits: **11 / [fbda428801...bb54253ac8](https://github.com/OneGov/onegov-cloud/compare/fbda428801^...bb54253ac8)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.18)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
