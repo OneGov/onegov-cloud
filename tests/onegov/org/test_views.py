@@ -32,8 +32,7 @@ from sedate import replace_timezone
 
 from tests.onegov.org.common import get_mail
 from tests.shared import utils
-from tests.shared.utils import decode_map_value, encode_map_value, \
-    open_in_browser
+from tests.shared.utils import decode_map_value, encode_map_value
 from unittest.mock import patch
 from webtest import Upload
 from yubico_client import Yubico

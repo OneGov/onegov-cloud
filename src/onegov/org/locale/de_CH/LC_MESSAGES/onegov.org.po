@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-08 18:31+0100\n"
+"POT-Creation-Date: 2021-02-10 13:14+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,33 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.4.2\n"
+
+msgid "Open"
+msgstr "Offen"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
+
+msgid "Closed"
+msgstr "Abgeschlossen"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Paid"
+msgstr "Bezahlt"
+
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+msgid "Refunded"
+msgstr "Rückerstattet"
+
+msgid "Manual"
+msgstr "Manuell"
+
+msgid "Stripe Connect"
+msgstr ""
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -314,9 +341,6 @@ msgstr "Preis"
 
 msgid "Free of charge"
 msgstr "Kostenlos"
-
-msgid "Paid"
-msgstr "Bezahlt"
 
 msgid "Price per submission"
 msgstr "Preis pro Eingabe"
@@ -1373,6 +1397,9 @@ msgstr "Ticket wieder öffnen"
 msgid "New Note"
 msgstr "Neue Notiz"
 
+msgid "PDF"
+msgstr ""
+
 msgid "New Message"
 msgstr "Neue Nachricht"
 
@@ -1504,9 +1531,6 @@ msgstr "Exporte"
 
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
-
-msgid "Stripe Connect"
-msgstr ""
 
 msgid "Synchronise"
 msgstr "Synchronisieren"
@@ -1969,6 +1993,46 @@ msgstr ""
 "Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
 
+msgid "Source"
+msgstr "Herkunft"
+
+msgid "Subject"
+msgstr "Betreff"
+
+msgid "Owner"
+msgstr "Zuständig"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "Reaction Time"
+msgstr "Reaktionszeit"
+
+msgid "Process Time"
+msgstr "Bearbeitungszeit"
+
+msgid "Event Source"
+msgstr "Quelle Veranstaltung"
+
+msgid "Payment"
+msgstr "Zahlung"
+
+msgid "Total Amount"
+msgstr "Totalbetrag"
+
+msgid "Fee"
+msgstr "Gebühr"
+
+msgid ""
+"The record behind this ticket was removed. The following information is a "
+"snapshot kept for future reference."
+msgstr ""
+"Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen sind "
+"eine Momentaufnahme, erstellt vor der Löschung."
+
+msgid "Summary"
+msgstr "Zusammenfassung"
+
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
@@ -2187,32 +2251,11 @@ msgstr ""
 "Diese Seite hat keine Einleitung. Die Einleitung ist wichtig für die Suche "
 "und Auflistungen."
 
-msgid "Total Amount"
-msgstr "Totalbetrag"
-
 msgid "Change request"
 msgstr "Änderungsvorschlag"
 
 msgid "New Entry"
 msgstr "Neuer Eintrag"
-
-msgid "Open"
-msgstr "Offen"
-
-msgid "Pending"
-msgstr "In Bearbeitung"
-
-msgid "Closed"
-msgstr "Abgeschlossen"
-
-msgid "Failed"
-msgstr "Fehlgeschlagen"
-
-msgid "Refunded"
-msgstr "Rückerstattet"
-
-msgid "Manual"
-msgstr "Manuell"
 
 msgid "Previous Page"
 msgstr "Vorherige Seite"
@@ -2338,9 +2381,6 @@ msgstr "Privatsphäre"
 msgid "Send me my entered data by e-mail."
 msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 
-msgid "Payment"
-msgstr "Zahlung"
-
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
@@ -2358,12 +2398,6 @@ msgstr "Objekt"
 
 msgid "Net Amount"
 msgstr "Netto Betrag"
-
-msgid "Fee"
-msgstr "Gebühr"
-
-msgid "Created"
-msgstr "Erstellt"
 
 msgid "Disbursed"
 msgstr "Ausbezahlt"
@@ -3061,13 +3095,6 @@ msgstr ""
 "Ihr Registrationslink wurde wie folgt erstellt. Bitte kopieren Sie diesen "
 "bevor Sie weiterfahren, der Link wird Ihnen nicht wieder angezeigt:"
 
-msgid ""
-"The record behind this ticket was removed. The following information is a "
-"snapshot kept for future reference."
-msgstr ""
-"Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen sind "
-"eine Momentaufnahme, erstellt vor der Löschung."
-
 msgid "No activities yet."
 msgstr "Noch keine Aktivitäten."
 
@@ -3113,21 +3140,6 @@ msgstr "${count} Notizen"
 msgid "Amount"
 msgstr "Betrag"
 
-msgid "Source"
-msgstr "Herkunft"
-
-msgid "Owner"
-msgstr "Zuständig"
-
-msgid "Reaction Time"
-msgstr "Reaktionszeit"
-
-msgid "Process Time"
-msgstr "Bearbeitungszeit"
-
-msgid "Summary"
-msgstr "Zusammenfassung"
-
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -3144,9 +3156,6 @@ msgstr ""
 
 msgid "Request Reference"
 msgstr "Referenz Anfrage"
-
-msgid "Subject"
-msgstr "Betreff"
 
 msgid ""
 "Forgot something or have a special request? Add a message to the ticket."
@@ -3747,9 +3756,6 @@ msgstr "\"${title}\" wurde an ${recipient} gesendet"
 msgid "Sends a test newsletter to the given address"
 msgstr "Sendet ein Test-Newsletter an die gewählte Adresse"
 
-msgid "All"
-msgstr "Alle"
-
 msgid "Today"
 msgstr "Heute"
 
@@ -4171,6 +4177,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "created"
+#~ msgstr "erstellt"
 
 #~ msgid ""
 #~ "Describes how this resource has be be picked up. This text is used on the "

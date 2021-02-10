@@ -1,4 +1,7 @@
+from datetime import date
+
 import morepath
+from morepath import Response
 
 from onegov.chat import MessageCollection
 from onegov.core.utils import normalize_for_url
@@ -7,6 +10,7 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.core.elements import Link, Intercooler, Confirm
+from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import TicketNoteForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import InternalTicketChatMessageForm
@@ -496,6 +500,22 @@ def message_to_submitter(self, request, form):
     }
 
 
+@OrgApp.view(model=Ticket, name='pdf', permission=Private)
+def view_ticket_pdf(self, request):
+    """ View the generated PDF. """
+
+    content = TicketPdf.from_ticket(request, self)
+
+    return Response(
+        content.read(),
+        content_type='application/pdf',
+        content_disposition='inline; filename={}_{}.pdf'.format(
+            normalize_for_url(self.number),
+            date.today().strftime('%Y%m%d')
+        )
+    )
+
+
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',
              permission=Public, form=TicketChatMessageForm)
 def view_ticket_status(self, request, form):
@@ -581,14 +601,7 @@ def view_tickets(self, request):
         groups[handler].sort(key=lambda g: normalize_for_url(g))
 
     def get_filters():
-        states = (
-            ('open', _("Open")),
-            ('pending', _("Pending")),
-            ('closed', _("Closed")),
-            ('all', _("All"))
-        )
-
-        for id, text in states:
+        for id, text in TICKET_STATES.items():
             yield Link(
                 text=text,
                 url=request.link(self.for_state(id)),

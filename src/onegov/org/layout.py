@@ -1023,6 +1023,13 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'new-note'}
                 )
             )
+            links.append(
+                Link(
+                    text=_("PDF"),
+                    url=self.request.link(self.model, 'pdf'),
+                    attrs={'class': 'ticket-pdf'}
+                )
+            )
 
             return links
 

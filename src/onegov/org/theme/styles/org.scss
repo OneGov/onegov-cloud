@@ -1550,7 +1550,7 @@ $test-link-icon: '\f0e9';
 $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
-
+$pdf-icon: '\f1c1';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1673,6 +1673,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .sync::before { @include icon($sync-icon); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
+    .ticket-pdf::before { @include icon($pdf-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
