@@ -179,8 +179,6 @@ class TicketPdf(Pdf):
                     [MarkupParagraph(self.inner_html(item))]
                     for item in element
                 ]
-                for el in element:
-                    print(self.inner_html(el))
                 self.table(items, 'even')
 
     def ticket_metadata(self):
