@@ -3204,18 +3204,18 @@ def test_newsletter_schedule(client):
     time = replace_timezone(datetime(2018, 5, 31, 11, 55, 1), 'Europe/Zurich')
 
     with freeze_time(time):
-        send.form['time'] = '2018-05-31 12:00:00'
+        send.form['time'] = '2018-05-31 12:00'
         assert '5 Minuten in der Zukunft' in send.form.submit()
 
         # schedule the newsletter outside the hour
-        send.form['time'] = '2018-05-31 12:55:00'
+        send.form['time'] = '2018-05-31 12:55'
         assert 'nur zur vollen Stunde' in send.form.submit()
 
     # schedule the newsletter at a valid time
     time = replace_timezone(datetime(2018, 5, 31, 11, 55, 0), 'Europe/Zurich')
 
     with freeze_time(time):
-        send.form['time'] = '2018-05-31 12:00:00'
+        send.form['time'] = '2018-05-31 12:00'
         send.form.submit().follow()
 
 

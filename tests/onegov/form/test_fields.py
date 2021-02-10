@@ -16,7 +16,6 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import UploadField
-from onegov.form.fields import DateTimeField
 from onegov.form.validators import ValidPhoneNumber
 
 

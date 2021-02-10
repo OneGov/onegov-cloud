@@ -39,8 +39,8 @@ def test_edit_course_event(client_with_db):
     client.login_admin()
     new = client.get(view)
     new.form['location'] = 'New Loc'
-    new.form['start'] = datetime(2015, 5, 5)
-    new.form['end'] = datetime(2015, 5, 6)
+    new.form['start'] = '2015-05-05 00:00'
+    new.form['end'] = '2015-05-06 00:00'
     new.form['presenter_name'] = 'Pres'
     new.form['min_attendees'] = 2
     new.form['max_attendees'] = 3
@@ -73,8 +73,8 @@ def test_add_delete_course_event(client_with_db):
     page.form['presenter_name'] = 'Presenter'
     page.form['presenter_company'] = 'Company'
     page.form['presenter_email'] = 'p@t.com'
-    page.form['start'] = '2016-10-04 10:00:00'
-    page.form['end'] = '2016-10-04 12:00:00'
+    page.form['start'] = '2016-10-04 10:00'
+    page.form['end'] = '2016-10-04 12:00'
     page.form['location'] = 'location'
     assert page.form['min_attendees'].value == '1'
     page.form['max_attendees'] = '10'
@@ -89,8 +89,8 @@ def test_add_delete_course_event(client_with_db):
     page.form['presenter_name'] = 'Presenter'
     page.form['presenter_company'] = 'Company'
     page.form['presenter_email'] = 'p@t.com'
-    page.form['start'] = '2016-10-04 10:00:00'
-    page.form['end'] = '2016-10-04 12:00:00'
+    page.form['start'] = '2016-10-04 10:00'
+    page.form['end'] = '2016-10-04 12:00'
     page.form['location'] = 'location'
     page.form['max_attendees'] = '10'
     page = page.form.submit()

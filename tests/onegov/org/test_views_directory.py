@@ -14,8 +14,9 @@ from tests.shared.utils import create_image, open_in_browser
 
 
 def dt_for_form(dt):
-    """2020-11-25 12:29:00"""
-    return dt.strftime('%Y-%m-%d %H:%M:%S')
+    """2020-11-25 12:29, using the correct format for local datetime
+     fields """
+    return dt.strftime('%Y-%m-%dT%H:%M')
 
 
 def dt_repr(dt):
@@ -26,9 +27,11 @@ def dir_query(client):
     return client.app.session().query(ExtendedDirectoryEntry)
 
 
-def strip_ms(dt, timezone=None):
+def strip_s(dt, timezone=None):
+    """Strips the time from seconds ms and seconds according to inputs of
+    type datetime-local """
     dt = datetime(
-        dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+        dt.year, dt.month, dt.day, dt.hour, dt.minute)
     if not timezone:
         return dt
     return standardize_date(dt, timezone)
@@ -134,7 +137,7 @@ def test_publication_with_submission(client):
     monthly_entry = dir_query(client).one()
     assert monthly_entry.name == 'monthly'
     assert not monthly_entry.publication_start
-    assert monthly_entry.publication_end == strip_ms(
+    assert monthly_entry.publication_end == strip_s(
         monthly_end, timezone='Europe/Zurich')
 
     assert monthly_entry.publication_started
@@ -177,8 +180,8 @@ def test_directory_publication_change_request(client):
     accecpt_latest_submission(client)
     annual_entry = dir_query(client).first()
     assert annual_entry.name == 'annual'
-    assert annual_entry.publication_end == strip_ms(new_end, timezone='Europe/Zurich')
-    assert annual_entry.publication_start == strip_ms(now, timezone='Europe/Zurich')
+    assert annual_entry.publication_end == strip_s(new_end, timezone='Europe/Zurich')
+    assert annual_entry.publication_start == strip_s(now, timezone='Europe/Zurich')
 
 
 def test_directory_change_requests(client):
