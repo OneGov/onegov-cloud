@@ -1,14 +1,17 @@
 from datetime import timedelta
+
+from wtforms.fields.html5 import DateTimeField
+
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, ChosenSelectField
+from onegov.form.fields import MultiCheckboxField, ChosenSelectField, \
+    DateTimeLocalField
 from onegov.newsletter import Recipient
 from onegov.org import _
 from sedate import replace_timezone, to_timezone, utcnow
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms import ValidationError
-from wtforms.fields.html5 import DateTimeField
 
 
 class NewsletterForm(Form):
@@ -163,8 +166,8 @@ class NewsletterSendForm(Form):
         default='now'
     )
 
-    time = DateTimeField(
-        _("Time"),
+    time = DateTimeLocalField(
+        label=_("Time"),
         validators=[validators.InputRequired()],
         depends_on=('send', 'specify')
     )
