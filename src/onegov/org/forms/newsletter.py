@@ -1,7 +1,5 @@
 from datetime import timedelta
 
-from wtforms.fields.html5 import DateTimeField
-
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
 from onegov.form import Form
