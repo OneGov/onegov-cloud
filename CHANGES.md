@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2021.20`
+
+> commits: **5 / [eb99ea1ef8...c56f514ed2](https://github.com/OneGov/onegov-cloud/compare/eb99ea1ef8^...c56f514ed2)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.20)](https://buildkite.com/seantis/onegov-cloud)
+
+### Form
+
+🎉 **Removes deprecated DateTimeField everywhere**
+
+**`Feature`** | **[SEA-111](https://linear.app/seantis/issue/SEA-111)** | **[9f4af033d2](https://github.com/onegov/onegov-cloud/commit/9f4af033d229b53fc22046166f4961d2fa79b4bb)**
+
+### Org
+
+🎉 **Extends directory config to hide labels in main view**
+
+**`Feature`** | **[SEA-92](https://linear.app/seantis/issue/SEA-92)** | **[eb99ea1ef8](https://github.com/onegov/onegov-cloud/commit/eb99ea1ef84535cae1652f5dc0189e2784bd1b9d)**
+
 ## Release `2021.19`
 
-> commits: **15 / [a1d6a50697...d3ea0464b2](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...d3ea0464b2)**  
+> released: **2021-02-10 14:42**<br>
+> commits: **16 / [a1d6a50697...f6af388d87](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...f6af388d87)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.19)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
