@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-10 13:14+0100\n"
+"POT-Creation-Date: 2021-02-10 15:37+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -255,6 +255,9 @@ msgstr "Format Principal"
 
 msgid "Main view"
 msgstr "Affichage principal"
+
+msgid "Hide these labels on the main view"
+msgstr "Cacher ces noms de champs dans la vue principale"
 
 msgid "Address"
 msgstr "Adresse"

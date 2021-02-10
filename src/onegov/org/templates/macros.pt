@@ -541,7 +541,7 @@
     <h2 tal:condition="fieldset.is_visible and rendered_fields|nothing">${fieldset.label}</h2>
 
     <dl class="field-display" tal:repeat="(field, rendered) rendered_fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
-        <dt>${field.label.text}</dt>
+        <dt tal:condition="layout.show_label(field)">${field.label.text}</dt>
         <dd>
             <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
                 <tal:b define="url layout.field_download_link(field)">

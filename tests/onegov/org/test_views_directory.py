@@ -43,6 +43,7 @@ def create_directory(client, publication=True, change_reqs=True):
                     Pic *= *.jpg|*.png|*.gif
                 """
     page.form['content_fields'] = 'Name\nPic'
+    page.form['content_hide_labels'] = 'Pic'
     page.form['title_format'] = '[Name]'
     page.form['enable_map'] = 'entry'
     page.form['enable_publication'] = publication
@@ -78,6 +79,9 @@ def test_publication_added_by_admin(client):
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
+
+    assert 'Pic' not in entry
+
     entry_db = dir_query(client).one()
     # timezone unaware and not converted to utc before
     # contains publications relevant info

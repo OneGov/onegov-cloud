@@ -96,6 +96,11 @@ class DirectoryBaseForm(Form):
         fieldset=_("Display"),
         render_kw={'class_': 'formcode-select'})
 
+    content_hide_labels = TextAreaField(
+        label=_("Hide these labels on the main view"),
+        fieldset=_("Display"),
+        render_kw={'class_': 'formcode-select'})
+
     contact_fields = TextAreaField(
         label=_("Address"),
         fieldset=_("Display"),
@@ -405,6 +410,8 @@ class DirectoryBaseForm(Form):
     @property
     def configuration(self):
         content_fields = list(self.extract_field_ids(self.content_fields))
+        content_hide_labels = list(
+            self.extract_field_ids(self.content_hide_labels))
         contact_fields = list(self.extract_field_ids(self.contact_fields))
         keyword_fields = list(self.extract_field_ids(self.keyword_fields))
         thumbnails = list(self.extract_field_ids(self.show_as_thumbnails))
@@ -421,7 +428,8 @@ class DirectoryBaseForm(Form):
             searchable=content_fields + contact_fields,
             display={
                 'content': content_fields,
-                'contact': contact_fields
+                'contact': contact_fields,
+                'content_hide_labels': content_hide_labels
             },
             direction=self.order_direction.data,
             link_pattern=self.link_pattern.data,
@@ -447,6 +455,8 @@ class DirectoryBaseForm(Form):
         self.title_format.data = cfg.title
         self.lead_format.data = cfg.lead or ''
         self.content_fields.data = '\n'.join(cfg.display.get('content', ''))
+        self.content_hide_labels.data = '\n'.join(
+            cfg.display.get('content_hide_labels', ''))
         self.contact_fields.data = '\n'.join(cfg.display.get('contact', ''))
         self.keyword_fields.data = join('keywords')
         self.order_direction.data = cfg.direction == 'desc' and 'desc' or 'asc'

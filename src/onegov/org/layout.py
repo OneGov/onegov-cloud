@@ -574,6 +574,9 @@ class DefaultLayout(Layout):
             Link(r.title, self.request.link(r)) for r in self.root_pages
         )
 
+    def show_label(self, field):
+        return True
+
 
 class DefaultMailLayout(Layout):
     """ A special layout for creating HTML E-Mails. """
@@ -2061,6 +2064,9 @@ class DirectoryEntryBaseLayout(DefaultLayout):
     @property
     def directory(self):
         return self.model.directory
+
+    def show_label(self, field):
+        return field.id not in self.model.hidden_label_fields
 
 
 class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):

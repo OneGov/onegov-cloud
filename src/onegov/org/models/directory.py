@@ -345,6 +345,13 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
                 if field.id in content_config and field.data
             )
 
+    @property
+    def hidden_label_fields(self):
+        return {
+            as_internal_id(k)
+            for k in self.display_config.get('content_hide_labels', tuple())
+        }
+
 
 class ExtendedDirectoryEntryCollection(DirectoryEntryCollection):
 
