@@ -77,8 +77,9 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     with open(pdf_1, 'rb') as file:
         content_1 = file.read()
     manage.form['file'] = Upload('1.pdf', content_1, 'application/pdf')
-    manage = manage.form.submit().maybe_follow()
-    assert "Attachment added" in manage
+    manage.form.submit()
+
+    manage = client.get('/page/about').click("Manage attachments")
     assert "1.pdf" in manage
     assert manage.click('1.pdf').content_type == 'application/pdf'
 
@@ -88,8 +89,9 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     with open(pdf_2, 'rb') as file:
         content_2 = file.read()
     manage.form['file'] = Upload('2.pdf', content_2, 'application/pdf')
-    manage = manage.form.submit().maybe_follow()
-    assert "Anhang hinzugefügt" in manage
+    manage.form.submit()
+
+    manage = client.get('/page/about').click("Anhänge verwalten")
     assert "1.pdf" not in manage
     assert "2.pdf" in manage
     assert manage.click('2.pdf').content_type == 'application/pdf'

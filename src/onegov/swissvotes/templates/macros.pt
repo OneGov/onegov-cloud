@@ -211,4 +211,21 @@
         </tal:block>
     </metal:image_gallery>
 
+    <metal:slider define-macro="slider" i18n:domain="onegov.swissvotes">
+        <ul class="slides" data-orbit data-options="timer_speed: 5000;
+                                                    pause_on_hover: false;
+                                                    next_on_click: false;
+                                                    swipe: false;
+                                                    navigation_arrows: false;
+                                                    slide_number: false;
+                                                    bullets: false;
+                                                    variable_height: false;
+                                                    " >
+            <li tal:repeat="slide slides">
+                <a tal:condition="slide.url" href="${slide.url}"><img src="${slide.image}" alt="${slide.label}" /></a>
+                <img tal:condition="not:slide.url" src="${slide.image}" alt="${slide.label}" />
+            </li>
+        </ul>
+    </metal:slider>
+
 </body>

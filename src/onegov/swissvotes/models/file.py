@@ -12,6 +12,20 @@ class SwissVoteFile(File):
         return self.reference.filename
 
 
+class TranslatablePageFile(File):
+    """ An attachment to a translatable content page. """
+
+    __mapper_args__ = {'polymorphic_identity': 'swissvotes_page'}
+
+    @property
+    def locale(self):
+        return self.name.split('-')[0]
+
+    @property
+    def filename(self):
+        return self.reference.filename
+
+
 class FileSubCollection(object):
     """ """
 

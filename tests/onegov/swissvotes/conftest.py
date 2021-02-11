@@ -138,6 +138,19 @@ def campaign_material(swissvotes_app):
 
 
 @fixture(scope="function")
+def slider_images(swissvotes_app):
+    result = {}
+
+    for name in ('1', '1-1', '2.1-x', '2.2-x', '2.3-x', 'n'):
+        attachment = TranslatablePageFile(id=random_token())
+        attachment.name = f'slider_images-{name}.png'
+        attachment.reference = as_fileintent(create_image(), f'{name}.png')
+        result[name] = attachment
+
+    yield result
+
+
+@fixture(scope="function")
 def attachment_urls():
     yield {
         'de_CH': {

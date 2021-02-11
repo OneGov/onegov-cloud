@@ -129,12 +129,15 @@ class DeleteVoteLayout(VoteDetailLayout):
 class DeleteVoteAttachmentLayout(DefaultLayout):
 
     @cached_property
+    def parent(self):
+        return self.model.linked_swissvotes[0]
+
+    @cached_property
     def breadcrumbs(self):
-        model = self.model.linked_swissvotes[0]
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Votes"), self.votes_url),
-            Link(model.short_title, self.request.link(model)),
+            Link(self.parent.short_title, self.request.link(self.parent)),
             Link(self.title, '#'),
         ]
 

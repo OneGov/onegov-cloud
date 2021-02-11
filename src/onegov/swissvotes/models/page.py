@@ -4,25 +4,11 @@ from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.file import AssociatedFiles
-from onegov.file import File
+from onegov.swissvotes.models.file import FileSubCollection
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
-
-
-class TranslatablePageFile(File):
-    """ An attachment to a translatable content page. """
-
-    __mapper_args__ = {'polymorphic_identity': 'swissvotes_page'}
-
-    @property
-    def locale(self):
-        return self.name.split('-')[0]
-
-    @property
-    def filename(self):
-        return self.reference.filename
 
 
 class TranslatablePage(Base, TimestampMixin, AssociatedFiles):
@@ -66,6 +52,8 @@ class TranslatablePage(Base, TimestampMixin, AssociatedFiles):
         files = [f for f in self.files
                  if name in f.filename and f.locale == locale]
         return files and files[0] or None
+
+    slider_images = FileSubCollection()
 
 
 class TranslatablePageMove(object):

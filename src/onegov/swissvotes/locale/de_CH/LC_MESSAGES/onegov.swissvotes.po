@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-01-25 10:16+0100\n"
+"POT-Creation-Date: 2021-02-11 08:42+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -199,6 +199,9 @@ msgstr "Seite bearbeiten"
 
 msgid "Manage attachments"
 msgstr "Anhänge verwalten"
+
+msgid "Manage slider images"
+msgstr "Slider-Bilder verwalten"
 
 msgid "Delete page"
 msgstr "Seite löschen"
@@ -1808,11 +1811,13 @@ msgstr "Seite gelöscht"
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Möchten Sie \"${item}\" wirklich löschen?"
 
-msgid "Attachments"
-msgstr "Anhänge"
-
-msgid "Attachment added."
-msgstr "Anhang hinzugefügt."
+msgid ""
+"To associate a slider image with a vote, start the filename with the BFS "
+"number followed by a hyphen, for example, \"501-1.jpg\"."
+msgstr ""
+"Um ein Slider-Bild mit einer Abstimmung zu verknüpfen, muss der Dateinamen "
+"mit der BFS-Nummer beginnen, gefolgt von einem Bindestrich, z. B. \"501-1.jpg"
+"\"."
 
 msgid "Attachment deleted."
 msgstr "Anhang gelöscht."

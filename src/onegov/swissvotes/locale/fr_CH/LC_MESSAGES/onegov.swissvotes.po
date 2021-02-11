@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-01-25 10:16+0100\n"
+"POT-Creation-Date: 2021-02-11 08:42+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -198,6 +198,9 @@ msgstr "Modifier la page"
 
 msgid "Manage attachments"
 msgstr "Gérer les pièces jointes"
+
+msgid "Manage slider images"
+msgstr "Gérer les images de glissement"
 
 msgid "Delete page"
 msgstr "Supprimer la page"
@@ -1811,11 +1814,12 @@ msgstr "Page supprimée"
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Voulez-vous vraiment supprimer \"${item}\" ?"
 
-msgid "Attachments"
-msgstr "Pièces jointes"
-
-msgid "Attachment added."
-msgstr "Pièce jointe ajoutée."
+msgid ""
+"To associate a slider image with a vote, start the filename with the BFS "
+"number followed by a hyphen, for example, \"501-1.jpg\"."
+msgstr ""
+"Pour associer une image de curseur à un sondage, commencez le nom du fichier "
+"par le numéro BFS suivi d'un trait d'union, par exemple \"501-1.jpg\"."
 
 msgid "Attachment deleted."
 msgstr "Pièce jointe supprimée."

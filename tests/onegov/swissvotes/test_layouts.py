@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
+from onegov.core.utils import Bunch
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
@@ -17,7 +18,8 @@ from onegov.swissvotes.layouts import EditPageLayout
 from onegov.swissvotes.layouts import MailLayout
 from onegov.swissvotes.layouts import ManageCampaingMaterialNayLayout
 from onegov.swissvotes.layouts import ManageCampaingMaterialYeaLayout
-from onegov.swissvotes.layouts import PageAttachmentsLayout
+from onegov.swissvotes.layouts import ManagePageAttachmentsLayout
+from onegov.swissvotes.layouts import ManagePageSliderImagesLayout
 from onegov.swissvotes.layouts import PageLayout
 from onegov.swissvotes.layouts import UpdateExternalResourcesLayout
 from onegov.swissvotes.layouts import UpdateVotesLayout
@@ -63,6 +65,10 @@ class DummyRequest(object):
     def link(self, model, name=''):
         if isinstance(model, str):
             return f'{model}/{name}'
+        if hasattr(model, 'bfs_number'):
+            return f'{model.__class__.__name__}/{model.bfs_number}/{name}'
+        if hasattr(model, 'id'):
+            return f'{model.__class__.__name__}/{model.id}/{name}'
         return f'{model.__class__.__name__}/{name}'
 
     def exclude_invisible(self, objects):
@@ -120,11 +126,13 @@ def test_layout_default(swissvotes_app):
     assert layout.move_page_url_template == (
         'TranslatablePageMove/?csrf-token=x'
     )
-    assert path([layout.disclaimer_link]) == 'TranslatablePage'
+    assert path([layout.disclaimer_link]) == 'TranslatablePage/disclaimer'
     layout.disclaimer_link.text == 'disclaimer'
-    assert path([layout.imprint_link]) == 'TranslatablePage'
+    assert path([layout.imprint_link]) == 'TranslatablePage/imprint'
     layout.imprint_link.text == 'imprint'
-    assert path([layout.data_protection_link]) == 'TranslatablePage'
+    assert path([layout.data_protection_link]) == (
+        'TranslatablePage/data-protection'
+    )
     layout.data_protection_link.text == 'data-protection'
 
     # Login
@@ -342,9 +350,10 @@ def test_layout_page(session):
     request.roles = ['editor']
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
-        'TranslatablePage/edit',
-        'TranslatablePage/attachments',
-        'TranslatablePage/delete',
+        'TranslatablePage/page/edit',
+        'TranslatablePage/page/attachments',
+        'TranslatablePage/page/slider-images',
+        'TranslatablePage/page/delete',
         'TranslatablePageCollection/add'
     ]
 
@@ -352,9 +361,10 @@ def test_layout_page(session):
     request.roles = ['admin']
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
-        'TranslatablePage/edit',
-        'TranslatablePage/attachments',
-        'TranslatablePage/delete',
+        'TranslatablePage/page/edit',
+        'TranslatablePage/page/attachments',
+        'TranslatablePage/page/slider-images',
+        'TranslatablePage/page/delete',
         'TranslatablePageCollection/add'
     ]
 
@@ -362,9 +372,79 @@ def test_layout_page(session):
     model.id = 'home'
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
-        'TranslatablePage/edit',
-        'TranslatablePage/attachments',
+        'TranslatablePage/home/edit',
+        'TranslatablePage/home/attachments',
+        'TranslatablePage/home/slider-images',
         'TranslatablePageCollection/add'
+    ]
+
+
+def test_layout_page_slides(swissvotes_app, slider_images):
+    session = swissvotes_app.session()
+    votes = {
+        bfs_number: SwissVote(
+            title_de=f'Vote {bfs_number} DE',
+            title_fr=f'Vote {bfs_number} FR',
+            short_title_de='Vote D',
+            short_title_fr='Vote F',
+            bfs_number=Decimal(bfs_number),
+            date=date(1990, 6, 2),
+            legislation_number=10,
+            legislation_decade=NumericRange(1990, 1994),
+            votes_on_same_day=2,
+            _legal_form=1
+        ) for bfs_number in ('1', '2.1', '2.2')
+    }
+    for vote in votes.values():
+        session.add(vote)
+    session.flush()
+
+    request = DummyRequest()
+    request.app = swissvotes_app
+    model = TranslatablePage(
+        id='page',
+        title_translations={'en_US': "Page", 'de_CH': "Seite"},
+        content_translations={'en_US': "Content", 'de_CH': "Inhalt"}
+    )
+    session.add(model)
+    session.flush()
+
+    for file in slider_images.values():
+        model.files.append(file)
+    assert len(model.slider_images) == 6
+
+    layout = PageLayout(model, request)
+    assert layout.slides == [
+        Bunch(
+            image='TranslatablePageFile/{}/'.format(slider_images['1-1'].id),
+            url='SwissVote/{}/'.format(votes['1'].bfs_number),
+            label=votes['1'].title,
+        ),
+        Bunch(
+            image='TranslatablePageFile/{}/'.format(slider_images['1'].id),
+            url='SwissVote/{}/'.format(votes['1'].bfs_number),
+            label=votes['1'].title,
+        ),
+        Bunch(
+            image='TranslatablePageFile/{}/'.format(slider_images['2.1-x'].id),
+            url='SwissVote/{}/'.format(votes['2.1'].bfs_number),
+            label=votes['2.1'].title,
+        ),
+        Bunch(
+            image='TranslatablePageFile/{}/'.format(slider_images['2.2-x'].id),
+            url='SwissVote/{}/'.format(votes['2.2'].bfs_number),
+            label=votes['2.2'].title,
+        ),
+        Bunch(
+            image='TranslatablePageFile/{}/'.format(slider_images['2.3-x'].id),
+            url='',
+            label='',
+        ),
+        Bunch(
+            image='TranslatablePageFile/{}/'.format(slider_images['n'].id),
+            url='',
+            label='',
+        ),
     ]
 
 
@@ -401,7 +481,7 @@ def test_layout_edit_page(session):
     layout = EditPageLayout(model, request)
     assert layout.title == "Edit page"
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/#'
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/page/#'
 
     # Log in as editor
     request.roles = ['editor']
@@ -427,7 +507,7 @@ def test_layout_delete_page(session):
     layout = DeletePageLayout(model, request)
     assert layout.title == "Delete page"
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/#'
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/page/#'
 
     # Log in as editor
     request.roles = ['editor']
@@ -440,7 +520,7 @@ def test_layout_delete_page(session):
     assert layout.editbar_links == []
 
 
-def test_layout_page_attachments(session):
+def test_layout_manage_page_attachments(session):
     request = DummyRequest()
     model = TranslatablePage(
         id='page',
@@ -450,10 +530,36 @@ def test_layout_page_attachments(session):
     session.add(model)
     session.flush()
 
-    layout = PageAttachmentsLayout(model, request)
+    layout = ManagePageAttachmentsLayout(model, request)
     assert layout.title == "Manage attachments"
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/#'
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/page/#'
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = EditPageLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = EditPageLayout(model, request)
+    assert layout.editbar_links == []
+
+
+def test_layout_mange_page_slides(session):
+    request = DummyRequest()
+    model = TranslatablePage(
+        id='page',
+        title_translations={'en_US': "Page", 'de_CH': "Seite"},
+        content_translations={'en_US': "Content", 'de_CH': "Inhalt"}
+    )
+    session.add(model)
+    session.flush()
+
+    layout = ManagePageSliderImagesLayout(model, request)
+    assert layout.title == "Manage slider images"
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/page/#'
 
     # Log in as editor
     request.roles = ['editor']
@@ -473,10 +579,20 @@ def test_layout_delete_page_attachment(swissvotes_app):
     model.name = 'attachment-name'
     model.reference = as_fileintent(BytesIO(b'test'), 'filename')
 
+    page = TranslatablePage(
+        id='page',
+        title_translations={'en_US': "Page", 'de_CH': "Seite"},
+        content_translations={'en_US': "Content", 'de_CH': "Inhalt"}
+    )
+    session = swissvotes_app.session()
+    session.add(page)
+    session.flush()
+    page.files.append(model)
+
     layout = DeletePageAttachmentLayout(model, request)
     assert layout.title == "Delete attachment"
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePageFile/#'
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/page/#'
 
     # Log in as editor
     request.roles = ['editor']
@@ -527,20 +643,20 @@ def test_layout_vote(swissvotes_app):
     request.roles = ['editor']
     layout = VoteLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
-        'SwissVote/upload',
-        'SwissVote/manage-campaign-material-yea',
-        'SwissVote/manage-campaign-material-nay',
-        'SwissVote/delete'
+        'SwissVote/100.00/upload',
+        'SwissVote/100.00/manage-campaign-material-yea',
+        'SwissVote/100.00/manage-campaign-material-nay',
+        'SwissVote/100.00/delete'
     ]
 
     # Log in as admin
     request.roles = ['admin']
     layout = VoteLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
-        'SwissVote/upload',
-        'SwissVote/manage-campaign-material-yea',
-        'SwissVote/manage-campaign-material-nay',
-        'SwissVote/delete'
+        'SwissVote/100.00/upload',
+        'SwissVote/100.00/manage-campaign-material-yea',
+        'SwissVote/100.00/manage-campaign-material-nay',
+        'SwissVote/100.00/delete'
     ]
 
 
@@ -575,7 +691,7 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
             attachment_urls.get(locale, {}).get(attachment)
             or attachment_urls['de_CH'][attachment]  # fallback
         )
-        assert layout.attachments[attachment] == f'SwissVote/{filename}'
+        assert layout.attachments[attachment] == f'SwissVote/100/{filename}'
 
 
 def test_layout_vote_strengths(swissvotes_app):
@@ -586,13 +702,14 @@ def test_layout_vote_strengths(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        bfs_number=Decimal('100')
     )
 
     layout = VoteStrengthsLayout(model, request)
     assert layout.title == _("Voter strengths")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'Principal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/100/#'
     )
 
     # Log in as editor
@@ -614,13 +731,14 @@ def test_layout_upload_vote_attachemts(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        bfs_number=Decimal('100')
     )
 
     layout = UploadVoteAttachemtsLayout(model, request)
     assert layout.title == _("Manage attachments")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'Principal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/100/#'
     )
 
     # Log in as editor
@@ -642,13 +760,14 @@ def test_layout_delete_vote(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        bfs_number=Decimal('100')
     )
 
     layout = DeleteVoteLayout(model, request)
     assert layout.title == _("Delete vote")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'Principal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/100/#'
     )
 
     # Log in as editor
@@ -744,13 +863,14 @@ def test_layout_manage_campaign_material_yea(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        bfs_number=Decimal('100')
     )
 
     layout = ManageCampaingMaterialYeaLayout(model, request)
     assert layout.title == _("Campaign material for a Yes")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'Principal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/100/#'
     )
 
     # Log in as editor
@@ -772,13 +892,14 @@ def test_layout_manage_campaign_material_nay(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        bfs_number=Decimal('100')
     )
 
     layout = ManageCampaingMaterialNayLayout(model, request)
     assert layout.title == _("Campaign material for a No")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'Principal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/100/#'
     )
 
     # Log in as editor
@@ -821,6 +942,7 @@ def test_layout_delete_vote_attachment(swissvotes_app, attachments):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        bfs_number=Decimal('100')
     )
     vote.ad_analysis = attachments['ad_analysis']
     model = vote.ad_analysis
@@ -829,7 +951,7 @@ def test_layout_delete_vote_attachment(swissvotes_app, attachments):
     assert layout.title == _("Delete attachment")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'Principal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/100/#'
     )
 
     # Log in as editor

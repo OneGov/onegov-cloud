@@ -68,10 +68,9 @@ main {
 }
 
 .side-panel {
-    border: 1px solid $table-border-color;
-    border-color: $white;
-    border-radius: 2px;
-    padding: 2em;
+    .slides {
+        margin-bottom: 2em;
+    }
 }
 
 /*

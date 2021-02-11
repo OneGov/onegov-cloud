@@ -420,14 +420,14 @@ def upload_manage_campaign_material_nay(self, request):
 )
 def delete_vote_attachment(self, request, form):
     layout = DeleteVoteAttachmentLayout(self, request)
+    url = request.link(
+        layout.parent,
+        'manage-campaign-material-{}'.format(
+            'nay' if 'nay' in self.name else 'yea'
+        )
+    )
 
     if form.submitted(request):
-        url = request.link(
-            self.linked_swissvotes[0],
-            'manage-campaign-material-{}'.format(
-                'nay' if 'nay' in self.name else 'yea'
-            )
-        )
         request.session.delete(self)
         request.message(_("Attachment deleted."), 'success')
         return redirect(url)
@@ -443,5 +443,5 @@ def delete_vote_attachment(self, request, form):
         'subtitle': _("Delete"),
         'button_text': _("Delete"),
         'button_class': 'alert',
-        'cancel': request.link(self)
+        'cancel': url
     }

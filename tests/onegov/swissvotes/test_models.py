@@ -13,6 +13,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
+from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
 from psycopg2.extras import NumericRange
 from translationstring import TranslationString
@@ -119,6 +120,14 @@ def test_model_localized_file():
     del my.file
     assert my.file is None
     assert set(file.name for file in my.files) == {'file-de_CH'}
+
+
+def test_model_file_subcollection():
+    class MyClass:
+        files = [Bunch(name='a'), Bunch(name='x_b'), Bunch(name='x_a')]
+        x = FileSubCollection()
+
+    assert MyClass().x == [Bunch(name='x_a'), Bunch(name='x_b')]
 
 
 def test_model_page(session):
