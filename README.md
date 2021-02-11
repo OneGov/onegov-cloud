@@ -139,7 +139,7 @@ brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv
 ```shell
 sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev
 libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev
-libpoppler-cpp-dev pv
+libpoppler-cpp-dev pv libzbar0
 ```
 
 ## Installation 🤘
@@ -183,11 +183,11 @@ To configure your setup, copy the example configuration and adjust it to your ne
 
 ## Create database for onegov
 
-Define a user `dev` and password `devpassword` using `dsn: postgresql://dev:devpassword@localhost:5432/onegov` 
+Define a user `dev` and password `devpassword` using `dsn: postgresql://dev:devpassword@localhost:5432/onegov`
 in `onegov.yml`:
 
     sudo -u postgres psql
-    
+
     CREATE USER dev WITH PASSWORD 'devpassword' LOGIN NOINHERIT;
     ALTER USER dev WITH SUPERUSER;
     CREATE DATABASE onegov;
@@ -209,7 +209,7 @@ Then, start your local instance:
 And open the local url in your browser:
 
     open http://localhost/onegov_town/govikon
-    
+
 To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variable:
 
     export ONEGOV_DEVELOPMENT='1'
