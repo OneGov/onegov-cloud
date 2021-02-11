@@ -38,6 +38,7 @@ LEVELS = (
         'onegov.pdf',
         'onegov.people',
         'onegov.quill',
+        'onegov.qrcode',
         'onegov.recipient',
         'onegov.reservation',
         'onegov.search',
