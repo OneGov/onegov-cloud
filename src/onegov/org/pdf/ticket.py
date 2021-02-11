@@ -17,6 +17,15 @@ from onegov.org.views.message import view_messages_feed
 from onegov.pdf import Pdf, page_fn_header
 from html5lib.filters.whitespace import Filter as whitespace_filter
 from reportlab.lib import colors
+from reportlab.lib.units import cm
+from reportlab.lib.utils import ImageReader
+
+
+from onegov.qrcode import QrCode
+
+
+class TicketQrCode(QrCode):
+    _border = 0
 
 
 class TicketPdf(Pdf):
@@ -26,6 +35,7 @@ class TicketPdf(Pdf):
         translations = kwargs.pop('translations', None)
         ticket = kwargs.pop('ticket')
         layout = kwargs.pop('layout')
+        qr_payload = kwargs.pop('qr_payload')
         super(TicketPdf, self).__init__(*args, **kwargs)
         self.ticket = ticket
         self.locale = locale
@@ -34,6 +44,7 @@ class TicketPdf(Pdf):
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_("Source")) + f': {self.doc.author}'
+        self.doc.qr_payload = qr_payload
 
     def translate(self, text):
         """ Translates the given string. """
@@ -78,9 +89,27 @@ class TicketPdf(Pdf):
         )
         canvas.restoreState()
 
+    @staticmethod
+    def page_fn_header_and_footer_qr(canvas, doc):
+        TicketPdf.page_fn_header_and_footer(canvas, doc)
+        height = 2 * cm
+        width = height
+        canvas.saveState()
+        # 0/0 is bottom left
+        image = ImageReader(TicketQrCode.from_payload(doc.qr_payload))
+        canvas.drawImage(
+            image,
+            x=doc.pagesize[0] - doc.rightMargin - width,
+            y=doc.pagesize[1] - doc.topMargin - height,
+            width=width,
+            height=height,
+            mask='auto')
+        canvas.restoreState()
+
     @property
     def page_fn(self):
-        return self.page_fn_header_and_footer
+        """ First page the same as later except Qr-Code ..."""
+        return self.page_fn_header_and_footer_qr
 
     @property
     def page_fn_later(self):
@@ -261,8 +290,6 @@ class TicketPdf(Pdf):
         if not html or html == '<p></p>':
             return
 
-        print(html)
-
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         ticket_summary_tags = ['dl', 'dt', 'dd', 'h2', 'div']
@@ -313,6 +340,8 @@ class TicketPdf(Pdf):
             translations=request.app.translations,
             locale=request.locale,
             layout=layout,
+            qr_payload=request.link(
+                ticket, name=request.is_manager and None or 'status')
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,

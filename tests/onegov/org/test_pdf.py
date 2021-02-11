@@ -8,6 +8,7 @@ from onegov.org.models import TicketMessage
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from tests.shared.utils import open_pdf
 
 
 def open_ticket(request, token, handler_code, create_message=True):
@@ -53,6 +54,10 @@ def test_ticket_pdf(org_app, handlers):
     def class_link(cls, *args, **kwargs):
         return cls.__name__
 
+    def link(*args, **kwargs):
+        name = kwargs.pop('name')
+        return f'https://seantis.ch/{name or ""}'
+
     host_url = '127.0.0.1:8080'
 
     request = Bunch(
@@ -65,8 +70,8 @@ def test_ticket_pdf(org_app, handlers):
         get_translate=get_translate,
         locale='de_CH',
         host_url=host_url,
-        class_link=class_link
-
+        class_link=class_link,
+        link=link
     )
     collection = ResourceCollection(libres_context)
     forms = FormCollection(session)
@@ -108,6 +113,8 @@ def test_ticket_pdf(org_app, handlers):
     assert submission
 
     pdf = TicketPdf.from_ticket(request, ticket)
+    # open_pdf(pdf)
+
     reader = PdfFileReader(pdf)
     assert reader.getNumPages() == 1
     page = reader.getPage(0).extractText()
