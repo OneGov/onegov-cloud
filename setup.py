@@ -33,6 +33,7 @@ setup(
         'onegov.pay',
         'onegov.pdf',
         'onegov.people',
+        'onegov.qrcode',
         'onegov.quill',
         'onegov.recipient',
         'onegov.reservation',
