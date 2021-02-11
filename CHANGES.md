@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2021.21`
+
+> commits: **6 / [13aae131a1...585e2f1cf6](https://github.com/OneGov/onegov-cloud/compare/13aae131a1^...585e2f1cf6)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.21)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds Qr-Code to ticket pdf**
+
+**`Feature`** | **[13aae131a1](https://github.com/onegov/onegov-cloud/commit/13aae131a1da6afd43266369671cfb5180ee7ab9)**
+
+### Swissvotes
+
+🎉 **Add slider to frontpage.**
+
+**`Feature`** | **[VOTES-79](https://issues.seantis.ch/browse/VOTES-79)** | **[abaf934683](https://github.com/onegov/onegov-cloud/commit/abaf934683e4ab8fa0bf4c463df23a862af6eb43)**
+
 ## Release `2021.20`
 
-> commits: **5 / [eb99ea1ef8...c56f514ed2](https://github.com/OneGov/onegov-cloud/compare/eb99ea1ef8^...c56f514ed2)**  
+> released: **2021-02-10 18:31**<br>
+> commits: **6 / [eb99ea1ef8...52896c2160](https://github.com/OneGov/onegov-cloud/compare/eb99ea1ef8^...52896c2160)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.20)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Form
