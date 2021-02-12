@@ -97,7 +97,7 @@ class PageLayout(DefaultLayout):
             result.append(
                 Bunch(
                     image=self.request.link(image),
-                    label=vote.title if vote else '',
+                    label=vote.title if vote else image.filename,
                     url=self.request.link(vote) if vote else ''
                 )
             )

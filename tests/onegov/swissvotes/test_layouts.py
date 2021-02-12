@@ -438,12 +438,12 @@ def test_layout_page_slides(swissvotes_app, slider_images):
         Bunch(
             image='TranslatablePageFile/{}/'.format(slider_images['2.3-x'].id),
             url='',
-            label='',
+            label='2.3-x.png',
         ),
         Bunch(
             image='TranslatablePageFile/{}/'.format(slider_images['n'].id),
             url='',
-            label='',
+            label='n.png',
         ),
     ]
 
