@@ -982,6 +982,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             'fr_CH': 'nachbefragung-codebuch-fr.xlsx',
         }
     )
+    post_vote_poll_report = LocalizedFile(
+        label=_('Technical report of the post-vote poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-technischer-bericht.pdf',
+        }
+    )
     preliminary_examination = LocalizedFile(
         label=_('Preliminary examination'),
         extension='pdf',

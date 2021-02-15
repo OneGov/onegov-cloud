@@ -952,6 +952,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_dataset_dta is None
     assert vote.post_vote_poll_methodology is None
+    assert vote.post_vote_poll_report is None
     assert vote.preliminary_examination is None
     assert vote.realization is None
     assert vote.resolution is None
@@ -975,6 +976,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'post_vote_poll_dataset_sav',
         'post_vote_poll_dataset_dta',
         'post_vote_poll_methodology',
+        'post_vote_poll_report',
         'preliminary_examination',
         'realization',
         'resolution',

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-02-15 10:55+0100\n"
+"POT-Creation-Date: 2021-02-15 11:20+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -116,6 +116,9 @@ msgstr "Codebook for the post-vote poll (PDF)"
 
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Codebook for the post-vote poll (XLSX)"
+
+msgid "Technical report of the post-vote poll"
+msgstr "Technical report of the post-vote poll"
 
 msgid "Updating the external resources may take some time."
 msgstr "Updating the external resources may take some time."
@@ -1772,6 +1775,9 @@ msgstr "Display the map"
 
 msgid "Cockpit with selected results"
 msgstr "Cockpit with selected results"
+
+msgid "Technical report"
+msgstr "Technical report"
 
 msgid "Filter"
 msgstr "Filter"

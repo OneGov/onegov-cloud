@@ -86,6 +86,7 @@ def attachments(swissvotes_app):
         ('resolution', "Arrêté constatant le résultat"),
         ('voting_booklet', "Brochure explicative"),
         ('voting_text', "Abstimmungstext"),
+        ('post_vote_poll_report', "Technischer Bericht"),
     ):
         file = BytesIO()
         pdf = Pdf(file)
@@ -190,6 +191,7 @@ def attachment_urls():
             'post_vote_poll_dataset_sav': 'nachbefragung.sav',
             'post_vote_poll_dataset_dta': 'nachbefragung.dta',
             'post_vote_poll_methodology': 'nachbefragung-methode-de.pdf',
+            'post_vote_poll_report': 'nachbefragung-technischer-bericht.pdf',
             'post_vote_poll': 'nachbefragung-de.pdf',
             'preliminary_examination': 'vorpruefung-de.pdf',
             'realization': 'zustandekommen-de.pdf',
