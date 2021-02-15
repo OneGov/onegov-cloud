@@ -1,26 +1,21 @@
 import os
 from collections import OrderedDict
 
-from onegov.foundation6 import BaseTheme
+from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
-HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default'
-ARIAL = 'Arial, sans-serif !default'
-VERDANA = 'Verdana, Geneva, sans-serif !default'
-COURIER_NEW = '"Courier New", Courier, monospace !default'     # monospace
-ROBOTO_CONDENSED = '"Roboto Condensed", sans-serif !default'
-MERRIWEATHER = 'Merriweather, sans-serif !default'
+HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default;'
+ARIAL = 'Arial, sans-serif !default;'
+VERDANA = 'Verdana, Geneva, sans-serif !default;'
+COURIER_NEW = '"Courier New", Courier, monospace !default;'     # monospace
 
-# "Merriweather","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif
 # options editable by the user
 user_options = {
-    'primary-color-ui': '#006fba',
-    'body-font-family-ui': MERRIWEATHER,
-    'header-font-family-ui': ROBOTO_CONDENSED
+    'primary-color': '#006fba',
+    'font-family-sans-serif': HELVETICA
 }
 
 default_font_families = {
-    'Roboto Condensed': ROBOTO_CONDENSED,
     'Helvetica': HELVETICA,
     'Arial': ARIAL,
     'Verdana': VERDANA,
@@ -32,7 +27,6 @@ class OrgTheme(BaseTheme):
     name = 'onegov.org.foundation'
 
     _force_compile = False
-    use_flex = True
 
     @property
     def default_options(self):
@@ -50,43 +44,35 @@ class OrgTheme(BaseTheme):
         return options
 
     @property
-    def foundation_styles(self):
-        return 'global-styles', 'forms', 'typography'
-
-    @property
     def foundation_components(self):
         return (
-            'button',
-            'button-group',
-            'close-button',
-            'label',
-            # 'progress-bar',
-            # 'slider',
-            # 'switch',
-            'table',
-            # 'badge',
-            'breadcrumbs',
-            'callout',
-            'card',
-            'dropdown',
-            'pagination',
-            'tooltip',
+            'grid',
             'accordion',
-            'media-object',
+            'alert-boxes',
+            'block-grid',
+            'breadcrumbs',
+            'button-groups',
+            'buttons',
+            'dropdown',
+            'dropdown-buttons',
+            'forms',
+            'inline-lists',
+            'labels',
             'orbit',
-            'responsive-embed',
-            'tabs',
-            'thumbnail',
-            'menu',
-            'menu-icon',
-            'accordion-menu',
-            'drilldown-menu',
-            'dropdown-menu',
-            'off-canvas',
+            'pagination',
+            'panels',
+            'progress-bars',
             'reveal',
-            'sticky',
-            'title-bar',
+            'side-nav',
+            'switches',
+            'split-buttons',
+            'sub-nav',
+            'tables',
+            'thumbs',
+            'tooltips',
             'top-bar',
+            'type',
+            'visibility',
         )
 
     @property
@@ -100,31 +86,9 @@ class OrgTheme(BaseTheme):
 
     @property
     def post_imports(self):
-        """Our scss code split into various files"""
         return [
-            'custom_mixins',
-            'typography',
-            'header',
             'org',
-            'sortable',
-            'sidebars',
-            'forms',
-            'panels',
-            'sliders',
-            'org-settings',
-            'helpers',
-            'footer',
-            'chosen',
-            'news',
-            'events',
-            'homepage-tiles',
-            'tickets',
-            'user',
-            'timeline',
-            'upload',
-            'files',
-            'publication_signature',
-            'image-grid'
+            'chosen'
         ]
 
     @property
