@@ -13,13 +13,13 @@ from onegov.core.custom import json
 from onegov.core.elements import Block, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.i18n import SiteLocale
+from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify, paragraphify
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
-from onegov.foundation6.integration import FoundationLayout
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -50,7 +50,7 @@ from sedate import to_timezone
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
 
-class Layout(FoundationLayout):
+class Layout(ChameleonLayout):
     """ Contains methods to render a page inheriting from layout.pt.
 
     All pages inheriting from layout.pt rely on this class being present
@@ -103,7 +103,7 @@ class Layout(FoundationLayout):
     @property
     def primary_color(self):
         return self.org.theme_options.get(
-            'primary-color-ui', user_options['primary-color-ui'])
+            'primary-color', user_options['primary-color'])
 
     @cached_property
     def favicon_apple_touch_url(self):
@@ -136,7 +136,7 @@ class Layout(FoundationLayout):
     @cached_property
     def font_awesome_path(self):
         return self.request.link(StaticFile(
-            'font-awesome5/css/all.min.css',
+            'font-awesome/css/font-awesome.min.css',
             version=self.app.version
         ))
 
@@ -522,12 +522,6 @@ class Layout(FoundationLayout):
         """ Use with tal:attributes='target layout.file_link_target' """
         return self.org.open_files_target_blank and '_blank' or None
 
-    @cached_property
-    def drilldown_back(self):
-        back = self.request.translate(_("back"))
-        return '<li class="js-drilldown-back">' \
-               f'<a class="new-back">{back}</a></li>'
-
 
 class DefaultLayout(Layout):
     """ The default layout meant for the public facing parts of the site. """
@@ -570,9 +564,6 @@ class DefaultLayout(Layout):
         """ Returns the breadcrumbs for the current page. """
         return [Link(_("Homepage"), self.homepage_url)]
 
-    @property
-    def on_homepage(self):
-        return self.request.url == self.homepage_url
 
     @cached_property
     def root_pages(self):
@@ -581,10 +572,7 @@ class DefaultLayout(Layout):
     @cached_property
     def top_navigation(self):
         return tuple(
-            (Link(r.title, self.request.link(r)), tuple(
-                Link(c.title, self.request.link(c))
-                for c in self.request.exclude_invisible(r.children)
-            )) for r in self.root_pages
+            Link(r.title, self.request.link(r)) for r in self.root_pages
         )
 
     def show_label(self, field):
@@ -673,16 +661,7 @@ class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):
     pass
 
 
-class SettingsLayout(DefaultLayout):
-    def __init__(self, model, request, setting=None):
-        super().__init__(model, request)
-
-        self.include_editor()
-        self.include_code_editor()
-        self.request.include('tags-input')
-
-        self.setting = setting
-
+class SettingsLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         bc = [
@@ -696,38 +675,56 @@ class SettingsLayout(DefaultLayout):
         return bc
 
 
-class PageLayout(AdjacencyListLayout):
+class SettingsLayout(DefaultLayout, SettingsLayoutMixin):
+    def __init__(self, model, request, setting=None):
+        super().__init__(model, request)
 
+        self.include_editor()
+        self.include_code_editor()
+        self.request.include('tags-input')
+
+        self.setting = setting
+
+
+class PageLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return tuple(self.get_breadcrumbs(self.model))
 
     @cached_property
     def sidebar_links(self):
-        # Todo: Rename this and remove the sidebars in templates
         return tuple(self.get_sidebar(type='topic'))
 
 
-class NewsLayout(AdjacencyListLayout):
+class PageLayout(AdjacencyListLayout, PageLayoutMixin):
+    pass
 
+
+class NewsLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return tuple(self.get_breadcrumbs(self.model))
 
 
-class EditorLayout(AdjacencyListLayout):
+class NewsLayout(AdjacencyListLayout, NewsLayoutMixin):
+    pass
 
-    def __init__(self, model, request, site_title):
-        super().__init__(model, request)
-        self.site_title = site_title
-        self.include_editor()
 
+class EditorLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         links = list(self.get_breadcrumbs(self.model.page))
         links.append(Link(self.site_title, url='#'))
 
         return links
+
+
+class EditorLayout(AdjacencyListLayout, EditorLayoutMixin):
+
+    def __init__(self, model, request, site_title):
+        super().__init__(model, request)
+        self.site_title = site_title
+        self.include_editor()
 
 
 class FormEditorLayout(DefaultLayout):
@@ -738,13 +735,7 @@ class FormEditorLayout(DefaultLayout):
         self.include_code_editor()
 
 
-class FormSubmissionLayout(DefaultLayout):
-
-    def __init__(self, model, request, title=None):
-        super().__init__(model, request)
-        self.include_code_editor()
-        self.title = title or self.form.title
-
+class FormSubmissionLayoutMixin:
     @cached_property
     def form(self):
         if hasattr(self.model, 'form'):
@@ -849,8 +840,15 @@ class FormSubmissionLayout(DefaultLayout):
         return [edit_link, delete_link, export_link, registration_windows_link]
 
 
-class FormCollectionLayout(DefaultLayout):
+class FormSubmissionLayout(DefaultLayout, FormSubmissionLayoutMixin):
 
+    def __init__(self, model, request, title=None):
+        super().__init__(model, request)
+        self.include_code_editor()
+        self.title = title or self.form.title
+
+
+class FormCollectionLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -878,8 +876,11 @@ class FormCollectionLayout(DefaultLayout):
             ]
 
 
-class PersonCollectionLayout(DefaultLayout):
+class FormCollectionLayout(DefaultLayout, FormCollectionLayoutMixin):
+    pass
 
+
+class PersonCollectionLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -907,8 +908,11 @@ class PersonCollectionLayout(DefaultLayout):
             ]
 
 
-class PersonLayout(DefaultLayout):
+class PersonCollectionLayout(DefaultLayout, PersonCollectionLayoutMixin):
+    pass
 
+
+class PersonLayoutMixin:
     @cached_property
     def collection(self):
         return PersonCollection(self.request.session)
@@ -952,8 +956,11 @@ class PersonLayout(DefaultLayout):
             ]
 
 
-class TicketsLayout(DefaultLayout):
+class PersonLayout(DefaultLayout, PersonLayoutMixin):
+    pass
 
+
+class TicketsLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -962,12 +969,11 @@ class TicketsLayout(DefaultLayout):
         ]
 
 
-class TicketLayout(DefaultLayout):
+class TicketsLayout(DefaultLayout, TicketsLayoutMixin):
+    pass
 
-    def __init__(self, model, request):
-        super().__init__(model, request)
-        self.request.include('timeline')
 
+class TicketsLayoutMixin:
     @cached_property
     def collection(self):
         return TicketCollection(self.request.session)
@@ -988,10 +994,10 @@ class TicketLayout(DefaultLayout):
             if self.model.state == 'pending':
                 links = self.model.handler.get_links(self.request)
                 assert len(links) <= 2, """
-                    Models are limited to two model-specific links. Usually
-                    a primary single link and a link group containing the
-                    other links.
-                """
+                       Models are limited to two model-specific links. Usually
+                       a primary single link and a link group containing the
+                       other links.
+                   """
             else:
                 links = []
 
@@ -1051,13 +1057,14 @@ class TicketLayout(DefaultLayout):
             return links
 
 
-class TicketNoteLayout(DefaultLayout):
+class TicketLayout(DefaultLayout, TicketsLayoutMixin):
 
-    def __init__(self, model, request, title, ticket=None):
+    def __init__(self, model, request):
         super().__init__(model, request)
-        self.title = title
-        self.ticket = ticket or model
+        self.request.include('timeline')
 
+
+class TicketNoteLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1070,17 +1077,20 @@ class TicketNoteLayout(DefaultLayout):
         ]
 
 
-class TicketChatMessageLayout(DefaultLayout):
+class TicketNoteLayout(DefaultLayout, TicketNoteLayoutMixin):
 
-    def __init__(self, model, request, internal=False):
+    def __init__(self, model, request, title, ticket=None):
         super().__init__(model, request)
-        self.internal = internal
+        self.title = title
+        self.ticket = ticket or model
 
+
+class TicketChatMessageLayoutMixin:
     @cached_property
     def breadcrumbs(self):
-        return self.internal\
-            and self.internal_breadcrumbs\
-            or self.public_breadcrumbs
+        return self.internal \
+               and self.internal_breadcrumbs \
+               or self.public_breadcrumbs
 
     @property
     def internal_breadcrumbs(self):
@@ -1102,8 +1112,14 @@ class TicketChatMessageLayout(DefaultLayout):
         ]
 
 
-class ResourcesLayout(DefaultLayout):
+class TicketChatMessageLayout(DefaultLayout, TicketChatMessageLayoutMixin):
 
+    def __init__(self, model, request, internal=False):
+        super().__init__(model, request)
+        self.internal = internal
+
+
+class ResourcesLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1144,8 +1160,11 @@ class ResourcesLayout(DefaultLayout):
             ]
 
 
-class ResourceRecipientsLayout(DefaultLayout):
+class ResourcesLayout(DefaultLayout, ResourcesLayoutMixin):
+    pass
 
+
+class ResourceRecipientsLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1180,11 +1199,11 @@ class ResourceRecipientsLayout(DefaultLayout):
             ]
 
 
-class ResourceRecipientsFormLayout(DefaultLayout):
+class ResourceRecipientsLayout(DefaultLayout, ResourcesLayoutMixin):
+    pass
 
-    def __init__(self, model, request, title):
-        super().__init__(model, request)
-        self.title = title
+
+class ResourceRecipientsFormLayoutMixin:
 
     @cached_property
     def breadcrumbs(self):
@@ -1204,13 +1223,15 @@ class ResourceRecipientsFormLayout(DefaultLayout):
         ]
 
 
-class ResourceLayout(DefaultLayout):
+class ResourceRecipientsFormLayout(
+        DefaultLayout, ResourceRecipientsFormLayoutMixin):
 
-    def __init__(self, model, request):
+    def __init__(self, model, request, title):
         super().__init__(model, request)
+        self.title = title
 
-        self.request.include('fullcalendar')
 
+class ResourceLayoutMixin:
     @cached_property
     def collection(self):
         return ResourceCollection(self.request.app.libres_context)
@@ -1297,12 +1318,20 @@ class ResourceLayout(DefaultLayout):
             ]
 
 
+class ResourceLayout(DefaultLayout, ResourceLayoutMixin):
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        self.request.include('fullcalendar')
+
+
+
 class ReservationLayout(ResourceLayout):
     editbar_links = None
 
 
-class AllocationRulesLayout(ResourceLayout):
-
+class AllocationRulesLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1331,12 +1360,11 @@ class AllocationRulesLayout(ResourceLayout):
         ]
 
 
-class AllocationEditFormLayout(DefaultLayout):
-    """ Same as the resource layout, but with different editbar links, because
-    there's not really an allocation view, but there are allocation forms.
+class AllocationRulesLayout(ResourceLayout, AllocationRulesLayoutMixin):
+    pass
 
-    """
 
+class AllocationEditFormLayoutMixin:
     @cached_property
     def collection(self):
         return ResourceCollection(self.request.app.libres_context)
@@ -1389,8 +1417,15 @@ class AllocationEditFormLayout(DefaultLayout):
                 )
 
 
-class EventBaseLayout(DefaultLayout):
+class AllocationEditFormLayout(DefaultLayout, AllocationEditFormLayoutMixin):
+    """ Same as the resource layout, but with different editbar links, because
+    there's not really an allocation view, but there are allocation forms.
 
+    """
+    pass
+
+
+class EventBaseLayoutMixin:
     def format_recurrence(self, recurrence):
         """ Returns a human readable version of an RRULE used by us. """
 
@@ -1420,8 +1455,11 @@ class EventBaseLayout(DefaultLayout):
         return False if ticket else True
 
 
-class OccurrencesLayout(EventBaseLayout):
+class EventBaseLayout(DefaultLayout, EventBaseLayoutMixin):
+    pass
 
+
+class OccurrencesLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1441,12 +1479,11 @@ class OccurrencesLayout(EventBaseLayout):
             )
 
 
-class OccurrenceLayout(EventBaseLayout):
+class OccurrencesLayout(EventBaseLayout, OccurrencesLayoutMixin):
+    pass
 
-    def __init__(self, model, request):
-        super().__init__(model, request)
-        self.request.include('monthly-view')
 
+class OccurrenceLayoutMixin:
     @cached_property
     def collection(self):
         return OccurrenceCollection(self.request.session)
@@ -1543,8 +1580,14 @@ class OccurrenceLayout(EventBaseLayout):
             return [edit_link, delete_link]
 
 
-class EventLayout(EventBaseLayout):
+class OccurrenceLayout(EventBaseLayout, OccurrenceLayoutMixin):
 
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.request.include('monthly-view')
+
+
+class EventLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1648,8 +1691,11 @@ class EventLayout(EventBaseLayout):
         return [edit_link, delete_link]
 
 
-class NewsletterLayout(DefaultLayout):
+class EventLayout(EventBaseLayout, EventLayoutMixin):
+    pass
 
+
+class NewsletterLayoutMixin:
     @cached_property
     def collection(self):
         return NewsletterCollection(self.app.session())
@@ -1750,8 +1796,11 @@ class NewsletterLayout(DefaultLayout):
             ]
 
 
-class RecipientLayout(DefaultLayout):
+class NewsletterLayout(DefaultLayout, NewsletterLayoutMixin):
+    pass
 
+
+class RecipientLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1763,8 +1812,11 @@ class RecipientLayout(DefaultLayout):
         ]
 
 
-class ImageSetCollectionLayout(DefaultLayout):
+class RecipientLayout(DefaultLayout, RecipientLayoutMixin):
+    pass
 
+
+class ImageSetCollectionLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1797,12 +1849,11 @@ class ImageSetCollectionLayout(DefaultLayout):
             ]
 
 
-class ImageSetLayout(DefaultLayout):
+class ImageSetCollectionLayout(DefaultLayout, ImageSetCollectionLayoutMixin):
+    pass
 
-    def __init__(self, model, request):
-        super().__init__(model, request)
-        self.request.include('photoswipe')
 
+class ImageSetLayoutMixin:
     @property
     def collection(self):
         return ImageSetCollection(self.request.session)
@@ -1856,8 +1907,14 @@ class ImageSetLayout(DefaultLayout):
             ]
 
 
-class UserManagementLayout(DefaultLayout):
+class ImageSetLayout(DefaultLayout, ImageSetLayoutMixin):
 
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.request.include('photoswipe')
+
+
+class UserManagementLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1900,8 +1957,11 @@ class UserManagementLayout(DefaultLayout):
         return links
 
 
-class UserLayout(DefaultLayout):
+class UserManagementLayout(DefaultLayout, UserManagementLayoutMixin):
+    pass
 
+
+class UserLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1922,7 +1982,11 @@ class UserLayout(DefaultLayout):
             ]
 
 
-class ExportCollectionLayout(DefaultLayout):
+class UserLayout(DefaultLayout, UserLayoutMixin):
+    pass
+
+
+class ExportCollectionLayoutMixin:
 
     @cached_property
     def breadcrumbs(self):
@@ -1932,8 +1996,11 @@ class ExportCollectionLayout(DefaultLayout):
         ]
 
 
-class PaymentProviderLayout(DefaultLayout):
+class ExportCollectionLayout(DefaultLayout, ExportCollectionLayoutMixin):
+    pass
 
+
+class PaymentProviderLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -1968,8 +2035,11 @@ class PaymentProviderLayout(DefaultLayout):
             ]
 
 
-class PaymentCollectionLayout(DefaultLayout):
+class PaymentProviderLayout(DefaultLayout, PaymentProviderLayoutMixin):
+    pass
 
+
+class PaymentCollectionLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -2014,11 +2084,11 @@ class PaymentCollectionLayout(DefaultLayout):
         return links
 
 
-class MessageCollectionLayout(DefaultLayout):
-    def __init__(self, model, request):
-        super().__init__(model, request)
-        self.request.include('timeline')
+class PaymentCollectionLayout(DefaultLayout, PaymentCollectionLayoutMixin):
+    pass
 
+
+class MessageCollectionLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -2027,13 +2097,13 @@ class MessageCollectionLayout(DefaultLayout):
         ]
 
 
-class DirectoryCollectionLayout(DefaultLayout):
-
+class MessageCollectionLayout(DefaultLayout, MessageCollectionLayoutMixin):
     def __init__(self, model, request):
         super().__init__(model, request)
-        self.include_editor()
-        self.include_code_editor()
-        self.request.include('iconwidget')
+        self.request.include('timeline')
+
+
+class DirectoryCollectionLayoutMixin:
 
     @cached_property
     def breadcrumbs(self):
@@ -2062,7 +2132,25 @@ class DirectoryCollectionLayout(DefaultLayout):
             ]
 
 
-class DirectoryEntryBaseLayout(DefaultLayout):
+class DirectoryCollectionLayout(DefaultLayout, DirectoryCollectionLayoutMixin):
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.include_editor()
+        self.include_code_editor()
+        self.request.include('iconwidget')
+
+
+class DirectoryEntryBaseLayoutMixin:
+    @property
+    def directory(self):
+        return self.model.directory
+
+    def show_label(self, field):
+        return field.id not in self.model.hidden_label_fields
+
+
+class DirectoryEntryBaseLayout(DefaultLayout, DirectoryEntryBaseLayoutMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2075,16 +2163,8 @@ class DirectoryEntryBaseLayout(DefaultLayout):
             self.custom_body_attributes['data-default-marker-icon']\
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
-    @property
-    def directory(self):
-        return self.model.directory
 
-    def show_label(self, field):
-        return field.id not in self.model.hidden_label_fields
-
-
-class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
-
+class DirectoryEntryCollectionLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -2232,8 +2312,12 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
 
-class DirectoryEntryLayout(DirectoryEntryBaseLayout):
+class DirectoryEntryCollectionLayout(
+        DirectoryEntryBaseLayout, DirectoryEntryCollectionLayoutMixin):
+    pass
 
+
+class DirectoryEntryLayoutMixin:
     @property
     def thumbnail_field_ids(self):
         return [
@@ -2306,12 +2390,12 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
         self.request.include('form-length-counter')
 
 
-class PublicationLayout(DefaultLayout):
+class DirectoryEntryLayout(
+        DirectoryEntryBaseLayout, DirectoryEntryLayoutMixin):
+    pass
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.request.include('filedigest')
 
+class PublicationLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
@@ -2322,11 +2406,21 @@ class PublicationLayout(DefaultLayout):
         ]
 
 
-class DashboardLayout(DefaultLayout):
+class PublicationLayout(DefaultLayout, PublicationLayoutMixin):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request.include('filedigest')
+
+
+class DashboardLayoutMixin:
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Dashboard"), '#')
         ]
+
+
+class DashboardLayout(DefaultLayout, DashboardLayoutMixin):
+    pass
