@@ -6,16 +6,16 @@
 
         <p i18n:translate>Sign up to our newsletter to always stay up to date:</p>
         
-        <div class="grid-x">
-            <div class="cell small-12 medium-9 large-6">
+        <div class="row">
+            <div class="columns small-12 medium-9 large-6">
                 <form class="signup" action="${form.action}" method="POST">
                     <div>${form.csrf_token}</div>
-                    <div class="grid-x">
-                        <div class="cell small-8 ${form.address.errors and 'error'}">
+                    <div class="row collapse">
+                        <div class="columns small-8 ${form.address.errors and 'error'}">
                             <input data-typeahead-subject type="email" name="address" placeholder="E-Mail Address" i18n:attributes="placeholder"/>
                             <small class="error" tal:repeat="error form.address.errors">${error}</small>
                         </div>
-                        <div class="cell small-4 ${form.address.errors and 'error'}">
+                        <div class="columns small-4 ${form.address.errors and 'error'}">
                             <button type="submit" class="button postfix" i18n:translate>
                                 Signup
                             </button>
@@ -25,8 +25,8 @@
             </div>
         </div>
 
-        <div class="grid-x" tal:condition="request.is_manager">
-            <div class="cell small-12 medium-9 large-6">
+        <div class="row" tal:condition="request.is_manager">
+            <div class="columns small-12 medium-9 large-6">
                 <div i18n:translate>There are currently <tal:b i18n:name="count">${recipients_count}</tal:b> recipients registered.</div>
             </div>
         </div>

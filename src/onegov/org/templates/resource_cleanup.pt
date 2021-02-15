@@ -6,8 +6,8 @@
         <div class="panel" i18n:translate>
             Removes all unreserved allocations between the start and end date.
         </div>
-        <div class="grid-x">
-            <div class="small-12 medium-8 large-6 cell">
+        <div class="row">
+            <div class="small-12 medium-8 large-6 columns">
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

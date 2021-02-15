@@ -9,8 +9,8 @@
         <div tal:condition="guideline|nothing" class="limit-line-width">
             <tal:b replace="structure guideline" />
         </div>
-        <div class="grid-x">
-            <div class="small-12 medium-8 large-6 cell">
+        <div class="row">
+            <div class="small-12 medium-8 large-6 columns">
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

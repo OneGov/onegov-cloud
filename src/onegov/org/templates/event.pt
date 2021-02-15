@@ -15,18 +15,18 @@
             </p>
         </div>
 
-        <div class="grid-x event-preview">
-            <div class="large-8 medium-8 cell">
+        <div class="row collapse event-preview">
+            <div class="large-8 medium-8 columns">
                 <tal:b metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
             </div>
 
-            <div class="large-4 medium-4 cell">
+            <div class="large-4 medium-4 columns">
                 <tal:b metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
             </div>
         </div>
 
-        <div class="grid-x fieldset-display-submit" tal:condition="completable">
-            <div class="small-12 cell">
+        <div class="row fieldset-display-submit" tal:condition="completable">
+            <div class="small-12 columns">
                 <form action="" method="POST">
                     <input type="hidden" name="complete">
                     <input type="submit" value="Complete" class="button" i18n:attributes="value">

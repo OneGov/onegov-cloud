@@ -7,10 +7,10 @@
             <tal:b repeat="(title, group) groups">
                 <tal:b define="submissions registrations[group]|nothing" condition="submissions">
                     <dt>
-                        <h3>
+                        <h2 class="h3-size">
                             <tal:b i18n:translate>${title}</tal:b>
                             <tal:b tal:condition="submissions">(${len(submissions)})</tal:b>
-                        </h3>
+                        </h2>
                     </dt>
 
                     <dd>

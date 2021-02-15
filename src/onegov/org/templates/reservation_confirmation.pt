@@ -3,8 +3,8 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x fieldset-display">
-            <div class="small-12 medium-12 large-12 cell reservation-confirmation">
+        <div class="row fieldset-display">
+            <div class="small-12 medium-12 large-12 columns reservation-confirmation">
                 <div class="panel callout">
                     <p i18n:translate="">
                         Please review your data and press "Complete" to finalize the process.
@@ -25,8 +25,8 @@
                 <div metal:use-macro="layout.macros['display_form']" />
             </div>
         </div>
-        <div class="grid-x fieldset-display-submit">
-            <div class="small-12 cell">
+        <div class="row fieldset-display-submit">
+            <div class="small-12 columns">
                 <tal:b metal:use-macro="layout.macros['checkout_form']"
                     tal:define="payment_method layout.model.payment_method; show_privacy_settings form is not None">
 
