@@ -346,6 +346,9 @@ msgstr "Jadl"
 msgid "actor-jlps-abbreviation"
 msgstr "JL"
 
+msgid "actor-jmitte-abbreviation"
+msgstr "JC"
+
 msgid "actor-jna-abbreviation"
 msgstr "JDS"
 
@@ -384,6 +387,12 @@ msgstr "PLS"
 
 msgid "actor-mcg-abbreviation"
 msgstr "MCG"
+
+msgid "actor-mitte-abbreviation"
+msgstr "Centre"
+
+msgid "actor-mitte-fr-abbreviation"
+msgstr "Centre-Fe"
 
 msgid "actor-pda-abbreviation"
 msgstr "PST"
@@ -584,6 +593,9 @@ msgstr "Jeunes AdI"
 msgid "actor-jlps-label"
 msgstr "Jeunes PLS"
 
+msgid "actor-jmitte-label"
+msgstr "Jeunes du Centre"
+
 msgid "actor-jna-label"
 msgstr "Jeunes Démocrates Suisses"
 
@@ -624,6 +636,12 @@ msgstr "Parti libéral suisse"
 
 msgid "actor-mcg-label"
 msgstr "Mouvement citoyens genevois"
+
+msgid "actor-mitte-label"
+msgstr "Le Centre suisse"
+
+msgid "actor-mitte-fr-label"
+msgstr "Le Centre Femmes"
 
 msgid "actor-pda-label"
 msgstr "Parti Suisse du Travail"

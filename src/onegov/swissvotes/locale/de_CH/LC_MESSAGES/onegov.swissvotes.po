@@ -347,6 +347,9 @@ msgstr "JLdU"
 msgid "actor-jlps-abbreviation"
 msgstr "JLPS"
 
+msgid "actor-jmitte-abbreviation"
+msgstr "JM"
+
 msgid "actor-jna-abbreviation"
 msgstr "JNA"
 
@@ -385,6 +388,12 @@ msgstr "LPS"
 
 msgid "actor-mcg-abbreviation"
 msgstr "MCG"
+
+msgid "actor-mitte-abbreviation"
+msgstr "Mitte"
+
+msgid "actor-mitte-fr-abbreviation"
+msgstr "Mitte-Fr"
 
 msgid "actor-pda-abbreviation"
 msgstr "PdA"
@@ -581,6 +590,9 @@ msgstr "Junger LdU"
 msgid "actor-jlps-label"
 msgstr "Junge LPS"
 
+msgid "actor-jmitte-label"
+msgstr "Die Junge Mitte"
+
 msgid "actor-jna-label"
 msgstr "Junge NA"
 
@@ -619,6 +631,12 @@ msgstr "Liberale Partei der Schweiz"
 
 msgid "actor-mcg-label"
 msgstr "Mouvement citoyens genevois"
+
+msgid "actor-mitte-label"
+msgstr "Die Mitte Schweiz"
+
+msgid "actor-mitte-fr-label"
+msgstr "Die Mitte Frauen"
 
 msgid "actor-pda-label"
 msgstr "Partei der Arbeit"

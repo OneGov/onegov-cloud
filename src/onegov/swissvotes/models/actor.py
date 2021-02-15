@@ -23,7 +23,7 @@ class Actor(object):
         return (
             'bdp', 'csp', 'cvp', 'edu', 'evp', 'fdp', 'fps', 'glp', 'gps',
             'kvp', 'ldu', 'lega', 'lps', 'mcg', 'pda', 'poch', 'rep', 'sd',
-            'sps', 'svp'
+            'sps', 'svp', 'mitte'
         )
 
     @staticmethod
@@ -73,6 +73,7 @@ class Actor(object):
             'jgps': _("actor-jgps-abbreviation"),
             'jldu': _("actor-jldu-abbreviation"),
             'jlps': _("actor-jlps-abbreviation"),
+            'jmitte': _("actor-jmitte-abbreviation"),
             'jna': _("actor-jna-abbreviation"),
             'jpda': _("actor-jpda-abbreviation"),
             'jsd': _("actor-jsd-abbreviation"),
@@ -86,6 +87,8 @@ class Actor(object):
             'lega': _("actor-lega-abbreviation"),
             'lps': _("actor-lps-abbreviation"),
             'mcg': _("actor-mcg-abbreviation"),
+            'mitte': _("actor-mitte-abbreviation"),
+            'mitte-fr': _("actor-mitte-fr-abbreviation"),
             'pda': _("actor-pda-abbreviation"),
             'poch': _("actor-poch-abbreviation"),
             'pps': _("actor-pps-abbreviation"),
@@ -156,6 +159,7 @@ class Actor(object):
             'jgps': _("actor-jgps-label"),
             'jldu': _("actor-jldu-label"),
             'jlps': _("actor-jlps-label"),
+            'jmitte': _("actor-jmitte-label"),
             'jna': _("actor-jna-label"),
             'jpda': _("actor-jpda-label"),
             'jsd': _("actor-jsd-label"),
@@ -169,6 +173,8 @@ class Actor(object):
             'lega': _("actor-lega-label"),
             'lps': _("actor-lps-label"),
             'mcg': _("actor-mcg-label"),
+            'mitte': _("actor-mitte-label"),
+            'mitte-fr': _("actor-mitte-fr-label"),
             'pda': _("actor-pda-label"),
             'poch': _("actor-poch-label"),
             'pps': _("actor-pps-label"),

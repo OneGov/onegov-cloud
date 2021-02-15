@@ -754,6 +754,7 @@ def test_model_vote(session, sample_vote):
     assert vote.national_council_share_glp == Decimal('18.10')
     assert vote.national_council_share_bdp == Decimal('19.10')
     assert vote.national_council_share_mcg == Decimal('20.20')
+    assert vote.national_council_share_mitte == Decimal('20.10')
     assert vote.national_council_share_ubrige == Decimal('21.20')
     assert vote.national_council_share_yeas == Decimal('22.20')
     assert vote.national_council_share_nays == Decimal('23.20')
@@ -1207,7 +1208,7 @@ def test_model_column_mapper():
         ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None)
     ]
 
-    assert list(mapper.items())[304] == (
+    assert list(mapper.items())[305] == (
         '!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER', True,
         None, None
     )

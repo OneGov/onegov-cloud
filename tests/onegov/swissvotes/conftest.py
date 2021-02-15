@@ -683,6 +683,7 @@ def sample_vote():
     vote.national_council_share_glp = Decimal('18.10')
     vote.national_council_share_bdp = Decimal('19.10')
     vote.national_council_share_mcg = Decimal('20.20')
+    vote.national_council_share_mitte = Decimal('20.10')
     vote.national_council_share_ubrige = Decimal('21.20')
     vote.national_council_share_yeas = Decimal('22.20')
     vote.national_council_share_nays = Decimal('23.20')

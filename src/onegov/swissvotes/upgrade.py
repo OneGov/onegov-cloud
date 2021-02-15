@@ -421,3 +421,12 @@ def change_media_tonality_types(context):
         'ALTER TABLE swissvotes '
         'ALTER COLUMN media_coverage_tonality_f TYPE NUMERIC(13, 10)'
     )
+
+
+@upgrade_task('Adds die Mitte columns')
+def add_die_mittel_columns(context):
+    if not context.has_column('swissvotes', 'national_council_share_mitte'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('national_council_share_mitte', Numeric(13, 10))
+        )

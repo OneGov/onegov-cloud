@@ -837,6 +837,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     national_council_share_glp = Column(Numeric(13, 10))
     national_council_share_bdp = Column(Numeric(13, 10))
     national_council_share_mcg = Column(Numeric(13, 10))
+    national_council_share_mitte = Column(Numeric(13, 10))
     national_council_share_ubrige = Column(Numeric(13, 10))
     national_council_share_yeas = Column(Numeric(13, 10))
     national_council_share_nays = Column(Numeric(13, 10))
