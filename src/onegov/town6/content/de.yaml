@@ -69,18 +69,18 @@ filesets:
       lead: Diese Bilder werden auf der Startseite angezeigt.
       view: grid
     files:
-      - path: images/3bearyu-muo-daiga-ellaby.jpg
+      - path: ../../org/content/images/3bearyu-muo-daiga-ellaby.jpg
         note: "{organisation} Grillfest"
-      - path: images/hzgs56ze49s-anthony-delanoix.jpg
+      - path: ../../org/content/images/hzgs56ze49s-anthony-delanoix.jpg
         note: "{organisation} Benefiz Konzert"
-      - path: images/jwimshwif14-jeff-sheldon.jpg
+      - path: ../../org/content/images/jwimshwif14-jeff-sheldon.jpg
         note: "Lebenslanges Lernen mit {organisation}"
-      - path: images/tdvsbpscg7c-tim-napier.jpg
+      - path: ../../org/content/images/tdvsbpscg7c-tim-napier.jpg
         note: "Der Saal kann gemietet werden"
 
 organisation:
   theme_options:
-    primary-color: '#006fba'
+    primary-color-ui: '#006fba'
   meta:
     contact: |
       Fabian Reinhard

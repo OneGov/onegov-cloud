@@ -70,18 +70,18 @@ filesets:
       lead: Ces images sont affichées sur la page d'accueil.
       view: grid
     files:
-      - path: images/3bearyu-muo-daiga-ellaby.jpg
+      - path: ../../org/content/images/3bearyu-muo-daiga-ellaby.jpg
         note: "Barbecue de {organisation}"
-      - path: images/hzgs56ze49s-anthony-delanoix.jpg
+      - path: ../../org/content/images/hzgs56ze49s-anthony-delanoix.jpg
         note: "Concert de charité de {organisation}"
-      - path: images/jwimshwif14-jeff-sheldon.jpg
+      - path: ../../org/content/images/jwimshwif14-jeff-sheldon.jpg
         note: "Apprentissage à vie avec {organisation}"
-      - path: images/tdvsbpscg7c-tim-napier.jpg
+      - path: ../../org/content/images/tdvsbpscg7c-tim-napier.jpg
         note: "La salle peut être louée"
 
 organisation:
   theme_options:
-    primary-color: '#006fba'
+    primary-color-ui: '#006fba'
   meta:
     contact: |
       Fabian Reinhard
