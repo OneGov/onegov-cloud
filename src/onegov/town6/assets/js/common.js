@@ -11,11 +11,6 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
-var initFoundation = function() {
-    $(document).on('ready page:load', function() {
-        $(document).foundation();
-    });
-};
 
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
@@ -33,14 +28,12 @@ var processCommonNodes = function(elements, out_of_band) {
     // intercooler redirects
     setupRedirectAfter(targets.find('a'));
 
-    // initialise zurb foundation (only works on the document level)
-    initFoundation();
-
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
     // generic toggle button
-    targets.find('[data-toggle]').toggleButton();
+    // TODO: this breaks the navigation, find another way
+    targets.find('[data-toggle]').not('header *').toggleButton();
 
     // send an event to allow optional scripts to hook themselves up
     // (we only do out of band updates since it's not guaranteed that these
@@ -140,7 +133,7 @@ $('.image-select input[type="checkbox"]').on('click', function(e) {
     var target = $(e.target);
     var checked = target.is(':checked');
 
-    target.closest('.image-box').toggleClass('selected', checked);
+    target.closest('.image-container').toggleClass('selected', checked);
 });
 
 // A generic error messages handler
@@ -155,7 +148,7 @@ function showAlertMessage(message, type, target) {
         .append($('<a href="#" class="close">&times;</a>'));
 
     $(target || '#alert-boxes').append(alert);
-    initFoundation();
+    // initFoundation();
 }
 
 $(document).on('show-alert', function(_, data) {
@@ -189,9 +182,9 @@ $(document).ajaxError(function(_e, xhr, _settings, error) {
 });
 
 // show the slider once everything has loaded
-$(document).ready(function() {
-    $('.slider').css('opacity', 1);
-});
+// $(document).ready(function() {
+//     $('.slider').css('opacity', 1);
+// });
 
 // support some extraordinary styling
 $(document).ready(function() {

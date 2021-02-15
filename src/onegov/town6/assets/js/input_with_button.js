@@ -37,13 +37,13 @@ var setup_internal_link_select = function(input) {
         return;
     }
 
-    input.wrap('<div class="small-11 columns"></div>');
-    input.closest('.columns').wrap('<div class="row collapse input-with-button">');
-    input.closest('.row').append(
-        '<div class="small-1 columns"><a class="button secondary postfix">' + button + '</a></div>'
+    input.wrap('<div class="small-11 cell"></div>');
+    input.closest('.cell').wrap('<div class="grid-x input-with-button">');
+    input.closest('.grid-x').append(
+        '<div class="small-1 cell"><a class="button secondary postfix">' + button + '</a></div>'
     );
 
-    var row = input.closest('.row');
+    var row = input.closest('.grid-x');
     for (var i=0; i<types.length; i++) {
         row.addClass(types[i]);
     }
@@ -119,13 +119,13 @@ var get_types = function(input) {
 var get_button_face = function(types) {
     if (types.length == 1) {
         if (types[0] == 'image-url') {
-            return '<i class="fa fa-picture-o"></i>';
+            return '<i class="fas fa-image"></i>';
         }
         if (types[0] == 'file-url') {
-            return '<i class="fa fa-paperclip"></i>';
+            return '<i class="fas fa-paperclip"></i>';
         }
         if (types[0] == 'internal-url') {
-            return '<i class="fa fa-link"></i>';
+            return '<i class="fas fa-link"></i>';
         }
     }
 
