@@ -63,4 +63,3 @@ def test_extended_directory_entry_collection(
     # Test the hybrid_property expressions on class per query
     session.execute("SET TIME ZONE 'GMT';")
     assert collection.query().count() == (1 if is_published else 0)
-
