@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2021.22`
+
+> commits: **5 / [c025d2954e...17aa9d45e3](https://github.com/OneGov/onegov-cloud/compare/c025d2954e^...17aa9d45e3)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.22)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🎉 **Adds Die Mitte.**
+
+**`Feature`** | **[VOTES-98](https://issues.seantis.ch/browse/VOTES-98)** | **[2aa9ed9883](https://github.com/onegov/onegov-cloud/commit/2aa9ed98839a3b9b71365eb946beb64164d79257)**
+
+🎉 **Add aditional post-vote poll dataset formats.**
+
+**`Feature`** | **[VOTES-99](https://issues.seantis.ch/browse/VOTES-99)** | **[10c20c1026](https://github.com/onegov/onegov-cloud/commit/10c20c1026b5c6c6e83c3c46c4612fa9c07a07ed)**
+
+🎉 **Add additional post-vote poll codebook format.**
+
+**`Feature`** | **[VOTES-100](https://issues.seantis.ch/browse/VOTES-100)** | **[8600ae7e8d](https://github.com/onegov/onegov-cloud/commit/8600ae7e8df2b95ee35af6804a48f9506b138d87)**
+
+🎉 **Add technical report of the post-vote poll.**
+
+**`Feature`** | **[VOTES-101](https://issues.seantis.ch/browse/VOTES-101)** | **[17aa9d45e3](https://github.com/onegov/onegov-cloud/commit/17aa9d45e32bcdf5c020b9dcd180958a16a4868d)**
+
 ## Release `2021.21`
 
-> commits: **6 / [13aae131a1...585e2f1cf6](https://github.com/OneGov/onegov-cloud/compare/13aae131a1^...585e2f1cf6)**  
+> released: **2021-02-11 16:24**<br>
+> commits: **7 / [13aae131a1...a278187144](https://github.com/OneGov/onegov-cloud/compare/13aae131a1^...a278187144)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.21)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
