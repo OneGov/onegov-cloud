@@ -11,10 +11,56 @@ from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_homepage_settings, view_settings, \
     handle_generic_settings, handle_ticket_settings, preview_holiday_settings
-from onegov.town.views.settings import get_custom_settings_form
 from onegov.town6.app import TownApp
 from wtforms import BooleanField, StringField
 
+
+
+def get_custom_settings_form(model, request):
+
+    class CustomFieldsForm(Form):
+        online_counter_label = StringField(
+            label=_("Online Counter Label"),
+            description=_("Forms and applications"))
+
+        reservations_label = StringField(
+            label=_("Reservations Label"),
+            description=_("Daypasses and rooms"))
+
+        daypass_label = StringField(
+            label=_("SBB Daypass Label"),
+            description=_("Generalabonnement for Towns"))
+
+        publications_label = StringField(
+            label=_("Publications Label"),
+            description=_("Official Documents"))
+
+        e_move_label = StringField(
+            label=_('E-Move Label'),
+            description=_('E-Move')
+        )
+
+        e_move_url = StringField(
+            label=_('E-Move Url'),
+            description=_('E-Move')
+        )
+
+        hide_publications = BooleanField(
+            label=_("Hide Publications on Homepage"))
+
+    return move_fields(
+        form_class=merge_forms(HomepageSettingsForm, CustomFieldsForm),
+        fields=(
+            'online_counter_label',
+            'reservations_label',
+            'daypass_label',
+            'publications_label',
+            'e_move_label',
+            'e_move_url',
+            'hide_publications',
+        ),
+        after='homepage_image_6'
+    )
 
 @TownApp.html(
     model=Organisation, name='settings', template='settings.pt',
