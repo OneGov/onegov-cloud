@@ -16,8 +16,8 @@ def test_locked_course_event_reservations(client_with_db):
     page.form['presenter_company'] = 'Presenter'
     page.form['presenter_email'] = 'presenter@example.org'
     page.form['locked_for_subscriptions'] = True
-    page.form['start'] = '2050-10-04 10:00:00'
-    page.form['end'] = '2050-10-04 12:00:00'
+    page.form['start'] = '2050-10-04 10:00'
+    page.form['end'] = '2050-10-04 12:00'
     page.form['location'] = 'location'
     page.form['max_attendees'] = 20
     # goes to the event created

@@ -100,6 +100,7 @@ def get_frameworks_asset():
     yield 'jquery.datetimepicker.css'
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
+    yield 'form-adjust.js'
 
 
 @WtfsApp.webasset('common')

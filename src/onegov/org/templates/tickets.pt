@@ -100,6 +100,7 @@
                             <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
                         </td>
                     </tr>
+                  <div metal:use-macro="layout.macros['tickets_table_row']"/>
                 </tal:b>
             </tbody>
         </table>

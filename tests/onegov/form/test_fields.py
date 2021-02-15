@@ -2,11 +2,14 @@ import re
 import tempfile
 
 from cgi import FieldStorage
+from datetime import datetime
 from gzip import GzipFile
 from io import BytesIO
+
+
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, DateTimeLocalField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import HtmlField
 from onegov.form.fields import MultiCheckboxField
@@ -143,3 +146,30 @@ def test_chosen_select_multiple_field():
     assert 'class="chosen-select"' in field()
     assert 'data-no_results_text="No results match"' in field()
     assert 'data-placeholder="Select Some Options"' in field()
+
+
+def test_date_time_local_field():
+
+    class DummyPostData(dict):
+        def getlist(self, key):
+            v = self[key]
+            if not isinstance(v, (list, tuple)):
+                v = [v]
+            return v
+
+    form = Form()
+    field = DateTimeLocalField()
+    field = field.bind(form, 'dt')
+
+    assert field.format == '%Y-%m-%dT%H:%M'
+    field.data = datetime(2010, 1, 2, 3, 4)
+    assert "2010-01-02T03:04" in field()
+
+    field = DateTimeLocalField()
+    field = field.bind(form, 'dt')
+
+    field.process(DummyPostData({'dt': "2010-01-02T03:04"}))
+    assert field.data == datetime(2010, 1, 2, 3, 4)
+
+    field.process(DummyPostData({'dt': "2010-05-06 07:08"}))
+    assert field.data == datetime(2010, 5, 6, 7, 8)

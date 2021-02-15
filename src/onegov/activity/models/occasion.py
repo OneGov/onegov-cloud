@@ -269,8 +269,8 @@ class Occasion(Base, TimestampMixin):
     def max_spots(self):
         return self.spots.upper - 1
 
-    def is_past_deadline(self, date):
-        return date > self.deadline
+    def is_past_deadline(self, now):
+        return now > self.period.as_local_datetime(self.deadline)
 
     def is_past_cancellation(self, date):
         cancellation = self.cancellation_deadline

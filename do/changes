@@ -10,7 +10,7 @@ from itertools import groupby, tee
 from typing import Optional
 
 
-COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z_\- ]{2,15}: ')
+COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z_\- ]{2,18}: ')
 RELEASE_TAG = re.compile(r'release-[0-9]{4}\.[0-9]+')
 
 
@@ -150,6 +150,9 @@ class ChangelogCommit(object):
 
         if link.startswith('STAKA-'):
             return f"https://ogc-ar.atlassian.net/projects/STAKA/issues/{link}"
+
+        if link.startswith('STAKABS-'):
+            return f"https://kt-bs.atlassian.net/browse/{link}"
 
         if link.startswith('SEA-'):
             return f"https://linear.app/seantis/issue/{link}"

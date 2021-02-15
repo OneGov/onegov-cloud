@@ -1,13 +1,17 @@
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.layouts import AgencyCollectionLayout
-from onegov.agency.layouts import AgencyLayout
-from onegov.agency.layouts import ExtendedPersonCollectionLayout
-from onegov.agency.layouts import ExtendedPersonLayout
-from onegov.agency.layouts import MembershipLayout
+from onegov.agency.layout import AgencyCollectionLayout
+from onegov.agency.layout import AgencyLayout
+from onegov.agency.layout import ExtendedPersonCollectionLayout
+from onegov.agency.layout import ExtendedPersonLayout
+from onegov.agency.layout import MembershipLayout
+from onegov.agency.layout import UserGroupCollectionLayout
+from onegov.agency.layout import UserGroupLayout
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.people import AgencyMembership
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 
 
 class DummyOrg(object):
@@ -22,7 +26,9 @@ class DummyRequest(object):
     locale = 'en'
     is_logged_in = False
     is_manager = False
+    is_admin = False
     session = None
+    permissions = {}
 
     def __init__(self):
         self.app = DummyApp()
@@ -43,6 +49,10 @@ class DummyRequest(object):
 
     def new_csrf_token(self):
         return 'x'
+
+    def has_permission(self, model, permission):
+        permissions = self.permissions.get(model.__class__.__name__, [])
+        return permission.__name__ in permissions
 
 
 def path(links):
@@ -75,11 +85,12 @@ def test_agency_collection_layout():
     assert path(layout.breadcrumbs) == 'DummyOrg/ExtendedAgencyCollection'
     assert layout.move_agency_url_template == 'AgencyMove/?csrf-token=x'
 
-    # Log in as manager
-    request.is_manager = True
+    # Add permission
+    request.permissions = {'ExtendedAgencyCollection': ['Private']}
     layout = AgencyCollectionLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'ExtendedAgencyCollection/create-pdf',
+        'ExtendedAgencyCollection/sort',
         'ExtendedAgencyCollection/new'
     ]
 
@@ -97,8 +108,8 @@ def test_agency_layout():
     assert layout.move_membership_within_agency_url_template == \
         'AgencyMembershipMoveWithinAgency/?csrf-token=x'
 
-    # Log in as manager
-    request.is_manager = True
+    # Add permission
+    request.permissions = {'ExtendedAgency': ['Private']}
     layout = AgencyLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'AgencyProxy/edit',
@@ -121,8 +132,8 @@ def test_membership_layout():
     assert path(layout.breadcrumbs) == \
         'DummyOrg/ExtendedAgencyCollection/ExtendedAgency/AgencyMembership'
 
-    # Log in as manager
-    request.is_manager = True
+    # Add permission
+    request.permissions = {'AgencyMembership': ['Private']}
     layout = MembershipLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'AgencyMembership/edit',
@@ -166,8 +177,8 @@ def test_extended_person_layout():
     assert path(layout.breadcrumbs) == \
         'DummyOrg/ExtendedPersonCollection/ExtendedPerson'
 
-    # Log in as manager
-    request.is_manager = True
+    # Add permission
+    request.permissions = {'ExtendedPerson': ['Private']}
     layout = ExtendedPersonLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'ExtendedPerson/edit',
@@ -179,3 +190,37 @@ def test_extended_person_layout():
     child = ExtendedAgency('Child', parent=root)
     assert layout.agency_path(root) == 'Root'
     assert layout.agency_path(child) == 'Root > Child'
+
+
+def test_user_group_collection_layout():
+    request = DummyRequest()
+    model = UserGroupCollection(None)
+
+    layout = UserGroupCollectionLayout(model, request)
+    assert layout.editbar_links is None
+    assert path(layout.breadcrumbs) == 'DummyOrg/UserGroupCollection'
+
+    # Login as admin
+    request.is_admin = True
+    layout = UserGroupCollectionLayout(model, request)
+    assert list(hrefs(layout.editbar_links)) == [
+        'UserGroupCollection/new'
+    ]
+
+
+def test_user_group_layout():
+    request = DummyRequest()
+    model = UserGroup()
+
+    layout = UserGroupLayout(model, request)
+    assert isinstance(layout.collection, UserGroupCollection)
+    assert layout.editbar_links is None
+    assert path(layout.breadcrumbs) == 'DummyOrg/UserGroupCollection/UserGroup'
+
+    # Login as admin
+    request.is_admin = True
+    layout = UserGroupLayout(model, request)
+    assert list(hrefs(layout.editbar_links)) == [
+        'UserGroup/edit',
+        'UserGroup/?csrf-token=x',
+    ]

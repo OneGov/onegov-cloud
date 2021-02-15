@@ -2475,7 +2475,6 @@ $booking-left-margin: 2rem;
         aspect ratio 16:5 (100/16*5 =31.25)
         see https://stackoverflow.com/q/1495407
     */
-    padding-bottom: 31.25%;
     position: relative;
 
     div > img,
@@ -2484,12 +2483,28 @@ $booking-left-margin: 2rem;
     }
 
     a {
-        bottom: 0;
+        color: $body-font-color;
         display: block;
-        left: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
+        text-decoration: none;
+        z-index: 2;
+    }
+
+    p.banner-info {
+        font-style: italic;
+        margin: .25rem 0;
+    }
+
+    & > div {
+        display: flex;
+
+        & > img {
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: 1;
+        }
     }
 }
 

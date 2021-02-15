@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-09-05 14:32+0200\n"
+"POT-Creation-Date: 2020-11-09 12:25+0100\n"
 "PO-Revision-Date: 2017-06-22 08:50+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -18,6 +18,9 @@ msgstr ""
 "Generated-By: Lingua 3.11\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.2\n"
+
+msgid "LDAP"
+msgstr ""
 
 msgid "LDAP Kerberos"
 msgstr "LDAP Kerberos"
@@ -39,6 +42,25 @@ msgstr "Benutzer «${user}» hat ist nicht autorisiert"
 #, python-format
 msgid "Successfully logged in as «${user}»"
 msgstr "Erfolgreich angemeldet als «${user}»"
+
+msgid "AzureAD"
+msgstr ""
+
+msgid "Login with Microsoft"
+msgstr "Einloggen mit Microsoft"
+
+msgid "Authorisation failed due to an error"
+msgstr "Authorisierung fehlgeschlagen"
+
+msgid "Your login has expired"
+msgstr "Ihr Login ist verfallen"
+
+msgid ""
+"Can't login because your user has no groups. Contact your AzureAD system "
+"administrator"
+msgstr ""
+"Login fehlgeschlagen, da ihr Nutzer keine Gruppenzugehörigkeiten hat. "
+"Kontaktieren Sie ihren Azure AD System-Administrator"
 
 msgid "Name"
 msgstr "Name"
@@ -99,3 +121,8 @@ msgstr "30 Tage"
 
 msgid "Number of Signups"
 msgstr "Anzahl Anmeldungen"
+
+#~ msgid ""
+#~ "Can't login because user has no groups. Contact your AzureAD system "
+#~ "administrator"
+#~ msgstr "Login fehlgeschlagen, da der Nutzer keine Gruppen hat"

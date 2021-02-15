@@ -1,4 +1,3 @@
-import base64
 import kerberos
 import morepath
 import pytest

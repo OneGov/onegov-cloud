@@ -8,6 +8,8 @@ from sedate import utcnow
 from sqlalchemy import desc
 
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent
+from onegov.fsi.models.course_notification_template import InfoTemplate, \
+    SubscriptionTemplate, CancellationTemplate, ReminderTemplate
 from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.user import User
 from onegov.fsi import FsiApp
@@ -45,22 +47,22 @@ def hashed_password():
     return _hashed_password
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def fsi_app(request, hashed_password):
     yield create_fsi_app(request, False, hashed_password)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def fsi_app_mocked(request, hashed_password):
     yield create_fsi_app(request, False, hashed_password, mock_db=True)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_fsi_app(request, hashed_password):
     yield create_fsi_app(request, True, hashed_password)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_fsi_app_mocked(request, hashed_password):
     yield create_fsi_app(request, True, hashed_password, mock_db=True)
 
@@ -257,10 +259,15 @@ class FsiScenario(BaseScenario):
         exclude = ('organisation', 'permissions')
 
         if not external:
-            user = self.add_user(
-                **{k: v for k, v in columns.items() if k not in exclude}
-            )
-            columns.setdefault('user_id', user.id)
+            if not columns.get('user_id'):
+                user = self.add_user(
+                    **{k: v for k, v in columns.items() if k not in exclude}
+                )
+                columns['user_id'] = user.id
+            else:
+                user = self.session.query(User).filter_by(
+                    id=columns['user_id']).one()
+
             columns.setdefault('source_id', user.source_id)
         else:
             columns.setdefault('_email', columns['username'])
@@ -300,7 +307,7 @@ class FsiScenario(BaseScenario):
         user.data['emergency'] = f'123 456 789 ({self.faker.name()})'
         return user
 
-    def add_course(self, **columns):
+    def add_course(self, add_templates=False, **columns):
         columns.setdefault('name', f"Course {len(self.courses)}")
         columns.setdefault('description', 'default description')
         self.courses.append(self.add(
@@ -308,7 +315,17 @@ class FsiScenario(BaseScenario):
             **columns,
             id=uuid4()
         ))
-        return self.courses[-1].id
+        latest = self.courses[-1]
+        if add_templates:
+            data = dict(course_event_id=latest.id)
+            self.session.add_all((
+                InfoTemplate(**data),
+                SubscriptionTemplate(**data),
+                CancellationTemplate(**data),
+                ReminderTemplate(**data)
+            ))
+
+        return latest.id
 
     def add_course_event(self, course, **columns):
         columns['course_id'] = course.id
@@ -348,21 +365,29 @@ class FsiScenario(BaseScenario):
         ))
         return self.subscriptions[-1]
 
-    def add_notification_template(self, all_types=True, **columns):
-        columns.setdefault('type', 'reservation')
-        columns.setdefault('subject', columns['type'].upper())
+    def add_notification_template(self, event, all_types=True, **columns):
         columns.setdefault('text', )
+        columns.setdefault('course_event_id', event.id)
 
         types = TEMPLATE_MODEL_MAPPING.keys()
         if not all_types:
+            columns.setdefault('type', 'reservation')
+            columns.setdefault('subject', columns['type'].upper())
             types = (columns['type'], )
-
-        for t in types:
             self.templates.append(self.add(
-                TEMPLATE_MODEL_MAPPING[t],
+                TEMPLATE_MODEL_MAPPING[columns['type']],
                 **columns,
                 id=uuid4()
             ))
+        else:
+            columns.pop('subject', None)
+            for t in types:
+                self.templates.append(self.add(
+                    TEMPLATE_MODEL_MAPPING[t],
+                    subject=t.upper(),
+                    **columns,
+                    id=uuid4()
+                ))
         return self.templates[-len(types)::]
 
     def first_user(self, role='admin'):

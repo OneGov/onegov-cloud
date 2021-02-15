@@ -14,9 +14,8 @@ from onegov.core.elements import Block, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.i18n import SiteLocale
 from onegov.core.static import StaticFile
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, paragraphify
 from onegov.directory import DirectoryCollection
-from onegov.directory import DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
@@ -36,6 +35,7 @@ from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models import Search
 from onegov.org.models import SiteCollection
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.theme.org_theme import user_options
 from onegov.pay import PaymentCollection, PaymentProviderCollection
@@ -81,6 +81,9 @@ class Layout(FoundationLayout):
 
         super().__init__(*args, **kwargs)
 
+    def has_model_permission(self, permission):
+        return self.request.has_permission(self.model, permission)
+
     @property
     def name(self):
         """ Takes the class name of the layout and generates a name which
@@ -101,6 +104,22 @@ class Layout(FoundationLayout):
     def primary_color(self):
         return self.org.theme_options.get(
             'primary-color-ui', user_options['primary-color-ui'])
+
+    @cached_property
+    def favicon_apple_touch_url(self):
+        return self.app.org.favicon_apple_touch_url
+
+    @cached_property
+    def favicon_pinned_tab_safari_url(self):
+        return self.app.org.favicon_pinned_tab_safari_url
+
+    @cached_property
+    def favicon_win_url(self):
+        return self.app.org.favicon_win_url
+
+    @cached_property
+    def favicon_mac_url(self):
+        return self.app.org.favicon_mac_url
 
     @cached_property
     def default_map_view(self):
@@ -483,6 +502,26 @@ class Layout(FoundationLayout):
             self.request.class_link(Auth, name='reset-password')
         )
 
+    def linkify(self, text):
+        return linkify(text).replace('\n', '<br>') if text else text
+
+    def linkify_field(self, field, rendered):
+        include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
+        if field.render_kw:
+            if field.render_kw.get('data-editor') == 'markdown':
+                return rendered
+            # HtmlField
+            if field.render_kw.get('class_') == 'editor':
+                return rendered
+        if field.type in include:
+            return self.linkify(rendered.replace('<br>', '\n'))
+        return rendered
+
+    @property
+    def file_link_target(self):
+        """ Use with tal:attributes='target layout.file_link_target' """
+        return self.org.open_files_target_blank and '_blank' or None
+
     @cached_property
     def drilldown_back(self):
         back = self.request.translate(_("back"))
@@ -548,6 +587,9 @@ class DefaultLayout(Layout):
             )) for r in self.root_pages
         )
 
+    def show_label(self, field):
+        return True
+
 
 class DefaultMailLayout(Layout):
     """ A special layout for creating HTML E-Mails. """
@@ -581,11 +623,13 @@ class DefaultMailLayout(Layout):
             )
         )
 
+    def paragraphify(self, text):
+        return paragraphify(text)
 
-class AdjacencyListLayout(DefaultLayout):
+
+class AdjacencyListMixin:
     """ Provides layouts for for models inheriting from
-    :class:`onegov.core.orm.abstract.AdjacencyList`
-
+        :class:`onegov.core.orm.abstract.AdjacencyList`
     """
 
     @cached_property
@@ -623,6 +667,10 @@ class AdjacencyListLayout(DefaultLayout):
                     links=tuple(children),
                     model=item
                 )
+
+
+class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):
+    pass
 
 
 class SettingsLayout(DefaultLayout):
@@ -990,6 +1038,13 @@ class TicketLayout(DefaultLayout):
                     text=_("New Note"),
                     url=self.request.link(self.model, 'note'),
                     attrs={'class': 'new-note'}
+                )
+            )
+            links.append(
+                Link(
+                    text=_("PDF"),
+                    url=self.request.link(self.model, 'pdf'),
+                    attrs={'class': 'ticket-pdf'}
                 )
             )
 
@@ -1857,7 +1912,7 @@ class UserLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_admin:
+        if self.request.is_admin and not self.model.source:
             return [
                 Link(
                     text=_("Edit"),
@@ -2024,6 +2079,9 @@ class DirectoryEntryBaseLayout(DefaultLayout):
     def directory(self):
         return self.model.directory
 
+    def show_label(self, field):
+        return field.id not in self.model.hidden_label_fields
+
 
 class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
@@ -2035,7 +2093,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                 DirectoryCollection
             )),
             Link(_(self.model.directory.title), self.request.class_link(
-                DirectoryEntryCollection, {
+                ExtendedDirectoryEntryCollection, {
                     'directory_name': self.model.directory_name
                 }
             ))
@@ -2043,6 +2101,16 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
     @cached_property
     def editbar_links(self):
+
+        export_link = Link(
+            text=_("Export"),
+            url=self.request.class_link(
+                ExtendedDirectoryEntryCollection, {
+                    'directory_name': self.model.directory_name
+                }, name='+export'
+            ),
+            attrs={'class': 'export-link'}
+        )
 
         def links():
 
@@ -2054,20 +2122,12 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                 )
 
             if self.request.is_manager:
-                yield Link(
-                    text=_("Export"),
-                    url=self.request.class_link(
-                        DirectoryEntryCollection, {
-                            'directory_name': self.model.directory_name
-                        }, name='+export'
-                    ),
-                    attrs={'class': 'export-link'}
-                )
+                yield export_link
 
                 yield Link(
                     text=_("Import"),
                     url=self.request.class_link(
-                        DirectoryEntryCollection, {
+                        ExtendedDirectoryEntryCollection, {
                             'directory_name': self.model.directory_name
                         }, name='+import'
                     ),
@@ -2117,7 +2177,59 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                     ]
                 )
 
+            if not self.request.is_logged_in:
+                yield export_link
+
         return list(links())
+
+    def get_pub_link(self, text, filter=None, toggle_active=True):
+        filter_data = {}
+        classes = []
+        if filter:
+            filter_data[filter] = True
+            if toggle_active and filter in self.request.params:
+                classes.append('active')
+
+        return Link(
+            text=text,
+            url=self.request.class_link(
+                ExtendedDirectoryEntryCollection,
+                {**filter_data, 'directory_name': self.directory.name}
+            ),
+            attrs={'class': classes}
+        )
+
+    @property
+    def publication_filters(self):
+        if not self.request.is_logged_in:
+            return {}
+        if self.request.is_manager:
+            return dict(
+                published_only=_('Published'),
+                upcoming_only=_("Upcoming"),
+                past_only=_("Past"),
+            )
+        return dict(
+            published_only=_('Published'),
+            past_only=_("Past"),
+        )
+
+    @property
+    def publication_filter_title(self):
+        default_title = self.request.translate(_("Publication"))
+        for filter in self.publication_filters:
+            if filter in self.request.params:
+                applied_title = self.request.translate(
+                    self.publication_filters[filter])
+                return f'{default_title}: {applied_title}'
+        return f'{default_title}: {self.request.translate(_("Choose filter"))}'
+
+    @property
+    def publication_links(self):
+        return (
+            self.get_pub_link(text, filter_kw)
+            for filter_kw, text in self.publication_filters.items()
+        )
 
 
 class DirectoryEntryLayout(DirectoryEntryBaseLayout):
@@ -2144,7 +2256,7 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
                 DirectoryCollection
             )),
             Link(_(self.model.directory.title), self.request.class_link(
-                DirectoryEntryCollection, {
+                ExtendedDirectoryEntryCollection, {
                     'directory_name': self.model.directory.name
                 }
             )),
@@ -2181,7 +2293,8 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
                         Intercooler(
                             request_method='DELETE',
                             redirect_after=self.request.link(
-                                DirectoryEntryCollection(self.model.directory)
+                                ExtendedDirectoryEntryCollection(
+                                    self.model.directory)
                             )
                         )
                     )

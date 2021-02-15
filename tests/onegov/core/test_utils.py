@@ -10,7 +10,7 @@ from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import linkify_phone, _phone_ch
+from onegov.core.utils import Bunch, linkify_phone, _phone_ch
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
@@ -90,6 +90,8 @@ valid_test_phone_numbers = [
 # +041 324 4321 will treat + like a normal text around
 
 invalid_test_phone_numbers = [
+    '<a href="tel:061 444 44 44">061 444 44 44</a>',
+    '">+41 44 453 45 45',
     'some text',
     '+31 654 32 54',
     '+0041 543 44 44',
@@ -109,10 +111,11 @@ def test_phone_regex_groups_valid(number):
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
 def test_phone_linkify_valid(number):
     r = linkify_phone(number)
-    assert r != number
     number = utils.remove_duplicate_whitespace(number)
     wanted = f'<a href="tel:{number}">{number}</a>'
     assert r == wanted
+    # Important !
+    assert linkify_phone(wanted) == wanted
 
 
 @pytest.mark.parametrize("number", invalid_test_phone_numbers)
@@ -135,6 +138,12 @@ def test_linkify():
     # we can disable that however
     assert utils.linkify('info@example.org<br>', escape=False)\
         == '<a href="mailto:info@example.org">info@example.org</a><br>'
+
+    # test a longer html string with valid phone number
+    tel_nr = valid_test_phone_numbers[0]
+    text = f'2016/2019<br>{tel_nr}'
+    assert utils.linkify(text, escape=False) ==\
+           f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a>'
 
 
 @pytest.mark.parametrize("tel", [
@@ -386,3 +395,25 @@ def test_paragraphify():
     assert utils.paragraphify('foo\n\nbar') == '<p>foo</p><p>bar</p>'
     assert utils.paragraphify('foo\r\nbar') == '<p>foo<br>bar</p>'
     assert utils.paragraphify('foo\r\n\r\nbar') == '<p>foo</p><p>bar</p>'
+
+
+def test_bunch():
+    bunch = Bunch(a=1, b=2)
+    assert bunch.a == 1
+    assert bunch.b == 2
+
+    assert (Bunch() == Bunch()) is True
+    assert (Bunch(x=1) == Bunch()) is False
+    assert (Bunch(x=1) == Bunch(x=1)) is True
+    assert (Bunch(x=1) == Bunch(x=2)) is False
+    assert (Bunch(x=1, y=2) == Bunch(x=1, y=2)) is True
+    assert (Bunch(x=1, y=2) == Bunch(x=2, y=2)) is False
+    assert (Bunch(x=1, y=2) == Bunch(x=1, y=3)) is False
+
+    assert (Bunch() != Bunch()) is False
+    assert (Bunch(x=1) != Bunch()) is True
+    assert (Bunch(x=1) != Bunch(x=1)) is False
+    assert (Bunch(x=1) != Bunch(x=2)) is True
+    assert (Bunch(x=1, y=2) != Bunch(x=1, y=2)) is False
+    assert (Bunch(x=1, y=2) != Bunch(x=2, y=2)) is True
+    assert (Bunch(x=1, y=2) != Bunch(x=1, y=3)) is True

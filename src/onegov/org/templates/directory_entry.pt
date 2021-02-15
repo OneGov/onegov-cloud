@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content"
                    tal:define="
-                    lead entry.lead;
+                    lead layout.linkify(entry.lead);
                     text None;
                     people None;
                     contact entry.contact;
@@ -26,6 +26,7 @@
                             allow_downloads True;
                             allow_views True;
                             form entry.directory.form_obj;
+                            linkify_display True;
                         "
                     />
                 </div>

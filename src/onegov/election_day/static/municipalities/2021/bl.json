@@ -1,0 +1,346 @@
+{
+    "2761": {
+        "district": "Arlesheim",
+        "name": "Aesch (BL)"
+    },
+    "2762": {
+        "district": "Arlesheim",
+        "name": "Allschwil"
+    },
+    "2763": {
+        "district": "Arlesheim",
+        "name": "Arlesheim"
+    },
+    "2764": {
+        "district": "Arlesheim",
+        "name": "Biel-Benken"
+    },
+    "2765": {
+        "district": "Arlesheim",
+        "name": "Binningen"
+    },
+    "2766": {
+        "district": "Arlesheim",
+        "name": "Birsfelden"
+    },
+    "2767": {
+        "district": "Arlesheim",
+        "name": "Bottmingen"
+    },
+    "2768": {
+        "district": "Arlesheim",
+        "name": "Ettingen"
+    },
+    "2769": {
+        "district": "Arlesheim",
+        "name": "M\u00fcnchenstein"
+    },
+    "2770": {
+        "district": "Arlesheim",
+        "name": "Muttenz"
+    },
+    "2771": {
+        "district": "Arlesheim",
+        "name": "Oberwil (BL)"
+    },
+    "2772": {
+        "district": "Arlesheim",
+        "name": "Pfeffingen"
+    },
+    "2773": {
+        "district": "Arlesheim",
+        "name": "Reinach (BL)"
+    },
+    "2774": {
+        "district": "Arlesheim",
+        "name": "Sch\u00f6nenbuch"
+    },
+    "2775": {
+        "district": "Arlesheim",
+        "name": "Therwil"
+    },
+    "2781": {
+        "district": "Laufen",
+        "name": "Blauen"
+    },
+    "2782": {
+        "district": "Laufen",
+        "name": "Brislach"
+    },
+    "2783": {
+        "district": "Laufen",
+        "name": "Burg im Leimental"
+    },
+    "2784": {
+        "district": "Laufen",
+        "name": "Dittingen"
+    },
+    "2785": {
+        "district": "Laufen",
+        "name": "Duggingen"
+    },
+    "2786": {
+        "district": "Laufen",
+        "name": "Grellingen"
+    },
+    "2787": {
+        "district": "Laufen",
+        "name": "Laufen"
+    },
+    "2788": {
+        "district": "Laufen",
+        "name": "Liesberg"
+    },
+    "2789": {
+        "district": "Laufen",
+        "name": "Nenzlingen"
+    },
+    "2790": {
+        "district": "Laufen",
+        "name": "Roggenburg"
+    },
+    "2791": {
+        "district": "Laufen",
+        "name": "R\u00f6schenz"
+    },
+    "2792": {
+        "district": "Laufen",
+        "name": "Wahlen"
+    },
+    "2793": {
+        "district": "Laufen",
+        "name": "Zwingen"
+    },
+    "2821": {
+        "district": "Liestal",
+        "name": "Arisdorf"
+    },
+    "2822": {
+        "district": "Liestal",
+        "name": "Augst"
+    },
+    "2823": {
+        "district": "Liestal",
+        "name": "Bubendorf"
+    },
+    "2824": {
+        "district": "Liestal",
+        "name": "Frenkendorf"
+    },
+    "2825": {
+        "district": "Liestal",
+        "name": "F\u00fcllinsdorf"
+    },
+    "2826": {
+        "district": "Liestal",
+        "name": "Giebenach"
+    },
+    "2827": {
+        "district": "Liestal",
+        "name": "Hersberg"
+    },
+    "2828": {
+        "district": "Liestal",
+        "name": "Lausen"
+    },
+    "2829": {
+        "district": "Liestal",
+        "name": "Liestal"
+    },
+    "2830": {
+        "district": "Liestal",
+        "name": "Lupsingen"
+    },
+    "2831": {
+        "district": "Liestal",
+        "name": "Pratteln"
+    },
+    "2832": {
+        "district": "Liestal",
+        "name": "Ramlinsburg"
+    },
+    "2833": {
+        "district": "Liestal",
+        "name": "Seltisberg"
+    },
+    "2834": {
+        "district": "Liestal",
+        "name": "Ziefen"
+    },
+    "2841": {
+        "district": "Sissach",
+        "name": "Anwil"
+    },
+    "2842": {
+        "district": "Sissach",
+        "name": "B\u00f6ckten"
+    },
+    "2843": {
+        "district": "Sissach",
+        "name": "Buckten"
+    },
+    "2844": {
+        "district": "Sissach",
+        "name": "Buus"
+    },
+    "2845": {
+        "district": "Sissach",
+        "name": "Diepflingen"
+    },
+    "2846": {
+        "district": "Sissach",
+        "name": "Gelterkinden"
+    },
+    "2847": {
+        "district": "Sissach",
+        "name": "H\u00e4felfingen"
+    },
+    "2848": {
+        "district": "Sissach",
+        "name": "Hemmiken"
+    },
+    "2849": {
+        "district": "Sissach",
+        "name": "Itingen"
+    },
+    "2850": {
+        "district": "Sissach",
+        "name": "K\u00e4nerkinden"
+    },
+    "2851": {
+        "district": "Sissach",
+        "name": "Kilchberg (BL)"
+    },
+    "2852": {
+        "district": "Sissach",
+        "name": "L\u00e4ufelfingen"
+    },
+    "2853": {
+        "district": "Sissach",
+        "name": "Maisprach"
+    },
+    "2854": {
+        "district": "Sissach",
+        "name": "Nusshof"
+    },
+    "2855": {
+        "district": "Sissach",
+        "name": "Oltingen"
+    },
+    "2856": {
+        "district": "Sissach",
+        "name": "Ormalingen"
+    },
+    "2857": {
+        "district": "Sissach",
+        "name": "Rickenbach (BL)"
+    },
+    "2858": {
+        "district": "Sissach",
+        "name": "Rothenfluh"
+    },
+    "2859": {
+        "district": "Sissach",
+        "name": "R\u00fcmlingen"
+    },
+    "2860": {
+        "district": "Sissach",
+        "name": "R\u00fcnenberg"
+    },
+    "2861": {
+        "district": "Sissach",
+        "name": "Sissach"
+    },
+    "2862": {
+        "district": "Sissach",
+        "name": "Tecknau"
+    },
+    "2863": {
+        "district": "Sissach",
+        "name": "Tenniken"
+    },
+    "2864": {
+        "district": "Sissach",
+        "name": "Th\u00fcrnen"
+    },
+    "2865": {
+        "district": "Sissach",
+        "name": "Wenslingen"
+    },
+    "2866": {
+        "district": "Sissach",
+        "name": "Wintersingen"
+    },
+    "2867": {
+        "district": "Sissach",
+        "name": "Wittinsburg"
+    },
+    "2868": {
+        "district": "Sissach",
+        "name": "Zeglingen"
+    },
+    "2869": {
+        "district": "Sissach",
+        "name": "Zunzgen"
+    },
+    "2881": {
+        "district": "Waldenburg",
+        "name": "Arboldswil"
+    },
+    "2882": {
+        "district": "Waldenburg",
+        "name": "Bennwil"
+    },
+    "2883": {
+        "district": "Waldenburg",
+        "name": "Bretzwil"
+    },
+    "2884": {
+        "district": "Waldenburg",
+        "name": "Diegten"
+    },
+    "2885": {
+        "district": "Waldenburg",
+        "name": "Eptingen"
+    },
+    "2886": {
+        "district": "Waldenburg",
+        "name": "H\u00f6lstein"
+    },
+    "2887": {
+        "district": "Waldenburg",
+        "name": "Lampenberg"
+    },
+    "2888": {
+        "district": "Waldenburg",
+        "name": "Langenbruck"
+    },
+    "2889": {
+        "district": "Waldenburg",
+        "name": "Lauwil"
+    },
+    "2890": {
+        "district": "Waldenburg",
+        "name": "Liedertswil"
+    },
+    "2891": {
+        "district": "Waldenburg",
+        "name": "Niederdorf"
+    },
+    "2892": {
+        "district": "Waldenburg",
+        "name": "Oberdorf (BL)"
+    },
+    "2893": {
+        "district": "Waldenburg",
+        "name": "Reigoldswil"
+    },
+    "2894": {
+        "district": "Waldenburg",
+        "name": "Titterten"
+    },
+    "2895": {
+        "district": "Waldenburg",
+        "name": "Waldenburg"
+    }
+}

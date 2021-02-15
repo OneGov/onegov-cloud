@@ -71,7 +71,8 @@ class ResourceCollection(object):
     def by_reservation(self, reservation):
         return self.by_id(reservation.resource)
 
-    def delete(self, resource, including_reservations=False):
+    def delete(self, resource, including_reservations=False,
+               handle_reservation=None):
         scheduler = resource.get_scheduler(self.libres_context)
 
         if not including_reservations:
@@ -80,6 +81,10 @@ class ResourceCollection(object):
 
             scheduler.managed_allocations().delete('fetch')
         else:
+            if callable(handle_reservation):
+                for res in scheduler.managed_reservations():
+                    # e.g. create a ticket snapshot
+                    handle_reservation(res)
             scheduler.extinguish_managed_records()
 
         self.session.delete(resource)

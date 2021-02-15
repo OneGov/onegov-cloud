@@ -1,19 +1,27 @@
+from morepath import redirect
+from onegov.core.crypto import random_token
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.static import StaticFile
 from onegov.core.utils import normalize_for_url
 from onegov.file.integration import render_depot_file
+from onegov.file.utils import as_fileintent
 from onegov.form import Form
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.forms import AttachmentsForm
+from onegov.swissvotes.layouts import DeleteVoteAttachmentLayout
 from onegov.swissvotes.layouts import DeleteVoteLayout
+from onegov.swissvotes.layouts import ManageCampaingMaterialNayLayout
+from onegov.swissvotes.layouts import ManageCampaingMaterialYeaLayout
 from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
 from onegov.swissvotes.layouts import VoteLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import Actor
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
+from webob.exc import HTTPNotFound
+from webob.exc import HTTPUnsupportedMediaType
 
 
 @SwissvotesApp.html(
@@ -36,240 +44,12 @@ def view_vote(self, request):
 
     return {
         'layout': layout,
-        'brief_description': layout.get_file_url('brief_description'),
-        'voting_text': layout.get_file_url('voting_text'),
-        'federal_council_message': layout.get_file_url(
-            'federal_council_message'),
-        'parliamentary_debate': layout.get_file_url('parliamentary_debate'),
-        'voting_booklet': layout.get_file_url('voting_booklet'),
-        'resolution': layout.get_file_url('resolution'),
-        'realization': layout.get_file_url('realization'),
-        'ad_analysis': layout.get_file_url('ad_analysis'),
-        'foeg_analysis': layout.get_file_url('foeg_analysis'),
-        'post_vote_poll': layout.get_file_url('post_vote_poll'),
-        'preliminary_examination': layout.get_file_url(
-            'preliminary_examination'),
-        'bkchrono': self.bk_chrono(request.locale),
-        'bkresults': self.bk_results(request.locale),
-        'curiavista': self.curiavista(request.locale),
-        'results_by_domain': layout.get_file_url('results_by_domain'),
         'bfs_map': bfs_map,
         'prev': prev,
         'next': next,
         'map_preview': request.link(StaticFile('images/map-preview.png')),
+        'posters': self.posters(request)
     }
-
-
-# Static paths for files
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='kurzbeschreibung.pdf'
-)
-def brief_description_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('brief_description', request))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='abstimmungstext-de.pdf'
-)
-def voting_text_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_text', 'de_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='abstimmungstext-fr.pdf'
-)
-def voting_text_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_text', 'fr_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='botschaft-de.pdf'
-)
-def federal_council_message_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale(
-            'federal_council_message', 'de_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='botschaft-fr.pdf'
-)
-def federal_council_message_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale(
-            'federal_council_message', 'fr_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='parlamentsberatung.pdf'
-)
-def parliamentary_debate_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('parliamentary_debate', request))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='brochure-de.pdf'
-)
-def voting_booklet_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_booklet', 'de_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='brochure-fr.pdf'
-)
-def voting_booklet_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('voting_booklet', 'fr_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='erwahrung-de.pdf'
-)
-def resultion_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('resolution', 'de_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='erwahrung-fr.pdf'
-)
-def resolution_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('resolution', 'fr_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='zustandekommen-de.pdf'
-)
-def realization_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('realization', 'de_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='zustandekommen-fr.pdf'
-)
-def realization_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('realization', 'fr_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='inserateanalyse.pdf'
-)
-def ad_analysis_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('ad_analysis', request))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='staatsebenen.xlsx'
-)
-def results_by_domain_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('results_by_domain', request))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='medienanalyse.pdf'
-)
-def foeg_analysis_static(self, request):
-    return request.redirect(
-        request.link(self.get_file('foeg_analysis', request))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='nachbefragung-de.pdf'
-)
-def post_vote_poll_de_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('post_vote_poll', 'de_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='nachbefragung-fr.pdf'
-)
-def post_vote_poll_fr_static(self, request):
-    return request.redirect(
-        request.link(self.get_file_by_locale('post_vote_poll', 'fr_CH'))
-    )
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='vorpruefung-de.pdf'
-)
-def preliminary_exam_de_static(self, request):
-    return request.redirect(
-        request.link(
-            self.get_file_by_locale('preliminary_examination', 'de_CH')))
-
-
-@SwissvotesApp.view(
-    model=SwissVote,
-    permission=Public,
-    name='vorpruefung-fr.pdf'
-)
-def preliminary_exam_fr_static(self, request):
-    return request.redirect(
-        request.link(
-            self.get_file_by_locale('preliminary_examination', 'fr_CH')))
 
 
 @SwissvotesApp.json(
@@ -470,6 +250,7 @@ def upload_vote_attachments(self, request, form):
     return {
         'layout': layout,
         'form': form,
+        'button_text': _("Upload"),
         'cancel': request.link(self)
     }
 
@@ -511,28 +292,156 @@ def delete_vote(self, request, form):
 def view_file(self, request):
     @request.after
     def set_filename(response):
-        bfs_number = self.linked_swissvotes[0].bfs_number
-        name = self.name.split('-')[0]
-        extension = {'results_by_domain': 'xlsx'}.get(name, 'pdf')
-        title = {
-            'voting_text': _("Voting text"),
-            'brief_description': _("Brief description Swissvotes"),
-            'realization': _("Realization"),
-            'federal_council_message': _("Federal council message"),
-            'parliamentary_debate': _("Parliamentary debate"),
-            'voting_booklet': _("Voting booklet"),
-            'ad_analysis': _("Analysis of the advertising campaign"),
-            'foeg_analysis': _("Media coverage: fög analysis"),
-            'post_vote_poll': _("Post-vote poll"),
-            'preliminary_examination': _("Preliminary examination"),
-            'resolution': _("Resolution"),
-            'results_by_domain': _(
-                "Result by canton, district and municipality"
+        attribute = SwissVote.localized_files().get(self.name.split('-')[0])
+        if attribute:
+            bfs_number = self.linked_swissvotes[0].bfs_number
+            extension = attribute.extension
+            title = normalize_for_url(request.translate(attribute.label))
+            response.headers['Content-Disposition'] = (
+                f'inline; filename={bfs_number}-{title}.{extension}'
             )
-        }.get(name, '')
-        title = normalize_for_url(request.translate(title))
-        response.headers['Content-Disposition'] = (
-            f'inline; filename={bfs_number}-{title}.{extension}'
-        )
 
     return self.reference.file
+
+
+def create_static_file_view(attribute, locale):
+    def static_view(self, request):
+        file = self.get_file(attribute, locale=locale, fallback=False)
+        if not file:
+            raise HTTPNotFound()
+        return request.redirect(request.link(file))
+
+    return static_view
+
+
+for attribute_name, attribute in SwissVote.localized_files().items():
+    for locale, view_name in attribute.static_views.items():
+        SwissvotesApp.view(
+            model=SwissVote,
+            permission=Public,
+            name=view_name
+        )(create_static_file_view(attribute_name, locale))
+
+
+@SwissvotesApp.html(
+    model=SwissVote,
+    template='attachments.pt',
+    name='manage-campaign-material-yea',
+    permission=Private
+)
+def view_manage_campaign_material_yea(self, request):
+    layout = ManageCampaingMaterialYeaLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload-campaign-material-yea')
+        ),
+        'files': self.campaign_material_yea,
+        'notice': self,
+    }
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    name='upload-campaign-material-yea',
+    permission=Private,
+    request_method='POST'
+)
+def upload_manage_campaign_material_yea(self, request):
+    request.assert_valid_csrf_token()
+
+    attachment = SwissVoteFile(id=random_token())
+    attachment.name = 'campaign_material_yea-{}'.format(
+        request.params['file'].filename
+    )
+    attachment.reference = as_fileintent(
+        request.params['file'].file,
+        request.params['file'].filename
+    )
+
+    if attachment.reference.content_type not in ('image/jpeg', 'image/png'):
+        raise HTTPUnsupportedMediaType()
+
+    self.files.append(attachment)
+
+
+@SwissvotesApp.html(
+    model=SwissVote,
+    template='attachments.pt',
+    name='manage-campaign-material-nay',
+    permission=Private
+)
+def view_manage_campaign_material_nay(self, request):
+    layout = ManageCampaingMaterialNayLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload-campaign-material-nay')
+        ),
+        'files': self.campaign_material_nay,
+        'notice': self,
+    }
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    name='upload-campaign-material-nay',
+    permission=Private,
+    request_method='POST'
+)
+def upload_manage_campaign_material_nay(self, request):
+    request.assert_valid_csrf_token()
+
+    attachment = SwissVoteFile(id=random_token())
+    attachment.name = 'campaign_material_nay-{}'.format(
+        request.params['file'].filename
+    )
+    attachment.reference = as_fileintent(
+        request.params['file'].file,
+        request.params['file'].filename
+    )
+
+    if attachment.reference.content_type not in ('image/jpeg', 'image/png'):
+        raise HTTPUnsupportedMediaType()
+
+    self.files.append(attachment)
+
+
+@SwissvotesApp.form(
+    model=SwissVoteFile,
+    name='delete',
+    template='form.pt',
+    permission=Private,
+    form=Form
+)
+def delete_vote_attachment(self, request, form):
+    layout = DeleteVoteAttachmentLayout(self, request)
+    url = request.link(
+        layout.parent,
+        'manage-campaign-material-{}'.format(
+            'nay' if 'nay' in self.name else 'yea'
+        )
+    )
+
+    if form.submitted(request):
+        request.session.delete(self)
+        request.message(_("Attachment deleted."), 'success')
+        return redirect(url)
+
+    return {
+        'message': _(
+            'Do you really want to delete "${item}"?',
+            mapping={'item': self.filename}
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.filename,
+        'subtitle': _("Delete"),
+        'button_text': _("Delete"),
+        'button_class': 'alert',
+        'cancel': url
+    }

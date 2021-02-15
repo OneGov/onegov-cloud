@@ -103,8 +103,11 @@ configuration: &global-config
   # To test mapbox integration, a mapbox token has to be provided
   # mapbox_token:
 
+  # Install https://github.com/seantis/d3-renderer
+#  d3_renderer: 'http://localhost:1337'
+
    # For Swissvotes, the Museum für Gestatlung has an api
-  mfg_api_token:
+  # mfg_api_token:
 
   # for org app, disable the password reset view (case the users have their own auth providers)
   # disable_password_reset: true
@@ -128,55 +131,72 @@ configuration: &global-config
       oauth_gateway_secret: barfoo
 
   # Alternative login providers
-  authentication_providers:
+  # authentication_providers:
+#     msal:
+#           tenants:
+#             "onegov_agency/bs":
+#               tenant_id: ''
+#               client_id: ''
+#               client_secret: ''
+#             attributes:
+#               source_id: 'sub'
+#               username: 'email'
+#               groups: 'groups'
+#               first_name: 'given_name'
+#               last_name: 'family_name'
+#           roles:
+#             "onegov_agency/bs":
+#               admins: ''
+#               editors: ''
+#               members: ''
 
-    # Login with LDAP, using Kerberos as authentication
-    ldap_kerberos:
-
-      # If set to true, the provider will automatically log in users that
-      # hit the root page (/) if they have an account
-      auto_login: true
-
-      # Kerberos configuration
-      kerberos_keytab: /etc/keytab
-      kerberos_hostname: ogc.example.org
-      kerberos_service: HTTP
-
-      # LDAP configuration (TLS is required!)
-      ldap_url: ldaps://ldap.example.org
-      ldap_username: 'cn=service,ou=service,dc=seantis,dc=ch'
-      ldap_password: 'hunter2'
-
-      # LDAP attributes
-      name_attribute: cn
-      mails_attribute: mail
-      groups_attribute: memberOf
-
-      # This suffix is stripped from all user names if found.
-      # For example, if Kerberos returns foo@example.org, but LDAP only
-      # contains, 'foo', then setting the suffix to '@example.org' will help.
-      suffix: '@example.org'
-
-      # Role mapping
-      roles:
-
-        # For all applications
-        "__default__":
-          admin: admins
-          editor: editors
-          member: members
-
-        # For applications of a specific namespace
-        "onegov_org":
-          admin: admins
-          editor: editors
-          member: members
-
-        # For applications of a specific application id
-        "onegov_org/govikon":
-          admin: admins
-          editor: editors
-          member: members
+#    # Login with LDAP, using Kerberos as authentication
+#    ldap_kerberos:
+#
+#      # If set to true, the provider will automatically log in users that
+#      # hit the root page (/) if they have an account
+#      auto_login: true
+#
+#      # Kerberos configuration
+#      kerberos_keytab: /etc/keytab
+#      kerberos_hostname: ogc.example.org
+#      kerberos_service: HTTP
+#
+#      # LDAP configuration (TLS is required!)
+#      ldap_url: ldaps://ldap.example.org
+#      ldap_username: 'cn=service,ou=service,dc=seantis,dc=ch'
+#      ldap_password: 'hunter2'
+#
+#      # LDAP attributes
+#      name_attribute: cn
+#      mails_attribute: mail
+#      groups_attribute: memberOf
+#
+#      # This suffix is stripped from all user names if found.
+#      # For example, if Kerberos returns foo@example.org, but LDAP only
+#      # contains, 'foo', then setting the suffix to '@example.org' will help.
+#      suffix: '@example.org'
+#
+#      # Role mapping
+#      roles:
+#
+#        # For all applications
+#        "__default__":
+#          admin: admins
+#          editor: editors
+#          member: members
+#
+#        # For applications of a specific namespace
+#        "onegov_org":
+#          admin: admins
+#          editor: editors
+#          member: members
+#
+#        # For applications of a specific application id
+#        "onegov_org/govikon":
+#          admin: admins
+#          editor: editors
+#          member: members
 
 # All supported applications
 applications:
@@ -249,6 +269,12 @@ applications:
   - path: /onegov_redesign_test
     application: onegov.redesign_test.RedesignApp
     namespace: onegov_redesign_test
+    configuration:
+      <<: *global-config
+
+  - path: /translator_directory/*
+    application: onegov.translator_directory.TranslatorDirectoryApp
+    namespace: translator_directory
     configuration:
       <<: *global-config
 

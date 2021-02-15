@@ -118,7 +118,7 @@ class Auth(object):
         :param second_factor:
             The value of the second factor or None.
 
-        :skip_providers:
+        :param skip_providers:
             In special cases where e.g. an LDAP-Provider is a source of users
             but can't offer the password for authentication, you can login
             using the application database.
@@ -134,6 +134,8 @@ class Auth(object):
 
         if isinstance(self.app, UserApp) and not skip_providers:
             for provider in self.app.providers:
+                if not provider.available(self.app):
+                    continue
                 if provider.kind == 'integrated':
                     user = provider.authenticate_user(
                         request=request,
@@ -159,8 +161,13 @@ class Auth(object):
 
         # only built-in users currently support second factors
         if source is None:
-            if not self.is_valid_second_factor(user, second_factor):
-                return fail()
+            try:
+                if not self.is_valid_second_factor(user, second_factor):
+                    return fail()
+            except Exception as e:
+                log.info(f'Second factor exception for user {user.username}: '
+                         f'{e.args[0]}')
+                return None
 
         # users from external authentication providers may not login using
         # a regular login - if for some reason the source is false (if the
@@ -252,8 +259,8 @@ class Auth(object):
 
         return response
 
-    def logout_to(self, request):
-        """ Logs the current user out and redirects to ``self.to``.
+    def logout_to(self, request, to=None):
+        """ Logs the current user out and redirects to ``to`` or ``self.to``.
 
         :return: A response redirecting to ``self.to`` with the identity
         forgotten.
@@ -263,7 +270,7 @@ class Auth(object):
         user = self.by_identity(request.identity)
         user and user.remove_current_session(request)
 
-        response = self.redirect(request, self.to)
+        response = self.redirect(request, to or self.to)
         request.app.forget_identity(response, request)
 
         return response

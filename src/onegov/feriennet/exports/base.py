@@ -92,13 +92,13 @@ class FeriennetExport(Export):
         yield _("Activity Text (HTML)"), activity.text
         yield _("Activity Status"), ACTIVITY_STATES[activity.state]
         yield _("Activity Location"), activity.location
+        yield _("Activity Tags"), "\n".join(sorted(activity.tags or []))
 
     def booking_fields(self, booking):
-        state = booking.period_bound_booking_state(booking.period)
-
-        yield _("Booking State"), BOOKING_STATES[state]
+        yield _("Booking State"), BOOKING_STATES[booking.state]
         yield _("Booking Priority"), booking.priority
         yield _("Booking Cost"), booking.cost
+        yield _("Booking Date"), booking.created.date()
 
     def attendee_fields(self, attendee):
         first_name, last_name = decode_name(attendee.name)
@@ -133,6 +133,9 @@ class FeriennetExport(Export):
             need.number.lower, need.number.upper - 1)
         yield _("Need Name"), need.name
         yield _("Need Description"), need.description
+
+    def activity_tags(self, tags):
+        yield _("Activity Tags"), "\n".join(sorted(tags or []))
 
     def user_fields(self, user):
         user_data = user.data or {}

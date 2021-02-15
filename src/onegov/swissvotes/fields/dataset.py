@@ -9,6 +9,7 @@ from onegov.swissvotes.models import SwissVote
 from psycopg2.extras import NumericRange
 from xlrd import open_workbook
 from xlrd import XL_CELL_EMPTY
+from xlrd import XL_CELL_NUMBER
 from xlrd import xldate
 
 
@@ -98,7 +99,13 @@ class SwissvoteDatasetField(UploadField):
                     if cell.ctype == XL_CELL_EMPTY:
                         value = None
                     elif type_ == 'TEXT':
-                        value = str(cell.value)
+                        if (
+                            cell.ctype == XL_CELL_NUMBER
+                            and int(cell.value) == cell.value
+                        ):
+                            value = str(int(cell.value))
+                        else:
+                            value = str(cell.value)
                         value = '' if value == '.' else value
                     elif type_ == 'DATE':
                         if isinstance(cell.value, str):

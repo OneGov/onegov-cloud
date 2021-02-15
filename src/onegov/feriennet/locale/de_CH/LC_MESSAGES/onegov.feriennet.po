@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-10 08:58+0200\n"
+"POT-Creation-Date: 2021-01-14 15:11+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,9 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.12\n"
+
+msgid "Partner of Pro Juventute"
+msgstr "Partner von Pro Juventute"
 
 msgid "No active period"
 msgstr "Kein aktiver Zeitraum"
@@ -154,6 +157,9 @@ msgstr "Angebot Status"
 msgid "Activity Location"
 msgstr "Angebot Ort"
 
+msgid "Activity Tags"
+msgstr "Angebot Kategorien"
+
 msgid "Booking State"
 msgstr "Buchung Status"
 
@@ -162,6 +168,9 @@ msgstr "Buchung Priorität"
 
 msgid "Booking Cost"
 msgstr "Buchung Kosten"
+
+msgid "Booking Date"
+msgstr "Buchungsdatum"
 
 msgid "Attendee First Name"
 msgstr "Teilnehmer Vorname"
@@ -513,6 +522,21 @@ msgstr "Theater"
 
 msgid "Trade"
 msgstr "Handwerk"
+
+msgid "Camp"
+msgstr "Lager"
+
+msgid "Camp in House"
+msgstr "Hauslager"
+
+msgid "Tent Camp"
+msgstr "Zeltlager"
+
+msgid "Family Camp"
+msgstr "Familienlager"
+
+msgid "Trecking Camp"
+msgstr "Trekkinglager"
 
 msgid "Title"
 msgstr "Titel"
@@ -989,8 +1013,18 @@ msgstr ""
 "Jeder Teilnehmer kann für einen fixen Preis an einer limitierten Anzahl von "
 "Angeboten teilnehmen."
 
+msgid ""
+"Each attendee may attend a fixed number of activites. Each activity is "
+"billed separately."
+msgstr ""
+"Jeder Teilnehmer kann eine fixe Anzahl Angebote besuchen. Jede Aktivität "
+"wird separat verrechnet"
+
 msgid "Maximum Number of Activities per Attendee"
 msgstr "Maximale Anzahl Angebote pro Teilnehmer"
+
+msgid "Maximum Number of Bookings per Attendee and period"
+msgstr "Maximale Anzahl Buchungen per Teilnehmer und Zeitraum"
 
 msgid "Cost of the Pass"
 msgstr "Kosten des Passes"
@@ -1740,7 +1774,7 @@ msgid ""
 "activities."
 msgstr ""
 "Melden Sie Ihr Kind kostenlos für eine Rega-Gönnerschaft während allen "
-"gebuchten Ferienaktivitäten 2020 an."
+"gebuchten Ferienaktivitäten an."
 
 msgid "Register here"
 msgstr "Hier anmelden"
@@ -1989,6 +2023,13 @@ msgid ""
 "additional charges."
 msgstr ""
 "Der Ferienpass kostet ${amount} CHF pro Kind. Einzelne Angebote können "
+"zusätzliche Teilnahmegebühren verlangen."
+
+msgid ""
+"A booking costs ${amount} CHF per child. Individual activities may incur "
+"additional charges."
+msgstr ""
+"Eine Buchung kostet ${amount} CHF pro Kind. Einzelne Angebote können "
 "zusätzliche Teilnahmegebühren verlangen."
 
 msgid ""
@@ -2480,7 +2521,7 @@ msgid "Create Bills"
 msgstr "Rechnungen erstellen"
 
 msgid "The period must be active in order to reset billing"
-msgstr "Die Periode muss aktiv sein, um die Fakturierung zurückzusetzen"
+msgstr "Der Zeitraum muss aktiv sein, um die Fakturierung zurückzusetzen"
 
 msgid "The billing was successfully reset"
 msgstr "Die Fakturierung wurde erfolgreich zurückgesetzt"
@@ -2512,6 +2553,12 @@ msgstr "Es konnten keine Zahlungen importiert werden"
 
 msgid "The submitted xml data could not be decoded"
 msgstr "Die abgeschickten Daten konnten nicht dekodiert werden"
+
+msgid ""
+"The submitted xml data could not be parsed. Please check the file integrity"
+msgstr ""
+"Die abgeschickten Daten konnten nicht verarbeitet werden. Prüfen Sie die "
+"Datei-Integrität"
 
 msgid "No transactions were found in the given file"
 msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
@@ -2650,11 +2697,12 @@ msgid "This donation has already been paid"
 msgstr "Die Spende wurde bereits bezahlt"
 
 msgid "Can not do matchings for an inactive period"
-msgstr "Zuteilungen können nur in einer aktiven Periode durchgeführt werden"
+msgstr "Zuteilungen können nur in einem aktiven Zeitraum durchgeführt werden"
 
 msgid "Can not do matchings for an confirmed period"
 msgstr ""
-"Zuteilungen können nur in einer nicht bestätigten Periode durchgeführt werden"
+"Zuteilungen können nur in einem nicht bestätigten Zeitraum durchgeführt "
+"werden"
 
 msgid "The matching was confirmed successfully"
 msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
@@ -2932,6 +2980,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Holiday Camp"
+#~ msgstr "Ferienlager"
 
 #~ msgid "The minium age cannot be higher than the maximum age"
 #~ msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"

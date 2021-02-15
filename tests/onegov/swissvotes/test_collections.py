@@ -215,24 +215,41 @@ def test_votes_term_filter(swissvotes_app):
     c_text_de = 'swissvotes."searchable_text_de_CH"'
     c_text_fr = 'swissvotes."searchable_text_fr_CH"'
 
-    assert compiled(term='100') == [
-        'swissvotes.bfs_number = 100',
-        'swissvotes.procedure_number = 100',
-        f"{c_title_de} @@ to_tsquery('german', '100')",
-        f"{c_title_fr} @@ to_tsquery('french', '100')",
-        f"{c_short_title_de} @@ to_tsquery('german', '100')",
-        f"{c_short_title_fr} @@ to_tsquery('french', '100')",
-        f"{c_keyword} @@ to_tsquery('german', '100')",
+    assert compiled(term='987') == [
+        'swissvotes.bfs_number = 987',
+        "swissvotes.procedure_number = '987'",
+        f"{c_title_de} @@ to_tsquery('german', '987')",
+        f"{c_title_fr} @@ to_tsquery('french', '987')",
+        f"{c_short_title_de} @@ to_tsquery('german', '987')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '987')",
+        f"{c_keyword} @@ to_tsquery('german', '987')",
     ]
 
-    assert compiled(term='100.1') == [
-        'swissvotes.bfs_number = 100.1',
-        'swissvotes.procedure_number = 100.1',
-        f"{c_title_de} @@ to_tsquery('german', '100.1')",
-        f"{c_title_fr} @@ to_tsquery('french', '100.1')",
-        f"{c_short_title_de} @@ to_tsquery('german', '100.1')",
-        f"{c_short_title_fr} @@ to_tsquery('french', '100.1')",
-        f"{c_keyword} @@ to_tsquery('german', '100.1')",
+    assert compiled(term='17.060') == [
+        'swissvotes.bfs_number = 17.060',
+        "swissvotes.procedure_number = '17.060'",
+        f"{c_title_de} @@ to_tsquery('german', '17.060')",
+        f"{c_title_fr} @@ to_tsquery('french', '17.060')",
+        f"{c_short_title_de} @@ to_tsquery('german', '17.060')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '17.060')",
+        f"{c_keyword} @@ to_tsquery('german', '17.060')",
+    ]
+
+    assert compiled(term='17.12.2004') == [
+        f"{c_title_de} @@ to_tsquery('german', '17.12.2004')",
+        f"{c_title_fr} @@ to_tsquery('french', '17.12.2004')",
+        f"{c_short_title_de} @@ to_tsquery('german', '17.12.2004')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '17.12.2004')",
+        f"{c_keyword} @@ to_tsquery('german', '17.12.2004')",
+    ]
+
+    assert compiled(term='1893_002') == [
+        "swissvotes.procedure_number = '1893_002'",
+        f"{c_title_de} @@ to_tsquery('german', '1893002')",
+        f"{c_title_fr} @@ to_tsquery('french', '1893002')",
+        f"{c_short_title_de} @@ to_tsquery('german', '1893002')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '1893002')",
+        f"{c_keyword} @@ to_tsquery('german', '1893002')",
     ]
 
     assert compiled(term='abc') == [
@@ -843,8 +860,7 @@ def test_votes_export(swissvotes_app):
         result_cantons_yeas=Decimal('1.5'),
         result_cantons_nays=Decimal('24.5'),
         result_cantons_yeas_p=Decimal('60.01'),
-        posters_no="https://museum.ch/objects/1 https://museum.ch/objects/1",
-        swissvoteslink='https://example.com/122.0'
+        swissvoteslink='https://example.com/122.0',
     )
     vote.result_ag_eligible_voters = 101
     vote.result_ag_votes_valid = 102
@@ -1055,7 +1071,7 @@ def test_votes_export(swissvotes_app):
     vote.result_zh_yeas_p = Decimal('10.80')
     vote._result_zh_accepted = 0
     vote._department_in_charge = 1
-    vote.procedure_number = Decimal('24.557')
+    vote.procedure_number = '24.557'
     vote._position_federal_council = 1
     vote._position_parliament = 1
     vote._position_national_council = 1
@@ -1094,6 +1110,7 @@ def test_votes_export(swissvotes_app):
         'glp': 66,
         'bdp': None,
         'mcg': 9999,
+        'mitte': 9999,
         'sav': 1,
         'eco': 2,
         'sgv': 3,
@@ -1507,6 +1524,64 @@ def test_votes_export(swissvotes_app):
         'sgv_sh': 1,
         'vpod_ge': 1,
         'vpod_vd': 1,
+        'mitte-fr_ch': 2,
+        'mitte_ag': 2,
+        'mitte_ai': 2,
+        'mitte_ar': 2,
+        'mitte_be': 2,
+        'mitte_bl': 2,
+        'mitte_bs': 2,
+        'mitte_fr': 2,
+        'mitte_ge': 2,
+        'mitte_gl': 2,
+        'mitte_gr': 2,
+        'mitte_ju': 2,
+        'mitte_lu': 2,
+        'mitte_ne': 2,
+        'mitte_nw': 2,
+        'mitte_ow': 2,
+        'mitte_sg': 2,
+        'mitte_sh': 2,
+        'mitte_so': 2,
+        'mitte_sz': 2,
+        'mitte_tg': 2,
+        'mitte_ti': 2,
+        'mitte_ur': 2,
+        'mitte_vd': 2,
+        'mitte_vs': 2,
+        'mitte_vsr': 2,
+        'mitte_vso': 2,
+        'mitte_zg': 2,
+        'mitte_zh': 2,
+        'jmitte_ch': 2,
+        'jmitte_ag': 2,
+        'jmitte_ai': 2,
+        'jmitte_ar': 2,
+        'jmitte_be': 2,
+        'jmitte_bl': 2,
+        'jmitte_bs': 2,
+        'jmitte_fr': 2,
+        'jmitte_ge': 2,
+        'jmitte_gl': 2,
+        'jmitte_gr': 2,
+        'jmitte_ju': 2,
+        'jmitte_lu': 2,
+        'jmitte_ne': 2,
+        'jmitte_nw': 2,
+        'jmitte_ow': 2,
+        'jmitte_sg': 2,
+        'jmitte_sh': 2,
+        'jmitte_so': 2,
+        'jmitte_sz': 2,
+        'jmitte_tg': 2,
+        'jmitte_ti': 2,
+        'jmitte_ur': 2,
+        'jmitte_vd': 2,
+        'jmitte_vs': 2,
+        'jmitte_vsr': 2,
+        'jmitte_vso': 2,
+        'jmitte_zg': 2,
+        'jmitte_zh': 2,
     }
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
@@ -1529,6 +1604,7 @@ def test_votes_export(swissvotes_app):
     vote.national_council_share_glp = Decimal('18.10')
     vote.national_council_share_bdp = Decimal('19.10')
     vote.national_council_share_mcg = Decimal('20.20')
+    vote.national_council_share_mitte = Decimal('20.10')
     vote.national_council_share_ubrige = Decimal('21.20')
     vote.national_council_share_yeas = Decimal('22.20')
     vote.national_council_share_nays = Decimal('23.20')
@@ -1545,6 +1621,37 @@ def test_votes_export(swissvotes_app):
     vote.bkresults_fr = 'bkresults_fr'
     vote.bkchrono_de = 'bkchrono_de'
     vote.bkchrono_fr = 'bkchrono_fr'
+    vote.posters_mfg_yea = (
+        'https://museum.ch/objects/1 '
+        'https://museum.ch/objects/2'
+    )
+    vote.posters_mfg_nay = (
+        'https://museum.ch/objects/3 '
+        'https://museum.ch/objects/4'
+    )
+    vote.posters_sa_yea = (
+        'https://sozialarchiv.ch/objects/1 '
+        'https://sozialarchiv.ch/objects/2'
+    )
+    vote.posters_sa_nay = (
+        'https://sozialarchiv.ch/objects/3 '
+        'https://sozialarchiv.ch/objects/4'
+    )
+    vote.post_vote_poll_link_de = 'https://post.vote.poll/de'
+    vote.post_vote_poll_link_fr = 'https://post.vote.poll/fr'
+    vote.post_vote_poll_link_en = 'https://post.vote.poll/en'
+    vote.media_ads_total = 1001
+    vote.media_ads_per_issue = Decimal('10.02')
+    vote.media_ads_yea = 1003
+    vote.media_ads_nay = 1004
+    vote.media_ads_neutral = 1005
+    vote.media_ads_yea_p = Decimal('10.06')
+    vote.media_coverage_articles_total = 1007
+    vote.media_coverage_articles_d = 1008
+    vote.media_coverage_articles_f = 1009
+    vote.media_coverage_tonality_total = Decimal('10.10')
+    vote.media_coverage_tonality_d = Decimal('10.11')
+    vote.media_coverage_tonality_f = Decimal('10.12')
 
     votes.session.flush()
     votes.session.expire_all()
@@ -1555,7 +1662,7 @@ def test_votes_export(swissvotes_app):
     rows = list(DictReader(file))
     assert len(rows) == 1
     csv = dict(rows[0])
-    assert csv == {
+    expected = {
         'anr': '100,1',
         'datum': '02.06.1990',
         'legislatur': '4',
@@ -1806,7 +1913,7 @@ def test_votes_export(swissvotes_app):
         'zh-nein': '107',
         'zh-stimmen': '103',
         'dep': '1',
-        'gesch_nr': '24,557',
+        'gesch_nr': '24.557',
         'br-pos': '1',
         'bv-pos': '1',
         'nr-pos': '1',
@@ -1844,6 +1951,7 @@ def test_votes_export(swissvotes_app):
         'p-glp': '66',
         'p-bdp': '.',
         'p-mcg': '9999',
+        'p-mitte': '9999',
         'p-sav': '1',
         'p-eco': '2',
         'p-sgv': '3',
@@ -2255,6 +2363,64 @@ def test_votes_export(swissvotes_app):
         'pdev-sgv_SH': '1',
         'pdev-vpod_GE': '1',
         'pdev-vpod_VD': '1',
+        'pdev-mitte_frauen': '2',
+        'pdev-mitte_AG': '2',
+        'pdev-mitte_AI': '2',
+        'pdev-mitte_AR': '2',
+        'pdev-mitte_BE': '2',
+        'pdev-mitte_BL': '2',
+        'pdev-mitte_BS': '2',
+        'pdev-mitte_FR': '2',
+        'pdev-mitte_GE': '2',
+        'pdev-mitte_GL': '2',
+        'pdev-mitte_GR': '2',
+        'pdev-mitte_JU': '2',
+        'pdev-mitte_LU': '2',
+        'pdev-mitte_NE': '2',
+        'pdev-mitte_NW': '2',
+        'pdev-mitte_OW': '2',
+        'pdev-mitte_SG': '2',
+        'pdev-mitte_SH': '2',
+        'pdev-mitte_SO': '2',
+        'pdev-mitte_SZ': '2',
+        'pdev-mitte_TG': '2',
+        'pdev-mitte_TI': '2',
+        'pdev-mitte_UR': '2',
+        'pdev-mitte_VD': '2',
+        'pdev-mitte_VS': '2',
+        'pdev-mitte_VSr': '2',
+        'pdev-mitte_VSo': '2',
+        'pdev-mitte_ZG': '2',
+        'pdev-mitte_ZH': '2',
+        'pdev-jmitte_CH': '2',
+        'pdev-jmitte_AG': '2',
+        'pdev-jmitte_AI': '2',
+        'pdev-jmitte_AR': '2',
+        'pdev-jmitte_BE': '2',
+        'pdev-jmitte_BL': '2',
+        'pdev-jmitte_BS': '2',
+        'pdev-jmitte_FR': '2',
+        'pdev-jmitte_GE': '2',
+        'pdev-jmitte_GL': '2',
+        'pdev-jmitte_GR': '2',
+        'pdev-jmitte_JU': '2',
+        'pdev-jmitte_LU': '2',
+        'pdev-jmitte_NE': '2',
+        'pdev-jmitte_NW': '2',
+        'pdev-jmitte_OW': '2',
+        'pdev-jmitte_SG': '2',
+        'pdev-jmitte_SH': '2',
+        'pdev-jmitte_SO': '2',
+        'pdev-jmitte_SZ': '2',
+        'pdev-jmitte_TG': '2',
+        'pdev-jmitte_TI': '2',
+        'pdev-jmitte_UR': '2',
+        'pdev-jmitte_VD': '2',
+        'pdev-jmitte_VS': '2',
+        'pdev-jmitte_VSr': '2',
+        'pdev-jmitte_VSo': '2',
+        'pdev-jmitte_ZG': '2',
+        'pdev-jmitte_ZH': '2',
         'nr-wahl': '1990',
         'w-fdp': '1,1',
         'w-cvp': '2,1',
@@ -2276,6 +2442,7 @@ def test_votes_export(swissvotes_app):
         'w-glp': '18,1',
         'w-bdp': '19,1',
         'w-mcg': '20,2',
+        'w-mitte': '20,1',
         'w-ubrige': '21,2',
         'ja-lager': '22,2',
         'nein-lager': '23,2',
@@ -2288,11 +2455,40 @@ def test_votes_export(swissvotes_app):
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
-        'poster_nein': "https://museum.ch/objects/1 "
-                       "https://museum.ch/objects/1",
-        'poster_ja': '.',
-        'swissvoteslink': 'https://example.com/122.0'
+        'poster_ja_mfg': (
+            'https://museum.ch/objects/1 '
+            'https://museum.ch/objects/2'
+        ),
+        'poster_nein_mfg': (
+            'https://museum.ch/objects/3 '
+            'https://museum.ch/objects/4'
+        ),
+        'poster_ja_sa': (
+            'https://sozialarchiv.ch/objects/1 '
+            'https://sozialarchiv.ch/objects/2'
+        ),
+        'poster_nein_sa': (
+            'https://sozialarchiv.ch/objects/3 '
+            'https://sozialarchiv.ch/objects/4'
+        ),
+        'swissvoteslink': 'https://example.com/122.0',
+        'nach_cockpit_d': 'https://post.vote.poll/de',
+        'nach_cockpit_f': 'https://post.vote.poll/fr',
+        'nach_cockpit_e': 'https://post.vote.poll/en',
+        'inserate-total': '1001',
+        'inserate-je-ausgabe': '10,02',
+        'inserate-ja': '1003',
+        'inserate-nein': '1004',
+        'inserate-neutral': '1005',
+        'inserate-jaanteil': '10,06',
+        'mediares-tot': '1007',
+        'mediares-d': '1008',
+        'mediares-f': '1009',
+        'mediaton-tot': '10,1',
+        'mediaton-d': '10,11',
+        'mediaton-f': '10,12',
     }
+    assert csv == expected
 
     file = BytesIO()
     votes.export_xlsx(file)
@@ -2305,7 +2501,7 @@ def test_votes_export(swissvotes_app):
             [cell.value for cell in sheet.row(1)]
         )
     )
-    assert xlsx == {
+    expected = {
         'anr': 100.1,
         'datum': 33026.0,
         'legislatur': 4.0,
@@ -2556,7 +2752,7 @@ def test_votes_export(swissvotes_app):
         'zh-nein': 107.0,
         'zh-stimmen': 103.0,
         'dep': 1.0,
-        'gesch_nr': 24.557,
+        'gesch_nr': '24.557',
         'br-pos': 1.0,
         'bv-pos': 1.0,
         'nr-pos': 1.0,
@@ -2594,6 +2790,7 @@ def test_votes_export(swissvotes_app):
         'p-glp': 66.0,
         'p-bdp': '',
         'p-mcg': 9999.0,
+        'p-mitte': 9999.0,
         'p-sav': 1.0,
         'p-eco': 2.0,
         'p-sgv': 3.0,
@@ -3006,6 +3203,64 @@ def test_votes_export(swissvotes_app):
         'pdev-sgv_SH': 1.0,
         'pdev-vpod_GE': 1.0,
         'pdev-vpod_VD': 1.0,
+        'pdev-mitte_frauen': 2.0,
+        'pdev-mitte_AG': 2.0,
+        'pdev-mitte_AI': 2.0,
+        'pdev-mitte_AR': 2.0,
+        'pdev-mitte_BE': 2.0,
+        'pdev-mitte_BL': 2.0,
+        'pdev-mitte_BS': 2.0,
+        'pdev-mitte_FR': 2.0,
+        'pdev-mitte_GE': 2.0,
+        'pdev-mitte_GL': 2.0,
+        'pdev-mitte_GR': 2.0,
+        'pdev-mitte_JU': 2.0,
+        'pdev-mitte_LU': 2.0,
+        'pdev-mitte_NE': 2.0,
+        'pdev-mitte_NW': 2.0,
+        'pdev-mitte_OW': 2.0,
+        'pdev-mitte_SG': 2.0,
+        'pdev-mitte_SH': 2.0,
+        'pdev-mitte_SO': 2.0,
+        'pdev-mitte_SZ': 2.0,
+        'pdev-mitte_TG': 2.0,
+        'pdev-mitte_TI': 2.0,
+        'pdev-mitte_UR': 2.0,
+        'pdev-mitte_VD': 2.0,
+        'pdev-mitte_VS': 2.0,
+        'pdev-mitte_VSr': 2.0,
+        'pdev-mitte_VSo': 2.0,
+        'pdev-mitte_ZG': 2.0,
+        'pdev-mitte_ZH': 2.0,
+        'pdev-jmitte_CH': 2.0,
+        'pdev-jmitte_AG': 2.0,
+        'pdev-jmitte_AI': 2.0,
+        'pdev-jmitte_AR': 2.0,
+        'pdev-jmitte_BE': 2.0,
+        'pdev-jmitte_BL': 2.0,
+        'pdev-jmitte_BS': 2.0,
+        'pdev-jmitte_FR': 2.0,
+        'pdev-jmitte_GE': 2.0,
+        'pdev-jmitte_GL': 2.0,
+        'pdev-jmitte_GR': 2.0,
+        'pdev-jmitte_JU': 2.0,
+        'pdev-jmitte_LU': 2.0,
+        'pdev-jmitte_NE': 2.0,
+        'pdev-jmitte_NW': 2.0,
+        'pdev-jmitte_OW': 2.0,
+        'pdev-jmitte_SG': 2.0,
+        'pdev-jmitte_SH': 2.0,
+        'pdev-jmitte_SO': 2.0,
+        'pdev-jmitte_SZ': 2.0,
+        'pdev-jmitte_TG': 2.0,
+        'pdev-jmitte_TI': 2.0,
+        'pdev-jmitte_UR': 2.0,
+        'pdev-jmitte_VD': 2.0,
+        'pdev-jmitte_VS': 2.0,
+        'pdev-jmitte_VSr': 2.0,
+        'pdev-jmitte_VSo': 2.0,
+        'pdev-jmitte_ZG': 2.0,
+        'pdev-jmitte_ZH': 2.0,
         'nr-wahl': 1990.0,
         'w-fdp': 1.1,
         'w-cvp': 2.1,
@@ -3027,6 +3282,7 @@ def test_votes_export(swissvotes_app):
         'w-glp': 18.1,
         'w-bdp': 19.1,
         'w-mcg': 20.2,
+        'w-mitte': 20.1,
         'w-ubrige': 21.2,
         'ja-lager': 22.2,
         'nein-lager': 23.2,
@@ -3039,10 +3295,39 @@ def test_votes_export(swissvotes_app):
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
-        'poster_ja': '',
-        'poster_nein': "https://museum.ch/objects/1 "
-                       "https://museum.ch/objects/1",
-        'swissvoteslink': 'https://example.com/122.0'
+        'poster_ja_mfg': (
+            'https://museum.ch/objects/1 '
+            'https://museum.ch/objects/2'
+        ),
+        'poster_nein_mfg': (
+            'https://museum.ch/objects/3 '
+            'https://museum.ch/objects/4'
+        ),
+        'poster_ja_sa': (
+            'https://sozialarchiv.ch/objects/1 '
+            'https://sozialarchiv.ch/objects/2'
+        ),
+        'poster_nein_sa': (
+            'https://sozialarchiv.ch/objects/3 '
+            'https://sozialarchiv.ch/objects/4'
+        ),
+        'swissvoteslink': 'https://example.com/122.0',
+        'nach_cockpit_d': 'https://post.vote.poll/de',
+        'nach_cockpit_f': 'https://post.vote.poll/fr',
+        'nach_cockpit_e': 'https://post.vote.poll/en',
+        'inserate-total': 1001,
+        'inserate-je-ausgabe': 10.02,
+        'inserate-ja': 1003,
+        'inserate-nein': 1004,
+        'inserate-neutral': 1005,
+        'inserate-jaanteil': 10.06,
+        'mediares-tot': 1007,
+        'mediares-d': 1008,
+        'mediares-f': 1009,
+        'mediaton-tot': 10.10,
+        'mediaton-d': 10.11,
+        'mediaton-f': 10.12,
     }
+    assert xlsx == expected
 
     assert csv.keys() == xlsx.keys()

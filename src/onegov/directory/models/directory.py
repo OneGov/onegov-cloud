@@ -1,5 +1,7 @@
 import inspect
 
+from sedate import to_timezone
+
 from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
@@ -98,10 +100,22 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         return self.__class__._decl_class_registry[self.entry_cls_name]
 
     def add(self, values, type=INHERIT):
+        start = values.pop('publication_start', None)
+        end = values.pop('publication_end', None)
+
+        # Not converting to UTC here led to returning non-UTC datetimes
+        # from UTCDateTimeField, not triggering `def process_result_value`
+        if start:
+            start = to_timezone(start, 'UTC')
+        if end:
+            end = to_timezone(end, 'UTC')
+
         entry = self.entry_cls(
             directory=self,
             type=self.type if type is INHERIT else type,
             meta={},
+            publication_start=start,
+            publication_end=end,
         )
 
         return self.update(entry, values, set_name=True)
@@ -329,6 +343,9 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                     obj.__class__,
                     lambda v: isinstance(v, InstrumentedAttribute)
                 )}
+
+                include = ('publication_start', 'publication_end')
+                exclude = {k for k in exclude if k not in include}
 
                 super().populate_obj(obj, exclude=exclude)
 

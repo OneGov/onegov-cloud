@@ -2,8 +2,8 @@ from morepath import redirect
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.forms import MutationForm
-from onegov.agency.layouts import AgencyLayout
-from onegov.agency.layouts import ExtendedPersonLayout
+from onegov.agency.layout import AgencyLayout
+from onegov.agency.layout import ExtendedPersonLayout
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Public

@@ -1,8 +1,5 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes" tal:define="vote layout.model">
-    <tal:block metal:fill-slot="title">
-        ${layout.title}
-        <small tal:condition="vote.keyword">${vote.keyword}</small>
-    </tal:block>
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
     <tal:block metal:fill-slot="content">
         <div class="vote">
 
@@ -58,9 +55,9 @@
                             </tal:block>
                         </td>
                     </tr>
-                    <tr tal:condition="brief_description">
+                    <tr tal:condition="layout.attachments['brief_description']">
                         <th class="column-30" i18n:translate>Brief description Swissvotes</th>
-                        <td><a href="${brief_description}" target="_blank" class="brief-description">PDF</a>
+                        <td><a href="${layout.attachments['brief_description']}" target="_blank" class="brief-description">PDF</a>
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span></td>
                     </tr>
@@ -71,15 +68,15 @@
                             <a href="${vote.anneepolitique}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
                             </td>
                     </tr>
-                    <tr tal:condition="voting_text">
+                    <tr tal:condition="layout.attachments['voting_text']">
                         <th class="column-30" i18n:translate>Voting text</th>
-                        <td><a href="${voting_text}" target="_blank" class="voting-text">
+                        <td><a href="${layout.attachments['voting_text']}" target="_blank" class="voting-text">
                         PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span></td>
                     </tr>
-                    <tr tal:condition="bkchrono">
+                    <tr tal:condition="vote.bk_chrono">
                         <th class="column-30" i18n:translate>Official Chronology</th>
                         <td>
-                            <a href="${bkchrono}" target="_blank" class="bkchrono" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="${vote.bk_chrono}" target="_blank" class="bk_chrono" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
                     <tr tal:condition="False">
@@ -99,9 +96,9 @@
                         <th class="column-30" i18n:translate>Initiator</th>
                         <td>${vote.initiator}</td>
                     </tr>
-                    <tr tal:condition="preliminary_examination">
+                    <tr tal:condition="layout.attachments['preliminary_examination']">
                         <th class="column-30" i18n:translate>Preliminary examination</th>
-                        <td><a class="preliminary-examination" target="_blank" href="${preliminary_examination}">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span></td>
+                        <td><a class="preliminary-examination" target="_blank" href="${layout.attachments['preliminary_examination']}">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span></td>
 
                     </tr>
                     <tr tal:condition="vote.signatures_valid is not None">
@@ -115,9 +112,9 @@
                         </th>
                         <td>${layout.format_number(vote.duration_initative_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
-                    <tr tal:condition="realization">
+                    <tr tal:condition="layout.attachments['realization']">
                         <th class="column-30" i18n:translate>Realization</th>
-                        <td><a href="${realization}" target="_blank" class="realization">PDF</a></td>
+                        <td><a href="${layout.attachments['realization']}" target="_blank" class="realization">PDF</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -127,9 +124,9 @@
                     <tr><th colspan="2" i18n:translate>Pre-parliamentary phase</th></tr>
                 </thead>
                 <tbody>
-                    <tr tal:condition="federal_council_message">
+                    <tr tal:condition="layout.attachments['federal_council_message']">
                         <th class="column-30" i18n:translate>Federal council message</th>
-                        <td><a href="${federal_council_message}" target="_blank" class="federal-council-message">
+                        <td><a href="${layout.attachments['federal_council_message']}" target="_blank" class="federal-council-message">
                         PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
@@ -145,20 +142,20 @@
                     <tr><th colspan="2" i18n:translate>Parliamentary phase</th></tr>
                 </thead>
                 <tbody>
-                    <tr tal:condition="vote.procedure_number is not None">
+                    <tr tal:condition="vote.procedure_number">
                         <th class="column-30" i18n:translate>Procedure number</th>
-                        <td>${layout.format_procedure_number(vote.procedure_number)}</td>
+                        <td>${vote.procedure_number}</td>
                     </tr>
-                    <tr tal:condition="parliamentary_debate or curiavista">
+                    <tr tal:condition="layout.attachments['parliamentary_debate'] or vote.curiavista">
                         <th class="column-30" i18n:translate>Parliamentary debate</th>
                         <td>
-                            <a href="${parliamentary_debate}" target="_blank" class="parliamentary-debate" tal:condition="parliamentary_debate">
+                            <a href="${layout.attachments['parliamentary_debate']}" target="_blank" class="parliamentary-debate" tal:condition="layout.attachments['parliamentary_debate']">
                             PDF</a>
-                            <tal:b condition="parliamentary_debate and curiavista">
+                            <tal:b condition="layout.attachments['parliamentary_debate'] and vote.curiavista">
                                 /
                             </tal:b>
-                            <tal:b condition="curiavista">
-                                <a href="${curiavista}" target="_blank" i18n:translate>Link</a>
+                            <tal:b condition="vote.curiavista">
+                                <a href="${vote.curiavista}" target="_blank" i18n:translate>Link</a>
                                 <span tal:condition="request.html_lang == 'en-US'">
                                     (in German / French)
                                 </span>
@@ -167,8 +164,8 @@
                     </tr>
                     <tr tal:condition="vote.duration_federal_assembly is not None">
                         <th class="column-30">
-                        <span i18n:translate>Duration in Parliament</span>
-                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the Federal Council dispatch and the Parliament’s final vote"><i class="fa fa-info" aria-hidden="true"></i></span>
+                          <span i18n:translate>Duration in Parliament</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the Federal Council dispatch and the Parliament’s final vote"><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td>${layout.format_number(vote.duration_federal_assembly)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
@@ -232,9 +229,9 @@
                         </th>
                         <td>${layout.format_number(vote.duration_referendum_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
-                    <tr tal:condition="realization">
+                    <tr tal:condition="layout.attachments['realization']">
                         <th class="column-30" i18n:translate>Realization</th>
-                        <td><a href="${realization}" target="_blank" class="realization">PDF</a></td>
+                        <td><a href="${layout.attachments['realization']}" target="_blank" class="realization">PDF</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -244,10 +241,10 @@
                     <tr><th colspan="2" i18n:translate>Voting campaign</th></tr>
                 </thead>
                 <tbody>
-                    <tr tal:condition="voting_booklet">
+                    <tr tal:condition="layout.attachments['voting_booklet']">
                         <th class="column-30" i18n:translate>Voting booklet</th>
                         <td>
-                        <a href="${voting_booklet}" target="_blank" class="voting-booklet">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        <a href="${layout.attachments['voting_booklet']}" target="_blank" class="voting-booklet">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
                     <tr tal:condition="vote.recommendations_parties">
@@ -305,34 +302,63 @@
                             </dl>
                         </td>
                     </tr>
-                    <!--? Posters Museum für Gestaltung                    -->
-                    <tr tal:condition="vote.posters_yes_imgs">
-                        <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a Yes</th>
-                        <td>
-                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.poster_links('yes'); id_suffix 'yes'" />
-                        </td>
+                    <tr tal:condition="vote.media_ads_total">
+                        <th class="column-30">
+                          <span i18n:translate>Number of adverts in print media</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Total number of adverts on the vote published in some 50 print media outlets in the last 8 weeks before voting day (intensity of the advertising campaign). For more details, see the analysis of the advertising campaign by Année Politique Suisse."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_ads_total)}</td>
                     </tr>
-                    <tr tal:condition="vote.posters_no_imgs">
-                        <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a No</th>
-                        <td>
-                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.poster_links('no'); id_suffix 'no'" />
-                        </td>
+                    <tr tal:condition="vote.media_ads_yea_p">
+                        <th class="column-30">
+                          <span i18n:translate>Percentage of adverts for a 'yes'</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Percentage of adverts canvassing a 'yes' vote. A figure of over 50% indicates that more adverts for a 'yes' than for a 'no' were placed. For more details, see the analysis of the advertising campaign by Année Politique Suisse."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_ads_yea_p, 0)}%</td>
                     </tr>
-                    <tr tal:condition="ad_analysis">
-                        <th class="column-30" i18n:translate>Analysis of the advertising campaign</th>
-                        <td><a href="${ad_analysis}" target="_blank" class="ad-analysis">PDF</a>
+                    <tr tal:condition="layout.attachments['ad_analysis']">
+                        <th class="column-30" i18n:translate>Analysis of the advertising campaign by Année Politique</th>
+                        <td><a href="${layout.attachments['ad_analysis']}" target="_blank" class="ad-analysis">PDF</a>
                         <span tal:condition="request.html_lang == 'en-US'">(in German)</span><span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="foeg_analysis">
-                        <th i18n:translate>Media coverage: fög analysis</th>
+                    <tr tal:condition="vote.media_coverage_articles_total">
+                        <th class="column-30">
+                          <span i18n:translate>Media coverage: number of articles</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of media articles on the vote that appeared in a selection of media outlets in the last 12 weeks before voting day. Hence, this indicator measures the intensity of media coverage of the vote. For more details, see the fög analysis report."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_coverage_articles_total)}</td>
+                    </tr>
+                    <tr tal:condition="vote.media_coverage_tonality_total">
+                        <th class="column-30">
+                          <span i18n:translate>Media coverage: tonality</span>
+                          <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="A positive figure means that the ‘yes’ position was covered more broadly than the ‘no’ position in the analysed media outlets. A negative figure means that the ‘no’ position prevailed in the analysed media sample. The tonality indicator can range from -100 (all media coverage was negative) to +100 (all media coverage was positive). For more details, see the fög analysis report."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>${layout.format_number(vote.media_coverage_tonality_total, 0)}
+                          <span i18n:translate tal:condition="vote.media_coverage_tonality_total > 0">(predominantly positive)</span>
+                          <span i18n:translate tal:condition="vote.media_coverage_tonality_total < 0">(predominantly negative)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['foeg_analysis']">
+                        <th class="column-30" i18n:translate>Media coverage: fög analysis</th>
                         <td>
-                            <a href="${foeg_analysis}" target="_blank" class="foeg-analysis">PDF</a> /
-                            <a href="${layout.foeg_static_url}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="${layout.attachments['foeg_analysis']}" target="_blank" class="foeg-analysis">PDF</a> /
+                            <a href="https://www.foeg.uzh.ch/de/forschung/Projekte/Abstimmungsmonitor.html" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
-
+                    <tr tal:condition="posters['yea']">
+                        <th class="column-30" i18n:translate="">Campaign material for a Yes</th>
+                        <td>
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['yea']; id_suffix 'yea'" />
+                        </td>
+                    </tr>
+                    <tr tal:condition="posters['nay']">
+                        <th class="column-30" i18n:translate="">Campaign material for a No</th>
+                        <td>
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['nay']; id_suffix 'nay'" />
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -388,40 +414,92 @@
                         <th class="column-30" i18n:translate>Turnout</th>
                         <td>${layout.format_number(vote.result_turnout, 2)}%</td>
                     </tr>
-                    <tr tal:condition="resolution">
+                    <tr tal:condition="layout.attachments['resolution']">
                         <th class="column-30" i18n:translate>Resolution</th>
-                        <td><a href="${resolution}" target="_blank" class="resolution">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        <td><a href="${layout.attachments['resolution']}" target="_blank" class="resolution">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
 
                         </td>
                     </tr>
-                    <tr tal:condition="results_by_domain">
+                    <tr tal:condition="layout.attachments['results_by_domain']">
                         <th class="column-30" i18n:translate>Result by canton, district and municipality</th>
-                        <td><a href="${results_by_domain}" target="_blank" class="results-by-domain">
+                        <td><a href="${layout.attachments['results_by_domain']}" target="_blank" class="results-by-domain">
                             Excel
                             </a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="bkresults">
-                        <th i18n:translate>Overview of voting result by the Federal Chancellery</th>
+                    <tr tal:condition="vote.bk_results">
+                        <th class="column-30" i18n:translate>Overview of voting result by the Federal Chancellery</th>
                         <td>
-                            <a href="${bkresults}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="${vote.bk_results}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="post_vote_poll">
-                        <th i18n:translate>Post-vote poll</th>
+                    <tr tal:condition="bfs_map" class="bfs-map">
+                        <th class="column-30" i18n:translate>Interactive map of the Swiss Federal Statistical Office</th>
                         <td>
-                            <a href="${post_vote_poll}" target="_blank" class="post-vote-poll">
-                            PDF</a> /
-                            <a href="${layout.voto_static_url}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a class="button secondary" aria-role="button" href="${bfs_map}" i18n:translate>Display the map</a>
                         </td>
                     </tr>
-                    <tr tal:condition="bfs_map">
-                        <td colspan="2">
-                            <div style="margin-bottom: .5rem;"><strong i18n:translate>Interactive map of the Swiss Federal Statistical Office</strong></div>
-                            <a class="button secondary bfs-map" aria-role="button" href="${bfs_map}">
-                                <tal:block i18n:translate>Display the map</tal:block>
-                            </a>
+                </tbody>
+            </table>
+
+            <table class="collapsible" tal:condition="vote.post_vote_poll_link or
+                                                      layout.attachments['post_vote_poll'] or
+                                                      layout.attachments['post_vote_poll_methodology'] or
+                                                      layout.attachments['post_vote_poll_dataset'] or
+                                                      layout.attachments['post_vote_poll_dataset_sav'] or
+                                                      layout.attachments['post_vote_poll_dataset_dta'] or
+                                                      layout.attachments['post_vote_poll_codebook'] or
+                                                      layout.attachments['post_vote_poll_codebook_xlsx'] or
+                                                      layout.attachments['post_vote_poll_report']
+                                                      ">
+                <thead>
+                    <tr><th colspan="2" i18n:translate>Post-vote poll</th></tr>
+                </thead>
+                <tbody>
+                    <tr tal:condition="layout.attachments['post_vote_poll']">
+                        <th class="column-30" i18n:translate>Full analysis of post-vote poll results</th>
+                        <td>
+                            <a href="${layout.attachments['post_vote_poll']}" target="_blank" class="post-vote-poll">PDF</a>
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="vote.post_vote_poll_link">
+                        <th class="column-30" i18n:translate>Cockpit with selected results</th>
+                        <td><a href="${vote.post_vote_poll_link}" target="_blank" i18n:translate>Link</a></td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['post_vote_poll_methodology']">
+                        <th class="column-30" i18n:translate>Questionnaire of the poll</th>
+                        <td>
+                            <a href="${layout.attachments['post_vote_poll_methodology']}" target="_blank" class="post-vote-poll-methodology">PDF</a>
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['post_vote_poll_dataset'] or
+                                       layout.attachments['post_vote_poll_dataset_sav'] or
+                                       layout.attachments['post_vote_poll_dataset_dta']">
+                        <th class="column-30" i18n:translate>Dataset of the post-vote poll</th>
+                        <td class="inline-links">
+                            <a href="${layout.attachments['post_vote_poll_dataset']}" target="_blank" class="post-vote-poll-dataset">CSV</a>
+                            <a href="${layout.attachments['post_vote_poll_dataset_sav']}" target="_blank" class="post-vote-poll-dataset-sav">SAV</a>
+                            <a href="${layout.attachments['post_vote_poll_dataset_dta']}" target="_blank" class="post-vote-poll-dataset-dta">DTA</a>
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['post_vote_poll_codebook'] or
+                                       layout.attachments['post_vote_poll_codebook_xlsx']">
+                        <th class="column-30" i18n:translate>Codebook for the post-vote poll</th>
+                        <td class="inline-links">
+                            <a href="${layout.attachments['post_vote_poll_codebook']}" target="_blank" class="post-vote-poll-codebook">PDF</a>
+                            <a href="${layout.attachments['post_vote_poll_codebook_xlsx']}" target="_blank" class="post-vote-poll-codebook-xlsx">XLSX</a>
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['post_vote_poll_report']">
+                        <th class="column-30" i18n:translate>Technical report</th>
+                        <td>
+                            <a href="${layout.attachments['post_vote_poll_report']}" target="_blank" class="post-vote-poll-report">PDF</a>
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
                 </tbody>

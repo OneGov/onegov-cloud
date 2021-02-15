@@ -1,0 +1,123 @@
+import transaction
+
+from onegov.page import PageCollection
+
+
+def test_news(client):
+    client.login_admin().follow()
+
+    page = client.get('/news')
+    page = page.click('Nachricht')
+    page.form['title'] = "We have a new homepage"
+    page.form['lead'] = "It is very good"
+    page.form['text'] = "It is lots of fun"
+    page = page.form.submit().follow()
+
+    assert "We have a new homepage" in page.text
+    assert "It is very good" in page.text
+    assert "It is lots of fun" in page.text
+
+    page = client.get('/news')
+    assert "We have a new homepage" in page.text
+    assert "It is very good" in page.text
+    assert "It is lots of fun" not in page.text
+
+    page = client.get('/news/we-have-a-new-homepage')
+    client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
+    page = client.get('/news')
+    assert "We have a new homepage" not in page.text
+    assert "It is very good" not in page.text
+    assert "It is lots of fun" not in page.text
+
+
+def test_news_on_homepage(client):
+    client.login_admin()
+    anon = client.spawn()
+
+    news_list = client.get('/news')
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Foo"
+    page.form['lead'] = "Lorem"
+    page.form.submit()
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Bar"
+    page.form['lead'] = "Lorem"
+    page.form.submit()
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Baz"
+    page.form['lead'] = "Lorem"
+    page.form.submit()
+
+    # only two items are shown on the homepage
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" not in homepage
+
+    # sticky news don't count toward that limit
+    foo = PageCollection(client.app.session()).by_path('news/foo')
+    foo.is_visible_on_homepage = True
+
+    transaction.commit()
+
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    # hidden news don't count for anonymous users
+    baz = PageCollection(client.app.session()).by_path('news/baz')
+    baz.access = 'private'
+
+    transaction.commit()
+
+    homepage = anon.get('/')
+    assert "Baz" not in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    # even if they are stickied
+    baz = PageCollection(client.app.session()).by_path('news/baz')
+    baz.access = 'private'
+    baz.is_visible_on_homepage = True
+
+    transaction.commit()
+
+    homepage = anon.get('/')
+    assert "Baz" not in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+
+def test_hide_news(client):
+    client.login_editor()
+
+    new_page = client.get('/news').click('Nachricht')
+
+    new_page.form['title'] = "Test"
+    new_page.form['access'] = 'private'
+    page = new_page.form.submit().follow()
+
+    anonymous = client.spawn()
+    response = anonymous.get(page.request.url, expect_errors=True)
+    assert response.status_code == 403
+
+    edit_page = page.click("Bearbeiten")
+    edit_page.form['access'] = 'public'
+    page = edit_page.form.submit().follow()
+
+    response = anonymous.get(page.request.url)
+    assert response.status_code == 200

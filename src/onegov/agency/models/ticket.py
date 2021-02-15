@@ -1,9 +1,10 @@
 from cached_property import cached_property
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.layouts import AgencyLayout
-from onegov.agency.layouts import ExtendedPersonLayout
+from onegov.agency.layout import AgencyLayout
+from onegov.agency.layout import ExtendedPersonLayout
 from onegov.core.templates import render_macro
+from onegov.core.utils import linkify
 from onegov.org import _
 from onegov.org.models.ticket import OrgTicketMixin
 from onegov.ticket import Handler
@@ -62,12 +63,13 @@ class AgencyMutationHandler(Handler):
 
     def get_summary(self, request):
         layout = AgencyLayout(self.agency, request)
+        message = self.data['handler_data']['submitter_message']
         return render_macro(
             layout.macros['display_agency_mutation'],
             request,
             {
                 'agency': self.agency,
-                'message': self.data['handler_data']['submitter_message'],
+                'message': linkify(message).replace('\n', '<br>'),
                 'layout': layout
             }
         )
@@ -111,12 +113,13 @@ class PersonMutationHandler(Handler):
 
     def get_summary(self, request):
         layout = ExtendedPersonLayout(self.person, request)
+        message = self.data['handler_data']['submitter_message']
         return render_macro(
             layout.macros['display_person_mutation'],
             request,
             {
                 'person': self.person,
-                'message': self.data['handler_data']['submitter_message'],
+                'message': linkify(message).replace('\n', '<br>'),
                 'layout': layout
             }
         )

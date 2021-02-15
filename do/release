@@ -4,14 +4,15 @@ set -euo pipefail
 SELF="$( cd "$(dirname "$0")" ; pwd -P )"
 REPO="$(dirname "$SELF")"
 
-# The following block ontains the Sentry token to announce releases on
+# The following block ontains the Sentry Auth token to announce releases on
 # sentry.io. This has been encrypted as follows:
 #
 # echo "my-token" | gpg --encrypt --armor \
 #   --recipient patrick.bucher@seantis.ch \
 #   --recipient fabian.reinhard@seantis.ch \
 #   --recipient tobias.reinhard@seantis.ch \
-#   --recipient lukas.burkhard@seantis.ch
+#   --recipient lukas.burkhard@seantis.ch \
+#   --recipient marc.sommerhalder@seantis.ch
 #
 # Be sure to update `configure-sentry` below and update the comment above
 # if the intended recipients change. You will also want to create a new
@@ -20,41 +21,52 @@ REPO="$(dirname "$SELF")"
 SENTRY_TOKEN_ENCRYPTED="
 -----BEGIN PGP MESSAGE-----
 
-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
-ag==
-=BrJo
+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
+CLcXCA==
+=GZYD
 -----END PGP MESSAGE-----
 "
 
@@ -65,6 +77,7 @@ function configure-sentry() {
             --recipient fabian.reinhard@seantis.ch \
             --recipient tobias.reinhard@seantis.ch \
             --recipient lukas.burkhard@seantis.ch \
+            --recipient marc.sommerhalder@seantis.ch \
     )"
 
     export SENTRY_ORG="seantis-gmbh"
@@ -83,7 +96,6 @@ function announce-release-on-sentry-io() {
     local current_commit="$2"
     local previous_commit="$3"
 
-    configure-sentry
     curl "https://sentry.io/api/0/organizations/${SENTRY_ORG}/releases/" \
         -X POST \
         -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" \
@@ -157,4 +169,5 @@ function release() {
     announce-release-on-sentry-io "onegov-cloud:${new}" "$current_commit" "$previous_commit"
 }
 
+configure-sentry
 release

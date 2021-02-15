@@ -116,6 +116,11 @@ class DateTimeLocalFieldRenderer(DateFieldRenderer):
     date_format = '%d.%m.%Y %H:%M'
 
 
+@registry.register_for('TimezoneDateTimeField')
+class TimezoneDateTimeFieldRenderer(DateFieldRenderer):
+    date_format = '%d.%m.%Y %H:%M %Z'
+
+
 @registry.register_for('TimeField')
 class TimeFieldRenderer(BaseRenderer):
     def __call__(self, field):

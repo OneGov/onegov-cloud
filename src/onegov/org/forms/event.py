@@ -226,6 +226,10 @@ class EventForm(Form):
         super().__init__(*args, **kwargs)
         self.date_errors = {}
 
+    def populate_submitter(self):
+        if self.request.is_logged_in:
+            self.email.data = self.request.current_username
+
     def on_request(self):
         self.request.include('common')
         self.request.include('many')
@@ -233,6 +237,8 @@ class EventForm(Form):
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
+        if not self.email.data:
+            self.populate_submitter()
 
     def sort_tags(self):
         self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))

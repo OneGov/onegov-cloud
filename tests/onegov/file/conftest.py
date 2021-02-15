@@ -3,7 +3,7 @@ import pytest
 from depot.manager import DepotManager
 
 
-@pytest.yield_fixture(scope='function', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def depot(temporary_directory):
     DepotManager.configure('default', {
         'depot.backend': 'depot.io.local.LocalFileStorage',

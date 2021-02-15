@@ -31,10 +31,16 @@ from uuid import uuid4
 class Pdf(PDFDocument):
     """ A PDF document. """
 
+    default_link_color = '#00538c'
+
     def __init__(self, *args, **kwargs):
         toc_levels = kwargs.pop('toc_levels', 3)
         created = kwargs.pop('created', '')
         logo = kwargs.pop('logo', None)
+        link_color = kwargs.pop('link_color', self.default_link_color)
+        link_color = link_color or self.default_link_color
+        underline_links = kwargs.pop('underline_links', False) or False
+        underline_width = str(kwargs.pop('underline_width', 0.5))
 
         super(Pdf, self).__init__(*args, **kwargs)
 
@@ -46,8 +52,12 @@ class Pdf(PDFDocument):
         self.toc = None
         self.toc_numbering = {}
         self.toc_levels = toc_levels
+        self.link_color = link_color
+        self.underline_links = underline_links
+        self.underline_width = underline_width
 
-    def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None):
+    def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
+                         **kwargs):
         frame_kwargs = {
             'showBoundary': self.show_boundaries,
             'leftPadding': 0,
@@ -58,10 +68,11 @@ class Pdf(PDFDocument):
 
         width = 21 * cm
         height = 29.7 * cm
-        margin_left = 2.5 * cm
-        margin_right = 2.5 * cm
-        margin_top = 3 * cm
-        margin_bottom = 3 * cm
+        font_size = kwargs.get('font_size', 10)
+        margin_left = kwargs.get('margin_left', 2.5 * cm)
+        margin_right = kwargs.get('margin_right', 2.5 * cm)
+        margin_top = kwargs.get('margin_top', 3 * cm)
+        margin_bottom = kwargs.get('margin_bottom', 3 * cm)
 
         full_frame = Frame(
             margin_left,
@@ -83,13 +94,15 @@ class Pdf(PDFDocument):
         ])
         self.story.append(NextPageTemplate('Later'))
 
-        self.generate_style(font_size=10)
-        self.adjust_style(font_size=10)
+        self.adjust_style(font_size=font_size)
 
     def adjust_style(self, font_size=10):
         """ Sets basic styling (borrowed from common browser defaults). """
 
-        self.generate_style(font_size=font_size)
+        self.generate_style(
+            font_name=self.font_name,
+            font_size=font_size
+        )
 
         self.style.heading1.fontSize = 2 * self.style.fontSize
         self.style.heading1.spaceBefore = 0.67 * self.style.heading1.fontSize
@@ -388,6 +401,30 @@ class Pdf(PDFDocument):
 
         self.p(text, style=style or self.style.figcaption)
 
+    @staticmethod
+    # Walk the tree and convert the elements
+    def strip(text):
+        text = text.strip('\r\n')
+        prefix = ' ' if text.startswith(' ') else ''
+        postfix = ' ' if text.endswith(' ') else ''
+
+        # some characters cause issues in the Reportlab and pdfdocument
+        # library, so we need to escape them
+        text = text.replace(';', '&#59;')
+
+        return prefix + text.strip() + postfix
+
+    @staticmethod
+    def inner_html(element):
+        return '{}{}{}'.format(
+            Pdf.strip(element.text or ''),
+            ''.join((
+                Pdf.strip(etree.tostring(child, encoding='unicode'))
+                for child in element
+            )),
+            Pdf.strip(element.tail or '')
+        )
+
     def mini_html(self, html, linkify=False):
         """ Convert a small subset of HTML into ReportLab paragraphs.
 
@@ -408,14 +445,26 @@ class Pdf(PDFDocument):
         filters = [whitespace_filter]
 
         if linkify:
+            link_color = self.link_color
+            underline_links = self.underline_links
+            underline_width = self.underline_width
+
             def colorize(attrs, new=False):
-                attrs[(None, u'color')] = '#00538c'
+                # phone numbers appear here but are escaped, skip...
+                if not attrs.get((None, 'href')):
+                    return
+                attrs[(None, u'color')] = link_color
+                if underline_links:
+                    attrs[(None, u'underline')] = '1'
+                    attrs[('a', u'underlineColor')] = link_color
+                    attrs[('a', u'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')
             attributes['a'] = ('href',)
             filters.append(
-                partial(LinkifyFilter, parse_email=True, callbacks=[colorize])
+                partial(
+                    LinkifyFilter, parse_email=True, callbacks=[colorize])
             )
 
         cleaner = Cleaner(
@@ -425,38 +474,17 @@ class Pdf(PDFDocument):
             filters=filters
         )
         html = cleaner.clean(html)
-
-        # Walk the tree and convert the elements
-        def strip(text):
-            text = text.strip('\r\n')
-            prefix = ' ' if text.startswith(' ') else ''
-            postfix = ' ' if text.endswith(' ') else ''
-
-            # some characters cause issues in the Reportlab and pdfdocument
-            # library, so we need to escape them
-            text = text.replace(';', '&#59;')
-
-            return prefix + text.strip() + postfix
-
-        def inner_html(element):
-            return '{}{}{}'.format(
-                strip(element.text or ''),
-                ''.join((
-                    strip(etree.tostring(child, encoding='unicode'))
-                    for child in element
-                )),
-                strip(element.tail or '')
-            )
+        # Todo: phone numbers with href="tel:.." are cleaned out
 
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         for element in tree.find('body'):
             if element.tag == 'p':
-                self.p_markup(inner_html(element), self.style.paragraph)
+                self.p_markup(self.inner_html(element), self.style.paragraph)
             elif element.tag in 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [
-                    MarkupParagraph(inner_html(item), style)
+                    MarkupParagraph(self.inner_html(item), style)
                     for item in element
                 ]
                 self.story.append(
@@ -475,7 +503,7 @@ class Pdf(PDFDocument):
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ul.leftIndent
                 items = [
-                    MarkupParagraph(inner_html(item), style)
+                    MarkupParagraph(self.inner_html(item), style)
                     for item in element
                 ]
                 self.story.append(

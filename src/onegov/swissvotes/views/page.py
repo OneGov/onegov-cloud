@@ -12,14 +12,17 @@ from onegov.swissvotes.layouts import AddPageLayout
 from onegov.swissvotes.layouts import DeletePageAttachmentLayout
 from onegov.swissvotes.layouts import DeletePageLayout
 from onegov.swissvotes.layouts import EditPageLayout
-from onegov.swissvotes.layouts import PageAttachmentsLayout
+from onegov.swissvotes.layouts import ManagePageAttachmentsLayout
+from onegov.swissvotes.layouts import ManagePageSliderImagesLayout
 from onegov.swissvotes.layouts import PageLayout
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
+from random import sample
+from webob.exc import HTTPNotFound
+from webob.exc import HTTPUnsupportedMediaType
 
 
-# Static redirects
 @SwissvotesApp.html(
     model=TranslatablePage,
     permission=Public,
@@ -27,6 +30,8 @@ from onegov.swissvotes.models import TranslatablePageMove
 )
 def brief_desc_static_de(self, request):
     file = self.get_file_by_locale('QUELLEN', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -36,8 +41,9 @@ def brief_desc_static_de(self, request):
     name='kurzbeschreibung-fr.pdf'
 )
 def brief_desc_static_fr(self, request):
-    locale = 'fr_CH'
-    file = self.get_file_by_locale('REFERENCES des descriptifs', locale)
+    file = self.get_file_by_locale('REFERENCES des descriptifs', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -47,8 +53,9 @@ def brief_desc_static_fr(self, request):
     name='kurzbeschreibung-en.pdf'
 )
 def brief_desc_static_en(self, request):
-    locale = 'en_US'
-    file = self.get_file_by_locale('REFERENCES for descriptions', locale)
+    file = self.get_file_by_locale('REFERENCES for descriptions', 'en_US')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -59,6 +66,8 @@ def brief_desc_static_en(self, request):
 )
 def dataset_csv_static(self, request):
     file = self.get_file('DATASET CSV', request)
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -69,6 +78,8 @@ def dataset_csv_static(self, request):
 )
 def dataset_xlsx_static(self, request):
     file = self.get_file('DATASET XLSX', request)
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -79,6 +90,8 @@ def dataset_xlsx_static(self, request):
 )
 def codebook_de_static(self, request):
     file = self.get_file_by_locale('CODEBOOK', 'de_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -89,6 +102,8 @@ def codebook_de_static(self, request):
 )
 def codebook_fr_static(self, request):
     file = self.get_file_by_locale('CODEBOOK', 'fr_CH')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -99,6 +114,8 @@ def codebook_fr_static(self, request):
 )
 def codebook_us_static(self, request):
     file = self.get_file_by_locale('CODEBOOK', 'en_US')
+    if not file:
+        raise HTTPNotFound()
     return request.redirect(request.link(file))
 
 
@@ -108,22 +125,21 @@ def codebook_us_static(self, request):
     permission=Public
 )
 def view_page(self, request):
-    """ View a page. """
+    layout = PageLayout(self, request)
 
     files = [file for file in self.files if file.locale == request.locale]
     if 'DATASET' not in ",".join((f.filename for f in files)):
         dataset = [
             f for f in self.files
-            if 'DATASET' in f.filename and f.locale == request.default_locale]
+            if 'DATASET' in f.filename and f.locale == request.default_locale
+        ]
         files.extend(dataset)
-    layout = PageLayout(self, request)
-    files_data = [
-        (f.filename, layout.get_file_url(f)) for f in files
-    ]
+    files = sorted([(f.filename, layout.get_file_url(f)) for f in files])
 
     return {
         'layout': layout,
-        'files_data': files_data
+        'files': files,
+        'slides': sample(layout.slides, len(layout.slides))
     }
 
 
@@ -182,7 +198,7 @@ def edit_page(self, request, form):
     template='form.pt',
     name='delete'
 )
-def delete_vote(self, request, form):
+def delete_page(self, request, form):
     layout = DeletePageLayout(self, request)
 
     if form.submitted(request):
@@ -221,17 +237,15 @@ def move_page(self, request):
     permission=Private
 )
 def view_page_attachments(self, request):
-    """ View all attachments of a page and allow to drop new attachments. """
-
-    layout = PageAttachmentsLayout(self, request)
-    upload_url = layout.csrf_protected_url(request.link(self, name='upload'))
+    layout = ManagePageAttachmentsLayout(self, request)
     files = [file for file in self.files if file.locale == request.locale]
 
     return {
         'layout': layout,
         'title': self.title,
-        'subtitle': _("Attachments"),
-        'upload_url': upload_url,
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload-attachment')
+        ),
         'files': files,
         'notice': self,
     }
@@ -239,18 +253,11 @@ def view_page_attachments(self, request):
 
 @SwissvotesApp.view(
     model=TranslatablePage,
-    name='upload',
+    name='upload-attachment',
     permission=Private,
     request_method='POST'
 )
 def upload_page_attachment(self, request):
-    """ Upload an attachment and add it to the page.
-
-    Raises a HTTP 415 (Unsupported Media Type) if the file format is not
-    supported.
-
-    """
-
     request.assert_valid_csrf_token()
 
     attachment = TranslatablePageFile(id=random_token())
@@ -264,8 +271,54 @@ def upload_page_attachment(self, request):
     )
 
     self.files.append(attachment)
-    request.message(_("Attachment added."), 'success')
-    return redirect(request.link(self, 'attachments'))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    template='attachments.pt',
+    name='slider-images',
+    permission=Private
+)
+def view_page_slider_images(self, request):
+    layout = ManagePageSliderImagesLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'callout': _(
+            'To associate a slider image with a vote, start the filename with '
+            'the BFS number followed by a hyphen, for example, "501-1.jpg".'
+        ),
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload-slider-image')
+        ),
+        'files': self.slider_images,
+        'notice': self,
+    }
+
+
+@SwissvotesApp.view(
+    model=TranslatablePage,
+    name='upload-slider-image',
+    permission=Private,
+    request_method='POST'
+)
+def upload_page_slider_image(self, request):
+    request.assert_valid_csrf_token()
+
+    attachment = TranslatablePageFile(id=random_token())
+    attachment.name = 'slider_images-{}'.format(
+        request.params['file'].filename
+    )
+    attachment.reference = as_fileintent(
+        request.params['file'].file,
+        request.params['file'].filename
+    )
+
+    if attachment.reference.content_type not in ('image/jpeg', 'image/png'):
+        raise HTTPUnsupportedMediaType()
+
+    self.files.append(attachment)
 
 
 @SwissvotesApp.form(
@@ -276,12 +329,14 @@ def upload_page_attachment(self, request):
     form=Form
 )
 def delete_page_attachment(self, request, form):
-    """ Delete an attachment. """
-
     layout = DeletePageAttachmentLayout(self, request)
+    url = request.link(
+        layout.parent,
+        'slider-images' if self in layout.parent.slider_images
+        else 'attachments'
+    )
 
     if form.submitted(request):
-        url = request.link(self.linked_swissvotes_page[0], 'attachments')
         request.session.delete(self)
         request.message(_("Attachment deleted."), 'success')
         return redirect(url)
@@ -297,5 +352,5 @@ def delete_page_attachment(self, request, form):
         'subtitle': _("Delete"),
         'button_text': _("Delete"),
         'button_class': 'alert',
-        'cancel': request.link(self)
+        'cancel': url
     }

@@ -181,6 +181,7 @@ class ArchivedResultCollection(object):
 
         if isinstance(item, Election):
             result.type = 'election'
+            result.turnout = item.turnout
             result.elected_candidates = item.elected_candidates
             for association in item.associations:
                 self.update(association.election_compound, request)
@@ -193,6 +194,7 @@ class ArchivedResultCollection(object):
 
         if isinstance(item, Vote):
             result.type = 'vote'
+            result.turnout = item.turnout
             result.answer = item.answer
             result.nays_percentage = item.nays_percentage
             result.yeas_percentage = item.yeas_percentage

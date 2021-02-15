@@ -8,6 +8,7 @@ from onegov.swissvotes.forms import AttachmentsForm
 from onegov.swissvotes.forms import PageForm
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
+from onegov.swissvotes.forms import UpdateExternalResourcesForm
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import TranslatablePage
 from psycopg2.extras import NumericRange
@@ -19,9 +20,10 @@ class DummyPrincipal(object):
 
 
 class DummyApp(object):
-    def __init__(self, session, principal):
+    def __init__(self, session, principal, mfg_api_token=None):
         self._session = session
         self.principal = principal
+        self.mfg_api_token = None
 
     def session(self):
         return self._session
@@ -111,6 +113,8 @@ def test_attachments_form(swissvotes_app, attachments):
         assert data['size']
         assert data['filename'] == name
         assert data['mimetype'] in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',
@@ -125,6 +129,8 @@ def test_attachments_form(swissvotes_app, attachments):
         assert file == attachments[name]
         assert file.reference.filename == name
         assert file.reference.content_type in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',
@@ -442,17 +448,32 @@ def test_update_dataset_form(session):
     workbook.add_worksheet('CITATION')
     worksheet.write_row(0, 0, ColumnMapper().columns.values())
     worksheet.write_row(1, 0, [
-        100.1,  # anr / NUMERIC
+        '100.1',  # anr / NUMERIC
         '1.2.2008',  # datum / DATE
-        1,  # legislatur / INTEGER
-        '2004-2008',  # legisjahr / INT4RANGE
-        'kurztitel de',  # titel_kurz_d
-        'kurztitel fr',  # titel_kurz_f
-        'titel de',  # titel_off_d
-        'titel fr',  # titel_off_f
+        'titel_kurz_d',  # short_title_de / TEXT
+        'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_off_d',  # title_de / TEXT
+        'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
-        2,  # anzahl / INTEGER
-        3,  # rechtsform
+        'link',  # swissvoteslink / TEXT
+        '2',  # anzahl / INTEGER
+        '3',  # rechtsform / INTEGER
+        '',  # anneepolitique / TEXT
+        '',  # bkchrono-de / TEXT
+        '',  # bkchrono-fr / TEXT
+        '13',  # d1e1 / NUMERIC
+        '',  # d1e2 / NUMERIC
+        '',  # d1e3 / NUMERIC
+        '12',  # d2e1 / NUMERIC
+        '12.6',  # d2e2 / NUMERIC
+        '',  # d2e3 / NUMERIC
+        '12',  # d3e1 / NUMERIC
+        '12.5',  # d3e2 / NUMERIC
+        '12.55',  # d3e3 / NUMERIC
+        '',  # dep
+        '',  # br-pos
+        '1',  # legislatur / INTEGER
+        '2004-2008',  # legisjahr / INT4RANGE
     ])
     workbook.close()
     file.seek(0)
@@ -464,4 +485,27 @@ def test_update_dataset_form(session):
 
     form.dataset.process(DummyPostData({'dataset': field_storage}))
 
+    assert form.validate()
+
+
+def test_update_external_resources_form(session):
+    form = UpdateExternalResourcesForm()
+    form.request = DummyRequest(session, DummyPrincipal())
+
+    assert form.resources.choices == (
+        ('mfg', 'eMuseum.ch'),
+        ('sa', 'Social Archives')
+    )
+
+    # Validate
+    assert not form.validate()
+
+    form.resources.process(DummyPostData({'resources': ['sa']}))
+    assert form.validate()
+
+    form.resources.process(DummyPostData({'resources': ['mfg']}))
+    assert not form.validate()
+
+    form.request.app.mfg_api_token = 'token'
+    form.resources.process(DummyPostData({'resources': ['sa', 'mfg']}))
     assert form.validate()

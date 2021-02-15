@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-10 08:58+0200\n"
+"POT-Creation-Date: 2021-01-14 15:11+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -13,6 +13,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.3\n"
+
+msgid "Partner of Pro Juventute"
+msgstr "Partenaire Pro Juventute"
 
 msgid "No active period"
 msgstr "Pas de période active"
@@ -155,6 +158,9 @@ msgstr "État activité"
 msgid "Activity Location"
 msgstr "Lieu de l'activité"
 
+msgid "Activity Tags"
+msgstr "Catégories de l'activity"
+
 msgid "Booking State"
 msgstr "État de la réservation"
 
@@ -163,6 +169,9 @@ msgstr "Priorité de la réservation"
 
 msgid "Booking Cost"
 msgstr "Coût de la réservation"
+
+msgid "Booking Date"
+msgstr "Date de réservation"
 
 msgid "Attendee First Name"
 msgstr "Prénom du participant"
@@ -515,6 +524,21 @@ msgstr "Théâtre"
 
 msgid "Trade"
 msgstr "Commerce"
+
+msgid "Camp"
+msgstr "Camps"
+
+msgid "Camp in House"
+msgstr "Camps en maison de vacances"
+
+msgid "Tent Camp"
+msgstr "Camps en camping"
+
+msgid "Family Camp"
+msgstr "Camps de famille"
+
+msgid "Trecking Camp"
+msgstr "Camps en randonnée"
 
 msgid "Title"
 msgstr "Titre"
@@ -1003,8 +1027,18 @@ msgstr ""
 "Chaque participant peut réserver un nombre limité d'activités pour un prix "
 "forfaitaire."
 
+msgid ""
+"Each attendee may attend a fixed number of activites. Each activity is "
+"billed separately."
+msgstr ""
+"Chaque participant peut réserver un nombre limité d'activités. Chaque "
+"activité est facturée séparément."
+
 msgid "Maximum Number of Activities per Attendee"
 msgstr "Nombre maximum d'activités par participants"
+
+msgid "Maximum Number of Bookings per Attendee and period"
+msgstr "Nombre maximum d'activités par participants et period"
 
 msgid "Cost of the Pass"
 msgstr "Prix du passeport"
@@ -1762,7 +1796,7 @@ msgid ""
 "activities."
 msgstr ""
 "Affiliez gratuitement votre enfant à la Rega pour la durée de toutes les "
-"activités de vacances réservées pour 2020."
+"activités de vacances réservées."
 
 msgid "Register here"
 msgstr "Inscriptions ici"
@@ -2010,6 +2044,13 @@ msgid ""
 msgstr ""
 "Le passeport coûte ${amount} CHF par enfant. Certaines activités "
 "individuelles peuvent faire l'objet d'un supplément."
+
+msgid ""
+"A booking costs ${amount} CHF per child. Individual activities may incur "
+"additional charges."
+msgstr ""
+"Une réservation coûte ${amount} CHF par enfant. Les activités individuelles "
+"peuvent entraîner des frais supplémentaires"
 
 msgid ""
 "Between each booking we enforce ${minutes} minutes of block-time in which no "
@@ -2534,6 +2575,12 @@ msgstr "Aucun paiement n'a pu être importé"
 
 msgid "The submitted xml data could not be decoded"
 msgstr "Les données xml soumises n'ont pas pu être décodées"
+
+msgid ""
+"The submitted xml data could not be parsed. Please check the file integrity"
+msgstr ""
+"Les données xml soumises n'ont pas pu être lu. Veuillez vérifier l'intégrité "
+"du xml"
 
 msgid "No transactions were found in the given file"
 msgstr "Aucune transaction n'a été trouvée dans le fichier donné"

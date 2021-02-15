@@ -6,7 +6,6 @@ from collections import OrderedDict
 from itertools import groupby
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
-from onegov.core.utils import linkify
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.file import File
 from onegov.file.utils import name_without_extension
@@ -185,14 +184,16 @@ def view_newsletter(self, request):
     def link(f, name=None):
         return request.class_link(File, {'id': f.id}, name=name)
 
+    layout = NewsletterLayout(self, request)
+
     return {
-        'layout': NewsletterLayout(self, request),
+        'layout': layout,
         'newsletter': self,
         'news': news_by_newsletter(self, request),
         'occurrences': occurrences_by_newsletter(self, request),
         'publications': publications_by_newsletter(self, request),
         'title': self.title,
-        'lead': linkify(self.lead),
+        'lead': layout.linkify(self.lead),
         'link': link,
         'name_without_extension': name_without_extension,
     }
@@ -273,10 +274,11 @@ def delete_page(self, request):
 
 
 def send_newsletter(request, newsletter, recipients, is_test=False):
+    layout = DefaultMailLayout(newsletter, request)
     html = Template(render_template(
         'mail_newsletter.pt', request, {
-            'layout': DefaultMailLayout(newsletter, request),
-            'lead': linkify(newsletter.lead or '').replace('\n', '<br>'),
+            'layout': layout,
+            'lead': layout.linkify(newsletter.lead or ''),
             'newsletter': newsletter,
             'title': newsletter.title,
             'unsubscribe': '$unsubscribe',
@@ -368,4 +370,22 @@ def handle_test_newsletter(self, request, form):
         'helptext': _(
             "Sends a test newsletter to the given address"
         )
+    }
+
+
+@OrgApp.html(model=Newsletter,
+             template='mail_newsletter.pt', name='preview', permission=Private)
+def handle_preview_newsletter(self, request):
+    layout = DefaultMailLayout(self, request)
+
+    return {
+        'layout': layout,
+        'lead': layout.linkify(self.lead or ''),
+        'newsletter': self,
+        'title': self.title,
+        'unsubscribe': '#',
+        'news': news_by_newsletter(self, request),
+        'occurrences': occurrences_by_newsletter(self, request),
+        'publications': publications_by_newsletter(self, request),
+        'name_without_extension': name_without_extension
     }

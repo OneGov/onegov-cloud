@@ -91,6 +91,7 @@ def view_messages_feed(self, request):
                     layout.format_date(m.created, 'weekday_long'),
                     layout.format_date(m.created, 'date_long')
                 )),
+                'owner': owners.get(m.owner).username,
                 'html': render_message(
                     message=m,
                     request=request,

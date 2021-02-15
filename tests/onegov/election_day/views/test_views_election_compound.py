@@ -31,7 +31,7 @@ def test_view_election_compound_districts(election_day_app_gr):
     districts = client.get('/elections/elections/districts')
     assert "Hinterrhein" in districts
     assert "Albula" in districts
-    # Intermediary results status_callout etc.
+    # intermediate results status_callout etc.
     assert '0 von 2' in districts        # Ausgezählt 0 von 2
     assert '0 von 15' in districts      # Mandate 0 von 15
 

@@ -6,10 +6,13 @@ from onegov.form import Form
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
-from onegov.swissvotes.external_sources import update_poster_urls
+from onegov.swissvotes.external_resources import MfgPosters
+from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
+from onegov.swissvotes.forms import UpdateExternalResourcesForm
 from onegov.swissvotes.layouts import DeleteVotesLayout
+from onegov.swissvotes.layouts import UpdateExternalResourcesLayout
 from onegov.swissvotes.layouts import UpdateVotesLayout
 from onegov.swissvotes.layouts import VotesLayout
 from translationstring import TranslationString
@@ -29,33 +32,6 @@ def view_votes(self, request, form):
         'layout': VotesLayout(self, request),
         'form': form
     }
-
-
-@SwissvotesApp.html(
-    model=SwissVoteCollection,
-    permission=Private,
-    name='update-external-resources',
-    request_method='POST'
-)
-def update_external_resources(self, request):
-    request.assert_valid_csrf_token()
-    if not request.app.mfg_api_token:
-        request.alert(_("A valid api key is missing"))
-        return
-    added, updated, failed = update_poster_urls(request)
-    request.message(
-        _(
-            "Poster image urls updated (${added} added, ${updated} updated)",
-            mapping={'added': added, 'updated': updated}
-        ),
-        'success'
-    )
-
-    if failed:
-        request.alert(
-            _("Poster image urls failed: ${failed}",
-              mapping={'failed': failed}),
-        )
 
 
 @SwissvotesApp.form(
@@ -104,6 +80,68 @@ def update_votes(self, request, form):
         'form': form,
         'cancel': request.link(self),
         'button_text': _("Update"),
+    }
+
+
+@SwissvotesApp.form(
+    model=SwissVoteCollection,
+    permission=Private,
+    form=UpdateExternalResourcesForm,
+    template='form.pt',
+    name='update-external-resources'
+)
+def update_external_resources(self, request, form):
+    self = self.default()
+
+    layout = UpdateExternalResourcesLayout(self, request)
+
+    if form.submitted(request):
+        added_total = 0
+        updated_total = 0
+        removed_total = 0
+        failed_total = set()
+        for resource, cls in (
+            ('mfg', MfgPosters(request.app.mfg_api_token)),
+            ('sa', SaPosters())
+        ):
+            if resource in form.resources.data:
+                added, updated, removed, failed = cls.fetch(request.session)
+                added_total += added
+                updated_total += updated
+                removed_total += removed
+                failed_total |= failed
+
+        request.message(
+            _(
+                'External resources updated (${added} added, '
+                '${updated} updated, ${removed} removed)',
+                mapping={
+                    'added': added_total,
+                    'updated': updated_total,
+                    'removed': removed_total
+                }
+            ),
+            'success'
+        )
+        if failed_total:
+            failed_total = ', '.join((
+                layout.format_bfs_number(item) for item in sorted(failed_total)
+            ))
+            request.message(
+                _(
+                    'Some external resources could not be updated: ${failed}',
+                    mapping={'failed': failed_total}
+                ),
+                'warning'
+            )
+
+        return request.redirect(layout.votes_url)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'cancel': request.link(self),
+        'button_text': _("Update external resources"),
     }
 
 

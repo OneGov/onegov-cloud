@@ -320,7 +320,7 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
         defer('cost')
     )
 
-    if period.all_inclusive and period.max_bookings_per_attendee:
+    if period.max_bookings_per_attendee:
         default_limit = period.max_bookings_per_attendee
         attendee_limits = None
     else:

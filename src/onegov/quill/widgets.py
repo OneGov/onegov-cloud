@@ -77,6 +77,8 @@ class QuillInput(HiddenInput):
         input = super(QuillInput, self).__call__(field, **kwargs)
 
         container_id = f'quill-container-{self.id}'
+        scroll_container_id = f'scrolling-container-{self.id}'
+
         formats = ', '.join(self.formats)
         toolbar = ', '.join(self.toolbar)
         placeholders = [
@@ -86,7 +88,11 @@ class QuillInput(HiddenInput):
         placeholders = ', '.join(placeholders)
 
         return HTMLString(f"""
-            <div class="quill-container" id="{container_id}"></div>
+            <div style="position:relative">
+                <div class="scrolling-container" id="{scroll_container_id}">
+                  <div class="quill-container" id="{container_id}"></div>
+                </div>
+            </div>
             <script>
                 window.addEventListener('load', function () {{
                     Quill.register(
@@ -103,6 +109,7 @@ class QuillInput(HiddenInput):
                                 placeholders: [{placeholders}]
                             }}
                         }},
+                        scrollingContainer: '#{scroll_container_id}',
                         theme: 'snow'
                     }});
                     quill.clipboard.dangerouslyPasteHTML(input.value);

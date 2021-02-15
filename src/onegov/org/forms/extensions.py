@@ -1,7 +1,11 @@
 from cached_property import cached_property
+from sedate import utcnow, to_timezone
+
 from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
-from onegov.form.fields import UploadField
+from onegov.form.submissions import prepare_for_submission
+from onegov.form.fields import UploadField, TimezoneDateTimeField
+from onegov.form.validators import StrictOptional
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from wtforms.fields import TextAreaField
@@ -57,6 +61,7 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
 
         # XXX circular import
         from onegov.org.models.directory import ExtendedDirectoryEntry
+        prepare_for_submission(self.form_class, for_change_request=True)
 
         class ChangeRequestForm(self.form_class):
 
@@ -95,13 +100,23 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 if isinstance(field, UploadField):
                     return field.data and True or False
 
-                return self.target.values.get(field.id) != field.data
+                # like coordinates, provided through extension
+                if field.id in ('publication_start', 'publication_end'):
+                    if not field.data:
+                        return False
+                    return to_timezone(field.data, 'UTC') != \
+                        getattr(self.target, field.id)
 
-            def render_original(self, field):
+                stored = self.target.values.get(field.id) or None
+                field_data = field.data or None
+                return stored != field_data
+
+            def render_original(self, field, from_model=False):
                 prev = field.data
 
                 try:
-                    field.data = self.target.values.get(field.id)
+                    field.data = self.target.values.get(field.id) if \
+                        not from_model else getattr(self.target, field.id)
                     return super().render_display(field)
                 finally:
                     field.data = prev
@@ -115,6 +130,10 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
 
                     if field.id in ('csrf_token', 'coordinates'):
                         return proposed
+
+                    if field.id in ('publication_start', 'publication_end'):
+                        original = self.render_original(field, from_model=True)
+                        return render_html_diff(original, proposed)
 
                     if field.id not in self.target.values:
                         return proposed
@@ -139,3 +158,47 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 return False
 
         return ChangeRequestForm
+
+
+class PublicationFormExtension(FormExtension, name='publication'):
+    """Can be used with TimezonePublicationMixin or UTCDateTime type decorator.
+    """
+
+    def create(self, timezone='Europe/Zurich'):
+        tz = timezone
+
+        class PublicationForm(self.form_class):
+
+            publication_start = TimezoneDateTimeField(
+                label=_('Start'),
+                timezone=tz,
+                fieldset=_('Publication'),
+                validators=[StrictOptional()]
+            )
+
+            publication_end = TimezoneDateTimeField(
+                label=_('End'),
+                timezone=tz,
+                fieldset=_('Publication'),
+                validators=[StrictOptional()]
+            )
+
+            def ensure_publication_start_end(self):
+                start = self.publication_start
+                end = self.publication_end
+                if not start or not end:
+                    return
+                if end.data and to_timezone(end.data, 'UTC') <= utcnow():
+                    self.publication_end.errors.append(
+                        _("Publication end must be in the future"))
+                    return False
+                if not start.data or not end.data:
+                    return
+
+                if end.data <= start.data:
+                    self.errors.setdefault('global-errors', [])
+                    self.errors['global-errors'].append(
+                        _("Publication start must be prior to end"))
+                    return False
+
+        return PublicationForm

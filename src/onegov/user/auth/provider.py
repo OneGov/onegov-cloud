@@ -1,12 +1,18 @@
 import time
 
 from abc import ABCMeta, abstractmethod
+from uuid import uuid4
+
+import morepath
 from attr import attrs, attrib, validators
+from sedate import utcnow
+
 from onegov.core.crypto import random_token
 from onegov.core.utils import rchop
-from onegov.user import _, log, UserCollection
+from onegov.user import _, log, UserCollection, Auth
 from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
+from onegov.user.auth.clients.msal import MSALConnections
 from onegov.user.models.user import User
 from translationstring import TranslationString
 from typing import Dict
@@ -39,6 +45,15 @@ class Success(Conclusion):
 
 @attrs(slots=True, frozen=True)
 class Failure(Conclusion):
+    """ Indicates a corrupt JWT """
+
+    note: TranslationString = attrib()
+
+    def __bool__(self):
+        return False
+
+
+class InvalidJWT(Failure):
     """ Indicates a failed authentication. """
 
     note: TranslationString = attrib()
@@ -98,6 +113,12 @@ class AuthenticationProvider(metaclass=ABCMeta):
         """
 
         return cls()
+
+    def available(self, app):
+        """Returns the the authentication provider is available for the current
+        app. Since there are tenant specific connections, we might want to
+        check, if for the tenant of the app, there is an available client."""
+        return True
 
 
 @attrs()
@@ -199,7 +220,8 @@ def spawn_ldap_client(**cfg):
     return client
 
 
-def ensure_user(source, source_id, session, username, role, force_role=True):
+def ensure_user(source, source_id, session, username, role, force_role=True,
+                realname=None):
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
 
@@ -233,6 +255,7 @@ def ensure_user(source, source_id, session, username, role, force_role=True):
     # the source of the user is always the last provider that was used
     user.source = source
     user.source_id = source_id
+    user.realname = realname
 
     return user
 
@@ -613,3 +636,280 @@ class LDAPKerberosProvider(
             session=request.session,
             username=mails[0],
             role=role)
+
+
+@attrs
+class OauthProvider(SeparateAuthenticationProvider):
+    """General Prototype class for an Oath Provider with typical OAuth flow.
+    """
+
+    @abstractmethod
+    def logout_url(self, request):
+        """ Returns the tenant or app specific logout url to the authentication
+        endpoint in a consistent manner.
+         """
+
+    @abstractmethod
+    def request_authorisation(self, request):
+        """
+        Takes the request from the redirect_uri view sent from the users
+        browser. The redirect view expects either:
+        * a Conclusion, either Success or Failure
+        * a webob response, e.g. to redirect to the logout page
+
+        The redirect view, where this function is used, will eventually fulfill
+        the login process whereas :func:`self.authenticate_request` is purely
+        to redirect the user to the auth provider.
+        """
+
+    @staticmethod
+    def logout_redirect_uri(request):
+        """This url usually has to be registered with the OAuth Provider.
+        Should not contain any query parameters. """
+        return request.class_link(Auth, name='logout')
+
+    def redirect_uri(self, request):
+        """Returns the redirect uri in a consistent manner
+        without query parameters."""
+        return request.class_link(
+            AuthenticationProvider,
+            {'name': self.metadata.name},
+            name='redirect'
+        )
+
+
+@attrs(auto_attribs=True)
+class AzureADProvider(
+    OauthProvider,
+    metadata=ProviderMetadata(name='msal', title=_("AzureAD"))
+):
+    """
+    Authenticates and authorizes a user in AzureAD for a specific AzureAD
+    tenant_id and client_id in an OpenID Connect flow.
+
+    For this to work, we need
+
+        - Client ID
+        - Client Secret
+        - Tenant ID
+
+    We have to give the AzureAD manager following Urls, that should not change:
+
+        - Redirect uri (https://<host>/auth_providers/msal/redirect)
+        - Logout Redirect uri (https://<host>/auth/logout)
+
+    Additionally, weh AzureAD Manager should set additional token claims
+    for the authorisation to work:
+
+        - `email` claim
+        - `groups` claim for role mapping
+        - optional: `family_name` and `given_name` for User.realname
+
+    The claims `preferred_username` or `upn` could also be used for
+    User.realname."""
+
+    # msal instances by tenant
+    tenants: MSALConnections = attrib()
+
+    # Roles configuration
+    roles: RolesMapping = attrib()
+
+    # Custom hint to be shown in the login view
+    custom_hint: str = ''
+
+    @classmethod
+    def configure(cls, **cfg):
+
+        if not cfg:
+            return None
+
+        return cls(
+            tenants=MSALConnections.from_cfg(cfg.get('tenants')),
+            custom_hint=cfg.get('hint', None),
+            roles=RolesMapping(cfg.get('roles', {
+                '__default__': {
+                    'admins': 'admins',
+                    'editors': 'editors',
+                    'members': 'members'
+                }
+            }))
+        )
+
+    def button_text(self, request):
+        return _("Login with Microsoft")
+
+    def logout_url(self, request):
+        client = self.tenants.client(request.app)
+        return client.logout_url(self.logout_redirect_uri(request))
+
+    def authenticate_request(self, request):
+        """
+        Returns a redirect response or a Conclusion
+
+        Parameters of the original request are kept for when external services
+        call back.
+        """
+
+        app = request.app
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if not roles:
+            # Considered as a misconfiguration of the app
+            log.error(f"No role map for {app.application_id}")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not client:
+            # Considered as a misconfiguration of the app
+            log.error(f'No msal client found for '
+                      f'{app.application_id} or {app.namespace}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        state = app.sign(str(uuid4()))
+        nonce = str(uuid4())
+        request.browser_session['state'] = state
+        request.browser_session['login_to'] = self.to
+        request.browser_session['nonce'] = nonce
+
+        # We can not include self.to, the redirect uri must always be the same
+        auth_url = client.connection.get_authorization_request_url(
+            scopes=[],
+            state=state,
+            redirect_uri=self.redirect_uri(request),
+            response_type='code',
+            nonce=nonce
+        )
+
+        return morepath.redirect(auth_url)
+
+    def validate_id_token(self, request, token):
+        """
+        Makes sure the id token is validated correctly according to
+        https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
+        """
+
+        app = request.app
+        client = self.tenants.client(app)
+        id_token_claims = token.get('id_token_claims', {})
+        iss = id_token_claims.get('iss')
+
+        endpoint = client.connection.authority.token_endpoint
+        endpoint = endpoint.replace('oauth2/', '').replace('token', '')
+        endpoint = endpoint.rstrip('/')
+
+        if iss != endpoint:
+            log.info(f'Issue claim check failed: {iss} v.s {endpoint}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        now = utcnow().timestamp()
+        iat = id_token_claims.get('iat')
+        if iat > now:
+            log.info(f'IAT check failed: {iat} > {now}')
+            return Failure(_('Authorisation failed due to an error'))
+        exp = id_token_claims.get('exp')
+        if now > exp:
+            log.info(f'EXP check failed, token expired: {now} > {exp}')
+            return Failure(_('Your login has expired'))
+
+        return True
+
+    def request_authorisation(self, request):
+        """
+        If "Stay Logged In" on the Microsoft Login page is chosen,
+        AzureAD behaves like an auto-login provider, redirecting the user back
+        immediately to the redirect view without prompting a password or
+        even showing any Microsoft page. Microsoft set their own cookies to
+        make this possible.
+
+        Return a webob Response or a Conclusion.
+        """
+        # Fetch the state that was saved upon first redirect
+        app = request.app
+        state = request.browser_session.get('state')
+
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if request.params.get('state') != state:
+            log.warning('state is not matching, csrf check failed')
+            return Failure(_('Authorisation failed due to an error'))
+
+        authorization_code = request.params.get('code')
+
+        if authorization_code is None:
+            log.warning('No code found in url query params')
+            return Failure(_('Authorisation failed due to an error'))
+
+        # Must take the same redirect url as used in the first step
+        # The nonce is evaluated inside msal library and raises ValueError
+        token_result = client.connection.acquire_token_by_authorization_code(
+            authorization_code,
+            scopes=[],
+            redirect_uri=self.redirect_uri(request),
+            nonce=request.browser_session.pop('nonce')
+        )
+
+        if "error" in token_result:
+            log.info(
+                f"Error in token result - "
+                f"{token_result['error']}: "
+                f"{token_result.get('error_description')}"
+            )
+            return Failure(_('Authorisation failed due to an error'))
+
+        validate_conclusion = self.validate_id_token(request, token_result)
+        if not validate_conclusion:
+            return validate_conclusion
+
+        id_token_claims = token_result.get('id_token_claims', {})
+        username = id_token_claims.get(client.attributes.username)
+        source_id = id_token_claims.get(client.attributes.source_id)
+        groups = id_token_claims.get(client.attributes.groups)
+        first_name = id_token_claims.get(client.attributes.first_name)
+        last_name = id_token_claims.get(client.attributes.last_name)
+        preferred_username = id_token_claims.get(
+            client.attributes.preferred_username)
+
+        if not username:
+            log.info("No username found in authorisation step")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not source_id:
+            log.info(f"No source_id found for {username}")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not groups:
+            log.info(f"No groups found for {username}")
+            return Failure(_("Can't login because your user has no groups. "
+                             "Contact your AzureAD system administrator"))
+
+        role = self.roles.match(roles, groups)
+
+        if not role:
+            log.info(f"No authorized group for {username}, "
+                     f"having groups: {', '.join(groups)}")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if first_name and last_name:
+            realname = f'{first_name} {last_name}'
+        else:
+            realname = preferred_username
+
+        user = ensure_user(
+            source=self.name,
+            source_id=source_id,
+            session=request.session,
+            username=username,
+            role=role,
+            realname=realname
+        )
+
+        # We set the path we wanted to go when starting the oauth flow
+        self.to = request.browser_session.pop('login_to', '/')
+
+        return Success(user, _("Successfully logged in as «${user}»", mapping={
+            'user': user.username
+        }))
+
+    def available(self, app):
+        return self.tenants.client(app) and True or False

@@ -1,20 +1,22 @@
+from decimal import Decimal
 from io import BytesIO
 from onegov.core.utils import module_path
+from onegov.swissvotes.external_resources.posters import MfgPosters
+from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import SwissVote
 from pytest import mark
+from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
 from xlrd import open_workbook
 from xlsxwriter.workbook import Workbook
 
 
-@mark.parametrize("file", [
-    module_path(
-        'tests.onegov.swissvotes',
-        'fixtures/votes_2020_04_05_mit_Plakaten.xlsx'),
+@mark.parametrize('file', [
+    module_path('tests.onegov.swissvotes', 'fixtures/dataset.xlsx'),
 ])
-def test_update_votes(swissvotes_app, file):
+def test_view_update_votes(swissvotes_app, file):
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -99,7 +101,7 @@ def test_update_votes(swissvotes_app, file):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_update_votes_unknown_descriptors(swissvotes_app):
+def test_view_update_votes_unknown_descriptors(swissvotes_app):
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -116,15 +118,17 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
     worksheet.write_row(1, 0, [
         '100.1',  # anr
         '1.2.2008',  # datum
-        '1',  # legislatur
-        '2004-2008',  # legisjahr
         'kurztitel de',  # titel_kurz_d
         'kurztitel fr',  # titel_kurz_f
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
+        'link',  # swissvoteslink
         '2',  # anzahl
         '3',  # rechtsform
+        '',  # anneepolitique
+        '',  # bkchrono-de
+        '',  # bkchrono-fr
         '13',  # d1e1
         '',  # d1e2
         '',  # d1e3
@@ -134,6 +138,10 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
         '12',  # d3e1
         '12.5',  # d3e2
         '12.55',  # d3e3
+        '',  # dep
+        '',  # br-pos
+        '1',  # legislatur
+        '2004-2008',  # legisjahr
     ])
     workbook.close()
     file.seek(0)
@@ -148,3 +156,25 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
     manage = manage.form.submit().follow()
     assert "Datensatz aktualisiert (1 hinzugefügt, 0 geändert)" in manage
     assert "unbekannte Deskriptoren: 12.55, 12.6, 13" in manage
+
+
+@patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, {Decimal('4')}))
+@patch.object(SaPosters, 'fetch', return_value=(5, 6, 7, {Decimal('8')}))
+def test_view_update_external_resources(mfg, sa, swissvotes_app):
+    swissvotes_app.mfg_api_token = 'xxx'
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    manage = client.get('/').maybe_follow().click('Abstimmungen')
+    manage = manage.click('Externe Quellen aktualisieren')
+    manage.form['resources'] = ['mfg', 'sa']
+    manage = manage.form.submit().follow()
+
+    assert '6 hinzugefügt, 8 geändert, 10 gelöscht' in manage
+    assert 'Quellen konnten nicht aktualisiert werden: 4, 8' in manage

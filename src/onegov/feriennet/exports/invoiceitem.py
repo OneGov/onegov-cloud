@@ -1,4 +1,4 @@
-from onegov.activity import Invoice, InvoiceItem, InvoiceReference
+from onegov.activity import Invoice, InvoiceItem, InvoiceReference, Activity
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
@@ -20,12 +20,13 @@ class InvoiceItemExport(FeriennetExport):
         return self.rows(session, form.selected_period)
 
     def rows(self, session, period):
-        for item in self.query(session, period):
-            yield ((k, v) for k, v in self.fields(item))
+        for item, tags in self.query(session, period):
+            yield ((k, v) for k, v in self.fields(item, tags))
 
     def query(self, session, period):
-        q = session.query(InvoiceItem)
+        q = session.query(InvoiceItem, Activity._tags)
         q = q.join(Invoice).join(User).join(InvoiceReference)
+        q = q.join(Activity, InvoiceItem.text == Activity.title, isouter=True)
         q = q.options(
             contains_eager(InvoiceItem.invoice)
             .contains_eager(Invoice.user)
@@ -39,9 +40,9 @@ class InvoiceItemExport(FeriennetExport):
             InvoiceItem.group,
             InvoiceItem.text
         )
-
         return q
 
-    def fields(self, item):
+    def fields(self, item, tags):
         yield from self.invoice_item_fields(item)
         yield from self.user_fields(item.invoice.user)
+        yield from self.activity_tags(tags)

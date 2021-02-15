@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-07 13:04+0200\n"
+"POT-Creation-Date: 2020-09-14 11:19+0200\n"
 "PO-Revision-Date: 2019-05-15 08:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -117,11 +117,8 @@ msgstr "Expresssendung"
 msgid "Regular and express shipment"
 msgstr "Alle Sendungen"
 
-msgid "Start date is after end date"
-msgstr "Startdatum liegt vor dem Enddatum"
-
-msgid "Please limit your report to 2 years"
-msgstr "Bitte limitieren Sie Auswertung auf 2 Jahre"
+msgid "Start and end must be in the same year"
+msgstr "Start und Ende müssen im gleichen Jahr liegen"
 
 msgid "Dispatch date"
 msgstr "Versanddatum"
@@ -298,10 +295,6 @@ msgstr "Benachrichtigung hinzufügen"
 
 msgid "Edit notification"
 msgstr "Benachrichtigung bearbeiten"
-
-#, python-format
-msgid "before ${year}"
-msgstr "vor ${year}"
 
 msgid "Print delivery note"
 msgstr "Lieferschein drucken"
@@ -506,9 +499,6 @@ msgstr "Abholtermine"
 
 msgid "Notification"
 msgstr "Benachrichtigung"
-
-msgid "No results found"
-msgstr "Keine Resultate gefunden"
 
 msgid "Delivery"
 msgstr "Versand"

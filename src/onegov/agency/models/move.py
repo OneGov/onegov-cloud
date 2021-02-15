@@ -1,3 +1,4 @@
+from cached_property import cached_property
 from onegov.core.orm.abstract import MoveDirection
 
 
@@ -9,6 +10,18 @@ class Move(object):
         self.subject_id = subject_id
         self.target_id = target_id
         self.direction = direction
+
+    @cached_property
+    def collection(self):
+        raise NotImplementedError
+
+    @cached_property
+    def subject(self):
+        return self.collection.by_id(self.subject_id)
+
+    @cached_property
+    def target(self):
+        return self.collection.by_id(self.target_id)
 
     @classmethod
     def for_url_template(cls):
@@ -26,17 +39,17 @@ class Move(object):
 class AgencyMove(Move):
     """ Represents a single move of a suborganization. """
 
-    def execute(self):
+    @cached_property
+    def collection(self):
         from onegov.agency.collections import ExtendedAgencyCollection
+        return ExtendedAgencyCollection(self.session)
 
-        agencies = ExtendedAgencyCollection(self.session)
-        subject = agencies.by_id(self.subject_id)
-        target = agencies.by_id(self.target_id)
-        if subject and target and subject != target:
-            if subject.parent_id == target.parent_id:
-                agencies.move(
-                    subject=subject,
-                    target=target,
+    def execute(self):
+        if self.subject and self.target and self.subject != self.target:
+            if self.subject.parent_id == self.target.parent_id:
+                self.collection.move(
+                    subject=self.subject,
+                    target=self.target,
                     direction=getattr(MoveDirection, self.direction)
                 )
 
@@ -44,17 +57,17 @@ class AgencyMove(Move):
 class AgencyMembershipMoveWithinAgency(Move):
     """ Represents a single move of a membership with respect to a Agency. """
 
-    def execute(self):
+    @cached_property
+    def collection(self):
         from onegov.people import AgencyMembershipCollection
+        return AgencyMembershipCollection(self.session)
 
-        memberships = AgencyMembershipCollection(self.session)
-        subject = memberships.by_id(self.subject_id)
-        target = memberships.by_id(self.target_id)
-        if subject and target and subject != target:
-            if subject.agency_id == target.agency_id:
-                memberships.move(
-                    subject=subject,
-                    target=target,
+    def execute(self):
+        if self.subject and self.target and self.subject != self.target:
+            if self.subject.agency_id == self.target.agency_id:
+                self.collection.move(
+                    subject=self.subject,
+                    target=self.target,
                     direction=getattr(MoveDirection, self.direction),
                     move_on_col='order_within_agency'
                 )
@@ -63,17 +76,17 @@ class AgencyMembershipMoveWithinAgency(Move):
 class AgencyMembershipMoveWithinPerson(Move):
     """ Represents a single move of a membership with respect to a Person. """
 
-    def execute(self):
+    @cached_property
+    def collection(self):
         from onegov.people import AgencyMembershipCollection
+        return AgencyMembershipCollection(self.session)
 
-        memberships = AgencyMembershipCollection(self.session)
-        subject = memberships.by_id(self.subject_id)
-        target = memberships.by_id(self.target_id)
-        if subject and target and subject != target:
-            if subject.person_id == target.person_id:
-                memberships.move(
-                    subject=subject,
-                    target=target,
+    def execute(self):
+        if self.subject and self.target and self.subject != self.target:
+            if self.subject.person_id == self.target.person_id:
+                self.collection.move(
+                    subject=self.subject,
+                    target=self.target,
                     direction=getattr(MoveDirection, self.direction),
                     move_on_col='order_within_person'
                 )

@@ -44,7 +44,7 @@ def view_dispatch_dates(self, request, form):
             r.date for r in form.municipality.pickup_dates.filter(
                 PickupDate.date > date.today()
             )
-        ]
+        ] or [date(2018, 1, 1), date.today()]
         return render_macro(
             layout.macros['dispatch_dates'],
             request,

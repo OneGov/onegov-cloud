@@ -35,7 +35,13 @@ TAGS = tuple((tag, tag) for tag in (
     _("Styling"),
     _("Theater"),
     _("Trade"),
+    _("Camp"),
+    _("Camp in House"),
+    _("Tent Camp"),
+    _("Family Camp"),
+    _("Trecking Camp"),
 ))
+# When adding new tags for WWF, adapt exports/base.py::141
 
 
 class VacationActivityForm(Form):

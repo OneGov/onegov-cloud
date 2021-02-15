@@ -25,7 +25,10 @@ def get_course_details(request, id):
 @FsiApp.path(model=CourseEvent, path='/fsi/event/{id}')
 def get_course_event_details(request, id):
     return CourseEventCollection(
-        request.session, show_hidden=request.is_manager).by_id(id)
+        request.session,
+        show_hidden=request.is_manager,
+        show_locked=True
+    ).by_id(id)
 
 
 @FsiApp.path(
@@ -47,6 +50,7 @@ def get_past_events_view(
         page=page,
         show_hidden=show_hidden,
         course_id=course_id,
+        show_locked=True
     )
 
 
@@ -81,7 +85,8 @@ def get_events_view(
         limit=limit,
         show_hidden=show_hidden,
         course_id=course_id,
-        sort_desc=sort_desc
+        sort_desc=sort_desc,
+        show_locked=True
     )
 
 

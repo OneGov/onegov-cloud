@@ -14,6 +14,15 @@ from purl import URL
 from sqlalchemy.orm import object_session
 
 
+def ticket_submitter(ticket):
+    handler = ticket.handler
+    mail = handler.deleted and ticket.snapshot.get('email') or handler.email
+    # case of EventSubmissionHandler for imported events
+    if handler.data.get('source'):
+        mail = handler.data.get('user', mail)
+    return mail
+
+
 class OrgTicketMixin(object):
     """ Adds additional methods to the ticket, needed by the organisations
     implementation of it. Strictly limited to things that

@@ -110,7 +110,10 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
     @property
     def event_from_form(self):
         return self.course_event_id.data and CourseEventCollection(
-            self.request.session).by_id(self.course_event_id.data)
+            self.request.session,
+            show_hidden=True,
+            show_locked=True
+        ).by_id(self.course_event_id.data)
 
     def ensure_no_other_subscriptions(self):
         if self.attendee_id.data and self.course_event_id.data:
@@ -137,7 +140,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
                       "Please refresh the page")
                 )
                 return False
-            if self.event_from_form.locked and not self.request.is_admin:
+            if event.locked and not self.request.is_admin:
                 self.course_event_id.errors.append(
                     _("This course event can't be booked (anymore).")
                 )

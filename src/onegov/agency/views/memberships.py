@@ -3,7 +3,7 @@ from morepath.request import Response
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.forms import MembershipForm
-from onegov.agency.layouts import MembershipLayout
+from onegov.agency.layout import MembershipLayout
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
 from onegov.core.security import Private

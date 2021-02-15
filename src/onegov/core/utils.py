@@ -16,7 +16,7 @@ import shutil
 import sqlalchemy
 import urllib.request
 
-from collections import Iterable
+from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
@@ -56,12 +56,20 @@ _email_regex = re.compile((
 # detects multiple successive newlines
 _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 
+# detect starting strings of phone inside a link
+_phone_inside_a_tags = r'(\">|href=\"tel:)?'
+
 # matches duplicate whitespace
 _duplicate_whitespace = re.compile(r'\s{2,}')
 
 # regex pattern for swiss phone numbers
 _phone_ch_country_code = r"(\+41|0041|0[0-9]{2})"
 _phone_ch = re.compile(_phone_ch_country_code + r'([ \r\f\t\d]+)')
+
+# Adds a regex group to capture if a leading a tag is present or if the
+# number is part of the href attributes
+_phone_ch_html_safe = re.compile(
+    _phone_inside_a_tags + _phone_ch_country_code + r'([ \r\f\t\d]+)')
 
 # for yubikeys
 ALPHABET = 'cbdefghijklnrtuv'
@@ -249,6 +257,14 @@ class Bunch(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 def render_file(file_path, request):
     """ Takes the given file_path (content) and renders it to the browser.
@@ -310,6 +326,8 @@ def linkify_phone(text):
         return re.sub(r'\s', '', number)
 
     def is_valid_length(number):
+        if number.startswith('+00'):
+            return False
         if number.startswith('00'):
             return len(number) == 13
         elif number.startswith('0'):
@@ -319,15 +337,18 @@ def linkify_phone(text):
         return False
 
     def handle_match(match):
-        number = match.group(0)
+        inside_html = match.group(1)
+        number = f'{match.group(2)}{match.group(3)}'
         assert not number.endswith('\n')
+        if inside_html:
+            return match.group(0)
         if is_valid_length(strip_whitespace(number)):
             number = remove_duplicate_whitespace(number).strip()
             return f'<a href="tel:{number}">{number}</a>'
 
-        return number
+        return match.group(0)
 
-    return _phone_ch.sub(handle_match, text)
+    return _phone_ch_html_safe.sub(handle_match, text)
 
 
 def linkify(text, escape=True):
@@ -633,6 +654,11 @@ def binary_to_dictionary(binary, filename=None):
     assert isinstance(binary, bytes)
 
     mimetype = magic.from_buffer(binary, mime=True)
+
+    # according to https://tools.ietf.org/html/rfc7111, text/csv should be used
+    if mimetype == 'application/csv':
+        mimetype = 'text/csv'
+
     gzipdata = BytesIO()
 
     with gzip.GzipFile(fileobj=gzipdata, mode='wb') as f:

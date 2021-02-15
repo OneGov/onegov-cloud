@@ -70,6 +70,7 @@ def test_views_daily_job(client):
     assert "4444" in view
     assert "5555" in view
     assert "6666" in view
+    assert 'bis 2017' in view
 
     view = get_daily_list('boxes_and_forms', '2019-01-10')
     assert "1111" not in view

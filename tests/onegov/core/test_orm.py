@@ -1091,6 +1091,7 @@ def test_orm_signals(postgres_dsn):
     assert len(inserted) == 2
 
     session.query(Document).update({'body': 'hello world'})
+    session.expire_all()
     assert len(updated) == 2
     assert updated[0][0].body == 'hello world'
     assert updated[0][1] == 'foo'
@@ -1795,8 +1796,9 @@ def test_selectable_sql_query(session):
         )
     ).fetchall()
 
-    assert columns == [('groname', )]
+    assert columns == [('groname', ), ('grosysid', )]
     assert columns[0].column_name == 'groname'
+    assert columns[1].column_name == 'grosysid'
 
     columns = session.execute(
         select((stmt.c.column_name, )).where(
@@ -1807,9 +1809,8 @@ def test_selectable_sql_query(session):
         ).order_by(stmt.c.column_name)
     ).fetchall()
 
-    assert columns == [('grolist', ), ('grosysid', )]
+    assert columns == [('grolist', )]
     assert columns[0].column_name == 'grolist'
-    assert columns[1].column_name == 'grosysid'
 
 
 def test_selectable_sql_query_with_array(session):
@@ -1948,3 +1949,21 @@ def test_unaccent_expression(postgres_dsn):
 
     query = session.query(Test).order_by(unaccent(Test.text))
     assert [r.text for r in query] == ['Deutschland', 'Österreich', 'Schweiz']
+
+
+def test_postgres_timezone(postgres_dsn):
+    """ We need to set the timezone when creating the test database for local
+    development. Servers are configured having GMT as default timezone.
+    This test will fail locally until we find the solution. """
+
+    valid_timezones = ('UTC', 'GMT', 'Etc/UTC')
+
+    Base = declarative_base(cls=ModelBase)
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+    session = mgr.session()
+    assert session.execute('show timezone;').scalar() in valid_timezones, """
+    Run 
+        ALTER DATABASE onegov SET timezone TO 'UTC';    
+    to change the default timezone, then restart postgres service.
+    """

@@ -1,6 +1,8 @@
 from cached_property import cached_property
 from chameleon.utils import Markup
-from datetime import date
+
+from sedate import utcnow
+
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.core.templates import render_macro
@@ -392,7 +394,7 @@ class AttendeeSignupForm(AttendeeBase):
         if self.request.is_admin:
             return True
 
-        if self.model.is_past_deadline(date.today()):
+        if self.model.is_past_deadline(utcnow()):
             self.attendee.errors.append(_("The deadline has passed"))
             return False
 

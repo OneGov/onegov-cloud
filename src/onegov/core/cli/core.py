@@ -264,6 +264,8 @@ class GroupContextGuard(object):
             if len(matches) > 1:
                 abort("This selector may not reference an existing path")
 
+            self.abort_if_no_selector(click_context, matches)
+
             if len(self.selector.lstrip('/').split('/')) != 2:
                 abort("This selector must reference a full path")
 
@@ -433,8 +435,8 @@ class GroupContext(GroupContextGuard):
                 if fnmatch(selector, self.selector):
                     yield selector
 
-        if self.creates_path:
-            yield self.selector.rstrip('/')
+            if self.creates_path:
+                yield self.selector.rstrip('/')
 
 
 def get_context_specific_settings(context):

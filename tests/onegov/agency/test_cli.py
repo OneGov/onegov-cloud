@@ -293,7 +293,5 @@ def test_import_bs_data(cfg_path):
         '--agency-file', agency_file,
         '--people-file', people_file
     ])
-    print(result.output)
+
     assert result.exit_code == 0
-
-

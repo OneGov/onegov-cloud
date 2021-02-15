@@ -134,8 +134,3 @@ Intercooler.ready(function(element) {
     processCommonNodes(el, true);
 });
 
-
-var updateDispatchDates = function(dispatch_date, return_date) {
-    $('#dispatch_date').val(dispatch_date);
-    $('#return_date').val(return_date);
-}

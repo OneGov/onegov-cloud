@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sedate import utcnow
 
 from onegov.fsi.models import CourseEvent
+from tests.shared.utils import open_in_browser
 
 
 def test_course_event_collection(client):
@@ -38,8 +39,8 @@ def test_edit_course_event(client_with_db):
     client.login_admin()
     new = client.get(view)
     new.form['location'] = 'New Loc'
-    new.form['start'] = datetime(2015, 5, 5)
-    new.form['end'] = datetime(2015, 5, 6)
+    new.form['start'] = '2015-05-05 00:00'
+    new.form['end'] = '2015-05-06 00:00'
     new.form['presenter_name'] = 'Pres'
     new.form['min_attendees'] = 2
     new.form['max_attendees'] = 3
@@ -53,6 +54,9 @@ def test_edit_course_event(client_with_db):
     assert f'min. 2 max. 3' in page
     # String will not be rendered in email preview
     assert 'This course is hidden.' not in page
+    # test no changes
+    page = client.get(view)
+    page.form.submit().follow()
 
 
 def test_add_delete_course_event(client_with_db):
@@ -64,13 +68,13 @@ def test_add_delete_course_event(client_with_db):
     client.login_admin()
     page = client.get(view)
     assert page.form['course_id'].value
-    print('course_id value: ', page.form['course_id'].value)
+
     page.form['presenter_name'] = 'Presenter'
     page.form['presenter_name'] = 'Presenter'
     page.form['presenter_company'] = 'Company'
     page.form['presenter_email'] = 'p@t.com'
-    page.form['start'] = '2016-10-04 10:00:00'
-    page.form['end'] = '2016-10-04 12:00:00'
+    page.form['start'] = '2016-10-04 10:00'
+    page.form['end'] = '2016-10-04 12:00'
     page.form['location'] = 'location'
     assert page.form['min_attendees'].value == '1'
     page.form['max_attendees'] = '10'
@@ -78,6 +82,19 @@ def test_add_delete_course_event(client_with_db):
     # Follow will not work if there are error in the form
     page = page.form.submit().follow()
     assert 'Eine neue Durchführung wurde hinzugefügt' in page
+
+    # Test add duplicate
+    page = client.get(view)
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_company'] = 'Company'
+    page.form['presenter_email'] = 'p@t.com'
+    page.form['start'] = '2016-10-04 10:00'
+    page.form['end'] = '2016-10-04 12:00'
+    page.form['location'] = 'location'
+    page.form['max_attendees'] = '10'
+    page = page.form.submit()
+    assert 'Ein Duplikat dieser Durchführung existiert bereits' in page
 
     # Delete course without subscriptions
     session = client.app.session()
@@ -234,3 +251,52 @@ def test_edit_subscription_for_other_attendee(client_with_db):
     page = new.form.submit().follow()
     assert 'Neue Anmeldung wurde hinzugefügt' in page
     assert len(client.app.smtp.outbox) == 1
+
+
+def test_delete_subscriptions_past_present(client, scenario):
+    now = utcnow()
+    scenario.add_course(name='Testcourse with Templates')
+    scenario.add_attendee()
+    scenario.commit()
+    scenario.refresh()
+
+    past_event = scenario.add_course_event(
+        scenario.latest_course,
+        start=now - timedelta(days=2, minutes=30),
+        end=now - timedelta(days=2)
+    )
+    event = scenario.add_course_event(
+        scenario.latest_course,
+        start=now + timedelta(days=2),
+        end=now + timedelta(days=2, minutes=30)
+    )
+
+    scenario.add_subscription(event, scenario.latest_attendee)
+    scenario.add_subscription(past_event, scenario.latest_attendee)
+    scenario.add_notification_template(event)
+    scenario.add_notification_template(past_event)
+    scenario.commit()
+    scenario.refresh()
+
+    client.login_admin()
+    event_subscriptions = f'/fsi/reservations?course_event_id=' \
+                          f'{scenario.latest_event.id}'
+
+    page = client.get(event_subscriptions)
+    response = client.delete(
+        page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
+    assert response.status_code == 200
+    assert client.app.smtp.outbox.pop()
+
+    page = client.get(event_subscriptions)
+    assert 'Keine Einträge gefunden' in page
+
+    past_event_subscriptions = f'/fsi/reservations?course_event_id=' \
+                               f'{scenario.course_events[-2].id}'
+
+    page = client.get(past_event_subscriptions)
+    response = client.delete(
+        page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
+
+    assert response.status_code == 200
+    assert len(client.app.smtp.outbox) == 0

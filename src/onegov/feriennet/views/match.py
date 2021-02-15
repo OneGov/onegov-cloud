@@ -28,7 +28,6 @@ def handle_matches(self, request, form):
     layout = MatchCollectionLayout(self, request)
 
     if form.submitted(request):
-        assert self.period.active and not self.period.confirmed
         if not self.period.active:
             request.warning(_("Can not do matchings for an inactive period"))
             return request.redirect(request.link(self))

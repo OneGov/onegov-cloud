@@ -344,3 +344,89 @@ def add_swissvoteslink(context):
         context.operations.add_column(
             'swissvotes', Column('swissvoteslink', Text())
         )
+
+
+@upgrade_task('Changes procedure number type to text')
+def change_procedure_number_type(context):
+    context.operations.execute(
+        'ALTER TABLE swissvotes ALTER COLUMN procedure_number TYPE TEXT'
+    )
+
+
+@upgrade_task('Adds post-vote poll links')
+def add_post_vote_poll_links(context):
+    columns = (
+        'post_vote_poll_link_de',
+        'post_vote_poll_link_fr',
+        'post_vote_poll_link_en'
+    )
+    for column in columns:
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text()))
+
+
+@upgrade_task('Adds media fields')
+def add_media_fields(context):
+    columns = (
+        ('media_ads_total', Integer()),
+        ('media_ads_per_issue', Numeric(13, 10)),
+        ('media_ads_yea', Integer()),
+        ('media_ads_nay', Integer()),
+        ('media_ads_neutral', Integer()),
+        ('media_ads_yea_p', Numeric(13, 10)),
+        ('media_coverage_articles_total', Integer()),
+        ('media_coverage_articles_d', Integer()),
+        ('media_coverage_articles_f', Integer()),
+        ('media_coverage_tonality_total', Integer()),
+        ('media_coverage_tonality_d', Integer()),
+        ('media_coverage_tonality_f', Integer()),
+    )
+    for column, type_ in columns:
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, type_))
+
+
+@upgrade_task(
+    'Add additional poster links',
+    requires='onegov.swissvotes:Adds poster_yes and poster_no'
+)
+def add_additional_poster_links(context):
+    for old, new in (
+        ('posters_yes', 'posters_mfg_yea'),
+        ('posters_no', 'posters_mfg_nay')
+    ):
+        if (
+            context.has_column('swissvotes', old)
+            and not context.has_column('swissvotes', new)
+        ):
+            context.operations.alter_column(
+                'swissvotes', old, new_column_name=new
+            )
+    for column in ('posters_sa_yea', 'posters_sa_nay'):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text()))
+
+
+@upgrade_task('Change media tonality types to numeric')
+def change_media_tonality_types(context):
+    context.operations.execute(
+        'ALTER TABLE swissvotes '
+        'ALTER COLUMN media_coverage_tonality_total TYPE NUMERIC(13, 10)'
+    )
+    context.operations.execute(
+        'ALTER TABLE swissvotes '
+        'ALTER COLUMN media_coverage_tonality_d TYPE NUMERIC(13, 10)'
+    )
+    context.operations.execute(
+        'ALTER TABLE swissvotes '
+        'ALTER COLUMN media_coverage_tonality_f TYPE NUMERIC(13, 10)'
+    )
+
+
+@upgrade_task('Adds die Mitte columns')
+def add_die_mittel_columns(context):
+    if not context.has_column('swissvotes', 'national_council_share_mitte'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('national_council_share_mitte', Numeric(13, 10))
+        )

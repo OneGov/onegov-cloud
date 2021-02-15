@@ -1,0 +1,29 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.agency">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns medium-9">
+                <table class="user-groups">
+                      <tbody>
+                          <tr class="subheader">
+                              <td>
+                                  <tal:block i18n:translate>All</tal:block> (${len(groups)})
+                              </td>
+                              <td></td>
+                          </tr>
+                          <tr tal:repeat="group groups">
+                              <td>${group.name}</td>
+                              <td class="text-links">
+                                  <a href="${request.link(group)}" i18n:translate>View</a>
+                              </td>
+                          </tr>
+                      </tbody>
+                </table>
+            </div>
+            <div class="columns medium-3 filter-panel">
+            </div>
+        </div>
+    </tal:b>
+</div>

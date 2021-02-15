@@ -11,12 +11,14 @@ from onegov.user.collections import UserGroupCollection
 from onegov.user.integration import UserApp
 from onegov.user.models import User
 from onegov.user.models import UserGroup
+from onegov.user.models import RoleMapping
 
 __all__ = [
     'Auth',
+    'RoleMapping',
     'User',
     'UserApp',
-    'UserGroup',
     'UserCollection',
-    'UserGroupCollection'
+    'UserGroup',
+    'UserGroupCollection',
 ]

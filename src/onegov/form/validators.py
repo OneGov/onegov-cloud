@@ -1,4 +1,6 @@
 import importlib
+import re
+
 import humanize
 import phonenumbers
 
@@ -78,6 +80,7 @@ class WhitelistedMimeType(object):
         'image/png',
         'image/x-ms-bmp',
         'text/plain',
+        'text/csv'
     }
 
     message = _("Files of this type are not supported.")
@@ -229,6 +232,24 @@ class ValidPhoneNumber(object):
                 and phonenumbers.is_possible_number(number)
             )
             if not valid:
+                raise ValidationError(self.message)
+
+
+swiss_ssn_rgxp = re.compile(r'756\.\d{4}\.\d{4}\.\d{2}$')
+
+
+class ValidSwissSocialSecurityNumber(object):
+    """ Makes sure the given input is a valid swiss social security number.
+
+    Expects an :class:`wtforms.StringField` instance.
+
+    """
+
+    message = _("Not a valid swiss social security number.")
+
+    def __call__(self, form, field):
+        if field.data:
+            if not re.match(swiss_ssn_rgxp, field.data):
                 raise ValidationError(self.message)
 
 

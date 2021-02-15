@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-07 12:01+0200\n"
+"POT-Creation-Date: 2020-11-11 14:09+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -112,6 +112,9 @@ msgstr "Email"
 msgid "Permissions"
 msgstr "Berechtigungen"
 
+msgid "Organisation"
+msgstr "Organisation"
+
 msgid "An attendee with this email already exists"
 msgstr "Ein Teilnehmer mit dieser E-Mail existiert bereits"
 
@@ -154,6 +157,9 @@ msgstr "Status"
 msgid "Please use a start prior to the end"
 msgstr "Bitte benutzen Sie eine Anfangszeit vor der Startzeit"
 
+msgid "A duplicate event already exists"
+msgstr "Ein Duplikat dieser Durchführung existiert bereits"
+
 msgid "Email Subject"
 msgstr "Betreff"
 
@@ -170,7 +176,8 @@ msgid "Course Event"
 msgstr "Kursdurchführung"
 
 msgid "The selected course was deleted. Please refresh the page"
-msgstr "Die gewählte Veranstaltung wurde gelöscht. Bitte laden sie die Seite neu"
+msgstr ""
+"Die gewählte Veranstaltung wurde gelöscht. Bitte laden sie die Seite neu"
 
 msgid "There are other subscriptions for the same course in this year"
 msgstr "Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs"
@@ -475,9 +482,6 @@ msgstr "Keine Teilnehmer in der Datenbank"
 msgid "Family name, surname"
 msgstr "Nachname, Vorname"
 
-msgid "Organisation"
-msgstr "Organisation"
-
 msgid "True"
 msgstr "Ja"
 
@@ -601,11 +605,9 @@ msgid "iZug/Fachstelle Sicherheit"
 msgstr "iZug/Fachstelle Sicherheit"
 
 msgid ""
-"Unfortuntely, we have to inform you, that the following course event will "
-"not take place:"
-msgstr ""
-"Leider müssen wir Ihnen mitteilen, dass folgender Kurs nicht wie geplant "
-"stattfindet:"
+"We unsubscribed you from the following course event which, will not take "
+"place:"
+msgstr "Sie wurden von der folgenden Veranstaltung abgemeldet:"
 
 msgid "Available event dates can be found at:"
 msgstr "Verfügbare Kurstermine finden Sie unter:"
@@ -680,8 +682,8 @@ msgstr "Sende Info-Email"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "Added a new course event"
-msgstr "Eine neue Durchführung wurde hinzugefügt"
+msgid "Added a new external attendee"
+msgstr "Neuer externer Teilnehmer hinzugefügt"
 
 msgid "External attendee successfully deleted"
 msgstr "Externer Teilnehmer erfolgreich gelöscht"
@@ -719,6 +721,9 @@ msgstr "Kurs erfolgreich gelöscht"
 msgid "This course has events and can not be deleted"
 msgstr ""
 "Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden"
+
+msgid "Added a new course event"
+msgstr "Eine neue Durchführung wurde hinzugefügt"
 
 msgid "This event has registrations and can not be deleted"
 msgstr ""
@@ -765,6 +770,13 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid ""
+#~ "Unfortuntely, we have to inform you, that the following course event will "
+#~ "not take place:"
+#~ msgstr ""
+#~ "Leider müssen wir Ihnen mitteilen, dass folgender Kurs nicht wie geplant "
+#~ "stattfindet:"
 
 #~ msgid "Refresh Interval (months)"
 #~ msgstr "Wiederholungsintervall (in Monaten)"

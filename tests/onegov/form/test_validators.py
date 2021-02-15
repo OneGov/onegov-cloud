@@ -1,5 +1,6 @@
 from onegov.core.orm import SessionManager
-from onegov.form.validators import InputRequiredIf
+from onegov.form.validators import InputRequiredIf, \
+    ValidSwissSocialSecurityNumber
 from onegov.form.validators import UniqueColumnValue
 from onegov.form.validators import ValidPhoneNumber
 from pytest import raises
@@ -115,3 +116,35 @@ def test_input_required_if_validator():
     for field in form.__dict__.values():
         for value in values:
             InputRequiredIf(field.name, value)(form, Field('x', 'y'))
+
+
+def test_swiss_ssn_validator():
+
+    class Field(object):
+        def __init__(self, data):
+            self.data = data
+
+    validator = ValidSwissSocialSecurityNumber()
+
+    validator(None, Field(None))
+    validator(None, Field(''))
+
+    validator(None, Field('756.1234.5678.97'))
+
+    with raises(ValidationError):
+        validator(None, Field('757.1234.5678.97'))
+
+    with raises(ValidationError):
+        validator(None, Field('756.x234.5678.97'))
+
+    with raises(ValidationError):
+        validator(None, Field('756.1234.567.97'))
+
+    with raises(ValidationError):
+        validator(None, Field('756.1234.5678.7'))
+
+    with raises(ValidationError):
+        validator(None, Field(' 756.1234.5678.7'))
+
+    with raises(ValidationError):
+        validator(None, Field('756.1234.5678.7 '))

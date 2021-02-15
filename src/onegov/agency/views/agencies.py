@@ -8,13 +8,14 @@ from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.forms import MoveAgencyForm
-from onegov.agency.layouts import AgencyCollectionLayout
-from onegov.agency.layouts import AgencyLayout
+from onegov.agency.layout import AgencyCollectionLayout
+from onegov.agency.layout import AgencyLayout
 from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org.elements import Link
@@ -48,11 +49,27 @@ def view_agencies(self, request):
     if root_pdf_modified is not None:
         self.root_pdf_modified = str(root_pdf_modified.timestamp())
         pdf_link = request.link(self, name='pdf')
+    layout = AgencyCollectionLayout(self, request)
 
     return {
         'title': _("Agencies"),
         'agencies': self.roots,
         'pdf_link': pdf_link,
+        'layout': layout
+    }
+
+
+@AgencyApp.html(
+    model=ExtendedAgencyCollection,
+    template='root_agencies.pt',
+    name='sort',
+    permission=Private
+)
+def view_sort_root_agencies(self, request):
+
+    return {
+        'title': _("Sort root agencies"),
+        'agencies': self.roots,
         'layout': AgencyCollectionLayout(self, request)
     }
 
@@ -69,6 +86,32 @@ def view_agency(self, request):
         'agency': self,
         'layout': AgencyLayout(self, request)
     }
+
+
+@AgencyApp.view(
+    model=ExtendedAgency,
+    permission=Public,
+    name='as-nav-item'
+)
+def view_agency_as_nav_item(self, request):
+    layout = AgencyCollectionLayout(self, request)
+
+    @request.after
+    def push_history_state(response):
+        response.headers.add(
+            'X-IC-PushURL',
+            request.class_link(
+                ExtendedAgencyCollection, {'browse': str(self.id)})
+        )
+
+    return render_macro(
+        layout.macros['agency_nav_item_content'],
+        request,
+        {
+            'agency': self,
+            'layout': layout,
+        }
+    )
 
 
 @AgencyApp.form(
@@ -210,10 +253,9 @@ def move_agency(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.success(_("Agency moved"))
-        return redirect(request.link(self))
+        return redirect(request.link(self.proxy()))
 
-    if not form.errors:
-        form.apply_model(self)
+    form.apply_model(self)
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_("Move"), '#'))
@@ -272,13 +314,16 @@ def create_root_pdf(self, request, form):
     page_break_level = int(org.meta.get(
         'page_break_on_level_root_pdf', 1))
 
+    org = request.app.org
     if form.submitted(request):
         request.app.root_pdf = request.app.pdf_class.from_agencies(
             agencies=self.roots,
-            title=request.app.org.name,
+            title=org.name,
             toc=True,
-            exclude=request.app.org.hidden_people_fields,
-            page_break_on_level=page_break_level
+            exclude=org.hidden_people_fields,
+            page_break_on_level=page_break_level,
+            link_color=org.meta.get('pdf_link_color'),
+            underline_links=org.meta.get('pdf_underline_links')
         )
         request.success(_("PDF created"))
         return redirect(request.link(self))
@@ -313,8 +358,10 @@ def create_agency_pdf(self, request, form):
             agencies=[self],
             title=self.title,
             toc=False,
-            exclude=request.app.org.hidden_people_fields,
-            page_break_on_level=page_break_level
+            exclude=org.hidden_people_fields,
+            page_break_on_level=page_break_level,
+            link_color=org.meta.get('pdf_link_color'),
+            underline_links=org.meta.get('pdf_underline_links')
         )
         request.success(_("PDF created"))
         return redirect(request.link(self))
@@ -339,7 +386,11 @@ def create_agency_pdf(self, request, form):
     permission=Private
 )
 def delete_agency(self, request):
-
+    if not self.deletable:
+        request.error(
+            _("Agency with memberships or suborganizations can't be deleted")
+        )
+        return
     request.assert_valid_csrf_token()
     ExtendedAgencyCollection(request.session).delete(self)
 

@@ -104,7 +104,7 @@ def get_global_tools(request):
             links.append(
                 Link(
                     _("Users"), request.class_link(UserCollection),
-                    attrs={'class': 'users'}
+                    attrs={'class': 'user'}
                 )
             )
 

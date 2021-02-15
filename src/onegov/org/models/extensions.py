@@ -4,7 +4,8 @@ from onegov.core.utils import linkify, normalize_for_url
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
-from onegov.org.forms.extensions import CoordinatesFormExtension
+from onegov.org.forms.extensions import CoordinatesFormExtension, \
+    PublicationFormExtension
 from onegov.people import Person, PersonCollection
 from sqlalchemy.orm import object_session
 from wtforms import BooleanField, RadioField, StringField, TextAreaField, \
@@ -148,6 +149,19 @@ class ContactExtension(ContentExtension):
             )
 
         return ContactPageForm
+
+
+class NewsletterExtension(ContentExtension):
+    text_in_newsletter = content_property(default=False)
+
+    def extend_form(self, form_class, request):
+        class NewsletterSettingsForm(form_class):
+            text_in_newsletter = BooleanField(
+                label=_('Use text instead of lead in the newsletter'),
+                fieldset=_('Newsletter'),
+                default=False
+            )
+        return NewsletterSettingsForm
 
 
 class PersonLinkExtension(ContentExtension):
@@ -377,3 +391,9 @@ class ResourceValidationExtension(ContentExtension):
                     )
 
         return WithResourceValidation
+
+
+class PublicationExtension(ContentExtension):
+
+    def extend_form(self, form_class, request):
+        return PublicationFormExtension(form_class).create()

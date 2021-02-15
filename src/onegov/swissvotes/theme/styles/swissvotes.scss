@@ -68,10 +68,9 @@ main {
 }
 
 .side-panel {
-    border: 1px solid $table-border-color;
-    border-color: $white;
-    border-radius: 2px;
-    padding: 2em;
+    .slides {
+        margin-bottom: 2em;
+    }
 }
 
 /*
@@ -195,6 +194,23 @@ h2 small {
         display: block;
         margin-bottom: 1em;
     }
+
+    .button {
+        display: block;
+        font-size: inherit;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    th {
+        vertical-align: top;
+    }
+
+    .inline-links {
+        a:not(:first-child)::before {
+            content: "/ ";
+        }
+    }
 }
 
 /*
@@ -246,10 +262,9 @@ svg text {
     BFS Map
 */
 .bfs-map {
-    &.button {
-        display: block;
-        margin: 0 auto;
-        max-width: 50%;
+    .bfs-map-title {
+        font-weight: bold;
+        margin-bottom: .5rem;
     }
 
     iframe {
@@ -283,6 +298,10 @@ $modal-padding-md: 70px;
     .image-container {
         box-sizing: border-box;
         margin-bottom: .5rem;
+
+        &.additional {
+            display: none;
+        }
 
         img {
             cursor: pointer;

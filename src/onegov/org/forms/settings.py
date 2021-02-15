@@ -2,6 +2,8 @@ import re
 
 from cached_property import cached_property
 from lxml import etree
+from wtforms.validators import NumberRange
+
 from onegov.form import Form
 from onegov.form import with_options
 from onegov.form.fields import MultiCheckboxField, TagsField, ChosenSelectField
@@ -13,10 +15,11 @@ from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.homepage_widgets import XML_LINE_OFFSET
 from onegov.org.theme import user_options
 from purl import URL
-from wtforms import BooleanField, StringField, TextAreaField, RadioField
+from wtforms import BooleanField, StringField, TextAreaField, RadioField, \
+    FloatField
 from wtforms import ValidationError
 from wtforms import validators
-from wtforms.fields.html5 import EmailField, URLField
+from wtforms.fields.html5 import EmailField, URLField, IntegerField
 from wtforms_components import ColorField
 
 from onegov.ticket import handlers
@@ -123,7 +126,7 @@ class GeneralSettingsForm(Form):
 
     def process_obj(self, model):
         super().process_obj(model)
-        self.theme_options = model.theme_options
+        self.theme_options = model.theme_options or {}
 
     def populate_font_families(self):
         self.body_font_family_ui.choices = tuple(
@@ -142,6 +145,27 @@ class GeneralSettingsForm(Form):
 
 
 class FooterSettingsForm(Form):
+
+    footer_left_width = IntegerField(
+        label=_("Column width left side"),
+        fieldset=_("Footer Division"),
+        default=3,
+        validators=[validators.InputRequired()]
+    )
+
+    footer_center_width = IntegerField(
+        label=_("Column width for the center"),
+        fieldset=_("Footer Division"),
+        default=5,
+        validators=[validators.InputRequired()]
+    )
+
+    footer_right_width = IntegerField(
+        label=_("Column width right side"),
+        fieldset=_("Footer Division"),
+        default=4,
+        validators=[validators.InputRequired()]
+    )
 
     contact = TextAreaField(
         label=_("Contact"),
@@ -295,6 +319,116 @@ class FooterSettingsForm(Form):
         label=_("Website"),
         description=_("The partner's website"),
         fieldset=_("Fourth Partner"))
+
+    def ensure_correct_footer_column_width(self):
+
+        for col in ('left', 'center', 'right'):
+            if getattr(self, f'footer_{col}_width').data <= 0:
+                field = getattr(self, f'footer_{col}_width')
+                field.errors.append(
+                    _('The width of the column must be greater than 0')
+                )
+                return False
+
+        summed_cols = sum([
+            self.footer_left_width.data,
+            self.footer_center_width.data,
+            self.footer_right_width.data
+        ])
+
+        if summed_cols != 12:
+            self.errors['global-errors'] = [(
+                _("The sum of all the footer columns must be equal to 12")
+            )]
+            return False
+
+
+class FaviconSettingsForm(Form):
+
+    favicon_win_url = StringField(
+        label=_("Icon 16x16 PNG (Windows)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_mac_url = StringField(
+        label=_("Icon 32x32 PNG (Mac)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_apple_touch_url = StringField(
+        label=_("Icon 57x57 PNG (iPhone, iPod, iPad)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_pinned_tab_safari_url = StringField(
+        label=_("Icon SVG 20x20 (Safari)"),
+        description=_("URL pointing to the icon"),
+        render_kw={'class_': 'image-url'},
+    )
+
+
+class LinksSettingsForm(Form):
+    open_files_target_blank = BooleanField(
+        label=_("Open files in separate window"),
+        description=_(
+            'User will stay on the page when opening images and files')
+    )
+
+
+class HeaderSettingsForm(Form):
+
+    left_header_name = StringField(
+        label=_("Name"),
+        description=_(""),
+        fieldset=_("Title header left side")
+    )
+
+    left_header_url = URLField(
+        label=_("URL"),
+        description=_("Optional"),
+        fieldset=_("Title header left side")
+    )
+
+    left_header_color = ColorField(
+        label=_("Font color"),
+        fieldset=_("Title header left side")
+    )
+
+    left_header_rem = FloatField(
+        label=_("Relative font size"),
+        fieldset=_("Title header left side"),
+        validators=[
+            NumberRange(0.5, 7)
+        ],
+        default=1
+    )
+
+    @property
+    def header_options(self):
+        return {
+            'left_header_name': self.left_header_name.data or None,
+            'left_header_url': self.left_header_url.data or None,
+            'left_header_color': self.left_header_color.data.get_hex(),
+            'left_header_rem': self.left_header_rem.data
+        }
+
+    @header_options.setter
+    def header_options(self, options):
+        self.left_header_name.data = options.get('left_header_name')
+        self.left_header_url.data = options.get('left_header_url')
+        self.left_header_color.data = options.get('left_header_color')
+        self.left_header_rem.data = options.get('left_header_rem', 1)
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        model.header_options = self.header_options
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.header_options = model.header_options or {}
 
 
 class HomepageSettingsForm(Form):

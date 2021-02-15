@@ -108,5 +108,11 @@ class ProcessedUploadedFile(UploadedFile):
             # content is discarded soon afterwards
             content = b''
             content_type = 'application/malicious'
+        except pdftotext.Error:
+            # signed pdfs have shown to be difficult to handle by pdftotext
+            # it uses poppler apt package in the background resulting in old
+            # versions installed on the host. We still would like to sign
+            # the pdfs in which case file.stats has hopefully been set already
+            pass
 
         super().process_content(content, filename, content_type)

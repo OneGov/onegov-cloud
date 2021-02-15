@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 11:18+0100\n"
+"POT-Creation-Date: 2020-10-28 09:42+0100\n"
 "PO-Revision-Date: 2019-10-15 09:19+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -497,10 +497,6 @@ msgid "district_label_sg"
 msgstr "Circul electoral"
 
 #. Default: District
-msgid "district_label_sz_2020"
-msgstr "Circul electoral"
-
-#. Default: District
 msgid "district_label_sz"
 msgstr "Circul electoral"
 
@@ -514,10 +510,6 @@ msgstr "Regiuns"
 
 #. Default: Constituencies
 msgid "districts_label_sg"
-msgstr "Circuls electorals"
-
-#. Default: District
-msgid "districts_label_sz_2020"
 msgstr "Circuls electorals"
 
 #. Default: Districts
@@ -1037,6 +1029,13 @@ msgstr "Cedels electorals vids"
 msgid "Invalid Ballots"
 msgstr "Cedels electorals nunvalaivels"
 
+msgid "Intermediate results abbrev"
+msgstr "Resultats interm."
+
+#, python-format
+msgid "Intermediate results: ${counted} of ${total} ${entities}"
+msgstr "resultats intermediars: ${counted} da ${total} ${entities}"
+
 msgid "Wrong username or password"
 msgstr ""
 "Il num da l'utilisadra u da l'utilisader n'è betg enconuschent u il pled-"
@@ -1301,6 +1300,12 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "district_label_sz_2020"
+#~ msgstr "Circul electoral"
+
+#~ msgid "districts_label_sz_2020"
+#~ msgstr "Circuls electorals"
 
 #~ msgid "Value of ausmittlungsstand not between 0 and 3"
 #~ msgstr "La valur da ausmittlungsstand n'è betg tranter 0 e 3"

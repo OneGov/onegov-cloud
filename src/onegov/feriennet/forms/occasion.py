@@ -296,6 +296,9 @@ class OccasionForm(Form):
         if self.request.view_name == 'clone':
             return
 
+        if not self.max_spots.data:
+            return
+
         if len(self.model.accepted) > self.max_spots.data:
             self.max_spots.errors.append(_(
                 "The maximum number of spots is lower than the number "

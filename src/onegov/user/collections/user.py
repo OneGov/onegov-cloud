@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections.abc import Iterable
 from onegov.core.crypto import random_token
 from onegov.core.utils import toggle
 from onegov.user import log
@@ -127,6 +127,16 @@ class UserCollection(object):
                 FROM users
             ) AS elements ORDER BY tags
         """)
+
+        return tuple(r[0] for r in records)
+
+    @property
+    def sources(self):
+        """ All available sources. """
+
+        records = self.session.query(User.source)
+        records = records.filter(User.source.isnot(None))
+        records = records.order_by(User.source).distinct()
 
         return tuple(r[0] for r in records)
 

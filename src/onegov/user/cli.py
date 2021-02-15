@@ -164,31 +164,35 @@ def deactivate(username):
 @cli.command(context_settings={'singular': True})
 @click.option('--active-only', help="Only show active users", is_flag=True)
 @click.option('--inactive-only', help="Only show inactive users", is_flag=True)
-def list(active_only, inactive_only):
+@click.option('--sources', help="Display sources", is_flag=True, default=False)
+def list(active_only, inactive_only, sources):
     """ Lists all users. """
 
     assert not all((active_only, inactive_only))
 
     def list_users(request, app):
 
-        template = '{active} {username} [{role}]'
-
         users = UserCollection(app.session()).query()
-        users = users.with_entities(User.username, User.role, User.active)
+        users = users.with_entities(
+            User.username, User.role, User.active, User.source
+        )
         users = users.order_by(User.username, User.role)
 
-        for username, role, active in users.all():
+        for username, role, active, source in users.all():
             if active_only and not active:
                 continue
 
             if inactive_only and active:
                 continue
 
-            print(template.format(
-                active=active and '✔︎' or '✘',
-                username=username,
-                role=role
-            ))
+            print(
+                '{active} {username} [{role}]{source}'.format(
+                    active='✔︎' if active else '✘',
+                    username=username,
+                    role=role,
+                    source=f' {{{source}}}' if sources else ''
+                )
+            )
 
     return list_users
 

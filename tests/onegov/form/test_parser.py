@@ -3,6 +3,7 @@ import pytest
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form.fields import DateTimeLocalField
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.pay import Price
 from textwrap import dedent
@@ -11,7 +12,6 @@ from wtforms import FileField
 from wtforms import validators
 from wtforms.fields.html5 import (
     DateField,
-    DateTimeLocalField,
     EmailField,
     URLField,
 )
@@ -22,10 +22,14 @@ def parse(expr, text):
     return expr.parseString(text)
 
 
-def test_help_field_identifier():
+@pytest.mark.parametrize('comment,output', [
+    ('<< Some text >>', 'Some text'),
+    ('<< [Z](www.co.me) >>', '[Z](www.co.me)')
+])
+def test_help_field_identifier(comment, output):
 
-    parsed_result = parse(field_help_identifier(), '<< Some text >>')
-    assert parsed_result.message == 'Some text'
+    parsed_result = parse(field_help_identifier(), comment)
+    assert parsed_result.message == output
 
 
 def test_parse_text():

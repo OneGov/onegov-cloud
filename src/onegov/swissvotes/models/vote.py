@@ -1,14 +1,17 @@
 from cached_property import cached_property
 from collections import OrderedDict
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin, ContentMixin, meta_property
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import meta_property
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
-from onegov.file import AssociatedFiles
-from onegov.file import File
+from onegov.core.utils import Bunch
 from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
-from onegov.swissvotes.models.localized_file import LocalizedFile
+from onegov.swissvotes.models.file import FileSubCollection
+from onegov.swissvotes.models.file import LocalizedFile
+from onegov.swissvotes.models.file import LocalizedFiles
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
 from sqlalchemy import Column
@@ -23,12 +26,6 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
-
-
-class SwissVoteFile(File):
-    """ An attachment to a vote. """
-
-    __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
 
 class encoded_property(object):
@@ -55,7 +52,7 @@ class encoded_property(object):
         return instance.codes(self.name, instance.deciding_question).get(value)
 
 
-class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
+class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     """ A single vote as defined by the code book.
 
@@ -197,38 +194,6 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     swissvoteslink = Column(Text)
 
     @property
-    def deciding_question(self):
-        return self._legal_form == 5
-
-    # Additional links added late 2019
-    curia_vista_de = Column(Text)
-    curia_vista_fr = Column(Text)
-    bkresults_de = Column(Text)
-    bkresults_fr = Column(Text)
-    bkchrono_de = Column(Text)
-    bkchrono_fr = Column(Text)
-
-    # space-sep urls for Museum for Gestaltung, coming from the dataset
-    posters_yes = Column(Text)
-    posters_no = Column(Text)
-
-    # Fetched list of image urls using MfG API
-    posters_yes_imgs = meta_property()
-    posters_no_imgs = meta_property()
-
-    def poster_links(self, answer):
-        assert answer in ('yes', 'no')
-        if answer == 'yes':
-            if not self.posters_yes_imgs or not self.posters_yes:
-                return None
-            sources = self.posters_yes.split(' ')
-            return ((url, self.posters_yes_imgs.get(url)) for url in sources)
-        if not self.posters_no_imgs or not self.posters_no:
-            return None
-        sources = self.posters_no.split(' ')
-        return ((url, self.posters_no_imgs.get(url)) for url in sources)
-
-    @property
     def title(self):
         if self.session_manager.current_locale == 'fr_CH':
             return self.title_fr
@@ -257,15 +222,114 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         except ValueError:
             pass
 
-    def bk_results(self, locale):
-        return self.bkresults_fr if locale == 'fr_CH' else self.bkresults_de
+    @property
+    def deciding_question(self):
+        return self._legal_form == 5
 
-    def bk_chrono(self, locale):
-        return self.bkchrono_fr if locale == 'fr_CH' else self.bkchrono_de
+    # Additional links added late 2019
+    curia_vista_de = Column(Text)
+    curia_vista_fr = Column(Text)
+    bkresults_de = Column(Text)
+    bkresults_fr = Column(Text)
+    bkchrono_de = Column(Text)
+    bkchrono_fr = Column(Text)
 
-    def curiavista(self, locale):
-        return self.curia_vista_fr if locale == 'fr_CH' \
-            else self.curia_vista_de
+    @property
+    def curiavista(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.curia_vista_fr
+        else:
+            return self.curia_vista_de
+
+    @property
+    def bk_results(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.bkresults_fr
+        else:
+            return self.bkresults_de
+
+    @property
+    def bk_chrono(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.bkchrono_fr
+        else:
+            return self.bkchrono_de
+
+    # space-separated poster URLs coming from the dataset
+    posters_mfg_yea = Column(Text)
+    posters_mfg_nay = Column(Text)
+    posters_sa_yea = Column(Text)
+    posters_sa_nay = Column(Text)
+
+    # Fetched list of image urls using MfG API
+    posters_mfg_yea_imgs = meta_property(default=dict)
+    posters_mfg_nay_imgs = meta_property(default=dict)
+
+    # Fetched list of image urls using SA API
+    posters_sa_yea_imgs = meta_property(default=dict)
+    posters_sa_nay_imgs = meta_property(default=dict)
+
+    def posters(self, request):
+        result = {'yea': [], 'nay': []}
+        for key, attribute, label in (
+            ('yea', 'posters_mfg_yea_imgs', _('Link eMuseum.ch')),
+            ('nay', 'posters_mfg_nay_imgs', _('Link eMuseum.ch')),
+            ('yea', 'posters_sa_yea_imgs', _('Link Social Archives')),
+            ('nay', 'posters_sa_nay_imgs', _('Link Social Archives')),
+        ):
+            for url, image in getattr(self, attribute).items():
+                result[key].append(
+                    Bunch(
+                        thumbnail=image,
+                        image=image,
+                        url=url,
+                        label=label
+                    )
+                )
+        for key, attribute, label in (
+            ('yea', 'campaign_material_yea', _('Swissvotes database')),
+            ('nay', 'campaign_material_nay', _('Swissvotes database')),
+        ):
+            for image in getattr(self, attribute):
+                result[key].append(
+                    Bunch(
+                        thumbnail=request.link(image, 'thumbnail'),
+                        image=request.link(image),
+                        url=None,
+                        label=label
+                    )
+                )
+        return result
+
+    # Post-vote poll
+    post_vote_poll_link_de = Column(Text)
+    post_vote_poll_link_fr = Column(Text)
+    post_vote_poll_link_en = Column(Text)
+
+    @property
+    def post_vote_poll_link(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.post_vote_poll_link_fr
+        elif self.session_manager.current_locale == 'en_US':
+            return self.post_vote_poll_link_en
+        else:
+            return self.post_vote_poll_link_de
+
+    # Media
+    media_ads_total = Column(Integer)
+    media_ads_per_issue = deferred(Column(Numeric(13, 10)), group='dataset')
+    media_ads_yea = deferred(Column(Integer), group='dataset')
+    media_ads_nay = deferred(Column(Integer), group='dataset')
+    media_ads_neutral = deferred(Column(Integer), group='dataset')
+    media_ads_yea_p = Column(Numeric(13, 10))
+    media_coverage_articles_total = Column(Integer)
+    media_coverage_articles_d = deferred(Column(Integer), group='dataset')
+    media_coverage_articles_f = deferred(Column(Integer), group='dataset')
+    media_coverage_tonality_total = Column(Numeric(13, 10))
+    media_coverage_tonality_d = deferred(Column(Numeric(13, 10)),
+                                         group='dataset')
+    media_coverage_tonality_f = deferred(Column(Numeric(13, 10)),
+                                         group='dataset')
 
     # Descriptor
     descriptor_1_level_1 = Column(Numeric(8, 4))
@@ -597,7 +661,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     # Authorities
     _department_in_charge = Column('department_in_charge', Integer)
     department_in_charge = encoded_property()
-    procedure_number = Column(Numeric(8, 3))
+    procedure_number = Column(Text)
     _position_federal_council = Column('position_federal_council', Integer)
     position_federal_council = encoded_property()
     _position_parliament = Column('position_parliament', Integer)
@@ -773,6 +837,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     national_council_share_glp = Column(Numeric(13, 10))
     national_council_share_bdp = Column(Numeric(13, 10))
     national_council_share_mcg = Column(Numeric(13, 10))
+    national_council_share_mitte = Column(Numeric(13, 10))
     national_council_share_ubrige = Column(Numeric(13, 10))
     national_council_share_yeas = Column(Numeric(13, 10))
     national_council_share_nays = Column(Numeric(13, 10))
@@ -789,18 +854,152 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
         return False
 
     # attachments
-    voting_text = LocalizedFile()
-    brief_description = LocalizedFile()
-    federal_council_message = LocalizedFile()
-    parliamentary_debate = LocalizedFile()
-    voting_booklet = LocalizedFile()
-    resolution = LocalizedFile()
-    realization = LocalizedFile()
-    ad_analysis = LocalizedFile()
-    results_by_domain = LocalizedFile()
-    foeg_analysis = LocalizedFile()
-    post_vote_poll = LocalizedFile()
-    preliminary_examination = LocalizedFile()
+    voting_text = LocalizedFile(
+        label=_('Voting text'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'abstimmungstext-de.pdf',
+            'fr_CH': 'abstimmungstext-fr.pdf',
+        }
+    )
+    brief_description = LocalizedFile(
+        label=_('Brief description Swissvotes'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'kurzbeschreibung.pdf',
+        }
+    )
+    federal_council_message = LocalizedFile(
+        label=_('Federal council message'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'botschaft-de.pdf',
+            'fr_CH': 'botschaft-fr.pdf',
+        }
+    )
+    parliamentary_debate = LocalizedFile(
+        label=_('Parliamentary debate'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'parlamentsberatung.pdf',
+        }
+    )
+    voting_booklet = LocalizedFile(
+        label=_('Voting booklet'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'brochure-de.pdf',
+            'fr_CH': 'brochure-fr.pdf',
+        }
+    )
+    resolution = LocalizedFile(
+        label=_('Resolution'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'erwahrung-de.pdf',
+            'fr_CH': 'erwahrung-fr.pdf',
+        }
+    )
+    realization = LocalizedFile(
+        label=_('Realization'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'zustandekommen-de.pdf',
+            'fr_CH': 'zustandekommen-fr.pdf',
+        }
+    )
+    ad_analysis = LocalizedFile(
+        label=_('Analysis of the advertising campaign by Année Politique'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'inserateanalyse.pdf',
+        }
+    )
+    results_by_domain = LocalizedFile(
+        label=_('Result by canton, district and municipality'),
+        extension='xlsx',
+        static_views={
+            'de_CH': 'staatsebenen.xlsx',
+        }
+    )
+    foeg_analysis = LocalizedFile(
+        label=_('Media coverage: fög analysis'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'medienanalyse.pdf',
+        }
+    )
+    post_vote_poll = LocalizedFile(
+        label=_('Full analysis of post-vote poll results'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-de.pdf',
+            'fr_CH': 'nachbefragung-fr.pdf',
+        }
+    )
+    post_vote_poll_methodology = LocalizedFile(
+        label=_('Questionnaire of the poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-methode-de.pdf',
+            'fr_CH': 'nachbefragung-methode-fr.pdf',
+        }
+    )
+    post_vote_poll_dataset = LocalizedFile(
+        label=_('Dataset of the post-vote poll'),
+        extension='csv',
+        static_views={
+            'de_CH': 'nachbefragung.csv',
+        }
+    )
+    post_vote_poll_dataset_sav = LocalizedFile(
+        label=_('Dataset of the post-vote poll'),
+        extension='sav',
+        static_views={
+            'de_CH': 'nachbefragung.sav',
+        }
+    )
+    post_vote_poll_dataset_dta = LocalizedFile(
+        label=_('Dataset of the post-vote poll'),
+        extension='dta',
+        static_views={
+            'de_CH': 'nachbefragung.dta',
+        }
+    )
+    post_vote_poll_codebook = LocalizedFile(
+        label=_('Codebook for the post-vote poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-codebuch-de.pdf',
+            'fr_CH': 'nachbefragung-codebuch-fr.pdf',
+        }
+    )
+    post_vote_poll_codebook_xlsx = LocalizedFile(
+        label=_('Codebook for the post-vote poll'),
+        extension='xlsx',
+        static_views={
+            'de_CH': 'nachbefragung-codebuch-de.xlsx',
+            'fr_CH': 'nachbefragung-codebuch-fr.xlsx',
+        }
+    )
+    post_vote_poll_report = LocalizedFile(
+        label=_('Technical report of the post-vote poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'nachbefragung-technischer-bericht.pdf',
+        }
+    )
+    preliminary_examination = LocalizedFile(
+        label=_('Preliminary examination'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'vorpruefung-de.pdf',
+            'fr_CH': 'vorpruefung-fr.pdf',
+        }
+    )
+
+    campaign_material_yea = FileSubCollection()
+    campaign_material_nay = FileSubCollection()
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))
@@ -839,16 +1038,17 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     def files_observer(self, files):
         self.vectorize_files()
 
-    def get_file(self, name, request):
-        """ Returns the requested localized file, falls back to the default
-        locale.
+    def get_file(self, name, locale=None, fallback=True):
+        """ Returns the requested localized file.
+
+        Uses the current locale if no locale is given.
+
+        Falls back to the default locale if the file is not available in the
+        requested locale.
 
         """
-        fallback = SwissVote.__dict__.get(name).__get_by_locale__(
-            self, request.app.default_locale
-        )
-        return getattr(self, name, None) or fallback
-
-    def get_file_by_locale(self, name, locale):
-        return SwissVote.__dict__.get(name).__get_by_locale__(
-            self, locale)
+        get = SwissVote.__dict__.get(name).__get_by_locale__
+        default_locale = self.session_manager.default_locale
+        fallback = get(self, default_locale) if fallback else None
+        result = get(self, locale) if locale else getattr(self, name, None)
+        return result or fallback

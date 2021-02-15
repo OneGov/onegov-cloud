@@ -6,9 +6,13 @@
       i18n:domain="onegov.org">
 <body>
 
-<metal:b define-macro="favicon">
-    <!--! To be overridden by other applications -->
-</metal:b>
+<metal:favicon define-macro="favicon">
+    <link tal:condition="layout.favicon_apple_touch_url|nothing" rel="apple-touch-icon" sizes="57x57" href="${layout.favicon_apple_touch_url}">
+    <link tal:condition="layout.favicon_win_url|nothing" rel="icon" type="image/png" href="${layout.favicon_win_url}" sizes="16x16">
+    <link tal:condition="layout.favicon_mac_url|nothing" rel="icon" type="image/png" href="${layout.favicon_mac_url}" sizes="32x32">
+    <link tal:condition="layout.favicon_pinned_tab_safari_url|nothing" rel="mask-icon" href="${layout.favicon_pinned_tab_safari_url}" color="${layout.primary_color}">
+    <meta name="theme-color" content="${layout.primary_color}">
+</metal:favicon>
 
 <metal:b define-macro="before_directory_entry_lead">
     <!--! To be override by other applications -->
@@ -16,7 +20,7 @@
 
 <metal:b define-macro="extra_usermanagement_fields">
     <!--! To be override by other applications -->
-</metal:b
+</metal:b>
 
 <metal:b define-macro="consume_messages" i18n:domain="onegov.org">
     <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
@@ -98,7 +102,8 @@
                        facebook layout.org.meta.facebook_url|nothing;
                        twitter layout.org.meta.twitter_url|nothing;
                        instagram layout.org.meta.instagram_url|nothing;
-                       youtube layout.org.meta.youtube_url|nothing;">
+                       youtube layout.org.meta.youtube_url|nothing;
+                       custom_links layout.custom_links|nothing;">
         <div class="grid-x footer-columns" tal:condition="any((
             contact,
             contact_url,
@@ -108,6 +113,7 @@
             twitter,
             instagram,
             youtube,
+            custom_links
         ))">
             <div class="small-12 medium-4 cell">
                 <metal:b use-macro="layout.macros['footer_contact']" />
@@ -332,7 +338,7 @@
     </tal:b>
 </metal:fields>
 
-<metal:homepage-tiles define-macro="homepage-tile-card">
+<metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.org">
     <div class="card" id="homepage-tile-${item.number}" data-equalizer-watch>
         <div class="card-divider">
             <h5>${item.page.text}</h5>
@@ -374,7 +380,7 @@
 
             See onegov.core.i18n.get_translation_bound_meta.render_field
         -->
-        <tal:b define="description request.translate(field.description or ''); long_description len(description) > 54; content field(placeholder=not long_description and description)">
+        <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description len(description) > 54 or is_md; content field(placeholder=not long_description and description)">
             <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
             <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
             <div class="long-field-help" tal:condition="long_description">
@@ -482,7 +488,7 @@
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 cell page-content-main">
                 <div metal:define-slot="before-lead"></div>
-                <span class="page-lead" tal:condition="lead" tal:content="lead" />
+                <span class="page-lead" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
@@ -491,7 +497,7 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or show_side_panel">
             <div class="small-12 medium-8 cell page-content-main">
-                <span class="page-lead" tal:condition="lead" tal:content="lead" />
+                <span class="page-lead" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
@@ -548,7 +554,7 @@
     <h2 tal:condition="fieldset.is_visible and rendered_fields|nothing">${fieldset.label}</h2>
 
     <dl class="field-display" tal:repeat="(field, rendered) rendered_fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
-        <dt>${field.label.text}</dt>
+        <dt tal:condition="layout.show_label(field)">${field.label.text}</dt>
         <dd>
             <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
                 <tal:b define="url layout.field_download_link(field)">
@@ -567,8 +573,11 @@
 
                 </tal:b>
             </tal:b>
-            <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">
-                <tal:b replace="structure rendered" />
+            <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'" >
+                <tal:b tal:switch="linkify_display|False">
+                    <tal:b tal:case="True" replace="structure layout.linkify_field(field, rendered)" />
+                    <tal:b tal:case="False" replace="structure rendered" />
+                </tal:b>
             </tal:b>
         </dd>
         <div class="clearfix"></div>
@@ -1064,6 +1073,15 @@
     </tal:b>
 </metal:role_plural>
 
+<metal:user_source define-macro="user-source" i18n:domain="onegov.org">
+    <tal:b switch="source">
+        <tal:b case="'msal'">AzureAD</tal:b>
+        <tal:b case="'ldap'">LDAP</tal:b>
+        <tal:b case="'ldap_kerberos'">LDAP Kerberos</tal:b>
+        <tal:b case="default" i18n:translate>${source}</tal:b>
+    </tal:b>
+</metal:user_source>
+
 <metal:identicon define-macro="identicon" i18n:domain="onegov.org">
     <tal:b define="identicon_size size|'small'">
         <span class="user-initials-${identicon_size}" style="background-color: ${layout.get_user_color(username)}" title="${username}">
@@ -1517,7 +1535,8 @@
                 </a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
 
-                <div class="list-lead">${record.meta.get('lead')}</div>
+                <div class="list-lead" tal:content="structure layout.linkify(record.meta.get('lead'))">
+                </div>
             </li>
         </ul>
     </tal:b>
@@ -1575,25 +1594,25 @@
             </div>
         </tal:b>
 
-        <h3 i18n:translate>Publication</h3>
-        <div class="publication" tal:define="
-            post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
-            publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
-        ">
-            <div tal:condition="file.published" class="file-status-tag">
-                <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                   ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                   class="is-published">
-                    <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
-                </a>
-            </div>
-            <div tal:condition="not:file.published" class="file-status-tag">
-                <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                   ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                   class="is-not-published">
-                    <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
-                </a>
-            </div>
+            <h3 i18n:translate tal:condition="not: hide_publication|False">Publication</h3>
+            <div class="publication" tal:define="
+                post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+                publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
+            " tal:condition="not: hide_publication|False">
+                <div tal:condition="file.published" class="file-status-tag">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-published">
+                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
+                    </a>
+                </div>
+                <div tal:condition="not:file.published" class="file-status-tag">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-not-published">
+                        <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
+                    </a>
+                </div>
 
             <div class="publication-settings ${publish_date and 'publication-date-set' or 'publication-date-not-set'}" tal:condition="not:file.published">
                 <form method="POST">
@@ -1876,3 +1895,42 @@
         </li>
     </ul>
 </metal:holidays>
+
+<metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.org">
+  <tr tal:define="ticket_url request.link(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
+      <td class="ticket-number-plain">
+          <a href="${ticket_url}">
+              ${ticket.number}
+          </a>
+      </td>
+      <td class="ticket-group" colspan="2">
+          <div>${translate(ticket.group)}</div>
+          <div>${ticket.title}</div>
+          <div>${ticket.subtitle}</div>
+          <tal:b define="payment ticket.handler.payment" tal:condition="payment">
+              <div class="payment-state payment-state-${payment.state}">
+                  ${layout.format_number(payment.amount)} ${payment.currency}
+              </div>
+          </tal:b>
+      </td>
+      <td class="ticket-date">
+          ${layout.format_date(ticket.created, 'relative')}
+      </td>
+      <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
+          <a class="ticket-accept ticket-button" href="${request.link(ticket, 'accept')}" i18n:translate>
+              Accept
+          </a>
+      </td>
+      <td class="ticket-state" tal:condition="ticket.state != 'open'">
+          <tal:b condition="ticket.state == 'pending'" i18n:translate>
+              Pending
+          </tal:b>
+          <tal:b condition="ticket.state == 'closed'" i18n:translate>
+              Closed
+          </tal:b>
+      </td>
+      <td class="ticket-user" tal:condition="ticket.state != 'open'">
+          <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
+      </td>
+  </tr>
+</metal:tickets_table_row>

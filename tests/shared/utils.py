@@ -1,3 +1,4 @@
+from onegov.core.custom import json
 import os
 import shutil
 
@@ -10,14 +11,48 @@ from onegov.core.utils import Bunch, scan_morepath_modules, module_path
 from PIL import Image
 from random import randint
 from uuid import uuid4
+from base64 import b64decode, b64encode
+
+
+def encode_map_value(dictionary):
+    return b64encode(json.dumps(dictionary).encode('utf-8'))
+
+
+def decode_map_value(value):
+    return json.loads(b64decode(value).decode('utf-8'))
 
 
 def open_in_browser(response, browser='firefox'):
-    assert shutil.which(browser)
-    path = '/tmp/test.html'
+    if not shutil.which(browser):
+        print(f'{browser} is not installed, skipping...')
+        return
+    path = f'/tmp/test-{str(uuid4())}.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
     os.system(f'{browser} {path} &')
+
+
+def open_in_excel(byte_string, exe='libreoffice'):
+    if not shutil.which(exe):
+        print(f'{exe} is not installed, skipping...')
+        return
+
+    path = '/tmp/test.xlsx'
+    with open(path, 'wb') as f:
+        f.write(byte_string.read())
+    cmd = exe + ' --calc -n' if exe == 'libreoffice' else exe
+    os.system(f'{cmd} {path} &')
+
+
+def open_pdf(byte_string, exe='evince'):
+    if not shutil.which(exe):
+        print(f'{exe} is not installed, skipping...')
+        return
+    path = f'/tmp/test.pdf'
+    with open(path, 'wb') as f:
+        f.write(byte_string.read())
+    cmd = exe
+    os.system(f'{cmd} {path} &')
 
 
 def create_image(width=50, height=50, output=None):
@@ -57,7 +92,7 @@ def random_namespace():
 def create_app(app_class, request, use_elasticsearch=False,
                reuse_filestorage=True, use_smtp=True,
                depot_backend='depot.io.local.LocalFileStorage',
-               depot_storage_path=None):
+               depot_storage_path=None, **kwargs):
 
     # filestorage can be reused between tries as it is nowadays mainly (if not
     # exclusively) used by the theme compiler
@@ -112,7 +147,8 @@ def create_app(app_class, request, use_elasticsearch=False,
         redis_url=request.getfixturevalue('redis_url'),
         yubikey_client_id='foo',
         yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
-        signing_services=str(signing_services)
+        signing_services=str(signing_services),
+        **kwargs
     )
 
     app.set_application_id(app.namespace + '/test')

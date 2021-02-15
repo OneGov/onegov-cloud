@@ -26,11 +26,11 @@
         </td></tr></table>
 
         <p i18n:translate tal:condition="message.meta.origin == 'internal'">
-            Please <a href="${request.link(model, 'status')}" i18n:name="link" i18n:translate>visit the ticket status page</a> to reply.
+            Please <a href="${request.link(model, 'status')}" i18n:name="link" i18n:translate>visit the request status page</a> to reply.
         </p>
 
         <p i18n:translate tal:condition="message.meta.origin == 'external'">
-            Please <a href="${request.link(model)}" i18n:name="link" i18n:translate>visit the ticket page</a> to reply.
+            Please <a href="${request.link(model)}" i18n:name="link" i18n:translate>visit the request page</a> to reply.
         </p>
     </tal:b>
 </div>

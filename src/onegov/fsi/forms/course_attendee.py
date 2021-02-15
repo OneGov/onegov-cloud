@@ -2,7 +2,7 @@ from wtforms import StringField
 from wtforms.validators import InputRequired, Email
 from wtforms.fields.html5 import EmailField
 
-from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
 from onegov.fsi import _
 from onegov.form import Form
 from onegov.fsi.models import CourseAttendee
@@ -27,6 +27,11 @@ class CourseAttendeeForm(Form):
         validators=[InputRequired(), Email()],
     )
 
+    organisation = ChosenSelectField(
+        label=_('Organisation'),
+        choices=[],
+    )
+
     permissions = ChosenSelectMultipleField(
         label=_('Permissions'),
         choices=[]
@@ -44,6 +49,8 @@ class CourseAttendeeForm(Form):
             model.permissions = self.permissions.data
         if self.email:
             model._email = self.email.data
+        if self.organisation:
+            model.organisation = self.organisation.data
 
     def apply_model(self, model):
         self.first_name.data = model.first_name
@@ -52,6 +59,22 @@ class CourseAttendeeForm(Form):
             self.permissions.data = model.permissions
         if self.email:
             self.email.data = model.email
+        if self.organisation:
+            self.organisation.data = model.organisation
+
+    def set_organisation_choices(self):
+
+        if self.request.is_admin:
+            organisations = tuple(
+                p.code for p in self.unique_permission_codes() if p.code)
+
+        else:
+            organisations = tuple(self.request.attendee.permissions)
+
+        if external_attendee_org not in organisations:
+            organisations = (external_attendee_org,) + organisations
+
+        self.organisation.choices = [(org, org) for org in organisations]
 
     def on_request(self):
         # is an external
@@ -63,6 +86,10 @@ class CourseAttendeeForm(Form):
                 (p.code, p.code)
                 for p in self.unique_permission_codes() if p.code
             ]
+        if self.model.user_id or not self.request.is_manager:
+            self.delete_field('organisation')
+        else:
+            self.set_organisation_choices()
 
 
 class AddExternalAttendeeForm(CourseAttendeeForm):
@@ -84,8 +111,4 @@ class AddExternalAttendeeForm(CourseAttendeeForm):
 
     def on_request(self):
         self.delete_field('permissions')
-
-    def get_useful_data(self, exclude={'csrf_token'}):
-        data = super().get_useful_data()
-        data['organisation'] = external_attendee_org
-        return data
+        self.set_organisation_choices()

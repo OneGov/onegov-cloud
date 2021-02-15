@@ -4,8 +4,8 @@
         <div class="row">
             <div class="columns small-12">
                 <h1>${layout.title}<br><small>${layout.subtitle}</small></h1>
-                <p tal:condition="not: results" i18n:translate="">No results found</p>
-                <table tal:condition="results">
+
+                <table>
                     <thead>
                         <tr>
                             <th class="center" colspan="2" i18n:translate>Municipality</th>
@@ -22,7 +22,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr tal:repeat="result results">
+                        <tr tal:repeat="result layout.model.query()">
                             <td>${result.name}</td>
                             <td class="right">${result.bfs_number}</td>
                             <td class="right">${result.dispatch_boxes}</td>
@@ -32,7 +32,7 @@
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr>
+                        <tr tal:define="total layout.model.total()">
                             <th colspan="2" i18n:translate>Total</th>
                             <td class="right">${total.dispatch_boxes}</td>
                             <td class="right">${total.return_boxes}</td>

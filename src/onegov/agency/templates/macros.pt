@@ -36,9 +36,9 @@
                 <ul class="memberships" data-sortable data-sortable-url="${layout.move_membership_within_agency_url_template}">
                     <tal:block tal:repeat="membership memberships">
                         <li tal:condition="(membership.access == 'public' and membership.person.access == 'public') or request.is_logged_in" data-sortable-id="${membership.id}">
-                            <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>,
-                            <a style="text" href="${request.link(membership)}">${membership.title}</a>
+                            <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>, <a href="${request.link(membership)}">${membership.title}</a>
                             <span tal:condition="membership.prefix|None">${membership.prefix}</span>
+                            <a tal:condition="request.is_manager_for_model(agency)" href="${request.link(membership, name='edit')}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                         </li>
                     </tal:block>
                 </ul>
@@ -46,7 +46,7 @@
         </div>
     </metal:agency_card>
 
-    <metal:person_card define-macro="person_list_card" i18n:domain="onegov.agency">
+    <metal:person_list_card define-macro="person_list_card" i18n:domain="onegov.agency">
         <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
             <ul>
                 <li class="person-card-title">
@@ -69,7 +69,7 @@
             </ul>
             <div class="clearfix"></div>
         </div>
-    </metal:person_card>
+    </metal:person_list_card>
 
     <metal:person_card define-macro="person_card" i18n:domain="onegov.agency">
         <div class="person-card person-single-item" tal:define="memberships person.memberships_by_agency; exclude request.app.org.excluded_person_fields(request)">
@@ -146,9 +146,10 @@
                         <dd>
                             <ul data-sortable data-sortable-url="${layout.move_membership_within_person_url_template}">
                                 <tal:block tal:repeat="membership memberships">
-                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership" data-sortable-id="${membership.id}">
-                                        <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)|None}">${membership.agency.title}</a> -
-                                        <a href="${request.link(membership)}">${membership.title}</a>
+                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership" data-sortable-id="${membership.id}"
+                                            tal:define="agency_path layout.agency_path(membership.agency)|None; full_path request.app.org.agency_path_display_on_people">
+                                        <a tal:define="full_path_ full_path and agency_path" href="${request.link(membership.agency)}" title="${agency_path if not full_path else ''}">${membership.agency.title if not full_path_ else agency_path}</a> -
+                                        <a tal:define="title membership.title or layout.default_membership_title" href="${request.link(membership)}">${title}</a>
                                     </li>
                                 </tal:block>
                             </ul>
@@ -199,8 +200,8 @@
         <a href="${request.link(result)}">${result.title}</a>
         <p tal:define="memberships result.memberships_by_agency">
             <tal:block tal:repeat="membership memberships">
-                <span tal:condition="(membership.access == 'public' and membership.agency.access == 'public') or request.is_logged_in">
-                    ${membership.title} ${membership.agency.title}<br>
+                <span tal:condition="(membership.access == 'public' and membership.agency.access == 'public') or request.is_logged_in" tal:define="display_levels request.app.org.agency_display_levels; sep ' > '">
+                    <tal:b tal:condition="display_levels" tal:define="path layout.agency_path(membership.agency, sep, with_item=False, levels=display_levels)">${path + sep if path else ''}</tal:b>${membership.title} ${membership.agency.title}<br>
                 </span>
             </tal:block>
             <span tal:condition="not:memberships|nothing" i18n:translate>People</span>
@@ -232,7 +233,7 @@
             <dd><span tal:repeat="ancestor agency.ancestors">${ancestor.title}</span> <span>${agency.title}</span></dd>
 
             <dt i18n:translate>Message</dt>
-            <dd>${message}</dd>
+            <dd tal:content="structure message"></dd>
         </dl>
     </metal:display_agency_mutation>
 
@@ -243,8 +244,131 @@
             <dd><a href="${request.link(person)}">${person.title}</a></dd>
 
             <dt i18n:translate>Message</dt>
-            <dd>${message}</dd>
+            <dd tal:content="structure message"></dd>
         </dl>
     </metal:display_person_mutation>
+
+    <metal:agency_nav_item_content define-macro="agency_nav_item_content" i18n:domain="onegov.agency">
+          <tal:b tal:define="memberships agency.memberships; children agency.children">
+            <div class="details">
+                <a href="${request.link(agency)}" i18n:translate="">Show agency</a>
+            </div>
+            <ul class="memberships" tal:condition="memberships">
+               <li class="person" tal:repeat="membership memberships">
+                   <tal:b tal:define="person membership.person">
+                       <a href="${request.link(person)}">${person.title}</a>
+                   </tal:b>
+               </li>
+            </ul>
+            <ul class="children" tal:condition="children">
+                <tal:block tal:repeat="child children">
+                    <li class="child" tal:condition="child.access == 'public' or request.is_logged_in">
+                        <tal:b metal:use-macro="layout.macros.agency_nav_item" tal:define="agency child; content_only False"/>
+                    </li>
+                </tal:block>
+            </ul>
+        </tal:b>
+    </metal:agency_nav_item_content>
+
+    <metal:agency_nav_item define-macro="agency_nav_item" i18n:domain="onegov.agency">
+        <tal:b tal:define="agency_id str(agency.id)">
+            <div
+                tal:condition="not: content_only|False"
+                class="collapsible"
+                id="trigger-${agency_id}"
+                ic-action="toggleClass:active">
+
+                <a class="title" href="javascript:;">${agency.title}</a>
+            </div>
+            <tal:b tal:switch="layout.prerender_content(agency_id)">
+                <tal:b tal:case="False">
+                    <div
+                        id="content-${agency_id}"
+                        style="display: none"
+                        ic-trigger-from="#trigger-${agency_id}"
+                        ic-trigger-on="click"
+                        ic-get-from="${layout.nav_item_url(agency)}"
+                        ic-action="toggle"
+                    >
+                    </div>
+                </tal:b>
+                <tal:b tal:case="True">
+                    <tal:b metal:use-macro="layout.macros.agency_nav_item_content"/>
+                </tal:b>
+            </tal:b>
+
+        </tal:b>
+    </metal:agency_nav_item>
+
+    <metal:agency_nav_tree define-macro="agency_nav_tree" i18n:domain="onegov.agency">
+        <ul class="agency-nav">
+            <li tal:repeat="agency agencies">
+                <tal:b metal:use-macro="layout.macros.agency_nav_item"/>
+            </li>
+        </ul>
+    </metal:agency_nav_tree>
+
+    <metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.agency">
+      <tr tal:define="ticket_url request.link(ticket); has_access request.is_manager_for_model(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
+          <tal:block tal:condition="has_access">
+              <td class="ticket-number-plain">
+                  <a href="${ticket_url}">
+                      ${ticket.number}
+                  </a>
+              </td>
+              <td class="ticket-group" colspan="2">
+                  <div>${translate(ticket.group)}</div>
+                  <div>${ticket.title}</div>
+                  <div>${ticket.subtitle}</div>
+                  <tal:block define="payment ticket.handler.payment" tal:condition="payment">
+                      <div class="payment-state payment-state-${payment.state}">
+                          ${layout.format_number(payment.amount)} ${payment.currency}
+                      </div>
+                  </tal:block>
+              </td>
+              <td class="ticket-date">
+                  ${layout.format_date(ticket.created, 'relative')}
+              </td>
+              <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
+                  <a class="ticket-accept ticket-button" href="${request.link(ticket, 'accept')}" i18n:translate>
+                      Accept
+                  </a>
+              </td>
+              <td class="ticket-state" tal:condition="ticket.state != 'open'">
+                  <tal:block condition="ticket.state == 'pending'" i18n:translate>
+                      Pending
+                  </tal:block>
+                  <tal:block condition="ticket.state == 'closed'" i18n:translate>
+                      Closed
+                  </tal:block>
+              </td>
+              <td class="ticket-user" tal:condition="ticket.state != 'open'">
+                  <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
+              </td>
+          </tal:block>
+          <tal:block tal:condition="not has_access">
+            <td class="ticket-number-plain" colspan="6">
+                ${ticket.number}
+            </td>
+          </tal:block>
+
+
+
+      </tr>
+    </metal:tickets_table_row>
+
+    <metal:b define-macro="extra_usermanagement_fields" i18n:domain="onegov.agency">
+        <div>
+            <dt i18n:translate>User Group</dt>
+            <dd>
+                <tal:block tal:condition="user.group">
+                    ✔︎ <span>${user.group.name}</span>
+                </tal:block>
+                <tal:block tal:condition="not user.group">
+                    ✘︎ <span i18n:translate>None</span>
+                </tal:block>
+            </dd>
+        </div>
+    </metal:b>
 
 </body>

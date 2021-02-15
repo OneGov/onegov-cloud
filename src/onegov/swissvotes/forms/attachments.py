@@ -8,11 +8,29 @@ from onegov.swissvotes import _
 from onegov.swissvotes.models import SwissVoteFile
 
 
+CSV_MIME_TYPES = {
+    'text/csv',
+    'text/plain'
+}
+
 XLSX_MIME_TYPES = {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.ms-office',
     'application/octet-stream',
     'application/zip'
+}
+
+PDF_MIME_TYPES = {
+    'application/pdf'
+}
+
+SAV_MIME_TYPES = {
+    'application/octet-stream',
+}
+
+
+DTA_MIME_TYPES = {
+    'application/octet-stream',
 }
 
 
@@ -22,100 +40,175 @@ class AttachmentsForm(Form):
         "Uploading attachments may take some time due to full-text indexing."
     )
 
-    voting_text = UploadField(
-        label=_("Voting text"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
     brief_description = UploadField(
         label=_("Brief description Swissvotes"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("General"),
     )
 
-    federal_council_message = UploadField(
-        label=_("Federal council message"),
+    voting_text = UploadField(
+        label=_("Voting text"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
-    parliamentary_debate = UploadField(
-        label=_("Parliamentary debate"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
-    voting_booklet = UploadField(
-        label=_("Voting booklet"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
-    resolution = UploadField(
-        label=_("Resolution"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
-    realization = UploadField(
-        label=_("Realization"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
-    ad_analysis = UploadField(
-        label=_("Advertisment analysis"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
-    foeg_analysis = UploadField(
-        label=_("Fög Analysis"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
-    )
-
-    post_vote_poll = UploadField(
-        label=_("Post-vote poll"),
-        validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("General"),
     )
 
     preliminary_examination = UploadField(
         label=_("Preliminary examination"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Submission"),
+    )
+
+    realization = UploadField(
+        label=_("Realization"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Submission"),
+    )
+
+    federal_council_message = UploadField(
+        label=_("Federal council message"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Pre-parliamentary phase"),
+    )
+
+    parliamentary_debate = UploadField(
+        label=_("Parliamentary debate"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Parliamentary phase"),
+    )
+
+    voting_booklet = UploadField(
+        label=_("Voting booklet"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Voting campaign"),
+    )
+
+    ad_analysis = UploadField(
+        label=_("Advertisment analysis"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Voting campaign"),
+    )
+
+    foeg_analysis = UploadField(
+        label=_("Fög Analysis"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Voting campaign"),
+    )
+
+    resolution = UploadField(
+        label=_("Resolution"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Vote"),
     )
 
     results_by_domain = UploadField(
         label=_("Result by canton, district and municipality"),
         validators=[
             WhitelistedMimeType(XLSX_MIME_TYPES),
-            FileSizeLimit(50 * 1024 * 1024)
-        ]
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Vote"),
+    )
+
+    post_vote_poll = UploadField(
+        label=_("Full analysis of post-vote poll results"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_methodology = UploadField(
+        label=_("Questionnaire of the poll"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_dataset = UploadField(
+        label=_("Dataset of the post-vote poll (CSV)"),
+        validators=[
+            WhitelistedMimeType(CSV_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_dataset_sav = UploadField(
+        label=_("Dataset of the post-vote poll (SAV)"),
+        validators=[
+            WhitelistedMimeType(SAV_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_dataset_dta = UploadField(
+        label=_("Dataset of the post-vote poll (DTA)"),
+        validators=[
+            WhitelistedMimeType(DTA_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_codebook = UploadField(
+        label=_("Codebook for the post-vote poll (PDF)"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_codebook_xlsx = UploadField(
+        label=_("Codebook for the post-vote poll (XLSX)"),
+        validators=[
+            WhitelistedMimeType(XLSX_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_report = UploadField(
+        label=_("Technical report of the post-vote poll"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
     )
 
     def update_model(self, model):

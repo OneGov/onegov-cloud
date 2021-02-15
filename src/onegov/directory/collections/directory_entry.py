@@ -104,16 +104,25 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
     def model_class(self):
         return DirectoryEntry.get_polymorphic_class(self.type, DirectoryEntry)
 
-    @property
-    def available_filters(self):
+    def available_filters(self, sort_choices=False, sortfunc=None):
+        """ Retrieve the filters with their choices. Return by default in the
+        order of how the are defined in the structrue.
+        To filter alphabetically, set sort_choices=True. """
         keywords = tuple(
             as_internal_id(k)
             for k in self.directory.configuration.keywords or tuple()
         )
         fields = {f.id: f for f in self.directory.fields if f.id in keywords}
 
+        def _sort(values):
+            if not sort_choices:
+                return values
+            if not sortfunc:
+                return sorted(values)
+            return sorted(values, key=sortfunc)
+
         return (
-            (k, fields[k].label, sorted([c.label for c in fields[k].choices]))
+            (k, fields[k].label, _sort([c.label for c in fields[k].choices]))
             for k in keywords if hasattr(fields[k], 'choices')
         )
 

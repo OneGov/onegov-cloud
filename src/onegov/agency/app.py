@@ -1,19 +1,22 @@
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
 from onegov.agency.initial_content import create_new_organisation
-from onegov.agency.pdf import AgencyPdfAr
+from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
+from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
 from onegov.core import utils
 from onegov.form import FormApp
 from onegov.org import OrgApp
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_editor_asset as editor_assets
+from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_redactor_asset as redactor_assets
 
 
 class AgencyApp(OrgApp, FormApp):
+
+    request_class = AgencyRequest
 
     @property
     def root_pdf_exists(self):
@@ -66,6 +69,8 @@ class AgencyApp(OrgApp, FormApp):
             return AgencyPdfAr
         if pdf_layout == 'zg':
             return AgencyPdfZg
+        if pdf_layout == 'bs':
+            return AgencyPdfBs
         return AgencyPdfDefault
 
     @property

@@ -23,6 +23,7 @@ def get_election_summary(election, request, url=None):
             'total': election.progress[1] or 0
         },
         'title': election.title_translations,
+        'turnout': election.turnout,
         'type': 'election',
         'url': url or request.link(election),
     }
@@ -82,6 +83,7 @@ def get_vote_summary(vote, request, url=None):
             'total': (vote.progress[1] or 0) / divider
         },
         'title': vote.title_translations,
+        'turnout': vote.turnout,
         'type': 'vote',
         'url': url or request.link(vote),
         'yeas_percentage': yeas_percentage,

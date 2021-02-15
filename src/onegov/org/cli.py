@@ -1051,7 +1051,7 @@ def close_ticket(ticket, user, request):
 @click.option('--state-transfers', multiple=True,
               help="Usage: local:remote, e.g. published:withdrawn")
 @click.option('--published-only', is_flag=True, default=False,
-              help='Only add event is they are publised on remote')
+              help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
 def fetch(group_context, source, tag, location, create_tickets,
           state_transfers, published_only, delete_orphaned_tickets):

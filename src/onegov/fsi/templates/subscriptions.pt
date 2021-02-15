@@ -44,8 +44,7 @@
                                                 <td tal:define="sent subscription.course_event.info_template.last_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
                                                 <td tal:condition="request.is_admin" class="hide-for-print">
                                                     <!--?  Delete Button -->
-                                                    <metal:b tal:condition="not: subscription.course_event.is_past" tal:define="item subscription" use-macro="layout.macros['intercooler_btn_for_item']"/>
-<!--?                                                    <a href="${request.link(subscription, name='edit-placeholder' if subscription.is_placeholder else 'edit')}" class="button tiny secondary" i18n:translate="">Edit</a>-->
+                                                    <metal:b tal:condition="request.is_admin" tal:define="item subscription" use-macro="layout.macros['intercooler_btn_for_item']"/>
                                                     <a tal:condition="subscription.is_placeholder" href="${request.link(subscription, name='edit-placeholder')}" class="button tiny secondary" i18n:translate="">Edit</a>
 
                                             </td>

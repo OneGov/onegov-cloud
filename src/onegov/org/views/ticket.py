@@ -1,4 +1,7 @@
+from datetime import date
+
 import morepath
+from morepath import Response
 
 from onegov.chat import MessageCollection
 from onegov.core.utils import normalize_for_url
@@ -7,6 +10,7 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.core.elements import Link, Intercooler, Confirm
+from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import TicketNoteForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import InternalTicketChatMessageForm
@@ -17,6 +21,8 @@ from onegov.org.layout import TicketsLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
+from onegov.org.models.ticket import ticket_submitter
+from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
@@ -87,11 +93,7 @@ def view_ticket(self, request):
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
 
-    submitter = handler.deleted and self.snapshot.get('email') or handler.email
-
-    # case of EventSubmissionHandler for imported events
-    if handler.data.get('source'):
-        submitter = handler.data.get('user', submitter)
+    submitter = ticket_submitter(self)
 
     return {
         'title': self.number,
@@ -231,7 +233,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
     if origin == 'internal':
 
         # if the messages is sent to the outside, we always send an e-mail
-        receivers = (ticket.handler.email, )
+        receivers = (ticket.snapshot.get('email') or ticket.handler.email, )
         reply_to = request.current_username
 
     else:
@@ -498,6 +500,22 @@ def message_to_submitter(self, request, form):
     }
 
 
+@OrgApp.view(model=Ticket, name='pdf', permission=Private)
+def view_ticket_pdf(self, request):
+    """ View the generated PDF. """
+
+    content = TicketPdf.from_ticket(request, self)
+
+    return Response(
+        content.read(),
+        content_type='application/pdf',
+        content_disposition='inline; filename={}_{}.pdf'.format(
+            normalize_for_url(self.number),
+            date.today().strftime('%Y%m%d')
+        )
+    )
+
+
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',
              permission=Public, form=TicketChatMessageForm)
 def view_ticket_status(self, request, form):
@@ -511,16 +529,24 @@ def view_ticket_status(self, request, form):
     else:
         raise NotImplementedError
 
+    if request.is_logged_in:
+        status_text = _("Ticket Status")
+        closed_text = _("The ticket has already been closed")
+    else:
+        # We adjust the wording for users that do not know what a ticket is
+        status_text = _("Request Status")
+        closed_text = _("The request has already been closed")
+
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Ticket Status"), '#')
+        Link(status_text, '#')
     ]
 
     if form.submitted(request):
 
         if self.state == 'closed':
-            request.alert(_("The ticket has already been closed"))
+            request.alert(closed_text)
         else:
             message = TicketChatMessage.create(
                 self, request,
@@ -540,6 +566,10 @@ def view_ticket_status(self, request, form):
         type=request.app.settings.org.public_ticket_messages
     )
 
+    pick_up_hint = None
+    if hasattr(self.handler, 'resource') and self.handler.resource:
+        pick_up_hint = self.handler.resource.pick_up
+
     return {
         'title': title,
         'layout': layout,
@@ -547,7 +577,8 @@ def view_ticket_status(self, request, form):
         'feed_data': messages and json.dumps(
             view_messages_feed(messages, request)
         ) or None,
-        'form': form
+        'form': form,
+        'pick_up_hint': pick_up_hint
     }
 
 
@@ -570,14 +601,7 @@ def view_tickets(self, request):
         groups[handler].sort(key=lambda g: normalize_for_url(g))
 
     def get_filters():
-        states = (
-            ('open', _("Open")),
-            ('pending', _("Pending")),
-            ('closed', _("Closed")),
-            ('all', _("All"))
-        )
-
-        for id, text in states:
+        for id, text in TICKET_STATES.items():
             yield Link(
                 text=text,
                 url=request.link(self.for_state(id)),

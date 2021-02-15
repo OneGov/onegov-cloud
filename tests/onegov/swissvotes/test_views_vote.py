@@ -3,150 +3,16 @@ from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.views.vote import view_vote_percentages
 from psycopg2.extras import NumericRange
+from pytest import mark
+from re import findall
 from transaction import commit
+from translationstring import TranslationString
 from webtest import TestApp as Client
 from webtest.forms import Upload
-from translationstring import TranslationString
-import re
-
-test_vote_data = dict(
-    bfs_number=Decimal('100.1'),
-    date=date(1990, 6, 2),
-    legislation_number=4,
-    legislation_decade=NumericRange(1990, 1994),
-    title_de="Vote DE",
-    title_fr="Vote FR",
-    short_title_de="V D",
-    short_title_fr="V F",
-    keyword="Keyword",
-    votes_on_same_day=2,
-    _legal_form=1,
-    initiator="Initiator",
-    anneepolitique="anneepolitique",
-    curia_vista_de='cv_de',
-    curia_vista_fr='cv_fr',
-    bkresults_de='bkr_de',
-    bkresults_fr='bkr_fr',
-    bkchrono_de='bkc_de',
-    bkchrono_fr='bkc_fr',
-    posters_yes='https://yes.com/objects/1 https://yes.com/objects/2',
-    posters_no='https://no.com/objects/1 https://no.com/objects/2',
-    posters_yes_imgs={'https://yes.com/objects/1': 'img_url'},
-    descriptor_1_level_1=Decimal('4'),
-    descriptor_1_level_2=Decimal('4.2'),
-    descriptor_1_level_3=Decimal('4.21'),
-    descriptor_2_level_1=Decimal('10'),
-    descriptor_2_level_2=Decimal('10.3'),
-    descriptor_2_level_3=Decimal('10.35'),
-    descriptor_3_level_1=Decimal('10'),
-    descriptor_3_level_2=Decimal('10.3'),
-    descriptor_3_level_3=Decimal('10.33'),
-    _result=1,
-    result_eligible_voters=2,
-    result_votes_empty=3,
-    result_votes_invalid=4,
-    result_votes_valid=5,
-    result_votes_total=6,
-    result_turnout=Decimal('20.01'),
-    _result_people_accepted=1,
-    result_people_yeas=8,
-    result_people_nays=9,
-    result_people_yeas_p=Decimal('40.01'),
-    _result_cantons_accepted=1,
-    result_cantons_yeas=Decimal('1.5'),
-    result_cantons_nays=Decimal('24.5'),
-    result_cantons_yeas_p=Decimal('60.01'),
-    _department_in_charge=1,
-    procedure_number=Decimal('24.557'),
-    _position_federal_council=1,
-    _position_parliament=1,
-    _position_national_council=1,
-    position_national_council_yeas=10,
-    position_national_council_nays=20,
-    _position_council_of_states=1,
-    position_council_of_states_yeas=30,
-    position_council_of_states_nays=40,
-    duration_federal_assembly=30,
-    duration_post_federal_assembly=31,
-    duration_initative_collection=32,
-    duration_initative_federal_council=33,
-    duration_initative_total=34,
-    duration_referendum_collection=35,
-    duration_referendum_total=36,
-    signatures_valid=40,
-    signatures_invalid=41,
-    recommendations={
-        'fdp': 1,
-        'cvp': 1,
-        'sps': 1,
-        'svp': 1,
-        'lps': 2,
-        'ldu': 2,
-        'evp': 2,
-        'csp': 3,
-        'pda': 3,
-        'poch': 3,
-        'gps': 4,
-        'sd': 4,
-        'rep': 4,
-        'edu': 5,
-        'fps': 5,
-        'lega': 5,
-        'kvp': 66,
-        'glp': 66,
-        'bdp': None,
-        'mcg': 9999,
-        'sav': 1,
-        'eco': 2,
-        'sgv': 3,
-        'sbv-usp': 3,
-        'sgb': 3,
-        'travs': 3,
-        'vsa': 9999,
-    },
-    recommendations_other_yes="Pro Velo",
-    recommendations_other_no=None,
-    recommendations_other_free="Pro Natura, Greenpeace",
-    recommendations_divergent={
-        'fdp-fr_ch': 2,
-        'jcvp_ch': 2,
-    },
-    national_council_election_year=1990,
-    national_council_share_fdp=Decimal('01.10'),
-    national_council_share_cvp=Decimal('02.10'),
-    national_council_share_sp=Decimal('03.10'),
-    national_council_share_svp=Decimal('04.10'),
-    national_council_share_lps=Decimal('05.10'),
-    national_council_share_ldu=Decimal('06.10'),
-    national_council_share_evp=Decimal('07.10'),
-    national_council_share_csp=Decimal('08.10'),
-    national_council_share_pda=Decimal('09.10'),
-    national_council_share_poch=Decimal('10.10'),
-    national_council_share_gps=Decimal('11.10'),
-    national_council_share_sd=Decimal('12.10'),
-    national_council_share_rep=Decimal('13.10'),
-    national_council_share_edu=Decimal('14.10'),
-    national_council_share_fps=Decimal('15.10'),
-    national_council_share_lega=Decimal('16.10'),
-    national_council_share_kvp=Decimal('17.10'),
-    national_council_share_glp=Decimal('18.10'),
-    national_council_share_bdp=Decimal('19.10'),
-    national_council_share_mcg=Decimal('20.20'),
-    national_council_share_ubrige=Decimal('21.20'),
-    national_council_share_yeas=Decimal('22.20'),
-    national_council_share_nays=Decimal('23.20'),
-    national_council_share_neutral=Decimal('24.20'),
-    national_council_share_none=Decimal('25.20'),
-    national_council_share_empty=Decimal('26.20'),
-    national_council_share_free_vote=Decimal('27.20'),
-    national_council_share_unknown=Decimal('28.20')
-)
 
 
-def test_view_vote(swissvotes_app):
-    swissvotes_app.session().add(
-        SwissVote(**test_vote_data)
-    )
+def test_view_vote(swissvotes_app, sample_vote):
+    swissvotes_app.session().add(sample_vote)
     commit()
 
     client = Client(swissvotes_app)
@@ -154,7 +20,6 @@ def test_view_vote(swissvotes_app):
 
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
-    print(page)
     assert "100.1" in page
     assert "Vote DE" in page
     assert "V D" in page
@@ -165,11 +30,11 @@ def test_view_vote(swissvotes_app):
         "Wirtschaft &gt; Arbeit und Beschäftigung &gt; Arbeitsbedingungen"
     ) in page
     assert (
-        "Soziale Fragen – Sozialpolitik &gt; Soziale Gruppen &gt; "
+        "Sozialpolitik &gt; Soziale Gruppen &gt; "
         "Kinder und Jugendliche"
     ) in page
     assert (
-        "Soziale Fragen – Sozialpolitik &gt; Soziale Gruppen &gt; "
+        "Sozialpolitik &gt; Soziale Gruppen &gt; "
         "Stellung der Frau"
     ) in page
     assert "anneepolitique" in page
@@ -214,6 +79,9 @@ def test_view_vote(swissvotes_app):
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
     assert "Kampagnenmaterial Ja" in page
+    assert "Offizielle Chronologie" in page
+    assert "Ergebnisübersicht Bundeskanzlei" in page
+    assert "(mehrheitlich befürwortend)" in page
 
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()
@@ -239,7 +107,7 @@ def test_view_vote(swissvotes_app):
     assert "25.2%" in page
     assert "26.2%" in page
     assert "27.2%" in page
-    assert len(re.findall(r'28\.2\%', str(page))) == 2
+    assert len(findall(r'28\.2\%', str(page))) == 2
     assert "1.1%" in page
     assert "2.1%" in page
     assert "3.1%" in page
@@ -333,14 +201,10 @@ def test_view_vote(swissvotes_app):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_deciding_question(swissvotes_app):
-    data = test_vote_data
-    del data['posters_yes_imgs']
-    data['_legal_form'] = 5
+def test_view_vote_deciding_question(swissvotes_app, sample_vote):
+    sample_vote._legal_form = 5
 
-    swissvotes_app.session().add(
-        SwissVote(**data)
-    )
+    swissvotes_app.session().add(sample_vote)
     commit()
 
     client = Client(swissvotes_app)
@@ -349,15 +213,11 @@ def test_view_deciding_question(swissvotes_app):
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
 
-    assert "Offizielle Chronologie" in page
-    assert "Ergebnisübersicht Bundeskanzlei" in page
-    assert "Ergebnisübersicht Bundeskanzlei" in page
-
     assert "Wähleranteil des Lagers für Bevorzugung der Initiative" in page
-    assert "Abgelehnt" not in page
-    assert "Angenommen"not in page
-    assert "Ja" not in page
-    assert "Nein" not in page
+    assert "(40.01% für die Initiative)" in page
+    assert "(1.5 für die Initiative, 24.5 für den Gegenentwurf)" in page
+    assert "(10 für die Initiative, 20 für den Gegenentwurf)" in page
+    assert "(30 für die Initiative, 40 für den Gegenentwurf)" in page
 
 
 def test_vote_upload(swissvotes_app, attachments):
@@ -403,10 +263,11 @@ def test_vote_upload(swissvotes_app, attachments):
     for name in names:
         name = name.replace('_', '-')
         url = manage.pyquery(f'a.{name}')[0].attrib['href']
-        print(url)
         page = client.get(
             url).maybe_follow()
         assert page.content_type in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',
@@ -426,6 +287,8 @@ def test_vote_upload(swissvotes_app, attachments):
         page = client.get(
             manage.pyquery(f'a.{name}')[0].attrib['href']).maybe_follow()
         assert page.content_type in (
+            'text/plain',
+            'text/csv',
             'application/pdf',
             'application/zip',
             'application/vnd.ms-office',
@@ -437,7 +300,7 @@ def test_vote_upload(swissvotes_app, attachments):
         assert page.content_disposition.startswith('inline; filename=100.1')
 
 
-def test_vote_pagination(swissvotes_app):
+def test_view_vote_pagination(swissvotes_app):
     for day, number in ((1, '100'), (2, '101.1'), (2, '101.2'), (3, '102')):
         swissvotes_app.session().add(
             SwissVote(
@@ -498,7 +361,7 @@ def test_vote_pagination(swissvotes_app):
     assert "<td>102</td>" in page
 
 
-def test_vote_chart(session):
+def test_view_vote_chart(session):
     class Request(object):
         def translate(self, text):
             if isinstance(text, TranslationString):
@@ -676,3 +539,95 @@ def test_vote_chart(session):
             'Parties preferring the counter-proposal 3.4%'
         ),
     }
+
+
+@mark.parametrize('locale', ('de_CH', 'fr_CH'))
+def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
+                                           attachments, attachment_urls,
+                                           locale):
+
+    session = swissvotes_app.session()
+    session.add(sample_vote)
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = page.click("Details")
+
+    # No attachments yet
+    for name in attachment_urls[locale].values():
+        view = client.get(f'{page.request.url}/{name}', status=404)
+        assert view.status_code == 404
+
+    vote = session.query(SwissVote).first()
+    vote.session_manager.current_locale = locale
+    for name, attachment in attachments.items():
+        setattr(vote, name, attachment)
+    commit()
+
+    for name in attachment_urls[locale].values():
+        view = client.get(f'{page.request.url}/{name}')
+        assert view.status_code in (200, 301, 302)
+
+
+def test_view_vote_campaign_material(swissvotes_app, sample_vote,
+                                     campaign_material):
+
+    session = swissvotes_app.session()
+    session.add(sample_vote)
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    page = client.get('/').maybe_follow().click('Abstimmungen')
+    page = page.click('Details')
+
+    # Yea
+    manage = page.click('Kampagnenmaterial Ja')
+    assert 'Keine Anhänge.' in manage
+
+    # ... upload
+    manage.form['file'] = Upload(
+        '1.png',
+        campaign_material['campaign_material_yea-1.png'].reference.file.read(),
+        'image/png'
+    )
+    manage = manage.form.submit().maybe_follow()
+    assert manage.status_code == 200
+
+    manage = page.click('Kampagnenmaterial Ja')
+    assert '1.png' in manage
+    assert manage.click('1.png').content_type == 'image/png'
+
+    # ... delete
+    manage = manage.click('Löschen').form.submit().maybe_follow()
+    assert 'Keine Anhänge.' in manage
+
+    # Nay
+    manage = page.click('Kampagnenmaterial Nein')
+    assert 'Keine Anhänge.' in manage
+
+    # ... upload
+    manage.form['file'] = Upload(
+        '1.png',
+        campaign_material['campaign_material_nay-1.png'].reference.file.read(),
+        'image/png'
+    )
+    manage = manage.form.submit().maybe_follow()
+    assert manage.status_code == 200
+
+    manage = page.click('Kampagnenmaterial Nein')
+    assert '1.png' in manage
+    assert manage.click('1.png').content_type == 'image/png'
+
+    # ... delete
+    manage = manage.click('Löschen').form.submit().maybe_follow()
+    assert 'Keine Anhänge.' in manage

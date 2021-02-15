@@ -7,7 +7,6 @@ from onegov.core.utils import render_file
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
-from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
@@ -29,6 +28,8 @@ from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
 
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+
 
 def get_directory_form_class(model, request):
     return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
@@ -38,20 +39,24 @@ def get_directory_entry_form_class(model, request):
     form_class = ExtendedDirectoryEntry().with_content_extensions(
         model.directory.form_class, request)
 
-    class OptionalMapForm(form_class):
+    class OptionalMapPublicationForm(form_class):
         def on_request(self):
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
-    return OptionalMapForm
+            if not model.directory.enable_publication and not request.is_admin:
+                self.delete_field('publication_start')
+                self.delete_field('publication_end')
+
+    return OptionalMapPublicationForm
 
 
 def get_submission_form_class(model, request):
-    return model.directory.form_class_for_submissions(include_private=True)
+    return model.directory.form_class_for_submissions(change_request=False)
 
 
 def get_change_request_form_class(model, request):
-    return model.directory.form_class_for_submissions(include_private=False)
+    return model.directory.form_class_for_submissions(change_request=True)
 
 
 @OrgApp.html(
@@ -64,7 +69,10 @@ def view_directories(self, request):
         'layout': DirectoryCollectionLayout(self, request),
         'directories': request.exclude_invisible(self.query()),
         'link': lambda directory: request.link(
-            DirectoryEntryCollection(directory)
+            ExtendedDirectoryEntryCollection(
+                directory,
+                published_only=not request.is_manager
+            )
         )
     }
 
@@ -74,7 +82,7 @@ def view_directories(self, request):
     permission=Public)
 def view_directory_redirect(self, request):
     return request.redirect(request.class_link(
-        DirectoryEntryCollection, {'directory_name': self.name}
+        ExtendedDirectoryEntryCollection, {'directory_name': self.name}
     ))
 
 
@@ -93,7 +101,7 @@ def handle_new_directory(self, request, form):
 
         request.success(_("Added a new directory"))
         return request.redirect(
-            request.link(DirectoryEntryCollection(directory)))
+            request.link(ExtendedDirectoryEntryCollection(directory)))
 
     layout = DirectoryCollectionLayout(self, request)
     layout.breadcrumbs = [
@@ -110,7 +118,7 @@ def handle_new_directory(self, request, form):
     }
 
 
-@OrgApp.form(model=DirectoryEntryCollection, name='edit',
+@OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
 def handle_edit_directory(self, request, form):
@@ -179,7 +187,7 @@ def handle_edit_directory(self, request, form):
 
 
 @OrgApp.view(
-    model=DirectoryEntryCollection,
+    model=ExtendedDirectoryEntryCollection,
     permission=Secret,
     request_method='DELETE')
 def delete_directory(self, request):
@@ -209,7 +217,7 @@ def get_filters(request, self, keyword_counts=None):
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
-    for keyword, title, values in self.available_filters:
+    for keyword, title, values in self.available_filters(sort_choices=False):
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
@@ -243,7 +251,7 @@ def keyword_count(request, collection):
 
 
 @OrgApp.html(
-    model=DirectoryEntryCollection,
+    model=ExtendedDirectoryEntryCollection,
     permission=Public,
     template='directory.pt')
 def view_directory(self, request):
@@ -276,7 +284,7 @@ def view_directory(self, request):
 
 
 @OrgApp.json(
-    model=DirectoryEntryCollection,
+    model=ExtendedDirectoryEntryCollection,
     permission=Public,
     name='geojson')
 def view_geojson(self, request):
@@ -337,7 +345,7 @@ def view_geojson(self, request):
 
 
 @OrgApp.form(
-    model=DirectoryEntryCollection,
+    model=ExtendedDirectoryEntryCollection,
     permission=Private,
     template='form.pt',
     form=get_directory_entry_form_class,
@@ -392,7 +400,7 @@ def handle_edit_directory_entry(self, request, form):
     }
 
 
-@OrgApp.form(model=DirectoryEntryCollection,
+@OrgApp.form(model=ExtendedDirectoryEntryCollection,
              permission=Public,
              template='directory_entry_submission_form.pt',
              form=get_submission_form_class,
@@ -546,9 +554,13 @@ def delete_directory_entry(self, request):
     request.success(_("The entry was deleted"))
 
 
-@OrgApp.form(model=DirectoryEntryCollection, permission=Private, name='export',
+@OrgApp.form(model=ExtendedDirectoryEntryCollection,
+             permission=Public, name='export',
              template='export.pt', form=ExportForm)
 def view_export(self, request, form):
+
+    if not request.is_visible(self.directory):
+        return HTTPForbidden()
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
@@ -572,8 +584,13 @@ def view_export(self, request, form):
     }
 
 
-@OrgApp.view(model=DirectoryEntryCollection, permission=Private, name='zip')
+@OrgApp.view(model=ExtendedDirectoryEntryCollection,
+             permission=Public, name='zip')
 def view_zip_file(self, request):
+
+    if not request.is_visible(self.directory):
+        return HTTPForbidden()
+
     layout = DirectoryEntryCollectionLayout(self, request)
 
     format = request.params.get('format', 'json')
@@ -584,7 +601,7 @@ def view_zip_file(self, request):
 
     with NamedTemporaryFile() as f:
         archive = DirectoryZipArchive(f.name + '.zip', format, transform)
-        archive.write(self.directory)
+        archive.write(self.directory, entry_filter=request.exclude_invisible)
 
         response = render_file(str(archive.path), request)
 
@@ -598,7 +615,8 @@ def view_zip_file(self, request):
     return response
 
 
-@OrgApp.form(model=DirectoryEntryCollection, permission=Private, name='import',
+@OrgApp.form(model=ExtendedDirectoryEntryCollection,
+             permission=Private, name='import',
              template='directory_import.pt', form=DirectoryImportForm)
 def view_import(self, request, form):
     error = None

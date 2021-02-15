@@ -23,6 +23,24 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
+                    text=_("Campaign material for a Yes"),
+                    url=self.request.link(
+                        self.model, name='manage-campaign-material-yea'
+                    ),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
+            result.append(
+                Link(
+                    text=_("Campaign material for a No"),
+                    url=self.request.link(
+                        self.model, name='manage-campaign-material-nay'
+                    ),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
+            result.append(
+                Link(
                     text=_("Delete vote"),
                     url=self.request.link(self.model, name='delete'),
                     attrs={'class': 'delete-icon'}
@@ -38,90 +56,91 @@ class VoteLayout(DefaultLayout):
             Link(self.title, '#'),
         ]
 
-    @property
-    def voto_static_url(self):
-        if self.request.html_lang == 'fr-CH':
-            return 'https://www.voto.swiss/fr/voto'
-        return 'https://www.voto.swiss/voto'
+    @cached_property
+    def attachments(self):
+        """ Returns a dictionary with static URLS for attachments.
 
-    @property
-    def foeg_static_url(self):
-        return 'https://foeg.uzh.ch/de/abstimmungsmonitor.html'
+        Note that not ony file / locale combinations with a file_name
+        definition have a static URL!
+        """
 
-    def get_file_url(self, name):
-
-        mapping = {
-            'voting_text': 'abstimmungstext-<lang>.pdf',
-            'brief_description': 'kurzbeschreibung.pdf',
-            'federal_council_message': 'botschaft-<lang>.pdf',
-            'parliamentary_debate': 'parlamentsberatung.pdf',
-            'voting_booklet': 'brochure-<lang>.pdf',
-            'resolution': 'erwahrung-<lang>.pdf',
-            'realization': 'zustandekommen-<lang>.pdf',
-            'ad_analysis': 'inserateanalyse.pdf',
-            'results_by_domain': 'staatsebenen.xlsx',
-            'foeg_analysis': 'medienanalyse.pdf',
-            'post_vote_poll': 'nachbefragung-<lang>.pdf',
-            'preliminary_examination': 'vorpruefung-<lang>.pdf',
+        return {
+            name: (
+                self.request.link(
+                    self.model,
+                    file.static_views.get(
+                        self.request.locale,
+                        file.static_views['de_CH']
+                    )
+                )
+                if self.model.get_file(name) else None
+            )
+            for name, file in self.model.localized_files().items()
         }
 
-        if name not in mapping:
-            return None
 
-        attachment = self.model.get_file(name, self.request)
-        if not attachment:
-            return None
+class VoteDetailLayout(DefaultLayout):
 
-        attachment_locale = attachment.name.split('-')[1]
-        viewname = mapping[name].replace(
-            '<lang>', attachment_locale.split('_')[0])
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.model.short_title, self.request.link(self.model)),
+            Link(self.title, '#'),
+        ]
 
-        return self.request.link(self.model, name=viewname)
 
-
-class VoteStrengthsLayout(DefaultLayout):
+class VoteStrengthsLayout(VoteDetailLayout):
 
     @cached_property
     def title(self):
         return _("Voter strengths")
 
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
-            Link(self.model.short_title, self.request.link(self.model)),
-            Link(self.title, '#'),
-        ]
 
-
-class UploadVoteAttachemtsLayout(DefaultLayout):
+class UploadVoteAttachemtsLayout(VoteDetailLayout):
 
     @cached_property
     def title(self):
         return _("Manage attachments")
 
+
+class ManageCampaingMaterialYeaLayout(VoteDetailLayout):
+
     @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
-            Link(self.model.short_title, self.request.link(self.model)),
-            Link(self.title, '#'),
-        ]
+    def title(self):
+        return _("Campaign material for a Yes")
 
 
-class DeleteVoteLayout(DefaultLayout):
+class ManageCampaingMaterialNayLayout(VoteDetailLayout):
+
+    @cached_property
+    def title(self):
+        return _("Campaign material for a No")
+
+
+class DeleteVoteLayout(VoteDetailLayout):
 
     @cached_property
     def title(self):
         return _("Delete vote")
 
+
+class DeleteVoteAttachmentLayout(DefaultLayout):
+
+    @cached_property
+    def parent(self):
+        return self.model.linked_swissvotes[0]
+
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Votes"), self.votes_url),
-            Link(self.model.short_title, self.request.link(self.model)),
+            Link(self.parent.short_title, self.request.link(self.parent)),
             Link(self.title, '#'),
         ]
+
+    @cached_property
+    def title(self):
+        return _("Delete attachment")

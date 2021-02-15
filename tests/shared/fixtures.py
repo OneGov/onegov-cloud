@@ -1,5 +1,7 @@
 import os
 import platform
+import re
+
 import port_for
 import pytest
 import shlex
@@ -15,6 +17,8 @@ from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor, TCPExecutor
+from webdriver_manager.utils import ChromeType
+
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from pathlib import Path
@@ -456,7 +460,14 @@ def webdriver_options():
 
 @pytest.fixture(scope="session")
 def webdriver_executable_path():
-    return ChromeDriverManager().install()
+    pattern = r'\d+\.\d+\.\d+'
+    stdout = os.popen('google-chrome --version || google-chrome-stable --version').read()
+    version = re.search(pattern, stdout)
+    if version:
+        driver = ChromeType.GOOGLE
+    else:
+        driver = ChromeType.CHROMIUM
+    return ChromeDriverManager(chrome_type=driver).install()
 
 
 @pytest.fixture(scope="session")

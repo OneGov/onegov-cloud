@@ -1,8 +1,11 @@
 from cached_property import cached_property
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
+from onegov.core.utils import Bunch
 from onegov.swissvotes import _
+from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.layouts.default import DefaultLayout
+from pathlib import Path
 
 
 class PageLayout(DefaultLayout):
@@ -26,6 +29,13 @@ class PageLayout(DefaultLayout):
                 Link(
                     text=_("Manage attachments"),
                     url=self.request.link(self.model, name='attachments'),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
+            result.append(
+                Link(
+                    text=_("Manage slider images"),
+                    url=self.request.link(self.model, name='slider-images'),
                     attrs={'class': 'upload-icon'}
                 )
             )
@@ -77,6 +87,22 @@ class PageLayout(DefaultLayout):
                 self.model, name='swissvotes_dataset.xlsx')
         return self.request.link(file)
 
+    @cached_property
+    def slides(self):
+        votes = SwissVoteCollection(self.app)
+        result = []
+        for image in self.model.slider_images:
+            bfs_number = Path(image.filename).stem.split('-')[0]
+            vote = votes.by_bfs_number(bfs_number)
+            result.append(
+                Bunch(
+                    image=self.request.link(image),
+                    label=vote.title if vote else image.filename,
+                    url=self.request.link(vote) if vote else ''
+                )
+            )
+        return result
+
 
 class AddPageLayout(DefaultLayout):
 
@@ -92,49 +118,43 @@ class AddPageLayout(DefaultLayout):
         ]
 
 
-class EditPageLayout(DefaultLayout):
+class PageDetailLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#'),
+        ]
+
+
+class EditPageLayout(PageDetailLayout):
 
     @cached_property
     def title(self):
         return _("Edit page")
 
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(self.model.title, self.request.link(self.model)),
-            Link(self.title, '#'),
-        ]
 
-
-class DeletePageLayout(DefaultLayout):
+class DeletePageLayout(PageDetailLayout):
 
     @cached_property
     def title(self):
         return _("Delete page")
 
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(self.model.title, self.request.link(self.model)),
-            Link(self.title, '#'),
-        ]
 
-
-class PageAttachmentsLayout(DefaultLayout):
+class ManagePageAttachmentsLayout(PageDetailLayout):
 
     @cached_property
     def title(self):
         return _("Manage attachments")
 
+
+class ManagePageSliderImagesLayout(PageDetailLayout):
+
     @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(self.model.title, self.request.link(self.model)),
-            Link(self.title, '#'),
-        ]
+    def title(self):
+        return _("Manage slider images")
 
 
 class DeletePageAttachmentLayout(DefaultLayout):
@@ -144,9 +164,13 @@ class DeletePageAttachmentLayout(DefaultLayout):
         return _("Delete attachment")
 
     @cached_property
+    def parent(self):
+        return self.model.linked_swissvotes_page[0]
+
+    @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
-            Link(self.model.filename, self.request.link(self.model)),
+            Link(self.parent.title, self.request.link(self.parent)),
             Link(self.title, '#'),
         ]

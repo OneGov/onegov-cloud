@@ -35,9 +35,9 @@
                             <th class="dark-blue subtitle" i18n:translate>Municipality</th>
                             <th class="right subtitle dark-blue" i18n:translate>BFS number</th>
                             <th class="right subtitle blue" i18n:translate>Boxes</th>
-                            <th class="right subtitle light-blue"><tal:block i18n:translate>until</tal:block> ${layout.current_year-2}</th>
-                            <th class="right subtitle light-blue">${layout.current_year-1}</th>
-                            <th class="right subtitle light-blue">${layout.current_year}</th>
+                            <th class="right subtitle light-blue"><tal:block i18n:translate>until</tal:block> ${layout.model.date.year-2}</th>
+                            <th class="right subtitle light-blue">${layout.model.date.year-1}</th>
+                            <th class="right subtitle light-blue">${layout.model.date.year}</th>
                             <th class="right subtitle light-blue" i18n:translate>Total</th>
                             <th class="light-blue"></th>
                             <th class="right subtitle green" i18n:translate>Scan Center</th>

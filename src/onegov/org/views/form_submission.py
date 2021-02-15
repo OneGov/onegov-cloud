@@ -111,7 +111,7 @@ def handle_defined_form(self, request, form):
         'form': enabled and form,
         'definition': self,
         'form_width': 'small',
-        'lead': self.meta.get('lead'),
+        'lead': layout.linkify(self.meta.get('lead')),
         'text': self.content.get('text'),
         'people': self.people,
         'contact': self.contact_html,
@@ -134,7 +134,7 @@ def handle_pending_submission(self, request):
     user to turn the submission into a complete submission, once all data
     is valid.
 
-    This view has two states, a completeable state where the form values
+    This view has two states, a completable state where the form values
     are displayed without a form and an edit state, where a form is rendered
     to change the values.
 
@@ -271,7 +271,7 @@ def handle_complete_submission(self, request):
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
-                subject=_("Your ticket has been opened"),
+                subject=_("Your request has been registered"),
                 ticket=ticket,
                 receivers=(self.email, ),
                 content={

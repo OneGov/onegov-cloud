@@ -226,13 +226,13 @@ class DirectoryArchiveReader(object):
 class DirectoryArchiveWriter(object):
     """ Writing part of :class:`DirectoryArchive`. """
 
-    def write(self, directory):
+    def write(self, directory, *args, **kwargs):
         """ Writes the given directory. """
-
+        entry_filter = kwargs.pop('entry_filter', None)
         assert self.format in ('xlsx', 'csv', 'json')
 
         self.write_directory_metadata(directory)
-        self.write_directory_entries(directory)
+        self.write_directory_entries(directory, entry_filter)
 
     def write_directory_metadata(self, directory):
         """ Writes the metadata. """
@@ -249,8 +249,9 @@ class DirectoryArchiveWriter(object):
         }
         self.write_json(self.path / 'metadata.json', metadata)
 
-    def write_directory_entries(self, directory):
-        """ Writes the directory entries. """
+    def write_directory_entries(self, directory, entry_filter=None):
+        """ Writes the directory entries. Allows filtering with custom
+        entry_filter function. """
 
         fields = directory.fields
         paths = {}
@@ -288,7 +289,11 @@ class DirectoryArchiveWriter(object):
 
             return data
 
-        data = tuple(as_dict(e) for e in directory.entries)
+        entries = directory.entries
+        if entry_filter:
+            entries = entry_filter(entries)
+
+        data = tuple(as_dict(e) for e in entries)
 
         write = getattr(self, 'write_{}'.format(self.format))
         write(self.path / 'data.{}'.format(self.format), data)

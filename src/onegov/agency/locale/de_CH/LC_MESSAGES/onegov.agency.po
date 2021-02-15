@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-08-29 09:10+0200\n"
-"PO-Revision-Date: 2019-08-29 09:16+0200\n"
+"POT-Creation-Date: 2021-01-27 12:37+0100\n"
+"PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +11,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.4.2\n"
+
+msgid "User groups"
+msgstr "Benutzergruppen"
 
 msgid "Hidden contents"
 msgstr "Versteckte Inhalte"
@@ -103,11 +106,41 @@ msgstr "Zusatz"
 msgid "Prefix"
 msgstr "Präfix"
 
+msgid "This field is required."
+msgstr "Das ist ein Pflichtfeld."
+
 msgid "E-Mail"
 msgstr "E-Mail"
 
 msgid "Message"
 msgstr "Nachricht"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "People with memberships can't be deleted"
+msgstr "Personen mit Mitgliedschaften können nicht gelöscht werden"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Do you really want to delete this person?"
+msgstr "Möchten Sie die Person wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete person"
+msgstr "Person löschen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -115,32 +148,26 @@ msgstr "Startseite"
 msgid "Create PDF"
 msgstr "PDF erstellen"
 
+msgid "Sort root agencies"
+msgstr "Hauptorganisationen sortieren"
+
 msgid "Add"
 msgstr "Hinzufügen"
 
 msgid "Agency"
 msgstr "Organisation"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Move"
-msgstr "Verschieben"
-
-msgid "Delete"
-msgstr "Löschen"
-
 msgid "Do you really want to delete this agency?"
 msgstr "Möchten Sie die Organisation wirklich löschen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Delete agency"
 msgstr "Organisation löschen"
 
-msgid "Cancel"
-msgstr "Abbrechen"
+msgid "Agency with memberships or suborganizations can't be deleted"
+msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"
+
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Membership"
 msgstr "Mitgliedschaft"
@@ -179,6 +206,18 @@ msgstr "Mitgliedschaft löschen"
 
 msgid "Create Excel"
 msgstr "Excel erstellen"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "User Group"
+msgstr "Benutzergruppe"
+
+msgid "Do you really want to delete this user group?"
+msgstr "Möchten Sie diese Benutzergruppe wirklich löschen"
+
+msgid "Delete user group"
+msgstr "Benutzergruppe löschen"
 
 msgid "Mutation"
 msgstr "Mutation"
@@ -258,8 +297,36 @@ msgstr "Mutationsmeldung"
 msgid "Path"
 msgstr "Pfad"
 
+msgid "Show agency"
+msgstr "Organisation anzeigen"
+
+msgid "Accept"
+msgstr "Annehmen"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
+
+msgid "Closed"
+msgstr "Abgeschlossen"
+
+msgid "None"
+msgstr "Keine"
+
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
+
+msgid ""
+"Sort the root agencies per drag and drop. Sub-organisations can be sorted by "
+"clicking on one of the root agencies."
+msgstr ""
+"Sortieren sie die Hauptorganisationen per Drag & Drop. Um "
+"Unterorganisationen zu sortieren, klicken sie auf eine Hauptorganisation."
+
+msgid "All"
+msgstr "Alle"
+
+msgid "View"
+msgstr "Anzeigen"
 
 msgid "Added a new agency"
 msgstr "Eine neue Organisation wurde hinzufügt"
@@ -278,6 +345,9 @@ msgstr "Neue Mitgliedschaft"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "Update"
+msgstr "Aktualisieren"
 
 msgid "Agency moved"
 msgstr "Organisation verschoben"
@@ -347,8 +417,50 @@ msgstr "1.1.1 Titel"
 msgid "For organisation PDF's, page after every:"
 msgstr "Für PDF's der Organisationen, Seitenwechsel nach:"
 
+msgid "PDF link color"
+msgstr "Farbe Hyperlinks im PDF"
+
+msgid "Underline pdf links"
+msgstr "Hyperlinks unterstreichen"
+
+msgid "Show additional agencies to search results"
+msgstr "Zusätzliche Organisation in den Suchresultaten anzeigen"
+
+msgid "Customize search results"
+msgstr "Suchresultate anpassen"
+
+msgid "Level 1 represents the root agencies, Level 2 their children"
+msgstr ""
+"Ebene 1 entspricht der obersten Organisationebene, Ebene 2 deren "
+"Unterorganisationen"
+
+msgid "Show full agency path"
+msgstr "Zeige ganzen Organisationspfad"
+
+msgid "Always show the full path of the memberships agency"
+msgstr "Zeige immer den gesamten Pfad für die Organisation der Mitgliedschaft"
+
+msgid "People detail page"
+msgstr "Detailseite Personen"
+
 msgid "Users may report corrections"
 msgstr "Benutzer können Mutationen melden"
 
 msgid "Data"
 msgstr "Daten"
+
+#, python-format
+msgid "Level ${lvl}"
+msgstr "Ebene ${lvl}"
+
+msgid "User Groups"
+msgstr "Benutzergruppen"
+
+msgid "Added a new user group"
+msgstr "Eine neue Benutzergruppe wurde hinzugefügt"
+
+msgid "New user group"
+msgstr "Neue Benutzergruppe"
+
+msgid "Edit user group"
+msgstr "Benutzergruppe bearbeiten"

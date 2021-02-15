@@ -30,6 +30,7 @@ class DummyRequest(object):
         self._is_secret = False
         self._is_private = False
         self._is_personal = False
+        self._url = ''
 
     def is_secret(self, model):
         return self._is_secret
@@ -47,6 +48,13 @@ class DummyRequest(object):
         return '/{}/{}/'.format(
             target.__class__.__name__ if target else '', name
         ).replace('///', '/',).replace('//', '/',)
+
+    def class_link(self, cls, name=None):
+        return '/{}/{}'.format(cls.__name__, name or '')
+
+    @property
+    def url(self):
+        return self._url
 
     def translate(self, text):
         return text.interpolate()
@@ -85,6 +93,13 @@ def test_layout_menu():
         ('Published Official Notices', '/GazetteNoticeCollection/', False, [])
     ]
 
+    exports_menu_tab = ('Exports', None, False, [
+            ('Issues', '/IssueCollection/export', False, []),
+            ('Organizations', '/OrganizationCollection/export', False, []),
+            ('Categories', '/CategoryCollection/export', False, []),
+            ('Users', '/UserCollection/export', False, []),
+        ])
+
     request._is_private = True
     assert layout.menu == [
         ('Official Notices', '/GazetteNoticeCollection/', False, []),
@@ -96,6 +111,7 @@ def test_layout_menu():
             ('Users', '/UserCollection/', False, []),
         ]),
         ('Statistics', '/GazetteNoticeCollection/statistics/', False, []),
+        exports_menu_tab,
     ]
 
     request._is_secret = True
@@ -109,6 +125,7 @@ def test_layout_menu():
             ('Users', '/UserCollection/', False, []),
         ]),
         ('Statistics', '/GazetteNoticeCollection/statistics/', False, []),
+        exports_menu_tab
     ]
 
 

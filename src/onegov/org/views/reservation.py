@@ -440,7 +440,7 @@ def finalize_reservation(self, request):
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
+            subject=_("Your request has been registered"),
             receivers=(reservations[0].email,),
             ticket=ticket,
             content={
@@ -472,8 +472,20 @@ def accept_reservation(self, request):
         reservations = resource.scheduler.reservations_by_token(self.token)
         reservations = reservations.order_by(Reservation.start)
 
+        token = self.token.hex
         tickets = TicketCollection(request.session)
-        ticket = tickets.by_handler_id(self.token.hex)
+        ticket = tickets.by_handler_id(token)
+
+        forms = FormCollection(request.session)
+        submission = forms.submissions.by_id(token)
+
+        if submission:
+            form = submission.form_obj
+        else:
+            form = None
+
+        # Include all the forms details to be able to print it out
+        show_submission = True
 
         send_ticket_mail(
             request=request,
@@ -484,7 +496,9 @@ def accept_reservation(self, request):
             content={
                 'model': self,
                 'resource': resource,
-                'reservations': reservations
+                'reservations': reservations,
+                'show_submission': show_submission,
+                'form': form
             }
         )
 

@@ -54,7 +54,7 @@ message (see below):
     git checkout ticket-101
     git rebase master
     git checkout master
-    git merge ticket-101 --edit
+    git merge ticket-101 --edit -no-ff
 
 ### Commit Messages
 
@@ -118,7 +118,7 @@ name is valid (first character must be uppercase!).
 To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
-* Postgres 10+
+* Postgres 12+
 * Python 3.8+
 * OpenJDK 11+
 * Elasticsearch 7.x
@@ -139,7 +139,7 @@ brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv
 ```shell
 sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev
 libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev
-libpoppler-cpp-dev pv
+libpoppler-cpp-dev pv libzbar0
 ```
 
 ## Installation 🤘
@@ -181,6 +181,19 @@ To configure your setup, copy the example configuration and adjust it to your ne
 
     cp onegov.yml.example onegov.yml
 
+## Create database for onegov
+
+Define a user `dev` and password `devpassword` using `dsn: postgresql://dev:devpassword@localhost:5432/onegov`
+in `onegov.yml`:
+
+    sudo -u postgres psql
+
+    CREATE USER dev WITH PASSWORD 'devpassword' LOGIN NOINHERIT;
+    ALTER USER dev WITH SUPERUSER;
+    CREATE DATABASE onegov;
+    GRANT ALL PRIVILEGES ON DATABASE onegov TO dev;
+    ALTER DATABASE onegov SET timezone TO 'UTC';
+
 Once you are happy, you can start your first organisation:
 
     onegov-org --select /onegov_org/govikon add "Gemeinde Govikon"
@@ -196,7 +209,7 @@ Then, start your local instance:
 And open the local url in your browser:
 
     open http://localhost/onegov_town/govikon
-    
+
 To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variable:
 
     export ONEGOV_DEVELOPMENT='1'

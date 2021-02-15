@@ -41,7 +41,9 @@
             if ('labelLeftHand' in params) labelLeftHand = params.labelLeftHand;
             if ('labelExpats' in params) labelExpats = params.labelExpats;
             if ('options' in params) options = params.options;
-            if ('hidePercentages' in params) hide_percentages = params.hidePercentages;
+            console.log(params.hidePercentages)
+            console.log(params.hide_percentages)
+            if ('hidePercentages' in params) hide_percentages = params.hidePercentages || false;
         }
         console.assert(typeof hide_percentages === "boolean", 'hide_percentages is not a boolean: ', hide_percentages);
 

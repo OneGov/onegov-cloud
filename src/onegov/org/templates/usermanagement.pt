@@ -46,7 +46,7 @@
                                 </tal:b>
 
                                 <td class="text-links">
-                                    <a href="${request.link(user)}" i18n:translate>View</a>&nbsp;<a href="${request.link(user, 'edit')}" i18n:translate>Edit</a>
+                                    <a href="${request.link(user)}" i18n:translate>View</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -65,6 +65,10 @@
                 <div tal:condition="filters['tag']|nothing" class="filter-tags">
                     <h3 class="filter-title" i18n:translate>Tags</h3>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tag']" />
+                </div>
+                <div tal:condition="filters['source']|nothing" class="filter-source">
+                    <h2 class="filter-title" i18n:translate>Source</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['source']" />
                 </div>
             </div>
         </div>

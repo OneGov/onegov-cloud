@@ -139,12 +139,36 @@ function asMarkerMap(map, input) {
     var marker;
     var coordinates = getCoordinates(input);
     var icon = L.VectorMarkers.icon(getMarkerOptions(input));
+    var draggableMarker = true;
+    if (input.data('undraggable') !== undefined) {
+        draggableMarker = false;
+    }
 
-    function addMarker(position, zoom) {
+    function fillAddressFormFields (geocode_result) {
+        // Will fill in your form fields with the fetched geocoded address result.
+        // Can be used in combination with the CoordinatesField that uses a marker map to store the address at the same
+        // time as the coordinates
+        var addrInput = $('input#address');
+        var zipCodeInput = $('input#zip_code')
+        var cityInput = $('input#city')
+        var countryInput = $('input#country')
+
+        if (addrInput.length && zipCodeInput.length && cityInput.length) {
+            var properties = geocode_result.properties;
+            addrInput.val([properties.text || '', properties.address || ''].join(' ').trim());
+            zipCodeInput.val(properties.postcode || '');
+            cityInput.val(properties.place || '');
+            if(countryInput.length) {
+                countryInput.val(properties.country || '');
+            }
+        }
+    }
+
+    function addMarker(position, zoom, title) {
         position = position || map.getCenter();
         zoom = zoom || map.getZoom();
-
-        marker = L.marker(position, {icon: icon, draggable: true});
+        title = title || '';
+        marker = L.marker(position, {icon: icon, draggable: draggableMarker, title});
         marker.addTo(map);
         map.setZoom(zoom);
 
@@ -195,12 +219,12 @@ function asMarkerMap(map, input) {
         pointButton.state('remove-point');
     }
 
-    map.on('geocode-marked', function() {
+    map.on('geocode-marked', function(result) {
         if (hasMarker()) {
             removeMarker();
         }
-
-        addMarker();
+        addMarker(null, null, result.geocode.name);
+        fillAddressFormFields(result.geocode);
         pointButton.state('remove-point');
     });
 
@@ -298,12 +322,14 @@ function addGeocoder(map) {
 }
 
 function getMapboxTiles() {
-    var url = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}';
-    url += (L.Browser.retina ? '@2x.png' : '.png');
-    url += '?access_token=' + getMapboxToken();
+    var url = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}';
 
     return L.tileLayer(url, {
-        attribution: '<ul><li><a href="https://www.mapbox.com/map-feedback/">© Mapbox</a></li><li><a href="http://www.openstreetmap.org/copyright">© OpenStreetMap</a></li></ul>'
+        attribution: '<ul><li><a href="https://www.mapbox.com/map-feedback/">© Mapbox</a></li><li><a href="http://www.openstreetmap.org/copyright">© OpenStreetMap</a></li></ul>',
+        tileSize: 512,
+        zoomOffset: -1,
+        id: 'mapbox/streets-v11',
+        accessToken: getMapboxToken()
     });
 }
 

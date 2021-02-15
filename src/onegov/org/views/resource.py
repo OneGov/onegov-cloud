@@ -11,6 +11,7 @@ from onegov.core.security import Public, Private
 from onegov.core.utils import module_path
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
+from onegov.org.cli import close_ticket
 from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.org import _, OrgApp, utils
 from onegov.org.elements import Link
@@ -20,7 +21,7 @@ from onegov.org.forms import (
 from onegov.org.layout import ResourcesLayout, ResourceLayout
 from onegov.org.models.resource import DaypassResource, RoomResource
 from onegov.org.utils import group_by_column, keywords_first
-from onegov.ticket import Ticket
+from onegov.ticket import Ticket, TicketCollection
 from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, select
@@ -180,8 +181,20 @@ def handle_delete_resource(self, request):
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
+    tickets = TicketCollection(request.session)
+
+    def handle_reservation_tickets(reservation):
+        ticket = tickets.by_handler_id(reservation.token.hex)
+        if ticket:
+            close_ticket(ticket, request.current_user, request)
+            ticket.create_snapshot(request)
+
     collection = ResourceCollection(request.app.libres_context)
-    collection.delete(self, including_reservations=False)
+    collection.delete(
+        self,
+        including_reservations=True,
+        handle_reservation=handle_reservation_tickets
+    )
 
 
 @OrgApp.form(model=Resource, permission=Private, name='cleanup',

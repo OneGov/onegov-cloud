@@ -1,17 +1,20 @@
-from io import BytesIO
-from decimal import Decimal
 from datetime import date
-from psycopg2.extras import NumericRange
-from tests.shared.utils import create_app
+from decimal import Decimal
+from io import BytesIO
 from onegov.core.crypto import hash_password
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
 from onegov.swissvotes import SwissvotesApp
-from onegov.swissvotes.models import Principal, SwissVote
+from onegov.swissvotes.models import Principal
+from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
+from onegov.swissvotes.models import TranslatablePageFile
 from onegov.user import User
+from psycopg2.extras import NumericRange
 from pytest import fixture
+from tests.shared.utils import create_app
+from tests.shared.utils import create_image
 from transaction import commit
 from xlsxwriter.workbook import Workbook
 
@@ -70,17 +73,20 @@ def swissvotes_app(request, temporary_path):
 def attachments(swissvotes_app):
     result = {}
     for name, content in (
-        ('preliminary_examination', "Voruntersuchung"),
-        ('post_vote_poll', "Nachbefragung"),
-        ('foeg_analysis', "Medienanalyse fög"),
         ('ad_analysis', "Inserateanalyse"),
         ('brief_description', "Kurschbeschreibung"),
         ('federal_council_message', "Message du Conseil fédéral"),
+        ('foeg_analysis', "Medienanalyse fög"),
         ('parliamentary_debate', "Parlamentdebatte"),
+        ('post_vote_poll_codebook', "Codebuch"),
+        ('post_vote_poll_methodology', "Methodenbeschrieb"),
+        ('post_vote_poll', "Nachbefragung"),
+        ('preliminary_examination', "Voruntersuchung"),
         ('realization', "Réalisation"),
         ('resolution', "Arrêté constatant le résultat"),
         ('voting_booklet', "Brochure explicative"),
         ('voting_text', "Abstimmungstext"),
+        ('post_vote_poll_report', "Technischer Bericht"),
     ):
         file = BytesIO()
         pdf = Pdf(file)
@@ -95,6 +101,7 @@ def attachments(swissvotes_app):
 
     for name in (
         'results_by_domain',
+        'post_vote_poll_codebook_xlsx'
     ):
         file = BytesIO()
         workbook = Workbook(file)
@@ -108,7 +115,206 @@ def attachments(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
+    for name in (
+        'post_vote_poll_dataset',
+    ):
+        file = BytesIO()
+        file.write(b'a,b\n100,200')
+
+        attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    for name in (
+        'post_vote_poll_dataset_sav',
+    ):
+        file = BytesIO()
+        file.write(b'$FL2@(#) SPSS DATA FILE MS Windows Release 12.0 \x02')
+
+        attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    for name in (
+        'post_vote_poll_dataset_dta',
+    ):
+        file = BytesIO()
+        file.write(b'<stata_dta><header><release>117</release> \x02')
+
+        attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
     yield result
+
+
+@fixture(scope="function")
+def campaign_material(swissvotes_app):
+    result = {}
+
+    for name in ('yea-1.png', 'yea-2.png', 'nay-1.png', 'nay-2.png'):
+        name = f'campaign_material_{name}'
+        file = create_image()
+
+        attachment = SwissVoteFile(id=random_token(), name=name)
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    yield result
+
+
+@fixture(scope="function")
+def slider_images(swissvotes_app):
+    result = {}
+
+    for name in ('1', '1-1', '2.1-x', '2.2-x', '2.3-x', 'n'):
+        attachment = TranslatablePageFile(id=random_token())
+        attachment.name = f'slider_images-{name}.png'
+        attachment.reference = as_fileintent(create_image(), f'{name}.png')
+        result[name] = attachment
+
+    yield result
+
+
+@fixture(scope="function")
+def attachment_urls():
+    yield {
+        'de_CH': {
+            'ad_analysis': 'inserateanalyse.pdf',
+            'brief_description': 'kurzbeschreibung.pdf',
+            'federal_council_message': 'botschaft-de.pdf',
+            'foeg_analysis': 'medienanalyse.pdf',
+            'parliamentary_debate': 'parlamentsberatung.pdf',
+            'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
+            'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-de.xlsx',
+            'post_vote_poll_dataset': 'nachbefragung.csv',
+            'post_vote_poll_dataset_sav': 'nachbefragung.sav',
+            'post_vote_poll_dataset_dta': 'nachbefragung.dta',
+            'post_vote_poll_methodology': 'nachbefragung-methode-de.pdf',
+            'post_vote_poll_report': 'nachbefragung-technischer-bericht.pdf',
+            'post_vote_poll': 'nachbefragung-de.pdf',
+            'preliminary_examination': 'vorpruefung-de.pdf',
+            'realization': 'zustandekommen-de.pdf',
+            'resolution': 'erwahrung-de.pdf',
+            'results_by_domain': 'staatsebenen.xlsx',
+            'voting_booklet': 'brochure-de.pdf',
+            'voting_text': 'abstimmungstext-de.pdf',
+        },
+        'fr_CH': {
+            'federal_council_message': 'botschaft-fr.pdf',
+            'post_vote_poll_codebook': 'nachbefragung-codebuch-fr.pdf',
+            'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-fr.xlsx',
+            'post_vote_poll_methodology': 'nachbefragung-methode-fr.pdf',
+            'post_vote_poll': 'nachbefragung-fr.pdf',
+            'preliminary_examination': 'vorpruefung-fr.pdf',
+            'realization': 'zustandekommen-fr.pdf',
+            'resolution': 'erwahrung-fr.pdf',
+            'voting_booklet': 'brochure-fr.pdf',
+            'voting_text': 'abstimmungstext-fr.pdf',
+        },
+        'en_US': {}
+    }
+
+
+@fixture(scope='function')
+def page_attachments_filenames():
+    yield {
+        'de_CH': {
+            'CODEBOOK': 'CODEBOOK.pdf',
+            'DATASET CSV': 'DATASET CSV dd-mm-yyyy.csv',
+            'DATASET XLSX': 'DATASET XLSX dd-mm-yyyy.xlsx',
+            'REFERENCES': 'QUELLEN Kurzbeschreibungen.pdf',
+        },
+        'fr_CH': {
+            'CODEBOOK': 'CODEBOOK.pdf',
+            'DATASET CSV': 'DATASET CSV dd-mm-yyyy.csv',
+            'DATASET XLSX': 'DATASET XLSX dd-mm-yyyy.xlsx',
+            'REFERENCES': 'REFERENCES des descriptifs.pdf',
+        },
+        'en_US': {
+            'CODEBOOK': 'CODEBOOK.pdf',
+            'DATASET CSV': 'DATASET CSV dd-mm-yyyy.csv',
+            'DATASET XLSX': 'DATASET XLSX dd-mm-yyyy.xlsx',
+            'REFERENCES': 'REFERENCES for descriptions.pdf',
+        }
+    }
+
+
+@fixture(scope="function")
+def page_attachments(swissvotes_app, page_attachments_filenames):
+    result = {}
+
+    for locale in ('de_CH', 'fr_CH', 'en_US'):
+        result[locale] = {}
+        for name, content in (
+            ('REFERENCES', 'Quellen'),
+            ('CODEBOOK', 'Codebuch'),
+        ):
+            file = BytesIO()
+            pdf = Pdf(file)
+            pdf.init_report()
+            pdf.p(content)
+            pdf.generate()
+            file.seek(0)
+
+            filename = page_attachments_filenames[locale][name]
+            attachment = TranslatablePageFile(
+                id=random_token(),
+                name=f'{locale}-{filename}'
+            )
+            attachment.reference = as_fileintent(file, filename)
+            result[locale][name] = attachment
+
+        for name in ('DATASET XLSX',):
+            file = BytesIO()
+            workbook = Workbook(file)
+            worksheet = workbook.add_worksheet('DATA')
+            worksheet.write_row(0, 0, ['a', 'b'])
+            worksheet.write_row(1, 0, [100, 200])
+            workbook.close()
+            file.seek(0)
+
+            filename = page_attachments_filenames[locale][name]
+            attachment = TranslatablePageFile(
+                id=random_token(),
+                name=f'{locale}-{filename}'
+            )
+            attachment.reference = as_fileintent(file, filename)
+            result[locale][name] = attachment
+
+        for name in ('DATASET CSV',):
+            file = BytesIO()
+            file.write(b'a,b\n100,200')
+
+            filename = page_attachments_filenames[locale][name]
+            attachment = TranslatablePageFile(
+                id=random_token(),
+                name=f'{locale}-{filename}'
+            )
+            attachment.reference = as_fileintent(file, filename)
+            result[locale][name] = attachment
+
+    yield result
+
+
+@fixture(scope="function")
+def page_attachment_urls():
+    yield {
+        'de_CH': {
+            'CODEBOOK': 'codebook-de.pdf',
+            'DATASET CSV': 'swissvotes_dataset.csv',
+            'DATASET XLSX': 'swissvotes_dataset.xlsx',
+            'REFERENCES': 'kurzbeschreibung-de.pdf',
+        },
+        'fr_CH': {
+            'CODEBOOK': 'codebook-fr.pdf',
+            'REFERENCES': 'kurzbeschreibung-fr.pdf',
+        },
+        'en_US': {
+            'CODEBOOK': 'codebook-en.pdf',
+            'REFERENCES': 'kurzbeschreibung-en.pdf',
+        }
+    }
 
 
 @fixture(scope="function")
@@ -137,12 +343,50 @@ def sample_vote():
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
     vote.bfs_map_fr = "htt(ps://www.ap/mapIdOnly/1815[e.html}"
-    vote.posters_yes = 'https://yes.com/objects/1 https://yes.com/objects/2'
-    vote.posters_no = 'https://no.com/objects/1 https://no.com/objects/2'
-    vote.posters_yes_imgs = {
+    vote.posters_mfg_yea = (
+        'https://yes.com/objects/1 '
+        'https://yes.com/objects/2'
+    )
+    vote.posters_mfg_nay = (
+        'https://no.com/objects/1 '
+        'https://no.com/objects/2'
+    )
+    vote.posters_mfg_yea_imgs = {
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
+    vote.posters_sa_yea = (
+        'https://yes.com/objects/3 '
+        'https://yes.com/objects/4'
+    )
+    vote.posters_sa_nay = (
+        'https://no.com/objects/3 '
+        'https://no.com/objects/4'
+    )
+    vote.posters_sa_nay_imgs = {
+        'https://no.com/objects/3': 'https://detail.com/3'
+    }
+    vote.curia_vista_de = 'cv_de'
+    vote.curia_vista_fr = 'cv_fr'
+    vote.bkresults_de = 'bkr_de'
+    vote.bkresults_fr = 'bkr_fr'
+    vote.bkchrono_de = 'bkc_de'
+    vote.bkchrono_fr = 'bkc_fr'
     vote.swissvoteslink = 'https://example.com/122.0'
+    vote.post_vote_poll_link_de = 'https://post.vote.poll/de'
+    vote.post_vote_poll_link_fr = 'https://post.vote.poll/fr'
+    vote.post_vote_poll_link_en = 'https://post.vote.poll/en'
+    vote.media_ads_total = 3001
+    vote.media_ads_per_issue = Decimal('30.02')
+    vote.media_ads_yea = 3003
+    vote.media_ads_nay = 3004
+    vote.media_ads_neutral = 3005
+    vote.media_ads_yea_p = Decimal('30.06')
+    vote.media_coverage_articles_total = 3007
+    vote.media_coverage_articles_d = 3008
+    vote.media_coverage_articles_f = 3009
+    vote.media_coverage_tonality_total = Decimal('30.10')
+    vote.media_coverage_tonality_d = Decimal('30.11')
+    vote.media_coverage_tonality_f = Decimal('30.12')
     vote.descriptor_1_level_1 = Decimal('4')
     vote.descriptor_1_level_2 = Decimal('4.2')
     vote.descriptor_1_level_3 = Decimal('4.21')
@@ -375,7 +619,7 @@ def sample_vote():
     vote.result_zh_nays = 107
     vote.result_zh_yeas_p = Decimal('10.80')
     vote._department_in_charge = 1
-    vote.procedure_number = Decimal('24.557')
+    vote.procedure_number = '24.557'
     vote._position_federal_council = 1
     vote._position_parliament = 1
     vote._position_national_council = 1
@@ -470,6 +714,7 @@ def sample_vote():
     vote.national_council_share_glp = Decimal('18.10')
     vote.national_council_share_bdp = Decimal('19.10')
     vote.national_council_share_mcg = Decimal('20.20')
+    vote.national_council_share_mitte = Decimal('20.10')
     vote.national_council_share_ubrige = Decimal('21.20')
     vote.national_council_share_yeas = Decimal('22.20')
     vote.national_council_share_nays = Decimal('23.20')

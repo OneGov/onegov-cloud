@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-09-05 14:32+0200\n"
+"POT-Creation-Date: 2020-11-09 12:25+0100\n"
 "PO-Revision-Date: 2017-06-22 16:02+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: French\n"
@@ -16,6 +16,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.2\n"
+
+msgid "LDAP"
+msgstr ""
 
 msgid "LDAP Kerberos"
 msgstr "LDAP Kerberos"
@@ -37,6 +40,25 @@ msgstr "L'utilisateur « ${user} » n'est pas autorisé"
 #, python-format
 msgid "Successfully logged in as «${user}»"
 msgstr "Connecté avec succès en tant que « ${user} »"
+
+msgid "AzureAD"
+msgstr ""
+
+msgid "Login with Microsoft"
+msgstr "Connection avec Microsoft"
+
+msgid "Authorisation failed due to an error"
+msgstr "L'autorisation a échoué en raison d'une erreur"
+
+msgid "Your login has expired"
+msgstr "Votre login a expiré"
+
+msgid ""
+"Can't login because your user has no groups. Contact your AzureAD system "
+"administrator"
+msgstr ""
+"Vous ne pouvez pas vous connecter car votre utilisateur n'a pas de groupes. "
+"Contactez votre administrateur système AzureAD."
 
 msgid "Name"
 msgstr "Nom"

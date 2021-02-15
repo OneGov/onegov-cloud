@@ -22,7 +22,7 @@
 
                             <div class="columns small-10">
                                 <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
-                                <p class="page-lead">${activity.lead}</p>
+                                <span class="page-lead" tal:content="structure layout.paragraphify(layout.linkify(activity.lead))"/>
 
                                 <div class="row collapse" tal:define="
                                     ages activity_ages(activity, request);

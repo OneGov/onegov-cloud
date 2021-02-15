@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 11:18+0100\n"
+"POT-Creation-Date: 2020-10-28 09:42+0100\n"
 "PO-Revision-Date: 2020-03-13 11:14+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -496,10 +496,6 @@ msgid "district_label_sg"
 msgstr "Wahlkreis"
 
 #. Default: District
-msgid "district_label_sz_2020"
-msgstr "Gemeinde"
-
-#. Default: District
 msgid "district_label_sz"
 msgstr "Bezirk"
 
@@ -514,10 +510,6 @@ msgstr "Regionen"
 #. Default: Constituencies
 msgid "districts_label_sg"
 msgstr "Wahlkreise"
-
-#. Default: District
-msgid "districts_label_sz_2020"
-msgstr "Gemeinden"
 
 #. Default: Districts
 msgid "districts_label_sz"
@@ -1033,6 +1025,13 @@ msgstr "Leere Wahlzettel"
 msgid "Invalid Ballots"
 msgstr "Ungültige Wahlzettel"
 
+msgid "Intermediate results abbrev"
+msgstr "Zwischenerg."
+
+#, python-format
+msgid "Intermediate results: ${counted} of ${total} ${entities}"
+msgstr "Zwischenresultate: ${counted} von ${total} ${entities}"
+
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
 
@@ -1291,6 +1290,15 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid "Intermediate results: ${counted} of ${total} entities"
+#~ msgstr "Zwischenresultate: ${counted} von ${total} Gemeinden"
+
+#~ msgid "district_label_sz_2020"
+#~ msgstr "Gemeinde"
+
+#~ msgid "districts_label_sz_2020"
+#~ msgstr "Gemeinden"
 
 #~ msgid "Value of ausmittlungsstand not between 0 and 3"
 #~ msgstr "Wert von ausmittlungsstand nicht zwischen 0 and 3"

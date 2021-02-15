@@ -1,6 +1,8 @@
 from babel import Locale
-import numbers
 from cached_property import cached_property
+from decimal import Decimal
+from decimal import ROUND_HALF_UP
+from numbers import Integral
 from onegov.core.elements import Link
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
@@ -151,10 +153,16 @@ class DefaultLayout(ChameleonLayout):
             return ''
 
         if decimal_places is None:
-            if isinstance(number, numbers.Integral):
+            if isinstance(number, Integral):
                 decimal_places = 0
             else:
                 decimal_places = 2
+
+        if decimal_places is not None:
+            number = Decimal(number).quantize(
+                Decimal(10) ** -decimal_places,
+                rounding=ROUND_HALF_UP
+            )
 
         locale = self.request.locale
         # Fixes using "," for french locale instead of "." as for german
@@ -163,18 +171,3 @@ class DefaultLayout(ChameleonLayout):
         decimal, group = self.number_symbols(locale)
         result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
         return result.translate({ord(','): group, ord('.'): decimal})
-
-    def format_procedure_number(self, number):
-        """ There are two different formats for the procedure number: a plain
-        sequence number before 1974/75 and a sequence number prefixed with the
-        year.
-
-        The first one is in the range (1, ~12500) and stored as decimal without
-        a decimal place. The second one is in the range (~74000, n) and stored
-        as decimal / 1000.
-        """
-        if number is None:
-            return ''
-        if number.to_integral_value() == number:
-            return str(number.to_integral_value())
-        return self.format_number(number, 3, '06')

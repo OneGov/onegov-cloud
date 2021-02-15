@@ -1,4 +1,5 @@
 from freezegun import freeze_time
+from onegov.user import RoleMapping
 from onegov.user import User
 from onegov.user import UserGroup
 from unittest.mock import call
@@ -208,3 +209,42 @@ def test_user_cleanup_sessions():
             user.logout_all_sessions(DummyRequest('zzz'))
             assert 'xxx' not in user.sessions
             assert 'yyy' not in user.sessions
+
+
+def test_role_mapping(session):
+    user = User(username='nathan', password='pwd', role='editor')
+    group = UserGroup(name='group')
+    session.add(user)
+    session.add(group)
+    session.flush()
+
+    session.add(
+        RoleMapping(
+            username=user.username,
+            content_type='my_type',
+            content_id='1',
+            role='admin'
+        )
+    )
+    session.add(
+        RoleMapping(
+            group_id=group.id,
+            content_type='my_type',
+            content_id='2',
+            role='editor'
+        )
+    )
+    session.add(
+        RoleMapping(
+            username=user.username,
+            group_id=group.id,
+            content_type='my_type',
+            content_id='2',
+            role='member'
+        )
+    )
+
+    assert user.role_mappings.count() == 2
+    assert group.role_mappings.count() == 2
+    assert {item.role for item in user.role_mappings} == {'admin', 'member'}
+    assert {item.role for item in group.role_mappings} == {'editor', 'member'}

@@ -1,9 +1,12 @@
 from io import BytesIO
+from onegov.core.utils import linkify
+from onegov.org.models import Organisation
 from PyPDF2 import PdfFileReader
+from pytest import mark
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 
 
-def test_views_1(client):
+def test_views(client):
     client.login_admin()
     settings = client.get('/module-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
@@ -84,7 +87,7 @@ def test_views_1(client):
     new_agency = agencies.click('Organisation', href='new')
     new_agency.form['title'] = 'Bundesbehörden'
     bund = new_agency.form.submit().follow()
-
+    bund_url = bund.request.url
     assert 'Bundesbehörden' in bund
 
     tel_nr = valid_test_phone_numbers[0]
@@ -115,21 +118,22 @@ def test_views_1(client):
     assert 'Ständerat' in sr
 
     # ... sort agencies
-    bund = client.get('/organizations').click('Bundesbehörden')
-    url = bund.pyquery('ul.children').attr('data-sortable-url')
+    sort = client.get('/organizations').click('Hauptorganisationen sortieren')
+    url = sort.pyquery('ul.agencies').attr('data-sortable-url')
+
     url = url.replace('%7Bsubject_id%7D', '2')
     url = url.replace('%7Bdirection%7D', 'below')
     url = url.replace('%7Btarget_id%7D', '3')
     client.put(url)
 
-    bund = client.get('/organizations').click('Bundesbehörden')
+    bund = client.get(bund_url)
     assert [a.text for a in bund.pyquery('ul.children li a')] == [
         'Ständerat', 'Nationalrat',
     ]
 
     bund.click("Unterorganisationen", href='sort')
 
-    bund = client.get('/organizations').click('Bundesbehörden')
+    bund = client.get(bund_url)
     assert [a.text for a in bund.pyquery('ul.children li a')] == [
         'Nationalrat', 'Ständerat',
     ]
@@ -177,24 +181,24 @@ def test_views_1(client):
     new_membership.form['title'] = "Zweiter Ständerat für Zug"
     new_membership.form['person_id'].select(text="Aeschi Thomas")
     agency = new_membership.form.submit().follow()
-
     assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
-        'Eder Joachim', 'Ständerat für Zug',
-        'Aeschi Thomas', 'Zweiter Ständerat für Zug',
+        'Eder Joachim', 'Ständerat für Zug', None,
+        'Aeschi Thomas', 'Zweiter Ständerat für Zug', None
     ]
 
     agency.click("Mitgliedschaften", href='sort')
     agency = client.get(agency.request.url)
+
     assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
-        'Aeschi Thomas', 'Zweiter Ständerat für Zug',
-        'Eder Joachim', 'Ständerat für Zug',
+        'Aeschi Thomas', 'Zweiter Ständerat für Zug', None,
+        'Eder Joachim', 'Ständerat für Zug', None
     ]
 
     agency.click("Zweiter Ständerat für Zug").click("Löschen")
 
     # ... PDFs
     client.login_editor()
-    bund = client.get('/organizations').click("Bundesbehörden")
+    bund = client.get(bund_url)
     bund = bund.click("PDF erstellen").form.submit().follow()
 
     pdf = bund.click("Organisation als PDF speichern")
@@ -225,23 +229,24 @@ def test_views_1(client):
     move = sr.click("Verschieben")
     move.form['parent_id'].select(text="- oberste Ebene -")
     sr = move.form.submit().maybe_follow()
+    sr_url = sr.request.url
     assert "Organisation verschoben" in sr
 
     move = bund.click("Verschieben")
     move.form['parent_id'].select(text="Ständerat")
     bund = move.form.submit().maybe_follow()
     assert "Organisation verschoben" in bund
-
-    client.get('/organizations').click("Ständerat").click("Eder Joachim")
-    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+    client.get(sr_url).click("Eder Joachim")
+    client.get(sr_url).click("Bundesbehörden")\
         .click("Nationalrat")
-    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+    client.get(sr_url).click("Bundesbehörden")\
         .click("Nationalrat")
-    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+    client.get(sr_url).click("Bundesbehörden")\
         .click("Nationalrat").click("Aeschi Thomas")
 
     # Delete agency
-    bund = client.get('/organizations').click("Ständerat")
+    client.login_admin()
+    bund = client.get(sr_url)
     agencies = bund.click("Löschen")
     assert "noch keine Organisationen" in client.get('/organizations')
 
@@ -261,17 +266,17 @@ def test_views_hidden(client):
 
     new_agency = client.get('/organizations').click('Organisation', href='new')
     new_agency.form['title'] = 'Bundesbehörden'
-    root = new_agency.form.submit().follow()
-    assert 'Bundesbehörden' in root
+    bund = new_agency.form.submit().follow()
+    assert 'Bundesbehörden' in bund
 
-    new_agency = root.click('Organisation', href='new')
+    new_agency = bund.click('Organisation', href='new')
     new_agency.form['title'] = 'Nationalrat'
     new_agency.form['access'] = 'private'
     child = new_agency.form.submit().follow()
     assert 'Nationalrat' in child
-    assert 'Nationalrat' in client.get('/organizations')
+    assert 'Nationalrat' in client.get(bund.request.url)
 
-    new_membership = root.click("Mitgliedschaft", href='new')
+    new_membership = bund.click("Mitgliedschaft", href='new')
     new_membership.form['title'] = "Mitglied von Zug"
     new_membership.form['person_id'].select(text="Aeschi Thomas")
     new_membership.form['access'] = 'private'
@@ -313,6 +318,14 @@ def test_views_hidden(client):
 
 
 def test_view_pdf_settings(client):
+
+    org = client.app.session().query(Organisation).one()
+    assert org.pdf_layout is None
+    assert org.page_break_on_level_root_pdf is None
+    assert org.page_break_on_level_org_pdf is None
+    assert org.report_changes is None
+    color = '#7a8367'
+
     def get_pdf():
         agencies = client.get('/organizations')
         agencies = agencies.click("PDF erstellen").form.submit().follow()
@@ -326,21 +339,49 @@ def test_view_pdf_settings(client):
 
     client.login_admin()
 
-    assert client.get('/agency-settings')\
-        .form['pdf_layout'].value == 'default'
-
     assert get_pdf() == '1\nGovikon\n0\nPlaceholder for table of contents\n'
 
     settings = client.get('/agency-settings')
+
+    # Test default options for pdf rendering
+    assert settings.form['pdf_layout'].value == 'default'
+    assert settings.form['root_pdf_page_break'].value == '1'
+    assert settings.form['orga_pdf_page_break'].value == '1'
+    assert settings.form['report_changes'].value == 'y'
+
+    # Todo: Find out why this does not work in the test
+    # the field report_changes is Boolean with the same default on
+    # the meta_property, the default is applied in populate_obj, and then
+    # something weird happens in the test
+
+    # assert settings.form['underline_links'].value == 'n'
+    # assert settings.pyquery.find('input[name=link_color]').val() == \
+    #        Pdf.default_link_color
+
     settings.form['pdf_layout'] = 'zg'
-    settings.form.submit()
+    settings.form['root_pdf_page_break'] = '2'
+    settings.form['orga_pdf_page_break'] = '2'
+    settings.form['report_changes'] = False
+    settings.form['underline_links'] = True
+    settings.form['link_color'] = color
+
+    page = settings.form.submit().follow()
+    assert 'Ihre Änderungen wurden gespeichert' in page
+
+    settings = client.get('/agency-settings')
+    assert settings.form['pdf_layout'].value == 'zg'
+    assert settings.form['root_pdf_page_break'].value == '2'
+    assert settings.form['orga_pdf_page_break'].value == '2'
+    assert settings.form['report_changes'].value is None
+    assert settings.form['underline_links'].value == 'y'
+    assert settings.form['link_color'].value == color
 
     assert get_pdf() == 'Govikon\n0\nPlaceholder for table of contents\n'
 
 
 def test_view_report_change(client):
     # Add data
-    client.login_editor()
+    client.login_admin()
 
     new = client.get('/people').click("Person", href='new')
     new.form['academic_title'] = "Dr."
@@ -355,31 +396,41 @@ def test_view_report_change(client):
     new = agency.click("Mitgliedschaft", href='new')
     new.form['title'] = "Doctor"
     new.form['person_id'].select(text="Rivera Nick")
+    new.form.submit().follow()
+
+    new = client.get('/organizations').click("Organisation", href='new')
+    new.form['title'] = "School"
+    new.form.submit().follow()
+
+    new = client.get('/usergroups').click("Benutzergruppe", href='new')
+    new.form['name'] = "School Editors"
+    new.form['users'].select_multiple(texts=["member@example.org"])
+    new.form['agencies'].select_multiple(texts=["School"])
+    new.form.submit().follow()
 
     # Report agency change
     change = agency.click("Mutation melden")
     change.form['email'] = "info@hospital-springfield.com"
-    change.form['message'] = "Please add our address."
+
+    long_message = """
+    I saw some errors. Check
+    - https://mywebsite.com
+    Contact me under +41 77 777 77 77
+    """.strip()
+    linkified = linkify(long_message).replace('\n', '<br>')
+
+    change.form['message'] = long_message
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
-    ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
-    ticket = client.get(ticket_number)
-    assert "Mutationsmeldung" in ticket
-    assert "Hospital Springfield" in ticket
-    assert "Please add our address." in ticket
-    assert "info@hospital-springfield.com" in ticket
-    ticket = ticket.click("Ticket annehmen").follow()
-    ticket = ticket.click("Ticket abschliessen").follow()
-
-    agency.click("Löschen")
-
-    ticket = client.get(ticket_number)
-    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
-    assert "Mutationsmeldung" in ticket
-    assert "Hospital Springfield" in ticket
-    assert "Please add our address." in ticket
-    assert "info@hospital-springfield.com" in ticket
+    agency_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
+    agency_ticket = client.get(agency_ticket_number)
+    assert "Mutationsmeldung" in agency_ticket
+    assert "Hospital Springfield" in agency_ticket
+    assert linkified in agency_ticket
+    assert "info@hospital-springfield.com" in agency_ticket
+    agency_ticket = agency_ticket.click("Ticket annehmen").follow()
+    agency_ticket = agency_ticket.click("Ticket abschliessen").follow()
 
     # Report person change
     change = person.click("Mutation melden")
@@ -388,18 +439,36 @@ def test_view_report_change(client):
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
-    ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
-    ticket = client.get(ticket_number)
-    assert "Mutationsmeldung" in ticket
-    assert "Rivera Nick" in ticket
-    assert "Dr. Rivera's retired." in ticket
-    assert "info@hospital-springfield.com" in ticket
-    ticket = ticket.click("Ticket annehmen").follow()
-    ticket = ticket.click("Ticket abschliessen").follow()
+    person_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
+    person_ticket = client.get(person_ticket_number)
+    assert "Mutationsmeldung" in person_ticket
+    assert "Rivera Nick" in person_ticket
+    assert "Dr. Rivera's retired." in person_ticket
+    assert "info@hospital-springfield.com" in person_ticket
+    person_ticket = person_ticket.click("Ticket annehmen").follow()
+    person_ticket = person_ticket.click("Ticket abschliessen").follow()
 
+    # Details not shown if missing permissions
+    client.login('member@example.org', 'hunter2')
+    client.get(agency_ticket_number, status=403)
+    client.get(person_ticket_number, status=403)
+    page = client.get('/tickets/ALL/closed')
+    assert 'ticket-number-plain' in page
+    assert 'ticket-state' not in page
+
+    # Deleted content
+    client.login_admin()
+    agency.click("Löschen")
     person.click("Löschen")
 
-    ticket = client.get(ticket_number)
+    ticket = client.get(agency_ticket_number)
+    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
+    assert "Mutationsmeldung" in ticket
+    assert "Hospital Springfield" in ticket
+    assert linkified in ticket
+    assert "info@hospital-springfield.com" in ticket
+
+    ticket = client.get(person_ticket_number)
     assert "Der hinterlegte Datensatz wurde entfernt." in ticket
     assert "Mutationsmeldung" in ticket
     assert "Rivera Nick" in ticket
@@ -466,3 +535,89 @@ def test_excel_export_not_logged_in(client):
     page = client.get(
         '/people/people-xlsx', expect_errors=True).maybe_follow()
     assert page.status == '403 Forbidden'
+
+
+@mark.flaky(reruns=3)
+def test_basic_search(client_with_es):
+    client = client_with_es
+    client.login_admin()
+    new = client.get('/people').click("Person", href='new')
+    new.form['academic_title'] = "Dr."
+    new.form['first_name'] = "Nick"
+    new.form['last_name'] = "Rivera"
+    new.form.submit().follow()
+
+    client.app.es_client.indices.refresh(index='_all')
+
+    client = client.spawn()
+    client.get('/search?q=Nick')
+
+
+def test_footer_settings_custom_links(client):
+    client.login_admin()
+
+    # footer settings custom links
+    settings = client.get('/footer-settings')
+    custom_url = 'https://custom.com/1'
+    custom_name = 'Custom1'
+
+    settings.form['custom_link_1_name'] = custom_name
+    settings.form['custom_link_1_url'] = custom_url
+    settings.form['custom_link_2_name'] = 'Custom2'
+    settings.form['custom_link_2_url'] = None
+
+    page = settings.form.submit().follow()
+    assert f'<a href="{custom_url}">{custom_name}</a>' in page
+    assert 'Custom2' not in page
+
+
+def test_view_user_groups(client):
+    client.login_admin()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Bundesbehörden'
+    manage.form.submit()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Kantonsrat'
+    manage.form.submit()
+
+    # create
+    manage = client.get('/usergroups').click('Benutzergruppe', href='new')
+    manage.form['name'] = 'Gruppe BB'
+    manage.form['users'].select_multiple(texts=['editor@example.org'])
+    manage.form['agencies'].select_multiple(texts=['Bundesbehörden'])
+    page = manage.form.submit().maybe_follow()
+    assert 'Gruppe BB' in page
+    assert 'editor@example.org' in page
+    assert 'Bundesbehörden' in page
+
+    page = client.get('/usermanagement').click('Anzeigen', index=1)
+    assert 'editor@example.org' in page
+    assert 'Gruppe BB' in page
+
+    # modify
+    manage = client.get('/usergroups').click('Anzeigen').click('Bearbeiten')
+    manage.form['name'] = 'Gruppe KR'
+    manage.form['users'].select_multiple(texts=['admin@example.org'])
+    manage.form['agencies'].select_multiple(texts=['Kantonsrat'])
+    page = manage.form.submit().maybe_follow()
+    assert 'Gruppe KR' in page
+    assert 'admin@example.org' in page
+    assert 'editor@example.org' not in page
+    assert 'Kantonsrat' in page
+    assert 'Bundesbehörden' not in page
+
+    page = client.get('/usermanagement').click('Anzeigen', index=0)
+    assert 'admin@example.org' in page
+    assert 'Gruppe BB' not in page
+    assert 'Gruppe KR' in page
+
+    page = client.get('/usermanagement').click('Anzeigen', index=1)
+    assert 'editor@example.org' in page
+    assert 'Gruppe BB' not in page
+    assert 'Gruppe KR' not in page
+
+    # delete
+    client.get('/usergroups').click('Anzeigen').click('Löschen')
+    assert 'Alle (0)' in client.get('/usergroups')

@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-07 13:24+0200\n"
-"PO-Revision-Date: 2020-05-10 10:58+0200\n"
+"POT-Creation-Date: 2021-02-10 15:37+0100\n"
+"PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -12,7 +12,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.4.2\n"
+
+msgid "Open"
+msgstr "Ouvert"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Closed"
+msgstr "Fermé"
+
+msgid "All"
+msgstr "Tout"
+
+msgid "Paid"
+msgstr "Payé"
+
+msgid "Failed"
+msgstr "Échoué"
+
+msgid "Refunded"
+msgstr "Remboursé"
+
+msgid "Manual"
+msgstr "Manuelle"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -229,6 +256,9 @@ msgstr "Format Principal"
 msgid "Main view"
 msgstr "Affichage principal"
 
+msgid "Hide these labels on the main view"
+msgstr "Cacher ces noms de champs dans la vue principale"
+
 msgid "Address"
 msgstr "Adresse"
 
@@ -316,9 +346,6 @@ msgstr "Prix"
 msgid "Free of charge"
 msgstr "Gratuit"
 
-msgid "Paid"
-msgstr "Payé"
-
 msgid "Price per submission"
 msgstr "Prix par proposition"
 
@@ -330,6 +357,19 @@ msgstr "Les utilisateurs peuvent envoyer des demandes de modifications"
 
 msgid "Change requests"
 msgstr "Demandes de modifications"
+
+msgid "Enable publication dates"
+msgstr "Activer les dates de publication"
+
+msgid ""
+"Users may suggest publication start and/or end of the entry on submissions "
+"and change requests"
+msgstr ""
+"Les utilisateurs peuvent suggérer le début et/ou la fin de la publication de "
+"l'entrée sur les soumissions et les demandes de changement"
+
+msgid "Publication"
+msgstr "Publication"
 
 #, python-format
 msgid "The following fields are unknown: ${fields}"
@@ -550,6 +590,12 @@ msgstr "Commentaire"
 
 msgid "Please provide at least one change"
 msgstr "Veuillez apporter au moins une modification"
+
+msgid "Publication end must be in the future"
+msgstr "La fin de la publication doit être dans le futur"
+
+msgid "Publication start must be prior to end"
+msgstr "Le début de la publication doit être antérieur à la fin"
 
 msgid "Describes what this form is about"
 msgstr "Décrit le contenu de ce formulaire"
@@ -774,6 +820,16 @@ msgstr "Décrit en quoi consiste cette ressource de réservation"
 msgid "Used to group the resource in the overview"
 msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
 
+msgid "Pick-Up"
+msgstr "Ramassage"
+
+msgid ""
+"Describes how this resource can be picked up. This text is used on the "
+"ticket status page to inform the user"
+msgstr ""
+"Décrit la manière dont cette ressource peut être récupérée. Ce texte est "
+"utilisé sur la page de statut du ticket pour informer le client"
+
 msgid "Extra Fields Definition"
 msgstr "Définition de champs supplémentaires"
 
@@ -887,6 +943,18 @@ msgstr "Allemand"
 msgid "French"
 msgstr "Français"
 
+msgid "Column width left side"
+msgstr "Largeur de la colonne côté gauche"
+
+msgid "Footer Division"
+msgstr "Division du pied du page"
+
+msgid "Column width for the center"
+msgstr "Largeur de la colonne au centre"
+
+msgid "Column width right side"
+msgstr "Largeur de la colonne côté droite"
+
 msgid "Contact"
 msgstr "Contact"
 
@@ -983,6 +1051,46 @@ msgstr "Troisième partenaire"
 
 msgid "Fourth Partner"
 msgstr "Quatrième partenaire"
+
+msgid "The width of the column must be greater than 0"
+msgstr "La largeur de la colonne doit être supérieure à 0"
+
+msgid "The sum of all the footer columns must be equal to 12"
+msgstr "La somme de toutes les colonnes de bas de page doit être égale à 12"
+
+msgid "Icon 16x16 PNG (Windows)"
+msgstr ""
+
+msgid "URL pointing to the icon"
+msgstr "URL pointant vers le Favicon"
+
+msgid "Icon 32x32 PNG (Mac)"
+msgstr ""
+
+msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
+msgstr ""
+
+msgid "Icon SVG 20x20 (Safari)"
+msgstr ""
+
+msgid "Open files in separate window"
+msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
+
+msgid "User will stay on the page when opening images and files"
+msgstr ""
+"L'utilisateur reste sur la page lorsqu'il ouvre des images et des fichiers"
+
+msgid "Title header left side"
+msgstr "Titre dans en-tête, face gauche"
+
+msgid "Optional"
+msgstr "Facultatif"
+
+msgid "Font color"
+msgstr "Couleur de la police"
+
+msgid "Relative font size"
+msgstr "Taille de police relative"
 
 msgid "Homepage Image #1"
 msgstr "Image n°1 de page d'accueil"
@@ -1297,6 +1405,9 @@ msgstr "Ré-ouvrir le ticket"
 msgid "New Note"
 msgstr "Nouveau commentaire"
 
+msgid "PDF"
+msgstr ""
+
 msgid "New Message"
 msgstr "Nouveau message"
 
@@ -1427,9 +1538,6 @@ msgstr "Exports"
 msgid "Payment Providers"
 msgstr "Opérateurs de paiement"
 
-msgid "Stripe Connect"
-msgstr "Stripe Connect"
-
 msgid "Synchronise"
 msgstr "Synchroniser"
 
@@ -1451,6 +1559,18 @@ msgstr "Supprimer le dossier"
 
 msgid "Entry"
 msgstr "Entrée"
+
+msgid "Published"
+msgstr "Publié"
+
+msgid "Upcoming"
+msgstr "A l'anvenir"
+
+msgid "Past"
+msgstr "Passé"
+
+msgid "Choose filter"
+msgstr "Sélectionner un filtre"
 
 msgid "Delete entry"
 msgstr "Supprimer l'entrée"
@@ -1503,8 +1623,11 @@ msgstr "Visible sur la page d'accueil"
 msgid "Visibility"
 msgstr "Visibilité"
 
+msgid "Use text instead of lead in the newsletter"
+msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
+
 msgid "A resource with this name already exists"
-msgstr ""
+msgstr "Une ressource portant ce nom existe déjà"
 
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -1877,6 +2000,46 @@ msgstr ""
 "supprimez d'abord toutes les sous-pages, ou demandez à un administrateur de "
 "le faire pour vous."
 
+msgid "Source"
+msgstr "Source"
+
+msgid "Subject"
+msgstr "Sujet"
+
+msgid "Owner"
+msgstr "Propriétaire"
+
+msgid "Created"
+msgstr "Créé"
+
+msgid "Reaction Time"
+msgstr "Temps de réaction"
+
+msgid "Process Time"
+msgstr "Temps de traitement"
+
+msgid "Event Source"
+msgstr "Source d'événement"
+
+msgid "Payment"
+msgstr "Paiement"
+
+msgid "Total Amount"
+msgstr "Montant total"
+
+msgid "Fee"
+msgstr "Tarif"
+
+msgid ""
+"The record behind this ticket was removed. The following information is a "
+"snapshot kept for future reference."
+msgstr ""
+"Le dossier lié à ce ticket a été supprimé. L'information suivante est un "
+"instantané conservé pour une référence future."
+
+msgid "Summary"
+msgstr "Sommaire"
+
 msgid "No rules defined."
 msgstr "Aucune règle définie."
 
@@ -2043,9 +2206,9 @@ msgstr ""
 
 msgid "corona_message"
 msgstr ""
-"En raison de la situation exceptionnelle, le Conseil fédéral interdit les "
-"manifestations publiques et privées. Tous les événements sont donc annulés "
-"et n'auront pas lieu."
+"Dans le but de contenir le coronavirus, le Conseil fédéral interdit les "
+"manifestations publiques. Tous les événements sont donc annulés et n'auront "
+"pas lieu avant la fin du mois de février."
 
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
@@ -2098,32 +2261,11 @@ msgstr ""
 "Cette rubrique ne contient pas d’introduction. Il est important de saisir un "
 "texte comme introduction pour faciliter la recherche et les listes."
 
-msgid "Total Amount"
-msgstr "Montant total"
-
 msgid "Change request"
 msgstr "Demande de modification"
 
 msgid "New Entry"
 msgstr "Nouvelle entrée"
-
-msgid "Open"
-msgstr "Ouvert"
-
-msgid "Pending"
-msgstr "En attente"
-
-msgid "Closed"
-msgstr "Fermé"
-
-msgid "Failed"
-msgstr "Échoué"
-
-msgid "Refunded"
-msgstr "Remboursé"
-
-msgid "Manual"
-msgstr "Manuelle"
 
 msgid "Previous Page"
 msgstr "Page précédente"
@@ -2146,9 +2288,6 @@ msgstr "Initié"
 
 msgid "Submitted"
 msgstr "Soumis"
-
-msgid "Published"
-msgstr "Publié"
 
 msgid "Withdrawn"
 msgstr "Retiré"
@@ -2251,9 +2390,6 @@ msgstr "Confidentialité"
 msgid "Send me my entered data by e-mail."
 msgstr "M'envoyer mes données saisies par e-mail."
 
-msgid "Payment"
-msgstr "Paiement"
-
 msgid "Pay Online Now"
 msgstr "Payer en ligne maintenant"
 
@@ -2272,20 +2408,11 @@ msgstr "Objet"
 msgid "Net Amount"
 msgstr "Montant net"
 
-msgid "Fee"
-msgstr "Tarif"
-
-msgid "Created"
-msgstr "Créé"
-
 msgid "Disbursed"
 msgstr "Décaissé"
 
 msgid "Digital Signature"
 msgstr "Signature électronique"
-
-msgid "Publication"
-msgstr "Publication"
 
 msgid "Private"
 msgstr "Privé"
@@ -2368,6 +2495,9 @@ msgstr "${name} a été signé numériquement le ${date}"
 
 msgid "${name} is not in our database"
 msgstr "${name} n'est pas dans notre base de données"
+
+msgid "Accept"
+msgstr "Accepter"
 
 msgid "Hello!"
 msgstr "Bonjour"
@@ -2492,8 +2622,8 @@ msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 msgid "Your directory submission has been adopted:"
 msgstr "Votre proposition de répertoire a été adoptée :"
 
-msgid "Check ticket status"
-msgstr "Vérifier l'état du ticket"
+msgid "Check request status"
+msgstr "Vérifier l'état de la demande"
 
 msgid "Your change request has been applied:"
 msgstr "Votre demande de modification a été effectuée :"
@@ -2556,19 +2686,19 @@ msgstr ""
 "Si vous ne souhaitez pas changer de mot de passe, vous pouvez ignorer cet e-"
 "mail."
 
-msgid "Your ticket has received a payment."
-msgstr "Votre ticket a reçu un paiement."
+msgid "Your request has received a payment."
+msgstr "Votre demande a reçu un paiement."
 
-msgid "Your ticket was marked as unpaid."
-msgstr "Votre ticket a été marqué non payé."
+msgid "Your request was marked as unpaid."
+msgstr "Votre demande a été marquée comme non payée."
 
 msgid ""
-"Your ticket's payment has been refunded. Note that it might take a few days "
+"Your request's payment has been refunded. Note that it might take a few days "
 "until your refunded amount is shown on your credit card bill."
 msgstr ""
-"Votre ticket vous a été remboursé. Notez qu'il peut se passer quelques jours "
-"avant que le montant du remboursement ne figure sur votre relevé de carte de "
-"crédit."
+"Le paiement de votre demande a été remboursé. Notez qu'il peut se passer "
+"quelques jours avant que le montant du remboursement ne figure sur votre "
+"relevé de carte de crédit."
 
 msgid "Amount:"
 msgstr "Montant :"
@@ -2600,44 +2730,44 @@ msgstr "Un message a été envoyé à propos de ${ref} :"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the ticket status page"
-#. Canonical text for ${link} is: "visit the ticket page"
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
 #. Used in sentence: "Please ${link} to reply."
-msgid "visit the ticket status page"
-msgstr "visitez la page de statut du ticket"
+msgid "visit the request status page"
+msgstr "visitez la page de statut de la demande"
 
 #. Used in sentence: "Please ${link} to reply."
-msgid "visit the ticket page"
-msgstr "visitez la page du ticket"
+msgid "visit the request page"
+msgstr "visitez la page de la demande"
 
-msgid "Your ticket has been closed."
-msgstr "Votre ticket a été fermé."
+msgid "Your request has been closed."
+msgstr "Votre demande a été complétée."
 
-msgid "Your ticket's timeline has been archived for future reference:"
+msgid "Your requests's timeline has been archived for future reference:"
 msgstr ""
-"L'historique de votre ticket a été archivé pour des références futures :"
+"L'historique de votre demande a été archivé pour des références futures :"
 
-msgid "Ticket Timeline"
-msgstr "Historique du ticket"
+msgid "Request Timeline"
+msgstr "Historique de la demande"
 
 msgid "Thank you for your request."
 msgstr "Merci pour votre requête."
 
-msgid "A new ticket has been opened:"
-msgstr "Un nouveau ticket a été ouvert :"
+msgid "Your request has been registered with the following reference:"
+msgstr "Votre demande a été enregistrée avec la référence suivante :"
 
 msgid ""
 "We will send another e-mail once your ticket has been completed. In the "
 "meantime you can check the status of your ticket at any time:"
 msgstr ""
-"Nous vous enverrons un autre e-mail dès que votre ticket aura été traité. "
-"Entre-temps, vous pouvez aller voir l'état de votre ticket à tout moment :"
+"Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
+"Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment :"
 
-msgid "Your ticket has been reopened"
-msgstr "Votre ticket a été ré-ouvert"
+msgid "Your request has been reopened"
+msgstr "Votre demande a été ré-ouverte"
 
 msgid "Directory entry adopted."
 msgstr "L'entrée de répertoire a été adoptée."
@@ -2947,6 +3077,14 @@ msgstr "Tous les abonnés ont déjà reçu ce bulletin d'information."
 msgid "The newsletter is scheduled to be sent on ${time}"
 msgstr "La newsletter est programmée pour être envoyée le ${time}"
 
+msgid ""
+"Check the email text. You can use the full news text instead of the leading "
+"if you want. You will find this setting in the edit menu of the news item."
+msgstr ""
+"Vérifiez le texte du courriel. Vous pouvez utiliser le texte complet de la "
+"nouvelle au lieu de l'entête si vous le souhaitez. Vous trouverez ce "
+"paramètre dans le menu d'édition de la nouvelle."
+
 msgid "Delivery"
 msgstr "Envoi"
 
@@ -2969,13 +3107,6 @@ msgid ""
 msgstr ""
 "Votre lien d'inscription a été créé comme suit. Copiez-le avant de "
 "continuer, il ne vous sera pas montré à nouveau :"
-
-msgid ""
-"The record behind this ticket was removed. The following information is a "
-"snapshot kept for future reference."
-msgstr ""
-"Le dossier lié à ce ticket a été supprimé. L'information suivante est un "
-"instantané conservé pour une référence future."
 
 msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
@@ -3024,21 +3155,6 @@ msgstr "${count} notes"
 msgid "Amount"
 msgstr "Montant"
 
-msgid "Source"
-msgstr "Source"
-
-msgid "Owner"
-msgstr "Propriétaire"
-
-msgid "Reaction Time"
-msgstr "Temps de réaction"
-
-msgid "Process Time"
-msgstr "Temps de traitement"
-
-msgid "Summary"
-msgstr "Sommaire"
-
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -3054,17 +3170,14 @@ msgstr ""
 "Vous pouvez utiliser des liens/des adresses e-mail qui sont transformées en "
 "liens cliquables."
 
-msgid "Ticket Number"
-msgstr "Numéro du ticket"
-
-msgid "Subject"
-msgstr "Sujet"
+msgid "Request Reference"
+msgstr "Référence"
 
 msgid ""
 "Forgot something or have a special request? Add a message to the ticket."
 msgstr ""
 "Vous avez oublié quelque chose ou avez une demande spéciale ? Ajoutez un "
-"message au ticket."
+"message a la demande."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
@@ -3077,9 +3190,6 @@ msgstr "Propriétaire :"
 
 msgid "Kind:"
 msgstr "Type :"
-
-msgid "Accept"
-msgstr "Accepter"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -3094,6 +3204,9 @@ msgid ""
 msgstr ""
 "Vous n'êtes pas automatiquement redirigé afin que vous puissiez modifier ou "
 "supprimer ce lien."
+
+msgid "local"
+msgstr "local"
 
 msgid "No links found."
 msgstr "Aucun lien trouvé."
@@ -3452,8 +3565,8 @@ msgstr ""
 "ne sont pas publiés. Il n'ont aucuns droits à être publiés et les événements "
 "déjà publiés peuvent être supprimés de la page sans notification ni motif."
 
-msgid "Your ticket has been opened"
-msgstr "Votre ticket a été ouvert"
+msgid "Your request has been registered"
+msgstr "Yotre demande a été enregistrée."
 
 msgid "Your request could not be accepted automatically!"
 msgstr "Votre demande n'a pas pu être traitée automatiquement."
@@ -3664,9 +3777,6 @@ msgstr "Envoyé \"${title}\" à ${recipient}"
 
 msgid "Sends a test newsletter to the given address"
 msgstr "Envoi d'une newsletter de test à l'adresse indiquée"
-
-msgid "All"
-msgstr "Tout"
 
 msgid "Today"
 msgstr "Aujourd’hui"
@@ -3889,6 +3999,15 @@ msgstr "${count} résultats"
 msgid "Search Unavailable"
 msgstr "Recherche non disponible"
 
+msgid "Favicon"
+msgstr "Favicon"
+
+msgid "Links"
+msgstr ""
+
+msgid "Header"
+msgstr "En-tête"
+
 msgid "Footer"
 msgstr "Bas de page"
 
@@ -4010,6 +4129,9 @@ msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
 msgid "You have reopened ticket ${number}"
 msgstr "Vous avez réouvert ${number} ticket(s)"
 
+msgid "Your ticket has been reopened"
+msgstr "Votre ticket a été ré-ouvert"
+
 #, python-format
 msgid "You have disabled e-mails for ticket ${number}"
 msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
@@ -4041,6 +4163,12 @@ msgstr "Votre demande est actuellement en attente"
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
 
+msgid "Request Status"
+msgstr "Status Demand"
+
+msgid "The request has already been closed"
+msgstr "Votre demand a déjà été clòturée. "
+
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
 
@@ -4071,35 +4199,53 @@ msgstr "L'utilisateur a bien été créé"
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
 
-#~ msgid "E-Mail Reply Address"
-#~ msgstr "Adresse e-mail de réponse"
+#~ msgid "created"
+#~ msgstr "créé"
 
-#~ msgid "A room with this name already exists"
-#~ msgstr "Une resource portant le même nom existe déjà"
+#~ msgid "Reservation Daypass"
+#~ msgstr "Réreservation Carte journalière"
 
-#~ msgid ""
-#~ "The feature to automatically close tickets and accept their items is "
-#~ "experimental. It works for ${handler_codes}."
-#~ msgstr ""
-#~ "La fonction permettant de fermer automatiquement les tickets et "
-#~ "d'accepter leurs articles est expérimentale. Il fonctionne pour "
-#~ "${handler_codes}."
+#~ msgid "Check ticket status"
+#~ msgstr "Vérifier l'état du ticket"
 
-#~ msgid "Lecture"
-#~ msgstr "Lecture"
+#~ msgid "Your ticket has received a payment."
+#~ msgstr "Votre ticket a reçu un paiement."
 
-#~ msgid "Castle garden"
-#~ msgstr "Jardin du château"
-
-#~ msgid "This site is hidden from the general public"
-#~ msgstr "Ce site est caché pour le grand public"
+#~ msgid "Your ticket was marked as unpaid."
+#~ msgstr "Votre ticket a été marqué non payé."
 
 #~ msgid ""
-#~ "This site is hidden from the general public. To show it to everyone, edit "
-#~ "this page and disable \"Hide from public\"."
+#~ "Your ticket's payment has been refunded. Note that it might take a few "
+#~ "days until your refunded amount is shown on your credit card bill."
 #~ msgstr ""
-#~ "Ce site est caché du grand public. Pour le montrer à tout le monde, "
-#~ "modifiez cette page et désactivez « Cacher du public »."
+#~ "Votre ticket vous a été remboursé. Notez qu'il peut se passer quelques "
+#~ "jours avant que le montant du remboursement ne figure sur votre relevé de "
+#~ "carte de crédit."
 
-#~ msgid "Hide from the public"
-#~ msgstr "Cacher au public"
+#~ msgid "visit the ticket status page"
+#~ msgstr "visitez la page de statut du ticket"
+
+#~ msgid "visit the ticket page"
+#~ msgstr "visitez la page du ticket"
+
+#~ msgid "Your ticket has been closed."
+#~ msgstr "Votre ticket a été fermé."
+
+#~ msgid "Your ticket's timeline has been archived for future reference:"
+#~ msgstr ""
+#~ "L'historique de votre ticket a été archivé pour des références futures :"
+
+#~ msgid "Ticket Timeline"
+#~ msgstr "Historique du ticket"
+
+#~ msgid "A new ticket has been opened:"
+#~ msgstr "Un nouveau ticket a été ouvert :"
+
+#~ msgid "Request-ID"
+#~ msgstr "ID de la demande"
+
+#~ msgid "Your ticket has been opened"
+#~ msgstr "Votre ticket a été ouvert"
+
+#~ msgid "Ticket Number"
+#~ msgstr "Numéro du ticket"

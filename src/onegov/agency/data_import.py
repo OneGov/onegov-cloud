@@ -3,7 +3,6 @@ from datetime import datetime
 
 from onegov.agency.collections import ExtendedAgencyCollection, \
     ExtendedPersonCollection
-from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
@@ -40,7 +39,9 @@ def get_phone(string):
     if string.startswith('00'):
         return string.replace('00', '+', 1)
     if not string.startswith('+'):
-        return string.replace('0', '+41 ', 1)
+        if len(string.replace(' ', '')) == 10:  # be sure #digits fit CH
+            return string.replace('0', '+41 ', 1)
+    return string
 
 
 def p(text):
@@ -51,18 +52,24 @@ def br(text):
     return text + '<br>'
 
 
+def split_address_on_new_line(address, newline=False):
+    new_addr = '<br>'.join(part.strip() for part in address.split(','))
+    new_addr = new_addr + '<br>' if newline else new_addr
+    return new_addr
+
+
 def get_address(line):
-    # Todo: Split addresses using plz and place a line down below
     stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
     if stao_addr and post_addr:
         if stao_addr == post_addr:
-            return br(stao_addr)
+            return br(split_address_on_new_line(stao_addr))
         else:
-            return br(stao_addr) + br(post_addr)
+            return br(split_address_on_new_line(stao_addr, True)) +\
+                   br(split_address_on_new_line(post_addr))
     elif stao_addr:
-        return br(stao_addr)
+        return br(split_address_on_new_line(stao_addr))
     if post_addr:
-        return br(post_addr)
+        return br(split_address_on_new_line(post_addr))
 
 
 def get_agency_portrait(line):
@@ -111,6 +118,12 @@ def import_bs_agencies(csvfile, session, app):
         line.verzorgeinheitid for line in csvfile.lines
         if line.verzvorfahreoeid not in lines_by_id.keys()
     )
+    if len(treat_as_root) == 1:
+        # Use the first level as root
+        treat_as_root = tuple(
+            line.verzorgeinheitid for line in csvfile.lines
+            if line.verzvorfahreoeid in treat_as_root
+        )
     added_agencies = {}
     children = defaultdict(list)
     roots = []
@@ -134,7 +147,8 @@ def import_bs_agencies(csvfile, session, app):
             title=line.bezeichnung.strip(),
             description=None,
             portrait=portrait,
-            order=numeric_priority(v_(line.anzeigeprio))
+            order=numeric_priority(v_(line.anzeigeprio)),
+            export_fields=["person.title", "person.phone"]
         )
         added_agencies[line.verzorgeinheitid] = agency
         return agency
@@ -173,9 +187,6 @@ def import_bs_persons(csvfile, agencies, session, app):
             s for s in (bemerkung, notiz, sprechstunde) if s]
         )
 
-        if sprechstunde:
-            note += f"\n{sprechstunde}"
-
         agency_id = line.verzorgeinheitid
 
         person_ = people.add(
@@ -200,16 +211,14 @@ def import_bs_persons(csvfile, agencies, session, app):
         if agency_id:
             agency = agencies.get(agency_id)
             if agency:
-                agency.memberships.append(ExtendedAgencyMembership(
-                    person_id=person_.id,
-                    title='',
+                agency.add_person(
+                    person_.id,
+                    title='Mitglied',
                     since=None,
                     prefix=None,
                     addition=None,
                     note=None,
-                    order_within_agency=0,
-                    order_within_person=0
-                ))
+                )
 
             else:
                 print(f'agency id {agency_id} not found in agencies')
@@ -227,4 +236,142 @@ def import_bs_data(agency_file, person_file, request, app):
     agencies = import_bs_agencies(agency_file, session, app)
     persons = import_bs_persons(person_file, agencies, session, app)
 
+    for agency in agencies.values():
+        agency.sort_relationships()
+
     return agencies, persons
+
+
+@with_open
+def parse_agencies(csvfile):
+    lines_by_id = {line.verzorgeinheitid: line for line in csvfile.lines}
+    treat_as_root = tuple(
+        line.verzorgeinheitid for line in csvfile.lines
+        if line.verzvorfahreoeid not in lines_by_id.keys()
+    )
+    if len(treat_as_root) == 1:
+        # Use the first level as root
+        treat_as_root = tuple(
+            line.verzorgeinheitid for line in csvfile.lines
+            if line.verzvorfahreoeid in treat_as_root
+        )
+    added_agencies = {}
+
+    print('Treated as root agencies: ', ", ".join(treat_as_root))
+    for line in csvfile.lines:
+        basisid = line.verzorgeinheitid
+        added_agencies[basisid] = line.bezeichnung.strip()
+
+    return added_agencies
+
+
+@with_open
+def match_person_membership_title(csvfile, agencies, request, app):
+    session = request.session
+    people = ExtendedPersonCollection(session)
+    agency_coll = ExtendedAgencyCollection(session)
+    person_query = session.query(people.model_class)
+
+    total_entries = 0
+    person_not_found = []
+    agency_by_name_not_found = []
+    updated_memberships = []
+
+    def find_persons(line):
+        nonlocal person_not_found
+
+        email = v_(line.email)
+        fn = v_(line.vorname)
+        ln = v_(line.name)
+
+        persons = []
+
+        if email:
+            persons = person_query.filter(people.model_class.email.in_(
+                (email, email.lower())
+            )).all()
+        if not persons and fn and ln:
+            persons = person_query.filter(
+                people.model_class.first_name == fn,
+                people.model_class.last_name == ln
+            ).all()
+        if not persons:
+            person_not_found.append(f'{email}, {fn} {ln}')
+        return persons
+
+    def get_agencies_by_name(name):
+        return agency_coll.query().filter_by(title=name).all()
+
+    def match_membership_title(line, agencies):
+        nonlocal agency_by_name_not_found
+
+        persons = find_persons(line)
+        agency_id = line.verzorgeinheitid
+        if not persons:
+            return
+        if agency_id not in agencies:
+            # actually we don't come here with our data for a solid export
+            return
+
+        agency_name = agencies[agency_id]
+        agencies_by_name = get_agencies_by_name(agency_name)
+
+        if not agencies_by_name:
+            agency_by_name_not_found.append(agency_name)
+            return
+
+        def set_membership_title(membership, name):
+            nonlocal updated_memberships
+
+            title = membership.title.strip()
+            name = name.strip() if name else None
+
+            if not name:
+                if title:
+                    # print('No function given but title set')
+                    return
+                membership.title = 'Mitglied'
+                updated_memberships.append(membership)
+                return
+
+            if title and title != 'Mitglied':
+                # title already set
+                return
+
+            membership.title = name
+            updated_memberships.append(membership)
+
+        function = v_(line.funktion)
+        for person in persons:
+            for membership in person.memberships:
+                agency = membership.agency
+                if agency in agencies_by_name:
+                    set_membership_title(membership, function)
+
+    for ix, line in enumerate(csvfile.lines):
+        if ix % 50 == 0:
+            app.es_indexer.process()
+        total_entries += 1
+        match_membership_title(line, agencies)
+
+    person_not_found = set(person_not_found)
+    agency_by_name_not_found = set(agency_by_name_not_found)
+
+    print('---- STATISTICS ----')
+    print('Total rows: ', total_entries)
+    print('Unique People not found: ', len(person_not_found))
+    print('Unique Agencies by name not found: ', len(agency_by_name_not_found))
+    print('Updated memberships: ', len(updated_memberships))
+
+    log_file_path = '/var/lib/onegov-cloud/staka_bs_memberships_title.log'
+    with open(str(log_file_path), 'w') as f:
+        f.write('PEOPLE NOT FOUND\n')
+        f.write("\n".join(person_not_found))
+        f.write('\n\nAGENCIES NOT FOUND\n')
+        f.write("\n".join((agency_by_name_not_found)))
+    print('Find the logfile in ' + log_file_path)
+
+
+def import_membership_titles(agency_file, person_file, request, app):
+    agencies = parse_agencies(agency_file)
+    match_person_membership_title(person_file, agencies, request, app)

@@ -3,8 +3,6 @@ from uuid import uuid4
 
 from sedate import utcnow
 
-from tests.shared.utils import open_in_browser
-
 
 def test_audit_for_course(client, scenario):
     """

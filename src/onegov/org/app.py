@@ -493,6 +493,7 @@ def get_common_asset():
     yield 'lazysizes.js'
     yield 'toggle.js'
     yield 'common.js'
+    yield '_blank.js'
 
 
 @OrgApp.webasset('fontpreview')

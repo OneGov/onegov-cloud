@@ -187,7 +187,7 @@ def test_view_users_export(gazette_app):
     admin = Client(gazette_app)
     login_admin(admin)
 
-    result = admin.get('/users').click("Als XLSX herunterladen")
+    result = admin.get('/users').click("Als XLSX herunterladen").form.submit()
     book = open_workbook(file_contents=result.body)
     assert book.nsheets == 2
 

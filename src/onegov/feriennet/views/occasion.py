@@ -103,7 +103,6 @@ def edit_occasion(self, request, form):
         )
     else:
         warning = None
-
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
@@ -350,4 +349,9 @@ def handle_occasion_need(self, request, form):
     request_method='DELETE')
 def delete_occasion_need(self, request):
     request.assert_valid_csrf_token()
+
+    # Likewise, before flushing the changes, the needs observer is not
+    # triggered by an event.
+    occasion = self.occasion
     request.session.delete(self)
+    occasion.observe_needs(occasion.needs)

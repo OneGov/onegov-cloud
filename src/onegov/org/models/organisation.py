@@ -98,6 +98,42 @@ class Organisation(Base, TimestampMixin):
     tickets_skip_opening_email = meta_property()
     mute_all_tickets = meta_property()
 
+    # Type boolean
+    report_changes = meta_property()
+
+    # PDF rendering options
+    pdf_layout = meta_property()
+    pdf_link_color = meta_property()
+    pdf_underline_links = meta_property(default=False)
+
+    # break points of pages after title of level x, type integer
+    page_break_on_level_root_pdf = meta_property()
+    page_break_on_level_org_pdf = meta_property()
+
+    # For custom search results or on the people detail view, include topmost
+    # n levels as indexes of agency.ancestors, type: list of integers
+    agency_display_levels = meta_property()
+
+    # Header settings that go into the div.globals
+    header_options = meta_property(default=dict)
+
+    # Setting if show full agency path on people detail view
+    agency_path_display_on_people = meta_property(default=False)
+
+    # Favicon urls for favicon macro
+    favicon_win_url = meta_property()
+    favicon_mac_url = meta_property()
+    favicon_apple_touch_url = meta_property()
+    favicon_pinned_tab_safari_url = meta_property()
+
+    # Links Settings
+    open_files_target_blank = meta_property(default=True)
+
+    # Footer column width settings
+    footer_left_width = meta_property(default=3)
+    footer_center_width = meta_property(default=5)
+    footer_right_width = meta_property(default=4)
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

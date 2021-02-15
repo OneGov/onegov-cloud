@@ -11,9 +11,14 @@
 
             <tal:b repeat="item news">
                 <strong><a href="${request.link(item)}">${item.title}</a></strong>
-                <p>
-                    ${layout.with_hashtags(item.lead)}
-                </p>
+                <tal:b tal:switch="item.text_in_newsletter">
+                    <tal:b tal:case="False">
+                        <p>${layout.with_hashtags(item.lead)}</p>
+                    </tal:b>
+                    <tal:b tal:case="True" tal:content="structure item.text">
+                    </tal:b>
+                </tal:b>
+
             </tal:b>
         </tal:b>
 

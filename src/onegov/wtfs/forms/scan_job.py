@@ -7,7 +7,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.wtfs import _
 from onegov.wtfs.fields import HintField
-from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import Municipality, ScanJob
 from onegov.wtfs.models import PickupDate
 from wtforms import HiddenField
 from wtforms import IntegerField
@@ -142,7 +142,7 @@ class AddScanJobForm(Form):
         )
         query = query.filter(PickupDate.date > after)
         query = query.order_by(PickupDate.date)
-        return [r.date for r in query]
+        return [r.date for r in query] or [date(2018, 1, 1), date.today()]
 
     @property
     def return_date(self):
@@ -250,7 +250,7 @@ class EditScanJobForm(Form):
     )
 
     def update_labels(self):
-        year = date.today().year
+        year = self.model.dispatch_date.year
         self.dispatch_tax_forms_older.label.text = _(
             "Tax forms until ${year}", mapping={'year': year - 2}
         )
@@ -448,7 +448,11 @@ class UnrestrictedScanJobForm(Form):
     )
 
     def update_labels(self):
-        year = date.today().year
+        if isinstance(self.model, ScanJob):
+            year = self.model.dispatch_date.year
+        else:
+            year = date.today().year
+
         self.dispatch_tax_forms_older.label.text = _(
             "Tax forms until ${year}", mapping={'year': year - 2}
         )

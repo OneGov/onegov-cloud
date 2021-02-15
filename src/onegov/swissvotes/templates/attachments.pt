@@ -5,6 +5,7 @@
 
             <div class="row attachments">
                 <div class="small-12 columns">
+                    <div class="panel callout" tal:condition="callout|nothing">${callout}</div>
 
                     <table class="attachments stackable">
                         <thead>

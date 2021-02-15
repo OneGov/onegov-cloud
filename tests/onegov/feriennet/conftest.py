@@ -37,12 +37,12 @@ def client_with_es(es_feriennet_app):
     return Client(es_feriennet_app)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def feriennet_app(request):
     yield create_feriennet_app(request, use_elasticsearch=False)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_feriennet_app(request):
     yield create_feriennet_app(request, use_elasticsearch=True)
 

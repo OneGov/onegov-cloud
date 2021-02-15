@@ -1,17 +1,17 @@
-# This file was generated from translations/Uebersetzungstabelle 2019-05-24.xlsx
+# This file was generated from Uebersetzungstabelle 2020-08-21.xlsx
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2020-04-22 21:49+0200\n"
-"PO-Revision-Date: 2019-12-14 14:10+0100\n"
-"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
+"POT-Creation-Date: 2021-02-15 11:20+0100\n"
+"PO-Revision-Date: 2021-01-07 09:13+0100\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: de_CH\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.4.2\n"
 
 msgid "Not a valid XLSX file."
 msgstr "Keine gültige XLSX-Datei."
@@ -44,26 +44,41 @@ msgstr ""
 "Das Hochladen von Anhängen kann aufgrund der Volltextindizierung einige Zeit "
 "in Anspruch nehmen."
 
+msgid "Brief description Swissvotes"
+msgstr "Kurzbeschreibung Swissvotes"
+
+msgid "General"
+msgstr "Allgemeines"
+
 msgid "Voting text"
 msgstr "Abstimmungstext"
 
-msgid "Brief description Swissvotes"
-msgstr "Kurzbeschreibung Swissvotes"
+msgid "Preliminary examination"
+msgstr "Vorprüfung"
+
+msgid "Submission"
+msgstr "Einreichung"
+
+msgid "Realization"
+msgstr "Zustandekommen"
 
 msgid "Federal council message"
 msgstr "Botschaft des Bundesrats"
 
+msgid "Pre-parliamentary phase"
+msgstr "Vorparlamentarische Phase"
+
 msgid "Parliamentary debate"
 msgstr "Parlamentsberatung"
+
+msgid "Parliamentary phase"
+msgstr "Im Parlament"
 
 msgid "Voting booklet"
 msgstr "Abstimmungsbüchlein"
 
-msgid "Resolution"
-msgstr "Erwahrungsbeschluss"
-
-msgid "Realization"
-msgstr "Zustandekommen"
+msgid "Voting campaign"
+msgstr "Abstimmungskampf"
 
 msgid "Advertisment analysis"
 msgstr "Inserateanalyse"
@@ -71,14 +86,57 @@ msgstr "Inserateanalyse"
 msgid "Fög Analysis"
 msgstr "Medienanalyse fög"
 
-msgid "Post-vote poll"
-msgstr "Nachbefragung"
+msgid "Resolution"
+msgstr "Erwahrungsbeschluss"
 
-msgid "Preliminary examination"
-msgstr "Vorprüfung"
+msgid "Vote"
+msgstr "Abstimmung"
 
 msgid "Result by canton, district and municipality"
 msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
+
+msgid "Full analysis of post-vote poll results"
+msgstr "Analysebericht Nachbefragung"
+
+msgid "Post-vote poll"
+msgstr "Nachbefragung"
+
+msgid "Questionnaire of the poll"
+msgstr "Fragebogen der Nachbefragung"
+
+msgid "Dataset of the post-vote poll (CSV)"
+msgstr "Datensatz der Nachbefragung (CSV)"
+
+msgid "Dataset of the post-vote poll (SAV)"
+msgstr "Datensatz der Nachbefragung (SAV)"
+
+msgid "Dataset of the post-vote poll (DTA)"
+msgstr "Datensatz der Nachbefragung (DTA)"
+
+msgid "Codebook for the post-vote poll (PDF)"
+msgstr "Codebuch zur Nachbefragung (PDF)"
+
+msgid "Codebook for the post-vote poll (XLSX)"
+msgstr "Codebuch zur Nachbefragung (XLSX)"
+
+msgid "Technical report of the post-vote poll"
+msgstr "Technischer Bericht der Nachbefragung"
+
+msgid "Updating the external resources may take some time."
+msgstr ""
+"Die Aktualisierung der externen Quellen kann einige Zeit in Anspruch nehmen."
+
+msgid "Resource"
+msgstr "Quelle"
+
+msgid "eMuseum.ch"
+msgstr "eMuseum.ch"
+
+msgid "Social Archives"
+msgstr "Sozialarchiv"
+
+msgid "No eMuseum API key available."
+msgstr "Kein eMuseum API Schlüssel verfügbar."
 
 msgid "Title"
 msgstr "Titel"
@@ -154,6 +212,9 @@ msgstr "Seite bearbeiten"
 msgid "Manage attachments"
 msgstr "Anhänge verwalten"
 
+msgid "Manage slider images"
+msgstr "Slider-Bilder verwalten"
+
 msgid "Delete page"
 msgstr "Seite löschen"
 
@@ -169,6 +230,12 @@ msgstr "Seite hinzufügen"
 msgid "Delete attachment"
 msgstr "Anhang löschen"
 
+msgid "Campaign material for a Yes"
+msgstr "Kampagnenmaterial Ja"
+
+msgid "Campaign material for a No"
+msgstr "Kampagnenmaterial Nein"
+
 msgid "Delete vote"
 msgstr "Abstimmung löschen"
 
@@ -180,15 +247,6 @@ msgstr "Datensatz aktualisieren"
 
 msgid "Update external resources"
 msgstr "Externe Quellen aktualisieren"
-
-msgid "Update all external resources?"
-msgstr "Alle externen Quellen aktualisieren?"
-
-msgid "This can take some time."
-msgstr "Dies kann eine Weile dauern."
-
-msgid "Cancel"
-msgstr "Abbrechen"
 
 msgid "Download dataset (CSV)"
 msgstr "Datensatz herunterladen (CSV)"
@@ -301,6 +359,9 @@ msgstr "JLdU"
 msgid "actor-jlps-abbreviation"
 msgstr "JLPS"
 
+msgid "actor-jmitte-abbreviation"
+msgstr "JM"
+
 msgid "actor-jna-abbreviation"
 msgstr "JNA"
 
@@ -339,6 +400,12 @@ msgstr "LPS"
 
 msgid "actor-mcg-abbreviation"
 msgstr "MCG"
+
+msgid "actor-mitte-abbreviation"
+msgstr "Mitte"
+
+msgid "actor-mitte-fr-abbreviation"
+msgstr "Mitte-Fr"
 
 msgid "actor-pda-abbreviation"
 msgstr "PdA"
@@ -535,6 +602,9 @@ msgstr "Junger LdU"
 msgid "actor-jlps-label"
 msgstr "Junge LPS"
 
+msgid "actor-jmitte-label"
+msgstr "Die Junge Mitte"
+
 msgid "actor-jna-label"
 msgstr "Junge NA"
 
@@ -573,6 +643,12 @@ msgstr "Liberale Partei der Schweiz"
 
 msgid "actor-mcg-label"
 msgstr "Mouvement citoyens genevois"
+
+msgid "actor-mitte-label"
+msgstr "Die Mitte Schweiz"
+
+msgid "actor-mitte-fr-label"
+msgstr "Die Mitte Frauen"
 
 msgid "actor-pda-label"
 msgstr "Partei der Arbeit"
@@ -722,7 +798,7 @@ msgid "d-3-151"
 msgstr "Territorialfragen"
 
 msgid "d-3-152"
-msgstr "Beziehung Bund-Kanton"
+msgstr "Beziehungen zwischen Bund und Kantonen"
 
 msgid "d-3-153"
 msgstr "Aufgabenteilung"
@@ -776,7 +852,7 @@ msgid "d-3-223"
 msgstr "EWR"
 
 msgid "d-3-224"
-msgstr "Andere Organisationen"
+msgstr "Andere europäische Organisationen"
 
 msgid "d-2-23"
 msgstr "Internationale Organisationen"
@@ -785,7 +861,7 @@ msgid "d-3-231"
 msgstr "UNO"
 
 msgid "d-3-232"
-msgstr "Andere Organisationen"
+msgstr "Andere internationale Organisationen"
 
 msgid "d-2-24"
 msgstr "Entwicklungszusammenarbeit"
@@ -806,7 +882,7 @@ msgid "d-2-27"
 msgstr "Diplomatie"
 
 msgid "d-2-28"
-msgstr "Auslandschweizer"
+msgstr "Auslandschweizerinnen und Auslandschweizer"
 
 msgid "d-1-3"
 msgstr "Sicherheitspolitik"
@@ -842,7 +918,7 @@ msgid "d-3-325"
 msgstr "Dienstverweigerung – Zivildienst"
 
 msgid "d-3-326"
-msgstr "Armeebeschaffung"
+msgstr "Armeeabschaffung"
 
 msgid "d-3-327"
 msgstr "Militärische Ausbildung"
@@ -911,7 +987,7 @@ msgid "d-3-442"
 msgstr "Hotellerie und Gastgewerbe"
 
 msgid "d-3-443"
-msgstr "Spielbanken – Kursaal – Kasino"
+msgstr "Geldspiele"
 
 msgid "d-1-5"
 msgstr "Landwirtschaft"
@@ -953,10 +1029,10 @@ msgid "d-2-62"
 msgstr "Finanzordnung"
 
 msgid "d-2-63"
-msgstr "Ausgabenordnung"
+msgstr "Öffentliche Ausgaben"
 
 msgid "d-2-64"
-msgstr "Sparmassnahmen – Sanierungsmassnahmen"
+msgstr "Spar- und Sanierungsmassnahmen"
 
 msgid "d-1-7"
 msgstr "Energie"
@@ -1055,7 +1131,7 @@ msgid "d-3-934"
 msgstr "Gewässerschutz"
 
 msgid "d-3-935"
-msgstr "Boden"
+msgstr "Bodenschutz"
 
 msgid "d-3-936"
 msgstr "Abfälle"
@@ -1067,7 +1143,7 @@ msgid "d-3-938"
 msgstr "Tierschutz"
 
 msgid "d-1-10"
-msgstr "Soziale Fragen – Sozialpolitik"
+msgstr "Sozialpolitik"
 
 msgid "d-2-101"
 msgstr "Gesundheit"
@@ -1136,7 +1212,7 @@ msgid "d-3-1036"
 msgstr "Seniorinnen und Senioren"
 
 msgid "d-3-1037"
-msgstr "Invalide"
+msgstr "Behinderte"
 
 msgid "d-3-1038"
 msgstr "Homosexuelle"
@@ -1385,6 +1461,27 @@ msgstr "Organisation existiert nicht mehr"
 msgid "unknown"
 msgstr "unbekannt"
 
+msgid "Link eMuseum.ch"
+msgstr "Link eMuseum.ch"
+
+msgid "Link Social Archives"
+msgstr "Link Sozialarchiv"
+
+msgid "Swissvotes database"
+msgstr "Swissvotes-Datenbank"
+
+msgid "Analysis of the advertising campaign by Année Politique"
+msgstr "Inseratekampagne: Analyse von APS"
+
+msgid "Media coverage: fög analysis"
+msgstr "Medienberichterstattung: Analyse des fög"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Datensatz der Nachbefragung"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Codebuch zur Nachbefragung"
+
 msgid "Attachment"
 msgstr "Anhang"
 
@@ -1407,6 +1504,13 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
+msgid ""
+"This webpage is best viewed with a modern Browser. Consider to use Chrome, "
+"Firefox or Edge. <dynamic element>"
+msgstr ""
+"Diese Webseite wird am besten mit einem modernen Browser angezeigt. Erwägen "
+"Sie, Chrome, Firefox oder Edge zu verwenden. <dynamic element>"
+
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -1425,6 +1529,9 @@ msgstr "Vorherige Seite"
 msgid "Next Page"
 msgstr "Nächste Seite"
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
 msgid "Search"
 msgstr "Suchen"
 
@@ -1440,8 +1547,8 @@ msgstr "Auswahl"
 msgid "Columns"
 msgstr "Spalten"
 
-msgid "Link eMuseum.ch"
-msgstr "Link eMuseum.ch"
+msgid "Show all"
+msgstr "Alle anzeigen"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -1487,9 +1594,6 @@ msgstr "Vorherige Abstimmung"
 msgid "Next vote"
 msgstr "Nächste Abstimmung"
 
-msgid "General"
-msgstr "Allgemeines"
-
 msgid "Official title"
 msgstr "Offizieller Titel"
 
@@ -1514,9 +1618,6 @@ msgstr "Offizielle Chronologie"
 msgid "Related votes"
 msgstr "Verwandte Vorlagen"
 
-msgid "Submission"
-msgstr "Einreichung"
-
 msgid "Initiator"
 msgstr "Urheber"
 
@@ -1533,12 +1634,6 @@ msgstr "Anzahl Tage vom Sammelbeginn bis zur Einreichung"
 
 msgid "Days"
 msgstr "Tage"
-
-msgid "Pre-parliamentary phase"
-msgstr "Vorparlamentarische Phase"
-
-msgid "Parliamentary phase"
-msgstr "Im Parlament"
 
 msgid "Procedure number"
 msgstr "Geschäftsnummer"
@@ -1567,9 +1662,6 @@ msgid ""
 "the success of the referendum"
 msgstr ""
 "Anzahl Tage vom Parlamentsbeschluss bis zum Beschluss über das Zustandekommen"
-
-msgid "Voting campaign"
-msgstr "Abstimmungskampf"
 
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
@@ -1601,20 +1693,69 @@ msgstr "Weitere Parolen"
 msgid "Divergent branches"
 msgstr "Abweichende Sektionen"
 
-msgid "Campaign material for a Yes"
-msgstr "Kampagnenmaterial Ja"
+msgid "Number of adverts in print media"
+msgstr "Anzahl Inserate in Printmedien"
 
-msgid "Campaign material for a No"
-msgstr "Kampagnenmaterial Nein"
+msgid ""
+"Total number of adverts on the vote published in some 50 print media outlets "
+"in the last 8 weeks before voting day (intensity of the advertising "
+"campaign). For more details, see the analysis of the advertising campaign by "
+"Année Politique Suisse."
+msgstr ""
+"Anzahl aller Inserate zur Abstimmungsvorlage, die in rund 50 Printmedien in "
+"den 8 Wochen vor dem Abstimmungstermin erschienen sind (Intensität der "
+"Inseratekampagne). Für Details siehe die APS-Analyse der Inseratekampagne."
 
-msgid "Analysis of the advertising campaign"
-msgstr "Analyse der Inseratekampagne"
+msgid "Percentage of adverts for a 'yes'"
+msgstr "Anteil Ja-Inserate"
 
-msgid "Media coverage: fög analysis"
-msgstr "Medienberichterstattung: Analyse des fög"
+msgid ""
+"Percentage of adverts canvassing a 'yes' vote. A figure of over 50% "
+"indicates that more adverts for a 'yes' than for a 'no' were placed. For "
+"more details, see the analysis of the advertising campaign by Année "
+"Politique Suisse."
+msgstr ""
+"Prozentanteil der Inserate, die für ein Ja warben. Ein Wert über 50% "
+"bedeutet, dass mehr Ja- als Nein-Inserate geschaltet wurden. Für Details "
+"siehe die APS-Analyse der Inseratekampagne."
 
-msgid "Vote"
-msgstr "Abstimmung"
+msgid "Media coverage: number of articles"
+msgstr "Medienberichterstattung: Anzahl Beiträge"
+
+msgid ""
+"Number of media articles on the vote that appeared in a selection of media "
+"outlets in the last 12 weeks before voting day. Hence, this indicator "
+"measures the intensity of media coverage of the vote. For more details, see "
+"the fög analysis report."
+msgstr ""
+"Anzahl Medienbeiträge zur Vorlage, die in einer Auswahl von Publikationen in "
+"den 12 Wochen vor der Abstimmung erschienen sind. Der Indikator misst die "
+"Intensität der medialen Behandlung der Vorlage. Für Details siehe die "
+"Angaben im Analysebericht des fög."
+
+msgid "Media coverage: tonality"
+msgstr "Medienberichterstattung: Tonalität"
+
+msgid ""
+"A positive figure means that the ‘yes’ position was covered more broadly "
+"than the ‘no’ position in the analysed media outlets. A negative figure "
+"means that the ‘no’ position prevailed in the analysed media sample. The "
+"tonality indicator can range from -100 (all media coverage was negative) to "
+"+100 (all media coverage was positive). For more details, see the fög "
+"analysis report."
+msgstr ""
+"Ein positiver Wert bedeutet, dass in den analysierten Medien überwiegend "
+"befürwortende Positionen zur Vorlage erschienen sind. Bei einem negativen "
+"Wert überwogen in der Medienberichterstattung die ablehnenden Positionen. "
+"Der Tonalitäts-Wert kann sich zwischen -100 (alle Medienbeiträge waren "
+"ablehnend) und +100 (alle Medienbeiträge waren befürwortend) bewegen. Für "
+"Details siehe die Angaben im Analysebericht des fög."
+
+msgid "(predominantly positive)"
+msgstr "(mehrheitlich befürwortend)"
+
+msgid "(predominantly negative)"
+msgstr "(mehrheitlich ablehnend)"
 
 msgid "People"
 msgstr "Volk"
@@ -1636,6 +1777,12 @@ msgstr "Interaktive Karte des Bundesamts für Statistik"
 
 msgid "Display the map"
 msgstr "Karte anzeigen"
+
+msgid "Cockpit with selected results"
+msgstr "Cockpit mit Analyseergebnissen"
+
+msgid "Technical report"
+msgstr "Technischer Bericht"
 
 msgid "Filter"
 msgstr "Filtern"
@@ -1703,11 +1850,13 @@ msgstr "Seite gelöscht"
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Möchten Sie \"${item}\" wirklich löschen?"
 
-msgid "Attachments"
-msgstr "Anhänge"
-
-msgid "Attachment added."
-msgstr "Anhang hinzugefügt."
+msgid ""
+"To associate a slider image with a vote, start the filename with the BFS "
+"number followed by a hyphen, for example, \"501-1.jpg\"."
+msgstr ""
+"Um ein Slider-Bild mit einer Abstimmung zu verknüpfen, muss der Dateinamen "
+"mit der BFS-Nummer beginnen, gefolgt von einem Bindestrich, z. B. \"501-1.jpg"
+"\"."
 
 msgid "Attachment deleted."
 msgstr "Anhang gelöscht."
@@ -1792,17 +1941,6 @@ msgstr "Anhänge aktualisiert"
 msgid "Vote deleted"
 msgstr "Abstimmung gelöscht."
 
-msgid "A valid api key is missing"
-msgstr "Ein gültiger Api-Key fehlt"
-
-#, python-format
-msgid "Poster image urls updated (${added} added, ${updated} updated)"
-msgstr "Bild-Urls aktualisiert (${added} neu, ${updated} aktualisiert)"
-
-#, python-format
-msgid "Poster image urls failed: ${failed}"
-msgstr "Fehlgeschlagene Bild-Url-Abfragen: ${failed}"
-
 #, python-format
 msgid "Dataset updated (${added} added, ${updated} updated)"
 msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
@@ -1811,54 +1949,20 @@ msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
 
+#, python-format
+msgid ""
+"External resources updated (${added} added, ${updated} updated, ${removed} "
+"removed)"
+msgstr ""
+"Externe Quellen aktualisiert (${added} hinzugefügt, ${updated} geändert, "
+"${removed} gelöscht)"
+
+#, python-format
+msgid "Some external resources could not be updated: ${failed}"
+msgstr "Einige externe Quellen konnten nicht aktualisiert werden: ${failed}"
+
 msgid "All votes deleted"
 msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
-
-#~ msgid "for the counter proposal"
-#~ msgstr "für den Gegenentwurf"
-
-#~ msgid "for the initative"
-#~ msgstr "für die Initiative"
-
-#~ msgid "Overview of voting result by the Confederation"
-#~ msgstr "Ergebnisübersicht Bundeskanzlei"
-
-#~ msgid "Unknown"
-#~ msgstr "Unbekannt"
-
-#~ msgid ""
-#~ "Number of days between the start of collecting signatures and their "
-#~ "filing by the initiators."
-#~ msgstr "Anzahl Tage vom Sammelbeginn bis zur Einreichung."
-
-#~ msgid ""
-#~ "Number of days between the Federal Council dispatch and the Parliament’s "
-#~ "final vote."
-#~ msgstr ""
-#~ "Anzahl Tage von der Verabschiedung der bundesrätlichen Botschaft bis zum "
-#~ "Parlamentsbeschluss."
-
-#~ msgid ""
-#~ "Number of days between the Parliament’s final vote and the decree to "
-#~ "declare the success of the referendum."
-#~ msgstr ""
-#~ "Anzahl Tage vom Parlamentsbeschluss bis zum Beschluss über das "
-#~ "Zustandekommen."
-
-#~ msgid ""
-#~ "Cumulated electoral share of the parties which recommend to vote Yes."
-#~ msgstr ""
-#~ "Kumulierter Wähleranteil der Parteien, die die Ja-Parole zur Vorlage "
-#~ "gefasst haben."
-
-#~ msgid "Without / Unknown"
-#~ msgstr "Ohne / Unbekannt"
-
-#~ msgid "Yes Camp"
-#~ msgstr "Ja-Lager"
-
-#~ msgid "Vague"
-#~ msgstr "Unbestimmt"

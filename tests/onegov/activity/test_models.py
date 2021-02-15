@@ -1,9 +1,13 @@
+from unittest.mock import patch
+
 import pytest
 import sqlalchemy
 import transaction
 
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
+from sedate import standardize_date
+
 from onegov.activity import ActivityCollection, OccasionNeed, Volunteer
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee
@@ -1791,7 +1795,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'accepted'
     assert b1.state == 'blocked'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'accepted'
     assert b2.state == 'cancelled'
@@ -1810,7 +1814,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'blocked'
     assert b3.state == 'open'
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
@@ -1830,7 +1834,7 @@ def test_cancel_booking(session, owner):
     assert b1.state == 'blocked'
     assert b2.state == 'accepted'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'denied'
     assert b2.state == 'cancelled'
@@ -1849,7 +1853,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'accepted'
     assert b3.state == 'open'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'accepted'
     assert b2.state == 'cancelled'
@@ -1868,7 +1872,7 @@ def test_cancel_booking(session, owner):
     assert b2.state == 'open'
     assert b3.state == 'open'
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
@@ -1893,14 +1897,14 @@ def test_cancel_booking(session, owner):
     assert b3.state == 'blocked'
     assert b4.state == 'blocked'
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
     assert b3.state == 'blocked'
     assert b4.state == 'blocked'
 
-    bookings.cancel_booking(b2)
+    bookings.cancel_booking(b2, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'cancelled'
@@ -1925,7 +1929,7 @@ def test_cancel_booking(session, owner):
 
     session.flush()
 
-    bookings.cancel_booking(b1)
+    bookings.cancel_booking(b1, cascade=True)
 
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
@@ -1942,27 +1946,38 @@ def test_period_phases(session):
         execution=(date(2016, 11, 1), date(2016, 11, 30)),
         active=False,
     )
-
+    assert period.finalizable
+    assert period.finalized is False
     assert period.phase == 'inactive'
 
     period.active = True
 
     with freeze_time('2016-08-31'):
         assert period.phase == 'inactive'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'inactive'
 
     with freeze_time('2016-09-01'):
         assert period.phase == 'wishlist'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'wishlist'
 
     with freeze_time('2016-09-15'):
         assert period.phase == 'wishlist'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'wishlist'
 
     period.confirmed = True
 
     with freeze_time('2016-09-14'):
         assert period.phase == 'inactive'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'inactive'
 
     with freeze_time('2016-09-15'):
         assert period.phase == 'booking'
+        with patch.object(period, 'finalizable', return_value=False):
+            assert period.phase == 'booking'
 
     period.finalized = True
 
@@ -1974,6 +1989,29 @@ def test_period_phases(session):
 
     with freeze_time('2016-12-01'):
         assert period.phase == 'archive'
+
+    # Periods without billing (finalizable=False) will always have finalized=False ?!
+    # An example is Domat-Ems period 2020
+    # Furthermore, Ferienpass Zürich used a booking period having the same end as the execution period
+    # I have no idea if this is not something that should not be done or that leads to unintended side effects
+    period.finalizable = False
+    period.finalized = False
+
+    with freeze_time('2016-10-31'):
+        # between end of booking phase and start of execution phase
+        assert period.phase == 'inactive'
+
+    with freeze_time('2016-11-01'):
+        # This does not make sense and has to be evaluated in the future when there is budget
+        assert period.phase == 'inactive'
+        # assert period.phase == 'execution'
+
+    with freeze_time('2016-12-01'):
+        # assert period.phase == 'archive'
+        assert period.phase == 'inactive'
+
+    ## The phase might also take into consideration the period.archived attribute for the phase
+
 
 
 def test_invoices(session, owner, prebooking_period, inactive_period):
@@ -2295,7 +2333,7 @@ def test_cancel_occasion(session, owner):
     o1.cancel()
 
     assert b1.state == 'cancelled'
-    assert b2.state == 'accepted'
+    assert b2.state == 'blocked'
     assert o1.cancelled
     assert not o2.cancelled
 
@@ -2465,10 +2503,14 @@ def test_prebooking_phases():
     period.prebooking_end = date(2017, 5, 2)
     period.booking_start = date(2017, 5, 3)
 
-    with freeze_time('2017-04-30 23:59:59'):
+    def standardize(string):
+        dt = datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
+        return standardize_date(dt, 'Europe/Zurich')
+
+    with freeze_time(standardize('2017-04-30 23:59:59')):
         assert period.is_prebooking_in_future
 
-    with freeze_time('2017-05-01 00:00:00'):
+    with freeze_time(standardize('2017-05-01 00:00:00')):
         assert not period.is_prebooking_in_future
 
         period.active = False
@@ -2477,12 +2519,12 @@ def test_prebooking_phases():
         period.active = True
         assert period.is_currently_prebooking
 
-    with freeze_time('2017-05-05 00:00:00'):
+    with freeze_time(standardize('2017-05-05 00:00:00')):
         assert not period.is_prebooking_in_future
         assert not period.is_currently_prebooking
         assert period.is_prebooking_in_past
 
-    with freeze_time('2017-05-02 23:59:59'):
+    with freeze_time(standardize('2017-05-02 23:59:59')):
         assert period.is_currently_prebooking
 
         period.confirmed = True

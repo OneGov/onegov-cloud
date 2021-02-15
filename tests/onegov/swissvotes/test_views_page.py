@@ -1,5 +1,6 @@
-from onegov.core.utils import module_path
+from onegov.swissvotes.models import TranslatablePage
 from pytest import mark
+from transaction import commit
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
@@ -49,11 +50,7 @@ def test_view_page(swissvotes_app):
     client.get('/page/about', status=404)
 
 
-@mark.parametrize("pdf_1, pdf_2", [(
-    module_path('tests.onegov.swissvotes', 'fixtures/example_1.pdf'),
-    module_path('tests.onegov.swissvotes', 'fixtures/example_2.pdf')
-)])
-def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
+def test_view_page_attachments(swissvotes_app, page_attachments):
 
     client = Client(swissvotes_app)
 
@@ -72,22 +69,30 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     assert "No attachments." in manage
 
     # Upload two attachment (en_US, de_CH)
-    with open(pdf_1, 'rb') as file:
-        content_1 = file.read()
-    manage.form['file'] = Upload('1.pdf', content_1, 'application/pdf')
+    manage.form['file'] = Upload(
+        '1.pdf',
+        page_attachments['en_US']['CODEBOOK'].reference.file.read(),
+        'application/pdf'
+    )
     manage = manage.form.submit().maybe_follow()
-    assert "Attachment added" in manage
+    assert manage.status_code == 200
+
+    manage = client.get('/page/about').click("Manage attachments")
     assert "1.pdf" in manage
     assert manage.click('1.pdf').content_type == 'application/pdf'
 
     client.get('/locale/de_CH').follow()
     manage = client.get('/page/about').click("Anhänge verwalten")
 
-    with open(pdf_2, 'rb') as file:
-        content_2 = file.read()
-    manage.form['file'] = Upload('2.pdf', content_2, 'application/pdf')
+    manage.form['file'] = Upload(
+        '2.pdf',
+        page_attachments['de_CH']['CODEBOOK'].reference.file.read(),
+        'application/pdf'
+    )
     manage = manage.form.submit().maybe_follow()
-    assert "Anhang hinzugefügt" in manage
+    assert manage.status_code == 200
+
+    manage = client.get('/page/about').click("Anhänge verwalten")
     assert "1.pdf" not in manage
     assert "2.pdf" in manage
     assert manage.click('2.pdf').content_type == 'application/pdf'
@@ -113,3 +118,76 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     view = client.get('/page/about')
     assert "1.pdf" not in view
     assert "2.pdf" not in view
+
+
+@mark.parametrize('locale', ('de_CH', 'fr_CH', 'en_US'))
+def test_view_page_static_attachment_links(
+    swissvotes_app, page_attachments, page_attachment_urls,
+    locale
+):
+    client = Client(swissvotes_app)
+    url = client.get('/').maybe_follow().click('imprint').request.url
+
+    # No attachments yet
+    for name in page_attachment_urls[locale].values():
+        view = client.get(f'{url}/{name}', status=404)
+        assert view.status_code == 404
+
+    session = swissvotes_app.session()
+    page = session.query(TranslatablePage).filter_by(title='imprint').one()
+    page.files = list(page_attachments[locale].values())
+    commit()
+
+    for name in page_attachment_urls[locale].values():
+        view = client.get(f'{url}/{name}')
+        assert view.status_code in (200, 301, 302)
+
+
+def test_view_page_slider_images(swissvotes_app, slider_images):
+
+    client = Client(swissvotes_app)
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    client.get('/locale/en_US').follow()
+    add = client.get('/').maybe_follow().click(href='add')
+    add.form['title'] = 'About'
+    add.form['content'] = 'About the project'
+    add.form.submit()
+
+    manage = client.get('/page/about').click('Manage slider images')
+    assert 'No attachments.' in manage
+
+    # Upload image
+    manage.form['file'] = Upload(
+        '2.1-x.png',
+        slider_images['2.1-x'].reference.file.read(),
+        'image/png'
+    )
+    assert manage.form.submit().maybe_follow().status_code == 200
+
+    manage = client.get('/page/about').click('Manage slider images')
+    assert '2.1-x.png' in manage
+    assert manage.click('2.1-x.png').content_type == 'image/png'
+
+    # Check visibility
+    view = client.get('/page/about')
+    assert 'data-orbit' in view
+    assert '2.1-x.png' in view
+
+    client.get('/locale/de_CH').follow()
+    view = client.get('/page/about')
+    assert 'data-orbit' in view
+    assert '2.1-x.png' in view
+
+    # Delete attachments
+    client.get('/locale/de_CH').follow()
+    client.get('/page/about').click('Slider-Bilder verwalten')\
+        .click('Löschen').form.submit()
+
+    view = client.get('/page/about')
+    assert 'data-orbit' not in view
+    assert '2.1-x.png' not in view
