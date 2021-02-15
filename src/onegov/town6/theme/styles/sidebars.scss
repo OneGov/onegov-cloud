@@ -1,0 +1,120 @@
+/*
+    sidebar navigation left
+*/
+
+.sidebar {
+
+}
+
+.searchbox {
+    margin-top: 2rem;
+    padding: 1rem;
+}
+
+.typeahead {
+    position: relative;
+
+    ul {
+        background-color: $white;
+        border-width: 0 1px 1px;
+        box-shadow: 0 0 5px $jumbo;
+        left: 1em;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        //right: 1em;
+        z-index: 1;
+        overflow: visible;
+    }
+
+    a {
+        color: $input-color;
+        display: block;
+        font-size: $input-font-size;
+    }
+
+    li {
+        padding: 0 5px;
+
+        // highlight links with the active class
+        &.active {
+            background-color: $topbar-bg-color;
+
+            a {
+                font-weight: bold;
+            }
+        }
+
+        // highlight links when hovering
+        &:hover {
+            background-color: $topbar-bg-color !important;
+
+            a {
+                color: $primary-color !important;
+                font-weight: bold !important;
+            }
+        }
+    }
+
+    // do not highlight links with the active class when hovering (so we
+    // get a different highlight when hovering)
+    &:hover li.active {
+        background-color: $white;
+
+        a {
+            color: $body-font-color;
+            font-weight: normal;
+        }
+    }
+}
+
+/*
+    Sidebar drag & drop
+*/
+.dragging {
+    opacity: 1;
+
+    &.sortable-ghost {
+        opacity: 0;
+    }
+}
+
+@keyframes flash-success {
+    0% { color: transparent; }
+    20% { color: $primary-color; }
+    25% { color: $primary-color; }
+    50% { color: lighten($primary-color, 20%); }
+    75% { color: $primary-color; }
+    80% { color: $primary-color; }
+    100% { color: transparent; }
+}
+
+@keyframes flash-failure {
+    0% { color: transparent; }
+    20% { color: $alert-color; }
+    25% { color: $alert-color; }
+    50% { color: lighten($alert-color, 20%); }
+    75% { color: $alert-color; }
+    80% { color: $alert-color; }
+    100% { color: transparent; }
+}
+
+.flash > a::after {
+    @include prefix(animation-duration, .7s);
+    @include prefix(animation-fill-mode, forwards);
+    font-family: 'FontAwesome';
+    margin-left: 5px;
+}
+
+.flash.success > a::after {
+    @include prefix(animation-name, flash-success);
+    color: $primary-color;
+    content: ' \f0c7';
+}
+
+.flash.failure > a::after {
+    @include prefix(animation-name, flash-failure);
+    color: $alert-color;
+    content: ' \f05e';
+}

@@ -1,0 +1,62 @@
+// we need to use exact pixel measurements for the footer or we end up with
+// inconsistent results across browsers, which might mean the difference between
+// showing a scrollbar and not showing one
+$footer-text-color: $primary-fg-color;
+
+.footer-container {
+    background-color: $primary-color;
+}
+
+.footer-content {
+
+    //box-shadow: 0 -2px 0 $white;
+    max-width: 100% !important;
+
+    padding: 0;
+
+    > .cell > .grid-x {
+        margin: 0 auto;
+        max-width: $grid-row-width;
+    }
+
+    * {
+        color: $footer-text-color;
+        line-height: 1.5rem;
+        font-family: $header-font-family;
+    }
+
+    h2 {
+        font-weight: 500;
+        letter-spacing: 1px;
+        margin-bottom: 13px;
+    }
+
+    h2.custom-links {
+        text-transform: none;
+    }
+
+    .footer-columns {
+        padding-bottom: .5rem;
+        padding-top: 1.25rem;
+
+        @include clean-ul;
+
+        p {
+            line-height: 1.5rem;
+            margin-bottom: .5rem;
+        }
+    }
+
+    .footer-links {
+        padding: .5rem 0;
+        position: relative;
+        text-align: center;
+
+        .cell {
+            span + span::before {
+                content: '•';
+            }
+        }
+    }
+
+}

@@ -1,0 +1,11 @@
+/*
+    Icon widget customisation
+*/
+.icon-widget {
+    li:hover,
+    li.active {
+        background: $primary-color !important;
+        border-color: $primary-fg-color !important;
+        color: $primary-fg-color !important;
+    }
+}
