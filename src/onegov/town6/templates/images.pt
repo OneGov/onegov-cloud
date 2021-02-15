@@ -1,0 +1,45 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x">
+            <div class="small-12 cell" tal:define="upload_url layout.image_upload_url">
+                <h2 i18n:translate="">Upload</h2>
+
+                <tal:b metal:use-macro="layout.macros.upload">
+                    <tal:b metal:fill-slot="upload-filelist">
+                        <div class="upload-filelist-header" style="display: none;">
+                            <h2 i18n:translate>Just Uploaded</h2>
+                            <div class="panel">
+                                <p i18n:translate="">
+                                    To edit the image descriptions, click on one, enter your descrption and press return.
+                                    To abort press escape.
+                                </p>
+                            </div>
+
+                            <div class="upload-filelist image-grid">
+
+                            </div>
+                        </div>
+                    </tal:b>
+                </tal:b>
+            </div>
+        </div>
+        <div class="grid-x">
+            <div class="small-12 cell">
+                <tal:b tal:repeat="group images">
+                    <h2 i18n:translate="">${group['group']}</h2>
+                    <div class="image-grid">
+                        <tal:b repeat="image group['images']">
+                            <tal:b metal:use-macro="layout.macros.uploaded_image" define="index repeat.image.index" />
+                        </tal:b>
+                    </div>
+                </tal:b>
+                <tal:b condition="not:images">
+                    <p i18n:translate="">No images uploaded yet</p>
+                </tal:b>
+            </div>
+        </div>
+    </tal:b>
+</div>

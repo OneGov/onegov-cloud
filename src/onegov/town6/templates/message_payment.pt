@@ -1,0 +1,23 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b switch="model.meta.change">
+                <tal:b case="'marked-as-paid'" i18n:translate>
+                    <tal:b i18n:name="amount">${layout.format_number(model.meta['amount'])} ${model.meta['currency']}</tal:b> marked as paid.
+                </tal:b>
+                <tal:b case="'marked-as-unpaid'" i18n:translate>
+                    <tal:b i18n:name="amount">${layout.format_number(model.meta['amount'])} ${model.meta['currency']}</tal:b> marked as unpaid.
+                </tal:b>
+                <tal:b case="'captured'" i18n:translate>
+                    <tal:b i18n:name="amount">${layout.format_number(model.meta['amount'])} ${model.meta['currency']}</tal:b> captured.
+                </tal:b>
+                <tal:b case="'refunded'" i18n:translate>
+                    <tal:b i18n:name="amount">${layout.format_number(model.meta['amount'])} ${model.meta['currency']}</tal:b> refunded.
+                </tal:b>
+            </tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>

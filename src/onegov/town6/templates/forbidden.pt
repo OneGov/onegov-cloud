@@ -1,0 +1,20 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <p i18n:translate="">
+            You are trying to open a page for which you are not authorized.
+        </p>
+        <p>
+            <a href="${login_url}" id="alternate-login-link">
+                <tal:b i18n:translate="" condition="layout.request.is_logged_in">
+                    Please follow this link to login with a different user.
+                </tal:b>
+                <tal:b i18n:translate="" condition="not:layout.request.is_logged_in">
+                    Please follow this link to login.
+                </tal:b>
+            </a>
+        </p>
+    </tal:b>
+</div>

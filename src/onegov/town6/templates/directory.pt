@@ -1,0 +1,87 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="grid-x" tal:condition="directory.enable_map == 'everywhere'">
+            <div class="cell medium-12">
+                <div class="geojson-map directories-map"
+                    data-geojson="${geojson}"
+                    data-lat="${layout.default_map_view.lat}"
+                    data-lon="${layout.default_map_view.lon}"
+                    data-zoom="${layout.default_map_view.zoom}"
+                    data-map-height="333px"
+                ></div>
+            </div>
+        </div>
+
+        <p tal:condition="directory.lead">${directory.lead}</p>
+
+        <div class="grid-x reverse-on-mobile">
+            <div class="cell medium-8">
+                <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
+
+                <ul class="with-lead ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
+                    <li tal:repeat="entry entries">
+                        <div class="thumbnail" tal:condition="show_thumbnails">
+                            <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
+                                <img data-src="${thumbnail}" class="lazyload" data-no-alt align="top" alt="" />
+                            </tal:b>
+                        </div>
+
+                        <div>
+                            <a class="list-title" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
+
+                            <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                                <div class="list-lead">
+                                    <tal:b condition="custom_lead" replace="structure custom_lead" />
+                                    <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                </div>
+                            </tal:b>
+                        </div>
+                    </li>
+                </ul>
+
+                <tal:b define="text directory.content.get('text')" condition="text">
+                    <h2 i18n:translate>Further Information</h2>
+                    <tal:b content="structure text" />
+                </tal:b>
+
+            </div>
+
+            <div class="cell medium-4">
+                <div class="grid-x" tal:condition="searchwidget">
+                    <div class="cell medium-12">
+                        <tal:b replace="structure searchwidget.html(layout)" />
+                    </div>
+                </div>
+
+                <div class="filter-panel" tal:condition="filters">
+                    <div tal:repeat="filter filters" class="filter-periods">
+                        <h2 class="filter-title">${filter.title}</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
+                    </div>
+                </div>
+
+                <div class="submit-yours" tal:condition="directory.enable_submissions">
+                    <dl>
+                        <dt>
+                            <a href="${submit}">
+                                <h2 i18n:translate="">Propose entry</h2>
+                            </a>
+                        </dt>
+                        <dd i18n:translate="">Something missing? Propose a new entry.</dd>
+                    </dl>
+                </div>
+                <div class="publication-nav" tal:condition="layout.publication_filters">
+                    <button href="#" data-dropdown="pubnav" aria-controls="pubnav" aria-expanded="false" class="button small secondary dropdown" i18n:translate>${layout.publication_filter_title}</button><br>
+                    <ul id="pubnav" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                        <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </tal:b>
+</div>

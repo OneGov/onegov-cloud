@@ -1,0 +1,39 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+
+        <p i18n:translate tal:condition="action=='confirmed'">
+            Your registration for "<tal:b i18n:name="title">${model.form.title}</tal:b>" has been confirmed.
+        </p>
+
+        <p i18n:translate tal:condition="action=='denied'">
+            Your registration for "<tal:b i18n:name="title">${model.form.title}</tal:b>" has been denied.
+        </p>
+
+        <p i18n:translate tal:condition="action=='cancelled'">
+            Your registration for "<tal:b i18n:name="title">${model.form.title}</tal:b>" has been cancelled.
+        </p>
+
+        <p>
+            <hr class="large">
+
+            <dl class="field-display">
+                <dt i18n:translate="">Registration</dt>
+                <dd><a href="${request.link(model.form)}">${model.form.title}</a></dd>
+                <dt i18n:translate="">Registration Window</dt>
+                <dd>${layout.format_date_range(model.registration_window.start, model.registration_window.end)}</dd>
+            </dl>
+
+            <tal:b condition="show_submission|nothing">
+                <metal:b use-macro="layout.macros['display_form']" />
+            </tal:b>
+
+            <hr class="large">
+        </p>
+
+        <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${ticket.number}</span></p>
+    </tal:b>
+</div>

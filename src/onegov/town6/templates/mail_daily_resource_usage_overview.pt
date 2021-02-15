@@ -1,0 +1,83 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>
+            Good morning,
+        </p>
+        <p i18n:translate>
+            The following reservations are scheduled for today.
+        </p>
+
+        <tal:b repeat="(resource_id, title) resources.items()">
+            <tal:b condition="resource_id in included_resources" define="reservations reservations.get(resource_id)">
+                <div tal:repeat="reservation reservations" class="reservation">
+                    <p class="header">
+                        <b>${title}</b><br>
+
+                        <b tal:define="start reservation.display_start(); end reservation.display_end()">
+                            <!--! simple whole day check: -->
+                            <tal:b condition="start.time() != end.time()">
+                                ${layout.format_time_range(start, end)}
+                            </tal:b>
+                            <tal:b condition="start.time() == end.time()">
+                                <tal:b i18n:translate>Whole day</tal:b>
+                            </tal:b>
+                        </b>
+                    </p>
+                    <div class="body">
+                        <p>
+                            <span class="descreet"><tal:b i18n:translate>E-Mail</tal:b></span><br>
+                            ${reservation.email}
+                        </p>
+                        <p>
+                            <span class="descreet"><tal:b i18n:translate>Quota</tal:b></span><br>
+                            ${reservation.quota}
+                        </p>
+
+                        <tal:b condition="reservation.submission">
+                            <tal:b define="form parse_form(reservation.submission.definition)(data=reservation.submission.data)">
+                                <div tal:repeat="fieldset form.fieldsets" class="fieldset">
+                                    <tal:b define="fields fieldset.non_empty_fields" condition="fields">
+                                        <p>
+                                            <u tal:condition="fieldset.is_visible"><b>${fieldset.label}</b></u>
+                                        </p>
+
+                                        <p tal:repeat="field fields.values()">
+                                            <span class="descreet">${field.label.text}</span><br>
+                                            ${form.render_display(field)}
+                                        </p>
+                                    </tal:b>
+                                </div>
+                            </tal:b>
+                        </tal:b>
+                    </div>
+                </div>
+            </tal:b>
+        </tal:b>
+
+        <tal:b repeat="(resource_id, title) resources.items()">
+            <tal:b condition="resource_id in included_resources" define="reservations reservations.get(resource_id)">
+                <div class="reservation" tal:condition="not:reservations">
+                    <p class="header">
+                        <b>${title}</b>
+                    </p>
+
+                    <div class="body">
+                        <p i18n:translate>No reservations today.</p>
+                    </div>
+                </div>
+            </tal:b>
+        </tal:b>
+
+        <p i18n:translate>Have a great day!</p>
+        <tal:b metal:use-macro="layout.macros['sender']" />
+    </tal:b>
+    <tal:b metal:fill-slot="above-footer">
+        <p>
+            <span i18n:translate>
+                This is the daily reservation overview for <tal:b i18n:name="organisation">${organisation}</tal:b>. If you no longer want to receive this e-mail please contact an administrator so they can remove you from the recipients list.
+            </span>
+    </tal:b>
+</div>

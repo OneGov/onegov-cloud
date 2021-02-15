@@ -1,0 +1,8 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.app.homepage_template" />
+    </tal:b>
+</div>

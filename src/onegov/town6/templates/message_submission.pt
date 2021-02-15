@@ -1,0 +1,20 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b switch="model.meta.change">
+                <tal:b case="'confirmed'" i18n:translate>
+                    Registration confirmed.
+                </tal:b>
+                <tal:b case="'denied'" i18n:translate>
+                    Registration denied.
+                </tal:b>
+                <tal:b case="'cancelled'" i18n:translate>
+                    Registration cancelled.
+                </tal:b>
+            </tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>

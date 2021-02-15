@@ -1,0 +1,11 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <p i18n:translate>
+            Sorry, the page you are looking for could not be found. Try checking the URL
+            for errors or use the search box on the top.
+        </p>
+    </tal:b>
+</div>

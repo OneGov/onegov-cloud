@@ -1,0 +1,15 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b tal:content="structure model.formatted_text(layout)" />
+        </metal:b>
+        <metal:b fill-slot="actions">
+            <div class="text-links">
+                <tal:b repeat="link model.links(layout)" content="structure link(layout)" />
+            </div>
+        </metal:b>
+    </metal:b>
+</tal:b>

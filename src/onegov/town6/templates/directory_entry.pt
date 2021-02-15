@@ -1,0 +1,59 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
+                   tal:define="
+                    lead layout.linkify(entry.lead);
+                    text None;
+                    people None;
+                    contact entry.contact;
+                    coordinates entry.directory.enable_map in ('everywhere', 'entry') and entry.coordinates;
+                    show_side_panel layout.model.directory.enable_change_requests|nothing;
+                    ">
+
+            <div metal:fill-slot="before-lead">
+                <metal:b use-macro="layout.macros['before_directory_entry_lead']" />
+            </div>
+
+            <div metal:fill-slot="after-lead">
+                <div class="directory-fields">
+                    <metal:b
+                        use-macro="layout.macros['display_fields']"
+                        tal:define="
+                            fields entry.content_fields;
+                            allow_downloads True;
+                            allow_views True;
+                            form entry.directory.form_obj;
+                            linkify_display True;
+                        "
+                    />
+                </div>
+
+                <dl tal:define="link entry.external_link_visible and entry.external_link" tal:condition="link" class="field-display">
+                    <dt i18n:translate>External link</dt>
+                    <dd>
+                        <a href="${link}">
+                            <tal:b condition="entry.external_link_title">${entry.external_link_title}</tal:b>
+                            <tal:b i18n:translate condition="not:entry.external_link_title">More information</tal:b>
+                        </a>
+                    </dd>
+                </dl>
+            </div>
+
+            <div metal:fill-slot="after-panels" tal:condition="layout.model.directory.enable_change_requests|nothing">
+                <div class="submit-yours">
+                    <dl>
+                        <dt>
+                            <a href="${request.link(layout.model, 'change-request')}">
+                                <h2 i18n:translate>Change Request</h2>
+                            </a>
+                        </dt>
+                        <dd i18n:translate>Found an error? Propose a change to this entry.</dd>
+                    </dl>
+                </div>
+            </div>
+        </tal:b>
+    </tal:b>
+</div>

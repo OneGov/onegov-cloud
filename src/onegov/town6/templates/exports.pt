@@ -1,0 +1,20 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <p i18n:translate tal:condition="not:exports">
+            No exports available.
+        </p>
+        <ul class="with-lead" tal:condition="exports">
+            <li tal:repeat="export exports">
+                <a class="list-title" href="${request.link(export)}">
+                    ${export.title}
+                </a>
+                <div class="list-lead">
+                    ${export.explanation}
+                </div>
+            </li>
+        </ul>
+    </tal:b>
+</div>

@@ -1,0 +1,39 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+
+        <p i18n:translate>
+            An administrator just created a new account on
+            <a href="${request.link(org)}" i18n:name="org">${org.title}</a>
+            for you.
+        </p>
+
+        <p i18n:translate>
+            Your username is <strong i18n:name="email">${user.username}</strong>.
+        </p>
+
+        <p i18n:translate>
+            Click on the following link to set your account password:
+        </p>
+
+        <p>
+            <a href="${layout.password_reset_url(user)}" i18n:translate>Set Account Password</a>
+        </p>
+
+        <p i18n:translate>
+            If the password link has expired, you can also request a new password here:
+        </p>
+
+        <p tal:define="Auth import:onegov.user.Auth">
+            <a i18n:translate href="${request.class_link(Auth, name='request-password')}">Reset password</a>
+        </p>
+
+        <p i18n:translate tal:condition="user.yubikey_serial">
+            To use your account you need the Yubikey with the serial
+            <tal:b i18n:name="number">${user.yubikey_serial}</tal:b>
+        </p>
+    </tal:b>
+</div>

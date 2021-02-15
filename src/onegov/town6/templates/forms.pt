@@ -1,0 +1,10 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
+
+        <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped forms" />
+    </tal:b>
+</div>

@@ -1,0 +1,23 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="panel limit-line-width">
+            <p i18n:translate>
+                The following link can be used to subscribe to the reservations
+                of this calendar. It can be used by anyone that knows the link
+                in multiple calendar applications.
+            </p>
+
+            <p i18n:translate>
+                Note that we have no control over how often calendar applications
+                update the calendars they are subscribed to (if they update at all).
+                Therefore the information shown in the calendar may be wrong or
+                out of date. Use it at your own risk.
+            </p>
+
+            <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${url}">${url}</a></b>
+        </div>
+    </tal:b>
+</div>

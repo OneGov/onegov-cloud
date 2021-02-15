@@ -1,0 +1,8 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div metal:use-macro="layout.macros['atoz']" tal:define="items model.get_items_by_letter().items()" />
+    </tal:b>
+</div>

@@ -1,0 +1,17 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>Your request has been closed.</p>
+
+        <p>
+            <span i18n:translate>Your requests's timeline has been archived for future reference:</span>
+            <br>
+            <a href="${request.link(model, 'status')}" i18n:translate>Request Timeline</a>
+        </p>
+
+        <p i18n:translate>Thank you for your request.</p>
+    </tal:b>
+</div>

@@ -1,0 +1,27 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b switch="model.meta.change" define="count len(model.meta['reservations'])">
+                <tal:b case="'accepted'">
+                    <tal:b condition="count == 1" i18n:translate>
+                        1 reservation accepted.
+                    </tal:b>
+                    <tal:b condition="count > 1" i18n:translate>
+                        <tal:b i18n:name="count">${count}</tal:b> reservations accepted.
+                    </tal:b>
+                </tal:b>
+                <tal:b case="'rejected'">
+                    <tal:b condition="count == 1" i18n:translate>
+                        1 reservation rejected.
+                    </tal:b>
+                    <tal:b condition="count > 1" i18n:translate>
+                        <tal:b i18n:name="count">${count}</tal:b> reservations rejected.
+                    </tal:b>
+                </tal:b>
+            </tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>

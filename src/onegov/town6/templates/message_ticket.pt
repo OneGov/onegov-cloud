@@ -1,0 +1,29 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b switch="model.meta.change">
+                <tal:b case="'opened'" i18n:translate>
+                    Ticket opened.
+                </tal:b>
+                <tal:b case="'accepted'" i18n:translate>
+                    Ticket accepted.
+                </tal:b>
+                <tal:b case="'closed'" i18n:translate>
+                    Ticket closed.
+                </tal:b>
+                <tal:b case="'reopened'" i18n:translate>
+                    Ticket reopened.
+                </tal:b>
+                <tal:b case="'muted'" i18n:translate>
+                    Ticket e-mails disabled.
+                </tal:b>
+                <tal:b case="'unmuted'" i18n:translate>
+                    Ticket e-mails enabled.
+                </tal:b>
+            </tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>
