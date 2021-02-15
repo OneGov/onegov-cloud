@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-02-15 10:18+0100\n"
+"POT-Creation-Date: 2021-02-15 10:55+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -113,8 +113,11 @@ msgstr "Datensatz der Nachbefragung (SAV)"
 msgid "Dataset of the post-vote poll (DTA)"
 msgstr "Datensatz der Nachbefragung (DTA)"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Codebuch zur Nachbefragung"
+msgid "Codebook for the post-vote poll (PDF)"
+msgstr "Codebuch zur Nachbefragung (PDF)"
+
+msgid "Codebook for the post-vote poll (XLSX)"
+msgstr "Codebuch zur Nachbefragung (XLSX)"
 
 msgid "Updating the external resources may take some time."
 msgstr ""
@@ -1470,6 +1473,12 @@ msgstr "Inseratekampagne: Analyse von APS"
 msgid "Media coverage: fög analysis"
 msgstr "Medienberichterstattung: Analyse des fög"
 
+msgid "Dataset of the post-vote poll"
+msgstr "Datensatz der Nachbefragung"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Codebuch zur Nachbefragung"
+
 msgid "Attachment"
 msgstr "Anhang"
 
@@ -1768,9 +1777,6 @@ msgstr "Karte anzeigen"
 
 msgid "Cockpit with selected results"
 msgstr "Cockpit mit Analyseergebnissen"
-
-msgid "Dataset of the post-vote poll"
-msgstr "Datensatz der Nachbefragung"
 
 msgid "Filter"
 msgstr "Filtern"

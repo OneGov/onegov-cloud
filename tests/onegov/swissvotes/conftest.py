@@ -100,6 +100,7 @@ def attachments(swissvotes_app):
 
     for name in (
         'results_by_domain',
+        'post_vote_poll_codebook_xlsx'
     ):
         file = BytesIO()
         workbook = Workbook(file)
@@ -184,6 +185,7 @@ def attachment_urls():
             'foeg_analysis': 'medienanalyse.pdf',
             'parliamentary_debate': 'parlamentsberatung.pdf',
             'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
+            'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-de.xlsx',
             'post_vote_poll_dataset': 'nachbefragung.csv',
             'post_vote_poll_dataset_sav': 'nachbefragung.sav',
             'post_vote_poll_dataset_dta': 'nachbefragung.dta',
@@ -199,6 +201,7 @@ def attachment_urls():
         'fr_CH': {
             'federal_council_message': 'botschaft-fr.pdf',
             'post_vote_poll_codebook': 'nachbefragung-codebuch-fr.pdf',
+            'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-fr.xlsx',
             'post_vote_poll_methodology': 'nachbefragung-methode-fr.pdf',
             'post_vote_poll': 'nachbefragung-fr.pdf',
             'preliminary_examination': 'vorpruefung-fr.pdf',

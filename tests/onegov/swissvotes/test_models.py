@@ -947,6 +947,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.parliamentary_debate is None
     assert vote.post_vote_poll is None
     assert vote.post_vote_poll_codebook is None
+    assert vote.post_vote_poll_codebook_xlsx is None
     assert vote.post_vote_poll_dataset is None
     assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_dataset_dta is None
@@ -969,6 +970,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'parliamentary_debate',
         'post_vote_poll',
         'post_vote_poll_codebook',
+        'post_vote_poll_codebook_xlsx',
         'post_vote_poll_dataset',
         'post_vote_poll_dataset_sav',
         'post_vote_poll_dataset_dta',

@@ -974,6 +974,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             'fr_CH': 'nachbefragung-codebuch-fr.pdf',
         }
     )
+    post_vote_poll_codebook_xlsx = LocalizedFile(
+        label=_('Codebook for the post-vote poll'),
+        extension='xlsx',
+        static_views={
+            'de_CH': 'nachbefragung-codebuch-de.xlsx',
+            'fr_CH': 'nachbefragung-codebuch-fr.xlsx',
+        }
+    )
     preliminary_examination = LocalizedFile(
         label=_('Preliminary examination'),
         extension='pdf',

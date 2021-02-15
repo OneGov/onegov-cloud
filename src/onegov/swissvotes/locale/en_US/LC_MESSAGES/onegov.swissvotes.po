@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-02-15 10:18+0100\n"
+"POT-Creation-Date: 2021-02-15 10:55+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -111,8 +111,11 @@ msgstr "Dataset of the post-vote poll (SAV)"
 msgid "Dataset of the post-vote poll (DTA)"
 msgstr "Dataset of the post-vote poll (DTA)"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Codebook for the post-vote poll"
+msgid "Codebook for the post-vote poll (PDF)"
+msgstr "Codebook for the post-vote poll (PDF)"
+
+msgid "Codebook for the post-vote poll (XLSX)"
+msgstr "Codebook for the post-vote poll (XLSX)"
 
 msgid "Updating the external resources may take some time."
 msgstr "Updating the external resources may take some time."
@@ -1465,6 +1468,12 @@ msgstr "Analysis of the advertising campaign by Année Politique"
 msgid "Media coverage: fög analysis"
 msgstr "Media coverage: fög analysis"
 
+msgid "Dataset of the post-vote poll"
+msgstr "Dataset of the post-vote poll"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Codebook for the post-vote poll"
+
 msgid "Attachment"
 msgstr "Attachment"
 
@@ -1763,9 +1772,6 @@ msgstr "Display the map"
 
 msgid "Cockpit with selected results"
 msgstr "Cockpit with selected results"
-
-msgid "Dataset of the post-vote poll"
-msgstr "Dataset of the post-vote poll"
 
 msgid "Filter"
 msgstr "Filter"

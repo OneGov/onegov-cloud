@@ -20,6 +20,10 @@ XLSX_MIME_TYPES = {
     'application/zip'
 }
 
+PDF_MIME_TYPES = {
+    'application/pdf'
+}
+
 SAV_MIME_TYPES = {
     'application/octet-stream',
 }
@@ -39,7 +43,7 @@ class AttachmentsForm(Form):
     brief_description = UploadField(
         label=_("Brief description Swissvotes"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("General"),
@@ -48,7 +52,7 @@ class AttachmentsForm(Form):
     voting_text = UploadField(
         label=_("Voting text"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("General"),
@@ -57,7 +61,7 @@ class AttachmentsForm(Form):
     preliminary_examination = UploadField(
         label=_("Preliminary examination"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Submission"),
@@ -66,7 +70,7 @@ class AttachmentsForm(Form):
     realization = UploadField(
         label=_("Realization"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Submission"),
@@ -75,7 +79,7 @@ class AttachmentsForm(Form):
     federal_council_message = UploadField(
         label=_("Federal council message"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Pre-parliamentary phase"),
@@ -84,7 +88,7 @@ class AttachmentsForm(Form):
     parliamentary_debate = UploadField(
         label=_("Parliamentary debate"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Parliamentary phase"),
@@ -93,7 +97,7 @@ class AttachmentsForm(Form):
     voting_booklet = UploadField(
         label=_("Voting booklet"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Voting campaign"),
@@ -102,7 +106,7 @@ class AttachmentsForm(Form):
     ad_analysis = UploadField(
         label=_("Advertisment analysis"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Voting campaign"),
@@ -111,7 +115,7 @@ class AttachmentsForm(Form):
     foeg_analysis = UploadField(
         label=_("Fög Analysis"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Voting campaign"),
@@ -120,7 +124,7 @@ class AttachmentsForm(Form):
     resolution = UploadField(
         label=_("Resolution"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Vote"),
@@ -138,7 +142,7 @@ class AttachmentsForm(Form):
     post_vote_poll = UploadField(
         label=_("Full analysis of post-vote poll results"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Post-vote poll"),
@@ -147,7 +151,7 @@ class AttachmentsForm(Form):
     post_vote_poll_methodology = UploadField(
         label=_("Questionnaire of the poll"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Post-vote poll"),
@@ -181,9 +185,18 @@ class AttachmentsForm(Form):
     )
 
     post_vote_poll_codebook = UploadField(
-        label=_("Codebook for the post-vote poll"),
+        label=_("Codebook for the post-vote poll (PDF)"),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_codebook_xlsx = UploadField(
+        label=_("Codebook for the post-vote poll (XLSX)"),
+        validators=[
+            WhitelistedMimeType(XLSX_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Post-vote poll"),

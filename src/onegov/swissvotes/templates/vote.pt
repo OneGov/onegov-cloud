@@ -449,7 +449,8 @@
                                                       layout.attachments['post_vote_poll_dataset'] or
                                                       layout.attachments['post_vote_poll_dataset_sav'] or
                                                       layout.attachments['post_vote_poll_dataset_dta'] or
-                                                      layout.attachments['post_vote_poll_codebook']">
+                                                      layout.attachments['post_vote_poll_codebook'] or
+                                                      layout.attachments['post_vote_poll_codebook_xlsx']">
                 <thead>
                     <tr><th colspan="2" i18n:translate>Post-vote poll</th></tr>
                 </thead>
@@ -482,10 +483,12 @@
                             <a href="${layout.attachments['post_vote_poll_dataset_dta']}" target="_blank" class="post-vote-poll-dataset-dta">DTA</a>
                         </td>
                     </tr>
-                    <tr tal:condition="layout.attachments['post_vote_poll_codebook']">
+                    <tr tal:condition="layout.attachments['post_vote_poll_codebook'] or
+                                       layout.attachments['post_vote_poll_codebook_xlsx']">
                         <th class="column-30" i18n:translate>Codebook for the post-vote poll</th>
-                        <td>
+                        <td class="inline-links">
                             <a href="${layout.attachments['post_vote_poll_codebook']}" target="_blank" class="post-vote-poll-codebook">PDF</a>
+                            <a href="${layout.attachments['post_vote_poll_codebook_xlsx']}" target="_blank" class="post-vote-poll-codebook-xlsx">XLSX</a>
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>

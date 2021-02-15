@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-02-15 10:18+0100\n"
+"POT-Creation-Date: 2021-02-15 10:55+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -113,8 +113,11 @@ msgstr "Jeu de données de l'enquête (SAV)"
 msgid "Dataset of the post-vote poll (DTA)"
 msgstr "Jeu de données de l'enquête (DTA)"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Liste des codes de l’enquête"
+msgid "Codebook for the post-vote poll (PDF)"
+msgstr "Liste des codes de l’enquête (PDF)"
+
+msgid "Codebook for the post-vote poll (XLSX)"
+msgstr "Liste des codes de l’enquête (XLSX)"
 
 msgid "Updating the external resources may take some time."
 msgstr "La mise à jour des ressources externes peut prendre un certain temps."
@@ -1475,6 +1478,12 @@ msgstr "Analyse APS des annonces de campagne"
 msgid "Media coverage: fög analysis"
 msgstr "Couverture médiatique: analyse fög"
 
+msgid "Dataset of the post-vote poll"
+msgstr "Jeu de données de l'enquête"
+
+msgid "Codebook for the post-vote poll"
+msgstr "Liste des codes de l’enquête"
+
 msgid "Attachment"
 msgstr "Pièce jointe"
 
@@ -1772,9 +1781,6 @@ msgstr "Présenter la carte"
 
 msgid "Cockpit with selected results"
 msgstr "Cockpit avec des résultats d'analyse"
-
-msgid "Dataset of the post-vote poll"
-msgstr "Jeu de données de l'enquête"
 
 msgid "Filter"
 msgstr "Filtre de recherche"
