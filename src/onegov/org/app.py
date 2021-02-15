@@ -4,13 +4,12 @@ from chameleon import PageTemplate
 from collections import defaultdict
 from dectate import directive
 from more.content_security import SELF
-from onegov.core import utils
+from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
 from onegov.file import DepotApp
 from onegov.form import FormApp
-from onegov.foundation6.integration import FoundationApp
 from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.homepage_widgets import transform_homepage_structure
@@ -29,8 +28,8 @@ from purl import URL
 from sqlalchemy import desc
 
 
-class OrgApp(FoundationApp, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp):
+class OrgAppBase:
+    """All the org apps functionality as a mixin."""
 
     serve_static_files = True
     request_class = OrgRequest
@@ -169,7 +168,7 @@ class OrgApp(FoundationApp, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @property
     def font_family(self):
-        return self.theme_options.get('body-font-family-ui')
+        return self.theme_options.get('font-family-sans-serif')
 
     def checkout_button(self, button_label, title, price, email, locale):
         provider = self.default_payment_provider
@@ -219,6 +218,11 @@ class OrgApp(FoundationApp, LibresIntegration, ElasticsearchApp, MapboxApp,
             return None
 
         return URL(request.link(dashboard)).path()
+
+
+class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
+             DepotApp, PayApp, FormApp, UserApp, OrgAppBase):
+    pass
 
 
 @OrgApp.webasset_path()
@@ -470,6 +474,13 @@ def get_common_asset():
     yield 'jquery.datetimepicker.css'
     yield 'locale.js'
     yield 'modernizr.js'
+    yield 'jquery.js'
+    yield 'foundation.js'
+    yield 'foundation.alert.js'
+    yield 'foundation.dropdown.js'
+    yield 'foundation.orbit.js'
+    yield 'foundation.reveal.js'
+    yield 'foundation.topbar.js'
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
@@ -494,6 +505,11 @@ def get_common_asset():
     yield 'toggle.js'
     yield 'common.js'
     yield '_blank.js'
+
+
+@OrgApp.webasset('accordion')
+def get_accordion_asset():
+    yield 'foundation.accordion.js'
 
 
 @OrgApp.webasset('fontpreview')
