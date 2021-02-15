@@ -5,12 +5,13 @@ from pytz import UTC
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from webtest import Upload
 
-from onegov.directory import DirectoryEntry
+from onegov.directory import DirectoryEntry, DirectoryCollection, \
+    DirectoryConfiguration
 from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
-from tests.shared.utils import create_image, open_in_browser
+from tests.shared.utils import create_image
 
 
 def dt_for_form(dt):
@@ -496,3 +497,74 @@ def test_directory_visibility(client):
     editor.login_editor()
     page = editor.get('/directories').click('Clubs')
     assert len(page.pyquery('.publication-nav a')) == 3
+
+
+def test_markdown_in_directories(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['structure'] = """
+        Name *= ___
+        Notes = <markdown>
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['content_fields'] = 'Notes'
+    page.form.submit().follow()
+
+    page = client.get('/directories/clubs')
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Soccer Club'
+    page.form['notes'] = '* Soccer rules!'
+    page.form.submit().follow()
+
+    assert "<li>Soccer rules" in client.get('/directories/clubs/soccer-club')
+
+
+def test_bug_semicolons_in_choices_with_filters(client):
+    session = client.app.session()
+    test_label = "Z: with semicolon"
+
+    structure = f"""
+    Name *= ___
+    Choice *=
+        (x) {test_label}
+        ( ) B
+        ( ) C
+    """
+    DirectoryCollection(session, type='extended').add(
+        title='Choices',
+        structure=structure,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=["Name"],
+            display={
+                'content': ['Name', 'Choice'],
+                'contact': []
+            },
+            keywords=['Choice']
+        )
+    )
+    session.flush()
+    transaction.commit()
+    client.login_admin()
+    page = client.get('/directories/choices')
+    # Test the counter for the filters
+    assert f'{test_label} (0)' in page
+
+    page = page.click('Eintrag')
+    page.form['name'] = '1'
+    page = page.form.submit().follow()
+    assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
+
+    page = client.get('/directories/choices')
+    assert f'{test_label} (1)' in page
+
+    # Get the url with the filter
+    url = page.pyquery('.blank-label > a')[0].attrib['href']
+    page = client.get(url)
+    assert 'Choices' in page
+
+    # Test that ordering is as defined by form and not alphabetically
+    tags = page.pyquery('ul.tags a')
+    assert [t.text for t in tags] == [f'{test_label} (1)', 'B (0)', 'C (0)']

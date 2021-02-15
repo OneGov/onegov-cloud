@@ -44,6 +44,7 @@ setup(
         'onegov.swissvotes',
         'onegov.ticket',
         'onegov.town',
+        'onegov.town6',
         'onegov.user',
         'onegov.winterthur',
         'onegov.wtfs',

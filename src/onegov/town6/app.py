@@ -1,0 +1,39 @@
+from onegov.core.utils import module_path
+from onegov.town6.initial_content import create_new_organisation
+from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
+    OrgApp
+from onegov.town.theme import TownTheme
+
+
+class TownApp(OrgApp):
+
+    def configure_organisation(self, **cfg):
+        cfg.setdefault('enable_user_registration', False)
+        cfg.setdefault('enable_yubikey', True)
+        super().configure_organisation(**cfg)
+
+
+@TownApp.static_directory()
+def get_static_directory():
+    return 'static'
+
+
+@TownApp.template_directory()
+def get_template_directory():
+    return 'templates'
+
+
+@TownApp.setting(section='core', name='theme')
+def get_theme():
+    return TownTheme()
+
+
+@TownApp.setting(section='i18n', name='localedirs')
+def get_i18n_localedirs():
+    return [module_path('onegov.town6', 'locale')] \
+        + get_org_i18n_localedirs()
+
+
+@TownApp.setting(section='org', name='create_new_organisation')
+def get_create_new_organisation_factory():
+    return create_new_organisation
