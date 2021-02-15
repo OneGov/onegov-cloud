@@ -952,6 +952,20 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             'de_CH': 'nachbefragung.csv',
         }
     )
+    post_vote_poll_dataset_sav = LocalizedFile(
+        label=_('Dataset of the post-vote poll'),
+        extension='sav',
+        static_views={
+            'de_CH': 'nachbefragung.sav',
+        }
+    )
+    post_vote_poll_dataset_dta = LocalizedFile(
+        label=_('Dataset of the post-vote poll'),
+        extension='dta',
+        static_views={
+            'de_CH': 'nachbefragung.dta',
+        }
+    )
     post_vote_poll_codebook = LocalizedFile(
         label=_('Codebook for the post-vote poll'),
         extension='pdf',

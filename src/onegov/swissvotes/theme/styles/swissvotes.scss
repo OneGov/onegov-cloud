@@ -205,6 +205,12 @@ h2 small {
     th {
         vertical-align: top;
     }
+
+    .inline-links {
+        a:not(:first-child)::before {
+            content: "/ ";
+        }
+    }
 }
 
 /*

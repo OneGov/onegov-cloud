@@ -98,7 +98,9 @@ def attachments(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
-    for name in ('results_by_domain',):
+    for name in (
+        'results_by_domain',
+    ):
         file = BytesIO()
         workbook = Workbook(file)
         worksheet = workbook.add_worksheet('DATA')
@@ -111,9 +113,31 @@ def attachments(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
-    for name in ('post_vote_poll_dataset',):
+    for name in (
+        'post_vote_poll_dataset',
+    ):
         file = BytesIO()
         file.write(b'a,b\n100,200')
+
+        attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    for name in (
+        'post_vote_poll_dataset_sav',
+    ):
+        file = BytesIO()
+        file.write(b'$FL2@(#) SPSS DATA FILE MS Windows Release 12.0 \x02')
+
+        attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    for name in (
+        'post_vote_poll_dataset_dta',
+    ):
+        file = BytesIO()
+        file.write(b'<stata_dta><header><release>117</release> \x02')
 
         attachment = SwissVoteFile(id=random_token())
         attachment.reference = as_fileintent(file, name)
@@ -161,6 +185,8 @@ def attachment_urls():
             'parliamentary_debate': 'parlamentsberatung.pdf',
             'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
             'post_vote_poll_dataset': 'nachbefragung.csv',
+            'post_vote_poll_dataset_sav': 'nachbefragung.sav',
+            'post_vote_poll_dataset_dta': 'nachbefragung.dta',
             'post_vote_poll_methodology': 'nachbefragung-methode-de.pdf',
             'post_vote_poll': 'nachbefragung-de.pdf',
             'preliminary_examination': 'vorpruefung-de.pdf',

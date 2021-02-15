@@ -443,7 +443,13 @@
                 </tbody>
             </table>
 
-            <table class="collapsible" tal:condition="layout.attachments['post_vote_poll'] or vote.post_vote_poll_link or layout.attachments['post_vote_poll_methodology'] or layout.attachments['post_vote_poll_dataset'] or layout.attachments['post_vote_poll_codebook']">
+            <table class="collapsible" tal:condition="vote.post_vote_poll_link or
+                                                      layout.attachments['post_vote_poll'] or
+                                                      layout.attachments['post_vote_poll_methodology'] or
+                                                      layout.attachments['post_vote_poll_dataset'] or
+                                                      layout.attachments['post_vote_poll_dataset_sav'] or
+                                                      layout.attachments['post_vote_poll_dataset_dta'] or
+                                                      layout.attachments['post_vote_poll_codebook']">
                 <thead>
                     <tr><th colspan="2" i18n:translate>Post-vote poll</th></tr>
                 </thead>
@@ -466,10 +472,14 @@
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="layout.attachments['post_vote_poll_dataset']">
+                    <tr tal:condition="layout.attachments['post_vote_poll_dataset'] or
+                                       layout.attachments['post_vote_poll_dataset_sav'] or
+                                       layout.attachments['post_vote_poll_dataset_dta']">
                         <th class="column-30" i18n:translate>Dataset of the post-vote poll</th>
-                        <td>
+                        <td class="inline-links">
                             <a href="${layout.attachments['post_vote_poll_dataset']}" target="_blank" class="post-vote-poll-dataset">CSV</a>
+                            <a href="${layout.attachments['post_vote_poll_dataset_sav']}" target="_blank" class="post-vote-poll-dataset-sav">SAV</a>
+                            <a href="${layout.attachments['post_vote_poll_dataset_dta']}" target="_blank" class="post-vote-poll-dataset-dta">DTA</a>
                         </td>
                     </tr>
                     <tr tal:condition="layout.attachments['post_vote_poll_codebook']">

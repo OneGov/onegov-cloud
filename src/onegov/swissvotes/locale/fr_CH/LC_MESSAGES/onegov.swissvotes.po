@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-02-11 08:42+0100\n"
+"POT-Creation-Date: 2021-02-15 10:18+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -104,8 +104,14 @@ msgstr "Enquête post-votation"
 msgid "Questionnaire of the poll"
 msgstr "Questionnaire de l'enquête"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Jeu de données de l'enquête"
+msgid "Dataset of the post-vote poll (CSV)"
+msgstr "Jeu de données de l'enquête (CSV)"
+
+msgid "Dataset of the post-vote poll (SAV)"
+msgstr "Jeu de données de l'enquête (SAV)"
+
+msgid "Dataset of the post-vote poll (DTA)"
+msgstr "Jeu de données de l'enquête (DTA)"
 
 msgid "Codebook for the post-vote poll"
 msgstr "Liste des codes de l’enquête"
@@ -1766,6 +1772,9 @@ msgstr "Présenter la carte"
 
 msgid "Cockpit with selected results"
 msgstr "Cockpit avec des résultats d'analyse"
+
+msgid "Dataset of the post-vote poll"
+msgstr "Jeu de données de l'enquête"
 
 msgid "Filter"
 msgstr "Filtre de recherche"

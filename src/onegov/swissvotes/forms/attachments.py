@@ -20,6 +20,15 @@ XLSX_MIME_TYPES = {
     'application/zip'
 }
 
+SAV_MIME_TYPES = {
+    'application/octet-stream',
+}
+
+
+DTA_MIME_TYPES = {
+    'application/octet-stream',
+}
+
 
 class AttachmentsForm(Form):
 
@@ -145,9 +154,27 @@ class AttachmentsForm(Form):
     )
 
     post_vote_poll_dataset = UploadField(
-        label=_("Dataset of the post-vote poll"),
+        label=_("Dataset of the post-vote poll (CSV)"),
         validators=[
             WhitelistedMimeType(CSV_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_dataset_sav = UploadField(
+        label=_("Dataset of the post-vote poll (SAV)"),
+        validators=[
+            WhitelistedMimeType(SAV_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote poll"),
+    )
+
+    post_vote_poll_dataset_dta = UploadField(
+        label=_("Dataset of the post-vote poll (DTA)"),
+        validators=[
+            WhitelistedMimeType(DTA_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Post-vote poll"),
