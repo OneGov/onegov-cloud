@@ -9,11 +9,11 @@ from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
     OrgTicketSettingsForm
 from onegov.org.models import Organisation
-from onegov.org.views.settings import handle_homepage_settings, view_settings, \
-    handle_generic_settings, handle_ticket_settings, preview_holiday_settings
+from onegov.org.views.settings import (
+    handle_homepage_settings, view_settings, handle_generic_settings,
+    handle_ticket_settings, preview_holiday_settings)
 from onegov.town6.app import TownApp
 from wtforms import BooleanField, StringField
-
 
 
 def get_custom_settings_form(model, request):
@@ -62,6 +62,7 @@ def get_custom_settings_form(model, request):
         after='homepage_image_6'
     )
 
+
 @TownApp.html(
     model=Organisation, name='settings', template='settings.pt',
     permission=Secret)
@@ -91,14 +92,6 @@ def handle_favicon_settings(self, request, form):
     icon=' fa-link', order=-980)
 def handle_links_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Links"))
-
-
-@TownApp.form(
-    model=Organisation, name='homepage-settings', template='form.pt',
-    permission=Secret, form=HomepageSettingsForm, setting=_("Homepage"),
-    icon='fa-home', order=-900)
-def handle_homepage_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Homepage"))
 
 
 @TownApp.form(
@@ -159,7 +152,7 @@ def handle_town_ticket_settings(self, request, form):
 
 
 @TownApp.form(model=Organisation, name='holiday-settings-preview',
-             permission=Secret, form=HolidaySettingsForm)
+              permission=Secret, form=HolidaySettingsForm)
 def preview_town_holiday_settings(self, request, form):
     return preview_holiday_settings(self, request, form)
 

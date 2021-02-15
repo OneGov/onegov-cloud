@@ -1,6 +1,6 @@
 from onegov.core.security import Private
 from onegov.org.views.export import view_export_collection, view_export
-from onegov.town6 import TownApp, _
+from onegov.town6 import TownApp
 from onegov.org.models import Export, ExportCollection
 
 

@@ -5,6 +5,6 @@ from onegov.org.models import PublicationCollection
 
 
 @TownApp.html(model=PublicationCollection, permission=Public,
-             template='publications.pt')
+              template='publications.pt')
 def town_view_publications(self, request):
     return view_publications(self, request)

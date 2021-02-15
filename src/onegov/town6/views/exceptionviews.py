@@ -1,6 +1,6 @@
 from onegov.core.security import Public
 from onegov.org.views.exceptionviews import handle_forbidden, handle_notfound
-from onegov.town6 import _, TownApp
+from onegov.town6 import TownApp
 from webob.exc import HTTPForbidden, HTTPNotFound
 
 

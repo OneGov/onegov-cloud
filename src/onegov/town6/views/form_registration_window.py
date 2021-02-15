@@ -4,7 +4,7 @@ from onegov.form import FormRegistrationWindow
 from onegov.org.views.form_registration_window import \
     handle_new_registration_form, view_registration_window, \
     handle_edit_registration_form
-from onegov.town6 import TownApp, _
+from onegov.town6 import TownApp
 from onegov.org.forms import FormRegistrationWindowForm
 
 

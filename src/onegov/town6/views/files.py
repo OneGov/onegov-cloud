@@ -7,7 +7,9 @@ from onegov.file import File
 from onegov.file.utils import extension_for_content_type
 from onegov.org.views.files import view_file_details, \
     view_get_image_collection, view_upload_general_file, \
-    view_upload_image_file, view_file_digest, handle_sign
+    view_upload_image_file, view_file_digest, handle_sign, Img, \
+    view_get_image_collection_json
+
 from onegov.town6 import _, TownApp
 from onegov.core.elements import Link
 from onegov.org.layout import DefaultLayout
@@ -22,7 +24,7 @@ from sedate import to_timezone
 
 
 @TownApp.html(model=GeneralFileCollection, template='files.pt',
-             permission=Private)
+              permission=Private)
 def view_town_file_collection(self, request):
 
     layout = DefaultLayout(self, request)
@@ -77,7 +79,7 @@ def view_town_file_details(self, request):
 
 
 @TownApp.html(model=ImageFileCollection, template='images.pt',
-             permission=Private)
+              permission=Private)
 def view_town_image_collection(self, request):
     return view_get_image_collection(self, request)
     layout = DefaultLayout(self, request)
@@ -116,13 +118,13 @@ def view_town_image_collection(self, request):
 
 
 @TownApp.html(model=GeneralFileCollection, name='upload',
-             request_method='POST', permission=Private)
+              request_method='POST', permission=Private)
 def view_town_upload_general_file(self, request):
     return view_upload_general_file(self, request)
 
 
 @TownApp.html(model=ImageFileCollection, name='upload',
-             request_method='POST', permission=Private)
+              request_method='POST', permission=Private)
 def view_town_upload_image_file(self, request):
     return view_upload_image_file(self, request)
 
@@ -133,7 +135,6 @@ def view_town_file_digest(self, request):
 
 
 @TownApp.html(model=File, name='sign', request_method='POST',
-             permission=Private)
+              permission=Private)
 def town_handle_sign(self, request):
     return handle_sign(self, request)
-

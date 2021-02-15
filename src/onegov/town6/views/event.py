@@ -1,23 +1,9 @@
-""" The onegov org collection of images uploaded to the site. """
-import morepath
 
-from morepath.request import Response
-from onegov.core.security import Private, Public
-from onegov.event import Event, EventCollection, OccurrenceCollection
+from onegov.core.security import Public
+from onegov.event import Event, OccurrenceCollection
 from onegov.org.views.event import event_form, handle_new_event, view_event, \
     handle_edit_event
-from onegov.town6 import _, TownApp
-from onegov.org.cli import close_ticket
-from onegov.org.elements import Link
-from onegov.org.forms import EventForm
-from onegov.org.layout import EventLayout
-from onegov.org.mail import send_ticket_mail
-from onegov.org.models import TicketMessage, EventMessage
-from onegov.org.models.extensions import AccessExtension
-from onegov.ticket import TicketCollection
-from sedate import utcnow
-from uuid import uuid4
-from webob import exc
+from onegov.town6 import TownApp
 
 
 @TownApp.form(

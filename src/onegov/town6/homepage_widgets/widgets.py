@@ -37,7 +37,7 @@ class RowWidget(object):
 
 
 @TownApp.homepage_widget(tag='row-wide')
-class RowWidget(object):
+class RowWidgetWide(object):
     template = """
         <xsl:template match="row-wide">
             <div class="grid-container full">

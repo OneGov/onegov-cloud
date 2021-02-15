@@ -1,6 +1,6 @@
 from onegov.core.security import Public
 from onegov.org.views.search import search
-from onegov.town6 import _, TownApp
+from onegov.town6 import TownApp
 from onegov.org.models import Search
 
 

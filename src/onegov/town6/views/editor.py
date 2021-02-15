@@ -5,6 +5,6 @@ from onegov.org.models import Editor
 
 
 @TownApp.form(model=Editor, template='form.pt', permission=Private,
-             form=get_form_class)
+              form=get_form_class)
 def town_handle_page_form(self, request, form):
     return handle_page_form(self, request, form)

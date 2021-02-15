@@ -9,4 +9,4 @@ class DirectoryBaseForm(OrgDirectoryBaseForm):
     @property
     def default_marker_color(self):
         return self.request.app.org.theme_options.get('primary-color-ui') \
-               or user_options['primary-color-ui']
+            or user_options['primary-color-ui']

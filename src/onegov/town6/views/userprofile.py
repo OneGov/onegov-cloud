@@ -15,7 +15,11 @@ def town_handle_user_profile(self, request, form):
 
 
 # the view name must remain english, so that automated tools can detect it
-@TownApp.html(model=Organisation, name='unsubscribe', template='userprofile.pt',
-             permission=Public)
+@TownApp.html(
+    model=Organisation,
+    name='unsubscribe',
+    template='userprofile.pt',
+    permission=Public
+)
 def town_handle_unsubscribe(self, request):
     return handle_unsubscribe(self, request)

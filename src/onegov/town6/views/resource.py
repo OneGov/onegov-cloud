@@ -11,25 +11,25 @@ from onegov.org.forms import ResourceCleanupForm, ResourceExportForm
 
 
 @TownApp.html(model=ResourceCollection, template='resources.pt',
-             permission=Public)
+              permission=Public)
 def town_view_resources(self, request):
     return view_resources(self, request)
 
 
 @TownApp.form(model=ResourceCollection, name='new-room',
-             template='form.pt', permission=Private, form=get_room_form)
+              template='form.pt', permission=Private, form=get_room_form)
 def town_handle_new_room(self, request, form):
     return handle_new_room(self, request, form)
 
 
 @TownApp.form(model=ResourceCollection, name='new-daypass',
-             template='form.pt', permission=Private, form=get_daypass_form)
+              template='form.pt', permission=Private, form=get_daypass_form)
 def town_handle_new_daypass(self, request, form):
     return handle_new_daypass(self, request, form)
 
 
 @TownApp.form(model=Resource, name='edit', template='form.pt',
-             permission=Private, form=get_resource_form)
+              permission=Private, form=get_resource_form)
 def town_handle_edit_resource(self, request, form):
     return handle_edit_resource(self, request, form)
 
@@ -40,24 +40,24 @@ def town_view_resource(self, request):
 
 
 @TownApp.form(model=Resource, permission=Private, name='cleanup',
-             form=ResourceCleanupForm, template='resource_cleanup.pt')
+              form=ResourceCleanupForm, template='resource_cleanup.pt')
 def town_handle_cleanup_allocations(self, request, form):
     return handle_cleanup_allocations(self, request, form)
 
 
 @TownApp.html(model=Resource, permission=Private, name='occupancy',
-             template='resource_occupancy.pt')
+              template='resource_occupancy.pt')
 def town_view_occupancy(self, request):
     return view_occupancy(self, request)
 
 
 @TownApp.html(model=Resource, template='resource-subscribe.pt',
-             permission=Private, name='subscribe')
+              permission=Private, name='subscribe')
 def town_view_resource_subscribe(self, request):
     return view_resource_subscribe(self, request)
 
 
 @TownApp.form(model=Resource, permission=Private, name='export',
-             template='export.pt', form=ResourceExportForm)
+              template='export.pt', form=ResourceExportForm)
 def town_view_export(self, request, form):
     return view_export(self, request, form)
