@@ -12,41 +12,12 @@ from sqlalchemy import func
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
-def get_lead(text, max_chars=180, consider_sentences=True):
-    if len(text) > max_chars:
-        first_point_ix = text.find('.')
-        if not first_point_ix or not consider_sentences:
-            return text[0:max_chars] + '...'
-        elif first_point_ix >= max_chars:
-            return text
-        else:
-            end = text[0:max_chars].rindex('.') + 1
-            return text[0:end]
-
-    return text
-
-
 @OrgApp.homepage_widget(tag='row')
 class RowWidget(object):
     template = """
         <xsl:template match="row">
-            <div class="grid-container">
-                <div class="grid-x grid-padding-x">
-                    <xsl:apply-templates select="node()"/>
-                </div>
-            </div>
-        </xsl:template>
-    """
-
-
-@OrgApp.homepage_widget(tag='row-wide')
-class RowWidget(object):
-    template = """
-        <xsl:template match="row-wide">
-            <div class="grid-container full">
-                <div class="grid-x">
-                    <xsl:apply-templates select="node()"/>
-                </div>
+            <div class="row">
+                <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
     """
@@ -56,7 +27,7 @@ class RowWidget(object):
 class ColumnWidget(object):
     template = """
         <xsl:template match="column">
-            <div class="small-12 medium-{@span} cell">
+            <div class="small-12 medium-{@span} columns">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
@@ -91,9 +62,9 @@ class LinksWidget(object):
     template = """
         <xsl:template match="links">
             <xsl:if test="@title">
-                <h3>
+                <h2>
                     <xsl:value-of select="@title" />
-                </h3>
+                </h2>
             </xsl:if>
             <ul class="panel-links">
                 <xsl:for-each select="link">
@@ -166,7 +137,7 @@ class NewsWidget(object):
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
-                tal:define="heading 'h5'; show_all_news_link True;
+                tal:define="heading 'h3'; show_all_news_link True;
                 hide_date True"
             />
         </xsl:template>
@@ -214,17 +185,11 @@ class CoverWidget(object):
     """
 
 
-EventCard = namedtuple(
-    'EventCard', ['text', 'url', 'subtitle', 'image_url', 'location', 'lead']
-)
-
-
 @OrgApp.homepage_widget(tag='events')
 class EventsWidget(object):
     template = """
         <xsl:template match="events">
-            <metal:block use-macro="layout.macros['event-cards']"
-            tal:define="with_lead True" />
+            <metal:block use-macro="layout.macros['events-panel']" />
         </xsl:template>
     """
 
@@ -234,16 +199,21 @@ class EventsWidget(object):
 
         event_layout = EventBaseLayout(layout.model, layout.request)
         event_links = [
-            EventCard(
+            Link(
                 text=o.title,
                 url=layout.request.link(o),
                 subtitle=event_layout.format_date(o.localized_start, 'event')
-                .title(),
-                image_url=o.event.image and layout.request.link(o.event.image),
-                location=o.location,
-                lead=get_lead(o.event.description)
+                .title()
             ) for o in occurrences
         ]
+
+        event_links.append(
+            Link(
+                text=_("All events"),
+                url=event_layout.events_url,
+                classes=('more-link', )
+            )
+        )
 
         latest_events = LinkGroup(
             title=_("Events"),
@@ -251,13 +221,7 @@ class EventsWidget(object):
         )
 
         return {
-            'event_panel': latest_events,
-            'all_events_link': Link(
-                text=_("All events"),
-                url=event_layout.events_url,
-                classes=('more-link', )
-            ),
-
+            'event_panel': latest_events
         }
 
 
@@ -397,29 +361,3 @@ class SliderWidget(object):
         return {
             'images': images
         }
-
-
-PartnerCard = namedtuple('PartnerCard', ['url', 'image_url', 'lead'])
-
-
-@OrgApp.homepage_widget(tag='partners')
-class PartnerWidget(object):
-
-    template = """
-            <xsl:template match="partners">
-                <metal:block use-macro="layout.macros['partner-cards']" />
-            </xsl:template>
-    """
-
-    def get_variables(self, layout):
-        org = layout.org
-        partner_attrs = [key for key in dir(org) if 'partner' in key]
-        partner_count = int(len(partner_attrs) / 3)
-
-        return {'partners': [
-            PartnerCard(
-                url=getattr(org, f'partner_{ix}_url'),
-                image_url=getattr(org, f'partner_{ix}_img'),
-                lead=getattr(org, f'partner_{ix}_name'),
-            ) for ix in range(1, partner_count + 1)
-        ]}
