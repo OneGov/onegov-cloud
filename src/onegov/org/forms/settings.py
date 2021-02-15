@@ -51,16 +51,9 @@ class GeneralSettingsForm(Form):
     primary_color = ColorField(
         label=_("Primary Color"))
 
-    body_font_family_ui = ChosenSelectField(
-        label=_('Body Font Family'),
+    font_family_sans_serif = ChosenSelectField(
+        label=_('Default Font Family'),
         description='Used for text in html body',
-        choices=[],
-        validators=[validators.InputRequired()]
-    )
-
-    header_font_family_ui = ChosenSelectField(
-        label=_('Header Font Family'),
-        description='Used for all the headings',
         choices=[],
         validators=[validators.InputRequired()]
     )
@@ -78,20 +71,14 @@ class GeneralSettingsForm(Form):
         options = self.model.theme_options
 
         try:
-            options['primary-color-ui'] = self.primary_color.data.get_hex()
+            options['primary-color'] = self.primary_color.data.get_hex()
         except AttributeError:
-            options['primary-color-ui'] = user_options['primary-color-ui']
-
-        body_family = self.body_font_family_ui.data
-        if body_family not in self.theme.font_families.values():
-            options['body-font-family-ui'] = self.default_font_family
+            options['primary-color'] = user_options['primary-color']
+        font_family = self.font_family_sans_serif.data
+        if font_family not in self.theme.font_families.values():
+            options['font-family-sans-serif'] = self.default_font_family
         else:
-            options['body-font-family-ui'] = body_family
-        header_family = self.header_font_family_ui.data
-        if header_family not in self.theme.font_families.values():
-            options['header-font-family-ui'] = self.default_font_family
-        else:
-            options['header-font-family-ui'] = header_family
+            options['font-family-sans-serif'] = font_family
 
         # override the options using the default values if no value was given
         for key in options:
@@ -106,19 +93,13 @@ class GeneralSettingsForm(Form):
 
     @property
     def default_font_family(self):
-        return self.theme.default_options.get('body-font-family-ui')
-
-    @property
-    def header_font_family(self):
-        return self.theme.default_options.get('header-font-family-ui')
+        return self.theme.default_options.get('font-family-sans-serif')
 
     @theme_options.setter
     def theme_options(self, options):
-        self.primary_color.data = options.get('primary-color-ui')
-        self.body_font_family_ui.data = options.get(
-            'body-font-family-ui') or self.default_font_family
-        self.header_font_family_ui.data = options.get(
-            'header-font-family-ui') or self.default_font_family
+        self.primary_color.data = options.get('primary-color')
+        self.font_family_sans_serif.data = options.get(
+            'font-family-sans-serif') or self.default_font_family
 
     def populate_obj(self, model):
         super().populate_obj(model)
@@ -129,10 +110,7 @@ class GeneralSettingsForm(Form):
         self.theme_options = model.theme_options or {}
 
     def populate_font_families(self):
-        self.body_font_family_ui.choices = tuple(
-            (value, label) for label, value in self.theme.font_families.items()
-        )
-        self.header_font_family_ui.choices = tuple(
+        self.font_family_sans_serif.choices = tuple(
             (value, label) for label, value in self.theme.font_families.items()
         )
 
