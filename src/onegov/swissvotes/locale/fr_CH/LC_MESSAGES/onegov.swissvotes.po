@@ -650,7 +650,7 @@ msgid "actor-mcg-label"
 msgstr "Mouvement citoyens genevois"
 
 msgid "actor-mitte-label"
-msgstr "Le Centre suisse"
+msgstr "Le Centre"
 
 msgid "actor-mitte-fr-label"
 msgstr "Le Centre Femmes"

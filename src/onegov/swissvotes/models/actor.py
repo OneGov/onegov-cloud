@@ -22,8 +22,8 @@ class Actor(object):
 
         return (
             'bdp', 'csp', 'cvp', 'edu', 'evp', 'fdp', 'fps', 'glp', 'gps',
-            'kvp', 'ldu', 'lega', 'lps', 'mcg', 'pda', 'poch', 'rep', 'sd',
-            'sps', 'svp', 'mitte'
+            'kvp', 'ldu', 'lega', 'lps', 'mcg', 'mitte', 'pda', 'poch', 'rep',
+            'sd', 'sps', 'svp'
         )
 
     @staticmethod
