@@ -6,9 +6,8 @@ from onegov.org.theme.org_theme import HELVETICA
 
 # options editable by the user
 user_options = {
-    'primary-color-ui': '#006fba',
-    'body-font-family-ui': HELVETICA,
-    'header-font-family-ui': HELVETICA,
+    'primary-color': '#006fba',
+    'font-family-sans-serif': HELVETICA
 
 }
 
@@ -26,7 +25,3 @@ class TownTheme(OrgTheme):
     def extra_search_paths(self):
         base_paths = super().extra_search_paths
         return [module_path('onegov.town.theme', 'styles')] + base_paths
-
-    @property
-    def font_search_path(self):
-        return module_path('onegov.org.theme', 'fonts')
