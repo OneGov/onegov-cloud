@@ -10,17 +10,19 @@ from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
-    handle_ticket_settings, preview_holiday_settings, handle_generic_settings)
+    handle_ticket_settings, preview_holiday_settings)
 
 from onegov.org.views.settings import handle_generic_settings as \
     handle_org_generic_settings
 from onegov.town6.app import TownApp
 from wtforms import BooleanField, StringField
 
+from onegov.town6.layout import SettingsLayout
 
-# def handle_generic_settings(self, request, form, title):
-#     layout = SettingsLayout(self, request, title)
-#     return handle_org_generic_settings(self, request, form, layout)
+
+def handle_generic_settings(self, request, form, title):
+    layout = SettingsLayout(self, request, title)
+    return handle_org_generic_settings(self, request, form, layout)
 
 
 def get_custom_settings_form(model, request):
