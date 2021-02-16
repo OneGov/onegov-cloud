@@ -178,13 +178,13 @@ def handle_newsletters(self, request, form):
 
 
 @OrgApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
-def view_newsletter(self, request):
+def view_newsletter(self, request, layout=None):
 
     # link to file and thumbnail by id
     def link(f, name=None):
         return request.class_link(File, {'id': f.id}, name=name)
 
-    layout = NewsletterLayout(self, request)
+    layout = layout or NewsletterLayout(self, request)
 
     return {
         'layout': layout,
@@ -201,7 +201,7 @@ def view_newsletter(self, request):
 
 @OrgApp.html(model=RecipientCollection, template='recipients.pt',
              permission=Private)
-def view_subscribers(self, request):
+def view_subscribers(self, request, layout=None):
 
     # i18n:attributes translations do not support variables, so we need
     # to do this ourselves
@@ -223,7 +223,7 @@ def view_subscribers(self, request):
 
 @OrgApp.form(model=NewsletterCollection, name='new', template='form.pt',
              permission=Public, form=get_newsletter_form)
-def handle_new_newsletter(self, request, form):
+def handle_new_newsletter(self, request, form, layout=None):
 
     if form.submitted(request):
         try:
@@ -238,7 +238,7 @@ def handle_new_newsletter(self, request, form):
 
     return {
         'form': form,
-        'layout': NewsletterLayout(self, request),
+        'layout': layout or NewsletterLayout(self, request),
         'title': _("New Newsletter"),
         'size': 'large'
     }
@@ -246,7 +246,7 @@ def handle_new_newsletter(self, request, form):
 
 @OrgApp.form(model=Newsletter, template='form.pt', name='edit',
              permission=Private, form=get_newsletter_form)
-def edit_newsletter(self, request, form):
+def edit_newsletter(self, request, form, layout=None):
 
     if form.submitted(request):
         form.update_model(self, request)
@@ -258,7 +258,7 @@ def edit_newsletter(self, request, form):
         form.apply_model(self)
 
     return {
-        'layout': NewsletterLayout(self, request),
+        'layout': layout or NewsletterLayout(self, request),
         'form': form,
         'title': _("Edit Newsletter"),
         'size': 'large'
@@ -273,8 +273,9 @@ def delete_page(self, request):
     request.success(_("The newsletter was deleted"))
 
 
-def send_newsletter(request, newsletter, recipients, is_test=False):
-    layout = DefaultMailLayout(newsletter, request)
+def send_newsletter(request, newsletter, recipients, is_test=False,
+                    layout=None):
+    layout = layout or DefaultMailLayout(newsletter, request)
     html = Template(render_template(
         'mail_newsletter.pt', request, {
             'layout': layout,
@@ -311,8 +312,8 @@ def send_newsletter(request, newsletter, recipients, is_test=False):
 
 @OrgApp.form(model=Newsletter, template='send_newsletter.pt', name='send',
              permission=Private, form=NewsletterSendForm)
-def handle_send_newsletter(self, request, form):
-    layout = NewsletterLayout(self, request)
+def handle_send_newsletter(self, request, form, layout=None):
+    layout = layout or NewsletterLayout(self, request)
 
     open_recipients = self.open_recipients
 
@@ -350,8 +351,8 @@ def handle_send_newsletter(self, request, form):
 
 @OrgApp.form(model=Newsletter, template='form.pt', name='test',
              permission=Private, form=NewsletterTestForm.build)
-def handle_test_newsletter(self, request, form):
-    layout = NewsletterLayout(self, request)
+def handle_test_newsletter(self, request, form, layout=None):
+    layout = layout or NewsletterLayout(self, request)
 
     if form.submitted(request):
         send_newsletter(request, self, (form.recipient, ), is_test=True)
@@ -375,8 +376,8 @@ def handle_test_newsletter(self, request, form):
 
 @OrgApp.html(model=Newsletter,
              template='mail_newsletter.pt', name='preview', permission=Private)
-def handle_preview_newsletter(self, request):
-    layout = DefaultMailLayout(self, request)
+def handle_preview_newsletter(self, request, layout=None):
+    layout = layout or DefaultMailLayout(self, request)
 
     return {
         'layout': layout,

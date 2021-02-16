@@ -26,7 +26,7 @@ from webob import exc
 
 @OrgApp.form(model=Auth, name='login', template='login.pt', permission=Public,
              form=LoginForm)
-def handle_login(self, request, form):
+def handle_login(self, request, form, layout=None):
     """ Handles the login requests. """
 
     if not request.app.enable_yubikey:
@@ -66,7 +66,7 @@ def handle_login(self, request, form):
 
         request.alert(_("Wrong e-mail address, password or yubikey."))
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     request.include('scroll-to-username')
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
@@ -95,7 +95,7 @@ def handle_login(self, request, form):
 
 @OrgApp.form(model=Auth, name='register', template='form.pt',
              permission=Public, form=RegistrationForm)
-def handle_registration(self, request, form):
+def handle_registration(self, request, form, layout=None):
     """ Handles the user registration. """
 
     if not request.app.enable_user_registration:
@@ -137,7 +137,7 @@ def handle_registration(self, request, form):
 
             return morepath.redirect(request.link(request.app.org))
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Register"), request.link(self, name='register'))
@@ -221,13 +221,13 @@ def view_logout(self, request):
 
 @OrgApp.form(model=Auth, name='request-password', template='form.pt',
              permission=Public, form=RequestPasswordResetForm)
-def handle_password_reset_request(self, request, form):
+def handle_password_reset_request(self, request, form, layout=None):
     """ Handles the GET and POST password reset requests. """
 
     if request.app.disable_password_reset:
         raise exc.HTTPNotFound()
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Reset password"), request.link(self, name='request-password'))
@@ -273,7 +273,7 @@ def handle_password_reset_request(self, request, form):
 
 @OrgApp.form(model=Auth, name='reset-password', template='form.pt',
              permission=Public, form=PasswordResetForm)
-def handle_password_reset(self, request, form):
+def handle_password_reset(self, request, form, layout=None):
 
     if request.app.disable_password_reset:
         raise exc.HTTPNotFound()
@@ -299,7 +299,7 @@ def handle_password_reset(self, request, form):
     if 'token' in request.params:
         form.token.data = request.params['token']
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Reset password"), request.link(self, name='request-password'))

@@ -6,9 +6,9 @@ from onegov.org.models import AtoZ
 
 
 @OrgApp.html(model=AtoZ, template='atoz.pt', permission=Public)
-def atoz(self, request):
+def atoz(self, request, layout=None):
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs.append(Link(_("Topics A-Z"), '#'))
 
     return {

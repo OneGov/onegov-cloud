@@ -16,10 +16,10 @@ from webob.exc import HTTPForbidden
 @OrgApp.form(
     model=Organisation, name='userprofile', template='userprofile.pt',
     permission=Personal, form=UserProfileForm)
-def handle_user_profile(self, request, form):
+def handle_user_profile(self, request, form, layout=None):
     """ Handles the GET and POST login requests. """
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
 
     collection = UserCollection(request.session)
     user = collection.by_username(request.identity.userid)

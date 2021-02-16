@@ -22,9 +22,9 @@ from sqlalchemy import and_
     permission=Private,
     form=FormSubmissionsExport,
     template='export.pt')
-def handle_form_submissions_export(self, request, form):
+def handle_form_submissions_export(self, request, form, layout=None):
 
-    layout = FormSubmissionLayout(self, request)
+    layout = layout or FormSubmissionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
     layout.editbar_links = None
 

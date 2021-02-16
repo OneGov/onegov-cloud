@@ -8,10 +8,10 @@ from onegov.org.utils import group_by_column
 
 
 @OrgApp.html(model=FormCollection, template='forms.pt', permission=Public)
-def view_form_collection(self, request):
+def view_form_collection(self, request, layout=None):
 
     return {
-        'layout': FormCollectionLayout(self, request),
+        'layout': layout or FormCollectionLayout(self, request),
         'title': _("Forms"),
         'forms': group_by_column(
             request=request,

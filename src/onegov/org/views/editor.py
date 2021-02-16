@@ -22,22 +22,22 @@ def get_form_class(editor, request):
 
 @OrgApp.form(model=Editor, template='form.pt', permission=Private,
              form=get_form_class)
-def handle_page_form(self, request, form):
+def handle_page_form(self, request, form, layout=None):
     if self.action == 'new':
-        return handle_new_page(self, request, form)
+        return handle_new_page(self, request, form, layout)
     elif self.action == 'edit':
-        return handle_edit_page(self, request, form)
+        return handle_edit_page(self, request, form, layout)
     elif self.action == 'paste':
         clipboard = Clipboard.from_session(request)
         src = clipboard.get_object()
         clipboard.clear()
 
-        return handle_new_page(self, request, form, src)
+        return handle_new_page(self, request, form, src, layout)
     else:
         raise NotImplementedError
 
 
-def handle_new_page(self, request, form, src=None):
+def handle_new_page(self, request, form, src=None, layout=None):
 
     if form.submitted(request):
         pages = PageCollection(request.session)
@@ -58,14 +58,14 @@ def handle_new_page(self, request, form, src=None):
     site_title = self.page.trait_messages[self.trait]['new_page_title']
 
     return {
-        'layout': EditorLayout(self, request, site_title),
+        'layout': layout or EditorLayout(self, request, site_title),
         'title': site_title,
         'form': form,
         'form_width': 'large'
     }
 
 
-def handle_edit_page(self, request, form):
+def handle_edit_page(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self.page)
         request.success(_("Your changes were saved"))
@@ -77,7 +77,7 @@ def handle_edit_page(self, request, form):
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
 
     return {
-        'layout': EditorLayout(self, request, site_title),
+        'layout': layout or EditorLayout(self, request, site_title),
         'title': site_title,
         'form': form,
         'form_width': 'large'

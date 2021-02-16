@@ -10,9 +10,9 @@ from webob import exc
 
 
 @OrgApp.html(model=Search, template='search.pt', permission=Public)
-def search(self, request):
+def search(self, request, layout=None):
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs.append(Link(_("Search"), '#'))
 
     try:

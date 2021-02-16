@@ -81,7 +81,7 @@ def get_hints(layout, window):
 
 @OrgApp.form(model=FormDefinition, template='form.pt', permission=Public,
              form=lambda self, request: self.form_class)
-def handle_defined_form(self, request, form):
+def handle_defined_form(self, request, form, layout=None):
     """ Renders the empty form and takes input, even if it's not valid, stores
     it as a pending submission and redirects the user to the view that handles
     pending submissions.
@@ -103,7 +103,7 @@ def handle_defined_form(self, request, form):
 
         return morepath.redirect(request.link(submission))
 
-    layout = FormSubmissionLayout(self, request)
+    layout = layout or FormSubmissionLayout(self, request)
 
     return {
         'layout': layout,
@@ -129,7 +129,7 @@ def handle_defined_form(self, request, form):
              permission=Private, request_method='GET')
 @OrgApp.html(model=CompleteFormSubmission, template='submission.pt',
              permission=Private, request_method='POST')
-def handle_pending_submission(self, request):
+def handle_pending_submission(self, request, layout=None):
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.
@@ -189,7 +189,7 @@ def handle_pending_submission(self, request):
     edit_link = edit_link.as_string()
 
     return {
-        'layout': FormSubmissionLayout(self, request, title),
+        'layout': layout or FormSubmissionLayout(self, request, title),
         'title': title,
         'form': form,
         'completable': completable,

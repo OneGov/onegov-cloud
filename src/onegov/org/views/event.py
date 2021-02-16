@@ -110,7 +110,7 @@ def publish_event(self, request):
     form=event_form,
     permission=Public
 )
-def handle_new_event(self, request, form):
+def handle_new_event(self, request, form, layout=None):
     """ Add a new event.
 
     The event is created and the user is redirected to a view where he can
@@ -141,7 +141,7 @@ def handle_new_event(self, request, form):
 
         return morepath.redirect(request.link(event))
 
-    layout = EventLayout(self, request)
+    layout = layout or EventLayout(self, request)
     layout.editbar_links = []
 
     return {
@@ -165,7 +165,7 @@ def handle_new_event(self, request, form):
     permission=Public,
     request_method='POST'
 )
-def view_event(self, request):
+def view_event(self, request, layout=None):
     """ View an event.
 
     If the event is not already submitted, the submit form is displayed.
@@ -218,7 +218,7 @@ def view_event(self, request):
         'completable': self.state == 'initiated',
         'edit_url': request.link(self, 'edit'),
         'event': self,
-        'layout': EventLayout(self, request),
+        'layout': layout or EventLayout(self, request),
         'ticket': ticket,
         'title': self.title,
     }
@@ -231,7 +231,7 @@ def view_event(self, request):
     permission=Public,
     form=event_form
 )
-def handle_edit_event(self, request, form):
+def handle_edit_event(self, request, form, layout=None):
     """ Edit an event.
 
     An anonymous user might edit an initiated event, a logged in user can also
@@ -249,7 +249,7 @@ def handle_edit_event(self, request, form):
 
     form.process(obj=self)
 
-    layout = EventLayout(self, request)
+    layout = layout or EventLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
 

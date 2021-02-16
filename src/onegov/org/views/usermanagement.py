@@ -21,10 +21,10 @@ from wtforms.validators import Optional
 
 @OrgApp.html(model=UserCollection, template='usermanagement.pt',
              permission=Secret)
-def view_usermanagement(self, request):
+def view_usermanagement(self, request, layout=None):
     """ Allows the management of organisation users. """
 
-    layout = UserManagementLayout(self, request)
+    layout = layout or UserManagementLayout(self, request)
 
     users = defaultdict(list)
     query = self.query().order_by(User.username)
@@ -91,7 +91,7 @@ def view_usermanagement(self, request):
     permission=Secret,
     form=SignupLinkForm,
     name='signup-link')
-def handle_create_signup_link(self, request, form):
+def handle_create_signup_link(self, request, form, layout=None):
     link = None
 
     if form.submitted(request):
@@ -100,7 +100,7 @@ def handle_create_signup_link(self, request, form):
 
         link = request.link(auth, 'register')
 
-    layout = UserManagementLayout(self, request)
+    layout = layout or UserManagementLayout(self, request)
     layout.breadcrumbs.append(Link(_("New Signup Link"), '#'))
     layout.editbar_links = None
 
@@ -113,10 +113,10 @@ def handle_create_signup_link(self, request, form):
 
 
 @OrgApp.html(model=User, template='user.pt', permission=Secret)
-def view_user(self, request):
+def view_user(self, request, layout=None):
     """ Shows all objects owned by the given user. """
 
-    layout = UserLayout(self, request)
+    layout = layout or UserLayout(self, request)
 
     linkgroups = [
         fn(request, self) for fn in request.app.config.linkgroup_registry
@@ -186,7 +186,7 @@ def get_manage_user_form(self, request):
 
 @OrgApp.form(model=User, template='form.pt', form=get_manage_user_form,
              permission=Secret, name='edit')
-def handle_manage_user(self, request, form):
+def handle_manage_user(self, request, form, layout=None):
 
     if self.source:
         raise HTTPForbidden()
@@ -208,7 +208,7 @@ def handle_manage_user(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = UserManagementLayout(self, request)
+    layout = layout or UserManagementLayout(self, request)
     layout.breadcrumbs.append(Link(self.username, '#'))
 
     return {
@@ -220,12 +220,12 @@ def handle_manage_user(self, request, form):
 
 @OrgApp.form(model=UserCollection, template='newuser.pt',
              form=NewUserForm, name='new', permission=Secret)
-def handle_new_user(self, request, form):
+def handle_new_user(self, request, form, layout=None):
 
     if not request.app.enable_yubikey:
         form.delete_field('yubikey')
 
-    layout = UserManagementLayout(self, request)
+    layout = layout or UserManagementLayout(self, request)
     layout.breadcrumbs.append(Link(_("New User"), '#'))
     layout.editbar_links = None
 

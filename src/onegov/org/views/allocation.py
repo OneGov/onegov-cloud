@@ -77,8 +77,8 @@ def process_rules(self, request):
 
 @OrgApp.html(model=Resource, name='rules', permission=Private,
              template='allocation_rules.pt')
-def view_allocation_rules(self, request):
-    layout = AllocationRulesLayout(self, request)
+def view_allocation_rules(self, request, layout=None):
+    layout = layout or AllocationRulesLayout(self, request)
 
     def link_for_rule(rule, name):
         url = URL(request.link(self, name))
@@ -197,7 +197,7 @@ def get_allocation_rule_form_class(resource, request):
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-allocation',
              permission=Private, form=get_new_allocation_form_class)
-def handle_new_allocation(self, request, form):
+def handle_new_allocation(self, request, form, layout=None):
     """ Handles new allocations for differing form classes. """
 
     if form.submitted(request):
@@ -247,7 +247,7 @@ def handle_new_allocation(self, request, form):
                     form.start_time.data = start
                     form.end_time.data = end
 
-    layout = ResourceLayout(self, request)
+    layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("New allocation"), '#'))
     layout.editbar_links = None
 
@@ -260,7 +260,7 @@ def handle_new_allocation(self, request, form):
 
 @OrgApp.form(model=Allocation, template='form.pt', name='edit',
              permission=Private, form=get_edit_allocation_form_class)
-def handle_edit_allocation(self, request, form):
+def handle_edit_allocation(self, request, form, layout=None):
     """ Handles edit allocation for differing form classes. """
 
     resources = ResourceCollection(request.app.libres_context)
@@ -308,7 +308,7 @@ def handle_edit_allocation(self, request, form):
             form.apply_dates(start, end)
 
     return {
-        'layout': AllocationEditFormLayout(self, request),
+        'layout': layout or AllocationEditFormLayout(self, request),
         'title': _("Edit allocation"),
         'form': form
     }
@@ -332,8 +332,8 @@ def handle_delete_allocation(self, request):
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
              permission=Private, form=get_allocation_rule_form_class)
-def handle_allocation_rule(self, request, form):
-    layout = AllocationRulesLayout(self, request)
+def handle_allocation_rule(self, request, form, layout=None):
+    layout = layout or AllocationRulesLayout(self, request)
 
     if form.submitted(request):
         changes = form.apply(self)

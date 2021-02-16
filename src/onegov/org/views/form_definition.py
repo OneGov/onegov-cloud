@@ -26,7 +26,7 @@ def get_form_class(model, request):
 
 @OrgApp.form(model=FormCollection, name='new', template='form.pt',
              permission=Private, form=get_form_class)
-def handle_new_definition(self, request, form):
+def handle_new_definition(self, request, form, layout=None):
 
     if form.submitted(request):
 
@@ -43,7 +43,7 @@ def handle_new_definition(self, request, form):
             request.success(_("Added a new form"))
             return morepath.redirect(request.link(definition))
 
-    layout = FormEditorLayout(self, request)
+    layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Forms"), request.link(self)),
@@ -60,7 +60,7 @@ def handle_new_definition(self, request, form):
 
 @OrgApp.form(model=FormDefinition, template='form.pt', permission=Private,
              form=get_form_class, name='edit')
-def handle_edit_definition(self, request, form):
+def handle_edit_definition(self, request, form, layout=None):
 
     if form.submitted(request):
         form.populate_obj(self, exclude={'definition'})
@@ -73,7 +73,7 @@ def handle_edit_definition(self, request, form):
 
     collection = FormCollection(request.session)
 
-    layout = FormEditorLayout(self, request)
+    layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Forms"), request.link(collection)),
