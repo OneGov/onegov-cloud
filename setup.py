@@ -263,6 +263,7 @@ setup(
             'onegov.swissvotes=onegov.swissvotes.upgrade',
             'onegov.ticket=onegov.ticket.upgrade',
             'onegov.town=onegov.town.upgrade',
+            'onegov.town6=onegov.town6.upgrade',
             'onegov.user=onegov.user.upgrade',
             'onegov.winterthur=onegov.winterthur.upgrade',
             'onegov.wtfs=onegov.wtfs.upgrade',
