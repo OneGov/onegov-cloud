@@ -141,6 +141,10 @@ class TownTheme(BaseTheme):
         module = self.name.replace('foundation', 'theme')
         return module_path(module, 'fonts')
 
+    # @property
+    # def font_search_path(self):
+    #     return module_path('onegov.org.theme', 'fonts')
+
     @property
     def font_families(self):
         families = default_font_families.copy()

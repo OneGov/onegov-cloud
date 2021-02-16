@@ -10,13 +10,13 @@ from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.town6.initial_content import create_new_organisation
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
-    OrgAppBase
+    OrgApp
 from onegov.town6.theme import TownTheme
 from onegov.user import UserApp
 
 
-class TownApp(FoundationApp, LibresIntegration, ElasticsearchApp, MapboxApp,
-              DepotApp, PayApp, FormApp, UserApp, OrgAppBase):
+class TownApp(OrgApp, LibresIntegration, ElasticsearchApp, MapboxApp,
+              DepotApp, PayApp, FormApp, UserApp):
 
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
