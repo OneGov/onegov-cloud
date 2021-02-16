@@ -211,7 +211,7 @@ def get_reservation_form_class(resource, request):
 
 @OrgApp.form(model=Resource, name='form', template='reservation_form.pt',
              permission=Public, form=get_reservation_form_class)
-def handle_reservation_form(self, request, form):
+def handle_reservation_form(self, request, form, layout=None):
     """ Asks the user for the form data required to complete one or many
     reservations on a resource.
 
@@ -279,7 +279,7 @@ def handle_reservation_form(self, request, form):
             "The form contains errors. Please check the fields marked in red."
         ))
 
-    layout = ReservationLayout(self, request)
+    layout = layout or layout or ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
 
     title = _("New dates for ${title}", mapping={
@@ -333,7 +333,7 @@ def blocked_by_zipcode(request, resource, form, reservations):
 
 @OrgApp.html(model=Resource, name='confirmation', permission=Public,
              template='reservation_confirmation.pt')
-def confirm_reservation(self, request):
+def confirm_reservation(self, request, layout=None):
     reservations = self.bound_reservations(request).all()
     assert_access_only_if_there_are_reservations(reservations)
 
@@ -347,7 +347,7 @@ def confirm_reservation(self, request):
     else:
         form = None
 
-    layout = ReservationLayout(self, request)
+    layout = layout or ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Confirm"), '#'))
 
     failed_reservations = set(

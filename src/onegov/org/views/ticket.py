@@ -32,7 +32,7 @@ from sqlalchemy import select
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
-def view_ticket(self, request):
+def view_ticket(self, request, layout=None):
 
     handler = self.handler
 
@@ -83,7 +83,7 @@ def view_ticket(self, request):
         select(stmt.c).where(stmt.c.channel_id == self.number)).first()
 
     # if we have a payment, show the payment button
-    layout = TicketLayout(self, request)
+    layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
 
@@ -284,7 +284,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
     model=Ticket, name='note', permission=Private,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
-def handle_new_note(self, request, form):
+def handle_new_note(self, request, form, layout=None):
 
     if form.submitted(request):
         TicketNote.create(self, request, form.text.data, form.file.create())
@@ -293,7 +293,7 @@ def handle_new_note(self, request, form):
 
     return {
         'title': _("New Note"),
-        'layout': TicketNoteLayout(self, request, _("New Note")),
+        'layout': layout or TicketNoteLayout(self, request, _("New Note")),
         'form': form,
         'hint': 'default'
     }
@@ -319,7 +319,7 @@ def delete_ticket_note(self, request):
     model=TicketNote, name='edit', permission=Private,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
-def handle_edit_note(self, request, form):
+def handle_edit_note(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self)
         self.owner = request.current_username
@@ -333,9 +333,10 @@ def handle_edit_note(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
+    layout = layout or TicketNoteLayout(self.ticket, request, _("New Note"))
     return {
         'title': _("Edit Note"),
-        'layout': TicketNoteLayout(self.ticket, request, _("New Note")),
+        'layout': layout,
         'form': form,
         'hint': self.owner != request.current_username and 'owner'
     }
@@ -453,7 +454,7 @@ def unmute_ticket(self, request):
 
 @OrgApp.form(model=Ticket, name='message-to-submitter', permission=Private,
              form=InternalTicketChatMessageForm, template='form.pt')
-def message_to_submitter(self, request, form):
+def message_to_submitter(self, request, form, layout=None):
     recipient = self.snapshot.get('email') or self.handler.email
 
     if not recipient:
@@ -489,7 +490,7 @@ def message_to_submitter(self, request, form):
 
     return {
         'title': _("New Message"),
-        'layout': TicketChatMessageLayout(self, request),
+        'layout': layout or TicketChatMessageLayout(self, request),
         'form': form,
         'helptext': _(
             "The following message will be sent to ${address} and it will be "
@@ -518,7 +519,7 @@ def view_ticket_pdf(self, request):
 
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',
              permission=Public, form=TicketChatMessageForm)
-def view_ticket_status(self, request, form):
+def view_ticket_status(self, request, form, layout=None):
 
     if self.state == 'open':
         title = _("Your request has been submitted")
@@ -537,7 +538,7 @@ def view_ticket_status(self, request, form):
         status_text = _("Request Status")
         closed_text = _("The request has already been closed")
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(status_text, '#')
@@ -584,7 +585,7 @@ def view_ticket_status(self, request, form):
 
 @OrgApp.html(model=TicketCollection, template='tickets.pt',
              permission=Private)
-def view_tickets(self, request):
+def view_tickets(self, request, layout=None):
     query = as_selectable("""
         SELECT
             handler_code,                         -- Text
@@ -690,7 +691,7 @@ def view_tickets(self, request):
 
     return {
         'title': _("Tickets"),
-        'layout': TicketsLayout(self, request),
+        'layout': layout or TicketsLayout(self, request),
         'tickets': self.batch,
         'filters': filters,
         'handlers': handlers,

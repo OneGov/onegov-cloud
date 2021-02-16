@@ -87,12 +87,12 @@ class Img(object):
 
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
              permission=Private)
-def view_get_file_collection(self, request):
+def view_get_file_collection(self, request, layout=None):
     request.include('common')
     request.include('upload')
     request.include('prompt')
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Files"), '#')
@@ -135,8 +135,8 @@ def view_get_file_collection(self, request):
 
 
 @OrgApp.html(model=GeneralFile, permission=Private, name='details')
-def view_file_details(self, request):
-    layout = DefaultLayout(self, request)
+def view_file_details(self, request, layout=None):
+    layout = layout or DefaultLayout(self, request)
     extension = extension_for_content_type(
         self.reference.content_type,
         self.reference.filename
@@ -211,12 +211,12 @@ def handle_update_publish_date(self, request):
 
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
              permission=Private)
-def view_get_image_collection(self, request):
+def view_get_image_collection(self, request, layout=None):
     request.include('common')
     request.include('upload')
     request.include('editalttext')
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
 
     images = view_get_image_collection_json(
         self, request, produce_image=lambda image: Img.from_image(
@@ -314,9 +314,9 @@ def view_upload_file(self, request, return_file=False):
 
 @OrgApp.html(model=GeneralFileCollection, name='upload',
              request_method='POST', permission=Private)
-def view_upload_general_file(self, request):
+def view_upload_general_file(self, request, layout=None):
     uploaded_file = view_upload_file(self, request, return_file=True)
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
 
     return render_macro(layout.macros['file-info'], request, {
         'file': uploaded_file,
@@ -333,9 +333,9 @@ def view_upload_general_file(self, request):
 
 @OrgApp.html(model=ImageFileCollection, name='upload',
              request_method='POST', permission=Private)
-def view_upload_image_file(self, request):
+def view_upload_image_file(self, request, layout=None):
     uploaded_file = view_upload_file(self, request, return_file=True)
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
 
     return render_macro(layout.macros['uploaded_image'], request, {
         'image': Img.from_image(layout, uploaded_file),
@@ -382,7 +382,7 @@ def view_upload_file_by_json(self, request):
 
 
 @OrgApp.html(model=GeneralFileCollection, name='digest', permission=Public)
-def view_file_digest(self, request):
+def view_file_digest(self, request, layout=None):
     name = request.params.get('name')
     digest = request.params.get('digest')
 
@@ -393,7 +393,7 @@ def view_file_digest(self, request):
         raise exc.HTTPBadRequest("missing digest")
 
     metadata = self.locate_signature_metadata(digest)
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
 
     return render_macro(layout.macros['digest_result'], request, {
         'layout': layout,
@@ -409,7 +409,7 @@ def view_file_digest(self, request):
 
 @OrgApp.html(model=File, name='sign', request_method='POST',
              permission=Private)
-def handle_sign(self, request):
+def handle_sign(self, request, layout=None):
     request.assert_valid_csrf_token()
     token = request.params.get('token')
 
@@ -443,7 +443,7 @@ def handle_sign(self, request):
     except InvalidTokenError:
         request.alert(_("Your Yubikey could not be validated"))
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
 
     return render_macro(layout.macros['sign_result'], request, {
         'layout': layout,

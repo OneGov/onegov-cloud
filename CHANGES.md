@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.23`
+
+> commits: **2 / [4827a53757...402a3c117e](https://github.com/OneGov/onegov-cloud/compare/4827a53757^...402a3c117e)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.23)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🐞 **Fixes various minor bugs.**
+
+**`Bugfix`** | **[402a3c117e](https://github.com/onegov/onegov-cloud/commit/402a3c117ea05b342c91bad17cbc2e8fe4d83fe5)**
+
 ## Release `2021.22`
 
-> commits: **5 / [c025d2954e...17aa9d45e3](https://github.com/OneGov/onegov-cloud/compare/c025d2954e^...17aa9d45e3)**  
+> released: **2021-02-15 11:58**<br>
+> commits: **6 / [c025d2954e...a1d5d27ced](https://github.com/OneGov/onegov-cloud/compare/c025d2954e^...a1d5d27ced)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.22)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes

@@ -27,14 +27,14 @@ def get_form_class(self, request):
 
 @OrgApp.html(model=ImageSetCollection, template='imagesets.pt',
              permission=Public)
-def view_imagesets(self, request):
+def view_imagesets(self, request, layout=None):
 
     # XXX add collation support to the core (create collations automatically)
     imagesets = self.query().all()
     imagesets = sorted(imagesets, key=lambda d: unidecode(d.title))
 
     return {
-        'layout': ImageSetCollectionLayout(self, request),
+        'layout': layout or ImageSetCollectionLayout(self, request),
         'title': _("Photo Albums"),
         'imagesets': request.exclude_invisible(imagesets)
     }
@@ -42,7 +42,7 @@ def view_imagesets(self, request):
 
 @OrgApp.html(model=ImageSet, name='select', template='select_images.pt',
              permission=Private, request_method='GET')
-def select_images(self, request):
+def select_images(self, request, layout=None):
 
     collection = ImageFileCollection(request.session)
     selected = {f.id for f in self.files}
@@ -61,7 +61,7 @@ def select_images(self, request):
         } for group, items in collection.grouped_by_date()
     ]
 
-    layout = ImageSetLayout(self, request)
+    layout = layout or ImageSetLayout(self, request)
     layout.breadcrumbs.append(Link(_("Select"), '#'))
 
     action = URL(request.link(self, 'select')).query_param(
@@ -95,7 +95,7 @@ def handle_select_images(self, request):
 
 @OrgApp.form(model=ImageSetCollection, name='new', template='form.pt',
              permission=Private, form=get_form_class)
-def handle_new_imageset(self, request, form):
+def handle_new_imageset(self, request, form, layout=None):
 
     if form.submitted(request):
         imageset = self.add(title=form.title.data)
@@ -104,7 +104,7 @@ def handle_new_imageset(self, request, form):
 
         return morepath.redirect(request.link(imageset))
 
-    layout = ImageSetCollectionLayout(self, request)
+    layout = layout or ImageSetCollectionLayout(self, request)
     layout.include_editor()
     layout.breadcrumbs.append(Link(_("New"), '#'))
 
@@ -117,7 +117,7 @@ def handle_new_imageset(self, request, form):
 
 @OrgApp.form(model=ImageSet, name='edit', template='form.pt',
              permission=Private, form=get_form_class)
-def handle_edit_imageset(self, request, form):
+def handle_edit_imageset(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self)
 
@@ -127,7 +127,7 @@ def handle_edit_imageset(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = ImageSetLayout(self, request)
+    layout = layout or ImageSetLayout(self, request)
     layout.include_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
 
@@ -147,10 +147,10 @@ def handle_delete_imageset(self, request):
 
 
 @OrgApp.html(model=ImageSet, template='imageset.pt', permission=Public)
-def view_imageset(self, request):
+def view_imageset(self, request, layout=None):
 
     return {
-        'layout': ImageSetLayout(self, request),
+        'layout': layout or ImageSetLayout(self, request),
         'title': self.title,
         'imageset': self
     }

@@ -19,9 +19,9 @@ from wtforms.fields import BooleanField
     model=PaymentProviderCollection,
     permission=Secret,
     template='payment_providers.pt')
-def view_payment_providers(self, request):
+def view_payment_providers(self, request, layout=None):
 
-    layout = PaymentProviderLayout(self, request)
+    layout = layout or PaymentProviderLayout(self, request)
 
     def links(provider):
         if not provider.default:
@@ -200,7 +200,7 @@ def get_settings_form(model, request):
     form=get_settings_form,
     template='form.pt',
     name='settings')
-def handle_provider_settings(self, request, form):
+def handle_provider_settings(self, request, form, layout=None):
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -212,7 +212,7 @@ def handle_provider_settings(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = PaymentProviderLayout(self, request)
+    layout = layout or PaymentProviderLayout(self, request)
     layout.breadcrumbs.append(Link(self.title, '#'))
 
     return {

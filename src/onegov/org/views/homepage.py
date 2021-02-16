@@ -34,7 +34,7 @@ def redirect_to(request, target, path):
 
 
 @OrgApp.html(model=Organisation, template='homepage.pt', permission=Public)
-def view_org(self, request):
+def view_org(self, request, layout=None):
     """ Renders the org's homepage. """
 
     # the homepage can optionally be used as a jump-pad to redirect to
@@ -48,7 +48,7 @@ def view_org(self, request):
     if redirect:
         return redirect
 
-    layout = DefaultLayout(self, request)
+    layout = layout or DefaultLayout(self, request)
 
     default = {
         'layout': layout,

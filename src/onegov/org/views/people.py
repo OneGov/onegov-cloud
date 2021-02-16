@@ -11,7 +11,7 @@ from onegov.people import Person, PersonCollection
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
-def view_people(self, request):
+def view_people(self, request, layout=None):
 
     people = self.query().order_by(Person.last_name, Person.first_name)
 
@@ -26,23 +26,23 @@ def view_people(self, request):
     return {
         'title': _("People"),
         'people': AtoZPeople(request).get_items_by_letter().items(),
-        'layout': PersonCollectionLayout(self, request)
+        'layout': layout or PersonCollectionLayout(self, request)
     }
 
 
 @OrgApp.html(model=Person, template='person.pt', permission=Public)
-def view_person(self, request):
+def view_person(self, request, layout=None):
 
     return {
         'title': self.title,
         'person': self,
-        'layout': PersonLayout(self, request)
+        'layout': layout or PersonLayout(self, request)
     }
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',
              permission=Private, form=PersonForm)
-def handle_new_person(self, request, form):
+def handle_new_person(self, request, form, layout=None):
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
@@ -50,7 +50,7 @@ def handle_new_person(self, request, form):
 
         return morepath.redirect(request.link(person))
 
-    layout = PersonCollectionLayout(self, request)
+    layout = layout or PersonCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
 
@@ -63,7 +63,7 @@ def handle_new_person(self, request, form):
 
 @OrgApp.form(model=Person, name='edit', template='form.pt',
              permission=Private, form=PersonForm)
-def handle_edit_person(self, request, form):
+def handle_edit_person(self, request, form, layout=None):
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -73,7 +73,7 @@ def handle_edit_person(self, request, form):
     else:
         form.process(obj=self)
 
-    layout = PersonLayout(self, request)
+    layout = layout or PersonLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.include_editor()
 

@@ -641,7 +641,7 @@ msgid "actor-mcg-label"
 msgstr "Mouvement citoyens genevois"
 
 msgid "actor-mitte-label"
-msgstr "Die Mitte Schweiz"
+msgstr "Die Mitte"
 
 msgid "actor-mitte-fr-label"
 msgstr "Die Mitte Frauen"

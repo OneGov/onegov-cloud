@@ -88,7 +88,7 @@ def view_directory_redirect(self, request):
 
 @OrgApp.form(model=DirectoryCollection, name='new', template='form.pt',
              permission=Secret, form=get_directory_form_class)
-def handle_new_directory(self, request, form):
+def handle_new_directory(self, request, form, layout=None):
     if form.submitted(request):
         try:
             directory = self.add_by_form(form, properties=('configuration', ))
@@ -103,7 +103,7 @@ def handle_new_directory(self, request, form):
         return request.redirect(
             request.link(ExtendedDirectoryEntryCollection(directory)))
 
-    layout = DirectoryCollectionLayout(self, request)
+    layout = layout or DirectoryCollectionLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Directories"), request.link(self)),
@@ -121,7 +121,7 @@ def handle_new_directory(self, request, form):
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
-def handle_edit_directory(self, request, form):
+def handle_edit_directory(self, request, form, layout=None):
     migration = None
     error = None
 
@@ -165,7 +165,7 @@ def handle_edit_directory(self, request, form):
     elif not request.POST:
         form.process(obj=self.directory)
 
-    layout = DirectoryCollectionLayout(self, request)
+    layout = layout or DirectoryCollectionLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Directories"), request.link(self)),
@@ -254,7 +254,7 @@ def keyword_count(request, collection):
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
     template='directory.pt')
-def view_directory(self, request):
+def view_directory(self, request, layout=None):
 
     entries = request.exclude_invisible(self.query())
     keyword_counts = keyword_count(request, self)
@@ -270,7 +270,7 @@ def view_directory(self, request):
         return id and request.class_link(File, {'id': id}, name='thumbnail')
 
     return {
-        'layout': DirectoryEntryCollectionLayout(self, request),
+        'layout': layout or DirectoryEntryCollectionLayout(self, request),
         'title': self.directory.title,
         'entries': entries,
         'directory': self.directory,
@@ -350,7 +350,7 @@ def view_geojson(self, request):
     template='form.pt',
     form=get_directory_entry_form_class,
     name='new')
-def handle_new_directory_entry(self, request, form):
+def handle_new_directory_entry(self, request, form, layout=None):
     if form.submitted(request):
         entry = self.directory.add_by_form(form, type='extended')
 
@@ -361,7 +361,7 @@ def handle_new_directory_entry(self, request, form):
         for field in form.match_fields(include_classes=(UploadField, )):
             getattr(form, field).data = {}
 
-    layout = DirectoryEntryCollectionLayout(self, request)
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.editbar_links = []
@@ -379,7 +379,7 @@ def handle_new_directory_entry(self, request, form):
     template='form.pt',
     form=get_directory_entry_form_class,
     name='edit')
-def handle_edit_directory_entry(self, request, form):
+def handle_edit_directory_entry(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self)
 
@@ -388,7 +388,7 @@ def handle_edit_directory_entry(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = DirectoryEntryLayout(self, request)
+    layout = layout or DirectoryEntryLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
@@ -405,7 +405,7 @@ def handle_edit_directory_entry(self, request, form):
              template='directory_entry_submission_form.pt',
              form=get_submission_form_class,
              name='submit')
-def handle_submit_directory_entry(self, request, form):
+def handle_submit_directory_entry(self, request, form, layout=None):
 
     if not self.directory.enable_submissions:
         raise HTTPForbidden()
@@ -451,7 +451,7 @@ def handle_submit_directory_entry(self, request, form):
 
         return request.redirect(url.as_string())
 
-    layout = DirectoryEntryCollectionLayout(self, request)
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(title, '#'))
     layout.editbar_links = []
@@ -470,7 +470,7 @@ def handle_submit_directory_entry(self, request, form):
              template='directory_entry_submission_form.pt',
              form=get_change_request_form_class,
              name='change-request')
-def handle_change_request(self, request, form):
+def handle_change_request(self, request, form, layout=None):
 
     if not self.directory.enable_change_requests:
         raise HTTPForbidden()
@@ -510,7 +510,7 @@ def handle_change_request(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = DirectoryEntryLayout(self, request)
+    layout = layout or DirectoryEntryLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(title, '#'))
     layout.editbar_links = []
@@ -532,10 +532,10 @@ def handle_change_request(self, request, form):
     model=DirectoryEntry,
     permission=Public,
     template='directory_entry.pt')
-def view_directory_entry(self, request):
+def view_directory_entry(self, request, layout=None):
 
     return {
-        'layout': DirectoryEntryLayout(self, request),
+        'layout': layout or DirectoryEntryLayout(self, request),
         'title': self.title,
         'entry': self
     }
@@ -557,12 +557,12 @@ def delete_directory_entry(self, request):
 @OrgApp.form(model=ExtendedDirectoryEntryCollection,
              permission=Public, name='export',
              template='export.pt', form=ExportForm)
-def view_export(self, request, form):
+def view_export(self, request, form, layout=None):
 
     if not request.is_visible(self.directory):
         return HTTPForbidden()
 
-    layout = DirectoryEntryCollectionLayout(self, request)
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
     layout.editbar_links = None
 
@@ -618,10 +618,10 @@ def view_zip_file(self, request):
 @OrgApp.form(model=ExtendedDirectoryEntryCollection,
              permission=Private, name='import',
              template='directory_import.pt', form=DirectoryImportForm)
-def view_import(self, request, form):
+def view_import(self, request, form, layout=None):
     error = None
 
-    layout = DirectoryEntryCollectionLayout(self, request)
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Import"), '#'))
     layout.editbar_links = None
 

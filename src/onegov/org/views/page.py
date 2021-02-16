@@ -25,14 +25,14 @@ def delete_page(self, request):
 
 
 @OrgApp.html(model=Topic, template='topic.pt', permission=Public)
-def view_topic(self, request):
+def view_topic(self, request, layout=None):
 
     assert self.trait in {'link', 'page'}
 
     if not request.is_manager and self.trait == 'link':
         return morepath.redirect(self.content['url'])
 
-    layout = PageLayout(self, request)
+    layout = layout or PageLayout(self, request)
 
     if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
@@ -53,9 +53,9 @@ def view_topic(self, request):
 
 
 @OrgApp.html(model=News, template='news.pt', permission=Public)
-def view_news(self, request):
+def view_news(self, request, layout=None):
 
-    layout = NewsLayout(self, request)
+    layout = layout or NewsLayout(self, request)
     years = self.years
 
     try:

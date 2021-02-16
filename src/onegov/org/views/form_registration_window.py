@@ -16,11 +16,11 @@ from sqlalchemy import desc
     permission=Private,
     form=FormRegistrationWindowForm,
     template='form.pt')
-def handle_new_registration_form(self, request, form):
+def handle_new_registration_form(self, request, form, layout=None):
 
     title = _("New Registration Window")
 
-    layout = FormSubmissionLayout(self, request)
+    layout = layout or FormSubmissionLayout(self, request)
     layout.editbar_links = None
     layout.breadcrumbs.append(Link(title, '#'))
 
@@ -49,9 +49,9 @@ def handle_new_registration_form(self, request, form):
     model=FormRegistrationWindow,
     permission=Private,
     template='registration_window.pt')
-def view_registration_window(self, request):
+def view_registration_window(self, request, layout=None):
 
-    layout = FormSubmissionLayout(self.form, request)
+    layout = layout or FormSubmissionLayout(self.form, request)
     title = layout.format_date_range(self.start, self.end)
 
     layout.breadcrumbs.append(Link(title, '#'))
@@ -115,11 +115,11 @@ def view_registration_window(self, request):
     form=FormRegistrationWindowForm,
     template='form.pt',
     name='edit')
-def handle_edit_registration_form(self, request, form):
+def handle_edit_registration_form(self, request, form, layout=None):
 
     title = _("Edit Registration Window")
 
-    layout = FormSubmissionLayout(self.form, request)
+    layout = layout or FormSubmissionLayout(self.form, request)
     layout.breadcrumbs.append(Link(title, '#'))
     layout.editbar_links = []
 

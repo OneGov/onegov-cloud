@@ -5,8 +5,8 @@ from onegov.org.models import Dashboard
 
 
 @OrgApp.html(model=Dashboard, template='dashboard.pt', permission=Secret)
-def dashboard(self, request):
-    layout = DashboardLayout(self, request)
+def dashboard(self, request, layout=None):
+    layout = layout or DashboardLayout(self, request)
 
     return {
         'title': _("Dashboard"),

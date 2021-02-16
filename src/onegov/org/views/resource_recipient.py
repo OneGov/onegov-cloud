@@ -12,9 +12,9 @@ from onegov.org.elements import DeleteLink, Link
     model=ResourceRecipientCollection,
     template='resource_recipients.pt',
     permission=Private)
-def view_resource_recipients(self, request):
+def view_resource_recipients(self, request, layout=None):
 
-    layout = ResourceRecipientsLayout(self, request)
+    layout = layout or ResourceRecipientsLayout(self, request)
 
     def recipient_links(recipient):
         yield Link(
@@ -46,7 +46,7 @@ def view_resource_recipients(self, request):
     template='form.pt',
     permission=Private,
     form=ResourceRecipientForm)
-def handle_new_resource_recipient(self, request, form):
+def handle_new_resource_recipient(self, request, form, layout=None):
 
     if form.submitted(request):
         self.add(
@@ -64,7 +64,7 @@ def handle_new_resource_recipient(self, request, form):
 
     return {
         'title': title,
-        'layout': ResourceRecipientsFormLayout(self, request, title),
+        'layout': layout or ResourceRecipientsFormLayout(self, request, title),
         'form': form
     }
 
@@ -75,7 +75,7 @@ def handle_new_resource_recipient(self, request, form):
     template='form.pt',
     permission=Private,
     form=ResourceRecipientForm)
-def handle_edit_resource_recipient(self, request, form):
+def handle_edit_resource_recipient(self, request, form, layout=None):
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -91,7 +91,7 @@ def handle_edit_resource_recipient(self, request, form):
 
     return {
         'title': title,
-        'layout': ResourceRecipientsFormLayout(self, request, title),
+        'layout': layout or ResourceRecipientsFormLayout(self, request, title),
         'form': form
     }
 

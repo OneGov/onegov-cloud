@@ -11,12 +11,12 @@ from onegov.org.elements import Link
     model=ExportCollection,
     permission=Private,
     template='exports.pt')
-def view_export_collection(self, request):
+def view_export_collection(self, request, layout=None):
     exports = list(self.exports_for_current_user(request))
     exports.sort(key=lambda e: normalize_for_url(request.translate(e.title)))
 
     return {
-        'layout': ExportCollectionLayout(self, request),
+        'layout': layout or ExportCollectionLayout(self, request),
         'title': _("Exports"),
         'exports': exports
     }
@@ -27,8 +27,8 @@ def view_export_collection(self, request):
     permission=Private,
     template='export.pt',
     form=lambda model, request: model.form_class)
-def view_export(self, request, form):
-    layout = ExportCollectionLayout(self, request)
+def view_export(self, request, form, layout=None):
+    layout = layout or ExportCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(self.title, request.link(self)))
 
     if form.submitted(request):

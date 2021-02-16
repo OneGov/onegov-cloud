@@ -56,9 +56,9 @@ class Owner(namedtuple('OwnerBase', ('username', 'realname'))):
 
 
 @OrgApp.json(model=MessageCollection, permission=Private, name='feed')
-def view_messages_feed(self, request):
+def view_messages_feed(self, request, layout=None):
     mapper = inspect(Message).polymorphic_map
-    layout = MessageCollectionLayout(self, request)
+    layout = layout or MessageCollectionLayout(self, request)
 
     def cast(message):
         message.__class__ = mapper[message.type].class_
@@ -108,7 +108,7 @@ def view_messages_feed(self, request):
     permission=Private,
     template='timeline.pt'
 )
-def view_messages(self, request):
+def view_messages(self, request, layout=None):
 
     # The initial load contains only the 25 latest message (the feed will
     # return the 25 oldest messages by default)
@@ -119,7 +119,7 @@ def view_messages(self, request):
             self.newer_than = beyond_horizon.id
 
     return {
-        'layout': MessageCollectionLayout(self, request),
+        'layout': layout or MessageCollectionLayout(self, request),
         'title': _("Timeline"),
         'feed': request.link(self, 'feed'),
         'feed_data': json.dumps(

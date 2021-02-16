@@ -28,8 +28,8 @@ MONTHS = (
 
 @OrgApp.html(model=PublicationCollection, permission=Public,
              template='publications.pt')
-def view_publications(self, request):
-    layout = PublicationLayout(self, request)
+def view_publications(self, request, layout=None):
+    layout = layout or PublicationLayout(self, request)
 
     # filter by year, from latest to first year
     s = self.first_year(layout.timezone) or self.year

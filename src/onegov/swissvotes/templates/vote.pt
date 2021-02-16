@@ -464,6 +464,14 @@
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
+                    <tr tal:condition="layout.attachments['post_vote_poll_report']">
+                        <th class="column-30" i18n:translate>Technical report</th>
+                        <td>
+                            <a href="${layout.attachments['post_vote_poll_report']}" target="_blank" class="post-vote-poll-report">PDF</a>
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                        </td>
+                    </tr>
                     <tr tal:condition="vote.post_vote_poll_link">
                         <th class="column-30" i18n:translate>Cockpit with selected results</th>
                         <td><a href="${vote.post_vote_poll_link}" target="_blank" i18n:translate>Link</a></td>
@@ -480,26 +488,18 @@
                                        layout.attachments['post_vote_poll_dataset_dta']">
                         <th class="column-30" i18n:translate>Dataset of the post-vote poll</th>
                         <td class="inline-links">
-                            <a href="${layout.attachments['post_vote_poll_dataset']}" target="_blank" class="post-vote-poll-dataset">CSV</a>
-                            <a href="${layout.attachments['post_vote_poll_dataset_sav']}" target="_blank" class="post-vote-poll-dataset-sav">SAV</a>
-                            <a href="${layout.attachments['post_vote_poll_dataset_dta']}" target="_blank" class="post-vote-poll-dataset-dta">DTA</a>
+                            <a tal:condition="layout.attachments['post_vote_poll_dataset']" href="${layout.attachments['post_vote_poll_dataset']}" target="_blank" class="post-vote-poll-dataset">CSV</a>
+                            <a tal:condition="layout.attachments['post_vote_poll_dataset_sav']" href="${layout.attachments['post_vote_poll_dataset_sav']}" target="_blank" class="post-vote-poll-dataset-sav">SAV</a>
+                            <a tal:condition="layout.attachments['post_vote_poll_dataset_dta']" href="${layout.attachments['post_vote_poll_dataset_dta']}" target="_blank" class="post-vote-poll-dataset-dta">DTA</a>
                         </td>
                     </tr>
                     <tr tal:condition="layout.attachments['post_vote_poll_codebook'] or
                                        layout.attachments['post_vote_poll_codebook_xlsx']">
                         <th class="column-30" i18n:translate>Codebook for the post-vote poll</th>
                         <td class="inline-links">
-                            <a href="${layout.attachments['post_vote_poll_codebook']}" target="_blank" class="post-vote-poll-codebook">PDF</a>
-                            <a href="${layout.attachments['post_vote_poll_codebook_xlsx']}" target="_blank" class="post-vote-poll-codebook-xlsx">XLSX</a>
+                            <a tal:condition="layout.attachments['post_vote_poll_codebook']" href="${layout.attachments['post_vote_poll_codebook']}" target="_blank" class="post-vote-poll-codebook">PDF</a>
+                            <a tal:condition="layout.attachments['post_vote_poll_codebook_xlsx']" href="${layout.attachments['post_vote_poll_codebook_xlsx']}" target="_blank" class="post-vote-poll-codebook-xlsx">Excel</a>
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
-                        </td>
-                    </tr>
-                    <tr tal:condition="layout.attachments['post_vote_poll_report']">
-                        <th class="column-30" i18n:translate>Technical report</th>
-                        <td>
-                            <a href="${layout.attachments['post_vote_poll_report']}" target="_blank" class="post-vote-poll-report">PDF</a>
-                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
-                            <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
                 </tbody>

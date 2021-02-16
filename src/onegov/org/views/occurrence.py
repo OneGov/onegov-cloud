@@ -17,10 +17,10 @@ from sqlalchemy.orm import joinedload
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
              permission=Public)
-def view_occurrences(self, request):
+def view_occurrences(self, request, layout=None):
     """ View all occurrences of all events. """
 
-    layout = OccurrencesLayout(self, request)
+    layout = layout or OccurrencesLayout(self, request)
 
     translated_tags = [
         (tag, request.translate(_(tag))) for tag in self.used_tags
@@ -88,10 +88,10 @@ def view_occurrences(self, request):
 
 
 @OrgApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
-def view_occurrence(self, request):
+def view_occurrence(self, request, layout=None):
     """ View a single occurrence of an event. """
 
-    layout = OccurrenceLayout(self, request)
+    layout = layout or OccurrenceLayout(self, request)
     today = replace_timezone(as_datetime(date.today()), self.timezone)
     occurrences = self.event.occurrence_dates(localize=True)
     occurrences = list(filter(lambda x: x >= today, occurrences))
@@ -135,10 +135,10 @@ def ical_export_occurences(self, request):
 
 @OrgApp.form(model=OccurrenceCollection, name='export', permission=Private,
              form=ExportForm, template='export.pt')
-def export_occurrences(self, request, form):
+def export_occurrences(self, request, form, layout=None):
     """ Export the occurrences in various formats. """
 
-    layout = OccurrencesLayout(self, request)
+    layout = layout or OccurrencesLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
     layout.editbar_links = None
 

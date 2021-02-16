@@ -66,7 +66,7 @@ def send_ticket_notifications(payment, request, change):
     model=PaymentCollection,
     template='payments.pt',
     permission=Private)
-def view_payments(self, request):
+def view_payments(self, request, layout=None):
     tickets = TicketCollection(request.session)
 
     providers = {
@@ -78,7 +78,7 @@ def view_payments(self, request):
 
     return {
         'title': _("Payments"),
-        'layout': PaymentCollectionLayout(self, request),
+        'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
         'get_ticket': partial(ticket_by_link, tickets),
         'providers': providers,
@@ -92,8 +92,8 @@ def view_payments(self, request):
     template='form.pt',
     permission=Private,
     form=merge_forms(DateRangeForm, ExportForm))
-def export_payments(self, request, form):
-    layout = PaymentCollectionLayout(self, request)
+def export_payments(self, request, form, layout=None):
+    layout = layout or PaymentCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
     layout.editbar_links = None
 

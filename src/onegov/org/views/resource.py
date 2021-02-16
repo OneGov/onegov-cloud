@@ -63,7 +63,7 @@ def get_resource_form(self, request, type=None):
 
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
-def view_resources(self, request):
+def view_resources(self, request, layout=None):
     return {
         'title': _("Reservations"),
         'resources': group_by_column(
@@ -72,7 +72,7 @@ def view_resources(self, request):
             group_column=Resource.group,
             sort_column=Resource.title
         ),
-        'layout': ResourcesLayout(self, request)
+        'layout': layout or ResourcesLayout(self, request)
     }
 
 
@@ -103,17 +103,17 @@ def view_resources_json(self, request):
 
 @OrgApp.form(model=ResourceCollection, name='new-room',
              template='form.pt', permission=Private, form=get_room_form)
-def handle_new_room(self, request, form):
-    return handle_new_resource(self, request, form, 'room')
+def handle_new_room(self, request, form, layout=None):
+    return handle_new_resource(self, request, form, 'room', layout)
 
 
 @OrgApp.form(model=ResourceCollection, name='new-daypass',
              template='form.pt', permission=Private, form=get_daypass_form)
-def handle_new_daypass(self, request, form):
-    return handle_new_resource(self, request, form, 'daypass')
+def handle_new_daypass(self, request, form, layout=None):
+    return handle_new_resource(self, request, form, 'daypass', layout)
 
 
-def handle_new_resource(self, request, form, type):
+def handle_new_resource(self, request, form, type, layout=None):
     if form.submitted(request):
 
         resource = self.add(
@@ -124,7 +124,7 @@ def handle_new_resource(self, request, form, type):
         request.success(RESOURCE_TYPES[type]['success'])
         return morepath.redirect(request.link(resource))
 
-    layout = ResourcesLayout(self, request)
+    layout = layout or ResourcesLayout(self, request)
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(RESOURCE_TYPES[type]['title'], '#'))
@@ -139,7 +139,7 @@ def handle_new_resource(self, request, form, type):
 
 @OrgApp.form(model=Resource, name='edit', template='form.pt',
              permission=Private, form=get_resource_form)
-def handle_edit_resource(self, request, form):
+def handle_edit_resource(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self)
 
@@ -149,7 +149,7 @@ def handle_edit_resource(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = ResourceLayout(self, request)
+    layout = layout or ResourceLayout(self, request)
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
@@ -163,11 +163,11 @@ def handle_edit_resource(self, request, form):
 
 
 @OrgApp.html(model=Resource, template='resource.pt', permission=Public)
-def view_resource(self, request):
+def view_resource(self, request, layout=None):
     return {
         'title': self.title,
         'resource': self,
-        'layout': ResourceLayout(self, request),
+        'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='slots'),
         'resources_url': request.class_link(ResourceCollection, name='json')
     }
@@ -199,7 +199,7 @@ def handle_delete_resource(self, request):
 
 @OrgApp.form(model=Resource, permission=Private, name='cleanup',
              form=ResourceCleanupForm, template='resource_cleanup.pt')
-def handle_cleanup_allocations(self, request, form):
+def handle_cleanup_allocations(self, request, form, layout=None):
     """ Removes all unused allocations between the given dates. """
 
     if form.submitted(request):
@@ -217,7 +217,7 @@ def handle_cleanup_allocations(self, request, form):
     if request.method == 'GET':
         form.start.data, form.end.data = get_date_range(self, request.params)
 
-    layout = ResourceLayout(self, request)
+    layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Clean up"), '#'))
     layout.editbar_links = None
 
@@ -303,7 +303,7 @@ def get_date_range(resource, params):
 
 @OrgApp.html(model=Resource, permission=Private, name='occupancy',
              template='resource_occupancy.pt')
-def view_occupancy(self, request):
+def view_occupancy(self, request, layout=None):
 
     # infer the default start/end date from the calendar view parameters
     start, end = get_date_range(self, request.params)
@@ -338,7 +338,7 @@ def view_occupancy(self, request):
         )
         count += len(occupancy[date])
 
-    layout = ResourceLayout(self, request)
+    layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
     layout.editbar_links = None
 
@@ -360,7 +360,7 @@ def view_occupancy(self, request):
 
 @OrgApp.html(model=Resource, template='resource-subscribe.pt',
              permission=Private, name='subscribe')
-def view_resource_subscribe(self, request):
+def view_resource_subscribe(self, request, layout=None):
     url = URL(request.link(self, 'ical'))
     url = url.scheme('webcal')
 
@@ -370,7 +370,7 @@ def view_resource_subscribe(self, request):
     url = url.query_param('access-token', self.access_token)
     url = url.as_string()
 
-    layout = ResourceLayout(self, request)
+    layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Subscribe"), '#'))
 
     return {
@@ -439,9 +439,9 @@ def view_ical(self, request):
 
 @OrgApp.form(model=Resource, permission=Private, name='export',
              template='export.pt', form=ResourceExportForm)
-def view_export(self, request, form):
+def view_export(self, request, form, layout=None):
 
-    layout = ResourceLayout(self, request)
+    layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
     layout.editbar_links = None
 
