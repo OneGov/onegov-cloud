@@ -28,8 +28,8 @@ from purl import URL
 from sqlalchemy import desc
 
 
-class OrgAppBase:
-    """All the org apps functionality as a mixin."""
+class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
+             DepotApp, PayApp, FormApp, UserApp):
 
     serve_static_files = True
     request_class = OrgRequest
@@ -218,11 +218,6 @@ class OrgAppBase:
             return None
 
         return URL(request.link(dashboard)).path()
-
-
-class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp, OrgAppBase):
-    pass
 
 
 @OrgApp.webasset_path()
