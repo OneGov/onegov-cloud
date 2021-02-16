@@ -7,8 +7,10 @@ from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
-from onegov.org.models import ResourceRecipientCollection, ImageFileCollection, \
-    ImageSetCollection, ExportCollection, PublicationCollection
+from onegov.org.models import (
+    ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
+    ExportCollection, PublicationCollection
+)
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.people import PersonCollection
@@ -19,7 +21,7 @@ from onegov.core.elements import Link, Block, Confirm, Intercooler, LinkGroup
 from onegov.core.static import StaticFile
 from onegov.town6.theme import user_options
 from onegov.org.layout import (
-    Layout as OrgLayout, AdjacencyListMixin, DefaultLayout as OrgDefaultLayout,
+    Layout as OrgLayout, AdjacencyListMixin,
     DefaultLayoutMixin, DefaultMailLayoutMixin,
 )
 from onegov.user import UserCollection

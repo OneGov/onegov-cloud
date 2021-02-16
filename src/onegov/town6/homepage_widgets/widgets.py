@@ -214,8 +214,8 @@ class ServicesWidget(object):
             text=_("Online Counter"),
             url=layout.request.class_link(FormCollection),
             subtitle=(
-                    layout.org.meta.get('online_counter_label')
-                    or _("Forms and applications")
+                layout.org.meta.get('online_counter_label')
+                or _("Forms and applications")
             ),
             classes=('online-counter', 'h5-size')
         )
@@ -236,8 +236,8 @@ class ServicesWidget(object):
             text=_("Reservations"),
             url=layout.request.class_link(ResourceCollection),
             subtitle=(
-                    layout.org.meta.get('reservations_label')
-                    or _("Daypasses and rooms")
+                layout.org.meta.get('reservations_label')
+                or _("Daypasses and rooms")
             ),
             classes=('reservations', 'h5-size')
         )
@@ -252,7 +252,6 @@ class ServicesWidget(object):
                 ),
                 classes=('e-move', 'h5-size')
             )
-
 
         resources = ResourceCollection(layout.app.libres_context)
 

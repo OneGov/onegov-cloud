@@ -168,7 +168,7 @@ def migrate_homepage_structure(context):
         <row>
             <column span="12">
                 <row>
-                    <column span="8">                
+                    <column span="8">
                     </column>
                     <column span="4">
                         <panel>
@@ -180,7 +180,7 @@ def migrate_homepage_structure(context):
             </column>
         </row>
         <row>
-            <column span="12">        
+            <column span="12">
                 <news />
             </column>
         </row>
@@ -194,7 +194,7 @@ def migrate_homepage_structure(context):
         <row>
             <column span="12">
                 <homepage-tiles />
-            </column>               
+            </column>
         </row>
         <line />
         <row>
