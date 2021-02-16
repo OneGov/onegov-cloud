@@ -1,3 +1,5 @@
+import textwrap
+
 from onegov.core.upgrade import upgrade_task
 from onegov.org.models import Organisation
 from onegov.town6.theme.town_theme import MERRIWEATHER, ROBOTO_CONDENSED
@@ -26,3 +28,64 @@ def migrate_theme_options(context):
     if primary_color:
         del org.theme_options['primary-color']
         org.theme_options['primary-color-ui'] = primary_color
+
+
+@upgrade_task('Add structure for foundation layout')
+def migrate_homepage_structure(context):
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    if '<services />' not in org.meta['homepage_structure']:
+        return
+
+    org.meta['homepage_structure'] = textwrap.dedent("""\
+        <row-wide>
+            <column span="12">
+                <slider />
+            </column>
+        </row-wide>
+        <row>
+            <column span="12">
+                <row>
+                    <column span="8">                
+                    </column>
+                    <column span="4">
+                        <panel>
+                            <services />
+                        </panel>
+                    </column>
+                </row>
+                <line />
+            </column>
+        </row>
+        <row>
+            <column span="12">        
+                <news />
+            </column>
+        </row>
+        <line />
+        <row>
+            <column span="12">
+                <events />
+            </column>
+        </row>
+        <line />
+        <row>
+            <column span="12">
+                <homepage-tiles />
+            </column>               
+        </row>
+        <line />
+        <row>
+            <column span="12">
+                <directories />
+            </column>
+        </row>
+        <row>
+            <column span="12">
+                <partners />
+            </column>
+        </row>
+    """)
