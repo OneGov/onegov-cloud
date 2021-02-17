@@ -24,9 +24,9 @@ def get_form_class(editor, request):
              form=get_form_class)
 def handle_page_form(self, request, form, layout=None):
     if self.action == 'new':
-        return handle_new_page(self, request, form, layout)
+        return handle_new_page(self, request, form, layout=layout)
     elif self.action == 'edit':
-        return handle_edit_page(self, request, form, layout)
+        return handle_edit_page(self, request, form, layout=layout)
     elif self.action == 'paste':
         clipboard = Clipboard.from_session(request)
         src = clipboard.get_object()
