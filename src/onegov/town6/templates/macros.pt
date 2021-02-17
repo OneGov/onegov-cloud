@@ -417,14 +417,16 @@
             <img src="${item.image_url}">
         </div>
         <div class="card-section">
-            <h6 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.created, 'relative')}</small></h6>
-            <tal:b tal:switch="heading|'h5'">
-                <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
-                <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
-                <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h5>
-            </tal:b>
-            <p class="news-lead">${item.content.lead}</p>
-            <div><a i18n:translate href="${request.link(item)}" class="more-link">read more</a></div>
+            <div>
+                <h6 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.created, 'relative')}</small></h6>
+                <tal:b tal:switch="heading|'h5'">
+                    <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
+                    <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
+                    <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h5>
+                </tal:b>
+                <p class="news-lead">${item.content.lead}</p>
+            </div>
+            <a i18n:translate href="${request.link(item)}" class="more-link">read more</a>
         </div>
     </div>
 </metal:newslist>
