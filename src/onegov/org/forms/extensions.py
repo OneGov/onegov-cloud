@@ -189,6 +189,9 @@ class PublicationFormExtension(FormExtension, name='publication'):
                 if not start or not end:
                     return
                 if end.data and to_timezone(end.data, 'UTC') <= utcnow():
+                    pub_end = self.model.publication_end
+                    if to_timezone(end.data, 'UTC') == pub_end:
+                        return
                     self.publication_end.errors.append(
                         _("Publication end must be in the future"))
                     return False
