@@ -44,7 +44,7 @@ class RowWidget(object):
 class RowWidgetWide(object):
     template = """
         <xsl:template match="row-wide">
-            <div class="grid-container full">
+            <div class="grid-container full {@bgcolor}">
                 <div class="grid-x">
                     <xsl:apply-templates select="node()"/>
                 </div>

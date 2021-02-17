@@ -9,3 +9,18 @@
         color: $primary-fg-color !important;
     }
 }
+
+/*
+    Homepage widgets
+*/
+
+.homepage > .grid-container.full {
+
+    .gray {
+        background: $white-smoke;
+    }
+
+    .primary {
+        background: $primary-color;
+    }
+}
