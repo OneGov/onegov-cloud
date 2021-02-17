@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-01-26 13:14+0100\n"
+"POT-Creation-Date: 2021-02-17 21:22+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -27,11 +27,11 @@ msgstr "Ihre E-Mail Adresse"
 msgid "Primary Color"
 msgstr "Grundfarbe"
 
+msgid "Only characters are allowed"
+msgstr "Nur Buchstaben sind erlaubt"
+
 msgid "Online Counter for Towns Demo"
 msgstr "Demo Online Schalter für Gemeinden"
-
-msgid "We are ready to launch! Click continue once you're ready."
-msgstr "Wir sind bereit zum Start! Klicken Sie 'Start' sobald Sie bereit sind."
 
 msgid "Start using the online counter for your town immediately."
 msgstr "Nutzen Sie den Online Schalter für Gemeinden sofort."
@@ -41,9 +41,6 @@ msgstr "Die Einrichtung dauert weniger als eine Minute."
 
 msgid "Free with no commitment."
 msgstr "Gratis und unverbindlich."
-
-msgid "Welcome to OneGov Cloud"
-msgstr "Willkommen bei der OneGov Cloud"
 
 msgid ""
 "This town exists already and can't be created. Is it your town but you did "
@@ -59,6 +56,12 @@ msgid "Please write down your username and password before you continue. "
 msgstr ""
 "Bitte notieren Sie sich Ihren Benutzernamen und Ihr Passwort bevor Sie "
 "weiterfahren."
+
+msgid "We are ready to launch! Click continue once you're ready."
+msgstr "Wir sind bereit zum Start! Klicken Sie 'Start' sobald Sie bereit sind."
+
+msgid "Welcome to OneGov Cloud"
+msgstr "Willkommen bei der OneGov Cloud"
 
 msgid "Username"
 msgstr "Benutzername"
