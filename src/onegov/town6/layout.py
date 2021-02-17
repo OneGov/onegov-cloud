@@ -1775,3 +1775,23 @@ class DashboardLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Dashboard"), '#')
         ]
+
+
+class GeneralFileCollectionLayout(DefaultLayout):
+    def __init__(self, model, request):
+        """
+        The order of assets differ from org where common.js must come first
+        including jquery. Here, the foundation6 assets contain jquery and must
+        come first.
+        """
+        super().__init__(model, request)
+        request.include('upload')
+        request.include('prompt')
+
+
+class ImageFileCollectionLayout(DefaultLayout):
+
+    def __init__(self, model, request):
+        request.include('upload')
+        request.include('editalttext')
+        super().__init__(model, request)

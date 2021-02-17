@@ -87,7 +87,7 @@ def town_handle_general_settings(self, request, form):
 @TownApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
-    icon=' fa-external-link-square', order=-990)
+    icon='fas fa-external-link-square-alt', order=-990)
 def town_handle_favicon_settings(self, request, form):
     return handle_favicon_settings(
         self, request, form, SettingsLayout(self, request))
@@ -96,7 +96,7 @@ def town_handle_favicon_settings(self, request, form):
 @TownApp.form(
     model=Organisation, name='link-settings', template='form.pt',
     permission=Secret, form=LinksSettingsForm, setting=_("Links"),
-    icon=' fa-link', order=-980)
+    icon='fa-link', order=-980)
 def town_handle_links_settings(self, request, form):
     return handle_links_settings(
         self, request, form, SettingsLayout(self, request))
@@ -179,7 +179,7 @@ def town_preview_holiday_settings(self, request, form):
 def custom_handle_settings(self, request, form):
 
     form.delete_field('homepage_cover')
-    form.delete_field('homepage_structure')
+    # form.delete_field('homepage_structure')
     form.delete_field('redirect_homepage_to')
     form.delete_field('redirect_path')
 
