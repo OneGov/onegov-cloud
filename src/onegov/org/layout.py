@@ -2320,3 +2320,11 @@ class DashboardLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Dashboard"), '#')
         ]
+
+
+class GeneralFileCollectionLayout(DefaultLayout):
+    def __init__(self, model, request):
+        request.include('common')
+        request.include('upload')
+        request.include('prompt')
+        super().__init__(model, request)
