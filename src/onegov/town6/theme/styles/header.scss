@@ -10,7 +10,7 @@ $globals-height: 2.5rem;
 $accept-link-icon: '\f00c';
 $cleanup-link-icon: '\f0d0';
 $copy-link-icon: '\f0c5';
-$delete-link-icon: '\f014';
+$delete-link-icon: '\f2ed';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f044';
 $export-link-icon: '\f019';
@@ -30,7 +30,7 @@ $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f003';
-$new-note-icon: '\f24a';
+$new-note-icon: '\f249';
 $new-page-icon: '\f15b';
 $new-payment-icon: '\f09d';
 $new-person-icon: '\f007';
@@ -44,7 +44,7 @@ $paste-link-icon: '\f0ea';
 $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f09d';
-$payments-icon: '\f09d';
+$payments-icon: $payment-provider-icon;
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
@@ -54,6 +54,7 @@ $test-link-icon: '\f0e9';
 $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
+$pdf-icon: '\f1c1';
 
 .globals {
     // Todo: the link text inside the second level should not wrap
@@ -105,13 +106,12 @@ $view-link: '\f06e';
         }
     }
 
-    //.login::before { @apply fas fa-sign-in-alt; }
     .login::before { @include icon-bold("\f2f6"); }
     .logout::before { @include icon-bold("\f2f5"); }
     .register::before { @include icon("\f234"); }
     .user::before { @include icon("\f007"); }
     .users::before { @include icon-bold("\f0c0"); }
-    .payment::before { @include icon-bold($payments-icon); }
+    .payment::before { @include icon($payments-icon); }
     .payment-provider::before { @include icon-bold($payment-provider-icon); }
     .profile::before { @include icon("\f2bd"); }
     .management::before { @include icon-bold('\f013'); }
@@ -240,7 +240,7 @@ $editbar-fg-color-active: $white;
         border-bottom: 1px dashed $iron;
     }
 
-    .accept-link::before { @include icon($accept-link-icon); }
+    .accept-link::before { @include icon-bold($accept-link-icon); }
     .cleanup-link::before { @include icon($cleanup-link-icon); }
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
@@ -282,4 +282,5 @@ $editbar-fg-color-active: $white;
     .sync::before { @include icon-bold($sync-icon); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
+    .ticket-pdf::before { @include icon($pdf-icon); }
 }
