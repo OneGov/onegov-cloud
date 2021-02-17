@@ -115,7 +115,7 @@ def publications_by_newsletter(newsletter, request):
 
 @OrgApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
              permission=Public, form=SignupForm)
-def handle_newsletters(self, request, form):
+def handle_newsletters(self, request, form, layout=None, mail_layout=None):
 
     if form.submitted(request):
         recipients = RecipientCollection(request.session)
@@ -135,7 +135,7 @@ def handle_newsletters(self, request, form):
             )
 
             confirm_mail = render_template('mail_confirm.pt', request, {
-                'layout': DefaultMailLayout(self, request),
+                'layout': mail_layout or DefaultMailLayout(self, request),
                 'newsletters': self,
                 'subscription': recipient.subscription,
                 'title': title
@@ -170,7 +170,7 @@ def handle_newsletters(self, request, form):
 
     return {
         'form': form,
-        'layout': NewsletterLayout(self, request),
+        'layout': layout or NewsletterLayout(self, request),
         'newsletters': query.all(),
         'title': _("Newsletter"),
         'recipients_count': recipients_count

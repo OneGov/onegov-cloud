@@ -61,6 +61,8 @@ def handle_new_resource_recipient(self, request, form, layout=None):
         return request.redirect(request.link(self))
 
     title = _("New Recipient")
+    if layout:
+        layout.title = title
 
     return {
         'title': title,

@@ -4,6 +4,7 @@ from onegov.event import Event, OccurrenceCollection
 from onegov.org.views.event import event_form, handle_new_event, view_event, \
     handle_edit_event
 from onegov.town6 import TownApp
+from onegov.town6.layout import EventLayout
 
 
 @TownApp.form(
@@ -14,7 +15,7 @@ from onegov.town6 import TownApp
     permission=Public
 )
 def town_handle_new_event(self, request, form):
-    return handle_new_event(self, request, form)
+    return handle_new_event(self, request, form, EventLayout(self, request))
 
 
 @TownApp.html(
@@ -30,7 +31,7 @@ def town_handle_new_event(self, request, form):
     request_method='POST'
 )
 def town_view_event(self, request):
-    return view_event(self, request)
+    return view_event(self, request, EventLayout(self, request))
 
 
 @TownApp.form(
@@ -41,4 +42,4 @@ def town_view_event(self, request):
     form=event_form
 )
 def town_handle_edit_event(self, request, form):
-    return handle_edit_event(self, request, form)
+    return handle_edit_event(self, request, form, EventLayout(self, request))

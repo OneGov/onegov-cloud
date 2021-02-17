@@ -4,6 +4,9 @@ from onegov.org.views.resource_recipient import view_resource_recipients, \
 from onegov.town6 import TownApp
 from onegov.org.forms import ResourceRecipientForm
 from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
+from onegov.town6.layout import ResourceRecipientsLayout, \
+    ResourceRecipientsFormLayout
+from onegov.town6 import _
 
 
 @TownApp.html(
@@ -11,7 +14,8 @@ from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
     template='resource_recipients.pt',
     permission=Private)
 def town_view_resource_recipients(self, request):
-    return view_resource_recipients(self, request)
+    return view_resource_recipients(
+        self, request, ResourceRecipientsLayout(self, request))
 
 
 @TownApp.form(
@@ -21,7 +25,11 @@ def town_view_resource_recipients(self, request):
     permission=Private,
     form=ResourceRecipientForm)
 def town_handle_new_resource_recipient(self, request, form):
-    return handle_new_resource_recipient(self, request, form)
+    title = _("New Recipient")
+    return handle_new_resource_recipient(
+        self, request, form,
+        ResourceRecipientsFormLayout(self, request, title)
+    )
 
 
 @TownApp.form(
@@ -31,4 +39,8 @@ def town_handle_new_resource_recipient(self, request, form):
     permission=Private,
     form=ResourceRecipientForm)
 def town_handle_edit_resource_recipient(self, request, form):
-    return handle_edit_resource_recipient(self, request, form)
+    title = _("Edit Recipient")
+    return handle_edit_resource_recipient(
+        self, request, form,
+        ResourceRecipientsFormLayout(self, request, title)
+    )

@@ -17,7 +17,7 @@ from onegov.org.views.settings import handle_generic_settings as \
 from onegov.town6.app import TownApp
 from wtforms import BooleanField, StringField
 
-from onegov.town6.layout import SettingsLayout
+from onegov.town6.layout import SettingsLayout, DefaultLayout
 
 
 def handle_generic_settings(self, request, form, title):
@@ -76,7 +76,7 @@ def get_custom_settings_form(model, request):
     model=Organisation, name='settings', template='settings.pt',
     permission=Secret)
 def view_town_settings(self, request):
-    return view_settings(self, request)
+    return view_settings(self, request, SettingsLayout(self, request))
 
 
 @TownApp.form(
@@ -157,13 +157,15 @@ def handle_holiday_settings(self, request, form):
     setting=_("Ticket Settings"), order=-950, icon='fa-ticket-alt'
 )
 def handle_town_ticket_settings(self, request, form):
-    return handle_ticket_settings(self, request, form)
+    return handle_ticket_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(model=Organisation, name='holiday-settings-preview',
               permission=Secret, form=HolidaySettingsForm)
 def preview_town_holiday_settings(self, request, form):
-    return preview_holiday_settings(self, request, form)
+    return preview_holiday_settings(
+        self, request, form, DefaultLayout(self, request))
 
 
 @TownApp.form(model=Organisation, name='homepage-settings', template='form.pt',
@@ -176,4 +178,5 @@ def custom_handle_settings(self, request, form):
     form.delete_field('redirect_homepage_to')
     form.delete_field('redirect_path')
 
-    return handle_homepage_settings(self, request, form)
+    return handle_homepage_settings(
+        self, request, form, SettingsLayout(self, request))

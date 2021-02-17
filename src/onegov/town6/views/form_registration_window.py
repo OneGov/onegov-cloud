@@ -6,6 +6,7 @@ from onegov.org.views.form_registration_window import \
     handle_edit_registration_form
 from onegov.town6 import TownApp
 from onegov.org.forms import FormRegistrationWindowForm
+from onegov.town6.layout import FormSubmissionLayout
 
 
 @TownApp.form(
@@ -15,7 +16,8 @@ from onegov.org.forms import FormRegistrationWindowForm
     form=FormRegistrationWindowForm,
     template='form.pt')
 def town_handle_new_registration_form(self, request, form):
-    return handle_new_registration_form(self, request, form)
+    return handle_new_registration_form(
+        self, request, form, FormSubmissionLayout(self, request))
 
 
 @TownApp.html(
@@ -23,7 +25,8 @@ def town_handle_new_registration_form(self, request, form):
     permission=Private,
     template='registration_window.pt')
 def town_view_registration_window(self, request):
-    return view_registration_window(self, request)
+    return view_registration_window(
+        self, request, FormSubmissionLayout(self, request))
 
 
 @TownApp.form(
@@ -33,4 +36,5 @@ def town_view_registration_window(self, request):
     template='form.pt',
     name='edit')
 def town_handle_edit_registration_form(self, request, form):
-    return handle_edit_registration_form(self, request, form)
+    return handle_edit_registration_form(
+        self, request, form, FormSubmissionLayout(self, request))

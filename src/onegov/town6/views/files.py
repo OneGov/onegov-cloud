@@ -75,7 +75,7 @@ def view_town_file_collection(self, request):
 
 @TownApp.html(model=GeneralFile, permission=Private, name='details')
 def view_town_file_details(self, request):
-    return view_file_details(self, request)
+    return view_file_details(self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(model=ImageFileCollection, template='images.pt',
@@ -120,21 +120,22 @@ def view_town_image_collection(self, request):
 @TownApp.html(model=GeneralFileCollection, name='upload',
               request_method='POST', permission=Private)
 def view_town_upload_general_file(self, request):
-    return view_upload_general_file(self, request)
+    return view_upload_general_file(
+        self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(model=ImageFileCollection, name='upload',
               request_method='POST', permission=Private)
 def view_town_upload_image_file(self, request):
-    return view_upload_image_file(self, request)
+    return view_upload_image_file(self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(model=GeneralFileCollection, name='digest', permission=Public)
 def view_town_file_digest(self, request):
-    return view_file_digest(self, request)
+    return view_file_digest(self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(model=File, name='sign', request_method='POST',
               permission=Private)
 def town_handle_sign(self, request):
-    return handle_sign(self, request)
+    return handle_sign(self, request, DefaultLayout(self, request))

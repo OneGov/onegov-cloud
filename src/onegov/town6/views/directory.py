@@ -16,6 +16,8 @@ from onegov.org.forms.generic import ExportForm
 
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.town6.layout import DirectoryCollectionLayout, \
+    DirectoryEntryCollectionLayout, DirectoryEntryLayout
 
 
 @TownApp.html(
@@ -23,20 +25,23 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
     template='directories.pt',
     permission=Public)
 def town_view_directories(self, request):
-    return view_directories(self, request)
+    return view_directories(
+        self, request, DirectoryCollectionLayout(self, request))
 
 
 @TownApp.form(model=DirectoryCollection, name='new', template='form.pt',
               permission=Secret, form=get_directory_form_class)
 def town_handle_new_directory(self, request, form):
-    return handle_new_directory(self, request, form)
+    return handle_new_directory(
+        self, request, form, DirectoryCollectionLayout(self, request))
 
 
 @TownApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
               template='directory_form.pt', permission=Secret,
               form=get_directory_form_class)
 def town_handle_edit_directory(self, request, form):
-    return handle_edit_directory(self, request, form)
+    return handle_edit_directory(
+        self, request, form, DirectoryCollectionLayout(self, request))
 
 
 @TownApp.html(
@@ -44,7 +49,8 @@ def town_handle_edit_directory(self, request, form):
     permission=Public,
     template='directory.pt')
 def town_view_directory(self, request):
-    return view_directory(self, request)
+    return view_directory(
+        self, request, DirectoryEntryCollectionLayout(self, request))
 
 
 @TownApp.form(
@@ -54,7 +60,8 @@ def town_view_directory(self, request):
     form=get_directory_entry_form_class,
     name='new')
 def town_handle_new_directory_entry(self, request, form):
-    return handle_new_directory_entry(self, request, form)
+    return handle_new_directory_entry(
+        self, request, form, DirectoryEntryCollectionLayout(self, request))
 
 
 @TownApp.form(
@@ -64,7 +71,8 @@ def town_handle_new_directory_entry(self, request, form):
     form=get_directory_entry_form_class,
     name='edit')
 def town_handle_edit_directory_entry(self, request, form):
-    return handle_edit_directory_entry(self, request, form)
+    return handle_edit_directory_entry(
+        self, request, form, DirectoryEntryLayout(self, request))
 
 
 @TownApp.form(model=ExtendedDirectoryEntryCollection,
@@ -73,7 +81,8 @@ def town_handle_edit_directory_entry(self, request, form):
               form=get_submission_form_class,
               name='submit')
 def town_handle_submit_directory_entry(self, request, form):
-    return handle_submit_directory_entry(self, request, form)
+    return handle_submit_directory_entry(
+        self, request, form, DirectoryEntryCollectionLayout(self, request))
 
 
 @TownApp.form(model=DirectoryEntry,
@@ -82,7 +91,8 @@ def town_handle_submit_directory_entry(self, request, form):
               form=get_change_request_form_class,
               name='change-request')
 def town_handle_change_request(self, request, form):
-    return handle_change_request(self, request, form)
+    return handle_change_request(
+        self, request, form, DirectoryEntryLayout(self, request))
 
 
 @TownApp.html(
@@ -90,18 +100,21 @@ def town_handle_change_request(self, request, form):
     permission=Public,
     template='directory_entry.pt')
 def town_view_directory_entry(self, request):
-    return view_directory_entry(self, request)
+    return view_directory_entry(
+        self, request, DirectoryEntryLayout(self, request))
 
 
 @TownApp.form(model=ExtendedDirectoryEntryCollection,
               permission=Public, name='export',
               template='export.pt', form=ExportForm)
 def town_view_export(self, request, form):
-    return view_export(self, request, form)
+    return view_export(
+        self, request, form, DirectoryEntryCollectionLayout(self, request))
 
 
 @TownApp.form(model=ExtendedDirectoryEntryCollection,
               permission=Private, name='import',
               template='directory_import.pt', form=DirectoryImportForm)
 def town_view_import(self, request, form):
-    return view_import(self, request, form)
+    return view_import(
+        self, request, form, DirectoryEntryCollectionLayout(self, request))

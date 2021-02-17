@@ -6,6 +6,7 @@ from onegov.org.views.auth import (
     handle_password_reset_request, handle_password_reset
 )
 from onegov.town6 import TownApp
+from onegov.town6.layout import DefaultLayout
 
 from onegov.user import Auth
 
@@ -20,13 +21,14 @@ from onegov.user.forms import RequestPasswordResetForm
 def town_handle_login(self, request, form):
     """ Handles the login requests. """
 
-    return handle_login(self, request, form)
+    return handle_login(self, request, form, DefaultLayout(self, request))
 
 
 @TownApp.form(model=Auth, name='register', template='form.pt',
               permission=Public, form=RegistrationForm)
 def town_handle_registration(self, request, form):
-    return handle_registration(self, request, form)
+    return handle_registration(
+        self, request, form, DefaultLayout(self, request))
 
 
 @TownApp.html(model=Auth, name='logout', permission=Personal)
@@ -37,10 +39,12 @@ def view_logout(self, request):
 @TownApp.form(model=Auth, name='request-password', template='form.pt',
               permission=Public, form=RequestPasswordResetForm)
 def town_handle_password_reset_request(self, request, form):
-    return handle_password_reset_request(self, request, form)
+    return handle_password_reset_request(
+        self, request, form, DefaultLayout(self, request))
 
 
 @TownApp.form(model=Auth, name='reset-password', template='form.pt',
               permission=Public, form=PasswordResetForm)
 def town_handle_password_reset(self, request, form):
-    return handle_password_reset(self, request, form)
+    return handle_password_reset(
+        self, request, form, DefaultLayout(self, request))
