@@ -2328,3 +2328,12 @@ class GeneralFileCollectionLayout(DefaultLayout):
         request.include('upload')
         request.include('prompt')
         super().__init__(model, request)
+
+
+class ImageFileCollectionLayout(DefaultLayout):
+
+    def __init__(self, model, request):
+        request.include('common')
+        request.include('upload')
+        request.include('editalttext')
+        super().__init__(model, request)
