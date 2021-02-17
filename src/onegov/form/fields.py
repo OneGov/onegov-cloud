@@ -295,6 +295,8 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
     def process_formdata(self, valuelist):
         if valuelist:
             valuelist = [' '.join(valuelist).replace(' ', 'T')]
+            if len(valuelist[0]) != 16:
+                valuelist[0] = valuelist[0][0:16]
         super(DateTimeLocalField, self).process_formdata(valuelist)
 
 
