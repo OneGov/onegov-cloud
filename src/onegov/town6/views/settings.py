@@ -10,7 +10,10 @@ from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
-    handle_ticket_settings, preview_holiday_settings)
+    handle_ticket_settings, preview_holiday_settings, handle_general_settings,
+    handle_favicon_settings, handle_links_settings, handle_header_settings,
+    handle_footer_settings, handle_module_settings, handle_map_settings,
+    handle_analytics_settings, handle_holiday_settings)
 
 from onegov.org.views.settings import handle_generic_settings as \
     handle_org_generic_settings
@@ -83,72 +86,81 @@ def view_town_settings(self, request):
     model=Organisation, name='general-settings', template='form.pt',
     permission=Secret, form=GeneralSettingsForm, setting=_("General"),
     icon='fa-cogs', order=-1000)
-def handle_general_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("General"))
+def town_handle_general_settings(self, request, form):
+    return handle_general_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
     icon=' fa-external-link-square', order=-990)
-def handle_favicon_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Favicon"))
+def town_handle_favicon_settings(self, request, form):
+    return handle_favicon_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='link-settings', template='form.pt',
     permission=Secret, form=LinksSettingsForm, setting=_("Links"),
     icon=' fa-link', order=-980)
-def handle_links_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Links"))
+def town_handle_links_settings(self, request, form):
+    return handle_links_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='header-settings', template='form.pt',
     permission=Secret, form=HeaderSettingsForm, setting=_("Header"),
     icon='fa-window-maximize', order=-810)
-def handle_header_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Header"))
+def town_handle_header_settings(self, request, form):
+    return handle_header_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='footer-settings', template='form.pt',
     permission=Secret, form=FooterSettingsForm, setting=_("Footer"),
     icon='fa-window-minimize', order=-800)
-def handle_footer_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Footer"))
+def town_handle_footer_settings(self, request, form):
+    return handle_footer_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='module-settings', template='form.pt',
     permission=Secret, form=ModuleSettingsForm, setting=_("Modules"),
     icon='fa-sitemap', order=-700)
-def handle_module_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Modules"))
+def town_handle_module_settings(self, request, form):
+    return handle_module_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='map-settings', template='form.pt',
     permission=Secret, form=MapSettingsForm, setting=_("Map"),
     icon='fa-map-marker-alt', order=-700)
-def handle_map_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Map"))
+def town_handle_map_settings(self, request, form):
+    return handle_map_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='analytics-settings', template='form.pt',
     permission=Secret, form=AnalyticsSettingsForm, setting=_("Analytics"),
     icon='fa-chart-bar ', order=-600)
-def handle_analytics_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Analytics"))
+def town_handle_analytics_settings(self, request, form):
+    return handle_analytics_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
     model=Organisation, name='holiday-settings', template='form.pt',
     permission=Secret, form=HolidaySettingsForm, setting=_("Holidays"),
     icon='fa-calendar', order=-500)
-def handle_holiday_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Holidays"))
+def town_handle_holiday_settings(self, request, form):
+    return handle_holiday_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
@@ -156,14 +168,14 @@ def handle_holiday_settings(self, request, form):
     permission=Secret, form=OrgTicketSettingsForm,
     setting=_("Ticket Settings"), order=-950, icon='fa-ticket-alt'
 )
-def handle_town_ticket_settings(self, request, form):
+def town_handle_ticket_settings(self, request, form):
     return handle_ticket_settings(
         self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(model=Organisation, name='holiday-settings-preview',
               permission=Secret, form=HolidaySettingsForm)
-def preview_town_holiday_settings(self, request, form):
+def town_preview_holiday_settings(self, request, form):
     return preview_holiday_settings(
         self, request, form, DefaultLayout(self, request))
 
