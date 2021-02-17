@@ -155,7 +155,7 @@ class EventsWidget(object):
         latest_events = LinkGroup(
             title=_("Events"),
             links=event_links,
-        )
+        ) if event_links else None
 
         return {
             'event_panel': latest_events,
