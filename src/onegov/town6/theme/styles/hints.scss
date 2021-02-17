@@ -64,7 +64,7 @@
     }
 
     input[value="private"] + label::before {
-        @include icon('\f023');
+        @include icon-bold('\f023');
         color: $red-dark;
     }
 }
@@ -76,7 +76,7 @@
 }
 
 .private-hint::before {
-    @include icon('\f023');
+    @include icon-bold('\f023');
     color: $red-dark;
     font-style: normal;
 }

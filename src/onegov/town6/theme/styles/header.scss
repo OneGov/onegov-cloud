@@ -4,6 +4,56 @@
 $globals-margin: .75rem;
 $globals-height: 2.5rem;
 
+/*
+    edit bar (and popup links)
+*/
+$accept-link-icon: '\f00c';
+$cleanup-link-icon: '\f0d0';
+$copy-link-icon: '\f0c5';
+$delete-link-icon: '\f014';
+$disabled-icon: '\f05e';
+$edit-link-icon: '\f044';
+$export-link-icon: '\f019';
+$file-link-icon: '\f0c6';
+$image-link-icon: '\f03e';
+$import-link-icon: '\f093';
+$internal-link-icon: '\f0c1';
+$manage-recipients: '\f003';
+$manage-subscribers: '\f0c0';
+$mark-as-paid: '\f058';
+$mark-as-unpaid: '\f057';
+$new-daypass-icon: '\f145';
+$new-directory-icon: '\f0e8';
+$new-directory-entry-icon: '\f114';
+$new-recipient: '\f1fa';
+$new-form-icon: '\f044';
+$new-link-icon: '\f0c1';
+$new-news-icon: '\f1ea';
+$new-newsletter-icon: '\f003';
+$new-note-icon: '\f24a';
+$new-page-icon: '\f15b';
+$new-payment-icon: '\f09d';
+$new-person-icon: '\f007';
+$new-photo-album: '\f03e';
+$new-registration-window: '\f067';
+$new-reservation-icon: '\f271';
+$new-room-icon: '\f015';
+$new-stripe-connect-icon: '\f1f5';
+$new-user-icon: '\f234';
+$paste-link-icon: '\f0ea';
+$payment-capture-icon: '\f09d';
+$payment-refund-icon: '\f0e2';
+$payment-provider-icon: '\f09d';
+$payments-icon: '\f09d';
+$rule-link-icon: '\f085';
+$select-icon: '\f14a';
+$send-link-icon: '\f1d9';
+$sync-icon: '\f2f1';
+$subscribe-link-icon: '\f0c1';
+$test-link-icon: '\f0e9';
+$occupancy-link-icon: '\f022';
+$upload-icon: '\f0ee';
+$view-link: '\f06e';
 
 .globals {
     // Todo: the link text inside the second level should not wrap
@@ -55,13 +105,14 @@ $globals-height: 2.5rem;
         }
     }
 
-    .login::before { @include icon("\f2f6"); }
+    //.login::before { @apply fas fa-sign-in-alt; }
+    .login::before { @include icon-bold("\f2f6"); }
     .logout::before { @include icon-bold("\f2f5"); }
     .register::before { @include icon("\f234"); }
     .user::before { @include icon("\f007"); }
     .users::before { @include icon-bold("\f0c0"); }
-    .payment::before { @include icon('\f09d'); }
-    .payment-provider::before { @include icon('\f283'); }
+    .payment::before { @include icon-bold($payments-icon); }
+    .payment-provider::before { @include icon-bold($payment-provider-icon); }
     .profile::before { @include icon("\f2bd"); }
     .management::before { @include icon-bold('\f013'); }
     .images::before { @include icon('\f03e'); }
@@ -149,57 +200,6 @@ $navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
 }
 
 
-/*
-    edit bar (and popup links)
-*/
-$accept-link-icon: '\f00c';
-$cleanup-link-icon: '\f0d0';
-$copy-link-icon: '\f0c5';
-$delete-link-icon: '\f014';
-$disabled-icon: '\f05e';
-$edit-link-icon: '\f044';
-$export-link-icon: '\f019';
-$file-link-icon: '\f0c6';
-$image-link-icon: '\f03e';
-$import-link-icon: '\f093';
-$internal-link-icon: '\f0c1';
-$manage-recipients: '\f003';
-$manage-subscribers: '\f0c0';
-$mark-as-paid: '\f058';
-$mark-as-unpaid: '\f057';
-$new-daypass-icon: '\f145';
-$new-directory-icon: '\f0e8';
-$new-directory-entry-icon: '\f114';
-$new-recipient: '\f1fa';
-$new-form-icon: '\f044';
-$new-link-icon: '\f0c1';
-$new-news-icon: '\f1ea';
-$new-newsletter-icon: '\f003';
-$new-note-icon: '\f24a';
-$new-page-icon: '\f15b';
-$new-payment-icon: '\f09d';
-$new-person-icon: '\f007';
-$new-photo-album: '\f03e';
-$new-registration-window: '\f067';
-$new-reservation-icon: '\f271';
-$new-room-icon: '\f015';
-$new-stripe-connect-icon: '\f1f5';
-$new-user-icon: '\f234';
-$paste-link-icon: '\f0ea';
-$payment-capture-icon: '\f09d';
-$payment-refund-icon: '\f0e2';
-$payment-provider-icon: '\f283';
-$payments-icon: '\f09d';
-$rule-link-icon: '\f085';
-$select-icon: '\f14a';
-$send-link-icon: '\f1d9';
-$sync-icon: '\f021';
-$subscribe-link-icon: '\f0c1';
-$test-link-icon: '\f0e9';
-$occupancy-link-icon: '\f022';
-$upload-icon: '\f0ee';
-$view-link: '\f06e';
-
 $editbar-bg-color: $black;
 $editbar-bg-color-active: lighten($black, 15%);
 $editbar-fg-color: $white;
@@ -245,7 +245,7 @@ $editbar-fg-color-active: $white;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
-    .export-link::before { @include icon($export-link-icon); }
+    .export-link::before { @include icon-bold($export-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
@@ -272,14 +272,14 @@ $editbar-fg-color-active: $white;
     .new-user::before { @include icon-bold($new-user-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
-    .payment-provider::before { @include icon($payment-provider-icon); }
+    .payment-provider::before { @include icon-bold($payment-provider-icon); }
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
     .subscribe-link::before { @include icon($subscribe-link-icon); }
     .test-link::before { @include icon($test-link-icon); }
     .rule-link::before { @include icon($rule-link-icon); }
-    .sync::before { @include icon($sync-icon); }
+    .sync::before { @include icon-bold($sync-icon); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
 }

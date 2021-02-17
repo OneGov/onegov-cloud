@@ -101,7 +101,7 @@ $pdf-preview-max-width: 256px;
         }
 
         &.signed td:nth-child(3)::after {
-            @include icon('\f023');
+            @include icon-bold('\f023');
             display: inline;
         }
 
