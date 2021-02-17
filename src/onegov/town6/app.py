@@ -138,7 +138,34 @@ def get_webasset_output():
     return 'assets/bundles'
 
 
-@TownApp.webasset('sortable')
-def get_sortable_asset():
-    yield 'sortable.js'
-    yield 'sortable_custom.js'
+@TownApp.webasset('common')
+def get_common_asset():
+    yield 'global.js'
+    yield 'polyfills.js'
+    yield 'jquery.datetimepicker.css'
+    yield 'locale.js'
+    yield 'modernizr.js'
+    yield 'intercooler.js'
+    yield 'underscore.js'
+    yield 'react.js'
+    yield 'react-dom.js'
+    yield 'form_dependencies.js'
+    yield 'confirm.jsx'
+    yield 'typeahead.jsx'
+    yield 'pay'
+    yield 'moment.js'
+    yield 'moment.de-ch.js'
+    yield 'moment.fr-ch.js'
+    yield 'jquery.datetimepicker.js'
+    yield 'jquery.mousewheel.js'
+    yield 'jquery.popupoverlay.js'
+    yield 'jquery.load.js'
+    yield 'videoframe.js'
+    yield 'datetimepicker.js'
+    yield 'url.js'
+    yield 'date-range-selector.js'
+    yield 'lazyalttext.js'
+    yield 'lazysizes.js'
+    yield 'toggle.js'
+    yield 'common.js'
+    yield '_blank.js'
