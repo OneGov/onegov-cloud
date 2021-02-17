@@ -124,7 +124,8 @@ class TownTheme(BaseTheme):
             'upload',
             'files',
             'publication_signature',
-            'image-grid'
+            'image-grid',
+            'widgets'
         ]
 
     @property

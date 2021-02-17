@@ -14,13 +14,27 @@
     Homepage widgets
 */
 
-.homepage > .grid-container.full {
+.homepage {
 
-    .gray {
+    .full.gray {
         background: $white-smoke;
     }
 
-    .primary {
-        background: $primary-color;
+    .full.primary {
+        @include primary-color-background;
+    }
+
+    &> div.grid-container {
+
+        padding-bottom: 1.4rem;
+        padding-top: 1.4rem;
+
+        &:first-of-type {
+            padding-top: 0;
+        }
+
+        &:last-of-type {
+            padding-bottom: 0;
+        }
     }
 }

@@ -160,51 +160,60 @@ def migrate_homepage_structure(context):
         return
 
     org.meta['homepage_structure'] = textwrap.dedent("""\
-        <row-wide>
-            <column span="12">
-                <slider />
-            </column>
-        </row-wide>
+<row-wide>
+    <column span="12">
+        <slider />
+    </column>
+</row-wide>
+<row>
+    <column span="12">
         <row>
-            <column span="12">
-                <row>
-                    <column span="8">
-                    </column>
-                    <column span="4">
-                        <panel>
-                            <services />
-                        </panel>
-                    </column>
-                </row>
-                <line />
+            <column span="8">
+            </column>
+            <column span="4">
+                <panel>
+                    <services />
+                </panel>
             </column>
         </row>
+    </column>
+</row>
+<row-wide bgcolor="gray">
+    <column span="12">
         <row>
             <column span="12">
                 <news />
             </column>
         </row>
-        <line />
+    </column>
+</row-wide>
+<row-wide bgcolor="primary">
+    <column span="12">
         <row>
             <column span="12">
                 <events />
             </column>
         </row>
-        <line />
-        <row>
-            <column span="12">
-                <homepage-tiles />
-            </column>
-        </row>
-        <line />
-        <row>
-            <column span="12">
-                <directories />
-            </column>
-        </row>
+    </column>
+</row-wide>
+<row>
+    <column span="12">
+        <homepage-tiles show-title="True"/>
+    </column>
+</row>
+<line />
+<row>
+    <column span="12">
+        <directories />
+    </column>
+</row>
+<row-wide bgcolor="gray">
+    <column span="12">
         <row>
             <column span="12">
                 <partners />
             </column>
         </row>
+    </column>
+</row-wide>
     """)
