@@ -148,6 +148,9 @@ class DirectoriesWidget(object):
 
 @OrgApp.homepage_widget(tag='news')
 class NewsWidget(object):
+
+    news_limit = 2
+
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
@@ -182,7 +185,7 @@ class NewsWidget(object):
                     count += 1
 
         return {
-            'news': limited(news, limit=2),
+            'news': limited(news, limit=self.news_limit),
             'get_lead': get_lead
         }
 

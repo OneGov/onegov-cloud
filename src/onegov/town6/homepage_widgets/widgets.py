@@ -85,6 +85,7 @@ class LinksWidget(object):
 
 @TownApp.homepage_widget(tag='news')
 class NewsWidget(OrgNewsWidget):
+    news_limit = 3
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
