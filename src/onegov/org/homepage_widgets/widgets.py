@@ -12,6 +12,20 @@ from sqlalchemy import func
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
+def get_lead(text, max_chars=180, consider_sentences=True):
+    if len(text) > max_chars:
+        first_point_ix = text.find('.')
+        if not first_point_ix or not consider_sentences:
+            return text[0:max_chars] + '...'
+        elif first_point_ix >= max_chars:
+            return text
+        else:
+            end = text[0:max_chars].rindex('.') + 1
+            return text[0:end]
+
+    return text
+
+
 @OrgApp.homepage_widget(tag='row')
 class RowWidget(object):
     template = """
@@ -168,7 +182,8 @@ class NewsWidget(object):
                     count += 1
 
         return {
-            'news': limited(news, limit=2)
+            'news': limited(news, limit=2),
+            'get_lead': get_lead
         }
 
 
