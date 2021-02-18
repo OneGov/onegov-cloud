@@ -23,9 +23,11 @@
 </metal:b>
 
 <metal:b define-macro="consume_messages" i18n:domain="onegov.org">
-    <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
+    <div tal:repeat="message request.consume_messages()" data-closable class="callout alert-box ${message.type}">
         ${message.text}
-        <a href="#" class="close">&times;</a>
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
       </div>
 </metal:b>
 

@@ -261,7 +261,7 @@
     background-color: $topbar-bg-color;
     border-radius: $border-radius $border-radius 0 0;
     font-size: .875rem;
-    width: 100%;
+    width: 85%;
 
     .calendar-day-thumbnail {
         background-position: center top;
@@ -272,7 +272,7 @@
         position: relative;
         width: 100%;
 
-        .fa {
+        .far {
             bottom: 0;
             color: $iron;
             font-size: $icon-size;

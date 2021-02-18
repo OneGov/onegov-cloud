@@ -125,7 +125,10 @@ class TownTheme(BaseTheme):
             'files',
             'publication_signature',
             'image-grid',
-            'widgets'
+            'widgets',
+            'popup',
+            'fullcalendar',
+            'alert'
         ]
 
     @property
