@@ -56,3 +56,29 @@ p > * {
 .page-text ul li a {
     font-family: $body-font-family !important;
 }
+
+
+/*
+
+All places where we change to the sans serif font
+
+*/
+
+small.error,
+span.error,
+form label,
+form fieldset,
+dl.field-display,
+dl.field-display > dt,
+#content dt {
+    font-family: $header-font-family;
+}
+
+/*
+    Alert boxes
+*/
+
+#alert-boxes {
+    font-family: $header-font-family;
+    font-style: italic;
+}
