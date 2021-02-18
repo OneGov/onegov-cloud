@@ -85,6 +85,7 @@ $pdf-icon: '\f1c1';
                 height: $globals-height;
                 line-height: $globals-height;
                 padding: 0 1rem;
+
                 &::after {
                     border-color: $white transparent transparent !important;
                 }
@@ -92,7 +93,8 @@ $pdf-icon: '\f1c1';
         }
     }
 
-    .is-dropdown-submenu, .is-accordion-submenu {
+    .is-dropdown-submenu,
+    .is-accordion-submenu {
 
         a {
             color: $body-font-color;
@@ -159,7 +161,7 @@ $pdf-icon: '\f1c1';
     }
 }
 
-$navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
+$navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);
 
 #nav-bar {
 
@@ -167,8 +169,8 @@ $navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
     z-index: 1000;
 
     .cell {
-        padding: 20px 0;
         align-self: center;
+        padding: 20px 0;
     }
 
     .nav-bar-sticky {
@@ -186,16 +188,14 @@ $navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
         justify-content: flex-end;
     }
 
-    width: 100%;
-
     img {
         height: 6em;
         object-fit: contain;
     }
 
     i {
-        margin-right: .5rem;
         color: $primary-color;
+        margin-right: .5rem;
 
         @include breakpoint(medium up) {
             font-size: 1.25rem;
@@ -216,13 +216,14 @@ $editbar-fg-color-active: $white;
     margin-bottom: 2px;
     margin-top: -2px;
 
-    li a:before {
+    li a::before {
         margin-right: 2 * $default-icon-margin;
     }
 
 
     > li > a {
         color: $editbar-fg-color;
+
         &::after {
             border-color: $editbar-fg-color transparent transparent !important;
         }
@@ -230,12 +231,13 @@ $editbar-fg-color-active: $white;
 
     // Top-level item active state
     > li.is-active > a {
-      background: $editbar-bg-color-active !important;
-      color: $editbar-fg-color-active !important;
+        background: $editbar-bg-color-active !important;
+        color: $editbar-fg-color-active !important;
     }
 
     .submenu > li a {
         color: $editbar-bg-color;
+
         &:hover {
             color: $editbar-bg-color-active;
         }

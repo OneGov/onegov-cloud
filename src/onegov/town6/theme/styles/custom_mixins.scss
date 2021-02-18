@@ -43,21 +43,21 @@
     font-family: 'Font Awesome 5 Free';
     font-style: normal;
     font-variant: normal;
-    text-rendering: auto;
     line-height: 1;
+    text-rendering: auto;
 }
 
 @mixin icon($icon) {
+    @include icon-base;
     content: $icon;
     font-weight: 400;
-    @include icon-base;
     line-height: inherit;
 }
 
 @mixin icon-bold($icon) {
+    @include icon-base;
     content: $icon;
     font-weight: 900;
-    @include icon-base;
     line-height: inherit;
 }
 
@@ -77,45 +77,46 @@
 $more-link-icon: "\f054";
 
 @mixin more-link-after {
-  a::after {
-    @include icon-bold($more-link-icon);
-    float: right;
+    a::after {
+        @include icon-bold($more-link-icon);
+        float: right;
   }
 }
 
 @mixin clean-ul {
-  list-style: none;
-  margin: 0;
-
-  ul {
     list-style: none;
     margin: 0;
-  }
+
+    ul {
+        list-style: none;
+        margin: 0;
+    }
 }
 
 @mixin more-list {
 
-  margin: 0;
-  padding: 0;
-  list-style: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 
-  li {
-    border-bottom: 1px solid #f5f5f5;
-    font-weight: bold;
-    padding: .5rem 0;
+    li {
 
-    @include more-link-after;
+        @include more-link-after;
+        border-bottom: 1px solid #f5f5f5;
+        font-weight: bold;
+        padding: .5rem 0;
 
-    &:first-of-type {padding-top: 0}
-    &:last-of-type {
-        border: none;
-        padding-bottom: 0;
+        &:first-of-type { padding-top: 0; }
+
+        &:last-of-type {
+            border: 0;
+            padding-bottom: 0;
+        }
     }
-  }
 }
 
 .more-list {
-  @include more-list;
+    @include more-list;
 }
 
 /*
@@ -124,16 +125,16 @@ $more-link-icon: "\f054";
 
 // We use this mixin to create postfix/prefix form Labels
 @mixin prefix-postfix-base {
-  border: $input-prefix-border;
-  display: block;
-  font-size: $form-label-font-size;
-  height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
-  line-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
-  overflow: visible;
-  padding-bottom: 0;
-  padding-top: 0;
-  position: relative;
-  text-align: center;
-  width: 100%;
-  z-index: 2;
+    border: $input-prefix-border;
+    display: block;
+    font-size: $form-label-font-size;
+    height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
+    line-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
+    overflow: visible;
+    padding-bottom: 0;
+    padding-top: 0;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 2;
 }

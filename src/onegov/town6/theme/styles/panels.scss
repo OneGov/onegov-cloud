@@ -4,13 +4,6 @@
 .filter-panel {
     margin-bottom: 1rem;
 
-    .filter-title {
-        //font-size: $h4-font-size - $h4-font-reduction;
-        //margin-bottom: 1rem;
-        //margin-top: 0;
-        //padding: 0 0 .75rem;
-    }
-
     ul.tags {
         list-style: none;
         margin: 0 0 .75rem;
@@ -159,8 +152,8 @@ $publications-icon: '\f1ea';
         }
 
         .panel-links {
-            color: $primary-fg-color;
             background-color: $primary-color;
+            color: $primary-fg-color;
         }
 
         li {
@@ -169,7 +162,7 @@ $publications-icon: '\f1ea';
         }
 
         li:last-of-type {
-            border: none;
+            border: 0;
         }
     }
 
@@ -291,9 +284,9 @@ $checklist-icon: "\f0ae";
         > ul {
 
             li:first-child {
-                margin-bottom: .5rem;
-                font-size: $h3-font-size;
                 font-family: $header-font-family;
+                font-size: $h3-font-size;
+                margin-bottom: .5rem;
             }
 
 
@@ -311,6 +304,6 @@ $checklist-icon: "\f0ae";
 
 .side-panel.highlighted {
     background-color: $light-gray;
-    padding: 1rem;
     font-family: $header-font-family;
+    padding: 1rem;
 }

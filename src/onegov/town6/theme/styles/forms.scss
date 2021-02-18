@@ -3,7 +3,8 @@
 */
 
 form {
-    label ul, ul {
+    label ul,
+    ul {
         list-style: none;
         margin: 0;
     }
@@ -30,9 +31,9 @@ input[type='color'] {
 .input-with-button {
 
     .button {
-        box-sizing: border-box;
         @include prefix-postfix-base;
-        border-left: none;
+        border-left: 0;
+        box-sizing: border-box;
 
         // IE 9, 10 and 11 will put the link inside the button element because
         // Internet Explorer. Here we hide the result.

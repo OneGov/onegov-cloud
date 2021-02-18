@@ -39,11 +39,17 @@ $default-icon-margin: .25rem;
 
 /* Font family settings */
 
-a, button, button *, span, span *, thead {
+a,
+button,
+button *,
+span,
+span *,
+thead {
     font-family: $header-font-family;
 }
 
-p, p > * {
+p,
+p > * {
     font-family: $body-font-family;
 }
 

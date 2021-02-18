@@ -21,8 +21,8 @@ $footer-text-color: $primary-fg-color;
 
     * {
         color: $footer-text-color;
-        line-height: 1.5rem;
         font-family: $header-font-family;
+        line-height: 1.5rem;
     }
 
     h2 {
@@ -36,10 +36,10 @@ $footer-text-color: $primary-fg-color;
     }
 
     .footer-columns {
-        padding-bottom: .5rem;
-        padding-top: 1.25rem;
 
         @include clean-ul;
+        padding-bottom: .5rem;
+        padding-top: 1.25rem;
 
         p {
             line-height: 1.5rem;

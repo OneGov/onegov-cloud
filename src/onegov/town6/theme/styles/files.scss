@@ -40,6 +40,7 @@ $pdf-preview-max-width: 256px;
 
     tr:first-child  {
         padding-top: 1rem;
+
         &:first-of-type {
             text-align: left;
         }
@@ -72,8 +73,8 @@ $pdf-preview-max-width: 256px;
     th span {
         @include label;
         @include primary-color-background;
-        border: 1px solid $primary-color;
         @include circle;
+        border: 1px solid $primary-color;
         font-size: .875rem;
         font-weight: bold;
     }
@@ -196,7 +197,9 @@ $pdf-preview-max-width: 256px;
         }
     }
 
-    .fa, .fas, .far {
+    .fa,
+    .fas,
+    .far {
         @include prefix(transition-duration, .5s);
         @include prefix(filter, blur(0));
     }

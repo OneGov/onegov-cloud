@@ -19,6 +19,7 @@
 
     thead {
         background-color: $white;
+
         &:not(:first-of-type) td {
             padding-top: 1.5rem;
         }

@@ -238,6 +238,7 @@ tr.ticket:hover {
 /* ticket filter fake table header */
 .ticket-filters {
 
+    background-color: $table-striped-background;
     display: flex;
     justify-content: space-between;
     padding: .5rem;
@@ -248,11 +249,11 @@ tr.ticket:hover {
     }
 
     .f-dropdown {
+        margin: 0;
+        max-height: 400px;
         overflow-x: hidden;
         overflow-y: auto;
-        max-height: 400px;
         padding: 0;
-        margin: 0;
 
         li:hover {
             @include primary-color-background;
@@ -266,9 +267,9 @@ tr.ticket:hover {
         a {
             font-size: .875rem;
             overflow: hidden;
+            padding: .5rem;
             text-overflow: ellipsis;
             white-space: nowrap;
-            padding: .5rem;
 
             ::before {
                 font-weight: normal;
@@ -291,18 +292,17 @@ tr.ticket:hover {
 
     button.small {
         font-size: .9rem;
+        margin-bottom: 0;
+        margin-left: 1rem;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        margin-bottom: 0;
-        margin-left: 1rem;
 
         @include breakpoint(small only) {
+            margin-bottom: 1rem;
+            margin-right: 0;
             max-width: 160px;
             overflow-x: hidden;
-
-            margin-right: 0;
-            margin-bottom: 1rem;
 
             &:first-of-type {
                 margin-bottom: .5rem;
@@ -314,8 +314,6 @@ tr.ticket:hover {
             right: .9rem;
         }
     }
-
-    background-color: $table-striped-background;
 }
 
 

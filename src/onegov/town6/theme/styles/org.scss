@@ -91,9 +91,10 @@ a[href^="mailto:"] {
     approach: https://dev.to/domysee/keeping-the-footer-at-the-bottom-with-css-flexbox-5h5f
 */
 
-html, body {
-    width: 100%;
+html,
+body {
     height: 100%;
+    width: 100%;
 }
 
 .off-canvas-content {
@@ -347,7 +348,7 @@ footer {
     font-style: italic;
     margin-bottom: 1rem;
     overflow: hidden;
-    padding: 1rem 0 .7rem 0;
+    padding: 1rem 0 .7rem;
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -355,8 +356,8 @@ footer {
         line-height: 1rem;
 
         // color last element
-       &:last-child a {
-           color: $black;
+        &:last-child a {
+            color: $black;
        }
     }
 
@@ -371,7 +372,7 @@ footer {
 
 /* Card component tuning */
 .card-section {
-    @include clean-ul();
+    @include clean-ul;
 }
 
 /*
@@ -384,7 +385,8 @@ table {
     font-family: $header-font-family;
 }
 
-table tr th, table tr td {
+table tr th,
+table tr td {
     font-size: .875rem;
 }
 
@@ -397,8 +399,8 @@ ul.pagination li {
 
     &.current > a {
         color: $primary-fg-color;
-        pointer-events: none;
         font-weight: bold;
+        pointer-events: none;
     }
 
 }
