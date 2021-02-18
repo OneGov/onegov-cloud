@@ -210,6 +210,10 @@ $editbar-bg-color-active: lighten($black, 15%);
 $editbar-fg-color: $white;
 $editbar-fg-color-active: $white;
 
+.edit-bar-container {
+    background-color: $editbar-bg-color;
+}
+
 .edit-bar {
 
     background-color: $editbar-bg-color;
