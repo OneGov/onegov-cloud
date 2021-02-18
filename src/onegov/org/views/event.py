@@ -50,14 +50,14 @@ def assert_anonymous_access_only_temporary(request, event):
         raise exc.HTTPForbidden()
 
 
-def event_form(model, request):
+def event_form(model, request, form=None):
     if request.is_manager:
         # unlike typical extended models, the property of this is defined
         # on the event model, while we are only using the form extension part
         # here
-        return AccessExtension().extend_form(EventForm, request)
+        return AccessExtension().extend_form(form or EventForm, request)
 
-    return EventForm
+    return form or EventForm
 
 
 @OrgApp.view(

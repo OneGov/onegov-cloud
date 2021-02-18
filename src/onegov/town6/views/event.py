@@ -1,10 +1,15 @@
 
 from onegov.core.security import Public
 from onegov.event import Event, OccurrenceCollection
-from onegov.org.views.event import event_form, handle_new_event, view_event, \
-    handle_edit_event
+from onegov.org.views.event import event_form as org_event_form, \
+    handle_new_event, view_event, handle_edit_event
 from onegov.town6 import TownApp
+from onegov.town6.forms.event import EventForm
 from onegov.town6.layout import EventLayout
+
+
+def event_form(model, request):
+    return org_event_form(model, request, EventForm)
 
 
 @TownApp.form(
@@ -15,7 +20,9 @@ from onegov.town6.layout import EventLayout
     permission=Public
 )
 def town_handle_new_event(self, request, form):
-    return handle_new_event(self, request, form, EventLayout(self, request))
+    layout = EventLayout(self, request)
+    request.include('many')
+    return handle_new_event(self, request, form, layout)
 
 
 @TownApp.html(
