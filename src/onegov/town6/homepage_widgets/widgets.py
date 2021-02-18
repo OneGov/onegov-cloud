@@ -4,27 +4,14 @@ from onegov.form import FormCollection
 from onegov.org.elements import Link, LinkGroup
 from onegov.org.layout import EventBaseLayout
 
-from onegov.org.homepage_widgets.widgets import NewsWidget as OrgNewsWidget
+from onegov.org.homepage_widgets.widgets import NewsWidget as OrgNewsWidget, \
+    get_lead
 from onegov.org.models import ImageSetCollection, PublicationCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
 
 from onegov.town6 import TownApp
 from onegov.town6 import _
-
-
-def get_lead(text, max_chars=180, consider_sentences=True):
-    if len(text) > max_chars:
-        first_point_ix = text.find('.')
-        if not first_point_ix or not consider_sentences:
-            return text[0:max_chars] + '...'
-        elif first_point_ix >= max_chars:
-            return text
-        else:
-            end = text[0:max_chars].rindex('.') + 1
-            return text[0:end]
-
-    return text
 
 
 @TownApp.homepage_widget(tag='row')
@@ -102,7 +89,7 @@ class NewsWidget(OrgNewsWidget):
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
                 tal:define="heading 'h5'; show_all_news_link True;
-                hide_date True"
+                hide_date False"
             />
         </xsl:template>
     """

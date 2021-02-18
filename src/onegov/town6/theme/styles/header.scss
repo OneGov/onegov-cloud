@@ -72,6 +72,8 @@ $pdf-icon: '\f1c1';
 
     .grid-x > .cell > ul {
 
+        z-index: 1001;
+
         @include breakpoint(medium up) {
             display: flex;
             flex-direction: row-reverse;
@@ -160,6 +162,9 @@ $pdf-icon: '\f1c1';
 $navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
 
 #nav-bar {
+
+    width: 100%;
+    z-index: 1000;
 
     .cell {
         padding: 20px 0;

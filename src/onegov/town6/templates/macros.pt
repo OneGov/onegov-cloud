@@ -424,7 +424,7 @@
                     <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
                     <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h5>
                 </tal:b>
-                <p class="news-lead">${item.content.lead}</p>
+                <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
             </div>
             <a i18n:translate href="${request.link(item)}" class="more-link">read more</a>
         </div>
