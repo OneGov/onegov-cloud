@@ -307,3 +307,14 @@ $checklist-icon: "\f0ae";
     font-family: $header-font-family;
     padding: 1rem;
 }
+
+
+.panel {
+    @include smooth-edges;
+
+    // Zurb lacks a separate color for callout panels.
+    &.callout {
+        background: $callout-panel-bg;
+        border-color: $callout-panel-border-color;
+    }
+}
