@@ -330,9 +330,9 @@
                     <metal:b use-macro="layout.macros['field']" />
                 </label>
 
-                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
+                <label tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
                     <metal:b use-macro="layout.macros['field']" />
-                </div>
+                </label>
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:b>
         </tal:b>
@@ -874,9 +874,7 @@
 
         <dt i18n:translate>List Preview</dt>
         <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence; use_links False">
-            <div class="grid-x">
-                <metal:b use-macro="layout.macros['occurrence_list_view']" />
-            </div>
+            <metal:b use-macro="layout.macros['occurrence_list_view']" />
         </dd>
 
         <tal:b condition="event.image">
@@ -976,7 +974,7 @@
     </a>
 
     <a href="${link|nothing}" tal:condition="not:image|nothing" class="calendar-day-thumbnail">
-        <i class="fa fa-calendar-o" aria-hidden="true"></i>
+        <i class="far fa-calendar" aria-hidden="true"></i>
     </a>
 
     <div class="calendar-day-date">
@@ -993,9 +991,7 @@
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.org">
     <tal:b repeat="occurrence occurrences">
-        <div class="grid-x">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
-        </div>
     </tal:b>
 
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
@@ -1003,6 +999,9 @@
 
 <metal:occurrence_list_view define-macro="occurrence_list_view">
     <div class="occurrence" tal:define="use_links use_links|True">
+        <div class="grid-x">
+
+
         <div class="large-3 medium-4 small-5 cell calendar-day-column">
             <metal:b
                 tal:define="
@@ -1024,8 +1023,7 @@
                 ${time[0].upper()}${time[1:]}
             </div>
             <div class="occurrence-tags"><span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span></div>
-        </div>
-        <div class="clearfix"></div>
+        </div></div>
     </div>
 </metal:occurrence_list_view>
 

@@ -63,11 +63,6 @@ $events-icon-width: 3ex;
     .occurrence {
         margin-bottom: 0;
     }
-
-    .occurrence > div:first-child {
-        //margin-left: -($column-gutter / 2);
-        margin-left: -(50px / 2);
-    }
 }
 
 .occurrence-map,

@@ -284,3 +284,25 @@ $input-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 $input-color: rgba($black, .75);
 $input-font-size: rem-calc(14);  // same as the label
 $form-label-color: scale-color($black, $lightness: 30%);
+
+/*
+
+Button styles from foundation5
+
+*/
+
+button.round,
+.button.round {
+    border-radius: 50%;
+}
+
+
+dl dd {
+    margin-bottom: .75rem;
+}
+
+/*
+    Foundation6 variable overwrites for components
+*/
+
+$button-padding: .85em 1.5em;

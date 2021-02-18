@@ -1,16 +1,101 @@
 /*
+    Errors
+ */
+
+small.error,
+span.error {
+    background: $alert-color;
+    color: $white;
+    display: block;
+    font-style: italic;
+    margin-bottom: 1rem;
+    margin-top: -1px;
+    padding: .5rem;
+}
+
+/*
     Forms
 */
 
 form {
-    label ul,
-    ul {
-        list-style: none;
-        margin: 0;
-    }
 
     label {
-        font-family: $header-font-family;
+
+        min-width: 75%;
+
+        &.error {
+            color: $alert-color;
+
+            & input {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    label > ul,
+    .upload-widget > ul,
+    .group-label > ul {
+        list-style: none;
+        margin: 0;
+
+        &:last-of-type {
+            margin-bottom: .5rem;
+        }
+
+        li input[type="checkbox"],
+        li input[type="radio"] {
+            margin: 0;
+        }
+    }
+
+    .label-text,
+    label > ul label {
+        max-width: 90%;
+    }
+
+    .label-text {
+        font-weight: bold;
+    }
+
+    //.field-help {
+    //    color: $steel;
+    //    font-size: .8rem;
+    //    margin-left: 1.25rem;
+    //}
+    //
+    //.long-field-help,
+    //.long-field-help p {
+    //    color: $steel;
+    //    font-size: .8rem;
+    //    margin: .25rem 0 .5rem;
+    //}
+
+    input.invalid,
+    input.invalid:focus {
+        border-color: $alert-color;
+    }
+
+    .label-required {
+        color: $primary-color;
+        font-weight: bold;
+    }
+
+    .map-wrapper {
+        margin-bottom: 1rem;
+    }
+
+    fieldset {
+        border: 0;
+        border-top: 1px solid $table-border-color;
+        margin-bottom: 1rem;
+        padding: 0;
+
+        legend {
+            font-size: $input-font-size;
+            margin-bottom: .75rem;
+            padding: 0 .75rem;
+            text-align: center;
+        }
     }
 }
 
@@ -80,7 +165,7 @@ dl.field-display > dt {
     margin-bottom: 0;
 }
 
-.field-display {
+.display-fields {
 
     p.thumbnail {
         border-radius: 5px;
@@ -114,7 +199,7 @@ dl.field-display > dt {
     font-weight: bold;
 }
 
-.cell.fieldset-display-submit form {
+.grid-x.fieldset-display-submit form {
     display: inline-block;
     margin-right: .5em;
 }
@@ -153,11 +238,11 @@ dl.field-display > dt {
 */
 
 .field-button {
-    height: 27px;
-    margin-top: 27px;
-    padding: 5px;
+    //height: 27px;
+    margin-top: 30px !important;
+    padding: 5px !important;
     text-align: center;
-    width: 27px;
+    //width: 27px;
 
     + .field-button {
         margin-left: 10px;
