@@ -94,7 +94,7 @@ $pdf-icon: '\f1c1';
     .is-dropdown-submenu,
     .is-accordion-submenu {
 
-        z-index: 1001;
+        z-index: 1101;
 
         a {
             color: $body-font-color;
@@ -166,7 +166,7 @@ $navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);
 #nav-bar {
 
     width: 100%;
-    z-index: 1000;
+    z-index: 1100;
 
     .cell {
         align-self: center;
