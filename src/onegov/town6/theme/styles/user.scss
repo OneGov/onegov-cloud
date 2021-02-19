@@ -89,8 +89,8 @@
 .user-initials-small,
 .user-initials-medium,
 .user-initials-large {
+    @include circle;
     background-color: $gainsboro;
-    border-radius: 50px;
     color: $body-font-color;
     display: inline-block;
     text-align: center;
