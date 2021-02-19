@@ -24,7 +24,7 @@ $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f145';
 $new-directory-icon: '\f0e8';
-$new-directory-entry-icon: '\f114';
+$new-directory-entry-icon: '\f07b';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
@@ -72,8 +72,6 @@ $pdf-icon: '\f1c1';
 
     .grid-x > .cell > ul {
 
-        z-index: 1001;
-
         @include breakpoint(medium up) {
             display: flex;
             flex-direction: row-reverse;
@@ -95,6 +93,8 @@ $pdf-icon: '\f1c1';
 
     .is-dropdown-submenu,
     .is-accordion-submenu {
+
+        z-index: 1001;
 
         a {
             color: $body-font-color;

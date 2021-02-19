@@ -70,7 +70,8 @@ form label,
 form fieldset,
 dl.field-display,
 dl.field-display > dt,
-#content dt {
+#content dt,
+.ticket-panel {
     font-family: $header-font-family;
 }
 

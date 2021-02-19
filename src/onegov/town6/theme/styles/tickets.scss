@@ -6,6 +6,16 @@ $pending-ticket-bg: $blue-light;
 $closed-ticket-bg: $green-light;
 $ticket-number-bg: $yellow-light;
 
+@mixin status-batch($bg) {
+    background: $bg;
+    display: inline-block;
+    font-weight: normal;
+    padding: .25rem .5rem;
+    text-align: center;
+    white-space: nowrap;
+}
+
+
 .ticket-number-plain {
     color: $monsoon;
     font-family: $font-family-monospace;
@@ -15,12 +25,7 @@ $ticket-number-bg: $yellow-light;
 
 
 .ticket-number {
-    //@include label(
-    //    $padding: .25rem .5rem,
-    //    $text-size: 1rem,
-    //    $bg: $ticket-number-bg
-    //);
-    @include label;
+    background: $ticket-number-bg;
     font-family: $font-family-monospace;
 }
 
@@ -29,30 +34,15 @@ $ticket-number-bg: $yellow-light;
 }
 
 .ticket-state-open {
-    //@include label(
-    //    $padding: .25rem .5rem,
-    //    $text-size: 1rem,
-    //    $bg: $open-ticket-bg
-    //);
-    @include label;
+    @include status-batch($open-ticket-bg);
 }
 
 .ticket-state-pending {
-    //@include label(
-    //    $padding: .25rem .5rem,
-    //    $text-size: 1rem,
-    //    $bg: $pending-ticket-bg
-    //);
-    @include label;
+    @include status-batch($pending-ticket-bg);
 }
 
 .ticket-state-closed {
-    //@include label(
-    //    $padding: .25rem .5rem,
-    //    $text-size: 1rem,
-    //    $bg: $closed-ticket-bg
-    //);
-    @include label;
+    @include status-batch($closed-ticket-bg);
 }
 
 .ticket-timeline .message .title {
@@ -70,18 +60,19 @@ $ticket-number-bg: $yellow-light;
 */
 $accept-ticket-icon-hover: '\f192';
 $close-ticket-icon: '\f111';
+$open-ticket-icon: $close-ticket-icon;
+$accept-ticket-icon: $open-ticket-icon;
 $close-ticket-icon-hover: '\f058';
-$reopen-ticket-icon: '\f1db';
-$reopen-ticket-icon-hover: '\f192';
+$reopen-ticket-icon: $accept-ticket-icon;
+$reopen-ticket-icon-hover: $accept-ticket-icon-hover;
 $all-handler-icon: '\f069';
 $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
-$dir-handler-icon: '\f114';
-$open-ticket-icon: '\f111';
-$pending-ticket-icon: '\f192';
-$accept-ticket-icon: $open-ticket-icon;
-$closed-ticket-icon: '\f058';
+$dir-handler-icon: '\f07b';
+$pending-ticket-icon: $accept-ticket-icon-hover;
+
+$closed-ticket-icon: $close-ticket-icon-hover;
 $all-ticket-icon: '\f055';
 
 .ticket-filter-open::before {

@@ -31,7 +31,7 @@
                     <h2 i18n:translate>Submitter</h2>
 
                     <div class="ticket-submitter-address">
-                        <i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i>
+                        <i class="far fa-fw fa-envelope"></i>
                         <a href="mailto:${submitter}">${submitter}</a>
                     </div>
 
