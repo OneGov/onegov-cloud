@@ -18,31 +18,56 @@ $ticket-number-bg: $yellow-light;
 
 .ticket-number-plain {
     color: $monsoon;
-    font-family: $font-family-monospace;
     font-weight: bold;
-}
 
+    a {
+        font-family: $font-family-monospace;
+        margin-left: .25rem;
+    }
+}
 
 
 .ticket-number {
-    background: $ticket-number-bg;
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $ticket-number-bg
+    );
+
     font-family: $font-family-monospace;
+
+    a {
+        font-family: $font-family-monospace;
+    }
 }
+
 
 .ticket-date {
     color: $monsoon;
 }
 
 .ticket-state-open {
-    @include status-batch($open-ticket-bg);
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $open-ticket-bg
+    );
 }
 
 .ticket-state-pending {
-    @include status-batch($pending-ticket-bg);
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $pending-ticket-bg
+    );
 }
 
 .ticket-state-closed {
-    @include status-batch($closed-ticket-bg);
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $closed-ticket-bg
+    );
 }
 
 .ticket-timeline .message .title {
@@ -503,4 +528,38 @@ button {
         background: $blue-light;
         color: #333;
     }
+}
+
+.field-display {
+
+    p.thumbnail {
+        border-radius: 5px;
+        padding: 0;
+
+        img {
+            border-radius: 5px;
+            max-height: 150px;
+            object-fit: cover;
+            vertical-align: top;
+        }
+    }
+
+    > dd,
+    .field-display-data {
+        margin-bottom: 1rem;
+
+        img {
+            margin-top: .5rem;
+        }
+
+        .marker-map {
+            max-height: 300px;
+            max-width: 500px;
+        }
+
+    }
+}
+
+.field-display-label {
+    font-weight: bold;
 }
