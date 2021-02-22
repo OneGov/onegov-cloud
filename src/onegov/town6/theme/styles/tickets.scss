@@ -439,7 +439,7 @@ button {
     Ticket status page message adjustments
 */
 .status-chat {
-    .title {
+    .message .title {
         // use this instead of visibility:hidden or display:none - we do not
         // want this to bread by screen-readers, but we also want the element
         // to stick around so the line defined by ::before stays
