@@ -321,12 +321,3 @@ $button-padding: .85em 1.5em;
 select {
     @include clear-appearance;
 }
-
-.reveal.reveal {
-    z-index: 1106;
-}
-
-.reveal-overlay.reveal-overlay {
-    z-index: 1105;
-}
-

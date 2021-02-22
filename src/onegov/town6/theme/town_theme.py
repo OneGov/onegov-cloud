@@ -129,7 +129,8 @@ class TownTheme(BaseTheme):
             'widgets',
             'popup',
             'fullcalendar',
-            'alert'
+            'alert',
+            'redactor'
         ]
 
     @property

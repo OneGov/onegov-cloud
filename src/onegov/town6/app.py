@@ -169,3 +169,15 @@ def get_common_asset():
     yield 'toggle.js'
     yield 'common.js'
     yield '_blank.js'
+
+
+@TownApp.webasset('editor')
+def get_editor_asset():
+    yield 'bufferbuttons.js'
+    yield 'definedlinks.js'
+    yield 'filemanager.js'
+    yield 'imagemanager.js'
+    yield 'redactor.de.js'
+    yield 'redactor.fr.js'
+    yield 'input_with_button.js'
+    yield 'editor.js'
