@@ -306,3 +306,17 @@ dl dd {
 */
 
 $button-padding: .85em 1.5em;
+
+/*
+    Fix for normalizing select in chrome
+*/
+
+@mixin clear-appearance() {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+select {
+    @include clear-appearance;
+}
