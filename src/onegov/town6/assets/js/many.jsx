@@ -81,7 +81,7 @@ var ManyDates = React.createClass({
 
                     return (
                         <div key={'date-' + index}>
-                            <div className={"row " + (value.error && 'error' || '')}>
+                            <div className={"grid-x grid-padding-x " + (value.error && 'error' || '')}>
                                 <div className="small-10 cell">
                                     <DateTimePickerField required
                                         type="date"
@@ -111,7 +111,7 @@ var ManyDates = React.createClass({
                             </div>
                             {
                                 value.error &&
-                                    <div className="row date-error">
+                                    <div className="grid-x date-error">
                                         <div className="small-10 cell end">
                                             <small className="error">{value.error}</small>
                                         </div>
@@ -184,7 +184,7 @@ var ManyDateTimeRanges = React.createClass({
 
                     return (
                         <div key={index}>
-                            <div className={"row " + (value.error && 'error' || '')}>
+                            <div className={"grid-x " + (value.error && 'error' || '')}>
                                 <div className="small-5 cell">
                                     <DateTimePickerField required
                                         type="datetime"
@@ -224,7 +224,7 @@ var ManyDateTimeRanges = React.createClass({
                             </div>
                             {
                                 value.error &&
-                                    <div className="row date-error">
+                                    <div className="grid-x date-error">
                                         <div className="small-10 cell end">
                                             <small className="error">{value.error}</small>
                                         </div>
@@ -299,6 +299,7 @@ jQuery.fn.many = function() {
     return this.each(function() {
 
         var target = $(this);
+        console.log(this)
         var type = extractType(target);
         var data = JSON.parse(target.val());
         var label = target.closest('label');

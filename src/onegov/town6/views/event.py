@@ -49,4 +49,6 @@ def town_view_event(self, request):
     form=event_form
 )
 def town_handle_edit_event(self, request, form):
-    return handle_edit_event(self, request, form, EventLayout(self, request))
+    layout = EventLayout(self, request)
+    request.include('many')
+    return handle_edit_event(self, request, form, layout)
