@@ -142,3 +142,22 @@
         top: 20%;
     }
 }
+
+/*
+    dialog styling, used in modals and the confirm trait
+*/
+.dialog {
+
+    h3 {
+        font-weight: bold;
+    }
+
+    p {
+        max-width: $max-line-width;
+    }
+
+    .button {
+        margin: 1rem 1rem 0 0;
+    }
+
+}

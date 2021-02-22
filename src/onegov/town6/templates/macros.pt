@@ -1651,7 +1651,7 @@
                         <span i18n:translate>1 page</span>
                     </div>
                     <div tal:condition="file.stats.get('pages', 0) > 1">
-                        <i class="far fa-file-alt" aria-hidden="true"></i>
+                        <i class="far fa-fw fa-file-alt" aria-hidden="true"></i>
                         <span i18n:translate><tal:b i18n:name="count">${file.stats.get('pages', 0)}</tal:b> pages</span>
                     </div>
                     <div tal:define="words file.stats.get('words', 0)">

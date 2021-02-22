@@ -71,7 +71,8 @@ form fieldset,
 dl.field-display,
 dl.field-display > dt,
 #content dt,
-.ticket-panel {
+.ticket-panel,
+.dialog p {
     font-family: $header-font-family;
 }
 
