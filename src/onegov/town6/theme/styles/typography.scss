@@ -72,7 +72,10 @@ dl.field-display,
 dl.field-display > dt,
 #content dt,
 .ticket-panel,
-.dialog p {
+.dialog p,
+.message,
+.field-display-label,
+.field-display-data {
     font-family: $header-font-family;
 }
 
