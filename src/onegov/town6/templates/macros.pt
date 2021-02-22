@@ -346,7 +346,7 @@
             <h5>${item.page.text}</h5>
         </div>
         <div class="card-section">
-            <ul>
+            <ul class="more-list">
                 <li tal:repeat="link item.links" tal:content="structure link(layout)" />
             </ul>
         </div>
@@ -356,7 +356,7 @@
 <metal:homepage-tiles define-macro="homepage-tiles">
     <div tal:define="show_title show_title|nothing">
         <h3 i18n:translate class="${'' if show_title else 'show-for-sr'}">Selected Topics</h3>
-        <div class="grid-x grid-padding-x more-list" data-equalizer data-equalize-on="medium">
+        <div class="grid-x grid-padding-x" data-equalizer data-equalize-on="medium">
             <div class="cell small-12 medium-6 large-4 homepgage-tile" tal:repeat="item tiles">
                 <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
             </div>
