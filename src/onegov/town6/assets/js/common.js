@@ -32,7 +32,6 @@ var processCommonNodes = function(elements, out_of_band) {
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
     // generic toggle button
-    // TODO: this breaks the navigation, find another way
     targets.find('[data-toggle]').not('header *').toggleButton();
 
     // send an event to allow optional scripts to hook themselves up
@@ -181,10 +180,6 @@ $(document).ajaxError(function(_e, xhr, _settings, error) {
     }
 });
 
-// show the slider once everything has loaded
-// $(document).ready(function() {
-//     $('.slider').css('opacity', 1);
-// });
 
 // support some extraordinary styling
 $(document).ready(function() {
