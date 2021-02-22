@@ -36,7 +36,7 @@
             text-align: left;
 
             &.rounded {
-                @include circle;
+                @include rounded-corners;
             }
         }
     }
@@ -254,26 +254,26 @@ $publications-icon: '\f1ea';
     //}
 }
 
-//.borderless-side-panel {
-//    margin-bottom: 1.5rem;
-//
-//    h2 {
-//        border-bottom: 2px solid $primary-color;
-//        font-size: 1rem;
-//        margin-bottom: .6rem;
-//        padding-bottom: .5rem;
-//    }
-//
-//    ul {
-//        list-style: none;
-//        margin: 0;
-//
-//        li {
-//            font-size: .875rem;
-//            margin-bottom: .4rem;
-//        }
-//    }
-//}
+.borderless-side-panel {
+    margin-bottom: 1.5rem;
+
+    h2 {
+        border-bottom: 2px solid $primary-color;
+        font-size: 1rem;
+        margin-bottom: .6rem;
+        padding-bottom: .5rem;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+
+        li {
+            font-size: .875rem;
+            margin-bottom: .4rem;
+        }
+    }
+}
 
 $checklist-icon: "\f0ae";
 
@@ -316,5 +316,22 @@ $checklist-icon: "\f0ae";
     &.callout {
         background: $callout-panel-bg;
         border-color: $callout-panel-border-color;
+    }
+}
+
+/*
+    Custom record submission
+*/
+.submit-yours {
+    @include callout(get-color(secondary));
+    @include smooth-edges;
+
+    padding: 1rem 1rem .5rem;
+
+    h2 {
+        color: $primary-color;
+        display: inline;
+        font-size: 1rem;
+        font-weight: bold;
     }
 }

@@ -35,6 +35,10 @@
     border-radius: 50%;
 }
 
+@mixin rounded-corners {
+    border-radius: 1000px;
+}
+
 // This is the base fa uses for the class .fa and .fas
 @mixin icon-base {
     -moz-osx-font-smoothing: grayscale;

@@ -1032,7 +1032,7 @@
         <form action="" method="GET">
             <div metal:define-slot="before-date-range"></div>
 
-            <div class="grid-x date-range-selector">
+            <div class="grid-x grid-padding-x date-range-selector">
                 <div class="large-6 cell">
                     <div class="grid-x">
                         <label i18n:translate>From</label>
