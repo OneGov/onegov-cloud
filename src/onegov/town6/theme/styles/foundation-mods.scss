@@ -311,12 +311,22 @@ $button-padding: .85em 1.5em;
     Fix for normalizing select in chrome
 */
 
-@mixin clear-appearance() {
-    appearance: none;
-    -webkit-appearance: none;
+@mixin clear-appearance {
     -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+
 }
 
 select {
     @include clear-appearance;
 }
+
+.reveal.reveal {
+    z-index: 1106;
+}
+
+.reveal-overlay.reveal-overlay {
+    z-index: 1105;
+}
+

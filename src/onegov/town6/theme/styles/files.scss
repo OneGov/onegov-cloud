@@ -35,7 +35,8 @@ $pdf-preview-max-width: 256px;
     width: 100%;
 
     th {
-        padding-top: 2rem;
+        padding-top: 1.8rem;
+        text-align: left;
     }
 
     tr:first-child  {
@@ -73,13 +74,13 @@ $pdf-preview-max-width: 256px;
     th span {
         @include label;
         @include primary-color-background;
-        @include circle;
+        @include rounded-corners;
         border: 1px solid $primary-color;
         font-size: .875rem;
         font-weight: bold;
     }
 
-    .file-info {
+    tr.file-info {
         td:nth-child(1) {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -104,6 +105,9 @@ $pdf-preview-max-width: 256px;
         &.signed td:nth-child(3)::after {
             @include icon-bold('\f023');
             display: inline;
+            font-size: 90%;
+            margin-left: .2em;
+
         }
 
         td:nth-child(4) {
@@ -133,17 +137,6 @@ $pdf-preview-max-width: 256px;
 
 .file-preview-wrapper {
     display: flex;
-    //:nth-child(1) {
-    //    //width: 40%;
-    //}
-
-    //&:nth-child(2) {
-    //    width: 30%;
-    //}
-    //
-    //&:nth-child(3) {
-    //    width: 40%;
-    //}
 }
 
 .file-details {
