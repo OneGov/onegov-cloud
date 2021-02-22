@@ -54,6 +54,8 @@ form {
     }
 
     .label-text {
+        color: $form-label-color;
+        font-size: $form-label-font-size;
         font-weight: bold;
     }
 

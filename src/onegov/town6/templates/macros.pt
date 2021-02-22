@@ -330,9 +330,9 @@
                     <metal:b use-macro="layout.macros['field']" />
                 </label>
 
-                <label tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
+                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
                     <metal:b use-macro="layout.macros['field']" />
-                </label>
+                </div>
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:b>
         </tal:b>
