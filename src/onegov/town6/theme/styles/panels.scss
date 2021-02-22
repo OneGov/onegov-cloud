@@ -55,17 +55,13 @@ ul.panel-links {
 
     list-style: none;
     margin: 0;
+    padding: 0 1rem;
 
     a {
         display: block;
         font-weight: bold;
         overflow: hidden;
         text-overflow: ellipsis;
-
-        //&.more-link {
-        //    font-size: .875rem;
-        //    font-weight: 500;
-        //}
     }
 
     small {
@@ -73,13 +69,6 @@ ul.panel-links {
         font-size: .875rem;
     }
 
-    li {
-        margin-bottom: .5em;
-    }
-
-    li:last-child {
-        margin-bottom: 0;
-    }
 }
 
 //ul.panel-links {

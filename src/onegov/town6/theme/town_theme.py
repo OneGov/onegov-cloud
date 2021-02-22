@@ -109,6 +109,7 @@ class TownTheme(BaseTheme):
             'sortable',
             'sidebars',
             'forms',
+            'formcode',
             'panels',
             'sliders',
             'org-settings',
@@ -144,10 +145,6 @@ class TownTheme(BaseTheme):
         parent applications if OrgTheme is inherited. """
         module = self.name.replace('foundation', 'theme')
         return module_path(module, 'fonts')
-
-    # @property
-    # def font_search_path(self):
-    #     return module_path('onegov.org.theme', 'fonts')
 
     @property
     def font_families(self):
