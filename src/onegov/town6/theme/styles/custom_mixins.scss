@@ -186,7 +186,10 @@ $label-font-family: $body-font-family !default;
         background-color: $bg;
 
         // We control the text color for you based on the background color.
-        @if $bg-lightness < 70% { color: $label-font-color-alt; }
+        // sass-lint:disable-block space-around-operator
+        @if $bg-lightness < 70% {
+            color: $label-font-color-alt;
+        }
         @else { color: $label-font-color; }
     }
 
