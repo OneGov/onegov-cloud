@@ -278,6 +278,8 @@ footer {
 */
 .blank-label {
     @include label;
+    background: none;
+    color: $black;
     border: 1px solid $gray;
     font-size: .8rem;
     margin: 0 4px 7px 0;
