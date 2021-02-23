@@ -259,7 +259,7 @@ $editbar-fg-color-active: $white;
     .export-link::before { @include icon-bold($export-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
-    .import-link::before { @include icon($import-link-icon); }
+    .import-link::before { @include icon-bold($import-link-icon); }
     .internal-url::before { @include icon($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }

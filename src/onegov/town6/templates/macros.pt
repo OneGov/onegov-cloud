@@ -1532,7 +1532,7 @@
         <ul class="with-lead">
             <li tal:repeat="record grouped[group]">
 
-                <a class="list-title" tal:attributes="href request.link(record)">
+                <a class="list-title h5-size" tal:attributes="href request.link(record)">
                     ${record.title}
                 </a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
