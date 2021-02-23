@@ -36,18 +36,6 @@ $default-icon-margin: .25rem;
 
 }
 
-
-/* Font family settings */
-
-a,
-button,
-button *,
-span,
-span *,
-thead {
-    font-family: $header-font-family;
-}
-
 p,
 p > * {
     font-family: $body-font-family;
@@ -64,19 +52,30 @@ All places where we change to the sans serif font
 
 */
 
+a,
+button,
+button *,
+span,
+span *,
+thead,
+dd,
+dt,
 small.error,
 span.error,
 form label,
 form fieldset,
-dl.field-display,
-dl.field-display > dt,
-#content dt,
 .ticket-panel,
 .dialog p,
 .message,
 .field-display-label,
-.field-display-data {
+.field-display-data,
+.side-panel.highlighted,
+.list-lead {
     font-family: $header-font-family;
+}
+
+.page-lead {
+    font-family: $body-font-family;
 }
 
 /*

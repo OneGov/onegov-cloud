@@ -292,8 +292,7 @@ $checklist-icon: "\f0ae";
 }
 
 .side-panel.highlighted {
-    background-color: $light-gray;
-    font-family: $header-font-family;
+    @include callout-style(get-color(secondary));
     padding: 1rem;
 }
 
