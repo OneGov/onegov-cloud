@@ -33,3 +33,5 @@ OneGov.utils.inferTime = function(time) {
 
     return numeric;
 };
+
+var fa_version = $('link[href*="font-awesome5"]').get(0) && 5 || 4

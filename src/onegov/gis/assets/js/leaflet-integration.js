@@ -257,7 +257,7 @@ function addExternalLinkButton(map) {
         position: 'topright',
         states: [{
             stateName: 'closed',
-            icon: 'fa-external-link',
+            icon: fa_version === 5 && 'fas fa-external-link-alt' || 'fa-external-link',
             onClick: function(btn) {
                 var menu = $('<ul class="map-context-menu">');
                 var point = map.getCenter();
@@ -270,7 +270,7 @@ function addExternalLinkButton(map) {
             }
         }, {
             stateName: 'open',
-            icon: 'fa-external-link',
+            icon: fa_version === 5 && 'fas fa-external-link-alt' || 'fa-external-link',
             onClick: function(btn) {
                 $(btn.button).parent().find('.map-context-menu').remove();
                 btn.state('closed');
