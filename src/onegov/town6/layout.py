@@ -890,7 +890,6 @@ class OccurrenceLayout(EventBaseLayout):
 
     def __init__(self, model, request):
         super().__init__(model, request)
-        self.request.include('monthly-view')
 
     @cached_property
     def collection(self):

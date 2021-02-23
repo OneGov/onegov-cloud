@@ -131,7 +131,8 @@ class TownTheme(BaseTheme):
             'fullcalendar',
             'alert',
             'redactor',
-            'directories'
+            'directories',
+            'daypicker'
         ]
 
     @property
