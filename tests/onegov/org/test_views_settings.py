@@ -61,6 +61,14 @@ def test_settings(client):
 
     color = '#006fbb'
     settings = client.get('/header-settings')
+
+    # test not giving color (IE11 is not picking a color by default)
+    assert settings.form['left_header_color'].value == ''
+    page = settings.form.submit()
+    settings = client.get('/header-settings')
+    # test default not giving the color
+    assert settings.form['left_header_color'].value == '#000000'
+
     settings.form['left_header_name'] = 'Homepage of Govikon'
     settings.form['left_header_url'] = 'https://govikon.ch'
     settings.form['left_header_rem'] = 2.5
