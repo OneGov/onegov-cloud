@@ -37,7 +37,7 @@ class TownForm(Form):
 
     def ensure_valid_name(self):
         name = self.name.data
-        if not re.match(r'^[A-Za-z]+$', name):
+        if not re.match(r'^[A-Za-z\s]+$', name) or not name.strip():
             self.name.errors.append(
                 _("Only characters are allowed")
             )
