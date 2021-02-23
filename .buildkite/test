@@ -11,6 +11,7 @@ rm /etc/apt/preferences
 install-packages \
     wget \
     apparmor \
+    curl \
     git-core \
     postgresql \
     redis \
@@ -52,6 +53,7 @@ echo "--- Installing dependencies :python:"
 cd /app/src
 pip install '.[test]' \
     pytest-test-groups \
+    pytest-cov \
     --quiet
 
 # reset the build assets again (like in the upstream container script),
@@ -77,9 +79,20 @@ else
     xdist="-n $PROCESSES"
 fi
 
+COMMIT="$BUILDKITE_COMMIT"
+COVERAGE_REPORT="/tmp/coverage.xml"
+export COVERAGE_FILE="/tmp/.coverage"
+
 # shellcheck disable=SC2086
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
     --test-group $GROUP \
     --test-group-count $GROUP_COUNT $xdist \
+    --cov \
+    --cov-report xml:$COVERAGE_REPORT \
     tests
+
+echo "--- Uploading code coverage results to codecov.io"
+
+# shellcheck disable=SC2086
+bash <(curl -s https://codecov.io/bash) -t ${CODECOV_ONEGOV_TOKEN} -f ${COVERAGE_REPORT} -C ${COMMIT}
