@@ -168,7 +168,7 @@ $navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);
     width: 100%;
     z-index: 999;
 
-    .cell {
+    .navigation .cell {
         align-self: center;
         padding: 20px 0;
     }
@@ -217,6 +217,7 @@ $editbar-fg-color-active: $white;
 .edit-bar {
 
     background-color: $editbar-bg-color;
+    box-shadow: $navbar-shadow;
     margin-bottom: 2px;
     margin-top: -2px;
 
