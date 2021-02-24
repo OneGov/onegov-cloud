@@ -159,6 +159,12 @@ class NewsLayout(AdjacencyListLayout):
     def breadcrumbs(self):
         return tuple(self.get_breadcrumbs(self.model))
 
+    @cached_property
+    def contact_html(self):
+        return self.model.contact_html or '<ul><li>{}</li></ul>'.format(
+            '</li><li>'.join(linkify(self.org.contact).splitlines())
+        )
+
 
 class EditorLayout(AdjacencyListLayout):
 
