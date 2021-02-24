@@ -5,6 +5,7 @@ import morepath
 from datetime import datetime
 from onegov.core.security import Public, Private
 from onegov.org.elements import Link
+from onegov.org.homepage_widgets.widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
 from onegov.page import Page, PageCollection
@@ -83,5 +84,6 @@ def view_news(self, request, layout=None):
         'page': self,
         'children': children,
         'years': years,
-        'current_year': year
+        'current_year': year,
+        'get_lead': get_lead
     }
