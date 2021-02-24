@@ -19,7 +19,7 @@
                         <span i18n:translate class="show-for-sr">Owner:</span>
                         <span>${owner.text}</span>
                     </button>
-                    <div id="owners" class="dropdown-pane" data-dropdown data-auto-focus="true">
+                    <div id="owners" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
                         <ul class="f-dropdown disable-scroll">
                             <li tal:repeat="link owners">
                                 <a href="${link.attrs.href}" class="${repeat.link.start and 'ALL-link' or 'ticket-group-filter'}">
@@ -39,7 +39,7 @@
                         <span i18n:translate class="show-for-sr">Kind:</span>
                         <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
                     </button>
-                    <div id="handlers" class="dropdown-pane" data-dropdown>
+                    <div id="handlers" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
                         <ul class="f-dropdown disable-scroll">
                             <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
                         </ul>
