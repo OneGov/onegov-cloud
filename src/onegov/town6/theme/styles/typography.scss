@@ -71,12 +71,9 @@ form fieldset,
 .field-display-data,
 .side-panel.highlighted,
 .list-lead,
-.monthly-view-wrapper {
-    font-family: $header-font-family;
-}
-
-.page-lead {
-    font-family: $body-font-family;
+.monthly-view-wrapper,
+li strong {
+    font-family: $header-font-family-ui;
 }
 
 /*
