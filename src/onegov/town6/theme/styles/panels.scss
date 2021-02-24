@@ -267,7 +267,7 @@ $publications-icon: '\f1ea';
 $checklist-icon: "\f0ae";
 
 .homepage .side-panel:first-child,
-.side-panel.highlighted {
+.side-panel {
 
     &.without-title {
         > ul {
@@ -279,6 +279,7 @@ $checklist-icon: "\f0ae";
             }
 
             li {
+                font-family: $header-font-family;
                 min-height: .5rem;
 
                 + li {
@@ -319,5 +320,16 @@ $checklist-icon: "\f0ae";
         display: inline;
         font-size: 1rem;
         font-weight: bold;
+    }
+}
+
+.people-panel {
+    li div:first-of-type {
+        margin-top: .3rem;
+    }
+
+    ul {
+        border-top: $morelist-border;
+        padding-top: .5rem;
     }
 }

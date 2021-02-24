@@ -97,6 +97,8 @@ $more-link-icon: "\f054";
     }
 }
 
+$morelist-border: 1px solid #f5f5f5;
+
 @mixin more-list {
 
     list-style: none;
@@ -106,8 +108,8 @@ $more-link-icon: "\f054";
     li {
 
         @include more-link-after;
-        border-bottom: 1px solid #f5f5f5;
-        font-weight: bold;
+        border-bottom: $morelist-border;
+        font-family: $header-font-family;
         padding: .5rem 0;
 
         &:first-of-type { padding-top: 0; }
@@ -119,6 +121,7 @@ $more-link-icon: "\f054";
 
         a {
             display: inline-block;
+            font-weight: bold;
             width: 100%;
         }
     }

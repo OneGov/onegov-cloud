@@ -9,7 +9,7 @@
     The maximum width of a line relative to the font. This limits textblocks
     to a readable length.
 */
-$max-line-width: 67ex;
+$max-line-width: 71ex;
 
 .limit-line-width {
     max-width: $max-line-width;
