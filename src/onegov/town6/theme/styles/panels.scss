@@ -290,7 +290,7 @@ $checklist-icon: "\f0ae";
 }
 
 .side-panel.highlighted {
-    @include callout-style(get-color(secondary));
+    @include callout-style($gray-dark-medium);
     padding: 1rem;
 }
 
