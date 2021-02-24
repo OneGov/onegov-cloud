@@ -507,8 +507,11 @@
             </div>
             <div class="small-12 medium-4 cell page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
-                <div class="side-panel without-title" tal:condition="contact or coordinates or location">
-                    <tal:b condition="contact" content="structure contact" />
+                <div class="side-panel contact-panel" tal:condition="contact or coordinates or location">
+                    <h3 i18n:translate tal:condition="contact">Contact</h3>
+                    <div class="contact-panel-content">
+                        <tal:b condition="contact" content="structure contact" />
+                    </div>
                     <br tal:condition="coordinates and contact" />
                     <h3 i18n:translate tal:condition="not contact">Map</h3>
                     <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>

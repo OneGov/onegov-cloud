@@ -266,6 +266,14 @@ $publications-icon: '\f1ea';
 
 $checklist-icon: "\f0ae";
 
+@mixin contact-content-base {
+    min-height: .5rem;
+
+    + li {
+        margin-top: .25rem;
+    }
+}
+
 .homepage .side-panel:first-child,
 .side-panel {
 
@@ -279,18 +287,19 @@ $checklist-icon: "\f0ae";
             }
 
             li {
+                @include contact-content-base;
                 font-family: $header-font-family;
-                min-height: .5rem;
-
-                + li {
-                    margin-top: .25rem;
-                }
             }
         }
     }
 }
 
-.side-panel.highlighted {
+.contact-panel-content > ul li {
+    @include contact-content-base
+}
+
+.side-panel.highlighted,
+.contact-panel-content {
     @include callout-style($gray-dark-medium);
     padding: 1rem;
 }
@@ -310,7 +319,7 @@ $checklist-icon: "\f0ae";
     Custom record submission
 */
 .submit-yours {
-    @include callout(get-color(secondary));
+    @include callout($gray-dark-medium);
     @include smooth-edges;
 
     padding: 1rem 1rem .5rem;
