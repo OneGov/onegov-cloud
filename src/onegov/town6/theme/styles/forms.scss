@@ -62,7 +62,7 @@ form {
     .field-help {
         color: $steel;
         font-size: .8rem;
-        margin-left: 1.25rem;
+        margin-left: 1.6rem;
     }
 
     .long-field-help,
@@ -92,12 +92,19 @@ form {
         margin-bottom: 1rem;
         padding: 0;
 
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+
         legend {
             font-size: $input-font-size;
-            margin-bottom: .75rem;
             padding: 0 .75rem;
             text-align: center;
         }
+    }
+
+    .formfields {
+        margin-bottom: .75rem;
     }
 
     /*
@@ -177,6 +184,10 @@ input[type='color'] {
     display: block;
     margin-bottom: 1rem;
     padding: 0;
+}
+
+input.has-field-help {
+    margin-bottom: 0;
 }
 
 /*

@@ -132,7 +132,8 @@ class TownTheme(BaseTheme):
             'alert',
             'redactor',
             'directories',
-            'daypicker'
+            'daypicker',
+            'payment'
         ]
 
     @property
