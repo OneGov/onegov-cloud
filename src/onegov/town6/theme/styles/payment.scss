@@ -52,11 +52,11 @@
     }
 
     &.payment-state-paid {
-        border: 1px solid $success-color;
+        border: 1px solid get-color(success);
 
         &::before {
             @include icon('\f058');
-            color: $success-color;
+            color: get-color(success);
             margin-right: .75ex;
         }
     }
@@ -66,17 +66,17 @@
 
         &::before {
             @include icon('\f057');
-            color: $alert-color;
+            color: get-color(alert);
             margin-right: .75ex;
         }
     }
 
     &.payment-state-cancelled {
-        border: 1px solid $warning-color;
+        border: 1px solid get-color(warning);
 
         &::before {
-            @include icon('\f06a');
-            color: $warning-color;
+            @include icon-bold('\f06a');
+            color: get-color(warning);
             margin-right: .75ex;
         }
     }
