@@ -2,7 +2,9 @@
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
-from onegov.org.forms import HomepageSettingsForm, GeneralSettingsForm
+from onegov.org.forms import HomepageSettingsForm
+from onegov.town6.forms.settings import GeneralSettingsForm
+
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
     MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
