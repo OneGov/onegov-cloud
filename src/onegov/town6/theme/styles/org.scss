@@ -423,3 +423,10 @@ ul.pagination li {
 .monthly-view-wrapper {
     position: relative;
 }
+
+/*
+    what-input close-button outline fix
+*/
+.close-button {
+    @include clear-focus-outline;
+}

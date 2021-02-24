@@ -209,3 +209,7 @@ $label-font-family: $body-font-family !default;
     @include label-size($padding, $text-size);
     @include label-style($bg, $radius);
 }
+
+@mixin clear-focus-outline {
+    &:focus { outline: none; }
+}
