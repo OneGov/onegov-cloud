@@ -213,3 +213,9 @@ $label-font-family: $body-font-family !default;
 @mixin clear-focus-outline {
     &:focus { outline: none; }
 }
+
+@mixin editor-toolbar {
+    border-radius: $select-radius;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    margin: 0 1px;
+}

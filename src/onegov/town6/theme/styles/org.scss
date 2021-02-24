@@ -430,3 +430,7 @@ ul.pagination li {
 .close-button {
     @include clear-focus-outline;
 }
+
+.redactor-toolbar.redactor-toolbar {
+    @include editor-toolbar;
+}
