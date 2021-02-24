@@ -99,6 +99,73 @@ form {
             text-align: center;
         }
     }
+
+    /*
+        Custom Style for the ace editor. Only use monospace fonts with ace.js
+    */
+
+    .code-editor-wrapper {
+        @include form-element;
+        height: auto;
+        margin-bottom: .75rem;
+        padding: 0;
+
+        // Fixes cursor being off
+        * {
+            direction: ltr !important;
+            font-family: $font-family-monospace;
+            text-align: left !important;
+        }
+
+        // focused is a class because the wrapper doesn't get ':focus'
+        &.focused {
+            background-color: $input-background-focus;
+            border: $input-border-focus;
+            box-shadow: $input-shadow-focus;
+        }
+    }
+
+    .error {
+        .code-editor-wrapper {
+            margin-bottom: 0;
+            padding: 0;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            margin-bottom: inherit;
+        }
+    }
+
+    .code-editor {
+        &.read-only {
+            background-color: $input-background-disabled;
+            color: $steel;
+            cursor: $input-cursor-disabled;
+        }
+    }
+
+    .ace_content {
+        color: inherit;
+        font-size: 12px;
+        line-height: 12px;
+    }
+
+    .ace_scroller {
+        box-shadow: $input-shadow;
+    }
+
+    .focused .ace_scroller {
+        background: $input-background-focus;
+    }
+
+    .ace-syntax-error {
+        background: $yellow-light;
+        position: absolute;
+    }
+    /*
+    <--
+    */
 }
 
 /*
