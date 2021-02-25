@@ -397,7 +397,8 @@ class HeaderSettingsForm(Form):
     def header_options(self, options):
         self.left_header_name.data = options.get('left_header_name')
         self.left_header_url.data = options.get('left_header_url')
-        self.left_header_color.data = options.get('left_header_color')
+        self.left_header_color.data = options.get(
+            'left_header_color', '#000000')
         self.left_header_rem.data = options.get('left_header_rem', 1)
 
     def populate_obj(self, model):

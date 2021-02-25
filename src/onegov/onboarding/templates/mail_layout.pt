@@ -237,7 +237,7 @@
                         <tr>
                             <td align="center">
                                 <p metal:define-slot="footer">
-                                    OneGov.ch, Unter der Egg 5, CH-6004 Luzern, +41 41 511 22 50, <a href="mailto.onegov@seantis.ch">onegov@seantis.ch</a>
+                                    OneGov.ch, Pilatusstrasse 3, CH-6003 Luzern, +41 41 511 22 50, <a href="mailto.onegov@seantis.ch">onegov@seantis.ch</a>
                                 </p>
                             </td>
                         </tr>

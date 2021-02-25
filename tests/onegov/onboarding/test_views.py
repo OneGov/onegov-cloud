@@ -6,6 +6,8 @@ from tests.shared import utils
 from onegov.town import TownApp
 from webtest import TestApp as Client
 
+from tests.shared.utils import open_in_browser
+
 
 def test_view_permissions():
     utils.assert_explicit_permissions(
@@ -64,9 +66,12 @@ def test_town_create(onboarding_app, temporary_directory, smtp, redis_url):
     c = Client(onboarding_app)
     a = c.get('/for-towns/1')
 
-    a.form['name'] = 'New York'
+    a.form['name'] = 'New York0'
     a.form['user'] = 'admin@example.org'
     a.form['color'] = '#ff00ff'
+
+    assert 'Nur Buchstaben sind erlaubt' in a.form.submit()
+    a.form['name'] = 'New York'
     a = a.form.submit().follow()
 
     assert 'New York' in a

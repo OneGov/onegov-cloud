@@ -272,20 +272,25 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def posters(self, request):
         result = {'yea': [], 'nay': []}
         for key, attribute, label in (
-            ('yea', 'posters_mfg_yea_imgs', _('Link eMuseum.ch')),
-            ('nay', 'posters_mfg_nay_imgs', _('Link eMuseum.ch')),
-            ('yea', 'posters_sa_yea_imgs', _('Link Social Archives')),
-            ('nay', 'posters_sa_nay_imgs', _('Link Social Archives')),
+            ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
+            ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
+            ('yea', 'posters_sa_yea', _('Link Social Archives')),
+            ('nay', 'posters_sa_nay', _('Link Social Archives')),
         ):
-            for url, image in getattr(self, attribute).items():
-                result[key].append(
-                    Bunch(
-                        thumbnail=image,
-                        image=image,
-                        url=url,
-                        label=label
+            images = getattr(self, f'{attribute}_imgs')
+            urls = (getattr(self, attribute) or '').strip().split(' ')
+            for url in urls:
+                image = images.get(url)
+                if image:
+                    result[key].append(
+                        Bunch(
+                            thumbnail=image,
+                            image=image,
+                            url=url,
+                            label=label
+                        )
                     )
-                )
+
         for key, attribute, label in (
             ('yea', 'campaign_material_yea', _('Swissvotes database')),
             ('nay', 'campaign_material_nay', _('Swissvotes database')),

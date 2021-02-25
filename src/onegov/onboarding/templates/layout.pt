@@ -53,8 +53,8 @@ metal:define-macro="layout">
                     <h2 i18n:translate>Contact</h2>
                     <ul>
                         <li>OneGov.ch</li>
-                        <li>Unter der Egg 5</li>
-                        <li>CH-6004 Luzern</li>
+                        <li>Pilatusstrasse 3</li>
+                        <li>CH-6003 Luzern</li>
                         <li class="empty"></li>
                         <li><i class="fa fa-phone"></i> +41 41 511 22 50</li>
                         <li><i class="fa fa-envelope-o"></i> <a href="mailto:onegov@seantis.ch">onegov@seantis.ch</a></li>

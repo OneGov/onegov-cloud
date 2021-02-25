@@ -173,3 +173,7 @@ def test_date_time_local_field():
 
     field.process(DummyPostData({'dt': "2010-05-06 07:08"}))
     assert field.data == datetime(2010, 5, 6, 7, 8)
+
+    # Firefox...
+    field.process(DummyPostData({'dt': "2010-05-06 07:08:00"}))
+    assert field.data == datetime(2010, 5, 6, 7, 8)

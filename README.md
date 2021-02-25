@@ -27,7 +27,7 @@ looking for, you might appreciate these links:
 
 ---
 
-[![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud)
+[![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud)
 
 ## Branches 🖖
 

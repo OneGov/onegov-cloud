@@ -1,3 +1,5 @@
+import re
+
 from onegov.form import Form
 from onegov.onboarding import _
 from wtforms import StringField, validators
@@ -32,6 +34,14 @@ class TownForm(Form):
         validators=[validators.InputRequired()],
         default='#005ba1'
     )
+
+    def ensure_valid_name(self):
+        name = self.name.data
+        if not re.match(r'^[A-Za-z\s]+$', name) or not name.strip():
+            self.name.errors.append(
+                _("Only characters are allowed")
+            )
+            return False
 
 
 class FinishForm(Form):

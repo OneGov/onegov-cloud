@@ -694,6 +694,37 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
         assert layout.attachments[attachment] == f'SwissVote/100/{filename}'
 
 
+def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
+                                        attachment_urls):
+    model = SwissVote(
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="Vote D",
+        short_title_fr="Vote F",
+        bfs_number=Decimal('100'),
+        date=date(1990, 6, 2),
+        legislation_number=10,
+        legislation_decade=NumericRange(1990, 1994),
+        votes_on_same_day=2,
+        _legal_form=1
+    )
+    model.session_manager.current_locale = 'de_CH'
+    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])
+
+    session = swissvotes_app.session()
+    session.add(model)
+    session.flush()
+
+    request = DummyRequest()
+    request.app = swissvotes_app
+    request.locale = 'fr_CH'
+
+    layout = VoteLayout(model, request)
+    assert layout.attachments['post_vote_poll'] == (
+        'SwissVote/100/nachbefragung-de.pdf'
+    )
+
+
 def test_layout_vote_strengths(swissvotes_app):
     request = DummyRequest()
     request.app = swissvotes_app

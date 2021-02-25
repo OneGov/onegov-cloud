@@ -11,7 +11,7 @@
                             <tr class="subheader">
                                 <td>
                                     <tal:b metal:use-macro="layout.macros['role-plural']" />
-                                    (${len(users.get(role))})
+                                    (${len(users.get(role, []))})
                                 </td>
                                 <td></td>
                                 <td tal:condition="enable_yubikey" i18n:translate>

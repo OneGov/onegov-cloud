@@ -10,6 +10,7 @@ from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.models import Region
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
@@ -233,6 +234,39 @@ def test_model_page_file(swissvotes_app):
     assert file.locale == 'de_CH'
 
 
+def test_model_swissvotes_file(swissvotes_app):
+    session = swissvotes_app.session()
+
+    vote = SwissVote(
+        bfs_number=Decimal('100.1'),
+        date=date(1990, 6, 2),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="V D",
+        short_title_fr="V F",
+        keyword="Keyword",
+        votes_on_same_day=2,
+        _legal_form=1,
+    )
+    session.add(vote)
+    session.flush()
+
+    assert vote.files == []
+
+    attachment = SwissVoteFile(id=random_token())
+    attachment.name = 'xxx-de_CH'
+    attachment.reference = as_fileintent(BytesIO(b'test'), 'test.txt')
+    vote.files.append(attachment)
+    session.flush()
+
+    file = vote.files[0]
+    assert file.name == 'xxx-de_CH'
+    assert file.filename == 'test.txt'
+    assert file.locale == 'de_CH'
+
+
 def test_model_policy_area(session):
     policy_area = PolicyArea('1')
     assert repr(policy_area) == '1'
@@ -343,8 +377,8 @@ def test_model_vote(session, sample_vote):
         'https://yes.com/objects/4'
     )
     assert vote.posters_sa_nay == (
-        'https://no.com/objects/3 '
-        'https://no.com/objects/4'
+        'https://no.com/objects/4 '
+        'https://no.com/objects/3'
     )
     assert vote.posters_mfg_yea_imgs == {
         'https://yes.com/objects/1': 'https://detail.com/1'
@@ -352,7 +386,8 @@ def test_model_vote(session, sample_vote):
     assert vote.posters_mfg_nay_imgs == {}
     assert vote.posters_sa_yea_imgs == {}
     assert vote.posters_sa_nay_imgs == {
-        'https://no.com/objects/3': 'https://detail.com/3'
+        'https://no.com/objects/3': 'https://detail.com/3',
+        'https://no.com/objects/4': 'https://detail.com/4'
     }
     assert vote.swissvoteslink == 'https://example.com/122.0'
     assert vote.bk_chrono == 'bkc_de'
@@ -886,6 +921,12 @@ def test_model_vote(session, sample_vote):
 
     assert vote.posters(DummyRequest()) == {
         'nay': [
+            Bunch(
+                thumbnail='https://detail.com/4',
+                image='https://detail.com/4',
+                url='https://no.com/objects/4',
+                label='Link Social Archives'
+            ),
             Bunch(
                 thumbnail='https://detail.com/3',
                 image='https://detail.com/3',
