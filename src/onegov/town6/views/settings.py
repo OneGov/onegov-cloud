@@ -1,8 +1,7 @@
 """ The settings view, defining things like the logo or color of the org. """
 from onegov.core.security import Secret
-from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
-from onegov.org.forms import HomepageSettingsForm
+from onegov.town.views.settings import get_custom_settings_form
 from onegov.town6.forms.settings import GeneralSettingsForm
 
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
@@ -18,56 +17,8 @@ from onegov.org.views.settings import (
     handle_analytics_settings, handle_holiday_settings)
 
 from onegov.town6.app import TownApp
-from wtforms import BooleanField, StringField
 
 from onegov.town6.layout import SettingsLayout, DefaultLayout
-
-
-def get_custom_settings_form(model, request):
-
-    class CustomFieldsForm(Form):
-        online_counter_label = StringField(
-            label=_("Online Counter Label"),
-            description=_("Forms and applications"))
-
-        reservations_label = StringField(
-            label=_("Reservations Label"),
-            description=_("Daypasses and rooms"))
-
-        daypass_label = StringField(
-            label=_("SBB Daypass Label"),
-            description=_("Generalabonnement for Towns"))
-
-        publications_label = StringField(
-            label=_("Publications Label"),
-            description=_("Official Documents"))
-
-        e_move_label = StringField(
-            label=_('E-Move Label'),
-            description=_('E-Move')
-        )
-
-        e_move_url = StringField(
-            label=_('E-Move Url'),
-            description=_('E-Move')
-        )
-
-        hide_publications = BooleanField(
-            label=_("Hide Publications on Homepage"))
-
-    return move_fields(
-        form_class=merge_forms(HomepageSettingsForm, CustomFieldsForm),
-        fields=(
-            'online_counter_label',
-            'reservations_label',
-            'daypass_label',
-            'publications_label',
-            'e_move_label',
-            'e_move_url',
-            'hide_publications',
-        ),
-        after='homepage_image_6'
-    )
 
 
 @TownApp.html(
@@ -181,7 +132,6 @@ def town_preview_holiday_settings(self, request, form):
 def custom_handle_settings(self, request, form):
 
     form.delete_field('homepage_cover')
-    # form.delete_field('homepage_structure')
     form.delete_field('redirect_homepage_to')
     form.delete_field('redirect_path')
 
