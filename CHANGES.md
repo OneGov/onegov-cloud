@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2021.24`
+
+> commits: **12 / [35fac7f40f...5a9d001dcf](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...5a9d001dcf)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.24)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Adds default value for homepage left header color**
+
+Fixes issue for browsers not using default by themselves (IE11).
+
+**`Bugfix`** | **[2188aaa7fa](https://github.com/onegov/onegov-cloud/commit/2188aaa7face029ff760683fb901ace3b571dd2d)**
+
+### Swissvotes
+
+🐞 **Sort posters by links.**
+
+**`Bugfix`** | **[VOTES-102](https://issues.seantis.ch/browse/VOTES-102)** | **[511c1c875a](https://github.com/onegov/onegov-cloud/commit/511c1c875abe8817696126185b8d71b8c7d3958e)**
+
+🐞 **Fix vote attachments fallback URLs.**
+
+**`Bugfix`** | **[VOTES-102](https://issues.seantis.ch/browse/VOTES-102)** | **[5a9d001dcf](https://github.com/onegov/onegov-cloud/commit/5a9d001dcf32379250ffe8a5272479cc2c92d080)**
+
 ## Release `2021.23`
 
-> commits: **2 / [4827a53757...402a3c117e](https://github.com/OneGov/onegov-cloud/compare/4827a53757^...402a3c117e)**  
+> released: **2021-02-16 08:12**<br>
+> commits: **3 / [4827a53757...1c525760cf](https://github.com/OneGov/onegov-cloud/compare/4827a53757^...1c525760cf)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.23)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
