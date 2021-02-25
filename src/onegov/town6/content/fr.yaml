@@ -99,48 +99,59 @@ organisation:
     opening_hours_html: Du lundi au vendredi, de 09 h 00 à 17 h 00.
     twitter_url: https://twitter.com/seantis
     homepage_structure: |
+      <row-wide>
+          <column span="12">
+              <slider />
+          </column>
+      </row-wide>
       <row>
-        <column span="8">
-          <slider />
-          <news />
-        </column>
-        <column span="4">
-          <panel>
-            <links title="Services">
-              <link url="./forms"
-                    description="Demandes et réponses">
-                    Formulaires
-              </link>
-              <link url="./resources"
-                    description="Pièces et cartes journalières">
-                    Réservations
-              </link>
-            </links>
-          </panel>
-
-          <panel>
-            <events />
-          </panel>
-
-          <panel>
-            <links title="Contacts et photos">
-              <link url="./people"
-                    description="Tous les contacts">
-                Personnes
-              </link>
-              <link url="./photoalbums"
-                    description="Impressions">
-                Albums photo
-              </link>
-              <link url="./a-z"
-                    description="Catalogue de A à Z">
-                Sujets
-              </link>
-            </links>
-          </panel>
-
-          <panel>
-            <directories />
-          </panel>
-        </column>
+          <column span="12">
+              <row>
+                  <column span="8">
+                  </column>
+                  <column span="4">
+                      <panel>
+                          <services />
+                      </panel>
+                  </column>
+              </row>
+          </column>
       </row>
+      <row-wide bgcolor="gray">
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <news />
+                  </column>
+              </row>
+          </column>
+      </row-wide>
+      <row-wide bgcolor="primary">
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <events />
+                  </column>
+              </row>
+          </column>
+      </row-wide>
+      <row>
+          <column span="12">
+              <homepage-tiles show-title="True"/>
+          </column>
+      </row>
+      <line />
+      <row>
+          <column span="12">
+              <directories />
+          </column>
+      </row>
+      <row-wide bgcolor="gray">
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <partners />
+                  </column>
+              </row>
+          </column>
+      </row-wide>
