@@ -368,8 +368,8 @@ footer {
 /*
     content block
 */
-.content {
-    margin-bottom: 2rem;
+.content .grid-container:last-of-type {
+    padding-bottom: 2rem;
 }
 
 /* Card component tuning */
