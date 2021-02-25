@@ -359,11 +359,12 @@ def sample_vote():
         'https://yes.com/objects/4'
     )
     vote.posters_sa_nay = (
-        'https://no.com/objects/3 '
-        'https://no.com/objects/4'
+        'https://no.com/objects/4 '
+        'https://no.com/objects/3'
     )
     vote.posters_sa_nay_imgs = {
-        'https://no.com/objects/3': 'https://detail.com/3'
+        'https://no.com/objects/3': 'https://detail.com/3',
+        'https://no.com/objects/4': 'https://detail.com/4'
     }
     vote.curia_vista_de = 'cv_de'
     vote.curia_vista_fr = 'cv_fr'

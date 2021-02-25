@@ -343,8 +343,8 @@ def test_model_vote(session, sample_vote):
         'https://yes.com/objects/4'
     )
     assert vote.posters_sa_nay == (
-        'https://no.com/objects/3 '
-        'https://no.com/objects/4'
+        'https://no.com/objects/4 '
+        'https://no.com/objects/3'
     )
     assert vote.posters_mfg_yea_imgs == {
         'https://yes.com/objects/1': 'https://detail.com/1'
@@ -352,7 +352,8 @@ def test_model_vote(session, sample_vote):
     assert vote.posters_mfg_nay_imgs == {}
     assert vote.posters_sa_yea_imgs == {}
     assert vote.posters_sa_nay_imgs == {
-        'https://no.com/objects/3': 'https://detail.com/3'
+        'https://no.com/objects/3': 'https://detail.com/3',
+        'https://no.com/objects/4': 'https://detail.com/4'
     }
     assert vote.swissvoteslink == 'https://example.com/122.0'
     assert vote.bk_chrono == 'bkc_de'
@@ -886,6 +887,12 @@ def test_model_vote(session, sample_vote):
 
     assert vote.posters(DummyRequest()) == {
         'nay': [
+            Bunch(
+                thumbnail='https://detail.com/4',
+                image='https://detail.com/4',
+                url='https://no.com/objects/4',
+                label='Link Social Archives'
+            ),
             Bunch(
                 thumbnail='https://detail.com/3',
                 image='https://detail.com/3',
