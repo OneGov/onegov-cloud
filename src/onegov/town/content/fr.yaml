@@ -161,7 +161,7 @@ pages:
 
         <p>
           <strong>Fabian Reinhard</strong><br>
-          Unter der Egg 5 <br>
+          Pilatusstrasse 3 <br>
           6004 Lucerne <br>
           +41 41 511 22 50 <br>
           <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
@@ -198,13 +198,13 @@ organisation:
   meta:
     contact: |
       Fabian Reinhard
-      Unter der Egg 5
+      Pilatusstrasse 3
       6004 Lucerne
       +41 41 511 22 50
       fabian.reinhard@seantis.ch
     contact_html: >
       Fabian Reinhard<br>
-      Unter der Egg 5<br>
+      Pilatusstrasse 3<br>
       6004 Lucerne<br>
       +41 41 511 22 50<br>
       <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
