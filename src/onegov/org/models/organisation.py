@@ -46,6 +46,7 @@ class Organisation(Base, TimestampMixin):
     reservations_label = meta_property()
     publications_label = meta_property()
     hide_publications = meta_property()
+    event_limit_homepage = meta_property(default=4)
     daypass_label = meta_property()
     e_move_label = meta_property()
     e_move_url = meta_property()
