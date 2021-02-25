@@ -87,10 +87,8 @@
     <footer class="footer-container">
         <div class="grid-container">
             <div class="grid-x grid-padding-x footer-content">
-                <div class="small-12 cell">
-                    <metal:b use-macro="layout.macros['footer_columns']" />
-                    <metal:b use-macro="layout.macros['footer_links']" />
-                </div>
+                <metal:b use-macro="layout.macros['footer_columns']" />
+                <metal:b use-macro="layout.macros['footer_links']" />
             </div>
         </div>
     </footer>
@@ -106,7 +104,7 @@
                        instagram layout.org.meta.instagram_url|nothing;
                        youtube layout.org.meta.youtube_url|nothing;
                        custom_links layout.custom_links|nothing;">
-        <div class="grid-x footer-columns" tal:condition="any((
+        <tal:b tal:condition="any((
             contact,
             contact_url,
             opening_hours,
@@ -129,7 +127,7 @@
                 <metal:b use-macro="layout.macros['footer_social_media']" />
                 <metal:b use-macro="layout.macros['footer_custom_links']" />
             </div>
-        </div>
+        </tal:b>
     </tal:b>
 </metal:footer_columns>
 
@@ -142,25 +140,25 @@
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
-    <div class="grid-x footer-links">
-      <div class="small-12 cell">
-        <tal:b condition="not request.app.org.hide_onegov_footer|True">
-            <span>
-                <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
-            </span>
-            <span>
-                <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
-                    Privacy Protection
-                </a>
-            </span>
-        </tal:b>
-        <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
-            <a href="${about_url}" i18n:translate>
-                About
+
+  <div class="small-12 cell footer-links">
+    <tal:b condition="not request.app.org.hide_onegov_footer|True">
+        <span>
+            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+        </span>
+        <span>
+            <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+                Privacy Protection
             </a>
         </span>
-      </div>
-    </div>
+    </tal:b>
+    <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
+        <a href="${about_url}" i18n:translate>
+            About
+        </a>
+    </span>
+  </div>
+
 </metal:footer_links>
 
 

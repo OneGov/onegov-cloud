@@ -2,6 +2,7 @@
 // inconsistent results across browsers, which might mean the difference between
 // showing a scrollbar and not showing one
 $footer-text-color: $primary-fg-color;
+$footer-hover-color: $primary-fg-color;
 
 .footer-container {
     background-color: $primary-color;
@@ -9,19 +10,8 @@ $footer-text-color: $primary-fg-color;
 
 .footer-content {
 
-    //box-shadow: 0 -2px 0 $white;
-    max-width: 100% !important;
-
-    padding: 0;
-
-    > .cell > .grid-x {
-        margin: 0 auto;
-        max-width: $grid-row-width;
-    }
-
     * {
         color: $footer-text-color;
-        font-family: $header-font-family;
         line-height: 1.5rem;
     }
 
@@ -35,7 +25,7 @@ $footer-text-color: $primary-fg-color;
         text-transform: none;
     }
 
-    .footer-columns {
+    .cell {
 
         @include clean-ul;
         padding-bottom: .5rem;
@@ -45,6 +35,10 @@ $footer-text-color: $primary-fg-color;
             line-height: 1.5rem;
             margin-bottom: .5rem;
         }
+
+        a:hover {
+            color: $footer-hover-color;
+        }
     }
 
     .footer-links {
@@ -52,7 +46,7 @@ $footer-text-color: $primary-fg-color;
         position: relative;
         text-align: center;
 
-        .cell {
+        &.cell {
             span + span::before {
                 content: '•';
             }
