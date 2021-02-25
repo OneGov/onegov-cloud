@@ -250,6 +250,9 @@
             <div tal:condition="item.location"><a href="${item.url}"><i class="fas fa-map-marker-alt"></i>${item.location}</a></div>
         </div>
         <img tal:condition="item.image_url" src="${item.image_url}">
+        <div class="image-placeholder card-section">
+            <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        </div>
         <div class="card-section" tal:condition="with_lead|False">
             <h5>${item.lead}</h5>
         </div>
@@ -281,6 +284,14 @@
     </div>
 
 </metal:panel>
+
+<metal:card define-macro="directories-cards">
+    <div class="card" data-equalizer-watch>
+        <div class="card-section">
+
+        </div>
+    </div>
+</metal:card>
 
 <metal:form define-macro="form">
     <div class="panel global-errors" tal:condition="form.errors.get('global-errors')">
@@ -984,7 +995,7 @@
         <i class="far fa-calendar" aria-hidden="true"></i>
     </a>
 
-    <div class="calendar-day-date">
+    <div class="calendar-day-date" tal:condition="date|nothing">
         <div class="weekday">${layout.format_date(date, 'weekday_short').rstrip('.')}</div>
         <div class="date">
             ${date.day}.

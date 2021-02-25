@@ -136,7 +136,7 @@ class EventsWidget(object):
                 .title(),
                 image_url=o.event.image and layout.request.link(o.event.image),
                 location=o.location,
-                lead=get_lead(o.event.description)
+                lead=get_lead(o.event.title)
             ) for o in occurrences
         ]
 
