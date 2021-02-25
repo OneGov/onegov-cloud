@@ -444,7 +444,7 @@
         </div>
 
         <div class="cell small-12 medium-6 large-4 news-list-item" tal:repeat="item news">
-            <metal:newlist use-macro="layout.macros['news-item-card']" />
+            <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
 
     </div>
