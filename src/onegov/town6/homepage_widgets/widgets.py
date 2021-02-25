@@ -125,7 +125,7 @@ class EventsWidget(object):
 
     def get_variables(self, layout):
         occurrences = OccurrenceCollection(layout.app.session()).query()
-        occurrences = occurrences.limit(4)
+        occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
         event_layout = EventBaseLayout(layout.model, layout.request)
         event_links = [
