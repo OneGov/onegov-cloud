@@ -8,6 +8,10 @@ class SwissVoteFile(File):
     __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
     @property
+    def locale(self):
+        return self.name.split('-')[1]
+
+    @property
     def filename(self):
         return self.reference.filename
 

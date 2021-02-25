@@ -64,19 +64,20 @@ class VoteLayout(DefaultLayout):
         definition have a static URL!
         """
 
-        return {
-            name: (
-                self.request.link(
+        result = {}
+        for name, file in self.model.localized_files().items():
+            result[name] = None
+            attachment = self.model.get_file(name)
+            if attachment:
+                result[name] = self.request.link(
                     self.model,
                     file.static_views.get(
-                        self.request.locale,
+                        attachment.locale,
                         file.static_views['de_CH']
                     )
                 )
-                if self.model.get_file(name) else None
-            )
-            for name, file in self.model.localized_files().items()
-        }
+
+        return result
 
 
 class VoteDetailLayout(DefaultLayout):

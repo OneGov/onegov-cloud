@@ -10,6 +10,7 @@ from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.models import Region
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
@@ -229,6 +230,39 @@ def test_model_page_file(swissvotes_app):
 
     file = session.query(TranslatablePage).one().files[0]
     assert file.name == 'de_CH-test.txt'
+    assert file.filename == 'test.txt'
+    assert file.locale == 'de_CH'
+
+
+def test_model_swissvotes_file(swissvotes_app):
+    session = swissvotes_app.session()
+
+    vote = SwissVote(
+        bfs_number=Decimal('100.1'),
+        date=date(1990, 6, 2),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="V D",
+        short_title_fr="V F",
+        keyword="Keyword",
+        votes_on_same_day=2,
+        _legal_form=1,
+    )
+    session.add(vote)
+    session.flush()
+
+    assert vote.files == []
+
+    attachment = SwissVoteFile(id=random_token())
+    attachment.name = 'xxx-de_CH'
+    attachment.reference = as_fileintent(BytesIO(b'test'), 'test.txt')
+    vote.files.append(attachment)
+    session.flush()
+
+    file = vote.files[0]
+    assert file.name == 'xxx-de_CH'
     assert file.filename == 'test.txt'
     assert file.locale == 'de_CH'
 
