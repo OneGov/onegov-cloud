@@ -67,7 +67,7 @@
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
 
 
-        <div class="off-canvas position-left sidebar" id="offCanvas" data-off-canvas>
+        <div class="off-canvas position-left" id="offCanvas" data-off-canvas>
             <!-- Close button -->
             <button class="close-button" aria-label="Close menu" type="button" data-close>
                 <span aria-hidden="true">&times;</span>

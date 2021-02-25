@@ -48,7 +48,7 @@ class Layout(OrgLayout):
     def drilldown_back(self):
         back = self.request.translate(_("back"))
         return '<li class="js-drilldown-back">' \
-               f'<a class="new-back">{back}</a></li>'
+               f'<a tabindex="0">{back}</a></li>'
 
     @property
     def on_homepage(self):
@@ -74,12 +74,13 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
     @cached_property
     def top_navigation(self):
-        return tuple(
-            (Link(r.title, self.request.link(r)), tuple(
-                Link(c.title, self.request.link(c))
-                for c in self.request.exclude_invisible(r.children)
-            )) for r in self.root_pages
-        )
+        def yield_children(page):
+            return (
+                Link(page.title, self.request.link(page)),
+                tuple(yield_children(p) for p in
+                      self.request.exclude_invisible(page.children))
+            )
+        return tuple(yield_children(page) for page in self.root_pages)
 
     @cached_property
     def breadcrumbs(self):

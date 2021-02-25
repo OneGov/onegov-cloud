@@ -31,13 +31,23 @@
       </div>
 </metal:b>
 
+
+<metal:navigation define-macro="side-navigation-nested">
+    <tal:b tal:content="structure link(layout)"/>
+    <ul class="vertical menu nested" tal:condition="children">
+        <tal:b tal:repeat="(sublink, c) children">
+            <li>
+                <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
+            </li>
+        </tal:b>
+    </ul>
+</metal:navigation>
+
+
 <metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu" data-responsive-menu="drilldown medium-accordion" tal:define="links top_navigation|layout.top_navigation">
+    <ul class="vertical menu side-navigation" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(link, children) links">
-            <tal:b tal:content="structure link(layout)"/>
-            <ul class="menu vertical" tal:condition="add_chidlren|False and children">
-                <li tal:repeat="sublink children" tal:content="structure sublink(layout)" />
-            </ul>
+            <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>
     </ul>
 </metal:navigation>
