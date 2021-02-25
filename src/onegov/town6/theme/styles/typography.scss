@@ -72,9 +72,9 @@ form fieldset,
 .side-panel.highlighted,
 .list-lead,
 .monthly-view-wrapper,
-.contact-panel-content,
+.contact-panel-content > *,
 li strong {
-    font-family: $header-font-family-ui;
+    font-family: $header-font-family;
 }
 
 /*

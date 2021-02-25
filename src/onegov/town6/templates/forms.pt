@@ -3,8 +3,12 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
-
-        <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped forms" />
+        <tal:b metal:use-macro="layout.macros.page_content"
+                 tal:define="lead None; text None; people None; coordinates None; contact layout.org.meta.get('contact_html')">
+            <tal:b metal:fill-slot="after-text">
+                <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
+                <metal:b use-macro="layout.macros['group_by_column']" tal:condition="forms" tal:define="grouped forms" />
+            </tal:b>
+        </tal:b>
     </tal:b>
 </div>

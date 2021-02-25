@@ -418,7 +418,7 @@
         </div>
         <div class="card-section">
             <div>
-                <h6 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.created, 'relative')}</small></h6>
+                <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.created, 'relative')}</small></h5>
                 <tal:b tal:switch="heading|'h5'">
                     <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
                     <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
@@ -1528,7 +1528,7 @@
     <tal:b repeat="group grouped">
         <h2 tal:condition="len(grouped) > 1">${group}</h2>
 
-        <ul class="with-lead">
+        <ul class="forms-list">
             <li tal:repeat="record grouped[group]">
 
                 <a class="list-title h5-size" tal:attributes="href request.link(record)">
