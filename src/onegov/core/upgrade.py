@@ -229,7 +229,8 @@ def get_tasks_by_id(upgrade_modules=None):
 
             # make sure we don't have duplicate function names - it works, but
             # it makes debugging harder
-            assert function.__name__ not in fn_names, "Duplicate function name"
+            assert function.__name__ not in fn_names, \
+                f"Duplicate function name: {function.__name__}"
             fn_names.add(function.__name__)
 
     return tasks
