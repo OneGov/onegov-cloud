@@ -1,7 +1,4 @@
-from morepath.request import Response
 from onegov.ballot import Vote
-from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.core.custom import json
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
@@ -27,11 +24,7 @@ def view_vote_data(self, request):
     }
 
 
-@ElectionDayApp.view(
-    model=Vote,
-    name='data-json',
-    permission=Public
-)
+@ElectionDayApp.json_file(model=Vote, name='data-json')
 def view_vote_data_as_json(self, request):
 
     """ View the raw data as JSON. """
@@ -40,20 +33,13 @@ def view_vote_data_as_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    return Response(
-        json.dumps(self.export(), sort_keys=True, indent=2).encode('utf-8'),
-        content_type='application/json',
-        content_disposition='inline; filename={}.json'.format(
-            normalize_for_url(self.title)
-        )
-    )
+    return {
+        'data': self.export(),
+        'name': normalize_for_url(self.title)
+    }
 
 
-@ElectionDayApp.view(
-    model=Vote,
-    name='data-csv',
-    permission=Public
-)
+@ElectionDayApp.csv_file(model=Vote, name='data-csv')
 def view_vote_data_as_csv(self, request):
 
     """ View the raw data as CSV. """
@@ -62,10 +48,7 @@ def view_vote_data_as_csv(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    return Response(
-        convert_list_of_dicts_to_csv(self.export()),
-        content_type='text/csv',
-        content_disposition='inline; filename={}.csv'.format(
-            normalize_for_url(self.title)
-        )
-    )
+    return {
+        'data': self.export(),
+        'name': normalize_for_url(self.title)
+    }

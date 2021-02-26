@@ -1,5 +1,4 @@
 from morepath import redirect
-from morepath.request import Response
 from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.core.security import Public
@@ -219,11 +218,7 @@ def view_ballot_districts_as_map(self, request):
     }
 
 
-@ElectionDayApp.json(
-    model=Ballot,
-    name='districts-map-svg',
-    permission=Public
-)
+@ElectionDayApp.svg_file(model=Ballot, name='districts-map-svg')
 def view_ballot_districts_svg(self, request):
 
     """" Download the results of the districts of ballot as a SVG. """
@@ -231,15 +226,7 @@ def view_ballot_districts_svg(self, request):
     layout = VoteLayout(
         self.vote, request, tab='{}-districts'.format(self.type)
     )
-    if not layout.svg_path:
-        return Response(status='503 Service Unavailable')
-
-    content = None
-    with request.app.filestorage.open(layout.svg_path, 'r') as f:
-        content = f.read()
-
-    return Response(
-        content,
-        content_type=('application/svg; charset=utf-8'),
-        content_disposition='inline; filename={}'.format(layout.svg_name)
-    )
+    return {
+        'path': layout.svg_path,
+        'name': layout.svg_name
+    }

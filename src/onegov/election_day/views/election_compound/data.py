@@ -1,7 +1,4 @@
-from morepath.request import Response
 from onegov.ballot import ElectionCompound
-from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.core.custom import json
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -28,11 +25,7 @@ def view_election_compound_data(self, request):
     }
 
 
-@ElectionDayApp.view(
-    model=ElectionCompound,
-    name='data-json',
-    permission=Public
-)
+@ElectionDayApp.json_file(model=ElectionCompound, name='data-json')
 def view_election_compound_data_as_json(self, request):
 
     """ View the raw data as JSON. """
@@ -41,23 +34,13 @@ def view_election_compound_data_as_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    return Response(
-        json.dumps(
-            self.export(consider_completed=True),
-            sort_keys=True,
-            indent=2).encode('utf-8'),
-        content_type='application/json',
-        content_disposition='inline; filename={}.json'.format(
-            normalize_for_url(self.title)
-        )
-    )
+    return {
+        'data': self.export(consider_completed=True),
+        'name': normalize_for_url(self.title)
+    }
 
 
-@ElectionDayApp.view(
-    model=ElectionCompound,
-    name='data-csv',
-    permission=Public
-)
+@ElectionDayApp.csv_file(model=ElectionCompound, name='data-csv')
 def view_election_compound_data_as_csv(self, request):
 
     """ View the raw data as CSV. """
@@ -66,20 +49,13 @@ def view_election_compound_data_as_csv(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    return Response(
-        convert_list_of_dicts_to_csv(self.export()),
-        content_type='text/csv',
-        content_disposition='inline; filename={}.csv'.format(
-            normalize_for_url(self.title)
-        )
-    )
+    return {
+        'data': self.export(),
+        'name': normalize_for_url(self.title)
+    }
 
 
-@ElectionDayApp.view(
-    model=ElectionCompound,
-    name='data-parties',
-    permission=Public
-)
+@ElectionDayApp.csv_file(model=ElectionCompound, name='data-parties')
 def view_election_compound_parties_data_as_csv(self, request):
 
     """ View the raw parties data as CSV. """
@@ -88,15 +64,10 @@ def view_election_compound_parties_data_as_csv(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    return Response(
-        convert_list_of_dicts_to_csv(self.export_parties()),
-        content_type='text/csv',
-        content_disposition='inline; filename={}.csv'.format(
-            normalize_for_url(
-                '{}-{}'.format(
-                    self.title,
-                    request.translate(_("Parties")).lower()
-                )
-            )
+    return {
+        'data': self.export_parties(),
+        'name': '{}-{}'.format(
+            self.title,
+            request.translate(_("Parties")).lower()
         )
-    )
+    }
