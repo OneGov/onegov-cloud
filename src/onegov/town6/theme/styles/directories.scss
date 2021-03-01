@@ -64,3 +64,28 @@
         font-weight: bold;
     }
 }
+
+.publication-nav {
+
+    display: flex;
+    justify-content: flex-end;
+
+    .dropdown-pane {
+        max-width: 20ex;
+        padding: 0;
+    }
+
+    .f-dropdown {
+        margin: 0;
+
+        li:hover {
+            @include primary-color-background;
+            a { color: $white; }
+        }
+
+        a {
+            font-size: .875rem;
+            padding: .5rem;
+        }
+    }
+}

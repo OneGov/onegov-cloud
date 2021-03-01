@@ -75,12 +75,13 @@
                     </dl>
                 </div>
                 <div class="publication-nav" tal:condition="layout.publication_filters">
-                    <button href="#" data-dropdown="pubnav" aria-controls="pubnav" aria-expanded="false" class="button small secondary dropdown" i18n:translate>${layout.publication_filter_title}</button><br>
-                    <ul id="pubnav" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                        <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
-                    </ul>
+                    <button type="button" data-toggle="pubnav" class="button small dropdown secondary" i18n:translate>${layout.publication_filter_title}</button>
+                    <div id="pubnav" class="dropdown-pane" data-dropdown data-position="bottom" data-alignment="right" data-parent-class="cell" data-hover-pane="true" data-hover="true">
+                        <ul class="f-dropdown">
+                            <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
         </div>
     </tal:b>

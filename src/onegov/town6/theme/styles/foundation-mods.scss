@@ -329,9 +329,13 @@ select {
 }
 
 /*
-dropdown button secondary fix
+    dropdown buttons
 */
 .dropdown.button.secondary::after,
 .dropdown.button.secondary::before {
     border-color: $black transparent transparent;
+}
+
+ul.f-dropdown {
+    list-style: none;
 }
