@@ -327,3 +327,11 @@ $button-padding: .85em 1.5em;
 select {
     @include clear-appearance;
 }
+
+/*
+dropdown button secondary fix
+*/
+.dropdown.button.secondary::after,
+.dropdown.button.secondary::before {
+    border-color: $black transparent transparent;
+}
