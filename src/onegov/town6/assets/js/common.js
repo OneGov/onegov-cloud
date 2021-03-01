@@ -236,3 +236,16 @@ function autoResize() {
     }
 
 }
+
+// Customize the sidebar. We need click events to browse to links with children
+$(document).ready(function() {
+    $('[data-click-target]').each(function() {
+        var el = $(this);
+        el.on('click', function () {
+            var parent = el.parent()
+            console.log(parent.get(0));
+            parent.off('click')
+            window.location = el.data('click-target')
+        })
+    });
+});

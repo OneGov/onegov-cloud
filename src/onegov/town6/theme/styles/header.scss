@@ -296,3 +296,10 @@ $editbar-fg-color-active: $white;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
 }
+
+
+.side-navigation {
+    span[data-click-target] {
+        z-index: 100;
+    }
+}
