@@ -46,6 +46,10 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             label=_("Number of events displayed on homepage")
         )
 
+        news_limit_homepage = IntegerField(
+            label=_("Number of news entries on homepage")
+        )
+
     return move_fields(
         form_class=merge_forms(
             homepage_settings_form or HomepageSettingsForm, CustomFieldsForm),
@@ -57,7 +61,8 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             'e_move_label',
             'e_move_url',
             'hide_publications',
-            'event_limit_homepage'
+            'event_limit_homepage',
+            'news_limit_homepage'
         ),
         after='homepage_image_6'
     )

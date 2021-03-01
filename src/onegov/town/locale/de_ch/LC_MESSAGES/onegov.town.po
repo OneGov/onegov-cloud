@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-25 14:28+0100\n"
+"POT-Creation-Date: 2021-03-01 11:11+0100\n"
 "PO-Revision-Date: 2020-03-24 11:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -83,7 +83,10 @@ msgid "Hide Publications on Homepage"
 msgstr "Publikationen auf der Homepage ausblenden"
 
 msgid "Number of events displayed on homepage"
-msgstr "Anzahl auf der Homepage angezeigter Veranstaltungen"
+msgstr "Anzahl angezeigte Veranstaltungen"
+
+msgid "Number of news entries on homepage"
+msgstr "Anzahl angezeigte News/ Einträge für Aktuelles"
 
 msgid "Homepage"
 msgstr "Startseite"

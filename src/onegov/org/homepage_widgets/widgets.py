@@ -149,8 +149,6 @@ class DirectoriesWidget(object):
 @OrgApp.homepage_widget(tag='news')
 class NewsWidget(object):
 
-    news_limit = 2
-
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
@@ -170,8 +168,9 @@ class NewsWidget(object):
 
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
+        news_limit = layout.org.news_limit_homepage
         news = layout.request.exclude_invisible(
-            layout.root_pages[-1].news_query(limit=4).all())
+            layout.root_pages[-1].news_query(limit=news_limit + 2).all())
 
         # limits the news, but doesn't count sticky news towards that limit
         def limited(news, limit):
@@ -185,7 +184,7 @@ class NewsWidget(object):
                     count += 1
 
         return {
-            'news': limited(news, limit=self.news_limit),
+            'news': limited(news, limit=news_limit),
             'get_lead': get_lead
         }
 
