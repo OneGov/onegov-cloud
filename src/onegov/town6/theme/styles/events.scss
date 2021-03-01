@@ -5,25 +5,36 @@ $events-icon-width: 3ex;
 $placeholder-icon-size: 6rem;
 
 .events {
+    .card img {
+        transition: transform .5s ease;
+
+        &:hover {
+            transform: scale(1.15);
+        }
+    }
+
+    .contained {
+        border-bottom: 1px solid $iron;
+        border-top: 1px solid $iron;
+    }
+
+    &.image-placeholder {
+        display: flex;
+        justify-content: center;
+
+        .far {
+            color: $iron;
+            font-size: $placeholder-icon-size;
+            height: $placeholder-icon-size;
+            margin: auto;
+            width: $placeholder-icon-size;
+        }
+    }
+
     .card-section {
         a {
             font-weight: bold;
             i { width: $events-icon-width; }
-        }
-
-        &.image-placeholder {
-            border-bottom: 1px solid $iron;
-            border-top: 1px solid $iron;
-            display: flex;
-            justify-content: center;
-
-            .far {
-                color: $iron;
-                font-size: $placeholder-icon-size;
-                height: $placeholder-icon-size;
-                margin: auto;
-                width: $placeholder-icon-size;
-            }
         }
     }
 

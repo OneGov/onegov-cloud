@@ -252,8 +252,8 @@
             <div><a href="${item.url}"><i class="far fa-calendar-alt"></i>${item.subtitle}</a></div>
             <div tal:condition="item.location"><a href="${item.url}"><i class="fas fa-map-marker-alt"></i>${item.location}</a></div>
         </div>
-        <img tal:condition="item.image_url" src="${item.image_url}">
-        <div class="image-placeholder card-section">
+        <img class="contained" tal:condition="item.image_url" src="${item.image_url}">
+        <div class="image-placeholder card-section contained" tal:condition="not: item.image_url">
             <i class="far fa-calendar-alt" aria-hidden="true"></i>
         </div>
         <div class="card-section" tal:condition="with_lead|False">
