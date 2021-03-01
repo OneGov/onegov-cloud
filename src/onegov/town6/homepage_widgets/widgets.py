@@ -1,12 +1,15 @@
 from collections import namedtuple
+
+from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.org.elements import Link, LinkGroup
 from onegov.org.layout import EventBaseLayout
 
 from onegov.org.homepage_widgets.widgets import NewsWidget as OrgNewsWidget, \
-    get_lead
+    get_lead, DirectoriesWidget as OrgDirectoriesWidget
 from onegov.org.models import ImageSetCollection, PublicationCollection
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
 
@@ -301,3 +304,12 @@ class ContactsAndAlbumsWidget(object):
                 ]
             )
         }
+
+
+@TownApp.homepage_widget(tag='directories')
+class DirectoriesWidget(OrgDirectoriesWidget):
+    template = """
+        <xsl:template match="directories">
+            <metal:block use-macro="layout.macros['directories-list']" />
+        </xsl:template>
+    """

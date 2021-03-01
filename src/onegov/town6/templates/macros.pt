@@ -275,23 +275,29 @@
 
 </metal:panel>
 
-<metal:panel define-macro="directories-panel">
-    <div class="directories-panel">
-        <tal:b condition="directory_panel.links">
-            <h3 i18n:translate>Directories</h3>
-            <metal:b use-macro="layout.macros['panel-links']" tal:define="panel directory_panel" />
-        </tal:b>
-    </div>
-
-</metal:panel>
-
-<metal:card define-macro="directories-cards">
+<metal:card define-macro="directory-card">
     <div class="card" data-equalizer-watch>
         <div class="card-section">
-
+            <tal:b tal:content="structure link(layout)" />
+            <small>${link.subtitle}</small>
         </div>
     </div>
 </metal:card>
+
+<metal:directory define-macro="directories-list">
+    <div class="directories-list">
+        <h3>
+            <span>${directory_panel.title}</span>
+            <small tal:content="structure directory_panel.links[-1](layout)" />
+        </h3>
+        <div class="cards-container">
+            <tal:b tal:repeat="link directory_panel.links[0:-1]">
+                <tal:b metal:use-macro="layout.macros['directory_card']" />
+            </tal:b>
+        </div>
+
+    </div>
+</metal:directory>
 
 <metal:form define-macro="form">
     <div class="panel global-errors" tal:condition="form.errors.get('global-errors')">

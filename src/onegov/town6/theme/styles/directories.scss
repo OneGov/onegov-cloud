@@ -39,3 +39,24 @@
         }
     }
 }
+
+.directories-list {
+
+    > div.cards-container {
+        display: flex;
+    }
+
+    .card {
+        margin-right: 1rem;
+        max-width: 12ex;
+
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
+
+    .card-section a {
+        display: block;
+        font-weight: bold;
+    }
+}
