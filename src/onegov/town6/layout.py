@@ -153,6 +153,12 @@ class PageLayout(AdjacencyListLayout):
     def sidebar_links(self):
         return tuple(self.get_sidebar(type='topic'))
 
+    @cached_property
+    def contact_html(self):
+        return self.model.contact_html or '<ul><li>{}</li></ul>'.format(
+            '</li><li>'.join(linkify(self.org.contact).splitlines())
+        )
+
 
 class NewsLayout(AdjacencyListLayout):
 
