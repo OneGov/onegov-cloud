@@ -1,7 +1,5 @@
 from collections import defaultdict
-
 from morepath import redirect
-from morepath.request import Response
 from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
@@ -153,31 +151,16 @@ def view_vote_summary(self, request):
     return get_vote_summary(self, request)
 
 
-@ElectionDayApp.view(
-    model=Vote,
-    name='pdf',
-    permission=Public
-)
+@ElectionDayApp.pdf_file(model=Vote, name='pdf')
 def view_vote_pdf(self, request):
 
     """ View the generated PDF. """
 
     layout = VoteLayout(self, request)
-
-    if not layout.pdf_path:
-        return Response(status='503 Service Unavailable')
-
-    content = None
-    with request.app.filestorage.open(layout.pdf_path, 'rb') as f:
-        content = f.read()
-
-    return Response(
-        content,
-        content_type='application/pdf',
-        content_disposition='inline; filename={}.pdf'.format(
-            normalize_for_url(self.title)
-        )
-    )
+    return {
+        'path': layout.pdf_path,
+        'name': normalize_for_url(self.title)
+    }
 
 
 @ElectionDayApp.html(

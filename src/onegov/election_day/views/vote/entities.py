@@ -1,5 +1,4 @@
 from morepath import redirect
-from morepath.request import Response
 from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.core.security import Public
@@ -218,11 +217,7 @@ def view_vote_entities_table_tie_breaker(self, request):
     return redirect(request.link(self.tie_breaker, name='entities-table'))
 
 
-@ElectionDayApp.json(
-    model=Ballot,
-    name='entities-map-svg',
-    permission=Public
-)
+@ElectionDayApp.svg_file(model=Ballot, name='entities-map-svg')
 def view_ballot_entities_svg(self, request):
 
     """ Download the results of the entities of ballot as a SVG. """
@@ -230,15 +225,7 @@ def view_ballot_entities_svg(self, request):
     layout = VoteLayout(
         self.vote, request, tab='{}-entities'.format(self.type)
     )
-    if not layout.svg_path:
-        return Response(status='503 Service Unavailable')
-
-    content = None
-    with request.app.filestorage.open(layout.svg_path, 'r') as f:
-        content = f.read()
-
-    return Response(
-        content,
-        content_type=('application/svg; charset=utf-8'),
-        content_disposition='inline; filename={}'.format(layout.svg_name)
-    )
+    return {
+        'path': layout.svg_path,
+        'name': layout.svg_name
+    }

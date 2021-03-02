@@ -1,4 +1,3 @@
-from morepath.request import Response
 from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
@@ -85,25 +84,13 @@ def view_election_compound_lists(self, request):
     }
 
 
-@ElectionDayApp.view(
-    model=ElectionCompound,
-    name='lists-svg',
-    permission=Public
-)
+@ElectionDayApp.svg_file(model=ElectionCompound, name='lists-svg')
 def view_election_compound_lists_svg(self, request):
 
     """ View the lists as SVG. """
 
     layout = ElectionCompoundLayout(self, request, 'lists')
-    if not layout.svg_path:
-        return Response(status='503 Service Unavailable')
-
-    content = None
-    with request.app.filestorage.open(layout.svg_path, 'r') as f:
-        content = f.read()
-
-    return Response(
-        content,
-        content_type='application/svg; charset=utf-8',
-        content_disposition='inline; filename={}'.format(layout.svg_name)
-    )
+    return {
+        'path': layout.svg_path,
+        'name': layout.svg_name
+    }

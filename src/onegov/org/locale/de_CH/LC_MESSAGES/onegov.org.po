@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-02-10 15:37+0100\n"
+"POT-Creation-Date: 2021-03-02 17:27+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1193,6 +1193,12 @@ msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
 msgid "Mute all tickets"
 msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 
+msgid "Disable news and hide the entry in the navigation"
+msgstr "'Aktuelles' deaktivieren und Eintrag in Navigation verstecken"
+
+msgid "All other topics can be hidden in their settings"
+msgstr "Alle anderen Themen können in ihren Einstellungen versteckt werden"
+
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
@@ -2201,7 +2207,7 @@ msgid "corona_message"
 msgstr ""
 "Zur Eindämmung des Coronavirus verbietet der Bundesrat öffentliche "
 "Veranstaltungen. Alle Veranstaltungen sind damit abgesagt und finden bis "
-"Ende Februar nicht statt."
+"Ende März nicht statt."
 
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
@@ -4013,6 +4019,9 @@ msgstr ""
 "genießen! Das bedeutet, dass anonyme Benutzer den Seiteninhalt ohne "
 "Benutzerinteraktion eines Admins beeinflussen können! Aktivieren Sie diese "
 "Einstellung am besten nur für einen begrenzten Zeitraum."
+
+msgid "Site Navigation Settings"
+msgstr "Einstellungen Seiten-Navigation"
 
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"

@@ -10,8 +10,12 @@ from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import current_language_tween_factory
 from onegov.core.framework import transaction_tween_factory
+from onegov.election_day.directives import CsvFileAction
+from onegov.election_day.directives import JsonFileAction
 from onegov.election_day.directives import ManageFormAction
 from onegov.election_day.directives import ManageHtmlAction
+from onegov.election_day.directives import PdfFileViewAction
+from onegov.election_day.directives import SvgFileViewAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.form import FormApp
@@ -25,8 +29,12 @@ class ElectionDayApp(Framework, FormApp, UserApp):
     """
 
     serve_static_files = True
-    manage_html = directive(ManageHtmlAction)
+    csv_file = directive(CsvFileAction)
+    json_file = directive(JsonFileAction)
     manage_form = directive(ManageFormAction)
+    manage_html = directive(ManageHtmlAction)
+    pdf_file = directive(PdfFileViewAction)
+    svg_file = directive(SvgFileViewAction)
 
     @property
     def principal(self):

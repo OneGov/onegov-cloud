@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.25`
+
+> commits: **5 / [dd199312fb...2d0f32c139](https://github.com/OneGov/onegov-cloud/compare/dd199312fb^...2d0f32c139)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.25)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🐞 **Adds missing pagination in election archive search.**
+
+**`Bugfix`** | **[179d4513ab](https://github.com/onegov/onegov-cloud/commit/179d4513abe4c8f62a51fa45a2f9e60b19b30d1b)**
+
 ## Release `2021.24`
 
-> commits: **12 / [35fac7f40f...5a9d001dcf](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...5a9d001dcf)**  
+> released: **2021-02-25 11:57**<br>
+> commits: **13 / [35fac7f40f...b8d872e9cd](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...b8d872e9cd)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.24)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
