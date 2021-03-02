@@ -311,3 +311,18 @@ class DirectoriesWidget(OrgDirectoriesWidget):
             <metal:block use-macro="layout.macros['directories-list']" />
         </xsl:template>
     """
+
+
+@TownApp.homepage_widget(tag='focus')
+class FocusWidget(object):
+
+    template = """
+         <xsl:template match="focus">
+            <metal:block use-macro="layout.macros['focus-panel']" />
+        </xsl:template>
+    """
+
+    def get_variables(self, layout):
+        return {
+            'image_url': layout.org.focus_widget_image
+        }

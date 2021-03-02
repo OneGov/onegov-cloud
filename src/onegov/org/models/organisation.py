@@ -48,6 +48,7 @@ class Organisation(Base, TimestampMixin):
     hide_publications = meta_property()
     event_limit_homepage = meta_property(default=4)
     news_limit_homepage = meta_property(default=3)
+    focus_widget_image = meta_property()
     daypass_label = meta_property()
     e_move_label = meta_property()
     e_move_url = meta_property()

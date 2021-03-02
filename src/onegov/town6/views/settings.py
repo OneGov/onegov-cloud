@@ -1,13 +1,15 @@
 """ The settings view, defining things like the logo or color of the org. """
+from wtforms import StringField, BooleanField, IntegerField
+
 from onegov.core.security import Secret
+from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
-from onegov.town.views.settings import get_custom_settings_form
 from onegov.town6.forms.settings import GeneralSettingsForm
 
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
     MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
-    OrgTicketSettingsForm
+    OrgTicketSettingsForm, HomepageSettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -19,6 +21,70 @@ from onegov.org.views.settings import (
 from onegov.town6.app import TownApp
 
 from onegov.town6.layout import SettingsLayout, DefaultLayout
+
+
+def get_custom_settings_form(model, request, homepage_settings_form=None):
+
+    class CustomFieldsForm(Form):
+        online_counter_label = StringField(
+            label=_("Online Counter Label"),
+            description=_("Forms and applications"))
+
+        reservations_label = StringField(
+            label=_("Reservations Label"),
+            description=_("Daypasses and rooms"))
+
+        daypass_label = StringField(
+            label=_("SBB Daypass Label"),
+            description=_("Generalabonnement for Towns"))
+
+        publications_label = StringField(
+            label=_("Publications Label"),
+            description=_("Official Documents"))
+
+        e_move_label = StringField(
+            label=_('E-Move Label'),
+            description=_('E-Move')
+        )
+
+        e_move_url = StringField(
+            label=_('E-Move Url'),
+            description=_('E-Move')
+        )
+
+        hide_publications = BooleanField(
+            label=_("Hide Publications on Homepage"))
+
+        event_limit_homepage = IntegerField(
+            label=_("Number of events displayed on homepage")
+        )
+
+        news_limit_homepage = IntegerField(
+            label=_("Number of news entries on homepage")
+        )
+
+        focus_widget_image = StringField(
+            label=_("Image Focus"),
+            render_kw={'class_': 'image-url'}
+        )
+
+    return move_fields(
+        form_class=merge_forms(
+            homepage_settings_form or HomepageSettingsForm, CustomFieldsForm),
+        fields=(
+            'online_counter_label',
+            'reservations_label',
+            'daypass_label',
+            'publications_label',
+            'e_move_label',
+            'e_move_url',
+            'hide_publications',
+            'event_limit_homepage',
+            'news_limit_homepage',
+            'focus_widget_image'
+        ),
+        after='homepage_image_6'
+    )
 
 
 @TownApp.html(

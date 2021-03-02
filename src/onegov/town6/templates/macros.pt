@@ -1963,3 +1963,12 @@
       </td>
   </tr>
 </metal:tickets_table_row>
+
+<metal:focus define-macro="focus-panel">
+    <h3>
+        <span i18n:translate="">Focus</span>
+    </h3>
+    <div class="focus-image" tal:condition="image_url">
+        <img src="${image_url}" alt="focus image">
+    </div>
+</metal:focus>
