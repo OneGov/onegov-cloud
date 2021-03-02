@@ -50,16 +50,13 @@ def migrate_homepage_structure_for_town6(context):
     </column>
 </row-wide>
 <row>
-    <column span="12">
-        <row>
-            <column span="8">
-            </column>
-            <column span="4">
-                <panel>
-                    <services />
-                </panel>
-            </column>
-        </row>
+    <column span="8">
+        <focus />
+    </column>
+    <column span="4">
+        <panel>
+            <services />
+        </panel>
     </column>
 </row>
 <row-wide bgcolor="gray">
@@ -85,7 +82,6 @@ def migrate_homepage_structure_for_town6(context):
         <homepage-tiles show-title="True"/>
     </column>
 </row>
-<line />
 <row>
     <column span="12">
         <directories />
