@@ -34,4 +34,15 @@ OneGov.utils.inferTime = function(time) {
     return numeric;
 };
 
-var fa_version = $('link[href*="font-awesome5"]').get(0) && 5 || 4
+function get_fa_version() {
+    var links = document.getElementsByTagName('link')
+    for (link of links) {
+        if (link.href && link.href.includes('font-awesome5')) {
+            return 5
+        }
+    }
+    return 4
+}
+
+var fa_version = get_fa_version()
+
