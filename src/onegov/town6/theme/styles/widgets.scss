@@ -11,14 +11,14 @@
 }
 
 /*
-    Homepage widgets
+    (Homepage) widgets
 */
 
-.homepage {
+.grid-container.full.gray {
+    background: $white-smoke;
+}
 
-    .full.gray {
-        background: $white-smoke;
-    }
+.homepage {
 
     .full.primary {
         @include primary-color-background;

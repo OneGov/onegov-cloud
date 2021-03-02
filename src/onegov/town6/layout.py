@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from cached_property import cached_property
 from dateutil.rrule import rrulestr
 from dateutil import rrule
@@ -26,6 +28,8 @@ from onegov.org.layout import (
 )
 from onegov.user import UserCollection
 
+PartnerCard = namedtuple('PartnerCard', ['url', 'image_url', 'lead'])
+
 
 class Layout(OrgLayout):
     def __init__(self, model, request):
@@ -53,6 +57,29 @@ class Layout(OrgLayout):
     @property
     def on_homepage(self):
         return self.request.url == self.homepage_url
+
+    @property
+    def partners(self):
+        partner_attrs = [key for key in dir(self.org) if 'partner' in key]
+        partner_count = int(len(partner_attrs) / 3)
+
+        return [
+            PartnerCard(
+                url=getattr(self.org, f'partner_{ix}_url'),
+                image_url=getattr(self.org, f'partner_{ix}_img'),
+                lead=getattr(self.org, f'partner_{ix}_name'),
+            ) for ix in range(1, partner_count + 1)
+        ]
+
+    @property
+    def show_partners(self):
+        if self.on_homepage or self.request.is_admin:
+            return False
+        if '<partner' not in self.org.homepage_structure:
+            return False
+        if not self.org.always_show_partners:
+            return False
+        return True
 
 
 class DefaultLayout(Layout, DefaultLayoutMixin):

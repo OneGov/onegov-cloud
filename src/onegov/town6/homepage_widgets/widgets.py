@@ -157,9 +157,6 @@ class EventsWidget(object):
         }
 
 
-PartnerCard = namedtuple('PartnerCard', ['url', 'image_url', 'lead'])
-
-
 @TownApp.homepage_widget(tag='partners')
 class PartnerWidget(object):
 
@@ -170,17 +167,7 @@ class PartnerWidget(object):
     """
 
     def get_variables(self, layout):
-        org = layout.org
-        partner_attrs = [key for key in dir(org) if 'partner' in key]
-        partner_count = int(len(partner_attrs) / 3)
-
-        return {'partners': [
-            PartnerCard(
-                url=getattr(org, f'partner_{ix}_url'),
-                image_url=getattr(org, f'partner_{ix}_img'),
-                lead=getattr(org, f'partner_{ix}_name'),
-            ) for ix in range(1, partner_count + 1)
-        ]}
+        return {'partners': layout.partners}
 
 
 @TownApp.homepage_widget(tag='services')

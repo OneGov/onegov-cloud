@@ -87,6 +87,18 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
     )
 
 
+def custom_footer_settings_form(model, request):
+
+    class ExtendedFooterSettings(Form):
+        always_show_partners = BooleanField(
+            label=_('Show partners on all pages'),
+            description=_('Shows the footer on all pages but for admins'),
+            fieldset=_('Partner display')
+        )
+
+    return merge_forms(FooterSettingsForm, ExtendedFooterSettings)
+
+
 @TownApp.html(
     model=Organisation, name='settings', template='settings.pt',
     permission=Secret)
@@ -132,7 +144,7 @@ def town_handle_header_settings(self, request, form):
 
 @TownApp.form(
     model=Organisation, name='footer-settings', template='form.pt',
-    permission=Secret, form=FooterSettingsForm, setting=_("Footer"),
+    permission=Secret, form=custom_footer_settings_form, setting=_("Footer"),
     icon='fa-window-minimize', order=-800)
 def town_handle_footer_settings(self, request, form):
     return handle_footer_settings(

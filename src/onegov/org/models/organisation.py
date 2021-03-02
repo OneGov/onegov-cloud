@@ -95,6 +95,7 @@ class Organisation(Base, TimestampMixin):
     partner_4_img = meta_property()
     partner_4_url = meta_property()
     partner_4_name = meta_property()
+    always_show_partners = meta_property(default=False)
 
     # Ticket options
     ticket_auto_accepts = meta_property()
