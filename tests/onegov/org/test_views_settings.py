@@ -1,5 +1,4 @@
 from onegov.org.theme.org_theme import HELVETICA
-from tests.shared.utils import open_in_browser
 
 
 def test_settings(client):
@@ -95,10 +94,13 @@ def test_site_navigation_settings(client):
     assert 'Aktuelles' in str(client.get('/').pyquery('.top-bar-section'))
     client.login_admin()
     page = client.get('/navigation-settings')
-    open_in_browser(page)
     assert 'Einstellungen Seiten-Navigation' in page
     page.form['disable_news'] = True
     page.form.submit().follow()
 
-    client.get('/news', status=403)
+    editor = client.spawn()
+    editor.login_editor()
+    editor.get('/news', status=403)
+
+    client.get('/news')
     assert 'Aktuelles' not in str(client.get('/').pyquery('.top-bar-section'))

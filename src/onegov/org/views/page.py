@@ -59,7 +59,7 @@ def view_topic(self, request, layout=None):
 def view_news(self, request, layout=None):
 
     layout = layout or NewsLayout(self, request)
-    if layout.org.disable_news:
+    if layout.org.disable_news and not request.is_admin:
         return HTTPForbidden()
 
     years = self.years
