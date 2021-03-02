@@ -187,7 +187,6 @@
                                             <div metal:define-slot="title"></div>
                                             <div metal:define-slot="post-title"></div>
                                         </h1>
-                                          <p tal:condition="layout.sidebar_links">This page has sidebarlinks. its just a hint four you!</p>
                                         <div metal:define-slot="content"></div>
                                     </section>
                                 </div>
@@ -195,8 +194,21 @@
                         </div>
                     </article>
                 </tal:b>
-
-
+                <div class="partners-everywhere">
+                    <div class="grid-container full gray" tal:condition="layout.show_partners">
+                        <div class="grid-x">
+                            <div class="cell small-12">
+                                <div class="grid-container">
+                                    <div class="grid-x grid-padding-x grid-padding-y">
+                                        <div class="cell small-12">
+                                            <metal:block tal:condition="layout.show_partners" use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <metal:footer use-macro="layout.macros['footer']" />
 
             </main>
