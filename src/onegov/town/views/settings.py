@@ -43,11 +43,11 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             label=_("Hide Publications on Homepage"))
 
         event_limit_homepage = IntegerField(
-            label=_("Number of events displayed on homepage")
+            label=_("Maximum number of events displayed on homepage")
         )
 
         news_limit_homepage = IntegerField(
-            label=_("Number of news entries on homepage")
+            label=_("Maximum number of news entries on homepage")
         )
 
     return move_fields(
