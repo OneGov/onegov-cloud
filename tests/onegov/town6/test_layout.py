@@ -150,7 +150,7 @@ def test_page_layout_breadcrumbs(session):
 def test_template_layout(postgres_dsn, redis_url):
 
     class Mock(object):
-        pass
+       homepage_structure = ''
 
     class App(TownApp):
         theme_options = {}
