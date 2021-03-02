@@ -17,7 +17,8 @@ cli = command_group()
 def update():
     """ Update helper for foundation6 using node and webpack """
     if not shutil.which('foundation'):
-        click.secho('Install foundation cli first')
+        click.secho('Install foundation cli first: '
+                    'npm install -g foundation-cli')
         sys.exit()
 
     if not shutil.which('yarn'):
