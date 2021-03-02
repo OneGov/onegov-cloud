@@ -3,6 +3,9 @@
 import morepath
 
 from datetime import datetime
+
+from webob.exc import HTTPForbidden
+
 from onegov.core.security import Public, Private
 from onegov.org.elements import Link
 from onegov.org.layout import PageLayout, NewsLayout
@@ -56,6 +59,9 @@ def view_topic(self, request, layout=None):
 def view_news(self, request, layout=None):
 
     layout = layout or NewsLayout(self, request)
+    if layout.org.disable_news:
+        return HTTPForbidden()
+
     years = self.years
 
     try:

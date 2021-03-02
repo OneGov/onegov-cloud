@@ -14,7 +14,8 @@ from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
-    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm
+    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
+    OrgSiteNavigationForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.models import Organisation
@@ -163,6 +164,16 @@ def handle_ticket_settings(self, request, form, layout=None):
             "page content without user interaction of an admin! "
             "Best activate this setting just for a limited period of time.")
     return resp
+
+
+@OrgApp.form(
+    model=Organisation, name='navigation-settings', template='form.pt',
+    permission=Secret, form=OrgSiteNavigationForm,
+    setting=_("Site Navigation Settings"), order=-951, icon='far fa-compass'
+)
+def handle_site_navigation_settings(self, request, form, layout=None):
+    return handle_generic_settings(
+        self, request, form, _("Site Navigation Settings"), layout)
 
 
 @OrgApp.form(model=Organisation, name='holiday-settings-preview',

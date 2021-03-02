@@ -570,8 +570,14 @@ class DefaultLayout(Layout):
 
     @cached_property
     def top_navigation(self):
+        def include(page):
+            if page.type == 'news' and self.org.disable_news:
+                return False
+            return True
+
         return tuple(
-            Link(r.title, self.request.link(r)) for r in self.root_pages
+            Link(r.title, self.request.link(r))
+            for r in self.root_pages if include(r)
         )
 
     def show_label(self, field):
