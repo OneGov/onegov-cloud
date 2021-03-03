@@ -14,84 +14,62 @@ def locale_file(module, lang):
 
 def open_file(path, mode='r'):
     with open(path, mode) as f:
-        file = f.readlines()
+        file = f.read()
     return file
 
 
-def msg_id(line):
-    match = re.match(r'msgid\s(.*?)$', line)
-    return match and match.group(0)
+def parse_entry(block):
+    parts = block.split('msgstr ')
+    ID = parts[0].replace('msgid ', '')
+    return ID, parts[1]
 
 
-def msg_str(line):
-    match = re.match(r'msgstr\s(.*?)$', line)
-    return match and match.group(0)
+def blocks_from_file(src, lang):
+    return re.split(r'\n\n', open_file(locale_file(src, lang)))
 
 
-def fusion_po(src, target, lang, dry_run=False):
-    src_lines = {}
+def parse_file(src, lang):
+    src_dict = {}
+    for block in blocks_from_file(src, lang):
+        id_, value = parse_entry(block)
+        src_dict[id_] = value
+    return src_dict
 
-    # We only use simply case everything on one line
 
-    id_block = None
-    for line in open_file(locale_file(src, lang)):
-        line = line.rstrip('\n')
-        if not line:
+def emtpy_value(value):
+    return value == '""'
+
+
+def fusion_po(src, target, lang, dry_run=False, overwrite=False):
+    src_parsed = parse_file(src, lang)
+
+    new_blocks = []
+    for block in blocks_from_file(target, lang):
+        ID, value = parse_entry(block)
+        new_val = src_parsed.get(ID)
+
+        if not new_val or emtpy_value(new_val):
+            new_blocks.append(block)
             continue
 
-        id_ = msg_id(line)
-        if id_:
-            if id_ != 'msgid ""':
-                id_block = id_
-            else:
-                id_block = None
-            continue
-
-        value = msg_str(line)
-        if value and id_block:
-            src_lines[id_block] = value
-            continue
-
-    new_target = []
-    id_block = None
-
-    target_lines = open_file(locale_file(target, lang))
-    for line in target_lines:
-        line = line.rstrip('\n')
-        if not line:
-            new_target.append('')
-            continue
-
-        id_ = msg_id(line)
-        value = msg_str(line)
-
-        if id_:
-            id_block = id_
-            new_target.append(line)
-            continue
-
-        if value:
-            new_val = src_lines.get(id_block)
-            if new_val and '""' in value:
-                new_target.append(new_val)
-            else:
-                new_target.append(value)
-            continue
-
-        new_target.append(line)
+        if emtpy_value(value) or overwrite:
+            new_blocks.append(f'msgid {ID}msgstr {new_val}')
+        else:
+            new_blocks.append(block)
 
     if not dry_run:
         with open(locale_file(target, lang), 'w') as new:
-            new.write("\n".join(new_target))
+            new.write('\n\n'.join(new_blocks))
     else:
-        print("\n".join(new_target))
+        click.secho('\n\n'.join(new_blocks))
 
 
 @click.command()
 @click.option('--src', required=True)
 @click.option('--target', required=True)
+@click.option('--overwrite', is_flag=True, default=False)
 @click.option('--dry-run', is_flag=True, default=False)
-def apply_translations(src, target, dry_run):
+def apply_translations(src, target, overwrite, dry_run):
     """
     Use the source and target names of onegov modules to transfer
     translations that appear in both.
@@ -105,7 +83,7 @@ def apply_translations(src, target, dry_run):
     ]
 
     for lang in langs:
-        fusion_po(src, target, lang, dry_run)
+        fusion_po(src, target, lang, dry_run, overwrite)
 
 
 if __name__ == '__main__':
