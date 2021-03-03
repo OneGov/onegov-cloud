@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+
+import os
+import re
+
+import click
+
+base = os.path.join(os.getcwd(), 'src', 'onegov')
+
+
+def locale_file(module, lang):
+    return f'{base}/{module}/locale/{lang}/LC_MESSAGES/onegov.{module}.po'
+
+
+def open_file(path, mode='r'):
+    with open(path, mode) as f:
+        file = f.readlines()
+    return file
+
+
+def msg_id(line):
+    match = re.match(r'msgid\s(.*?)$', line)
+    return match and match.group(0)
+
+
+def msg_str(line):
+    match = re.match(r'msgstr\s(.*?)$', line)
+    return match and match.group(0)
+
+
+def fusion_po(src, target, lang, dry_run=False):
+    src_lines = {}
+
+    # We only use simply case everything on one line
+
+    id_block = None
+    for line in open_file(locale_file(src, lang)):
+        line = line.rstrip('\n')
+        if not line:
+            continue
+
+        id_ = msg_id(line)
+        if id_:
+            if id_ != 'msgid ""':
+                id_block = id_
+            else:
+                id_block = None
+            continue
+
+        value = msg_str(line)
+        if value and id_block:
+            src_lines[id_block] = value
+            continue
+
+    new_target = []
+    id_block = None
+
+    target_lines = open_file(locale_file(target, lang))
+    for line in target_lines:
+        line = line.rstrip('\n')
+        if not line:
+            new_target.append('')
+            continue
+
+        id_ = msg_id(line)
+        value = msg_str(line)
+
+        if id_:
+            id_block = id_
+            new_target.append(line)
+            continue
+
+        if value:
+            new_val = src_lines.get(id_block)
+            if new_val and '""' in value:
+                new_target.append(new_val)
+            else:
+                new_target.append(value)
+            continue
+
+        new_target.append(line)
+
+    if not dry_run:
+        with open(locale_file(target, lang), 'w') as new:
+            new.write("\n".join(new_target))
+    else:
+        print("\n".join(new_target))
+
+
+@click.command()
+@click.option('--src', required=True)
+@click.option('--target', required=True)
+@click.option('--dry-run', is_flag=True, default=False)
+def apply_translations(src, target, dry_run):
+    """
+    Use the source and target names of onegov modules to transfer
+    translations that appear in both.
+
+    Only one line translations are supported by now.
+    Can be used to migrate other app to foundation6.
+    """
+    src_locals = f'{base}/{src}/locale'
+    langs = [
+        f for f in os.listdir(src_locals) if not f.endswith('.pot')
+    ]
+
+    for lang in langs:
+        fusion_po(src, target, lang, dry_run)
+
+
+if __name__ == '__main__':
+    apply_translations()
