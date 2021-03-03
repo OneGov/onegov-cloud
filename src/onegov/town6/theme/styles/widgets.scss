@@ -24,7 +24,12 @@
         @include primary-color-background;
     }
 
-    &> div.grid-container {
+    &> .grid-container {
+
+        @include breakpoint(small only) {
+            padding-bottom: .625rem;
+            padding-top: .625rem;
+        }
 
         padding-bottom: 1.4rem;
         padding-top: 1.4rem;

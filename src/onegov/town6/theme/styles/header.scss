@@ -59,7 +59,11 @@ $pdf-icon: '\f1c1';
 .globals {
     // Todo: the link text inside the second level should not wrap
     @include primary-color-background;
-    margin-bottom: $globals-margin;
+
+    @include breakpoint(small only) {
+        padding: 0;
+    }
+
     min-height: $globals-height;
     padding: .5rem;
 
@@ -78,11 +82,18 @@ $pdf-icon: '\f1c1';
         }
 
         > li {
+
             > a {
                 @include primary-color-background;
-                height: $globals-height;
+                height: 100%;
                 line-height: $globals-height;
                 padding: 0 1rem;
+                @include breakpoint(medium up) {
+                    align-items: center;
+                    display: flex;
+                    justify-content: flex-end;
+                    padding-right: 0;
+                }
 
                 &::after {
                     border-color: $white transparent transparent !important;
@@ -168,9 +179,21 @@ $navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);
     width: 100%;
     z-index: 999;
 
-    .navigation .cell {
-        align-self: center;
-        padding: 20px 0;
+    .navigation {
+        .cell {
+
+            @include breakpoint(small only) {
+                padding: 0;
+            }
+
+            align-self: center;
+            padding: 20px 0;
+
+        }
+
+        .grid-x:first-of-type {
+            height: 100%;
+        }
     }
 
     .nav-bar-sticky {
@@ -191,6 +214,11 @@ $navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);
     img {
         height: 6em;
         object-fit: contain;
+
+        @include breakpoint(small only) {
+            transform: scale(.8);
+        }
+
     }
 
     i {
