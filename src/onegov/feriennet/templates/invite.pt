@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="inline-top-bar">
-                    <h3 i18n:translate>
+                    <h2 class="h3-size" i18n:translate>
                         Own Children
                     </h2>
 
@@ -89,9 +89,9 @@
                 </ul>
 
                 <div class="inline-top-bar">
-                    <h3 i18n:translate>
+                    <h2 class="h3-size" i18n:translate>
                         Other Children
-                    </h3>
+                    </h2>
                     <a href="${mailto}" class="button small secondary">
                         <i class="fa fa-fw fa-envelope" aria-hidden="true"></i>
                         <tal:b i18n:translate>
