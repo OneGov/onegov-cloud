@@ -168,6 +168,7 @@ def get_common_asset():
     yield 'lazysizes.js'
     yield 'common.js'
     yield '_blank.js'
+    yield 'animate.js'
 
 
 @TownApp.webasset('editor')
