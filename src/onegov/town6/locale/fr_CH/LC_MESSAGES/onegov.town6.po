@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-03-03 16:24+0100\n"
+"POT-Creation-Date: 2021-03-03 20:32+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "Body Font Family"
-msgstr ""
+msgid "Font family serif"
+msgstr "Schriftart mit Serifen"
 
-msgid "Header Font Family"
-msgstr ""
+msgid "Font family sans-serif"
+msgstr "Hautpschriftart sans-serif"
 
 msgid "Events"
 msgstr "Événements"
@@ -78,7 +78,7 @@ msgid "Impressions"
 msgstr "Impressions"
 
 msgid "back"
-msgstr ""
+msgstr "zurück"
 
 msgid "Homepage"
 msgstr "Page d'accueil"
@@ -601,7 +601,7 @@ msgid "Latest news"
 msgstr "Dernières nouvelles"
 
 msgid "All articles"
-msgstr ""
+msgstr "Alle Beiträge"
 
 msgid "This site is private"
 msgstr "Ce site est privé"
@@ -658,7 +658,7 @@ msgid "Previous Page"
 msgstr "Page précédente"
 
 msgid "You're on page"
-msgstr ""
+msgstr "Sie sind auf Seite"
 
 msgid "Next Page"
 msgstr "Page suivante"
@@ -777,8 +777,8 @@ msgstr ""
 "des photos, ajoutez quelques photos à un album et marquez-les comme "
 "disponibles pour la page d'accueil."
 
-msgid "Current Slide"
-msgstr ""
+msgid "Current Image"
+msgstr "Aktuelles Bild"
 
 msgid "Digitally signed"
 msgstr "Signé électroniquement"
@@ -1779,16 +1779,16 @@ msgid "Number of news entries on homepage"
 msgstr "Nombre des nouvelles sur la page d'accueil"
 
 msgid "Image Focus"
-msgstr ""
+msgstr "Bild Fokus"
 
 msgid "Show partners on all pages"
-msgstr ""
+msgstr "Partner auf allen Seiten anzeigen"
 
 msgid "Shows the footer on all pages but for admins"
-msgstr ""
+msgstr "Zeige die Fusszeile auf allen Seiten, ausser für Administratoren"
 
 msgid "Partner display"
-msgstr ""
+msgstr "Anzeige Partner"
 
 msgid "General"
 msgstr "Général"

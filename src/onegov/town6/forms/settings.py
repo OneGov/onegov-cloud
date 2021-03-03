@@ -11,14 +11,14 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
     # Todo: Add those fields after primary color
     body_font_family_ui = ChosenSelectField(
-        label=_('Body Font Family'),
+        label=_('Font family serif'),
         description='Used for text in html body',
         choices=[],
         validators=[validators.InputRequired()]
     )
 
     header_font_family_ui = ChosenSelectField(
-        label=_('Header Font Family'),
+        label=_('Font family sans-serif'),
         description='Used for all the headings',
         choices=[],
         validators=[validators.InputRequired()]
