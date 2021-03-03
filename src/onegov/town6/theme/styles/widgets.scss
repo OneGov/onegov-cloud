@@ -18,6 +18,18 @@
     background: $white-smoke;
 }
 
+article.content .grid-container:last-of-type {
+    @include breakpoint(medium up) {
+        padding-bottom: 1.4rem;
+    }
+}
+
+article.content .side-panel {
+    @include breakpoint(small only) {
+        padding-top: .625rem;
+    }
+}
+
 .homepage {
 
     .full.primary {
