@@ -134,7 +134,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="grid-container fluid edit-bar-container">
+                            <div class="grid-container fluid edit-bar-container" tal:condition="layout.editbar_links">
                                 <div class="grid-x">
                                     <div class="cell small-12">
                                         <div class="grid-container">
@@ -144,7 +144,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
