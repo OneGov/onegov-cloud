@@ -5,9 +5,8 @@ NEWSGOT = '"NewsGot", Verdana, Arial, sans-serif;'
 
 # options editable by the user
 user_options = {
-    'primary-color-ui': '#e33521',
-    'body-font-family-ui': NEWSGOT,
-    'header-font-family-ui': NEWSGOT
+    'primary-color': '#e33521',
+    'font-family-sans-serif': NEWSGOT
 }
 
 
