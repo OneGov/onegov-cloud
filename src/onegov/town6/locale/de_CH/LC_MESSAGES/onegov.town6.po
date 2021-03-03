@@ -11,52 +11,52 @@ msgid "All events"
 msgstr "Alle Veranstaltungen"
 
 msgid "Online Counter"
-msgstr ""
+msgstr "Online-Schalter"
 
 msgid "Forms and applications"
-msgstr ""
+msgstr "Formulare und Gesuche"
 
 msgid "Publications"
 msgstr "Publikationen"
 
 msgid "Official Documents"
-msgstr ""
+msgstr "Amtliche Dokumente"
 
 msgid "Reservations"
 msgstr "Reservationen"
 
 msgid "Daypasses and rooms"
-msgstr ""
+msgstr "Tageskarten und Räume"
 
 msgid "E-Move"
-msgstr ""
+msgstr "e-Umzug"
 
 msgid "Move with eMovingCH"
-msgstr ""
+msgstr "Umziehen mit eMovingCH"
 
 msgid "SBB Daypass"
-msgstr ""
+msgstr "SBB Tageskarte"
 
 msgid "Generalabonnement for Towns"
-msgstr ""
+msgstr "Generalabonnement Gemeinde"
 
 msgid "Services"
-msgstr ""
+msgstr "Dienstleistungen"
 
 msgid "Contacts and Photos"
-msgstr ""
+msgstr "Kontakte und Fotos"
 
 msgid "People"
 msgstr "Personen"
 
 msgid "All contacts"
-msgstr ""
+msgstr "Alle Kontakte"
 
 msgid "Photo Albums"
 msgstr "Fotoalben"
 
 msgid "Impressions"
-msgstr ""
+msgstr "Impressionen"
 
 msgid "back"
 msgstr ""
@@ -1597,31 +1597,31 @@ msgid "Edit Recipient"
 msgstr "Empfänger Bearbeiten"
 
 msgid "Online Counter Label"
-msgstr ""
+msgstr "Onlineschalter Label"
 
 msgid "Reservations Label"
-msgstr ""
+msgstr "Reservationen Label"
 
 msgid "SBB Daypass Label"
-msgstr ""
+msgstr "SBB Tageskarte Label"
 
 msgid "Publications Label"
-msgstr ""
+msgstr "Publikationen Label"
 
 msgid "E-Move Label"
-msgstr ""
+msgstr "E-Umzug Label"
 
 msgid "E-Move Url"
-msgstr ""
+msgstr "E-Umzug Url"
 
 msgid "Hide Publications on Homepage"
-msgstr ""
+msgstr "Publikationen auf der Homepage ausblenden"
 
 msgid "Number of events displayed on homepage"
-msgstr ""
+msgstr "Anzahl angezeigte Veranstaltungen"
 
 msgid "Number of news entries on homepage"
-msgstr ""
+msgstr "Anzahl angezeigte News/ Einträge für Aktuelles"
 
 msgid "Image Focus"
 msgstr ""

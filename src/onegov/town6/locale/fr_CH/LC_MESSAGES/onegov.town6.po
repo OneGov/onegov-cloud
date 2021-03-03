@@ -30,52 +30,52 @@ msgid "All events"
 msgstr "Tous les événements"
 
 msgid "Online Counter"
-msgstr ""
+msgstr "Comptoir en ligne"
 
 msgid "Forms and applications"
-msgstr ""
+msgstr "Formulaires et candidatures"
 
 msgid "Publications"
 msgstr "Publications"
 
 msgid "Official Documents"
-msgstr ""
+msgstr "Documents officiels"
 
 msgid "Reservations"
 msgstr "Réservations"
 
 msgid "Daypasses and rooms"
-msgstr ""
+msgstr "Cartes journalières et pièces"
 
 msgid "E-Move"
-msgstr ""
+msgstr "e-Déménagement"
 
 msgid "Move with eMovingCH"
-msgstr ""
+msgstr "Services d' eDéménagementCH"
 
 msgid "SBB Daypass"
-msgstr ""
+msgstr "Carte journalière CFF"
 
 msgid "Generalabonnement for Towns"
-msgstr ""
+msgstr "Abonnement général pour les villes"
 
 msgid "Services"
-msgstr ""
+msgstr "Services"
 
 msgid "Contacts and Photos"
-msgstr ""
+msgstr "Contacts et photos"
 
 msgid "People"
 msgstr "Personnes"
 
 msgid "All contacts"
-msgstr ""
+msgstr "Tous les contacts"
 
 msgid "Photo Albums"
 msgstr "Albums photo"
 
 msgid "Impressions"
-msgstr ""
+msgstr "Impressions"
 
 msgid "back"
 msgstr ""
@@ -1616,31 +1616,31 @@ msgid "Edit Recipient"
 msgstr "Éditer le destinataire"
 
 msgid "Online Counter Label"
-msgstr ""
+msgstr "Étiquette de comptoir en ligne"
 
 msgid "Reservations Label"
-msgstr ""
+msgstr "Étiquette de réservations"
 
 msgid "SBB Daypass Label"
-msgstr ""
+msgstr "Étiquette de carte journalière CFF"
 
 msgid "Publications Label"
-msgstr ""
+msgstr "Étiquette de publications"
 
 msgid "E-Move Label"
-msgstr ""
+msgstr "Étiquette de eDéménagement"
 
 msgid "E-Move Url"
-msgstr ""
+msgstr "Url de eDéménagement"
 
 msgid "Hide Publications on Homepage"
-msgstr ""
+msgstr "Masquer les publications sur la page d'accueil"
 
 msgid "Number of events displayed on homepage"
-msgstr ""
+msgstr "Nombre d'événements affichés sur la page d'accueil"
 
 msgid "Number of news entries on homepage"
-msgstr ""
+msgstr "Nombre des nouvelles sur la page d'accueil"
 
 msgid "Image Focus"
 msgstr ""
