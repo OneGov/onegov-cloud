@@ -29,7 +29,7 @@ pages:
 organisation:
   theme_options:
     footer-height: 235px
-    primary-color-ui: '#e33521'
+    primary-color: '#e33521'
   meta:
     homepage_structure: |
       <row>
