@@ -1560,7 +1560,7 @@ msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"
 
 msgid "Click the following link to set a new password:"
-msgstr "Cliquez sur le lien suivant pour définir un nouveau mot de passe :"
+msgstr "Cliquez sur le lien suivant pour définir un nouveau mot de passe:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
