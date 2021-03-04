@@ -225,6 +225,7 @@ setup(
             'onegov-server=onegov.server.cli:run',
             'onegov-swissvotes=onegov.swissvotes.cli:cli',
             'onegov-town=onegov.org.cli:cli',
+            'onegov-town6=onegov.org.cli:cli',
             'onegov-user=onegov.user.cli:cli',
             'onegov-winterthur=onegov.winterthur.cli:cli',
             'onegov-wtfs=onegov.wtfs.cli:cli',
