@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-03-03 20:32+0100\n"
+"POT-Creation-Date: 2021-03-04 01:51+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -348,7 +348,7 @@ msgstr "Imprimer"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
-msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
+msgstr "Voulez-vous vraiment supprimer «${title}»?"
 
 msgid "All entries will be deleted as well!"
 msgstr "Toutes les entrées seront également supprimées !"
@@ -396,7 +396,7 @@ msgid "Propose entry"
 msgstr "Proposer une entrée"
 
 msgid "Something missing? Propose a new entry."
-msgstr "Il manque quelque chose ? Proposez une nouvelle entrée."
+msgstr "Il manque quelque chose? Proposez une nouvelle entrée."
 
 msgid "External link"
 msgstr "Lien externe"
@@ -409,7 +409,7 @@ msgstr "Demande de modification"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr ""
-"Vous avez trouvé une erreur ? Proposez une modification à apporter à cette "
+"Vous avez trouvé une erreur? Proposez une modification à apporter à cette "
 "entrée."
 
 msgid ""
@@ -592,11 +592,9 @@ msgstr "Envoyer"
 msgid "Drop files to upload"
 msgstr "Déposez des fichiers pour télécharger"
 
-msgid "<dynamic element> <dynamic element>"
-msgstr ""
+msgid "read more"
+msgstr "en savoir plus"
 
-#. Used in sentence: "<dynamic element> <dynamic element>"
-#.
 msgid "Latest news"
 msgstr "Dernières nouvelles"
 
@@ -888,7 +886,7 @@ msgid "${count} words"
 msgstr "${count} mots"
 
 msgid "Do you really want to delete this file?"
-msgstr "Voulez-vous vraiment supprimer ce fichier ?"
+msgstr "Voulez-vous vraiment supprimer ce fichier?"
 
 msgid "Delete File"
 msgstr "Supprimez le fichier"
@@ -957,7 +955,7 @@ msgstr ""
 "${homepage}."
 
 msgid "To activate your account, click confirm below:"
-msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous :"
+msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
 
 msgid "Confirm my account"
 msgstr "Confirmer mon compte"
@@ -980,7 +978,7 @@ msgstr ""
 "d'informations suivante:"
 
 msgid "Plese click the following link to confirm your subscription:"
-msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement :"
+msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement:"
 
 msgid "Confirm subscription"
 msgstr "Confirmer l'abonnement"
@@ -1011,7 +1009,7 @@ msgid "No reservations today."
 msgstr "Aucune réservation aujourd'hui."
 
 msgid "Have a great day!"
-msgstr "Passez une bonne journée !"
+msgstr "Passez une bonne journée!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -1023,10 +1021,10 @@ msgstr ""
 "pour qu'il vous enlève de la liste des destinataires."
 
 msgid "This is what happend on the ${org} website yesterday:"
-msgstr "Voici ce qui s'est passé aujourd'hui sur le site web de ${org} :"
+msgstr "Voici ce qui s'est passé aujourd'hui sur le site web de ${org}:"
 
 msgid "This is what happend on the ${org} website over the weekend:"
-msgstr "Voici ce qui s'est passé ce week-end sur le site web de ${org} :"
+msgstr "Voici ce qui s'est passé ce week-end sur le site web de ${org}:"
 
 msgid "tickets were opened."
 msgstr "tickets ouverts."
@@ -1059,7 +1057,7 @@ msgid "ticket is pending."
 msgstr "ticket en attente."
 
 msgid "Have a great week!"
-msgstr "Bonne semaine !"
+msgstr "Bonne semaine!"
 
 msgid ""
 "This is the daily OneGov Cloud status e-mail. If you don't want to receive "
@@ -1081,16 +1079,16 @@ msgid "Check request status"
 msgstr "Vérifier l'état de la demande"
 
 msgid "Your change request has been applied:"
-msgstr "Votre demande de modification a été effectuée :"
+msgstr "Votre demande de modification a été effectuée:"
 
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Votre proposition de répertoire a malheureusement été rejetée :"
 
 msgid "Your event has been accepted:"
-msgstr "Votre événement a été accepté :"
+msgstr "Votre événement a été accepté:"
 
 msgid "Your event has unfortunately been rejected:"
-msgstr "Votre événement a malheureusement été rejeté :"
+msgstr "Votre événement a malheureusement été rejeté:"
 
 msgid "The OneGov Cloud Team"
 msgstr "L'équipe de OneGov Cloud"
@@ -1104,7 +1102,7 @@ msgstr "Votre nom d'utilisateur est ${email}."
 
 msgid "Click on the following link to set your account password:"
 msgstr ""
-"Cliquer sur le lien suivant pour définir le mot de passe de votre compte :"
+"Cliquer sur le lien suivant pour définir le mot de passe de votre compte:"
 
 msgid "Set Account Password"
 msgstr "Définir le mot de passe du compte"
@@ -1134,7 +1132,7 @@ msgid "Click here to unsubscribe."
 msgstr "Cliquer ici pour vous désabonner."
 
 msgid "Click the following link to set a new password:"
-msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe :"
+msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
@@ -1156,7 +1154,7 @@ msgstr ""
 "relevé de carte de crédit."
 
 msgid "Amount:"
-msgstr "Montant :"
+msgstr "Montant:"
 
 msgid "Your registration for \"${title}\" has been confirmed."
 msgstr "Votre inscription pour \"${title}\" a été confirmée."
@@ -1177,13 +1175,13 @@ msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
 
 msgid "The following reservations have been accepted:"
-msgstr "Les réservations suivantes ont été acceptées :"
+msgstr "Les réservations suivantes ont été acceptées:"
 
 msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Les réservations suivantes ont malheureusement été annulées :"
+msgstr "Les réservations suivantes ont malheureusement été annulées:"
 
 msgid "A message has been sent regarding ${ref}:"
-msgstr "Un message a été envoyé à propos de ${ref} :"
+msgstr "Un message a été envoyé à propos de ${ref}:"
 
 msgid "${author} wrote"
 msgstr "${author} a écrit"
@@ -1314,7 +1312,7 @@ msgstr "E-mails de tickets activés."
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
-"permanence :"
+"permanence:"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -1339,10 +1337,10 @@ msgid ""
 "password, as it won't be shown to you again:"
 msgstr ""
 "Création de l'utilisateur ${username} réussie. Veuillez conserver ce mot de "
-"passe d'utilisateur, car il ne vous sera plus montré à nouveau : "
+"passe d'utilisateur, car il ne vous sera plus montré à nouveau:"
 
 msgid "Password:"
-msgstr "Mot de passe :"
+msgstr "Mot de passe:"
 
 msgid ""
 "The user ${username} was created successfully. An e-mail has been sent to "
@@ -1582,7 +1580,7 @@ msgid ""
 "continuing, it won't be shown to you again:"
 msgstr ""
 "Votre lien d'inscription a été créé comme suit. Copiez-le avant de "
-"continuer, il ne vous sera pas montré à nouveau :"
+"continuer, il ne vous sera pas montré à nouveau:"
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -1683,7 +1681,7 @@ msgstr "Sujet"
 msgid ""
 "Forgot something or have a special request? Add a message to the ticket."
 msgstr ""
-"Vous avez oublié quelque chose ou avez une demande spéciale ? Ajoutez un "
+"Vous avez oublié quelque chose ou avez une demande spéciale? Ajoutez un "
 "message a la demande."
 
 msgid "New messages have been disabled because the ticket has been closed."
