@@ -207,6 +207,12 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /onegov_town6/*
+    application: onegov.town6.TownApp
+    namespace: onegov_town6
+    configuration:
+      <<: *global-config
+
   - path: /onegov_agency/*
     application: onegov.agency.AgencyApp
     namespace: onegov_agency
