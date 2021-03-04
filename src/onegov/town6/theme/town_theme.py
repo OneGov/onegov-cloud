@@ -133,7 +133,8 @@ class TownTheme(BaseTheme):
             'redactor',
             'directories',
             'daypicker',
-            'payment'
+            'payment',
+            'person'
         ]
 
     @property

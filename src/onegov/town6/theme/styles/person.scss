@@ -3,7 +3,7 @@
 */
 $person-website-icon: '\f0c1';
 $person-phone-icon: '\f095';
-$person-email-icon: '\f003';
+$person-email-icon: '\f0e0';
 
 .person-card {
     margin: 0 1em 1em 0;
@@ -71,13 +71,13 @@ $person-email-icon: '\f003';
 
     &.person-single-item {
         .person-card-website::before {
-            @include icon($person-website-icon);
+            @include icon-bold($person-website-icon);
             color: $primary-color;
         }
 
         .person-card-phone::before,
         .person-card-phone-direct::before {
-            @include icon($person-phone-icon);
+            @include icon-bold($person-phone-icon);
             color: $primary-color;
         }
 
@@ -91,10 +91,9 @@ $person-email-icon: '\f003';
 @include breakpoint(small only) {
     .person-card {
         .person-card-portrait {
-            float: none;
-            height: calc(100vw - 3rem);
-            margin-bottom: 1em;
-            width: calc(100vw - 3rem);
+            height: calc(100vw - 6rem);
+            margin: 0 auto 1em auto;
+            width: calc(100vw - 6rem);
         }
     }
 }
@@ -136,5 +135,28 @@ $person-email-icon: '\f003';
 
     .person-card-function {
         margin-bottom: 0;
+    }
+}
+
+/*
+    A-Z Blocks
+*/
+
+.atoz-block {
+    h2 {
+        border-bottom: 1px solid $gray-pastel;
+    }
+
+    ul {
+        list-style: none;
+        margin-left: 0;
+    }
+}
+
+@media #{$large-only} {
+    .atoz-block {
+        h2 {
+            max-width: 50%;
+        }
     }
 }
