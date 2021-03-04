@@ -1,4 +1,4 @@
-<tal:b i18n:domain="onegov.org">
+<tal:b i18n:domain="onegov.town6">
     <metal:b use-macro="layout.macros['generic_message']">
         <metal:b fill-slot="title">
             <a href="${link}">${model.meta.name}</a>

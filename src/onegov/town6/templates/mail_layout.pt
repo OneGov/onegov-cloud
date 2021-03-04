@@ -17,7 +17,7 @@
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     xmlns:metal="http://xml.zope.org/namespaces/metal"
     xmlns:tal="http://xml.zope.org/namespaces/tal"
-    i18n:domain="onegov.org"
+    i18n:domain="onegov.town6"
     metal:define-macro="layout">
 <head>
     <meta name="viewport" content="width=device-width" />

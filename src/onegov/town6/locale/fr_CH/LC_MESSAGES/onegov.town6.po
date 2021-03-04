@@ -601,7 +601,7 @@ msgid "Latest news"
 msgstr "Dernières nouvelles"
 
 msgid "All articles"
-msgstr "Alle Beiträge"
+msgstr "Toutes les contributions"
 
 msgid "This site is private"
 msgstr "Ce site est privé"

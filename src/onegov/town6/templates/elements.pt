@@ -1,4 +1,4 @@
-<xml xmlns="http://www.w3.org/1999/xhtml" i18n:domain="onegov.org">
+<xml xmlns="http://www.w3.org/1999/xhtml" i18n:domain="onegov.town6">
 
 <!--! A generic link element -->
 <metal:b define-macro="link">

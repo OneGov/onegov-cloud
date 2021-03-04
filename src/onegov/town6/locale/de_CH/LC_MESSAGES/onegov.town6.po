@@ -602,7 +602,7 @@ msgid "Latest news"
 msgstr "Aktuelles"
 
 msgid "All articles"
-msgstr "Toutes les contributions"
+msgstr "Alle Beiträge"
 
 msgid "This site is private"
 msgstr "Diese Seite ist Privat"
