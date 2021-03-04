@@ -20,8 +20,7 @@ def open_file(path, mode='r'):
 
 def parse_entry(block):
     parts = block.split('msgstr ')
-    ID = parts[0].replace('msgid ', '')
-    return ID, parts[1]
+    return parts[0].replace('msgid ', ''), parts[1]
 
 
 def blocks_from_file(src, lang):
@@ -74,8 +73,6 @@ def apply_translations(src, target, overwrite, dry_run):
     Use the source and target names of onegov modules to transfer
     translations that appear in both.
 
-    Only one line translations are supported by now.
-    Can be used to migrate other app to foundation6.
     """
     src_locals = f'{base}/{src}/locale'
     langs = [

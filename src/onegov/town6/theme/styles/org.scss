@@ -10,6 +10,7 @@
     to a readable length.
 */
 $max-line-width: 71ex;
+$max-lead-with: 66ex;
 
 .limit-line-width {
     max-width: $max-line-width;
@@ -149,7 +150,7 @@ footer {
     font-size: $h5-font-size;
     font-weight: 400;
     margin-bottom: 1rem;
-    max-width: $max-line-width;
+    max-width: $max-lead-with;
 }
 
 /*
