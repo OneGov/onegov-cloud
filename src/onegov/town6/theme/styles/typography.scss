@@ -41,7 +41,8 @@ p > * {
     font-family: $body-font-family;
 }
 
-.page-text ul li a {
+.page-text ul li a,
+p a {
     font-family: $body-font-family !important;
 }
 
