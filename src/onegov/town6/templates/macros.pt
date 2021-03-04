@@ -439,7 +439,7 @@
     </form>
 </metal:upload>
 
-<metal:newslist define-macro="news-item-card">
+<metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
     <div class="card" data-equalizer-watch>
         <div tal:condition="item.image_url|nothing" class="card-header">
             <img src="${item.image_url}">
@@ -463,7 +463,7 @@
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
     <div class="newslist grid-x grid-padding-x" tal:condition="news" data-equalizer data-equalize-on="medium">
         <div class="cell small-12">
-            <h3 i18n:translate tal:condition="not:hide_title|False">
+            <h3 tal:condition="not:hide_title|False">
                 <span i18n:translate="">Latest news</span>
                 <small tal:condition="show_all_news_link|nothing">
                     <a href="${layout.newsletter_url}"><i class="fas fa-chevron-right" aria-hidden="true"></i><span i18n:translate>All articles</span></a>
@@ -1040,7 +1040,7 @@
             />
         </div>
         <div class="large-9 medium-8 small-7 cell calendar-text-column">
-            <h3>
+            <h3 class="h4-size">
                 <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
