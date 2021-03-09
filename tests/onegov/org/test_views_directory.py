@@ -202,7 +202,8 @@ def test_directory_change_requests(client):
         Name *= ___
         Pic *= *.jpg|*.png|*.gif
     """
-    page.form['enable_change_requests'] = True
+    # We test as if change requests would be enabled
+    page.form['enable_change_requests'] = False
     page.form['title_format'] = '[Name]'
     page.form['content_fields'] = 'Name\nPic'
     page = page.form.submit().follow()
@@ -216,7 +217,7 @@ def test_directory_change_requests(client):
     img_url = page.pyquery('.field-display img').attr('href')
 
     # ask for a change, completely empty
-    page = page.click("Änderung vorschlagen")
+    page = client.get(f'{page.request.url}/change-request')
     page.form['submitter'] = 'user@example.org'
     assert len(client.app.smtp.outbox) == 0
     assert 'publication_start' not in page.form.fields
@@ -273,9 +274,9 @@ def test_directory_submissions(client, postgres):
     assert "Eintrag vorschlagen" not in page
 
     # change it to accept submissions
-    page = page.click("Konfigurieren")
-    page.form['enable_submissions'] = True
-    page = page.form.submit()
+    config_page = page.click("Konfigurieren")
+    config_page.form['enable_submissions'] = True
+    page = config_page.form.submit()
 
     # this fails because there are invisible fields
     assert "«Description» nicht sichtbar" in page
@@ -284,6 +285,10 @@ def test_directory_submissions(client, postgres):
     page = page.form.submit().follow()
 
     assert "Eintrag vorschlagen" in page
+
+    # change it back to no submission and test if it works if the url is known
+    config_page.form['enable_submissions'] = False
+    config_page.form.submit()
 
     # create a submission with a missing field
     page = page.click("Eintrag vorschlagen")
