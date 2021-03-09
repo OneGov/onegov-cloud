@@ -13,9 +13,8 @@ from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id, Form, \
-    WTFormsClassBuilder, merge_forms
-from onegov.form.fields import UploadField, MultiCheckboxField
+from onegov.form import FormCollection, as_internal_id
+from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
@@ -569,8 +568,8 @@ def view_export(self, request, form, layout=None):
 
         return request.redirect(url.as_string())
 
-    filters = get_filters(
-            request, self, keyword_count(request, self), view_name='+export')
+    filters = get_filters(request, self, keyword_count(request, self),
+                          view_name='+export')
 
     if filters:
         pretext = _("On the right side, you can filter the entries of this "
