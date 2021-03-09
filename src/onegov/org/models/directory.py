@@ -221,6 +221,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     enable_submissions = meta_property()
     enable_change_requests = meta_property()
     enable_publication = meta_property()
+    submitter_meta_fields = meta_property()
 
     submissions_guideline = content_property()
     change_requests_guideline = content_property()

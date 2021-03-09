@@ -407,9 +407,6 @@ def handle_edit_directory_entry(self, request, form, layout=None):
              name='submit')
 def handle_submit_directory_entry(self, request, form, layout=None):
 
-    if not self.directory.enable_submissions:
-        raise HTTPForbidden()
-
     title = _("Submit a New Directory Entry")
 
     if form.submitted(request):
@@ -439,8 +436,9 @@ def handle_submit_directory_entry(self, request, form, layout=None):
                 'extensions': tuple(
                     ext for ext in self.directory.extensions
                     if ext != 'submitter'
-                )
-            }
+                ),
+                **form.submitter_meta
+            },
         )
 
         # remove old submission while we are at it
@@ -472,9 +470,6 @@ def handle_submit_directory_entry(self, request, form, layout=None):
              name='change-request')
 def handle_change_request(self, request, form, layout=None):
 
-    if not self.directory.enable_change_requests:
-        raise HTTPForbidden()
-
     title = _("Propose a change")
 
     if form.submitted(request):
@@ -496,6 +491,7 @@ def handle_change_request(self, request, form, layout=None):
                 'directory': self.directory.id.hex,
                 'directory_entry': self.id.hex,
                 'extensions': extensions,
+                **form.submitter_meta
             }
         )
 
