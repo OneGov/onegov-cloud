@@ -1,7 +1,7 @@
 import html
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import TimestampMixin, meta_property
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles, File
@@ -59,6 +59,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
     #: metadata about this submission
     meta = Column(JSON, nullable=False)
+
+    #: Additional information about the submitee
+    submitter_name = meta_property()
+    submitter_address = meta_property()
+    submitter_phone = meta_property()
 
     #: the submission data
     data = Column(JSON, nullable=False)

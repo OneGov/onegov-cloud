@@ -5,12 +5,12 @@ from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
 from onegov.form.submissions import prepare_for_submission
 from onegov.form.fields import UploadField, TimezoneDateTimeField
-from onegov.form.validators import StrictOptional
+from onegov.form.validators import StrictOptional, ValidPhoneNumber
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from wtforms.fields import TextAreaField
+from wtforms.fields import TextAreaField, StringField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, InputRequired
 
 
 class CoordinatesFormExtension(FormExtension, name='coordinates'):
@@ -38,6 +38,33 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
                 fieldset=_("Submitter"),
                 validators=[DataRequired()]
             )
+
+            submitter_name = StringField(
+                label=_('Name'),
+                fieldset=_("Submitter"),
+                validators=[InputRequired()]
+            )
+
+            submitter_address = StringField(
+                label=_('Address'),
+                fieldset=_("Submitter"),
+                validators=[InputRequired()]
+            )
+
+            submitter_phone = StringField(
+                label=_('Phone'),
+                fieldset=_("Submitter"),
+                validators=[ValidPhoneNumber()]
+            )
+
+            def on_request(self):
+                """ This is not an optimal solution defining this on a form
+                extension. However, this is the first of it's cind.
+                Don't forget to call super for the next one. =) """
+                additional_fields = self.model.directory.submitter_meta or []
+                for field in ('name', 'address', 'phone'):
+                    if f'submitter_{field}' not in additional_fields:
+                        self.delete_field(f'submitter_{field}')
 
         return SubmitterForm
 
