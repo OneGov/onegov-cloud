@@ -13,8 +13,9 @@ from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id
-from onegov.form.fields import UploadField
+from onegov.form import FormCollection, as_internal_id, Form, \
+    WTFormsClassBuilder, merge_forms
+from onegov.form.fields import UploadField, MultiCheckboxField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
@@ -202,7 +203,7 @@ def delete_directory(self, request):
     request.success(_("The directory was deleted"))
 
 
-def get_filters(request, self, keyword_counts=None):
+def get_filters(request, self, keyword_counts=None, view_name=None):
     Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
     empty = tuple()
@@ -225,7 +226,7 @@ def get_filters(request, self, keyword_counts=None):
                 url=request.link(self.for_filter(
                     singular=keyword in radio_fields,
                     **{keyword: value}
-                )),
+                ), name=view_name),
                 rounded=keyword in radio_fields
             ) for value in values
         )))
@@ -568,15 +569,25 @@ def view_export(self, request, form, layout=None):
 
         return request.redirect(url.as_string())
 
+    filters = get_filters(
+            request, self, keyword_count(request, self), view_name='+export')
+
+    if filters:
+        pretext = _("On the right side, you can filter the entries of this "
+                    "directory to export.")
+    else:
+        pretext = _("Exports all entries of this directory.")
+
     return {
         'layout': layout,
         'title': _("Export"),
         'form': form,
-        'explanation': _(
-            "Exports all entries of this directory. The resulting zipfile "
-            "contains the selected format as well as metadata and "
-            "images/files if the directory contains any."
-        )
+        'explanation': f'{request.translate(pretext)} ' + request.translate(_(
+            "The resulting zipfile contains the selected format as well "
+            "as metadata and images/files if the directory contains any."
+        )),
+        'filters': filters,
+        'count': self.query().count()
     }
 
 
@@ -597,7 +608,11 @@ def view_zip_file(self, request):
 
     with NamedTemporaryFile() as f:
         archive = DirectoryZipArchive(f.name + '.zip', format, transform)
-        archive.write(self.directory, entry_filter=request.exclude_invisible)
+        archive.write(
+            self.directory,
+            entry_filter=request.exclude_invisible,
+            query=self.query()
+        )
 
         response = render_file(str(archive.path), request)
 

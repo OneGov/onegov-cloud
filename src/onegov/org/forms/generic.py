@@ -55,7 +55,7 @@ class ExportForm(Form):
 
     def as_export_response(self, results, title='export', **kwargs):
         """ Turns the given results (list of dicts) into a webob response
-        with the currently selected fiel format.
+        with the currently selected file format.
 
         The additional keyword arguments are directly passed into the
         convert_list_of_dicts_to_* functions.

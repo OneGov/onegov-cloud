@@ -229,10 +229,11 @@ class DirectoryArchiveWriter(object):
     def write(self, directory, *args, **kwargs):
         """ Writes the given directory. """
         entry_filter = kwargs.pop('entry_filter', None)
+        query = kwargs.pop('query', None)
         assert self.format in ('xlsx', 'csv', 'json')
 
         self.write_directory_metadata(directory)
-        self.write_directory_entries(directory, entry_filter)
+        self.write_directory_entries(directory, entry_filter, query)
 
     def write_directory_metadata(self, directory):
         """ Writes the metadata. """
@@ -249,9 +250,10 @@ class DirectoryArchiveWriter(object):
         }
         self.write_json(self.path / 'metadata.json', metadata)
 
-    def write_directory_entries(self, directory, entry_filter=None):
+    def write_directory_entries(
+            self, directory, entry_filter=None, query=None):
         """ Writes the directory entries. Allows filtering with custom
-        entry_filter function. """
+        entry_filter function as well as passing a query object """
 
         fields = directory.fields
         paths = {}
@@ -289,7 +291,7 @@ class DirectoryArchiveWriter(object):
 
             return data
 
-        entries = directory.entries
+        entries = query and query.all() or directory.entries
         if entry_filter:
             entries = entry_filter(entries)
 
