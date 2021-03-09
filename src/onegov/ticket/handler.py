@@ -61,6 +61,21 @@ class Handler(object):
         raise NotImplementedError
 
     @property
+    def submitter_name(self):
+        """ Returns the name of the submitter """
+        return
+
+    @property
+    def submitter_address(self):
+        """ Returns the address of the submitter """
+        return
+
+    @property
+    def submitter_phone(self):
+        """ Returns the phone of the submitter """
+        return
+
+    @property
     def title(self):
         """ Returns the title of the ticket. If this title may change over
         time, the handler must call :meth:`self.refresh` when there's a change.
