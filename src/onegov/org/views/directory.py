@@ -407,9 +407,6 @@ def handle_edit_directory_entry(self, request, form, layout=None):
              name='submit')
 def handle_submit_directory_entry(self, request, form, layout=None):
 
-    if not self.directory.enable_submissions:
-        raise HTTPForbidden()
-
     title = _("Submit a New Directory Entry")
 
     if form.submitted(request):
@@ -471,9 +468,6 @@ def handle_submit_directory_entry(self, request, form, layout=None):
              form=get_change_request_form_class,
              name='change-request')
 def handle_change_request(self, request, form, layout=None):
-
-    if not self.directory.enable_change_requests:
-        raise HTTPForbidden()
 
     title = _("Propose a change")
 

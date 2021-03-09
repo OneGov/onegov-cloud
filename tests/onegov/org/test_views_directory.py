@@ -70,6 +70,9 @@ def test_publication_added_by_admin(client):
 
     meetings = create_directory(client, publication=False)
 
+    # These url should be available for people who know it
+    client.get('/directories/meetings/+submit')
+
     # create one entry as admin, publications is still available for admin
     page = meetings.click('Eintrag', index=0)
     page.form['name'] = 'Annual'
@@ -83,6 +86,9 @@ def test_publication_added_by_admin(client):
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
+
+    # check that the change request url is not protected
+    client.get('/directories/meetings/annual/change-request')
 
     assert 'Pic' not in entry
 
