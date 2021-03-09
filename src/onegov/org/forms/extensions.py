@@ -33,6 +33,7 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
 
     def create(self):
         class SubmitterForm(self.form_class):
+
             submitter = EmailField(
                 label=_("E-Mail"),
                 fieldset=_("Submitter"),
@@ -54,17 +55,33 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
             submitter_phone = StringField(
                 label=_('Phone'),
                 fieldset=_("Submitter"),
-                validators=[ValidPhoneNumber()]
+                validators=[InputRequired(), ValidPhoneNumber()]
             )
 
             def on_request(self):
                 """ This is not an optimal solution defining this on a form
                 extension. However, this is the first of it's cind.
                 Don't forget to call super for the next one. =) """
-                additional_fields = self.model.directory.submitter_meta or []
+                if not hasattr(self.model, 'directory'):
+                    fields = []
+                else:
+                    fields = self.model.directory.submitter_meta_fields or []
                 for field in ('name', 'address', 'phone'):
-                    if f'submitter_{field}' not in additional_fields:
+                    if f'submitter_{field}' not in fields:
                         self.delete_field(f'submitter_{field}')
+
+            @property
+            def submitter_meta(self):
+
+                def field_data(name):
+                    field = getattr(self, name)
+                    return field and field.data or None
+
+                return {
+                    'submitter_name': field_data('submitter_name'),
+                    'submitter_phone': field_data('submitter_phone'),
+                    'submitter_address': field_data('submitter_address')
+                }
 
         return SubmitterForm
 

@@ -436,8 +436,9 @@ def handle_submit_directory_entry(self, request, form, layout=None):
                 'extensions': tuple(
                     ext for ext in self.directory.extensions
                     if ext != 'submitter'
-                )
-            }
+                ),
+                **form.submitter_meta
+            },
         )
 
         # remove old submission while we are at it

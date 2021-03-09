@@ -729,6 +729,21 @@ class DirectoryEntryHandler(Handler):
         return self.submission.email
 
     @property
+    def submitter_name(self):
+        return self.deleted and self.ticket.snapshot.get('submitter_name') \
+               or self.submission.submitter_name
+
+    @property
+    def submitter_phone(self):
+        return self.deleted and self.ticket.snapshot.get('submitter_phone') \
+               or self.submission.submitter_phone
+
+    @property
+    def submitter_address(self):
+        return self.deleted and self.ticket.snapshot.get('submitter_address') \
+               or self.submission.submitter_address
+
+    @property
     def title(self):
         return self.submission.title
 
