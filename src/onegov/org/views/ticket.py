@@ -93,8 +93,6 @@ def view_ticket(self, request, layout=None):
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
 
-    submitter = ticket_submitter(self)
-
     return {
         'title': self.number,
         'layout': layout,
@@ -103,7 +101,10 @@ def view_ticket(self, request, layout=None):
         'deleted': handler.deleted,
         'handler': handler,
         'event_source': handler.data.get('source'),
-        'submitter': submitter,
+        'submitter': ticket_submitter(self),
+        'submitter_name': handler.submitter_name,
+        'submitter_address': handler.submitter_address,
+        'submitter_phone': handler.submitter_phone,
         'payment_button': payment_button,
         'counts': counts,
         'feed_data': json.dumps(

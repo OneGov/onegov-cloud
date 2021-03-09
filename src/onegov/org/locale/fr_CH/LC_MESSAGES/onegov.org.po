@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-02 17:27+0100\n"
+"POT-Creation-Date: 2021-03-09 15:50+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -371,6 +371,18 @@ msgstr ""
 msgid "Publication"
 msgstr "Publication"
 
+msgid "Information to be provided in addition to the E-mail"
+msgstr "Informations complémentaires du demandeur requises à l'e-mail"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Submitter"
+msgstr "Auteur"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Les champs suivants sont inconnus : ${fields}"
@@ -493,9 +505,6 @@ msgstr "Tradition"
 
 msgid "Youth"
 msgstr "Jeunesse"
-
-msgid "Submitter"
-msgstr "Auteur"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto dans le jardin du château"
@@ -781,9 +790,6 @@ msgstr "Nom de famille"
 msgid "Function"
 msgstr "Fonction"
 
-msgid "Phone"
-msgstr "Téléphone"
-
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
 
@@ -903,9 +909,6 @@ msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
 
 msgid "The price must be larger than zero"
 msgstr "Le prix doit être supérieur à zéro"
-
-msgid "Name"
-msgstr "Nom"
 
 msgid "Send on"
 msgstr "Envoyer sur"

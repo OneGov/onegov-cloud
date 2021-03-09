@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-02 17:27+0100\n"
+"POT-Creation-Date: 2021-03-09 15:50+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -370,6 +370,18 @@ msgstr ""
 msgid "Publication"
 msgstr "Publikation"
 
+msgid "Information to be provided in addition to the E-mail"
+msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Submitter"
+msgstr "Antragsteller/in"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
@@ -491,9 +503,6 @@ msgstr "Brauchtum"
 
 msgid "Youth"
 msgstr "Jugend"
-
-msgid "Submitter"
-msgstr "Antragsteller/in"
 
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
@@ -777,9 +786,6 @@ msgstr "Nachname"
 msgid "Function"
 msgstr "Funktion"
 
-msgid "Phone"
-msgstr "Telefon"
-
 msgid "Direct Phone Number"
 msgstr "Direktnummer"
 
@@ -899,9 +905,6 @@ msgstr ""
 
 msgid "The price must be larger than zero"
 msgstr "Der Preis muss grösser als Null sein"
-
-msgid "Name"
-msgstr "Name"
 
 msgid "Send on"
 msgstr "Senden am"

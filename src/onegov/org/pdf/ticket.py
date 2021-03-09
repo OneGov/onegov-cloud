@@ -230,9 +230,23 @@ class TicketPdf(Pdf):
         def seconds(time):
             return self.layout.format_seconds(time) if time else ''
 
+        meta_fields = {
+            'submitter_name': _("Name"),
+            'submitter_address': _("Address"),
+            'submitter_phone': _("Phone")
+        }
+
+        # pep572 still a cool thing
+        submitter_meta = [
+            [text, layout.linkify(value)]
+            for field, text in meta_fields.items()
+            if (value := getattr(handler, field))
+        ]
+
         data = [
             [_("Subject"), subject],
             [_("Submitter"), submitter],
+            *submitter_meta,
             [_("State"), ticket_state],
             [_("Group"), group],
             [_("Owner"), owner],

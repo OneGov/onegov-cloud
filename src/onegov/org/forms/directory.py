@@ -10,7 +10,7 @@ from onegov.form import merge_forms
 from onegov.form import move_fields
 from onegov.form import parse_formcode
 from onegov.form.errors import FormError
-from onegov.form.fields import IconField
+from onegov.form.fields import IconField, MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
@@ -256,6 +256,16 @@ class DirectoryBaseForm(Form):
                       "of the entry on submissions and change requests"),
         fieldset=_("Publication"),
         default=False)
+
+    submitter_meta_fields = MultiCheckboxField(
+        label=_("Information to be provided in addition to the E-mail"),
+        choices=(
+            ('submitter_name', _("Name")),
+            ('submitter_address', _("Address")),
+            ('submitter_phone', _("Phone")),
+        ),
+        fieldset=_("Submitter")
+    )
 
     @cached_property
     def known_field_ids(self):

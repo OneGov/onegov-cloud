@@ -491,6 +491,7 @@ def handle_change_request(self, request, form, layout=None):
                 'directory': self.directory.id.hex,
                 'directory_entry': self.id.hex,
                 'extensions': extensions,
+                **form.submitter_meta
             }
         )
 
