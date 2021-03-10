@@ -37,9 +37,9 @@
         <span data-click-target="${link.attrs['href']}">${link.text}</span>
     </a>
     <tal:b tal:condition="not: children" tal:content="structure link(layout)"/>
-    <ul class="vertical menu nested" tal:condition="children">
-        <tal:b tal:repeat="(sublink, c) children">
-            <li>
+    <ul class="vertical menu nested" data-sortable data-sortable-url="${layout.sortable_url_template}" tal:condition="children">
+        <tal:b tal:repeat="(page_id, sublink, c) children">
+            <li data-sortable-id="${page_id}">
                 <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
             </li>
         </tal:b>
@@ -48,8 +48,8 @@
 
 
 <metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu side-navigation" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
-        <li tal:repeat="(link, children) links">
+    <ul class="vertical menu side-navigation" data-sortable data-sortable-url="${layout.sortable_url_template}" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+        <li tal:repeat="(page_id, link, children) links" data-sortable-id="${page_id}">
             <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>
     </ul>

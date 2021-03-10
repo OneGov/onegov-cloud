@@ -11,7 +11,7 @@ from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org.models import (
     ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
-    ExportCollection, PublicationCollection
+    ExportCollection, PublicationCollection, PageMove
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
@@ -110,7 +110,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def top_navigation(self):
         def yield_children(page):
             return (
-                Link(page.title, self.request.link(page)),
+                page.id, Link(page.title, self.request.link(page)),
                 tuple(yield_children(p) for p in
                       self.request.exclude_invisible(page.children))
             )
@@ -124,6 +124,12 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     @cached_property
     def root_pages(self):
         return self.request.exclude_invisible(self.app.root_pages)
+
+    @cached_property
+    def sortable_url_template(self):
+        return self.csrf_protected_url(
+            self.request.link(PageMove.for_url_template())
+        )
 
 
 class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
