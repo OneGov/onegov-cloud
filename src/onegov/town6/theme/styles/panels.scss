@@ -281,6 +281,9 @@ $checklist-icon: "\f0ae";
         > ul {
 
             li:first-child {
+                @include breakpoint(small only) {
+                    font-size: $h3-font-size - $h3-font-reduction;
+                }
                 font-family: $header-font-family;
                 font-size: $h3-font-size;
                 margin-bottom: .5rem;

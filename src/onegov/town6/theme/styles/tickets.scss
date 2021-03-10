@@ -372,18 +372,30 @@ button {
 
     h2 {
         font-size: $h3-font-size;
+        @include breakpoint(small only) {
+            font-size: $h3-font-size - $h3-font-reduction;
+        }
     }
 
     h3 {
         font-size: $h4-font-size;
+        @include breakpoint(small only) {
+            font-size: $h4-font-size - $h4-font-reduction;
+        }
     }
 
     h4 {
         font-size: $h5-font-size;
+        @include breakpoint(small only) {
+            font-size: $h5-font-size - $h5-font-reduction;
+        }
     }
 
     h6 {
         font-size: $h6-font-size;
+        @include breakpoint(small only) {
+            font-size: $h6-font-size - $h6-font-reduction;
+        }
     }
 
     dd {

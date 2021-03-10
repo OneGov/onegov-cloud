@@ -4,7 +4,6 @@
 
 .newsletter-lead {
     display: block;
-    font-size: $h5-font-size;
     font-weight: 400;
     margin-bottom: 1rem;
     max-width: $max-line-width;
@@ -41,6 +40,9 @@
 
 .newsletter-block > h2,
 .newsletter-block .newslist h2 {
+    @include breakpoint(small only) {
+        font-size: $h3-font-size - $h3-font-reduction;
+    }
     font-size: $h3-font-size;
 }
 

@@ -518,7 +518,7 @@
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 cell page-content-main">
                 <div metal:define-slot="before-lead"></div>
-                <span class="page-lead" tal:condition="lead" tal:content="structure lead" />
+                <span class="page-lead h5-size" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
@@ -527,7 +527,7 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or show_side_panel">
             <div class="small-12 medium-8 cell page-content-main">
-                <span class="page-lead" tal:condition="lead" tal:content="structure lead" />
+                <span class="page-lead h5-size" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
