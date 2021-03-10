@@ -1,10 +1,12 @@
+from unittest.mock import patch
+
 import pytest
 import transaction
 
 from datetime import date
 from onegov.core.custom import json
 from onegov.core.utils import Bunch
-from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryCollection, DirectoryEntryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryArchive
 from onegov.directory import DirectoryZipArchive
@@ -50,7 +52,15 @@ def test_archive_create(session, temporary_path):
 
     businesses = directories.by_name('businesses')
 
+    collection = DirectoryEntryCollection(businesses)
+    query = collection.query().limit(1)
+
     archive = DirectoryArchive(temporary_path, 'json')
+
+    with patch.object(archive, 'write_directory_entries', return_value=None) as po:
+        archive.write(businesses, query=query)
+    po.assert_called_once_with(businesses, None, query)
+
     archive.write(businesses)
 
     metadata = json.loads((temporary_path / 'metadata.json').open().read())
