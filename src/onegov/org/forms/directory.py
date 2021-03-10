@@ -562,6 +562,14 @@ class DirectoryImportForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    @staticmethod
+    def clear_entries(session, target):
+        for existing in target.entries:
+            session.delete(existing)
+
+        target.entries.clear()
+        session.flush()
+
     def run_import(self, target):
         session = object_session(target)
 
@@ -572,11 +580,7 @@ class DirectoryImportForm(Form):
             count += 1
 
         if self.mode.data == 'replace':
-            for existing in target.entries:
-                session.delete(existing)
-
-            target.entries.clear()
-            session.flush()
+            self.clear_entries(session, target)
 
         archive = DirectoryZipArchive.from_buffer(self.zip_file.file)
         archive.read(

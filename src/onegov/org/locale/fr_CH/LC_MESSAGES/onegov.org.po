@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-09 21:35+0100\n"
+"POT-Creation-Date: 2021-03-10 20:33+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2148,6 +2148,9 @@ msgstr ""
 msgid "Complete"
 msgstr "Complet"
 
+msgid "Entries in export: ${count}"
+msgstr "Entrées dans l'exportation: ${count}"
+
 msgid "No exports available."
 msgstr "Aucune exportation disponible."
 
@@ -4217,6 +4220,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Chosen entries: ${count}"
+#~ msgstr "Entrées sélectionnées: ${count}"
 
 #~ msgid ""
 #~ "Exports all entries of this directory. The resulting zipfile contains the "
