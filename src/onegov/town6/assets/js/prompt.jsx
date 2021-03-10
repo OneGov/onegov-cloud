@@ -97,7 +97,6 @@ var showPrompt = function(options) {
     $('body').one('opened.fndtn.reveal', function() {
         prompt_el.find('input').focus().select();
     });
-    console.log(prompt_el)
     prompt_el.foundation('open');
 };
 

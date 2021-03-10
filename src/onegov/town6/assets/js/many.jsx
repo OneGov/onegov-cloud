@@ -299,7 +299,6 @@ jQuery.fn.many = function() {
     return this.each(function() {
 
         var target = $(this);
-        console.log(this)
         var type = extractType(target);
         var data = JSON.parse(target.val());
         var label = target.closest('label');

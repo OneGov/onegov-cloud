@@ -243,7 +243,6 @@ $(document).ready(function() {
         var el = $(this);
         el.on('click', function () {
             var parent = el.parent()
-            console.log(parent.get(0));
             parent.off('click')
             window.location = el.data('click-target')
         })
