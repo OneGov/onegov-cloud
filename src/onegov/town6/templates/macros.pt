@@ -466,7 +466,10 @@
             <h3 tal:condition="not:hide_title|False">
                 <span i18n:translate="">Latest news</span>
                 <small tal:condition="show_all_news_link|nothing">
-                    <a href="${layout.newsletter_url}"><i class="fas fa-chevron-right" aria-hidden="true"></i><span i18n:translate>All articles</span></a>
+                    <a href="${layout.news_url}">
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i><span i18n:translate>All articles</span></a>
+                    <span> / </span>
+                    <a href="${layout.newsletter_url}"><span i18n:translate>Newsletter</span></a>
                 </small>
             </h3>
         </div>
@@ -1964,7 +1967,7 @@
   </tr>
 </metal:tickets_table_row>
 
-<metal:focus define-macro="focus-panel">
+<metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
     <h3>
         <span i18n:translate="">Focus</span>
     </h3>
