@@ -33,6 +33,7 @@ class TownTheme(BaseTheme):
 
     _force_compile = False
     use_flex = True
+    include_motion_ui = True
 
     @property
     def default_options(self):
@@ -139,7 +140,7 @@ class TownTheme(BaseTheme):
 
     @property
     def extra_search_paths(self):
-        return [
+        return super().extra_search_paths + [
             module_path('onegov.town6.theme', 'styles'),
             self.font_search_path
         ]

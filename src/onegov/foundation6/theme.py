@@ -60,6 +60,8 @@ class BaseTheme(CoreTheme):
         '-zf-bp-value'
     )
 
+    include_motion_ui = False
+
     def __init__(self, compress=True):
         """ Initializes the theme.
 
@@ -182,6 +184,12 @@ class BaseTheme(CoreTheme):
         )
 
     @property
+    def foundation_motion_ui(self):
+        if self.include_motion_ui:
+            return 'motion-ui-transitions', 'motion-ui-animations'
+        return []
+
+    @property
     def post_imports(self):
         """
         Imports added after the foundation import. The imports must be found
@@ -210,6 +218,14 @@ class BaseTheme(CoreTheme):
             os.path.dirname(__file__), 'foundation', 'foundation', 'scss')
 
     @property
+    def vendor_path(self):
+        """ The search path for the foundation files included in this module.
+
+        """
+        return os.path.join(
+            os.path.dirname(__file__), 'foundation', 'vendor')
+
+    @property
     def includes(self):
         not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes',
                        'visibility-classes', 'prototype-classes',
@@ -222,7 +238,8 @@ class BaseTheme(CoreTheme):
             (f'@include foundation-{i};' for i in self.foundation_styles),
             (self.foundation_grid, ),
             (f"@include foundation-{i};" for i in self.foundation_components),
-            (self.foundation_helpers, )
+            (self.foundation_helpers, ),
+            (f"@include {i};" for i in self.foundation_motion_ui)
         )
 
     def compile(self, options={}):
@@ -249,6 +266,9 @@ class BaseTheme(CoreTheme):
         print("@include add-foundation-colors;", file=theme)
         print("@import 'foundation';", file=theme)
 
+        if self.include_motion_ui:
+            print("@import 'motion-ui/motion-ui';", file=theme)
+
         print('\n'.join(
             f"@import '{i}';" for i in self.post_imports), file=theme)
 
@@ -256,7 +276,9 @@ class BaseTheme(CoreTheme):
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
-
+        if self.include_motion_ui:
+            paths.append(self.vendor_path)
+        print(theme.getvalue())
         return sass.compile(
             string=theme.getvalue(),
             include_paths=paths,
