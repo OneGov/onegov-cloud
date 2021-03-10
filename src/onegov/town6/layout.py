@@ -1838,6 +1838,6 @@ class GeneralFileCollectionLayout(DefaultLayout):
 class ImageFileCollectionLayout(DefaultLayout):
 
     def __init__(self, model, request):
+        super().__init__(model, request)
         request.include('upload')
         request.include('editalttext')
-        super().__init__(model, request)
