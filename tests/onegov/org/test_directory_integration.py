@@ -6,6 +6,7 @@ import transaction
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration, \
     DirectoryZipArchive, DirectoryEntryCollection
+from onegov.directory.errors import DuplicateEntryError
 from onegov.org.forms import DirectoryImportForm
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.models import ExtendedDirectory
@@ -36,7 +37,7 @@ class DummyRequest:
         return True
 
 
-@pytest.mark.parametrize('export_fmt,apply_metadata', [
+@pytest.mark.parametrize('export_fmt,clear', [
     ('csv', True),
     ('csv', False),
     ('xlsx', True),
@@ -45,16 +46,29 @@ class DummyRequest:
     ('json', True),
 ])
 def test_directory_roundtrip(
-        session, temporary_path, export_fmt, apply_metadata):
+        session, temporary_path, export_fmt, clear):
     directories = DirectoryCollection(session, type='extended')
-    dir_structure = "Name *= ___\nContact (for infos) = ___"
+    dir_structure = """
+            Name *= ___
+            Contact (for infos) = ___
+            Category =
+                [ ] A
+                [ ] B &;
+                [ ] Z: with semicolon
+            Choice =
+                (x) yes
+                ( ) no
+            Notes = <markdown>
+            Prozent = 0.00..100.00
+        """
     events = directories.add(
         title="Events",
         lead="The town's events",
         structure=dir_structure,
         configuration=DirectoryConfiguration(
             title="[name]",
-            order=['name']
+            order=['name'],
+            keywords=['Category', 'Choice']
         ),
         meta={
             'enable_map': False,
@@ -71,19 +85,32 @@ def test_directory_roundtrip(
     events.add(values=dict(
         name="Dance",
         contact_for_infos_='John',
+        category=['Z: with semicolon', 'B &;'],
+        choice='no',
+        notes=None,
+        prozent=99
+
+    ))
+    events.add(values=dict(
+        name="Zumba",
+        contact_for_infos_='Helen',
+        category=['A'],
+        choice='yes',
+        notes=None,
+        prozent=99
 
     ))
     transaction.commit()
 
     events = directories.by_name('events')
 
-    def transform(key, value):
-        return formatter(key), formatter(value)
-
     request = DummyRequest(session)
     self = DirectoryEntryCollection(events, type='extended')
     layout = DirectoryEntryCollectionLayout(self, request)
     formatter = layout.export_formatter(export_fmt)
+
+    def transform(key, value):
+        return formatter(key), formatter(value)
 
     with NamedTemporaryFile() as f:
         archive = DirectoryZipArchive(
@@ -99,14 +126,33 @@ def test_directory_roundtrip(
         nonlocal count
         count += 1
 
-    # Test add only new ones
+    # # Test add only new ones
     read_directory = archive.read(
         target=events,
         skip_existing=True,
-        apply_metadata=apply_metadata,
+        apply_metadata=False,
         after_import=count_entry
     )
     assert count == 0
     # Even though the metadata is not applied, the correct polymorphic class
     # has been loaded using the metadata. So the type gets always applied.
     assert read_directory.type == 'extended'
+
+    if clear:
+        DirectoryImportForm.clear_entries(session, events)
+
+    directory = archive.read(
+        target=events,
+        skip_existing=True,
+        apply_metadata=True,
+        after_import=count_entry
+    )
+
+    if clear:
+        assert count == 2
+        assert directory.meta == events.meta
+        assert directory.configuration == events.configuration
+        assert directory.content == events.content
+    else:
+        assert count == 0
+
