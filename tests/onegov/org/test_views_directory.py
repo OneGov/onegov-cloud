@@ -38,7 +38,8 @@ def strip_s(dt, timezone=None):
     return standardize_date(dt, timezone)
 
 
-def create_directory(client, publication=True, change_reqs=True):
+def create_directory(client, publication=True, change_reqs=True,
+                     submission=True, extended_submitter=False):
     client.login_admin()
     page = client.get('/directories').click('Verzeichnis')
     page.form['title'] = "Meetings"
@@ -52,7 +53,14 @@ def create_directory(client, publication=True, change_reqs=True):
     page.form['enable_map'] = 'entry'
     page.form['enable_publication'] = publication
     page.form['enable_change_requests'] = change_reqs
-    page.form['enable_submissions'] = True
+    if submission:
+        page.form['enable_submissions'] = True
+
+    if extended_submitter:
+        page.form['submitter_meta_fields'] = [
+            'submitter_name', 'submitter_address'
+        ]
+
     meetings = page.form.submit().follow()
     return meetings
 
@@ -62,6 +70,7 @@ def accecpt_latest_submission(client):
         "Annehmen", index=0).follow()
     accept_url = page.pyquery('.accept-link').attr('ic-post-to')
     client.post(accept_url)
+    return page
 
 
 def test_publication_added_by_admin(client):
@@ -69,6 +78,9 @@ def test_publication_added_by_admin(client):
     now = to_timezone(utc_now, 'Europe/Zurich')
 
     meetings = create_directory(client, publication=False)
+
+    # These url should be available for people who know it
+    client.get('/directories/meetings/+submit')
 
     # create one entry as admin, publications is still available for admin
     page = meetings.click('Eintrag', index=0)
@@ -83,6 +95,9 @@ def test_publication_added_by_admin(client):
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
+
+    # check that the change request url is not protected
+    client.get('/directories/meetings/annual/change-request')
 
     assert 'Pic' not in entry
 
@@ -102,13 +117,18 @@ def test_publication_added_by_admin(client):
 def test_publication_with_submission(client):
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
-    meetings = create_directory(client, publication=True)
+    meetings = create_directory(
+        client, publication=True, extended_submitter=True)
 
     # create a submission
     submission = meetings.click('Eintrag', index=1)
     submission.form['name'] = 'Monthly'
     submission.form['pic'] = Upload('monthly.jpg', create_image().read())
     submission.form['submitter'] = 'user@example.org'
+    submission.form['submitter_name'] = 'User Example'
+    submission.form['submitter_address'] = 'Testaddress'
+    assert 'submitter_phone' not in submission.form.fields
+
     submission.form['publication_end'] = dt_for_form(now)
     submission = submission.form.submit()
     assert 'Das Publikationsende muss in der Zukunft liegen' in submission
@@ -120,20 +140,30 @@ def test_publication_with_submission(client):
     preview = submission.form.submit().follow()
     submission = client.app.session().query(FormSubmission).one()
     assert 'publication_end' in submission.data
+    assert submission.submitter_name
+    assert submission.submitter_address
+    assert not submission.submitter_phone
+
     # is visible in the preview like coordinates
     assert 'Publikation' in preview
     assert dt_repr(monthly_end) in preview
 
     edit = preview.click('Bearbeiten')
     assert edit.form['publication_end'].value
+    assert 'submitter_name' not in edit.form.fields
 
     preview.form.submit().follow()
 
     submission = client.app.session().query(FormSubmission).one()
     assert 'publication_end' in submission.data
+    assert submission.submitter_name
+    assert submission.submitter_address
+    assert not submission.submitter_phone
 
-    # Accept the new submission
-    accecpt_latest_submission(client)
+    # Accept the new submission and test the ticket page
+    ticket_page = accecpt_latest_submission(client)
+    assert 'User Example' in ticket_page
+    assert 'Testaddress' in ticket_page
 
     monthly_entry = dir_query(client).one()
     assert monthly_entry.name == 'monthly'
@@ -152,7 +182,8 @@ def test_publication_with_submission(client):
 def test_directory_publication_change_request(client):
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
-    meetings = create_directory(client, publication=True)
+    meetings = create_directory(
+        client, publication=True, extended_submitter=True)
     end = now + timedelta(days=1)
 
     # create entry
@@ -166,6 +197,8 @@ def test_directory_publication_change_request(client):
     # make change requests
     page = entry.click('Änderung vorschlagen')
     page.form['submitter'] = 'user@example.org'
+    page.form['submitter_name'] = 'User Example'
+    page.form['submitter_address'] = 'User Address'
     assert page.form['publication_start'].value == dt_for_form(now)
     assert page.form['publication_end'].value == dt_for_form(
         now + timedelta(days=1))
@@ -178,7 +211,9 @@ def test_directory_publication_change_request(client):
     assert changes.pyquery('.diff del')[0].text == dt_repr(standardize_date(end, 'UTC'))
 
     page = changes.form.submit().follow()
-    accecpt_latest_submission(client)
+    ticket_page = accecpt_latest_submission(client)
+    assert 'User Example' in ticket_page
+    assert 'User Address' in ticket_page
     annual_entry = dir_query(client).first()
     assert annual_entry.name == 'annual'
     assert annual_entry.publication_end == strip_s(new_end, timezone='Europe/Zurich')
@@ -196,7 +231,8 @@ def test_directory_change_requests(client):
         Name *= ___
         Pic *= *.jpg|*.png|*.gif
     """
-    page.form['enable_change_requests'] = True
+    # We test as if change requests would be enabled
+    page.form['enable_change_requests'] = False
     page.form['title_format'] = '[Name]'
     page.form['content_fields'] = 'Name\nPic'
     page = page.form.submit().follow()
@@ -210,7 +246,7 @@ def test_directory_change_requests(client):
     img_url = page.pyquery('.field-display img').attr('href')
 
     # ask for a change, completely empty
-    page = page.click("Änderung vorschlagen")
+    page = client.get(f'{page.request.url}/change-request')
     page.form['submitter'] = 'user@example.org'
     assert len(client.app.smtp.outbox) == 0
     assert 'publication_start' not in page.form.fields
@@ -267,9 +303,9 @@ def test_directory_submissions(client, postgres):
     assert "Eintrag vorschlagen" not in page
 
     # change it to accept submissions
-    page = page.click("Konfigurieren")
-    page.form['enable_submissions'] = True
-    page = page.form.submit()
+    config_page = page.click("Konfigurieren")
+    config_page.form['enable_submissions'] = True
+    page = config_page.form.submit()
 
     # this fails because there are invisible fields
     assert "«Description» nicht sichtbar" in page
@@ -279,8 +315,12 @@ def test_directory_submissions(client, postgres):
 
     assert "Eintrag vorschlagen" in page
 
+    # change it back to no submission and test if it works if the url is known
+    config_page.form['enable_submissions'] = False
+    config_page.form.submit()
+
     # create a submission with a missing field
-    page = page.click("Eintrag vorschlagen")
+    page = client.get('/directories/points-of-interest/+submit')
     page.form['description'] = '\n'.join((
         "The Washington Monument is an obelisk on the National Mall in",
         "Washington, D.C., built to commemorate George Washington, once",

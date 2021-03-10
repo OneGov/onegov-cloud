@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-03 19:32+0100\n"
+"POT-Creation-Date: 2021-03-09 21:35+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -371,6 +371,18 @@ msgstr ""
 msgid "Publication"
 msgstr "Publication"
 
+msgid "Information to be provided in addition to the E-mail"
+msgstr "Informations complémentaires du demandeur requises à l'e-mail"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Submitter"
+msgstr "Auteur"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Les champs suivants sont inconnus : ${fields}"
@@ -493,9 +505,6 @@ msgstr "Tradition"
 
 msgid "Youth"
 msgstr "Jeunesse"
-
-msgid "Submitter"
-msgstr "Auteur"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto dans le jardin du château"
@@ -781,9 +790,6 @@ msgstr "Nom de famille"
 msgid "Function"
 msgstr "Fonction"
 
-msgid "Phone"
-msgstr "Téléphone"
-
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
 
@@ -903,9 +909,6 @@ msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
 
 msgid "The price must be larger than zero"
 msgstr "Le prix doit être supérieur à zéro"
-
-msgid "Name"
-msgstr "Nom"
 
 msgid "Send on"
 msgstr "Envoyer sur"
@@ -2379,8 +2382,6 @@ msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time."
 msgstr ""
-"Votre demande sera traitée sous peu. Pour connaître l'état d'avancement de "
-"votre demande, vous pouvez revenir à tout moment sur cette page."
 
 msgid ""
 "Your request has been completed. If you asked for documents to be sent to "
@@ -2536,10 +2537,10 @@ msgid ""
 "newsletter:"
 msgstr ""
 "Vous recevez ce courriel parce que vous vous êtes abonné à la lettre "
-"d'informations suivante:"
+"d'informations suivante :"
 
 msgid "Plese click the following link to confirm your subscription:"
-msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement:"
+msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement :"
 
 msgid "Confirm subscription"
 msgstr "Confirmer l'abonnement"
@@ -2687,7 +2688,7 @@ msgid "Click here to unsubscribe."
 msgstr "Cliquer ici pour vous désabonner."
 
 msgid "Click the following link to set a new password:"
-msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe:"
+msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe :"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
@@ -2709,7 +2710,7 @@ msgstr ""
 "relevé de carte de crédit."
 
 msgid "Amount:"
-msgstr "Montant:"
+msgstr "Montant :"
 
 msgid "Your registration for \"${title}\" has been confirmed."
 msgstr "Votre inscription pour \"${title}\" a été confirmée."
@@ -2756,7 +2757,7 @@ msgstr "Votre demande a été complétée."
 
 msgid "Your requests's timeline has been archived for future reference:"
 msgstr ""
-"L'historique de votre demande a été archivé pour des références futures:"
+"L'historique de votre demande a été archivé pour des références futures :"
 
 msgid "Request Timeline"
 msgstr "Historique de la demande"
@@ -2772,7 +2773,7 @@ msgid ""
 "meantime you can check the status of your ticket at any time:"
 msgstr ""
 "Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
-"Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment:"
+"Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment :"
 
 msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
@@ -2858,7 +2859,7 @@ msgstr "E-mails de tickets activés."
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
-"permanence:"
+"permanence :"
 
 msgid "Signup"
 msgstr "S'abonner"
@@ -2880,10 +2881,10 @@ msgid ""
 "password, as it won't be shown to you again:"
 msgstr ""
 "Création de l'utilisateur ${username} réussie. Veuillez conserver ce mot de "
-"passe d'utilisateur, car il ne vous sera plus montré à nouveau: "
+"passe d'utilisateur, car il ne vous sera plus montré à nouveau : "
 
 msgid "Password:"
-msgstr "Mot de passe:"
+msgstr "Mot de passe :"
 
 msgid ""
 "The user ${username} was created successfully. An e-mail has been sent to "
@@ -3114,7 +3115,7 @@ msgid ""
 "continuing, it won't be shown to you again:"
 msgstr ""
 "Votre lien d'inscription a été créé comme suit. Copiez-le avant de "
-"continuer, il ne vous sera pas montré à nouveau:"
+"continuer, il ne vous sera pas montré à nouveau :"
 
 msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
@@ -3507,13 +3508,20 @@ msgid "The entry was deleted"
 msgstr "L'entrée a été supprimée"
 
 msgid ""
-"Exports all entries of this directory. The resulting zipfile contains the "
-"selected format as well as metadata and images/files if the directory "
-"contains any."
+"On the right side, you can filter the entries of this directory to export."
 msgstr ""
-"Exporte toutes les entrées de ce dossier. Le fichier zip généré contient les "
-"formats sélectionnés ainsi que les métadonnées et les images/fichiers du "
-"dossier, s'il en contient."
+"Sur le côté droit, vous pouvez filtrer les entrées du dossier pour les "
+"exporter."
+
+msgid "Exports all entries of this directory."
+msgstr "Exporte toutes les entrées de ce dossier."
+
+msgid ""
+"The resulting zipfile contains the selected format as well as metadata and "
+"images/files if the directory contains any."
+msgstr ""
+"Le fichier zip généré contient les formats sélectionnés ainsi que les "
+"métadonnées et les images/fichiersdu dossier, s'il en contient."
 
 #, python-format
 msgid "The column ${name} is missing"
@@ -4209,6 +4217,15 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid ""
+#~ "Exports all entries of this directory. The resulting zipfile contains the "
+#~ "selected format as well as metadata and images/files if the directory "
+#~ "contains any."
+#~ msgstr ""
+#~ "Exporte toutes les entrées de ce dossier. Le fichier zip généré contient "
+#~ "les formats sélectionnés ainsi que les métadonnées et les images/fichiers "
+#~ "du dossier, s'il en contient."
 
 #~ msgid "created"
 #~ msgstr "créé"

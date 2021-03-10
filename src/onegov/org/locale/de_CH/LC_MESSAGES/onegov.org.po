@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-03 19:32+0100\n"
+"POT-Creation-Date: 2021-03-09 21:35+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -370,6 +370,18 @@ msgstr ""
 msgid "Publication"
 msgstr "Publikation"
 
+msgid "Information to be provided in addition to the E-mail"
+msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Submitter"
+msgstr "Antragsteller/in"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
@@ -491,9 +503,6 @@ msgstr "Brauchtum"
 
 msgid "Youth"
 msgstr "Jugend"
-
-msgid "Submitter"
-msgstr "Antragsteller/in"
 
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
@@ -777,9 +786,6 @@ msgstr "Nachname"
 msgid "Function"
 msgstr "Funktion"
 
-msgid "Phone"
-msgstr "Telefon"
-
 msgid "Direct Phone Number"
 msgstr "Direktnummer"
 
@@ -899,9 +905,6 @@ msgstr ""
 
 msgid "The price must be larger than zero"
 msgstr "Der Preis muss grösser als Null sein"
-
-msgid "Name"
-msgstr "Name"
 
 msgid "Send on"
 msgstr "Senden am"
@@ -3487,13 +3490,20 @@ msgid "The entry was deleted"
 msgstr "Der Eintrag wurde gelöscht"
 
 msgid ""
-"Exports all entries of this directory. The resulting zipfile contains the "
-"selected format as well as metadata and images/files if the directory "
-"contains any."
+"On the right side, you can filter the entries of this directory to export."
 msgstr ""
-"Exportiert alle Einträge dieses Verzeichnisses. Die resultierende Zip-Datei "
-"enthält das gewählte Format sowie alle Metadaten und allfällige Bilder/"
-"Dateien."
+"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den "
+"Export filter."
+
+msgid "Exports all entries of this directory."
+msgstr "Exportiert alle Einträge dieses Verzeichniseses."
+
+msgid ""
+"The resulting zipfile contains the selected format as well as metadata and "
+"images/files if the directory contains any."
+msgstr ""
+"Die resultierende Zip-Datei enthält das gewählte Format sowie alle Metadaten "
+"und allfällige Bilder/Dateien."
 
 #, python-format
 msgid "The column ${name} is missing"
@@ -4189,6 +4199,15 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid ""
+#~ "Exports all entries of this directory. The resulting zipfile contains the "
+#~ "selected format as well as metadata and images/files if the directory "
+#~ "contains any."
+#~ msgstr ""
+#~ "Exportiert alle Einträge dieses Verzeichnisses. Die resultierende Zip-"
+#~ "Datei enthält das gewählte Format sowie alle Metadaten und allfällige "
+#~ "Bilder/Dateien."
 
 #~ msgid "created"
 #~ msgstr "erstellt"

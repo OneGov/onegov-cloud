@@ -24,15 +24,29 @@
                     </p>
                 </div>
             </div>
-            <!--! -->
 
             <div class="columns small-12 medium-4">
                 <div class="ticket-panel ticket-submitter ${ticket.muted and 'ticket-submitter-muted' or 'ticket-submitter-unmuted'}">
                     <h2 i18n:translate>Submitter</h2>
 
-                    <div class="ticket-submitter-address">
+                    <div class="ticket-submitter-meta">
                         <i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i>
                         <a href="mailto:${submitter}">${submitter}</a>
+                    </div>
+
+                    <div class="ticket-submitter-meta" tal:condition="submitter_name">
+                        <i class="fa fa-fw fa-user-o" aria-hidden="true"></i>
+                        <span>${submitter_name}</span>
+                    </div>
+
+                    <div class="ticket-submitter-meta" tal:condition="submitter_address">
+                        <i class="fa fa-fw fa-home" aria-hidden="true"></i>
+                        <span>${submitter_address}</span>
+                    </div>
+
+                    <div class="ticket-submitter-meta" tal:condition="submitter_phone">
+                        <i class="fa fa-fw fa-phone" aria-hidden="true"></i>
+                        <span tal:content="structure layout.linkify(submitter_phone)"></span>
                     </div>
 
                     <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status">

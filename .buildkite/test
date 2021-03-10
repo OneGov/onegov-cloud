@@ -27,6 +27,7 @@ install-packages \
     libnss3 \
     libx11-xcb1 \
     libxcb-dri3-0 \
+    libxshmfence1 \
     libxss1 \
     xdg-utils
 
