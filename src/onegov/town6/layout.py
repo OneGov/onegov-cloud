@@ -81,6 +81,13 @@ class Layout(OrgLayout):
             return False
         return True
 
+    @cached_property
+    def search_keybindings_help(self):
+        return self.request.translate(
+            _('Press ${shortcut} to open Search',
+              mapping={'shortcut': 'Ctrl+Shift+F / Ctrl+Shift+S'})
+        )
+
 
 class DefaultLayout(Layout, DefaultLayoutMixin):
 

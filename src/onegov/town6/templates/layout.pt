@@ -130,7 +130,7 @@
                                         </a>
                                     </div>
                                     <div class="large-2 small-2 cell right-side">
-                                        <button data-toggle="offCanvas"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
+                                        <button data-toggle="offCanvas" tal:attributes="title layout.search_keybindings_help"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
                                     </div>
                                 </div>
                             </div>
