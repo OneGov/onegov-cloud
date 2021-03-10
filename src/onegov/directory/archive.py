@@ -298,7 +298,7 @@ class DirectoryArchiveWriter(object):
 
             return data
 
-        entries = query and query.all() or directory.entries
+        entries = query.all() if query else directory.entries
         if entry_filter:
             entries = entry_filter(entries)
 
