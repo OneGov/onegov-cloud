@@ -1,6 +1,7 @@
 const jsdom = require('jsdom');
-const d3 = require('../d3');
-const barChart = require('../d3.chart.bar')(d3);
+const path = '../../../../src/onegov/election_day'
+const d3 = require(path + '/assets/js/d3');
+const barChart = require(path + '/assets/js/d3.chart.bar')(d3);
 
 describe('Bar chart', () => {
   it('renders an empty svg with no data', () => {
@@ -39,7 +40,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar@0.svg", document.svg());
+    // require('fs').writeFile("bar@0.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(18*24+40);
     expect(chart.width()).toBe(0+20);
@@ -72,7 +73,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar@100.svg", document.svg());
+    // require('fs').writeFile("bar@100.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(18*24+40);
     expect(chart.width()).toBe(100+20);
@@ -105,7 +106,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar@500.svg", document.svg());
+    // require('fs').writeFile("bar@500.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(18*24+40);
     expect(chart.width()).toBe(500+20);
@@ -138,7 +139,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar@700.svg", document.svg());
+    // require('fs').writeFile("bar@700.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(18*24+40);
     expect(chart.width()).toBe(700+20);
@@ -171,7 +172,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar@2000.svg", document.svg());
+    // require('fs').writeFile("bar@2000.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(18*24+40);
     expect(chart.width()).toBe(2000+20);
@@ -195,7 +196,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar_m@0.svg", document.svg());
+    // require('fs').writeFile("bar_m@0.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(8*24+40);
     expect(chart.width()).toBe(700+20);
@@ -219,7 +220,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar_m@1.svg", document.svg());
+    // require('fs').writeFile("bar_m@1.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(8*24+40);
     expect(chart.width()).toBe(700+20);
@@ -243,7 +244,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar_m@50p.svg", document.svg());
+    // require('fs').writeFile("bar_m@50p.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(8*24+40);
     expect(chart.width()).toBe(700+20);
@@ -267,7 +268,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar_m@100p.svg", document.svg());
+    // require('fs').writeFile("bar_m@100p.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(8*24+40);
     expect(chart.width()).toBe(700+20);
@@ -291,7 +292,7 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("bar_m@120p.svg", document.svg());
+    // require('fs').writeFile("bar_m@120p.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(8*24+40);
     expect(chart.width()).toBe(700+20);

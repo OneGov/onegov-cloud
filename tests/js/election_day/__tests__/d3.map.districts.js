@@ -1,8 +1,9 @@
 const jsdom = require('jsdom');
-const d3 = require('../d3');
-const topojson = require('../topojson');
-const mapChart = require('../d3.map.districts')(d3, topojson);
-const mapdata = require('../../../static/mapdata/2017/gr.json');
+const path = '../../../../src/onegov/election_day'
+const d3 = require(path + '/assets/js/d3');
+const topojson = require(path + '/assets/js/topojson');
+const mapChart = require(path + '/assets/js/d3.map.districts')(d3, topojson);
+const mapdata = require(path + '/static/mapdata/2017/gr.json');
 const data = {
   "Albula": {
     counted: true,
@@ -82,7 +83,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@1.svg", document.svg());
+    // require('fs').writeFile("map@1.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(1);
   });
@@ -97,7 +98,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@200.svg", document.svg());
+    // require('fs').writeFile("map@200.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(200);
   });
@@ -112,7 +113,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@500.svg", document.svg());
+    // require('fs').writeFile("map@500.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(500);
   });
@@ -127,7 +128,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@700.svg", document.svg());
+    // require('fs').writeFile("map@700.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -142,7 +143,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@2000.svg", document.svg());
+    // require('fs').writeFile("map@2000.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(2000);
   });
@@ -158,7 +159,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@r.svg", document.svg());
+    // require('fs').writeFile("map@r.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -174,7 +175,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@b.svg", document.svg());
+    // require('fs').writeFile("map@b.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -206,7 +207,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@partial.svg", document.svg());
+    // require('fs').writeFile("map@partial.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
