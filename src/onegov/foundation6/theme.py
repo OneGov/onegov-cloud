@@ -278,7 +278,6 @@ class BaseTheme(CoreTheme):
         paths.append(self.foundation_path)
         if self.include_motion_ui:
             paths.append(self.vendor_path)
-        print(theme.getvalue())
         return sass.compile(
             string=theme.getvalue(),
             include_paths=paths,
