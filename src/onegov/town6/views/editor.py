@@ -8,7 +8,6 @@ from onegov.town6.layout import EditorLayout
 @TownApp.form(model=Editor, template='form.pt', permission=Private,
               form=get_form_class)
 def town_handle_page_form(self, request, form):
-    site_title = self.page.trait_messages[self.trait]['new_page_title']
     return handle_page_form(
-        self, request, form, EditorLayout(self, request, site_title)
+        self, request, form, EditorLayout(self, request, site_title=None)
     )
