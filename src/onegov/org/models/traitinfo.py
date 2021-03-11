@@ -90,8 +90,8 @@ class TraitInfo(object):
         """
         raise NotImplementedError
 
-    def get_form_class(self, trait):
-        """ Returns the form class for the given trait. """
+    def get_form_class(self, trait, action):
+        """ Returns the form class for the given trait, action. """
         raise NotImplementedError
 
     def get_editbar_links(self, request):

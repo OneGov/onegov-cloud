@@ -176,7 +176,7 @@
                             <div metal:define-slot="content"></div>
                         </section>
                     </article>
-                    <article class="content ${'with-sidebar-links' if layout.sidebar_links else 'without-sidebar-links'}" tal:condition="not: on_homepage" >
+                    <article class="content ${'with-sidebar-links' if sidebar_links else 'without-sidebar-links'}" tal:condition="not: on_homepage" >
                         <div class="grid-container">
                             <div class="grid-x grid-padding-x">
                                 <div class="cell small-12">

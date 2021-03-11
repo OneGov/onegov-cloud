@@ -62,7 +62,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     def is_supported_trait(self, trait):
         return trait in {'link', 'page'}
 
-    def get_form_class(self, trait, request):
+    def get_form_class(self, trait, action, request):
         if trait == 'link':
             return self.with_content_extensions(LinkForm, request, extensions=[
                 AccessExtension,
