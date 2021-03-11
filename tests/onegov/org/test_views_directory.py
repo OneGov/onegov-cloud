@@ -240,7 +240,7 @@ def test_directory_change_requests(client):
     page = page.form.submit().follow()
 
     # create an entry
-    page = page.click('Eintrag')
+    page = page.click('Eintrag', index=0)
     page.form['name'] = 'Central Park'
     page.form['pic'] = Upload('test.jpg', create_image().read())
     assert 'publication_start' in page.form.fields
@@ -302,7 +302,9 @@ def test_directory_submissions(client, postgres):
     page.form['price_per_submission'] = 100
     page.form['payment_method'] = 'manual'
     page = page.form.submit().follow()
-    assert "Eintrag vorschlagen" not in page
+    assert "Eintrag vorschlagen" in page
+    anon = client.spawn()
+    assert "Eintrag vorschlagen" not in anon.get(page.request.url)
 
     # change it to accept submissions
     config_page = page.click("Konfigurieren")
@@ -594,7 +596,7 @@ def test_bug_semicolons_in_choices_with_filters(client):
     # Test the counter for the filters
     assert f'{test_label} (0)' in page
 
-    page = page.click('Eintrag')
+    page = page.click('Eintrag', index=0)
     page.form['name'] = '1'
     page = page.form.submit().follow()
     assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page

@@ -42,11 +42,12 @@
                 </dl>
             </div>
 
-            <div metal:fill-slot="after-panels" tal:condition="layout.model.directory.enable_change_requests|nothing">
+            <div metal:fill-slot="after-panels" tal:condition="request.is_manager or layout.model.directory.enable_change_requests|nothing">
                 <div class="submit-yours">
                     <dl>
                         <dt>
                             <a href="${request.link(layout.model, 'change-request')}">
+                                <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.access_hint" tal:define="item layout.model.directory"/>
                                 <h2 i18n:translate>Change Request</h2>
                             </a>
                         </dt>
