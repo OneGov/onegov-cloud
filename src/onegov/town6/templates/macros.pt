@@ -481,6 +481,36 @@
     </div>
 </metal:newslist>
 
+<metal:newsletter define-macro="newsletter_signup">
+
+    <metal:b define-slot="pre_form"></metal:b>
+
+    <div class="grid-x">
+        <div class="cell small-12 medium-${span_lg|9} large-${span_md|6}">
+            <form class="signup" action="${form.action}" method="POST">
+                <div>${form.csrf_token}</div>
+                <div class="grid-x grid-padding-x">
+                    <div class="cell small-8 ${form.address.errors and 'error'}">
+                        <input data-typeahead-subject type="email"
+                               name="address"
+                               placeholder="E-Mail Address" i18n:attributes="placeholder"/>
+                        <small class="error" tal:repeat="error form.address.errors">${error}</small>
+                    </div>
+                    <div class="cell small-4 ${form.address.errors and 'error'}">
+                        <button type="submit"
+                                class="button" i18n:translate>
+                            Signup
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <metal:b define-slot="after_form"></metal:b>
+
+</metal:newsletter>
+
 <metal:access_hint define-macro="access_hint" i18n:domain="onegov.town6">
     <tal:b condition="item.access == 'private'|False">
         <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
