@@ -2096,11 +2096,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
         export_link = Link(
             text=_("Export"),
-            url=self.request.class_link(
-                ExtendedDirectoryEntryCollection, {
-                    'directory_name': self.model.directory_name
-                }, name='+export'
-            ),
+            url=self.request.link(self.model, name='+export'),
             attrs={'class': 'export-link'}
         )
 
