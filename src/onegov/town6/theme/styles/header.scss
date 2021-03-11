@@ -291,7 +291,7 @@ $editbar-fg-color-active: $white;
     .import-link::before { @include icon-bold($import-link-icon); }
     .internal-url::before { @include icon($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
-    .manage-subscribers::before { @include icon($manage-subscribers); }
+    .manage-subscribers::before { @include icon-bold($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
