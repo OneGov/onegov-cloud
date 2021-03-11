@@ -216,7 +216,7 @@ def view_subscribers(self, request, layout=None):
         by_letter[key] = list(values)
 
     return {
-        'layout': RecipientLayout(self, request),
+        'layout': layout or RecipientLayout(self, request),
         'title': _("Subscribers"),
         'by_letter': by_letter,
         'warning': warning,
