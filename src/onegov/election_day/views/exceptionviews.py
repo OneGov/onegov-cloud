@@ -2,6 +2,7 @@ from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
+from webob.exc import HTTPAccepted
 from webob.exc import HTTPForbidden
 from webob.exc import HTTPNotFound
 
@@ -45,4 +46,27 @@ def handle_notfound(self, request):
         'layout': DefaultLayout(self, request),
         'title': _("Page not Found"),
         'message': _("The page you are looking for could not be found."),
+    }
+
+
+@ElectionDayApp.html(
+    model=HTTPAccepted,
+    template='exception.pt',
+    permission=Public
+)
+def handle_service_unavailable(self, request):
+
+    """ Displays a nice HTTP 202 exception. """
+
+    @request.after
+    def set_status_code(response):
+        response.status_code = self.code
+
+    return {
+        'layout': DefaultLayout(self, request),
+        'title': _("File not yet ready"),
+        'message': _(
+            "The file you are looking for is not ready yet. "
+            "Please try again later."
+        ),
     }

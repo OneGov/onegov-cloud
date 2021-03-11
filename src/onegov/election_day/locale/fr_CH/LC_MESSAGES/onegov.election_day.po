@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 09:42+0100\n"
-"PO-Revision-Date: 2019-10-10 10:46+0200\n"
+"POT-Creation-Date: 2021-03-11 08:04+0100\n"
+"PO-Revision-Date: 2021-03-11 08:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.4.2\n"
 
 msgid "The final results are available"
 msgstr "Les résultats finaux sont disponibles"
@@ -603,12 +603,12 @@ msgstr "Intégration"
 msgid "Download"
 msgstr "Télécharger"
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
+#.
 msgid "figcaption_connections"
 msgstr ""
 "Le diagramme montre la répartition des voix et des mandats sur la liste et "
@@ -649,8 +649,8 @@ msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés "
 "en rouge."
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Page d'accueil"
 
@@ -681,8 +681,8 @@ msgstr "Parti"
 msgid "List"
 msgstr "Liste"
 
-#.
 #. Default: Votes
+#.
 msgid "single_votes"
 msgstr "Votes"
 
@@ -795,13 +795,13 @@ msgstr "Votes reçus"
 msgid "Seats"
 msgstr "Sièges"
 
-#.
 #. Default: Voter turnout
+#.
 msgid "turnout_vote"
 msgstr "Participation au vote"
 
-#.
 #. Default: eligible Voters
+#.
 msgid "eligible_voters_vote"
 msgstr "Electeurs"
 
@@ -850,10 +850,10 @@ msgstr "Levier"
 msgid "Columns"
 msgstr "Colonnes"
 
-#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
+#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
@@ -866,11 +866,11 @@ msgstr "Année"
 msgid "Difference"
 msgstr "Différence"
 
-#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
+#.
 msgid "figcaption_panachage"
 msgstr ""
 "Le diagramme montre l'origine des votes. Les barres de gauche correspondent "
@@ -1079,6 +1079,14 @@ msgstr "Page Introuvable"
 
 msgid "The page you are looking for could not be found."
 msgstr "La page que vous cherchez n’a pas pu être trouvée."
+
+msgid "File not yet ready"
+msgstr "Fichier pas encore prêt"
+
+msgid "The file you are looking for is not ready yet. Please try again later."
+msgstr ""
+"Le fichier que vous recherchez n'est pas encore prêt. Veuillez réessayer "
+"plus tard."
 
 msgid "Results updated."
 msgstr "Résultats mis à jour."

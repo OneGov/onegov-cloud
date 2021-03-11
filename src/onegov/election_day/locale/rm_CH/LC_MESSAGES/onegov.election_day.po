@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 09:42+0100\n"
-"PO-Revision-Date: 2019-10-15 09:19+0200\n"
+"POT-Creation-Date: 2021-03-11 08:04+0100\n"
+"PO-Revision-Date: 2021-03-11 08:09+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.4.2\n"
 
 msgid "The final results are available"
 msgstr "Ils resultats finals èn disponibels"
@@ -605,12 +605,12 @@ msgstr "Incorporar"
 msgid "Download"
 msgstr "Telechargiar"
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
+#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagram mussa la repartiziun da las vuschs e dals mandats sin las "
@@ -652,8 +652,8 @@ msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
 "cotschen."
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziala"
 
@@ -684,8 +684,8 @@ msgstr "Partida"
 msgid "List"
 msgstr "Glista"
 
-#.
 #. Default: Votes
+#.
 msgid "single_votes"
 msgstr "Vuschs"
 
@@ -797,13 +797,13 @@ msgstr "Cedels electorals consegnads"
 msgid "Seats"
 msgstr "sezs"
 
-#.
 #. Default: Voter turnout
+#.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
 
-#.
 #. Default: eligible Voters
+#.
 msgid "eligible_voters_vote"
 msgstr "Persunas cun dretg da votar"
 
@@ -853,10 +853,10 @@ msgstr "Selecziun"
 msgid "Columns"
 msgstr "Colonnas"
 
-#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
+#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagram mussa las vuschs gudagnadas ed ils mandats da las partidas. Las "
@@ -869,11 +869,11 @@ msgstr "Onn"
 msgid "Difference"
 msgstr "Differenza"
 
-#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
+#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
@@ -1083,6 +1083,12 @@ msgstr "Betg chattà la pagina"
 
 msgid "The page you are looking for could not be found."
 msgstr "La pagina giavischada n'è betg vegnida chattada."
+
+msgid "File not yet ready"
+msgstr ""
+
+msgid "The file you are looking for is not ready yet. Please try again later."
+msgstr ""
 
 msgid "Results updated."
 msgstr "Actualisà ils resultats."
