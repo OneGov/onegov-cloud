@@ -14,15 +14,15 @@ steps:
   - wait
 
   # run the javascript tests
-  - command: "test-container"
-    label: "Jesting"
-
-    agents:
-      - queue=generic
-
-    env:
-      CONTAINER: "onegov-cloud:head"
-      CONTAINER_TEST_SCRIPT: ".buildkite/jest"
+  # - command: "test-container"
+  #   label: "Jesting"
+  #
+  #   agents:
+  #     - queue=generic
+  #
+  #   env:
+  #     CONTAINER: "onegov-cloud:head"
+  #     CONTAINER_TEST_SCRIPT: ".buildkite/jest"
 
   - wait
 
