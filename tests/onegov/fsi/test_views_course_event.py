@@ -1,9 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from sedate import utcnow
 
 from onegov.fsi.models import CourseEvent
-from tests.shared.utils import open_in_browser
 
 
 def test_course_event_collection(client):

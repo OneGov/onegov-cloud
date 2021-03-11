@@ -6,8 +6,6 @@ from tests.shared import utils
 from onegov.town import TownApp
 from webtest import TestApp as Client
 
-from tests.shared.utils import open_in_browser
-
 
 def test_view_permissions():
     utils.assert_explicit_permissions(
