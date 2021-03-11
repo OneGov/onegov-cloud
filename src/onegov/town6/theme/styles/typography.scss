@@ -43,7 +43,7 @@ p > * {
 
 .page-text ul li a,
 p a {
-    font-family: $body-font-family !important;
+    font-family: $body-font-family;
 }
 
 
@@ -79,7 +79,8 @@ li strong,
 .orbit-caption,
 em,
 .occurrence-date,
-.occurrence-location {
+.occurrence-location,
+.footer-content.footer-content p a {
     font-family: $header-font-family;
 }
 
