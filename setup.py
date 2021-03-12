@@ -37,7 +37,6 @@ setup(
         'onegov.quill',
         'onegov.recipient',
         'onegov.reservation',
-        'onegov.redesign_test',
         'onegov.search',
         'onegov.server',
         'onegov.shared',
@@ -48,7 +47,6 @@ setup(
         'onegov.user',
         'onegov.winterthur',
         'onegov.wtfs',
-        'onegov.redesign_test',
         'onegov.translator_directory',
     ],
     install_requires=[
