@@ -59,6 +59,12 @@ form {
         font-weight: bold;
     }
 
+    .field-type-booleanfield {
+        [type="checkbox"] {
+            margin-bottom: 0;
+        }
+    }
+
     .field-help {
         color: $steel;
         font-size: .8rem;
