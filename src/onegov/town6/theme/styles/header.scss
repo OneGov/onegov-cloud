@@ -229,7 +229,7 @@ $transition-duration: .1s;
 
         @include breakpoint(medium up) {
             &.scaled {
-                transform: scale(.9);
+                transform: scale(.85);
             }
         }
     }
