@@ -176,6 +176,16 @@ form {
         background: $yellow-light;
         position: absolute;
     }
+
+    .formcode-select {
+        @include form-element;
+        height: 100%;
+        min-height: 2.3125rem;
+
+        input[type="checkbox"] {
+            margin-top: .25rem !important;
+        }
+    }
     /*
     <--
     */
