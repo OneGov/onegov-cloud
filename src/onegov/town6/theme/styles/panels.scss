@@ -310,6 +310,11 @@ $checklist-icon: "\f0ae";
 
 .panel {
     @include smooth-edges;
+    @include callout;
+
+    background: $panel-bg;
+    border-color: $panel-border-color;
+    color: $oil;
 
     // Zurb lacks a separate color for callout panels.
     &.callout {
