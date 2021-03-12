@@ -367,7 +367,7 @@
 </metal:fields>
 
 <metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
-    <div class="card" id="homepage-tile-${item.number}" data-equalizer-watch>
+    <div class="card" id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
         <div class="card-divider">
             <h5>${item.page.text}</h5>
         </div>
