@@ -1,5 +1,4 @@
 from onegov.core.security import Public
-from onegov.org.forms import NewsletterForm
 from onegov.org.models import News, Topic
 from onegov.org.views.page import view_topic, view_news
 from onegov.town6 import TownApp
