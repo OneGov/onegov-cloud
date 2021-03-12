@@ -306,7 +306,7 @@ $editbar-fg-color-active: $white;
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon-bold($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
-    .new-directory::before { @include icon($new-directory-icon); }
+    .new-directory::before { @include icon-bold($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon-bold($new-link-icon); }

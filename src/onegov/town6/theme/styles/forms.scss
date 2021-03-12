@@ -113,6 +113,10 @@ form {
         margin-bottom: .75rem;
     }
 
+    .fieldset .formfields:last-of-type {
+        margin-bottom: 0;
+    }
+
     /*
         Custom Style for the ace editor. Only use monospace fonts with ace.js
     */
