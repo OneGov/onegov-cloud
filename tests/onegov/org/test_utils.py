@@ -32,6 +32,12 @@ def test_annotate_html():
     assert 'class="has-video"></a>' in utils.annotate_html(html)
 
     html = (
+        '<p><a href="https://youtu.be/gEbx_0dBjbM"></a></p>'
+    )
+    assert '<p class="has-video">' in utils.annotate_html(html)
+    assert 'class="has-video"></a>' in utils.annotate_html(html)
+
+    html = (
         '<p>'
         '<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></a>'
         '<img />'
