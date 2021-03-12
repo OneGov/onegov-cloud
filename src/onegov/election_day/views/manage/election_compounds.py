@@ -65,6 +65,7 @@ def edit_election_compound(self, request, form):
         form.update_model(self)
         archive.update(self, request)
         request.message(_("Compound modified."), 'success')
+        request.app.pages_cache.invalidate()
         return redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -93,6 +94,7 @@ def clear_election_compound(self, request, form):
     if form.submitted(request):
         archive.clear(self, request)
         request.message(_("Results deleted."), 'success')
+        request.app.pages_cache.invalidate()
         return redirect(layout.manage_model_link)
 
     return {
@@ -125,8 +127,8 @@ def delete_election_compound(self, request, form):
 
     if form.submitted(request):
         archive.delete(self, request)
-
         request.message(_("Compound deleted."), 'success')
+        request.app.pages_cache.invalidate()
         return redirect(layout.manage_model_link)
 
     return {

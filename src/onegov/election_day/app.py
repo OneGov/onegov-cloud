@@ -160,7 +160,6 @@ def enable_iframes_tween_factory(app, handler):
     iframe_paths = (
         r'/ballot/.*',
         r'/vote/.*',
-        r'/votes/.*',
         r'/election/.*',
         r'/elections/.*',
     )
@@ -190,7 +189,6 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
     cache_paths = (
         '/ballot/.*',
         '/vote/.*',
-        '/votes/.*',
         '/election/.*',
         '/elections/.*',
         '/catalog.rdf',
@@ -223,7 +221,7 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
 
         # each page is cached once per language and headerless/headerful
         # (and by application id as the pages_cache is bound to it)
-        mode = 'headerless' in request.browser_session and 'hl' or 'hf'
+        mode = 'hl' if 'headerless' in request.browser_session else 'hf'
         key = ':'.join((request.locale, request.path_info, mode))
 
         return app.pages_cache.get_or_create(

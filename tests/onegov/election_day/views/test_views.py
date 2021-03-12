@@ -1,22 +1,23 @@
-import onegov.election_day
-
 from datetime import date
 from freezegun import freeze_time
+from onegov import election_day
 from onegov.ballot import Ballot
+from onegov.ballot import Vote
+from onegov.election_day import ElectionDayApp
 from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
+from transaction import commit
 from unittest.mock import patch
 from webtest import TestApp as Client
 from xml.etree.ElementTree import fromstring
 
 
 def test_view_permissions():
-    utils.assert_explicit_permissions(
-        onegov.election_day, onegov.election_day.ElectionDayApp)
+    utils.assert_explicit_permissions(election_day, ElectionDayApp)
 
 
 def test_i18n(election_day_app):
@@ -94,26 +95,31 @@ def test_pages_cache(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    assert '0xdeadbeef' in anonymous.get('/')
-    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
-    assert '0xdeadbeef' in anonymous.get('/catalog.rdf')
+    urls = ('/vote/0xdeadbeef/entities', '/catalog.rdf')
+    no_cache = [('Cache-Control', 'no-cache')]
 
+    # Create cache entries
+    for url in urls:
+        assert '0xdeadbeef' in anonymous.get(url)
+
+    # Modify without invalidating the cache
+    election_day_app.session().query(Vote).one().title = '0xdeadc0de'
+    commit()
+
+    for url in urls:
+        assert '0xdeadc0de' not in anonymous.get(url)
+        assert '0xdeadc0de' in anonymous.get(url, headers=no_cache)
+        assert '0xdeadc0de' in client.get(url)  # never cached
+
+    # Modify with invalidating the cache
     edit = client.get('/vote/0xdeadbeef/edit')
-    edit.form['vote_de'] = '0xdeadc0de'
+    edit.form['vote_de'] = '0xd3adc0d3'
     edit.form.submit()
 
-    assert '0xdeadc0de' in client.get('/')
-    assert '0xdeadc0de' in anonymous.get('/')
-    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
-    assert '0xdeadc0de' in anonymous.get('/vote/0xdeadbeef/entities', headers=[
-        ('Cache-Control', 'no-cache')
-    ])
-
-    assert '0xdeadc0de' in client.get('/catalog.rdf')
-    assert '0xdeadc0de' not in anonymous.get('/catalog.rdf')
-    assert '0xdeadc0de' in anonymous.get('/catalog.rdf', headers=[
-        ('Cache-Control', 'no-cache')
-    ])
+    for url in urls:
+        assert '0xd3adc0d3' in anonymous.get(url)
+        assert '0xd3adc0d3' in anonymous.get(url, headers=no_cache)
+        assert '0xd3adc0d3' in client.get(url)
 
 
 def test_view_last_modified(election_day_app):
