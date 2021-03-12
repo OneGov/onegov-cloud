@@ -7,6 +7,7 @@ from onegov.core.directives import HtmlHandleFormAction
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.election_day.forms import EmptyForm
+from webob.exc import HTTPAccepted
 
 
 class ManageHtmlAction(HtmlAction):
@@ -50,7 +51,7 @@ class SvgFileViewAction(ViewAction):
         path = content.get('path')
         name = content.get('name')
         if not path:
-            return Response(status='503 Service Unavailable')
+            raise HTTPAccepted()
 
         content = None
         with request.app.filestorage.open(path, 'r') as f:
@@ -78,7 +79,7 @@ class PdfFileViewAction(ViewAction):
         path = content.get('path')
         name = content.get('name')
         if not path:
-            return Response(status='503 Service Unavailable')
+            raise HTTPAccepted()
 
         content = None
         with request.app.filestorage.open(path, 'rb') as f:

@@ -1,6 +1,7 @@
 const jsdom = require('jsdom');
-const d3 = require('../d3');
-const groupedChart = require('../d3.chart.grouped')(d3);
+const path = '../../../../src/onegov/election_day'
+const d3 = require(path + '/assets/js/d3');
+const groupedChart = require(path + '/assets/js/d3.chart.grouped')(d3);
 
 const results = [
   {"active": false, "group": "A", "value": {"front": 0, "back": 0}, "item": "1000"},
@@ -48,7 +49,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("grouped@1.svg", document.svg());
+    // require('fs').writeFile("grouped@1.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(1);
     expect(chart.width()).toBe(1);
@@ -67,7 +68,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("grouped@2.svg", document.svg());
+    // require('fs').writeFile("grouped@2.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(200);
@@ -86,7 +87,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("grouped@500.svg", document.svg());
+    // require('fs').writeFile("grouped@500.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(500);
@@ -105,7 +106,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("grouped@700.svg", document.svg());
+    // require('fs').writeFile("grouped@700.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(700);
@@ -124,7 +125,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("grouped@2k.svg", document.svg());
+    // require('fs').writeFile("grouped@2k.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(2000);
@@ -151,7 +152,7 @@ describe('Grouped bar chart', () => {
         ]}
     });
     chart(document.body);
-    // require('fs').writeFile("grouped@w.svg", document.svg());
+    // require('fs').writeFile("grouped@w.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(700);

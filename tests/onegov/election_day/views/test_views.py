@@ -226,7 +226,7 @@ def test_view_pdf(election_day_app):
         '/election/proporz-election/pdf',
     )
     for path in paths:
-        assert client.get(path, expect_errors=True).status_code == 503
+        assert client.get(path, expect_errors=True).status_code == 202
 
     pdf = '%PDF-1.6'.encode('utf-8')
     election_day_app.filestorage.makedir('pdf')
@@ -299,7 +299,7 @@ def test_view_svg(election_day_app):
         '/election/proporz-election/party-strengths-svg',
     )
     for path in paths:
-        assert client.get(path, expect_errors=True).status_code == 503
+        assert client.get(path, expect_errors=True).status_code == 202
 
     svg = (
         '<?xml version="1.0" encoding="UTF-8"?>'

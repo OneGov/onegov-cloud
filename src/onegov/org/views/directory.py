@@ -586,7 +586,7 @@ def view_export(self, request, form, layout=None):
             "as metadata and images/files if the directory contains any."
         )),
         'filters': filters,
-        'count': self.query().count()
+        'count': len(request.exclude_invisible(self.query().all()))
     }
 
 

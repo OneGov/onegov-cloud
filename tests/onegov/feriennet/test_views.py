@@ -17,8 +17,6 @@ from tests.shared import utils
 from psycopg2.extras import NumericRange
 from webtest import Upload
 
-from tests.shared.utils import open_in_browser
-
 
 def test_wwf_fixed_pass_system(client, scenario):
     scenario.add_period(

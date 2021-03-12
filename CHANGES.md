@@ -1,8 +1,55 @@
 # Changes
 
+## Release `2021.27`
+
+> commits: **4 / [ff6ba08b35...832f545476](https://github.com/OneGov/onegov-cloud/compare/ff6ba08b35^...832f545476)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.27)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🎉 **Adds nice error pages in case PDF and SVG files are not ready yet.**
+
+**`Feature`** | **[SEA-182](https://linear.app/seantis/issue/SEA-182)** | **[cf5febc17a](https://github.com/onegov/onegov-cloud/commit/cf5febc17aca0b40f4846b3ce977ce770b05721b)**
+
+### Org
+
+🐞 **Improves directory import and export**
+
+Fixes MissingColumnsError with import using csv/xlsx formats and some characters in labels.
+Adds tests for all formats for the roundtrip.
+
+**`Bugfix`** | **[ff6ba08b35](https://github.com/onegov/onegov-cloud/commit/ff6ba08b35be708f9ab859150767e199a94f938e)**
+
+## Release `2021.26`
+
+> released: **2021-03-10 10:41**<br>
+> commits: **14 / [640f8b1b67...cd35dde238](https://github.com/OneGov/onegov-cloud/compare/640f8b1b67^...cd35dde238)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.26)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds option to disable news**
+
+Disables the news view and hides the navigation entry.
+
+**`Feature`** | **[SEA-108](https://linear.app/seantis/issue/SEA-108)** | **[204bb7e759](https://github.com/onegov/onegov-cloud/commit/204bb7e759e816ea3ad5ee0dd7665332ce046c96)**
+
+🎉 **Improves submissions of directories (submitter info)**
+
+Adds option on directory to include additional fields to be filled out by
+a submitter. New submissions and change-request can be made if the url is known.
+Adds additional fields to ticket pdf and ticket view.
+
+**`Feature`** | **[SEA-102](https://linear.app/seantis/issue/SEA-102)** | **[d0bf415993](https://github.com/onegov/onegov-cloud/commit/d0bf4159934100fb3c1f1d7edea257d0de57aa3d)**
+
+🎉 **Improves directory export with filter panel**
+
+**`Feature`** | **[eb0aacba50](https://github.com/onegov/onegov-cloud/commit/eb0aacba508759cf40d208b1b357d0cd27f24436)**
+
 ## Release `2021.25`
 
-> commits: **5 / [dd199312fb...2d0f32c139](https://github.com/OneGov/onegov-cloud/compare/dd199312fb^...2d0f32c139)**  
+> released: **2021-03-01 14:39**<br>
+> commits: **6 / [dd199312fb...70b85a9b97](https://github.com/OneGov/onegov-cloud/compare/dd199312fb^...70b85a9b97)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.25)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day

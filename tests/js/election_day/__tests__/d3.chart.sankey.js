@@ -1,7 +1,8 @@
 const jsdom = require('jsdom');
-var d3 = require('../d3');
-require('../d3.sankey')(d3);
-const sankeyChart = require('../d3.chart.sankey')(d3);
+const path = '../../../../src/onegov/election_day'
+const d3 = require(path + '/assets/js/d3');
+require(path + '/assets/js/d3.sankey')(d3);
+const sankeyChart = require(path + '/assets/js/d3.chart.sankey')(d3);
 
 const data = {
   "nodes": [
@@ -42,7 +43,7 @@ describe('Sankey bar chart', () => {
       data: data
     });
     chart(document.body);
-    // require('fs').writeFile("sankey@1.svg", document.svg());
+    // require('fs').writeFile("sankey@1.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(21);
@@ -55,7 +56,7 @@ describe('Sankey bar chart', () => {
       data: data
     });
     chart(document.body);
-    // require('fs').writeFile("sankey@200.svg", document.svg());
+    // require('fs').writeFile("sankey@200.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(220);
@@ -68,7 +69,7 @@ describe('Sankey bar chart', () => {
       data: data
     });
     chart(document.body);
-    // require('fs').writeFile("sankey@500.svg", document.svg());
+    // require('fs').writeFile("sankey@500.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(520);
@@ -81,7 +82,7 @@ describe('Sankey bar chart', () => {
       data: data
     });
     chart(document.body);
-    // require('fs').writeFile("sankey@700.svg", document.svg());
+    // require('fs').writeFile("sankey@700.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(720);
@@ -94,7 +95,7 @@ describe('Sankey bar chart', () => {
       data: data
     });
     chart(document.body);
-    // require('fs').writeFile("sankey@2k.svg", document.svg());
+    // require('fs').writeFile("sankey@2k.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(2020);
@@ -125,7 +126,7 @@ describe('Sankey bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("sankey_4l.svg", document.svg());
+    // require('fs').writeFile("sankey_4l.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(720);
@@ -157,7 +158,7 @@ describe('Sankey bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("sankey_4li.svg", document.svg());
+    // require('fs').writeFile("sankey_4li.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(720);
@@ -189,7 +190,7 @@ describe('Sankey bar chart', () => {
       }
     });
     chart(document.body);
-    // require('fs').writeFile("sankey_color.svg", document.svg());
+    // require('fs').writeFile("sankey_color.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(720);

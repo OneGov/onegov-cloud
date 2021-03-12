@@ -1,12 +1,14 @@
 from datetime import timedelta, datetime
+from io import BytesIO
 
 import transaction
+from purl import URL
 from pytz import UTC
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from webtest import Upload
 
 from onegov.directory import DirectoryEntry, DirectoryCollection, \
-    DirectoryConfiguration
+    DirectoryConfiguration, DirectoryZipArchive
 from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
@@ -238,7 +240,7 @@ def test_directory_change_requests(client):
     page = page.form.submit().follow()
 
     # create an entry
-    page = page.click('Eintrag')
+    page = page.click('Eintrag', index=0)
     page.form['name'] = 'Central Park'
     page.form['pic'] = Upload('test.jpg', create_image().read())
     assert 'publication_start' in page.form.fields
@@ -300,7 +302,9 @@ def test_directory_submissions(client, postgres):
     page.form['price_per_submission'] = 100
     page.form['payment_method'] = 'manual'
     page = page.form.submit().follow()
-    assert "Eintrag vorschlagen" not in page
+    assert "Eintrag vorschlagen" in page
+    anon = client.spawn()
+    assert "Eintrag vorschlagen" not in anon.get(page.request.url)
 
     # change it to accept submissions
     config_page = page.click("Konfigurieren")
@@ -592,7 +596,7 @@ def test_bug_semicolons_in_choices_with_filters(client):
     # Test the counter for the filters
     assert f'{test_label} (0)' in page
 
-    page = page.click('Eintrag')
+    page = page.click('Eintrag', index=0)
     page.form['name'] = '1'
     page = page.form.submit().follow()
     assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
@@ -608,3 +612,84 @@ def test_bug_semicolons_in_choices_with_filters(client):
     # Test that ordering is as defined by form and not alphabetically
     tags = page.pyquery('ul.tags a')
     assert [t.text for t in tags] == [f'{test_label} (1)', 'B (0)', 'C (0)']
+
+
+def test_directory_export(client):
+    session = client.app.session()
+    directories = DirectoryCollection(session, type='extended')
+    dir_structure = """
+                Name *= ___
+                Contact (for infos) = ___
+                Category =
+                    [ ] A
+                    [ ] B
+                    [ ] Z: with semicolon
+                Choice =
+                    (x) yes
+                    ( ) no                
+            """
+
+    events = directories.add(
+        title="Events",
+        lead="The town's events",
+        structure=dir_structure,
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name'],
+            keywords=['Category', 'Choice']
+        ),
+        meta={
+            'enable_map': False,
+            'enable_submission': False,
+            'enable_change_requests': False,
+            'payment_method': None,
+        },
+        content={
+            'marker_color': 'red',
+
+        }
+    )
+
+    events.add(values=dict(
+        name="Dance",
+        contact_for_infos_='John',
+        category=['A'],
+        choice='yes'
+    ))
+    events.add(values=dict(
+        name="Zumba",
+        contact_for_infos_='Helen',
+        category=['Z: with semicolon', 'B'],
+        choice='no'
+    ))
+    transaction.commit()
+
+    events = directories.by_name('events')
+    export_page = client.get('/directories/events/+export')
+
+    # Does not find A (1) link by its text otherwise
+    filtered_url = export_page.pyquery(
+        '.filter-panel a:first-of-type')[0].attrib['href']
+
+    export_page = client.get(filtered_url)
+    export_page.form['file_format'] = 'csv'
+    export_view = export_page.form.submit()
+    export_view_url = export_view.headers['location']
+    assert URL(export_page.request.url).query_param('keywords') == \
+           (URL(export_view_url).query_param('keywords') or None)
+
+    resp = export_view.follow()
+
+    archive = DirectoryZipArchive.from_buffer(BytesIO(resp.body))
+
+    count = 0
+
+    def count_entry(entry):
+        nonlocal count
+        count += 1
+
+    # create a directory in memory
+    directory = archive.read(after_import=count_entry)
+    assert directory != events
+    assert count == 1
+    assert directory.meta == events.meta
