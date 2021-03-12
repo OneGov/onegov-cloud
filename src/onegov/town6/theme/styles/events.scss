@@ -6,10 +6,14 @@ $placeholder-icon-size: 6rem;
 
 .events {
     .card img {
+
+        max-height: 150px;
+        object-fit: cover;
         transition: transform .5s ease;
+        width: auto;
 
         &:hover {
-            transform: scale(1.15);
+            transform: scale(1.05);
         }
     }
 
@@ -95,6 +99,7 @@ $placeholder-icon-size: 6rem;
 .occurrence-map,
 .occurrence-image {
     margin-bottom: 1.5rem;
+    max-width: $max-line-width;
 }
 
 .date-range-selector-results {
