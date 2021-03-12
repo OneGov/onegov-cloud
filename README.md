@@ -246,6 +246,10 @@ To keep track of changes and only re-run necessary tests:
 
     py.test --testmon
 
+To get an image with profiling information (requires graphviz):
+
+    py.test --profile-svg
+
 ## Translations 🌍
 
 To extract the translation strings of an already configured module:

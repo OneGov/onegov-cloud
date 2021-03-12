@@ -189,6 +189,7 @@ setup(
             'pyquery',
             'pytest',
             'pytest-localserver',
+            'pytest-profiling',
             'pytest-redis',
             'pytest-rerunfailures',
             'pytest-timeout',

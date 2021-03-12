@@ -90,3 +90,6 @@ pyvenv.cfg
 # npm / jest
 package.json
 package-lock.json
+
+# pytest-profiling
+prof
