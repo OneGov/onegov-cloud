@@ -131,6 +131,9 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
             self.request.link(PageMove.for_url_template())
         )
 
+    def show_label(self, field):
+        return True
+
 
 class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
     """ A special layout for creating HTML E-Mails. """

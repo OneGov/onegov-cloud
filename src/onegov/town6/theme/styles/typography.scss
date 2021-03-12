@@ -99,7 +99,12 @@ em,
 .occurrence-date,
 .occurrence-location,
 .footer-content.footer-content p a,
-.calendar button {
+.calendar button,
+.contact-panel *,
+footer a,
+footer div,
+.page-lead,
+.panel p {
     font-family: $header-font-family;
 }
 

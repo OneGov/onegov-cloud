@@ -49,7 +49,7 @@ $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
 $sync-icon: '\f2f1';
-$subscribe-link-icon: '\f0c1';
+$subscribe-link-icon: '\f0f3';
 $test-link-icon: '\f0e9';
 $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
@@ -295,7 +295,7 @@ $editbar-fg-color-active: $white;
     }
 
     .accept-link::before { @include icon-bold($accept-link-icon); }
-    .cleanup-link::before { @include icon($cleanup-link-icon); }
+    .cleanup-link::before { @include icon-bold($cleanup-link-icon); }
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
@@ -319,7 +319,7 @@ $editbar-fg-color-active: $white;
     .new-person::before { @include icon($new-person-icon); }
     .new-photo-album::before { @include icon($new-photo-album); }
     .new-recipient::before { @include icon($new-recipient); }
-    .new-registration-window::before { @include icon($new-registration-window); }
+    .new-registration-window::before { @include icon-bold($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
@@ -330,9 +330,9 @@ $editbar-fg-color-active: $white;
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
-    .subscribe-link::before { @include icon($subscribe-link-icon); }
+    .subscribe-link::before { @include icon-bold($subscribe-link-icon); }
     .test-link::before { @include icon($test-link-icon); }
-    .rule-link::before { @include icon($rule-link-icon); }
+    .rule-link::before { @include icon-bold($rule-link-icon); }
     .sync::before { @include icon-bold($sync-icon); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
