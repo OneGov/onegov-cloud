@@ -250,6 +250,14 @@ To get an image with profiling information (requires graphviz):
 
     py.test --profile-svg
 
+To use a RAM located database;
+
+    docker run --rm \
+      -e POSTGRES_HOST_AUTH_METHOD=trust \
+      --mount type=tmpfs,destination=/var/lib/postgresql/data \
+      -p 55432:5432 postgres:12.6 -c fsync=off
+    pytest --nopg
+
 ## Translations 🌍
 
 To extract the translation strings of an already configured module:

@@ -45,6 +45,10 @@ redis_path = find_executable('redis-server')
 redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
 
 
+def pytest_addoption(parser):
+    parser.addoption('--nopg', action='store_true')
+
+
 @pytest.fixture(scope='session')
 def monkeysession(request):
     mp = MonkeyPatch()
@@ -116,11 +120,14 @@ def pg_preferred_versions(pg_default_preferred_versions):
 
 
 @pytest.fixture(scope="session")
-def postgres(pg_preferred_versions):
+def postgres(pg_preferred_versions, pytestconfig):
     """ Starts a postgres server using `testing.postgresql \
     <https://pypi.python.org/pypi/testing.postgresql/>`_ once per test session.
 
     """
+    if pytestconfig.getoption('nopg'):
+        yield None
+        return
 
     postgres_args = ' '.join((
         "-h 127.0.0.1",
@@ -139,11 +146,15 @@ def postgres(pg_preferred_versions):
 
 
 @pytest.fixture(scope="function")
-def postgres_dsn(postgres):
+def postgres_dsn(postgres, pytestconfig):
     """ Returns a dsn to a temporary postgres server. Cleans up the database
     after running the tests.
 
     """
+    if pytestconfig.getoption('nopg'):
+        yield 'postgresql://postgres:postgres@127.0.0.1:55432/postgres'
+        return
+
     postgres.reset_snapshots()
 
     yield postgres.url()
