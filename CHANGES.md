@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.28`
+
+> commits: **8 / [b16f503db2...d71c20ed75](https://github.com/OneGov/onegov-cloud/compare/b16f503db2^...d71c20ed75)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.28)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🐞 **Invalidate pages cache after modifying elections and votes.**
+
+**`Bugfix`** | **[SEA-184](https://linear.app/seantis/issue/SEA-184)** | **[93b6863c91](https://github.com/onegov/onegov-cloud/commit/93b6863c91d5540f1fd45b42086bbd6e23fc9a2c)**
+
 ## Release `2021.27`
 
-> commits: **4 / [ff6ba08b35...832f545476](https://github.com/OneGov/onegov-cloud/compare/ff6ba08b35^...832f545476)**  
+> released: **2021-03-11 08:39**<br>
+> commits: **5 / [ff6ba08b35...6f77624b93](https://github.com/OneGov/onegov-cloud/compare/ff6ba08b35^...6f77624b93)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.27)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
