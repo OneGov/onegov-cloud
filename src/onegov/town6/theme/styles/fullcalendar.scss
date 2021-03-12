@@ -211,13 +211,13 @@
 /*
     Fullcalendar responsive design
 */
-@include breakpoint(medium up) {
+@include breakpoint(medium only) {
     .fc .fc-toolbar {
         width: 100%;
     }
 }
 
-@include breakpoint(large only) {
+@include breakpoint(large up) {
     .fc .fc-toolbar {
         width: 80%;
     }
@@ -357,6 +357,302 @@
 
         .occurrence-tags {
             display: none;
+        }
+    }
+}
+
+/*
+    Reservation calendar
+*/
+.reservation-confirmation .reservation-selection .reservation-warning {
+    display: none;
+}
+
+.reservation-selection {
+    float: right;
+    padding: 0 0 0 15px;
+
+    p {
+        font-size: .875rem;
+    }
+
+    ul,
+    .prediction {
+        font-size: .8rem;
+        list-style: none;
+        margin: 0;
+    }
+
+    li {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .button {
+        border-radius: 3px;
+        display: block;
+        margin: 0;
+    }
+
+    .failed {
+        color: $alert-color;
+
+        .reservation-date::before {
+            background-color: transparentize($alert-color, .8);
+            color: $alert-color;
+        }
+    }
+
+    .reservation-warning {
+        color: $warning-color;
+        cursor: help;
+        margin-left: 1ex;
+    }
+
+    .reservation-date {
+        display: block;
+        font-weight: bold;
+
+        a {
+            color: $body-font-color;
+            display: inline-block;
+            margin: 0;
+
+            &:hover {
+                color: $anchor-font-color-hover;
+            }
+        }
+
+        &::before {
+            background-color: transparentize($primary-color, .8);
+            border-radius: 50px;
+            color: $primary-color;
+            content: attr(data-quota);
+            display: inline-block;
+            font-size: 12px;
+            height: 15px;
+            line-height: 15px;
+            margin-right: 1ex;
+            position: relative;
+            text-align: center;
+            width: 15px;
+        }
+    }
+
+    a,
+    .reservation-time,
+    .reservation-price {
+        display: block;
+        margin-left: 1.4rem;
+    }
+
+    &.large {
+        float: none;
+        padding: 0;
+        width: 100%;
+
+        span {
+            font-size: 1rem;
+        }
+
+        .reservation-date::before {
+            font-size: 1rem;
+            height: 24px;
+            line-height: 24px;
+            width: 24px;
+        }
+
+        .reservation-time,
+        .reservation-price {
+            margin-left: 2.3rem;
+        }
+    }
+
+    .prediction {
+        background-color: $smoke;
+        margin-top: 1rem !important;
+        padding: .2rem 0 .35rem .3rem;
+
+        a {
+            margin-left: .2rem;
+            margin-top: .25rem;
+
+            &::before {
+                @include icon('\f0d0');
+                color: $body-font-color;
+                margin-right: 1ex;
+            }
+        }
+    }
+
+    .reservation-denied {
+        border-left: 5px solid $red-pastel;
+        color: $alert-color;
+        font-size: .8rem;
+        margin-bottom: 1rem;
+        margin-left: .6rem;
+        margin-top: .5rem;
+        max-width: 23.25rem;
+        padding-left: 1.4rem;
+
+        ol {
+            margin: .5rem 0 0;
+
+            li {
+                background: $red;
+                border-radius: 3px;
+                color: $white;
+                display: inline-block;
+                font-size: .8rem;
+                font-weight: bold;
+                margin: 0;
+                padding: 1px 5px;
+            }
+        }
+    }
+}
+
+/*
+    Reservation selection responsive
+*/
+
+@include breakpoint(medium up) {
+    .reservation-selection {
+        float: right;
+        width: 20%;
+    }
+
+    .fc-view-container {
+        display: inline-block;
+        float: left;
+        width: 80%;
+    }
+}
+
+@include breakpoint(medium only) {
+    .reservation-selection {
+        width: 25%;
+
+        .button {
+            padding: 1rem 1.5rem;
+        }
+    }
+
+    .fc-view-container {
+        width: 75%;
+    }
+}
+
+@include breakpoint(small only) {
+    .reservation-selection {
+        float: none;
+        padding: 0;
+        width: 100%;
+    }
+
+    .fc-view-container {
+        display: block;
+        width: 100%;
+    }
+
+    .fc .fc-toolbar {
+        button,
+        .fc-button-group {
+            display: inline-block;
+            font-size: .7rem;
+        }
+
+        .fc-right {
+            left: -7px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+    }
+
+    .fc-view {
+        margin-bottom: 1rem;
+    }
+
+    .fc-scroller {
+        overflow-y: auto;
+    }
+}
+
+
+/*
+    reservation actions popup
+*/
+.reservation-actions {
+    h3 {
+        font-size: .875rem;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    form {
+        margin-bottom: .5rem;
+    }
+
+    input {
+        margin-bottom: 0;
+    }
+
+    input[type="time"],
+    input[type="text"] {
+        height: 2rem;
+    }
+
+    input[type="radio"] {
+        float: none;
+        font-size: .875rem;
+        position: relative;
+        top: -2px;
+    }
+
+    .label-text {
+        color: $form-label-color;
+        display: inline-block;
+        font-size: .875rem;
+        margin-right: 1rem;
+    }
+
+    label {
+        margin-right: .75rem;
+    }
+
+    button {
+        margin: 10px 0 0;
+        width: 100%;
+    }
+
+    .field {
+        margin-bottom: .25rem;
+
+        label:last-child {
+            margin-right: 0;
+        }
+    }
+
+    .split > div {
+        display: inline-block;
+        position: relative;
+        width: 50%;
+
+        &:first-child {
+            padding-right: 10px;
+
+            &::after {
+                color: $form-label-color;
+                content: '-';
+                font-size: .875rem;
+                position: absolute;
+                right: -4px;
+                top: 1.5rem;
+            }
+        }
+
+        &:last-child {
+            padding-left: 10px;
         }
     }
 }
