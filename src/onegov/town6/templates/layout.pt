@@ -92,8 +92,8 @@
         <div class="off-canvas-content" data-off-canvas-content>
             <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
             <main>
-                <header>
-                    <div class="globals">
+                <header id="header">
+                    <div id="globals" class="globals">
                         <div class="grid-container">
                           <div class="grid-x grid-padding-x">
                               <div class="cell small-12">
@@ -117,7 +117,7 @@
                         </div>
                     </div>
                     <div data-sticky-container id="nav-bar">
-                        <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;">
+                        <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="globals:bottom" data-stick-to="top">
                             <div class="grid-container navigation">
                                 <div class="grid-x">
                                     <div class="large-2 small-2 cell">
