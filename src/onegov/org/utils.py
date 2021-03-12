@@ -137,6 +137,7 @@ def annotate_html(html, request=None):
 
         condition = ' or '.join(
             'starts-with(@href, "{}")'.format(url) for url in {
+                'https://youtu.be',
                 'https://www.youtube.com',
                 'https://www.vimeo.com',
                 'https://vimeo',

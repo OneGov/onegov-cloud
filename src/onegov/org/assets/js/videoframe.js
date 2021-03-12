@@ -7,6 +7,7 @@
 
 var expressions = [
     /https?:\/\/(www\.youtube\.com)\/watch\?v=([^&]+)/i,
+    /https?:\/\/(youtu\.be)\/([^&]+)/i,
     /https?:\/\/([w]{0,3}\.?vimeo\.com).*?\/([0-9]+)/i
 ];
 
@@ -40,7 +41,7 @@ var rgb2hex = function(rgb) {
 };
 
 var getVideoUrl = function(host, id) {
-    if (host.match(/youtube\.com/gi)) {
+    if (host.match(/youtube\.com/gi) || host.match(/youtu\.be/gi)) {
         var origin = window.location.protocol +
         '//' + window.location.host +
         (window.location.port && (':' + window.location.port));
