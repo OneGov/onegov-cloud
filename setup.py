@@ -159,6 +159,7 @@ setup(
     ],
     extras_require={
         'dev': [
+            'pytest-profiling',
             'pytest-testmon',
             'pytest-xdist',
             'scrambler',
@@ -189,7 +190,6 @@ setup(
             'pyquery',
             'pytest',
             'pytest-localserver',
-            'pytest-profiling',
             'pytest-redis',
             'pytest-rerunfailures',
             'pytest-timeout',
