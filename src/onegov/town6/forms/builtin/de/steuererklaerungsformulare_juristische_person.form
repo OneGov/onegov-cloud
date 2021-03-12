@@ -1,0 +1,23 @@
+ Steuererklärungsformulare Juristische Person
+-------------------
+
+# Firmenangaben
+Identifikations-Nr. (Reg.-Nr.) = ___
+Name der Firma / Organisation * = ___
+
+# Adresse
+Strasse (inkl. Hausnummer) * = ___
+PLZ / Ort * = ___
+
+# Vertretung
+Vorname * = ___
+Name * = ___
+AHV-Nummer = # ch.ssn
+
+# Steuerperiode
+Steuerjahr * = ___
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

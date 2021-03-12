@@ -1,0 +1,29 @@
+Abmeldung Wegzug Inland
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+Geburtsdatum * = YYYY.MM.DD
+
+Strasse (inkl. Hausnummer) bisher * = ___
+PLZ / Ort bisher * = ___
+Telefon * = ___
+E-Mail * = @@@
+
+# Weitere Personen
+Mit Ehepartner(in) / Kinder =
+    [ ] Ehepartner(in)
+        Ehepartner(in) = ...
+    [ ] Kinder
+        Kinder = ...
+
+# Neue Adresse
+Datum Wegzug * = YYYY.MM.DD
+Strasse (inkl. Hausnummer) neu * = ___
+PLZ / Ort neu * = ___
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

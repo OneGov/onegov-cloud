@@ -1,0 +1,39 @@
+Anmeldung Zuzug
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+Ledigname = ___
+AHV-Nummer = ___
+Geburtsdatum * = YYYY.MM.DD
+Konfession = ___
+
+# Adresse neu
+Strasse (inkl. Hausnummer) * = ___
+PLZ / Ort * = ___
+Stockwerk = ___
+Anzahl Zimmer = ___
+
+Datum Zuzug * = YYYY.MM.DD
+Wohnverhältnis =
+    (x) Eigene Wohnung
+    ( ) in Gemeinschaft mit
+        Wohngemeinschaft mit (Vorname, Nachname) = ___
+    ( ) in Untermiete
+        Untermiete bei (Vorname, Nachname) = ___
+
+# Vermietung / Hausverwaltung
+Name Hausverwaltung = ___
+Strasse (inkl. Hausnummer) = ___
+PLZ / Ort = ___
+
+# Berufliche Tätigkeit
+Beruf = ___
+Arbeitgeber = ___
+Tätig seit = YYYY.MM.DD
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

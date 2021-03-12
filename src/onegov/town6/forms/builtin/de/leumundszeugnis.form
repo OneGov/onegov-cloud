@@ -1,0 +1,28 @@
+Leumundszeugnis
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+Geburtsdatum * = YYYY.MM.DD
+Heimatort = ___
+Beruf = ___
+
+# Adresse
+Strasse (inkl. Hausnummer) * = ___
+PLZ / Ort * = ___
+
+# Versand
+Versand * =
+    ( ) Ich möchte das Dokument am Schalter abholen
+    (x) Ich möchte das Dokument mittels Post erhalten
+        Abweichende Versandadresse =
+            (x) Nein
+            ( ) Ja
+                Strasse (inkl. Hausnummer) * = ___
+                PLZ / Ort * = ___
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

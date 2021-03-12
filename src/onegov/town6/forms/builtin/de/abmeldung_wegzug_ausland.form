@@ -1,0 +1,40 @@
+Abmeldung Wegzug Ausland
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+Geburtsdatum * = YYYY.MM.DD
+
+# Adresse bisher
+Strasse (inkl. Hausnummer) bisher * = ___
+PLZ / Ort bisher * = ___
+
+# Weitere Personen
+Mit Ehepartner(in) / Kinder =
+    [ ] Ehepartner(in)
+        Ehepartner(in) = ...
+    [ ] Kinder
+        Kinder = ...
+
+# Adresse neu
+Datum Wegzug * = YYYY.MM.DD
+Dauer Auslandaufenthalt * =
+    (x) Definitiv
+    ( ) Unbestimmt
+    ( ) Voraussichtlich Monate
+        Dauer in Monaten = ___
+
+Strasse (inkl. Hausnummer) neu * = ___
+PLZ / Ort neu * = ___
+Land neu * = ___
+
+# Kontaktadresse Inland
+c/o = ___
+Strasse (inkl. Hausnummer) = ___
+PLZ / Ort = ___
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...
