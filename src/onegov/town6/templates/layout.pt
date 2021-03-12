@@ -193,8 +193,8 @@
                         </div>
                     </article>
                 </tal:b>
-                <div class="partners-everywhere">
-                    <div class="grid-container full gray" tal:condition="layout.show_partners">
+                <div id="partners-everywhere" class="partners-everywhere" tal:condition="layout.show_partners">
+                    <div class="grid-container full gray">
                         <div class="grid-x">
                             <div class="cell small-12">
                                 <div class="grid-container">

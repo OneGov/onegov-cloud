@@ -27,10 +27,19 @@
                 <div metal:use-macro="layout.macros.newslist" tal:define="news children; hide_title True; lg_span 6; " />
             </div>
             <tal:b metal:use-macro="layout.macros.page_content_sidebar"
-            tal:define="lead None; text None; people page.people; contact layout.contact_html; coordinates None; location False;" />
+                     tal:define="lead None; text None; people page.people; contact layout.contact_html; coordinates None; location False;">
+                <tal:b metal:fill-slot="after-panels">
+                    <div class="newsletter-sidepanel">
+                        <a class="button expanded" href="${layout.newsletter_url}">
+                            <span class="h5-size" i18n:translate="">Newsletter Subscription</span>
+                        </a>
+                    </div>
+
+                </tal:b>
+            </tal:b>
         </div>
 
-        <tal:b metal:use-macro="layout.macros.page_content"
+        <tal:b metal:use-macro="layout.macros.page_content" tal:condition="not:children"
          tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact None if children else layout.contact_html; coordinates page.coordinates" />
 
     </tal:b>

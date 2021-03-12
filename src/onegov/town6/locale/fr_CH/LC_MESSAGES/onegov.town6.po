@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-03-10 10:11+0100\n"
+"POT-Creation-Date: 2021-03-12 09:30+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -604,6 +604,9 @@ msgstr "Dernières nouvelles"
 
 msgid "All articles"
 msgstr "Toutes les contributions"
+
+msgid "E-Mail Address"
+msgstr "Adresse e-mail"
 
 msgid "This site is private"
 msgstr "Ce site est privé"
@@ -1316,16 +1319,13 @@ msgstr "E-mails de tickets désactivés."
 msgid "Ticket e-mails enabled."
 msgstr "E-mails de tickets activés."
 
+msgid "Newsletter Subscription"
+msgstr "Abonnement lettre d'informations"
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
 "permanence:"
-
-msgid "E-Mail Address"
-msgstr "Adresse e-mail"
-
-msgid "Signup"
-msgstr "S'abonner"
 
 msgid "There are currently ${count} recipients registered."
 msgstr "Il y a actuellement ${count} destinataires enregistrés."
@@ -1821,3 +1821,9 @@ msgstr "Jours fériés"
 
 msgid "Ticket Settings"
 msgstr "Paramètres tickets"
+
+msgid "Site Navigation Settings"
+msgstr ""
+
+#~ msgid "Signup"
+#~ msgstr "S'abonner"

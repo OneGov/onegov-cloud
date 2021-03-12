@@ -97,7 +97,7 @@
 </metal:panel-links>
 
 <metal:footer define-macro="footer">
-    <footer class="footer-container">
+    <footer id="footer" class="footer-container">
         <div class="grid-container">
             <div class="grid-x grid-padding-x footer-content">
                 <metal:b use-macro="layout.macros['footer_columns']" />
@@ -486,7 +486,7 @@
     <metal:b define-slot="pre_form"></metal:b>
 
     <div class="grid-x">
-        <div class="cell small-12 medium-${span_lg|9} large-${span_md|6}">
+        <div class="cell small-12 medium-${span_md|9} large-${span_lg|6}">
             <form class="signup" action="${form.action}" method="POST">
                 <div>${form.csrf_token}</div>
                 <div class="grid-x grid-padding-x">
@@ -548,27 +548,27 @@
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
     <div class="small-12 medium-4 cell page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
-    <div metal:define-slot="before-panels"></div>
-    <div class="side-panel contact-panel" tal:condition="contact or coordinates or location">
-        <h3 i18n:translate tal:condition="contact">Contact</h3>
-        <div class="contact-panel-content">
-            <tal:b condition="contact" content="structure contact" />
+        <div metal:define-slot="before-panels"></div>
+        <div class="side-panel contact-panel" tal:condition="contact or coordinates or location">
+            <h3 i18n:translate tal:condition="contact">Contact</h3>
+            <div class="contact-panel-content">
+                <tal:b condition="contact" content="structure contact" />
+            </div>
+            <br tal:condition="coordinates and contact" />
+            <h3 i18n:translate tal:condition="not contact">Map</h3>
+            <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
+            <div class="location" tal:condition="location">${location}</div>
         </div>
-        <br tal:condition="coordinates and contact" />
-        <h3 i18n:translate tal:condition="not contact">Map</h3>
-        <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
-        <div class="location" tal:condition="location">${location}</div>
-    </div>
-    <div class="side-panel people-panel" tal:condition="people">
-        <h3 i18n:translate>People</h3>
-        <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
-            <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                <a class="h5-size" href="${request.link(person)}">${person.title}</a>
-                <div>${person.context_specific_function}</div>
-            </li>
-        </ul>
-    </div>
-    <div metal:define-slot="after-panels"></div>
+        <div class="side-panel people-panel" tal:condition="people">
+            <h3 i18n:translate>People</h3>
+            <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
+                <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
+                    <a class="h5-size" href="${request.link(person)}">${person.title}</a>
+                    <div>${person.context_specific_function}</div>
+                </li>
+            </ul>
+        </div>
+        <div id="after-panels" metal:define-slot="after-panels"></div>
     </div>
 </metal:page_content>
 
