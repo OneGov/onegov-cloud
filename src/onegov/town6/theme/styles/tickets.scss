@@ -140,7 +140,9 @@ $all-ticket-icon: '\f055';
         &.ticket-state,
         &.ticket-user {
             color: $monsoon;
-            text-align: right;
+            @include breakpoint(medium up) {
+                text-align: right;
+            }
         }
 
         &.ticket-user > div {
