@@ -1,3 +1,21 @@
+/*
+
+Global font adjustments for small screens. Whereas all titles get scaled,
+the actual paragraphs are not.
+
+*/
+
+p,
+a {
+    font-size: 100%;
+}
+
+@include breakpoint(small only) {
+    p,
+    a {
+        font-size: 90%;
+    }
+}
 
 /*
     Small text
