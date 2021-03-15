@@ -121,6 +121,28 @@ def test_detect_changed_fields():
     assert changes.changed_fields == ['Name']
 
 
+def test_remove_fieldset_in_between():
+    changes = StructuralChanges(
+        """ # F
+            A = ___
+            # S
+            B = ___
+            # T
+            C = ___
+        """,
+        """ # F
+            A = ___
+            B = ___
+            # T
+            C = ___
+        """
+    )
+    assert not changes.added_fields
+    assert not changes.removed_fields
+    assert changes.renamed_fields == {'S/B': 'F/B'}
+    assert not changes.changed_fields
+
+
 def test_directory_migration(session):
     """
     Testcases:
