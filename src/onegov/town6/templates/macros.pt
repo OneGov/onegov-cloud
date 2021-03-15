@@ -489,14 +489,14 @@
         <div class="cell small-12 medium-${span_md|9} large-${span_lg|6}">
             <form class="signup" action="${form.action}" method="POST">
                 <div>${form.csrf_token}</div>
-                <div class="grid-x grid-padding-x">
-                    <div class="cell small-8 ${form.address.errors and 'error'}">
+                <div class="grid-x">
+                    <div class="cell small-8 ${'error' if form.address.errors else ''}">
                         <input data-typeahead-subject type="email"
                                name="address"
                                placeholder="E-Mail Address" i18n:attributes="placeholder"/>
                         <small class="error" tal:repeat="error form.address.errors">${error}</small>
                     </div>
-                    <div class="cell small-4 ${form.address.errors and 'error'}">
+                    <div class="cell small-4 ${'error' if form.address.errors else ''}">
                         <button type="submit"
                                 class="button" i18n:translate>
                             Signup

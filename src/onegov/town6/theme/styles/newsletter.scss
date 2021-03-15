@@ -64,3 +64,17 @@
         overflow-y: scroll;
     }
 }
+
+
+/*
+    Newsletter Signup
+*/
+$input-height: ($input-font-size * unitless-calc($input-line-height)) + (get-side($input-padding, 'top') + get-side($input-padding, 'bottom')) - rem-calc(1);;
+
+.signup {
+    button {
+        height: $input-height;
+        padding-bottom: .5em;
+        padding-top: .5em;
+    }
+}
