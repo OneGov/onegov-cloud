@@ -1,0 +1,76 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="cell small-12 medium-9 small-order-2 medium-order-1 large-order-1">
+                <table class="usermanagement stack" tal:define="enable_yubikey request.app.enable_yubikey">
+                    <tal:b repeat="role ('admin', 'editor', 'member')">
+                        <thead>
+                            <tr>
+                                <td>
+                                    <tal:b metal:use-macro="layout.macros['role-plural']" />
+                                    (${len(users.get(role, []))})
+                                </td>
+                                <td></td>
+                                <td tal:condition="enable_yubikey" i18n:translate>
+                                    Yubikey
+                                </td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tbody tal:condition="users.get(role)">
+                            <tr tal:repeat="user users[role]" class="${user.active and 'user-active' or 'user-inactive'}">
+                                <td>
+                                    <tal:b condition="user.active">
+                                        <i class="far fa-user" aria-hidden="true" title="Active" i18n:attributes="title"></i>
+                                    </tal:b>
+                                    <tal:b condition="not:user.active">
+                                        <i class="fa fa-ban" aria-hidden="true" title="Inactive" i18n:attributes="title"></i>
+                                    </tal:b>
+                                    &nbsp;
+                                    <span>${user.username}</span>
+                                </td>
+
+                                <td>${user.realname}</td>
+
+                                <tal:b define="serial user.yubikey_serial" condition="enable_yubikey">
+                                    <td tal:condition="serial">
+                                        <span class="yubikey">
+                                            <i class="fa fa-key" aria-hidden="true"></i>
+                                            ${serial}
+                                        </span>
+                                    </td>
+                                    <td tal:condition="not:serial" i18n:translate></td>
+                                </tal:b>
+
+                                <td class="text-links">
+                                    <a href="${request.link(user)}" i18n:translate>View</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </tal:b>
+                </table>
+            </div>
+            <div class="cell small-12 medium-3 filter-panel small-order-1 medium-order-2 large-order-2">
+                <div tal:condition="filters['active']|nothing" class="filter-active">
+                    <h3 class="filter-title" i18n:translate>State</h3>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
+                </div>
+                <div tal:condition="filters['role']|nothing" class="filter-role">
+                    <h3 class="filter-title" i18n:translate>Role</h3>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['role']" />
+                </div>
+                <div tal:condition="filters['tag']|nothing" class="filter-tags">
+                    <h3 class="filter-title" i18n:translate>Tags</h3>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tag']" />
+                </div>
+                <div tal:condition="filters['source']|nothing" class="filter-source">
+                    <h2 class="filter-title" i18n:translate>Source</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['source']" />
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

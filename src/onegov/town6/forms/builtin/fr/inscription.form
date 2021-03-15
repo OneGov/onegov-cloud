@@ -1,0 +1,27 @@
+Inscription
+-----------
+
+# Identité
+Prénom * = ___
+Nom * = ___
+Émail * = @@@
+Numéro AVS = # ch.ssn
+Date de naissance * = YYYY.MM.DD
+
+# Adresse
+Numéro et nom de la voie * = ___
+Code postal / localité * = ___
+
+# Personelles
+Nutrition =
+    (x) Tout
+    ( ) Végétarien
+    ( ) Végan
+
+Style de musique =
+    [ ] Pop
+    [ ] Rock
+    [ ] Rap
+
+# Divers
+Remarques = ...

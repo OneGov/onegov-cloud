@@ -63,10 +63,10 @@ def get_change_request_form_class(model, request):
     model=DirectoryCollection,
     template='directories.pt',
     permission=Public)
-def view_directories(self, request):
+def view_directories(self, request, layout=None):
     return {
         'title': _("Directories"),
-        'layout': DirectoryCollectionLayout(self, request),
+        'layout': layout or DirectoryCollectionLayout(self, request),
         'directories': request.exclude_invisible(self.query()),
         'link': lambda directory: request.link(
             ExtendedDirectoryEntryCollection(

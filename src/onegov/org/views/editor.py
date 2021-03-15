@@ -15,9 +15,9 @@ def get_form_class(editor, request):
 
     if src and editor.action == 'paste':
         if src and src.trait in editor.page.allowed_subtraits:
-            return editor.page.get_form_class(src.trait, request)
-
-    return editor.page.get_form_class(editor.trait, request)
+            return editor.page.get_form_class(
+                src.trait, editor.action, request)
+    return editor.page.get_form_class(editor.trait, editor.action, request)
 
 
 @OrgApp.form(model=Editor, template='form.pt', permission=Private,
@@ -38,6 +38,9 @@ def handle_page_form(self, request, form, layout=None):
 
 
 def handle_new_page(self, request, form, src=None, layout=None):
+    site_title = self.page.trait_messages[self.trait]['new_page_title']
+    if layout:
+        layout.site_title = site_title
 
     if form.submitted(request):
         pages = PageCollection(request.session)
@@ -55,8 +58,6 @@ def handle_new_page(self, request, form, src=None, layout=None):
     if src:
         form.process(obj=src)
 
-    site_title = self.page.trait_messages[self.trait]['new_page_title']
-
     return {
         'layout': layout or EditorLayout(self, request, site_title),
         'title': site_title,
@@ -66,6 +67,10 @@ def handle_new_page(self, request, form, src=None, layout=None):
 
 
 def handle_edit_page(self, request, form, layout=None):
+    site_title = self.page.trait_messages[self.trait]['edit_page_title']
+    if layout:
+        layout.site_title = site_title
+
     if form.submitted(request):
         form.populate_obj(self.page)
         request.success(_("Your changes were saved"))
@@ -73,8 +78,6 @@ def handle_edit_page(self, request, form, layout=None):
         return morepath.redirect(request.link(self.page))
     elif not request.POST:
         form.process(obj=self.page)
-
-    site_title = self.page.trait_messages[self.trait]['edit_page_title']
 
     return {
         'layout': layout or EditorLayout(self, request, site_title),

@@ -1,0 +1,240 @@
+/*
+    useful mixins
+*/
+
+// sass-lint:disable-all
+@mixin grayscale {
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
+            filter: grayscale(100%);
+       -moz-filter: grayscale(100%);
+        -ms-filter: grayscale(100%);
+         -o-filter: grayscale(100%);
+            filter: gray;
+    -webkit-filter: grayscale(100%);
+}
+
+@mixin reset-filter {
+       -moz-filter: none;
+        -ms-filter: none;
+         -o-filter: none;
+            filter: none;
+    -webkit-filter: none;
+}
+// sass-lint:enable-all
+
+@mixin hairline {
+    border: 0;
+    border-bottom: 1px solid $gray;
+}
+
+@mixin smooth-edges {
+    border-radius: 2px;
+}
+
+@mixin circle {
+    border-radius: 50%;
+}
+
+@mixin rounded-corners {
+    border-radius: 1000px;
+}
+
+// This is the base fa uses for the class .fa and .fas
+@mixin icon-base {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-family: 'Font Awesome 5 Free';
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+}
+
+@mixin icon($icon) {
+    @include icon-base;
+    content: $icon;
+    font-weight: 400;
+    line-height: inherit;
+}
+
+@mixin icon-bold($icon) {
+    @include icon-base;
+    content: $icon;
+    font-weight: 900;
+    line-height: inherit;
+}
+
+@mixin prefix ($prop, $val) {
+    // sass-lint:disable-block property-sort-order
+    -webkit-#{$prop}: #{$val};
+    -moz-#{$prop}: #{$val};
+    -ms-#{$prop}: #{$val};
+    #{$prop}: #{$val};
+}
+
+@mixin primary-color-background {
+    background-color: $primary-color;
+    color: $primary-fg-color !important;
+}
+
+$more-link-icon: "\f054";
+
+@mixin more-link-after {
+    a::after {
+        @include icon-bold($more-link-icon);
+        float: right;
+  }
+}
+
+@mixin clean-ul {
+    list-style: none;
+    margin: 0;
+
+    ul {
+        list-style: none;
+        margin: 0;
+    }
+}
+
+$morelist-border: 1px solid #f5f5f5;
+$morelist-default-padding: .5rem 0;
+
+@mixin more-list($padding: $morelist-default-padding, $contained: false) {
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+
+        @include more-link-after;
+        border-bottom: $morelist-border;
+        font-family: $header-font-family;
+        padding: $padding;
+
+        .list-lead {
+            max-width: 90%;
+        }
+
+        @if $contained {
+            &:first-of-type {
+                border-top: $morelist-border;
+            }
+        } @else {
+            &:first-of-type { padding-top: 0; }
+
+            &:last-of-type {
+                border: 0;
+                padding-bottom: 0;
+            }
+        }
+
+
+        a {
+            display: inline-block;
+            font-weight: bold;
+            width: 100%;
+        }
+    }
+}
+
+.more-list {
+    @include more-list;
+}
+
+.morelist.contained {
+    @include more-list($morelist-default-padding, true)
+}
+
+/*
+  Form customisation needed coming from foundation5
+*/
+
+/*
+
+The foundation5 label component
+
+*/
+
+// We use these to style the labels
+$label-padding: rem-calc(4 8 4) !default;
+$label-radius: $global-radius !default;
+
+// We use these to style the label text
+$label-font-sizing: rem-calc(11) !default;
+$label-font-weight: $global-weight-normal !default;
+$label-font-color: $oil !default;
+$label-font-color-alt: $white !default;
+$label-font-family: $body-font-family !default;
+
+// We use this mixin to create postfix/prefix form Labels
+@mixin prefix-postfix-base {
+    border: $input-prefix-border;
+    display: block;
+    font-size: $form-label-font-size;
+    height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
+    line-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
+    overflow: visible;
+    padding-bottom: 0;
+    padding-top: 0;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 2;
+}
+
+@mixin label-base {
+    display: inline-block;
+    font-family: $label-font-family;
+    font-weight: $label-font-weight;
+    line-height: 1;
+    margin-bottom: auto;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+@mixin label-size($padding: $label-padding, $text-size: $label-font-sizing) {
+    @if $padding { padding: $padding; }
+    @if $text-size { font-size: $text-size; }
+}
+
+@mixin label-style($bg: $primary-color-ui, $radius: false) {
+    // We control which background color comes through
+    font-family: $header-font-family;
+    @if $bg {
+        // This find the lightness percentage of the background color.
+        $bg-lightness: lightness($bg);
+        background-color: $bg;
+
+        // We control the text color for you based on the background color.
+        // sass-lint:disable-block space-around-operator
+        @if $bg-lightness < 70% {
+            color: $label-font-color-alt;
+        }
+        @else { color: $label-font-color; }
+    }
+
+    // We use this to control the radius on labels.
+    @if $radius == true { @include radius($label-radius); }
+    @else if $radius { @include radius($radius); }
+
+}
+
+@mixin label($padding: $label-padding, $text-size: $label-font-sizing, $bg: $primary-color-ui, $radius: false) {
+    @include label-base;
+    @include label-size($padding, $text-size);
+    @include label-style($bg, $radius);
+}
+
+@mixin clear-focus-outline {
+    &:focus { outline: none; }
+}
+
+@mixin editor-toolbar {
+    border-radius: $select-radius;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    margin: 0 1px;
+}

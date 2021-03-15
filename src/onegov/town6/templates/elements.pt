@@ -1,0 +1,18 @@
+<xml xmlns="http://www.w3.org/1999/xhtml" i18n:domain="onegov.town6">
+
+<!--! A generic link element -->
+<metal:b define-macro="link">
+    <a tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'">
+            <metal:b
+                tal:define="item e.model"
+                use-macro="layout.macros['access_hint']"
+            />
+        </tal:b></a>
+</metal:b>
+
+<!--! An img element -->
+<metal:b define-macro="img">
+    <img tal:attributes="e.attrs" />
+</metal:b>
+
+</xml>

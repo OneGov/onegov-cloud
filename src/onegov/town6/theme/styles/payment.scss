@@ -1,0 +1,111 @@
+/*
+    Payments
+*/
+.payment-providers {
+    list-style: none;
+    margin: 0;
+
+    li + li {
+        margin-top: 1rem;
+    }
+
+    h2,
+    span {
+        color: $steel;
+    }
+
+    .payment-provider-default {
+        h2,
+        span {
+            color: $body-font-color;
+        }
+    }
+
+    h2 {
+        font-size: 1rem;
+        font-weight: bold;
+        margin: 0 0 .5rem;
+
+        &::before {
+            @include icon('\f1f5');
+            margin-right: 1.5ex;
+        }
+    }
+}
+
+/*
+    Payment states
+*/
+.payment-state {
+    background-color: $white;
+    display: inline-block;
+    padding: 2px 8px;
+
+    &.payment-state-open {
+        border: 1px solid get-color(info);
+
+        &::before {
+            @include icon('\f059');
+            color: get-color(info);
+            margin-right: .75ex;
+        }
+    }
+
+    &.payment-state-paid {
+        border: 1px solid get-color(success);
+
+        &::before {
+            @include icon('\f058');
+            color: get-color(success);
+            margin-right: .75ex;
+        }
+    }
+
+    &.payment-state-failed {
+        border: 1px solid $alert-color;
+
+        &::before {
+            @include icon('\f057');
+            color: get-color(alert);
+            margin-right: .75ex;
+        }
+    }
+
+    &.payment-state-cancelled {
+        border: 1px solid get-color(warning);
+
+        &::before {
+            @include icon-bold('\f06a');
+            color: get-color(warning);
+            margin-right: .75ex;
+        }
+    }
+}
+
+.tickets-table .payment-state {
+    background: transparent;
+    border: 0;
+    font-size: .8rem;
+    margin-top: .3ex;
+    padding: 0;
+
+    &::before {
+        margin-right: .25ex;
+    }
+
+    &.payment-state-paid::before {
+        color: $iron;
+    }
+}
+
+/*
+    Payments table
+*/
+.payments-table {
+    width: 100%;
+
+    td {
+        padding-right: 5px;
+        vertical-align: top;
+    }
+}

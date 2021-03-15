@@ -1,0 +1,162 @@
+/*
+    Person card
+*/
+$person-website-icon: '\f0c1';
+$person-phone-icon: '\f095';
+$person-email-icon: '\f0e0';
+
+.person-card {
+    margin: 0 1em 1em 0;
+
+    .person-card-portrait {
+        @include circle;
+
+        background: $topbar-bg-color;
+        height: 9rem;
+        overflow: hidden;
+        width: 9rem;
+
+        // this would be nicer with object-position and object-fit, but IE
+        // doesn't support it at all and Safari only somewhat.
+        .cover-image {
+            background-position: center top;
+            background-size: cover;
+            height: 100%;
+            width: 100%;
+        }
+
+        .fa-user {
+            color: $white;
+            font-size: 200px;
+        }
+    }
+
+    ul {
+        list-style: none;
+        margin-bottom: 0;
+        margin-left: 0;
+
+        li::before {
+            margin-right: .5ex;
+        }
+    }
+
+    .person-card-function {
+        margin-bottom: 1em;
+    }
+
+    .person-card-personal {
+        margin-bottom: 1em;
+
+        span:not(:last-child)::after {
+            content: ',';
+        }
+    }
+
+    .person-card-address {
+        margin-bottom: 1em;
+
+        span {
+            white-space: pre-line;
+        }
+    }
+
+    .person-card-notes {
+        padding-top: 1em;
+
+        span {
+            white-space: pre-line;
+        }
+    }
+
+    &.person-single-item {
+        .person-card-website::before {
+            @include icon-bold($person-website-icon);
+            color: $primary-color;
+        }
+
+        .person-card-phone::before,
+        .person-card-phone-direct::before {
+            @include icon-bold($person-phone-icon);
+            color: $primary-color;
+        }
+
+        .person-card-email::before {
+            @include icon($person-email-icon);
+            color: $primary-color;
+        }
+    }
+}
+
+@include breakpoint(small only) {
+    .person-card {
+        .person-card-portrait {
+            height: calc(100vw - 6rem);
+            margin: 0 auto 1em;
+            width: calc(100vw - 6rem);
+        }
+    }
+}
+
+/*
+    Person card in lists
+*/
+
+.person-list-card {
+    display: flex;
+
+    .person-card-portrait {
+        height: 5rem;
+        text-align: center;
+        width: 5rem;
+
+        .fa-user {
+            font-size: 80px;
+        }
+    }
+
+    > a {
+        margin-right: 1em;
+    }
+
+    ul {
+        > li {
+            font-size: .875rem;
+            max-width: calc(100vw - 7.5rem);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .person-card-title {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .person-card-function {
+        margin-bottom: 0;
+    }
+}
+
+/*
+    A-Z Blocks
+*/
+
+.atoz-block {
+    h2 {
+        border-bottom: 1px solid $gray-pastel;
+    }
+
+    ul {
+        list-style: none;
+        margin-left: 0;
+    }
+}
+
+@media #{$large-only} {
+    .atoz-block {
+        h2 {
+            max-width: 50%;
+        }
+    }
+}

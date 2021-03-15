@@ -16,7 +16,7 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
         'fr_CH': 'content/fr.yaml',
     }
 
-    path = path or module_path('onegov.town', locales[locale])
+    path = path or module_path('onegov.town6', locales[locale])
     content = load_content(path)
 
     # can only be called if no organisation is defined yet
@@ -34,7 +34,7 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
     }
 
     forms = forms or builtin_form_definitions(
-        module_path('onegov.town', form_locales[locale]))
+        module_path('onegov.town6', form_locales[locale]))
 
     translator = app.translations.get(locale)
 

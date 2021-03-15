@@ -5,13 +5,13 @@
 
     <tal:b metal:fill-slot="content">
 
-        <ul tal:condition="len(years) > 1" class="news-years">
-            <tal:b repeat="year years">
-                <li tal:condition="year == current_year">
-                    <strong>${year}</strong>
+        <ul tal:condition="len(year_links) > 1" class="news-years">
+            <tal:b repeat="link year_links">
+                <li tal:condition="link.active">
+                    <strong>${link.text}</strong>
                 </li>
-                <li tal:condition="year != current_year">
-                    <a href="${request.link(page)}?year=${year}">${year}</a>
+                <li tal:condition="not: link.active">
+                    <a href="${link.url}">${link.text}</a>
                 </li>
             </tal:b>
         </ul>

@@ -1,0 +1,24 @@
+/*
+    settings
+*/
+
+.org-settings {
+    font-size: 1rem;
+    list-style: none;
+    margin: 0;
+
+    i.fas {
+        border-radius: 50px;
+        display: inline-block;
+        height: 3ex;
+        text-align: center;
+        width: 3ex;
+    }
+}
+
+.form-preview-widget .holidays {
+    display: block;
+    font-size: .875rem;
+    list-style: none;
+    margin: 0 0 1rem;
+}

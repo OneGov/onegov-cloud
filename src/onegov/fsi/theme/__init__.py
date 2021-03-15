@@ -4,7 +4,7 @@ from onegov.org.theme import OrgTheme
 
 # options editable by the user
 user_options = {
-    'primary-color': '#1d487c',
+    'primary-color-ui': '#1d487c',
 }
 
 

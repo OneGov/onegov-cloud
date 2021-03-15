@@ -1,0 +1,341 @@
+@import 'util/util';
+
+/*
+    Base colors
+*/
+$black: #0f0f0f;
+$black-dark: #000;
+$black-light: #363738;
+$black-pastel: #dadada;
+$blue: #2575ed;
+$blue-dark: #1a52a5;
+$blue-light: #92baf6;
+$blue-pastel: #d3e3fb;
+$gray: #e0e3e5;
+$gray-dark-medium: #d1d4d6;
+$gray-dark: #b3b6b7;
+$gray-light: #f0f1f2;
+$gray-pastel: #f7f8f8;
+$green: #2c9f42;
+$green-dark: #237f35;
+$green-light: #96cfa1;
+$green-pastel: #d4ecd8;
+$orange: #ffb100;
+$orange-dark: #d59200;
+$red: #de2c3b;
+$red-dark: #b2232f;
+$red-light: #ef969d;
+$red-pastel: #f8d5d8;
+$white: #fff;
+$yellow: #ffc800;
+$yellow-dark: #cca000;
+$yellow-light: #ffe480;
+$yellow-pastel: #fff4cc;
+
+// present in foundation5 but not 6
+
+$ghost: #fafafa;
+$snow: #f9f9f9;
+$vapor: #f6f6f6;
+$white-smoke: #f5f5f5;
+$silver: #efefef;
+$smoke: #eee;
+$gainsboro: #ddd;
+$iron: #ccc;
+$base: #aaa;
+$aluminum: #999;
+$jumbo: #888;
+$monsoon: #777;
+$steel: #666;
+$charcoal: #555;
+$tuatara: #444;
+$oil: #333;
+$jet: #222;
+
+
+/*
+    Main colors
+*/
+
+$foundation-palette: (
+    primary: $primary-color-ui,
+    secondary: $gray,
+    success: $green-dark,
+    warning: $orange-dark,
+    alert: $red-dark,
+    info: $blue-dark
+);
+
+
+/* they should put the first access to these vars in _global,
+so that we would not have to overwrite it here again */
+@include add-foundation-colors;
+
+/*
+Body Font Family
+*/
+
+$body-font-family: $body-font-family-ui;
+$header-font-family: $header-font-family-ui;
+$header-lineheight: 1.4;
+
+$h1-font-size: rem-calc(44);
+$h2-font-size: rem-calc(37);
+$h3-font-size: rem-calc(27);
+$h4-font-size: rem-calc(23);
+$h5-font-size: rem-calc(18);
+$h6-font-size: 1rem !default;
+
+$h1-font-reduction: rem-calc(16);
+$h2-font-reduction: rem-calc(13);
+$h3-font-reduction: rem-calc(10);
+$h4-font-reduction: rem-calc(7);
+$h5-font-reduction: rem-calc(3);
+$h6-font-reduction: 0;
+
+$header-styles: (
+    small: (
+        'h1': ('font-size': $h1-font-size - $h1-font-reduction),
+        'h2': ('font-size': $h2-font-size - $h2-font-reduction),
+        'h3': ('font-size': $h3-font-size - $h3-font-reduction),
+        'h4': ('font-size': $h4-font-size - $h4-font-reduction),
+        'h5': ('font-size': $h5-font-size - $h5-font-reduction),
+        'h6': ('font-size': $h6-font-size - $h6-font-reduction),
+    ),
+    medium: (
+        'h1': ('font-size': $h1-font-size),
+        'h2': ('font-size': $h2-font-size),
+        'h3': ('font-size': $h3-font-size),
+        'h4': ('font-size': $h4-font-size),
+        'h5': ('font-size': $h5-font-size),
+        'h6': ('font-size': $h6-font-size),
+    ),
+);
+
+.h1-size { font-size: $h1-font-size - $h1-font-reduction; }
+.h2-size { font-size: $h2-font-size - $h2-font-reduction; }
+.h3-size { font-size: $h3-font-size - $h3-font-reduction; }
+.h4-size { font-size: $h4-font-size - $h4-font-reduction; }
+.h5-size { font-size: $h5-font-size - $h5-font-reduction; }
+.h6-size { font-size: $h6-font-size - $h6-font-reduction; }
+
+@include breakpoint(medium up) {
+    .h1-size,
+    .h2-size,
+    .h3-size,
+    .h4-size,
+    .h5-size,
+    .h6-size {
+        line-height: $header-lineheight;
+    }
+
+    .h1-size { font-size: $h1-font-size; }
+
+    .h2-size { font-size: $h2-font-size; }
+
+    .h3-size { font-size: $h3-font-size; }
+
+    .h4-size { font-size: $h4-font-size; }
+
+    .h5-size { font-size: $h5-font-size; }
+
+    .h6-size { font-size: $h6-font-size; }
+}
+
+/*
+    Grid
+*/
+$grid-container: rem-calc(1100);
+
+/*
+    Anchors
+*/
+
+$anchor-font-color: $primary-color;
+$anchor-font-color-hover: scale-color($anchor-font-color, $lightness: -20%);
+
+/*
+    Panels
+*/
+$panel-bg: $gray-pastel;
+$panel-border-color: scale-color($panel-bg, $lightness: -5%) !default;
+
+$callout-panel-bg: $yellow-light;
+$callout-panel-border-color: $yellow;
+
+/*
+    Labels
+*/
+$label-padding: rem-calc(6 10 6);
+$label-radius: 1px;
+
+/*
+    Buttons
+*/
+$button-font-family: $header-font-family;
+
+/*
+    Round corners
+*/
+$global-radius: 1px;
+
+$body-font-color: $black-dark;
+$bottom-links-color: #777;
+$bottom-links-size: .8rem;
+$crumb-bg: #fff;
+$crumb-border-size: 0;
+$f-dropdown-list-hover-bg: $gray;
+$header-line-height: 1.25;
+$include-print-styles: false;
+$row-width: rem-calc(1050);
+$side-nav-font-weight-active: bold;
+$side-nav-link-padding: rem-calc(0 14);
+$side-nav-padding: 0;
+$sub-nav-padding: .25rem;
+$table-border-style: none;
+$thumb-border-width: 0;
+$thumb-box-shadow: 0 0 0 2px rgba($black, .1);
+$thumb-box-shadow-hover: 0 0 0 2px rgba($black, .3);
+
+/*
+    Topbar
+*/
+
+$top-bar-border-size: .3rem;
+$topbar-bg-color: $gray-pastel;
+$topbar-dropdown-bg: $gray-pastel;
+$topbar-link-bg-hover: $gray;
+$topbar-link-color: #312f2e;
+$topbar-link-color-active: #312f2e;
+$topbar-link-color-active-hover: #312f2e;
+$topbar-link-color-hover: #312f2e;
+$topbar-link-weight: bold;
+$topbar-menu-icon-color: #312f2e;
+$topbar-menu-link-color: #312f2e;
+
+/*
+    Adds support for bright primary colors.
+*/
+$anchor-font-color: $primary-color;
+$crumb-font-color: $primary-color;
+$side-nav-link-color: $primary-color;
+$side-nav-link-color-active: #333;
+$side-nav-link-color-hover: #333;
+$primary-fg-color: if(lightness($primary-color) >= 60%, $body-font-color, $white);
+$button-font-color: $primary-fg-color;
+
+@if lightness($primary-color) >= 50% {
+    $anchor-font-color: scale-color($anchor-font-color, $lightness: -45%, $saturation: 10%);
+    $crumb-font-color: scale-color($crumb-font-color, $lightness: -45%, $saturation: 10%);
+    $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: 10%);
+}
+
+/*
+  FA icons
+ */
+
+$chevron-left-icon: '\f053';
+$chevron-right-icon: '\f054';
+
+/*
+Grid
+*/
+
+//$grid-container: 1200px;
+
+/*
+Off Canvas / SideBar
+*/
+
+$offcanvas-sizes: (
+    small: 250px,
+    medium: 350px
+);
+
+/* default fa icon paddings */
+
+$icon-margin-right: .25rem;
+
+/* possible bug in the breadcrumbs component which is set to default $primary-color blue */
+$breadcrumbs-item-color: $primary-color;
+
+/* Dropdown Menu */
+
+$dropdownmenu-min-width: 300px;
+
+/* Dropdown container */
+$dropdown-width: 400px;
+
+/*
+    Tables
+
+ */
+
+$table-border: none;
+
+/*
+    Pagination
+*/
+
+$pagination-arrows: false;
+$pagination-mobile-items: true;
+$pagination-mobile-current-item: true;
+$pagination-item-color: $aluminum;
+
+/*
+    Forms
+*/
+$fieldset-border: 1px solid $gainsboro;
+$input-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$input-color: rgba($black, .75);
+$input-font-size: rem-calc(14);  // same as the label
+$form-label-color: scale-color($black, $lightness: 30%);
+
+/*
+
+Button styles from foundation5
+
+*/
+
+button.round,
+.button.round {
+    border-radius: 50%;
+}
+
+
+dl dd {
+    margin-bottom: .75rem;
+}
+
+/*
+    Foundation6 variable overwrites for components
+*/
+
+$button-padding: .85em 1.5em;
+
+/*
+    Fix for normalizing select in chrome
+*/
+
+@mixin clear-appearance {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+
+}
+
+select {
+    @include clear-appearance;
+}
+
+/*
+    dropdown buttons
+*/
+.dropdown.button.secondary::after,
+.dropdown.button.secondary::before {
+    border-color: $black transparent transparent;
+}
+
+ul.f-dropdown {
+    list-style: none;
+}

@@ -1,0 +1,14 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <p tal:condition="not:resources" i18n:translate="">No reservation resources defined yet.</p>
+
+        <div class="grid-x" tal:condition="resources">
+            <div class="cell small-12 medium-7">
+                <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped resources" />
+            </div>
+        </div>
+    </tal:b>
+</div>

@@ -1,0 +1,223 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+
+            <!--! note that the following snippet is DUPLICATED below, because when
+                  printing this site we want the content panel to be shown first -->
+            <div class="cell small-12 medium-9 hide-for-print">
+                <div tal:condition="deleted" class="callout" i18n:translate>
+                    The record behind this ticket was removed. The following information
+                    is a snapshot kept for future reference.
+                </div>
+                <div class="ticket-summary" id="summary">
+                    <tal:b replace="structure summary" />
+                </div>
+
+                <div class="ticket-timeline" id="timeline">
+                    <h2 i18n:translate>Timeline</h2>
+                    <div class="timeline" data-feed-data="${feed_data}" data-feed='static'></div>
+                    <p class="timeline-no-messages" i18n:translate style="display: none;">
+                        No activities yet.
+                    </p>
+                </div>
+            </div>
+            <!--! -->
+
+            <div class="cell small-12 medium-3">
+                <div class="ticket-panel ticket-submitter ${ticket.muted and 'ticket-submitter-muted' or 'ticket-submitter-unmuted'}">
+                    <h2 i18n:translate>Submitter</h2>
+
+                    <div class="ticket-submitter-address">
+                        <i class="far fa-fw fa-envelope"></i>
+                        <a href="mailto:${submitter}">${submitter}</a>
+                    </div>
+
+                    <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status">
+                        <i class="fa fa-fw fa-check" aria-hidden="true"></i>
+
+                        <span i18n:translate>
+                            Ticket updates by e-mail
+                        </span>
+
+                        <a class="button small secondary" href="${request.link(ticket, 'mute')}">
+                            <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                            <span i18n:translate>Disable E-Mails</span>
+                        </a>
+                    </div>
+
+                    <div tal:condition="ticket.muted" class="ticket-submitter-notification-status">
+                        <i class="fa fa-fw fa-times" aria-hidden="true"></i>
+
+                        <span i18n:translate>
+                            No ticket updates by e-mail
+                        </span>
+
+                        <tal:b condition="not event_source">
+                            <a class="button small secondary" href="${request.link(ticket, 'unmute')}">
+                                <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                <span i18n:translate>Enable E-Mails</span>
+                            </a>
+                        </tal:b>
+
+                        <tal:b condition="event_source">
+                            <a class="button small secondary confirm disabled"
+                               data-confirm="E-Mails can not be sent for tickets of imported events"
+                                data-confirm-no="Cancel"
+                               i18n:attributes="data-confirm;data-confirm-no"
+                            >
+                                <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                <span i18n:translate>Enable E-Mails</span>
+
+                            </a>
+                        </tal:b>
+                    </div>
+
+                    <tal:b condition="not event_source and ticket.state != 'closed'">
+                        <a class="button small primary" href="${request.link(ticket, 'message-to-submitter')}">
+                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <span i18n:translate>Send Message</span>
+                        </a>
+                    </tal:b>
+
+                    <tal:b condition="not event_source and ticket.state == 'closed'">
+                        <a class="button small disabled confirm"
+                            data-confirm="Messages cannot be sent when the ticket is closed"
+                            data-confirm-extra="Please reopen the ticket to send a message"
+                            data-confirm-no="Cancel"
+                            i18n:attributes="data-confirm;data-confirm-extra;data-confirm-no">
+
+                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <span i18n:translate>Send Message</span>
+                        </a>
+                    </tal:b>
+
+                    <tal:b condition="event_source">
+                        <a class="button small disabled confirm"
+                            data-confirm="Messages cannot be sent for imported events"
+                            data-confirm-no="Cancel"
+                            i18n:attributes="data-confirm;data-confirm-no">
+
+                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <span i18n:translate>Send Message</span>
+                        </a>
+                    </tal:b>
+
+                    <ul class="counts" tal:condition="counts and (counts.notes or counts.internal or counts.external)">
+                        <li tal:condition="counts.external" class="counts-external">
+                            <a href="#timeline" i18n:translate>
+                                <span class="counts-value" i18n:name="count">${counts.external}</span> received
+                            </a>
+                        </li>
+                        <li tal:condition="counts.internal" class="counts-internal">
+                            <a href="#timeline" i18n:translate>
+                                <span class="counts-value" i18n:name="count">${counts.internal}</span> sent
+                            </a>
+                        </li>
+                        <li tal:condition="counts.notes" class="counts-note">
+                            <a href="#timeline" i18n:translate tal:condition="counts.notes == 1">
+                                <span class="counts-value" i18n:name="count">${counts.notes}</span> note
+                            </a>
+                            <a href="#timeline" i18n:translate tal:condition="counts.notes > 1">
+                                <span class="counts-value" i18n:name="count">${counts.notes}</span> notes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="ticket-panel" tal:define="payment handler.payment" tal:condition="payment">
+                    <h2 i18n:translate>Payment</h2>
+
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Amount</div>
+                        <div class="field-display-data ticket-payment-amount">
+                            <tal:b metal:use-macro="layout.macros['price']" tal:define="price payment; show_fee True" />
+                        </div>
+                    </div>
+
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>State</div>
+                        <div class="field-display-data ticket-payment-status">
+                            <tal:b metal:use-macro="layout.macros['payment_status']" />
+                        </div>
+                    </div>
+
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Source</div>
+                        <div class="field-display-data ticket-payment-source">
+                            <tal:b metal:use-macro="layout.macros['payment_source']" />
+                        </div>
+                    </div>
+
+                    <tal:b condition="payment_button" replace="structure payment_button(layout)" />
+                </div>
+
+                <div class="ticket-panel">
+                    <h2 i18n:translate>Ticket</h2>
+
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>State</div>
+                        <div class="field-display-data ticket-state">
+                            <tal:b metal:use-macro="layout.macros['ticket_status']" />
+                        </div>
+                    </div>
+
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Group</div>
+                        <div class="field-display-data ticket-group" tal:define="group handler.group|ticket.group">
+                             ${group}
+                        </div>
+                    </div>
+
+                    <div tal:condition="ticket.user_id" class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Owner</div>
+                        <div class="field-display-data ticket-owner">
+                            <a href="mailto:${ticket.user.username}">${ticket.user.username}</a>
+                        </div>
+                    </div>
+
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Created</div>
+                        <div class="field-display-data ticket-date" tal:define="created layout.to_timezone(ticket.created, layout.timezone)">
+                            ${layout.format_date(created, 'weekday_long')}, ${layout.format_date(created, 'datetime')}
+                        </div>
+                    </div>
+
+                    <div class="field-display-block" tal:condition="ticket.reaction_time">
+                        <div class="field-display-label" i18n:translate>Reaction Time</div>
+                        <div class="field-display-data ticket-date">
+                             ${layout.format_seconds(ticket.reaction_time)}
+                        </div>
+                    </div>
+
+                    <div class="field-display-block" tal:condition="ticket.process_time">
+                        <div class="field-display-label" i18n:translate>Process Time</div>
+                        <div class="field-display-data ticket-date">
+                             ${layout.format_seconds(ticket.process_time)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="cell small-12 medium-8 show-for-print" aria-hidden="true">
+                <div tal:condition="deleted" class="panel callout" i18n:translate>
+                    The record behind this ticket was removed. The following information
+                    is a snapshot kept for future reference.
+                </div>
+                <div class="ticket-summary">
+                    <h2 i18n:translate>Summary</h2>
+                    <tal:b replace="structure summary" />
+                </div>
+
+                <div class="ticket-timeline">
+                    <h2 i18n:translate>Timeline</h2>
+                    <div class="timeline" data-feed-data="${feed_data}" data-feed='static'></div>
+                    <p class="timeline-no-messages" i18n:translate style="display: none;">
+                        No activities yet.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

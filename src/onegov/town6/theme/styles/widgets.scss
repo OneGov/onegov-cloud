@@ -1,0 +1,57 @@
+/*
+    Icon widget customisation
+*/
+.icon-widget {
+    li:hover,
+    li.active {
+        background: $primary-color !important;
+        border-color: $primary-fg-color !important;
+        color: $primary-fg-color !important;
+    }
+}
+
+/*
+    (Homepage) widgets
+*/
+
+.grid-container.full.gray {
+    background: $white-smoke;
+}
+
+article.content .grid-container:last-of-type {
+    @include breakpoint(medium up) {
+        padding-bottom: 1.4rem;
+    }
+}
+
+article.content .side-panel {
+    @include breakpoint(small only) {
+        padding-top: .625rem;
+    }
+}
+
+.homepage {
+
+    .full.primary {
+        @include primary-color-background;
+    }
+
+    &> .grid-container {
+
+        @include breakpoint(small only) {
+            padding-bottom: .625rem;
+            padding-top: .625rem;
+        }
+
+        padding-bottom: 1.4rem;
+        padding-top: 1.4rem;
+
+        &:first-of-type {
+            padding-top: 0;
+        }
+
+        &:last-of-type {
+            padding-bottom: 0;
+        }
+    }
+}

@@ -1,0 +1,118 @@
+/*
+
+Global font adjustments for small screens. Whereas all titles get scaled,
+the actual paragraphs are not.
+
+*/
+
+p,
+a {
+    font-size: 100%;
+}
+
+@include breakpoint(small only) {
+    p,
+    a {
+        font-size: 90%;
+    }
+}
+
+/*
+    Small text
+*/
+.small-text {
+    font-size: .875rem;
+}
+
+.tiny-text {
+    font-size: .8rem;
+}
+
+/*
+    Small atomic text particles whose white-space should not be wrapped
+*/
+.nowrap {
+    white-space: nowrap;
+}
+
+$default-icon-width: 1.5ex;
+$default-icon-margin: .25rem;
+
+.more-link {
+    &::before {
+        @include icon-bold($more-link-icon);
+        width: $default-icon-width;
+    }
+
+}
+
+.more-link-after {
+    &::after {
+        @include icon-bold($more-link-icon);
+        width: $default-icon-width;
+    }
+
+}
+
+p,
+p > * {
+    font-family: $body-font-family;
+}
+
+.page-text ul li a,
+p a {
+    font-family: $body-font-family;
+}
+
+
+/*
+
+All places where we change to the sans serif font
+
+*/
+
+a,
+button,
+button *,
+span,
+span *,
+thead,
+dd,
+dt,
+small.error,
+span.error,
+form label,
+form fieldset,
+.ticket-panel,
+.dialog p,
+.message,
+.field-display-label,
+.field-display-data,
+.side-panel.highlighted,
+.list-lead,
+.monthly-view-wrapper,
+.contact-panel-content > *,
+li strong,
+.footer-content p,
+.orbit-caption,
+em,
+.occurrence-date,
+.occurrence-location,
+.footer-content.footer-content p a,
+.calendar button,
+.contact-panel *,
+footer a,
+footer div,
+.page-lead,
+.panel p {
+    font-family: $header-font-family;
+}
+
+/*
+    Alert boxes
+*/
+
+#alert-boxes {
+    font-family: $header-font-family;
+    font-style: italic;
+}

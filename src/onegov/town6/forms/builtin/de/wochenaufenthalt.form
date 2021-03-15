@@ -1,0 +1,48 @@
+Anmeldung Wochenaufenthalt
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+Ledigname (Mädchenname) = ___
+AHV-Nummer = # ch.ssn
+Geburtsdatum * = YYYY.MM.DD
+Konfession = ___
+
+# Adresse Wochenaufenthalt
+Strasse (inkl. Hausnummer) * = ___
+PLZ / Ort * = ___
+Stockwerk = ___
+Anzahl Zimmer = ___
+
+Wohnverhältnis =
+    (x) Eigene Wohnung
+    ( ) in Gemeinschaft mit
+        Wohngemeinschaft mit (Vorname, Nachname) = ___
+    ( ) in Untermiete
+        Untermiete bei (Vorname, Nachname) = ___
+
+
+# Vermietung / Hausverwaltung
+Name Hausverwaltung = ___
+Strasse (inkl. Hausnummer) = ___
+PLZ / Ort = ___
+
+# Aufenthalt
+Datum Zuzug * = YYYY.MM.DD
+Aufenthalt infolge =
+    [ ] festem Arbeitsverhältnis
+    [ ] befristetem Arbeitsverhältnis
+    [ ] Studienaufenthalt
+        Ausbildungsstätte = ___
+        Voraussichtliches Ende der Ausbildung = ___
+
+# Berufliche Tätigkeit
+Beruf = ___
+Arbeitgeber = ___
+Tätig seit = YYYY.MM.DD
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

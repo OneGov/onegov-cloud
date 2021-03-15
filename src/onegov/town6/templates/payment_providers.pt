@@ -1,0 +1,36 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div tal:condition="not:providers" i18n:translate>
+            No payment providers defined.
+        </div>
+
+        <ul class="payment-providers" tal:condition="providers">
+            <li tal:repeat="provider providers" class="payment-provider-${provider.type} ${provider.default and 'payment-provider-default' or ''}" id="${provider.id.hex}">
+                <h2><a href="${provider.url}">${provider.title}</a></h2>
+                <div>
+                    <span>${provider.public_identity}</span>
+                </div>
+                <div>
+                    <span i18n:translate>Connected:</span>
+                    ${provider.connected and '✔︎' or '✘'}
+                </div>
+                <div>
+                    <tal:b switch="provider.type">
+                        <tal:b case="'stripe_connect'">
+                            <span i18n:translate>Fee:</span>
+                            <span>
+                                ${'{:.02f}'.format(provider.fee_policy.percentage * 100)}% + ${'{:.02f}'.format(provider.fee_policy.fixed)}
+                            </span>
+                        </tal:b>
+                    </tal:b>
+                </div>
+                <div class="text-links">
+                    <tal:b tal:repeat="link links(provider)" tal:replace="structure link(layout)" />
+                </div>
+            </li>
+        </ul>
+    </tal:b>
+</div>

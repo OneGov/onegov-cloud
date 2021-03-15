@@ -1,0 +1,22 @@
+/*
+    Homepage slider
+*/
+
+.slider {
+
+    .orbit-figure {
+        max-height: $full-width-banner-height;
+
+        img {
+            object-fit: cover;
+        }
+    }
+
+    &.no-images {
+        background-color: $tuatara;
+        color: $white;
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+
+}

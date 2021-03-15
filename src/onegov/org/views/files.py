@@ -18,7 +18,8 @@ from onegov.file.utils import extension_for_content_type
 from onegov.file.errors import AlreadySignedError, InvalidTokenError
 from onegov.org import _, OrgApp
 from onegov.core.elements import Link
-from onegov.org.layout import DefaultLayout
+from onegov.org.layout import DefaultLayout, GeneralFileCollectionLayout, \
+    ImageFileCollectionLayout
 from onegov.org.models import (
     GeneralFile,
     GeneralFileCollection,
@@ -88,11 +89,8 @@ class Img(object):
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
              permission=Private)
 def view_get_file_collection(self, request, layout=None):
-    request.include('common')
-    request.include('upload')
-    request.include('prompt')
 
-    layout = layout or DefaultLayout(self, request)
+    layout = layout or GeneralFileCollectionLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Files"), '#')
@@ -212,11 +210,8 @@ def handle_update_publish_date(self, request):
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
              permission=Private)
 def view_get_image_collection(self, request, layout=None):
-    request.include('common')
-    request.include('upload')
-    request.include('editalttext')
 
-    layout = layout or DefaultLayout(self, request)
+    layout = layout or ImageFileCollectionLayout(self, request)
 
     images = view_get_image_collection_json(
         self, request, produce_image=lambda image: Img.from_image(

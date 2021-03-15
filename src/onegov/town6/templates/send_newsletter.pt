@@ -1,0 +1,78 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x">
+            <div class="small-12 cell">
+                <ul class="fa-ul">
+                    <li tal:condition="not:newsletter.sent">
+                        <i class="fa-li fa fa-times"></i>
+                        <span i18n:translate>
+                            This newsletter has not been sent yet.
+                        </span>
+                    </li>
+                    <li tal:condition="newsletter.sent">
+                        <i class="fa-li fa fa-check"></i>
+                        <span i18n:translate>
+                            First sent
+                            <span tal:replace='layout.format_date(newsletter.sent, "relative")' i18n:name='time_ago' />.
+                        </span>
+                    </li>
+                    <li tal:condition="previous_recipients">
+                        <i class="fa-li fa fa-check"></i>
+                        <span i18n:translate>
+                            This newsletter was sent to <span tal:replace='len(previous_recipients)' i18n:name='n' /> subscribers.
+                        </span>
+                    </li>
+
+                    <li tal:condition="not: open_recipients">
+                        <i class="fa-li fa fa-check"></i>
+                        <span i18n:translate>
+                            All subscribers have already received this newsletter.
+                        </span>
+                    </li>
+
+                    <li tal:condition="newsletter.scheduled">
+                        <i class="fa-li fa fa-clock-o"></i>
+                        <span i18n:translate>
+                            The newsletter is scheduled to be sent on <tal:b i18n:name="time">${layout.format_date(newsletter.scheduled, 'datetime_long')}</tal:b>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="grid-x" tal:condition="open_recipients">
+            <div class="small-12 medium-8 large-6 cell">
+
+        <div class="grid-x">
+            <div class="small-12 cell">
+                <h2 i18n:translate>Preview</h2>
+                <p i18n:translate="">Check the email text. You can use the full news text instead of the leading if you want.
+                    You will find this setting in the edit menu of the news item.</p>
+                <iframe class="resizeable no-click" src="${request.link(newsletter, name='preview')}" frameborder="0" width="100%" onload="autoResize()"></iframe>
+            </div>
+        </div>
+        <div class="grid-x" tal:condition="open_recipients">
+            <div class="small-12 medium-8 large-6 cell">
+                <h2 i18n:translate>Delivery</h2>
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+        <div class="grid-x" tal:condition="previous_recipients">
+            <div class="small-12 medium-8 large-6 cell">
+                <h2 i18n:translate>Recipients</h2>
+                <div class="previous-recipients">
+                    <p i18n:translate>
+                        The newsletter was already sent to the following addresses:
+                    </p>
+                    <ul>
+                        <li tal:repeat="recipient previous_recipients">
+                            ${recipient.address}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

@@ -1,0 +1,80 @@
+/*
+    Newsletter
+*/
+
+.newsletter-lead {
+    display: block;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    max-width: $max-line-width;
+    white-space: pre-line;
+}
+
+.recommended {
+    .date {
+        color: $jumbo;
+    }
+}
+
+.previous-recipients {
+    background-color: $white-smoke;
+    padding: 1em;
+
+    * {
+        color: $form-label-color;
+        font-size: $form-label-font-size;
+    }
+
+    p {
+        margin-bottom: .5em;
+    }
+
+    ul {
+        margin-bottom: 0;
+    }
+}
+
+.subscribers li:hover span {
+    background-color: $yellow-pastel;
+}
+
+.newsletter-block > h2,
+.newsletter-block .newslist h2 {
+    @include breakpoint(small only) {
+        font-size: $h3-font-size - $h3-font-reduction;
+    }
+    font-size: $h3-font-size;
+}
+
+.newsletter-block + .newsletter-block {
+    margin-top: 2rem;
+}
+
+.newsletter-publications-block {
+    margin-bottom: 3.5rem;
+}
+
+.newsletter-layout {
+
+    form .field-type-multicheckboxfield ul {
+        @include form-element;
+        height: auto;
+        max-height: 500px;
+        max-width: 100%;
+        overflow-y: scroll;
+    }
+}
+
+
+/*
+    Newsletter Signup
+*/
+$input-height: ($input-font-size * unitless-calc($input-line-height)) + (get-side($input-padding, 'top') + get-side($input-padding, 'bottom')) - rem-calc(1);;
+
+.signup {
+    button {
+        height: $input-height;
+        padding-bottom: .5em;
+        padding-top: .5em;
+    }
+}

@@ -1,0 +1,152 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Organisation
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird die Organisation beschrieben.
+  - title: Themen
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website werden die Kernthemen der Organisation
+        ausgeführt.
+  - title: Kontakt
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird beschrieben wie die Organisation zu
+        erreichen ist.
+  - title: Aktuelles
+    type: news
+    name: news
+    meta:
+      trait: news
+  - title: Wir haben eine neue Webseite!
+    parent: news
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Die neue Webseite läuft auf der Platform der OneGov Cloud.
+
+filesets:
+  - title: Startseiten-Bilder
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Diese Bilder werden auf der Startseite angezeigt.
+      view: grid
+    files:
+      - path: ../../org/content/images/3bearyu-muo-daiga-ellaby.jpg
+        note: "{organisation} Grillfest"
+      - path: ../../org/content/images/hzgs56ze49s-anthony-delanoix.jpg
+        note: "{organisation} Benefiz Konzert"
+      - path: ../../org/content/images/jwimshwif14-jeff-sheldon.jpg
+        note: "Lebenslanges Lernen mit {organisation}"
+      - path: ../../org/content/images/tdvsbpscg7c-tim-napier.jpg
+        note: "Der Saal kann gemietet werden"
+
+organisation:
+  theme_options:
+    primary-color-ui: '#006fba'
+  meta:
+    contact: |
+      Fabian Reinhard
+      Pilatusstrasse 3
+      6003 Luzern
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Pilatusstrasse 3<br>
+      6003 Luzern<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Montag - Freitag 09:00 - 17:00
+    opening_hours_html: Montag - Freitag 09:00 - 17:00
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row-wide>
+          <column span="12">
+              <slider />
+          </column>
+      </row-wide>
+      <row>
+          <column span="8">
+              <focus />
+          </column>
+          <column span="4">
+              <panel>
+                  <services />
+              </panel>
+          </column>
+      </row>
+      <row-wide bgcolor="gray">
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <news />
+                  </column>
+              </row>
+          </column>
+      </row-wide>
+      <row-wide bgcolor="primary">
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <events />
+                  </column>
+              </row>
+          </column>
+      </row-wide>
+      <row>
+          <column span="12">
+              <homepage-tiles show-title="True"/>
+          </column>
+      </row>
+      <row>
+          <column span="12">
+              <directories />
+          </column>
+      </row>
+      <row-wide bgcolor="gray">
+          <column span="12">
+              <row>
+                  <column span="12">
+                      <partners />
+                  </column>
+              </row>
+          </column>
+      </row-wide>

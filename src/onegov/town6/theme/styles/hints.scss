@@ -1,0 +1,82 @@
+/*
+    Hints
+*/
+.hints {
+    @include hairline;
+
+    margin: 0 0 .5rem;
+    padding: 0 0 .5rem;
+    position: relative;
+
+    .hint-date::before { @include icon('\f133'); }
+    .hint-count::before { @include icon('\f2c0'); }
+    .hint-stop::before { @include icon('\f05e'); }
+
+    .hint {
+        margin-left: 1.5rem;
+        padding-bottom: .25rem;
+
+        &::before {
+            display: inline-block;
+            left: 0;
+            margin-right: 1ex;
+            margin-top: -1px;
+            position: absolute;
+            text-align: center;
+            width: 1rem;
+        }
+    }
+}
+
+.panel .hints { // scss-lint:disable MergeableSelector
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    .hint:last-child {
+        padding-bottom: 0;
+    }
+}
+
+.hint {
+    font-size: .875rem;
+    line-height: 1.4rem;
+}
+
+/*
+    Access hints
+*/
+.field-access {
+    input + label::before {
+        margin-right: 1ex;
+        text-align: center;
+        width: 2ex;
+    }
+
+    input[value="public"] + label::before {
+        @include icon('\f06e');
+        color: $blue-dark;
+    }
+
+    input[value="secret"] + label::before {
+        @include icon('\f21b');
+        color: $yellow-dark;
+    }
+
+    input[value="private"] + label::before {
+        @include icon-bold('\f023');
+        color: $red-dark;
+    }
+}
+
+.secret-hint::before {
+    @include icon('\f21b');
+    color: $yellow-dark;
+    font-style: normal;
+}
+
+.private-hint::before {
+    @include icon-bold('\f023');
+    color: $red-dark;
+    font-style: normal;
+}

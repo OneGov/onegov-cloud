@@ -1,0 +1,128 @@
+/*
+    Events
+*/
+$events-icon-width: 3ex;
+$placeholder-icon-size: 6rem;
+
+.events {
+    .card img {
+
+        max-height: 150px;
+        object-fit: cover;
+        transition: transform .5s ease;
+        width: auto;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
+
+    .contained {
+        border-bottom: 1px solid $iron;
+        border-top: 1px solid $iron;
+    }
+
+    &.image-placeholder {
+        display: flex;
+        justify-content: center;
+
+        .far {
+            color: $iron;
+            font-size: $placeholder-icon-size;
+            height: $placeholder-icon-size;
+            margin: auto;
+            width: $placeholder-icon-size;
+        }
+    }
+
+    .card-section {
+        a {
+            font-weight: bold;
+            i { width: $events-icon-width; }
+        }
+    }
+
+    h3 {
+        display: inline-block;
+    }
+}
+
+.imported-event-panel p {
+    font-size: .875rem;
+}
+
+.imported-event {
+    display: inline-block;
+    font-size: .8rem;
+    margin-top: .5rem;
+}
+
+.calendar-export-list {
+    a::before {
+        @include icon($calendar-icon);
+        color: $body-font-color;
+        margin-right: 1ex;
+    }
+}
+
+// raise importance a bit by double-selecting
+.occurrence.occurrence {
+    margin-bottom: 2.25rem;
+
+    h3 {
+        font-weight: bold;
+    }
+
+    .occurrence-date {
+        font-size: .875rem;
+        margin-bottom: .5rem;
+        margin-top: .75rem;
+    }
+
+    .occurrence-location,
+    .occurrence-time {
+        font-size: 1rem;
+        margin-bottom: .25rem;
+    }
+
+    .occurrence-time {
+        margin-bottom: .6rem;
+    }
+}
+
+.event-preview {
+    .occurrence {
+        margin-bottom: 0;
+    }
+}
+
+.occurrence-map,
+.occurrence-image {
+    margin-bottom: 1.5rem;
+    max-width: $max-line-width;
+}
+
+.date-range-selector-results {
+    border-bottom: 2px solid $primary-color;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    padding-bottom: .5rem;
+}
+
+.occurrences-filter-panel {
+    margin-bottom: 2rem;
+}
+
+.occurrences-filter-tags,
+.date-range-selector {
+    margin-bottom: .5em;
+}
+
+.occurrence-tags,
+.occurrence-description {
+    margin-bottom: 1.25em;
+}
+
+.occurrence-description {
+    max-width: $max-line-width;
+}

@@ -1,0 +1,38 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="panel callout" tal:condition="completable">
+            <p i18n:translate class="limit-line-width">
+                Please review your data and press "Complete" to finalize the process.
+                If there's anything you'd like to change, click on "Edit" to return
+                to the filled-out form.
+            </p>
+            <p i18n:translate class="limit-line-width">
+                The image shown in the list view is a square. To have your image shown
+                fully in the list view, you need to use a square image.
+            </p>
+        </div>
+
+        <div class="grid-x event-preview">
+            <div class="large-8 medium-8 cell">
+                <tal:b metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
+            </div>
+
+            <div class="large-4 medium-4 cell">
+                <tal:b metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
+            </div>
+        </div>
+
+        <div class="grid-x fieldset-display-submit" tal:condition="completable">
+            <div class="small-12 cell">
+                <form action="" method="POST">
+                    <input type="hidden" name="complete">
+                    <input type="submit" value="Complete" class="button" i18n:attributes="value">
+                </form>
+                <a href="${edit_url}" class="button secondary" i18n:translate="">Edit</a>
+            </div>
+        </div>
+    </tal:b>
+</div>

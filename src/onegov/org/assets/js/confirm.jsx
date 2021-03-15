@@ -93,11 +93,6 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
         handle_yes();
         confirm_el.foundation('reveal', 'close');
     });
-    confirm_el.find('a.yes').enter(function() {
-        handle_yes();
-        confirm_el.foundation('reveal', 'close');
-    });
-
     confirm_el.foundation('reveal', 'open');
     confirm_el.focus();
 };

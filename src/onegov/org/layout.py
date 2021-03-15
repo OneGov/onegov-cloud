@@ -523,24 +523,7 @@ class Layout(ChameleonLayout):
         return self.org.open_files_target_blank and '_blank' or None
 
 
-class DefaultLayout(Layout):
-    """ The default layout meant for the public facing parts of the site. """
-
-    def __init__(self, model, request):
-        super().__init__(model, request)
-
-        # always include the common js files
-        self.request.include('common')
-        self.request.include('chosen')
-
-        # always include the map components
-        self.request.include(self.org.geo_provider)
-
-        if self.request.is_manager:
-            self.request.include('sortable')
-
-        self.hide_from_robots()
-
+class DefaultLayoutMixin:
     def hide_from_robots(self):
         """ Returns a X-Robots-Tag:noindex header on secret pages.
 
@@ -558,6 +541,28 @@ class DefaultLayout(Layout):
         @self.request.after
         def respond_with_no_index(response):
             response.headers['X-Robots-Tag'] = 'noindex'
+
+
+class DefaultLayout(Layout, DefaultLayoutMixin):
+    """ The default layout meant for the public facing parts of the site. """
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        # always include the common js files
+        self.request.include('common')
+        self.request.include('chosen')
+
+        # always include the map components
+        self.request.include(self.org.geo_provider)
+
+        if self.request.is_manager:
+            self.request.include('sortable')
+
+        self.hide_from_robots()
+
+    def show_label(self, field):
+        return True
 
     @cached_property
     def breadcrumbs(self):
@@ -580,11 +585,22 @@ class DefaultLayout(Layout):
             for r in self.root_pages if include(r)
         )
 
-    def show_label(self, field):
-        return True
+
+class DefaultMailLayoutMixin:
+    def unsubscribe_link(self, username):
+        return '{}?token={}'.format(
+            self.request.link(self.org, name='unsubscribe'),
+            self.request.new_url_safe_token(
+                data={'user': username},
+                salt='unsubscribe'
+            )
+        )
+
+    def paragraphify(self, text):
+        return paragraphify(text)
 
 
-class DefaultMailLayout(Layout):
+class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
@@ -606,18 +622,6 @@ class DefaultMailLayout(Layout):
         lines = (l for l in lines if l)
 
         return linkify(', '.join(lines))
-
-    def unsubscribe_link(self, username):
-        return '{}?token={}'.format(
-            self.request.link(self.org, name='unsubscribe'),
-            self.request.new_url_safe_token(
-                data={'user': username},
-                salt='unsubscribe'
-            )
-        )
-
-    def paragraphify(self, text):
-        return paragraphify(text)
 
 
 class AdjacencyListMixin:
@@ -2318,3 +2322,20 @@ class DashboardLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Dashboard"), '#')
         ]
+
+
+class GeneralFileCollectionLayout(DefaultLayout):
+    def __init__(self, model, request):
+        request.include('common')
+        request.include('upload')
+        request.include('prompt')
+        super().__init__(model, request)
+
+
+class ImageFileCollectionLayout(DefaultLayout):
+
+    def __init__(self, model, request):
+        request.include('common')
+        request.include('upload')
+        request.include('editalttext')
+        super().__init__(model, request)

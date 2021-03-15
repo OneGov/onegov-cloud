@@ -411,7 +411,7 @@ def get_timeline_asset():
 # is something we are not allowed to do per our license
 @OrgApp.webasset('redactor', filters={'js': None})
 def get_redactor_asset():
-    yield 'redactor.min.js'
+    yield 'redactor.js'
     yield 'redactor.css'
 
 

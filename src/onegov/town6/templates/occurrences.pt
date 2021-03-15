@@ -1,0 +1,97 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x">
+
+            <div class="large-8 medium-8 cell date-range-selector-target">
+                <div class="grid-x">
+                    <div class="large-12 cell">
+                        <div metal:use-macro="layout.macros['occurrences']" />
+                    </div>
+                </div>
+
+                <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
+
+
+            </div>
+
+            <div class="large-4 medium-4 cell">
+
+                <div class="tag-filters borderless-side-panel" tal:condition="tags">
+                    <h2 i18n:translate>Tag</h2>
+                    <div class="occurrences-filter-tags">
+                        <tal:b tal:repeat="tag tags">
+                            <span class="blank-label click-through ${tag.active and 'active' or ''}">
+                                <tal:b replace="structure tag(request)"></tal:b>
+                            </span>
+                        </tal:b>
+                    </div>
+                </div>
+
+                <div class="location-filters borderless-side-panel" tal:condition="locations">
+                    <h2 i18n:translate>Location</h2>
+                    <div class="occurrences-filter-locations">
+                        <div class="filter-panel">
+                            <ul class="tags">
+                                <li tal:repeat="location locations">
+                                    <span class="blank-label click-through ${location.active and 'active' or ''}">
+                                        <tal:b replace="structure location(request)"></tal:b>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="date-filters borderless-side-panel">
+                    <h2 i18n:translate>Date</h2>
+                    <div class="occurrences-filter-ranges">
+                        <div class="filter-panel">
+                            <ul class="tags">
+                                <li tal:repeat="range ranges">
+                                    <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
+                                        <tal:b replace="structure range(request)"></tal:b>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <metal:b use-macro="layout.macros['date-range-selector']">
+                        <tal:b metal:fill-slot="before-date-range">
+                            <input type="hidden" name="range" value="">
+                            <tal:b tal:repeat="tag active_tags">
+                                <input type="hidden" name="tags" value="${tag}">
+                            </tal:b>
+                        </tal:b>
+                    </metal:b>
+                </div>
+
+                <div class="occurrence-exports borderless-side-panel">
+                    <h2 i18n:translate>Exports</h2>
+                    <ul class="calendar-export-list">
+                        <li>
+                            <a href="${request.link(layout.model, name='ical')}" i18n:translate>
+                                Export these events
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="submit-yours">
+                    <dl>
+                        <dt>
+                            <a href="${add_link}">
+                                <h2 i18n:translate="">Submit your event</h2>
+                            </a>
+                        </dt>
+                        <dd i18n:translate="">Submit your own event</dd>
+                    </dl>
+                </div>
+          </div>
+
+        </div>
+    </tal:b>
+</div>

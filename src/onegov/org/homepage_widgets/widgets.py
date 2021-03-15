@@ -12,6 +12,20 @@ from sqlalchemy import func
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
+def get_lead(text, max_chars=180, consider_sentences=True):
+    if len(text) > max_chars:
+        first_point_ix = text.find('.')
+        if not first_point_ix or not consider_sentences:
+            return text[0:max_chars] + '...'
+        elif first_point_ix >= max_chars:
+            return text
+        else:
+            end = text[0:max_chars].rindex('.') + 1
+            return text[0:end]
+
+    return text
+
+
 @OrgApp.homepage_widget(tag='row')
 class RowWidget(object):
     template = """
@@ -134,6 +148,7 @@ class DirectoriesWidget(object):
 
 @OrgApp.homepage_widget(tag='news')
 class NewsWidget(object):
+
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
@@ -153,8 +168,9 @@ class NewsWidget(object):
 
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
+        news_limit = layout.org.news_limit_homepage
         news = layout.request.exclude_invisible(
-            layout.root_pages[-1].news_query(limit=4).all())
+            layout.root_pages[-1].news_query(limit=news_limit + 2).all())
 
         # limits the news, but doesn't count sticky news towards that limit
         def limited(news, limit):
@@ -168,7 +184,8 @@ class NewsWidget(object):
                     count += 1
 
         return {
-            'news': limited(news, limit=2)
+            'news': limited(news, limit=news_limit),
+            'get_lead': get_lead
         }
 
 
@@ -195,7 +212,7 @@ class EventsWidget(object):
 
     def get_variables(self, layout):
         occurrences = OccurrenceCollection(layout.app.session()).query()
-        occurrences = occurrences.limit(4)
+        occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
         event_layout = EventBaseLayout(layout.model, layout.request)
         event_links = [

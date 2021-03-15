@@ -87,7 +87,7 @@ class ContactsAndAlbumsWidget(object):
 
     template = """
         <xsl:template match="contacts_and_albums">
-            <h2 tal:content="contacts_and_albums_panel.title"></h2>
+            <h3 tal:content="contacts_and_albums_panel.title"></h3>
 
             <metal:block use-macro="layout.macros['panel-links']"
                 tal:define="panel contacts_and_albums_panel"

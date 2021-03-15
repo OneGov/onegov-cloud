@@ -35,16 +35,32 @@ class BaseTheme(CoreTheme):
         }
 
     Those options result in variables added at the very top of the sass source
-    before it is compiled::
-
-        @import 'foundation/functions';
+    (but after the _settings.scss) before it is compiled::
 
         $rowWidth: 1000px;
         $columnGutter: 30px;
 
     If your variables rely on a certain order you need to pass an ordered dict.
 
+    If use_flex is set to False on the theme itself,
+    the float grid is used instead.
+
+    If $xy-grid is set to false by the subclassing theme,
+    the flex grid is used.
+
     """
+
+    _uninitialized_vars = (
+        'primary-color',
+        'secondary-color',
+        'success-color',
+        'warning-color',
+        'alert-color',
+        '-zf-size',
+        '-zf-bp-value'
+    )
+
+    include_motion_ui = False
 
     def __init__(self, compress=True):
         """ Initializes the theme.
@@ -168,6 +184,12 @@ class BaseTheme(CoreTheme):
         )
 
     @property
+    def foundation_motion_ui(self):
+        if self.include_motion_ui:
+            return 'motion-ui-transitions', 'motion-ui-animations'
+        return []
+
+    @property
     def post_imports(self):
         """
         Imports added after the foundation import. The imports must be found
@@ -192,93 +214,16 @@ class BaseTheme(CoreTheme):
         """ The search path for the foundation files included in this module.
 
         """
-        return os.path.join(os.path.dirname(__file__), 'foundation')
+        return os.path.join(
+            os.path.dirname(__file__), 'foundation', 'foundation', 'scss')
 
     @property
-    def get_foundation_file(self):
-        """
-        Create the foundation.scss in code, since the pre_imports
-        must go there. Afterwards, in def compile, all the includes are added.
-        We import everything by default, and the include what is needed by
-        foundation_components.
-        """
-        deps = 'missing-dependencies'
-        pre_imports = '\n'.join(f"@import '{i}';" for i in self.pre_imports)
-        post_imports = '\n'.join(f"@import '{i}';" for i in self.post_imports)
-        fp = 'foundation/scss'
-        _vendor = 'foundation/_vendor'
-        return textwrap.dedent(f"""
-        /**
-         * Foundation for Sites
-         * Version 6.6.3
-         * https://get.foundation
-         * Licensed under MIT Open Source
-         */
-        // --- Dependencies ---
-        @import '{fp}/vendor/normalize';
-        @import '{_vendor}/sassy-lists/stylesheets/helpers/{deps}';
-        @import '{_vendor}/sassy-lists/stylesheets/helpers/true';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/contain';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/purge';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/remove';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/replace';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/to-list';
-        @import '{fp}/_settings';
-        {pre_imports}
-        // --- Components ---
-        // Utilities
-        @import '{fp}/util/util';
-        // Global styles
-        @import '{fp}/global';
-        @import '{fp}/forms/forms';
-        @import '{fp}/typography/typography';
-        // Grids
-        @import '{fp}/grid/grid';
-        @import '{fp}/xy-grid/xy-grid';
-        // Generic components
-        @import '{fp}/components/button';
-        @import '{fp}/components/button-group';
-        @import '{fp}/components/close-button';
-        @import '{fp}/components/label';
-        @import '{fp}/components/progress-bar';
-        @import '{fp}/components/slider';
-        @import '{fp}/components/switch';
-        @import '{fp}/components/table';
-        // Basic components
-        @import '{fp}/components/badge';
-        @import '{fp}/components/breadcrumbs';
-        @import '{fp}/components/callout';
-        @import '{fp}/components/card';
-        @import '{fp}/components/dropdown';
-        @import '{fp}/components/pagination';
-        @import '{fp}/components/tooltip';
-        // Containers
-        @import '{fp}/components/accordion';
-        @import '{fp}/components/media-object';
-        @import '{fp}/components/orbit';
-        @import '{fp}/components/responsive-embed';
-        @import '{fp}/components/tabs';
-        @import '{fp}/components/thumbnail';
-        // Menu-based containers
-        @import '{fp}/components/menu';
-        @import '{fp}/components/menu-icon';
-        @import '{fp}/components/accordion-menu';
-        @import '{fp}/components/drilldown';
-        @import '{fp}/components/dropdown-menu';
-        // Layout components
-        @import '{fp}/components/off-canvas';
-        @import '{fp}/components/reveal';
-        @import '{fp}/components/sticky';
-        @import '{fp}/components/title-bar';
-        @import '{fp}/components/top-bar';
-        // Helpers
-        @import '{fp}/components/float';
-        @import '{fp}/components/flex';
-        @import '{fp}/components/visibility';
-        @import '{fp}/prototype/prototype';
+    def vendor_path(self):
+        """ The search path for the foundation files included in this module.
 
-        {post_imports}
-        """)
+        """
+        return os.path.join(
+            os.path.dirname(__file__), 'foundation', 'vendor')
 
     @property
     def includes(self):
@@ -293,7 +238,8 @@ class BaseTheme(CoreTheme):
             (f'@include foundation-{i};' for i in self.foundation_styles),
             (self.foundation_grid, ),
             (f"@include foundation-{i};" for i in self.foundation_components),
-            (self.foundation_helpers, )
+            (self.foundation_helpers, ),
+            (f"@include {i};" for i in self.foundation_motion_ui)
         )
 
     def compile(self, options={}):
@@ -307,16 +253,31 @@ class BaseTheme(CoreTheme):
 
         print('@charset "utf-8";', file=theme)
 
+        # Fix depreciation warnings
+        print("\n".join(
+            f"${var}: null;" for var in self._uninitialized_vars), file=theme)
+
         for key, value in _options.items():
             print(f"${key}: {value};", file=theme)
 
-        print(self.get_foundation_file, file=theme)
+        print('\n'.join(
+            f"@import '{i}';" for i in self.pre_imports), file=theme)
+
+        print("@include add-foundation-colors;", file=theme)
+        print("@import 'foundation';", file=theme)
+
+        if self.include_motion_ui:
+            print("@import 'motion-ui/motion-ui';", file=theme)
+
+        print('\n'.join(
+            f"@import '{i}';" for i in self.post_imports), file=theme)
 
         print("\n".join(self.includes), file=theme)
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
-
+        if self.include_motion_ui:
+            paths.append(self.vendor_path)
         return sass.compile(
             string=theme.getvalue(),
             include_paths=paths,

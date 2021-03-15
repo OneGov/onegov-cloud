@@ -36,7 +36,7 @@ pages:
 
 organisation:
   theme_options:
-    primary-color: '#2f6db4'
+    primary-color-ui: '#2f6db4'
   meta:
     homepage_cover: |
       <p>

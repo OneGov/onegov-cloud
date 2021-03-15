@@ -7,10 +7,10 @@ from onegov.org.forms import HomepageSettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_homepage_settings
 from onegov.town.app import TownApp
-from wtforms import BooleanField, StringField
+from wtforms import BooleanField, StringField, IntegerField
 
 
-def get_custom_settings_form(model, request):
+def get_custom_settings_form(model, request, homepage_settings_form=None):
 
     class CustomFieldsForm(Form):
         online_counter_label = StringField(
@@ -42,8 +42,17 @@ def get_custom_settings_form(model, request):
         hide_publications = BooleanField(
             label=_("Hide Publications on Homepage"))
 
+        event_limit_homepage = IntegerField(
+            label=_("Maximum number of events displayed on homepage")
+        )
+
+        news_limit_homepage = IntegerField(
+            label=_("Maximum number of news entries on homepage")
+        )
+
     return move_fields(
-        form_class=merge_forms(HomepageSettingsForm, CustomFieldsForm),
+        form_class=merge_forms(
+            homepage_settings_form or HomepageSettingsForm, CustomFieldsForm),
         fields=(
             'online_counter_label',
             'reservations_label',
@@ -52,6 +61,8 @@ def get_custom_settings_form(model, request):
             'e_move_label',
             'e_move_url',
             'hide_publications',
+            'event_limit_homepage',
+            'news_limit_homepage'
         ),
         after='homepage_image_6'
     )

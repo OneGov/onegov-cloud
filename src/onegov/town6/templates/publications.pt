@@ -1,0 +1,58 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x">
+            <div class="cell small-12 medium-8">
+                <h2>${model.year}</h2>
+
+                <div class="publications">
+                    <div tal:repeat="(group, publications) grouped.items()" class="publication-group">
+                        <h3>${group}</h3>
+
+                        <ul class="dense" tal:switch="bool(publications)">
+                            <tal:b case="False">
+                                <li i18n:translate>No publications</li>
+                            </tal:b>
+
+                            <tal:b case="True">
+                                <li tal:repeat="publication publications">
+                                    <metal:b use-macro="layout.macros['publication']" />
+                                </li>
+                            </tal:b>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="cell small-12 medium-4 filter-panel">
+                <div class="filter-years">
+                    <h2 class="filter-title" i18n:translate>Years</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['years']" />
+                </div>
+
+                <div class="publication-info">
+                    <h2 class="filter-title" i18n:translate>Information</h2>
+                    <p i18n:translate>
+                        You can search through the content of all listed files
+                        by using the search on the top right.
+                    </p>
+                    <p i18n:translate>
+                        All files have been digitally signed. The digital
+                        signature of a downloaded file can be viewed in Adobe Acrobat Reader or by
+                        dragging an already downloaded file into the field
+                        below:
+                    </p>
+                    <div class="filedigest dropzone"
+                        data-filedigest-handler="${filedigest_handler}"
+                        data-filedigest-target=".filedigest-results"
+                        i18n:translate>
+                        Drop files to verify them
+                    </div>
+                    <div class="filedigest-results">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

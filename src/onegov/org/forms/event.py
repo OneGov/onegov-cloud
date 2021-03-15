@@ -63,6 +63,8 @@ WEEKDAYS = (
 class EventForm(Form):
     """ Defines the form for all events. """
 
+    on_request_include = ('common', 'many')
+
     timezone = 'Europe/Zurich'
 
     email = EmailField(
@@ -231,8 +233,8 @@ class EventForm(Form):
             self.email.data = self.request.current_username
 
     def on_request(self):
-        self.request.include('common')
-        self.request.include('many')
+        for include in self.on_request_include:
+            self.request.include(include)
         self.sort_tags()
 
         if not self.dates.data:

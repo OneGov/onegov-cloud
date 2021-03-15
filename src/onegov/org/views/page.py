@@ -8,6 +8,8 @@ from webob.exc import HTTPForbidden
 
 from onegov.core.security import Public, Private
 from onegov.org.elements import Link
+from onegov.core.elements import Link as CoreLink
+from onegov.org.homepage_widgets.widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
 from onegov.page import Page, PageCollection
@@ -82,12 +84,20 @@ def view_news(self, request, layout=None):
     else:
         children = request.exclude_invisible(query.all())
 
+    year_links = [CoreLink(
+        text=str(year_),
+        active=year_ == year,
+        url=f'{request.link(self)}?year={year_}',
+        rounded=True
+    ) for year_ in years]
+
     return {
         'layout': layout,
         'title': self.title,
         'name': self.trait_messages[self.trait]['name'],
         'page': self,
         'children': children,
-        'years': years,
-        'current_year': year
+        'year_links': year_links,
+        'current_year': year,
+        'get_lead': get_lead
     }

@@ -1,0 +1,439 @@
+/*
+    Fixes a foundation js error
+*/
+//.foundation-data-attribute-namespace {
+//    font-family: false;
+//}
+
+/*
+    The maximum width of a line relative to the font. This limits textblocks
+    to a readable length.
+*/
+$max-line-width: 71ex;
+$max-lead-with: 66ex;
+
+.limit-line-width {
+    max-width: $max-line-width;
+}
+
+/*
+    The height of full-width banners
+*/
+$full-width-banner-height: 530px;
+
+/*
+    Zurb foundation uses this without !import, which causes IE11 to not
+    apply the placeholder color.
+*/
+//:-ms-input-placeholder {
+//    color: $input-placeholder-font-color !important;
+//}
+
+/*
+    Links without href and no role should not show the cursor
+*/
+a:not([href]):not([role]) {
+    cursor: default;
+}
+
+.button,
+.confirm,
+.fc-event,
+a[ic-verb],
+a[onclick],
+.partition-occupied {
+    cursor: pointer !important;
+}
+
+/*
+    Hyphenation for browsers which support it.
+*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-text,
+.page-lead,
+.news-lead,
+.newsletter-lead {
+    @include prefix(hyphens, auto);
+}
+
+/*
+    Disable hyphenation in e-mail links and make them breakable
+*/
+a[href^="mailto:"] {
+    @include prefix(hyphens, none);
+    @include prefix(word-break, break-all);
+
+    // Non standard for WebKit
+    word-break: break-word;
+}
+
+/*
+    Get rid of the jump that is introduced when switching from a site with
+    scrollbar to a site without (or vice versa)
+
+    As a side-effect, this disables horizontal scrolling, but we don't have
+    that anyway because of our mobile-first design.
+*/
+//html {
+//    @media #{$medium-up} {
+//        overflow-x: hidden;
+//        width: 100vw;
+//    }
+//}
+
+/*
+    Our footer is kept at the bottom without being "sticky", thanks to this
+    approach: https://dev.to/domysee/keeping-the-footer-at-the-bottom-with-css-flexbox-5h5f
+*/
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+.off-canvas-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+}
+
+main {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+
+article {
+    background: $white;
+    flex-grow: 1;
+}
+
+header,
+article,
+footer {
+    flex-shrink: 0;
+}
+
+/*
+    Chrome shows a little up/down arrow on date fields which takes quite
+    a bit of space, without being useful
+*/
+//input[type="date"]::-webkit-inner-spin-button {
+//    -webkit-appearance: none;
+//    display: none;
+//}
+
+/*
+    main title
+*/
+
+.main-title {
+    margin-bottom: 1rem;
+    margin-top: -.5rem;
+}
+
+/*
+    page lead
+*/
+.page-lead {
+    display: block;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    max-width: $max-lead-with;
+}
+
+/*
+    image subtitles
+*/
+.alt-text {
+    background-color: $vapor;
+    color: $monsoon;
+    display: block;
+    font-size: .875rem;
+    padding: .25em .75em;
+    transition: background .5s ease-in-out;
+}
+
+.alt-text-missing {
+    background-color: $yellow-pastel;
+    font-style: italic;
+}
+
+.alt-text-changed-success {
+    background-color: $green-light;
+}
+
+.alt-text-changed-error {
+    background-color: $red-light;
+}
+
+/*
+    simple listed content
+*/
+.with-lead {
+    li + li {
+        margin-top: .5rem;
+    }
+
+    .list-title {
+        font-weight: bold;
+    }
+
+    .list-lead {
+        margin-bottom: .2em;
+        max-width: $max-line-width;
+
+        em {
+            font-style: normal;
+            font-weight: bold;
+        }
+    }
+}
+
+/*
+    page text
+*/
+
+.page-text {
+    margin-bottom: 2rem;
+
+    blockquote {
+        background-color: $topbar-bg-color;
+        padding: .5rem 1rem;
+    }
+
+    hr {
+        @include hairline;
+    }
+
+    img {
+        border-radius: 2px;
+        display: block;
+    }
+
+    p {
+        max-width: $max-line-width;
+    }
+
+    pre {
+        @include smooth-edges;
+
+        background: $white-smoke;
+        display: inline-block;
+        font-size: .9rem;
+        margin-bottom: 1rem;
+        padding: .75rem 1rem;
+    }
+
+    .has-video {
+        background-color: $gray-pastel;
+        cursor: pointer;
+        display: block;
+        min-height: 360px;
+        position: relative;
+        text-align: center;
+        width: 100%;
+
+        @include breakpoint(medium only) {
+            min-height: 300px;
+        }
+
+        @include breakpoint(small only) {
+            min-height: 200px;
+        }
+    }
+
+    .video-wrapper {
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 */
+        position: relative;
+
+        iframe {
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+        }
+    }
+}
+
+/*
+    blank (uncolored) labels
+*/
+.blank-label {
+    @include label;
+    background: none;
+    border: 1px solid $gray;
+    color: $black;
+    font-size: .8rem;
+    margin: 0 4px 7px 0;
+
+    &.active {
+        @include primary-color-background;
+        border: 1px solid $primary-color;
+    }
+
+    a {
+        color: inherit;
+    }
+}
+
+/*
+    Click through
+*/
+.click-through {
+    cursor: pointer;
+}
+
+/*
+    Links in simple text style (side by side)
+*/
+.text-links a:first-child::before {
+    display: none;
+}
+
+.text-links a::before {
+    color: $body-font-color;
+    content: ' | ';
+}
+
+/*
+    Dense lists
+*/
+.dense {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+    No margin bottom
+*/
+.no-margin-bottom {
+    margin-bottom: 0;
+}
+
+/*
+    Default Coat of Arms
+*/
+#coat-of-arms-left {
+    fill: lighten($primary-color, 20%);
+}
+
+#coat-of-arms-right {
+    fill: $primary-color;
+}
+
+/* Page Links */
+
+.page-links {
+    max-width: $max-line-width;
+}
+
+.breadcrumbs {
+    font-style: italic;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    padding: 1rem 0 .7rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    li {
+        line-height: 1rem;
+
+        // color last element
+        &:last-child a {
+            color: $black;
+       }
+    }
+
+}
+
+
+/* Card component tuning */
+.card-section {
+    @include clean-ul;
+}
+
+/*
+Tables
+*/
+// Todo: not used anymore in foundation6
+$table-border-color: smart-scale($table-background, $table-color-scale);
+
+table {
+    font-family: $header-font-family;
+}
+
+table tr th,
+table tr td {
+    font-size: .875rem;
+}
+
+
+/*
+    Pagination customisations
+*/
+
+ul.pagination li {
+
+    &.current > a {
+        color: $primary-fg-color;
+        font-weight: bold;
+        pointer-events: none;
+    }
+
+}
+
+/*
+    Leaflet customisations
+ */
+
+.leaflet-top.leaflet-top,
+.leaflet-bottom.leaflet-bottom {
+    z-index: 998;
+}
+
+/*
+    monthly view calendar
+*/
+
+.monthly-view-wrapper {
+    position: relative;
+}
+
+/*
+    what-input close-button outline fix
+*/
+.close-button {
+    @include clear-focus-outline;
+}
+
+.redactor-toolbar.redactor-toolbar {
+    @include editor-toolbar;
+}
+
+/*
+    Forms page
+*/
+$formlist-padding: .75rem 0;
+
+.forms-list {
+    @include more-list($formlist-padding, true);
+
+    li:last-of-type {
+        border: 0;
+        padding-bottom: 1.5rem;
+    }
+}

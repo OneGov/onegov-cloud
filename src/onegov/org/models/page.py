@@ -1,4 +1,5 @@
 from onegov.core.orm.mixins import content_property
+from onegov.form import Form
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
@@ -62,7 +63,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     def is_supported_trait(self, trait):
         return trait in {'link', 'page'}
 
-    def get_form_class(self, trait, request):
+    def get_form_class(self, trait, action, request):
         if trait == 'link':
             return self.with_content_extensions(LinkForm, request, extensions=[
                 AccessExtension,
@@ -96,7 +97,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     @property
     def editable(self):
-        return self.parent is not None
+        return True
 
     @property
     def paste_target(self):
@@ -116,8 +117,15 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def is_supported_trait(self, trait):
         return trait in {'news'}
 
-    def get_form_class(self, trait, request):
+    def get_root_page_form_class(self, request):
+        return self.with_content_extensions(
+            Form, request, extensions=(ContactExtension, PersonLinkExtension)
+        )
+
+    def get_form_class(self, trait, action, request):
         if trait == 'news':
+            if not self.parent and action == 'edit':
+                return self.get_root_page_form_class(request)
             form_class = self.with_content_extensions(PageForm, request)
 
             if hasattr(form_class, 'is_visible_on_homepage'):

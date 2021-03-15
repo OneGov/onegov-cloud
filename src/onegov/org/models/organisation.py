@@ -46,6 +46,9 @@ class Organisation(Base, TimestampMixin):
     reservations_label = meta_property()
     publications_label = meta_property()
     hide_publications = meta_property()
+    event_limit_homepage = meta_property(default=4)
+    news_limit_homepage = meta_property(default=2)
+    focus_widget_image = meta_property()
     daypass_label = meta_property()
     e_move_label = meta_property()
     e_move_url = meta_property()
@@ -77,7 +80,7 @@ class Organisation(Base, TimestampMixin):
     custom_link_3_name = meta_property()
     custom_link_3_url = meta_property()
 
-    # parter logos
+    # partner logos
     partner_1_img = meta_property()
     partner_1_url = meta_property()
     partner_1_name = meta_property()
@@ -93,6 +96,7 @@ class Organisation(Base, TimestampMixin):
     partner_4_img = meta_property()
     partner_4_url = meta_property()
     partner_4_name = meta_property()
+    always_show_partners = meta_property(default=False)
 
     # Ticket options
     ticket_auto_accepts = meta_property()

@@ -19,6 +19,7 @@ from onegov.org.forms import NewsletterForm
 from onegov.org.forms import NewsletterSendForm
 from onegov.org.forms import NewsletterTestForm
 from onegov.org.forms import SignupForm
+from onegov.org.homepage_widgets.widgets import get_lead
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
@@ -115,7 +116,7 @@ def publications_by_newsletter(newsletter, request):
 
 @OrgApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
              permission=Public, form=SignupForm)
-def handle_newsletters(self, request, form):
+def handle_newsletters(self, request, form, layout=None, mail_layout=None):
 
     if form.submitted(request):
         recipients = RecipientCollection(request.session)
@@ -135,7 +136,7 @@ def handle_newsletters(self, request, form):
             )
 
             confirm_mail = render_template('mail_confirm.pt', request, {
-                'layout': DefaultMailLayout(self, request),
+                'layout': mail_layout or DefaultMailLayout(self, request),
                 'newsletters': self,
                 'subscription': recipient.subscription,
                 'title': title
@@ -170,7 +171,7 @@ def handle_newsletters(self, request, form):
 
     return {
         'form': form,
-        'layout': NewsletterLayout(self, request),
+        'layout': layout or NewsletterLayout(self, request),
         'newsletters': query.all(),
         'title': _("Newsletter"),
         'recipients_count': recipients_count
@@ -196,6 +197,7 @@ def view_newsletter(self, request, layout=None):
         'lead': layout.linkify(self.lead),
         'link': link,
         'name_without_extension': name_without_extension,
+        'get_lead': get_lead
     }
 
 
@@ -214,7 +216,7 @@ def view_subscribers(self, request, layout=None):
         by_letter[key] = list(values)
 
     return {
-        'layout': RecipientLayout(self, request),
+        'layout': layout or RecipientLayout(self, request),
         'title': _("Subscribers"),
         'by_letter': by_letter,
         'warning': warning,
