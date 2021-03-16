@@ -12,10 +12,7 @@ nodeenv --node="$node" /tmp/node
 
 echo "--- Installing dependencies"
 cd /app/src/tests/js
-/tmp/node/bin/npm install jest jsdom
-
-echo "--- Writing config"
-echo "{\"scripts\":{\"test\": \"jest\"}}" > package.json
+/tmp/node/bin/npm install
 
 echo "--- Running Jest"
 /tmp/node/bin/npm test

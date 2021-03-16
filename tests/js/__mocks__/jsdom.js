@@ -1,5 +1,5 @@
 const jsdomUnmocked = require('jsdom');
-const d3 = require('../../../src/onegov/election_day/assets/js/d3');
+const d3 = require('d3');
 const fs = require('fs');
 
 module.exports = {
