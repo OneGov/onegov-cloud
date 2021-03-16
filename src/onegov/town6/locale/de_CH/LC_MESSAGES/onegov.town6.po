@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-03-12 09:30+0100\n"
+"POT-Creation-Date: 2021-03-16 09:31+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -78,7 +78,7 @@ msgid "Impressions"
 msgstr "Impressionen"
 
 msgid "back"
-msgstr "retour"
+msgstr "zurück"
 
 #, python-format
 msgid "Press ${shortcut} to open Search"
@@ -1321,6 +1321,9 @@ msgstr "Ticket E-Mails deaktiviert."
 msgid "Ticket e-mails enabled."
 msgstr "Ticket E-Mails aktiviert."
 
+msgid "Years"
+msgstr "Jahre"
+
 msgid "Newsletter Subscription"
 msgstr "Anmeldung Newsletter"
 
@@ -1418,9 +1421,6 @@ msgstr "Elektronische Visitenkarte (vCard)"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
-
-msgid "Years"
-msgstr "Jahre"
 
 msgid "Information"
 msgstr "Information"
