@@ -341,6 +341,17 @@ $editbar-fg-color-active: $white;
 
 
 .side-navigation {
+
+    @include breakpoint(small only) {
+        background: $offcanvas-background;
+
+        &.drilldown a,
+        &.drilldown li,
+        &.drilldown .is-drilldown-submenu {
+            background: $offcanvas-background;
+        }
+    }
+
     span[data-click-target] {
         z-index: 100;
     }
