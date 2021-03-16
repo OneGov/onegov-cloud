@@ -202,15 +202,19 @@ class StructuralChanges(object):
     """
 
     def __init__(self, old_structure, new_structure):
+        old_fieldsets = parse_formcode(old_structure)
+        new_fieldsets = parse_formcode(new_structure)
         self.old = {
-            f.human_id: f for f in flatten_fieldsets(
-                parse_formcode(old_structure))
+            f.human_id: f for f in flatten_fieldsets(old_fieldsets)
         }
         self.new = {
-            f.human_id: f for f in flatten_fieldsets(
-                parse_formcode(new_structure))
+            f.human_id: f for f in flatten_fieldsets(new_fieldsets)
         }
+        self.old_fieldsets = old_fieldsets
+        self.new_fieldsets = new_fieldsets
 
+        self.detect_added_fieldsets()
+        self.detect_removed_fieldsets()
         self.detect_added_fields()
         self.detect_removed_fields()
         self.detect_renamed_fields()  # modifies added/removed fields
@@ -223,6 +227,18 @@ class StructuralChanges(object):
             or self.renamed_fields
             or self.changed_fields
         )
+
+    def detect_removed_fieldsets(self):
+        new_ids = tuple(f.human_id for f in self.new_fieldsets)
+        self.removed_fieldsets = [
+            h for f in self.old_fieldsets if (h := f.human_id) not in new_ids
+        ]
+
+    def detect_added_fieldsets(self):
+        old_ids = (f.human_id for f in self.old_fieldsets)
+        self.added_fieldsets = [
+            h for f in self.new_fieldsets if (h := f.human_id) not in old_ids
+        ]
 
     def detect_added_fields(self):
         self.added_fields = [
