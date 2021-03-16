@@ -83,6 +83,7 @@ node_modules/
 
 # virtualenv
 bin
+include
 lib
 share
 pyvenv.cfg
