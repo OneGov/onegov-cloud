@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.29`
+
+> commits: **10 / [656bc95e19...004da0e960](https://github.com/OneGov/onegov-cloud/compare/656bc95e19^...004da0e960)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.29)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Fixes embedding youtu.be links not generating iframes**
+
+**`Bugfix`** | **[SEA-178](https://linear.app/seantis/issue/SEA-178)** | **[656bc95e19](https://github.com/onegov/onegov-cloud/commit/656bc95e1915addc9d4e314d39f44375615e686e)**
+
 ## Release `2021.28`
 
-> commits: **8 / [b16f503db2...d71c20ed75](https://github.com/OneGov/onegov-cloud/compare/b16f503db2^...d71c20ed75)**  
+> released: **2021-03-12 13:23**<br>
+> commits: **9 / [b16f503db2...eab8ec4369](https://github.com/OneGov/onegov-cloud/compare/b16f503db2^...eab8ec4369)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.28)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
