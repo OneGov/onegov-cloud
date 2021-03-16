@@ -252,7 +252,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
         if not form.validate():
 
-            # if the validaiton error is captured, the entry is added
+            # if the validation error is captured, the entry is added
             # to the directory, unless we expunge it
             entry.directory = None
             session and session.expunge(entry)
