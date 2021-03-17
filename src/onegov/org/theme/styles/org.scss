@@ -1353,7 +1353,8 @@ ul.panel-links {
     border: 1px solid $gray;
     margin-bottom: 2rem;
 
-    h2 {
+    h2,
+    h3 {
         border-bottom: 2px solid $primary-color;
         font-size: .875rem;
         margin-bottom: .25rem;
