@@ -1,8 +1,9 @@
 from cached_property import cached_property
 from elasticsearch_dsl.query import MultiMatch
 from onegov.core.templates import render_macro
-from onegov.directory import DirectoryEntry, DirectoryEntryCollection
+from onegov.directory import DirectoryEntry
 from onegov.form import as_internal_id
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur.app import WinterthurApp
 from sqlalchemy import cast, func, literal_column, Text
 from sqlalchemy.dialects.postgresql import array
@@ -63,7 +64,7 @@ class InlineSearch(object):
             'term': self.term,
             'directory': self.directory,
             'action': self.request.class_link(
-                DirectoryEntryCollection,
+                ExtendedDirectoryEntryCollection,
                 variables={
                     'directory_name': self.directory.name,
                     'search': self.name
@@ -112,7 +113,5 @@ class InlineSearch(object):
                     cast(literal_column('id'), Text)
                 )
             )
-
-        print(query)
 
         return query
