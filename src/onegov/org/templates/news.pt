@@ -11,7 +11,7 @@
                     <strong>${link.text}</strong>
                 </li>
                 <li tal:condition="not: link.active">
-                    <a href="${link.url}">${link.text}</a>
+                    <a href="${link.attrs['href']}">${link.text}</a>
                 </li>
             </tal:b>
         </ul>
