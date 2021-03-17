@@ -10,7 +10,7 @@ from itertools import groupby, tee
 from typing import Optional
 
 
-COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z_\- ]{2,18}: ')
+COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z6_\- ]{2,18}: ')
 RELEASE_TAG = re.compile(r'release-[0-9]{4}\.[0-9]+')
 
 
