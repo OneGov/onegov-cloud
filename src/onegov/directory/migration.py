@@ -245,15 +245,17 @@ class StructuralChanges(object):
         )
 
     def detect_removed_fieldsets(self):
-        new_ids = tuple(f.human_id for f in self.new_fieldsets)
+        new_ids = tuple(f.human_id for f in self.new_fieldsets if f.human_id)
         self.removed_fieldsets = [
-            h for f in self.old_fieldsets if (h := f.human_id) not in new_ids
+            f.human_id for f in self.old_fieldsets
+            if f.human_id and f.human_id not in new_ids
         ]
 
     def detect_added_fieldsets(self):
-        old_ids = (f.human_id for f in self.old_fieldsets)
+        old_ids = tuple(f.human_id for f in self.old_fieldsets if f.human_id)
         self.added_fieldsets = [
-            h for f in self.new_fieldsets if (h := f.human_id) not in old_ids
+            f.human_id for f in self.new_fieldsets
+            if f.human_id and f.human_id not in old_ids
         ]
 
     def detect_added_fields(self):
@@ -268,6 +270,54 @@ class StructuralChanges(object):
             if f.human_id not in {f.human_id for f in self.new.values()}
         ]
 
+    def do_rename(self, removed, added):
+        same_type = self.old[removed].type == self.new[added].type
+        if not same_type:
+            return False
+
+        added_fs = "/".join(added.split('/')[:-1])
+        removed_fs = "/".join(removed.split('/')[:-1])
+
+        # has no fieldset
+        if not added_fs and not removed_fs:
+            return same_type
+
+        # case fieldset/Oldname --> Oldname
+        if removed_fs and not added_fs:
+            if f'{removed_fs}/{added}' == removed:
+                return True
+
+        # case Oldname --> fieldset/Name
+        if added_fs and not removed_fs:
+            if f'{added_fs}/{removed}' == added:
+                return True
+
+        # case fieldset rename and field rename
+
+        in_removed = any(s == removed_fs for s in self.removed_fieldsets)
+        in_added = any(s == added_fs for s in self.added_fieldsets)
+
+        # Fieldset rename
+        expected = f'{added_fs}/{removed.split("/")[-1]}'
+        if in_added and in_removed:
+            if expected == added:
+                return True
+            if expected in self.added_fields:
+                return False
+            if added not in self.renamed_fields.values():
+                # Prevent assigning same new field twice
+                return True
+
+        # Fieldset has been deleted
+        if (in_removed and not in_added) or (in_added and not in_removed):
+            if expected == added:
+                # It matches exactly
+                return True
+            if expected in self.added_fields:
+                # there is another field that matches better
+                return False
+        return False
+
     def detect_renamed_fields(self):
         # renames are detected aggressively - we rather have an incorrect
         # rename than an add/remove combo. Renames lead to no data loss, while
@@ -276,7 +326,7 @@ class StructuralChanges(object):
 
         for r in self.removed_fields:
             for a in self.added_fields:
-                if self.old[r].type == self.new[a].type:
+                if r not in self.renamed_fields and self.do_rename(r, a):
                     self.renamed_fields[r] = a
 
         self.added_fields = [
