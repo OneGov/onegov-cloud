@@ -557,7 +557,7 @@ class DirectoryImportForm(Form):
                 'application/zip',
                 'application/octet-stream'
             }),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(500 * 1024 * 1024)
         ],
         render_kw=dict(force_simple=True)
     )

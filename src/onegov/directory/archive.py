@@ -48,7 +48,7 @@ class FieldParser(object):
         # be extra paranoid about these path values -> they could
         # potentially be used to access files on the local system
         assert '..' not in value
-        assert value.count('/') == 1
+        assert value.count('/') == 1, f'{value} not allowed'
         assert not value.startswith('/')
 
         path = self.archive_path / value
