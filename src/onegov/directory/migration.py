@@ -93,6 +93,9 @@ class DirectoryMigration(object):
 
         self.migrate_directory()
 
+        # Triggers the observer to func::structure_configuration_observer()
+        # and executing this very function because of an autoflush event
+        # in a new instance.
         for entry in self.entries:
             self.migrate_entry(entry)
 
@@ -101,8 +104,21 @@ class DirectoryMigration(object):
         self.directory.configuration = self.new_configuration
 
     def migrate_entry(self, entry):
+        """
+        This function is called after an update to the directory structure.
+        During execution of self.execute(), the directory is migrated.
+        On start of looping trough the entries, an auto_flush occurs, calling
+        the migration observer for the directory, which will instantiate yet
+        another instance of the migration. After this inside execute(),
+        the session is not flusing anymore, and we have to skip,
+        since the values are already migrated and migration will
+        fail when removing fieldsets.
+        """
         update = self.changes and True or False
+        session = object_session(entry)
 
+        if not session._flushing:
+            return
         self.migrate_values(entry.values)
         self.directory.update(entry, entry.values, force_update=update)
 
