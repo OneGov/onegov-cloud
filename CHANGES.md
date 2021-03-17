@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2021.30`
+
+> commits: **3 / [d7a436dfff...14048034f0](https://github.com/OneGov/onegov-cloud/compare/d7a436dfff^...14048034f0)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.30)](https://buildkite.com/seantis/onegov-cloud)
+
+### Directory
+
+🐞 **Improves directory migration greatly**
+
+Adds support for migration when fieldsets are removed or added. Improve test coverage for directory migration.
+Fixes sql alchemy observer calling migration of entries twice when triggering the migration.
+
+**`Bugfix`** | **[SEA-195](https://linear.app/seantis/issue/SEA-195)** | **[d7a436dfff](https://github.com/onegov/onegov-cloud/commit/d7a436dfff1ad8b9d09ffa784150be91f7c9206b)**
+
 ## Release `2021.29`
 
-> commits: **10 / [656bc95e19...004da0e960](https://github.com/OneGov/onegov-cloud/compare/656bc95e19^...004da0e960)**  
+> released: **2021-03-16 10:32**<br>
+> commits: **11 / [656bc95e19...6e2a9a9aa5](https://github.com/OneGov/onegov-cloud/compare/656bc95e19^...6e2a9a9aa5)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.29)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -10,6 +25,26 @@
 🐞 **Fixes embedding youtu.be links not generating iframes**
 
 **`Bugfix`** | **[SEA-178](https://linear.app/seantis/issue/SEA-178)** | **[656bc95e19](https://github.com/onegov/onegov-cloud/commit/656bc95e1915addc9d4e314d39f44375615e686e)**
+
+### Town6
+
+🎉 **Introdcues town6 redesign**
+
+Summary:
+
+- Top News site is now editable (only contact and address available)
+- Ctrl+Shift+F keyboard shortcut to open search
+- Customizable homepage structure (like in org)
+- Colors neutral, gray and primary can be chosen in homepage widgets as background
+- Sticky editbar for constant visibility
+- Nested side navigation with all layers with sorting
+- New sidepanel for /news and /topics page showing address and contact
+- Contact panel on the right is always shown for news and topics since the address is always displayed
+- improved auto-opening menues
+- improved mobile-friendliness (e.g. ticket table)
+- improved globals toolbar with some animations
+
+**`Feature`** | **[SEA-131](https://linear.app/seantis/issue/SEA-131)** | **[a3af64722f](https://github.com/onegov/onegov-cloud/commit/a3af64722f603f4c5ca81f7b7eeb4f26867bddcd)**
 
 ## Release `2021.28`
 
@@ -1282,6 +1317,15 @@ Fixes refactoring bug.
 > released: **2020-07-09 07:44**<br>
 > commits: **6 / [8eedf97eda...c73534ab01](https://github.com/OneGov/onegov-cloud/compare/8eedf97eda^...c73534ab01)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.64)](https://buildkite.com/seantis/onegov-cloud)
+
+### Foundation6
+
+🎉 **Adds foundation6 integration**
+
+Integrated as an app to server pre-transpiled js from foundation without having any webpack buildchain as dependency.
+Features an update cli that uses the foundation cli to update source files.
+
+**`Feature`** | **[8eedf97eda](https://github.com/onegov/onegov-cloud/commit/8eedf97eda7e69702b97afc08bed84c1c540e282)**
 
 ### Wtfs
 
