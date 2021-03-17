@@ -1,6 +1,7 @@
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import WinterthurApp
 from onegov.org.views import directory as base
-from onegov.directory import DirectoryCollection, DirectoryEntryCollection
+from onegov.directory import DirectoryCollection
 from onegov.core.security import Secret
 from onegov.form import merge_forms
 from onegov.form.utils import get_fields_from_class
@@ -56,7 +57,7 @@ def handle_new_directory(self, request, form):
     return base.handle_new_directory(self, request, form)
 
 
-@WinterthurApp.form(model=DirectoryEntryCollection, name='edit',
+@WinterthurApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
                     template='directory_form.pt', permission=Secret,
                     form=get_directory_form_class)
 def handle_edit_directory(self, request, form):

@@ -10,9 +10,9 @@ from decimal import Decimal, localcontext
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryCollection
-from onegov.directory import DirectoryEntryCollection
 from onegov.form import Form
 from onegov.org.models import Organisation
+from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
 from wtforms.fields import Field, BooleanField, SelectField
@@ -323,7 +323,7 @@ class DaycareSubsidyCalculator(object):
     def daycares(self):
         adapter = DirectoryDaycareAdapter(self.directory)
 
-        items = DirectoryEntryCollection(self.directory).query()
+        items = ExtendedDirectoryEntryCollection(self.directory).query()
         items = (i for i in items if i.access == 'public')
         items = {i.id.hex: adapter.as_daycare(i) for i in items}
 
