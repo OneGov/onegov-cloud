@@ -14,6 +14,7 @@ from onegov.org.models import (
     ExportCollection, PublicationCollection, PageMove
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
@@ -87,6 +88,13 @@ class Layout(OrgLayout):
             _('Press ${shortcut} to open Search',
               mapping={'shortcut': 'Ctrl+Shift+F / Ctrl+Shift+S'})
         )
+
+    @cached_property
+    def page_collection(self):
+        return PageCollection(self.request.session)
+
+    def page_by_path(self, path):
+        return self.page_collection.by_path(path)
 
 
 class DefaultLayout(Layout, DefaultLayoutMixin):

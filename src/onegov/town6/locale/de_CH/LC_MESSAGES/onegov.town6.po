@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-03-16 09:31+0100\n"
+"POT-Creation-Date: 2021-03-18 15:13+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -956,6 +956,9 @@ msgstr "Annehmen"
 msgid "Focus"
 msgstr "Fokus"
 
+msgid "Available options for the focus widget:"
+msgstr "Verfügbare Optionen für das Fokus-Widget:"
+
 msgid "Hello!"
 msgstr "Guten Tag"
 
@@ -1776,9 +1779,6 @@ msgstr "Anzahl angezeigte Veranstaltungen"
 msgid "Number of news entries on homepage"
 msgstr "Anzahl angezeigte News/ Einträge für Aktuelles"
 
-msgid "Image Focus"
-msgstr "Image Focus"
-
 msgid "Show partners on all pages"
 msgstr "Afficher les partenaires sur toutes les pages"
 
@@ -1817,6 +1817,9 @@ msgstr "Ticket-Einstellungen"
 
 msgid "Site Navigation Settings"
 msgstr ""
+
+#~ msgid "Image Focus"
+#~ msgstr "Image Focus"
 
 #~ msgid "Signup"
 #~ msgstr "Abonnieren"
