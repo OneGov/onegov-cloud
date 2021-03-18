@@ -30,6 +30,8 @@ steps:
     agents:
       - queue=generic
 
+    if: build.message =~ /jest/
+
     env:
       CONTAINER: "onegov-cloud:head"
       CONTAINER_TEST_SCRIPT: ".buildkite/jest"
