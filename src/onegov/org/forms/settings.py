@@ -707,10 +707,3 @@ class OrgTicketSettingsForm(Form):
         choices = tuple((key, key) for key in handlers.registry.keys())
         self.ticket_auto_accepts.choices = [('RSV', 'RSV')]
         self.tickets_skip_opening_email.choices = choices
-
-
-class OrgSiteNavigationForm(Form):
-    disable_news = BooleanField(
-        label=_('Disable news and hide the entry in the navigation'),
-        description=_('All other topics can be hidden in their settings')
-    )
