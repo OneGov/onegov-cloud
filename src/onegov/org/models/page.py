@@ -140,10 +140,15 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
         raise NotImplementedError
 
-    def news_query(self, limit=2):
+    def news_query(self, limit=2, published_only=True):
         news = object_session(self).query(News)
         news = news.filter(Page.parent == self)
-        news = news.order_by(desc(Page.created))
+        if published_only:
+            news = news.filter(
+                Page.publication_started == True,
+                Page.publication_ended == False
+            )
+        news = news.order_by(desc(Page.published_or_created))
         news = news.options(undefer('created'))
         news = news.options(undefer('content'))
         news = news.limit(limit)
@@ -154,13 +159,16 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         sticky_news = news.limit(None)
         sticky_news = sticky_news.filter(sticky)
 
-        return news.union(sticky_news).order_by(desc(Page.created))
+        return news.union(sticky_news).order_by(
+            desc(Page.published_or_created))
 
     @property
     def years(self):
         query = object_session(self).query(News)
-        query = query.with_entities(func.date_part('year', Page.created))
-        query = query.group_by(func.date_part('year', Page.created))
+        query = query.with_entities(
+            func.date_part('year', Page.published_or_created))
+        query = query.group_by(
+            func.date_part('year', Page.published_or_created))
         query = query.filter(Page.parent == self)
 
         return sorted([int(r[0]) for r in query.all()], reverse=True)
