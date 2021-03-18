@@ -101,8 +101,8 @@ def test_hide_page(client):
         edit_page.form.submit().follow()
 
     anonymous.get(page_url, status=404)
-
-    assert 'Test' not in client.get('/topics/organisation')
+    anon = client.spawn()
+    assert 'Test' not in anon.get('/topics/organisation')
 
 
 def test_copy_pages_to_news(client):
