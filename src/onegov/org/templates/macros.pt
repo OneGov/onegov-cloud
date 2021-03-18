@@ -423,7 +423,7 @@
                     <h2 tal:condition="heading == 'h2'|True">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h2>
                     <h3 tal:condition="heading == 'h3'|nothing">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
                 </a>
-                <p class="news-date" tal:condition="not:hide_date|False">${layout.format_date(item.created, 'relative')}</p>
+                <p class="news-date" tal:condition="not:hide_date|False">${layout.format_date(item.published_or_created, 'relative')}</p>
                 <p class="news-lead">${item.content.lead}</p>
             </div>
         </div>
