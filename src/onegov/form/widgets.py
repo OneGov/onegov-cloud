@@ -272,14 +272,15 @@ class PreviewWidget(object):
 class PanelWidget(object):
     """ A widget that displays the field's text as panel (no input). """
 
-    template = chameleon.PageTemplate("""
-        <div class="panel ${kind}">
-            ${text}
-        </div>
-    """)
+    template = chameleon.PageTemplate(
+        """<div class="panel ${kind}">${text}</div>"""
+    )
 
     def __call__(self, field, **kwargs):
-        return HTMLString(self.template.render(
+        text = self.template.render(
             kind=field.kind,
             text=field.meta.request.translate(field.text),
-        ).replace('">', '" ' + html_params(**kwargs) + '>'))
+        )
+        text = text.replace('">', '" ' + html_params(**kwargs) + '>')
+        text = text.replace('\n', '<br>')
+        return HTMLString(text)
