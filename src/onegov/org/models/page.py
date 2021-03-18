@@ -3,7 +3,8 @@ from onegov.form import Form
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
-from onegov.org.models.extensions import ContactExtension, NewsletterExtension
+from onegov.org.models.extensions import ContactExtension, NewsletterExtension, \
+    PublicationExtension
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
@@ -17,8 +18,8 @@ from sqlalchemy.orm import undefer, object_session
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
-            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
-            CoordinatesExtension):
+            PublicationExtension, VisibleOnHomepageExtension,
+            ContactExtension, PersonLinkExtension, CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     es_type_name = 'topics'
@@ -77,8 +78,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
-           AccessExtension, VisibleOnHomepageExtension, ContactExtension,
-           PersonLinkExtension, CoordinatesExtension):
+           AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
+           ContactExtension, PersonLinkExtension, CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     es_type_name = 'news'
