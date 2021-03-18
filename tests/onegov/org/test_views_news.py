@@ -57,7 +57,7 @@ def test_news_on_homepage(client):
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-01-01T00:00'
     page.form['publication_end'] = '2200-01-01T00:00'
-    page.form.submit()
+    page.form.submit().follow()
 
     page = news_list.click('Nachricht')
     page.form['title'] = "Bar"
