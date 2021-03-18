@@ -5,8 +5,22 @@ from onegov.page import PageCollection
 
 def test_news(client):
     client.login_admin().follow()
+    anon = client.spawn()
 
+    # Test edit the root news page
     page = client.get('/news')
+    assert 'Aktuelles' in page
+    # open_in_browser(page)
+    # assert False
+
+    edit = page.click('Bearbeiten')
+    edit.form['contact'] = 'We could show this address on the root news page'
+    edit.form['access'] = 'private'
+    edit.form.submit().follow()
+
+    assert 'Aktuelles' not in anon.get('/')
+    anon.get('/news', status=403)
+
     page = page.click('Nachricht')
     page.form['title'] = "We have a new homepage"
     page.form['lead'] = "It is very good"

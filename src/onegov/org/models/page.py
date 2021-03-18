@@ -119,7 +119,8 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     def get_root_page_form_class(self, request):
         return self.with_content_extensions(
-            Form, request, extensions=(ContactExtension, PersonLinkExtension)
+            Form, request, extensions=(
+                ContactExtension, PersonLinkExtension, AccessExtension)
         )
 
     def get_form_class(self, trait, action, request):
