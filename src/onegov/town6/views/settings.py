@@ -64,11 +64,6 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             label=_("Number of news entries on homepage")
         )
 
-        focus_widget_image = StringField(
-            label=_("Image Focus"),
-            render_kw={'class_': 'image-url'}
-        )
-
     return move_fields(
         form_class=merge_forms(
             homepage_settings_form or HomepageSettingsForm, CustomFieldsForm),
@@ -82,7 +77,6 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             'hide_publications',
             'event_limit_homepage',
             'news_limit_homepage',
-            'focus_widget_image'
         ),
         after='homepage_image_6'
     )
