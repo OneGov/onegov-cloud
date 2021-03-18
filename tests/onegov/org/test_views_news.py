@@ -104,7 +104,7 @@ def test_news_on_homepage(client):
     baz = PageCollection(client.app.session()).by_path('news/baz')
     baz.access = 'private'
     baz.is_visible_on_homepage = True
-    baz.publication_end = utcnow() - timedelta(days=1)
+    baz.publication_end = utcnow() - timedelta(minutes=5)
 
     transaction.commit()
 
@@ -117,6 +117,11 @@ def test_news_on_homepage(client):
     assert "Baz" in homepage
     assert "Bar" in homepage
     assert "Foo" in homepage
+
+    baz = PageCollection(client.app.session()).by_path('news/baz')
+    baz.access = 'public'
+    transaction.commit()
+    assert "Baz" not in anon.get('/')
 
 
 def test_hide_news(client):
