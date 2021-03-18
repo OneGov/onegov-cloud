@@ -83,15 +83,13 @@ def test_hide_page(client):
     page = new_page.form.submit().follow()
 
     anonymous = client.spawn()
-    response = anonymous.get(page.request.url, expect_errors=True)
-    assert response.status_code == 403
+    anonymous.get(page.request.url, status=403)
 
     edit_page = page.click("Bearbeiten")
     edit_page.form['access'] = 'public'
     page = edit_page.form.submit().follow()
 
-    response = anonymous.get(page.request.url)
-    assert response.status_code == 200
+    anonymous.get(page.request.url)
 
 
 def test_copy_pages_to_news(client):
