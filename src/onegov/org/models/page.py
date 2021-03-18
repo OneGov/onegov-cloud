@@ -3,8 +3,9 @@ from onegov.form import Form
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
-from onegov.org.models.extensions import ContactExtension, NewsletterExtension, \
-    PublicationExtension
+from onegov.org.models.extensions import (
+    ContactExtension, NewsletterExtension, PublicationExtension
+)
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension

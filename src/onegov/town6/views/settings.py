@@ -16,8 +16,7 @@ from onegov.org.views.settings import (
     handle_ticket_settings, preview_holiday_settings, handle_general_settings,
     handle_favicon_settings, handle_links_settings, handle_header_settings,
     handle_footer_settings, handle_module_settings, handle_map_settings,
-    handle_analytics_settings, handle_holiday_settings,
-    handle_generic_settings)
+    handle_analytics_settings, handle_holiday_settings)
 
 from onegov.town6.app import TownApp
 
