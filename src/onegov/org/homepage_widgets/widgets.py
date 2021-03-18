@@ -169,8 +169,12 @@ class NewsWidget(object):
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
         news_limit = layout.org.news_limit_homepage
+        query_params = dict(
+            limit=news_limit + 2,
+            published_only=not layout.request.is_manager
+        )
         news = layout.request.exclude_invisible(
-            layout.root_pages[-1].news_query(limit=news_limit + 2).all())
+            layout.root_pages[-1].news_query(**query_params).all())
 
         # limits the news, but doesn't count sticky news towards that limit
         def limited(news, limit):

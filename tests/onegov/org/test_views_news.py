@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 import transaction
+from sedate import utcnow
 
 from onegov.page import PageCollection
 from tests.shared.utils import open_in_browser
@@ -101,6 +104,7 @@ def test_news_on_homepage(client):
     baz = PageCollection(client.app.session()).by_path('news/baz')
     baz.access = 'private'
     baz.is_visible_on_homepage = True
+    baz.publication_end = utcnow() - timedelta(days=1)
 
     transaction.commit()
 
