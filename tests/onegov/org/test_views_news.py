@@ -10,8 +10,6 @@ def test_news(client):
     # Test edit the root news page
     page = client.get('/news')
     assert 'Aktuelles' in page
-    # open_in_browser(page)
-    # assert False
 
     edit = page.click('Bearbeiten')
     edit.form['contact'] = 'We could show this address on the root news page'
