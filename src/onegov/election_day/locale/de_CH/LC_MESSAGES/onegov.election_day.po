@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 08:04+0100\n"
-"PO-Revision-Date: 2021-03-11 08:06+0100\n"
+"POT-Creation-Date: 2021-03-18 09:31+0100\n"
+"PO-Revision-Date: 2021-03-18 10:24+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -316,6 +316,15 @@ msgstr "Link Text  Italienisch"
 
 msgid "Link label romansh"
 msgstr "Link Text  Rumantsch"
+
+msgid "Color suggestions"
+msgstr "Farbvorschläge"
+
+msgid "Colors"
+msgstr "Farben"
+
+msgid "Invalid color definitions"
+msgstr "Ungültige Farbdefinitionen"
 
 msgid "Cantonal"
 msgstr "Kantonal"

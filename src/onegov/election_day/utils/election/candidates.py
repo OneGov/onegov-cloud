@@ -42,13 +42,18 @@ def get_candidates_results(election, session):
 def get_candidates_data(election, request):
     """" Get the candidates as JSON. Used to for the candidates bar chart. """
 
+    colors = election.colors
+    default_color = '#999' if election.colors else ''
+
     session = object_session(election)
 
     candidates = session.query(
         Candidate.family_name,
         Candidate.first_name,
         Candidate.elected,
-        Candidate.votes.label('votes')
+        Candidate.votes.label('votes'),
+        Candidate.list_id,
+        Candidate.party
     )
     candidates = candidates.filter(Candidate.election_id == election.id)
 
@@ -84,13 +89,28 @@ def get_candidates_data(election, request):
             }
         candidates = candidates.filter(Candidate.elected == True)
 
+        colors = {
+            list_id: election.colors[name]
+            for list_id, name in session.query(List.id, List.name)
+            if name in election.colors
+        }
+
     return {
         'results': [
             {
-                'text': '{} {}'.format(candidate[0], candidate[1]),
+                'text': '{} {}'.format(
+                    candidate.family_name, candidate.first_name
+                ),
                 'value': candidate.votes,
-                'class': 'active' if candidate.elected and election.completed
-                else 'inactive'
+                'class': (
+                    'active' if candidate.elected and election.completed
+                    else 'inactive'
+                ),
+                'color': (
+                    colors.get(candidate.party)
+                    or colors.get(candidate.list_id)
+                    or default_color
+                )
             } for candidate in candidates
         ],
         'majority': majority,

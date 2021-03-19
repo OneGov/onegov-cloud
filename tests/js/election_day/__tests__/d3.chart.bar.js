@@ -297,4 +297,39 @@ describe('Bar chart', () => {
     expect(chart.height()).toBe(8*24+40);
     expect(chart.width()).toBe(700+20);
   });
+
+  it('renders a colored svg @700', () => {
+    var document = jsdom.jsdom();
+    var chart = barChart({
+      width: 700,
+      data: {
+        "results": [
+          {"value": 100000, "class": "active", "value2": 1, "text": "Rot", "color": "#990000"},
+          {"value": 100000, "class": "inactive", "value2": 0, "text": "Rot", "color": "#990000"},
+          {"value": 5000, "class": "active", "value2": 1, "text": "Rot", "color": "#990000"},
+          {"value": 5000, "class": "inactive", "value2": 0, "text": "Rot", "color": "#990000"},
+          {"value": 100000, "class": "active", "value2": 1, "text": "Grün", "color": "#009900"},
+          {"value": 100000, "class": "inactive", "value2": 0, "text": "Grün", "color": "#009900"},
+          {"value": 5000, "class": "active", "value2": 1, "text": "Grün", "color": "#009900"},
+          {"value": 5000, "class": "inactive", "value2": 0, "text": "Grün", "color": "#009900"},
+          {"value": 100000, "class": "active", "value2": 1, "text": "Blau", "color": "#000099"},
+          {"value": 100000, "class": "inactive", "value2": 0, "text": "Blau", "color": "#000099"},
+          {"value": 5000, "class": "active", "value2": 1, "text": "Blau", "color": "#000099"},
+          {"value": 5000, "class": "inactive", "value2": 0, "text": "Blau", "color": "#000099"},
+          {"value": 100000, "class": "active", "value2": 1, "text": "Grau", "color": "#999999"},
+          {"value": 100000, "class": "inactive", "value2": 0, "text": "Grau", "color": "#999999"},
+          {"value": 5000, "class": "active", "value2": 1, "text": "Grau", "color": "#999999"},
+          {"value": 5000, "class": "inactive", "value2": 0, "text": "Grau", "color": "#999999"},
+          {"value": 100000, "class": "active", "value2": 1, "text": "Default", "color": ""},
+          {"value": 100000, "class": "inactive", "value2": 0, "text": "Default", "color": ""},
+          {"value": 5000, "class": "active", "value2": 1, "text": "Default", "color": ""},
+          {"value": 5000, "class": "inactive", "value2": 0, "text": "Default", "color": ""},
+        ]}
+    });
+    chart(document.body);
+    // require('fs').writeFile("bar_c@700.svg", document.svg(), function(err, result) {});
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.height()).toBe(20*24+40);
+    expect(chart.width()).toBe(700+20);
+  });
 });

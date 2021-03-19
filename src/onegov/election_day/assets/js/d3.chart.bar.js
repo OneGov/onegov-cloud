@@ -101,9 +101,13 @@
                     .attr('class', function(d) {
                         return 'bar ' + d.class;
                     })
-                    .style('fill', options.colorInactive);
-                bar.filter(function(d) { return d.class == 'active'; })
-                    .style('fill', options.colorActive);
+                    .style('fill', function(d) {
+                        if (d.color) return d.color;
+                        return d.class == 'active' ? options.colorActive : options.colorInactive;
+                    })
+                    .style('opacity', function(d) {
+                        return d.color && d.class != 'active' ? 0.4 : 1;
+                    });
 
                 // ... and the label (one text inside the bar, one outside)
                 var label = line.append('g')
@@ -138,30 +142,36 @@
                         .attr('x2', offset + 5 + scale(majority))
                         .attr('y1', 0)
                         .attr('y2', options.barHeight * data.results.length)
-                        .attr('stroke-width', 3)
-                        .attr('stroke', 'black')
-                        .style('stroke-dasharray', ('4, 4'));
+                        .attr('stroke-width', 2)
+                        .attr('stroke', '#333')
+                        .style('stroke-dasharray', ('5, 5'));
                 }
 
                 // Fade-Effect on mouseover
                 if (interactive) {
                     bar.on('mouseover', function(d) {
+                        bar.filter(function(s) { return s == d; })
+                            .transition()
+                            .duration(700)
+                            .style('opacity', 1.0);
                         bar.filter(function(s) { return s != d; })
                             .transition()
                             .duration(700)
-                    		    .style('opacity', 0.1);
+                            .style('opacity', 0.1);
                         label.filter(function(s) { return s != d; })
                             .transition()
                             .duration(700)
-                    		    .style('opacity', 0.1);
+                            .style('opacity', 0.1);
                     });
                     bar.on('mouseout', function(d) {
                         bar.transition()
                             .duration(700)
-                    		    .style('opacity', 1);
+                            .style('opacity', function(d) {
+                                return d.color && d.class != 'active' ? 0.4 : 1;
+                            });
                         label.transition()
                             .duration(700)
-                    		    .style('opacity', 1);
+                            .style('opacity', 1);
                     });
                 }
 

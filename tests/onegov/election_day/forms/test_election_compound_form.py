@@ -149,6 +149,10 @@ def test_election_compound_form_model(session, related_link_labels):
     model.elections = [e1, e2]
     model.after_pukelsheim = True
     model.pukelsheim_completed = True
+    model.colors = {
+        'FDP': '#3a8bc1',
+        'CVP': '#ff9100',
+    }
     session.add(model)
 
     form = ElectionCompoundForm()
@@ -171,6 +175,10 @@ def test_election_compound_form_model(session, related_link_labels):
     assert form.elections.data == ['e-1', 'e-2']
     assert form.after_pukelsheim.data is True
     assert form.pukelsheim_completed.data is True
+    assert form.colors.data == (
+        'CVP #ff9100\n'
+        'FDP #3a8bc1'
+    )
 
     form.election_de.data = 'Some Elections (DE)'
     form.election_fr.data = 'Some Elections (FR)'
@@ -185,6 +193,12 @@ def test_election_compound_form_model(session, related_link_labels):
     form.elections.data = ['e-1', 'e-3', 'e-4']
     form.after_pukelsheim.data = False
     form.pukelsheim_completed.data = False
+    form.colors.data = (
+        'CVP #ff9100\r\n'
+        'SP Juso #dd0e0e\n'
+        'FDP   #3a8bc1\n'
+        'GLP\t\t#aeca00\n'
+    )
 
     form.request = DummyRequest(session=session)
     form.on_request()
@@ -203,3 +217,9 @@ def test_election_compound_form_model(session, related_link_labels):
     assert form.show_party_strengths.data is False
     assert form.show_mandate_allocation.data is False
     assert sorted([e.id for e in model.elections]) == ['e-1', 'e-3']
+    assert model.colors == {
+        'CVP': '#ff9100',
+        'FDP': '#3a8bc1',
+        'GLP': '#aeca00',
+        'SP Juso': '#dd0e0e',
+    }

@@ -65,6 +65,10 @@ def test_election_form_model(session, related_link_labels):
     model.distinct = False
     model.expats = False
     model.after_pukelsheim = True
+    model.colors = {
+        'FDP': '#3a8bc1',
+        'CVP': '#ff9100',
+    }
 
     form = ElectionForm()
     form.apply_model(model)
@@ -88,6 +92,10 @@ def test_election_form_model(session, related_link_labels):
     assert form.distinct.data is False
     assert form.expats.data is False
     assert form.after_pukelsheim.data is True
+    assert form.colors.data == (
+        'CVP #ff9100\n'
+        'FDP #3a8bc1'
+    )
 
     form.election_de.data = 'An Election (DE)'
     form.election_fr.data = 'An Election (FR)'
@@ -105,7 +113,12 @@ def test_election_form_model(session, related_link_labels):
     form.distinct.data = True
     form.expats.data = True
     form.after_pukelsheim.data = False
-
+    form.colors.data = (
+        'CVP #ff9100\r\n'
+        'SP Juso #dd0e0e\n'
+        'FDP   #3a8bc1\n'
+        'GLP\t\t#aeca00\n'
+    )
     form.update_model(model)
 
     assert model.title == 'An Election (DE)'
@@ -125,6 +138,12 @@ def test_election_form_model(session, related_link_labels):
     assert model.distinct is True
     assert model.expats is True
     assert model.after_pukelsheim is False
+    assert model.colors == {
+        'CVP': '#ff9100',
+        'FDP': '#3a8bc1',
+        'GLP': '#aeca00',
+        'SP Juso': '#dd0e0e',
+    }
 
 
 def test_election_form_relations(session):

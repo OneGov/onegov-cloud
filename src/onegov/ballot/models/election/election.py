@@ -306,6 +306,9 @@ class Election(Base, ContentMixin, TimestampMixin,
         )
         return results
 
+    #: Defines optional colors for lists and parties
+    colors = meta_property('colors', default=dict)
+
     def clear_results(self):
         """ Clears all the results. """
 

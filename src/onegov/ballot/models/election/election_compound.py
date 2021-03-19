@@ -126,6 +126,9 @@ class ElectionCompound(
         lazy='dynamic',
     )
 
+    #: Defines optional colors for parties
+    colors = meta_property('colors', default=dict)
+
     @property
     def elections(self):
         elections = [association.election for association in self.associations]

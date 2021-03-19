@@ -113,15 +113,19 @@ def get_list_results(election, session):
 def get_lists_data(election, request, mandates_only=False):
     """" View the lists as JSON. Used to for the lists bar chart. """
 
+    completed = election.completed
+    colors = election.colors
+    default_color = '#999' if election.colors else ''
+
     if isinstance(election, ElectionCompound):
-        completed = election.completed
         if not mandates_only:
             return {
                 'results': [{
                     'text': list_.name,
                     'value': list_.votes,
                     'value2': list_.number_of_mandates,
-                    'class': 'active' if completed else 'inactive'
+                    'class': 'active' if completed else 'inactive',
+                    'color': colors.get(list_.name) or default_color
                 } for list_ in election.lists_data()]
             }
         else:
@@ -130,7 +134,8 @@ def get_lists_data(election, request, mandates_only=False):
                     'text': list_.name,
                     'value': list_.number_of_mandates,
                     'value2': None,
-                    'class': 'active' if completed else 'inactive'
+                    'class': 'active' if completed else 'inactive',
+                    'color': colors.get(list_.name) or default_color
                 } for list_ in election.lists_data(
                     order_by='number_of_mandates')
                 ]
@@ -145,12 +150,15 @@ def get_lists_data(election, request, mandates_only=False):
 
     return {
         'results': [{
-            'text': item[0],
-            'value': item[1],
-            'value2': item[3] if election.completed else None,
-            'class': 'active' if election.completed
-            and item[3] else 'inactive',
-        } for item in get_list_results(election, object_session(election))],
+            'text': list_.name,
+            'value': list_.votes,
+            'value2': list_.number_of_mandates if completed else None,
+            'class': (
+                'active' if completed and list_.number_of_mandates
+                else 'inactive'
+            ),
+            'color': colors.get(list_.name) or default_color
+        } for list_ in get_list_results(election, object_session(election))],
         'majority': None,
         'title': election.title
     }

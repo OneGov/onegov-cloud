@@ -5,11 +5,15 @@ from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import PanelField
+from re import findall
 from sqlalchemy import or_
 from wtforms import BooleanField
 from wtforms import IntegerField
 from wtforms import RadioField
 from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms import ValidationError
 from wtforms.fields.html5 import DateField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import InputRequired
@@ -154,6 +158,49 @@ class ElectionForm(Form):
         render_kw={'lang': 'rm'}
     )
 
+    color_hint = PanelField(
+        label=_('Color suggestions'),
+        text=(
+            'AL #a74c97\n'
+            'BDP #a9cf00\n'
+            'CVP #d28b00\n'
+            'EDU #7f6b65\n'
+            'EVP #e3c700\n'
+            'FDP #0084c7\n'
+            'GLP #aeca00\n'
+            'GPS #54ba00\n'
+            'Piraten #333333\n'
+            'SP #c31906\n'
+            'SVP #408b3d\n'
+        ),
+        kind='',
+    )
+
+    colors = TextAreaField(
+        label=_('Colors'),
+        render_kw={'rows': 12},
+        description=(
+
+        )
+    )
+
+    def parse_colors(self, text):
+        if not text:
+            return {}
+        result = {
+            key.strip(): value
+            for key, value in findall(r'(.+)\s+(\#[0-9a-fA-F]{6})', text)
+        }
+        if len(text.strip().splitlines()) != len(result):
+            raise ValueError('Could not parse colors')
+        return result
+
+    def validate_colors(self, field):
+        try:
+            self.parse_colors(field.data)
+        except Exception:
+            raise ValidationError(_('Invalid color definitions'))
+
     def on_request(self):
         self.election_de.validators = []
         self.election_fr.validators = []
@@ -226,6 +273,8 @@ class ElectionForm(Form):
             link_labels['rm_CH'] = self.related_link_label_rm.data
         model.related_link_label = link_labels
 
+        model.colors = self.parse_colors(self.colors.data)
+
         # use symetric relationships
         session = self.request.session
         query = session.query(ElectionAssociation)
@@ -269,6 +318,10 @@ class ElectionForm(Form):
         self.expats.data = model.expats
         self.distinct.data = model.distinct
         self.after_pukelsheim.data = model.after_pukelsheim
+
+        self.colors.data = '\n'.join((
+            f'{name} {model.colors[name]}' for name in sorted(model.colors)
+        ))
 
         if model.type == 'majorz':
             self.election_type.choices = [
