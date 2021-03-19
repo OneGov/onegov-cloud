@@ -1,8 +1,30 @@
 # Changes
 
+## Release `2021.32`
+
+> commits: **5 / [0bcfc993fe...d0bbc71167](https://github.com/OneGov/onegov-cloud/compare/0bcfc993fe^...d0bbc71167)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.32)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🎉 **Add colors to list and candidate bar charts.**
+
+**`Feature`** | **[SEA-162](https://linear.app/seantis/issue/SEA-162)** | **[3f05403a28](https://github.com/onegov/onegov-cloud/commit/3f05403a2840a0471ccb4613cd74b732fe98be3d)**
+
+🐞 **Don't export empty party panachage results.**
+
+**`Bugfix`** | **[SEA-202](https://linear.app/seantis/issue/SEA-202)** | **[d0bbc71167](https://github.com/onegov/onegov-cloud/commit/d0bbc711676d21e28d75cba604a3e4c1701b4ac7)**
+
+### Form
+
+🎉 **Allows multi line panels.**
+
+**`Feature`** | **[3d54946a45](https://github.com/onegov/onegov-cloud/commit/3d54946a45336a5b958c9ac1eaf91371806f918d)**
+
 ## Release `2021.31`
 
-> commits: **6 / [c22a982b96...4ae32d8eb1](https://github.com/OneGov/onegov-cloud/compare/c22a982b96^...4ae32d8eb1)**  
+> released: **2021-03-17 18:00**<br>
+> commits: **7 / [c22a982b96...9ea8a9d53e](https://github.com/OneGov/onegov-cloud/compare/c22a982b96^...9ea8a9d53e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.31)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2021.30`
