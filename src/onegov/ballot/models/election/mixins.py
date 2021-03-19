@@ -94,11 +94,13 @@ class PartyResultExportMixin(object):
                 row['votes'] = result.get('votes', '')
 
                 # add the panachage results
-                for source in parties:
-                    id_ = parties.index(source)
-                    column = 'panachage_votes_from_{}'.format(id_)
-                    row[column] = result.get(source, '')
-                row['panachage_votes_from_999'] = result.get('', '')
+                if self.panachage_results.count():
+                    for source in parties:
+                        id_ = parties.index(source)
+                        column = 'panachage_votes_from_{}'.format(id_)
+                        row[column] = result.get(source, '')
+                    row['panachage_votes_from_999'] = result.get('', '')
+
                 rows.append(row)
 
         return rows

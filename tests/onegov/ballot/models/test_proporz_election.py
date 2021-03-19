@@ -1099,10 +1099,6 @@ def test_proporz_election_export_parties(session):
             'total_votes': 50,
             'votes': 3,
             'year': 2016,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_999': '',
-
         }, {
             'color': 'black',
             'mandates': 2,
@@ -1111,9 +1107,6 @@ def test_proporz_election_export_parties(session):
             'total_votes': 50,
             'votes': 2,
             'year': 2016,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_999': '',
         }, {
             'color': 'red',
             'mandates': 1,
@@ -1122,9 +1115,6 @@ def test_proporz_election_export_parties(session):
             'total_votes': 100,
             'votes': 1,
             'year': 2012,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_999': '',
         }, {
             'color': 'black',
             'mandates': 0,
@@ -1133,9 +1123,6 @@ def test_proporz_election_export_parties(session):
             'total_votes': 100,
             'votes': 0,
             'year': 2012,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_999': '',
         }
     ]
 
