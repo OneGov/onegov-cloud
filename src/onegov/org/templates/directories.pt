@@ -9,7 +9,6 @@
             <li tal:repeat="directory directories">
                 <a class="list-title" tal:attributes="href link(directory)">${directory.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
-                <metal:hint use-macro="layout.macros['publication_hint']" tal:define="item directory" />
                 <div class="list-lead">${directory.lead}</div>
             </li>
         </ul>
