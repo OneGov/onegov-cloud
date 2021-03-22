@@ -26,5 +26,9 @@ def town_handle_defined_form(self, request, form):
 @TownApp.html(model=CompleteFormSubmission, template='submission.pt',
               permission=Private, request_method='POST')
 def town_handle_pending_submission(self, request):
+    if 'title' in request.GET:
+        title = request.GET['title']
+    else:
+        title = self.form.title
     return handle_pending_submission(
-        self, request, FormSubmissionLayout(self, request))
+        self, request, FormSubmissionLayout(self, request, title))

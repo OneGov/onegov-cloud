@@ -103,10 +103,7 @@ var TypeAhead = function(form) {
             update_typeahead([]);
             return;
         }
-
-        var request = $.get(getSearchUrl(source, text));
-
-        request.success(function(data) {
+        $.get(getSearchUrl(source, text), function(data) {
             update_typeahead(data);
         });
     }, 100);
