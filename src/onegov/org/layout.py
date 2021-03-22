@@ -575,8 +575,14 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
     @cached_property
     def top_navigation(self):
+        def include(page):
+            if self.request.is_manager:
+                return True
+            return page.published
+
         return tuple(
             Link(r.title, self.request.link(r)) for r in self.root_pages
+            if include(r)
         )
 
 
@@ -642,7 +648,14 @@ class AdjacencyListMixin:
     def get_sidebar(self, type=None):
         """ Yields the sidebar for the given adjacency list item. """
         query = self.model.siblings.filter(self.model.__class__.type == type)
-        items = self.request.exclude_invisible(query.all())
+
+        def filter(items):
+            items = self.request.exclude_invisible(items)
+            if not self.request.is_manager:
+                return tuple(i for i in items if i.published)
+            return items
+
+        items = filter(query.all())
 
         for item in items:
             if item != self.model:
@@ -650,7 +663,7 @@ class AdjacencyListMixin:
             else:
                 children = (
                     Link(c.title, self.request.link(c), model=c) for c
-                    in self.request.exclude_invisible(self.model.children)
+                    in filter(self.model.children)
                 )
 
                 yield LinkGroup(
