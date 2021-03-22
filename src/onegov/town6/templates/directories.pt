@@ -9,7 +9,9 @@
                 <p tal:condition="not:directories" i18n:translate="">No directories defined yet.</p>
                 <ul tal:condition="directories" class="forms-list">
                     <li tal:repeat="directory directories">
-                        <a class="list-title h5-size" tal:attributes="href link(directory)">${directory.title}</a><metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
+                        <a class="list-title h5-size" tal:attributes="href link(directory)">${directory.title}</a>
+                        <metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
+                        <metal:hint use-macro="layout.macros['publication_hint']" tal:define="item directory" />
                         <div class="list-lead">${directory.lead}</div>
                     </li>
                 </ul>
