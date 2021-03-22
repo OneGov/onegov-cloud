@@ -118,7 +118,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def top_navigation(self):
         def yield_children(page):
             return (
-                page.id, Link(page.title, self.request.link(page)),
+                page, Link(page.title, self.request.link(page)),
                 tuple(yield_children(p) for p in
                       self.request.exclude_invisible(page.children))
             )

@@ -35,11 +35,19 @@
 <metal:navigation define-macro="side-navigation-nested">
     <a tal:condition="children">
         <span data-click-target="${link.attrs['href']}">${link.text}</span>
+        <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
+        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
     </a>
-    <tal:b tal:condition="not: children" tal:content="structure link(layout)"/>
+    <tal:b tal:condition="not: children">
+        <a href="${link.attrs['href']}">
+            <span>${link.text}</span>
+            <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
+            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+        </a>
+    </tal:b>
     <ul class="vertical menu nested" data-sortable data-sortable-url="${layout.sortable_url_template}" tal:condition="children">
-        <tal:b tal:repeat="(page_id, sublink, c) children">
-            <li data-sortable-id="${page_id}">
+        <tal:b tal:repeat="(page, sublink, c) children">
+            <li data-sortable-id="${page.id}">
                 <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
             </li>
         </tal:b>
@@ -49,7 +57,7 @@
 
 <metal:navigation define-macro="side-navigation">
     <ul class="vertical menu side-navigation" data-sortable data-sortable-url="${layout.sortable_url_template}" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
-        <li tal:repeat="(page_id, link, children) links" data-sortable-id="${page_id}">
+        <li tal:repeat="(page, link, children) links" data-sortable-id="${page.id}">
             <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>
     </ul>

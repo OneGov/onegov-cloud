@@ -1,5 +1,7 @@
 from freezegun import freeze_time
 
+from tests.shared.utils import open_in_browser
+
 
 def test_pages(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
@@ -102,7 +104,10 @@ def test_hide_page(client):
 
     anonymous.get(page_url, status=404)
     anon = client.spawn()
-    assert 'Test' not in anon.get('/topics/organisation')
+    page = anon.get('/topics/organisation')
+
+    # Test the links in the
+    assert 'Test' not in page
 
 
 def test_copy_pages_to_news(client):
