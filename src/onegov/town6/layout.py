@@ -127,8 +127,8 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
             return (
                 page, Link(page.title, self.request.link(page)),
                 tuple(yield_children(p) for p in
-                      self.exclude_invisible(page.children)
-            ))
+                      self.exclude_invisible(page.children))
+            )
         return tuple(yield_children(page) for page in self.root_pages)
 
     @cached_property
