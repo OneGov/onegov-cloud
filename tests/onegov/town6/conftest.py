@@ -4,13 +4,43 @@ import pytest
 import transaction
 
 from onegov.core.utils import module_path
-from tests.onegov.org.conftest import Client
 from tests.shared.utils import create_app
 from onegov.town6 import TownApp
 from onegov.town6.initial_content import builtin_form_definitions
 from onegov.town6.initial_content import create_new_organisation
 from onegov.user import User
 from pytest_localserver.http import WSGIServer
+from tests.shared import Client as BaseClient
+
+
+class Client(BaseClient):
+    skip_first_form = True
+    use_intercooler = True
+
+    def login_member(self, to=None):
+        return self.login('member@example.org', 'hunter2', to)
+
+    def bound_reserve(self, allocation):
+
+        default_start = '{:%H:%M}'.format(allocation.start)
+        default_end = '{:%H:%M}'.format(allocation.end)
+        default_whole_day = allocation.whole_day
+        resource = allocation.resource
+        allocation_id = allocation.id
+
+        def reserve(
+            start=default_start,
+            end=default_end,
+            quota=1,
+            whole_day=default_whole_day
+        ):
+            return self.post(
+                f'/allocation/{resource}/{allocation_id}/reserve'
+                f'?start={start}&end={end}&quota={quota}'
+                f'&whole_day={whole_day and "1" or "0"}'
+            )
+
+        return reserve
 
 
 @pytest.fixture(scope='session')
