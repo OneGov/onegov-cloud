@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-10 20:33+0100\n"
+"POT-Creation-Date: 2021-03-22 08:44+0100\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1203,12 +1203,6 @@ msgstr "N'envoyez pas d'e-mail lorsque cette catégorie de billets est ouverte"
 msgid "Mute all tickets"
 msgstr "Désactiver tous les emails de statut pour les tickets"
 
-msgid "Disable news and hide the entry in the navigation"
-msgstr "Désactiver les 'nouvelles' et masquer l'entrée dans la navigation"
-
-msgid "All other topics can be hidden in their settings"
-msgstr "Tous les autres sujets peuvent être cachés dans leurs paramètres"
-
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
 
@@ -2263,6 +2257,9 @@ msgstr "Déposez des fichiers pour télécharger"
 
 msgid "All news"
 msgstr "Toutes les nouvelles"
+
+msgid "This site is not published."
+msgstr "Cette page n'est pas publiée."
 
 msgid "This site is not public."
 msgstr "Ce site n'est pas public."
@@ -4053,9 +4050,6 @@ msgstr ""
 "influencer le contenu de la page sans l'intervention d'un administrateur ! "
 "Il est préférable d'activer ce paramètre uniquement pour une période limitée."
 
-msgid "Site Navigation Settings"
-msgstr "Paramètres navigation du site"
-
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"
 
@@ -4220,6 +4214,15 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Disable news and hide the entry in the navigation"
+#~ msgstr "Désactiver les 'nouvelles' et masquer l'entrée dans la navigation"
+
+#~ msgid "All other topics can be hidden in their settings"
+#~ msgstr "Tous les autres sujets peuvent être cachés dans leurs paramètres"
+
+#~ msgid "Site Navigation Settings"
+#~ msgstr "Paramètres navigation du site"
 
 #~ msgid "Chosen entries: ${count}"
 #~ msgstr "Entrées sélectionnées: ${count}"

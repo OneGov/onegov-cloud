@@ -1,12 +1,27 @@
+from datetime import timedelta
+
 import transaction
+from sedate import utcnow
 
 from onegov.page import PageCollection
 
 
 def test_news(client):
     client.login_admin().follow()
+    anon = client.spawn()
 
+    # Test edit the root news page
     page = client.get('/news')
+    assert 'Aktuelles' in page
+
+    edit = page.click('Bearbeiten')
+    edit.form['contact'] = 'We could show this address on the root news page'
+    edit.form['access'] = 'private'
+    edit.form.submit().follow()
+
+    assert 'Aktuelles' not in anon.get('/')
+    anon.get('/news', status=403)
+
     page = page.click('Nachricht')
     page.form['title'] = "We have a new homepage"
     page.form['lead'] = "It is very good"
@@ -39,7 +54,9 @@ def test_news_on_homepage(client):
     page = news_list.click('Nachricht')
     page.form['title'] = "Foo"
     page.form['lead'] = "Lorem"
-    page.form.submit()
+    page.form['publication_start'] = '2020-01-01T00:00'
+    page.form['publication_end'] = '2200-01-01T00:00'
+    page.form.submit().follow()
 
     page = news_list.click('Nachricht')
     page.form['title'] = "Bar"
@@ -88,6 +105,7 @@ def test_news_on_homepage(client):
     baz = PageCollection(client.app.session()).by_path('news/baz')
     baz.access = 'private'
     baz.is_visible_on_homepage = True
+    baz.publication_end = utcnow() - timedelta(minutes=5)
 
     transaction.commit()
 
@@ -100,6 +118,11 @@ def test_news_on_homepage(client):
     assert "Baz" in homepage
     assert "Bar" in homepage
     assert "Foo" in homepage
+
+    baz = PageCollection(client.app.session()).by_path('news/baz')
+    baz.access = 'public'
+    transaction.commit()
+    assert "Baz" not in anon.get('/')
 
 
 def test_hide_news(client):

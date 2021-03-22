@@ -1,3 +1,8 @@
+from freezegun import freeze_time
+
+from tests.shared.utils import open_in_browser
+
+
 def test_pages(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
@@ -81,17 +86,28 @@ def test_hide_page(client):
     new_page.form['title'] = "Test"
     new_page.form['access'] = 'private'
     page = new_page.form.submit().follow()
+    page_url = '/topics/organisation/test'
 
     anonymous = client.spawn()
-    response = anonymous.get(page.request.url, expect_errors=True)
-    assert response.status_code == 403
+    anonymous.get(page_url, status=403)
 
     edit_page = page.click("Bearbeiten")
     edit_page.form['access'] = 'public'
-    page = edit_page.form.submit().follow()
+    edit_page.form.submit().follow()
 
-    response = anonymous.get(page.request.url)
-    assert response.status_code == 200
+    anonymous.get(page_url, status=200)
+
+    with freeze_time('2019-01-01'):
+        edit_page = page.click("Bearbeiten")
+        edit_page.form['publication_end'] = '2019-02-01T00:00'
+        edit_page.form.submit().follow()
+
+    anonymous.get(page_url, status=404)
+    anon = client.spawn()
+    page = anon.get('/topics/organisation')
+
+    # Test the links in the
+    assert 'Test' not in page
 
 
 def test_copy_pages_to_news(client):

@@ -9,9 +9,14 @@ class Article(Page):
 def test_article(session):
     pages = PageCollection(session)
     root = pages.add_root("Root")
+    assert pages.query().filter(
+                Page.publication_started == True,
+                Page.publication_ended == False).one()
 
     page = pages.add(parent=root, title='Article', type='article')
     assert isinstance(page, Article)
+    assert page.published_or_created
+    assert page.published
 
     page = pages.add(parent=root, title='Page')
     assert not isinstance(page, Article)

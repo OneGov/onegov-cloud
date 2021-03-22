@@ -26,7 +26,8 @@ form {
         &.error {
             color: $alert-color;
 
-            & input {
+            & input,
+            & .button {
                 margin-bottom: 0;
             }
         }
@@ -104,8 +105,8 @@ form {
 
         legend {
             font-size: $input-font-size;
+            margin: 0 auto;
             padding: 0 .75rem;
-            text-align: center;
         }
     }
 
@@ -223,19 +224,24 @@ input.has-field-help {
 /*
     input buttons
 */
+
+@mixin input-button {
+    @include prefix-postfix-base;
+    border-left: 0;
+    box-sizing: border-box;
+
+    // IE 9, 10 and 11 will put the link inside the button element because
+    // Internet Explorer. Here we hide the result.
+    a,
+    .redactor-selection-marker {
+        display: none;
+    }
+}
+
 .input-with-button {
 
     .button {
-        @include prefix-postfix-base;
-        border-left: 0;
-        box-sizing: border-box;
-
-        // IE 9, 10 and 11 will put the link inside the button element because
-        // Internet Explorer. Here we hide the result.
-        a,
-        .redactor-selection-marker {
-            display: none;
-        }
+        @include input-button;
     }
 
     #redactor-modal-link-insert {
@@ -244,6 +250,10 @@ input.has-field-help {
             display: none;
         }
     }
+}
+
+.button.datetimepicker {
+    @include input-button;
 }
 
 .fieldset-display {

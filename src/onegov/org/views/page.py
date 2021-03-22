@@ -4,7 +4,7 @@ import morepath
 
 from datetime import datetime
 
-from webob.exc import HTTPForbidden
+from webob.exc import HTTPNotFound
 
 from onegov.core.security import Public, Private
 from onegov.org.elements import Link
@@ -34,8 +34,13 @@ def view_topic(self, request, layout=None):
 
     assert self.trait in {'link', 'page'}
 
-    if not request.is_manager and self.trait == 'link':
-        return morepath.redirect(self.content['url'])
+    if not request.is_manager:
+
+        if not self.published:
+            return HTTPNotFound()
+
+        if self.trait == 'link':
+            return morepath.redirect(self.content['url'])
 
     layout = layout or PageLayout(self, request)
 
@@ -43,7 +48,9 @@ def view_topic(self, request, layout=None):
         layout.editbar_links = self.get_editbar_links(request)
         children = self.children
     else:
-        children = request.exclude_invisible(self.children)
+        children = request.exclude_invisible(
+            (c for c in self.children if c.published)
+        )
 
     return {
         'layout': layout,
@@ -61,9 +68,6 @@ def view_topic(self, request, layout=None):
 def view_news(self, request, layout=None):
 
     layout = layout or NewsLayout(self, request)
-    if layout.org.disable_news and not request.is_admin:
-        return HTTPForbidden()
-
     years = self.years
 
     try:

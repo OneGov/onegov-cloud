@@ -4905,6 +4905,10 @@ h2 + div.timeline {
 
     padding: 1rem 1rem .5rem;
 
+    i.unpublished-hint::before {
+        width: 2ex;
+    }
+
     h2 {
         color: $primary-color;
         display: inline;
@@ -5926,6 +5930,12 @@ h2 + div.timeline {
 .private-hint::before {
     @include icon('\f023');
     color: $red-dark;
+    font-style: normal;
+}
+
+.unpublished-hint::before {
+    @include icon('\f070');
+    color: $orange-dark;
     font-style: normal;
 }
 

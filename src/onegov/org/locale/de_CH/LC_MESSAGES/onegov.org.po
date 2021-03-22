@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-10 20:33+0100\n"
+"POT-Creation-Date: 2021-03-22 08:44+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1196,12 +1196,6 @@ msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
 msgid "Mute all tickets"
 msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 
-msgid "Disable news and hide the entry in the navigation"
-msgstr "'Aktuelles' deaktivieren und Eintrag in Navigation verstecken"
-
-msgid "All other topics can be hidden in their settings"
-msgstr "Alle anderen Themen können in ihren Einstellungen versteckt werden"
-
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
@@ -2256,6 +2250,9 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
 msgid "All news"
 msgstr "Alle Nachrichten"
+
+msgid "This site is not published."
+msgstr "Diese Seite ist nicht publiziert."
 
 msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
@@ -4033,9 +4030,6 @@ msgstr ""
 "Benutzerinteraktion eines Admins beeinflussen können! Aktivieren Sie diese "
 "Einstellung am besten nur für einen begrenzten Zeitraum."
 
-msgid "Site Navigation Settings"
-msgstr "Einstellungen Seiten-Navigation"
-
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
 
@@ -4202,6 +4196,15 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Disable news and hide the entry in the navigation"
+#~ msgstr "'Aktuelles' deaktivieren und Eintrag in Navigation verstecken"
+
+#~ msgid "All other topics can be hidden in their settings"
+#~ msgstr "Alle anderen Themen können in ihren Einstellungen versteckt werden"
+
+#~ msgid "Site Navigation Settings"
+#~ msgstr "Einstellungen Seiten-Navigation"
 
 #~ msgid "Chosen entries: ${count}"
 #~ msgstr "Gewählte Einträge: ${count}"

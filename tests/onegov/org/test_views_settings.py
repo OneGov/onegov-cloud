@@ -88,19 +88,3 @@ def test_switch_languages(client):
     page = client.get('/general-settings')
     assert 'Allemand' in page
     assert 'Deutsch' not in page
-
-
-def test_site_navigation_settings(client):
-    assert 'Aktuelles' in str(client.get('/').pyquery('.top-bar-section'))
-    client.login_admin()
-    page = client.get('/navigation-settings')
-    assert 'Einstellungen Seiten-Navigation' in page
-    page.form['disable_news'] = True
-    page.form.submit().follow()
-
-    editor = client.spawn()
-    editor.login_editor()
-    editor.get('/news', status=403)
-
-    client.get('/news')
-    assert 'Aktuelles' not in str(client.get('/').pyquery('.top-bar-section'))

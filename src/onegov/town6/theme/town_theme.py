@@ -137,7 +137,8 @@ class TownTheme(BaseTheme):
             'payment',
             'person',
             'newsletter',
-            'search'
+            'search',
+            'hints'
         ]
 
     @property

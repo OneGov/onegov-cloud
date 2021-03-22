@@ -59,7 +59,7 @@
     }
 
     input[value="secret"] + label::before {
-        @include icon('\f21b');
+        @include icon-bold('\f21b');
         color: $yellow-dark;
     }
 
@@ -70,13 +70,22 @@
 }
 
 .secret-hint::before {
-    @include icon('\f21b');
+    @include icon-bold('\f21b');
     color: $yellow-dark;
+    font-size: .875rem;
     font-style: normal;
 }
 
 .private-hint::before {
     @include icon-bold('\f023');
     color: $red-dark;
+    font-size: .875rem;
+    font-style: normal;
+}
+
+.unpublished-hint::before {
+    @include icon-bold('\f070');
+    color: $orange-dark;
+    font-size: .875rem;
     font-style: normal;
 }
