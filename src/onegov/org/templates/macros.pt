@@ -446,7 +446,7 @@
 
 <metal:publication_hint define-macro="publication_hint" i18n:domain="onegov.org">
     <tal:b condition="not: item.published">
-        <i title="This site is not published" i18n:attributes="title" class="unpublished-hint"></i>
+        <i title="This site is not published." i18n:attributes="title" class="unpublished-hint"></i>
     </tal:b>
 </metal:publication_hint>
 
