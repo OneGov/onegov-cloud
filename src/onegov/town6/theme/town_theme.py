@@ -136,7 +136,8 @@ class TownTheme(BaseTheme):
             'daypicker',
             'payment',
             'person',
-            'newsletter'
+            'newsletter',
+            'search'
         ]
 
     @property
