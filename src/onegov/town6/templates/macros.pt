@@ -448,9 +448,9 @@
             <div>
                 <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.published_or_created, 'relative')}</small></h5>
                 <tal:b tal:switch="heading|'h5'">
-                    <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
-                    <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
-                    <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h5>
+                    <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
+                    <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h4>
+                    <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
                 </tal:b>
                 <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
             </div>
@@ -520,6 +520,12 @@
     </tal:b>
 </metal:access_hint>
 
+<metal:publication_hint define-macro="publication_hint" i18n:domain="onegov.town6">
+    <tal:b condition="not: item.published">
+        <i title="This site is not published" i18n:attributes="title" class="unpublished-hint"></i>
+    </tal:b>
+</metal:publication_hint>
+
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
     <tal:b condition="item.access == 'private'|False">
         <div class="grid-x">
@@ -533,6 +539,20 @@
         </div>
     </tal:b>
 </metal:access_hint_long>
+
+<metal:publication_hint_long define-macro="publication_hint_long" i18n:domain="onegov.town6">
+    <tal:b condition="not: item.published">
+        <div class="grid-x">
+            <div class="small-12 cell">
+                <div class="panel callout">
+                    <p i18n:translate>
+                        This site is not published.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</metal:publication_hint_long>
 
 <metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.town6">
     <tal:b condition="not item.lead and request.is_manager|nothing">
@@ -769,6 +789,7 @@
                     <tal:b condition="is_group">
                         <a href="#" class="group-title">${link.title}
                             <metal:b use-macro="layout.macros['access_hint']" tal:define="item link"/>
+                            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item link.model"/>
                         </a>
                         <ul class="children" tal:condition="link.links"
                             data-sortable data-sortable-url="${layout.sortable_url_template}">

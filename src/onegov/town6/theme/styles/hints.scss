@@ -80,3 +80,9 @@
     color: $red-dark;
     font-style: normal;
 }
+
+.unpublished-hint::before {
+    @include icon-bold('\f070');
+    color: $orange-dark;
+    font-style: normal;
+}
