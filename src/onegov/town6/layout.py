@@ -114,14 +114,21 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
         self.hide_from_robots()
 
+    def exclude_invisible(self, items):
+        items = self.request.exclude_invisible(items)
+        if not self.request.is_manager:
+            return tuple(i for i in items if i.published)
+        return items
+
     @cached_property
     def top_navigation(self):
+
         def yield_children(page):
             return (
                 page, Link(page.title, self.request.link(page)),
                 tuple(yield_children(p) for p in
-                      self.request.exclude_invisible(page.children))
-            )
+                      self.exclude_invisible(page.children)
+            ))
         return tuple(yield_children(page) for page in self.root_pages)
 
     @cached_property
@@ -131,7 +138,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
     @cached_property
     def root_pages(self):
-        return self.request.exclude_invisible(self.app.root_pages)
+        return self.exclude_invisible(self.app.root_pages)
 
     @cached_property
     def sortable_url_template(self):

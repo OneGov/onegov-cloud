@@ -569,20 +569,20 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         """ Returns the breadcrumbs for the current page. """
         return [Link(_("Homepage"), self.homepage_url)]
 
+    def exclude_invisible(self, items):
+        items = self.request.exclude_invisible(items)
+        if not self.request.is_manager:
+            return tuple(i for i in items if i.published)
+        return items
+
     @cached_property
     def root_pages(self):
-        return self.request.exclude_invisible(self.app.root_pages)
+        return self.exclude_invisible(self.app.root_pages)
 
     @cached_property
     def top_navigation(self):
-        def include(page):
-            if self.request.is_manager:
-                return True
-            return page.published
-
         return tuple(
             Link(r.title, self.request.link(r)) for r in self.root_pages
-            if include(r)
         )
 
 
