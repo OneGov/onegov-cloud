@@ -94,17 +94,17 @@ var evaluate_dependencies = function(form, input, dependencies) {
         var always_hidden = typeof input.attr('data-always-hidden') !== 'undefined';
 
         if (!always_hidden) {
-            input.show();
+            input.toggle(true);
         }
 
-        input.closest('label, .group-label').show().siblings('.error').show();
-        input.trigger('show');
+        input.closest('label, .group-label').show().siblings('.error').toggle(true);
+        input.toggle(true);
     } else {
-        input.hide();
+        input.toggle(false);
         if (hide_label) {
-            input.closest('label, .group-label').hide().siblings('.error').hide();
+            input.closest('label, .group-label').hide().siblings('.error').toggle(false);
         }
-        input.trigger('hide');
+        input.toggle(false);
     }
 };
 
@@ -130,7 +130,7 @@ var setup_depends_on = function(form) {
         });
     });
 
-    form.show();
+    form.toggle(true);
 };
 
 /*

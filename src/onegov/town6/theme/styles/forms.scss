@@ -142,6 +142,16 @@ form {
         }
     }
 
+    .redactor-box {
+        margin-bottom: .75rem;
+    }
+
+    // fixes redactor not working right in dependant field configurations
+    label:not([style*="display: none"]) .redactor-editor:not([style]) + textarea[data-depends-on],
+    label:not([style*="display: none"]) .redactor-editor:not([style*="display: none"]) + textarea[data-depends-on] {
+        display: none !important;
+    }
+
     .error {
         .code-editor-wrapper {
             margin-bottom: 0;
