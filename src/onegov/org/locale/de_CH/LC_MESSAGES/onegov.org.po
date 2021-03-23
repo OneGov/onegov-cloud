@@ -2207,7 +2207,7 @@ msgid "corona_message"
 msgstr ""
 "Zur Eindämmung des Coronavirus verbietet der Bundesrat öffentliche "
 "Veranstaltungen. Alle Veranstaltungen sind damit abgesagt und finden bis "
-"Ende März nicht statt."
+"14. April nicht statt."
 
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
