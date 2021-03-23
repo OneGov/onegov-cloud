@@ -45,7 +45,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def paste_target(self):
         if self.trait == 'link':
-            return self.parent
+            return self.parent or self
 
         if self.trait == 'page':
             return self
