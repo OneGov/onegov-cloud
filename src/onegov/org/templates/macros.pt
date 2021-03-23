@@ -382,10 +382,10 @@
 
             See onegov.core.i18n.get_translation_bound_meta.render_field
         -->
-        <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description len(description) > 54 or is_md; content field(placeholder=not long_description and description)">
+        <tal:b define="description layout.additional_field_help(field); content field(placeholder=field.description if not description else '')">
             <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
             <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-            <div class="long-field-help" tal:condition="long_description">
+            <div class="long-field-help" tal:condition="description">
                 <tal:b replace="structure description" />
             </div>
 

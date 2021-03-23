@@ -1,11 +1,12 @@
 import textwrap
+from collections import namedtuple
 from datetime import date
 
 import transaction
 from freezegun import freeze_time
 from webtest import Upload
 
-from onegov.form import FormCollection
+from onegov.form import FormCollection, as_internal_id
 from onegov.ticket import TicketCollection
 from tests.shared.utils import create_image
 
@@ -13,6 +14,79 @@ from tests.shared.utils import create_image
 def test_view_form_alert(client):
     login = client.get('/auth/login').form.submit()
     assert 'Das Formular enthält Fehler' in login
+
+
+def test_render_form(client):
+
+    class Field(object):
+        def __init__(self, name, definition, comment=None):
+            self.name = name
+            self.id = as_internal_id(name)
+            self.definition = definition
+            self.comment = comment
+
+        def __str__(self):
+            base = f'{self.name} {self.definition}'
+            if self.comment:
+                base += f'\n<< {self.comment} >>'
+            return base
+
+    long_field_help = 20 * 'ZZZ'
+    short_comment = 'short comment'
+
+    # BooleanField does not appear in formcode definitions...
+    # these also support the placeholder
+
+    supporting_long_field_help = [
+        Field('time', '= HH:MM', long_field_help),
+        Field('date_time', '= YYYY.MM.DD HH:MM', long_field_help),
+        Field('website', '= http://', long_field_help),
+        Field('date', '= YYYY.MM.DD', long_field_help),
+        Field('Textfield long', '*= ___', long_field_help),
+        Field('Email long', '* = @@@', long_field_help),
+        Field('Checkbox', """*= 
+                [ ] 4051
+                [ ] 4052""", long_field_help),
+        Field('Select', """= 
+                (x) A
+                ( ) B""", long_field_help),
+        Field('Alter', '= 0..150', long_field_help),
+        Field('Percentage', '= 0.00..100.00', long_field_help),
+        Field('IBAN', '= # iban', long_field_help),
+        Field('AHV Nummer', '= # ch.ssn', long_field_help),
+        Field('UID Nummer', '= # ch.uid', long_field_help),
+        Field('MWST Nummer', '= # ch.vat', long_field_help),
+        Field('Markdown', '= <markdown>', long_field_help)
+    ]
+
+    # Those should render description externally, checked visually
+    not_rendering_placeholder = [
+        Field('Checkbox2', """*= 
+                   [ ] 4051
+                   [ ] 4052""", short_comment),
+        Field('Select2', """= 
+                    (x) A
+                    ( ) B""", short_comment),
+        Field('Image2', '= *.jpg|*.png|*.gif', short_comment),
+        Field('Dokument2', '= *.pdf', short_comment)
+    ]
+
+    fields = not_rendering_placeholder + supporting_long_field_help
+    definition = "\n".join(str(f) for f in fields)
+
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Fields', definition=definition, type='custom')
+
+    transaction.commit()
+
+    page = client.get('/form/fields')
+
+    for field in fields:
+        row = page.pyquery(f'.field-{field.id} .long-field-help')
+        print(field.name)
+        assert row.text() == field.comment
+        assert 'None' not in row.text(), \
+            f'Description not captured by field {field.type}'
 
 
 def test_submit_form(client):

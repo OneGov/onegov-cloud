@@ -29,6 +29,12 @@ from wtforms.validators import InputRequired
 from wtforms_components import TimeField as DefaultTimeField
 from wtforms.fields.html5 import DateTimeLocalField as DateTimeLocalFieldBase
 
+FIELDS_NO_RENDERED_PLACEHOLDER = (
+    'MultiCheckboxField', 'RadioField', 'OrderedMultiCheckboxField',
+    'UploadField', 'ChosenSelectField', 'ChosenSelectMultipleField',
+    'PreviewField', 'PanelField', 'UploadFileWithORMSupport'
+)
+
 
 class TimeField(DefaultTimeField):
     """

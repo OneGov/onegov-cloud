@@ -19,7 +19,8 @@ from onegov.core.utils import linkify, paragraphify
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import FormCollection, as_internal_id, Form
+from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -521,6 +522,20 @@ class Layout(ChameleonLayout):
     def file_link_target(self):
         """ Use with tal:attributes='target layout.file_link_target' """
         return self.org.open_files_target_blank and '_blank' or None
+
+    def additional_field_help(self, field):
+        """ Returns the field description in modified form if
+         the description should be rendered separately in the field macro.
+         """
+        if not field.description:
+            return None
+        desc, is_md = Form.as_maybe_markdown(
+            self.request.translate(field.description)
+        )
+        if is_md or len(desc) > 54:
+            return desc
+        if field.type in FIELDS_NO_RENDERED_PLACEHOLDER:
+            return desc
 
 
 class DefaultLayoutMixin:
