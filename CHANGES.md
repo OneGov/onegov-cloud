@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2021.33`
+
+> commits: **7 / [f784f15bb6...a492f3aae6](https://github.com/OneGov/onegov-cloud/compare/f784f15bb6^...a492f3aae6)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.33)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds publication dates to pages (topics, news)**
+
+Makes predefined topics and news editable with constraints. Removes site-navigation setting for news.
+Pages are filtered by publication and access property. Any page or news can be hidden.
+Adds publication hints.
+
+**`Feature`** | **[SEA-179](https://linear.app/seantis/issue/SEA-179)** | **[f3c1724333](https://github.com/onegov/onegov-cloud/commit/f3c17243330cddef639d802c468f2cbb87e1ef69)**
+
+### Tonw6
+
+🐞 **Improve test coverage, minor ui fixes**
+
+**`Bugfix`** | **[f8754b24af](https://github.com/onegov/onegov-cloud/commit/f8754b24afdbb6e788157f7e1eed8831306fc7c7)**
+
+### Town6
+
+🎉 **Adds focus widget**
+
+Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
+
+**`Feature`** | **[SEA-18](https://linear.app/seantis/issue/SEA-18)** | **[490c282f4f](https://github.com/onegov/onegov-cloud/commit/490c282f4fbfbe46644bcbdffbfe0d9470bef225)**
+
 ## Release `2021.32`
 
-> commits: **5 / [0bcfc993fe...d0bbc71167](https://github.com/OneGov/onegov-cloud/compare/0bcfc993fe^...d0bbc71167)**  
+> released: **2021-03-19 09:33**<br>
+> commits: **6 / [0bcfc993fe...88af288eef](https://github.com/OneGov/onegov-cloud/compare/0bcfc993fe^...88af288eef)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.32)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
