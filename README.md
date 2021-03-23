@@ -230,6 +230,8 @@ Then, apply database changes.
 
 ## Tests 🤞
 
+### Python
+
 To run all tests (this will take ~ 30 minutes):
 
     py.test
@@ -250,13 +252,25 @@ To get an image with profiling information (requires graphviz):
 
     py.test --profile-svg
 
-To use a RAM located database;
+To use a RAM located database:
 
     docker run --rm \
       -e POSTGRES_HOST_AUTH_METHOD=trust \
       --mount type=tmpfs,destination=/var/lib/postgresql/data \
       -p 55432:5432 postgres:12.6 -c fsync=off
     pytest --nopg
+
+### JavaScript
+
+To run the javascript tests:
+
+    cd tests/js
+    npm install
+    npm test
+
+To update the snapshots after changes, run:
+
+    npm test -- --update-snapshot
 
 ## Translations 🌍
 
