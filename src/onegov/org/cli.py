@@ -39,6 +39,8 @@ from onegov.reservation import Allocation, Reservation
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.form import as_internal_id, parse_form
+from onegov.town6.upgrade import migrate_theme_options, \
+    migrate_homepage_structure_for_town6
 from onegov.user import UserCollection, User
 from purl import URL
 from sedate import replace_timezone, utcnow
@@ -1308,3 +1310,19 @@ def fix_directory_files(group_context):
                 fg='green'
             )
     return execute
+
+
+@cli.command('migrate-town', context_settings={'singular': True})
+@pass_group_context
+def migrate_town(group_context):
+    """ Migrates the database from an old town to the new town like in the
+    upgrades.
+
+    """
+
+    def migrate_to_new_town(request, app):
+        context = Bunch(session=app.session())
+        migrate_theme_options(context)
+        migrate_homepage_structure_for_town6(context)
+
+    return migrate_to_new_town
