@@ -271,6 +271,10 @@ class StructuralChanges(object):
         ]
 
     def do_rename(self, removed, added):
+        if removed in self.renamed_fields:
+            return False
+        if added in set(self.renamed_fields.values()):
+            return False
         same_type = self.old[removed].type == self.new[added].type
         if not same_type:
             return False
@@ -316,7 +320,9 @@ class StructuralChanges(object):
             if expected in self.added_fields:
                 # there is another field that matches better
                 return False
-        return False
+        # if len(self.added_fields) == len(self.removed_fields) == 1:
+        #     return True
+        return True
 
     def detect_renamed_fields(self):
         # renames are detected aggressively - we rather have an incorrect
@@ -326,7 +332,7 @@ class StructuralChanges(object):
 
         for r in self.removed_fields:
             for a in self.added_fields:
-                if r not in self.renamed_fields and self.do_rename(r, a):
+                if self.do_rename(r, a):
                     self.renamed_fields[r] = a
 
         self.added_fields = [

@@ -58,6 +58,39 @@ def test_duplicate_label_error():
 def test_detect_renamed_fields():
     changes = StructuralChanges(
         """
+            # F
+            Other = ___
+            Name = ___
+            Bottom = ___
+        """,
+        """
+            # F
+            Other New = ___
+            Name = ___
+            Bottom New = ___
+        """
+    )
+
+    assert changes.renamed_fields == {
+        'F/Other': 'F/Other New', 'F/Bottom': 'F/Bottom New'}
+
+    changes = StructuralChanges(
+        """
+            # F
+            Name = ___
+            Bottom = ___
+        """,
+        """
+            # F
+            Name New = ___
+            Bottom = ___
+        """
+    )
+
+    assert changes.renamed_fields == {'F/Name': 'F/Name New'}
+
+    changes = StructuralChanges(
+        """
             Top = ___
             First Name = ___
             Bottom = ___
