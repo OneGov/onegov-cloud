@@ -142,7 +142,7 @@ function showAlertMessage(message, type, target) {
 
     var alert = $('<div />')
         .attr('data-closable', '')
-        .attr('class', 'alert-box callout' + (type || 'alert'))
+        .attr('class', 'alert-box callout ' + (type || 'alert'))
         .text(message)
     $(target || '#alert-boxes').append(alert);
 }
