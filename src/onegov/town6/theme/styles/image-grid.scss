@@ -21,23 +21,16 @@
 
         }
 
-        @media #{$small-only} {
+        @include breakpoint(small only) {
             width: 100%;
         }
 
-        @media #{$medium-only} {
+        @include breakpoint(medium only) {
             width: 49%;
         }
 
-        @media #{$large-up} {
+        @include breakpoint(large up) {
             width: 24%;
-
-            &:last-of-type {
-                // Make the last element behave like justify-self: flex-start to prevent a gap between them
-                // see https://www.w3.org/TR/css-flexbox-1/#auto-margins
-                margin-left: 2%;
-                margin-right: auto;
-            }
         }
 
     }
