@@ -4,6 +4,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    list-style-type: none;
+    margin: 0;
 
     @keyframes zoom {
         from {transform: scale(0)}
@@ -40,6 +42,8 @@
 /*
     image control elements
 */
+
+// old .image-box in org
 .image-container {
 
     position: relative;
@@ -58,5 +62,44 @@
 
     .delete:hover {
         background-color: $alert-color;
+    }
+}
+
+/*
+    Image select
+*/
+
+.image-select {
+    .image-container {
+        @include grayscale;
+
+        &:hover {
+            img {
+                border-radius: 1px;
+                box-shadow: 0 0 0 3px $gainsboro;
+            }
+        }
+
+        &.selected {
+            @include reset-filter;
+
+            img {
+                border-radius: 1px;
+                box-shadow: 0 0 0 3px $primary-color;
+            }
+        }
+
+        input[type="checkbox"] {
+            height: 100%;
+            left: 0;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 }
