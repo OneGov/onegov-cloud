@@ -141,13 +141,10 @@ function showAlertMessage(message, type, target) {
     target = target || '#alert-boxes';
 
     var alert = $('<div />')
-        .attr('data-alert', '')
-        .attr('class', 'alert-box ' + (type || 'alert'))
+        .attr('data-closable', '')
+        .attr('class', 'alert-box callout' + (type || 'alert'))
         .text(message)
-        .append($('<a href="#" class="close">&times;</a>'));
-
     $(target || '#alert-boxes').append(alert);
-    // initFoundation();
 }
 
 $(document).on('show-alert', function(_, data) {
