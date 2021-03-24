@@ -6,6 +6,7 @@ from itertools import groupby
 
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
+from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.validators import StrictOptional
 from onegov.pay import Price
 from onegov.form.display import render_field
@@ -564,6 +565,20 @@ class Form(BaseForm):
         if stripped != raw_text:
             return md, True
         return raw_text, False
+
+    def additional_field_help(self, field, length_limit=54):
+        """ Returns the field description in modified form if
+         the description should be rendered separately in the field macro.
+         """
+        if not field.description:
+            return None
+        desc, is_md = Form.as_maybe_markdown(
+            self.request.translate(field.description)
+        )
+        if is_md or len(desc) > length_limit:
+            return desc
+        if field.type in FIELDS_NO_RENDERED_PLACEHOLDER:
+            return desc
 
 
 class Fieldset(object):
