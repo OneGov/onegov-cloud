@@ -22,7 +22,7 @@ $manage-recipients: '\f003';
 $manage-subscribers: '\f0c0';
 $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
-$new-daypass-icon: '\f145';
+$new-daypass-icon: '\f3ff';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f1fa';
@@ -306,7 +306,7 @@ $editbar-fg-color-active: $white;
     .internal-url::before { @include icon($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon-bold($manage-subscribers); }
-    .new-daypass::before { @include icon($new-daypass-icon); }
+    .new-daypass::before { @include icon-bold($new-daypass-icon); }
     .new-directory::before { @include icon-bold($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
@@ -321,7 +321,7 @@ $editbar-fg-color-active: $white;
     .new-recipient::before { @include icon($new-recipient); }
     .new-registration-window::before { @include icon-bold($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
-    .new-room::before { @include icon($new-room-icon); }
+    .new-room::before { @include icon-bold($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon-bold($new-user-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
