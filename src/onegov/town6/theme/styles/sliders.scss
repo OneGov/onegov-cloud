@@ -20,3 +20,8 @@
     }
 
 }
+
+// hack to make sure the active button isn't jumping in Chrome
+.orbit-bullets button.is-active span {
+    display: none;
+}
