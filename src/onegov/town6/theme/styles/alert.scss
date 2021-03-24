@@ -16,7 +16,7 @@ $warning-icon: '\f071';
         margin-right: .5rem;
 
         &::before {
-            @include icon($info-icon);
+            @include icon-bold($info-icon);
         }
     }
 }
@@ -43,8 +43,8 @@ $warning-icon: '\f071';
         vertical-align: middle;
     }
 
-    &.alert::before { @include icon($alert-icon); }
-    &.info::before { @include icon($info-icon); }
-    &.success::before { @include icon($success-icon); }
-    &.warning::before { @include icon($warning-icon); }
+    &.alert::before { @include icon-bold($alert-icon); }
+    &.info::before { @include icon-bold($info-icon); }
+    &.success::before { @include icon-bold($success-icon); }
+    &.warning::before { @include icon-bold($warning-icon); }
 }

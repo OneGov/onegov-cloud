@@ -55,7 +55,7 @@
         border: 1px solid get-color(success);
 
         &::before {
-            @include icon('\f058');
+            @include icon-bold('\f058');
             color: get-color(success);
             margin-right: .75ex;
         }
