@@ -500,6 +500,7 @@ def get_common_asset():
     yield 'toggle.js'
     yield 'common.js'
     yield '_blank.js'
+    yield 'form-length-counter.js'
 
 
 @OrgApp.webasset('accordion')
@@ -510,11 +511,6 @@ def get_accordion_asset():
 @OrgApp.webasset('fontpreview')
 def get_fontpreview_asset():
     yield 'fontpreview.js'
-
-
-@OrgApp.webasset('form-length-counter')
-def get_form_length_counter_asset():
-    yield 'form-length-counter.js'
 
 
 @OrgApp.webasset('scroll-to-username')

@@ -169,6 +169,7 @@ def get_common_asset():
     yield 'common.js'
     yield '_blank.js'
     yield 'animate.js'
+    yield 'form-length-counter.js'
 
 
 @TownApp.webasset('editor')

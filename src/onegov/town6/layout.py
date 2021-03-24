@@ -1812,10 +1812,6 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
                 )
             ]
 
-    def include_code_editor(self):
-        super().include_code_editor()
-        self.request.include('form-length-counter')
-
 
 class PublicationLayout(DefaultLayout):
 
