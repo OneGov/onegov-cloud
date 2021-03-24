@@ -416,7 +416,7 @@
 
             See onegov.core.i18n.get_translation_bound_meta.render_field
         -->
-        <tal:b define="description layout.additional_field_help(field); content field(placeholder=field.description if not description else '')">
+        <tal:b define="description layout.additional_field_help(field); content field(placeholder=(field.description or '') if not description else '')">
             <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
             <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
            <div class="long-field-help" tal:condition="description">
