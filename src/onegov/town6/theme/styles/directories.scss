@@ -63,6 +63,10 @@
         display: block;
         font-weight: bold;
     }
+
+    .card-section small {
+        font-family: $header-font-family;
+    }
 }
 
 .publication-nav {
