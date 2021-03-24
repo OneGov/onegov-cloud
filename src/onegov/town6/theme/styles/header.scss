@@ -52,7 +52,7 @@ $sync-icon: '\f2f1';
 $subscribe-link-icon: '\f0f3';
 $test-link-icon: '\f0e9';
 $occupancy-link-icon: '\f022';
-$upload-icon: '\f0ee';
+$upload-icon: '\f382';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
 
@@ -334,7 +334,7 @@ $editbar-fg-color-active: $white;
     .test-link::before { @include icon($test-link-icon); }
     .rule-link::before { @include icon-bold($rule-link-icon); }
     .sync::before { @include icon-bold($sync-icon); }
-    .upload::before { @include icon($upload-icon); }
+    .upload::before { @include icon-bold($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
 }
