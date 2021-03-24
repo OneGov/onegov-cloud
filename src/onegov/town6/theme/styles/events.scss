@@ -3,11 +3,12 @@
 */
 $events-icon-width: 3ex;
 $placeholder-icon-size: 6rem;
+$event-image-max-height: 150px;
 
 .events {
     .card img {
 
-        max-height: 150px;
+        max-height: $event-image-max-height;
         object-fit: cover;
         transition: transform .5s ease;
         width: auto;
@@ -25,6 +26,7 @@ $placeholder-icon-size: 6rem;
     .image-placeholder {
         display: flex;
         justify-content: center;
+        max-height: $event-image-max-height;
 
         .far {
             color: $iron;
@@ -36,6 +38,11 @@ $placeholder-icon-size: 6rem;
     }
 
     .card-section {
+        // so that the first section does not grow and images are top-aligned
+        &:first-of-type {
+            flex-grow: 0;
+        }
+
         a {
             font-weight: bold;
             i { width: $events-icon-width; }
