@@ -5,8 +5,8 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="small-12 medium-8 cell">
-            <div class="callout">
-                ${explanation}
+            <div class="panel">
+                <p>${explanation}</p>
             </div>
                 <div metal:use-macro="layout.macros['form']" />
             </div>

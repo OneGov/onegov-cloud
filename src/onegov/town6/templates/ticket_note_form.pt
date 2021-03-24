@@ -7,7 +7,7 @@
             <div class="small-12 medium-8 large-6 cell">
                 <tal:b switch="hint">
                     <tal:b case="'owner'">
-                        <div class="panel callout" i18n:translate>
+                        <div class="panel" i18n:translate>
                             You are editing a note created by someone else. By saving your changes
                             you will become the author of the whole note.
                         </div>

@@ -16,7 +16,7 @@
                         Please write down the user's password, as it won't be shown to you again:
                     </p>
 
-                    <div class="panel callout">
+                    <div class="panel">
                         <div i18n:translate>Password:</div>
                         <strong>${password}</strong>
                     </div>

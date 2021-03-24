@@ -216,7 +216,7 @@
                 </div>
             </div>
             <div class="cell small-12 medium-8 show-for-print" aria-hidden="true">
-                <div tal:condition="deleted" class="panel callout" i18n:translate>
+                <div tal:condition="deleted" class="panel" i18n:translate>
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.
                 </div>

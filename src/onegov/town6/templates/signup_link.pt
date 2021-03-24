@@ -16,7 +16,7 @@
         </div>
 
         <div class="grid-x" tal:condition="link">
-            <div class="panel callout">
+            <div class="panel">
                 <p i18n:translate>
                     Your signup link has been created as follows. Please copy
                     it before continuing, it won't be shown to you again:

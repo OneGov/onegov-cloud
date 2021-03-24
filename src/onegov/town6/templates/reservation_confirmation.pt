@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x fieldset-display">
             <div class="small-12 medium-12 large-12 cell reservation-confirmation">
-                <div class="panel callout">
+                <div class="panel">
                     <p i18n:translate="">
                         Please review your data and press "Complete" to finalize the process.
                         If there's anything you'd like to change, click on "Edit" to return

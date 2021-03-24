@@ -7,7 +7,7 @@
             ${explanation}
         </div>
 
-        <div class="panel callout" tal:condition="error">
+        <div class="panel" tal:condition="error">
             <p i18n:translate>
                 There was an error while importing your directory!
             </p>

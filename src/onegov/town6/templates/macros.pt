@@ -538,7 +538,7 @@
     <tal:b condition="item.access == 'private'|False">
         <div class="grid-x">
             <div class="small-12 cell">
-                <div class="panel callout">
+                <div class="panel">
                     <p i18n:translate>
                         This site is not public.
                     </p>
@@ -552,7 +552,7 @@
     <tal:b condition="not: item.published">
         <div class="grid-x">
             <div class="small-12 cell">
-                <div class="panel callout">
+                <div class="panel">
                     <p i18n:translate>
                         This site is not published.
                     </p>
@@ -566,7 +566,7 @@
     <tal:b condition="not item.lead and request.is_manager|nothing">
         <div class="grid-x">
             <div class="small-12 cell">
-                <div class="panel callout">
+                <div class="panel">
                     <p i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
                 </div>
             </div>

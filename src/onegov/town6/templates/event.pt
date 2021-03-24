@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="panel callout" tal:condition="completable">
+        <div class="panel" tal:condition="completable">
             <p i18n:translate class="limit-line-width">
                 Please review your data and press "Complete" to finalize the process.
                 If there's anything you'd like to change, click on "Edit" to return

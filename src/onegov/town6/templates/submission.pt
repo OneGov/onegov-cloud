@@ -10,7 +10,7 @@
         </div>
         <div class="grid-x fieldset-display" tal:condition="completable">
             <div class="small-12 medium-12 large-12 cell">
-                <div class="panel callout" tal:condition="model.state == 'pending'">
+                <div class="panel" tal:condition="model.state == 'pending'">
                     <p i18n:translate="">
                         Please review your data and press "Complete" to finalize the process.
                         If there's anything you'd like to change, click on "Edit" to return
