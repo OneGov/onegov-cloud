@@ -139,7 +139,8 @@ class TownTheme(BaseTheme):
             'newsletter',
             'search',
             'hints',
-            'allocations'
+            'allocations',
+            'homepage'
         ]
 
     @property
