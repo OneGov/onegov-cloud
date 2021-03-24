@@ -19,6 +19,8 @@ $('input[data-max-length]').each(function() {
             el.html(render_count(max_length - this.value.length));
             if ((max_length - this.value.length) < 0) {
                 el.css('color', '#FF0000');
+            } else {
+                el.removeAttr('style');
             }
         });
 
