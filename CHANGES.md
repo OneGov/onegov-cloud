@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2021.35`
+
+> commits: **19 / [d90b0247fb...8c0a763ff5](https://github.com/OneGov/onegov-cloud/compare/d90b0247fb^...8c0a763ff5)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.35)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Make sure field placeholder and descriptions are rendered correctly**
+
+**`Bugfix`** | **[SEA-220](https://linear.app/seantis/issue/SEA-220)** | **[d90b0247fb](https://github.com/onegov/onegov-cloud/commit/d90b0247fb1a740f4f8395b4cb518cad11e8ce26)**
+
 ## Release `2021.34`
 
-> commits: **5 / [01c2811fad...34f91a9969](https://github.com/OneGov/onegov-cloud/compare/01c2811fad^...34f91a9969)**  
+> released: **2021-03-23 15:34**<br>
+> commits: **6 / [01c2811fad...2b4e103fb5](https://github.com/OneGov/onegov-cloud/compare/01c2811fad^...2b4e103fb5)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.34)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2021.33`
