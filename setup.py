@@ -40,6 +40,7 @@ setup(
         'onegov.search',
         'onegov.server',
         'onegov.shared',
+        'onegov.stepsequence',
         'onegov.swissvotes',
         'onegov.ticket',
         'onegov.town',

@@ -43,6 +43,7 @@ LEVELS = (
         'onegov.reservation',
         'onegov.search',
         'onegov.shared',
+        'onegov.stepsequence',
         'onegov.ticket',
         'onegov.user',
     ),
