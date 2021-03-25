@@ -1266,7 +1266,7 @@
     <nav class="orbit-bullets">
         <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
             <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
-            <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span>
+<!--?            <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span> -->
         </button>
     </nav>
 </metal:bullets>
