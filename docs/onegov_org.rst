@@ -22,11 +22,9 @@ Directives
 Homepage Widgets
 ----------------
 
-.. automodule:: onegov.org.homepage_widgets.core
+.. automodule:: onegov.org.homepage_widgets
     :members:
 
-.. automodule:: onegov.org.homepage_widgets.widgets
-    :members:
 
 Layout
 ------

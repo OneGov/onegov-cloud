@@ -1,3 +1,36 @@
+""" Provides widgets.
+
+Widgets are small rendered pieces such as news messages or upcoming events.
+They are defined with XLS and can be combinded with simple XML.
+
+A widget is simply a class with a tag and template attribute and optionally
+a get_variables method::
+
+    class MyWidget:
+        tag = 'my-widget'
+        template = (
+            '<xsl:template match="my-widget">'
+            '    <div tal:attributes="class foo">'
+            '        <xsl:apply-templates select="node()"/>'
+            '    </div>'
+            '</xsl:template>'
+        )
+
+        def get_variables(self, layout):
+            return {'foo': 'bar'}
+
+XML using the widget tags can then be transformed to chameleon HTML/XML. The
+widget variables need to be injected before rendering::
+
+    from chameleon import PageTemplate
+    widgets = [MyWidget()]
+    structure = '<my-widget>Hello world!</my-widget>'
+    template = PageTemplate(transform_structure(widgets, structure))
+    layout = None
+    template.render(**inject_variables(widgets, layout, structure))
+
+"""
+
 from lxml import etree
 from wtforms import ValidationError
 
@@ -46,7 +79,7 @@ XML_LINE_OFFSET = 6
 
 
 def parse_structure(widgets, structure):
-    """ Takes the XML homepage structure and returns the parsed etree xml.
+    """ Takes the XML structure and returns the parsed etree xml.
 
     Raises a wtforms.ValidationError if there's an element which is not
     supported.
@@ -89,14 +122,12 @@ def parse_structure(widgets, structure):
     return xml
 
 
-def transform_homepage_structure(app, structure):
-    """ Takes the XML homepage structure and transforms it into a
-    chameleon template.
+def transform_structure(widgets, structure):
+    """ Takes the XML structure and transforms it into a chameleon template.
 
     The app is required as it contains the available widgets.
 
     """
-    widgets = app.config.homepage_widget_registry.values()
 
     xslt = XSLT_BASE.format('\n'.join(w.template for w in widgets))
     xslt = etree.fromstring(xslt.encode('utf-8'))
@@ -106,23 +137,25 @@ def transform_homepage_structure(app, structure):
     return etree.tostring(template, encoding='unicode', method='xml')
 
 
-def inject_widget_variables(layout, structure, variables=None):
-    """ Takes the layout, structure and a dict of variables meant for the
-    template engine and injects the variables required by the widgets, if
-    the widgets are indeed in use.
+def inject_variables(widgets, layout, structure, variables=None,
+                     unique_variable_names=True):
+    """ Takes the widgets, layout, structure and a dict of variables meant
+    for the template engine and injects the variables required by the widgets,
+    if the widgets are indeed in use.
 
     """
 
     if not structure:
         return variables
 
-    variables = variables or {}
+    variables = variables.copy() if variables is not None else {}
 
-    for tag, widget in layout.app.config.homepage_widget_registry.items():
-        if '<{}'.format(tag) in structure:
+    for widget in widgets:
+        if '<{}'.format(widget.tag) in structure:
             if hasattr(widget, 'get_variables'):
                 for key, value in widget.get_variables(layout).items():
-                    assert key not in variables, "use unique variable names"
+                    if unique_variable_names:
+                        assert key not in variables, "no unique variable names"
                     variables[key] = value
 
     return variables

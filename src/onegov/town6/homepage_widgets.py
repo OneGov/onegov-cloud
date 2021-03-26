@@ -5,7 +5,7 @@ from onegov.form import FormCollection
 from onegov.org.elements import Link, LinkGroup
 from onegov.org.layout import EventBaseLayout
 
-from onegov.org.homepage_widgets.widgets import NewsWidget as OrgNewsWidget, \
+from onegov.org.homepage_widgets import NewsWidget as OrgNewsWidget, \
     get_lead, DirectoriesWidget as OrgDirectoriesWidget
 from onegov.org.models import ImageSetCollection, PublicationCollection
 from onegov.people import PersonCollection

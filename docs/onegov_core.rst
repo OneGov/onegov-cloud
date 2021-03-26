@@ -160,3 +160,8 @@ CSV
 .. automodule:: onegov.core.csv
     :members:
 
+Widgets
+-------
+
+.. automodule:: onegov.core.widgets
+    :members:

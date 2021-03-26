@@ -9,7 +9,7 @@ from webob.exc import HTTPNotFound
 from onegov.core.security import Public, Private
 from onegov.org.elements import Link
 from onegov.core.elements import Link as CoreLink
-from onegov.org.homepage_widgets.widgets import get_lead
+from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
 from onegov.page import Page, PageCollection

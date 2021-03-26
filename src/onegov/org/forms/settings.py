@@ -4,6 +4,8 @@ from cached_property import cached_property
 from lxml import etree
 from wtforms.validators import NumberRange
 
+from onegov.core.widgets import transform_structure
+from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
 from onegov.form import with_options
 from onegov.form.fields import MultiCheckboxField, TagsField, ChosenSelectField
@@ -11,8 +13,6 @@ from onegov.form.fields import PreviewField
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.homepage_widgets import transform_homepage_structure
-from onegov.org.homepage_widgets import XML_LINE_OFFSET
 from onegov.org.theme import user_options
 from purl import URL
 from wtforms import BooleanField, StringField, TextAreaField, RadioField, \
@@ -477,7 +477,9 @@ class HomepageSettingsForm(Form):
     def validate_homepage_structure(self, field):
         if field.data:
             try:
-                transform_homepage_structure(self.request.app, field.data)
+                registry = self.request.app.config.homepage_widget_registry
+                widgets = registry.values()
+                transform_structure(widgets, field.data)
             except etree.XMLSyntaxError as e:
                 correct_line = e.position[0] - XML_LINE_OFFSET
 

@@ -8,11 +8,11 @@ from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
+from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
 from onegov.org import directives
-from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard
 from onegov.org.models import Topic, Organisation, PublicationCollection
@@ -114,9 +114,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     @orm_cached(policy='on-table-change:organisations')
     def homepage_template(self):
         structure = self.org.meta.get('homepage_structure')
-
         if structure:
-            return PageTemplate(transform_homepage_structure(self, structure))
+            widgets = self.config.homepage_widget_registry.values()
+            return PageTemplate(transform_structure(widgets, structure))
         else:
             return PageTemplate('')
 

@@ -19,7 +19,7 @@ from onegov.org.forms import NewsletterForm
 from onegov.org.forms import NewsletterSendForm
 from onegov.org.forms import NewsletterTestForm
 from onegov.org.forms import SignupForm
-from onegov.org.homepage_widgets.widgets import get_lead
+from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
