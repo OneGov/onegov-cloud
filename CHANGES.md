@@ -1,8 +1,14 @@
 # Changes
 
+## Release `2021.37`
+
+> commits: **2 / [52585f5d2c...8b66a41afa](https://github.com/OneGov/onegov-cloud/compare/52585f5d2c^...8b66a41afa)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.37)](https://buildkite.com/seantis/onegov-cloud)
+
 ## Release `2021.36`
 
-> commits: **4 / [2b1f49a369...f85c0996bc](https://github.com/OneGov/onegov-cloud/compare/2b1f49a369^...f85c0996bc)**  
+> released: **2021-03-25 15:11**<br>
+> commits: **5 / [2b1f49a369...0db36afcee](https://github.com/OneGov/onegov-cloud/compare/2b1f49a369^...0db36afcee)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.36)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2021.35`
