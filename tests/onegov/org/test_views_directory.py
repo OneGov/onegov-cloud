@@ -13,7 +13,7 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, open_in_browser
 
 
 def dt_for_form(dt):
@@ -130,6 +130,7 @@ def test_publication_with_submission(client):
     submission.form['submitter_name'] = 'User Example'
     submission.form['submitter_address'] = 'Testaddress'
     assert 'submitter_phone' not in submission.form.fields
+    assert not submission.pyquery('progress-indicator')
 
     submission.form['publication_end'] = dt_for_form(now)
     submission = submission.form.submit()
@@ -153,6 +154,7 @@ def test_publication_with_submission(client):
     edit = preview.click('Bearbeiten')
     assert edit.form['publication_end'].value
     assert 'submitter_name' not in edit.form.fields
+    assert not edit.pyquery('progress-indicator')
 
     preview.form.submit().follow()
 
@@ -332,6 +334,10 @@ def test_directory_submissions(client, postgres):
         "of the United States",
     ))
     page.form['submitter'] = 'info@example.org'
+
+    assert page.pyquery('[data-step="1"]').attr('class') == 'is-current'
+    assert page.pyquery('[data-step="2"]').attr('class') == ''
+
     page = page.form.submit()
 
     assert "error" in page
@@ -349,10 +355,14 @@ def test_directory_submissions(client, postgres):
     assert "Washingtom Monument" in page
     assert "George Washington" in page
     assert "README" in page
+    assert page.pyquery('[data-step="1"]').attr('class') == 'is-complete'
+    assert page.pyquery('[data-step="2"]').attr('class') == 'is-current'
+    assert page.pyquery('[data-step="3"]').attr('class') == ''
 
     # fix the result
     page = page.click("Bearbeiten", index=1)
     page.form['name'] = "Washington Monument"
+    assert page.pyquery('[data-step="2"]').attr('class') == 'is-current'
     page = page.form.submit()
 
     assert "Washingtom Monument" not in page
@@ -360,6 +370,9 @@ def test_directory_submissions(client, postgres):
 
     assert "DIR-" in page
     assert len(client.app.smtp.outbox) == 1
+    assert page.pyquery('[data-step="3"]').attr('class') == 'is-current'
+    assert page.pyquery('[data-step="2"]').attr('class') == 'is-complete'
+    assert page.pyquery('[data-step="1"]').attr('class') == 'is-complete'
 
     # the submission has not yet resulted in an entry
     assert 'Washington' not in client.get('/directories/points-of-interest')
