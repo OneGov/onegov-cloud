@@ -291,6 +291,7 @@ def org_content_security_policy():
     policy.connect_src.add('https://stats.g.doubleclick.net')
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
+    policy.connect_src.add('https://stats.seantis.ch')
 
     return policy
 
