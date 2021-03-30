@@ -47,6 +47,10 @@ class Step(object):
             self.origin, self.position, self.cls_before, self.cls_after
         )
 
+    def __repr__(self):
+        return f'Step({self.position}, {str(self.title)}, ' \
+               f'cls_after={self.cls_after}, cls_before={self.cls_before})'
+
 
 class StepCollection:
 
@@ -151,7 +155,8 @@ class StepSequenceRegistry(object):
 
         """ A decorator to register part of a full step sequence as follows::
 
-        @handlers.registered_step(1, _('Confirm'), cls_after='FormSubmission'))
+        @step_sequences.registered_step(
+        1, _('Confirm'), cls_after='FormSubmission')
         class MyDBModel(Base, StepsExtension):
             pass
 
