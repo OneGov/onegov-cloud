@@ -6,6 +6,7 @@
         <div tal:condition="hint|nothing" class="panel limit-line-width">
             ${hint}
         </div>
+        <div metal:use-macro="layout.macros['progress_indicator']" tal:define="steps layout.get_step_sequence()|nothing"/>
         <div tal:condition="guideline|nothing" class="limit-line-width">
             <tal:b replace="structure guideline" />
         </div>

@@ -538,6 +538,7 @@
 </metal:page_content>
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.org">
+    <div metal:use-macro="layout.macros['progress_indicator']" tal:define="steps layout.get_step_sequence()|nothing"/>
     <div tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
@@ -1924,3 +1925,15 @@
       </td>
   </tr>
 </metal:tickets_table_row>
+
+<metal:progress_indicator define-macro="progress_indicator">
+<ol class="${'with-title ' if show_title else ''}progress-indicator" tal:define="show_number show_number|True; show_title show_title|True" tal:condition="steps|nothing">
+
+    <tal:b tal:repeat="step steps">
+        <li tal:define="complete step.position < layout.step_position; current step.position == layout.step_position"
+                tal:attributes="data-step step.position if show_number else ''" class="${'is-current' if current else '' + 'is-complete' if complete else ''}">
+            <span tal:condition="show_title">${request.translate(step.title)}</span>
+        </li>
+    </tal:b>
+</ol>
+</metal:progress_indicator>

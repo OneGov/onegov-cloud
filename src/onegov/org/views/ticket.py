@@ -547,7 +547,7 @@ def view_ticket_status(self, request, form, layout=None):
         status_text = _("Request Status")
         closed_text = _("The request has already been closed")
 
-    layout = layout or DefaultLayout(self, request)
+    layout = layout or TicketChatMessageLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(status_text, '#')
