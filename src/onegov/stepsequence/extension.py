@@ -13,7 +13,9 @@ class StepBaseExtension:
 
 
 class StepsModelExtension(StepBaseExtension):
-    """ Can serve as Model Extension """
+    """ Can serve as Model Extension. However, if you need some
+    translations, is better to register steps on layouts that have access to
+    the model. """
 
     @property
     def step_position(self):
@@ -26,15 +28,18 @@ class StepsModelExtension(StepBaseExtension):
 
 
 class StepsLayoutExtension(StepBaseExtension):
+    """
+    For steps registered on layouts.
+    """
 
     @property
     def step_position(self):
         """ Can be overwritten by the model and based request params. """
-        return getattr(self.model, 'step_position')
+        raise NotImplementedError
 
     @cached_property
     def registered_steps(self):
-        return step_sequences.registry[self.model.__name__]
+        return step_sequences.registry[self.__class__.__name__]
 
     def get_step_sequence(self, position=None):
         """ Retrieve the full step sequence for thue current model.
