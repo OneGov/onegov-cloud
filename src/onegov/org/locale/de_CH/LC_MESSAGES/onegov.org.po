@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-22 08:44+0100\n"
+"POT-Creation-Date: 2021-03-31 17:01+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2206,8 +2206,8 @@ msgstr ""
 msgid "corona_message"
 msgstr ""
 "Zur Eindämmung des Coronavirus verbietet der Bundesrat öffentliche "
-"Veranstaltungen. Alle Veranstaltungen sind damit abgesagt und finden bis "
-"14. April nicht statt."
+"Veranstaltungen. Alle Veranstaltungen sind damit abgesagt und finden bis 14. "
+"April nicht statt."
 
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
@@ -3462,6 +3462,21 @@ msgid ""
 msgstr ""
 "Die verlangte Änderung kann nicht durchgeführt werden, da sie mit den "
 "bereist existierenden Einträgen inkompatibel ist."
+
+#, python-format
+msgid "Syntax Error in line ${line}"
+msgstr "Syntaxfehler auf Zeile ${line}"
+
+msgid "Syntax error in form"
+msgstr "Syntaxfehler im Formular"
+
+#, python-format
+msgid "Syntax error in field ${field_name}"
+msgstr ""
+
+#, python-format
+msgid "Error: Duplicate label ${label}"
+msgstr "Fehler: ${label} zweifach erfasst"
 
 msgid "The directory was deleted"
 msgstr "Das Verzeichnis wurde gelöscht"
