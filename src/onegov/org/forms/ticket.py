@@ -7,15 +7,20 @@ from onegov.org import _
 from wtforms import BooleanField, TextAreaField
 from wtforms import validators, ValidationError
 
+from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
+
 
 class TicketNoteForm(Form):
 
     text = TextAreaField(
         label=_("Text"),
         description=_("Your note about this ticket"),
-        validators=[validators.InputRequired()],
+        validators=[
+            validators.InputRequired(),
+            validators.Length(max=TABLE_CELL_CHAR_LIMIT)
+        ],
         filters=(strip_whitespace, ),
-        render_kw={'rows': 10})
+        render_kw={'rows': 10, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
     file = UploadFileWithORMSupport(
         label=_("Attachment"),
@@ -31,9 +36,12 @@ class TicketChatMessageForm(Form):
     text = TextAreaField(
         label=_("Message"),
         description=_("Your message"),
-        validators=[validators.InputRequired()],
+        validators=[
+            validators.InputRequired(),
+            validators.Length(max=TABLE_CELL_CHAR_LIMIT)
+        ],
         filters=(strip_whitespace, ),
-        render_kw={'rows': 5})
+        render_kw={'rows': 5, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
     def validate_text(self, field):
         if not self.text.data or not self.text.data.strip():

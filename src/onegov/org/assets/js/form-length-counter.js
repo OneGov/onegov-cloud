@@ -4,7 +4,7 @@ render_count = function(count) {
     return '(' + count + ')';
 };
 
-$('input[data-max-length]').each(function() {
+$('input[data-max-length],textarea[data-max-length]').each(function() {
         var $this = $(this);
         var counter_id = $this.attr('id') + '-counter';
         var max_length = $this.attr('data-max-length');

@@ -4,11 +4,14 @@ from PyPDF2 import PdfFileReader
 from webob.multidict import MultiDict
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, TicketChatMessage
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from tests.onegov.pdf.test_pdf import LONGEST_TABLE_CELL_TEXT
 from tests.shared.utils import open_pdf
+
+
 
 
 def open_ticket(request, token, handler_code, create_message=True):
@@ -40,6 +43,17 @@ def update_submission(session, submission, form):
     forms = FormCollection(session)
     if submission:
         forms.submissions.update(submission, form)
+
+
+def add_ticket_message(request, ticket, text):
+    message = TicketChatMessage.create(
+        ticket, request,
+        text=text,
+        owner='info@example.org',
+        recipient=None,
+        notify=None,
+        origin='internal')
+    return message
 
 
 def test_ticket_pdf(org_app, handlers):
@@ -97,9 +111,14 @@ def test_ticket_pdf(org_app, handlers):
     assert reservation
     ticket = open_ticket(request, token, 'RSV', owner)
 
+    add_ticket_message(request, ticket, LONGEST_TABLE_CELL_TEXT)
+
+    # We have to mitigate the case but its hard since we deal with html
+    # add_ticket_message(request, ticket, 2 * LONGEST_TABLE_CELL_TEXT)
+
     assert ticket.handler.resource
 
-    # is the ticket object sesPdfsion
+    # is the ticket object session
     assert ticket.handler.session
     submission = forms.submissions.by_id(token)
 
@@ -116,7 +135,7 @@ def test_ticket_pdf(org_app, handlers):
     # open_pdf(pdf)
 
     reader = PdfFileReader(pdf)
-    assert reader.getNumPages() == 1
+    assert reader.getNumPages() == 2
     page = reader.getPage(0).extractText()
     assert 'John' in page
     assert 'Data' in page
