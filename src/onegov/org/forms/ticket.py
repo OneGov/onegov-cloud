@@ -7,13 +7,18 @@ from onegov.org import _
 from wtforms import BooleanField, TextAreaField
 from wtforms import validators, ValidationError
 
+from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
+
 
 class TicketNoteForm(Form):
 
     text = TextAreaField(
         label=_("Text"),
         description=_("Your note about this ticket"),
-        validators=[validators.InputRequired()],
+        validators=[
+            validators.InputRequired(),
+            validators.Length(max=TABLE_CELL_CHAR_LIMIT)
+        ],
         filters=(strip_whitespace, ),
         render_kw={'rows': 10})
 
@@ -31,7 +36,10 @@ class TicketChatMessageForm(Form):
     text = TextAreaField(
         label=_("Message"),
         description=_("Your message"),
-        validators=[validators.InputRequired()],
+        validators=[
+            validators.InputRequired(),
+            validators.Length(max=TABLE_CELL_CHAR_LIMIT)
+        ],
         filters=(strip_whitespace, ),
         render_kw={'rows': 5})
 
