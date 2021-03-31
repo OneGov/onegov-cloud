@@ -203,7 +203,7 @@ class FieldTypeMigrations(object):
         return '{:%H:%M}'.format(value)
 
     def radio_to_checkbox(self, value):
-        return value
+        return [value]
 
     def text_to_url(self, value):
         return value
