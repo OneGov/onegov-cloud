@@ -20,7 +20,7 @@ class TicketNoteForm(Form):
             validators.Length(max=TABLE_CELL_CHAR_LIMIT)
         ],
         filters=(strip_whitespace, ),
-        render_kw={'rows': 10})
+        render_kw={'rows': 10, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
     file = UploadFileWithORMSupport(
         label=_("Attachment"),
@@ -41,7 +41,7 @@ class TicketChatMessageForm(Form):
             validators.Length(max=TABLE_CELL_CHAR_LIMIT)
         ],
         filters=(strip_whitespace, ),
-        render_kw={'rows': 5})
+        render_kw={'rows': 5, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
     def validate_text(self, field):
         if not self.text.data or not self.text.data.strip():
