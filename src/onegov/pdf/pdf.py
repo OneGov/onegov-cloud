@@ -29,6 +29,7 @@ from uuid import uuid4
 
 TABLE_CELL_CHAR_LIMIT = 2000
 
+
 class Pdf(PDFDocument):
     """ A PDF document. """
 
