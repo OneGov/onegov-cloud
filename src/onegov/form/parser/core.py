@@ -346,6 +346,7 @@ from decimal import Decimal
 from onegov.core.cache import lru_cache
 from onegov.core.utils import Bunch
 from onegov.form import errors
+from onegov.form.errors import MixedTypeError
 from onegov.form.parser.grammar import checkbox, field_help_identifier
 from onegov.form.parser.grammar import code
 from onegov.form.parser.grammar import date
@@ -883,7 +884,9 @@ def parse_field_block(field_block, field_classes,
         # make sure only one type is found (either radio or checkbox)
         types = {f.type for f in field.choices}
         assert types <= {'radio', 'checkbox'}
-        assert len(types) == 1
+
+        if not len(types) == 1:
+            raise MixedTypeError(key)
 
     result = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)

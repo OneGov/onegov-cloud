@@ -27,3 +27,8 @@ class InvalidFormSyntax(FormError):
 class FieldCompileError(FormError):
     def __init__(self, field_name):
         self.field_name = field_name
+
+
+class MixedTypeError(FormError):
+    def __init__(self, field_name):
+        self.field_name = field_name
