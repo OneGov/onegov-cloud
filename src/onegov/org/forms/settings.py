@@ -53,7 +53,6 @@ class GeneralSettingsForm(Form):
 
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
-        description='Used for text in html body',
         choices=[],
         validators=[validators.InputRequired()]
     )

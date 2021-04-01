@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-03-18 15:13+0100\n"
+"POT-Creation-Date: 2021-04-01 09:38+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -18,10 +18,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Font family serif"
-msgstr "Police serif"
+msgstr "Schriftart mit Serifen"
+
+msgid "Used for text in html body"
+msgstr "Wird für Paragraphen verwendet"
 
 msgid "Font family sans-serif"
-msgstr "Police principale sans-serif"
+msgstr "Hautpschriftart sans-serif"
+
+msgid "Used for all the headings"
+msgstr "Wird für alle Titel verwendet"
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -615,6 +621,9 @@ msgstr "Diese Seite ist Privat"
 msgid "This site is secret"
 msgstr "Diese Seite ist Geheim"
 
+msgid "This site is not published."
+msgstr "Diese Seite ist nicht veröffentlicht."
+
 msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
 
@@ -782,9 +791,6 @@ msgstr ""
 "Hier werden Bilder aus Ihren Fotoalben angezeigt. Dazu erstellen Sie einfach "
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
-
-msgid "Current Image"
-msgstr "Image acutuelle"
 
 msgid "Digitally signed"
 msgstr "Digital signiert"
@@ -1815,8 +1821,8 @@ msgstr "Feiertage"
 msgid "Ticket Settings"
 msgstr "Ticket-Einstellungen"
 
-msgid "Site Navigation Settings"
-msgstr ""
+#~ msgid "Current Image"
+#~ msgstr "Image acutuelle"
 
 #~ msgid "Image Focus"
 #~ msgstr "Image Focus"

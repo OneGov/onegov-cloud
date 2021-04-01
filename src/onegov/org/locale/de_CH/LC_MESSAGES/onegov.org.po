@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-31 17:01+0200\n"
+"POT-Creation-Date: 2021-04-01 09:45+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4211,6 +4211,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Used for text in html body"
+#~ msgstr "Wird für Paragraphen verwendet"
 
 #~ msgid "Disable news and hide the entry in the navigation"
 #~ msgstr "'Aktuelles' deaktivieren und Eintrag in Navigation verstecken"
