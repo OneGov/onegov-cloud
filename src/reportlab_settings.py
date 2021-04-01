@@ -1,0 +1,1 @@
+trustedSchemes = ['data']
