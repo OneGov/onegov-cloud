@@ -1,8 +1,46 @@
 # Changes
 
+## Release `2021.38`
+
+> commits: **11 / [a54d571901...49f2ac6f85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...49f2ac6f85)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.38)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🐞 **Fixes mandates of list in election compounds counted incorrectly.**
+
+**`Bugfix`** | **[49f2ac6f85](https://github.com/onegov/onegov-cloud/commit/49f2ac6f85d3907e0a0cd4dd29a437e5e3e47241)**
+
+### Org
+
+🐞 **Fixes error rendering ticket pdf summary table**
+
+- limits ticket messages to 2000 chars
+- Adds suppoert for max counter display on textarea
+- Fixes padding right of .message
+
+**`Bugfix`** | **[SEA-243](https://linear.app/seantis/issue/SEA-243)** | **[823ae76786](https://github.com/onegov/onegov-cloud/commit/823ae767868a88dc9e45d96a641e9905e313a6a2)**
+
+### Pdf
+
+✨ **Limits trustedSchemes for reportlab**
+
+Mitigates CVE-2020-28463.
+
+**`Other`** | **[OPS-349](#OPS-349)** | **[9822f014a3](https://github.com/onegov/onegov-cloud/commit/9822f014a3562b4a5c1ccb32513477a009444f13)**
+
+### Town6
+
+✨ **Fixes wrapping dates in event cards**
+
+Use abbreviations for weekdays.
+
+**`Improvement`** | **[SEA-244](https://linear.app/seantis/issue/SEA-244)** | **[5b0e4bc6aa](https://github.com/onegov/onegov-cloud/commit/5b0e4bc6aa3e72dea15c4e3d76ff9b8ea06b417b)**
+
 ## Release `2021.37`
 
-> commits: **2 / [52585f5d2c...8b66a41afa](https://github.com/OneGov/onegov-cloud/compare/52585f5d2c^...8b66a41afa)**  
+> released: **2021-03-30 09:03**<br>
+> commits: **3 / [52585f5d2c...51c603749f](https://github.com/OneGov/onegov-cloud/compare/52585f5d2c^...51c603749f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.37)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2021.36`
