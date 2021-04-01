@@ -73,6 +73,7 @@ class Layout(ChameleonLayout):
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
     event_format = 'EEEE, d. MMMM YYYY'
+    event_short_format = 'EE d. MMMM YYYY'
     isodate_format = 'y-M-d'
 
     def __init__(self, *args, **kwargs):

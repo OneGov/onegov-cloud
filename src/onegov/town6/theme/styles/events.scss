@@ -45,6 +45,7 @@ $event-image-max-height: 150px;
 
         a {
             font-weight: bold;
+            white-space: nowrap;
             i { width: $events-icon-width; }
         }
     }
