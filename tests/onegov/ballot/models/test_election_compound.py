@@ -983,3 +983,64 @@ def test_election_compound_doppelter_pukelsheim(session):
     election_compound.pukelsheim_completed = True
     assert proporz_1.completed is True
     assert proporz_2.completed is True
+
+
+def test_list_results(session):
+    election_compound = ElectionCompound(
+        title='Elections',
+        domain='canton',
+        date=date(2015, 6, 14),
+    )
+    session.add(election_compound)
+    session.flush()
+
+    assert election_compound.get_list_results().all() == []
+    elections = [
+        proporz_election(id='1'),
+        proporz_election(id='2'),
+        proporz_election(id='3')
+    ]
+    for election in elections:
+        session.add(election)
+    election_compound.elections = elections
+    session.flush()
+
+    assert election_compound.get_list_results().all() == [
+        ('Quimby Again!', 3, 3 * 520),
+        ('Kwik-E-Major', 0, 3 * 111)
+    ]
+
+    # Add another list
+    list_id = uuid4()
+    list_ = List(
+        id=list_id,
+        list_id='3',
+        number_of_mandates=5,
+        name='Burns burns!',
+    )
+    list_result = ListResult(
+        list_id=list_id,
+        votes=200
+    )
+    election_result = ElectionResult(
+        name='name',
+        entity_id=1,
+        counted=True,
+    )
+    election_result.list_results.append(list_result)
+    elections[0].lists.append(list_)
+    elections[0].results.append(election_result)
+    session.flush()
+
+    assert election_compound.get_list_results().all() == [
+        ('Quimby Again!', 3, 1560),
+        ('Kwik-E-Major', 0, 333),
+        ('Burns burns!', 5, 200)
+    ]
+    assert election_compound.get_list_results(
+        order_by='number_of_mandates'
+    ).all() == [
+        ('Burns burns!', 5, 200),
+        ('Quimby Again!', 3, 1560),
+        ('Kwik-E-Major', 0, 333)
+    ]

@@ -97,8 +97,8 @@ def get_list_results(election, session):
 
     if isinstance(election, ElectionCompound):
         if election.after_pukelsheim:
-            return election.lists_data(order_by='number_of_mandates')
-        return election.lists_data()
+            return election.get_list_results(order_by='number_of_mandates')
+        return election.get_list_results()
 
     result = session.query(
         List.name, List.votes.label('votes'),
@@ -126,7 +126,7 @@ def get_lists_data(election, request, mandates_only=False):
                     'value2': list_.number_of_mandates,
                     'class': 'active' if completed else 'inactive',
                     'color': colors.get(list_.name) or default_color
-                } for list_ in election.lists_data()]
+                } for list_ in election.get_list_results()]
             }
         else:
             return {
@@ -136,7 +136,7 @@ def get_lists_data(election, request, mandates_only=False):
                     'value2': None,
                     'class': 'active' if completed else 'inactive',
                     'color': colors.get(list_.name) or default_color
-                } for list_ in election.lists_data(
+                } for list_ in election.get_list_results(
                     order_by='number_of_mandates')
                 ]
             }

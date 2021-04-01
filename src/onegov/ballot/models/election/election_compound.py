@@ -1,5 +1,4 @@
 from collections import OrderedDict
-
 from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
@@ -20,17 +19,20 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
+from sqlalchemy import cast
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import desc
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
+from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import literal_column
 from uuid import uuid4
 
 
@@ -314,27 +316,57 @@ class ElectionCompound(
 
         return result
 
-    def lists_data(self, order_by='votes'):
-        """
-        Returns the sum of the number_of_mandates for every list of every
-        election of the compound.
+    def get_list_results(self, order_by='votes'):
+        """ Returns the aggregated number of mandates and votes of all the
+        lists.
 
         """
         assert order_by in ('votes', 'number_of_mandates')
-        ec = ElectionCompound
+
         session = object_session(self)
-        q = session.query(
-            List.name,
+
+        # Query number of mandates
+        mandates = session.query(
+            List.name.label('name'),
             func.sum(List.number_of_mandates).label('number_of_mandates'),
+            literal_column('0').label('votes')
+        )
+        mandates = mandates.join(
+            ElectionCompound.associations
+        )
+        mandates = mandates.filter(
+            ElectionCompound.id == self.id,
+        )
+        mandates = mandates.join(Election, List)
+        mandates = mandates.group_by(List.name)
+
+        # Query votes
+        votes = session.query(
+            List.name.label('name'),
+            literal_column('0').label('number_of_mandates'),
             func.sum(ListResult.votes).label('votes')
         )
-        q = q.join(ec.associations)
-        q = q.filter(ec.id == self.id, ec.date == Election.date)
-        q = q.join(Election).join(List).join(ListResult)
+        votes = votes.join(
+            ElectionCompound.associations
+        )
+        votes = votes.filter(
+            ElectionCompound.id == self.id,
+        )
+        votes = votes.join(Election, List, ListResult)
+        votes = votes.group_by(List.name)
 
-        q = q.group_by(List.name).subquery()
-        order_col = getattr(q.c, order_by)
-        return session.query(q).order_by(order_col.desc())
+        # Combine
+        union = mandates.union_all(votes).subquery('union')
+        query = session.query(
+            union.c.name.label('name'),
+            cast(func.sum(union.c.number_of_mandates), Integer).label(
+                'number_of_mandates'
+            ),
+            cast(func.sum(union.c.votes), Integer).label('votes')
+        )
+        query = query.group_by(union.c.name)
+        query = query.order_by(desc(order_by))
+        return query
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
