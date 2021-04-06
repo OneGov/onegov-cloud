@@ -9,14 +9,15 @@ from onegov.town6.forms.settings import GeneralSettingsForm
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
     MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
-    OrgTicketSettingsForm, HomepageSettingsForm
+    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
     handle_ticket_settings, preview_holiday_settings, handle_general_settings,
     handle_favicon_settings, handle_links_settings, handle_header_settings,
     handle_footer_settings, handle_module_settings, handle_map_settings,
-    handle_analytics_settings, handle_holiday_settings)
+    handle_analytics_settings, handle_holiday_settings,
+    handle_newsletter_settings)
 
 from onegov.town6.app import TownApp
 
@@ -189,6 +190,17 @@ def town_handle_holiday_settings(self, request, form):
 def town_handle_ticket_settings(self, request, form):
     return handle_ticket_settings(
         self, request, form, SettingsLayout(self, request))
+
+
+@TownApp.form(
+    model=Organisation, name='newsletter-settings', template='form.pt',
+    permission=Secret, form=NewsletterSettingsForm,
+    setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
+)
+def town_handle_newsletter_settings(self, request, form, layout=None):
+    return handle_newsletter_settings(
+        self, request, form, SettingsLayout(self, request)
+    )
 
 
 @TownApp.form(model=Organisation, name='holiday-settings-preview',
