@@ -1,7 +1,7 @@
 from onegov.form import Form
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from wtforms import StringField, TextAreaField, validators
+from wtforms import StringField, TextAreaField, validators, BooleanField
 from wtforms.fields.html5 import URLField
 
 
@@ -33,3 +33,8 @@ class PageForm(PageBaseForm):
 
     text = HtmlField(
         label=_("Text"))
+
+    lead_when_child = BooleanField(
+        label=_('Show the lead if accessing the parent page'),
+        description=_("(Redesign only)")
+    )

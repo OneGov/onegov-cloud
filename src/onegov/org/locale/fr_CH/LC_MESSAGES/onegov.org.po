@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-06 12:12+0200\n"
+"POT-Creation-Date: 2021-04-06 13:42+0200\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -774,6 +774,12 @@ msgstr "Lien"
 
 msgid "Describes what this page is about"
 msgstr "Décrit de quoi parle cette page"
+
+msgid "Show the lead if accessing the parent page"
+msgstr "Afficher l'introduction sur la page parent"
+
+msgid "(Redesign only)"
+msgstr ""
 
 msgid "Salutation"
 msgstr "Civilité"

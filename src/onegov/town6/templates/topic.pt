@@ -14,8 +14,9 @@
              tal:define="lead layout.linkify(page.content.get('lead'));text page.content.get('text'); people page.people; contact layout.contact_html; coordinates page.coordinates">
                 <tal:b metal:fill-slot="after-text">
                     <ul class="more-list page-links">
-                        <li tal:repeat="link children">
+                        <li tal:repeat="(lead, link) children">
                             <tal:b replace="structure link(layout)" />
+                            <div class="list-lead" tal:condition="lead">${lead}</div>
                         </li>
                     </ul>
                 </tal:b>

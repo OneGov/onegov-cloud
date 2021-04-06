@@ -16,7 +16,7 @@
                      <div class="row" tal:condition="children">
                         <div class="small-12 columns">
                             <ul class="inline-list page-links">
-                                <li tal:repeat="link children">
+                                <li tal:repeat="(lead, link) children">
                                     <tal:b replace="structure link(layout)" />
                                 </li>
                             </ul>

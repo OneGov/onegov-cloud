@@ -58,7 +58,8 @@ def view_topic(self, request, layout=None):
         'name': self.trait_messages[self.trait]['name'],
         'page': self,
         'children': [
-            Link(child.title, request.link(child), model=child)
+            (child.lead_when_child and child.lead,
+             Link(child.title, request.link(child), model=child))
             for child in children
         ]
     }
