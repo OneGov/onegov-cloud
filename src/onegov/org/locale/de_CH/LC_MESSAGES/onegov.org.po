@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-06 11:39+0200\n"
+"POT-Creation-Date: 2021-04-06 12:12+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1197,7 +1197,7 @@ msgid "Mute all tickets"
 msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 
 msgid "Include logo in newsletter"
-msgstr ""
+msgstr "Logo im Newsletter anzeigen"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
