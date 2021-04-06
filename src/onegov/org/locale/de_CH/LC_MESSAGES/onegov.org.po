@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-06 13:42+0200\n"
+"POT-Creation-Date: 2021-04-06 15:10+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1202,6 +1202,9 @@ msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
 msgid "Mute all tickets"
 msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 
+msgid "Always send email notification if a new ticket message is sent"
+msgstr "Email-Benachrichtigung immer senden bei neuen Ticket-Nachrichten"
+
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 
@@ -1225,6 +1228,9 @@ msgstr "Die Nachricht ist leer"
 
 msgid "Notify me about replies"
 msgstr "Ich möchte eine Benachrichtigung bei Antworten"
+
+msgid "Setting \"Always notify\" is active"
+msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
 msgid "Admin"
 msgstr "Administrator"

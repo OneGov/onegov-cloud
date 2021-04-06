@@ -688,6 +688,7 @@ class HolidaySettingsForm(Form):
 
 
 class OrgTicketSettingsForm(Form):
+
     ticket_auto_accepts = MultiCheckboxField(
         label=_("Accept request and close ticket automatically "
                 "for these ticket categories"),
@@ -702,6 +703,12 @@ class OrgTicketSettingsForm(Form):
 
     mute_all_tickets = BooleanField(
         label=_("Mute all tickets")
+    )
+
+    ticket_always_notify = BooleanField(
+        label=_('Always send email notification '
+                'if a new ticket message is sent'),
+        default=True
     )
 
     def on_request(self):

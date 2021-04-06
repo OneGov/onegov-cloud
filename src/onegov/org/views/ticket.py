@@ -243,10 +243,18 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
         # we do not notify
         last_internal = last_internal_message(request.session, ticket.number)
 
-        if not last_internal or not last_internal.meta.get('notify'):
+        receivers = None
+        always_notify = request.app.org.ticket_always_notify
+
+        if last_internal:
+            if last_internal.meta.get('notify') or always_notify:
+                receivers = (last_internal.owner,)
+        elif always_notify and ticket.user:
+            receivers = (ticket.user.username,)
+
+        if not receivers:
             return
 
-        receivers = (last_internal.owner, )
         reply_to = None  # default reply-to given by the application
 
     # we show the previous messages by going back until we find a message

@@ -8,6 +8,7 @@ from webtest import Upload
 
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
+from tests.onegov.org.common import get_mail
 
 
 def test_tickets(client):
@@ -83,6 +84,21 @@ def test_tickets(client):
     assert 'In Bearbeitung' in ticket_page
     assert 'FRM-' in ticket_page
 
+    # default is always enable email notifications
+    send_msg = ticket_page.request.url + '/message-to-submitter'
+    input_field = client.get(send_msg).pyquery('#notify')
+    assert input_field.attr('disabled') == 'disabled'
+
+    # Test mail notification on new message
+    assert len(client.app.smtp.outbox) == 1
+    anon = client.spawn()
+    ticket_status = ticket_page.request.url + '/status'
+    status = anon.get(ticket_status)
+    status.form['text'] = 'Testmessage'
+    status.form.submit().follow()
+
+    message = get_mail(client.app.smtp.outbox, 1)
+
     ticket_url = ticket_page.request.path
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
 
@@ -91,9 +107,9 @@ def test_tickets(client):
     assert page.pyquery('.pending-tickets').attr('data-count') == '0'
     assert page.pyquery('.closed-tickets').attr('data-count') == '1'
 
-    assert len(client.app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 3
 
-    message = client.app.smtp.outbox[1]
+    message = client.app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -118,7 +134,7 @@ def test_tickets(client):
     assert page.pyquery('.pending-tickets').attr('data-count') == '1'
     assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
-    message = client.app.smtp.outbox[2]
+    message = client.app.smtp.outbox[3]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -360,7 +376,7 @@ def test_ticket_chat(client):
         Last name * = ___
         E-Mail * = @@@
     """), type='custom')
-
+    client.app.org.ticket_always_notify = False
     transaction.commit()
 
     # submit a form

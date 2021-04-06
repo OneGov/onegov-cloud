@@ -50,4 +50,14 @@ class TicketChatMessageForm(Form):
 
 class InternalTicketChatMessageForm(TicketChatMessageForm):
 
-    notify = BooleanField(label=_("Notify me about replies"))
+    notify = BooleanField(
+        label=_("Notify me about replies"),
+    )
+
+    def on_request(self):
+        if self.request.app.org.ticket_always_notify:
+            if isinstance(self.notify.render_kw, dict):
+                self.notify.render_kw.update({'disabled': True})
+            else:
+                self.notify.render_kw = {'disabled': True}
+            self.notify.description = _('Setting "Always notify" is active')
