@@ -708,3 +708,10 @@ class OrgTicketSettingsForm(Form):
         choices = tuple((key, key) for key in handlers.registry.keys())
         self.ticket_auto_accepts.choices = [('RSV', 'RSV')]
         self.tickets_skip_opening_email.choices = choices
+
+
+class NewsletterSettingsForm(Form):
+
+    logo_in_newsletter = BooleanField(
+        label=_('Include logo in newsletter')
+    )
