@@ -1,8 +1,42 @@
 # Changes
 
+## Release `2021.39`
+
+> commits: **6 / [575884a9a5...e0162b5636](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...e0162b5636)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.39)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🐞 **Adds converters to paths.**
+
+**`Bugfix`** | **[575884a9a5](https://github.com/onegov/onegov-cloud/commit/575884a9a5726de1670b2a3a3cf053a951f31f09)**
+
+### Org
+
+🎉 **Enables logo in email newsletter**
+
+Adds new setting at /newsletter-settings to include homepage logo.
+
+**`Feature`** | **[SEA-251](https://linear.app/seantis/issue/SEA-251)** | **[94db9f73d1](https://github.com/onegov/onegov-cloud/commit/94db9f73d132e802752324ff0b97fe838d062ade)**
+
+🎉 **Enables ticket notifications for all external messages**
+
+Adds option to /ticket-settings to disable sending notifications for external messages. Outvotes setting in form message-to-submitter.
+
+**`Feature`** | **[SEA-245](https://linear.app/seantis/issue/SEA-245)** | **[e0162b5636](https://github.com/onegov/onegov-cloud/commit/e0162b563690ae4b7043eff4624a7cbf4cab0c14)**
+
+### Town6
+
+🎉 **Adds page setting to display page lead**
+
+On topic A with child B, show the B's lead on /topics/a if enabled in the settings of B.
+
+**`Feature`** | **[SEA-249](https://linear.app/seantis/issue/SEA-249)** | **[468544435f](https://github.com/onegov/onegov-cloud/commit/468544435f5165cbd2b6bad408a314a515951028)**
+
 ## Release `2021.38`
 
-> commits: **11 / [a54d571901...49f2ac6f85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...49f2ac6f85)**  
+> released: **2021-04-01 12:39**<br>
+> commits: **12 / [a54d571901...28f8485e85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...28f8485e85)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.38)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
