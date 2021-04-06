@@ -91,7 +91,7 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
     confirm_el.find('a.no').click(function() {
         confirm_el.foundation('close');
     });
-    confirm_el.find('a.yes').enter(function() {
+    confirm_el.find('a.yes').click(function() {
         handle_yes();
         confirm_el.foundation('close');
     });
