@@ -275,6 +275,13 @@
     .content table {
         width: 100%;
     }
+
+    .logo img,
+    .logo svg {
+        display: block;
+        height: 6em;
+        margin: 0 auto;
+    }
     </style>
 </head>
 <body bgcolor="#f6f6f6">
@@ -287,6 +294,9 @@
 
                 <!-- content -->
                 <div class="content">
+                    <div class="logo">
+                        <tal:b metal:define-slot="logo" />
+                    </div>
                 <table>
                     <tr>
                         <td>
