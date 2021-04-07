@@ -279,7 +279,6 @@ def analyze_directories(log_file, dry_run):
     fixes full-path filenames that come from Upload via IE11. """
 
     missing_folders = []
-    missing_entry_url = []
     db_entry_missing = []
     file_names_changed = []
 
@@ -317,31 +316,34 @@ def analyze_directories(log_file, dry_run):
                     file.reference['path']
                 )
                 if not os.path.exists(file_path):
-                    missing_folders.append(file_path)
-                    missing_entry_url.append(
-                        f'/directories/{entry.directory.name}/{entry.name}'
+                    data = (
+                        file_path,
+                        f'/directories/{entry.directory.name}/{entry.name}',
+                        entry.created
                     )
+                    missing_folders.append(data)
 
         if not any((missing_folders, file_names_changed)):
             click.secho('Nothing changed')
             return
 
         log_data = "\n".join((
-            '# --- MISSING FOLDER PATHS --- #',
-            *missing_folders,
-            '# --- URL FRAGMENTS FOR MISSING FILES --- #',
-            *missing_entry_url,
-            '# --- CHANGED FILENAMES --- #',
-            *file_names_changed,
-            '# --- FILE ENTRIES IN DB MISSING --- #',
-            *db_entry_missing
+            'MISSING FOLDER PATH,URL FRAGMENT, ENTRY CREATED',
+            *(f'{p},{u},{str(created)}' for p, u, created in missing_folders),
+        ))
+
+        log_filenames = "\n".join((
+            '--- CHANGED FILENAMES ---',
+            *file_names_changed
         ))
 
         if log_file:
             with open(log_file, 'w') as f:
                 click.secho(f'Writing log file to {log_file}')
                 f.write(log_data)
+            click.secho(log_filenames)
         else:
             click.secho(log_data)
+            click.secho(log_filenames)
 
     return handle_analyze_entries
