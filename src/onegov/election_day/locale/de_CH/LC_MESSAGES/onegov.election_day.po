@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-18 09:31+0100\n"
+"POT-Creation-Date: 2021-04-07 09:27+0200\n"
 "PO-Revision-Date: 2021-03-18 10:24+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -682,6 +682,47 @@ msgstr "Passwort vergessen?"
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
+msgid "List connection"
+msgstr "Listenverbindung"
+
+#. Default: Votes
+#.
+msgid "single_votes"
+msgstr "Stimmen"
+
+msgid "Sublist connection"
+msgstr "Unterlistenverbindung"
+
+msgid "Subtotal"
+msgstr "Zwischensumme"
+
+msgid "Mandates"
+msgstr "Mandate"
+
+msgid "Seats"
+msgstr "Sitze"
+
+msgid "eligible Voters"
+msgstr "Wahlberechtigte"
+
+msgid "Received Ballots"
+msgstr "Abgegebene Wahlzettel"
+
+msgid "Accounted Ballots"
+msgstr "Gültige Wahlzettel"
+
+msgid "Blank Ballots"
+msgstr "Leere Wahlzettel"
+
+msgid "Invalid Ballots"
+msgstr "Ungültige Wahlzettel"
+
+msgid "Accounted Votes"
+msgstr "Gültige Stimmen"
+
+msgid "Turnout"
+msgstr "Wahlbeteiligung"
+
 msgid "Candidate"
 msgstr "Kandidierende"
 
@@ -690,11 +731,6 @@ msgstr "Partei"
 
 msgid "List"
 msgstr "Liste"
-
-#. Default: Votes
-#.
-msgid "single_votes"
-msgstr "Stimmen"
 
 msgid "Elected"
 msgstr "Gewählt"
@@ -713,9 +749,6 @@ msgstr "Alle Kandidierenden"
 
 msgid "Elected candidates only"
 msgstr "Nur gewählte Kandidierende"
-
-msgid "Mandates"
-msgstr "Mandate"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
@@ -791,18 +824,6 @@ msgstr "Stichfrage zugunsten der Initiative"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
-
-msgid "Turnout"
-msgstr "Wahlbeteiligung"
-
-msgid "eligible Voters"
-msgstr "Wahlberechtigte"
-
-msgid "Received Ballots"
-msgstr "Abgegebene Wahlzettel"
-
-msgid "Seats"
-msgstr "Sitze"
 
 #. Default: Voter turnout
 #.
@@ -1010,29 +1031,11 @@ msgstr "Ja"
 msgid "Blank list"
 msgstr "Blankoliste"
 
-msgid "List connection"
-msgstr "Listenverbindung"
-
-msgid "Sublist connection"
-msgstr "Unterlistenverbindung"
-
 msgid "Panachage (parties)"
 msgstr "Panaschierstatistik (Parteien)"
 
 msgid "Panachage (lists)"
 msgstr "Panaschierstatistik (Listen)"
-
-msgid "Accounted Votes"
-msgstr "Gültige Stimmen"
-
-msgid "Accounted Ballots"
-msgstr "Gültige Wahlzettel"
-
-msgid "Blank Ballots"
-msgstr "Leere Wahlzettel"
-
-msgid "Invalid Ballots"
-msgstr "Ungültige Wahlzettel"
 
 msgid "Intermediate results abbrev"
 msgstr "Zwischenerg."
@@ -1306,46 +1309,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid "Intermediate results: ${counted} of ${total} entities"
-#~ msgstr "Zwischenresultate: ${counted} von ${total} Gemeinden"
-
-#~ msgid "district_label_sz_2020"
-#~ msgstr "Gemeinde"
-
-#~ msgid "districts_label_sz_2020"
-#~ msgstr "Gemeinden"
-
-#~ msgid "Value of ausmittlungsstand not between 0 and 3"
-#~ msgstr "Wert von ausmittlungsstand nicht zwischen 0 and 3"
-
-#~ msgid "Value ${col} is not between 0 and 3"
-#~ msgstr "Wert ${col} ist nicht zwischen 0 und 3"
-
-#~ msgid "Invalid list values"
-#~ msgstr "Ungültige Listendaten"
-
-#~ msgid "Could not read yeas"
-#~ msgstr "Konnte 'Ja Stimmen' nicht lesen"
-
-#~ msgid "Could not read nays"
-#~ msgstr "Konnte 'Nein Stimmen' nicht lesen"
-
-#~ msgid "Could not read the eligible voters"
-#~ msgstr "Konnte 'Stimmberechtigte' nicht lesen"
-
-#~ msgid "Could not read the invalid votes"
-#~ msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
-
-#~ msgid "Subtotal"
-#~ msgstr "Zwischensumme"
-
-#~ msgid "Missing column: ${col}"
-#~ msgstr "Fehlende Spalte: ${col}"
-
-#~ msgid "Invalid integer: ${col} Can not extract entity_id."
-#~ msgstr ""
-#~ "Ungültige Ganzzahl: ${col} entity_id konnte nicht abgeleitet werden."
-
-#~ msgid "Unknown derived list id"
-#~ msgstr "Unbekannte abgeleitete list id"

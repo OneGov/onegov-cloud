@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-18 09:31+0100\n"
+"POT-Creation-Date: 2021-04-07 09:27+0200\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -684,6 +684,47 @@ msgstr "Emblidà il pled-clav?"
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
 
+msgid "List connection"
+msgstr "Colliaziun da glistas"
+
+#. Default: Votes
+#.
+msgid "single_votes"
+msgstr "Vuschs"
+
+msgid "Sublist connection"
+msgstr "Sutcolliaziun da glistas"
+
+msgid "Subtotal"
+msgstr "Summa intermediara"
+
+msgid "Mandates"
+msgstr "Mandats"
+
+msgid "Seats"
+msgstr "sezs"
+
+msgid "eligible Voters"
+msgstr "Persunas cun dretg d’eleger"
+
+msgid "Received Ballots"
+msgstr "Cedels electorals consegnads"
+
+msgid "Accounted Ballots"
+msgstr "Cedels valaivels"
+
+msgid "Blank Ballots"
+msgstr "Cedels electorals vids"
+
+msgid "Invalid Ballots"
+msgstr "Cedels electorals nunvalaivels"
+
+msgid "Accounted Votes"
+msgstr "Vuschs valaivlas"
+
+msgid "Turnout"
+msgstr "Participaziun a las elecziuns"
+
 msgid "Candidate"
 msgstr "Persuna che candidescha"
 
@@ -692,11 +733,6 @@ msgstr "Partida"
 
 msgid "List"
 msgstr "Glista"
-
-#. Default: Votes
-#.
-msgid "single_votes"
-msgstr "Vuschs"
 
 msgid "Elected"
 msgstr "Elegida/elegì"
@@ -715,9 +751,6 @@ msgstr "Tut las candidatas e candidats"
 
 msgid "Elected candidates only"
 msgstr "Mo candidat(a)s elegid(a)s"
-
-msgid "Mandates"
-msgstr "Mandats"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
@@ -793,18 +826,6 @@ msgstr "Dumonda decisiva a favur da l'iniziativa"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Dumonda decisiva a favur da la cuntraproposta"
-
-msgid "Turnout"
-msgstr "Participaziun a las elecziuns"
-
-msgid "eligible Voters"
-msgstr "Persunas cun dretg d’eleger"
-
-msgid "Received Ballots"
-msgstr "Cedels electorals consegnads"
-
-msgid "Seats"
-msgstr "sezs"
 
 #. Default: Voter turnout
 #.
@@ -1014,29 +1035,11 @@ msgstr "GEA"
 msgid "Blank list"
 msgstr "Glista en blanco"
 
-msgid "List connection"
-msgstr "Colliaziun da glistas"
-
-msgid "Sublist connection"
-msgstr "Sutcolliaziun da glistas"
-
 msgid "Panachage (parties)"
 msgstr "Statistica da panaschar (partidas)"
 
 msgid "Panachage (lists)"
 msgstr "Statistica da panaschar (glistas)"
-
-msgid "Accounted Votes"
-msgstr "Vuschs valaivlas"
-
-msgid "Accounted Ballots"
-msgstr "Cedels valaivels"
-
-msgid "Blank Ballots"
-msgstr "Cedels electorals vids"
-
-msgid "Invalid Ballots"
-msgstr "Cedels electorals nunvalaivels"
 
 msgid "Intermediate results abbrev"
 msgstr "Resultats interm."
@@ -1315,33 +1318,3 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
-
-#~ msgid "district_label_sz_2020"
-#~ msgstr "Circul electoral"
-
-#~ msgid "districts_label_sz_2020"
-#~ msgstr "Circuls electorals"
-
-#~ msgid "Value of ausmittlungsstand not between 0 and 3"
-#~ msgstr "La valur da ausmittlungsstand n'è betg tranter 0 e 3"
-
-#~ msgid "Value ${col} is not between 0 and 3"
-#~ msgstr "La valur ${col} n'è betg tranter 0 e 3"
-
-#~ msgid "Invalid list values"
-#~ msgstr "Datas da glista nunvalaivlas"
-
-#~ msgid "Could not read yeas"
-#~ msgstr "I n'è betg stà pussaivel da leger las vuschs affirmativas"
-
-#~ msgid "Could not read nays"
-#~ msgstr "I n'è betg stà pussaivel da leger las vuschs negativas"
-
-#~ msgid "Could not read the eligible voters"
-#~ msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
-
-#~ msgid "Could not read the invalid votes"
-#~ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar nunvalaivels"
-
-#~ msgid "Subtotal"
-#~ msgstr "Summa intermediara"

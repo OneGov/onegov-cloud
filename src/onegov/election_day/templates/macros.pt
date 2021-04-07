@@ -5,7 +5,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal">
 <body>
 
-<metal:intermediate-results-popup define-macro="intermediate-results-popup">
+<metal:intermediate-results-popup define-macro="intermediate-results-popup" i18n:domain="onegov.election_day">
     <tal:b tal:condition="skip_rendering|nothing">
                 <div class="panel">
                     <h5>${help_text}</h5>
@@ -13,7 +13,7 @@
     </tal:b>
 </metal:intermediate-results-popup>
 
-<metal:proposal-by-entities-table define-macro="proposal-by-entities-table">
+<metal:proposal-by-entities-table define-macro="proposal-by-entities-table" i18n:domain="onegov.election_day">
     <table
         class="results tablesaw sortable"
         data-tablesaw-mode="columntoggle"
@@ -71,7 +71,7 @@
     </table>
 </metal:proposal-by-entities-table>
 
-<metal:election-connections-table define-macro="election-connections-table">
+<metal:election-connections-table define-macro="election-connections-table" i18n:domain="onegov.election_day">
     <div class="embedded-widget">
 
     </div>
@@ -113,7 +113,7 @@
         </tal:block>
 </metal:election-connections-table>
 
-<metal:election-compound-districts-table define-macro="election-compound-districts-table">
+<metal:election-compound-districts-table define-macro="election-compound-districts-table" i18n:domain="onegov.election_day">
     <table
         class="results tablesaw sortable"
         data-tablesaw-mode="columntoggle"
@@ -138,7 +138,7 @@
     </table>
 </metal:election-compound-districts-table>
 
-<metal:election-statistics-table define-macro="election-statistics-table">
+<metal:election-statistics-table define-macro="election-statistics-table" i18n:domain="onegov.election_day">
     <table
     class="results tablesaw sortable"
     data-tablesaw-mode="columntoggle"
@@ -194,8 +194,6 @@
         </tfoot>
     </table>
 </metal:election-statistics-table>
-
-
 
 <metal:election-compound-candidates-table define-macro="election-compound-candidates-table" i18n:domain="onegov.election_day">
     <table
@@ -478,7 +476,7 @@
     </ul>
 </metal:pagination>
 
-<metal:breadcrumbs define-macro="breadcrumbs">
+<metal:breadcrumbs define-macro="breadcrumbs" i18n:domain="onegov.election_day">
     <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
         <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
             <tal:block repeat="breadcrumb layout.breadcrumbs">
