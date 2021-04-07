@@ -1,3 +1,5 @@
+import os
+
 import click
 import json
 import sedate
@@ -7,6 +9,8 @@ from datetime import datetime
 from onegov.core.cli import command_group
 from onegov.core.crypto import random_token
 from onegov.core.csv import CSVFile
+from onegov.directory import DirectoryEntry
+from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.winterthur.models import MissionReport
 from onegov.winterthur.models import MissionReportFile
@@ -264,3 +268,80 @@ def import_mission_vehicles(import_file, replace, match):
             request.session.add(vehicle)
 
     return handle_import
+
+
+@cli.command(
+    name='analyze-directories', context_settings={'singular': True})
+@click.option('--log-file', help="Path if a logfile is wanted")
+@click.option('--dry-run', is_flag=True, default=False)
+def analyze_directories(log_file, dry_run):
+    """ Spots missing depot directories of file in directory entries and
+    fixes full-path filenames that come from Upload via IE11. """
+
+    missing_folders = []
+    missing_entry_url = []
+    db_entry_missing = []
+    file_names_changed = []
+
+    def is_full_path(file_name):
+        return ':\\' in file_name
+
+    def fix_file_name(file_name):
+        return file_name.split('\\')[-1]
+
+    def handle_analyze_entries(request, app):
+        for entry in request.session.query(DirectoryEntry).all():
+            for field in entry.directory.file_fields:
+                field_data = entry.content['values'][field.id]
+                file_data = field_data.get('data', '')
+                if not file_data:
+                    continue
+                file_id = file_data.lstrip('@')
+                file = request.session.query(File).filter_by(
+                    id=file_id).first()
+
+                if not file:
+                    db_entry_missing.append(file_id)
+                    continue
+
+                if is_full_path(file.name):
+                    new_name = fix_file_name(file.name)
+                    if not dry_run:
+                        file.name = new_name
+                    else:
+                        click.secho(f'Change {file.name} to {new_name}')
+                    file_names_changed.append(file_id)
+
+                file_path = os.path.join(
+                    request.app.depot_storage_path,
+                    file.reference['path']
+                )
+                if not os.path.exists(file_path):
+                    missing_folders.append(file_path)
+                    missing_entry_url.append(
+                        f'/directories/{entry.directory.name}/{entry.name}'
+                    )
+
+        if not any((missing_folders, file_names_changed)):
+            click.secho('Nothing changed')
+            return
+
+        log_data = "\n".join((
+            '# --- MISSING FOLDER PATHS --- #',
+            *missing_folders,
+            '# --- URL FRAGMENTS FOR MISSING FILES --- #',
+            *missing_entry_url,
+            '# --- CHANGED FILENAMES --- #',
+            *file_names_changed,
+            '# --- FILE ENTRIES IN DB MISSING --- #',
+            *db_entry_missing
+        ))
+
+        if log_file:
+            with open(log_file, 'w') as f:
+                click.secho(f'Writing log file to {log_file}')
+                f.write(log_data)
+        else:
+            click.secho(log_data)
+
+    return handle_analyze_entries
