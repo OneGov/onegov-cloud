@@ -48,7 +48,7 @@ def open_pdf(byte_string, exe='evince'):
     if not shutil.which(exe):
         print(f'{exe} is not installed, skipping...')
         return
-    path = f'/tmp/test.pdf'
+    path = '/tmp/test.pdf'
     with open(path, 'wb') as f:
         f.write(byte_string.read())
     cmd = exe

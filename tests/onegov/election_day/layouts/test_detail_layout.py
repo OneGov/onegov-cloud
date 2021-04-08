@@ -33,4 +33,3 @@ def test_hidden_tabs_mixin():
     ):
         layout = DetailLayout(DummyObject(model), request)
         assert layout.hide_tab(tab) is True
-

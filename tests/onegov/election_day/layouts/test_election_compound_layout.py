@@ -48,7 +48,7 @@ def test_election_compound_layout_1(session):
     assert layout.has_party_results is False
     assert layout.districts_are_entities is False
     assert layout.tab_visible('statistics') is False
-    assert request.app.principal.hidden_tabs == {'elections':  ['lists']}
+    assert request.app.principal.hidden_tabs == {'elections': ['lists']}
     assert layout.hide_tab('lists') is True
 
     request.app.principal.hidden_tabs = {}

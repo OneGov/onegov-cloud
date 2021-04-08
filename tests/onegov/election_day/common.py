@@ -171,7 +171,6 @@ class DummyPrincipal(object):
         return '__{}'.format(type)
 
 
-
 class DummyApp(object):
     def __init__(self, session=None, application_id='application_id'):
         self._session = session

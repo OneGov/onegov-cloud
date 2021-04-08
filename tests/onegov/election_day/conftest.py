@@ -375,7 +375,7 @@ def import_elections_wabstic(
 def get_mimetype(archive_filename):
     fname = archive_filename.split('/')[-1]
     ending = fname.split('.')[-1]
-    if ending.lower() in('xlsx', 'xls'):
+    if ending.lower() in ('xlsx', 'xls'):
         return 'application/vnd.openxmlformats-' \
                'officedocument.spreadsheetml.sheet'
     else:

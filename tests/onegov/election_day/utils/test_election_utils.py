@@ -1,13 +1,10 @@
 from datetime import date
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
-from onegov.election_day.utils.election import get_aggregated_list_results
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results_api
-from onegov.election_day.utils.election import get_elected_candidates
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
-from onegov.election_day.utils.election import get_lists_panachage_data
 from tests.onegov.election_day.common import print_errors
 
 

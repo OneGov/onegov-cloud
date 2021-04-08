@@ -335,7 +335,7 @@ def guess_java_home_or_fail():
         result = subprocess.run('/usr/libexec/java_home', capture_output=True)
 
         if result.returncode != 0:
-            raise RuntimeError(f'/usr/libexec/java_home failed')
+            raise RuntimeError('/usr/libexec/java_home failed')
 
         return result.stdout.decode('utf-8').strip()
 
@@ -472,7 +472,9 @@ def webdriver_options():
 @pytest.fixture(scope="session")
 def webdriver_executable_path():
     pattern = r'\d+\.\d+\.\d+'
-    stdout = os.popen('google-chrome --version || google-chrome-stable --version').read()
+    stdout = os.popen(
+        'google-chrome --version || google-chrome-stable --version'
+    ).read()
     version = re.search(pattern, stdout)
     if version:
         driver = ChromeType.GOOGLE
@@ -517,7 +519,7 @@ def glauth_binary():
     n = platform.system() == 'Darwin' and 'glauthOSX' or 'glauth64'
     url = f'https://github.com/glauth/glauth/releases/download/v{v}/{n}'
 
-    path = f'/tmp/glauth'
+    path = '/tmp/glauth'
 
     if not os.path.exists(path):
         http = urllib3.PoolManager()
