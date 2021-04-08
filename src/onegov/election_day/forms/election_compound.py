@@ -164,20 +164,6 @@ class ElectionCompoundForm(Form):
         except Exception:
             raise ValidationError(_('Invalid color definitions'))
 
-    def validate(self):
-        result = super(ElectionCompoundForm, self).validate()
-
-        if self.elections.data:
-            query = self.request.session.query(Election.type.distinct())
-            query = query.filter(Election.id.in_(self.elections.data))
-            if query.count() > 1:
-                self.elections.errors.append(
-                    _("Select either majorz or proporz elections.")
-                )
-                result = False
-
-        return result
-
     def on_request(self):
         self.election_de.validators = []
         self.election_fr.validators = []
@@ -198,15 +184,17 @@ class ElectionCompoundForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        query = query.filter(Election.domain == 'region')
+        query = query.filter(
+            Election.domain == 'region',
+            Election.type == 'proporz'
+        )
         self.elections.choices = [
             (
                 item.id,
-                '{} {} {} ({})'.format(
+                '{} {} {}'.format(
                     layout.format_date(item.date, 'date'),
                     item.shortcode or '',
                     item.title,
-                    item.type
                 ).replace("  ", " ")
             ) for item in query
         ]

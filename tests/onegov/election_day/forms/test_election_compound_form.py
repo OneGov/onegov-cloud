@@ -30,7 +30,7 @@ def test_election_compound_form_populate(session):
             date=date(2001, 1, 1))
     )
     session.add(
-        Election(
+        ProporzElection(
             title='election-3',
             domain='region',
             date=date(2000, 1, 1))
@@ -45,9 +45,8 @@ def test_election_compound_form_populate(session):
 
     form.on_request()
     assert form.elections.choices == [
-        ('election-2', '01.01.2001 1 election-2 (majorz)'),
-        ('election-1', '01.01.2001 2 election-1 (proporz)'),
-        ('election-3', '01.01.2000 election-3 (majorz)'),
+        ('election-1', '01.01.2001 2 election-1'),
+        ('election-3', '01.01.2000 election-3'),
     ]
 
 
@@ -59,14 +58,8 @@ def test_election_compound_form_validate(session):
             date=date(2001, 1, 1))
     )
     session.add(
-        Election(
+        ProporzElection(
             title='election-2',
-            domain='region',
-            date=date(2001, 1, 1))
-    )
-    session.add(
-        Election(
-            title='election-3',
             domain='region',
             date=date(2001, 1, 1))
     )
@@ -75,16 +68,6 @@ def test_election_compound_form_validate(session):
     form = ElectionCompoundForm()
     form.request = DummyRequest(session=session)
     form.on_request()
-    form.process(DummyPostData({
-        'election_de': 'Elections',
-        'domain': 'canton',
-        'date': '2012-01-01',
-        'elections': ['election-1', 'election-2'],
-    }))
-    assert not form.validate()
-    assert form.errors == {
-        'elections': ['Select either majorz or proporz elections.']
-    }
 
     form.process(DummyPostData({
         'election_de': 'Elections',
@@ -98,7 +81,7 @@ def test_election_compound_form_validate(session):
         'election_de': 'Elections',
         'domain': 'canton',
         'date': '2012-01-01',
-        'elections': ['election-2', 'election-3'],
+        'elections': ['election-1', 'election-2'],
     }))
     assert form.validate()
 
