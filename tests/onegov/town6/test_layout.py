@@ -22,7 +22,12 @@ class MockRequest(object):
     locale = 'en'
     is_logged_in = False
     is_manager = False
-    app = Bunch(org=Bunch(geo_provider='geo-mapbox'))
+    app = Bunch(org=Bunch(
+        geo_provider='geo-mapbox',
+        chatbot_type=None,
+        disable_chatbot=None,
+        chatbot_customer_id=None
+    ))
 
     def include(self, *args, **kwargs):
         pass
@@ -151,6 +156,9 @@ def test_template_layout(postgres_dsn, redis_url):
 
     class Mock(object):
        homepage_structure = ''
+       chatbot_type = None
+       chatbot_customer_id = None
+       disable_chatbot = False
 
     class App(TownApp):
         theme_options = {}

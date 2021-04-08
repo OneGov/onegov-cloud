@@ -142,6 +142,14 @@ class Organisation(Base, TimestampMixin):
     # Newsletter settings
     logo_in_newsletter = meta_property(default=False)
 
+    # Chatbot Settings
+    chatbot_type = meta_property()
+    chatbot_title = meta_property()
+    chatbot_bg_color = meta_property()
+    chatbot_customer_id = meta_property()
+    hide_chatbot_for_roles = meta_property(default=tuple)
+    disable_chatbot = meta_property(default=False)
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

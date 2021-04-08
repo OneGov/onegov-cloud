@@ -2061,3 +2061,34 @@
         </div>
     </tal:b>
 </metal:focus>
+
+<metal:chatbot define-macro="chatbot">
+<div class="autostick chatbot" tal:condition="layout.show_chatbot">
+    <tal:b tal:switch="layout.org.chatbot_type">
+        <tal:b tal:case="'scoutss'">
+            <div tal:condition="layout.org.chatbot_type"
+                    class="scoutsss-dialog"
+                    data-bgcolor="${layout.org.chatbot_bg_color or layout.primary_color}"
+                    data-videobubble="false"
+                    data-videoclickicon="true"
+                    data-notifications="false"
+                    data-video="false"
+                    data-videourl=""
+                    data-delay="2"
+                    data-videodelay="0"
+                    data-transparent="false"
+                    data-draggable="true"
+                    data-size="medium"
+                    data-click="widget"
+                    data-onclose="button"
+                    data-header="default"
+                    data-showicon="1"
+                    data-title="${layout.org.chatbot_title or 'Chatbot'}"
+                    data-placement="bottom-right"
+                    data-code="${layout.org.chatbot_customer_id}"
+                    data-img="https://s3.eu-west-1.amazonaws.com/scoutsss.prod/media-library/7e7e6570-61bf-11e7-bbc6-cd7b356496c5/Avatar-b6d82db0-45b5-11eb-b3b4-75dbbd27017e.png">
+                </div>
+        </tal:b>
+    </tal:b>
+</div>
+</metal:chatbot>

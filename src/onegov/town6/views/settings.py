@@ -4,7 +4,8 @@ from wtforms import StringField, BooleanField, IntegerField
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
-from onegov.town6.forms.settings import GeneralSettingsForm
+from onegov.town6.forms.settings import GeneralSettingsForm, \
+    ChatBotSettingsForm
 
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
@@ -17,7 +18,7 @@ from onegov.org.views.settings import (
     handle_favicon_settings, handle_links_settings, handle_header_settings,
     handle_footer_settings, handle_module_settings, handle_map_settings,
     handle_analytics_settings, handle_holiday_settings,
-    handle_newsletter_settings)
+    handle_newsletter_settings, handle_generic_settings)
 
 from onegov.town6.app import TownApp
 
@@ -221,3 +222,11 @@ def custom_handle_settings(self, request, form):
 
     return handle_homepage_settings(
         self, request, form, SettingsLayout(self, request))
+
+
+@TownApp.form(model=Organisation, name='chatbot-settings', template='form.pt',
+              permission=Secret, form=ChatBotSettingsForm,
+              setting=_("Chatbot"), icon='far fa-comments', order=-999)
+def handle_chatbot_settings(self, request, form):
+    return handle_generic_settings(
+        self, request, form, _("Chatbot"), SettingsLayout(self, request))

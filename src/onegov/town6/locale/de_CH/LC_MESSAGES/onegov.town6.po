@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-04-01 09:38+0200\n"
+"POT-Creation-Date: 2021-04-08 13:22+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -28,6 +28,33 @@ msgstr "Hautpschriftart sans-serif"
 
 msgid "Used for all the headings"
 msgstr "Wird für alle Titel verwendet"
+
+msgid "Supported Chatbots"
+msgstr "Unterstütze Chatbots"
+
+msgid "Chatbot title"
+msgstr "Titelüberschrift"
+
+msgid "Chatbot background color"
+msgstr "Chatbot Hintergrund-Farbe"
+
+msgid "Customer-ID"
+msgstr "Kunden-Identifier"
+
+msgid "Hide chatbot for chosen roles"
+msgstr "Verstecke Chatbot für gewählte Rollen"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Disable the chatbot"
+msgstr "Chatbot deaktivieren"
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -756,12 +783,6 @@ msgstr "Nach Datum filtern"
 
 msgid "Administrator"
 msgstr "Administrator"
-
-msgid "Editor"
-msgstr "Editor"
-
-msgid "Member"
-msgstr "Mitglied"
 
 msgid "Administrators"
 msgstr "Administratoren"
@@ -1820,6 +1841,12 @@ msgstr "Feiertage"
 
 msgid "Ticket Settings"
 msgstr "Ticket-Einstellungen"
+
+msgid "Newsletter Settings"
+msgstr "Newsletter Einstellungen"
+
+msgid "Chatbot"
+msgstr ""
 
 #~ msgid "Current Image"
 #~ msgstr "Image acutuelle"

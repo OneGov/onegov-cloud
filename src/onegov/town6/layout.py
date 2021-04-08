@@ -116,6 +116,27 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
             self.request.include('all_blank')
 
         self.hide_from_robots()
+        self.initChatbot()
+
+    def initChatbot(self):
+        if self.show_chatbot:
+            if self.org.chatbot_type == 'scoutss':
+                self.request.include('scoutss-chatbot')
+            else:
+                raise NotImplementedError
+
+    @cached_property
+    def show_chatbot(self):
+        if self.org.disable_chatbot:
+            return False
+        if not all((self.org.chatbot_customer_id, self.org.chatbot_type)):
+            return False
+        if not self.on_homepage:
+            return False
+        for role in self.org.hide_chatbot_for_roles:
+            if self.request.has_role(role):
+                return False
+        return True
 
     def exclude_invisible(self, items):
         items = self.request.exclude_invisible(items)

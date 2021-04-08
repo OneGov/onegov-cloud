@@ -1,9 +1,13 @@
+from wtforms_components import ColorField
+
+from onegov.form import Form
 from onegov.org.forms.settings import GeneralSettingsForm as \
     OrgGeneralSettingsForm
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
 from onegov.town6 import _
-from onegov.org.theme import user_options
-from wtforms import validators
+from onegov.town6.theme import user_options
+from wtforms import validators, StringField, RadioField, \
+    BooleanField
 
 
 class GeneralSettingsForm(OrgGeneralSettingsForm):
@@ -83,3 +87,51 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
         @self.request.after
         def clear_locale(response):
             response.delete_cookie('locale')
+
+
+class ChatBotSettingsForm(Form):
+
+    chatbot_type = RadioField(
+        label=_('Supported Chatbots'),
+        choices=[
+            ('scoutss', 'Scoutss')
+        ]
+    )
+
+    chatbot_title = StringField(
+        label=_('Chatbot title')
+    )
+
+    chatbot_color = ColorField(
+        label=_('Chatbot background color')
+    )
+
+    chatbot_customer_id = StringField(
+        label=_('Customer-ID')
+    )
+
+    hide_chatbot_for_roles = ChosenSelectMultipleField(
+        label=_('Hide chatbot for chosen roles'),
+        choices=(
+            ('admin', _('Admin')),
+            ('editor', _('Editor')),
+            ('member', _('Member')),
+        )
+    )
+
+    disable_chatbot = BooleanField(
+        label=_('Disable the chatbot')
+    )
+
+    def process_obj(self, obj):
+        super().process_obj(obj)
+        color = obj.chatbot_bg_color
+        if not color:
+            color = obj.theme_options.get(
+                'primary-color-ui', user_options['primary-color-ui'])
+
+        self.chatbot_color.data = color
+
+    def populate_obj(self, obj, *args, **kwargs):
+        super().populate_obj(obj, *args, **kwargs)
+        obj.chatbot_bg_color = self.chatbot_color.data.get_hex()

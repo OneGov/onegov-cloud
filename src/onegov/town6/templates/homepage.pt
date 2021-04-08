@@ -3,6 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.chatbot" />
         <tal:b metal:use-macro="layout.app.homepage_template" />
     </tal:b>
 </div>

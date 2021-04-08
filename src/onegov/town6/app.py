@@ -4,7 +4,7 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.town6.initial_content import create_new_organisation
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
-    OrgApp
+    OrgApp, org_content_security_policy
 from onegov.town6.theme import TownTheme
 
 
@@ -18,6 +18,14 @@ class TownApp(OrgApp, FoundationApp):
     @property
     def font_family(self):
         return self.theme_options.get('body-font-family-ui')
+
+
+@TownApp.setting(section='content_security_policy', name='default')
+def town_content_security_policy():
+    policy = org_content_security_policy()
+    policy.child_src.add('https://dialog.scoutsss.com/')
+    policy.child_src.add('https://business.scoutsss.com/')
+    return policy
 
 
 @TownApp.webasset_path()
@@ -182,3 +190,9 @@ def get_editor_asset():
     yield 'redactor.fr.js'
     yield 'input_with_button.js'
     yield 'editor.js'
+
+
+@TownApp.webasset('scoutss-chatbot')
+def get_scoutss_chatbot_assets():
+    yield 'jqueryui.min.js'
+    yield 'scoutss-dialog.js'
