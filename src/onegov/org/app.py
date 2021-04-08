@@ -517,3 +517,8 @@ def get_fontpreview_asset():
 @OrgApp.webasset('scroll-to-username')
 def get_scroll_to_username_asset():
     yield 'scroll_to_username.js'
+
+
+@OrgApp.webasset('all_blank')
+def get_all_blank_asset():
+    yield 'all_blank.js'

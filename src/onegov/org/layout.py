@@ -560,6 +560,9 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         if self.request.is_manager:
             self.request.include('sortable')
 
+        if self.org.open_files_target_blank:
+            self.request.include('all_blank')
+
         self.hide_from_robots()
 
     def show_label(self, field):
