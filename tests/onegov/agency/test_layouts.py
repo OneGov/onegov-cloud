@@ -16,6 +16,7 @@ from onegov.user import UserGroupCollection
 
 class DummyOrg(object):
     geo_provider = None
+    open_files_target_blank = True
 
 
 class DummyApp(object):

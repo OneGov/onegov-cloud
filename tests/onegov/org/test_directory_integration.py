@@ -6,10 +6,8 @@ import transaction
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration, \
     DirectoryZipArchive, DirectoryEntryCollection
-from onegov.directory.errors import DuplicateEntryError
 from onegov.org.forms import DirectoryImportForm
 from onegov.org.layout import DirectoryEntryCollectionLayout
-from onegov.org.models import ExtendedDirectory
 
 
 class DummyApp(object):
@@ -17,7 +15,10 @@ class DummyApp(object):
     def __init__(self, session, application_id='my-app'):
         self._session = session
         self.application_id = application_id
-        self.org = Bunch(geo_provider='none')
+        self.org = Bunch(
+            geo_provider='none',
+            open_files_target_blank=True
+        )
 
     def session(self):
         return self._session
@@ -155,4 +156,3 @@ def test_directory_roundtrip(
         assert directory.content == events.content
     else:
         assert count == 0
-

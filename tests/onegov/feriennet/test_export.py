@@ -37,7 +37,10 @@ def test_exports(client, scenario):
         return Bunch(
             app=Bunch(
                 active_period=periods.active(),
-                org=Bunch(geo_provider='geo-mapbox'),
+                org=Bunch(
+                    geo_provider='geo-mapbox',
+                    open_files_target_blank=True
+                ),
                 invoice_collection=invoice_collection,
                 periods=periods.query().all(),
             ),

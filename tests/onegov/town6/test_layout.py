@@ -24,6 +24,7 @@ class MockRequest(object):
     is_manager = False
     app = Bunch(org=Bunch(
         geo_provider='geo-mapbox',
+        open_files_target_blank=True,
         chatbot_type=None,
         disable_chatbot=None,
         chatbot_customer_id=None
@@ -155,10 +156,10 @@ def test_page_layout_breadcrumbs(session):
 def test_template_layout(postgres_dsn, redis_url):
 
     class Mock(object):
-       homepage_structure = ''
-       chatbot_type = None
-       chatbot_customer_id = None
-       disable_chatbot = False
+        homepage_structure = ''
+        chatbot_type = None
+        chatbot_customer_id = None
+        disable_chatbot = False
 
     class App(TownApp):
         theme_options = {}
@@ -169,6 +170,7 @@ def test_template_layout(postgres_dsn, redis_url):
         org.theme_options = theme_options
         org.locales = ['de_CH']
         org.geo_provider = 'geo-mapbox'
+        org.open_files_target_blank = True
         org.header_options = header_options
 
         # disable LibresIntegration for this test

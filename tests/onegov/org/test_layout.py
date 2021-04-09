@@ -11,7 +11,7 @@ from onegov.core.elements import Link
 from onegov.org.layout import (
     EventBaseLayout,
     DefaultLayout,
-    PageLayout, Layout
+    PageLayout
 )
 from onegov.page import Page
 from webtest import TestApp as Client
@@ -25,7 +25,12 @@ class MockRequest(object):
     locale = 'en'
     is_logged_in = False
     is_manager = False
-    app = Bunch(org=Bunch(geo_provider='geo-mapbox'))
+    app = Bunch(
+        org=Bunch(
+            geo_provider='geo-mapbox',
+            open_files_target_blank=True
+        )
+    )
 
     def include(self, *args, **kwargs):
         pass
@@ -164,6 +169,7 @@ def test_template_layout(postgres_dsn, redis_url):
         org.theme_options = theme_options
         org.locales = ['de_CH']
         org.geo_provider = 'geo-mapbox'
+        org.open_files_target_blank = True
         org.header_options = header_options
 
         # disable LibresIntegration for this test
