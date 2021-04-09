@@ -1,9 +1,10 @@
 from freezegun import freeze_time
+from io import BytesIO
+from openpyxl import load_workbook
+from pyquery import PyQuery as pq
 from tests.onegov.gazette.common import login_editor_1
 from tests.onegov.gazette.common import login_publisher
-from pyquery import PyQuery as pq
 from webtest import TestApp as Client
-from xlrd import open_workbook
 
 
 def test_view_categories(gazette_app):
@@ -136,34 +137,34 @@ def test_view_categories_export(gazette_app):
     login_publisher(client)
     response = client.get('/categories/export')
 
-    book = open_workbook(file_contents=response.body)
-    assert book.nsheets == 1
+    book = load_workbook(BytesIO(response.body))
+    assert len(book.worksheets) == 1
 
-    sheet = book.sheets()[0]
-    assert sheet.ncols == 4
-    assert sheet.nrows == 6
+    sheet = book.worksheets[0]
+    assert sheet.max_column == 4
+    assert sheet.max_row == 6
 
-    assert sheet.cell(0, 0).value == 'ID'
-    assert sheet.cell(0, 1).value == 'Name'
-    assert sheet.cell(0, 2).value == 'Titel'
-    assert sheet.cell(0, 3).value == 'Aktiv'
+    assert sheet.cell(1, 1).value == 'ID'
+    assert sheet.cell(1, 2).value == 'Name'
+    assert sheet.cell(1, 3).value == 'Titel'
+    assert sheet.cell(1, 4).value == 'Aktiv'
 
-    assert sheet.cell(1, 1).value == '13'
-    assert sheet.cell(1, 2).value == 'Commercial Register'
-    assert sheet.cell(1, 3).value == 1
+    assert sheet.cell(2, 2).value == '13'
+    assert sheet.cell(2, 3).value == 'Commercial Register'
+    assert sheet.cell(2, 4).value == 1
 
-    assert sheet.cell(2, 1).value == '10'
-    assert sheet.cell(2, 2).value == 'Complaints'
-    assert sheet.cell(2, 3).value == 0
+    assert sheet.cell(3, 2).value == '10'
+    assert sheet.cell(3, 3).value == 'Complaints'
+    assert sheet.cell(3, 4).value == 0
 
-    assert sheet.cell(3, 1).value == '11'
-    assert sheet.cell(3, 2).value == 'Education'
-    assert sheet.cell(3, 3).value == 1
+    assert sheet.cell(4, 2).value == '11'
+    assert sheet.cell(4, 3).value == 'Education'
+    assert sheet.cell(4, 4).value == 1
 
-    assert sheet.cell(4, 1).value == '14'
-    assert sheet.cell(4, 2).value == 'Elections'
-    assert sheet.cell(4, 3).value == 1
+    assert sheet.cell(5, 2).value == '14'
+    assert sheet.cell(5, 3).value == 'Elections'
+    assert sheet.cell(5, 4).value == 1
 
-    assert sheet.cell(5, 1).value == '12'
-    assert sheet.cell(5, 2).value == 'Submissions'
-    assert sheet.cell(5, 3).value == 1
+    assert sheet.cell(6, 2).value == '12'
+    assert sheet.cell(6, 3).value == 'Submissions'
+    assert sheet.cell(6, 4).value == 1

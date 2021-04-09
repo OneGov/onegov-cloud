@@ -9,9 +9,9 @@ from onegov.core.orm.abstract import MoveDirection
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
+from openpyxl import load_workbook
 from psycopg2.extras import NumericRange
 from pytest import skip
-from xlrd import open_workbook
 from pytz import utc
 
 
@@ -2493,17 +2493,17 @@ def test_votes_export(swissvotes_app):
     file = BytesIO()
     votes.export_xlsx(file)
     file.seek(0)
-    workbook = open_workbook(file_contents=file.read())
-    sheet = workbook.sheet_by_name('DATA')
+    workbook = load_workbook(file)
+    sheet = workbook.get_sheet_by_name('DATA')
     xlsx = dict(
         zip(
-            [cell.value for cell in sheet.row(0)],
-            [cell.value for cell in sheet.row(1)]
+            [cell.value for cell in tuple(sheet.rows)[0]],
+            [cell.value for cell in tuple(sheet.rows)[1]]
         )
     )
     expected = {
         'anr': 100.1,
-        'datum': 33026.0,
+        'datum': datetime(1990, 6, 2),
         'legislatur': 4.0,
         'legisjahr': '1990-1994',
         'titel_off_d': 'Vote DE',
@@ -2788,7 +2788,7 @@ def test_votes_export(swissvotes_app):
         'p-lega': 5.0,
         'p-kvp': 66.0,
         'p-glp': 66.0,
-        'p-bdp': '',
+        'p-bdp': None,
         'p-mcg': 9999.0,
         'p-mitte': 9999.0,
         'p-sav': 1.0,

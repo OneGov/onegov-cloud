@@ -1,13 +1,12 @@
+from datetime import datetime
 from freezegun import freeze_time
 from io import BytesIO
-from tests.onegov.gazette.common import login_editor_1
-from tests.onegov.gazette.common import login_publisher
+from openpyxl import load_workbook
 from PyPDF2 import PdfFileReader
 from pyquery import PyQuery as pq
+from tests.onegov.gazette.common import login_editor_1
+from tests.onegov.gazette.common import login_publisher
 from webtest import TestApp as Client
-from xlrd import open_workbook
-from xlrd import xldate_as_tuple
-from datetime import datetime
 
 
 def test_view_issues(gazette_app):
@@ -465,44 +464,34 @@ def test_view_issues_export(gazette_app):
     login_publisher(client)
     response = client.get('/issues/export')
 
-    book = open_workbook(file_contents=response.body)
-    assert book.nsheets == 1
+    book = load_workbook(BytesIO(response.body))
+    assert len(book.worksheets) == 1
 
-    sheet = book.sheets()[0]
-    assert sheet.ncols == 4
-    assert sheet.nrows == 15
+    sheet = book.worksheets[0]
+    assert sheet.max_column == 4
+    assert sheet.max_row == 15
 
-    def as_date(cell):
-        return datetime(
-            *xldate_as_tuple(cell.value, book.datemode)
-        ).date().isoformat()
+    assert sheet.cell(1, 1).value == 'Jahr'
+    assert sheet.cell(1, 2).value == 'Nummer'
+    assert sheet.cell(1, 3).value == 'Datum'
+    assert sheet.cell(1, 4).value == 'Eingabeschluss'
 
-    def as_datetime(cell):
-        return datetime(
-            *xldate_as_tuple(cell.value, book.datemode)
-        ).isoformat()
+    assert sheet.cell(2, 1).value == 2017
+    assert sheet.cell(2, 2).value == 40
+    assert sheet.cell(2, 3).value == datetime(2017, 10, 6)
+    assert sheet.cell(2, 4).value == datetime(2017, 10, 4, 14)
 
-    assert sheet.cell(0, 0).value == 'Jahr'
-    assert sheet.cell(0, 1).value == 'Nummer'
-    assert sheet.cell(0, 2).value == 'Datum'
-    assert sheet.cell(0, 3).value == 'Eingabeschluss'
+    assert sheet.cell(6, 1).value == 2017
+    assert sheet.cell(6, 2).value == 44
+    assert sheet.cell(6, 3).value == datetime(2017, 11, 3)
+    assert sheet.cell(6, 4).value == datetime(2017, 11, 1, 13)
 
-    assert int(sheet.cell(1, 0).value) == 2017
-    assert int(sheet.cell(1, 1).value) == 40
-    assert as_date(sheet.cell(1, 2)) == '2017-10-06'
-    assert as_datetime(sheet.cell(1, 3)) == '2017-10-04T14:00:00'
+    assert sheet.cell(14, 1).value == 2017
+    assert sheet.cell(14, 2).value == 52
+    assert sheet.cell(14, 3).value == datetime(2017, 12, 29)
+    assert sheet.cell(14, 4).value == datetime(2017, 12, 27, 13)
 
-    assert int(sheet.cell(5, 0).value) == 2017
-    assert int(sheet.cell(5, 1).value) == 44
-    assert as_date(sheet.cell(5, 2)) == '2017-11-03'
-    assert as_datetime(sheet.cell(5, 3)) == '2017-11-01T13:00:00'
-
-    assert int(sheet.cell(13, 0).value) == 2017
-    assert int(sheet.cell(13, 1).value) == 52
-    assert as_date(sheet.cell(13, 2)) == '2017-12-29'
-    assert as_datetime(sheet.cell(13, 3)) == '2017-12-27T13:00:00'
-
-    assert int(sheet.cell(14, 0).value) == 2018
-    assert int(sheet.cell(14, 1).value) == 1
-    assert as_date(sheet.cell(14, 2)) == '2018-01-05'
-    assert as_datetime(sheet.cell(14, 3)) == '2018-01-03T13:00:00'
+    assert sheet.cell(15, 1).value == 2018
+    assert sheet.cell(15, 2).value == 1
+    assert sheet.cell(15, 3).value == datetime(2018, 1, 5)
+    assert sheet.cell(15, 4).value == datetime(2018, 1, 3, 13)

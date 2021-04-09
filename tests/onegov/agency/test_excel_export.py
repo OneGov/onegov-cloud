@@ -1,8 +1,8 @@
-from xlrd import open_workbook
-
-from onegov.agency.excel_export import export_person_xlsx, column_mapper, \
-    extract_person_data
+from onegov.agency.excel_export import column_mapper
+from onegov.agency.excel_export import export_person_xlsx
+from onegov.agency.excel_export import extract_person_data
 from onegov.agency.models import ExtendedPerson, ExtendedAgency
+from openpyxl import load_workbook
 
 
 def test_excel_export(session):
@@ -67,9 +67,10 @@ def test_excel_export(session):
     assert len(write_out) == 4
 
     file = export_person_xlsx(session)
-    workbook = open_workbook(file_contents=file.read())
-    sheet = workbook.sheet_by_name('Personen')
-    titles = [cell.value for cell in sheet.row(0)]
+    workbook = load_workbook(file)
+    sheet = workbook.get_sheet_by_name('Personen')
+    titles = [cell.value for cell in tuple(sheet.rows)[0]]
+
     # Test titles
     assert titles == list(column_mapper.values())
 
@@ -77,8 +78,7 @@ def test_excel_export(session):
     ix_ln = list(column_mapper.values()).index('Nachname')
     ix_fn = list(column_mapper.values()).index('Vorname')
 
-    order = [
-        f"{row[ix_ln].value}{row[ix_fn].value}" for row in sheet.get_rows()]
+    order = [f"{row[ix_ln].value}{row[ix_fn].value}" for row in sheet.rows]
     assert order == ['NachnameVorname', 'AA', 'AB', 'AC', 'BC']
 
     # Test a row
@@ -90,8 +90,8 @@ def test_excel_export(session):
     row_num = 2
     for ix, (class_attrib, col_name) in enumerate(column_mapper.items()):
         if class_attrib == 'memberships':
-            assert sheet.row(row_num)[ix].value == \
+            assert sheet.cell(row_num + 1, ix + 1).value == \
                 f"{agency_x.title} - a in x\n{agency_y.title} - a in y"
         else:
-            assert sheet.row(row_num)[ix].value == \
+            assert sheet.cell(row_num + 1, ix + 1).value == \
                 none_to_empty_string(getattr(person_a, class_attrib))

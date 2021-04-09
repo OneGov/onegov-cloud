@@ -1,9 +1,10 @@
-import pytest
 import transaction
 
 from freezegun import freeze_time
 from io import BytesIO
 from onegov.gazette.models import GazetteNotice
+from openpyxl import load_workbook
+from PyPDF2 import PdfFileReader
 from tests.onegov.gazette.common import login_admin
 from tests.onegov.gazette.common import login_editor_1
 from tests.onegov.gazette.common import login_editor_2
@@ -11,12 +12,10 @@ from tests.onegov.gazette.common import login_editor_3
 from tests.onegov.gazette.common import login_publisher
 from tests.onegov.gazette.common import login_users
 from tests.onegov.gazette.common import publish_issue
-from PyPDF2 import PdfFileReader
 from unittest.mock import patch
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 from webtest import TestApp as Client
-from xlrd import open_workbook
 
 
 def test_view_notices(gazette_app):
@@ -599,12 +598,15 @@ def test_view_notices_statistics(gazette_app):
         result = publisher.get(
             '/notices/{}/statistics-xlsx?{}'.format(state, qs or '')
         )
-        book = open_workbook(file_contents=result.body)
-        for sheet in book.sheets():
-            if sheet.name == sheet_name:
+        book = load_workbook(BytesIO(result.body))
+        for sheet in book.worksheets:
+            if sheet.title == sheet_name:
                 return [
-                    [sheet.cell(row, col).value for col in range(sheet.ncols)]
-                    for row in range(sheet.nrows)
+                    [
+                        sheet.cell(row + 1, col + 1).value
+                        for col in range(sheet.max_column)
+                    ]
+                    for row in range(sheet.max_row)
                 ]
 
     # No notices yet
@@ -784,11 +786,13 @@ def test_view_notices_statistics_rejected(gazette_app):
         ]
 
         result_xslx = publisher.get('/notices/drafted/statistics-xlsx')
-        book = open_workbook(file_contents=result_xslx.body)
-        sheet = book.sheet_by_name('Zurückgewiesen')
+        book = load_workbook(BytesIO(result_xslx.body))
+        sheet = book.get_sheet_by_name('Zurückgewiesen')
         result_xslx = [
-            [sheet.cell(row, 0).value, int(sheet.cell(row, 1).value)]
-            for row in range(1, sheet.nrows)
+            [
+                sheet.cell(row + 1, 1).value, sheet.cell(row + 1, 2).value
+            ]
+            for row in range(1, sheet.max_row)
         ]
 
         assert result_html == result_xslx

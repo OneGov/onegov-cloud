@@ -9,7 +9,6 @@ from pytest import mark
 from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
-from xlrd import open_workbook
 from xlsxwriter.workbook import Workbook
 
 
@@ -27,10 +26,6 @@ def test_view_update_votes(swissvotes_app, file):
 
     with open(file, 'rb') as f:
         content = f.read()
-        workbook = open_workbook(file_contents=content)
-
-    sheet = workbook.sheet_by_name('DATA')
-    data_rows = sheet.nrows - 1
 
     # Upload
     manage = client.get('/').maybe_follow().click("Abstimmungen")
@@ -42,8 +37,7 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert f"Datensatz aktualisiert ({data_rows} " \
-        f"hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (659 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
