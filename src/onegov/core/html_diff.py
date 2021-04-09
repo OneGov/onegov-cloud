@@ -33,8 +33,8 @@ from genshi.input import ET
 import html5lib
 
 
-_leading_space_re = re.compile(r'^(\s+)(?u)')
-_diff_split_re = re.compile(r'(\s+)(?u)')
+_leading_space_re = re.compile(r'^(\s+)')
+_diff_split_re = re.compile(r'(\s+)')
 
 
 def diff_genshi_stream(old_stream, new_stream):
