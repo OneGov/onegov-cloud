@@ -248,3 +248,9 @@ function autoResize() {
     }
 
 }
+
+// expandible people panel
+$('.side-panel .expand-people a').on('click', function(e) {
+    e.preventDefault()
+    $(e.target).parent().parent().children().filter('.hideable').toggleClass('hidden')
+});

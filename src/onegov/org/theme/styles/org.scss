@@ -1353,6 +1353,10 @@ ul.panel-links {
     border: 1px solid $gray;
     margin-bottom: 2rem;
 
+    .hidden {
+        display: none;
+    }
+
     h2,
     h3 {
         border-bottom: 2px solid $primary-color;
