@@ -6,11 +6,9 @@ from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import SwissVote
+from openpyxl import load_workbook
+from openpyxl.utils.datetime import from_excel
 from psycopg2.extras import NumericRange
-from xlrd import open_workbook
-from xlrd import XL_CELL_EMPTY
-from xlrd import XL_CELL_NUMBER
-from xlrd import xldate
 
 
 class SwissvoteDatasetField(UploadField):
@@ -57,30 +55,25 @@ class SwissvoteDatasetField(UploadField):
         mapper = ColumnMapper()
 
         try:
-            workbook = open_workbook(
-                file_contents=self.raw_data[0].file.read()
-            )
+            workbook = load_workbook(self.raw_data[0].file, data_only=True)
         except Exception:
             raise ValueError(_("Not a valid XLSX file."))
 
-        if workbook.nsheets < 1:
+        if len(workbook.worksheets) < 1:
             raise ValueError(_("No data."))
 
-        data_sheet_name = 'DATA'
-        citation_sheet_name = 'CITATION'
-
-        if data_sheet_name not in workbook.sheet_names():
+        if 'DATA' not in workbook.get_sheet_names():
             raise ValueError(_('Sheet DATA is missing.'))
 
-        if citation_sheet_name not in workbook.sheet_names():
+        if 'CITATION' not in workbook.get_sheet_names():
             raise ValueError(_('Sheet CITATION is missing.'))
 
-        sheet = workbook.sheet_by_name(data_sheet_name)
+        sheet = workbook.get_sheet_by_name('DATA')
 
-        if sheet.nrows <= 1:
+        if sheet.max_row <= 1:
             raise ValueError(_("No data."))
 
-        headers = [column.value for column in sheet.row(0)]
+        headers = [column.value for column in tuple(sheet.rows)[0]]
         missing = set(mapper.columns.values()) - set(headers)
         if missing:
             raise ValueError(_(
@@ -88,19 +81,20 @@ class SwissvoteDatasetField(UploadField):
                 mapping={'columns': ', '.join(missing)}
             ))
 
-        for index in range(1, sheet.nrows):
-            row = sheet.row(index)
+        for index in range(2, sheet.max_row + 1):
             vote = SwissVote()
+            all_columns_empty = True
+            errors_of_empty_columns = []
             for (
                 attribute, column, type_, nullable, precision, scale
             ) in mapper.items():
-                cell = row[headers.index(column)]
+                cell = sheet.cell(index, headers.index(column) + 1)
                 try:
-                    if cell.ctype == XL_CELL_EMPTY:
+                    if cell.value is None:
                         value = None
                     elif type_ == 'TEXT':
                         if (
-                            cell.ctype == XL_CELL_NUMBER
+                            cell.data_type == 'n'
                             and int(cell.value) == cell.value
                         ):
                             value = str(int(cell.value))
@@ -108,15 +102,16 @@ class SwissvoteDatasetField(UploadField):
                             value = str(cell.value)
                         value = '' if value == '.' else value
                     elif type_ == 'DATE':
-                        if isinstance(cell.value, str):
+                        if cell.data_type == 's':
                             value = parse(cell.value, dayfirst=True).date()
+                        elif cell.data_type == 'n':
+                            value = from_excel(cell.value).date()
+                        elif cell.data_type == 'd':
+                            value = cell.value.date()
                         else:
-                            value = xldate.xldate_as_datetime(
-                                cell.value,
-                                workbook.datemode
-                            ).date()
+                            raise ValueError('Not a valid date format')
                     elif type_ == 'INTEGER':
-                        if isinstance(cell.value, str):
+                        if cell.data_type == 's':
                             value = cell.value
                             value = '' if value == '.' else value
                             value = int(value) if value else None
@@ -138,6 +133,8 @@ class SwissvoteDatasetField(UploadField):
                                 format(value, f'{precision}.{scale}f')
                             )
 
+                    all_columns_empty = all_columns_empty and value is None
+
                 except Exception:
                     errors.append((
                         index, column, f"'{value}' ≠ {type_.lower()}"
@@ -145,10 +142,12 @@ class SwissvoteDatasetField(UploadField):
 
                 else:
                     if not nullable and value is None:
-                        errors.append((index, column, "∅"))
+                        errors_of_empty_columns.append((index, column, "∅"))
                     mapper.set_value(vote, attribute, value)
 
-            data.append(vote)
+            if not all_columns_empty:
+                errors.extend(errors_of_empty_columns)
+                data.append(vote)
 
         if errors:
             raise ValueError(_(
