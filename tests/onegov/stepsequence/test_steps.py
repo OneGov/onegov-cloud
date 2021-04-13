@@ -1,7 +1,8 @@
 import pytest
 
 from onegov.stepsequence import Step, step_sequences
-from onegov.stepsequence.extension import StepsModelExtension
+from onegov.stepsequence.extension import StepsModelExtension, \
+    StepsLayoutExtension
 
 
 def test_step():
@@ -27,6 +28,39 @@ def test_step():
     assert not step < step_ahead
 
 
+def test_step_layout_extension(sequences):
+
+    class BaseLayout(object):
+
+        def __init__(self, model):
+            self.model = model
+
+    @sequences.registered_step(1, 'Start', cls_after='MiddleLayout')
+    class StartLayout(BaseLayout, StepsLayoutExtension):
+        @property
+        def step_position(self):
+            return 1
+
+    @sequences.registered_step(2, 'Middle', cls_after='MiddleLayout', cls_before='StartLayout')
+    class MiddleLayout(BaseLayout, StepsLayoutExtension):
+        @property
+        def step_position(self):
+            return 2
+
+    @sequences.registered_step(3, 'End', cls_before='MiddleLayout')
+    class EndLayout(BaseLayout, StepsLayoutExtension):
+        @property
+        def step_position(self):
+            return 3
+
+    start = StartLayout(None)
+    middle = MiddleLayout(None)
+    end = EndLayout(None)
+
+    assert start.get_step_sequence() == end.get_step_sequence() == \
+           middle.get_step_sequence()
+
+
 def test_step_registry(sequences):
 
     @sequences.registered_step(1, cls_after='Step2')
@@ -41,7 +75,6 @@ def test_step_registry(sequences):
     class Step3(StepsModelExtension):
         pass
 
-    assert len(sequences.registry.keys()) == 3
     step1 = Step1.registered_steps().get(1)
     step2 = Step2.registered_steps().get(2)
     step3 = Step3.registered_steps().get(3)
