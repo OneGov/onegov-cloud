@@ -519,7 +519,7 @@
                     <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
                     <div class="location" tal:condition="location">${location}</div>
                 </div>
-                <div class="side-panel people-panel" tal:condition="people" tal:define="collapsible len(people) > 3">
+                <div class="side-panel people-panel" tal:condition="people" tal:define="collapsible len(people or []) > 3">
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}" class="${repeat.person.index > 2 and 'hidden hideable' or ''}">
