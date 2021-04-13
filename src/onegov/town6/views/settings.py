@@ -5,7 +5,7 @@ from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
 from onegov.town6.forms.settings import GeneralSettingsForm, \
-    ChatBotSettingsForm
+    ChatSettingsForm
 
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
@@ -224,9 +224,9 @@ def custom_handle_settings(self, request, form):
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(model=Organisation, name='chatbot-settings', template='form.pt',
-              permission=Secret, form=ChatBotSettingsForm,
-              setting=_("Chatbot"), icon='far fa-comments', order=-999)
-def handle_chatbot_settings(self, request, form):
+@TownApp.form(model=Organisation, name='chat-settings', template='form.pt',
+              permission=Secret, form=ChatSettingsForm,
+              setting=_("Chat"), icon='far fa-comments', order=-999)
+def handle_chat_settings(self, request, form):
     return handle_generic_settings(
-        self, request, form, _("Chatbot"), SettingsLayout(self, request))
+        self, request, form, _("Chat"), SettingsLayout(self, request))

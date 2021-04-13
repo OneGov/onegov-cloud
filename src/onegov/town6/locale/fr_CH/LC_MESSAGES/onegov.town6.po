@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-04-08 13:22+0200\n"
+"POT-Creation-Date: 2021-04-13 10:41+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -29,20 +29,20 @@ msgstr "Police principale sans-serif"
 msgid "Used for all the headings"
 msgstr "Utilisé dans les titres"
 
-msgid "Supported Chatbots"
-msgstr "Chatbots supportés"
+msgid "Supported Chat Integrations"
+msgstr "Integrations de Chat supportées"
 
-msgid "Chatbot title"
-msgstr "Titre du Chatbot"
+msgid "Chat title"
+msgstr "Title du Chat"
 
-msgid "Chatbot background color"
-msgstr "Couleur de fond de Chatbot"
+msgid "Chat background color"
+msgstr "Couleur de fond de Chat"
 
 msgid "Customer-ID"
 msgstr "Identifiant du client"
 
-msgid "Hide chatbot for chosen roles"
-msgstr "Cacher le Chatbot pour les rôles choisis"
+msgid "Hide chat for chosen roles"
+msgstr "Cacher le Chat pour les rôles choisis"
 
 msgid "Admin"
 msgstr ""
@@ -53,8 +53,8 @@ msgstr "Rédacteur"
 msgid "Member"
 msgstr "Membres"
 
-msgid "Disable the chatbot"
-msgstr "Désactiver le Chatbot"
+msgid "Disable the chat"
+msgstr "Désactiver le Chat"
 
 msgid "Events"
 msgstr "Événements"
@@ -1852,8 +1852,23 @@ msgstr "Paramètres tickets"
 msgid "Newsletter Settings"
 msgstr "Paramètres de la newsletter"
 
-msgid "Chatbot"
+msgid "Chat"
 msgstr ""
+
+#~ msgid "Supported Chatbots"
+#~ msgstr "Chatbots supportés"
+
+#~ msgid "Chatbot title"
+#~ msgstr "Titre du Chatbot"
+
+#~ msgid "Chatbot background color"
+#~ msgstr "Couleur de fond de Chatbot"
+
+#~ msgid "Hide chatbot for chosen roles"
+#~ msgstr "Cacher le Chatbot pour les rôles choisis"
+
+#~ msgid "Disable the chatbot"
+#~ msgstr "Désactiver le Chatbot"
 
 #~ msgid "Current Image"
 #~ msgstr "Aktuelles Bild"

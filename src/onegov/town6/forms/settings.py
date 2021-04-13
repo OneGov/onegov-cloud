@@ -89,29 +89,29 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
             response.delete_cookie('locale')
 
 
-class ChatBotSettingsForm(Form):
+class ChatSettingsForm(Form):
 
-    chatbot_type = RadioField(
-        label=_('Supported Chatbots'),
+    chat_type = RadioField(
+        label=_('Supported Chat Integrations'),
         choices=[
             ('scoutss', 'Scoutss')
         ]
     )
 
-    chatbot_title = StringField(
-        label=_('Chatbot title')
+    chat_title = StringField(
+        label=_('Chat title')
     )
 
-    chatbot_color = ColorField(
-        label=_('Chatbot background color')
+    chat_color = ColorField(
+        label=_('Chat background color')
     )
 
-    chatbot_customer_id = StringField(
+    chat_customer_id = StringField(
         label=_('Customer-ID')
     )
 
-    hide_chatbot_for_roles = ChosenSelectMultipleField(
-        label=_('Hide chatbot for chosen roles'),
+    hide_chat_for_roles = ChosenSelectMultipleField(
+        label=_('Hide chat for chosen roles'),
         choices=(
             ('admin', _('Admin')),
             ('editor', _('Editor')),
@@ -119,19 +119,19 @@ class ChatBotSettingsForm(Form):
         )
     )
 
-    disable_chatbot = BooleanField(
-        label=_('Disable the chatbot')
+    disable_chat = BooleanField(
+        label=_('Disable the chat')
     )
 
     def process_obj(self, obj):
         super().process_obj(obj)
-        color = obj.chatbot_bg_color
+        color = obj.chat_bg_color
         if not color:
             color = obj.theme_options.get(
                 'primary-color-ui', user_options['primary-color-ui'])
 
-        self.chatbot_color.data = color
+        self.chat_color.data = color
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
-        obj.chatbot_bg_color = self.chatbot_color.data.get_hex()
+        obj.chat_bg_color = self.chat_color.data.get_hex()

@@ -74,19 +74,19 @@ def test_homepage(client):
     # Test chatbot on homepage
     assert not homepage.pyquery('.chatbot')
 
-    client.app.org.chatbot_customer_id = 'HEY'
-    client.app.org.chatbot_type = 'scoutss'
+    client.app.org.chat_customer_id = 'HEY'
+    client.app.org.chat_type = 'scoutss'
     transaction.commit()
-    assert client.get('/').pyquery('.chatbot')
+    assert client.get('/').pyquery('.chat')
 
     editor = client.spawn()
     editor.login_editor()
-    assert editor.get('/').pyquery('.chatbot')
+    assert editor.get('/').pyquery('.chat')
 
-    client.app.org.hide_chatbot_for_roles = ['admin', 'editor']
+    client.app.org.hide_chat_for_roles = ['admin', 'editor']
     transaction.commit()
-    assert not editor.get('/').pyquery('.chatbot')
+    assert not editor.get('/').pyquery('.chat')
 
-    client.app.org.disable_chatbot = True
+    client.app.org.disable_chat = True
     transaction.commit()
-    assert not client.get('/').pyquery('.chatbot')
+    assert not client.get('/').pyquery('.chat')

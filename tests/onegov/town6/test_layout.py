@@ -25,9 +25,9 @@ class MockRequest(object):
     app = Bunch(org=Bunch(
         geo_provider='geo-mapbox',
         open_files_target_blank=True,
-        chatbot_type=None,
-        disable_chatbot=None,
-        chatbot_customer_id=None
+        chat_type=None,
+        disable_chat=None,
+        chat_customer_id=None
     ))
 
     def include(self, *args, **kwargs):
@@ -157,9 +157,9 @@ def test_template_layout(postgres_dsn, redis_url):
 
     class Mock(object):
         homepage_structure = ''
-        chatbot_type = None
-        chatbot_customer_id = None
-        disable_chatbot = False
+        chat_type = None
+        chat_customer_id = None
+        disable_chat = False
 
     class App(TownApp):
         theme_options = {}
