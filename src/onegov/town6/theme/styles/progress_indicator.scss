@@ -1,0 +1,107 @@
+$progress-indicator-complete: $primary-color;
+$progress-indicator-current: lighten($primary-color, 20%);
+$progress-indicator-incomplete: $light-gray;
+$progress-indicator-step-size: 1.5em;
+$progress-indicator-width: 100%;
+
+.progress-indicator {
+    display: table;
+    font-family: $header-font-family;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    table-layout: fixed;
+    width: $progress-indicator-width;
+
+    &.with-title {
+        padding-bottom: 2em;
+    }
+
+    > li {
+
+        display: table-cell;
+        font-size: 1.5em;
+        position: relative;
+        text-align: center;
+
+
+        span {
+            color: $progress-indicator-incomplete;
+            font-size: rem-calc(14);
+            letter-spacing: .05px;
+            position: absolute;
+            text-transform: uppercase;
+            transform: translateX(-50%);
+
+        }
+
+        &::before {
+            background: $progress-indicator-incomplete;
+            border-radius: 100%;
+            content: attr(data-step);
+            display: block;
+            height: $progress-indicator-step-size;
+            line-height: $progress-indicator-step-size;
+            margin: 0 auto;
+            margin-bottom: .25em;
+            position: relative;
+            text-align: center;
+            width: $progress-indicator-step-size;
+            z-index: 200;
+        }
+
+        &::after {
+            background: $progress-indicator-incomplete;
+            content: '';
+            display: block;
+            height: $progress-indicator-step-size / 10;
+            left: 50%;
+            margin-left: 1.5em\9;
+            position: absolute;
+            top: 50%; // height of bar
+            transform: translateY(-100%);
+            width: 100%;
+            z-index: 0;
+        }
+
+        &:last-child::after {
+            display: none;
+        }
+
+        &.is-complete {
+            color: $progress-indicator-complete;
+
+            &::before,
+            &::after {
+                background: $progress-indicator-complete;
+                color: $white;
+            }
+
+            span {
+                color: $progress-indicator-complete;
+            }
+        }
+
+        &.is-current {
+            color: $progress-indicator-current;
+
+            &::before {
+                background: $progress-indicator-current;
+                color: if(lightness($progress-indicator-current) >= 50%, $body-font-color, $white);
+            }
+
+            span {
+                color: $progress-indicator-current;
+            }
+        }
+    }
+}
+
+
+.fieldset-display .progress-indicator,
+.progress-wrapper {
+    @include breakpoint(medium up) {
+        margin-bottom: .5em;
+        margin-top: 2em;
+    }
+}

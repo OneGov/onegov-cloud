@@ -41,8 +41,6 @@ from onegov.org.theme.org_theme import user_options
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
-from onegov.stepsequence import step_sequences
-from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection
 from onegov.user.utils import password_reset_url
@@ -747,20 +745,12 @@ class FormEditorLayout(DefaultLayout):
         self.include_code_editor()
 
 
-@step_sequences.registered_step(
-    2, _('Check'),
-    cls_before='DirectoryEntryCollectionLayout',
-    cls_after='TicketChatMessageLayout')
-class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
+class FormSubmissionLayout(DefaultLayout):
 
     def __init__(self, model, request, title=None):
         super().__init__(model, request)
         self.include_code_editor()
         self.title = title or self.form.title
-
-    @property
-    def step_position(self):
-        return 2
 
     @cached_property
     def form(self):
@@ -1087,17 +1077,11 @@ class TicketNoteLayout(DefaultLayout):
         ]
 
 
-@step_sequences.registered_step(3, _('Confirmation'),
-                                cls_before='FormSubmissionLayout')
-class TicketChatMessageLayout(DefaultLayout, StepsLayoutExtension):
+class TicketChatMessageLayout(DefaultLayout):
 
     def __init__(self, model, request, internal=False):
         super().__init__(model, request)
         self.internal = internal
-
-    @property
-    def step_position(self):
-        return 3
 
     @cached_property
     def breadcrumbs(self):
@@ -2106,16 +2090,7 @@ class DirectoryEntryBaseLayout(DefaultLayout):
         return field.id not in self.model.hidden_label_fields
 
 
-@step_sequences.registered_step(
-    1, _('Form'), cls_after='DirectoryEntryCollectionLayout')
-class DirectoryEntryCollectionLayout(
-    DirectoryEntryBaseLayout,
-    StepsLayoutExtension
-):
-
-    @property
-    def step_position(self):
-        return 1
+class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
     @cached_property
     def breadcrumbs(self):

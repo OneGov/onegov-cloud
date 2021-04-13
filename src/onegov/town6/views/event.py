@@ -38,7 +38,9 @@ def town_handle_new_event(self, request, form):
     request_method='POST'
 )
 def town_view_event(self, request):
-    return view_event(self, request, EventLayout(self, request))
+    layout = EventLayout(self, request)
+    layout.get_step_sequence()
+    return view_event(self, request, layout)
 
 
 @TownApp.form(

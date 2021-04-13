@@ -14,7 +14,6 @@ from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import TicketNoteForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import InternalTicketChatMessageForm
-from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout

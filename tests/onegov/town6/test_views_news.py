@@ -1,7 +1,3 @@
-import transaction
-
-from onegov.page import PageCollection
-from tests.shared.utils import open_in_browser
 
 
 def test_news(client):

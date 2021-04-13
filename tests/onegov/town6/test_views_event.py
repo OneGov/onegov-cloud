@@ -1,17 +1,12 @@
 from datetime import date, timedelta
 
 import babel
-import pytest
-
 from tests.onegov.town6.common import step_class
 
 
-@pytest.mark.parametrize('skip_opening_email', [True, False])
-def test_event_steps(client, skip_opening_email):
+def test_event_steps(client):
 
     form_page = client.get('/events').click("Veranstaltung melden")
-
-
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=4)
 
@@ -38,7 +33,6 @@ def test_event_steps(client, skip_opening_email):
 
     assert step_class(form_page, 1) == 'is-current'
     assert step_class(form_page, 2) == ''
-    # assert form_page.pyquery('[data-step="3"]').attr('class') == ''
 
     preview_page = form_page.form.submit().follow()
     assert "My Ewent" in preview_page
@@ -62,14 +56,12 @@ def test_event_steps(client, skip_opening_email):
 
     assert step_class(preview_page, 1) == 'is-complete'
     assert step_class(preview_page, 2) == 'is-current'
-    # assert preview_page.pyquery('[data-step="3"]').attr('class') == ''
 
     # Edit event
     form_page = preview_page.click("Bearbeiten", index=0)
     form_page.form['title'] = "My Event"
     assert step_class(form_page, 1) == 'is-complete'
     assert step_class(form_page, 2) == 'is-current'
-    # assert form_page.pyquery('[data-step="3"]').attr('class') == ''
 
     preview_page = form_page.form.submit().follow()
 
@@ -78,20 +70,15 @@ def test_event_steps(client, skip_opening_email):
 
     # Submit event
     confirmation_page = preview_page.form.submit().follow()
-    if skip_opening_email:
-        assert len(client.app.smtp.outbox) == 0
-        return
 
     assert "Vielen Dank für Ihre Eingabe!" in confirmation_page
     ticket_nr = confirmation_page.pyquery('.ticket-number').text()
     assert "EVN-" in ticket_nr
     assert "My Event" not in client.get('/events')
 
-    assert confirmation_page.pyquery('[data-step="1"]').attr('class') == \
-           'is-complete'
-    assert confirmation_page.pyquery('[data-step="2"]').attr('class') == \
-           'is-complete'
-    assert confirmation_page.pyquery('[data-step="3"]').attr('class') == 'is-current'
+    assert step_class(confirmation_page, 1) == 'is-complete'
+    assert step_class(confirmation_page, 2) == 'is-complete'
+    assert step_class(confirmation_page, 3) == 'is-current'
 
     assert len(client.app.smtp.outbox) == 1
     message = client.app.smtp.outbox[0]

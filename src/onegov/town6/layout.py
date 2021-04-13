@@ -18,6 +18,8 @@ from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
+from onegov.stepsequence import step_sequences
+from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.ticket import TicketCollection
 from onegov.town6 import _
 from onegov.core.elements import Link, Block, Confirm, Intercooler, LinkGroup
@@ -278,12 +280,38 @@ class FormEditorLayout(DefaultLayout):
         self.include_code_editor()
 
 
-class FormSubmissionLayout(DefaultLayout):
+@step_sequences.registered_step(
+    1, _('Form'), cls_after='FormSubmissionLayout')
+@step_sequences.registered_step(
+    2, _('Check'),
+    cls_before='FormSubmissionLayout',
+    cls_after='TicketChatMessageLayout'
+)
+@step_sequences.registered_step(
+    2, _('Check'),
+    cls_before='DirectoryEntryCollectionLayout',
+    cls_after='TicketChatMessageLayout')
+@step_sequences.registered_step(
+    2, _('Check'),
+    cls_before='EventLayout',
+    cls_after='TicketChatMessageLayout')
+@step_sequences.registered_step(
+    2, _('Check'),
+    cls_before='DirectoryEntryLayout',
+    cls_after='TicketChatMessageLayout'
+)
+class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
 
     def __init__(self, model, request, title=None):
         super().__init__(model, request)
         self.include_code_editor()
         self.title = title or self.form.title
+
+    @property
+    def step_position(self):
+        if self.model.__class__.__name__ == 'CustomFormDefinition':
+            return 1
+        return 2
 
     @cached_property
     def form(self):
@@ -610,11 +638,21 @@ class TicketNoteLayout(DefaultLayout):
         ]
 
 
-class TicketChatMessageLayout(DefaultLayout):
+@step_sequences.registered_step(
+    3, _('Confirmation'),
+    cls_before='FormSubmissionLayout')
+@step_sequences.registered_step(
+    3, _('Confirmation'),
+    cls_before='EventLayout')
+class TicketChatMessageLayout(DefaultLayout, StepsLayoutExtension):
 
     def __init__(self, model, request, internal=False):
         super().__init__(model, request)
         self.internal = internal
+
+    @property
+    def step_position(self):
+        return 3
 
     @cached_property
     def breadcrumbs(self):
@@ -1082,7 +1120,13 @@ class OccurrenceLayout(EventBaseLayout):
             return [edit_link, delete_link]
 
 
-class EventLayout(EventBaseLayout):
+@step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
+@step_sequences.registered_step(
+    2, _('Check'),
+    cls_before='EventLayout',
+    cls_after='TicketChatMessageLayout'
+)
+class EventLayout(EventBaseLayout, StepsLayoutExtension):
 
     @cached_property
     def breadcrumbs(self):
@@ -1091,6 +1135,12 @@ class EventLayout(EventBaseLayout):
             Link(_("Events"), self.events_url),
             Link(self.model.title, self.request.link(self.model)),
         ]
+
+    @property
+    def step_position(self):
+        if self.request.view_name == 'new':
+            return 1
+        return 2
 
     @cached_property
     def editbar_links(self):
@@ -1622,7 +1672,14 @@ class DirectoryEntryBaseLayout(DefaultLayout):
         return field.id not in self.model.hidden_label_fields
 
 
-class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
+@step_sequences.registered_step(
+    1, _('Form'), cls_after='FormSubmissionLayout'
+)
+class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
+                                     StepsLayoutExtension):
+    @property
+    def step_position(self):
+        return 1
 
     @cached_property
     def breadcrumbs(self):
@@ -1767,7 +1824,12 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
 
-class DirectoryEntryLayout(DirectoryEntryBaseLayout):
+@step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
+class DirectoryEntryLayout(DirectoryEntryBaseLayout, StepsLayoutExtension):
+
+    @property
+    def step_position(self):
+        return 1
 
     @property
     def thumbnail_field_ids(self):

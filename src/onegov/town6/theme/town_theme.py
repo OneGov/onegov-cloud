@@ -140,7 +140,8 @@ class TownTheme(BaseTheme):
             'search',
             'hints',
             'allocations',
-            'homepage'
+            'homepage',
+            'progress_indicator'
         ]
 
     @property
