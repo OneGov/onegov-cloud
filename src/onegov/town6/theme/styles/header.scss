@@ -303,7 +303,7 @@ $editbar-fg-color-active: $white;
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon-bold($import-link-icon); }
-    .internal-url::before { @include icon($internal-link-icon); }
+    .internal-url::before { @include icon-bold($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon-bold($manage-subscribers); }
     .new-daypass::before { @include icon-bold($new-daypass-icon); }
