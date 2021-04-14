@@ -1,8 +1,73 @@
 # Changes
 
+## Release `2021.40`
+
+> commits: **37 / [f59ab70a55...834f0533a3](https://github.com/OneGov/onegov-cloud/compare/f59ab70a55^...834f0533a3)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.40)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agencies
+
+✨ **Drop support for import from plone / seantis.agencies.**
+
+**`Other`** | **[SEA-101](https://linear.app/seantis/issue/SEA-101)** | **[eb7c3cf5ad](https://github.com/onegov/onegov-cloud/commit/eb7c3cf5adb0d03022a86f8262ead7943d268ebf)**
+
+### Election Day
+
+🐞 **Fixes translations.**
+
+**`Bugfix`** | **[f59ab70a55](https://github.com/onegov/onegov-cloud/commit/f59ab70a5520f82eabc95217a4fc3f226c1708a0)**
+
+🐞 **Removes possibility to create majorz election compounds.**
+
+Currently, one can define election compounds with majorz elections but 
+these don't contain lists results, which we display. Since such 
+compounds are historically possible, but are not really a use case at 
+the moment, we drop this feature.
+
+**`Bugfix`** | **[fb9c2824a7](https://github.com/onegov/onegov-cloud/commit/fb9c2824a7ef1871e3f29444408ee8f9838dae67)**
+
+### Feriennet
+
+🎉 **Enables favicon from /favicon-settings**
+
+**`Feature`** | **[FER-949](https://issues.seantis.ch/browse/FER-949)** | **[7092439672](https://github.com/onegov/onegov-cloud/commit/7092439672f367d88c27b3579b66f8390b9ca617)**
+
+### Org
+
+🎉 **Opens files in news/topics in new tab based on user setting**
+
+Enables settings org.open_files_target_blank for news and topics.
+
+**`Feature`** | **[FER-873](https://issues.seantis.ch/browse/FER-873)** | **[60e29148d6](https://github.com/onegov/onegov-cloud/commit/60e29148d69ab4790e5b6ec35f1ddf5c48e71346)**
+
+🎉 **Make people side panel expandible**
+
+**`Feature`** | **[SEA-7](https://linear.app/seantis/issue/SEA-7)** | **[33a6146f0b](https://github.com/onegov/onegov-cloud/commit/33a6146f0b14af32a6c456cf2b090bf900db95b6)**
+
+### Swissvotes
+
+✨ **Use openpyxl instead of xlrd.**
+
+**`Other`** | **[SEA-101](https://linear.app/seantis/issue/SEA-101)** | **[b1721cd1e2](https://github.com/onegov/onegov-cloud/commit/b1721cd1e2703adc181329bf768777e04de748dd)**
+
+### Town6
+
+🎉 **Adds chatbot integration**
+
+Adds a first integration for a chatbot with settings available on url /chatbot-settings.
+
+**`Feature`** | **[SEA-163](https://linear.app/seantis/issue/SEA-163)** | **[e295303bd4](https://github.com/onegov/onegov-cloud/commit/e295303bd4f245dc79bac11949e5d6c322b956eb)**
+
+🎉 **Adds progress indicator**
+
+Adds step sequence registry. Defines 3 steps for forms, event suggestions, and new directories and directory change-requests.
+
+**`Feature`** | **[SEA-105](https://linear.app/seantis/issue/SEA-105)** | **[24c69a0e37](https://github.com/onegov/onegov-cloud/commit/24c69a0e37c17eff18b68f3922a0df4b7bea5263)**
+
 ## Release `2021.39`
 
-> commits: **6 / [575884a9a5...e0162b5636](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...e0162b5636)**  
+> released: **2021-04-06 16:59**<br>
+> commits: **7 / [575884a9a5...c05630558a](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...c05630558a)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.39)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
