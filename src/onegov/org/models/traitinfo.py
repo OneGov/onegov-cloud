@@ -117,7 +117,7 @@ class TraitInfo(object):
                 name,
                 request.link(Editor('new', self, trait)),
                 classes=(
-                    'new-{}'.format(trait),
+                    f'new-{trait}',
                     'show-new-content-placeholder'
                 )
             )
