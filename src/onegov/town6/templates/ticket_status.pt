@@ -3,9 +3,12 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="progress-wrapper" tal:define="steps layout.get_step_sequence()|nothing" tal:condition="steps" >
-            <div metal:use-macro="layout.macros['progress_indicator']" />
-        </div>
+        <tal:b tal:define="steps layout.get_step_sequence()|nothing">
+            <div class="progress-wrapper" tal:condition="steps">
+                <div metal:use-macro="layout.macros['progress_indicator']" />
+                <br>
+            </div>
+        </tal:b>
         <div class="panel" tal:condition="ticket.state in {'open', 'closed'} and not pick_up_hint">
             <tal:b tal:condition="not: pick_up_hint" metal:use-macro="layout.macros['ticket_status_page_message']" />
         </div>

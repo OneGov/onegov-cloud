@@ -14,10 +14,12 @@
                 fully in the list view, you need to use a square image.
             </p>
         </div>
-
-        <div class="progress-wrapper" tal:define="steps layout.get_step_sequence()|nothing">
-            <div metal:use-macro="layout.macros['progress_indicator']" />
-        </div>
+        <tal:b tal:define="steps layout.get_step_sequence()|nothing">
+            <div class="progress-wrapper" tal:condition="steps">
+                <div metal:use-macro="layout.macros['progress_indicator']" />
+                <br>
+            </div>
+        </tal:b>
 
         <div class="grid-x event-preview">
             <div class="large-8 medium-8 cell">

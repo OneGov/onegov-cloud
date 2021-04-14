@@ -38,10 +38,12 @@
         <div class="panel" tal:condition="helptext|nothing">
              <p>${helptext}</p>
         </div>
-        <div class="progress-wrapper" tal:define="steps layout.get_step_sequence()|nothing">
-            <div metal:use-macro="layout.macros['progress_indicator']" />
-            <br>
-        </div>
+        <tal:b tal:define="steps layout.get_step_sequence()|nothing">
+            <div class="progress-wrapper" tal:condition="steps">
+                <div metal:use-macro="layout.macros['progress_indicator']" />
+                <br>
+            </div>
+        </tal:b>
 
         <tal:b metal:use-macro="layout.macros.page_content"
                    tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing">
