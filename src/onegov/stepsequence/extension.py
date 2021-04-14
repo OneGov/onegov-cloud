@@ -39,7 +39,6 @@ class StepsLayoutExtension(StepBaseExtension):
 
     @cached_property
     def registered_steps(self):
-        print(step_sequences.registry)
         return step_sequences.registry[self.__class__.__name__]
 
     def get_step_sequence(self, position=None):
