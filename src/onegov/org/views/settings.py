@@ -77,6 +77,14 @@ def handle_general_settings(self, request, form, layout=None):
 
 
 @OrgApp.form(
+    model=Organisation, name='homepage-settings', template='form.pt',
+    permission=Secret, form=HomepageSettingsForm, setting=_("Homepage"),
+    icon='fa-home', order=-995)
+def handle_homepage_settings(self, request, form, layout=None):
+    return handle_generic_settings(self, request, form, _("Homepage"), layout)
+
+
+@OrgApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
     icon=' fa-external-link-square', order=-990)
@@ -93,11 +101,31 @@ def handle_links_settings(self, request, form, layout=None):
 
 
 @OrgApp.form(
-    model=Organisation, name='homepage-settings', template='form.pt',
-    permission=Secret, form=HomepageSettingsForm, setting=_("Homepage"),
-    icon='fa-home', order=-900)
-def handle_homepage_settings(self, request, form, layout=None):
-    return handle_generic_settings(self, request, form, _("Homepage"), layout)
+    model=Organisation, name='newsletter-settings', template='form.pt',
+    permission=Secret, form=NewsletterSettingsForm,
+    setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
+)
+def handle_newsletter_settings(self, request, form, layout=None):
+    return handle_generic_settings(
+        self, request, form, _("Newsletter Settings"), layout
+    )
+
+
+@OrgApp.form(
+    model=Organisation, name='ticket-settings', template='form.pt',
+    permission=Secret, form=OrgTicketSettingsForm,
+    setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
+)
+def handle_ticket_settings(self, request, form, layout=None):
+    resp = handle_generic_settings(
+        self, request, form, _("Ticket Settings"), layout)
+    if request.method == 'GET':
+        resp['callout'] = _(
+            "Accepting and closing tickets automatically should be used "
+            "with care! This means that anonymous users can influence the "
+            "page content without user interaction of an admin! "
+            "Best activate this setting just for a limited period of time.")
+    return resp
 
 
 @OrgApp.form(
@@ -147,34 +175,6 @@ def handle_analytics_settings(self, request, form, layout=None):
     icon='fa-calendar-o', order=-500)
 def handle_holiday_settings(self, request, form, layout=None):
     return handle_generic_settings(self, request, form, _("Holidays"), layout)
-
-
-@OrgApp.form(
-    model=Organisation, name='ticket-settings', template='form.pt',
-    permission=Secret, form=OrgTicketSettingsForm,
-    setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
-)
-def handle_ticket_settings(self, request, form, layout=None):
-    resp = handle_generic_settings(
-        self, request, form, _("Ticket Settings"), layout)
-    if request.method == 'GET':
-        resp['callout'] = _(
-            "Accepting and closing tickets automatically should be used "
-            "with care! This means that anonymous users can influence the "
-            "page content without user interaction of an admin! "
-            "Best activate this setting just for a limited period of time.")
-    return resp
-
-
-@OrgApp.form(
-    model=Organisation, name='newsletter-settings', template='form.pt',
-    permission=Secret, form=NewsletterSettingsForm,
-    setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
-)
-def handle_newsletter_settings(self, request, form, layout=None):
-    return handle_generic_settings(
-        self, request, form, _("Newsletter Settings"), layout
-    )
 
 
 @OrgApp.form(model=Organisation, name='holiday-settings-preview',

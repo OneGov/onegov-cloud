@@ -111,6 +111,19 @@ def town_handle_general_settings(self, request, form):
         self, request, form, SettingsLayout(self, request))
 
 
+@TownApp.form(model=Organisation, name='homepage-settings', template='form.pt',
+              permission=Secret, form=get_custom_settings_form,
+              setting=_("Homepage"), icon='fa-home', order=-995)
+def custom_handle_settings(self, request, form):
+
+    form.delete_field('homepage_cover')
+    form.delete_field('redirect_homepage_to')
+    form.delete_field('redirect_path')
+
+    return handle_homepage_settings(
+        self, request, form, SettingsLayout(self, request))
+
+
 @TownApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
@@ -127,6 +140,14 @@ def town_handle_favicon_settings(self, request, form):
 def town_handle_links_settings(self, request, form):
     return handle_links_settings(
         self, request, form, SettingsLayout(self, request))
+
+
+@TownApp.form(model=Organisation, name='chat-settings', template='form.pt',
+              permission=Secret, form=ChatSettingsForm,
+              setting=_("Chat"), icon='far fa-comments', order=-980)
+def handle_chat_settings(self, request, form):
+    return handle_generic_settings(
+        self, request, form, _("Chat"), SettingsLayout(self, request))
 
 
 @TownApp.form(
@@ -209,24 +230,3 @@ def town_handle_newsletter_settings(self, request, form, layout=None):
 def town_preview_holiday_settings(self, request, form):
     return preview_holiday_settings(
         self, request, form, DefaultLayout(self, request))
-
-
-@TownApp.form(model=Organisation, name='homepage-settings', template='form.pt',
-              permission=Secret, form=get_custom_settings_form,
-              setting=_("Homepage"), icon='fa-home', order=-900)
-def custom_handle_settings(self, request, form):
-
-    form.delete_field('homepage_cover')
-    form.delete_field('redirect_homepage_to')
-    form.delete_field('redirect_path')
-
-    return handle_homepage_settings(
-        self, request, form, SettingsLayout(self, request))
-
-
-@TownApp.form(model=Organisation, name='chat-settings', template='form.pt',
-              permission=Secret, form=ChatSettingsForm,
-              setting=_("Chat"), icon='far fa-comments', order=-999)
-def handle_chat_settings(self, request, form):
-    return handle_generic_settings(
-        self, request, form, _("Chat"), SettingsLayout(self, request))
