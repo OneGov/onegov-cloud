@@ -98,7 +98,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     @property
     def deletable(self):
-        return self.parent is not None
+        return self.parent_id is not None
 
     @property
     def editable(self):
