@@ -1,16 +1,21 @@
 from freezegun import freeze_time
 
-from tests.shared.utils import open_in_browser
+from tests.onegov.org.common import edit_bar_links
 
 
 def test_pages(client):
+
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
     client.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
     root_page = client.get(root_url)
 
-    assert len(root_page.pyquery('.edit-bar')) == 1
+    links = edit_bar_links(root_page, 'text')
+    assert 'Url ändern' in links
+    assert len(links) == 5
     new_page = root_page.click('Thema')
     assert "Neues Thema" in new_page
 
@@ -27,8 +32,18 @@ def test_pages(client):
     assert page.pyquery('.page-text i').text()\
         .startswith("Experts say it's the fact")
 
-    edit_page = page.click("Bearbeiten")
+    # Test changing the url
+    assert 'Url ändern' not in editor.get(page.request.url)
+    url_page = page.click('Url ändern')
+    url_page.form['name'] = 'my govikoN'
+    url_page = url_page.form.submit()
+    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
+    url_page.form['name'] = 'my-govikon'
+    page = url_page.form.submit().follow()
+    assert 'organisation/my-govikon' in page.request.url
+    assert editor.get(url_page.request.url, status=403)
 
+    edit_page = page.click("Bearbeiten")
     assert "Thema Bearbeiten" in edit_page
     assert "&lt;h2&gt;Living in Govikon is Really Great&lt;/h2&gt" in edit_page
 
@@ -115,6 +130,7 @@ def test_links(client):
     client.login_admin()
     root_page = client.get(root_url)
 
+    assert 'Url ändern' in edit_bar_links(root_page, 'text')
     new_link = root_page.click("Verknüpfung")
     assert "Neue Verknüpfung" in new_link
 

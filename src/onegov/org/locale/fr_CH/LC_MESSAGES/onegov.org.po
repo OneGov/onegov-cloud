@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-16 09:04+0200\n"
+"POT-Creation-Date: 2021-04-14 11:11+0200\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -780,6 +780,16 @@ msgstr "Afficher l'introduction sur la page parent"
 
 msgid "(Redesign only)"
 msgstr ""
+
+msgid "Url path"
+msgstr "Chemin Url"
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Nom invalide. Une suggestion valid est: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Une entrée avec le même nom existe"
 
 msgid "Salutation"
 msgstr "Civilité"
@@ -2019,6 +2029,9 @@ msgstr ""
 "supprimer des pages avec des sous-pages. Pour supprimer cette page, "
 "supprimez d'abord toutes les sous-pages, ou demandez à un administrateur de "
 "le faire pour vous."
+
+msgid "Change Url"
+msgstr "Changer Url"
 
 msgid "Source"
 msgstr "Source"
@@ -3586,6 +3599,14 @@ msgstr ""
 "Exporter. Veuillez noter que seuls 10 éléments peuvent être importés à la "
 "fois. Pour importer davantage d'éléments, veuillez faire plusieurs "
 "importations."
+
+#, python-format
+msgid ""
+"Stable urls are important. Here you can change the path to your site. A "
+"total of ${number} pages are affected."
+msgstr ""
+"Les urls stables sont importantes. Vous pouvez modifier ici le chemin "
+"d'accès à votre site. Un total de ${number} pages sont concernées."
 
 msgid "The event submitter has not yet completed his submission"
 msgstr ""

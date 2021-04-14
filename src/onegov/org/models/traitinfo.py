@@ -181,3 +181,10 @@ class TraitInfo(object):
                         "to do it for you."
                     )
                 )
+
+        if request.is_admin and self.url_changeable:
+            yield Link(
+                _('Change Url'),
+                request.link(Editor('change-url', self)),
+                classes=('internal-url',)
+            )
