@@ -1,8 +1,6 @@
-import onegov.core
-import onegov.town6
+import onegov.ticket
 import pytest
 import transaction
-
 from onegov.core.utils import module_path
 from tests.shared.utils import create_app
 from onegov.town6 import TownApp
