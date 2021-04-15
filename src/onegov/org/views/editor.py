@@ -1,6 +1,7 @@
 """ Implements the adding/editing/removing of pages. """
 
 import morepath
+import transaction
 from webob.exc import HTTPForbidden
 
 from onegov.core.security import Private
@@ -98,16 +99,6 @@ def handle_change_page_url(self, request, form, layout=None):
     if not request.is_admin:
         return HTTPForbidden()
 
-    if form.submitted(request):
-        migration = PageNameChange.from_form(self.page, form)
-        migration.execute(test=form.test.data)
-        if not form.test.data:
-            request.success(_("Your changes were saved"))
-            return morepath.redirect(request.link(self.page))
-
-    elif not request.POST:
-        form.process(obj=self.page)
-
     subpage_count = 0
 
     def count_page(page):
@@ -119,14 +110,34 @@ def handle_change_page_url(self, request, form, layout=None):
     for child in self.page.children:
         count_page(child)
 
+    messages = [
+        _('Stable urls are important. Here you can change the '
+          'path to your site here independant of the title.'),
+        _('A total of ${number} pages are affected.',
+          mapping={'number': subpage_count})
+    ]
+
+    if form.submitted(request):
+        migration = PageNameChange.from_form(self.page, form)
+        link_count = migration.execute(test=form.test.data)
+        if not form.test.data:
+            request.success(_("Your changes were saved"))
+            return morepath.redirect(request.link(self.page))
+        else:
+            transaction.abort()
+
+        messages.append(
+            _('${count} links will be replaced by this action.',
+              mapping={'count': link_count}))
+
+    elif not request.POST:
+        form.process(obj=self.page)
+
     site_title = _('Change Url')
 
     return {
         'layout': layout or EditorLayout(self, request, site_title),
         'form': form,
         'title': site_title,
-        'callout': _('Stable urls are important. Here you can change the '
-                     'path to your site. A total of ${number} '
-                     'pages are affected.',
-                     mapping={'number': subpage_count})
+        'callout': " ".join(request.translate(m) for m in messages)
     }
