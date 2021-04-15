@@ -149,6 +149,7 @@ def test_links(client):
     # Change the root url
     change_url = root_page.click('Url ändern')
     change_url.form['name'] = 'org'
+    change_url.form['test'] = False
     root_page = change_url.form.submit().follow()
     root_url = root_page.request.url
     # check the link to org is updated getting 200 OK
