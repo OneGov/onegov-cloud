@@ -2,16 +2,8 @@ import re
 from collections import defaultdict
 
 from onegov.core.utils import normalize_for_url
-from onegov.form import FormDefinition
-from onegov.org.models import Topic, News, ExtendedDirectory, SiteCollection
+from onegov.org.models import SiteCollection
 
-
-# MODELS_WITH_LINKS = (
-#     # (FormDefinition, ('lead', 'text'), '__name__'),
-#     (News, ('lead', 'text', 'url'), '__name__'),
-#     (Topic, ('lead', 'text', 'url'), 'trait'),
-#     (ExtendedDirectory, ('lead', 'text',), '__name__'),
-# )
 
 class ContentMigrationMixin:
     migration_fields = ('lead', 'text', 'url')
