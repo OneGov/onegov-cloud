@@ -1349,19 +1349,18 @@ def migrate_links_cli(group_context, old_uri, dry_run):
         else:
             new_uri = request.domain
         migration = LinkMigration(request, old_uri=old_uri, new_uri=new_uri)
-        # total, grouped_count = migration.migrate_site_collection(
-        #     test=dry_run
-        # )
-        #
-        # if total:
-        #     click.secho(f'Total replaced: {total}')
-        #     click.secho('Replaced links by group:')
-        #     for group, counts in grouped_count.items():
-        #         click.secho(f'{group}')
-        #         for field, count in counts.items():
-        #             if count:
-        #                 click.secho(f'- {field}: {count}')
-        # else:
-        #     click.secho('Nothing found')
+        total, grouped_count = migration.migrate_site_collection(
+            test=dry_run
+        )
+
+        if total:
+            click.secho(f'Total replaced: {total}')
+            click.secho('Replaced links by group:')
+            for group, counts in grouped_count.items():
+                for field, count in counts.items():
+                    if count:
+                        click.secho(f'{group}.{field}: {count}')
+        else:
+            click.secho('Nothing found')
 
     return execute
