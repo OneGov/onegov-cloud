@@ -22,7 +22,7 @@ class SwissvoteDatasetField(UploadField):
                 'application/octet-stream',
                 'application/vnd.ms-excel',
                 'application/vnd.ms-office',
-                'application/vnd.openxmlformats-officedocument.'
+                'application/vnd.openxmlformats-officedocument',
                 'spreadsheetml.sheet',
                 'application/zip'
             })
