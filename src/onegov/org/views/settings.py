@@ -18,9 +18,9 @@ from onegov.org.forms.settings import OrgTicketSettingsForm, \
     NewsletterSettingsForm, LinkMigrationForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
+from onegov.org.migration import LinkMigration
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
-from onegov.org.models.page import migrate_page_links
 
 
 @OrgApp.html(
@@ -219,11 +219,14 @@ def handle_migrate_links(self, request, form, layout=None):
     test_results = None
 
     if form.submitted(request):
-        old_domain = form.old_domain.data
         test_only = form.test.data
-        found = migrate_page_links(
-            request.session, old_domain, domain, test_only
+        migration = LinkMigration(
+            request,
+            old_uri=form.old_domain.data,
+            new_uri=request.domain
         )
+        found_by_model = migration.migrate_site_collection(test_only)
+        found = sum(found_by_model.values())
 
         if not test_only:
             request.success(
