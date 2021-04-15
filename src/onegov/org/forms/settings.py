@@ -734,7 +734,7 @@ class LinkMigrationForm(Form):
 
     test = BooleanField(
         label=_('Test migration'),
-        description=_('Compares links to the current hostname'),
+        description=_('Compares links to the current domain'),
         default=True
     )
 

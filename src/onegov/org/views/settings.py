@@ -227,14 +227,14 @@ def handle_migrate_links(self, request, form, layout=None):
 
         if not test_only:
             request.success(
-                _('Migrated ${$number} links', mapping={'number': found}))
+                _('Migrated ${number} links', mapping={'number': found}))
             return request.redirect(request.link(self, name='settings'))
 
         test_results = _('Total of ${number} links found.',
                          mapping={'number': found})
 
     return {
-        'title': 'Migrate LINKS',
+        'title': _('Link Migration'),
         'form': form,
         'layout': layout or DefaultLayout(self, request),
         'helptext': test_results,

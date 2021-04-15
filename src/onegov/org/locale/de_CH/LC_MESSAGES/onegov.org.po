@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-14 11:11+0200\n"
+"POT-Creation-Date: 2021-04-15 08:06+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1217,6 +1217,21 @@ msgstr "Email-Benachrichtigung immer senden bei neuen Ticket-Nachrichten"
 
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
+
+msgid "Old domain"
+msgstr "Alte Domain"
+
+msgid "Test migration"
+msgstr "Migration testen"
+
+msgid "Compares links to the current domain"
+msgstr "Vergleicht Links mit der aktuellen Domain"
+
+msgid "Use a domain name without http(s)"
+msgstr "Benutze eine Domai ohne http(s)"
+
+msgid "Domain must contain a dot"
+msgstr "Die Domain muss einen Punkt enthalten"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -4052,20 +4067,8 @@ msgstr ""
 msgid "Links"
 msgstr ""
 
-msgid "Header"
-msgstr "Kopfzeile"
-
-msgid "Footer"
-msgstr "Fusszeile"
-
-msgid "Modules"
-msgstr "Module"
-
-msgid "Analytics"
-msgstr "Web-Statistik"
-
-msgid "Holidays"
-msgstr "Feiertage"
+msgid "Newsletter Settings"
+msgstr "Newsletter-Einstellungen"
 
 msgid "Ticket Settings"
 msgstr "Ticket-Einstellungen"
@@ -4081,11 +4084,41 @@ msgstr ""
 "Benutzerinteraktion eines Admins beeinflussen können! Aktivieren Sie diese "
 "Einstellung am besten nur für einen begrenzten Zeitraum."
 
-msgid "Newsletter Settings"
-msgstr "Newsletter-Einstellungen"
+msgid "Header"
+msgstr "Kopfzeile"
+
+msgid "Footer"
+msgstr "Fusszeile"
+
+msgid "Modules"
+msgstr "Module"
+
+msgid "Analytics"
+msgstr "Web-Statistik"
+
+msgid "Holidays"
+msgstr "Feiertage"
 
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
+
+msgid "Link Migration"
+msgstr "Migration Links"
+
+msgid "Migrate"
+msgstr "Migrieren"
+
+#, python-format
+msgid "Migrated ${number} links"
+msgstr "${number} Links migriert"
+
+#, python-format
+msgid "Total of ${number} links found."
+msgstr "Total ${number} Links gefunden"
+
+#, python-format
+msgid "Migrates links to new domain ${domain}"
+msgstr "Migriert die Links zur neuen Domain ${domain}"
 
 msgid "Topics"
 msgstr "Themen"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-14 11:11+0200\n"
+"POT-Creation-Date: 2021-04-15 08:06+0200\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1226,6 +1226,21 @@ msgstr ""
 
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"
+
+msgid "Old domain"
+msgstr "Domaine vieux"
+
+msgid "Test migration"
+msgstr "Tester migration"
+
+msgid "Compares links to the current domain"
+msgstr "Compare les liens avec le domaine actuel"
+
+msgid "Use a domain name without http(s)"
+msgstr "Utiliser un domaine sans http(s)"
+
+msgid "Domain must contain a dot"
+msgstr "Le domaine doit contenir un point"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -4075,20 +4090,8 @@ msgstr "Favicon"
 msgid "Links"
 msgstr ""
 
-msgid "Header"
-msgstr "En-tête"
-
-msgid "Footer"
-msgstr "Bas de page"
-
-msgid "Modules"
-msgstr "Modules"
-
-msgid "Analytics"
-msgstr "Analytics"
-
-msgid "Holidays"
-msgstr "Jours fériés"
+msgid "Newsletter Settings"
+msgstr "Paramètres de la newsletter"
 
 msgid "Ticket Settings"
 msgstr "Paramètres tickets"
@@ -4104,11 +4107,41 @@ msgstr ""
 "influencer le contenu de la page sans l'intervention d'un administrateur ! "
 "Il est préférable d'activer ce paramètre uniquement pour une période limitée."
 
-msgid "Newsletter Settings"
-msgstr "Paramètres de la newsletter"
+msgid "Header"
+msgstr "En-tête"
+
+msgid "Footer"
+msgstr "Bas de page"
+
+msgid "Modules"
+msgstr "Modules"
+
+msgid "Analytics"
+msgstr "Analytics"
+
+msgid "Holidays"
+msgstr "Jours fériés"
 
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"
+
+msgid "Link Migration"
+msgstr ""
+
+msgid "Migrate"
+msgstr ""
+
+#, python-format
+msgid "Migrated ${number} links"
+msgstr "${number} liens migrés"
+
+#, python-format
+msgid "Total of ${number} links found."
+msgstr "Total de ${number} liens trouvés"
+
+#, python-format
+msgid "Migrates links to new domain ${domain}"
+msgstr "Migration des liens vers le nouveau domaine"
 
 msgid "Topics"
 msgstr "Sujets"
