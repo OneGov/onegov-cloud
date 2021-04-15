@@ -2,7 +2,7 @@ import re
 
 from cached_property import cached_property
 from lxml import etree
-from wtforms.validators import NumberRange
+from wtforms.validators import NumberRange, InputRequired
 
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
@@ -722,3 +722,32 @@ class NewsletterSettingsForm(Form):
     logo_in_newsletter = BooleanField(
         label=_('Include logo in newsletter')
     )
+
+
+class LinkMigrationForm(Form):
+
+    old_domain = StringField(
+        label=_('Old domain'),
+        description='govikon.onegovcloud.ch',
+        validators=[InputRequired()]
+    )
+
+    test = BooleanField(
+        label=_('Test migration'),
+        description=_('Compares links to the current hostname'),
+        default=True
+    )
+
+    def ensure_correct_domain(self):
+        if self.old_domain.data:
+            errors = []
+            if self.old_domain.data.startswith('http'):
+                errors.append(
+                    _('Use a domain name without http(s)')
+                )
+            if '.' not in self.old_domain.data:
+                errors.append(_('Domain must contain a dot'))
+
+            if errors:
+                self.old_domain.errors = errors
+                return False

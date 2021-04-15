@@ -15,11 +15,12 @@ from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
-    NewsletterSettingsForm
+    NewsletterSettingsForm, LinkMigrationForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
+from onegov.org.models.page import migrate_page_links
 
 
 @OrgApp.html(
@@ -205,3 +206,39 @@ def preview_holiday_settings(self, request, form, layout=None):
             'year': layout.today().year,
         }
     )
+
+
+@OrgApp.form(
+    model=Organisation, name='migrate-links', template='form.pt',
+    permission=Secret, form=LinkMigrationForm, setting=_('Link Migration'),
+    icon='fa fa-random', order=-400)
+def handle_migrate_links(self, request, form, layout=None):
+
+    domain = request.domain
+    button_text = _('Migrate')
+    test_results = None
+
+    if form.submitted(request):
+        old_domain = form.old_domain.data
+        test_only = form.test.data
+        found = migrate_page_links(
+            request.session, old_domain, domain, test_only
+        )
+
+        if not test_only:
+            request.success(
+                _('Migrated ${$number} links', mapping={'number': found}))
+            return request.redirect(request.link(self, name='settings'))
+
+        test_results = _('Total of ${number} links found.',
+                         mapping={'number': found})
+
+    return {
+        'title': 'Migrate LINKS',
+        'form': form,
+        'layout': layout or DefaultLayout(self, request),
+        'helptext': test_results,
+        'button_text': button_text,
+        'callout': _('Migrates links to new domain ${domain}',
+                     mapping={'domain': domain}),
+    }
