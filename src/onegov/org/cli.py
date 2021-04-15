@@ -1,4 +1,5 @@
 """ Provides commands used to initialize org websites. """
+import sys
 from io import BytesIO
 from pathlib import Path
 
@@ -34,6 +35,7 @@ from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.forms import ReservationForm
+from onegov.org.models.page import migrate_page_links
 from onegov.pay.models import ManualPayment
 from onegov.reservation import Allocation, Reservation
 from onegov.reservation import ResourceCollection
@@ -1326,3 +1328,28 @@ def migrate_town(group_context):
         migrate_homepage_structure_for_town6(context)
 
     return migrate_to_new_town
+
+
+@cli.command('migrate-links', context_settings={'singular': True})
+@pass_group_context
+@click.argument('old-domain')
+@click.option('--dry-run', is_flag=True, default=False)
+def migrate_links_cli(group_context, old_domain, dry_run):
+    """ Migrates url's in pages. """
+    if '.' not in old_domain:
+        click.secho('Domain must contain a dot')
+        sys.exit(1)
+    if old_domain.startswith('http'):
+        click.secho('Use a domain without http(s)')
+        sys.exit(1)
+
+    def execute(request, app):
+        count = migrate_page_links(
+            app.session(),
+            old_domain=old_domain,
+            new_domain=request.domain,
+            test=dry_run
+        )
+        click.secho(f'Found entries: {count}')
+
+    return execute
