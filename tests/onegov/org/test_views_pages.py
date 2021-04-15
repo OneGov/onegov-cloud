@@ -141,6 +141,21 @@ def test_links(client):
     assert "Sie wurden nicht automatisch weitergeleitet" in link
     assert 'https://www.google.ch' in link
 
+    new_link = root_page.click("Verknüpfung")
+    new_link.form['url'] = root_url
+    new_link.form['title'] = 'Link to Org'
+    internal_link = new_link.form.submit().follow()
+
+    # Change the root url
+    change_url = root_page.click('Url ändern')
+    change_url.form['name'] = 'org'
+    root_page = change_url.form.submit().follow()
+    root_url = root_page.request.url
+    # check the link to org is updated getting 200 OK
+    link_page = root_page.click('Link to Org', index=0)
+
+    assert internal_link.request.url != link_page.request.url
+
     client.get('/auth/logout')
 
     root_page = client.get(root_url)

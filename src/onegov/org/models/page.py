@@ -242,3 +242,10 @@ def migrate_page_links(session, old_domain, new_domain, test=False):
         migrate(item, test)
 
     return found
+
+
+def update_topics_with_trait_link(session, old_url, new_url):
+    query = session.query(Topic).filter(Topic.meta['trait'].astext == 'link')
+    for link in query:
+        if link.url == old_url:
+            link.url = new_url
