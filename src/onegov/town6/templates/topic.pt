@@ -18,9 +18,6 @@
                             <tal:b replace="structure link(layout)" />
                             <div class="list-lead" tal:condition="lead">${lead}</div>
                         </li>
-                        <div class="list-lead" tal:condition="page.lead">
-                            ${page.lead}
-                        </div>
                     </ul>
                 </tal:b>
             </tal:b>
