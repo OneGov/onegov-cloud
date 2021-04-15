@@ -7,8 +7,8 @@ from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.forms.page import PageUrlForm
 from onegov.org.layout import EditorLayout
+from onegov.org.migration import PageNameChange
 from onegov.org.models import Clipboard, Editor
-from onegov.org.models.page import update_topics_with_trait_link
 from onegov.page import PageCollection
 
 
@@ -99,12 +99,11 @@ def handle_change_page_url(self, request, form, layout=None):
         return HTTPForbidden()
 
     if form.submitted(request):
-        old_url = request.link(self.page)
-        form.populate_obj(self.page)
-        new_url = request.link(self.page)
-        update_topics_with_trait_link(request.session, old_url, new_url)
-        request.success(_("Your changes were saved"))
-        return morepath.redirect(request.link(self.page))
+        migration = PageNameChange.from_form(self.page, form)
+        migration.execute(test=form.test.data)
+        if not form.test.data:
+            request.success(_("Your changes were saved"))
+            return morepath.redirect(request.link(self.page))
 
     elif not request.POST:
         form.process(obj=self.page)

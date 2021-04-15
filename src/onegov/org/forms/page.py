@@ -52,6 +52,11 @@ class PageUrlForm(Form):
         validators=[validators.InputRequired()]
     )
 
+    test = BooleanField(
+        label=_('Test'),
+        default=True
+    )
+
     def ensure_correct_name(self):
         if not self.name.data:
             return
