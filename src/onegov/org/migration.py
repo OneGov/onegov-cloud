@@ -38,7 +38,7 @@ class LinkMigration(ContentMigrationMixin):
             item,
             fields,
             test=False,
-            group_by='__name__',
+            group_by=None,
             count_obj=None
     ):
         """Supports replacing url's and domain names.
@@ -49,6 +49,7 @@ class LinkMigration(ContentMigrationMixin):
 
         old_uri = self.old_uri
         new_uri = self.new_uri
+        group_by = group_by or item.__class_.__name__
 
         def repl(matchobj):
             if self.use_domain:
@@ -69,7 +70,7 @@ class LinkMigration(ContentMigrationMixin):
             if value != new_val:
                 count += 1
                 id_count = count_by_id.setdefault(
-                    getattr(item, group_by),
+                    group_by,
                     defaultdict(int)
                 )
 
@@ -139,12 +140,14 @@ class PageNameChange(ContentMigrationMixin):
         page.name = self.new_name
         self.request.session.flush()
         urls_after = tuple(self.request.link(p) for p in subpages + [page])
+        assert urls_before != urls_after
 
         count = 0
         for before, after in zip(urls_before, urls_after):
             migration = LinkMigration(self.request, before, after)
             total, grouped = migration.migrate_site_collection(test=test)
             count += total
+        return count
 
     @classmethod
     def from_form(cls, model, form):
