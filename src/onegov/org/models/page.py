@@ -1,4 +1,3 @@
-import re
 from onegov.core.orm.mixins import content_property
 from onegov.form import Form
 from onegov.org import _
