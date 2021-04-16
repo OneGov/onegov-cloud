@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-15 08:06+0200\n"
+"POT-Creation-Date: 2021-04-16 08:24+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -780,6 +780,9 @@ msgstr "(verfügbar im Redesign)"
 msgid "Url path"
 msgstr "Url Pfad"
 
+msgid "Test"
+msgstr "Test"
+
 #, python-format
 msgid "Invalid name. A valid suggestion is: ${name}"
 msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
@@ -1541,9 +1544,6 @@ msgstr "Neu"
 
 msgid "Subscribers"
 msgstr "Abonnenten"
-
-msgid "Test"
-msgstr "Test"
 
 msgid "Delete newsletter"
 msgstr "Newsletter löschen"
@@ -3594,13 +3594,20 @@ msgstr ""
 "berücksichtigt werden. Um mehr Einträge zu importieren muss der Import "
 "wiederholt werden."
 
-#, python-format
 msgid ""
-"Stable urls are important. Here you can change the path to your site. A "
-"total of ${number} pages are affected."
+"Stable urls are important. Here you can change the path to your site here "
+"independant of the title."
 msgstr ""
-"Stabile Url's sind wichtig. Hier können sie den Url-Pfad zu dieser Seite "
-"ändern. Total ${number} Seiten sind davon betroffen."
+"Stabile Url's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"angepasst werden."
+
+#, python-format
+msgid "A total of ${number} subpages are affected."
+msgstr "Insgesamt ${number} Unterseiten sind betroffen."
+
+#, python-format
+msgid "${count} links will be replaced by this action."
+msgstr "${count} Links werden nach dieser Aktion ersetzt."
 
 msgid "The event submitter has not yet completed his submission"
 msgstr "Der/die Antragsteller/in hat ihren Antrag noch nicht abgeschlosesen"
@@ -4283,6 +4290,13 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid ""
+#~ "Stable urls are important. Here you can change the path to your site. A "
+#~ "total of ${number} pages are affected."
+#~ msgstr ""
+#~ "Stabile Url's sind wichtig. Hier können sie den Url-Pfad zu dieser Seite "
+#~ "ändern. Total ${number} Seiten sind davon betroffen."
 
 #~ msgid "Used for text in html body"
 #~ msgstr "Wird für Paragraphen verwendet"

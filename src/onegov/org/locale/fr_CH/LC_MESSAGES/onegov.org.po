@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-15 08:06+0200\n"
+"POT-Creation-Date: 2021-04-16 08:24+0200\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -784,6 +784,9 @@ msgstr ""
 msgid "Url path"
 msgstr "Chemin Url"
 
+msgid "Test"
+msgstr "Test"
+
 #, python-format
 msgid "Invalid name. A valid suggestion is: ${name}"
 msgstr "Nom invalide. Une suggestion valid est: ${name}"
@@ -1546,9 +1549,6 @@ msgstr "Nouveau"
 
 msgid "Subscribers"
 msgstr "Abonnés"
-
-msgid "Test"
-msgstr "Test"
 
 msgid "Delete newsletter"
 msgstr "Supprimer la newsletter"
@@ -3615,13 +3615,18 @@ msgstr ""
 "fois. Pour importer davantage d'éléments, veuillez faire plusieurs "
 "importations."
 
-#, python-format
 msgid ""
-"Stable urls are important. Here you can change the path to your site. A "
-"total of ${number} pages are affected."
-msgstr ""
-"Les urls stables sont importantes. Vous pouvez modifier ici le chemin "
-"d'accès à votre site. Un total de ${number} pages sont concernées."
+"Stable urls are important. Here you can change the path to your site here "
+"independant of the title."
+msgstr "Les urls stables sont importantes. Ici, vous pouvez modifier le chemin d'accès à votre site, indépendamment du titre."
+
+#, python-format
+msgid "A total of ${number} subpages are affected."
+msgstr "Au total, 5 sous-pages sont concernées."
+
+#, python-format
+msgid "${count} links will be replaced by this action."
+msgstr "${count} liens seront remplacés par cette action."
 
 msgid "The event submitter has not yet completed his submission"
 msgstr ""
@@ -4304,6 +4309,13 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid ""
+#~ "Stable urls are important. Here you can change the path to your site. A "
+#~ "total of ${number} pages are affected."
+#~ msgstr ""
+#~ "Les urls stables sont importantes. Vous pouvez modifier ici le chemin "
+#~ "d'accès à votre site. Un total de ${number} pages sont concernées."
 
 #~ msgid "Used for text in html body"
 #~ msgstr "Utilisé dans les paragraphes"

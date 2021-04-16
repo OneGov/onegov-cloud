@@ -113,7 +113,7 @@ def handle_change_page_url(self, request, form, layout=None):
     messages = [
         _('Stable urls are important. Here you can change the '
           'path to your site here independant of the title.'),
-        _('A total of ${number} pages are affected.',
+        _('A total of ${number} subpages are affected.',
           mapping={'number': subpage_count})
     ]
 
