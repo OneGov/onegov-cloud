@@ -165,7 +165,7 @@
   <div class="small-12 cell footer-links">
     <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
-            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+            <a href="https://www.onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
         <span>
             <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
