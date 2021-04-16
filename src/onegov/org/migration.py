@@ -41,7 +41,7 @@ class LinkMigration(ContentMigrationMixin):
 
         old_uri = self.old_uri
         new_uri = self.new_uri
-        group_by = group_by or item.__class_.__name__
+        group_by = group_by or item.__class__.__name__
 
         def repl(matchobj):
             if self.use_domain:
@@ -84,7 +84,6 @@ class LinkMigration(ContentMigrationMixin):
                 count, grouped_count = self.migrate_url(
                     item, self.migration_fields,
                     test=test,
-                    group_by=name,
                     count_obj=grouped
                 )
                 grouped = grouped_count
