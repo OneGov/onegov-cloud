@@ -1813,13 +1813,13 @@ msgid "Number of news entries on homepage"
 msgstr "Anzahl angezeigte News/ Einträge für Aktuelles"
 
 msgid "Show partners on all pages"
-msgstr "Afficher les partenaires sur toutes les pages"
+msgstr "Partner auf allen Seiten anzeigen"
 
 msgid "Shows the footer on all pages but for admins"
-msgstr "Affiche le pied de page sur toutes les pages sauf pour les admins"
+msgstr "Zeige die Fusszeile auf allen Seiten, ausser für Administratoren"
 
 msgid "Partner display"
-msgstr "Affichage partenaires"
+msgstr "Anzeige Partner"
 
 msgid "General"
 msgstr "Allgemein"
