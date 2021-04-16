@@ -1,6 +1,7 @@
 import transaction
 
 from onegov.core.utils import Bunch
+from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.org.migration import PageNameChange
 from onegov.page import PageCollection
 
@@ -13,6 +14,7 @@ def test_page_name_change(client):
         return 'https://example.com/' + uri.lstrip('/')
 
     pages = PageCollection(session)
+    directories = DirectoryCollection(session, type='extended')
 
     type_ = 'topic'
 
@@ -37,20 +39,38 @@ def test_page_name_change(client):
         meta={'trait': 'link', 'access': 'public'}
     ).id
 
+    # SiteCollection uses Directory in query, so we test if we do not skip
+    # content or meta fields (lead, text). The query actually returns the
+    # correct polymorphic class
+    directory = directories.add(
+        title='Dir',
+        lead=f'Links to {link(page)}',
+        text=f'Links to {link(page)}',
+        structure="""
+                Name *= ___
+            """,
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
+        )
+    )
+    dir_id = directory.id
     transaction.commit()
     request = Bunch(session=client.app.session(), link=link)
     pages = PageCollection(request.session)
+    directories = DirectoryCollection(request.session)
     page = pages.by_id(page_id)
 
     migration = PageNameChange(request, page, 'c')
     count = migration.execute()
     sublink = pages.by_id(sublink_id)
     subpage = pages.by_id(subpage_id)
+    directory = directories.by_id(dir_id)
 
-    print(sublink.lead)
-    print(sublink.text)
-    assert count == 3
+    assert count == 5
     assert link(page) != old_page_link
     assert sublink.url == link(page)
     assert link(page) in sublink.text
     assert link(subpage) in sublink.lead
+    assert link(page) in directory.text
+    assert link(page) in directory.lead
