@@ -30,7 +30,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     url = content_property()
 
     # Show the lead on topics page
-    lead_when_child = content_property()
+    lead_when_child = content_property(default=True)
 
     @property
     def es_skip(self):
