@@ -129,8 +129,13 @@ def test_view_new_translator(client):
         lat=46, lon=7, zoom=12
     )
     drive_distance = 60.01
+    iban = 'CH5604835012345678009'
 
     tel_mobile = '044 123 50 50'
+    page.form['first_name'] = 'Aunt'
+    page.form['last_name'] = 'Maggie'
+    page.form['iban'] = iban
+
     page.form['pers_id'] = 123456
     page.form['admission'] = 'in_progress'
     page.form['withholding_tax'] = True
@@ -179,6 +184,9 @@ def test_view_new_translator(client):
     assert 'Ihre Änderungen wurden gespeichert' in page
 
     assert '123456' in page
+    assert 'Aunt' in page
+    assert 'Maggie' in page
+    assert iban in page
     assert 'im Zulassungsverfahren' in page
     assert 'Ja' in page
     assert 'Weiblich' in page

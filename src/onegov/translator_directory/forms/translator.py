@@ -385,6 +385,9 @@ class TranslatorForm(Form, FormChoicesMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
+        model.first_name = self.first_name.data
+        model.last_name = self.last_name.data
+        model.iban = self.iban.data
         model.pers_id = self.pers_id.data or None
         model.admission = self.admission.data
         model.withholding_tax = self.withholding_tax.data
