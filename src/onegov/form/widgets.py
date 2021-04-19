@@ -183,41 +183,67 @@ class TagsWidget(TextInput):
 class IconWidget(TextInput):
 
     iconfont = 'FontAwesome'
-    icons = (
-        '&#xf111',  # fa-circle
-        '&#xf005',  # fa-star
-        '&#xf06a',  # fa-exclamation-circle
-        '&#xf059',  # fa-question-circle
-        '&#xf05e',  # fa-ban
-        '&#xf1b9',  # fa-car
-        '&#xf238',  # fa-train
-        '&#xf206',  # fa-bicycle
-        '&#xf291',  # fa-shopping-basket
-        '&#xf1b0',  # fa-paw
-        '&#xf1ae',  # fa-child
-        '&#xf06d',  # fa-fire
-        '&#xf1f8',  # fa-trash
-        '&#xf236',  # fa-hotel
-        '&#xf0f4',  # fa-coffee
-        '&#xf017',  # fa-click
-    )
+    icons = {
+        'FontAwesome': (
+            '&#xf111',  # fa-circle
+            '&#xf005',  # fa-star
+            '&#xf06a',  # fa-exclamation-circle
+            '&#xf059',  # fa-question-circle
+            '&#xf05e',  # fa-ban
+            '&#xf1b9',  # fa-car
+            '&#xf238',  # fa-train
+            '&#xf206',  # fa-bicycle
+            '&#xf291',  # fa-shopping-basket
+            '&#xf1b0',  # fa-paw
+            '&#xf1ae',  # fa-child
+            '&#xf06d',  # fa-fire
+            '&#xf1f8',  # fa-trash
+            '&#xf236',  # fa-hotel
+            '&#xf0f4',  # fa-coffee
+            '&#xf017',  # fa-clock
+        ),
+        'Font Awesome 5 Free': (
+            'fas fa-circle',
+            'fas fa-star',
+            'fas fa-exclamation-circle',
+            'fas fa-question-circle',
+            'fas fa-question-circle',
+            'fas fa-ban',
+            'fas fa-car',
+            'fas fa-train',
+            'fas fa-bicycle',
+            'fas fa-shopping-basket',
+            'fas fa-paw',
+            'fas fa-child',
+            'fas fa-fire',
+            'fas fa-trash',
+            'fas fa-hotel',
+            'fas fa-coffee',
+            'fas fa-clock'
+        )
+    }
 
-    template = chameleon.PageTemplate("""
+    @property
+    def template(self):
+        return chameleon.PageTemplate("""
         <div class="icon-widget">
             <ul style="font-family: ${iconfont}">
                 <li
                     tal:repeat="icon icons"
                     tal:content="structure icon"
+                    tal:condition="iconfont == 'FontAwesome'"
                 />
+                <li tal:condition="iconfont == 'Font Awesome 5 Free'"
+                    tal:repeat="icon icons" class="${icon}">
+                </li>
             </ul>
-
             <input type="hidden" name="${id}" value="${structure: value}">
         </div>
     """)
 
     def __call__(self, field, **kwargs):
         iconfont = kwargs.pop('iconfont', self.iconfont)
-        icons = kwargs.pop('icons', self.icons)
+        icons = kwargs.pop('icons', self.icons[iconfont])
 
         return HTMLString(self.template.render(
             iconfont=iconfont,
