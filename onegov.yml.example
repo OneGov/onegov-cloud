@@ -272,11 +272,6 @@ applications:
     namespace: onegov_wtfs
     configuration:
       <<: *global-config
-  - path: /onegov_redesign_test
-    application: onegov.redesign_test.RedesignApp
-    namespace: onegov_redesign_test
-    configuration:
-      <<: *global-config
 
   - path: /translator_directory/*
     application: onegov.translator_directory.TranslatorDirectoryApp
