@@ -1,7 +1,6 @@
 """ Implements the adding/editing/removing of pages. """
 
 import morepath
-import transaction
 from webob.exc import HTTPForbidden
 
 from onegov.core.security import Private
@@ -123,8 +122,6 @@ def handle_change_page_url(self, request, form, layout=None):
         if not form.test.data:
             request.success(_("Your changes were saved"))
             return morepath.redirect(request.link(self.page))
-        else:
-            transaction.abort()
 
         messages.append(
             _('${count} links will be replaced by this action.',

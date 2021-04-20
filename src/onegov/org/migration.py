@@ -1,6 +1,9 @@
 import re
 from collections import defaultdict
 
+import transaction
+from sqlalchemy.orm import object_session
+
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 
@@ -125,20 +128,30 @@ class PageNameChange(ContentMigrationMixin):
 
         page = self.page
         subpages = self.subpages
+        old_name = page.name
 
-        # Make sure the order before and after is the same
-        urls_before = tuple(self.request.link(p) for p in subpages + [page])
-        page.name = self.new_name
-        self.request.session.flush()
-        urls_after = tuple(self.request.link(p) for p in subpages + [page])
-        assert urls_before != urls_after
+        def run():
+            # Make sure the order before and after is the same
+            urls_before = tuple(
+                self.request.link(p) for p in subpages + [page])
+            page.name = self.new_name
+            urls_after = tuple(self.request.link(p) for p in subpages + [page])
+            assert urls_before != urls_after
 
-        count = 0
-        for before, after in zip(urls_before, urls_after):
-            migration = LinkMigration(self.request, before, after)
-            total, grouped = migration.migrate_site_collection(test=test)
-            count += total
-        return count
+            count = 0
+            for before, after in zip(urls_before, urls_after):
+                migration = LinkMigration(self.request, before, after)
+                total, grouped = migration.migrate_site_collection(test=test)
+                count += total
+            return count
+
+        if test:
+            with object_session(page).no_autoflush:
+                counter = run()
+                page.name = old_name
+                transaction.abort()
+                return counter
+        return run()
 
     @classmethod
     def from_form(cls, model, form):
