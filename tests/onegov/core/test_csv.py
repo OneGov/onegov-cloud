@@ -102,46 +102,47 @@ def test_wacky_csv_file():
 ])
 def test_convert_to_csv(excel_file):
     with open(excel_file, 'rb') as f:
-        convert_xls_to_csv(f, None)
-        convert_xls_to_csv(f, '')
-        with pytest.raises(IOError):
-            convert_xls_to_csv(f, 'Sheet 3')
+        headers = ['ID', 'Namä', 'Date', 'Bool', 'Leer', 'Formel']
+        csv = CSVFile(convert_xls_to_csv(f), headers)
 
-        csv = CSVFile(convert_xls_to_csv(f), ['ID', 'Namä', 'Date'])
-
-        assert list(csv.headers.keys()) == ['ID', 'Namä', 'Date']
+        assert list(csv.headers.keys()) == headers
         assert list(csv.lines) == [
             csv.rowtype(
                 rownumber=2,
                 id='1',
                 nama='Döner',
-                date='31.12.2015'
+                date='2015-12-31T00:00:00',
+                bool='1',
+                leer='',
+                formel='2'
             ),
             csv.rowtype(
                 rownumber=3,
                 id='2',
                 nama='“Cola”',
-                date='31.12.2014 12:00'
-            )
-        ]
-
-        csv = CSVFile(convert_xls_to_csv(f, 'Sheet 2'), ['ID', 'Namä', 'Date'])
-
-        assert list(csv.headers.keys()) == ['ID', 'Namä', 'Date']
-        assert list(csv.lines) == [
-            csv.rowtype(
-                rownumber=2,
-                id='1',
-                nama='Döner',
-                date='31.12.2015'
+                date='2014-12-31T12:00:00',
+                bool='0',
+                leer='',
+                formel='4'
             ),
             csv.rowtype(
-                rownumber=3,
-                id='3',
-                nama='“Cola”',
-                date='31.12.2014 12:00'
+                rownumber=4,
+                id='3.1',
+                nama='',
+                date='',
+                bool='',
+                leer='',
+                formel=''
             )
         ]
+
+        with pytest.raises(NotImplementedError):
+            csv = CSVFile(convert_xls_to_csv(f, 'Sheet 2'))
+        with pytest.raises(IOError):
+            convert_xls_to_csv(f, 'Sheet 3')
+
+        convert_xls_to_csv(f, None)
+        convert_xls_to_csv(f, '')
 
 
 def test_empty_line_csv_file():
