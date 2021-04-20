@@ -16,7 +16,7 @@ invalid_urls = [
 @pytest.mark.parametrize('url', invalid_urls)
 def test_fetch_all_invalid(url):
 
-    def handle_invalid(exception):
+    def handle_invalid(url, exception):
         if isinstance(exception, InvalidURL):
             return str(exception)
         else:

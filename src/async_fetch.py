@@ -1,9 +1,10 @@
-from typing import Union, Callable, Tuple, List
+from typing import Union, Callable, Tuple, List, Any
 
 import aiohttp
 import asyncio
 
-HandleExceptionType = Union[Tuple[Callable], List[Callable], Callable]
+ErrFunc = Callable[[str], Any]
+HandleExceptionType = Union[Tuple[ErrFunc], List[ErrFunc], ErrFunc]
 
 
 def raise_by_default(exception):
@@ -33,7 +34,7 @@ async def fetch(
     except Exception as e:
         if not handle_exceptions:
             raise e
-        return handle_exceptions(e)
+        return handle_exceptions(url, e)
 
 
 async def fetch_many(
