@@ -61,6 +61,12 @@ class PageUrlForm(Form):
         if not self.name.data:
             return
 
+        if self.model.page.name == self.name.data:
+            self.name.errors.append(
+                _('Please fill out a new name')
+            )
+            return False
+
         normalized_name = normalize_for_url(self.name.data)
         if not self.name.data == normalized_name:
             self.name.errors.append(
@@ -71,6 +77,7 @@ class PageUrlForm(Form):
 
         page = self.model.page
         duplicate_text = _("An entry with the same name exists")
+
         if not page.parent_id:
             query = object_session(page).query(Page)
             duplicate = query.filter(

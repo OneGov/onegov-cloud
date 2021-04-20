@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-16 08:24+0200\n"
+"POT-Creation-Date: 2021-04-20 10:42+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -782,6 +782,9 @@ msgstr "Url Pfad"
 
 msgid "Test"
 msgstr "Test"
+
+msgid "Please fill out a new name"
+msgstr "Bitte geben sie einen neuen Namen an."
 
 #, python-format
 msgid "Invalid name. A valid suggestion is: ${name}"
