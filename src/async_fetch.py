@@ -35,10 +35,10 @@ async def fetch(
             attr = getattr(response, response_attr)
             if callable(attr):
                 response_called = await attr()
-                return response_called
+                return url, response_called
             else:
                 # eg. status
-                return attr
+                return url, attr
     except Exception as e:
         if not handle_exceptions:
             raise e

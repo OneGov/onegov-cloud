@@ -39,4 +39,4 @@ def test_fetch_all_invalid(url):
 def test_fetch_all_valid():
     # get status 200 without waiting for the content
     results = async_aiohttp_get_all(valid_urls, response_attr='status')
-    assert results == [200, 200]
+    assert results == list(zip(valid_urls, [200, 200]))
