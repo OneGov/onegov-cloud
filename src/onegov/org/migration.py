@@ -8,11 +8,15 @@ from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 
 
-class ContentMigrationMixin:
-    migration_fields = ('lead', 'text', 'url')
+class ModelsWithLinksMixin:
+    fields_with_urls = ('lead', 'text', 'url')
+
+    @property
+    def site_collection(self):
+        return SiteCollection(self.request.session)
 
 
-class LinkMigration(ContentMigrationMixin):
+class LinkMigration(ModelsWithLinksMixin):
 
     def __init__(self, request, old_uri, new_uri=None):
         self.request = request
@@ -26,7 +30,6 @@ class LinkMigration(ContentMigrationMixin):
             raise ValueError('Domains must be consistent')
 
         self.use_domain = old_is_domain
-        self.site_collection = SiteCollection(request.session)
 
     def migrate_url(
             self,
@@ -85,7 +88,7 @@ class LinkMigration(ContentMigrationMixin):
         for name, entries in self.site_collection.get().items():
             for item in entries:
                 count, grouped_count = self.migrate_url(
-                    item, self.migration_fields,
+                    item, self.fields_with_urls,
                     test=test,
                     count_obj=grouped
                 )
@@ -94,7 +97,7 @@ class LinkMigration(ContentMigrationMixin):
         return total, grouped
 
 
-class PageNameChange(ContentMigrationMixin):
+class PageNameChange(ModelsWithLinksMixin):
 
     def __init__(self, request, page, new_name):
         assert new_name == normalize_for_url(new_name)
@@ -103,7 +106,6 @@ class PageNameChange(ContentMigrationMixin):
         self.request = request
         self.page = page
         self.new_name = new_name
-        self.site_collection = SiteCollection(request.session)
 
     @property
     def subpages(self):
