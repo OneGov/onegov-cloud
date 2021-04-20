@@ -3,8 +3,6 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 
-import pytest
-
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.forms import AttachmentsForm
@@ -437,7 +435,6 @@ def test_search_form(swissvotes_app):
     assert form.validate()
 
 
-@pytest.mark.skip('Needs rework to defined wanted error messages')
 def test_update_dataset_form(session):
     request = DummyRequest(session, DummyPrincipal())
 

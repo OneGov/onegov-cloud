@@ -1,8 +1,6 @@
 from decimal import Decimal
 from io import BytesIO
 
-import pytest
-
 from onegov.core.utils import module_path
 from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
@@ -15,7 +13,6 @@ from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
 
 
-@pytest.mark.skip('Todo: fix test')
 @mark.parametrize('file', [
     module_path('tests.onegov.swissvotes', 'fixtures/dataset.xlsx'),
 ])
@@ -99,7 +96,6 @@ def test_view_update_votes(swissvotes_app, file):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-@pytest.mark.skip('Todo: fix test')
 def test_view_update_votes_unknown_descriptors(swissvotes_app):
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
