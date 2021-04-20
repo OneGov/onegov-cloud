@@ -2,7 +2,7 @@ import transaction
 
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
-from onegov.org.migration import PageNameChange
+from onegov.org.management import PageNameChange
 from onegov.page import PageCollection
 
 

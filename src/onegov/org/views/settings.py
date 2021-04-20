@@ -16,9 +16,10 @@ from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
     NewsletterSettingsForm, LinkMigrationForm
+from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
-from onegov.org.migration import LinkMigration
+from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
 

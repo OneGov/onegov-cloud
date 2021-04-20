@@ -7,7 +7,7 @@ from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.forms.page import PageUrlForm
 from onegov.org.layout import EditorLayout
-from onegov.org.migration import PageNameChange
+from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
 from onegov.page import PageCollection
 

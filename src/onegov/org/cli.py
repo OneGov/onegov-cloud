@@ -33,7 +33,7 @@ from onegov.form import FormCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
-from onegov.org.migration import LinkMigration
+from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.forms import ReservationForm
 from onegov.pay.models import ManualPayment
