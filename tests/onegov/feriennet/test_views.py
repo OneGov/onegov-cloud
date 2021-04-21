@@ -743,7 +743,9 @@ def test_execution_period(client, scenario):
 
 
 def test_enroll_child(client, scenario):
-    scenario.add_period()
+    scenario.add_period(
+        prebooking_end=scenario.date_offset(0)
+    )
     scenario.add_activity(title="Retreat", state='accepted')
     scenario.add_occasion()
     scenario.add_user(
@@ -814,7 +816,7 @@ def test_enroll_child(client, scenario):
 
     assert "nur während der Wunschphase" in enroll.form.submit()
 
-    # set the record straight again
+    # set the record straight again and test it on the edge
     with scenario.update():
         scenario.latest_period.prebooking_start += timedelta(days=10)
         scenario.latest_period.prebooking_end += timedelta(days=10)

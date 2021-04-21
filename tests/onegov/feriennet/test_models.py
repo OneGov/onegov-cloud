@@ -60,7 +60,7 @@ def test_period(scenario):
 
     period = scenario.latest_period
     prebook = period.prebooking_start
-    endbook = period.prebooking_end
+    prebook_end = period.prebooking_end
 
     def local_(date):
         return period.as_local_datetime(date)
@@ -81,16 +81,18 @@ def test_period(scenario):
         assert not period.wishlist_phase
         assert not period.is_currently_prebooking
 
-    with freeze_time(local_(endbook) + timedelta(hours=23, minutes=59)):
+    with freeze_time(local_(prebook_end) + timedelta(hours=23, minutes=59)):
+        assert period.phase == 'wishlist'
+        assert period.wishlist_phase
         assert period.is_currently_prebooking
-        assert period.is_prebooking_in_past
+        assert not period.is_prebooking_in_past
 
-    with freeze_time(local_(endbook) + timedelta(days=1)):
+    with freeze_time(local_(prebook_end) + timedelta(days=1)):
         assert not period.is_currently_prebooking
         assert period.is_prebooking_in_past
 
     # exactly midnight in the chosen timezone
-    with freeze_time(local_(endbook)):
+    with freeze_time(local_(prebook_end)):
         assert period.wishlist_phase
         assert period.is_currently_prebooking
         assert not period.is_prebooking_in_past
