@@ -1,8 +1,39 @@
 # Changes
 
+## Release `2021.44`
+
+> commits: **6 / [374e89a420...133e3f16c2](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...133e3f16c2)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.44)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+✨ **Use openpyxl for XLSX, xlrd for XLS conversion to CSV.**
+
+**`Other`** | **[SEA-101](https://linear.app/seantis/issue/SEA-101)** | **[f8a2f4fcf1](https://github.com/onegov/onegov-cloud/commit/f8a2f4fcf10e921e30a4465bbce44fd91f0dca14)**
+
+### Feriennet
+
+🐞 **Fixes end of day for period phases**
+
+Ends phases at the end of day for prebooking, booking and wishlist phase.
+
+**`Bugfix`** | **[FER-947](https://issues.seantis.ch/browse/FER-947)** | **[7f06c9ca39](https://github.com/onegov/onegov-cloud/commit/7f06c9ca3991c8fb7ca4db6a3ffccca783ac0f04)**
+
+### Org
+
+🎉 **Adds admin tools for link adjustments and link checking**
+
+- Adds change-url views for Pages.
+  Migrates all subpages and links to itself and subpages.
+- Adds migration tool to replace a chosen old domain to the current domain
+- Add link health checker fetching links in async way
+
+**`Feature`** | **[SEA-255](https://linear.app/seantis/issue/SEA-255)** | **[133e3f16c2](https://github.com/onegov/onegov-cloud/commit/133e3f16c2444047444a152b019a272ac0c302af)**
+
 ## Release `2021.43`
 
-> commits: **11 / [47e62bf74e...d5b88dfde5](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...d5b88dfde5)**  
+> released: **2021-04-21 06:50**<br>
+> commits: **12 / [47e62bf74e...2effac2bd6](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...2effac2bd6)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.43)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Form
