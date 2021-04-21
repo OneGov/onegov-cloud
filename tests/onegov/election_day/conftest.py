@@ -71,7 +71,7 @@ def create_election_day(
     tenan = f'canton: {canton}' if canton else f'municipality: {municipality}'
     chart_percentages = bool_as_string(hide_candidate_chart_percentages)
 
-    app.filestorage.settext('principal.yml', textwrap.dedent(f"""
+    app.filestorage.writetext('principal.yml', textwrap.dedent(f"""
         name: Kanton Govikon
         logo: logo.jpg
         {tenan}

@@ -377,7 +377,7 @@ def test_opendata_catalog(election_day_app):
     # Empty
     root = fromstring(client.get('/catalog.rdf').text)
     assert root.tag.lower().endswith('rdf')
-    assert len(root[0].getchildren()) == 0
+    assert len(list(root[0])) == 0
 
     # With data
     login(client)

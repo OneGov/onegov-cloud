@@ -168,8 +168,8 @@ def create_gazette(request, temporary_path):
         depot_storage_path=str(temporary_path),
     )
     app.session_manager.set_locale('de_CH', 'de_CH')
-    app.filestorage.settext('principal.yml', dedent(PRINCIPAL))
-    app.filestorage.settext('govikon-pdf.svg', LOGO)
+    app.filestorage.writetext('principal.yml', dedent(PRINCIPAL))
+    app.filestorage.writetext('govikon-pdf.svg', LOGO)
 
     group_id = uuid4()
     session = app.session()

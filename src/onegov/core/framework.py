@@ -817,7 +817,7 @@ class Framework(
             from onegov.core import filestorage
 
             filename = filestorage.random_filename()
-            app.filestorage.settext(filename, 'Lorem Ipsum')
+            app.filestorage.writetext(filename, 'Lorem Ipsum')
 
             # returns either an url like '/files/4ec56cc005c594880a...'
             # or maybe 'https://amazonaws.com/onegov-cloud/32746/220592/q...'

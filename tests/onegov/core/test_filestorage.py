@@ -21,19 +21,19 @@ def test_independence(temporary_directory):
     app.namespace = 'tests'
 
     app.set_application_id('tests/foo')
-    app.filestorage.settext('document.txt', 'foo')
-    assert app.filestorage.getbytes('document.txt') == b'foo'
-    assert app.filestorage.gettext('document.txt') == 'foo'
+    app.filestorage.writetext('document.txt', 'foo')
+    assert app.filestorage.readbytes('document.txt') == b'foo'
+    assert app.filestorage.readtext('document.txt') == 'foo'
 
     app.set_application_id('tests/bar')
     assert not app.filestorage.exists('document.txt')
-    app.filestorage.settext('document.txt', 'bar')
-    assert app.filestorage.getbytes('document.txt') == b'bar'
-    assert app.filestorage.gettext('document.txt') == 'bar'
+    app.filestorage.writetext('document.txt', 'bar')
+    assert app.filestorage.readbytes('document.txt') == b'bar'
+    assert app.filestorage.readtext('document.txt') == 'bar'
 
     app.set_application_id('tests/foo')
-    assert app.filestorage.getbytes('document.txt') == b'foo'
-    assert app.filestorage.gettext('document.txt') == 'foo'
+    assert app.filestorage.readbytes('document.txt') == b'foo'
+    assert app.filestorage.readtext('document.txt') == 'foo'
 
     assert os.path.isdir(os.path.join(temporary_directory, 'tests-foo'))
     assert os.path.isdir(os.path.join(temporary_directory, 'tests-bar'))
@@ -90,8 +90,8 @@ def test_filestorage(temporary_directory, redis_url):
     )
     app.namespace = 'tests'
     app.set_application_id('tests/foo')
-    app.filestorage.settext('test.txt', 'asdf')
-    app.filestorage.settext('readme', 'readme')
+    app.filestorage.writetext('test.txt', 'asdf')
+    app.filestorage.writetext('readme', 'readme')
 
     client = Client(app)
     assert client.get('/?file=test.txt').text\
