@@ -6,7 +6,7 @@ import transaction
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
 
-from async_fetch import async_aiohttp_get_all
+from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 

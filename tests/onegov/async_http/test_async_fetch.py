@@ -1,7 +1,7 @@
 import pytest
 from aiohttp import InvalidURL
 
-from async_fetch import async_aiohttp_get_all
+from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import Bunch
 
 valid_urls = [

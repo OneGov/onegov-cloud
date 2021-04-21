@@ -10,6 +10,7 @@ setup(
     packages=[
         'onegov.activity',
         'onegov.agency',
+        'onegov.async_http',
         'onegov.ballot',
         'onegov.chat',
         'onegov.core',
