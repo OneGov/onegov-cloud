@@ -1,5 +1,4 @@
-from typing import Union, Callable, Tuple, List, Any, Sequence, \
-    Generator
+from typing import Union, Callable, Tuple, List, Any, Sequence
 
 import aiohttp
 import asyncio

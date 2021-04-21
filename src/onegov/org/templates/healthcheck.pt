@@ -8,8 +8,8 @@
             <thead>
                 <tr>
                     <th width="150" i18n:translate="">Total</th>
-                    <th width="150" i18n:translate="">Healthy</th>
-                    <th i18n:translate="">!200</th>
+                    <th width="250" i18n:translate="">Healthy</th>
+                    <th>Status !200</th>
                     <th i18n:translate="">Errors</th>
                     <th i18n:translate="">Duration [s]</th>
                 </tr>
@@ -28,7 +28,7 @@
           <thead>
             <tr>
               <th width="150" i18n:translate="">Model</th>
-                <th width="150" i18n:translate="">Status</th>
+                <th width="250" i18n:translate="">Status</th>
                 <th i18n:translate="">URL</th>
             </tr>
           </thead>
@@ -37,9 +37,7 @@
                 <td><a href="${result.link}" target="_blank">${result.name}</a></td>
                 <td>${result.message or ''}</td>
                 <td tal:define="url result.url">
-                  <span class="link-status nok ${internal_link(url) and 'internal'}">
-                      <a href="${url}" target="_blank">${truncate(url)}</a>
-                  </span>
+                    <a class="link-status nok ${internal_link(url) and 'internal'}" href="${url}" target="_blank">${truncate(url)}</a>
                 </td>
             </tr>
           </tbody>
