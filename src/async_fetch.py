@@ -12,16 +12,22 @@ def raise_by_default(url, exception):
     raise exception
 
 
+def default_callback(url, response):
+    return url, response
+
+
 async def fetch(
         url: UrlType,
         session,
         response_attr: str = 'json',
+        callback: FetchCallback = default_callback,
         handle_exceptions: HandleExceptionType = raise_by_default
 ):
     """
     Asynchronous get request. Pass handle_exceptions in order to get your
     desired error handling.
 
+    :param callback: callback to handle the response.
     :param url: object that has an attribute url or a string
     :param session: instance of aiohttp.ClientSession()
     :param response_attr: valid, (awaitable) attribute for response object
@@ -35,10 +41,10 @@ async def fetch(
             attr = getattr(response, response_attr)
             if callable(attr):
                 response_called = await attr()
-                return url, response_called
+                return callback(url, response_called)
             else:
                 # eg. status
-                return url, attr
+                return callback(url, attr)
     except Exception as e:
         if not handle_exceptions:
             raise e
@@ -50,6 +56,7 @@ async def fetch_many(
         urls: Sequence[UrlType],
         response_attr: str = 'json',
         fetch_func: Callable = fetch,
+        callback: FetchCallback = default_callback,
         handle_exceptions: HandleExceptionType = raise_by_default
 ):
     """ Registers a task per url using the coroutine fetch_func with correct
@@ -63,7 +70,13 @@ async def fetch_many(
 
         return await asyncio.gather(*(
             loop.create_task(
-                fetch_func(url, session, response_attr, exception_handler(ix))
+                fetch_func(
+                    url,
+                    session,
+                    response_attr,
+                    callback,
+                    exception_handler(ix)
+                )
             )
             for ix, url in enumerate(urls)))
 
@@ -71,6 +84,7 @@ async def fetch_many(
 def async_aiohttp_get_all(
         urls: Sequence[UrlType],
         response_attr: str = 'json',
+        callback: FetchCallback = default_callback,
         handle_exceptions: HandleExceptionType = raise_by_default
 ):
     """ Performs asynchronous get requests.
@@ -88,6 +102,7 @@ def async_aiohttp_get_all(
         fetch_many(
             loop, urls,
             response_attr=response_attr,
+            callback=callback,
             handle_exceptions=handle_exceptions
         )
     )
