@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-20 10:42+0200\n"
+"POT-Creation-Date: 2021-04-21 11:36+0200\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1248,6 +1248,15 @@ msgstr "Utiliser un domaine sans http(s)"
 msgid "Domain must contain a dot"
 msgstr "Le domaine doit contenir un point"
 
+msgid "Choose which links to check"
+msgstr ""
+
+msgid "External links only"
+msgstr ""
+
+msgid "External and internal links"
+msgstr ""
+
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
 
@@ -2226,6 +2235,27 @@ msgstr "Veuillez suivre ce lien pour vous connecter."
 
 msgid "No forms defined yet."
 msgstr "Aucun formulaire défini pour le moment."
+
+msgid "Total"
+msgstr ""
+
+msgid "Healthy"
+msgstr ""
+
+msgid "!200"
+msgstr ""
+
+msgid "Errors"
+msgstr ""
+
+msgid "Duration [s]"
+msgstr ""
+
+msgid "Model"
+msgstr ""
+
+msgid "Status"
+msgstr ""
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
@@ -4152,6 +4182,9 @@ msgstr "Total de ${number} liens trouvés"
 #, python-format
 msgid "Migrates links to new domain ${domain}"
 msgstr "Migration des liens vers le nouveau domaine"
+
+msgid "Link Health-Check"
+msgstr ""
 
 msgid "Topics"
 msgstr "Sujets"

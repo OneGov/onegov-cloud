@@ -9,7 +9,7 @@
                 <tr>
                     <th width="150" i18n:translate="">Total</th>
                     <th width="150" i18n:translate="">Healthy</th>
-                    <th i18n:translate="">Unhealthy</th>
+                    <th i18n:translate="">!200</th>
                     <th i18n:translate="">Errors</th>
                     <th i18n:translate="">Duration [s]</th>
                 </tr>
@@ -28,7 +28,7 @@
           <thead>
             <tr>
               <th width="150" i18n:translate="">Model</th>
-                <th width="150" i18n:translate="">Message</th>
+                <th width="150" i18n:translate="">Status</th>
                 <th i18n:translate="">URL</th>
             </tr>
           </thead>
