@@ -1,8 +1,28 @@
 # Changes
 
+## Release `2021.43`
+
+> commits: **11 / [47e62bf74e...d5b88dfde5](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...d5b88dfde5)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.43)](https://buildkite.com/seantis/onegov-cloud)
+
+### Form
+
+🐞 **Adds support for FontAwesome5 in IconWidget**
+
+Fixes IconField in DirectoryForm town6.
+
+**`Bugfix`** | **[SEA-248](https://linear.app/seantis/issue/SEA-248)** | **[879ded77fd](https://github.com/onegov/onegov-cloud/commit/879ded77fd01e60ae2669064e1fa4f47ab3d235a)**
+
+### Town6
+
+🎉 **Adds version link to Changes.md link to footer**
+
+**`Feature`** | **[SEA-273](https://linear.app/seantis/issue/SEA-273)** | **[66462f9756](https://github.com/onegov/onegov-cloud/commit/66462f9756633b4499a2f80a96f797ea057ee349)**
+
 ## Release `2021.42`
 
-> commits: **2 / [4d9fa2f5ff...93f3deaab1](https://github.com/OneGov/onegov-cloud/compare/4d9fa2f5ff^...93f3deaab1)**  
+> released: **2021-04-15 09:16**<br>
+> commits: **3 / [4d9fa2f5ff...e5d040398b](https://github.com/OneGov/onegov-cloud/compare/4d9fa2f5ff^...e5d040398b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.42)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2021.41`
