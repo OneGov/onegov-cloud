@@ -39,6 +39,7 @@ def test_pages(client):
     url_page = url_page.form.submit()
     assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
     url_page.form['name'] = 'my-govikon'
+    url_page.form['test'] = False
     page = url_page.form.submit().follow()
     assert 'organisation/my-govikon' in page.request.url
     assert editor.get(url_page.request.url, status=403)
