@@ -5,9 +5,11 @@ from io import BytesIO
 from onegov.core import utils
 from onegov.core.csv import (
     CSVFile,
+    convert_excel_to_csv,
     convert_list_of_dicts_to_csv,
     convert_list_of_dicts_to_xlsx,
     convert_xls_to_csv,
+    convert_xlsx_to_csv,
     detect_encoding,
     match_headers,
     normalize_header,
@@ -96,6 +98,32 @@ def test_wacky_csv_file():
     assert list(csv.lines)[1].temperatur == '0'
 
 
+def test_convert_xlsx_to_csv_wrong_format():
+    with pytest.raises(IOError):
+        convert_xlsx_to_csv(BytesIO())
+
+    with pytest.raises(IOError):
+        convert_xlsx_to_csv(BytesIO(b'abcd'))
+
+    path = utils.module_path('tests.onegov.core', 'fixtures/excel.xls')
+    with open(path, 'rb') as file:
+        with pytest.raises(IOError):
+            convert_xlsx_to_csv(file)
+
+
+def test_convert_xls_to_csv_wrong_format():
+    with pytest.raises(IOError):
+        convert_xls_to_csv(BytesIO())
+
+    with pytest.raises(IOError):
+        convert_xls_to_csv(BytesIO(b'abcd'))
+
+    path = utils.module_path('tests.onegov.core', 'fixtures/excel.xlsx')
+    with open(path, 'rb') as file:
+        with pytest.raises(IOError):
+            convert_xls_to_csv(file)
+
+
 @pytest.mark.parametrize("excel_file", [
     utils.module_path('tests.onegov.core', 'fixtures/excel.xls'),
     utils.module_path('tests.onegov.core', 'fixtures/excel.xlsx'),
@@ -103,7 +131,7 @@ def test_wacky_csv_file():
 def test_convert_to_csv(excel_file):
     with open(excel_file, 'rb') as f:
         headers = ['ID', 'Namä', 'Date', 'Bool', 'Leer', 'Formel']
-        csv = CSVFile(convert_xls_to_csv(f), headers)
+        csv = CSVFile(convert_excel_to_csv(f), headers)
 
         assert list(csv.headers.keys()) == headers
         assert list(csv.lines) == [
@@ -137,12 +165,12 @@ def test_convert_to_csv(excel_file):
         ]
 
         with pytest.raises(NotImplementedError):
-            csv = CSVFile(convert_xls_to_csv(f, 'Sheet 2'))
-        with pytest.raises(IOError):
-            convert_xls_to_csv(f, 'Sheet 3')
+            csv = CSVFile(convert_excel_to_csv(f, 'Sheet 2'))
+        with pytest.raises(KeyError):
+            convert_excel_to_csv(f, 'Sheet 3')
 
-        convert_xls_to_csv(f, None)
-        convert_xls_to_csv(f, '')
+        convert_excel_to_csv(f, None)
+        convert_excel_to_csv(f, '')
 
 
 def test_empty_line_csv_file():

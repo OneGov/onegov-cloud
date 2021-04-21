@@ -8,7 +8,7 @@ from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.crypto import hash_password, random_password
-from onegov.core.csv import CSVFile, convert_xls_to_csv
+from onegov.core.csv import CSVFile, convert_excel_to_csv
 from onegov.core.utils import Bunch
 from onegov.user import User, UserGroupCollection
 from onegov.wtfs.models import PickupDate, ScanJob
@@ -109,7 +109,7 @@ def import_users(path):
     def as_csv(path):
 
         if path.name.endswith('xlsx'):
-            adapt = convert_xls_to_csv
+            adapt = convert_excel_to_csv
         else:
             adapt = slurp
 

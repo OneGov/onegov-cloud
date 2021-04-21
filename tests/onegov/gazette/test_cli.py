@@ -128,12 +128,12 @@ def test_import_editors(temporary_directory, redis_url, session_manager):
     )
     assert result.exit_code == 0
     assert '3 group(s) imported' in result.output
-    assert '5 editor(s) imported'in result.output
+    assert '5 editor(s) imported' in result.output
 
     result = run_command(cfg_path, 'govikon', ['import-editors', path])
     assert result.exit_code == 0
     assert '3 group(s) imported' in result.output
-    assert '5 editor(s) imported'in result.output
+    assert '5 editor(s) imported' in result.output
 
     result = run_command(cfg_path, 'govikon', ['import-editors', path])
     assert result.exit_code != 0
@@ -145,7 +145,7 @@ def test_import_editors(temporary_directory, redis_url, session_manager):
     assert 'Deleting all editors' in result.output
     assert 'Deleting all groups' in result.output
     assert '3 group(s) imported' in result.output
-    assert '5 editor(s) imported'in result.output
+    assert '5 editor(s) imported' in result.output
 
     users = session_manager.session().execute("""
         SELECT users.username, users.realname, users.role, groups.name

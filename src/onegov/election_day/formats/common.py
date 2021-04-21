@@ -1,6 +1,6 @@
 import re
 
-from onegov.core.csv import convert_xls_to_csv
+from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.core.errors import AmbiguousColumnsError
 from onegov.core.errors import DuplicateColumnNamesError
@@ -9,7 +9,6 @@ from onegov.core.errors import EmptyLineInFileError
 from onegov.core.errors import InvalidFormatError
 from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
-from xlrd import XLRDError
 
 
 EXPATS = (
@@ -50,13 +49,13 @@ def load_csv(
     csvfile = file
     if mimetype not in ('text/plain', 'text/csv'):
         try:
-            csvfile = convert_xls_to_csv(file, 'Resultate')
+            csvfile = convert_excel_to_csv(file, 'Resultate')
             dialect = 'excel'
-        except IOError:
+        except KeyError:
             try:
-                csvfile = convert_xls_to_csv(file)
+                csvfile = convert_excel_to_csv(file)
                 dialect = 'excel'
-            except XLRDError:
+            except IOError:
                 error = FileImportError(
                     _("Not a valid xls/xlsx file."),
                     filename=filename
@@ -71,7 +70,7 @@ def load_csv(
                     _("Not a valid csv/xls/xlsx file."),
                     filename=filename
                 )
-        except XLRDError:
+        except IOError:
             error = FileImportError(
                 _("Not a valid xls/xlsx file."),
                 filename=filename

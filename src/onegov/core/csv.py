@@ -1,6 +1,7 @@
 """ Offers tools to deal with csv (and xls, xlsx) files. """
 
 import codecs
+import openpyxl
 import re
 import sys
 import tempfile
@@ -236,8 +237,70 @@ def normalize_header(header):
     return header
 
 
+def convert_xlsx_to_csv(xlsx, sheet_name=None):
+    """ Takes an XLS file and returns a csv file using the given worksheet
+    name or the first worksheet found.
+
+    """
+
+    xlsx.seek(0)
+
+    try:
+        excel = openpyxl.load_workbook(xlsx, data_only=True)
+    except Exception:
+        raise IOError("Could not read XLSX file")
+
+    if sheet_name:
+        try:
+            sheet = excel.get_sheet_by_name(sheet_name)
+        except KeyError:
+            raise KeyError(
+                "Could not find the given sheet in this excel file!"
+            )
+    else:
+        sheet = excel.worksheets[0]
+
+    text_output = StringIO()
+    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+
+    for row in range(1, sheet.max_row + 1):
+        values = []
+
+        for column in range(1, sheet.max_column + 1):
+            cell = sheet.cell(row, column)
+
+            if cell.value is None:
+                value = ''
+            elif cell.data_type == 's':
+                value = cell.value
+            elif cell.data_type == 'n':
+                if int(cell.value) == cell.value:
+                    value = str(int(cell.value))
+                else:
+                    value = str(cell.value)
+            elif cell.data_type == 'd':
+                value = cell.value.isoformat()
+            elif cell.data_type == 'b':
+                value = '1' if cell.value else '0'
+            else:
+                raise NotImplementedError
+
+            values.append(value)
+
+        if any(values):
+            writecsv.writerow(values)
+
+    text_output.seek(0)
+    output = BytesIO()
+
+    for line in text_output.readlines():
+        output.write(line.encode('utf-8'))
+
+    return output
+
+
 def convert_xls_to_csv(xls, sheet_name=None):
-    """ Takes an XLS/XLSX file and returns a csv file using the given worksheet
+    """ Takes an XLS file and returns a csv file using the given worksheet
     name or the first worksheet found.
 
     """
@@ -246,27 +309,19 @@ def convert_xls_to_csv(xls, sheet_name=None):
 
     try:
         excel = xlrd.open_workbook(file_contents=xls.read())
-    except UnicodeDecodeError:
-        raise IOError(
-            "Could not read excel file, "
-            "be sure to open the file in binary mode!"
-        )
+    except Exception:
+        raise IOError("Could not read XLS file")
 
     if sheet_name:
         try:
             sheet = excel.sheet_by_name(sheet_name)
         except xlrd.XLRDError:
-            raise IOError(
+            raise KeyError(
                 "Could not find the given sheet in this excel file!"
             )
     else:
         sheet = excel.sheet_by_index(0)
 
-    # XXX we want the output to be bytes encoded, which is not possible using
-    # python's csv module. I'm sure there's a clever way of doing this by
-    # using a custom StringIO class which encodes on the fly, but I haven't
-    # looked into it yet. So for now a conversion is done with some memory
-    # overhead.
     text_output = StringIO()
     writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
 
@@ -303,6 +358,18 @@ def convert_xls_to_csv(xls, sheet_name=None):
         output.write(line.encode('utf-8'))
 
     return output
+
+
+def convert_excel_to_csv(file, sheet_name=None):
+    """ Takes an XLS/XLSX file and returns a csv file using the given worksheet
+    name or the first worksheet found.
+
+    """
+
+    try:
+        return convert_xlsx_to_csv(file, sheet_name)
+    except IOError:
+        return convert_xls_to_csv(file, sheet_name)
 
 
 def get_keys_from_list_of_dicts(rows, key=None, reverse=False):

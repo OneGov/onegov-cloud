@@ -7,7 +7,7 @@ from dateutil import parser
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.crypto import random_password
-from onegov.core.csv import convert_xls_to_csv
+from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.gazette import _
 from onegov.gazette.collections import CategoryCollection
@@ -76,7 +76,7 @@ def import_editors(ctx, file, clear, dry_run, locale):
             for group in groups.query():
                 session.delete(group)
 
-        csvfile = convert_xls_to_csv(
+        csvfile = convert_excel_to_csv(
             file, sheet_name=request.translate(_("Editors"))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
@@ -149,7 +149,7 @@ def import_organizations(ctx, file, clear, dry_run, locale):
             for organization in organizations.query():
                 session.delete(organization)
 
-        csvfile = convert_xls_to_csv(
+        csvfile = convert_excel_to_csv(
             file, sheet_name=request.translate(_("Organizations"))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
@@ -221,7 +221,7 @@ def import_categories(ctx, file, clear, dry_run, locale):
             for category in categories.query():
                 session.delete(category)
 
-        csvfile = convert_xls_to_csv(
+        csvfile = convert_excel_to_csv(
             file, sheet_name=request.translate(_("Categories"))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
@@ -288,7 +288,7 @@ def import_issues(ctx, file, clear, dry_run, locale, timezone):
             for category in issues.query():
                 session.delete(category)
 
-        csvfile = convert_xls_to_csv(
+        csvfile = convert_excel_to_csv(
             file, sheet_name=request.translate(_("Issues"))
         )
         csv = CSVFile(csvfile, expected_headers=headers.values())
