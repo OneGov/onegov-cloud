@@ -52,6 +52,7 @@ setup(
     ],
     install_requires=[
         'AIS.py',
+        'aiohttp',
         'Pillow>=6.2.0',
         'PyYAML',
         'alembic',
@@ -143,6 +144,7 @@ setup(
         'ua-parser',
         'ulid',
         'unidecode',
+        'urlextract',
         'validate_email',
         'vobject',
         'watchdog',

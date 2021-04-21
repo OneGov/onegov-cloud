@@ -1,11 +1,14 @@
-from typing import Union, Callable, Tuple, List, Any, Sequence, NamedTuple
+from typing import Union, Callable, Tuple, List, Any, Sequence, \
+    Generator
 
 import aiohttp
 import asyncio
 
-ErrFunc = Callable[[str], Any]
-HandleExceptionType = Union[Tuple[ErrFunc], List[ErrFunc], ErrFunc]
 UrlType = Union[str, object]
+UrlsType = Union[Sequence[UrlType]]
+ErrFunc = Callable[[UrlType, Any], Any]
+HandleExceptionType = Union[ErrFunc, Tuple[ErrFunc], List[ErrFunc]]
+FetchCallback = Callable[[UrlType, Any], Any]
 
 
 def raise_by_default(url, exception):
@@ -53,7 +56,7 @@ async def fetch(
 
 async def fetch_many(
         loop,
-        urls: Sequence[UrlType],
+        urls: UrlsType,
         response_attr: str = 'json',
         fetch_func: Callable = fetch,
         callback: FetchCallback = default_callback,
@@ -82,7 +85,7 @@ async def fetch_many(
 
 
 def async_aiohttp_get_all(
-        urls: Sequence[UrlType],
+        urls: UrlsType,
         response_attr: str = 'json',
         callback: FetchCallback = default_callback,
         handle_exceptions: HandleExceptionType = raise_by_default
