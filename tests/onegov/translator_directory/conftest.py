@@ -1,13 +1,14 @@
 import pytest
 import transaction
+
+from onegov.fsi.initial_content import create_new_organisation
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.user import User
-from onegov.fsi.initial_content import create_new_organisation
-from tests.onegov.fsi.common import (
-    global_password)
+from sqlalchemy.orm.session import close_all_sessions
+from tests.onegov.fsi.common import global_password
 from tests.onegov.fsi.common import hashed_password as _hashed_password
-from tests.shared.utils import create_app
 from tests.shared import Client as BaseClient
+from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
@@ -85,10 +86,6 @@ def create_translator_app(request, use_elasticsearch, hashed_password):
     ))
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app
-
-
-
-

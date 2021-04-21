@@ -6,8 +6,9 @@ from onegov.core.utils import module_path
 from onegov.user import User
 from onegov.winterthur import WinterthurApp
 from onegov.winterthur.initial_content import create_new_organisation
-from tests.shared.utils import create_app
 from pathlib import Path
+from sqlalchemy.orm.session import close_all_sessions
+from tests.shared.utils import create_app
 
 
 @pytest.fixture()
@@ -67,6 +68,6 @@ def create_winterthur_app(request, use_elasticsearch):
     ))
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app

@@ -17,39 +17,40 @@ from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 
 from onegov.chat import MessageCollection
-from onegov.core.crypto import random_token
-from onegov.core.custom import json
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
+from onegov.core.crypto import random_token
 from onegov.core.csv import CSVFile
+from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event, Occurrence, EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
+from onegov.form import as_internal_id, parse_form
 from onegov.form import FormCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
+from onegov.org.forms import ReservationForm
 from onegov.org.forms.event import TAGS
 from onegov.org.models import Organisation, TicketNote, TicketMessage
-from onegov.org.forms import ReservationForm
 from onegov.pay.models import ManualPayment
 from onegov.reservation import Allocation, Reservation
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
-from onegov.form import as_internal_id, parse_form
-from onegov.town6.upgrade import migrate_theme_options, \
-    migrate_homepage_structure_for_town6
+from onegov.town6.upgrade import migrate_homepage_structure_for_town6
+from onegov.town6.upgrade import migrate_theme_options
 from onegov.user import UserCollection, User
+from operator import add as add_op
 from purl import URL
 from sedate import replace_timezone, utcnow
-from sqlalchemy.dialects.postgresql import array
 from sqlalchemy import create_engine, event, text, or_
+from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.session import close_all_sessions
 from tqdm import tqdm
 from uuid import UUID, uuid4
-from operator import add as add_op
 
 cli = command_group()
 
@@ -114,8 +115,8 @@ def delete(group_context):
 
             assert app.session_manager.is_valid_schema(app.schema)
 
+            close_all_sessions()
             dsn = app.session_manager.dsn
-            app.session_manager.session().close_all()
             app.session_manager.dispose()
 
             engine = create_engine(dsn)

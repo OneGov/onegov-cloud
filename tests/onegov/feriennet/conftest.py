@@ -1,14 +1,15 @@
 import transaction
 import pytest
 
-from tests.onegov.activity.fixtures.scenario import Scenario
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.models import VacationActivity
 from onegov.user import User
+from pytest_localserver.http import WSGIServer
+from sqlalchemy.orm.session import close_all_sessions
+from tests.onegov.activity.fixtures.scenario import Scenario
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
-from pytest_localserver.http import WSGIServer
 
 
 class Client(BaseClient):
@@ -103,7 +104,7 @@ def create_feriennet_app(request, use_elasticsearch):
     ))
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app
 

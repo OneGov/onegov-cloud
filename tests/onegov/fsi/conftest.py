@@ -14,6 +14,7 @@ from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
+from sqlalchemy.orm.session import close_all_sessions
 from tests.onegov.fsi.common import (
     global_password, admin_factory,
     editor_factory, admin_attendee_factory, editor_attendee_factory,
@@ -23,7 +24,6 @@ from tests.onegov.fsi.common import (
     future_course_reservation_factory, db_mock, TEMPLATE_MODEL_MAPPING)
 from tests.onegov.fsi.common import hashed_password as _hashed_password
 from tests.shared.scenario import BaseScenario
-
 from tests.shared.utils import create_app
 from tests.shared import Client as BaseClient
 
@@ -219,7 +219,7 @@ def create_fsi_app(request, use_elasticsearch, hashed_password, mock_db=False):
         db_mock(session)
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app
 

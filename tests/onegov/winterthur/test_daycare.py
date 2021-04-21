@@ -7,6 +7,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.org.models import Organisation
 from onegov.winterthur.daycare import DaycareSubsidyCalculator, Services
+from sqlalchemy.orm.session import close_all_sessions
 
 
 @pytest.fixture(scope='function')
@@ -106,7 +107,7 @@ def app(winterthur_app):
     }
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app
 

@@ -1,14 +1,16 @@
 import onegov.ticket
 import pytest
 import transaction
+
 from onegov.core.utils import module_path
-from tests.shared.utils import create_app
 from onegov.town6 import TownApp
 from onegov.town6.initial_content import builtin_form_definitions
 from onegov.town6.initial_content import create_new_organisation
 from onegov.user import User
 from pytest_localserver.http import WSGIServer
+from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client as BaseClient
+from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
@@ -108,6 +110,6 @@ def create_town_app(request, use_elasticsearch):
     ))
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app

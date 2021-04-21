@@ -1,10 +1,11 @@
-from tests.shared import Client
-from tests.shared.utils import create_app
 from onegov.agency.app import AgencyApp
 from onegov.agency.initial_content import create_new_organisation
 from onegov.user import User
 from os import path
 from pytest import fixture
+from sqlalchemy.orm.session import close_all_sessions
+from tests.shared import Client
+from tests.shared.utils import create_app
 from transaction import commit
 from yaml import dump
 
@@ -76,7 +77,7 @@ def create_agency_app(request, use_elasticsearch=False):
     )
 
     commit()
-    session.close_all()
+    close_all_sessions()
     return app
 
 

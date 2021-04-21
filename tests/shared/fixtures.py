@@ -161,9 +161,8 @@ def postgres_dsn(postgres, pytestconfig):
 
     transaction.abort()
 
-    manager = SessionManager(postgres.url(), None)
-    manager.session().close_all()
-    manager.dispose()
+    close_all_sessions()
+    SessionManager(postgres.url(), None).dispose()
 
     engine = create_engine(postgres.url())
     results = engine.execute(

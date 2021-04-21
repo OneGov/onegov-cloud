@@ -4,11 +4,12 @@ import pytest
 import transaction
 
 from onegov.core.utils import module_path
-from tests.shared.utils import create_app
 from onegov.town import TownApp
 from onegov.town.initial_content import builtin_form_definitions
 from onegov.town.initial_content import create_new_organisation
 from onegov.user import User
+from sqlalchemy.orm.session import close_all_sessions
+from tests.shared.utils import create_app
 
 
 @pytest.fixture(scope='session')
@@ -58,6 +59,6 @@ def create_town_app(request, use_elasticsearch):
     ))
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app

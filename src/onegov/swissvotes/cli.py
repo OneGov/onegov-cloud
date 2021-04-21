@@ -15,6 +15,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models.file import LocalizedFile
 from sqlalchemy import create_engine
+from sqlalchemy.orm.session import close_all_sessions
 
 
 cli = command_group()
@@ -55,8 +56,8 @@ def delete(group_context):
         assert app.has_database_connection
         assert app.session_manager.is_valid_schema(app.schema)
 
+        close_all_sessions()
         dsn = app.session_manager.dsn
-        app.session_manager.session().close_all()
         app.session_manager.dispose()
 
         engine = create_engine(dsn)

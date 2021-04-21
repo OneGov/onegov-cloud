@@ -4,14 +4,15 @@ import onegov.ticket
 import transaction
 import pytest
 
+from onegov.core.elements import Element
 from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
-from onegov.core.elements import Element
 from onegov.user import User
+from pytest_localserver.http import WSGIServer
+from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
-from pytest_localserver.http import WSGIServer
 from yaml import dump
 
 
@@ -147,7 +148,7 @@ def create_org_app(request, use_elasticsearch, cls=OrgApp):
     ))
 
     transaction.commit()
-    session.close_all()
+    close_all_sessions()
 
     return app
 
