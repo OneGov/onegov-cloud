@@ -117,7 +117,7 @@ class TraitInfo(object):
                 name,
                 request.link(Editor('new', self, trait)),
                 classes=(
-                    'new-{}'.format(trait),
+                    f'new-{trait}',
                     'show-new-content-placeholder'
                 )
             )
@@ -181,3 +181,10 @@ class TraitInfo(object):
                         "to do it for you."
                     )
                 )
+
+        if request.is_admin and self.url_changeable:
+            yield Link(
+                _('Change Url'),
+                request.link(Editor('change-url', self)),
+                classes=('internal-url',)
+            )

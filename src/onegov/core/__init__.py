@@ -23,6 +23,7 @@ LEVELS = (
     # modules,
     (
         'onegov.activity',
+        'onegov.async_http',
         'onegov.ballot',
         'onegov.chat',
         'onegov.directory',

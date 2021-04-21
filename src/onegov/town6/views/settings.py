@@ -10,7 +10,8 @@ from onegov.town6.forms.settings import GeneralSettingsForm, \
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
     MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
-    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm
+    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm, \
+    LinkMigrationForm, LinkHealthCheckForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -18,7 +19,8 @@ from onegov.org.views.settings import (
     handle_favicon_settings, handle_links_settings, handle_header_settings,
     handle_footer_settings, handle_module_settings, handle_map_settings,
     handle_analytics_settings, handle_holiday_settings,
-    handle_newsletter_settings, handle_generic_settings)
+    handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
+    handle_link_health_check)
 
 from onegov.town6.app import TownApp
 
@@ -111,6 +113,19 @@ def town_handle_general_settings(self, request, form):
         self, request, form, SettingsLayout(self, request))
 
 
+@TownApp.form(model=Organisation, name='homepage-settings', template='form.pt',
+              permission=Secret, form=get_custom_settings_form,
+              setting=_("Homepage"), icon='fa-home', order=-995)
+def custom_handle_settings(self, request, form):
+
+    form.delete_field('homepage_cover')
+    form.delete_field('redirect_homepage_to')
+    form.delete_field('redirect_path')
+
+    return handle_homepage_settings(
+        self, request, form, SettingsLayout(self, request))
+
+
 @TownApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
@@ -127,6 +142,14 @@ def town_handle_favicon_settings(self, request, form):
 def town_handle_links_settings(self, request, form):
     return handle_links_settings(
         self, request, form, SettingsLayout(self, request))
+
+
+@TownApp.form(model=Organisation, name='chat-settings', template='form.pt',
+              permission=Secret, form=ChatSettingsForm,
+              setting=_("Chat"), icon='far fa-comments', order=-980)
+def handle_chat_settings(self, request, form):
+    return handle_generic_settings(
+        self, request, form, _("Chat"), SettingsLayout(self, request))
 
 
 @TownApp.form(
@@ -198,7 +221,7 @@ def town_handle_ticket_settings(self, request, form):
     permission=Secret, form=NewsletterSettingsForm,
     setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
 )
-def town_handle_newsletter_settings(self, request, form, layout=None):
+def town_handle_newsletter_settings(self, request, form):
     return handle_newsletter_settings(
         self, request, form, SettingsLayout(self, request)
     )
@@ -211,22 +234,21 @@ def town_preview_holiday_settings(self, request, form):
         self, request, form, DefaultLayout(self, request))
 
 
-@TownApp.form(model=Organisation, name='homepage-settings', template='form.pt',
-              permission=Secret, form=get_custom_settings_form,
-              setting=_("Homepage"), icon='fa-home', order=-900)
-def custom_handle_settings(self, request, form):
-
-    form.delete_field('homepage_cover')
-    form.delete_field('redirect_homepage_to')
-    form.delete_field('redirect_path')
-
-    return handle_homepage_settings(
-        self, request, form, SettingsLayout(self, request))
+@TownApp.form(
+    model=Organisation, name='migrate-links', template='form.pt',
+    permission=Secret, form=LinkMigrationForm, setting=_('Link Migration'),
+    icon='fas fa-random', order=-400)
+def town_handle_migrate_links(self, request, form):
+    return handle_migrate_links(
+        self, request, form, DefaultLayout(self, request)
+    )
 
 
-@TownApp.form(model=Organisation, name='chat-settings', template='form.pt',
-              permission=Secret, form=ChatSettingsForm,
-              setting=_("Chat"), icon='far fa-comments', order=-999)
-def handle_chat_settings(self, request, form):
-    return handle_generic_settings(
-        self, request, form, _("Chat"), SettingsLayout(self, request))
+@TownApp.form(
+    model=Organisation, name='link-healthcheck', template='healthcheck.pt',
+    permission=Secret, form=LinkHealthCheckForm,
+    setting=_('Link Health-Check'), icon='fas fa-medkit', order=-399)
+def town_handle_link_health_check(self, request, form):
+    return handle_link_health_check(
+        self, request, form, DefaultLayout(self, request)
+    )

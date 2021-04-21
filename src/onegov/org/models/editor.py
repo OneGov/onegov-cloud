@@ -37,7 +37,7 @@ class Editor(object):
     @staticmethod
     def is_supported_action(action):
         """ Returns True if the given action is supported. """
-        return action in {'new', 'paste', 'edit', 'delete'}
+        return action in {'new', 'paste', 'edit', 'delete', 'change-url'}
 
     @property
     def page_id(self):

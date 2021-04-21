@@ -15,9 +15,11 @@ from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
-    NewsletterSettingsForm
+    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm
+from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
+from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
 
@@ -77,6 +79,14 @@ def handle_general_settings(self, request, form, layout=None):
 
 
 @OrgApp.form(
+    model=Organisation, name='homepage-settings', template='form.pt',
+    permission=Secret, form=HomepageSettingsForm, setting=_("Homepage"),
+    icon='fa-home', order=-995)
+def handle_homepage_settings(self, request, form, layout=None):
+    return handle_generic_settings(self, request, form, _("Homepage"), layout)
+
+
+@OrgApp.form(
     model=Organisation, name='favicon-settings', template='form.pt',
     permission=Secret, form=FaviconSettingsForm, setting=_("Favicon"),
     icon=' fa-external-link-square', order=-990)
@@ -93,11 +103,31 @@ def handle_links_settings(self, request, form, layout=None):
 
 
 @OrgApp.form(
-    model=Organisation, name='homepage-settings', template='form.pt',
-    permission=Secret, form=HomepageSettingsForm, setting=_("Homepage"),
-    icon='fa-home', order=-900)
-def handle_homepage_settings(self, request, form, layout=None):
-    return handle_generic_settings(self, request, form, _("Homepage"), layout)
+    model=Organisation, name='newsletter-settings', template='form.pt',
+    permission=Secret, form=NewsletterSettingsForm,
+    setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
+)
+def handle_newsletter_settings(self, request, form, layout=None):
+    return handle_generic_settings(
+        self, request, form, _("Newsletter Settings"), layout
+    )
+
+
+@OrgApp.form(
+    model=Organisation, name='ticket-settings', template='form.pt',
+    permission=Secret, form=OrgTicketSettingsForm,
+    setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
+)
+def handle_ticket_settings(self, request, form, layout=None):
+    resp = handle_generic_settings(
+        self, request, form, _("Ticket Settings"), layout)
+    if request.method == 'GET':
+        resp['callout'] = _(
+            "Accepting and closing tickets automatically should be used "
+            "with care! This means that anonymous users can influence the "
+            "page content without user interaction of an admin! "
+            "Best activate this setting just for a limited period of time.")
+    return resp
 
 
 @OrgApp.form(
@@ -149,34 +179,6 @@ def handle_holiday_settings(self, request, form, layout=None):
     return handle_generic_settings(self, request, form, _("Holidays"), layout)
 
 
-@OrgApp.form(
-    model=Organisation, name='ticket-settings', template='form.pt',
-    permission=Secret, form=OrgTicketSettingsForm,
-    setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
-)
-def handle_ticket_settings(self, request, form, layout=None):
-    resp = handle_generic_settings(
-        self, request, form, _("Ticket Settings"), layout)
-    if request.method == 'GET':
-        resp['callout'] = _(
-            "Accepting and closing tickets automatically should be used "
-            "with care! This means that anonymous users can influence the "
-            "page content without user interaction of an admin! "
-            "Best activate this setting just for a limited period of time.")
-    return resp
-
-
-@OrgApp.form(
-    model=Organisation, name='newsletter-settings', template='form.pt',
-    permission=Secret, form=NewsletterSettingsForm,
-    setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
-)
-def handle_newsletter_settings(self, request, form, layout=None):
-    return handle_generic_settings(
-        self, request, form, _("Newsletter Settings"), layout
-    )
-
-
 @OrgApp.form(model=Organisation, name='holiday-settings-preview',
              permission=Secret, form=HolidaySettingsForm)
 def preview_holiday_settings(self, request, form, layout=None):
@@ -205,3 +207,73 @@ def preview_holiday_settings(self, request, form, layout=None):
             'year': layout.today().year,
         }
     )
+
+
+@OrgApp.form(
+    model=Organisation, name='migrate-links', template='form.pt',
+    permission=Secret, form=LinkMigrationForm, setting=_('Link Migration'),
+    icon='fa fa-random', order=-400)
+def handle_migrate_links(self, request, form, layout=None):
+
+    domain = request.domain
+    button_text = _('Migrate')
+    test_results = None
+
+    if form.submitted(request):
+        test_only = form.test.data
+        migration = LinkMigration(
+            request,
+            old_uri=form.old_domain.data,
+            new_uri=request.domain
+        )
+        found_by_model = migration.migrate_site_collection(test_only)
+        found = sum(found_by_model.values())
+
+        if not test_only:
+            request.success(
+                _('Migrated ${number} links', mapping={'number': found}))
+            return request.redirect(request.link(self, name='settings'))
+
+        test_results = _('Total of ${number} links found.',
+                         mapping={'number': found})
+
+    return {
+        'title': _('Link Migration'),
+        'form': form,
+        'layout': layout or DefaultLayout(self, request),
+        'helptext': test_results,
+        'button_text': button_text,
+        'callout': _('Migrates links to new domain ${domain}',
+                     mapping={'domain': domain}),
+    }
+
+
+@OrgApp.form(
+    model=Organisation, name='link-healthcheck', template='healthcheck.pt',
+    permission=Secret, form=LinkHealthCheckForm,
+    setting=_('Link Health-Check'), icon='fa fa-medkit', order=-399)
+def handle_link_health_check(self, request, form, layout=None):
+
+    check_responses = None
+    healthcheck = LinkHealthCheck(request)
+
+    if form.submitted(request):
+        healthcheck.external_only = form.scope.data != 'external'
+        check_responses = healthcheck.unhealthy_urls()
+
+    url_max_len = 100
+
+    def truncate(text):
+        if len(text) > url_max_len:
+            return text[0:url_max_len - 1] + '...'
+        return text
+
+    return {
+        'title': _('Link Health-Check'),
+        'form': form,
+        'layout': layout or DefaultLayout(self, request),
+        'check_responses': check_responses,
+        'internal_link': healthcheck.internal_link,
+        'truncate': truncate,
+        'stats': healthcheck.unhealthy_urls_stats
+    }

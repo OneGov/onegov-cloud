@@ -1,16 +1,21 @@
 from freezegun import freeze_time
 
-from tests.shared.utils import open_in_browser
+from tests.onegov.org.common import edit_bar_links
 
 
 def test_pages(client):
+
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
     client.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
     root_page = client.get(root_url)
 
-    assert len(root_page.pyquery('.edit-bar')) == 1
+    links = edit_bar_links(root_page, 'text')
+    assert 'Url ändern' in links
+    assert len(links) == 5
     new_page = root_page.click('Thema')
     assert "Neues Thema" in new_page
 
@@ -27,8 +32,19 @@ def test_pages(client):
     assert page.pyquery('.page-text i').text()\
         .startswith("Experts say it's the fact")
 
-    edit_page = page.click("Bearbeiten")
+    # Test changing the url
+    assert 'Url ändern' not in editor.get(page.request.url)
+    url_page = page.click('Url ändern')
+    url_page.form['name'] = 'my govikoN'
+    url_page = url_page.form.submit()
+    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
+    url_page.form['name'] = 'my-govikon'
+    url_page.form['test'] = False
+    page = url_page.form.submit().follow()
+    assert 'organisation/my-govikon' in page.request.url
+    assert editor.get(url_page.request.url, status=403)
 
+    edit_page = page.click("Bearbeiten")
     assert "Thema Bearbeiten" in edit_page
     assert "&lt;h2&gt;Living in Govikon is Really Great&lt;/h2&gt" in edit_page
 
@@ -115,6 +131,7 @@ def test_links(client):
     client.login_admin()
     root_page = client.get(root_url)
 
+    assert 'Url ändern' in edit_bar_links(root_page, 'text')
     new_link = root_page.click("Verknüpfung")
     assert "Neue Verknüpfung" in new_link
 
@@ -124,6 +141,27 @@ def test_links(client):
 
     assert "Sie wurden nicht automatisch weitergeleitet" in link
     assert 'https://www.google.ch' in link
+
+    new_link = root_page.click("Verknüpfung")
+    new_link.form['url'] = root_url
+    new_link.form['title'] = 'Link to Org'
+    internal_link = new_link.form.submit().follow()
+
+    # Change the root url
+    change_url = root_page.click('Url ändern')
+    change_url.form['name'] = 'org'
+    change_url.form['test'] = True
+
+    change_url_check = change_url.form.submit()
+    callout = change_url_check.pyquery('.callout').text()
+    assert '1 Links werden nach dieser Aktion ersetzt.' in callout
+    change_url_check.form['test'] = False
+    root_page = change_url_check.form.submit().follow()
+    root_url = root_page.request.url
+    # check the link to org is updated getting 200 OK
+    link_page = root_page.click('Link to Org', index=0)
+
+    assert internal_link.request.url != link_page.request.url
 
     client.get('/auth/logout')
 

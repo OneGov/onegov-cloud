@@ -1,4 +1,5 @@
 """ Provides commands used to initialize org websites. """
+import sys
 from io import BytesIO
 from pathlib import Path
 
@@ -32,6 +33,7 @@ from onegov.form import FormCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
+from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.forms import ReservationForm
 from onegov.pay.models import ManualPayment
@@ -1326,3 +1328,39 @@ def migrate_town(group_context):
         migrate_homepage_structure_for_town6(context)
 
     return migrate_to_new_town
+
+
+@cli.command('migrate-links', context_settings={'singular': True})
+@pass_group_context
+@click.argument('old-uri')
+@click.option('--dry-run', is_flag=True, default=False)
+def migrate_links_cli(group_context, old_uri, dry_run):
+    """ Migrates url's in pages. Supports domains and full urls. Most of
+    the urls are located in meta and content fields.
+    """
+
+    if '.' not in old_uri:
+        click.secho('Domain must contain a dot')
+        sys.exit(1)
+
+    def execute(request, app):
+        if old_uri.startswith('http'):
+            new_uri = request.host_url
+        else:
+            new_uri = request.domain
+        migration = LinkMigration(request, old_uri=old_uri, new_uri=new_uri)
+        total, grouped_count = migration.migrate_site_collection(
+            test=dry_run
+        )
+
+        if total:
+            click.secho(f'Total replaced: {total}')
+            click.secho('Replaced links by group:')
+            for group, counts in grouped_count.items():
+                for field, count in counts.items():
+                    if count:
+                        click.secho(f'{group}.{field}: {count}')
+        else:
+            click.secho('Nothing found')
+
+    return execute

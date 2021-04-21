@@ -1,0 +1,30 @@
+$link-status-icon: '\f059';
+$link-status-ok-icon: '\f058';
+$link-status-nok-icon: '\f06a';
+
+.link-status {
+    color: $monsoon;
+
+    &::before {
+        @include icon($link-status-icon);
+        margin-right: .25em;
+    }
+
+    &.ok {
+        color: get-color(success);
+
+        &::before {
+            @include icon($link-status-ok-icon);
+            margin-right: .25em;
+        }
+    }
+
+    &.nok {
+        color: get-color(alert);
+
+        &::before {
+            @include icon-bold($link-status-nok-icon);
+            margin-right: .25em;
+        }
+    }
+}
