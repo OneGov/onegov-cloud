@@ -68,7 +68,7 @@ def test_excel_export(session):
 
     file = export_person_xlsx(session)
     workbook = load_workbook(file)
-    sheet = workbook.get_sheet_by_name('Personen')
+    sheet = workbook['Personen']
     titles = [cell.value for cell in tuple(sheet.rows)[0]]
 
     # Test titles

@@ -192,7 +192,7 @@ def test_view_users_export(gazette_app):
     book = load_workbook(BytesIO(result.body))
     assert len(book.worksheets) == 2
 
-    sheet = book.get_sheet_by_name('Redaktoren')
+    sheet = book['Redaktoren']
     assert sheet.max_column == 3
     assert sheet.max_row == 4
 
@@ -212,7 +212,7 @@ def test_view_users_export(gazette_app):
     assert sheet.cell(4, 2).value == 'Third Editor'
     assert sheet.cell(4, 3).value == 'editor3@example.org'
 
-    sheet = book.get_sheet_by_name('Herausgeber')
+    sheet = book['Herausgeber']
     assert sheet.max_column == 3
     assert sheet.max_row == 2
 

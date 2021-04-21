@@ -787,7 +787,7 @@ def test_view_notices_statistics_rejected(gazette_app):
 
         result_xslx = publisher.get('/notices/drafted/statistics-xlsx')
         book = load_workbook(BytesIO(result_xslx.body))
-        sheet = book.get_sheet_by_name('Zurückgewiesen')
+        sheet = book['Zurückgewiesen']
         result_xslx = [
             [
                 sheet.cell(row + 1, 1).value, sheet.cell(row + 1, 2).value

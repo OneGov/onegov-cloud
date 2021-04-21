@@ -252,7 +252,7 @@ def convert_xlsx_to_csv(xlsx, sheet_name=None):
 
     if sheet_name:
         try:
-            sheet = excel.get_sheet_by_name(sheet_name)
+            sheet = excel[sheet_name]
         except KeyError:
             raise KeyError(
                 "Could not find the given sheet in this excel file!"
