@@ -8,7 +8,8 @@ from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
 from onegov.form import with_options
-from onegov.form.fields import MultiCheckboxField, TagsField, ChosenSelectField
+from onegov.form.fields import MultiCheckboxField, TagsField, \
+    ChosenSelectField
 from onegov.form.fields import PreviewField
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -751,3 +752,15 @@ class LinkMigrationForm(Form):
             if errors:
                 self.old_domain.errors = errors
                 return False
+
+
+class LinkHealthCheckForm(Form):
+
+    scope = RadioField(
+        label=_('Choose which links to check'),
+        choices=(
+            ('external', _('External links only')),
+            ('both', _('External and internal links')),
+        ),
+        default='external'
+    )

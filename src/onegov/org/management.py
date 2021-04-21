@@ -1,9 +1,12 @@
 import re
-from collections import defaultdict
+import time
+from collections import defaultdict, namedtuple
 
 import transaction
 from sqlalchemy.orm import object_session
+from urlextract import URLExtract
 
+from async_fetch import async_aiohttp_get_all
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 
@@ -158,3 +161,114 @@ class PageNameChange(ModelsWithLinksMixin):
     @classmethod
     def from_form(cls, model, form):
         return cls(form.request, model, form.name.data)
+
+
+class LinkCheck(object):
+    def __init__(self, name, link, url):
+        self.name = name
+        self.link = link
+        self.url = self.ensure_protocol(url)
+        self.status = None
+        self.message = None
+
+    def ensure_protocol(self, url):
+        if not url.startswith('http'):
+            return 'https://' + url
+        return url
+
+
+class LinkHealthCheck(ModelsWithLinksMixin):
+    """
+
+    """
+
+    Statistic = namedtuple(
+        'UnhealthyStats', ['total', 'ok', 'nok', 'error', 'duration'])
+
+    def __init__(self, request, external_only=False):
+        self.request = request
+        self.external_only = external_only
+        self.domain = self.request.domain
+        self.extractor = URLExtract()
+
+        self.unhealthy_urls_stats = None
+        self._started = time.time()
+
+    @staticmethod
+    def stats_obj():
+        return
+
+    def internal_link(self, url):
+        return self.domain in url
+
+    def filter_urls(self, urls):
+        if self.external_only:
+            return tuple(url for url in urls if not self.internal_link(url))
+        return urls
+
+    def find_urls(self):
+        for name, entries in self.site_collection.get().items():
+            for entry in entries:
+                urls = []
+                for field in self.fields_with_urls:
+                    text = getattr(entry, field, None)
+                    if not text:
+                        continue
+                    found = self.extractor.find_urls(text, only_unique=True)
+                    if not found:
+                        continue
+                    urls += found
+                if urls:
+                    yield (
+                        entry.__class__.__name__,
+                        self.request.link(entry),
+                        self.filter_urls(urls)
+                    )
+
+    def unhealthy_urls(self):
+        """ We check the urls in the backend, since in the frontend we run into
+        the content-security-policy. """
+
+        total_count = 0
+        error_count = 0
+        not_okay_status = 0
+
+        def url_list_generator():
+            for name, model_link, urls in self.find_urls():
+                for url in urls:
+                    yield LinkCheck(name, model_link, url)
+
+        def handle_errors(check, exception):
+            nonlocal total_count
+            nonlocal error_count
+            check.message = str(exception)
+            total_count += 1
+            error_count += 1
+            return check
+
+        def on_success(check, status):
+            nonlocal total_count
+            nonlocal not_okay_status
+            check.status = status
+            check.message = f'Status {status}'
+            total_count += 1
+            if not status == 200:
+                not_okay_status += 1
+            return check
+
+        urls = async_aiohttp_get_all(
+            urls=tuple(url_list_generator()),
+            response_attr='status',
+            callback=on_success,
+            handle_exceptions=handle_errors
+        )
+
+        self.unhealthy_urls_stats = self.Statistic(
+            total=total_count,
+            error=error_count,
+            nok=not_okay_status,
+            ok=total_count - error_count - not_okay_status,
+            duration=time.time() - self._started
+        )
+
+        return tuple(check for check in urls if check.status != 200)

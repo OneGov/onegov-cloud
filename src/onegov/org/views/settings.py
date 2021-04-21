@@ -15,7 +15,7 @@ from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
-    NewsletterSettingsForm, LinkMigrationForm
+    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -245,4 +245,35 @@ def handle_migrate_links(self, request, form, layout=None):
         'button_text': button_text,
         'callout': _('Migrates links to new domain ${domain}',
                      mapping={'domain': domain}),
+    }
+
+
+@OrgApp.form(
+    model=Organisation, name='link-healthcheck', template='healthcheck.pt',
+    permission=Secret, form=LinkHealthCheckForm,
+    setting=_('Link Health-Check'), icon='fa fa-medkit', order=-399)
+def handle_link_health_check(self, request, form, layout=None):
+
+    check_responses = None
+    healthcheck = LinkHealthCheck(request)
+
+    if form.submitted(request):
+        healthcheck.external_only = form.scope.data != 'external'
+        check_responses = healthcheck.unhealthy_urls()
+
+    url_max_len = 100
+
+    def truncate(text):
+        if len(text) > url_max_len:
+            return text[0:url_max_len - 1] + '...'
+        return text
+
+    return {
+        'title': _('Link Health-Check'),
+        'form': form,
+        'layout': layout or DefaultLayout(self, request),
+        'check_responses': check_responses,
+        'internal_link': healthcheck.internal_link,
+        'truncate': truncate,
+        'stats': healthcheck.unhealthy_urls_stats
     }
