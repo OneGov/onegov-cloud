@@ -6027,11 +6027,10 @@ $link-status-nok-icon: '\f06a';
 
     &::before {
         @include icon($link-status-icon);
-        margin-right: .25em;
     }
 
     &.ok {
-        color: get-color(success);
+        color: $success-color;
 
         &::before {
             @include icon($link-status-ok-icon);
@@ -6040,11 +6039,10 @@ $link-status-nok-icon: '\f06a';
     }
 
     &.nok {
-        color: get-color(alert);
+        color: $alert-color;
 
         &::before {
             @include icon($link-status-nok-icon);
-            margin-right: .25em;
         }
     }
 }
