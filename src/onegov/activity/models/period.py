@@ -387,7 +387,7 @@ class Period(Base, TimestampMixin):
         current date is after prebooking end. """
         now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
-        end = self.as_local_datetime(self.prebooking_end)
+        end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
 
         if now > end:
             return True
