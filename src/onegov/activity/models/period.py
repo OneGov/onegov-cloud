@@ -316,7 +316,7 @@ class Period(Base, TimestampMixin):
         if now < local(self.booking_start):
             return 'inactive'
 
-        if not self.finalized and local(self.booking_end) < now:
+        if not self.finalized and local(self.booking_end, True) < now:
             return 'inactive'
 
         if not self.finalized:
@@ -325,10 +325,11 @@ class Period(Base, TimestampMixin):
         if now < local(self.execution_start):
             return 'payment'
 
-        if local(self.execution_start) <= now <= local(self.execution_end):
+        if local(self.execution_start) <= now <= \
+                local(self.execution_end, True):
             return 'execution'
 
-        if now > local(self.execution_end):
+        if now > local(self.execution_end, end_of_day=True):
             return 'archive'
 
     def confirm_and_start_booking_phase(self):
