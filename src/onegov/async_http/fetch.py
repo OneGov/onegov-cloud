@@ -68,7 +68,7 @@ async def fetch_many(
         def exception_handler(ix):
             if callable(handle_exceptions):
                 return handle_exceptions
-            return handle_exceptions[urls.index(ix)]
+            return handle_exceptions[ix]
 
         return await asyncio.gather(*(
             loop.create_task(
