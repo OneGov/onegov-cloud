@@ -223,6 +223,7 @@ setup(
             'onegov-gazette=onegov.gazette.cli:cli',
             'onegov-org=onegov.org.cli:cli',
             'onegov-pdf=onegov.pdf.cli:cli',
+            'onegov-people=onegov.people.cli:cli',
             'onegov-search=onegov.search.cli:cli',
             'onegov-server=onegov.server.cli:run',
             'onegov-swissvotes=onegov.swissvotes.cli:cli',
