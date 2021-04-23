@@ -46,6 +46,11 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         return True
 
     @property
+    def url_changeable(self):
+        """Open for all topics, even root ones."""
+        return True
+
+    @property
     def paste_target(self):
         if self.trait == 'link':
             return self.parent or self
@@ -98,11 +103,16 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     @property
     def deletable(self):
-        return self.parent is not None
+        return self.parent_id is not None
 
     @property
     def editable(self):
         return True
+
+    @property
+    def url_changeable(self):
+        """Open for all topics, even root ones."""
+        return self.parent_id is not None
 
     @property
     def paste_target(self):

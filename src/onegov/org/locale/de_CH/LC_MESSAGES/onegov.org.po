@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-16 09:04+0200\n"
+"POT-Creation-Date: 2021-04-21 11:41+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -777,6 +777,22 @@ msgstr "Zeige Einleitung auf übergeordneter Seite"
 msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
 
+msgid "Url path"
+msgstr "Url Pfad"
+
+msgid "Test"
+msgstr "Test"
+
+msgid "Please fill out a new name"
+msgstr "Bitte geben sie einen neuen Namen an."
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Ein Eintrag mit diesem Namen existiert bereits"
+
 msgid "Salutation"
 msgstr "Anrede"
 
@@ -1208,6 +1224,30 @@ msgstr "Email-Benachrichtigung immer senden bei neuen Ticket-Nachrichten"
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 
+msgid "Old domain"
+msgstr "Alte Domain"
+
+msgid "Test migration"
+msgstr "Migration testen"
+
+msgid "Compares links to the current domain"
+msgstr "Vergleicht Links mit der aktuellen Domain"
+
+msgid "Use a domain name without http(s)"
+msgstr "Benutze eine Domai ohne http(s)"
+
+msgid "Domain must contain a dot"
+msgstr "Die Domain muss einen Punkt enthalten"
+
+msgid "Choose which links to check"
+msgstr "Wählen Sie, welche Urls Überprüft werden sollen"
+
+msgid "External links only"
+msgstr "Externe Seiten"
+
+msgid "External and internal links"
+msgstr "Externe und interne Seiten"
+
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
@@ -1516,9 +1556,6 @@ msgstr "Neu"
 
 msgid "Subscribers"
 msgstr "Abonnenten"
-
-msgid "Test"
-msgstr "Test"
 
 msgid "Delete newsletter"
 msgstr "Newsletter löschen"
@@ -2014,6 +2051,9 @@ msgstr ""
 "Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
 
+msgid "Change Url"
+msgstr "Url ändern"
+
 msgid "Source"
 msgstr "Herkunft"
 
@@ -2188,6 +2228,24 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
+
+msgid "Total"
+msgstr ""
+
+msgid "Healthy"
+msgstr "Intakt"
+
+msgid "Errors"
+msgstr "Fehler"
+
+msgid "Duration [s]"
+msgstr "Abfragedauer [s]"
+
+msgid "Model"
+msgstr "Model"
+
+msgid "Status"
+msgstr ""
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
@@ -3566,6 +3624,21 @@ msgstr ""
 "berücksichtigt werden. Um mehr Einträge zu importieren muss der Import "
 "wiederholt werden."
 
+msgid ""
+"Stable urls are important. Here you can change the path to your site here "
+"independant of the title."
+msgstr ""
+"Stabile Url's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"angepasst werden."
+
+#, python-format
+msgid "A total of ${number} subpages are affected."
+msgstr "Insgesamt ${number} Unterseiten sind betroffen."
+
+#, python-format
+msgid "${count} links will be replaced by this action."
+msgstr "${count} Links werden nach dieser Aktion ersetzt."
+
 msgid "The event submitter has not yet completed his submission"
 msgstr "Der/die Antragsteller/in hat ihren Antrag noch nicht abgeschlosesen"
 
@@ -4031,20 +4104,8 @@ msgstr ""
 msgid "Links"
 msgstr ""
 
-msgid "Header"
-msgstr "Kopfzeile"
-
-msgid "Footer"
-msgstr "Fusszeile"
-
-msgid "Modules"
-msgstr "Module"
-
-msgid "Analytics"
-msgstr "Web-Statistik"
-
-msgid "Holidays"
-msgstr "Feiertage"
+msgid "Newsletter Settings"
+msgstr "Newsletter-Einstellungen"
 
 msgid "Ticket Settings"
 msgstr "Ticket-Einstellungen"
@@ -4060,11 +4121,44 @@ msgstr ""
 "Benutzerinteraktion eines Admins beeinflussen können! Aktivieren Sie diese "
 "Einstellung am besten nur für einen begrenzten Zeitraum."
 
-msgid "Newsletter Settings"
-msgstr "Newsletter-Einstellungen"
+msgid "Header"
+msgstr "Kopfzeile"
+
+msgid "Footer"
+msgstr "Fusszeile"
+
+msgid "Modules"
+msgstr "Module"
+
+msgid "Analytics"
+msgstr "Web-Statistik"
+
+msgid "Holidays"
+msgstr "Feiertage"
 
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
+
+msgid "Link Migration"
+msgstr "Migration Links"
+
+msgid "Migrate"
+msgstr "Migrieren"
+
+#, python-format
+msgid "Migrated ${number} links"
+msgstr "${number} Links migriert"
+
+#, python-format
+msgid "Total of ${number} links found."
+msgstr "Total ${number} Links gefunden"
+
+#, python-format
+msgid "Migrates links to new domain ${domain}"
+msgstr "Migriert die Links zur neuen Domain ${domain}"
+
+msgid "Link Health-Check"
+msgstr ""
 
 msgid "Topics"
 msgstr "Themen"
@@ -4229,6 +4323,16 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Unhealthy"
+#~ msgstr "Fehlerhaft"
+
+#~ msgid ""
+#~ "Stable urls are important. Here you can change the path to your site. A "
+#~ "total of ${number} pages are affected."
+#~ msgstr ""
+#~ "Stabile Url's sind wichtig. Hier können sie den Url-Pfad zu dieser Seite "
+#~ "ändern. Total ${number} Seiten sind davon betroffen."
 
 #~ msgid "Used for text in html body"
 #~ msgstr "Wird für Paragraphen verwendet"

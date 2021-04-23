@@ -10,6 +10,7 @@ setup(
     packages=[
         'onegov.activity',
         'onegov.agency',
+        'onegov.async_http',
         'onegov.ballot',
         'onegov.chat',
         'onegov.core',
@@ -52,6 +53,7 @@ setup(
     ],
     install_requires=[
         'AIS.py',
+        'aiohttp',
         'Pillow>=6.2.0',
         'PyYAML',
         'alembic',
@@ -143,6 +145,7 @@ setup(
         'ua-parser',
         'ulid',
         'unidecode',
+        'urlextract',
         'validate_email',
         'vobject',
         'watchdog',

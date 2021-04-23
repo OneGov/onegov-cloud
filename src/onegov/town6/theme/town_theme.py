@@ -141,7 +141,8 @@ class TownTheme(BaseTheme):
             'hints',
             'allocations',
             'homepage',
-            'progress_indicator'
+            'progress_indicator',
+            'healthcheck'
         ]
 
     @property

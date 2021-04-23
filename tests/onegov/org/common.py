@@ -26,3 +26,12 @@ def get_mail(outbox, index, encoding='utf-8'):
             ''.join(message.get_payload(1).as_string().splitlines()[3:])
         ).decode(encoding)
     }
+
+
+def edit_bar_links(page, attrib=None):
+    links = page.pyquery('.edit-bar a')
+    if attrib:
+        if attrib == 'text':
+            return [li.text for li in links]
+        return [li.attrs[attrib] for li in links]
+    return links

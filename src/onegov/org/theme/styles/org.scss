@@ -6015,3 +6015,39 @@ h2 + div.timeline {
 .no-click {
     pointer-events: none;
 }
+
+/* link checker */
+
+$link-status-icon: '\f29c';
+$link-status-ok-icon: '\f058';
+$link-status-nok-icon: '\f06a';
+
+.link-status {
+    color: $monsoon;
+
+    &::before {
+        @include icon($link-status-icon);
+    }
+
+    &.ok {
+        color: $success-color;
+
+        &::before {
+            @include icon($link-status-ok-icon);
+            margin-right: .25em;
+        }
+    }
+
+    &.nok {
+        color: $alert-color;
+
+        &::before {
+            @include icon($link-status-nok-icon);
+        }
+    }
+}
+
+table.link-check-results,
+table.link-check-stats {
+    width: 100%;
+}

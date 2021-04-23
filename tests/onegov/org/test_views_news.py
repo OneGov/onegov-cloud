@@ -4,6 +4,7 @@ import transaction
 from sedate import utcnow
 
 from onegov.page import PageCollection
+from tests.onegov.org.common import edit_bar_links
 
 
 def test_news(client):
@@ -13,6 +14,11 @@ def test_news(client):
     # Test edit the root news page
     page = client.get('/news')
     assert 'Aktuelles' in page
+
+    # Top page with path /news is fix, and all others are children
+    links = edit_bar_links(page, 'text')
+    assert 'Url ändern' not in links
+    assert len(links) == 3
 
     edit = page.click('Bearbeiten')
     edit.form['contact'] = 'We could show this address on the root news page'
