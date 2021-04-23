@@ -131,7 +131,7 @@ class ElectionCompoundForm(Form):
             'EVP #e3c700\n'
             'FDP #0084c7\n'
             'GLP #aeca00\n'
-            'GRÜNE #54ba00'
+            'GRÜNE #54ba00\n'
             'Piraten #333333\n'
             'SP #c31906\n'
             'SVP #408b3d\n'
