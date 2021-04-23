@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2021.45`
+
+> commits: **4 / [db4286be42...8bc504a68c](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...8bc504a68c)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.45)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🐞 **Adds missing newline in color suggestions.**
+
+**`Bugfix`** | **[8bc504a68c](https://github.com/onegov/onegov-cloud/commit/8bc504a68cc6c04f84a10f76e2318c0019afc38a)**
+
+### People
+
+🎉 **Add CLI commands for clearing, exporting and importing people.**
+
+**`Feature`** | **[SEA-252](https://linear.app/seantis/issue/SEA-252)** | **[39e6a28deb](https://github.com/onegov/onegov-cloud/commit/39e6a28debaced0038eaf4f4a027eb1f2af9e127)**
+
 ## Release `2021.44`
 
-> commits: **6 / [374e89a420...133e3f16c2](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...133e3f16c2)**  
+> released: **2021-04-21 15:59**<br>
+> commits: **7 / [374e89a420...1fc3b1a099](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...1fc3b1a099)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.44)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
