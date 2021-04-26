@@ -146,6 +146,8 @@ def reserve_allocation(self, request):
 
     # ...otherwise, try to reserve
     try:
+        # Todo: This entry created remained after a reservation
+        # and the session id got lost
         resource.scheduler.reserve(
             email='0xdeadbeef@example.org',  # will be set later
             dates=(start, end),
@@ -266,6 +268,7 @@ def handle_reservation_form(self, request, form, layout=None):
         data = {}
 
         # the email is the same for all reservations
+        # Todo: This entry created remained after a reservation
         if reservations[0].email != '0xdeadbeef@example.org':
             data['email'] = reservations[0].email
 
