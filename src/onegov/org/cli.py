@@ -740,7 +740,7 @@ def import_reservations(dsn, map):
                 mirror_of=mapping[row['mirror_of']].new_uuid,
                 group=row['group'],
                 quota=row['quota'],
-                quota_limit=row['quota_limit'],
+                quota_limit=getattr(row, 'quota_limit', None),
                 partly_available=row['partly_available'],
                 approve_manually=row['approve_manually'],
 
@@ -749,7 +749,7 @@ def import_reservations(dsn, map):
                 _start=replace_timezone(row['_start'], 'Europe/Zurich'),
                 _end=replace_timezone(row['_end'], 'Europe/Zurich'),
 
-                data=json.loads(row['data']),
+                data=json.loads(getattr(row, 'data', "{}")),
                 _raster=row['_raster'],
                 created=replace_timezone(row['created'], 'UTC'),
                 modified=utcnow(),
