@@ -245,9 +245,8 @@ def town_handle_migrate_links(self, request, form):
 
 
 @TownApp.form(
-    model=Organisation, name='link-healthcheck', template='healthcheck.pt',
-    permission=Secret, form=LinkHealthCheckForm,
-    setting=_('Link Health-Check'), icon='fas fa-medkit', order=-399)
+    model=Organisation, name='link-check', template='healthcheck.pt',
+    permission=Secret, form=LinkHealthCheckForm)
 def town_handle_link_health_check(self, request, form):
     return handle_link_health_check(
         self, request, form, DefaultLayout(self, request)

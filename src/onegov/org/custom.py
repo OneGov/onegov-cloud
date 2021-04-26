@@ -1,7 +1,8 @@
 from onegov.chat import MessageCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.org import _, OrgApp
-from onegov.org.models import GeneralFileCollection, ImageFileCollection
+from onegov.org.models import GeneralFileCollection, ImageFileCollection, \
+    Organisation
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection
@@ -105,6 +106,13 @@ def get_global_tools(request):
                 Link(
                     _("Users"), request.class_link(UserCollection),
                     attrs={'class': 'user'}
+                )
+            )
+            links.append(
+                Link(
+                    _("Link Check"),
+                    request.class_link(Organisation, name='link-check'),
+                    attrs={'class': 'link-check'}
                 )
             )
 

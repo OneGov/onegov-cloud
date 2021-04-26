@@ -342,6 +342,7 @@ $globals-height: 2.5rem;
     .settings::before { @include icon('\f1de'); }
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
+    .link-check::before { @include icon('\f0fa'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

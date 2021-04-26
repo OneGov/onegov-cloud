@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-04-13 16:22+0200\n"
+"POT-Creation-Date: 2021-04-26 07:31+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -123,6 +123,9 @@ msgstr "Page d'accueil"
 msgid "Settings"
 msgstr "Paramètres"
 
+msgid "Form"
+msgstr "Formulaire"
+
 msgid "Check"
 msgstr ""
 
@@ -165,9 +168,6 @@ msgstr "Fenêtres d'inscription"
 
 msgid "Add"
 msgstr "Ajouter"
-
-msgid "Form"
-msgstr "Formulaire"
 
 msgid "Person"
 msgstr "Personne"
@@ -1837,6 +1837,9 @@ msgstr "Favicon"
 msgid "Links"
 msgstr ""
 
+msgid "Chat"
+msgstr ""
+
 msgid "Header"
 msgstr "En-tête"
 
@@ -1858,7 +1861,10 @@ msgstr "Paramètres tickets"
 msgid "Newsletter Settings"
 msgstr "Paramètres de la newsletter"
 
-msgid "Chat"
+msgid "Link Migration"
+msgstr ""
+
+msgid "Link Check"
 msgstr ""
 
 #~ msgid "Supported Chatbots"

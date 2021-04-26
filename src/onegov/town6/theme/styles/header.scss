@@ -135,6 +135,7 @@ $pdf-icon: '\f1c1';
     .settings::before { @include icon-bold('\f1de'); }
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
+    .link-check::before { @include icon-bold('\f0fa'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

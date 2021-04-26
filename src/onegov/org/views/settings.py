@@ -249,9 +249,8 @@ def handle_migrate_links(self, request, form, layout=None):
 
 
 @OrgApp.form(
-    model=Organisation, name='link-healthcheck', template='healthcheck.pt',
-    permission=Secret, form=LinkHealthCheckForm,
-    setting=_('Link Health-Check'), icon='fa fa-medkit', order=-399)
+    model=Organisation, name='link-check', template='healthcheck.pt',
+    permission=Secret, form=LinkHealthCheckForm)
 def handle_link_health_check(self, request, form, layout=None):
 
     check_responses = None
@@ -269,7 +268,7 @@ def handle_link_health_check(self, request, form, layout=None):
         return text
 
     return {
-        'title': _('Link Health-Check'),
+        'title': _('Link Check'),
         'form': form,
         'layout': layout or DefaultLayout(self, request),
         'check_responses': check_responses,

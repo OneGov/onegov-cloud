@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-21 11:41+0200\n"
+"POT-Creation-Date: 2021-04-26 07:31+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4157,7 +4157,7 @@ msgstr "Total ${number} Links gefunden"
 msgid "Migrates links to new domain ${domain}"
 msgstr "Migriert die Links zur neuen Domain ${domain}"
 
-msgid "Link Health-Check"
+msgid "Link Check"
 msgstr ""
 
 msgid "Topics"
