@@ -249,7 +249,7 @@ def handle_migrate_links(self, request, form, layout=None):
 
 
 @OrgApp.form(
-    model=Organisation, name='link-check', template='healthcheck.pt',
+    model=Organisation, name='link-check', template='linkcheck.pt',
     permission=Secret, form=LinkHealthCheckForm)
 def handle_link_health_check(self, request, form, layout=None):
 
@@ -260,7 +260,7 @@ def handle_link_health_check(self, request, form, layout=None):
         healthcheck.external_only = form.scope.data != 'external'
         check_responses = healthcheck.unhealthy_urls()
 
-    url_max_len = 100
+    url_max_len = 80
 
     def truncate(text):
         if len(text) > url_max_len:

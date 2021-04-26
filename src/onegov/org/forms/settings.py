@@ -760,7 +760,7 @@ class LinkHealthCheckForm(Form):
         label=_('Choose which links to check'),
         choices=(
             ('external', _('External links only')),
-            ('both', _('External and internal links')),
+            ('internal', _('Internal links only')),
         ),
         default='external'
     )

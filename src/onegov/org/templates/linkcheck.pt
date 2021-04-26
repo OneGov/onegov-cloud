@@ -9,7 +9,7 @@
                 <tr>
                     <th width="150" i18n:translate="">Total</th>
                     <th width="250" i18n:translate="">Healthy</th>
-                    <th>Status !200</th>
+                    <th>Status ! 200</th>
                     <th i18n:translate="">Errors</th>
                     <th i18n:translate="">Duration [s]</th>
                 </tr>
@@ -27,7 +27,7 @@
         <table class="link-check-results">
           <thead>
             <tr>
-              <th width="150" i18n:translate="">Model</th>
+              <th width="150" i18n:translate="">Path</th>
                 <th width="250" i18n:translate="">Status</th>
                 <th i18n:translate="">URL</th>
             </tr>

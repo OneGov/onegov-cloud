@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-26 07:47+0200\n"
+"POT-Creation-Date: 2021-04-26 08:00+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1248,8 +1248,8 @@ msgstr "Wählen Sie, welche Urls Überprüft werden sollen"
 msgid "External links only"
 msgstr "Externe Seiten"
 
-msgid "External and internal links"
-msgstr "Externe und interne Seiten"
+msgid "Internal links only"
+msgstr "Interne Seiten"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -2235,24 +2235,6 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
 
-msgid "Total"
-msgstr ""
-
-msgid "Healthy"
-msgstr "Intakt"
-
-msgid "Errors"
-msgstr "Fehler"
-
-msgid "Duration [s]"
-msgstr "Abfragedauer [s]"
-
-msgid "Model"
-msgstr "Model"
-
-msgid "Status"
-msgstr ""
-
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
 "press return. To abort press escape."
@@ -2287,6 +2269,21 @@ msgstr ""
 "Laut Bundesratsentscheid vom 14. April dürfen ab 19. April 2021 wieder "
 "Veranstaltungen durchgeführt werden, mit begrenzter Platzzahl und den "
 "vorgegebenen Schutzmassnahmen."
+
+msgid "Total"
+msgstr ""
+
+msgid "Healthy"
+msgstr "Intakt"
+
+msgid "Errors"
+msgstr "Fehler"
+
+msgid "Duration [s]"
+msgstr "Abfragedauer [s]"
+
+msgid "Status"
+msgstr ""
 
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
@@ -4326,6 +4323,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Model"
+#~ msgstr "Model"
+
+#~ msgid "External and internal links"
+#~ msgstr "Externe und interne Seiten"
 
 #~ msgid "Unhealthy"
 #~ msgstr "Fehlerhaft"

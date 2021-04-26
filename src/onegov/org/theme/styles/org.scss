@@ -6025,6 +6025,8 @@ $link-status-nok-icon: '\f06a';
 
 .link-status {
     color: $monsoon;
+    overflow-x: hidden;
+    white-space: nowrap;
 
     &::before {
         @include icon($link-status-icon);

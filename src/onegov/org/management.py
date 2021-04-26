@@ -179,7 +179,7 @@ class LinkCheck(object):
 
 class LinkHealthCheck(ModelsWithLinksMixin):
     """
-
+    Check either internal or external urls for status 200.
     """
 
     Statistic = namedtuple(
@@ -204,7 +204,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     def filter_urls(self, urls):
         if self.external_only:
             return tuple(url for url in urls if not self.internal_link(url))
-        return urls
+        return tuple(url for url in urls if self.internal_link(url))
 
     def find_urls(self):
         for name, entries in self.site_collection.get().items():
