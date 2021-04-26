@@ -185,3 +185,19 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
             return False
 
         return True
+
+
+class ItemResource(Resource, AccessExtension, SearchableContent,
+                   ContactExtension, PersonLinkExtension,
+                   CoordinatesExtension, SharedMethods,
+                   ResourceValidationExtension):
+
+    __mapper_args__ = {'polymorphic_identity': 'daily-item'}
+
+    es_type_name = 'daily_items'
+
+    view = None
+
+    show_quota = True
+
+    title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'

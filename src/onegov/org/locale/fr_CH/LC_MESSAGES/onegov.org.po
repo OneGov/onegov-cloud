@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-26 08:00+0200\n"
+"POT-Creation-Date: 2021-04-26 16:19+0200\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -210,6 +210,12 @@ msgstr "Options"
 
 msgid "Reservations per time slot"
 msgstr "Maximum des reservation par unité des temps"
+
+msgid "Available items"
+msgstr "Articles disponibles"
+
+msgid "Reservations per time slot and person"
+msgstr "Réservations par tranche horaire et par personne"
 
 msgid "From"
 msgstr "De"
@@ -1485,6 +1491,9 @@ msgstr "Destinataires"
 
 msgid "Room"
 msgstr "Espace"
+
+msgid "Resource Item"
+msgstr "Article"
 
 msgid "Notifications"
 msgstr "Notifications"
@@ -4089,6 +4098,12 @@ msgstr "Nouvelle salle ajoutée"
 
 msgid "New room"
 msgstr "Nouvelle salle"
+
+msgid "Added a new item"
+msgstr "Nouveau article ajouté"
+
+msgid "New Item"
+msgstr "Nouveau article"
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"

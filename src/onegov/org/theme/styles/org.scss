@@ -1525,6 +1525,7 @@ $manage-subscribers: '\f0c0';
 $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f145';
+$new-daily-item-icon: '\f02d';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
@@ -1680,6 +1681,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
+    .new-daily-item::before { @include icon($new-daily-item-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }

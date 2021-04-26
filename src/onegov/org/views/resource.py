@@ -19,7 +19,8 @@ from onegov.org.forms import (
     ResourceForm, ResourceCleanupForm, ResourceExportForm
 )
 from onegov.org.layout import ResourcesLayout, ResourceLayout
-from onegov.org.models.resource import DaypassResource, RoomResource
+from onegov.org.models.resource import DaypassResource, RoomResource, \
+    ItemResource
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.ticket import Ticket, TicketCollection
 from purl import URL
@@ -39,6 +40,11 @@ RESOURCE_TYPES = {
         'success': _("Added a new room"),
         'title': _("New room"),
         'class': RoomResource
+    },
+    'daily-item': {
+        'success': _("Added a new item"),
+        'title': _("New Item"),
+        'class': ItemResource
     }
 }
 
@@ -49,6 +55,10 @@ def get_daypass_form(self, request):
 
 def get_room_form(self, request):
     return get_resource_form(self, request, 'room')
+
+
+def get_item_form(self, request):
+    return get_resource_form(self, request, 'daily-item')
 
 
 def get_resource_form(self, request, type=None):
@@ -111,6 +121,12 @@ def handle_new_room(self, request, form, layout=None):
              template='form.pt', permission=Private, form=get_daypass_form)
 def handle_new_daypass(self, request, form, layout=None):
     return handle_new_resource(self, request, form, 'daypass', layout)
+
+
+@OrgApp.form(model=ResourceCollection, name='new-daily-item',
+             template='form.pt', permission=Private, form=get_item_form)
+def handle_new_resource_item(self, request, form, layout=None):
+    return handle_new_resource(self, request, form, 'daily-item', layout)
 
 
 def handle_new_resource(self, request, form, type, layout=None):

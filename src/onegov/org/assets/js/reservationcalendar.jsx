@@ -142,6 +142,14 @@ rc.getFullcalendarOptions = function(options) {
                 right: views.join(',')
             };
             break;
+        case 'daily-item':
+            views = ['month'];
+            fcOptions.header = {
+                left: 'title today prev,next',
+                center: '',
+                right: ''
+            };
+            break;
         default:
             throw new Error("Unknown reservation calendar type: " + options.type);
     }

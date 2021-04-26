@@ -73,6 +73,14 @@ def test_resources(client):
 
     resources = client.get('/resources')
 
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Beamer'
+    resource = new_item.form.submit().follow()
+    assert 'Beamer' in resource
+    edit = resource.click('Bearbeiten')
+    edit.form['title'] = 'Beamers'
+    edit.form.submit().follow()
+
     new = resources.click('Raum')
     new.form['title'] = 'Meeting Room'
     resource = new.form.submit().follow()
@@ -84,7 +92,9 @@ def test_resources(client):
     edit.form['title'] = 'Besprechungsraum'
     edit.form.submit()
 
-    assert 'Besprechungsraum' in client.get('/resources')
+    resources = client.get('/resources')
+    assert 'Besprechungsraum' in resources
+    assert 'Beamers' in resources
 
     # Check warning duplicate
     duplicate = resources.click('Raum')
@@ -178,6 +188,41 @@ def test_reserved_resources_fields(client):
 
 def test_allocations(client):
     client.login_admin()
+    items = client.get('/resources').click('Gegenstand')
+    items.form['title'] = 'Beamer'
+    items.form.submit().follow()
+
+    # create new beamer allocation
+    new = client.get((
+        '/resource/beamer/new-allocation'
+        '?start=2015-08-04&end=2015-08-05'
+    ))
+
+    new.form['items'] = 1
+    new.form['item_limit'] = 1
+    new.form.submit()
+
+    # view the beamers
+    slots = client.get((
+        '/resource/beamer/slots'
+        '?start=2015-08-04&end=2015-08-05'
+    ))
+
+    assert len(slots.json) == 2
+    assert slots.json[0]['title'] == "Ganztägig \nVerfügbar"
+
+    # change the beamers
+    edit = client.get(client.extract_href(slots.json[0]['actions'][0]))
+    edit.form['items'] = 2
+    edit.form.submit()
+
+    slots = client.get((
+        '/resource/beamer/slots'
+        '?start=2015-08-04&end=2015-08-04'
+    ))
+
+    assert len(slots.json) == 1
+    assert slots.json[0]['title'] == "Ganztägig \n2 Verfügbar"
 
     # create a new daypass allocation
     new = client.get((

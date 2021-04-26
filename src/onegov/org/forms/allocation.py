@@ -467,6 +467,83 @@ class RoomAllocationForm(AllocationForm):
         )
 
 
+class DailyItemFields(object):
+
+    items = IntegerField(
+        label=_("Available items"),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_("Options"),
+        default=1,
+    )
+
+    item_limit = IntegerField(
+        label=_("Reservations per time slot and person"),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_("Options"),
+        default=1,
+    )
+
+
+class DailyItemAllocationForm(AllocationForm, DailyItemFields):
+
+    whole_day = True
+    partly_available = False
+    data = None
+
+    @property
+    def quota(self):
+        return self.items.data
+
+    @property
+    def quota_limit(self):
+        return self.item_limit.data
+
+    @property
+    def dates(self):
+        return self.generate_dates(
+            self.start.data,
+            self.end.data,
+            weekdays=self.weekdays
+        )
+
+
+class DailyItemAllocationEditForm(AllocationEditForm, DailyItemFields):
+    whole_day = True
+    partly_available = False
+    data = None
+
+    @property
+    def quota(self):
+        return self.items.data
+
+    @property
+    def quota_limit(self):
+        return self.item_limit.data
+
+    @property
+    def dates(self):
+        return (
+            sedate.as_datetime(self.date.data),
+            sedate.as_datetime(self.date.data) + timedelta(
+                days=1, microseconds=-1
+            )
+        )
+
+    def apply_dates(self, start, end):
+        self.date.data = start.date()
+
+    def apply_model(self, model):
+        self.date.data = model.display_start().date()
+        self.items.data = model.quota
+        self.item_limit.data = model.quota_limit
+
+
 class RoomAllocationEditForm(AllocationEditForm):
 
     as_whole_day = RadioField(

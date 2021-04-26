@@ -12,6 +12,8 @@ from onegov.org.forms import DaypassAllocationEditForm
 from onegov.org.forms import DaypassAllocationForm
 from onegov.org.forms import RoomAllocationEditForm
 from onegov.org.forms import RoomAllocationForm
+from onegov.org.forms.allocation import DailyItemAllocationForm, \
+    DailyItemAllocationEditForm
 from onegov.org.layout import AllocationEditFormLayout
 from onegov.org.layout import AllocationRulesLayout
 from onegov.org.layout import ResourceLayout
@@ -166,6 +168,9 @@ def get_new_allocation_form_class(resource, request):
     if resource.type == 'room':
         return RoomAllocationForm
 
+    if resource.type == 'daily-item':
+        return DailyItemAllocationForm
+
     raise NotImplementedError
 
 
@@ -183,6 +188,9 @@ def get_edit_allocation_form_class(allocation, request):
 
     if resource.type == 'room':
         return RoomAllocationEditForm
+
+    if resource.type == 'daily-item':
+        return DailyItemAllocationEditForm
 
     raise NotImplementedError
 

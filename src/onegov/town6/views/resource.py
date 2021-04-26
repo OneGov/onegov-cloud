@@ -4,7 +4,8 @@ from onegov.org.views.resource import view_resources, get_room_form, \
     get_daypass_form, handle_new_room, handle_new_daypass, \
     get_resource_form, handle_edit_resource, view_resource, \
     handle_cleanup_allocations, view_occupancy, \
-    view_resource_subscribe, view_export
+    view_resource_subscribe, view_export, get_item_form, \
+    handle_new_resource_item
 from onegov.reservation import ResourceCollection, Resource
 from onegov.town6 import TownApp
 from onegov.org.forms import ResourceCleanupForm, ResourceExportForm
@@ -27,6 +28,13 @@ def town_handle_new_room(self, request, form):
               template='form.pt', permission=Private, form=get_daypass_form)
 def town_handle_new_daypass(self, request, form):
     return handle_new_daypass(
+        self, request, form, ResourcesLayout(self, request))
+
+
+@TownApp.form(model=ResourceCollection, name='new-daily-item',
+              template='form.pt', permission=Private, form=get_item_form)
+def town_handle_new_resource_item(self, request, form):
+    return handle_new_resource_item(
         self, request, form, ResourcesLayout(self, request))
 
 

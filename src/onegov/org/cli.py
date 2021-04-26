@@ -824,11 +824,13 @@ def import_reservations(dsn, map):
                 'modified': replace_timezone(row['modified'], 'UTC'),
             }
 
-            if row['quota'] > 1 and mapping[row.resource].type != 'daypass':
-                raise RuntimeError(
-                    "Reservations with multiple quotas for rooms "
-                    "cannot be migrated"
-                )
+            if row['quota'] > 1:
+                type_ = mapping[row.resource].type
+                if type_ not in ('daypass', 'daily-item'):
+                    raise RuntimeError(
+                        "Reservations with multiple quotas for "
+                        f"type {type_} cannot be migrated"
+                    )
 
             # onegov.reservation does not support group targets, so we
             # translate those into normal allocations and create multiple

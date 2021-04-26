@@ -1145,6 +1145,14 @@ class ResourcesLayout(DefaultLayout):
                                 name='new-daypass'
                             ),
                             attrs={'class': 'new-daypass'}
+                        ),
+                        Link(
+                            text=_("Resource Item"),
+                            url=self.request.link(
+                                self.model,
+                                name='new-daily-item'
+                            ),
+                            attrs={'class': 'new-daily-item'}
                         )
                     ]
                 ),
