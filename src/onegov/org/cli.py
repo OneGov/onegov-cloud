@@ -16,6 +16,7 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+from wtforms.validators import Email
 
 from onegov.chat import MessageCollection
 from onegov.core.cache import lru_cache
@@ -740,7 +741,9 @@ def import_reservations(dsn, map):
                 mirror_of=mapping[row['mirror_of']].new_uuid,
                 group=row['group'],
                 quota=row['quota'],
-                quota_limit=getattr(row, 'quota_limit', None),
+                quota_limit=getattr(
+                    row, 'quota_limit',
+                    getattr(row, 'reservation_quota_limit')),
                 partly_available=row['partly_available'],
                 approve_manually=row['approve_manually'],
 
@@ -907,14 +910,21 @@ def import_reservations(dsn, map):
             .order_by(User.created).first()
 
         print("Writing tickets")
+        email_validator = Email('Invalid Email')
         for token, data in tqdm(reservation_data.items(), unit=" tickets"):
             form_class, form_data = get_form_class_and_data(data['data'])
 
             if form_data:
 
                 # fix common form errors
-                if data['email'] == 'info@rischrotkreuz.c':
-                    data['email'] = 'info@rischrotkreuz.ch'
+                if data['email']:
+                    if data['email'].endswith('.c'):
+                        data['email'] = data['email'] + 'h'
+                    try:
+                        email_validator(None, Bunch(data=data['email']))
+                    except Exception as e:
+                        e.message = f'Email {data["email"]} not valid'
+                        raise e
 
                 form_data['email'] = data['email']
                 form = form_class(data=form_data)
