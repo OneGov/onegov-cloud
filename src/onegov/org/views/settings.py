@@ -257,7 +257,7 @@ def handle_link_health_check(self, request, form, layout=None):
     healthcheck = LinkHealthCheck(request)
 
     if form.submitted(request):
-        healthcheck.external_only = form.scope.data != 'external'
+        healthcheck.link_type = form.scope.data
         check_responses = healthcheck.unhealthy_urls()
 
     url_max_len = 80

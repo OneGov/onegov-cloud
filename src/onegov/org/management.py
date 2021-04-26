@@ -189,7 +189,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     def __init__(
             self,
             request,
-            external_only=False,
+            link_type=None,
             total_timout=30
     ):
         """
@@ -198,7 +198,10 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         :param total_timout: timout for all requests in seconds
         """
         self.request = request
-        self.external_only = external_only
+        if link_type:
+            assert link_type in ('internal', 'external')
+
+        self.link_type = link_type or None
         self.domain = self.request.domain
         self.extractor = URLExtract()
 
@@ -207,6 +210,14 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         self.timeout = ClientTimeout(
             total=total_timout
         )
+
+    @property
+    def internal_only(self):
+        return self.link_type == 'internal'
+
+    @property
+    def external_only(self):
+        return self.link_type == 'external'
 
     @staticmethod
     def stats_obj():
@@ -218,7 +229,9 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     def filter_urls(self, urls):
         if self.external_only:
             return tuple(url for url in urls if not self.internal_link(url))
-        return tuple(url for url in urls if self.internal_link(url))
+        if self.internal_only:
+            return tuple(url for url in urls if self.internal_link(url))
+        return urls
 
     def find_urls(self):
         for name, entries in self.site_collection.get().items():

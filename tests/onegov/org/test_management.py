@@ -5,11 +5,13 @@ from onegov.page import PageCollection
 
 def test_link_health_check(org_app):
 
+    test_domain = 'example.org'
+
     def get_request():
         return Bunch(
             link=lambda x: 'URL-' + x.__class__.__name__,
             session=org_app.session(),
-            domain='example.org'
+            domain=test_domain
         )
 
     request = get_request()
@@ -67,3 +69,14 @@ def test_link_health_check(org_app):
     assert stats.ok == len(valid)
     assert stats.nok == nok_count
     assert stats.error == error_count
+
+    # check filters
+    check.link_type = 'internal'
+    urls = tuple(check.find_urls())
+    filtered = tuple([u for u in found_urls if test_domain in u])
+    assert urls == (('Topic', 'URL-Topic', filtered),)
+
+    check.link_type = 'external'
+    urls = tuple(check.find_urls())
+    filtered = tuple([u for u in found_urls if test_domain not in u])
+    assert urls == (('Topic', 'URL-Topic', filtered),)
