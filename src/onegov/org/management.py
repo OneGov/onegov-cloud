@@ -3,6 +3,7 @@ import time
 from collections import defaultdict, namedtuple
 
 import transaction
+from aiohttp import ClientTimeout
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
 
@@ -185,7 +186,17 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     Statistic = namedtuple(
         'UnhealthyStats', ['total', 'ok', 'nok', 'error', 'duration'])
 
-    def __init__(self, request, external_only=False):
+    def __init__(
+            self,
+            request,
+            external_only=False,
+            total_timout=30
+    ):
+        """
+        :param request: morepath request object
+        :param external_only: check external links not matching current domain
+        :param total_timout: timout for all requests in seconds
+        """
         self.request = request
         self.external_only = external_only
         self.domain = self.request.domain
@@ -193,6 +204,9 @@ class LinkHealthCheck(ModelsWithLinksMixin):
 
         self.unhealthy_urls_stats = None
         self._started = time.time()
+        self.timeout = ClientTimeout(
+            total=total_timout
+        )
 
     @staticmethod
     def stats_obj():
@@ -260,7 +274,8 @@ class LinkHealthCheck(ModelsWithLinksMixin):
             urls=tuple(url_list_generator()),
             response_attr='status',
             callback=on_success,
-            handle_exceptions=handle_errors
+            handle_exceptions=handle_errors,
+            timeout=self.timeout
         )
 
         self.unhealthy_urls_stats = self.Statistic(

@@ -1,7 +1,9 @@
-from typing import Union, Callable, Tuple, List, Any, Sequence
+from typing import Union, Callable, Tuple, List, Any, Sequence, Optional
 
 import aiohttp
 import asyncio
+
+from aiohttp import ClientTimeout
 
 UrlType = Union[str, object]
 UrlsType = Union[Sequence[UrlType]]
@@ -59,11 +61,12 @@ async def fetch_many(
         response_attr: str = 'json',
         fetch_func: Callable = fetch,
         callback: FetchCallback = default_callback,
-        handle_exceptions: HandleExceptionType = raise_by_default
+        handle_exceptions: HandleExceptionType = raise_by_default,
+        timeout: Optional[ClientTimeout] = None
 ):
     """ Registers a task per url using the coroutine fetch_func with correct
         signature. """
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(timeout=timeout) as session:
 
         def exception_handler(ix):
             if callable(handle_exceptions):
@@ -87,7 +90,8 @@ def async_aiohttp_get_all(
         urls: UrlsType,
         response_attr: str = 'json',
         callback: FetchCallback = default_callback,
-        handle_exceptions: HandleExceptionType = raise_by_default
+        handle_exceptions: HandleExceptionType = raise_by_default,
+        timeout: Optional[ClientTimeout] = None
 ):
     """ Performs asynchronous get requests.
 
@@ -105,6 +109,7 @@ def async_aiohttp_get_all(
             loop, urls,
             response_attr=response_attr,
             callback=callback,
-            handle_exceptions=handle_exceptions
+            handle_exceptions=handle_exceptions,
+            timeout=timeout or ClientTimeout()
         )
     )
