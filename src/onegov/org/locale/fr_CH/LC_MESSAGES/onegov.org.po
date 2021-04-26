@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-26 07:31+0200\n"
+"POT-Creation-Date: 2021-04-26 07:47+0200\n"
 "PO-Revision-Date: 2021-01-14 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -84,6 +84,9 @@ msgstr "Paramètres"
 
 msgid "Users"
 msgstr "Utilisateurs"
+
+msgid "Link Check"
+msgstr ""
 
 msgid "Management"
 msgstr "Gestion"
@@ -784,8 +787,8 @@ msgstr ""
 msgid "Url path"
 msgstr "Chemin Url"
 
-msgid "Test"
-msgstr "Test"
+msgid "Test run"
+msgstr "Test de fonctionnement"
 
 msgid "Please fill out a new name"
 msgstr "Veuillez remplir un nouveau nom"
@@ -1561,6 +1564,9 @@ msgstr "Nouveau"
 
 msgid "Subscribers"
 msgstr "Abonnés"
+
+msgid "Test"
+msgstr "Test"
 
 msgid "Delete newsletter"
 msgstr "Supprimer la newsletter"
@@ -4179,9 +4185,6 @@ msgstr "Total de ${number} liens trouvés"
 #, python-format
 msgid "Migrates links to new domain ${domain}"
 msgstr "Migration des liens vers le nouveau domaine"
-
-msgid "Link Check"
-msgstr ""
 
 msgid "Topics"
 msgstr "Sujets"

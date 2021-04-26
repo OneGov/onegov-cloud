@@ -53,7 +53,7 @@ class PageUrlForm(Form):
     )
 
     test = BooleanField(
-        label=_('Test'),
+        label=_('Test run'),
         default=True
     )
 
