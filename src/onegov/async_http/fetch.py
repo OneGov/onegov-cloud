@@ -66,6 +66,7 @@ async def fetch_many(
 ):
     """ Registers a task per url using the coroutine fetch_func with correct
         signature. """
+    timeout = timeout or ClientTimeout()
     async with aiohttp.ClientSession(timeout=timeout) as session:
 
         def exception_handler(ix):
