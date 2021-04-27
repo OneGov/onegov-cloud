@@ -27,6 +27,10 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 
     <tal:b metal:use-macro="layout.macros.favicon" />
+    <meta property="og:title" tal:attributes="content layout.og_title | title | layout.tile" />
+    <meta property="og:type" tal:attributes="content layout.og_type | 'website'" />
+    <meta property="og:url" tal:attributes="content layout.og_url | request.url" />
+    <meta property="og:image" tal:attributes="content og_content" tal:define="og_content layout.og_image | layout.org.logo_url | Nothing" tal:condition="og_content">
 
     <tal:b condition="layout.app.sentry_dsn">
       <script src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
