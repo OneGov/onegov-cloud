@@ -456,9 +456,9 @@
             <div>
                 <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.published_or_created, 'relative')}</small></h5>
                 <tal:b tal:switch="heading|'h5'">
-                    <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
-                    <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h4>
-                    <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
+                    <h3 class="heading" tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
+                    <h4 class="heading" tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h4>
+                    <h5 class="heading" tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
                 </tal:b>
                 <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
             </div>
