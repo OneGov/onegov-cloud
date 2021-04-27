@@ -1,8 +1,41 @@
 # Changes
 
+## Release `2021.46`
+
+> commits: **13 / [5dd6c63404...35aeaf118d](https://github.com/OneGov/onegov-cloud/compare/5dd6c63404^...35aeaf118d)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.46)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds open graph meta tags with defaults**
+
+Meta tags can be overwritten by using layouts using the corresponding attribute: og:title -> og_title.
+Applies for town6 as well.
+
+**`Feature`** | **[SEA-271](https://linear.app/seantis/issue/SEA-271)** | **[b829b72cca](https://github.com/onegov/onegov-cloud/commit/b829b72cca7ac6fea423756748ac33ea52399c75)**
+
+🎉 **Adds open graph meta tags with defaults**
+
+Meta tags can be overwritten using the corresponding attribute in the layout: og:title -> og_title.
+Applies for town6 as well.
+
+**`Feature`** | **[SEA-271](https://linear.app/seantis/issue/SEA-271)** | **[35aeaf118d](https://github.com/onegov/onegov-cloud/commit/35aeaf118da6d117a4aab21f00995f0656d784b8)**
+
+✨ **Adds daily-item Resource type**
+
+Adds news resource type for general purpose items that are reserved
+for a whole day with multiple quantities possible per allocation.
+
+- Adapts cli for importing legacy db
+- Adds translations
+- Adds the same to town6 app
+
+**`Other`** | **[53fe4cde0a](https://github.com/onegov/onegov-cloud/commit/53fe4cde0ad41c6be84bda2af2beae33b392ae2c)**
+
 ## Release `2021.45`
 
-> commits: **4 / [db4286be42...8bc504a68c](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...8bc504a68c)**  
+> released: **2021-04-23 12:08**<br>
+> commits: **5 / [db4286be42...a05fa442cd](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...a05fa442cd)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.45)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
