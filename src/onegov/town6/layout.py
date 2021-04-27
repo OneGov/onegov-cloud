@@ -644,6 +644,9 @@ class TicketNoteLayout(DefaultLayout):
 @step_sequences.registered_step(
     3, _('Confirmation'),
     cls_before='EventLayout')
+@step_sequences.registered_step(
+    3, _('Confirmation'),
+    cls_before='ReservationLayout')
 class TicketChatMessageLayout(DefaultLayout, StepsLayoutExtension):
 
     def __init__(self, model, request, internal=False):
@@ -883,8 +886,23 @@ class ResourceLayout(DefaultLayout):
             ]
 
 
-class ReservationLayout(ResourceLayout):
+@step_sequences.registered_step(
+    1, _("Form"), cls_after='ReservationLayout')
+@step_sequences.registered_step(
+    2, _("Check"),
+    cls_before='ReservationLayout', cls_after='TicketChatMessageLayout')
+class ReservationLayout(ResourceLayout, StepsLayoutExtension):
+
     editbar_links = None
+
+    @property
+    def step_position(self):
+        """ Note the last step is the ticket status page with step 3. """
+        view_name = self.request.view_name
+        if view_name == 'form':
+            return 1
+        if view_name == 'confirmation':
+            return 2
 
 
 class AllocationRulesLayout(ResourceLayout):
