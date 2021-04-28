@@ -81,12 +81,6 @@ def get_candidates_data(election, request):
         majority = election.absolute_majority
 
     if election.type == 'proporz':
-        if not election.completed:
-            return {
-                'results': [],
-                'majority': majority,
-                'title': election.title
-            }
         candidates = candidates.filter(Candidate.elected == True)
 
         colors = {
