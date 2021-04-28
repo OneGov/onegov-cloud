@@ -1,7 +1,7 @@
 /*
     Leaflet Vector Marker Template
 */
-var vectorMarkerSVGTemplate = '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg" version="1.1"><path transform="translate(2 2)" text-anchor="middle" fill="{{marker-color}}" fill-rule="nonzero" stroke="{{border-color}}" stroke-width="3" d="M12,0 C5.37136723,0 0,5.37130729 0,11.9998721 C0,14.6408328 0.85563905,17.0808246 2.30116496,19.0628596 L12,31.5826752 L21.698835,19.0628596 C23.1443609,17.0808246 24,14.6408328 24,11.9998721 C24,5.37130729 18.6286328,0 12,0 L12,0 Z"></path><text x="50%" y="50%" fill="{{icon-color}}" font-family="FontAwesome" font-size="14" text-anchor="middle" alignment-baseline="center">{{icon}}</text></svg>';
+var vectorMarkerSVGTemplate = '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg" version="1.1"><path transform="translate(2 2)" text-anchor="middle" fill="{{marker-color}}" fill-rule="nonzero" stroke="{{border-color}}" stroke-width="3" d="M12,0 C5.37136723,0 0,5.37130729 0,11.9998721 C0,14.6408328 0.85563905,17.0808246 2.30116496,19.0628596 L12,31.5826752 L21.698835,19.0628596 C23.1443609,17.0808246 24,14.6408328 24,11.9998721 C24,5.37130729 18.6286328,0 12,0 L12,0 Z"></path><text x="50%" y="50%" fill="{{icon-color}}" font-family="{{font_family}}" font-weight="{{font_weight}}" font-size="14" text-anchor="middle" alignment-baseline="center">{{icon}}</text></svg>';
 
 function VectorMarkerSVG(markerColor, borderColor, iconColor, icon) {
     icon = '&#x' + (icon || 'f111').replace('\\', '');
@@ -9,7 +9,9 @@ function VectorMarkerSVG(markerColor, borderColor, iconColor, icon) {
         .replace('{{marker-color}}', markerColor)
         .replace('{{border-color}}', borderColor)
         .replace('{{icon-color}}', iconColor)
-        .replace('{{icon}}', icon);
+        .replace('{{icon}}', icon)
+        .replace('{{font_family}}', fa_version === 5 && "'Font Awesome 5 Free'" || 'FontAwesome')
+        .replace('{{font_weight}}', fa_version === 5 && '900' || 'regular');
 }
 
 /*
@@ -58,6 +60,7 @@ L.VectorMarkers.Icon = L.Icon.extend({
 });
 
 L.VectorMarkers.icon = function(options) {
+    console.log(options);
     return new L.VectorMarkers.Icon(options);
 };
 
