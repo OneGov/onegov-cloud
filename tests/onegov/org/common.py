@@ -33,5 +33,5 @@ def edit_bar_links(page, attrib=None):
     if attrib:
         if attrib == 'text':
             return [li.text for li in links]
-        return [li.attrs[attrib] for li in links]
+        return [li.attrib[attrib] for li in links]
     return links
