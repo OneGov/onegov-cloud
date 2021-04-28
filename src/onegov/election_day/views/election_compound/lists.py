@@ -37,8 +37,7 @@ def view_election_compound_lists_chart(self, request):
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'type': 'bar',
-        'data_url': request.link(self, name='lists-data'),
+        'type': 'lists-chart',
     }
 
 

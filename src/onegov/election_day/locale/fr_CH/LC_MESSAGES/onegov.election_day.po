@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 09:27+0200\n"
-"PO-Revision-Date: 2021-03-18 10:24+0100\n"
+"POT-Creation-Date: 2021-04-07 09:31+0200\n"
+"PO-Revision-Date: 2021-04-01 10:23+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -364,6 +364,54 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votations"
 
+msgid "Number"
+msgstr "Numéro"
+
+msgid "Group"
+msgstr "Groupe"
+
+msgid "Use the same group for all screens you want to cycle through."
+msgstr ""
+"Utilisez le même groupe pour tous les écrans que vous souhaitez parcourir."
+
+msgid "Duration"
+msgstr "Durée"
+
+msgid ""
+"Number of seconds this screen is presented if cycling trough screens. If "
+"none is set, 20 seconds are used."
+msgstr ""
+"Nombre de secondes pendant lesquelles cet écran est présenté lors du passage "
+"d'un écran à l'autre. Si aucune valeur n'est définie, 20 secondes sont "
+"utilisées."
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Simple Vote"
+msgstr "Vote simple"
+
+msgid "Vote with Counter-Proposal"
+msgstr "Vote avec contre-projet"
+
+msgid "Compound of Elections"
+msgstr "Composante des élections"
+
+msgid "Vote"
+msgstr "Votation"
+
+msgid "Election"
+msgstr "Election"
+
+msgid "Available tags"
+msgstr "Tags disponibles"
+
+msgid "Structure"
+msgstr "Structure"
+
+msgid "Additional CSS"
+msgstr "CSS additionnel"
+
 msgid "Phone number"
 msgstr "Téléphone"
 
@@ -379,20 +427,8 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Résultats des partis"
 
-msgid "Vote"
-msgstr "Votation"
-
-msgid "Election"
-msgstr "Election"
-
 msgid "Identifier"
 msgstr "Identifiant"
-
-msgid "Simple Vote"
-msgstr "Vote simple"
-
-msgid "Vote with Counter-Proposal"
-msgstr "Vote avec contre-projet"
 
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
@@ -468,6 +504,9 @@ msgstr "Activer les notifications"
 
 msgid "Subscribers"
 msgstr "Abonnés"
+
+msgid "Screens"
+msgstr "Écrans"
 
 msgid "Manage"
 msgstr "Gérer"
@@ -606,9 +645,6 @@ msgstr "Résultats intermédiaires"
 msgid "No candidacies."
 msgstr "Aucune candidature."
 
-msgid "Embed"
-msgstr "Intégration"
-
 msgid "Download"
 msgstr "Télécharger"
 
@@ -635,23 +671,8 @@ msgstr "Le format des données est décrit ici:"
 msgid "Format Description"
 msgstr "Description du format"
 
-msgid "Yeas"
-msgstr "Oui"
-
-msgid "Nays"
-msgstr "Non"
-
-msgid "Empty"
-msgstr "Vide"
-
-msgid "Invalid"
-msgstr "Invalide"
-
-msgid "Not yet counted"
-msgstr "Pas encore compté"
-
-msgid "Total"
-msgstr "Total"
+msgid "Embed"
+msgstr "Intégration"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -680,6 +701,24 @@ msgstr "Mot de passe oublié?"
 
 msgid "Reset password"
 msgstr "Réinitialiser mot de passe"
+
+msgid "Yeas"
+msgstr "Oui"
+
+msgid "Nays"
+msgstr "Non"
+
+msgid "Empty"
+msgstr "Vide"
+
+msgid "Invalid"
+msgstr "Invalide"
+
+msgid "Not yet counted"
+msgstr "Pas encore compté"
+
+msgid "Total"
+msgstr "Total"
 
 msgid "List connection"
 msgstr "Connexion de listes"
@@ -986,6 +1025,12 @@ msgstr "Nouveau election"
 msgid "Upload results"
 msgstr "Mettre à jour les résultats"
 
+msgid "New screen"
+msgstr "Nouvel écran"
+
+msgid "No screens yet."
+msgstr "Pas encore d’écrans."
+
 msgid "No subscribers yet."
 msgstr "Pas encore d’abonnés."
 
@@ -1194,6 +1239,25 @@ msgstr ""
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Voulez-vous vraiment réactiver les notifications ?"
+
+msgid "Screen added."
+msgstr "Écran ajouté."
+
+msgid "Screen modified."
+msgstr "Écran modifié."
+
+#, python-format
+msgid "Screen ${number}"
+msgstr "Écran ${number}"
+
+msgid "Edit screen"
+msgstr "Modifier l’écran"
+
+msgid "Screen deleted."
+msgstr "Écran supprimé."
+
+msgid "Delete screen"
+msgstr "Supprimer l’écran"
 
 msgid "Subscriber deleted."
 msgstr "Souscripteur supprimé."

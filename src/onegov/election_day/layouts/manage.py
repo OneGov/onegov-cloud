@@ -6,6 +6,7 @@ from onegov.election_day import _
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import EmailSubscriberCollection
+from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
@@ -119,6 +120,13 @@ class ManageLayout(DefaultLayout):
                 ),
                 submenu
             ))
+
+        result.append((
+            _("Screens"),
+            self.request.link(ScreenCollection(session)),
+            isinstance(self.model, ScreenCollection),
+            []
+        ))
 
         return result
 
@@ -269,4 +277,19 @@ class ManageDataSourceItemsLayout(ManageLayout):
         )
         self.breadcrumbs.append(
             (_("Mappings"), request.link(self.model), ''),
+        )
+
+
+class ManageScreensLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            ScreenCollection(self.request.session)
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (_("Screens"), request.link(self.model), ''),
         )

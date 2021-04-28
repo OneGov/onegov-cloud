@@ -4,12 +4,14 @@ from onegov.ballot import VoteCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import EmailSubscriberCollection
+from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts import ManageDataSourceItemsLayout
 from onegov.election_day.layouts import ManageDataSourcesLayout
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.layouts import ManageScreensLayout
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.layouts import ManageUploadTokensLayout
 from onegov.election_day.layouts import ManageVotesLayout
@@ -36,7 +38,8 @@ def test_manage_layouts(session):
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -80,7 +83,8 @@ def test_manage_layouts(session):
                 False,
                 []
             )
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -106,7 +110,8 @@ def test_manage_layouts(session):
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -132,7 +137,8 @@ def test_manage_layouts(session):
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -158,7 +164,8 @@ def test_manage_layouts(session):
         ]),
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', True, []),
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -186,7 +193,8 @@ def test_manage_layouts(session):
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -214,7 +222,8 @@ def test_manage_layouts(session):
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -256,7 +265,8 @@ def test_manage_layouts(session):
                 False,
                 []
             )
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -292,9 +302,37 @@ def test_manage_layouts(session):
                 False,
                 []
             )
-        ])
+        ]),
+        ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
         ('SMS subscribers', 'SmsSubscriberCollection/archive', '')
+    ]
+
+    # Screens
+    layout = ManageScreensLayout(
+        ScreenCollection(session),
+        DummyRequest()
+    )
+    assert layout.manage_model_link == 'ScreenCollection/archive'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ]),
+        ('Import configuration', '', False, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
+        ]),
+        ('Screens', 'ScreenCollection/archive', True, [])
+    ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Screens', 'ScreenCollection/archive', '')
     ]

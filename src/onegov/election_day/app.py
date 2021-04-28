@@ -15,6 +15,7 @@ from onegov.election_day.directives import JsonFileAction
 from onegov.election_day.directives import ManageFormAction
 from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.directives import PdfFileViewAction
+from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
@@ -35,6 +36,7 @@ class ElectionDayApp(Framework, FormApp, UserApp):
     manage_html = directive(ManageHtmlAction)
     pdf_file = directive(PdfFileViewAction)
     svg_file = directive(SvgFileViewAction)
+    screen_widget = directive(ScreenWidgetAction)
 
     @property
     def principal(self):
@@ -191,6 +193,7 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/vote/.*',
         '/election/.*',
         '/elections/.*',
+        '/screen/.*',
         '/catalog.rdf',
     )
 
@@ -219,10 +222,15 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         if request.headers.get('cache-control') == 'no-cache':
             return handler(request)
 
-        # each page is cached once per language and headerless/headerful
-        # (and by application id as the pages_cache is bound to it)
-        mode = 'hl' if 'headerless' in request.browser_session else 'hf'
-        key = ':'.join((request.locale, request.path_info, mode))
+        # each page is cached once per request method, language and
+        # headerless/headerful (and by application id as the pages_cache is
+        # bound to it)
+        key = ':'.join((
+            request.method,
+            request.locale,
+            request.path_info,
+            'hl' if 'headerless' in request.browser_session else 'hf'
+        ))
 
         return app.pages_cache.get_or_create(
             key,

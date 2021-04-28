@@ -52,8 +52,7 @@ def view_election_candidates_chart(self, request):
         'help_text': election_incomplete_text,
         'model': self,
         'layout': DefaultLayout(self, request),
-        'type': 'bar',
-        'data_url': request.link(self, name='candidates-data'),
+        'type': 'candidates-chart',
     }
 
 

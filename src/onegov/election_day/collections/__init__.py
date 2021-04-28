@@ -5,6 +5,7 @@ from onegov.election_day.collections.notifications import \
     NotificationCollection
 from onegov.election_day.collections.archived_results import \
     ArchivedResultCollection, SearchableArchivedResultCollection
+from onegov.election_day.collections.screens import ScreenCollection
 from onegov.election_day.collections.subscribers import \
     EmailSubscriberCollection
 from onegov.election_day.collections.subscribers import \
@@ -14,12 +15,13 @@ from onegov.election_day.collections.upload_tokens import UploadTokenCollection
 
 
 __all__ = [
-    'SearchableArchivedResultCollection',
     'ArchivedResultCollection',
     'DataSourceCollection',
     'DataSourceItemCollection',
     'EmailSubscriberCollection',
     'NotificationCollection',
+    'ScreenCollection',
+    'SearchableArchivedResultCollection',
     'SmsSubscriberCollection',
     'SubscriberCollection',
     'UploadTokenCollection',

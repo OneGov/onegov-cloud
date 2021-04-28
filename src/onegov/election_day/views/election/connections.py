@@ -48,15 +48,10 @@ def view_election_connections_chart(self, request):
 
     skip_rendering = hide_connections_chart(self, request)
 
-    data_url = request.link(
-        self, name='connections-data') if not skip_rendering else None
-
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'type': 'sankey',
-        'inverse': 'true',
-        'data_url': data_url,
+        'type': 'connections-chart',
         'skip_rendering': skip_rendering,
         'help_text': election_incomplete_text
     }

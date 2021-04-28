@@ -8,10 +8,12 @@ from onegov.election_day.models.notification import WebhookNotification
 from onegov.election_day.models.principal import Canton
 from onegov.election_day.models.principal import Municipality
 from onegov.election_day.models.principal import Principal
+from onegov.election_day.models.screen import Screen
 from onegov.election_day.models.subscriber import EmailSubscriber
 from onegov.election_day.models.subscriber import SmsSubscriber
 from onegov.election_day.models.subscriber import Subscriber
 from onegov.election_day.models.upload_token import UploadToken
+
 
 __all__ = [
     'ArchivedResult',
@@ -23,6 +25,7 @@ __all__ = [
     'Municipality',
     'Notification',
     'Principal',
+    'Screen',
     'SmsNotification',
     'SmsSubscriber',
     'Subscriber',

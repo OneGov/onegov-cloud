@@ -133,6 +133,16 @@ class Election(Base, ContentMixin, TimestampMixin,
         return sum(1 for r in results if r[0]), len(results)
 
     @property
+    def counted_entities(self):
+        """ Returns the names of the already counted entities. """
+
+        query = object_session(self).query(ElectionResult.name)
+        query = query.filter(ElectionResult.counted.is_(True))
+        query = query.filter(ElectionResult.election_id == self.id)
+        query = query.order_by(ElectionResult.name)
+        return [result.name for result in query.all()]
+
+    @property
     def has_results(self):
         """ Returns True, if the election has any results. """
 

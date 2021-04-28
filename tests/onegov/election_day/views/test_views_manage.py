@@ -445,3 +445,109 @@ def test_reset_password(election_day_app):
     login_page.form['password'] = 'new_password'
     login_page = login_page.form.submit().follow()
     assert "Sie sind angemeldet" in login_page
+
+
+def test_view_manage_screens(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    assert client.get('/manage/screens', expect_errors=True).status_code == 403
+
+    login(client)
+
+    manage = client.get('/manage/screens')
+
+    assert 'Noch keine Screens' in manage
+
+    # Add two votes
+    new = client.get('/manage/votes').click('Neue Abstimmung')
+    new.form['vote_de'] = 'Einfache Vorlage'
+    new.form['vote_type'] = 'simple'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit().follow()
+
+    new = client.get('/manage/votes').click('Neue Abstimmung')
+    new.form['vote_de'] = 'Vorlage mit Gegenentwurf'
+    new.form['vote_type'] = 'complex'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit().follow()
+
+    # Add two elections
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'Majorz Wahl'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 10
+    new.form.submit().follow()
+
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'Proporz Wahl'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 5
+    new.form.submit().follow()
+
+    # Add a compound
+    new = client.get('/manage/election-compounds').click('Neue Verbindung')
+    new.form['election_de'] = 'Verbund von Wahlen'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'canton'
+    new.form['elections'] = ['proporz-wahl']
+    new.form.submit().follow()
+
+    # Add a screen
+    new = client.get('/manage/screens').click('Neuer Screen')
+    new.form['number'] = '5'
+    new.form['description'] = 'Mein Screen'
+    new.form['type'] = 'majorz_election'
+    new.form['majorz_election'] = 'majorz-wahl'
+    new.form['structure'] = '<title />'
+    new.form['css'] = '/* Custom CSS */'
+    manage = new.form.submit().follow()
+    assert 'Mein Screen' in manage
+    assert 'Majorz Wahl' in manage
+
+    edit = manage.click('Bearbeiten')
+    edit.form['type'] = 'proporz_election'
+    edit.form['proporz_election'] = 'proporz-wahl'
+    manage = edit.form.submit().follow()
+    assert 'Majorz Wahl' not in manage
+    assert 'Proporz Wahl' in manage
+
+    edit = manage.click('Bearbeiten')
+    edit.form['type'] = 'election_compound'
+    edit.form['election_compound'] = 'verbund-von-wahlen'
+    manage = edit.form.submit().follow()
+    assert 'Majorz Wahl' not in manage
+    assert 'Proporz Wahl' not in manage
+    assert 'Verbund von Wahlen' in manage
+
+    edit = manage.click('Bearbeiten')
+    edit.form['type'] = 'simple_vote'
+    edit.form['simple_vote'] = 'einfache-vorlage'
+    manage = edit.form.submit().follow()
+    assert 'Majorz Wahl' not in manage
+    assert 'Proporz Wahl' not in manage
+    assert 'Verbund von Wahlen' not in manage
+    assert 'Einfache Vorlage' in manage
+
+    edit = manage.click('Bearbeiten')
+    edit.form['type'] = 'complex_vote'
+    edit.form['complex_vote'] = 'vorlage-mit-gegenentwurf'
+    manage = edit.form.submit().follow()
+    assert 'Majorz Wahl' not in manage
+    assert 'Proporz Wahl' not in manage
+    assert 'Verbund von Wahlen' not in manage
+    assert 'Einfache Vorlage' not in manage
+    assert 'Vorlage mit Gegenentwurf' in manage
+
+    delete = manage.click('Löschen')
+    assert 'Screen löschen' in delete
+    assert 'Bearbeiten' in delete.click('Abbrechen')
+
+    manage = delete.form.submit().follow()
+    assert 'Noch keine Screens' in manage

@@ -30,23 +30,25 @@
             <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day" />
         </div>
         <tal:block tal:condition="not: skip_rendering|nothing">
+            <tal:b tal:condition="type == 'candidates-chart'">
+                <tal:block metal:use-macro="layout.macros['candidates-chart']" tal:define="embed False"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'lists-chart'">
+                <tal:block metal:use-macro="layout.macros['lists-chart']" tal:define="embed False"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'party-strengths-chart'">
+                <tal:block metal:use-macro="layout.macros['party-strengths-chart']" tal:define="embed False"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'connections-chart'">
+                <tal:block metal:use-macro="layout.macros['connections-chart']" tal:define="embed False"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'lists-panachage-chart'">
+                <tal:block metal:use-macro="layout.macros['lists-panachage-chart']" tal:define="embed False"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'parties-panachage-chart'">
+                <tal:block metal:use-macro="layout.macros['parties-panachage-chart']" tal:define="embed False"/>
+            </tal:b>
             <tal:block tal:condition="data_url|nothing">
-                <div class="bar-chart"
-                    tal:condition="type == 'bar'"
-                    data-dataurl="${data_url}"
-                    >
-                </div>
-                <div class="grouped-bar-chart"
-                    tal:condition="type == 'grouped-bar'"
-                    data-dataurl="${data_url}"
-                    >
-                </div>
-                <div class="sankey-chart"
-                    tal:condition="type == 'sankey'"
-                    data-dataurl="${data_url}"
-                    data-inverse="${inverse}"
-                    >
-                </div>
                 <select class="map-data-select" tal:condition="options|False">
                     <option tal:repeat="(value, label) options" tal:attributes="value value">${label}</option>
                 </select>
@@ -65,79 +67,11 @@
                     >
                 </div>
             </tal:block>
-            <tal:b tal:condition="type == 'ballot-table'">
-            <table
-                class="results tablesaw sortable"
-                data-tablesaw-mode="columntoggle"
-                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                data-tablesaw-minimap="">
-                <thead>
-                    <tr>
-                        <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
-                        <th data-tablesaw-priority="1" i18n:translate="" class="left-aligned">Result</th>
-                        <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
-                        <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
-                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Empty</th>
-                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Invalid</th>
-                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Yes %</th>
-                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">No %</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tal:b tal:condition="scope == 'entities'">
-                        <tr tal:repeat="result ballot.results">
-                        <tal:b condition="not: result.counted">
-                            <td>${layout.format_name(result)}</td>
-                            <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
-                        </tal:b>
-                        <tal:b condition="result.counted">
-                            <td>${layout.format_name(result)}</td>
-                            <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                            <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
-                            <td class="right-aligned">${layout.format_number(result.yeas)}</td>
-                            <td class="right-aligned">${layout.format_number(result.nays)}</td>
-                            <td class="right-aligned">${layout.format_number(result.empty)}</td>
-                            <td class="right-aligned">${layout.format_number(result.invalid)}</td>
-                            <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
-                            <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
-                        </tal:b>
-                    </tr>
-                    </tal:b>
-                    <tal:b tal:condition="scope == 'districts'">
-                        <tr tal:repeat="result ballot.results_by_district">
-                        <tal:b condition="not: result.counted">
-                            <td>${layout.format_name(result)}</td>
-                            <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
-                        </tal:b>
-                        <tal:b condition="result.counted">
-                            <td>${layout.format_name(result)}</td>
-                            <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                            <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
-                            <td class="right-aligned">${layout.format_number(result.yeas)}</td>
-                            <td class="right-aligned">${layout.format_number(result.nays)}</td>
-                            <td class="right-aligned">${layout.format_number(result.empty)}</td>
-                            <td class="right-aligned">${layout.format_number(result.invalid)}</td>
-                            <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
-                            <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
-                        </tal:b>
-                        </tr>
-                    </tal:b>
-                </tbody>
-                <tfoot tal:condition="ballot.results.count() != 1">
-                    <tr class="total">
-                        <td i18n:translate="">Total</td>
-                        <td class="answer" tal:condition="not:ballot.vote.completed" i18n:translate="">Not yet counted</td>
-                        <td class="answer accepted" tal:condition="ballot.vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
-                        <td class="answer rejected" tal:condition="ballot.vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
-                        <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
-                        <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
-                        <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
-                        <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
-                        <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
-                        <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
-                    </tr>
-                </tfoot>
-            </table>
+            <tal:b tal:condition="type == 'ballot-table' and scope == 'entities'">
+                <tal:b metal:use-macro="layout.macros['ballot-entities-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'ballot-table' and scope == 'districts'">
+                <tal:b metal:use-macro="layout.macros['ballot-districts-table']"/>
             </tal:b>
             <tal:b tal:condition="type == 'election-table' and scope == 'lists'">
                 <tal:b metal:use-macro="layout.macros['election-lists-table']"/>
@@ -157,20 +91,17 @@
             <tal:b tal:condition="type == 'election-table' and scope == 'connections'">
                 <tal:b metal:use-macro="layout.macros['election-connections-table']"/>
             </tal:b>
-
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'districts'">
                 <tal:b metal:use-macro="layout.macros['election-compound-districts-table']"/>
             </tal:b>
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'candidates'">
                 <tal:b metal:use-macro="layout.macros['election-compound-candidates-table']"/>
             </tal:b>
-
             <tal:b tal:condition="type == 'vote-header' and scope == 'vote'">
                 <div class="before-content">
                     <div metal:use-macro="layout.macros['vote_header']" tal:define="ballot layout.ballot" />
                 </div>
             </tal:b>
-
         </tal:block>
     </body>
 </html>

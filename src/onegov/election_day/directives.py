@@ -1,3 +1,4 @@
+from dectate import Action
 from morepath.directive import HtmlAction
 from morepath.directive import ViewAction
 from morepath.request import Response
@@ -129,3 +130,34 @@ class CsvFileAction(ViewAction):
             content_type='text/csv',
             content_disposition=f'inline; filename={name}.csv'
         )
+
+
+class ScreenWidgetRegistry(dict):
+
+    def by_categories(self, categories):
+        result = {}
+        for category in categories:
+            result.update(self.get(category, {}))
+        return result
+
+
+class ScreenWidgetAction(Action):
+    """ Register a screen widget. """
+
+    config = {
+        'screen_widget_registry': ScreenWidgetRegistry
+    }
+
+    def __init__(self, tag, category):
+        self.tag = tag
+        self.category = category
+
+    def identifier(self, screen_widget_registry):
+        return self.tag
+
+    def perform(self, func, screen_widget_registry):
+        widget = func()
+        assert widget.tag == self.tag
+        widget.category = self.category
+        screen_widget_registry.setdefault(self.category, {})
+        screen_widget_registry[self.category][self.tag] = widget

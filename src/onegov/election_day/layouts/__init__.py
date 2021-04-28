@@ -8,6 +8,7 @@ from onegov.election_day.layouts.manage import ManageDataSourcesLayout
 from onegov.election_day.layouts.manage import ManageElectionCompoundsLayout
 from onegov.election_day.layouts.manage import ManageElectionsLayout
 from onegov.election_day.layouts.manage import ManageLayout
+from onegov.election_day.layouts.manage import ManageScreensLayout
 from onegov.election_day.layouts.manage import ManageSubscribersLayout
 from onegov.election_day.layouts.manage import ManageUploadTokensLayout
 from onegov.election_day.layouts.manage import ManageVotesLayout
@@ -24,6 +25,7 @@ __all__ = [
     'ManageElectionCompoundsLayout',
     'ManageElectionsLayout',
     'ManageLayout',
+    'ManageScreensLayout',
     'ManageSubscribersLayout',
     'ManageUploadTokensLayout',
     'ManageVotesLayout',

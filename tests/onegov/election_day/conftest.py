@@ -27,8 +27,6 @@ from tests.onegov.election_day.common import DummyRequest, print_errors, \
 from onegov.user import User
 from tests.shared.utils import create_app
 
-model_mapping = dict(proporz=ProporzElection, majorz=Election)
-
 
 def bool_as_string(val):
     assert isinstance(val, bool)
@@ -235,6 +233,8 @@ def import_elections_internal(
     if dataset_name:
         assert '.' not in dataset_name, 'Remove the file ending' \
                                         ' from dataset_name'
+
+    model_mapping = dict(proporz=ProporzElection, majorz=Election)
 
     function_mapping = dict(
         proporz=import_election_internal_proporz,
@@ -545,15 +545,15 @@ def import_votes_internal(
             if not date_:
                 year = re.search(r'(\d){4}', name).group(0)
                 assert year, 'Put the a year into the filename'
-                election_date = date(int(year), 1, 1)
+                vote_date = date(int(year), 1, 1)
             else:
-                election_date = date_
+                vote_date = date_
 
             csv_file = f.extractfile(member).read()
             if not vote:
                 vote = model_mapping[vote_type](
                     title=f'{vote_type}_{api}_{name}',
-                    date=election_date,
+                    date=vote_date,
                     domain=domain,
                     expats=expats,
                 )
@@ -724,21 +724,18 @@ def import_test_datasets(session):
                 all_loaded.update(elections)
 
         elif model == 'vote' and api_format == 'internal':
-            if vote_type == 'simple':
-                votes = import_votes_internal(
-                    vote_type,
-                    principal,
-                    domain,
-                    app_session,
-                    date_,
-                    dataset_name,
-                    expats,
-                    vote,
-                    municipality
-                )
-                all_loaded.update(votes)
-            else:
-                raise NotImplementedError
+            votes = import_votes_internal(
+                vote_type,
+                principal,
+                domain,
+                app_session,
+                date_,
+                dataset_name,
+                expats,
+                vote,
+                municipality
+            )
+            all_loaded.update(votes)
         elif model == 'vote' and api_format == 'wabsti':
             # This function is used for simple and complex votes
             votes = import_votes_wabsti(

@@ -271,9 +271,10 @@ def test_election_counted(session):
 
     assert election.counted is False
     assert election.progress == (0, 0)
+    assert election.counted_entities == []
 
     election.results.append(ElectionResult(
-        name='name',
+        name='A',
         entity_id=1,
         counted=False,
         eligible_voters=200,
@@ -286,9 +287,10 @@ def test_election_counted(session):
 
     assert election.counted is False
     assert election.progress == (0, 1)
+    assert election.counted_entities == []
 
     election.results.append(ElectionResult(
-        name='name',
+        name='B',
         entity_id=2,
         counted=True,
         eligible_voters=200,
@@ -301,12 +303,14 @@ def test_election_counted(session):
 
     assert election.counted is False
     assert election.progress == (1, 2)
+    assert election.counted_entities == ['B']
 
     for result in election.results:
         result.counted = True
 
     assert election.counted is True
     assert election.progress == (2, 2)
+    assert election.counted_entities == ['A', 'B']
 
 
 def test_election_last_change(session):

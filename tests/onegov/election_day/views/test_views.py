@@ -358,7 +358,7 @@ def test_view_svg(election_day_app):
     ]
 
 
-def test_opendata_catalog(election_day_app):
+def test_view_opendata_catalog(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -425,3 +425,35 @@ def test_opendata_catalog(election_day_app):
         'http://kanton-govikon/election-elections',
         'http://kanton-govikon/vote-vote'
     }
+
+
+def test_view_screen(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    client.get('/screen/10', status=404)
+
+    login(client)
+
+    # Add two votes
+    new = client.get('/manage/votes').click('Neue Abstimmung')
+    new.form['vote_de'] = 'Einfache Vorlage'
+    new.form['vote_type'] = 'simple'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit().follow()
+
+    # Add a screen
+    new = client.get('/manage/screens').click('Neuer Screen')
+    new.form['number'] = '10'
+    new.form['description'] = 'Mein Screen'
+    new.form['type'] = 'simple_vote'
+    new.form['simple_vote'] = 'einfache-vorlage'
+    new.form['structure'] = '<title />'
+    new.form['css'] = '/* Custom CSS */'
+    manage = new.form.submit().follow()
+    assert 'Mein Screen' in manage
+    assert 'Einfache Vorlage' in manage
+
+    view = client.get('/screen/10')
+    assert 'Einfache Vorlage' in view

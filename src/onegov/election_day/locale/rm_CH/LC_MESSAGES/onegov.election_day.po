@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 09:27+0200\n"
+"POT-Creation-Date: 2021-04-07 09:31+0200\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -366,6 +366,50 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votaziuns"
 
+msgid "Number"
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+msgid "Use the same group for all screens you want to cycle through."
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid ""
+"Number of seconds this screen is presented if cycling trough screens. If "
+"none is set, 20 seconds are used."
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Simple Vote"
+msgstr "Project da votaziun simpel"
+
+msgid "Vote with Counter-Proposal"
+msgstr "Project cun cuntraproposta"
+
+msgid "Compound of Elections"
+msgstr ""
+
+msgid "Vote"
+msgstr "Votaziun"
+
+msgid "Election"
+msgstr "Elecziun"
+
+msgid "Available tags"
+msgstr ""
+
+msgid "Structure"
+msgstr ""
+
+msgid "Additional CSS"
+msgstr ""
+
 msgid "Phone number"
 msgstr "Numer da telefon"
 
@@ -381,20 +425,8 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Resultats da las partidas"
 
-msgid "Vote"
-msgstr "Votaziun"
-
-msgid "Election"
-msgstr "Elecziun"
-
 msgid "Identifier"
 msgstr "ID"
-
-msgid "Simple Vote"
-msgstr "Project da votaziun simpel"
-
-msgid "Vote with Counter-Proposal"
-msgstr "Project cun cuntraproposta"
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
@@ -470,6 +502,9 @@ msgstr "Trametter communicaziuns als abunents"
 
 msgid "Subscribers"
 msgstr "Abunents"
+
+msgid "Screens"
+msgstr ""
 
 msgid "Manage"
 msgstr "Administrar"
@@ -608,9 +643,6 @@ msgstr "Resultats intermediars"
 msgid "No candidacies."
 msgstr "Naginas candidaturas."
 
-msgid "Embed"
-msgstr "Incorporar"
-
 msgid "Download"
 msgstr "Telechargiar"
 
@@ -638,23 +670,8 @@ msgstr "Il format da las datas è descrit qua:"
 msgid "Format Description"
 msgstr "Descripziun dal format"
 
-msgid "Yeas"
-msgstr "Vuschs affirmativas"
-
-msgid "Nays"
-msgstr "Vuschs negativas"
-
-msgid "Empty"
-msgstr "Vid"
-
-msgid "Invalid"
-msgstr "Nunvalaivel"
-
-msgid "Not yet counted"
-msgstr "Anc betg eruì il resultat"
-
-msgid "Total"
-msgstr "Total"
+msgid "Embed"
+msgstr "Incorporar"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -683,6 +700,24 @@ msgstr "Emblidà il pled-clav?"
 
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
+
+msgid "Yeas"
+msgstr "Vuschs affirmativas"
+
+msgid "Nays"
+msgstr "Vuschs negativas"
+
+msgid "Empty"
+msgstr "Vid"
+
+msgid "Invalid"
+msgstr "Nunvalaivel"
+
+msgid "Not yet counted"
+msgstr "Anc betg eruì il resultat"
+
+msgid "Total"
+msgstr "Total"
 
 msgid "List connection"
 msgstr "Colliaziun da glistas"
@@ -990,6 +1025,12 @@ msgstr "Nova elecziun"
 msgid "Upload results"
 msgstr "Chargiar si resultats"
 
+msgid "New screen"
+msgstr ""
+
+msgid "No screens yet."
+msgstr ""
+
 msgid "No subscribers yet."
 msgstr "Anc nagins abunents."
 
@@ -1195,6 +1236,25 @@ msgstr ""
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Propi trametter danovamain communicaziuns als abunents?"
+
+msgid "Screen added."
+msgstr ""
+
+msgid "Screen modified."
+msgstr ""
+
+#, python-format
+msgid "Screen ${number}"
+msgstr ""
+
+msgid "Edit screen"
+msgstr ""
+
+msgid "Screen deleted."
+msgstr ""
+
+msgid "Delete screen"
+msgstr ""
 
 msgid "Subscriber deleted."
 msgstr "Stizzà l'abunent(a)."

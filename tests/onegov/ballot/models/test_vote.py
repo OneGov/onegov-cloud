@@ -351,29 +351,60 @@ def test_ballot_answer_nobody_wins(session):
 
 
 def test_vote_progress(session):
+    def result(name, counted):
+        return BallotResult(name=name, counted=counted, entity_id=1)
+
+    # Simple vote
     vote = Vote(
         title="Abstimmung",
         domain='federation',
         date=date(2015, 6, 18),
     )
-
-    vote.ballots.append(Ballot(type='proposal'))
-
     session.add(vote)
     session.flush()
 
-    vote.proposal.results.append(
-        BallotResult(name='1', counted=True, entity_id=1)
-    )
-    vote.proposal.results.append(
-        BallotResult(name='2', counted=True, entity_id=1)
-    )
-    vote.proposal.results.append(
-        BallotResult(name='3', counted=False, entity_id=1)
-    )
+    assert vote.progress == (0, 0)
+    assert vote.proposal.progress == (0, 0)
+    assert vote.counted_entities == []
+
+    vote.proposal.results.append(result('A', True))
+    vote.proposal.results.append(result('B', True))
+    vote.proposal.results.append(result('C', False))
 
     assert vote.progress == (2, 3)
     assert vote.proposal.progress == (2, 3)
+    assert vote.counted_entities == ['A', 'B']
+
+    # Complex vote
+    vote = ComplexVote(
+        title="Abstimmung",
+        domain='federation',
+        date=date(2015, 6, 18),
+    )
+    session.add(vote)
+    session.flush()
+
+    assert vote.progress == (0, 0)
+    assert vote.proposal.progress == (0, 0)
+    assert vote.counter_proposal.progress == (0, 0)
+    assert vote.tie_breaker.progress == (0, 0)
+    assert vote.counted_entities == []
+
+    vote.proposal.results.append(result('A', True))
+    vote.proposal.results.append(result('B', True))
+    vote.proposal.results.append(result('C', False))
+    vote.counter_proposal.results.append(result('A', True))
+    vote.counter_proposal.results.append(result('B', True))
+    vote.counter_proposal.results.append(result('C', False))
+    vote.tie_breaker.results.append(result('A', True))
+    vote.tie_breaker.results.append(result('B', True))
+    vote.tie_breaker.results.append(result('C', False))
+
+    assert vote.progress == (2, 3)
+    assert vote.proposal.progress == (2, 3)
+    assert vote.counter_proposal.progress == (2, 3)
+    assert vote.tie_breaker.progress == (2, 3)
+    assert vote.counted_entities == ['A', 'B']
 
 
 def test_vote_turnout(session):

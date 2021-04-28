@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html class="no-js" lang="${request.html_lang}"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    i18n:domain="onegov.election_day"
+    metal:define-macro="layout">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            <tal:block content="layout.principal.name" />:
+            <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
+        </title>
+        <!-- This site is running on the
+           ___              ____               ____ _                 _
+         / _ \ _ __   ___ / ___| _____   __  / ___| | ___  _   _  __| |
+        | | | | '_ \ / _ \ |  _ / _ \ \ / / | |   | |/ _ \| | | |/ _` |
+        | |_| | | | |  __/ |_| | (_) \ V /  | |___| | (_) | |_| | (_| |
+        \___/|_| |_|\___|\____|\___/ \_/    \____|_|\___/ \__,_|\__,_|
+
+        Have a look at the source code: https://onegov.readthedocs.org
+        -->
+        <link rel="stylesheet" type="text/css" href="${request.theme_link}">
+        <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
+        <style tal:condition="screen.css">${screen.css}</style>
+    </head>
+    <body>
+        <tal:b metal:use-macro="template" />
+        <script type="text/javascript">
+            var lastModified;
+            function reload() {
+                var http = new XMLHttpRequest();
+                http.open('HEAD', document.location + '?' + new Date().getTime());
+                http.onreadystatechange = function() {
+                    if (this.readyState == this.DONE) {
+                        var modified = this.getResponseHeader("Last-Modified");
+                        if (lastModified && modified != lastModified && this.status == 200) {
+                            window.location.reload();
+                        }
+                        lastModified = modified;
+                    }
+                };
+                http.send();
+            }
+            setInterval(reload, 5000);
+        </script>
+        <script tal:condition="screen.next" type="text/javascript">
+            function cycle() {
+                window.location.replace('${request.link(screen.next)}');
+            }
+            setInterval(cycle, ${(screen.duration or 20) * 1000});
+        </script>
+    </body>
+</html>

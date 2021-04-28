@@ -17,6 +17,7 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import EmailSubscriberCollection
+from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
@@ -26,6 +27,7 @@ from onegov.election_day.collections.archived_results import (
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.models import Principal
+from onegov.election_day.models import Screen
 from onegov.election_day.models import Subscriber
 from onegov.election_day.models import UploadToken
 from onegov.user import Auth
@@ -286,3 +288,25 @@ def get_archive_search(
 def get_locale(request, app, locale, to=None):
     to = to or request.link(app.principal)
     return SiteLocale.for_path(app, locale, to)
+
+
+@ElectionDayApp.path(
+    model=ScreenCollection,
+    path='/manage/screens',
+    converters=dict(
+        page=int
+    )
+)
+def get_manage_screens(app, page=0):
+    return ScreenCollection(app.session(), page)
+
+
+@ElectionDayApp.path(
+    model=Screen,
+    path='/screen/{number}',
+    converters=dict(
+        number=int
+    )
+)
+def get_screen(app, number):
+    return ScreenCollection(app.session()).by_number(number)

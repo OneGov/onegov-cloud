@@ -21,7 +21,7 @@
 
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
-                    <figure metal:use-macro="layout.macros['parties_panachage_figure']" />
+                    <figure metal:use-macro="layout.macros['parties_panachage_figure']" tal:define="model election"/>
                 </div>
             </div>
         </tal:block>

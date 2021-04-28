@@ -33,6 +33,34 @@ html {
 }
 
 /*
+    Ballot Result Bar
+*/
+.ballot-result-bar {
+    margin-bottom: 2em;
+
+    dl dt {
+        margin-bottom: 0;
+        opacity: .5;
+    }
+
+    dl dd {
+        font-size: 240%;
+        font-weight: bold;
+        margin-bottom: -6px;
+    }
+
+    .percentage {
+        background: $accepted-color;
+        height: .5rem;
+
+        .nays {
+            background: $rejected-color;
+            height: .5rem;
+        }
+    }
+}
+
+/*
     Before Content
 */
 .before-content {
@@ -56,17 +84,6 @@ html {
         margin-top: 1em;
     }
 
-    dl dt {
-        margin-bottom: 0;
-        opacity: .5;
-    }
-
-    dl dd {
-        font-size: 240%;
-        font-weight: bold;
-        margin-bottom: -6px;
-    }
-
     hr {
         border: 4px solid $primary-color;
         margin-bottom: 0;
@@ -74,14 +91,8 @@ html {
         padding: 0;
     }
 
-    .percentage {
-        background: $accepted-color;
-        height: .5rem;
-
-        .nays {
-            background: $rejected-color;
-            height: .5rem;
-        }
+    .ballot-result-bar {
+        margin-bottom: 0;
     }
 
     .embedded-widget {
@@ -92,6 +103,7 @@ html {
 
     }
 }
+
 
 /*
     Homepage
@@ -1029,9 +1041,10 @@ ul.pagination li.last {
     align-content: center;
 }
 
-
-
-
-
-
-
+/*
+    Fix empty columns collapsing
+*/
+.column,
+.columns {
+    min-height: 1px;
+}
