@@ -449,21 +449,21 @@
 </metal:upload>
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
-    <div class="card" data-equalizer-watch>
+    <div class="card" data-equalizer-watch tal:define="url request.link(item)">
         <div tal:condition="item.image_url|nothing" class="card-header">
             <img src="${item.image_url}">
         </div>
         <div class="card-section">
             <div>
                 <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.published_or_created, 'relative')}</small></h5>
-                <tal:b tal:switch="heading|'h5'">
-                    <h3 class="heading" tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
-                    <h4 class="heading" tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h4>
-                    <h5 class="heading" tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
-                </tal:b>
+                <a class="heading" href="${url}"><tal:b tal:switch="heading|'h5'">
+                    <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
+                    <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h4>
+                    <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
+                </tal:b></a>
                 <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
             </div>
-            <a href="${request.link(item)}" class="more-link" i18n:translate="">read more</a>
+            <a href="${url}" class="more-link" i18n:translate="">read more</a>
         </div>
     </div>
 </metal:newslist>

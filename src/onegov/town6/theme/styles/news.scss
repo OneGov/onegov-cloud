@@ -28,7 +28,17 @@
     }
 
     .heading {
-        font-weight: bold;
+        color: $body-font-color;
+
+        &:hover {
+            text-decoration: underline;
+        }
+
+        h3,
+        h4,
+        h3 {
+            font-weight: bold;
+        }
     }
 }
 
