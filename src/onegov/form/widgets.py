@@ -185,41 +185,40 @@ class IconWidget(TextInput):
     iconfont = 'FontAwesome'
     icons = {
         'FontAwesome': (
-            '&#xf111',  # fa-circle
-            '&#xf005',  # fa-star
-            '&#xf06a',  # fa-exclamation-circle
-            '&#xf059',  # fa-question-circle
-            '&#xf05e',  # fa-ban
-            '&#xf1b9',  # fa-car
-            '&#xf238',  # fa-train
-            '&#xf206',  # fa-bicycle
-            '&#xf291',  # fa-shopping-basket
-            '&#xf1b0',  # fa-paw
-            '&#xf1ae',  # fa-child
-            '&#xf06d',  # fa-fire
-            '&#xf1f8',  # fa-trash
-            '&#xf236',  # fa-hotel
-            '&#xf0f4',  # fa-coffee
-            '&#xf017',  # fa-clock
+            ('&#xf111', 'fa fa-circle'),
+            ('&#xf005', 'fa fa-star'),
+            ('&#xf06a', 'fa fa-exclamation-circle'),
+            ('&#xf059', 'fa fa-question-circle'),
+            ('&#xf05e', 'fa fa-ban'),
+            ('&#xf1b9', 'fa fa-car'),
+            ('&#xf238', 'fa fa-train'),
+            ('&#xf206', 'fa fa-bicycle'),
+            ('&#xf291', 'fa fa-shopping-basket'),
+            ('&#xf1b0', 'fa fa-paw'),
+            ('&#xf1ae', 'fa fa-child'),
+            ('&#xf06d', 'fa fa-fire'),
+            ('&#xf1f8', 'fa fa-trash'),
+            ('&#xf236', 'fa fa-hotel'),
+            ('&#xf0f4', 'fa fa-coffee'),
+            ('&#xf017', 'fa fa-clock'),
         ),
         'Font Awesome 5 Free': (
-            'fas fa-circle',
-            'fas fa-star',
-            'fas fa-exclamation-circle',
-            'fas fa-question-circle',
-            'fas fa-question-circle',
-            'fas fa-ban',
-            'fas fa-car',
-            'fas fa-train',
-            'fas fa-bicycle',
-            'fas fa-shopping-basket',
-            'fas fa-paw',
-            'fas fa-child',
-            'fas fa-fire',
-            'fas fa-trash',
-            'fas fa-hotel',
-            'fas fa-coffee',
-            'fas fa-clock'
+            ('&#xf111', 'fas fa-circle'),
+            ('&#xf005', 'fas fa-star'),
+            ('&#xf06a', 'fas fa-exclamation-circle'),
+            ('&#xf059', 'fas fa-question-circle'),
+            ('&#xf05e', 'fas fa-ban'),
+            ('&#xf1b9', 'fas fa-car'),
+            ('&#xf238', 'fas fa-train'),
+            ('&#xf206', 'fas fa-bicycle'),
+            ('&#xf291', 'fas fa-shopping-basket'),
+            ('&#xf1b0', 'fas fa-paw'),
+            ('&#xf1ae', 'fas fa-child'),
+            ('&#xf06d', 'fas fa-fire'),
+            ('&#xf1f8', 'fas fa-trash'),
+            ('&#xf594', 'fas fa-hotel'),
+            ('&#xf0f4', 'fas fa-coffee'),
+            ('&#xf017', 'fas fa-clock')
         )
     }
 
@@ -230,12 +229,9 @@ class IconWidget(TextInput):
             <ul style="font-family: ${iconfont}">
                 <li
                     tal:repeat="icon icons"
-                    tal:content="structure icon"
-                    tal:condition="iconfont == 'FontAwesome'"
+                    tal:content="structure icon[0]"
+                    style="font-weight: ${font_weight(icon)}"
                 />
-                <li tal:condition="iconfont == 'Font Awesome 5 Free'"
-                    tal:repeat="icon icons" class="${icon}">
-                </li>
             </ul>
             <input type="hidden" name="${id}" value="${structure: value}">
         </div>
@@ -245,11 +241,20 @@ class IconWidget(TextInput):
         iconfont = kwargs.pop('iconfont', self.iconfont)
         icons = kwargs.pop('icons', self.icons[iconfont])
 
+        if ' ' in iconfont:
+            iconfont = f"'{iconfont}'"
+
+        def font_weight(icon):
+            if icon[1].startswith('fas'):
+                return '900'
+            return 'regular'
+
         return HTMLString(self.template.render(
             iconfont=iconfont,
             icons=icons,
             id=field.id,
-            value=field.data or icons[0]
+            value=field.data or icons[0][0],
+            font_weight=font_weight
         ))
 
 
