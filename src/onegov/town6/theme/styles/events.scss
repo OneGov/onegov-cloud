@@ -37,7 +37,7 @@ $event-image-max-height: 150px;
         }
     }
 
-    .card-section {
+    .card-section:first-of-type {
         // so that the first section does not grow and images are top-aligned
         &:first-of-type {
             flex-grow: 0;
@@ -47,6 +47,14 @@ $event-image-max-height: 150px;
             font-weight: bold;
             white-space: nowrap;
             i { width: $events-icon-width; }
+        }
+    }
+
+    a.lead {
+        color: $body-font-color;
+
+        &:hover {
+            text-decoration: underline;
         }
     }
 

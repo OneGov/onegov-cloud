@@ -265,7 +265,7 @@
             <i class="far fa-calendar-alt" aria-hidden="true"></i>
         </div>
         <div class="card-section" tal:condition="with_lead|False">
-            <h5>${item.lead}</h5>
+            <a class="lead" href="${item.url}"><h5>${item.lead}</h5></a>
         </div>
     </div>
 </metal:events>
