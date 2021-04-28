@@ -1,6 +1,25 @@
 from freezegun import freeze_time
 
 from tests.onegov.org.common import edit_bar_links
+from tests.shared.utils import open_in_browser
+
+
+def check_breadcrumbs(page, excluded):
+    # check the breadcrumbs
+    breadcrumbs = page.pyquery('ul.breadcrumbs a')
+    for b in breadcrumbs:
+        url = b.attrib['href']
+        print(url)
+        assert excluded not in url, f'{excluded} still in {url}'
+
+
+def check_navlinks(page, excluded):
+    # check the nav links
+    nav_links = page.pyquery('ul.side-nav a')
+    for link in nav_links:
+        url = link.attrib['href']
+        print(url)
+        assert excluded not in url, f'{excluded} still in {url}'
 
 
 def test_pages(client):
@@ -32,18 +51,6 @@ def test_pages(client):
     assert page.pyquery('.page-text i').text()\
         .startswith("Experts say it's the fact")
 
-    # Test changing the url
-    assert 'Url ändern' not in editor.get(page.request.url)
-    url_page = page.click('Url ändern')
-    url_page.form['name'] = 'my govikoN'
-    url_page = url_page.form.submit()
-    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
-    url_page.form['name'] = 'my-govikon'
-    url_page.form['test'] = False
-    page = url_page.form.submit().follow()
-    assert 'organisation/my-govikon' in page.request.url
-    assert editor.get(url_page.request.url, status=403)
-
     edit_page = page.click("Bearbeiten")
     assert "Thema Bearbeiten" in edit_page
     assert "&lt;h2&gt;Living in Govikon is Really Great&lt;/h2&gt" in edit_page
@@ -62,7 +69,38 @@ def test_pages(client):
     assert "<script>alert('yes')</script>" not in page
     assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
 
+    # Test changing the url of the root page organisation
+    assert 'Url ändern' not in editor.get(root_page.request.url)
+    url_page = root_page.click('Url ändern')
+
+    old_name = url_page.form['name'].value
+    new_name = 'my-govikon'
+
+    url_page.form['name'] = 'my govikoN'
+    url_page = url_page.form.submit()
+    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
+    url_page.form['name'] = new_name
+    url_page.form['test'] = True
+    url_page = url_page.form.submit()
+    assert 'Insgesamt 1 Unterseiten sind betroffen' in url_page
+    assert '0 Links' in url_page
+
+    assert url_page.form['name'].value == new_name
+    url_page.form['test'] = False
+    org_page = url_page.form.submit().follow()
+
+    assert f'/topics/{new_name}' in org_page.request.url
+    check_breadcrumbs(org_page, old_name)
+    check_navlinks(org_page, old_name)
+
+    # check editor access
+    assert editor.get(url_page.request.url, status=403)
+
+    # test the sorting...
+
+    client.get(root_url, status=404)
     client.get('/auth/logout')
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     root_page = client.get(root_url)
 
     assert len(root_page.pyquery('.edit-bar')) == 0
