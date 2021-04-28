@@ -377,7 +377,8 @@
 <metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
     <div class="card" id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
         <div class="card-divider">
-            <h5>${item.page.text}</h5>
+            <a tal:condition="item.page.url" href="${item.page.url}"><h5>${item.page.text}</h5></a>
+            <h5 tal:condition="not item.page.url">${item.page.text}</h5>
         </div>
         <div class="card-section">
             <ul class="more-list">

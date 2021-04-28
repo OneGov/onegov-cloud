@@ -28,6 +28,20 @@
     border: 0;
 }
 
-.homepage-tile .card-section {
-    padding-bottom: .5rem;
+.homepage-tile {
+    .card-section {
+        padding-bottom: .5rem;
+    }
+
+    .card-divider a {
+        color: $body-font-color;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .card-divider h5 {
+        margin-bottom: 0;
+    }
 }
