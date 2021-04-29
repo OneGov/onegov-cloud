@@ -18,6 +18,18 @@ services:
     volumes:
       - data01:/usr/share/elasticsearch/data
 
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    restart: always
+    ports:
+      - '8081:80'
+      - '1025:25'
+      - '143:143'
+    volumes:
+        - smtp4dev-data:/smtp4dev
+
 volumes:
   data01:
+    driver: local
+  smtp4dev-data:
     driver: local
