@@ -1,8 +1,27 @@
 # Changes
 
+## Release `2021.47`
+
+> commits: **12 / [4f4f381207...9a17dbd1bd](https://github.com/OneGov/onegov-cloud/compare/4f4f381207^...9a17dbd1bd)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.47)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🎉 **Add screens.**
+
+Screens allow to show tables, charts and other widgets for a given vote 
+or election in a flexible way.
+
+**`Feature`** | **[SEA-147](https://linear.app/seantis/issue/SEA-147)** | **[d3be6d7077](https://github.com/onegov/onegov-cloud/commit/d3be6d70771e0615b3373096eb2a714d2fd66055)**
+
+🐞 **Fixes candidates chart not being displayed for intermediate results.**
+
+**`Bugfix`** | **[4f4f381207](https://github.com/onegov/onegov-cloud/commit/4f4f381207e85e9c82b3c6be0baf21e8f4d8b009)**
+
 ## Release `2021.46`
 
-> commits: **13 / [5dd6c63404...35aeaf118d](https://github.com/OneGov/onegov-cloud/compare/5dd6c63404^...35aeaf118d)**  
+> released: **2021-04-27 11:42**<br>
+> commits: **14 / [5dd6c63404...f6b9143271](https://github.com/OneGov/onegov-cloud/compare/5dd6c63404^...f6b9143271)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.46)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
