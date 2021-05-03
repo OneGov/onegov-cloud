@@ -58,7 +58,6 @@ $view-link: '\f06e';
 $pdf-icon: '\f1c1';
 
 .globals {
-    // Todo: the link text inside the second level should not wrap
     @include primary-color-background;
 
     @include breakpoint(small only) {
@@ -75,29 +74,35 @@ $pdf-icon: '\f1c1';
         }
     }
 
-    .grid-x > .cell > ul {
+    .grid-x > .cell {
 
-        @include breakpoint(medium up) {
-            display: flex;
-            flex-direction: row-reverse;
-        }
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
 
-        > li {
+        > ul {
+            @include breakpoint(medium up) {
+                display: flex;
+                flex-direction: row-reverse;
+            }
 
-            > a {
-                @include primary-color-background;
-                height: 100%;
-                line-height: $globals-height;
-                padding: 0 1rem;
-                @include breakpoint(medium up) {
-                    align-items: center;
-                    display: flex;
-                    justify-content: flex-end;
-                    padding-right: 0;
-                }
+            > li {
 
-                &::after {
-                    border-color: $white transparent transparent !important;
+                > a {
+                    @include primary-color-background;
+                    height: 100%;
+                    line-height: $globals-height;
+                    padding: 0 1rem;
+                    @include breakpoint(medium up) {
+                        align-items: center;
+                        display: flex;
+                        justify-content: flex-end;
+                        padding-right: 0;
+                    }
+
+                    &::after {
+                        border-color: $white transparent transparent !important;
+                    }
                 }
             }
         }
