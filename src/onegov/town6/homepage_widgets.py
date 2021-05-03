@@ -263,7 +263,7 @@ class ContactsAndAlbumsWidget(object):
               <div class="contacts-albums-panel">
                 <h3 tal:content="contacts_and_albums_panel.title"></h3>
                 <metal:block use-macro="layout.macros['panel-links']"
-                   tal:define="panel contacts_and_albums_panel; 
+                   tal:define="panel contacts_and_albums_panel;
                    classes ['more-list']"
                 />
               </div>

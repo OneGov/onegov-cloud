@@ -54,7 +54,7 @@ class OpenGraphMixin:
     @property
     def og_title(self):
         return getattr(self, 'title', None) or \
-               getattr(self.model, 'title', None)
+            getattr(self.model, 'title', None)
 
 
 class Layout(ChameleonLayout):
