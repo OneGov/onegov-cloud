@@ -71,7 +71,7 @@ setup(
         'colour',
         'cssmin',
         'dill!=0.2.7',
-        'dogpile.cache==1.0.2',
+        'dogpile.cache',
         'dukpy',
         'editdistance',
         'elasticsearch>=7.0.0,<8.0.0',
