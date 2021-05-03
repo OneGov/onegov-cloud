@@ -6,7 +6,6 @@ from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
 from onegov.form.fields import UploadField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
-from onegov.form.utils import with_options
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
@@ -25,7 +24,6 @@ from wtforms.validators import Length
 from wtforms.validators import NumberRange
 from wtforms.validators import Regexp
 from wtforms.validators import URL
-from wtforms.widgets import TextArea
 from wtforms_components import Email, If, TimeField
 
 
@@ -91,8 +89,8 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            widget=with_options(TextArea, rows=field.rows),
-            description=field.field_help
+            description=field.field_help,
+            render_kw={'rows': field.rows} if field.rows else None
         )
 
     elif field.type == 'password':
@@ -327,11 +325,10 @@ class WTFormsClassBuilder(object):
 
     def mark_as_dependent(self, field_id, dependency):
         field = getattr(self.form_class, field_id)
-        widget = field.kwargs.get('widget', field.field_class.widget)
-
-        field.kwargs['widget'] = with_options(
-            widget, **dependency.html_data
-        )
+        if not field.kwargs.get('render_kw'):
+            field.kwargs['render_kw'] = {}
+        print(dependency.html_data)
+        field.kwargs['render_kw'].update(dependency.html_data)
 
     def get_unique_field_id(self, label, dependency):
         # try to find a smart field_id that contains the dependency or the

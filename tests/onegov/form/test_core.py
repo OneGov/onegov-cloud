@@ -1,10 +1,9 @@
 from decimal import Decimal
-from onegov.form import Form, merge_forms, with_options, move_fields
+from onegov.form import Form, merge_forms, move_fields
 from onegov.pay import Price
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired
-from wtforms.widgets import TextArea
 from wtforms_components import TimeField
 
 
@@ -53,14 +52,6 @@ def test_useful_data():
     request = DummyRequest({'a': 'A', 'b': 'B', 'c': 'C'})
     assert TestForm(request.POST).get_useful_data(exclude={'a', 'b'}) \
         == {'c': 'C'}
-
-
-def test_with_options():
-    widget = with_options(TextArea, class_="markdown")
-    assert 'class="markdown"' in widget(DummyField('one', 'one', '1'))
-
-    widget = with_options(TextArea, class_="x")
-    assert 'class="x"' in widget(DummyField('one', 'one', '1'))
 
 
 def test_match_fields():

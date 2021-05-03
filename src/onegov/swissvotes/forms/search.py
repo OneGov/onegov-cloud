@@ -55,6 +55,7 @@ class SearchForm(Form):
         ),
         coerce=bool,
         render_kw={'size': 2},
+        default=0,
         description=_(
             "Searches all text fields and attachments. Select «No» to limit "
             "the search to title, keyword, vote number, and procedure number."

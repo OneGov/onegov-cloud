@@ -423,11 +423,15 @@ def test_dependent_validation():
     form.validate()
     assert not form.errors
 
+    # render_kw are passed to the widget call method when the field is rendered
     assert 'data-depends-on="payment/Bill"' in (
-        form.payment_address.widget(form.payment_address))
+        form.payment_address.widget(
+            form.payment_address, **form.payment_address.render_kw))
     assert 'data-depends-on="payment/Credit Card"' in (
         form.payment_credit_card_number.widget(
-            form.payment_credit_card_number))
+            form.payment_credit_card_number,
+            **form.payment_credit_card_number.render_kw
+        ))
 
 
 def test_nested_regression():

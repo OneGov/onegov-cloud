@@ -12,7 +12,7 @@ from wtforms.widgets import FileInput
 from wtforms.widgets import ListWidget
 from wtforms.widgets import Select
 from wtforms.widgets import TextInput
-from wtforms.widgets.core import HTMLString, html_params
+from wtforms.widgets.core import html_params
 
 
 class OrderedListWidget(ListWidget):

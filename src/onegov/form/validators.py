@@ -7,7 +7,6 @@ import phonenumbers
 from cgi import FieldStorage
 from mimetypes import types_map
 from onegov.form import _
-from onegov.form.utils import with_options
 from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError, \
     FieldCompileError
 from stdnum.exceptions import ValidationError as StdnumValidationError
@@ -140,9 +139,7 @@ class ValidFormDefinition(object):
             try:
                 form = parse_form(field.data)()
             except InvalidFormSyntax as e:
-                field.widget = with_options(
-                    field.widget, **{'data-highlight-line': e.line}
-                )
+                field.render_kw['data-highlight-line'] = e.line
                 raise ValidationError(
                     field.gettext(self.syntax).format(line=e.line)
                 )

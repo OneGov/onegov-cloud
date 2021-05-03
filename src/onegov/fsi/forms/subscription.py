@@ -86,7 +86,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
         if not events.first():
             return [self.none_choice]
-        return (self.event_choice(e) for e in events)
+        return tuple(self.event_choice(e) for e in events)
 
     def get_attendee_choices(self):
 
