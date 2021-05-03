@@ -493,10 +493,10 @@ def test_update_external_resources_form(session):
     form = UpdateExternalResourcesForm()
     form.request = DummyRequest(session, DummyPrincipal())
 
-    assert form.resources.choices == (
+    assert form.resources.choices == [
         ('mfg', 'eMuseum.ch'),
         ('sa', 'Social Archives')
-    )
+    ]
 
     # Validate
     assert not form.validate()
