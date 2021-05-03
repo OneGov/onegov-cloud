@@ -96,7 +96,7 @@
 </metal:breadcrumbs>
 
 <metal:panel-links define-macro="panel-links">
-    <ul class="${'panel-links' + (' callout' if as_callout else '')}" tal:define="as_callout as_callout|False">
+    <ul class="${' '.join(classes) + ' panel-links' + (' callout' if as_callout else '')}" tal:define="as_callout as_callout|False; classes classes|[]">
         <li tal:repeat="link panel.links">
             <tal:b content="structure link(layout)" />
             <small tal:condition="show_subtitle|True">${link.subtitle}</small>

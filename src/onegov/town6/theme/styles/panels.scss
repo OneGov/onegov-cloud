@@ -87,6 +87,10 @@ $publications-icon: '\f1ea';
     @include clean-ul;
     margin-bottom: 1rem;
 
+    .contacts-albums-panel ul.panel-links.more-list {
+        padding: 0;
+    }
+
     .services-panel {
         a.online-counter::before { @include icon-bold($tasks-icon); }
         a.publications::before { @include icon-bold($publications-icon); }
