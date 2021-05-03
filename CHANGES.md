@@ -1,8 +1,28 @@
 # Changes
 
+## Release `2021.48`
+
+> commits: **12 / [bf9ae82dfd...abada1388f](https://github.com/OneGov/onegov-cloud/compare/bf9ae82dfd^...abada1388f)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.48)](https://buildkite.com/seantis/onegov-cloud)
+
+### Town6
+
+✨ **Adds header link to template**
+
+**`Other`** | **[SEA-300](https://linear.app/seantis/issue/SEA-300)** | **[677352be3e](https://github.com/onegov/onegov-cloud/commit/677352be3efaf764645df5263874a52c696e68d0)**
+
+✨ **Display Directory Cards in flex grid**
+
+**`Other`** | **[SEA-302](https://linear.app/seantis/issue/SEA-302)** | **[2e7c00779c](https://github.com/onegov/onegov-cloud/commit/2e7c00779c9fb99a358de3931359498a091dc9c5)**
+
+✨ **Styles albums and contacts widget**
+
+**`Other`** | **[SEA-303](https://linear.app/seantis/issue/SEA-303)** | **[7d5879145d](https://github.com/onegov/onegov-cloud/commit/7d5879145d1b29e477ea205b37374c858d88a569)**
+
 ## Release `2021.47`
 
-> commits: **12 / [4f4f381207...9a17dbd1bd](https://github.com/OneGov/onegov-cloud/compare/4f4f381207^...9a17dbd1bd)**  
+> released: **2021-04-29 07:00**<br>
+> commits: **13 / [4f4f381207...184621e882](https://github.com/OneGov/onegov-cloud/compare/4f4f381207^...184621e882)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.47)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
