@@ -3,6 +3,8 @@ import humanize
 
 from contextlib import suppress
 from html import escape
+
+from markupsafe import Markup
 from morepath.error import LinkError
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import _
@@ -110,9 +112,8 @@ class UploadWidget(FileInput):
     def __call__(self, field, **kwargs):
         force_simple = kwargs.pop('force_simple', False)
         input_html = super().__call__(field, **kwargs)
-
         if force_simple or field.errors or not field.data:
-            return HTMLString("""
+            return Markup("""
                 <div class="upload-widget without-data">
                     {}
                 </div>
@@ -127,7 +128,7 @@ class UploadWidget(FileInput):
                     <div class="uploaded-image"><img src="{src}"></div>
                 """
 
-            return HTMLString("""
+            return Markup("""
                 <div class="upload-widget with-data">
                     <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
 
@@ -249,7 +250,7 @@ class IconWidget(TextInput):
                 return '900'
             return 'regular'
 
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             iconfont=iconfont,
             icons=icons,
             id=field.id,
@@ -292,7 +293,7 @@ class PreviewWidget(object):
     def __call__(self, field, **kwargs):
         field.meta.request.include('preview-widget-handler')
 
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             url=callable(field.url) and field.url(field.meta) or field.url,
             fields=field.fields,
             events=field.events,
@@ -314,4 +315,4 @@ class PanelWidget(object):
         )
         text = text.replace('">', '" ' + html_params(**kwargs) + '>')
         text = text.replace('\n', '<br>')
-        return HTMLString(text)
+        return Markup(text)
