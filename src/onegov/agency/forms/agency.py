@@ -152,7 +152,7 @@ class MoveAgencyForm(Form):
 
         parent_id = None
         parent = None
-        if self.parent_id.data.isdigit():
+        if self.parent_id.data and self.parent_id.data.isdigit():
             parent_id = int(self.parent_id.data)
             parent = agencies.by_id(parent_id)
         model.name = agencies.get_unique_child_name(model.title, parent)
