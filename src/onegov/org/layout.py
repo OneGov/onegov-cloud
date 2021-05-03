@@ -50,6 +50,13 @@ from sedate import to_timezone
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
 
+class OpenGraphMixin:
+    @property
+    def og_title(self):
+        return getattr(self, 'title', None) or \
+               getattr(self.model, 'title', None)
+
+
 class Layout(ChameleonLayout):
     """ Contains methods to render a page inheriting from layout.pt.
 
