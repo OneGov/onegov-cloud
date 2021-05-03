@@ -419,7 +419,7 @@
             <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
             <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
             <div class="long-field-help" tal:condition="long_description">
-                <tal:b replace="structure layout.linkify(long_description)"/>
+                <tal:b replace="structure long_description"/>
             </div>
 
             <!--! The field is placed here -->
