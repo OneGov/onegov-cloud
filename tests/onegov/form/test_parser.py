@@ -50,6 +50,12 @@ def test_parse_text():
     fields = form._fields.values()
     assert len(fields) == 6
 
+    assert form.comment.label.text == 'Comment'
+    assert form.comment.widget(form.comment, **form.comment.render_kw) == (
+        '<textarea id="comment" name="comment" rows="8">\r\n'
+        '</textarea>'
+    )
+
     assert form.first_name.label.text == 'First name'
     assert form.first_name.description == 'Fill in all in UPPER case'
     assert len(form.first_name.validators) == 1
@@ -63,10 +69,6 @@ def test_parse_text():
     assert len(form.country.validators) == 2
     assert isinstance(form.country.validators[0], validators.Optional)
     assert isinstance(form.country.validators[1], validators.Length)
-
-    assert form.comment.label.text == 'Comment'
-    assert form.comment.widget(form.comment) == (
-        '<textarea id="comment" name="comment" rows="8"></textarea>')
 
     assert form.zipcode.label.text == 'Zipcode'
     assert len(form.zipcode.validators) == 3
