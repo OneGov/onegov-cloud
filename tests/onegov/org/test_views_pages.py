@@ -20,6 +20,49 @@ def check_navlinks(page, excluded):
         assert excluded not in url, f'{excluded} still in {url}'
 
 
+def test_pages_cache(client):
+
+    client.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+    root_page = client.get(root_url)
+    links = edit_bar_links(root_page, 'text')
+    assert 'Url ändern' in links
+    assert len(links) == 5
+
+    # Test changing the url of the root page organisation
+    assert 'Url ändern' not in editor.get(root_page.request.url)
+    url_page = root_page.click('Url ändern')
+
+    old_name = url_page.form['name'].value
+    new_name = 'my-govikon'
+
+    url_page.form['name'] = 'my govikoN'
+    url_page = url_page.form.submit()
+    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
+    url_page.form['name'] = new_name
+    url_page.form['test'] = True
+    url_page = url_page.form.submit()
+    open_in_browser(url_page)
+    assert 'Insgesamt 0 Unterseiten sind betroffen' in url_page
+    assert '0 Links' in url_page
+
+    assert url_page.form['name'].value == new_name
+    url_page.form['test'] = False
+    org_page = url_page.form.submit().follow()
+
+    org_page = org_page.click('Organisation')
+
+    assert f'/topics/{new_name}' in org_page.request.url
+    check_breadcrumbs(org_page, old_name)
+    check_navlinks(org_page, old_name)
+
+    # check editor access
+    assert editor.get(url_page.request.url, status=403)
+
+
 def test_pages(client):
 
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
@@ -29,10 +72,6 @@ def test_pages(client):
     editor = client.spawn()
     editor.login_editor()
     root_page = client.get(root_url)
-
-    links = edit_bar_links(root_page, 'text')
-    assert 'Url ändern' in links
-    assert len(links) == 5
     new_page = root_page.click('Thema')
     assert "Neues Thema" in new_page
 
@@ -67,41 +106,7 @@ def test_pages(client):
     assert "<script>alert('yes')</script>" not in page
     assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
 
-    # Test changing the url of the root page organisation
-    assert 'Url ändern' not in editor.get(root_page.request.url)
-    url_page = root_page.click('Url ändern')
-
-    old_name = url_page.form['name'].value
-    new_name = 'my-govikon'
-
-    url_page.form['name'] = 'my govikoN'
-    url_page = url_page.form.submit()
-    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
-    url_page.form['name'] = new_name
-    url_page.form['test'] = True
-    url_page = url_page.form.submit()
-    assert 'Insgesamt 1 Unterseiten sind betroffen' in url_page
-    assert '0 Links' in url_page
-
-    assert url_page.form['name'].value == new_name
-    url_page.form['test'] = False
-    org_page = url_page.form.submit().follow()
-
-    assert f'/topics/{new_name}' in org_page.request.url
-    check_breadcrumbs(org_page, old_name)
-    check_navlinks(org_page, old_name)
-
-    # check editor access
-    assert editor.get(url_page.request.url, status=403)
-
-    # test the sorting...
-
-    client.get(root_url, status=404)
     client.get('/auth/logout')
-    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
-    root_page = client.get(root_url)
-
-    assert len(root_page.pyquery('.edit-bar')) == 0
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
     assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
