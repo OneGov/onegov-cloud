@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-30 10:48+0200\n"
+"POT-Creation-Date: 2021-05-04 10:32+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -291,12 +291,6 @@ msgstr "In Bearbeitung"
 msgid "Closed"
 msgstr "Abgeschlossen"
 
-msgid "User Group"
-msgstr "Benutzergruppe"
-
-msgid "None"
-msgstr "Keine"
-
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
@@ -306,15 +300,6 @@ msgid ""
 msgstr ""
 "Sortieren sie die Hauptorganisationen per Drag & Drop. Um "
 "Unterorganisationen zu sortieren, klicken sie auf eine Hauptorganisation."
-
-msgid "Users"
-msgstr "Benutzer"
-
-msgid "All"
-msgstr "Alle"
-
-msgid "View"
-msgstr "Anzeigen"
 
 msgid "Added a new agency"
 msgstr "Eine neue Organisation wurde hinzufügt"

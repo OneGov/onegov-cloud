@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-04-26 07:31+0200\n"
+"POT-Creation-Date: 2021-05-04 10:42+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -222,6 +222,9 @@ msgstr "Raum"
 msgid "Daypass"
 msgstr "Tageskarte"
 
+msgid "Resource Item"
+msgstr "Gegenstand"
+
 msgid "Notifications"
 msgstr "Mitteilungen"
 
@@ -359,6 +362,18 @@ msgstr "Neuer Registrationslink"
 
 msgid "User"
 msgstr "Benutzer"
+
+msgid "User groups"
+msgstr "Benutzergruppen"
+
+msgid "User group"
+msgstr "Benutzergruppe"
+
+msgid "Do you really want to delete this user group?"
+msgstr "Möchten Sie diese Benutzergruppe wirklich löschen"
+
+msgid "Delete user group"
+msgstr "Benutzergruppe löschen"
 
 msgid "Exports"
 msgstr "Exporte"
@@ -1758,17 +1773,26 @@ msgstr "Rolle"
 msgid "local"
 msgstr "lokal"
 
+msgid "None"
+msgstr "Keine"
+
 msgid "No links found."
 msgstr "Keine Verknüpfungen gefunden."
 
 msgid "Select an item to view it"
 msgstr "Wählen Sie einen Eintrag aus um diesen anzuzeigen"
 
-msgid "Yubikey"
-msgstr "YubiKey"
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "All"
+msgstr "Alle"
 
 msgid "View"
 msgstr "Ansicht"
+
+msgid "Yubikey"
+msgstr "YubiKey"
 
 msgid "Username"
 msgstr "Benutzername"
@@ -1855,31 +1879,4 @@ msgid "Newsletter Settings"
 msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
-msgstr ""
-
-msgid "Link Check"
-msgstr ""
-
-#~ msgid "Supported Chatbots"
-#~ msgstr "Unterstütze Chatbots"
-
-#~ msgid "Chatbot title"
-#~ msgstr "Titelüberschrift"
-
-#~ msgid "Chatbot background color"
-#~ msgstr "Chatbot Hintergrund-Farbe"
-
-#~ msgid "Hide chatbot for chosen roles"
-#~ msgstr "Verstecke Chatbot für gewählte Rollen"
-
-#~ msgid "Disable the chatbot"
-#~ msgstr "Chatbot deaktivieren"
-
-#~ msgid "Current Image"
-#~ msgstr "Image acutuelle"
-
-#~ msgid "Image Focus"
-#~ msgstr "Image Focus"
-
-#~ msgid "Signup"
-#~ msgstr "Abonnieren"
+msgstr "Migration Links"

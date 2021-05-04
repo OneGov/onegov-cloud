@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-04-26 07:31+0200\n"
+"POT-Creation-Date: 2021-05-04 10:42+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -220,6 +220,9 @@ msgstr "Espace"
 msgid "Daypass"
 msgstr "Carte journalière"
 
+msgid "Resource Item"
+msgstr "Article"
+
 msgid "Notifications"
 msgstr "Notifications"
 
@@ -355,6 +358,18 @@ msgstr "Créez un lien d'inscription"
 
 msgid "User"
 msgstr "Utilisateur"
+
+msgid "User groups"
+msgstr "Groupes d'utilisateurs"
+
+msgid "User group"
+msgstr "Groupe d'utilisateurs"
+
+msgid "Do you really want to delete this user group?"
+msgstr "Voulez-vous vraiment supprimer ce groupe d'utilisateurs ?"
+
+msgid "Delete user group"
+msgstr "Supprimer le groupe d'utilisateurs"
 
 msgid "Exports"
 msgstr "Exports"
@@ -1765,17 +1780,26 @@ msgstr "Rôle"
 msgid "local"
 msgstr "local"
 
+msgid "None"
+msgstr "Aucune"
+
 msgid "No links found."
 msgstr "Aucun lien trouvé."
 
 msgid "Select an item to view it"
 msgstr "Sélectionnez un élément pour le visualiser"
 
-msgid "Yubikey"
-msgstr "Yubikey"
+msgid "Users"
+msgstr "Utilisateurs"
+
+msgid "All"
+msgstr "Tout"
 
 msgid "View"
 msgstr "Visualiser"
+
+msgid "Yubikey"
+msgstr "Yubikey"
 
 msgid "Username"
 msgstr "Nom d'utilisateur"
@@ -1863,30 +1887,3 @@ msgstr "Paramètres de la newsletter"
 
 msgid "Link Migration"
 msgstr ""
-
-msgid "Link Check"
-msgstr ""
-
-#~ msgid "Supported Chatbots"
-#~ msgstr "Chatbots supportés"
-
-#~ msgid "Chatbot title"
-#~ msgstr "Titre du Chatbot"
-
-#~ msgid "Chatbot background color"
-#~ msgstr "Couleur de fond de Chatbot"
-
-#~ msgid "Hide chatbot for chosen roles"
-#~ msgstr "Cacher le Chatbot pour les rôles choisis"
-
-#~ msgid "Disable the chatbot"
-#~ msgstr "Désactiver le Chatbot"
-
-#~ msgid "Current Image"
-#~ msgstr "Aktuelles Bild"
-
-#~ msgid "Image Focus"
-#~ msgstr "Bild Fokus"
-
-#~ msgid "Signup"
-#~ msgstr "S'abonner"
