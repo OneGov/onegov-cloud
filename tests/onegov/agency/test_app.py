@@ -61,7 +61,7 @@ def test_app_custom(agency_app):
     assert as_text(get_global_tools(request)) == [
         {'Peter': ['User Profile', 'Logout']},
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
-                        'Settings', 'Users', 'Link Check', 'User groups',
+                        'Settings', 'Users', 'User groups', 'Link Check',
                         'Hidden contents']},
         {'Tickets': ['Open Tickets', 'Pending Tickets', 'Closed Tickets']}
     ]

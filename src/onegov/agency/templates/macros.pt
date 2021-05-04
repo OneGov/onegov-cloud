@@ -351,22 +351,16 @@
                 ${ticket.number}
             </td>
           </tal:block>
-
-
-
       </tr>
     </metal:tickets_table_row>
 
-    <metal:b define-macro="extra_usermanagement_fields" i18n:domain="onegov.agency">
+    <metal:b define-macro="extra_usergroup_fields" i18n:domain="onegov.agency">
         <div>
-            <dt i18n:translate>User Group</dt>
+            <dt i18n:translate>Agencies</dt>
             <dd>
-                <tal:block tal:condition="user.group">
-                    ✔︎ <span>${user.group.name}</span>
-                </tal:block>
-                <tal:block tal:condition="not user.group">
-                    ✘︎ <span i18n:translate>None</span>
-                </tal:block>
+                <ul tal:define="agencies python: sorted([r.agency.title for r in usergroup.role_mappings.all()])">
+                    <li tal:repeat="agency agencies">${agency}</li>
+                </ul>
             </dd>
         </div>
     </metal:b>

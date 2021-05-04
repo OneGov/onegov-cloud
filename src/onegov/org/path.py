@@ -65,6 +65,7 @@ from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import Auth, User, UserCollection
+from onegov.user import UserGroup, UserGroupCollection
 from uuid import UUID
 from webob import exc
 
@@ -97,6 +98,23 @@ def get_users(app, active=None, role=None, tag=None, provider=None,
         app.session(),
         active=active, role=role, tag=tag, provider=provider, source=source
     )
+
+
+@OrgApp.path(
+    model=UserGroup,
+    path='/user-groups/{id}',
+    converters=dict(id=UUID)
+)
+def get_user_group(app, id):
+    return UserGroupCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=UserGroupCollection,
+    path='/usergroups',
+)
+def get_user_groups(app):
+    return UserGroupCollection(app.session())
 
 
 @OrgApp.path(model=Topic, path='/topics', absorb=True)

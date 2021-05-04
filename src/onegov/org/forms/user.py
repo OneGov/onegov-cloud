@@ -1,12 +1,17 @@
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.form import Form, merge_forms
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
+from onegov.user import User
 from onegov.user import UserCollection
-from wtforms import BooleanField, RadioField, validators, \
-    StringField
+from wtforms import BooleanField
+from wtforms import RadioField
+from wtforms import StringField
+from wtforms import validators
 from wtforms.fields.html5 import EmailField
+from wtforms.validators import InputRequired
 
 
 AVAILABLE_ROLES = [
@@ -129,3 +134,44 @@ class PartialNewUserForm(Form):
 
 
 NewUserForm = merge_forms(PartialNewUserForm, ManageUserForm)
+
+
+class ManageUserGroupForm(Form):
+
+    name = StringField(
+        label=_('Name'),
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    users = ChosenSelectMultipleField(
+        label=_('Users'),
+        choices=[]
+    )
+
+    def on_request(self):
+        self.users.choices = [
+            (str(u.id), u.title)
+            for u in UserCollection(self.request.session).query()
+        ]
+
+    def update_model(self, model):
+        # Logout the new and old users
+        user_ids = {str(r.id) for r in model.users.with_entities(User.id)}
+        user_ids |= set(self.users.data)
+        users = UserCollection(self.request.session).query()
+        users = users.filter(User.id.in_(user_ids)).all()
+        for user in users:
+            if user != self.request.current_user:
+                user.logout_all_sessions(self.request)
+
+        # Update model
+        users = UserCollection(self.request.session).query()
+        users = users.filter(User.id.in_(self.users.data)).all()
+        model.name = self.name.data
+        model.users = users
+
+    def apply_model(self, model):
+        self.name.data = model.name
+        self.users.data = [str(u.id) for u in model.users]

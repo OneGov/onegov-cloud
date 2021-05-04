@@ -5,13 +5,9 @@ from onegov.agency.layout import AgencyLayout
 from onegov.agency.layout import ExtendedPersonCollectionLayout
 from onegov.agency.layout import ExtendedPersonLayout
 from onegov.agency.layout import MembershipLayout
-from onegov.agency.layout import UserGroupCollectionLayout
-from onegov.agency.layout import UserGroupLayout
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.people import AgencyMembership
-from onegov.user import UserGroup
-from onegov.user import UserGroupCollection
 
 
 class DummyOrg(object):
@@ -191,37 +187,3 @@ def test_extended_person_layout():
     child = ExtendedAgency('Child', parent=root)
     assert layout.agency_path(root) == 'Root'
     assert layout.agency_path(child) == 'Root > Child'
-
-
-def test_user_group_collection_layout():
-    request = DummyRequest()
-    model = UserGroupCollection(None)
-
-    layout = UserGroupCollectionLayout(model, request)
-    assert layout.editbar_links is None
-    assert path(layout.breadcrumbs) == 'DummyOrg/UserGroupCollection'
-
-    # Login as admin
-    request.is_admin = True
-    layout = UserGroupCollectionLayout(model, request)
-    assert list(hrefs(layout.editbar_links)) == [
-        'UserGroupCollection/new'
-    ]
-
-
-def test_user_group_layout():
-    request = DummyRequest()
-    model = UserGroup()
-
-    layout = UserGroupLayout(model, request)
-    assert isinstance(layout.collection, UserGroupCollection)
-    assert layout.editbar_links is None
-    assert path(layout.breadcrumbs) == 'DummyOrg/UserGroupCollection/UserGroup'
-
-    # Login as admin
-    request.is_admin = True
-    layout = UserGroupLayout(model, request)
-    assert list(hrefs(layout.editbar_links)) == [
-        'UserGroup/edit',
-        'UserGroup/?csrf-token=x',
-    ]

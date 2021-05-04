@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-26 16:19+0200\n"
+"POT-Creation-Date: 2021-04-30 10:55+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -83,6 +83,9 @@ msgstr "Einstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "User groups"
+msgstr "Benutzergruppen"
 
 msgid "Link Check"
 msgstr ""
@@ -1598,6 +1601,15 @@ msgstr "Neuer Registrationslink"
 
 msgid "User"
 msgstr "Benutzer"
+
+msgid "User group"
+msgstr "Benutzergruppe"
+
+msgid "Do you really want to delete this user group?"
+msgstr "Möchten Sie diese Benutzergruppe wirklich löschen"
+
+msgid "Delete user group"
+msgstr "Benutzergruppe löschen"
 
 msgid "Exports"
 msgstr "Exporte"
@@ -4317,6 +4329,15 @@ msgstr "Alle Tickets"
 
 msgid "All Users"
 msgstr "Alle Benutzer"
+
+msgid "Added a new user group"
+msgstr "Benutzergruppe hinzugefügt"
+
+msgid "New user group"
+msgstr "Neue Benutzergruppe"
+
+msgid "Edit user group"
+msgstr "Benutzergruppe bearbeiten"
 
 msgid "User Management"
 msgstr "Benutzerverwaltung"

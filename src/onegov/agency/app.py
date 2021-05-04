@@ -1,5 +1,6 @@
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
+from onegov.agency.forms import UserGroupForm
 from onegov.agency.initial_content import create_new_organisation
 from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs
 from onegov.agency.pdf import AgencyPdfDefault
@@ -103,6 +104,11 @@ def get_template_variables(request):
 @AgencyApp.setting(section='core', name='theme')
 def get_theme():
     return AgencyTheme()
+
+
+@AgencyApp.setting(section='org', name='usergroup_form_class')
+def get_usergroup_form_class():
+    return UserGroupForm
 
 
 @AgencyApp.setting(section='i18n', name='localedirs')

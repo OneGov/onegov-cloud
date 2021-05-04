@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-27 12:37+0100\n"
+"POT-Creation-Date: 2021-04-30 10:48+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,9 +12,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.4.2\n"
-
-msgid "User groups"
-msgstr "Benutzergruppen"
 
 msgid "Hidden contents"
 msgstr "Versteckte Inhalte"
@@ -115,12 +112,6 @@ msgstr "E-Mail"
 msgid "Message"
 msgstr "Nachricht"
 
-msgid "Name"
-msgstr "Name"
-
-msgid "Users"
-msgstr "Benutzer"
-
 msgid "People with memberships can't be deleted"
 msgstr "Personen mit Mitgliedschaften können nicht gelöscht werden"
 
@@ -209,15 +200,6 @@ msgstr "Excel erstellen"
 
 msgid "Member"
 msgstr "Mitglied"
-
-msgid "User Group"
-msgstr "Benutzergruppe"
-
-msgid "Do you really want to delete this user group?"
-msgstr "Möchten Sie diese Benutzergruppe wirklich löschen"
-
-msgid "Delete user group"
-msgstr "Benutzergruppe löschen"
 
 msgid "Mutation"
 msgstr "Mutation"
@@ -309,6 +291,9 @@ msgstr "In Bearbeitung"
 msgid "Closed"
 msgstr "Abgeschlossen"
 
+msgid "User Group"
+msgstr "Benutzergruppe"
+
 msgid "None"
 msgstr "Keine"
 
@@ -321,6 +306,9 @@ msgid ""
 msgstr ""
 "Sortieren sie die Hauptorganisationen per Drag & Drop. Um "
 "Unterorganisationen zu sortieren, klicken sie auf eine Hauptorganisation."
+
+msgid "Users"
+msgstr "Benutzer"
 
 msgid "All"
 msgstr "Alle"
@@ -452,15 +440,3 @@ msgstr "Daten"
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
-
-msgid "User Groups"
-msgstr "Benutzergruppen"
-
-msgid "Added a new user group"
-msgstr "Eine neue Benutzergruppe wurde hinzugefügt"
-
-msgid "New user group"
-msgstr "Neue Benutzergruppe"
-
-msgid "Edit user group"
-msgstr "Benutzergruppe bearbeiten"

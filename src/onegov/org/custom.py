@@ -5,7 +5,7 @@ from onegov.org.models import GeneralFileCollection, ImageFileCollection, \
     Organisation
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
-from onegov.user import Auth, UserCollection
+from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
 
 
@@ -38,6 +38,7 @@ def get_global_tools(request):
                 ), attrs={'class': 'logout'}
             ),
         ))
+
     else:
         yield Link(
             _("Login"), request.link(
@@ -108,6 +109,14 @@ def get_global_tools(request):
                     attrs={'class': 'user'}
                 )
             )
+
+            links.append(
+                Link(
+                    _('User groups'), request.class_link(UserGroupCollection),
+                    attrs={'class': 'users'}
+                )
+            )
+
             links.append(
                 Link(
                     _("Link Check"),

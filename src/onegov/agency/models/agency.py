@@ -46,6 +46,8 @@ class ExtendedAgency(Agency, AccessExtension):
             "RoleMapping.content_type == 'agencies'"
             ")"
         ),
+        backref='agency',
+        sync_backref=False,
         viewonly=True,
         lazy='dynamic'
     )

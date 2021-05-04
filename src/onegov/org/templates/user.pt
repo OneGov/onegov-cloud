@@ -40,6 +40,18 @@
                 </dd>
             </div>
 
+            <div>
+                <dt i18n:translate>User Group</dt>
+                <dd>
+                    <tal:block tal:condition="layout.model.group">
+                        ✔︎ <span>${layout.model.group.name}</span>
+                    </tal:block>
+                    <tal:block tal:condition="not layout.model.group">
+                        ✘︎ <span i18n:translate>None</span>
+                    </tal:block>
+                </dd>
+            </div>
+
             <metal:b use-macro="layout.macros['extra_usermanagement_fields']" tal:define="user layout.model" />
 
             <hr tal:condition="linkgroups">

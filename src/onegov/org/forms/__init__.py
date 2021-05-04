@@ -32,7 +32,9 @@ from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.ticket import TicketNoteForm
 from onegov.org.forms.ticket import TicketChatMessageForm
 from onegov.org.forms.ticket import InternalTicketChatMessageForm
-from onegov.org.forms.user import ManageUserForm, NewUserForm
+from onegov.org.forms.user import ManageUserForm
+from onegov.org.forms.user import NewUserForm
+from onegov.org.forms.user import ManageUserGroupForm
 from onegov.org.forms.userprofile import UserProfileForm
 
 
@@ -57,6 +59,7 @@ __all__ = [
     'InternalTicketChatMessageForm',
     'LinkForm',
     'ManageUserForm',
+    'ManageUserGroupForm',
     'MapSettingsForm',
     'ModuleSettingsForm',
     'NewsletterForm',

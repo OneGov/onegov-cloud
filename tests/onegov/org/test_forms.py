@@ -9,9 +9,13 @@ from onegov.org.forms import (
     EventForm,
     RoomAllocationEditForm,
     RoomAllocationForm, FormRegistrationWindowForm,
+    ManageUserGroupForm,
 )
 from onegov.org.forms.allocation import AllocationFormHelpers
 from webob.multidict import MultiDict
+from unittest.mock import MagicMock
+from onegov.user import UserCollection
+from onegov.user import UserGroupCollection
 
 
 @pytest.mark.parametrize('form_class', [
@@ -430,3 +434,56 @@ def test_form_registration_window_form(end):
 
     assert not form.validate()
     assert form.errors == {'end': ['Please use a stop date after the start']}
+
+
+def test_user_group_form(session):
+    users = UserCollection(session)
+    user_a = users.add(username='a@example.org', password='a', role='member')
+    user_b = users.add(username='b@example.org', password='b', role='member')
+    user_c = users.add(username='c@example.org', password='c', role='member')
+    user_a.logout_all_sessions = MagicMock()
+    user_b.logout_all_sessions = MagicMock()
+    user_c.logout_all_sessions = MagicMock()
+
+    # request = DummyRequest(session)
+    request = Bunch(session=session, current_user=None)
+    form = ManageUserGroupForm()
+    form.request = request
+    form.on_request()
+
+    # choices
+    assert sorted([x[1] for x in form.users.choices]) == [
+        'a@example.org', 'b@example.org', 'c@example.org',
+    ]
+
+    # apply / update
+    groups = UserGroupCollection(session)
+    group = groups.add(name='A')
+
+    form.apply_model(group)
+    assert form.name.data == 'A'
+    assert form.users.data == []
+
+    form.name.data = 'A/B'
+    form.users.data = [str(user_a.id), str(user_b.id)]
+    form.update_model(group)
+    assert group.users.count() == 2
+    assert user_a.logout_all_sessions.called is True
+    assert user_b.logout_all_sessions.called is True
+    assert user_c.logout_all_sessions.called is False
+
+    form.apply_model(group)
+    assert form.name.data == 'A/B'
+    assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
+
+    user_a.logout_all_sessions.reset_mock()
+    user_b.logout_all_sessions.reset_mock()
+    user_c.logout_all_sessions.reset_mock()
+
+    form.name.data = 'A.1'
+    form.users.data = [str(user_c.id)]
+    form.update_model(group)
+    assert group.users.one() == user_c
+    assert user_a.logout_all_sessions.called is True
+    assert user_b.logout_all_sessions.called is True
+    assert user_c.logout_all_sessions.called is True

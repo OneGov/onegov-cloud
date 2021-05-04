@@ -102,7 +102,7 @@ def test_add_new_user_without_activation_email(client):
 
     client.app.enable_yubikey = True
 
-    new = client.get('/usermanagement').click('Benutzer', index=2)
+    new = client.get('/usermanagement').click('Benutzer', href='new')
     new.form['username'] = 'admin@example.org'
 
     assert "existiert bereits" in new.form.submit()
@@ -130,7 +130,7 @@ def test_add_new_user_with_activation_email(client):
 
     client.app.enable_yubikey = False
 
-    new = client.get('/usermanagement').click('Benutzer', index=2)
+    new = client.get('/usermanagement').click('Benutzer', href='new')
     new.form['username'] = 'member@example.org'
     new.form['role'] = 'member'
     new.form['send_activation_email'] = True
@@ -159,7 +159,7 @@ def test_edit_user_settings(client):
 
     client.app.enable_yubikey = False
 
-    new = client.get('/usermanagement').click('Benutzer', index=2)
+    new = client.get('/usermanagement').click('Benutzer', href='new')
     new.form['username'] = 'new@example.org'
     new.form['role'] = 'member'
     new.form.submit()

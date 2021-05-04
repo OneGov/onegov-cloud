@@ -1,46 +1,51 @@
 from morepath import redirect
-from onegov.agency import _
-from onegov.agency import AgencyApp
-from onegov.agency.forms import UserGroupForm
-from onegov.agency.layout import UserGroupCollectionLayout
-from onegov.agency.layout import UserGroupLayout
-from onegov.agency.models import ExtendedAgency
+from onegov.org import _
+from onegov.org import OrgApp
+from onegov.org.forms import ManageUserGroupForm
+from onegov.org.layout import UserGroupCollectionLayout
+from onegov.org.layout import UserGroupLayout
 from onegov.core.elements import Link
 from onegov.core.security import Secret
 from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 
 
-@AgencyApp.html(
+def get_usergroup_form_class(model, request):
+    return getattr(
+        request.app.settings.org, 'usergroup_form_class', ManageUserGroupForm
+    )
+
+
+@OrgApp.html(
     model=UserGroupCollection,
     template='user_groups.pt',
     permission=Secret
 )
-def view_user_groups(self, request):
-    layout = UserGroupCollectionLayout(self, request)
+def view_user_groups(self, request, layout=None):
+    layout = layout or UserGroupCollectionLayout(self, request)
 
     return {
         'layout': layout,
-        'title': _('User Groups'),
+        'title': _('User groups'),
         'groups': self.query().all()
     }
 
 
-@AgencyApp.form(
+@OrgApp.form(
     model=UserGroupCollection,
     name='new',
     template='form.pt',
     permission=Secret,
-    form=UserGroupForm
+    form=get_usergroup_form_class
 )
-def add_user_group(self, request, form):
+def add_user_group(self, request, form, layout=None):
     if form.submitted(request):
         user_group = self.add(name=form.name.data)
         form.update_model(user_group)
         request.success(_('Added a new user group'))
         return redirect(request.link(user_group))
 
-    layout = UserGroupCollectionLayout(self, request)
+    layout = layout or UserGroupCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New user group'), '#'))
 
     return {
@@ -50,36 +55,28 @@ def add_user_group(self, request, form):
     }
 
 
-@AgencyApp.html(
+@OrgApp.html(
     model=UserGroup,
     template='user_group.pt',
     permission=Secret
 )
-def view_user_group(self, request):
-    layout = UserGroupLayout(self, request)
-    agencies = [
-        agency.title for agency in request.session.query(
-            ExtendedAgency.title
-        ).filter(
-            ExtendedAgency.id.in_([m.content_id for m in self.role_mappings])
-        )
-    ]
+def view_user_group(self, request, layout=None):
+    layout = layout or UserGroupLayout(self, request)
 
     return {
         'layout': layout,
         'title': self.name,
-        'agencies': agencies
     }
 
 
-@AgencyApp.form(
+@OrgApp.form(
     model=UserGroup,
     name='edit',
     template='form.pt',
     permission=Secret,
-    form=UserGroupForm
+    form=get_usergroup_form_class
 )
-def edit_user_group(self, request, form):
+def edit_user_group(self, request, form, layout=None):
     if form.submitted(request):
         form.update_model(self)
         request.success(_('Your changes were saved'))
@@ -88,7 +85,7 @@ def edit_user_group(self, request, form):
     if not form.errors:
         form.apply_model(self)
 
-    layout = UserGroupLayout(self, request)
+    layout = layout or UserGroupLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit user group'), '#'))
 
     return {
@@ -98,7 +95,7 @@ def edit_user_group(self, request, form):
     }
 
 
-@AgencyApp.view(
+@OrgApp.view(
     model=UserGroup,
     request_method='DELETE',
     permission=Secret

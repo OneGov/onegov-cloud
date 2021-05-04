@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-04-26 16:19+0200\n"
-"PO-Revision-Date: 2021-01-14 14:29+0100\n"
+"POT-Creation-Date: 2021-04-30 10:55+0200\n"
+"PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 2.4.3\n"
 
 msgid "Open"
 msgstr "Ouvert"
@@ -84,6 +84,9 @@ msgstr "Paramètres"
 
 msgid "Users"
 msgstr "Utilisateurs"
+
+msgid "User groups"
+msgstr "Groupes d'utilisateurs"
 
 msgid "Link Check"
 msgstr ""
@@ -1603,6 +1606,15 @@ msgstr "Créez un lien d'inscription"
 
 msgid "User"
 msgstr "Utilisateur"
+
+msgid "User group"
+msgstr "Groupe d'utilisateurs"
+
+msgid "Do you really want to delete this user group?"
+msgstr "Voulez-vous vraiment supprimer ce groupe d'utilisateurs ?"
+
+msgid "Delete user group"
+msgstr "Supprimer le groupe d'utilisateurs"
 
 msgid "Exports"
 msgstr "Exports"
@@ -4338,6 +4350,15 @@ msgstr "Tous les tickets"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"
+
+msgid "Added a new user group"
+msgstr ""
+
+msgid "New user group"
+msgstr "Nouveau groupe d'utilisateurs"
+
+msgid "Edit user group"
+msgstr "Modifier le groupe d'utilisateurs"
 
 msgid "User Management"
 msgstr "Gestion des utilisateurs"
