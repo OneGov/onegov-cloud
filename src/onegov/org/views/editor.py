@@ -122,6 +122,13 @@ def handle_change_page_url(self, request, form, layout=None):
         if not form.test.data:
             request.app.get_cache('pages', 100).invalidate()
             request.success(_("Your changes were saved"))
+
+            @request.after
+            def must_revalidate(response):
+                response.headers.add('cache-control', 'must-revalidate')
+                response.headers.add('cache-control', 'max-age=0, public')
+                response.headers['expires'] = '0'
+
             return morepath.redirect(request.link(self.page))
 
         messages.append(

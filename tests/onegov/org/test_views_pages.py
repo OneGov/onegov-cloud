@@ -9,7 +9,6 @@ def check_breadcrumbs(page, excluded):
     breadcrumbs = page.pyquery('ul.breadcrumbs a')
     for b in breadcrumbs:
         url = b.attrib['href']
-        print(url)
         assert excluded not in url, f'{excluded} still in {url}'
 
 
@@ -18,7 +17,6 @@ def check_navlinks(page, excluded):
     nav_links = page.pyquery('ul.side-nav a')
     for link in nav_links:
         url = link.attrib['href']
-        print(url)
         assert excluded not in url, f'{excluded} still in {url}'
 
 
