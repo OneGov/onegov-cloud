@@ -117,7 +117,8 @@ def handle_defined_form(self, request, form, layout=None):
         'contact': self.contact_html,
         'coordinates': self.coordinates,
         'hints': tuple(get_hints(layout, self.current_registration_window)),
-        'hints_callout': not enabled
+        'hints_callout': not enabled,
+        'button_text': _('Continue')
     }
 
 
