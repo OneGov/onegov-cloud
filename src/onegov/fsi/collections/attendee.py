@@ -43,7 +43,7 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         """
         return all((
             self.page == other.page,
-            self.external_only == other.exclude_external,
+            self.exclude_external == other.exclude_external,
             self.external_only == other.external_only))
 
     @property
