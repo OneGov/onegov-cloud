@@ -479,6 +479,7 @@ def handle_submit_directory_entry(self, request, form, layout=None):
         'layout': layout,
         'title': title,
         'guideline': self.directory.submissions_guideline,
+        'button_text': _('Continue')
     }
 
 
@@ -540,6 +541,7 @@ def handle_change_request(self, request, form, layout=None):
             "leaving the other fields intact. Then submit your request."
         ),
         'guideline': self.directory.change_requests_guideline,
+        'button_text': _('Continue')
     }
 
 
