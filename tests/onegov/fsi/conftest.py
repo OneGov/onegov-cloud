@@ -256,7 +256,7 @@ class FsiScenario(BaseScenario):
         if '.' in fn:
             fn, ln = fn.split('.')
 
-        exclude = ('organisation', 'permissions')
+        exclude = ('organisation', 'permissions', 'id')
 
         if not external:
             if not columns.get('user_id'):
@@ -274,7 +274,7 @@ class FsiScenario(BaseScenario):
 
         self.attendees.append(self.add(
             model=CourseAttendee,
-            id=uuid4(),
+            id=columns.get('id', uuid4()),
             user_id=columns.get('user_id'),
             source_id=columns.get('source_id'),
             first_name=fn,
