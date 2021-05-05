@@ -7,14 +7,7 @@ from onegov.fsi.models.course_notification_template import get_template_default
 from onegov.fsi.models.course_subscription import CourseSubscription
 
 
-def test_attendee_as_external(session, external_attendee):
-    external, data = external_attendee(session)
-    # Test the backrefs and how they work
-    assert external.user_id is None
-    assert external.user is None
-
-
-def test_attendee_1(
+def test_attendee(
         session, attendee, future_course_event, member, course_event):
     # past_event = course_event(session)
     course_event = future_course_event(session)
