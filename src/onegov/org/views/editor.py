@@ -120,7 +120,9 @@ def handle_change_page_url(self, request, form, layout=None):
         migration = PageNameChange.from_form(self.page, form)
         link_count = migration.execute(test=form.test.data)
         if not form.test.data:
-            request.app.get_cache('pages', 100).invalidate()
+            request.app.cache.delete(
+                f'{request.app.application_id}.root_pages'
+            )
             request.success(_("Your changes were saved"))
 
             @request.after

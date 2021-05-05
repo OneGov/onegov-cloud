@@ -1,7 +1,6 @@
 from freezegun import freeze_time
 
 from tests.onegov.org.common import edit_bar_links
-from tests.shared.utils import open_in_browser
 
 
 def check_breadcrumbs(page, excluded):
@@ -45,7 +44,6 @@ def test_pages_cache(client):
     url_page.form['name'] = new_name
     url_page.form['test'] = True
     url_page = url_page.form.submit()
-    open_in_browser(url_page)
     assert 'Insgesamt 0 Unterseiten sind betroffen' in url_page
     assert '0 Links' in url_page
 
