@@ -251,6 +251,7 @@ class FsiScenario(BaseScenario):
         assert 'first_name' not in columns, 'Provide email to construct'
         assert 'last_name' not in columns, 'Provide email to construct'
         columns.setdefault('username', self.faker.email())
+        columns.setdefault('active', True)
 
         fn, ln = columns['username'].split('@')
         if '.' in fn:
@@ -276,6 +277,7 @@ class FsiScenario(BaseScenario):
             model=CourseAttendee,
             id=columns.get('id', uuid4()),
             user_id=columns.get('user_id'),
+            active=columns.get('active'),
             source_id=columns.get('source_id'),
             first_name=fn,
             last_name=ln,
