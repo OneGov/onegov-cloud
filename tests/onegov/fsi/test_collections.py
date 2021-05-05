@@ -81,22 +81,21 @@ def test_course_event_collection(session, scenario):
     assert event_coll.query().count() == 1
 
 
-def test_event_collection_add_placeholder(session, course_event):
+def test_event_collection_add_placeholder(scenario):
     # Test add_placeholder method
-    course_event, data = course_event(session)
-    # event_coll.add_placeholder('Placeholder', course_event)
-    # Tests the secondary join event.attendees as well
-    assert course_event.attendees.count() == 0
-    # assert course_event.subscriptions.count() == 1
+    scenario.add_course()
+    scenario.add_course_event(course=scenario.latest_course)
+    assert scenario.latest_event.attendees.count() == 0
 
 
-def test_attendee_collection(
-        session, attendee, external_attendee, editor_attendee, scenario):
+def test_attendee_collection(scenario):
 
-    att, data = attendee(session)
-    att_with_org, data = attendee(
-        session, organisation='A', first_name='A', last_name='A')
-    external, data = external_attendee(session)
+    scenario.add_attendee()
+    scenario.add_attendee(organisation='A', username='A@A.com')
+    scenario.add_attendee(external=True)
+    scenario.add_attendee(active=False, username='inactive@example.org')
+
+    session = scenario.session
 
     auth_admin = authAttendee(role='admin')
 
@@ -125,33 +124,36 @@ def test_attendee_collection(
     # Get all of them, but himself does not exist
     assert coll.query().count() == 0
 
-    # make the editor exist, and test if he gets himself
-    editor, data = editor_attendee(session, id=auth_editor.id)
+    # create and attendee with an editor as user
+    scenario.add_attendee(role='editor', id=auth_editor.id)
     assert coll.query().count() == 1
 
     # check if he can see attendee with organisation
+    editor = scenario.latest_attendee
     editor.permissions = ['A']
     coll = CourseAttendeeCollection(session, auth_attendee=editor)
     assert coll.attendee_permissions == ['A']
     assert coll.query().count() == 2
 
 
-def test_reservation_collection_query(
-        session, attendee, admin_attendee, editor_attendee, course_event,
-        future_course_reservation, external_attendee):
+def test_reservation_collection_query(scenario):
+    session = scenario.session
+    scenario.add_attendee(role='admin')
 
-    admin, data = admin_attendee(session)
-    editor, data = editor_attendee(session)
-    att, data = attendee(session)
-    external, data = external_attendee(session)
-    event, data = course_event(session)
-    future_course_reservation(
-        session, course_event_id=event.id, attendee_id=att.id)
+    scenario.add_course()
+    scenario.add_course_event(course=scenario.latest_course)
 
-    future_course_reservation(session, attendee_id=editor.id)
+    scenario.add_attendee(role='member')
+    att = scenario.latest_attendee
+    scenario.add_subscription(scenario.latest_event, att)
 
-    future_course_reservation(
-        session, course_event_id=event.id, attendee_id=external.id)
+    scenario.add_attendee(role='editor')
+    editor = scenario.latest_attendee
+    scenario.add_subscription(scenario.latest_event, editor)
+
+    scenario.add_attendee(external=True)
+    scenario.add_subscription(scenario.latest_event, scenario.latest_attendee)
+    scenario.commit()
 
     auth_attendee = authAttendee()
 
@@ -170,18 +172,18 @@ def test_reservation_collection_query(
     coll = SubscriptionsCollection(
         session,
         auth_attendee=auth_attendee,
-        course_event_id=event.id)
-    assert coll.query().count() == 2
+        course_event_id=scenario.latest_event.id)
+    assert coll.query().count() == 3
 
     # Test for editor with no permissions should see just his own
     auth_attendee = authAttendee(role='editor', id=editor.id)
     coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 1
 
-    # Add a the same organisation and get one entry more
+    # Add an organisation
     att.organisation = 'A'
     coll.auth_attendee.permissions = ['A']
-    assert coll.query().count() == 2
+    assert coll.query().count() == 1
 
     # Test editor wants to get his own
     coll = SubscriptionsCollection(
