@@ -447,7 +447,8 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
 @cli.command(name='import-reservations', context_settings={'singular': True})
 @click.option('--dsn', required=True, help="DSN to the source database")
 @click.option('--map', required=True, help="CSV map between resources")
-def import_reservations(dsn, map):
+@click.option('--start-date', help="Only import entries after (Y-M-D)")
+def import_reservations(dsn, map, start_date):
     """ Imports reservations from a legacy seantis.reservation system.
 
     WARNING: Existing reservations and all associated tickets/submissions
