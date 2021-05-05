@@ -467,16 +467,10 @@ def test_user_group_form(session):
     assert sorted([x[1] for x in form.users.choices]) == [
         'a@example.org', 'b@example.org', 'c@example.org',
     ]
-    assert form.ticket_permissions.choices == [
-        ('AGN-', 'AGN'),
-        ('DIR-', 'DIR'),
-        ('EVN-', 'EVN'),
-        ('FER-', 'FER'),
-        ('FRM-', 'FRM'),
-        ('FRM-ABC', 'FRM: ABC'),
-        ('PER-', 'PER'),
-        ('RSV-', 'RSV')
-    ]
+    assert ('EVN-', 'EVN') in form.ticket_permissions.choices
+    assert ('FRM-', 'FRM') in form.ticket_permissions.choices
+    assert ('FRM-A', 'FRM: A') in form.ticket_permissions.choices
+    assert ('PER-', 'PER') in form.ticket_permissions.choices
 
     # apply / update
     groups = UserGroupCollection(session)
