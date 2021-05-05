@@ -353,7 +353,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
 
         if not user.attendee:
             is_editor = user.role == 'editor'
-            permissions = is_editor and external_attendee_org or None
+            permissions = is_editor and [external_attendee_org] or None
             user.attendee = CourseAttendee(permissions=permissions)
 
         user.attendee.first_name = data['first_name']
