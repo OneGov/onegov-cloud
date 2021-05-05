@@ -149,7 +149,8 @@ def handle_new_event(self, request, form, layout=None):
         'title': self.title,
         'form': form,
         'form_width': 'large',
-        'lead': terms
+        'lead': terms,
+        'button_text': _('Continue')
     }
 
 
