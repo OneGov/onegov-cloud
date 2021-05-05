@@ -22,25 +22,26 @@ class authAttendee:
         self.permissions = permissions or []
 
 
-def test_course_collection_1(session, course):
-    course(session, hidden_from_public=True, name='Hidden')
-    course1, data = course(session)
-    coll = CourseCollection(session)
+def test_course_collection(scenario):
+    scenario.add_course(hidden_from_public=True, name='Hidden')
+    scenario.add_course()
+    course1 = scenario.latest_course
+    coll = CourseCollection(scenario.session)
     # collection defaults to not return the hidden_from_public one's
     assert coll.query().count() == 1
     course1.hidden_from_public = True
-    session.flush()
     assert coll.by_id(course1.id) is not None
     assert coll.query().count() == 0
     coll.show_hidden_from_public = True
     assert coll.query().count() == 2
 
 
-def test_course_event_collection(session, course):
+def test_course_event_collection(session, scenario):
     now = utcnow()
+    course_id = scenario.add_course()
     new_course_events = (
         CourseEvent(
-            course_id=course(session)[0].id,
+            course_id=course_id,
             location=f'Address, Room {i}',
             start=now + timedelta(days=i),
             end=now + timedelta(days=i, hours=2),
@@ -90,7 +91,7 @@ def test_event_collection_add_placeholder(session, course_event):
 
 
 def test_attendee_collection(
-        session, attendee, external_attendee, editor_attendee):
+        session, attendee, external_attendee, editor_attendee, scenario):
 
     att, data = attendee(session)
     att_with_org, data = attendee(
