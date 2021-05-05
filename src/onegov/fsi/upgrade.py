@@ -162,3 +162,13 @@ def append_org_to_external_attendee(context):
                 AND NOT a.permissions @> ARRAY ['{external_attendee_org}']
             );
     """))
+
+
+@upgrade_task('Adds active property to attendees')
+def add_active_property_to_attendees(context):
+    if not context.has_column('fsi_attendees', 'active'):
+        context.add_column_with_defaults(
+            'fsi_attendees',
+            Column('active', Boolean, nullable=False, default=True),
+            default=lambda x: True
+        )
