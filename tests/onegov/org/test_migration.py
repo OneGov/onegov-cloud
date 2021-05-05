@@ -6,8 +6,8 @@ from onegov.org.management import PageNameChange
 from onegov.page import PageCollection
 
 
-def test_page_name_change(client):
-    session = client.app.session()
+def test_page_name_change(org_app):
+    session = org_app.session()
 
     def link(model):
         uri = "/".join(a.name for a in model.ancestors) + f'/{model.name}'
@@ -56,12 +56,12 @@ def test_page_name_change(client):
     )
     dir_id = directory.id
     transaction.commit()
-    request = Bunch(session=client.app.session(), link=link)
+    request = Bunch(session=org_app.session(), link=link)
     pages = PageCollection(request.session)
     directories = DirectoryCollection(request.session)
     page = pages.by_id(page_id)
 
-    migration = PageNameChange(request, page, 'c')
+    migration = PageNameChange(request, page, new_name='c')
     count = migration.execute()
     sublink = pages.by_id(sublink_id)
     subpage = pages.by_id(subpage_id)
