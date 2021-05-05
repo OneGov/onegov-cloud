@@ -592,12 +592,12 @@ def test_view_user_groups(client):
     assert 'editor@example.org' in page
     assert 'Bundesbehörden' in page
 
-    page = client.get('/usermanagement').click('Anzeigen', index=1)
+    page = client.get('/usermanagement').click('Ansicht', index=1)
     assert 'editor@example.org' in page
     assert 'Gruppe BB' in page
 
     # modify
-    manage = client.get('/usergroups').click('Anzeigen').click('Bearbeiten')
+    manage = client.get('/usergroups').click('Ansicht').click('Bearbeiten')
     manage.form['name'] = 'Gruppe KR'
     manage.form['users'].select_multiple(texts=['admin@example.org'])
     manage.form['agencies'].select_multiple(texts=['Kantonsrat'])
@@ -608,16 +608,16 @@ def test_view_user_groups(client):
     assert 'Kantonsrat' in page
     assert 'Bundesbehörden' not in page
 
-    page = client.get('/usermanagement').click('Anzeigen', index=0)
+    page = client.get('/usermanagement').click('Ansicht', index=0)
     assert 'admin@example.org' in page
     assert 'Gruppe BB' not in page
     assert 'Gruppe KR' in page
 
-    page = client.get('/usermanagement').click('Anzeigen', index=1)
+    page = client.get('/usermanagement').click('Ansicht', index=1)
     assert 'editor@example.org' in page
     assert 'Gruppe BB' not in page
     assert 'Gruppe KR' not in page
 
     # delete
-    client.get('/usergroups').click('Anzeigen').click('Löschen')
+    client.get('/usergroups').click('Ansicht').click('Löschen')
     assert 'Alle (0)' in client.get('/usergroups')

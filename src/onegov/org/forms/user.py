@@ -1,9 +1,12 @@
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.form import Form, merge_forms
+from onegov.form import FormDefinition
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
+from onegov.ticket import handlers
+from onegov.ticket import TicketPermission
 from onegov.user import User
 from onegov.user import UserCollection
 from wtforms import BooleanField
@@ -150,28 +153,61 @@ class ManageUserGroupForm(Form):
         choices=[]
     )
 
+    ticket_permissions = ChosenSelectMultipleField(
+        label=_('Ticket permissions'),
+        description=_(
+            'Restricts access and gives permission to these ticket categories'
+        ),
+        choices=[],
+    )
+
     def on_request(self):
         self.users.choices = [
             (str(u.id), u.title)
             for u in UserCollection(self.request.session).query()
         ]
+        ticket_choices = [(f'{key}-', key) for key in handlers.registry.keys()]
+        ticket_choices.extend([
+            (f'FRM-{form.title}', f'FRM: {form.title}')
+            for form in self.request.session.query(FormDefinition)
+        ])
+        self.ticket_permissions.choices = sorted(ticket_choices)
 
     def update_model(self, model):
+        session = self.request.session
+
         # Logout the new and old users
         user_ids = {str(r.id) for r in model.users.with_entities(User.id)}
         user_ids |= set(self.users.data)
-        users = UserCollection(self.request.session).query()
+        users = UserCollection(session).query()
         users = users.filter(User.id.in_(user_ids)).all()
         for user in users:
             if user != self.request.current_user:
                 user.logout_all_sessions(self.request)
 
         # Update model
-        users = UserCollection(self.request.session).query()
+        users = UserCollection(session).query()
         users = users.filter(User.id.in_(self.users.data)).all()
         model.name = self.name.data
         model.users = users
 
+        # Update ticket permissions
+        for permission in model.ticket_permissions:
+            session.delete(permission)
+        for permission in self.ticket_permissions.data:
+            handler_code, group = permission.split('-')
+            session.add(
+                TicketPermission(
+                    handler_code=handler_code,
+                    group=group or None,
+                    user_group=model
+                )
+            )
+
     def apply_model(self, model):
         self.name.data = model.name
         self.users.data = [str(u.id) for u in model.users]
+        self.ticket_permissions.data = [
+            f'{permission.handler_code}-{permission.group or ""}'
+            for permission in model.ticket_permissions
+        ]

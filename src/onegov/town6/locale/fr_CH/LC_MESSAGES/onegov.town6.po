@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-05-04 10:42+0200\n"
+"POT-Creation-Date: 2021-05-04 11:19+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1791,6 +1791,9 @@ msgstr "Sélectionnez un élément pour le visualiser"
 
 msgid "Users"
 msgstr "Utilisateurs"
+
+msgid "Ticket permissions"
+msgstr "Autorisation des tickets"
 
 msgid "All"
 msgstr "Tout"

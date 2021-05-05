@@ -19,13 +19,3 @@ def test_multi_checkbox_field():
     assert 'data-expand-title="Show all"' in field()
     assert 'data-fold-title="Show less"' in field()
     assert 'data-limit="5"' in field()
-
-    form = Form()
-    field = MultiCheckboxField(
-        choices=(('a', 'b'),),
-        render_kw={'disabled': True}
-    )
-    field = field.bind(form, 'choice')
-
-    field.data = ''
-    assert 'input disabled' in field()

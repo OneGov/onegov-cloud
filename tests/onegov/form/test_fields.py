@@ -52,6 +52,18 @@ def test_upload_file():
     assert dictionary_to_binary(data) == b'foobar'
 
 
+def test_multi_checkbox_field_disabled():
+    form = Form()
+    field = MultiCheckboxField(
+        choices=(('a', 'b'),),
+        render_kw={'disabled': True}
+    )
+    field = field.bind(form, 'choice')
+
+    field.data = ''
+    assert 'input disabled' in field()
+
+
 def test_ordered_multi_checkbox_field():
     ordinary = MultiCheckboxField(choices=[
         ('c', 'C'),

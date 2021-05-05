@@ -16,7 +16,6 @@ class MultiCheckboxField(MultiCheckboxFieldBase):
     """ A multi checkbox field where only the first elements are display and
     the the rest can be shown when needed.
 
-    Also, disables all the options if the whole field is disabled.
     """
 
     widget = MultiCheckboxWidget()
@@ -27,10 +26,3 @@ class MultiCheckboxField(MultiCheckboxFieldBase):
         kwargs['render_kw'] = render_kw
 
         super().__init__(*args, **kwargs)
-
-    def __iter__(self):
-        for opt in super(MultiCheckboxField, self).__iter__():
-            if 'disabled' in self.render_kw:
-                opt.render_kw = opt.render_kw or {}
-                opt.render_kw['disabled'] = self.render_kw['disabled']
-            yield opt

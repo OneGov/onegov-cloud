@@ -13,6 +13,17 @@
                 </dd>
             </div>
 
+            <div>
+                <dt i18n:translate>Ticket permissions</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="permission layout.model.ticket_permissions">
+                            ${permission.handler_code}<tal:block tal:condition="permission.group">: ${permission.group}</tal:block>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+
             <metal:b use-macro="layout.macros['extra_usergroup_fields']" tal:define="usergroup layout.model" />
         </dl>
     </tal:block>

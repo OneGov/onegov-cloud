@@ -3,8 +3,10 @@ import pytest
 from datetime import timedelta
 from freezegun import freeze_time
 from onegov.ticket import Ticket
+from onegov.ticket import TicketPermission
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
+from onegov.user import UserGroup
 from sedate import utcnow
 
 
@@ -217,3 +219,23 @@ def test_legacy_process_time(session):
         assert ticket.process_time is None
         assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow()
+
+
+def test_ticket_permission(session):
+    user_group = UserGroup(name='group')
+    permission = TicketPermission(
+        handler_code='PER', group=None, user_group=user_group
+    )
+    session.add(user_group)
+    session.add(permission)
+    session.flush()
+
+    user_group = session.query(UserGroup).one()
+    permission = session.query(TicketPermission).one()
+    assert permission.handler_code == 'PER'
+    assert permission.group is None
+    assert permission.user_group == user_group
+
+    session.delete(user_group)
+    session.flush()
+    assert session.query(TicketPermission).count() == 0

@@ -537,3 +537,44 @@ def test_ticket_chat(client):
     page = page.form.submit()
 
     assert "Ticket wurde bereits geschlossen" in page
+
+
+def test_disable_tickets(client):
+    client.login_admin()
+
+    # add form
+    manage = client.get('/forms/new')
+    manage.form['title'] = 'newsletter'
+    manage.form['definition'] = 'E-Mail *= @@@'
+    manage = manage.form.submit()
+
+    # add user group
+    manage = client.get('/usergroups/new')
+    manage.form['name'] = 'Group'
+    manage.form['users'].select_multiple(texts=['admin@example.org'])
+    manage.form['ticket_permissions'].select_multiple(texts=['FRM'])
+    manage = manage.form.submit()
+
+    client.logout()
+
+    # open a ticket
+    page = client.get('/form/newsletter')
+    page.form['e_mail'] = 'hans.maulwurf@simpson.com'
+    page = page.form.submit().follow().form.submit().follow()
+    ticket_number = page.pyquery('.ticket-number').text()
+    assert ticket_number.startswith('FRM-')
+
+    # check visibility
+    client.login_editor()
+    page = client.get('/tickets/ALL/open')
+    assert ticket_number in page
+    assert 'hans.maulwurf@simpson.com' not in page
+    assert 'Annehmen' not in page
+
+    client.logout()
+
+    client.login_admin()
+    page = client.get('/tickets/ALL/open')
+    assert ticket_number in page
+    assert 'hans.maulwurf@simpson.com' in page
+    assert 'hans.maulwurf@simpson.com' in page.click('Annehmen').follow()

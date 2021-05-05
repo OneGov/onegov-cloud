@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.core.request import CoreRequest
+from onegov.core.security import Private
 from onegov.user import User
 
 
@@ -13,6 +14,9 @@ class OrgRequest(CoreRequest):
         """
 
         return self.has_role('admin', 'editor')
+
+    def is_manager_for_model(self, model):
+        return self.has_permission(model, Private)
 
     @cached_property
     def is_admin(self):

@@ -15,6 +15,7 @@ from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.theme import user_options
+from onegov.ticket import TicketPermission
 from purl import URL
 from wtforms import BooleanField, StringField, TextAreaField, RadioField, \
     FloatField
@@ -712,10 +713,26 @@ class OrgTicketSettingsForm(Form):
         default=True
     )
 
+    permissions = MultiCheckboxField(
+        label=_('Categories restriced by user group settings'),
+        choices=[],
+        render_kw={'disabled': True}
+    )
+
     def on_request(self):
         choices = tuple((key, key) for key in handlers.registry.keys())
         self.ticket_auto_accepts.choices = [('RSV', 'RSV')]
         self.tickets_skip_opening_email.choices = choices
+
+        permissions = sorted([
+            (
+                p.id.hex,
+                ': '.join([x for x in (p.handler_code, p.group) if x])
+            )
+            for p in self.request.session.query(TicketPermission)
+        ], key=lambda x: x[1])
+        self.permissions.choices = permissions
+        self.permissions.default = [p[0] for p in permissions]
 
 
 class NewsletterSettingsForm(Form):

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-04 10:34+0200\n"
+"POT-Creation-Date: 2021-05-04 11:24+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1242,6 +1242,9 @@ msgstr ""
 "Toujours envoyer une notification par courriel pour les nouveaux messages de "
 "ticket"
 
+msgid "Categories restriced by user group settings"
+msgstr "Catégories restreintes par les paramètres du groupe d'utilisateurs"
+
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"
 
@@ -1338,6 +1341,12 @@ msgstr "Envoyer un e-mail d'activation avec des directives"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Un utilisateur avec cette adresse e-mail existe déjà"
+
+msgid "Ticket permissions"
+msgstr "Autorisation des tickets"
+
+msgid "Restricts access and gives permission to these ticket categories"
+msgstr "Restreint l'accès et donne la permission à ces catégories de tickets"
 
 msgid "Send a daily status e-mail."
 msgstr "Envoyez un e-mail de suivi quotidien."

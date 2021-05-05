@@ -1994,42 +1994,49 @@
 </metal:holidays>
 
 <metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.town6">
-  <tr tal:define="ticket_url request.link(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
-      <td class="ticket-number-plain">
-          <a href="${ticket_url}">
+    <tr tal:define="ticket_url request.link(ticket); has_access request.is_manager_for_model(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
+        <tal:block tal:condition="has_access">
+          <td class="ticket-number-plain">
+              <a href="${ticket_url}">
+                  ${ticket.number}
+              </a>
+          </td>
+          <td class="ticket-group" colspan="2">
+              <div>${translate(ticket.group)}</div>
+              <div>${ticket.title}</div>
+              <div>${ticket.subtitle}</div>
+              <tal:b define="payment ticket.handler.payment" tal:condition="payment">
+                  <div class="payment-state payment-state-${payment.state}">
+                      ${layout.format_number(payment.amount)} ${payment.currency}
+                  </div>
+              </tal:b>
+          </td>
+          <td class="ticket-date">
+              ${layout.format_date(ticket.created, 'relative')}
+          </td>
+          <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
+              <a class="ticket-accept ticket-button button small success" href="${request.link(ticket, 'accept')}" i18n:translate>
+                  Accept
+              </a>
+          </td>
+          <td class="ticket-state" tal:condition="ticket.state != 'open'">
+              <tal:b condition="ticket.state == 'pending'" i18n:translate>
+                  Pending
+              </tal:b>
+              <tal:b condition="ticket.state == 'closed'" i18n:translate>
+                  Closed
+              </tal:b>
+          </td>
+          <td class="ticket-user" tal:condition="ticket.state != 'open'">
+              <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
+          </td>
+        </tal:block>
+        <tal:block tal:condition="not has_access">
+          <td class="ticket-number-plain" colspan="6">
               ${ticket.number}
-          </a>
-      </td>
-      <td class="ticket-group" colspan="2">
-          <div>${translate(ticket.group)}</div>
-          <div>${ticket.title}</div>
-          <div>${ticket.subtitle}</div>
-          <tal:b define="payment ticket.handler.payment" tal:condition="payment">
-              <div class="payment-state payment-state-${payment.state}">
-                  ${layout.format_number(payment.amount)} ${payment.currency}
-              </div>
-          </tal:b>
-      </td>
-      <td class="ticket-date">
-          ${layout.format_date(ticket.created, 'relative')}
-      </td>
-      <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
-          <a class="ticket-accept ticket-button button small success" href="${request.link(ticket, 'accept')}" i18n:translate>
-              Accept
-          </a>
-      </td>
-      <td class="ticket-state" tal:condition="ticket.state != 'open'">
-          <tal:b condition="ticket.state == 'pending'" i18n:translate>
-              Pending
-          </tal:b>
-          <tal:b condition="ticket.state == 'closed'" i18n:translate>
-              Closed
-          </tal:b>
-      </td>
-      <td class="ticket-user" tal:condition="ticket.state != 'open'">
-          <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
-      </td>
-  </tr>
+          </td>
+        </tal:block>
+    </tr>
 </metal:tickets_table_row>
 
 <metal:focus define-macro="focus-title" i18n:domain="onegov.town6">

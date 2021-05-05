@@ -4,18 +4,20 @@ from datetime import date, datetime, time, timedelta
 from dateutil.rrule import MO, WE
 from onegov.core.utils import Bunch
 from onegov.event import Event
-from onegov.org.forms import (
-    DaypassAllocationForm,
-    EventForm,
-    RoomAllocationEditForm,
-    RoomAllocationForm, FormRegistrationWindowForm,
-    ManageUserGroupForm,
-)
+from onegov.form import FormDefinition
+from onegov.org.forms import DaypassAllocationForm
+from onegov.org.forms import EventForm
+from onegov.org.forms import FormRegistrationWindowForm
+from onegov.org.forms import ManageUserGroupForm
+from onegov.org.forms import RoomAllocationEditForm
+from onegov.org.forms import RoomAllocationForm
 from onegov.org.forms.allocation import AllocationFormHelpers
-from webob.multidict import MultiDict
-from unittest.mock import MagicMock
+from onegov.org.forms.settings import OrgTicketSettingsForm
+from onegov.ticket import TicketPermission
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
+from unittest.mock import MagicMock
+from webob.multidict import MultiDict
 
 
 @pytest.mark.parametrize('form_class', [
@@ -445,7 +447,17 @@ def test_user_group_form(session):
     user_b.logout_all_sessions = MagicMock()
     user_c.logout_all_sessions = MagicMock()
 
-    # request = DummyRequest(session)
+    session.add(
+        FormDefinition(
+            title='A',
+            name='a',
+            definition='# A',
+            order=0,
+            checksum='x'
+        )
+    )
+    session.flush()
+
     request = Bunch(session=session, current_user=None)
     form = ManageUserGroupForm()
     form.request = request
@@ -455,6 +467,16 @@ def test_user_group_form(session):
     assert sorted([x[1] for x in form.users.choices]) == [
         'a@example.org', 'b@example.org', 'c@example.org',
     ]
+    assert form.ticket_permissions.choices == [
+        ('AGN-', 'AGN'),
+        ('DIR-', 'DIR'),
+        ('EVN-', 'EVN'),
+        ('FER-', 'FER'),
+        ('FRM-', 'FRM'),
+        ('FRM-ABC', 'FRM: ABC'),
+        ('PER-', 'PER'),
+        ('RSV-', 'RSV')
+    ]
 
     # apply / update
     groups = UserGroupCollection(session)
@@ -463,18 +485,23 @@ def test_user_group_form(session):
     form.apply_model(group)
     assert form.name.data == 'A'
     assert form.users.data == []
+    assert form.ticket_permissions.data == []
 
     form.name.data = 'A/B'
     form.users.data = [str(user_a.id), str(user_b.id)]
+    form.ticket_permissions.data = ['EVN-', 'FRM-ABC']
+
     form.update_model(group)
     assert group.users.count() == 2
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is False
+    assert session.query(TicketPermission).count() == 2
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
     assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
+    assert set(form.ticket_permissions.data) == {'EVN-', 'FRM-ABC'}
 
     user_a.logout_all_sessions.reset_mock()
     user_b.logout_all_sessions.reset_mock()
@@ -482,8 +509,33 @@ def test_user_group_form(session):
 
     form.name.data = 'A.1'
     form.users.data = [str(user_c.id)]
+    form.ticket_permissions.data = ['PER-']
     form.update_model(group)
     assert group.users.one() == user_c
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is True
+    permission = session.query(TicketPermission).one()
+    assert permission.handler_code == 'PER'
+    assert permission.group is None
+    assert permission.user_group == group
+
+
+def test_settings_ticket_permissions(session):
+    group = UserGroupCollection(session).add(name='A')
+    p_1 = TicketPermission(handler_code='PER', group=None, user_group=group)
+    p_2 = TicketPermission(handler_code='FRM', group='ABC', user_group=group)
+    session.add(p_1)
+    session.add(p_2)
+    session.flush()
+
+    request = Bunch(session=session)
+    form = OrgTicketSettingsForm()
+    form.request = request
+    form.on_request()
+
+    assert form.permissions.choices == [
+        (p_2.id.hex, 'FRM: ABC'),
+        (p_1.id.hex, 'PER'),
+    ]
+    assert form.permissions.default == [p_2.id.hex, p_1.id.hex]

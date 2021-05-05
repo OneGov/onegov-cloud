@@ -6,10 +6,11 @@ from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
+from onegov.user import UserGroup
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import deferred, relationship
+from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
 
 
@@ -224,3 +225,33 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             data = getattr(self.handler, f'submitter_{info}')
             if data:
                 self.snapshot[f'submitter_{info}'] = data
+
+
+class TicketPermission(Base, TimestampMixin):
+    """ Defines a custom ticket permission.
+
+    If a ticket permission is defined for ticket handler (and optionally a
+    group), a user has to be in the given user group to access these tickets.
+
+    """
+
+    __tablename__ = 'ticket_permissions'
+
+    #: the id
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the user group needed for accessing the tickets
+    user_group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=False)
+    user_group = relationship(
+        UserGroup,
+        backref=backref(
+            'ticket_permissions',
+            cascade='all, delete-orphan',
+        )
+    )
+
+    #: the handler code this permission addresses
+    handler_code = Column(Text, nullable=False)
+
+    #: the group this permission addresses
+    group = Column(Text, nullable=True)

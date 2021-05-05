@@ -58,6 +58,13 @@ class MultiCheckboxField(SelectMultipleField):
         kwargs['option_widget'] = widgets.CheckboxInput()
         super().__init__(*args, **kwargs)
 
+    def __iter__(self):
+        for opt in super().__iter__():
+            if self.render_kw and 'disabled' in self.render_kw:
+                opt.render_kw = opt.render_kw or {}
+                opt.render_kw['disabled'] = self.render_kw['disabled']
+            yield opt
+
 
 class OrderedMultiCheckboxField(MultiCheckboxField):
     widget = OrderedMultiCheckboxWidget()
