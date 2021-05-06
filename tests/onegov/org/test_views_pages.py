@@ -51,7 +51,7 @@ def test_pages_cache(client):
     url_page.form['test'] = False
     org_page = url_page.form.submit().follow()
 
-    org_page = org_page.click('Organisation')
+    org_page = org_page.click('Organisation', index=0)
 
     assert f'/topics/{new_name}' in org_page.request.url
     check_breadcrumbs(org_page, old_name)
