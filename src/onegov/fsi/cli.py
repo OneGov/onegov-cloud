@@ -369,7 +369,9 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             session=session,
             username=data['mail'],
             role=data['role'],
-            force_role=force_role)
+            force_role=force_role,
+            force_active=True
+        )
 
         synced_users.append(user.id)
 
