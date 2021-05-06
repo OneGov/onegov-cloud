@@ -94,8 +94,6 @@ def test_attendee_collection(scenario):
     scenario.add_attendee(organisation='A', username='A@A.com')
     assert scenario.latest_attendee.active
     scenario.add_attendee(external=True)
-    scenario.add_attendee(active=False, username='inactive@example.org')
-    assert not scenario.latest_attendee.active
 
     session = scenario.session
 
