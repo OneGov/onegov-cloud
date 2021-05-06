@@ -27,7 +27,10 @@
                                         <p tal:case="False" i18n:translate>No entries found.</p>
                                         <ul tal:case="True">
                                             <tal:b tal:repeat="subscription layout.reservation_collection.query()">
-                                                <li tal:attributes="class python: 'grayed-out' if subscription.is_placeholder else ''">${str(subscription)}</li>
+                                                <tal:b tal:switch="subscription.is_placeholder">
+                                                    <li tal:case="True" class="grayed-out" i18n:attributes="title" tal:attributes="title 'Placeholder Subscription'">${str(subscription)}</li>
+                                                    <li tal:case="False">${str(subscription)}</li>
+                                                </tal:b>
                                             </tal:b>
                                         </ul>
                                     </tal:b>
