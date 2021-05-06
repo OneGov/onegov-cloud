@@ -43,7 +43,7 @@ def test_attendee(
     assert attendee.subscriptions.count() == 1
 
 
-def test_course_event_1(session, course, course_event, attendee):
+def test_course_event(session, course, course_event, attendee):
     attendee_, data = attendee(session)
     course, data = course(session)
     event, data = course_event(session)
@@ -107,7 +107,7 @@ def test_course_event_1(session, course, course_event, attendee):
     assert course.future_events.all() == []
 
 
-def test_reservation_1(session, attendee, course_event):
+def test_reservation(session, attendee, course_event):
     attendee = attendee(session)
     course_event = course_event(session)
     res = CourseSubscription(

@@ -296,7 +296,7 @@ def test_audit_collection(scenario):
 
     assert sorted(results) == sorted(
         (a.id, e.start) for a, e in
-        zip(scenario.attendees, scenario.course_events[:3])
+        zip(scenario.active_attendees, scenario.course_events[:3])
     )
 
     # add a subscription also for this attendee, but not completed

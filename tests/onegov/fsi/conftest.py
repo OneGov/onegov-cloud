@@ -362,7 +362,7 @@ class FsiScenario(BaseScenario):
             CourseSubscription,
             **columns,
             course_event_id=event.id,
-            attendee_id=attendee.id,
+            attendee_id=attendee.id if attendee else None,
             id=uuid4()
         ))
         return self.subscriptions[-1]
@@ -410,6 +410,10 @@ class FsiScenario(BaseScenario):
 
     def latest_subscriptions(self, count=1):
         return self.subscriptions[-count::]
+
+    @property
+    def active_attendees(self):
+        return [a for a in self.attendees if a.active]
 
 
 @pytest.fixture(scope='function')
