@@ -75,6 +75,15 @@ class SubscriptionCollectionLayout(DefaultLayout):
                     attrs={'class': 'add-icon'}
                 )
             )
+            if self.model.course_event_id:
+                if self.show_send_info_mail_button:
+                    links.append(
+                        Link(
+                            _('Send Info Mail'),
+                            self.preview_info_mail_url,
+                            attrs={'class': 'email-link'}
+                        )
+                    )
 
         links.append(
             LinkGroup(
@@ -89,10 +98,14 @@ class SubscriptionCollectionLayout(DefaultLayout):
     def course_event(self):
         return self.model.course_event
 
-    @property
+    @cached_property
     def preview_info_mail_url(self):
         return self.request.link(
             self.course_event.info_template, name='send')
+
+    @cached_property
+    def show_send_info_mail_button(self):
+        return self.course_event and not self.course_event.is_past
 
     @cached_property
     def breadcrumbs(self):

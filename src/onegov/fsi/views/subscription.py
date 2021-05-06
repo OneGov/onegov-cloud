@@ -20,7 +20,7 @@ from onegov.fsi.views.notifcations import handle_send_email
     template='subscriptions.pt',
     permission=Personal
 )
-def view_reservations(self, request):
+def view_subscriptions(self, request):
     layout = SubscriptionCollectionLayout(self, request)
     return {
         'layout': layout,
