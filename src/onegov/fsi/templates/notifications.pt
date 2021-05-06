@@ -24,7 +24,7 @@
                                         <tr>
                                             <td><a href="${layout.instance_link(notification)}">${notification.subject or notification.type}</a></td>
                                             <td>${layout.format_notification_type(notification.type)}</td>
-                                            <td>${layout.format_date(notification.modified, 'datetime_long_without_year')}</td>
+                                            <td>${layout.format_date(notification.modified, 'datetime_short')}</td>
                                         </tr>
                                     </tal:b>
                                 </tbody>
