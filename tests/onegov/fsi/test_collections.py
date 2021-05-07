@@ -260,6 +260,11 @@ def test_audit_collection(scenario):
     # add some noise
     scenario.add_course_event(scenario.latest_course)
     scenario.add_attendee(external=True, username='h.r@giger.ch')
+
+    # Add inactive attendee
+    scenario.add_attendee(active=False)
+    inactive = scenario.latest_attendee
+
     scenario.commit()
     scenario.refresh()
 
@@ -330,7 +335,7 @@ def test_audit_collection(scenario):
     # Check for admin
     audits.auth_attendee = fake_admin
     audits.organisations = []
-    assert audits.query().count() == len(scenario.attendees)
+    assert audits.query().count() == len(scenario.active_attendees)
     audits.organisations = ['AA']
     assert audits.query().count() == 1
     # get the one having ln starting with ZZZ
