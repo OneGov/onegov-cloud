@@ -95,7 +95,7 @@ def test_course_event(scenario):
     assert scenario.latest_course.future_events.count() == 2
 
 
-def test_reservation(session, attendee, course_event):
+def test_subscription(session, attendee, course_event):
     attendee = attendee(session)
     course_event = course_event(session)
     res = CourseSubscription(
@@ -130,7 +130,7 @@ def test_cascading_attendee_deletion(session, db_mock_session):
     assert session.query(CourseSubscription).count() == 1
 
 
-def test_notification_templates_1(session, course_event):
+def test_notification_templates(session, course_event):
     event, data = course_event(session)
     assert len(event.notification_templates) == 4
     assert event.info_template
