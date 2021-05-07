@@ -45,7 +45,7 @@ class NotificationTemplateSendForm(Form):
     def attendees(self):
         return [a for a in self.model.course_event.attendees if a.active]
 
-    @property
+    @cached_property
     def recipients_choices(self):
         return [(a.id, a.email) for a in self.attendees]
 
