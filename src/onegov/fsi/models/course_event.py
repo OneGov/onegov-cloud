@@ -240,7 +240,12 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.subscriptions.filter_by(
             attendee_id=attendee_id).first() is not None
 
-    def excluded_subscribers(self, year=None, as_uids=True):
+    def excluded_subscribers(
+            self,
+            year=None,
+            as_uids=True,
+            exclude_inactive=True
+    ):
         """
         Returns a list of attendees / names tuple of UIDS
         of attendees that have booked one of the events of a course in
@@ -256,24 +261,37 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
             datetime.datetime(year, 12, 31, tzinfo=pytz.utc)
         )
 
+        general_exclusions = [
+            CourseSubscription.course_event_id == self.id
+        ]
+
+        if exclude_inactive:
+            general_exclusions.append(CourseAttendee.active == False)
+
         return excl.filter(
             or_(
                 and_(
                     CourseEvent.course_id == self.course.id,
                     CourseEvent.start >= bounds[0],
-                    CourseEvent.end <= bounds[1]
+                    CourseEvent.end <= bounds[1],
                 ),
-                CourseSubscription.course_event_id == self.id
+                *general_exclusions
             )
         )
 
     def possible_subscribers(
-            self, external_only=False, year=None, as_uids=False):
+            self,
+            external_only=False,
+            year=None,
+            as_uids=False,
+            exclude_inactive=True
+    ):
         """Returns the list of possible bookers. Attendees that already have
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
 
-        excl = self.excluded_subscribers(year).subquery('excl')
+        excl = self.excluded_subscribers(year, exclude_inactive)
+        excl = excl.subquery('excl')
 
         # Use this because its less costly
         query = session.query(as_uids and CourseAttendee.id or CourseAttendee)

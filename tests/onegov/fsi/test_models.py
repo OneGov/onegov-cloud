@@ -55,13 +55,17 @@ def test_course_event(scenario):
     scenario.add_subscription(event, None, dummy_desc='Placeholder')
     scenario.add_subscription(event, scenario.latest_attendee)
 
+    # Add inactive attendee
+    scenario.add_attendee(active=False)
+    scenario.add_subscription(event, scenario.latest_attendee)
+
     scenario.commit()
     scenario.refresh()
 
     event = scenario.latest_event
-    assert event.subscriptions.count() == 2
-    assert event.attendees.count() == 1
-    assert event.available_seats == 20 - 2
+    assert event.subscriptions.count() == 3
+    assert event.attendees.count() == 2
+    assert event.available_seats == 20 - 3
     assert event.possible_subscribers().first() is None
 
     # Test possible and excluded subscribers
@@ -85,7 +89,7 @@ def test_course_event(scenario):
     assert event2.possible_subscribers(year=event.end.year).count() == 1
     assert event2.possible_subscribers(year=event.end.year + 1).count() == 2
     assert event.possible_subscribers(external_only=True).count() == 0
-    assert event.excluded_subscribers().all() == [(scenario.attendees[0].id,)]
+    assert event.excluded_subscribers().count() == 2
     assert event2.possible_subscribers().first() == attendee_2
 
     assert scenario.latest_course.future_events.count() == 2
