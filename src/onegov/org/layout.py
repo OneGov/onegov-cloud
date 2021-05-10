@@ -37,6 +37,7 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
+from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
@@ -50,14 +51,7 @@ from sedate import to_timezone
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
 
-class OpenGraphMixin:
-    @property
-    def og_title(self):
-        return getattr(self, 'title', None) or \
-            getattr(self.model, 'title', None)
-
-
-class Layout(ChameleonLayout):
+class Layout(ChameleonLayout, OpenGraphMixin):
     """ Contains methods to render a page inheriting from layout.pt.
 
     All pages inheriting from layout.pt rely on this class being present
