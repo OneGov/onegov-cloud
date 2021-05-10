@@ -41,10 +41,14 @@ def strip_s(dt, timezone=None):
 
 
 def create_directory(client, publication=True, change_reqs=True,
-                     submission=True, extended_submitter=False):
+                     submission=True, extended_submitter=False,
+                     title='Meetings', lead=None
+                     ):
     client.login_admin()
     page = client.get('/directories').click('Verzeichnis')
-    page.form['title'] = "Meetings"
+    page.form['title'] = title
+    if lead:
+        page.form['lead'] = lead
     page.form['structure'] = """
                     Name *= ___
                     Pic *= *.jpg|*.png|*.gif
@@ -79,7 +83,10 @@ def test_publication_added_by_admin(client):
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
 
-    meetings = create_directory(client, publication=False)
+    meetings = create_directory(
+        client, publication=False,
+        lead='Meetings Directory'
+    )
 
     # These url should be available for people who know it
     client.get('/directories/meetings/+submit')
@@ -97,6 +104,14 @@ def test_publication_added_by_admin(client):
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
+
+    # Check open graph meta tags
+    assert '<meta property="og:description" content="Meetings Directory"' in entry
+    assert 'meta property="og:image"' in entry
+    assert 'meta property="og:image:width" content="50"' in entry
+    assert 'meta property="og:image:height" content="50"' in entry
+    assert 'meta property="og:image:alt" content="annual.jpg"' in entry
+    assert 'meta property="og:image:type" content="image/png"' in entry
 
     # check that the change request url is not protected
     client.get('/directories/meetings/annual/change-request')
