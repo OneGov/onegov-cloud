@@ -1,6 +1,7 @@
 from freezegun import freeze_time
 
 from tests.onegov.org.common import edit_bar_links
+from tests.shared.utils import get_meta
 
 
 def check_breadcrumbs(page, excluded):
@@ -74,6 +75,7 @@ def test_pages(client):
     assert "Neues Thema" in new_page
 
     new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['lead'] = "Living in Govikon..."
     new_page.form['text'] = (
         "<h2>Living in Govikon is Really Great</h2>"
         "<i>Experts say it's the fact that Govikon does not really exist.</i>"
@@ -85,6 +87,11 @@ def test_pages(client):
         == "Living in Govikon is Really Great"
     assert page.pyquery('.page-text i').text()\
         .startswith("Experts say it's the fact")
+
+    # Test OpenGraph Meta
+    assert get_meta(page, 'og:title') == 'Living in Govikon is Swell'
+    assert get_meta(page, 'og:description') == 'Living in Govikon...'
+    assert not get_meta(page, 'og:image')
 
     edit_page = page.click("Bearbeiten")
     assert "Thema Bearbeiten" in edit_page
