@@ -20,3 +20,15 @@ def test_view_images(client):
 
     images_page = client.get('/images')
     assert "Noch keine Bilder hochgeladen" not in images_page
+
+    img_url = images_page.pyquery('.image-box a').attr('href')
+
+    # Test Open Graph meta properties
+    social_media = client.get('/social-media-settings')
+
+    social_media.form['og_logo_default'] = img_url
+    social_media.form.submit().follow()
+
+    home = client.get('/')
+    assert '<meta property="og:image:alt" content="Test.jpg">' in home
+    assert '<meta property="og:image"' in home
