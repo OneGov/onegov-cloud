@@ -2137,6 +2137,10 @@ class DirectoryCollectionLayout(DefaultLayout):
         self.include_code_editor()
         self.request.include('iconwidget')
 
+    @property
+    def og_description(self):
+        return self.request.translate(_("Directories"))
+
     @cached_property
     def breadcrumbs(self):
         return [

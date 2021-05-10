@@ -1743,6 +1743,10 @@ class DirectoryCollectionLayout(DefaultLayout):
             Link(_("Directories"), '#')
         ]
 
+    @property
+    def og_description(self):
+        return self.request.translate(_("Directories"))
+
     @cached_property
     def editbar_links(self):
         if self.request.is_admin:
