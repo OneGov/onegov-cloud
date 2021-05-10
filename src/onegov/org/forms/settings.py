@@ -324,8 +324,8 @@ class FooterSettingsForm(Form):
 
 class SocialMediaSettingsForm(Form):
     og_logo_default = StringField(
-        label=_("Logo URL"),
-        description=_("Default Social Media Preview Image for rich link "
+        label=_("Image"),
+        description=_("Default social media preview image for rich link "
                       "previews. Optimal size is 1200:630 px."),
         fieldset="OpenGraph",
         render_kw={'class_': 'image-url'}

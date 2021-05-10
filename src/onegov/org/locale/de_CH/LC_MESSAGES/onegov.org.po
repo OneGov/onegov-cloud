@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-04 11:24+0200\n"
+"POT-Creation-Date: 2021-05-10 18:07+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1090,6 +1090,11 @@ msgstr "Die Breite der Kolonne muss grösser sein als 0"
 
 msgid "The sum of all the footer columns must be equal to 12"
 msgstr "Die Summe aller Breiten der Fusszeilenkolonnen muss 12 sein."
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr "Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale Grösse beträgt 1200:630px."
 
 msgid "Icon 16x16 PNG (Windows)"
 msgstr ""
@@ -3601,6 +3606,9 @@ msgstr "Neuer Verzeichniseintrag"
 msgid "Submit a New Directory Entry"
 msgstr "Einen neuen Verzeichniseintrag vorschlagen."
 
+msgid "Continue"
+msgstr "Weiter"
+
 msgid "Propose a change"
 msgstr "Änderung vorschlagen"
 
@@ -4055,9 +4063,6 @@ msgstr "Reservieren"
 #, python-format
 msgid "New dates for ${title}"
 msgstr "Neue Termine für ${title}"
-
-msgid "Continue"
-msgstr "Weiter"
 
 msgid "Confirm your reservation"
 msgstr "Bestätigen Sie Ihre Reservation"
