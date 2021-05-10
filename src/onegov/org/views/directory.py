@@ -12,7 +12,6 @@ from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
-from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
 from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
     DuplicateLabelError
