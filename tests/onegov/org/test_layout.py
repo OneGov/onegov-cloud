@@ -188,6 +188,7 @@ def test_template_layout(postgres_dsn, redis_url):
     def view_model(self, request):
         layout = DefaultLayout(self, request)
         layout.homepage_url = None
+        layout.og_image_source = None
         layout.font_awesome_path = ''
         return {'layout': layout}
 
