@@ -5,6 +5,7 @@ from sedate import utcnow
 
 from onegov.page import PageCollection
 from tests.onegov.org.common import edit_bar_links
+from tests.shared.utils import get_meta
 
 
 def test_news(client):
@@ -37,6 +38,11 @@ def test_news(client):
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" in page.text
+
+    # Test OpenGraph Meta
+    assert get_meta(page, 'og:title') == 'We have a new homepage'
+    assert get_meta(page, 'og:description') == 'It is very good'
+    assert not get_meta(page, 'og:image')
 
     page = client.get('/news')
     assert "We have a new homepage" in page.text
