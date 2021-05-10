@@ -57,6 +57,7 @@ def create_directory(client, publication=True, change_reqs=True,
     page.form['content_hide_labels'] = 'Pic'
     page.form['title_format'] = '[Name]'
     page.form['enable_map'] = 'entry'
+    page.form['thumbnail'] = 'Pic'
     page.form['enable_publication'] = publication
     page.form['enable_change_requests'] = change_reqs
     if submission:
@@ -106,7 +107,6 @@ def test_publication_added_by_admin(client):
     entry = page.form.submit().follow()
 
     # Check open graph meta tags
-    # assert '<meta property="og:description" content="Meetings Directory"' in entry
     assert get_meta(entry, 'og:description') == "Meetings Directory"
     assert get_meta(entry, 'og:image')
     assert get_meta(entry, 'og:image:width') == '50'

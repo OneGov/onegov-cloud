@@ -7,6 +7,7 @@ from dateutil import rrule
 from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
+from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org.models import (
@@ -1787,6 +1788,28 @@ class DirectoryEntryBaseLayout(DefaultLayout):
     def show_label(self, field):
         return field.id not in self.model.hidden_label_fields
 
+    @cached_property
+    def thumbnail_field_id(self):
+        if self.directory.configuration.thumbnail:
+            return as_internal_id(self.directory.configuration.thumbnail)
+
+    def thumbnail_file_id(self, entry):
+        thumbnail = self.thumbnail_field_id
+        if not thumbnail:
+            return
+        return (entry.values.get(thumbnail) or {}).get('data', '').lstrip('@')
+
+    def thumbnail_link(self, entry):
+        file_id = self.thumbnail_file_id(entry)
+        return file_id and self.request.class_link(
+            File, {'id': id}, name='thumbnail')
+
+    def thumbnail_file(self, entry):
+        file_id = self.thumbnail_file_id(entry)
+        if not file_id:
+            return
+        return self.request.session.query(File).filter_by(id=file_id).first()
+
 
 @step_sequences.registered_step(
     1, _('Form'), cls_after='FormSubmissionLayout'
@@ -1946,6 +1969,14 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout, StepsLayoutExtension):
     @property
     def step_position(self):
         return 1
+
+    @cached_property
+    def og_image(self):
+        return self.thumbnail_file(self.model) or super().og_image
+
+    @property
+    def og_description(self):
+        return self.directory.lead
 
     @property
     def thumbnail_field_ids(self):

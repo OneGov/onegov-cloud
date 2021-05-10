@@ -278,18 +278,10 @@ def view_directory(self, request, layout=None):
     entries = request.exclude_invisible(self.query())
     keyword_counts = keyword_count(request, self)
     filters = get_filters(request, self, keyword_counts)
-
-    if self.directory.configuration.thumbnail:
-        thumbnail = as_internal_id(self.directory.configuration.thumbnail)
-    else:
-        thumbnail = None
-
-    def thumbnail_link(entry):
-        id = (entry.values.get(thumbnail) or {}).get('data', '').lstrip('@')
-        return id and request.class_link(File, {'id': id}, name='thumbnail')
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
 
     return {
-        'layout': layout or DirectoryEntryCollectionLayout(self, request),
+        'layout': layout,
         'title': self.directory.title,
         'entries': entries,
         'directory': self.directory,
@@ -297,8 +289,8 @@ def view_directory(self, request, layout=None):
         'filters': filters,
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),
-        'show_thumbnails': thumbnail and True or False,
-        'thumbnail_link': thumbnail_link
+        'show_thumbnails': layout.thumbnail_field_id and True or False,
+        'thumbnail_link': layout.thumbnail_link
     }
 
 
