@@ -4,6 +4,8 @@ import babel.dates
 import pytest
 
 from tests.shared.utils import get_meta
+from webtest.forms import Upload
+from tests.shared.utils import create_image
 
 
 def test_view_occurrences(client):
@@ -142,6 +144,11 @@ def test_view_occurrence(client):
         'BEGIN:VCALENDAR'
     )
 
+    # Test meta tags
+    assert get_meta(event, 'og:title') == 'Generalversammlung'
+    assert get_meta(event, 'og:description') == 'Alle Jahre wieder.'
+    assert not get_meta(event, 'og:image')
+
     event = events.click("Gemeinsames Turnen", index=0)
     assert event.pyquery('h1.main-title').text() == "Gemeinsames Turnen"
     assert "Turnhalle" in event
@@ -157,7 +164,7 @@ def test_view_occurrence(client):
         text.startswith('BEGIN:VCALENDAR')
 
 
-def fill_event_form(form_page, start_date, end_date):
+def fill_event_form(form_page, start_date, end_date, add_image=False):
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
     form_page.form['description'] = "My event is an event."
@@ -169,6 +176,8 @@ def fill_event_form(form_page, start_date, end_date):
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
     form_page.form['end_date'] = end_date.isoformat()
+    if add_image:
+        form_page.form['image'] = Upload('event.jpg', create_image().read())
     return form_page
 
 
@@ -417,6 +426,7 @@ def test_delete_event(client):
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
     form_page.form['repeat'] = 'without'
+    form_page.form['image'] = Upload('test.jpg', create_image().read())
     form_page.form.submit().follow().form.submit().follow()
 
     client.login_editor()
@@ -432,6 +442,10 @@ def test_delete_event(client):
 
     assert "Diese Veranstaltung kann nicht gelöscht werden." in \
         event_page.pyquery('a.delete-link')[0].values()
+
+    # Test OpenGraph Tags
+    assert get_meta(event_page, 'og:image:alt') == 'test.jpg'
+    assert not get_meta(event_page, 'og:description')
 
     # Delete the event via the ticket
     delete_link = ticket_page.pyquery('a.delete-link').attr('ic-delete-from')

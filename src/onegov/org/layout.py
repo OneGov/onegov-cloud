@@ -1471,6 +1471,14 @@ class OccurrenceLayout(EventBaseLayout):
     def collection(self):
         return OccurrenceCollection(self.request.session)
 
+    @property
+    def og_description(self):
+        return self.model.event.description
+
+    @cached_property
+    def og_image(self):
+        return self.model.event.image or super().og_image
+
     @cached_property
     def breadcrumbs(self):
         return [
