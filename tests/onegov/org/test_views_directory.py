@@ -394,8 +394,13 @@ def test_directory_submissions(client, postgres):
     ticket_url = page.request.url
     accept_url = page.pyquery('.accept-link').attr('ic-post-to')
     client.post(accept_url)
-    assert 'Washington' in client.get('/directories/points-of-interest')
+    poi = client.get('/directories/points-of-interest')
+    assert 'Washington' in poi
     assert len(client.app.smtp.outbox) == 2
+
+    entry = poi.click('Washington')
+    # Check open graph meta tags, this time the file is not an image
+    assert '<meta property="og:image"' not in entry
 
     # When accepting the the entry, add a directory file with same reference
     formfile = client.app.session().query(FormFile).one()
