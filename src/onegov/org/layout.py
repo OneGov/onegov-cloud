@@ -1438,6 +1438,10 @@ class EventBaseLayout(DefaultLayout):
 
 class OccurrencesLayout(EventBaseLayout):
 
+    @property
+    def og_description(self):
+        return self.request.translate(_("Events"))
+
     @cached_property
     def breadcrumbs(self):
         return [

@@ -3,6 +3,8 @@ from datetime import datetime, date, timedelta
 import babel.dates
 import pytest
 
+from tests.shared.utils import get_meta
+
 
 def test_view_occurrences(client):
     client.login_admin()
@@ -35,6 +37,11 @@ def test_view_occurrences(client):
     assert len(events()) == 10
     assert len(events('page=1')) == 2
     assert dates() == sorted(dates())
+
+    # Test OpenGraph tags
+    page = client.get('/events')
+    assert get_meta(page, 'og:description') == 'Veranstaltungen'
+    assert not get_meta(page, 'og:image')
 
     # Test tags
     query = 'tags=Party'
