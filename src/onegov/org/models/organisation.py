@@ -70,6 +70,7 @@ class Organisation(Base, TimestampMixin):
     twitter_url = meta_property()
     youtube_url = meta_property()
     instagram_url = meta_property()
+    og_logo_default = meta_property()
 
     # custom links
     custom_link_1_name = meta_property()

@@ -15,7 +15,8 @@ from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
-    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm
+    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm, \
+    SocialMediaSettingsForm
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -92,6 +93,15 @@ def handle_homepage_settings(self, request, form, layout=None):
     icon=' fa-external-link-square', order=-990)
 def handle_favicon_settings(self, request, form, layout=None):
     return handle_generic_settings(self, request, form, _("Favicon"), layout)
+
+
+@OrgApp.form(
+    model=Organisation, name='social-media-settings', template='form.pt',
+    permission=Secret, form=SocialMediaSettingsForm, setting=_("Social Media"),
+    icon=' fa fa-share-alt', order=-985)
+def handle_social_media_settings(self, request, form, layout=None):
+    return handle_generic_settings(
+        self, request, form, _("Social Media"), layout)
 
 
 @OrgApp.form(
