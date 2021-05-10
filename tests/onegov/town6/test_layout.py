@@ -190,6 +190,7 @@ def test_template_layout(postgres_dsn, redis_url):
         layout = DefaultLayout(self, request)
         layout.homepage_url = None
         layout.font_awesome_path = ''
+        layout.og_image_source = None
         return {'layout': layout}
 
     morepath.scan(more.transaction)
