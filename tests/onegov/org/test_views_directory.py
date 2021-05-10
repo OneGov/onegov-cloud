@@ -13,7 +13,7 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, get_meta
 
 
 def dt_for_form(dt):
@@ -106,12 +106,13 @@ def test_publication_added_by_admin(client):
     entry = page.form.submit().follow()
 
     # Check open graph meta tags
-    assert '<meta property="og:description" content="Meetings Directory"' in entry
-    assert 'meta property="og:image"' in entry
-    assert 'meta property="og:image:width" content="50"' in entry
-    assert 'meta property="og:image:height" content="50"' in entry
-    assert 'meta property="og:image:alt" content="annual.jpg"' in entry
-    assert 'meta property="og:image:type" content="image/png"' in entry
+    # assert '<meta property="og:description" content="Meetings Directory"' in entry
+    assert get_meta(entry, 'og:description') == "Meetings Directory"
+    assert get_meta(entry, 'og:image')
+    assert get_meta(entry, 'og:image:width') == '50'
+    assert get_meta(entry, 'og:image:height') == '50'
+    assert get_meta(entry, 'og:image:alt') == 'annual.jpg'
+    assert get_meta(entry, 'og:image:type') == 'image/png'
 
     # check that the change request url is not protected
     client.get('/directories/meetings/annual/change-request')
@@ -400,8 +401,7 @@ def test_directory_submissions(client, postgres):
 
     entry = poi.click('Washington')
     # Check open graph meta tags, this time the file is not an image
-    assert '<meta property="og:image"' not in entry
-
+    assert not get_meta(entry, "og:image")
     # When accepting the the entry, add a directory file with same reference
     formfile = client.app.session().query(FormFile).one()
     dirfile = client.app.session().query(DirectoryFile).one()

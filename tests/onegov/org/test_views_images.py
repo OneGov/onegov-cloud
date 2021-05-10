@@ -1,6 +1,6 @@
 from webtest import Upload
 
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, get_meta
 
 
 def test_view_images(client):
@@ -30,5 +30,5 @@ def test_view_images(client):
     social_media.form.submit().follow()
 
     home = client.get('/')
-    assert '<meta property="og:image:alt" content="Test.jpg">' in home
-    assert '<meta property="og:image"' in home
+    assert get_meta(home, 'og:image:alt') == 'Test.jpg'
+    assert get_meta(home, 'og:image')
