@@ -14,6 +14,15 @@ from uuid import uuid4
 from base64 import b64decode, b64encode
 
 
+def get_meta(page, property, returns='content', index=0):
+    """Searches the page for the meta tag"""
+    elems = page.pyquery(f"meta[property='{property}']")
+    if not elems:
+        return None
+    elem = elems[index]
+    return elem.attrib[returns]
+
+
 def encode_map_value(dictionary):
     return b64encode(json.dumps(dictionary).encode('utf-8'))
 
