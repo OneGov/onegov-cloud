@@ -29,21 +29,7 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 
     <tal:b metal:use-macro="layout.macros.favicon" />
-    <meta property="og:title" tal:attributes="content og_title" tal:define="og_title layout.og_title | title | layout.title | None" tal:condition="og_title" />
-    <meta property="og:type" tal:attributes="content layout.og_type | 'website'" />
-    <meta property="og:url" tal:attributes="content layout.og_url | request.url" />
-    <tal:b tal:define="og_image layout.og_image | layout.org.logo_url | None" tal:condition="og_image">
-    <meta property="og:image" tal:attributes="content og_image">
-    <meta property="og:image:secure_url" tal:attributes="content og_image">
-    <meta property="og:image:alt" tal:attributes="content og_image_alt" tal:define="og_image_alt layout.og_image_alt | layout.org.name | None">
-    </tal:b>
-
-    <meta property="og:site_name" tal:attributes="content site_name" tal:define="site_name layout.og_site_name | layout.org.name | None" tal:condition="site_name">
-    <meta property="og:description" tal:attributes="content og_description" tal:define="og_description layout.og_description | None" tal:condition="og_description">
-    <meta property="og:locale" tal:attributes="content request.locale">
-    <tal:b tal:repeat="locale langs" tal:define="langs (l for l in request.app.settings.i18n.locales if not l == request.locale)">
-    <meta property="og:locale:alternate" tal:attributes="content locale">
-    </tal:b>
+    <tal:b metal:use-macro="layout.macros.open_graph_tags" />
 
     <tal:b condition="layout.app.sentry_dsn">
       <script src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
