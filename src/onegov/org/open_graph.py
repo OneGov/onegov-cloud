@@ -1,5 +1,7 @@
 from cached_property import cached_property
 
+from onegov.file import File
+
 
 class OpenGraphMixin:
 
@@ -37,7 +39,8 @@ class OpenGraphMixin:
         url = self.og_image_source
         if not url or not self.is_internal(url):
             return
-        return self.request.app.object_by_path(url)
+        fid = url.split('/')[-1]
+        return self.request.session.query(File).filter_by(id=fid).first()
 
     @cached_property
     def og_image_url(self):
