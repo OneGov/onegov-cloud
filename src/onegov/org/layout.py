@@ -2221,7 +2221,7 @@ class DirectoryEntryBaseLayout(DefaultLayout):
     def thumbnail_link(self, entry):
         file_id = self.thumbnail_file_id(entry)
         return file_id and self.request.class_link(
-            File, {'id': id}, name='thumbnail')
+            File, {'id': file_id}, name='thumbnail')
 
     def thumbnail_file(self, entry):
         file_id = self.thumbnail_file_id(entry)
