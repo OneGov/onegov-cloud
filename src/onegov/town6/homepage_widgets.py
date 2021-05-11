@@ -7,7 +7,7 @@ from onegov.org.layout import EventBaseLayout
 
 from onegov.org.homepage_widgets import NewsWidget as OrgNewsWidget, \
     get_lead, DirectoriesWidget as OrgDirectoriesWidget
-from onegov.org.models import ImageSetCollection, PublicationCollection
+from onegov.org.models import PublicationCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
 
@@ -255,11 +255,11 @@ class ServicesWidget(object):
         }
 
 
-@TownApp.homepage_widget(tag='contacts_and_albums')
-class ContactsAndAlbumsWidget(object):
+@TownApp.homepage_widget(tag='contacts')
+class ContactsWidget(object):
 
     template = """
-           <xsl:template match="contacts_and_albums">
+           <xsl:template match="contacts">
               <div class="contacts-albums-panel">
                 <h3 tal:content="contacts_and_albums_panel.title"></h3>
                 <metal:block use-macro="layout.macros['panel-links']"
@@ -275,20 +275,14 @@ class ContactsAndAlbumsWidget(object):
 
         return {
             'contacts_and_albums_panel': LinkGroup(
-                title=_("Contacts and Photos"),
+                title=_("Contacts"),
                 links=[
                     Link(
                         text=_("People"),
                         url=request.class_link(PersonCollection),
                         subtitle=_("All contacts"),
                         classes=('h5-size',)
-                    ),
-                    Link(
-                        text=_("Photo Albums"),
-                        url=request.class_link(ImageSetCollection),
-                        subtitle=_("Impressions"),
-                        classes=('h5-size',)
-                    ),
+                    )
                 ]
             )
         }

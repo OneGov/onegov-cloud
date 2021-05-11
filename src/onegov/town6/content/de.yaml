@@ -111,6 +111,9 @@ organisation:
               <panel>
                   <services />
               </panel>
+              <panel>
+                <contacts />
+              </panel>
           </column>
       </row>
       <row-wide bgcolor="gray">
