@@ -113,7 +113,7 @@ organisation:
                   <services />
               </panel>
               <panel>
-                <contacts />
+                <contacts_and_albums />
               </panel>
           </column>
       </row>

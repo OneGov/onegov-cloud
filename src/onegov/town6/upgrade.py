@@ -97,17 +97,3 @@ def migrate_homepage_structure_for_town6(context):
     </column>
 </row-wide>
     """)
-
-
-@upgrade_task('Migrates contacts_and_albums widget')
-def migrate_contacts_and_albums_widget(context):
-    org = context.session.query(Organisation).first()
-
-    if org is None:
-        return
-    structure = org.meta['homepage_structure']
-    if 'contacts_and_albums' not in structure:
-        return
-
-    org.meta['homepage_structure'] = structure.replace(
-        'contacts_and_albums', 'contacts')

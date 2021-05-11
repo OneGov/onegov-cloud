@@ -255,11 +255,11 @@ class ServicesWidget(object):
         }
 
 
-@TownApp.homepage_widget(tag='contacts')
-class ContactsWidget(object):
+@TownApp.homepage_widget(tag='contacts_and_albums')
+class ContactsAndAlbumsWidget(object):
 
     template = """
-           <xsl:template match="contacts">
+           <xsl:template match="contacts_and_albums">
               <div class="contacts-albums-panel">
                 <h3 tal:content="contacts_and_albums_panel.title"></h3>
                 <metal:block use-macro="layout.macros['panel-links']"
