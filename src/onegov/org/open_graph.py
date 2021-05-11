@@ -31,7 +31,7 @@ class OpenGraphMixin:
 
     @cached_property
     def og_image_source(self):
-        return self.org.og_logo_default or self.org.logo_url
+        return self.org.og_logo_default
 
     @cached_property
     def og_image(self):
