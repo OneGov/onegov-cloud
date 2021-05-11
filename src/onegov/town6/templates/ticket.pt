@@ -30,27 +30,27 @@
                 <div class="ticket-panel ticket-submitter ${ticket.muted and 'ticket-submitter-muted' or 'ticket-submitter-unmuted'}">
                     <h2 i18n:translate>Submitter</h2>
 
-                    <div class="ticket-submitter-meta">
+                    <div class="ticket-submitter-meta nowrap">
                         <i class="far fa-fw fa-envelope"></i>
                         <a href="mailto:${submitter}">${submitter}</a>
                     </div>
 
-                    <div class="ticket-submitter-meta" tal:condition="submitter_name">
+                    <div class="ticket-submitter-meta nowrap" tal:condition="submitter_name">
                         <i class="fas fa-fw fa-user" aria-hidden="true"></i>
                         <span>${submitter_name}</span>
                     </div>
 
-                    <div class="ticket-submitter-meta" tal:condition="submitter_address">
+                    <div class="ticket-submitter-meta nowrap" tal:condition="submitter_address">
                         <i class="fas fa-fw fa-home" aria-hidden="true"></i>
                         <span>${submitter_address}</span>
                     </div>
 
-                    <div class="ticket-submitter-meta" tal:condition="submitter_phone">
+                    <div class="ticket-submitter-meta nowrap" tal:condition="submitter_phone">
                         <i class="fas fa-fw fa-phone" aria-hidden="true"></i>
                         <span tal:content="structure layout.linkify(submitter_phone)"></span>
                     </div>
 
-                    <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status">
+                    <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status nowrap">
                         <i class="fa fa-fw fa-check" aria-hidden="true"></i>
 
                         <span i18n:translate>
@@ -63,7 +63,7 @@
                         </a>
                     </div>
 
-                    <div tal:condition="ticket.muted" class="ticket-submitter-notification-status">
+                    <div tal:condition="ticket.muted" class="ticket-submitter-notification-status nowrap">
                         <i class="fa fa-fw fa-times" aria-hidden="true"></i>
 
                         <span i18n:translate>
