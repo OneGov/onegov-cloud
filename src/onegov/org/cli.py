@@ -447,7 +447,8 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
 @cli.command(name='import-reservations', context_settings={'singular': True})
 @click.option('--dsn', required=True, help="DSN to the source database")
 @click.option('--map', required=True, help="CSV map between resources")
-@click.option('--start-date', help="Only import entries after (Y-M-D)")
+@click.option('--start-date', help="Only import entries after (Y-M-D)",
+              default='2000-01-01', show_default=True)
 def import_reservations(dsn, map, start_date):
     """ Imports reservations from a legacy seantis.reservation system.
 
@@ -703,10 +704,13 @@ def import_reservations(dsn, map, start_date):
 
         session.flush()
 
-        print("Fetching remote allocations")
-        count, rows = select_with_count(remote, """
+        print(f'Resources: {mapping.keys()}')
+
+        print(f"Fetching remote allocations after {start_date}")
+        count, rows = select_with_count(remote, f"""
             SELECT * FROM allocations
             WHERE mirror_of IN :resources
+            AND _end >= '{start_date}'::date
             ORDER BY allocations.resource
         """, resources=tuple(mapping.keys()))
 
@@ -766,11 +770,16 @@ def import_reservations(dsn, map, start_date):
             allocation_ids[row['id']] = allocation.id
 
         # fetch the reserved slots that should be migrated
-        count, rows = select_with_count(remote, """
+        count, rows = select_with_count(
+            remote, """
             SELECT * FROM reserved_slots WHERE allocation_id IN (
                 SELECT id FROM allocations WHERE mirror_of IN :resources
+                AND id in :parsed
             )
-        """, resources=tuple(mapping.keys()))
+            """,
+            resources=tuple(mapping.keys()),
+            parsed=tuple(allocation_ids.keys())
+        )
 
         # create the reserved slots with the mapped values
         print("Writing reserved slots")
@@ -799,12 +808,16 @@ def import_reservations(dsn, map, start_date):
         session.flush()
 
         # fetch the reservations that should be migrated
-        count, rows = select_with_count(remote, """
-            SELECT * FROM reservations
+        count, rows = select_with_count(
+            remote, f"""
+            SELECT * FROM reservations re
             WHERE resource IN :resources
-              AND status = 'approved'
-            ORDER BY resource
-        """, resources=tuple(mapping.keys()))
+              AND re.status = 'approved'
+              AND re.end >= '{start_date}'::date
+            ORDER BY re.resource
+            """,
+            resources=tuple(mapping.keys()),
+        )
 
         def targeted_allocations(group):
             return session.query(Allocation).filter_by(group=group)
@@ -813,7 +826,7 @@ def import_reservations(dsn, map, start_date):
         reservation_data = {}
         payment_states = {}
 
-        print("Writing reservations")
+        print(f"Writing reservations after {start_date}")
         for row in tqdm(rows, unit=' reservations', total=count):
 
             reservation_data[row['token']] = {
