@@ -15,6 +15,7 @@ from onegov.org.models import (
     ExportCollection, PublicationCollection, PageMove
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.utils import IMG_URLS
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.people import PersonCollection
@@ -28,7 +29,7 @@ from onegov.core.static import StaticFile
 from onegov.town6.theme import user_options
 from onegov.org.layout import (
     Layout as OrgLayout, AdjacencyListMixin,
-    DefaultLayoutMixin, DefaultMailLayoutMixin,
+    DefaultLayoutMixin, DefaultMailLayoutMixin
 )
 from onegov.user import UserCollection, UserGroupCollection
 
@@ -231,6 +232,15 @@ class SettingsLayout(DefaultLayout):
 class PageLayout(AdjacencyListLayout):
 
     @cached_property
+    def og_image_source(self):
+        if not self.model.text:
+            return super().og_image_source
+        for url in IMG_URLS.findall(self.model.text) or []:
+            if self.is_internal(url):
+                return url
+        return super().og_image_source
+
+    @cached_property
     def breadcrumbs(self):
         return tuple(self.get_breadcrumbs(self.model))
 
@@ -246,6 +256,15 @@ class PageLayout(AdjacencyListLayout):
 
 
 class NewsLayout(AdjacencyListLayout):
+
+    @cached_property
+    def og_image_source(self):
+        if not self.model.text:
+            return super().og_image_source
+        for url in IMG_URLS.findall(self.model.text) or []:
+            if self.is_internal(url):
+                return url
+        return super().og_image_source
 
     @cached_property
     def breadcrumbs(self):

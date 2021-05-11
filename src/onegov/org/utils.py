@@ -33,6 +33,7 @@ EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 # note that this tag should be safe - i.e. it may not accept '<' or the like
 # to avoid js script injection further down the line
 HASHTAG = re.compile(r'#\w{3,}')
+IMG_URLS = re.compile(r'<img src="(.*?)"')
 
 
 def djb2_hash(text, size):

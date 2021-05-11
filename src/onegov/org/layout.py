@@ -39,6 +39,7 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
+from onegov.org.utils import IMG_URLS
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
@@ -708,6 +709,15 @@ class SettingsLayout(DefaultLayout):
 class PageLayout(AdjacencyListLayout):
 
     @cached_property
+    def og_image_source(self):
+        if not self.model.text:
+            return super().og_image_source
+        for url in IMG_URLS.findall(self.model.text) or []:
+            if self.is_internal(url):
+                return url
+        return super().og_image_source
+
+    @cached_property
     def breadcrumbs(self):
         return tuple(self.get_breadcrumbs(self.model))
 
@@ -717,6 +727,15 @@ class PageLayout(AdjacencyListLayout):
 
 
 class NewsLayout(AdjacencyListLayout):
+
+    @cached_property
+    def og_image_source(self):
+        if not self.model.text:
+            return super().og_image_source
+        for url in IMG_URLS.findall(self.model.text) or []:
+            if self.is_internal(url):
+                return url
+        return super().og_image_source
 
     @cached_property
     def breadcrumbs(self):

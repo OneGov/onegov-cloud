@@ -1,8 +1,8 @@
 from freezegun import freeze_time
 
 from tests.onegov.org.common import edit_bar_links
-from tests.shared.utils import get_meta
-
+from tests.shared.utils import get_meta, create_image, open_in_browser
+from webtest import Upload
 
 def check_breadcrumbs(page, excluded):
     # check the breadcrumbs
@@ -67,6 +67,18 @@ def test_pages(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
+    admin = client.spawn()
+    admin.login_admin()
+
+    images = admin.get('/images')
+    images.form['file'] = Upload('Test.jpg', create_image().read())
+    images.form.submit()
+    img_url = admin.get('/images').pyquery('.image-box a').attr('href')
+
+    embedded_img = f'<p class="has-img">' \
+                   f'<img src="${img_url}" class="lazyload-alt" ' \
+                   f'width="1167px" height="574px"></p>'
+
     client.login_admin()
     editor = client.spawn()
     editor.login_editor()
@@ -79,6 +91,7 @@ def test_pages(client):
     new_page.form['text'] = (
         "<h2>Living in Govikon is Really Great</h2>"
         "<i>Experts say it's the fact that Govikon does not really exist.</i>"
+        + embedded_img
     )
     page = new_page.form.submit().follow()
 
@@ -91,7 +104,7 @@ def test_pages(client):
     # Test OpenGraph Meta
     assert get_meta(page, 'og:title') == 'Living in Govikon is Swell'
     assert get_meta(page, 'og:description') == 'Living in Govikon...'
-    assert not get_meta(page, 'og:image')
+    assert get_meta(page, 'og:image') == img_url
 
     edit_page = page.click("Bearbeiten")
     assert "Thema Bearbeiten" in edit_page
