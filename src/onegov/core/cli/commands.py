@@ -67,6 +67,10 @@ def sendmail(group_context,
         def category(self):
             return self.message.get('X-Category')
 
+        @property
+        def exists(self):
+            return self.filename in self.maildir
+
         def remove(self):
             self.maildir.remove(self.filename)
 
@@ -90,7 +94,11 @@ def sendmail(group_context,
 
     # emails
     mails = (Mail(d, f) for d in dirs for f in d.keys())
-    mails = (m for m in mails if category is None or m.category == category)
+    mails = tuple(mails)
+    mails = (
+        m for m in mails
+        if m.exists and (category is None or m.category == category)
+    )
 
     # load all the mails we're going to process
     if limit:
