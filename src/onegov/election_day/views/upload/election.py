@@ -113,7 +113,7 @@ def view_upload_majorz_election(self, request, form):
                 transaction.abort()
             else:
                 status = 'success'
-                request.app.pages_cache.invalidate()
+                request.app.pages_cache.flush()
                 request.app.send_zulip(
                     request.app.principal.name,
                     'New results available: [{}]({})'.format(
@@ -218,7 +218,7 @@ def view_upload_proporz_election(self, request, form):
                 transaction.abort()
             else:
                 status = 'success'
-                request.app.pages_cache.invalidate()
+                request.app.pages_cache.flush()
                 request.app.send_zulip(
                     request.app.principal.name,
                     'New results available: [{}]({})'.format(

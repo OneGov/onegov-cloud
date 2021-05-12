@@ -39,7 +39,7 @@ def view_upload_election_party_results(self, request, form):
             transaction.abort()
         else:
             status = 'success'
-            request.app.pages_cache.invalidate()
+            request.app.pages_cache.flush()
             request.app.send_zulip(
                 request.app.principal.name,
                 'New party results available: [{}]({})'.format(
@@ -89,7 +89,7 @@ def view_upload_election_compound_party_results(self, request, form):
             transaction.abort()
         else:
             status = 'success'
-            request.app.pages_cache.invalidate()
+            request.app.pages_cache.flush()
             request.app.send_zulip(
                 request.app.principal.name,
                 'New party results available: [{}]({})'.format(

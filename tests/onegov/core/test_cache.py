@@ -69,3 +69,26 @@ def test_cache_independence(redis_url):
     app.namespace = 'towns'
     app.set_application_id('towns/washington')
     assert app.cache.get('foo')
+
+
+def test_cache_flush(redis_url):
+    bar = Framework()
+    bar.namespace = 'foo'
+    bar.set_application_id('foo/bar')
+    bar.configure_application(redis_url=redis_url)
+    assert bar.cache.keys() == []
+
+    baz = Framework()
+    baz.namespace = 'foo'
+    baz.set_application_id('foo/baz')
+    baz.configure_application(redis_url=redis_url)
+    assert baz.cache.keys() == []
+
+    bar.cache.set('moo', 'qux')
+    baz.cache.set('boo', 'qux')
+    assert bar.cache.keys() == [b'foo/bar:short-term:moo']
+    assert baz.cache.keys() == [b'foo/baz:short-term:boo']
+
+    baz.cache.flush()
+    assert bar.cache.keys() == [b'foo/bar:short-term:moo']
+    assert baz.cache.keys() == []

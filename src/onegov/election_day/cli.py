@@ -27,7 +27,7 @@ def add(group_context):
     """
 
     def add_instance(request, app):
-        app.cache.invalidate()
+        app.cache.flush()
         if not app.principal:
             click.secho("principal.yml not found", fg='yellow')
 

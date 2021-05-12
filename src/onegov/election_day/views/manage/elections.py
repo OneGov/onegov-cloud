@@ -71,7 +71,7 @@ def edit_election(self, request, form):
         form.update_model(self)
         archive.update(self, request)
         request.message(_("Election modified."), 'success')
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -100,7 +100,7 @@ def clear_election(self, request, form):
     if form.submitted(request):
         archive.clear(self, request)
         request.message(_("Results deleted."), 'success')
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     return {
@@ -134,7 +134,7 @@ def delete_election(self, request, form):
     if form.submitted(request):
         archive.delete(self, request)
         request.message(_("Election deleted."), 'success')
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     return {

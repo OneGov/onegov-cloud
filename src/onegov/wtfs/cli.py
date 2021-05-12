@@ -30,7 +30,7 @@ def add(group_context):
     """
 
     def add_instance(request, app):
-        app.cache.invalidate()
+        app.cache.flush()
         app.add_initial_content()
         click.echo("Instance was created successfully")
 

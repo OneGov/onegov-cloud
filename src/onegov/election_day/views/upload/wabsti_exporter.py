@@ -113,7 +113,7 @@ def view_upload_wabsti_vote(self, request):
         transaction.abort()
         return {'status': 'error', 'errors': errors}
     else:
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return {'status': 'success', 'errors': {}}
 
 
@@ -208,7 +208,7 @@ def view_upload_wabsti_majorz(self, request):
         transaction.abort()
         return {'status': 'error', 'errors': errors}
     else:
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return {'status': 'success', 'errors': {}}
 
 
@@ -311,5 +311,5 @@ def view_upload_wabsti_proporz(self, request):
         transaction.abort()
         return {'status': 'error', 'errors': errors}
     else:
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return {'status': 'success', 'errors': {}}

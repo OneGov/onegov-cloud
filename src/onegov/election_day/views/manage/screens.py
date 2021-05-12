@@ -66,7 +66,7 @@ def edit_screen_item(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.message(_('Screen modified.'), 'success')
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     if not form.errors:

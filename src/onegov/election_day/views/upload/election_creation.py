@@ -72,5 +72,5 @@ def view_create_wabsti_proporz(self, request):
         transaction.abort()
         return {'status': 'error', 'errors': errors}
     else:
-        request.app.pages_cache.invalidate()
+        request.app.pages_cache.flush()
         return {'status': 'success', 'errors': {}}

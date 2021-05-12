@@ -36,10 +36,11 @@ eventually be discarded by redis if the cache is full).
 
 import dill
 
-from fastcache import clru_cache as lru_cache  # noqa
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
+from fastcache import clru_cache as lru_cache  # noqa
 from redis import ConnectionPool
+from types import MethodType
 
 
 def dill_serialize(value):
@@ -54,6 +55,26 @@ def dill_deserialize(value):
     return dill.loads(value)
 
 
+def keys(cache):
+    # note, this cannot be used in a Redis cluster - if we use that
+    # we have to keep track of all keys separately
+    prefix = cache.key_mangler('').decode()
+    return cache.backend.reader_client.eval(
+        "return redis.pcall('keys', ARGV[1])", 0, f'{prefix}*'
+    )
+
+
+def flush(cache):
+    # note, this cannot be used in a Redis cluster - if we use that
+    # we have to keep track of all keys separately
+    prefix = cache.key_mangler('').decode()
+    return cache.backend.reader_client.eval("""
+        if #redis.pcall('keys', ARGV[1]) > 0 then
+            return redis.pcall('del', unpack(redis.call('keys', ARGV[1])))
+        end
+    """, 0, f'{prefix}*')
+
+
 @lru_cache(maxsize=1024)
 def get(namespace, expiration_time, redis_url):
 
@@ -65,7 +86,7 @@ def get(namespace, expiration_time, redis_url):
         serializer=dill_serialize,
         deserializer=dill_deserialize
     )
-    return make_region(**region_conf).configure(
+    result = make_region(**region_conf).configure(
         'dogpile.cache.redis',
         arguments={
             'url': redis_url,
@@ -73,6 +94,9 @@ def get(namespace, expiration_time, redis_url):
             'connection_pool': get_pool(redis_url)
         }
     )
+    result.flush = MethodType(flush, result)
+    result.keys = MethodType(keys, result)
+    return result
 
 
 @lru_cache(maxsize=16)
