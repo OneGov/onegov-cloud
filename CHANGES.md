@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2021.50`
+
+> commits: **2 / [f767eccb86...d40011e571](https://github.com/OneGov/onegov-cloud/compare/f767eccb86^...d40011e571)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.50)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds a flush method to caches.**
+
+Invalidating a dogpile cache region only works for the current process.
+
+**`Feature`** | **[SEA-314](https://linear.app/seantis/issue/SEA-314)** | **[d40011e571](https://github.com/onegov/onegov-cloud/commit/d40011e5713f91c74cc61818f39ec5d4bf7b30e5)**
+
 ## Release `2021.49`
 
-> commits: **41 / [7cd3771161...f7bb46ffde](https://github.com/OneGov/onegov-cloud/compare/7cd3771161^...f7bb46ffde)**  
+> released: **2021-05-11 12:17**<br>
+> commits: **42 / [7cd3771161...c707683eae](https://github.com/OneGov/onegov-cloud/compare/7cd3771161^...c707683eae)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.49)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
