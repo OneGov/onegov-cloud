@@ -5,18 +5,20 @@ from cgi import FieldStorage
 from datetime import datetime
 from gzip import GzipFile
 from io import BytesIO
-
-
+from onegov.core.utils import Bunch
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField, DateTimeLocalField
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import DateTimeLocalField
+from onegov.form.fields import HoneyPotField
 from onegov.form.fields import HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import UploadField
 from onegov.form.validators import ValidPhoneNumber
+from unittest.mock import patch
 
 
 def create_file(mimetype, filename, content):
@@ -189,3 +191,21 @@ def test_date_time_local_field():
     # Firefox...
     field.process(DummyPostData({'dt': "2010-05-06 07:08:00"}))
     assert field.data == datetime(2010, 5, 6, 7, 8)
+
+
+def test_honeypot_field():
+    form = Form()
+    form.request = Bunch(client_addr='1.1.1.1')
+    field = HoneyPotField()
+    field = field.bind(form, 'honeypot')
+    field.meta.request = Bunch(include=lambda x: None)
+    field.data = ''
+
+    assert 'class="lazy-wolves"' in field()
+    assert field.validate(form)
+
+    field.data = 'me-a-stupid-bot'
+    with patch('onegov.form.fields.log') as log:
+        assert not field.validate(form)
+        assert field.errors == ['Invalid value']
+        log.info.assert_called_with('Honeypot used by 1.1.1.1')

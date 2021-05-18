@@ -315,3 +315,12 @@ class PanelWidget(object):
         text = text.replace('">', '" ' + html_params(**kwargs) + '>')
         text = text.replace('\n', '<br>')
         return HTMLString(text)
+
+
+class HoneyPotWidget(TextInput):
+    """ A widget that displays the input normally not visible to the user. """
+
+    def __call__(self, field, **kwargs):
+        field.meta.request.include('lazy-wolves')
+        kwargs['class_'] = (kwargs.get('class_', '') + ' lazy-wolves').strip()
+        return super().__call__(field, **kwargs)

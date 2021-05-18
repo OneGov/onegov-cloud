@@ -1,5 +1,6 @@
 from decimal import Decimal
 from onegov.form import Form, merge_forms, with_options, move_fields
+from onegov.form.fields import HoneyPotField
 from onegov.pay import Price
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
@@ -49,8 +50,9 @@ def test_useful_data():
         a = StringField("a")
         b = StringField("b")
         c = StringField("c")
+        d = HoneyPotField()
 
-    request = DummyRequest({'a': 'A', 'b': 'B', 'c': 'C'})
+    request = DummyRequest({'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D'})
     assert TestForm(request.POST).get_useful_data(exclude={'a', 'b'}) \
         == {'c': 'C'}
 

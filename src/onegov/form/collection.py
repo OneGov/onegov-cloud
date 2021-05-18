@@ -203,13 +203,11 @@ class FormSubmissionCollection(object):
 
         # extensions are inherited from definitions
         if definition:
-            assert 'extensions' not in submission.meta, """
+            assert not submission.extensions, """
                 For submissions based on definitions, the extensions need
                 to be defined on the definition!
             """
-
-            if 'extensions' in definition.meta:
-                submission.meta['extensions'] = definition.meta['extensions']
+            submission.extensions = definition.extensions
 
         self.update(submission, form)
 

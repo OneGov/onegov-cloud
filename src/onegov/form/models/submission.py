@@ -93,6 +93,9 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: form setting may change later.
     payment_method = Column(Text, nullable=False, default='manual')
 
+    #: extensions
+    extensions = meta_property(default=list)
+
     __mapper_args__ = {
         "polymorphic_on": 'state'
     }
@@ -116,7 +119,9 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
-            parse_form(self.definition), self.meta.get('extensions'))
+            parse_form(self.definition),
+            self.extensions
+        )
 
     @property
     def form_obj(self):

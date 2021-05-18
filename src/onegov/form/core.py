@@ -7,6 +7,7 @@ from itertools import groupby
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
+from onegov.form.fields import HoneyPotField
 from onegov.form.validators import StrictOptional
 from onegov.pay import Price
 from onegov.form.display import render_field
@@ -453,6 +454,9 @@ class Form(BaseForm):
         that should not be stored in the db backend.
 
         """
+
+        honeypots = {f.name for f in self if isinstance(f, HoneyPotField)}
+        exclude = set(exclude) | honeypots
 
         return {k: v for k, v in self.data.items() if k not in exclude}
 

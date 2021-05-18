@@ -98,6 +98,11 @@ def get_preview_widget_asset():
     yield 'preview-widget.js'
 
 
+@FormApp.webasset('lazy-wolves')
+def get_honeypot_asset():
+    yield 'honeypot.css'
+
+
 @FormApp.webasset(
     'chosen',
     filters={'css': ['datauri', 'custom-rcssmin']}

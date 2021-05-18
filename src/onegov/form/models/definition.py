@@ -96,6 +96,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     #: content associated with the form
     text = content_property()
 
+    #: extensions
+    extensions = meta_property(default=list)
+
     #: payment options ('manual' for out of band payments without cc, 'free'
     #: for both manual and cc payments, 'cc' for forced cc payments)
     payment_method = Column(Text, nullable=False, default='manual')
@@ -109,7 +112,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
-            parse_form(self.definition), self.meta.get('extensions'))
+            parse_form(self.definition),
+            self.extensions,
+        )
 
     @observes('definition')
     def definition_observer(self, definition):

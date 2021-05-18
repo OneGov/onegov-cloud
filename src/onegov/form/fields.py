@@ -7,9 +7,11 @@ from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form import log
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import ChosenSelectWidget
+from onegov.form.widgets import HoneyPotWidget
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
@@ -337,3 +339,34 @@ class TimezoneDateTimeField(DateTimeLocalField):
 
         if self.data:
             self.data = sedate.replace_timezone(self.data, self.timezone)
+
+
+class HoneyPotField(StringField):
+    """ A field to identify bots.
+
+    A honey pot field is hidden using CSS and therefore not visible for users
+    but bots (probably). We therefore expect this field to be empty at any
+    time and throw an error if provided as well as adding a log message to
+    optionally ban the IP.
+
+    To add honey pot fields to your (public) forms, give it a reasonable name,
+    but not one that might be autofilled by browsers, e.g.:
+
+        delay = HoneyPotField()
+
+    """
+
+    widget = HoneyPotWidget()
+
+    def __init__(self, *args, **kwargs):
+        kwargs['label'] = ''
+        kwargs['validators'] = ''
+        kwargs['description'] = ''
+        kwargs['default'] = ''
+        super().__init__(*args, **kwargs)
+        self.type = 'LazyWolvesField'
+
+    def post_validate(self, form, validation_stopped):
+        if self.data:
+            log.info(f'Honeypot used by {form.request.client_addr}')
+            raise ValueError('Invalid value')
