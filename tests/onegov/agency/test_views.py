@@ -432,6 +432,14 @@ def test_view_report_change(client):
     agency_ticket = agency_ticket.click("Ticket annehmen").follow()
     agency_ticket = agency_ticket.click("Ticket abschliessen").follow()
 
+    # ... with honeypot filled
+    change = agency.click("Mutation melden")
+    change.form['email'] = "info@hospital-springfield.com"
+    change.form['delay'] = 'abc'
+    change.form['message'] = 'xyz'
+    change = change.form.submit().maybe_follow()
+    assert "Vielen Dank für Ihre Eingabe!" not in change
+
     # Report person change
     change = person.click("Mutation melden")
     change.form['email'] = "info@hospital-springfield.com"
@@ -447,6 +455,14 @@ def test_view_report_change(client):
     assert "info@hospital-springfield.com" in person_ticket
     person_ticket = person_ticket.click("Ticket annehmen").follow()
     person_ticket = person_ticket.click("Ticket abschliessen").follow()
+
+    # ... with honeypot filled
+    change = person.click("Mutation melden")
+    change.form['email'] = "info@hospital-springfield.com"
+    change.form['delay'] = 'abc'
+    change.form['message'] = 'xyz'
+    change = change.form.submit().maybe_follow()
+    assert "Vielen Dank für Ihre Eingabe!" not in change
 
     # Details not shown if missing permissions
     client.login('member@example.org', 'hunter2')

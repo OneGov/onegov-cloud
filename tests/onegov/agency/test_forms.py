@@ -34,6 +34,7 @@ class DummyRequest(object):
         self.time_zone = 'Europe/Zurich'
         self.permissions = permissions or {}
         self.current_user = current_user
+        self.client_addr = '1.1.1.1'
 
     def is_private(self, model):
         return self.private
@@ -288,6 +289,20 @@ def test_mutation_form():
         'email': 'info@hospital-springfield.org',
         'message': "Nick Rivera's retired."
     }
+    assert form.validate()
+
+    # honeypot
+    form = MutationForm(DummyPostData({
+        'email': 'info@hospital-springfield.org',
+        'message': "Nick Rivera's retired.",
+        'delay': '10'
+    }))
+    form.request = DummyRequest(None)
+    assert form.get_useful_data() == {
+        'email': 'info@hospital-springfield.org',
+        'message': "Nick Rivera's retired."
+    }
+    assert not form.validate()
 
 
 def test_user_group_form(session):
