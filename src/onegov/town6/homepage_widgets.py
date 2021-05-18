@@ -52,6 +52,17 @@ class ColumnWidget(object):
     """
 
 
+@TownApp.homepage_widget(tag='text')
+class TextWidget(object):
+    template = """
+        <xsl:template match="text">
+            <p class="homepage-text">
+                <xsl:apply-templates select="node()"/>
+            </p>
+        </xsl:template>
+    """
+
+
 @TownApp.homepage_widget(tag='links')
 class LinksWidget(object):
     template = """
