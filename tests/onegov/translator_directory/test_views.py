@@ -254,7 +254,7 @@ def test_create_new_language(client):
     page = page.form.submit()
     assert 'Dieses Feld wird benötigt' in page
 
-    page.form['name'] = ' enGlish   '
+    page.form['name'] = ' English   '
     page = page.form.submit().follow()
     assert 'Sprache English hinzugefügt' in page
     assert 'English' in page
@@ -263,6 +263,11 @@ def test_create_new_language(client):
     page.form['name'] = 'English'
     page = page.form.submit()
     assert 'English existiert bereits' in page
+
+    page = client.get('/languages').click('English')
+    page.form['name'] = 'English (British)'
+    page = page.form.submit().follow()
+    assert 'English (British)' in page
 
 
 def test_view_search_translator(client):

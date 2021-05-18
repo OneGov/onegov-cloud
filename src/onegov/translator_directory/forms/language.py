@@ -21,8 +21,7 @@ class LanguageForm(Form):
                 _('This field is required.')
             )
 
-        # We correct user input here
-        field.data = field.data.strip().lower().capitalize()
+        field.data = field.data.strip()
 
         query = self.request.session.query(Language)
         lang = query.filter_by(name=field.data).first()
