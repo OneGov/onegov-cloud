@@ -46,29 +46,29 @@ a textfield::
 
     My textfield = ___
 
-Comments can be added beneath a field, using the same indentation:
+Comments can be added beneath a field, using the same indentation::
 
     My textfield = ___
     << Explanation for my field >>
 
 All characters are allowed except ''>''.
 
-Complex example:
+Complex example::
 
-        Delivery * =
-            (x) I want it delivered
-                Alternate Address =
-                    (x) No
-                    ( ) Yes
-                        Street = ___
-                        << street >>
-                        Town = ___
-                << Alt >>
-            ( ) I want to pick it up
-        << delivery >>
+    Delivery * =
+        (x) I want it delivered
+            Alternate Address =
+                (x) No
+                ( ) Yes
+                    Street = ___
+                    << street >>
+                    Town = ___
+            << Alt >>
+        ( ) I want to pick it up
+    << delivery >>
 
-        Kommentar = ...
-        << kommentar >>
+    Kommentar = ...
+    << kommentar >>
 
 All possible fields are documented further below.
 

@@ -17,7 +17,7 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     other model (content).
 
     The model does not define the relationship to the content. Instead, the
-    realtionship should be defined in the content model when needed:
+    realtionship should be defined in the content model when needed::
 
         role_mappings = relationship(
             RoleMapping,

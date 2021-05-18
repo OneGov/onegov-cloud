@@ -31,7 +31,7 @@ class Principal(object):
     hidden_elements: Used to optionally show and hide certain charts on
     the defined views.
 
-    Example config in a yaml file:
+    Example config in a yaml file::
 
         hidden_elements:
                   always:
@@ -42,8 +42,9 @@ class Principal(object):
                       chart: false
                     candidates:
                       chart: false
+
     publish_intermediate_results: Optionally renders svg and pdf for
-    intermediate results. Example:
+    intermediate results. Example::
 
         publish_intermediate_results:
             vote: true
@@ -51,6 +52,7 @@ class Principal(object):
             election_compound: true
 
     Defaults to false if nothing specified
+
     """
 
     def __init__(
