@@ -48,6 +48,17 @@ class ColumnWidget(object):
     """
 
 
+@OrgApp.homepage_widget(tag='text')
+class TextWidget(object):
+    template = """
+        <xsl:template match="text">
+            <p class="homepage-text">
+                <xsl:apply-templates select="node()"/>
+            </p>
+        </xsl:template>
+    """
+
+
 @OrgApp.homepage_widget(tag='panel')
 class PanelWidget(object):
     # panels with less than one link (not counting the more-link) are
