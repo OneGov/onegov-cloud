@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-10 18:07+0200\n"
+"POT-Creation-Date: 2021-05-18 07:44+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1094,7 +1094,9 @@ msgstr "Die Summe aller Breiten der Fusszeilenkolonnen muss 12 sein."
 msgid ""
 "Default social media preview image for rich link previews. Optimal size is "
 "1200:630 px."
-msgstr "Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale Grösse beträgt 1200:630px."
+msgstr ""
+"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
+"Grösse beträgt 1200:630px."
 
 msgid "Icon 16x16 PNG (Windows)"
 msgstr ""
@@ -1723,6 +1725,12 @@ msgstr "Text statt Einleitung im Newsletter benutzen"
 
 msgid "A resource with this name already exists"
 msgstr "Eine Resource mit diesem Namen existiert bereits"
+
+msgid "Enable honey pot"
+msgstr "Honey pot aktivieren"
+
+msgid "Spam protection"
+msgstr "Spamschutz"
 
 msgid "This month"
 msgstr "Diesen Monat"

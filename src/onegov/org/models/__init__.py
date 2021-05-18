@@ -12,6 +12,7 @@ from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import ContentExtension
 from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import HoneyPotExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.file import GeneralFile
@@ -73,6 +74,7 @@ __all__ = [
     'FormPersonMove',
     'GeneralFile',
     'GeneralFileCollection',
+    'HoneyPotExtension',
     'AccessExtension',
     'ImageFile',
     'ImageFileCollection',

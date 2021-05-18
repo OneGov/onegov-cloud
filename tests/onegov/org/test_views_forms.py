@@ -1,5 +1,4 @@
 import textwrap
-from collections import namedtuple
 from datetime import date
 
 import transaction
@@ -44,10 +43,10 @@ def test_render_form(client):
         Field('date', '= YYYY.MM.DD', long_field_help),
         Field('Textfield long', '*= ___', long_field_help),
         Field('Email long', '* = @@@', long_field_help),
-        Field('Checkbox', """*= 
+        Field('Checkbox', """*=
                 [ ] 4051
                 [ ] 4052""", long_field_help),
-        Field('Select', """= 
+        Field('Select', """=
                 (x) A
                 ( ) B""", long_field_help),
         Field('Alter', '= 0..150', long_field_help),
@@ -61,10 +60,10 @@ def test_render_form(client):
 
     # Those should render description externally, checked visually
     not_rendering_placeholder = [
-        Field('Checkbox2', """*= 
+        Field('Checkbox2', """*=
                    [ ] 4051
                    [ ] 4052""", short_comment),
-        Field('Select2', """= 
+        Field('Select2', """=
                     (x) A
                     ( ) B""", short_comment),
         Field('Image2', '= *.jpg|*.png|*.gif', short_comment),
@@ -725,3 +724,61 @@ def test_exploit_markdown_in_forms(client):
 
     assert '<script>alert' not in page
     assert '&lt;script&gt;alert' in page
+
+
+def test_honeypotted_forms(client):
+    client.login_editor()
+
+    # this error is not strictly line based, so there's a general error
+    new_form = client.get('/forms/new')
+    new_form.form['title'] = 'My Form'
+    new_form.form['lead'] = 'This is a form'
+    new_form.form['text'] = 'There are not many like it'
+    new_form.form['definition'] = 'E-Mail * = @@@'
+    new_form.form.submit().follow()
+
+    form_page = client.get('/forms/').click('My Form')
+    assert 'duplicate_of' in form_page
+    assert 'lazy-wolves' in form_page
+    assert 'honeypot' not in form_page
+
+    # Honeypot not used
+    form_page = client.get('/forms/').click('My Form')
+    form_page.form['e_mail'] = 'test@example.com'
+    preview_page = form_page.form.submit().maybe_follow()
+    assert 'duplicate_of' not in preview_page
+    assert 'lazy-wolves' not in preview_page
+    assert 'honeypot' not in preview_page
+    assert 'Das Formular enthält Fehler' not in preview_page
+
+    # Honeypot used
+    form_page = client.get('/forms/').click('My Form')
+    form_page.form['e_mail'] = 'test@example.com'
+    form_page.form['duplicate_of'] = 'abc'
+    submission_page = form_page.form.submit().maybe_follow()
+    assert 'duplicate_of' in submission_page
+    assert 'lazy-wolves' in submission_page
+    assert 'honeypot' not in submission_page
+    assert 'Das Formular enthält Fehler' in submission_page
+
+    submission_page = submission_page.form.submit()
+    assert 'duplicate_of' in submission_page
+    assert 'lazy-wolves' in submission_page
+    assert 'honeypot' not in submission_page
+    assert 'Das Formular enthält Fehler' in submission_page
+
+    # Honeypot disabled
+    edit_form = client.get('/forms/').click('My Form').click('Bearbeiten')
+    edit_form.form['honeypot'] = ''
+    edit_form.form.submit()
+
+    form_page = client.get('/forms/').click('My Form')
+    assert 'duplicate_of' not in form_page
+    assert 'lazy-wolves' not in form_page
+
+    form_page.form['e_mail'] = 'test@example.com'
+    preview_page = form_page.form.submit().maybe_follow()
+    assert 'duplicate_of' not in preview_page
+    assert 'lazy-wolves' not in preview_page
+    assert 'honeypot' not in preview_page
+    assert 'Das Formular enthält Fehler' not in preview_page

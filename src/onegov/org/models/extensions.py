@@ -397,3 +397,20 @@ class PublicationExtension(ContentExtension):
 
     def extend_form(self, form_class, request):
         return PublicationFormExtension(form_class).create()
+
+
+class HoneyPotExtension(ContentExtension):
+
+    honeypot = meta_property(default=True)
+
+    def extend_form(self, form_class, request):
+
+        class HoneyPotForm(form_class):
+
+            honeypot = BooleanField(
+                label=_('Enable honey pot'),
+                default=True,
+                fieldset=_('Spam protection')
+            )
+
+        return HoneyPotForm

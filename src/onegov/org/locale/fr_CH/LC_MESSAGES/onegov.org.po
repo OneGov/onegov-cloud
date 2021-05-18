@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-10 18:07+0200\n"
+"POT-Creation-Date: 2021-05-18 07:44+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1726,6 +1726,12 @@ msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
 
 msgid "A resource with this name already exists"
 msgstr "Une ressource portant ce nom existe déjà"
+
+msgid "Enable honey pot"
+msgstr "Activer les honey pot"
+
+msgid "Spam protection"
+msgstr "Protection contre le spam"
 
 msgid "This month"
 msgstr "Ce mois-ci"

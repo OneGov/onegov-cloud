@@ -4,7 +4,9 @@ from sedate import utcnow, to_timezone
 from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
 from onegov.form.submissions import prepare_for_submission
-from onegov.form.fields import UploadField, TimezoneDateTimeField
+from onegov.form.fields import HoneyPotField
+from onegov.form.fields import TimezoneDateTimeField
+from onegov.form.fields import UploadField
 from onegov.form.validators import StrictOptional, ValidPhoneNumber
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -246,3 +248,17 @@ class PublicationFormExtension(FormExtension, name='publication'):
                     return False
 
         return PublicationForm
+
+
+class HoneyPotFormExtension(FormExtension, name='honeypot'):
+
+    def create(self):
+
+        class HoneyPotForm(self.form_class):
+            duplicate_of = HoneyPotField()
+
+            def on_request(self):
+                if self.model and not getattr(self.model, 'honeypot', False):
+                    self.delete_field('duplicate_of')
+
+        return HoneyPotForm

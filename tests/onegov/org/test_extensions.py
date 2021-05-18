@@ -1,7 +1,8 @@
 from onegov.core.utils import Bunch
 from onegov.form import Form
+from onegov.form.extensions import Extendable
 from onegov.org.models import (
-    PersonLinkExtension, ContactExtension, AccessExtension
+    PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension
 )
 from uuid import UUID
 
@@ -332,3 +333,58 @@ def test_contact_extension():
         "steve@apple.com\n"
         "https://www.apple.com"
     )
+
+
+def test_honeypot_extension():
+
+    class Submission(Extendable, HoneyPotExtension):
+        meta = {}
+
+    class EditSubmissionForm(Form):
+        pass
+
+    class SubmissionForm(Form):
+        pass
+
+    # Edit submission
+    # ... default
+    submission = Submission()
+    assert submission.honeypot is True
+
+    form_class = submission.with_content_extensions(
+        EditSubmissionForm, request=object()
+    )
+    form = form_class()
+    assert 'honeypot' in form._fields
+    assert form.honeypot.data is True
+
+    # ... change
+    form.honeypot.data = False
+    form.populate_obj(submission)
+    assert submission.honeypot is False
+
+    # ... apply
+    form_class = submission.with_content_extensions(
+        EditSubmissionForm, request=object()
+    )
+    form = form_class()
+    form.process(obj=submission)
+    assert form.honeypot.data is False
+
+    # Extend submission
+    # ... add
+    submission.honeypot = True
+    form_class = submission.extend_form_class(
+        SubmissionForm, extensions=['honeypot']
+    )
+    form = form_class()
+    form.model = submission
+    form.on_request()
+    assert 'duplicate_of' in form._fields
+
+    # ... don't add
+    submission.honeypot = False
+    form = form_class()
+    form.model = submission
+    form.on_request()
+    assert 'duplicate_of' not in form._fields
