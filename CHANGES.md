@@ -1,8 +1,44 @@
 # Changes
 
+## Release `2021.51`
+
+> commits: **15 / [8eaa83aa1c...0894294b9d](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...0894294b9d)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.51)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Use honeypots in mutuation form.**
+
+**`Feature`** | **[SEA-288](https://linear.app/seantis/issue/SEA-288)** | **[4c1553ec7e](https://github.com/onegov/onegov-cloud/commit/4c1553ec7ed2dace76307f384a6d2bc914191943)**
+
+### Form
+
+🎉 **Add honeypot fields.**
+
+A honey pot field is hidden using CSS and therefore not visible for 
+users
+but bots (probably). We expect this field to be empty at any
+time and throw an error if provided as well as adding a log message to
+optionally ban the IP.
+
+**`Feature`** | **[SEA-288](https://linear.app/seantis/issue/SEA-288)** | **[8eaa83aa1c](https://github.com/onegov/onegov-cloud/commit/8eaa83aa1cd87eb20e7f0e4eca857194b5f6508a)**
+
+### Org
+
+🎉 **Add honeypot extensions for form definitions.**
+
+**`Feature`** | **[4a076451f7](https://github.com/onegov/onegov-cloud/commit/4a076451f7d96473e03d164091df3c5396c8f9e6)**
+
+### Translatordirectory
+
+🐞 **Don't correct language input.**
+
+**`Bugfix`** | **[ZW-314](https://kanton-zug.atlassian.net/browse/ZW-314)** | **[f380853e13](https://github.com/onegov/onegov-cloud/commit/f380853e13dac0b726541509ba06e8cc587c9291)**
+
 ## Release `2021.50`
 
-> commits: **2 / [f767eccb86...d40011e571](https://github.com/OneGov/onegov-cloud/compare/f767eccb86^...d40011e571)**  
+> released: **2021-05-13 08:47**<br>
+> commits: **3 / [f767eccb86...ab32040507](https://github.com/OneGov/onegov-cloud/compare/f767eccb86^...ab32040507)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.50)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
