@@ -55,6 +55,7 @@ cd /app/src
 pip install '.[test]' \
     pytest-test-groups \
     pytest-cov \
+    pytest-codecov \
     --quiet
 
 # reset the build assets again (like in the upstream container script),
@@ -69,31 +70,20 @@ adduser --disabled-password --gecos "" test
 
 GROUP_COUNT="$BUILDKITE_PARALLEL_JOB_COUNT"
 GROUP="$(( BUILDKITE_PARALLEL_JOB + 1 ))"
-PROCESSES="$(($(grep -c ^processor /proc/cpuinfo) - 1))"
 
-echo "--- Running tests :pytest: (group: $GROUP/$GROUP_COUNT, processes: $PROCESSES)"
+echo "--- Running tests :pytest: (group: $GROUP/$GROUP_COUNT)"
 set +x
 
-if [[ "$PROCESSES" == "1" ]]; then
-    xdist=""
-else
-    xdist="-n $PROCESSES"
-fi
+export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
-COMMIT="$BUILDKITE_COMMIT"
-COVERAGE_REPORT="/tmp/coverage.xml"
-export COVERAGE_FILE="/tmp/.coverage"
-
-# shellcheck disable=SC2086
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
-    --test-group $GROUP \
-    --test-group-count $GROUP_COUNT $xdist \
+    --test-group "$GROUP" \
+    --test-group-count "$GROUP_COUNT" \
     --cov \
-    --cov-report xml:$COVERAGE_REPORT \
+    --cov-config=.coveragerc \
+    --codecov \
+    --codecov-branch="$BUILDKITE_BRANCH" \
+    --codecov-commit="$BUILDKITE_COMMIT" \
+    --codecov-slug=OneGov/onegov-cloud \
     tests
-
-echo "--- Uploading code coverage results to codecov.io"
-
-# shellcheck disable=SC2086
-bash <(curl -s https://codecov.io/bash) -t ${CODECOV_ONEGOV_TOKEN} -f ${COVERAGE_REPORT} -C ${COMMIT}
