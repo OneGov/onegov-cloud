@@ -433,9 +433,46 @@ def test_form_registration_window_form(end):
         ('waitinglist', 'no'),
     ]))
     form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+    form.model = Bunch(registration_windows=[])
 
     assert not form.validate()
     assert form.errors == {'end': ['Please use a stop date after the start']}
+
+
+@pytest.mark.parametrize('start, end', [
+    ('2000-01-05', '2000-01-10'),
+    ('2000-01-05', '2000-01-15'),
+    ('2000-01-15', '2000-01-16'),
+    ('2000-01-15', '2000-01-25'),
+    ('2000-01-20', '2000-01-25'),
+])
+def test_form_registration_window_form_existing(start, end):
+    form = FormRegistrationWindowForm(MultiDict([
+        ('start', start),
+        ('end', end),
+        ('limit_attendees', 'no'),
+        ('waitinglist', 'no'),
+    ]))
+    form.request = Bunch(
+        translate=lambda txt: txt,
+        include=lambda src: None,
+        app=Bunch(org=Bunch(geo_provider=None, open_files_target_blank=False)),
+        is_manager=True,
+        locale='de_CH'
+    )
+    form.model = Bunch(registration_windows=[
+        Bunch(start=date(2000, 1, 10), end=date(2000, 1, 20))
+    ])
+
+    assert not form.validate()
+    form.errors['start'][0].interpolate() == (
+        'The date range overlaps with an existing registration window '
+        '(10.01.2000 - 20.01.2000).'
+    )
+    form.errors['end'][0].interpolate() == (
+        'The date range overlaps with an existing registration window '
+        '(10.01.2000 - 20.01.2000).'
+    )
 
 
 def test_user_group_form(session):
