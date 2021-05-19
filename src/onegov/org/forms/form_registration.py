@@ -82,8 +82,42 @@ class FormRegistrationWindowForm(Form):
         if not self.start.data or not self.end.data:
             return
         if self.start.data >= self.end.data:
-            self.end.errors = [_("Please use a stop date after the start")]
+            self.end.errors.append(_("Please use a stop date after the start"))
             return False
+
+    def ensure_no_overlapping_windows(self):
+        """ Ensure that this registration window does not overlap with other
+        already defined registration windows.
+
+        """
+        if not self.start.data or not self.end.data:
+            return
+
+        form = getattr(self.model, 'form', self.model)
+        for existing in form.registration_windows:
+            if existing == self.model:
+                continue
+
+            latest_start = max(self.start.data, existing.start)
+            earliest_end = min(self.end.data, existing.end)
+            delta = (earliest_end - latest_start).days + 1
+            if delta > 0:
+                # circular
+                from onegov.org.layout import DefaultLayout
+                layout = DefaultLayout(self.model, self.request)
+
+                msg = _(
+                    "The date range overlaps with an existing registration "
+                    "window (${range}).",
+                    mapping={
+                        'range': layout.format_date_range(
+                            existing.start, existing.end
+                        )
+                    }
+                )
+                self.start.errors.append(msg)
+                self.end.errors.append(msg)
+                return False
 
     def validate_limit(self, field):
 

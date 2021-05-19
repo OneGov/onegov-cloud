@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-18 07:44+0200\n"
+"POT-Creation-Date: 2021-05-19 09:08+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -674,6 +674,12 @@ msgstr "Avancé"
 
 msgid "Please use a stop date after the start"
 msgstr "Veuillez utiliser une date d'arrêt après le début"
+
+#, python-format
+msgid ""
+"The date range overlaps with an existing registration window (${range})."
+msgstr ""
+"La période donnée chevauche une fenêtre d'inscription existante (${range})."
 
 #, python-format
 msgid ""
