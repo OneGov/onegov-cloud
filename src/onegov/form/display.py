@@ -150,9 +150,11 @@ class RadioFieldRenderer(BaseRenderer):
 class MultiCheckboxFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
+        choices = {value: f'? ({value})' for value in field.data}
+        choices.update(dict(field.choices))
         return "".join(
             "✓ "
-            + self.escape(self.translate(field, dict(field.choices)[value]))
+            + self.escape(self.translate(field, choices[value]))
             + '<br>'
             for value in field.data
         )[:-4]

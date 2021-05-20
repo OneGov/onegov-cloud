@@ -4,15 +4,18 @@ from onegov.form import render_field
 
 class MockField(object):
 
-    def __init__(self, type, data):
+    def __init__(self, type, data, choices=None):
         self.type = type
         self.data = data
         self.render_kw = None
 
-        if isinstance(data, str):
-            self.choices = [(data, data)]
-        elif isinstance(data, list):
-            self.choices = [(c, c) for c in data]
+        if choices is not None:
+            self.choices = choices
+        else:
+            if isinstance(data, str):
+                self.choices = [(data, data)]
+            elif isinstance(data, list):
+                self.choices = [(c, c) for c in data]
 
 
 def test_render_textfields():
@@ -45,5 +48,8 @@ def test_render_radio_field():
 
 
 def test_render_multi_checkbox_field():
+    assert render_field(MockField('MultiCheckboxField', [])) == ''
     assert render_field(MockField('MultiCheckboxField', ['a', 'b']))\
         == '✓ a<br>✓ b'
+    assert render_field(MockField('MultiCheckboxField', ['c'], [('a', 'a')]))\
+        == '✓ ? (c)'
