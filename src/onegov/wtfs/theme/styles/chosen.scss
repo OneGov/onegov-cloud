@@ -1,6 +1,16 @@
 .chosen-container {
-    margin: 0 0 1rem;
+    margin: 0 0 $form-spacing;
+
+    .chosen-choices {
+        min-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+        padding: ($form-spacing / 4) ($form-spacing / 2) !important;
+    }
+
+    li {
+        font-size: .875rem;
+    }
 }
+
 
 .chosen-single {
     background: $input-focus-bg-color !important;

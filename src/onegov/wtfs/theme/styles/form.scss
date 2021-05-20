@@ -156,19 +156,6 @@ form {
         }
     }
 
-    .chosen-container {
-        margin-bottom: $form-spacing;
-
-        .chosen-choices {
-            min-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
-            padding: ($form-spacing / 4) ($form-spacing / 2) !important;
-        }
-
-        li {
-            font-size: .875rem;
-        }
-    }
-
     .ql-editor {
         min-height: 30em;
     }
