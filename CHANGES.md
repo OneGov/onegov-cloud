@@ -2,7 +2,8 @@
 
 ## Release `2021.52`
 
-> commits: **7 / [173c481049...9c6b2cd771](https://github.com/OneGov/onegov-cloud/compare/173c481049^...9c6b2cd771)**  
+> released: **2021-05-21 11:27**<br>
+> commits: **10 / [173c481049...2eb3f14319](https://github.com/OneGov/onegov-cloud/compare/173c481049^...2eb3f14319)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.52)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Ballot
@@ -25,6 +26,14 @@
 
 ### Town6
 
+✨ **Move login from header to footer.**
+
+**`Other`** | **[SEA-345](https://linear.app/seantis/issue/SEA-345)** | **[3c5dd81156](https://github.com/onegov/onegov-cloud/commit/3c5dd81156313245ce7767ce36c3905370d6b13f)**
+
+✨ **Show full date in news.**
+
+**`Other`** | **[SEA-344](https://linear.app/seantis/issue/SEA-344)** | **[4c84a0fdf7](https://github.com/onegov/onegov-cloud/commit/4c84a0fdf7d9ebb57891e7696df9e68895b0602d)**
+
 ✨ **Hide news in top navigation.**
 
 **`Other`** | **[SEA-343](https://linear.app/seantis/issue/SEA-343)** | **[9c6b2cd771](https://github.com/onegov/onegov-cloud/commit/9c6b2cd77132b322850b0771dc19aacc5d53dfc0)**
@@ -32,7 +41,7 @@
 ## Release `2021.51`
 
 > released: **2021-05-19 13:32**<br>
-> commits: **16 / [8eaa83aa1c...e9cd52c898](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...e9cd52c898)**  
+> commits: **18 / [8eaa83aa1c...e9cd52c898](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...e9cd52c898)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.51)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -58,6 +67,14 @@ optionally ban the IP.
 🎉 **Add honeypot extensions for form definitions.**
 
 **`Feature`** | **[4a076451f7](https://github.com/onegov/onegov-cloud/commit/4a076451f7d96473e03d164091df3c5396c8f9e6)**
+
+🎉 **Adds a generic text homepage widget.**
+
+**`Feature`** | **[SEA-334](https://linear.app/seantis/issue/SEA-334)** | **[2ba1ee6428](https://github.com/onegov/onegov-cloud/commit/2ba1ee642858c21b3979dc575906c1920e7a5635)**
+
+🐞 **Check for overlapping form registration windows.**
+
+**`Bugfix`** | **[f838b92cbc](https://github.com/onegov/onegov-cloud/commit/f838b92cbcda7d07c382bcdca1fda1b9c638b3b6)**
 
 ### Translatordirectory
 
@@ -198,7 +215,7 @@ for a whole day with multiple quantities possible per allocation.
 ## Release `2021.45`
 
 > released: **2021-04-23 12:08**<br>
-> commits: **5 / [db4286be42...a05fa442cd](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...a05fa442cd)**  
+> commits: **7 / [db4286be42...a05fa442cd](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...a05fa442cd)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.45)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
@@ -216,7 +233,7 @@ for a whole day with multiple quantities possible per allocation.
 ## Release `2021.44`
 
 > released: **2021-04-21 15:59**<br>
-> commits: **7 / [374e89a420...1fc3b1a099](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...1fc3b1a099)**  
+> commits: **50 / [374e89a420...1fc3b1a099](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...1fc3b1a099)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.44)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -235,6 +252,12 @@ Ends phases at the end of day for prebooking, booking and wishlist phase.
 
 ### Org
 
+🎉 **Adds option to change page urls path for admins**
+
+For news and topics, adds option to change the url path independant from the page title. Works for trait link and page, but prevents changing name of the parent news item under /news.
+
+**`Feature`** | **[SEA-255](https://linear.app/seantis/issue/SEA-255)** | **[ea0e3a610f](https://github.com/onegov/onegov-cloud/commit/ea0e3a610f306c48d30fce4a160e764f0a19008a)**
+
 🎉 **Adds admin tools for link adjustments and link checking**
 
 - Adds change-url views for Pages.
@@ -247,7 +270,7 @@ Ends phases at the end of day for prebooking, booking and wishlist phase.
 ## Release `2021.43`
 
 > released: **2021-04-21 06:50**<br>
-> commits: **12 / [47e62bf74e...2effac2bd6](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...2effac2bd6)**  
+> commits: **14 / [47e62bf74e...2effac2bd6](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...2effac2bd6)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.43)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Form
@@ -344,7 +367,7 @@ Adds step sequence registry. Defines 3 steps for forms, event suggestions, and n
 ## Release `2021.39`
 
 > released: **2021-04-06 16:59**<br>
-> commits: **7 / [575884a9a5...c05630558a](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...c05630558a)**  
+> commits: **11 / [575884a9a5...c05630558a](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...c05630558a)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.39)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
@@ -378,7 +401,7 @@ On topic A with child B, show the B's lead on /topics/a if enabled in the settin
 ## Release `2021.38`
 
 > released: **2021-04-01 12:39**<br>
-> commits: **12 / [a54d571901...28f8485e85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...28f8485e85)**  
+> commits: **17 / [a54d571901...28f8485e85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...28f8485e85)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.38)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
@@ -446,7 +469,7 @@ Use abbreviations for weekdays.
 ## Release `2021.33`
 
 > released: **2021-03-23 08:39**<br>
-> commits: **8 / [f784f15bb6...6f15672fb2](https://github.com/OneGov/onegov-cloud/compare/f784f15bb6^...6f15672fb2)**  
+> commits: **45 / [f784f15bb6...6f15672fb2](https://github.com/OneGov/onegov-cloud/compare/f784f15bb6^...6f15672fb2)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.33)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -504,7 +527,7 @@ Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
 ## Release `2021.30`
 
 > released: **2021-03-17 13:39**<br>
-> commits: **4 / [d7a436dfff...144e0bb5b4](https://github.com/OneGov/onegov-cloud/compare/d7a436dfff^...144e0bb5b4)**  
+> commits: **9 / [7157f0f0e3...144e0bb5b4](https://github.com/OneGov/onegov-cloud/compare/7157f0f0e3^...144e0bb5b4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.30)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Directory
@@ -519,7 +542,7 @@ Fixes sql alchemy observer calling migration of entries twice when triggering th
 ## Release `2021.29`
 
 > released: **2021-03-16 10:32**<br>
-> commits: **11 / [656bc95e19...6e2a9a9aa5](https://github.com/OneGov/onegov-cloud/compare/656bc95e19^...6e2a9a9aa5)**  
+> commits: **441 / [4d722f9b3f...6e2a9a9aa5](https://github.com/OneGov/onegov-cloud/compare/4d722f9b3f^...6e2a9a9aa5)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.29)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -527,6 +550,12 @@ Fixes sql alchemy observer calling migration of entries twice when triggering th
 🐞 **Fixes embedding youtu.be links not generating iframes**
 
 **`Bugfix`** | **[SEA-178](https://linear.app/seantis/issue/SEA-178)** | **[656bc95e19](https://github.com/onegov/onegov-cloud/commit/656bc95e1915addc9d4e314d39f44375615e686e)**
+
+### Town
+
+✨ **Adds event limit to homepage settings**
+
+**`Other`** | **[SEA-19](https://linear.app/seantis/issue/SEA-19)** | **[bcec43f330](https://github.com/onegov/onegov-cloud/commit/bcec43f3308c2bcea7bb8686683f622c072921a1)**
 
 ### Town6
 
@@ -548,6 +577,24 @@ Summary:
 
 **`Feature`** | **[SEA-131](https://linear.app/seantis/issue/SEA-131)** | **[a3af64722f](https://github.com/onegov/onegov-cloud/commit/a3af64722f603f4c5ca81f7b7eeb4f26867bddcd)**
 
+✨ **Adds option to display partners on all pages**
+
+- Hide it for admins in order not to clutter the page
+
+**`Other`** | **[df9dc9f9ee](https://github.com/onegov/onegov-cloud/commit/df9dc9f9ee57445cad3e3229a325e21d4be2f817)**
+
+✨ **Adds option to display partners on all pages**
+
+- Hide it for admins in order not to clutter the page
+
+**`Other`** | **[29979c0681](https://github.com/onegov/onegov-cloud/commit/29979c0681787bac4a1f870c8dabe5885134fd09)**
+
+✨ **Adds option to display partners on all pages**
+
+- Hide it for admins in order not to clutter the page
+
+**`Other`** | **[9d6a9135be](https://github.com/onegov/onegov-cloud/commit/9d6a9135bebade37332ba5e329a1fc952175c1f6)**
+
 ## Release `2021.28`
 
 > released: **2021-03-12 13:23**<br>
@@ -563,7 +610,7 @@ Summary:
 ## Release `2021.27`
 
 > released: **2021-03-11 08:39**<br>
-> commits: **5 / [ff6ba08b35...6f77624b93](https://github.com/OneGov/onegov-cloud/compare/ff6ba08b35^...6f77624b93)**  
+> commits: **15 / [783a05f22d...6f77624b93](https://github.com/OneGov/onegov-cloud/compare/783a05f22d^...6f77624b93)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.27)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
@@ -584,7 +631,7 @@ Adds tests for all formats for the roundtrip.
 ## Release `2021.26`
 
 > released: **2021-03-10 10:41**<br>
-> commits: **14 / [640f8b1b67...cd35dde238](https://github.com/OneGov/onegov-cloud/compare/640f8b1b67^...cd35dde238)**  
+> commits: **25 / [640f8b1b67...cd35dde238](https://github.com/OneGov/onegov-cloud/compare/640f8b1b67^...cd35dde238)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.26)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -622,7 +669,7 @@ Adds additional fields to ticket pdf and ticket view.
 ## Release `2021.24`
 
 > released: **2021-02-25 11:57**<br>
-> commits: **13 / [35fac7f40f...b8d872e9cd](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...b8d872e9cd)**  
+> commits: **15 / [35fac7f40f...b8d872e9cd](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...b8d872e9cd)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.24)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -646,7 +693,7 @@ Fixes issue for browsers not using default by themselves (IE11).
 ## Release `2021.23`
 
 > released: **2021-02-16 08:12**<br>
-> commits: **3 / [4827a53757...1c525760cf](https://github.com/OneGov/onegov-cloud/compare/4827a53757^...1c525760cf)**  
+> commits: **6 / [9a6179524e...1c525760cf](https://github.com/OneGov/onegov-cloud/compare/9a6179524e^...1c525760cf)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.23)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
@@ -718,7 +765,7 @@ Fixes issue for browsers not using default by themselves (IE11).
 ## Release `2021.19`
 
 > released: **2021-02-10 14:42**<br>
-> commits: **16 / [a1d6a50697...f6af388d87](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...f6af388d87)**  
+> commits: **19 / [a1d6a50697...f6af388d87](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...f6af388d87)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.19)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -755,7 +802,7 @@ Create PDF from (snapshotted) tickets and its messages. Does not iclude any file
 ## Release `2021.18`
 
 > released: **2021-02-08 10:32**<br>
-> commits: **11 / [fbda428801...bb54253ac8](https://github.com/OneGov/onegov-cloud/compare/fbda428801^...bb54253ac8)**  
+> commits: **13 / [fbda428801...bb54253ac8](https://github.com/OneGov/onegov-cloud/compare/fbda428801^...bb54253ac8)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.18)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -874,10 +921,16 @@ Adapts the wording for ticket since not everyone is familiar with ticket systems
 ## Release `2021.12`
 
 > released: **2021-01-25 11:17**<br>
-> commits: **4 / [2846cafe60...6ddb46fe43](https://github.com/OneGov/onegov-cloud/compare/2846cafe60^...6ddb46fe43)**  
+> commits: **6 / [9fdc1b6440...6ddb46fe43](https://github.com/OneGov/onegov-cloud/compare/9fdc1b6440^...6ddb46fe43)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.12)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
+
+✨ **Adds mapdata 2021**
+
+generated with seantis.swiss-maps
+
+**`Other`** | **[8781e82269](https://github.com/onegov/onegov-cloud/commit/8781e8226949c40b20816156d5f63cb7ea48598e)**
 
 ✨ **Adds mapdata 2021**
 
@@ -906,7 +959,7 @@ created with seantis.swiss-maps
 ## Release `2021.10`
 
 > released: **2021-01-21 15:36**<br>
-> commits: **14 / [b4de6dd221...fa7b4ea44f](https://github.com/OneGov/onegov-cloud/compare/b4de6dd221^...fa7b4ea44f)**  
+> commits: **17 / [b4de6dd221...fa7b4ea44f](https://github.com/OneGov/onegov-cloud/compare/b4de6dd221^...fa7b4ea44f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.10)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -951,7 +1004,7 @@ Adds options in /agency-settings to choose color/underlined properties for PDF l
 ## Release `2021.8`
 
 > released: **2021-01-19 13:06**<br>
-> commits: **5 / [cc0332ba4a...0588321087](https://github.com/OneGov/onegov-cloud/compare/cc0332ba4a^...0588321087)**  
+> commits: **6 / [37b2d93720...0588321087](https://github.com/OneGov/onegov-cloud/compare/37b2d93720^...0588321087)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.8)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -991,7 +1044,7 @@ Adds options in /agency-settings to choose color/underlined properties for PDF l
 ## Release `2021.6`
 
 > released: **2021-01-15 16:48**<br>
-> commits: **14 / [3c16311d82...b852e119d7](https://github.com/OneGov/onegov-cloud/compare/3c16311d82^...b852e119d7)**  
+> commits: **22 / [88b6ea3f08...b852e119d7](https://github.com/OneGov/onegov-cloud/compare/88b6ea3f08^...b852e119d7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.6)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -1037,7 +1090,7 @@ Settings can be changed in /link-settings.
 ## Release `2021.5`
 
 > released: **2021-01-13 13:20**<br>
-> commits: **6 / [4c96652e68...895b79a6a0](https://github.com/OneGov/onegov-cloud/compare/4c96652e68^...895b79a6a0)**  
+> commits: **14 / [4c96652e68...895b79a6a0](https://github.com/OneGov/onegov-cloud/compare/4c96652e68^...895b79a6a0)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.5)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -1051,7 +1104,7 @@ Preserve lead word wrap with forms and resources.
 ## Release `2021.4`
 
 > released: **2021-01-12 15:53**<br>
-> commits: **7 / [587cf0f042...4f1ffe3aae](https://github.com/OneGov/onegov-cloud/compare/587cf0f042^...4f1ffe3aae)**  
+> commits: **10 / [963a2d2e32...4f1ffe3aae](https://github.com/OneGov/onegov-cloud/compare/963a2d2e32^...4f1ffe3aae)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.4)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -1079,7 +1132,7 @@ Aggregates the export links in a new menu tab for quick access. Adds form to cho
 ## Release `2021.3`
 
 > released: **2021-01-11 13:10**<br>
-> commits: **15 / [f3ee7657c6...3bb41feb38](https://github.com/OneGov/onegov-cloud/compare/f3ee7657c6^...3bb41feb38)**  
+> commits: **18 / [0b893332e4...3bb41feb38](https://github.com/OneGov/onegov-cloud/compare/0b893332e4^...3bb41feb38)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.3)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -1123,7 +1176,7 @@ Clients can define the width of all the footer sections for medium screen sizes.
 ## Release `2021.2`
 
 > released: **2021-01-07 12:17**<br>
-> commits: **12 / [279ad674c6...4313ff1e23](https://github.com/OneGov/onegov-cloud/compare/279ad674c6^...4313ff1e23)**  
+> commits: **18 / [279ad674c6...4313ff1e23](https://github.com/OneGov/onegov-cloud/compare/279ad674c6^...4313ff1e23)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.2)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -1285,7 +1338,7 @@ This applies for periods without billing (finalizable=False)
 ## Release `2020.86`
 
 > released: **2020-12-10 14:45**<br>
-> commits: **14 / [8a4db45342...648fb4981b](https://github.com/OneGov/onegov-cloud/compare/8a4db45342^...648fb4981b)**  
+> commits: **23 / [8a4db45342...648fb4981b](https://github.com/OneGov/onegov-cloud/compare/8a4db45342^...648fb4981b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.86)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -1303,7 +1356,7 @@ This applies for periods without billing (finalizable=False)
 ## Release `2020.85`
 
 > released: **2020-12-07 11:58**<br>
-> commits: **14 / [f5f6655050...cf99c9d51f](https://github.com/OneGov/onegov-cloud/compare/f5f6655050^...cf99c9d51f)**  
+> commits: **99 / [f5f6655050...cf99c9d51f](https://github.com/OneGov/onegov-cloud/compare/f5f6655050^...cf99c9d51f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.85)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -1345,7 +1398,7 @@ Make the directory export public. Filters exported entries by the access propert
 ## Release `2020.84`
 
 > released: **2020-12-02 17:34**<br>
-> commits: **3 / [51f199055b...c2bf3283b4](https://github.com/OneGov/onegov-cloud/compare/51f199055b^...c2bf3283b4)**  
+> commits: **17 / [51f199055b...c2bf3283b4](https://github.com/OneGov/onegov-cloud/compare/51f199055b^...c2bf3283b4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.84)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -1359,7 +1412,7 @@ Deactivates deletion of agencies with children or memberships or of people with 
 ## Release `2020.83`
 
 > released: **2020-12-01 11:46**<br>
-> commits: **17 / [7c8d87d16e...aefb07f2ca](https://github.com/OneGov/onegov-cloud/compare/7c8d87d16e^...aefb07f2ca)**  
+> commits: **35 / [7a7f927516...aefb07f2ca](https://github.com/OneGov/onegov-cloud/compare/7a7f927516^...aefb07f2ca)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.83)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -1399,7 +1452,7 @@ By alphabetical sorting of the filters in directories, users can now influece th
 ## Release `2020.82`
 
 > released: **2020-11-19 09:52**<br>
-> commits: **8 / [aeb0810c8d...2129f7f69b](https://github.com/OneGov/onegov-cloud/compare/aeb0810c8d^...2129f7f69b)**  
+> commits: **14 / [dc6f09ccbb...2129f7f69b](https://github.com/OneGov/onegov-cloud/compare/dc6f09ccbb^...2129f7f69b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.82)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -1420,6 +1473,13 @@ For the RTF Editor used for the gazette notices, the form field is not scrollabl
 
 ### Org
 
+🐞 **Fixes deletion of form failing if there are registration windows**
+
+Form submissions that might be linked to registration windows are deleted before or not.
+If not, it will still throw an error like before.
+
+**`Bugfix`** | **[SEA-11](https://linear.app/seantis/issue/SEA-11)** | **[898c2976cb](https://github.com/onegov/onegov-cloud/commit/898c2976cb8df4d1351e2286e4c89f7e1080c805)**
+
 🐞 **Fixes error when deleting form with FormRegistrationWindows**
 
 Fixes cascading to delete FormRegistratronWindows of a form.
@@ -1429,7 +1489,7 @@ Fixes cascading to delete FormRegistratronWindows of a form.
 ## Release `2020.81`
 
 > released: **2020-11-12 09:38**<br>
-> commits: **7 / [893fe9b26e...9ef2aa8e4c](https://github.com/OneGov/onegov-cloud/compare/893fe9b26e^...9ef2aa8e4c)**  
+> commits: **23 / [d4ec93f84f...9ef2aa8e4c](https://github.com/OneGov/onegov-cloud/compare/d4ec93f84f^...9ef2aa8e4c)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.81)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -1457,7 +1517,7 @@ Adds excel upload to directory-settings view. We drop the excel creation mechani
 ## Release `2020.80`
 
 > released: **2020-11-10 09:21**<br>
-> commits: **12 / [b3c432f736...72f33b5bc9](https://github.com/OneGov/onegov-cloud/compare/b3c432f736^...72f33b5bc9)**  
+> commits: **67 / [b3c432f736...72f33b5bc9](https://github.com/OneGov/onegov-cloud/compare/b3c432f736^...72f33b5bc9)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.80)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -1487,7 +1547,7 @@ Adds excel upload to directory-settings view. We drop the excel creation mechani
 ## Release `2020.79`
 
 > released: **2020-11-03 17:35**<br>
-> commits: **14 / [f30937ed4f...f7f2d2ec1e](https://github.com/OneGov/onegov-cloud/compare/f30937ed4f^...f7f2d2ec1e)**  
+> commits: **37 / [c2ed8655ee...f7f2d2ec1e](https://github.com/OneGov/onegov-cloud/compare/c2ed8655ee^...f7f2d2ec1e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.79)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -1525,7 +1585,7 @@ Adds authentication and authorisation based on `onegov.user` using the browser s
 ## Release `2020.78`
 
 > released: **2020-10-27 09:22**<br>
-> commits: **13 / [86025c8fdc...ab440cc97f](https://github.com/OneGov/onegov-cloud/compare/86025c8fdc^...ab440cc97f)**  
+> commits: **66 / [2822475863...ab440cc97f](https://github.com/OneGov/onegov-cloud/compare/2822475863^...ab440cc97f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.78)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -1565,7 +1625,7 @@ Introduces pass system with separate billing and fixed maximum number of booking
 ## Release `2020.77`
 
 > released: **2020-10-14 09:34**<br>
-> commits: **6 / [e4fef90b04...3181962e2c](https://github.com/OneGov/onegov-cloud/compare/e4fef90b04^...3181962e2c)**  
+> commits: **51 / [4a24d58abe...3181962e2c](https://github.com/OneGov/onegov-cloud/compare/4a24d58abe^...3181962e2c)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.77)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Translatordirectory
@@ -1596,7 +1656,7 @@ Introduces pass system with separate billing and fixed maximum number of booking
 ## Release `2020.75`
 
 > released: **2020-10-08 15:26**<br>
-> commits: **7 / [43da3b652f...836f4b0ae7](https://github.com/OneGov/onegov-cloud/compare/43da3b652f^...836f4b0ae7)**  
+> commits: **20 / [60c4651476...836f4b0ae7](https://github.com/OneGov/onegov-cloud/compare/60c4651476^...836f4b0ae7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.75)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -1610,7 +1670,7 @@ New options for the header section are introduced in /header-settings
 ## Release `2020.74`
 
 > released: **2020-10-06 22:38**<br>
-> commits: **4 / [67fdaff5dc...8a47113319](https://github.com/OneGov/onegov-cloud/compare/67fdaff5dc^...8a47113319)**  
+> commits: **8 / [eb20acb2e6...8a47113319](https://github.com/OneGov/onegov-cloud/compare/eb20acb2e6^...8a47113319)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.74)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -1624,7 +1684,7 @@ The whole organisation tree can be viewed on `/organisation` including membershi
 ## Release `2020.73`
 
 > released: **2020-10-05 10:16**<br>
-> commits: **5 / [add5c37f89...9ffb45cc10](https://github.com/OneGov/onegov-cloud/compare/add5c37f89^...9ffb45cc10)**  
+> commits: **23 / [add5c37f89...9ffb45cc10](https://github.com/OneGov/onegov-cloud/compare/add5c37f89^...9ffb45cc10)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.73)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -1652,7 +1712,7 @@ Migrating to the modern Static Tiles API using vector tiles.
 ## Release `2020.72`
 
 > released: **2020-09-21 16:51**<br>
-> commits: **17 / [49ede628a7...147a21ad9e](https://github.com/OneGov/onegov-cloud/compare/49ede628a7^...147a21ad9e)**  
+> commits: **20 / [49ede628a7...147a21ad9e](https://github.com/OneGov/onegov-cloud/compare/49ede628a7^...147a21ad9e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.72)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -1699,7 +1759,7 @@ Adds '--clear' flag to revert imported teacher data. Adds cli to clean duplicate
 ## Release `2020.71`
 
 > released: **2020-09-15 11:16**<br>
-> commits: **6 / [01f2217fae...5609d31d78](https://github.com/OneGov/onegov-cloud/compare/01f2217fae^...5609d31d78)**  
+> commits: **124 / [643836eba8...5609d31d78](https://github.com/OneGov/onegov-cloud/compare/643836eba8^...5609d31d78)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.71)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Translatordirectory
@@ -1755,7 +1815,7 @@ If it happens so that the event is deleted between getting and sending the form.
 ## Release `2020.68`
 
 > released: **2020-08-25 09:06**<br>
-> commits: **2 / [7924da746a...04c0134b43](https://github.com/OneGov/onegov-cloud/compare/7924da746a^...04c0134b43)**  
+> commits: **7 / [881720d59b...04c0134b43](https://github.com/OneGov/onegov-cloud/compare/881720d59b^...04c0134b43)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.68)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -1783,7 +1843,7 @@ Issue: FSI-2
 ## Release `2020.65`
 
 > released: **2020-07-28 15:02**<br>
-> commits: **18 / [3d8af21ce6...058c55662c](https://github.com/OneGov/onegov-cloud/compare/3d8af21ce6^...058c55662c)**  
+> commits: **22 / [3d8af21ce6...058c55662c](https://github.com/OneGov/onegov-cloud/compare/3d8af21ce6^...058c55662c)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.65)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -1817,7 +1877,7 @@ Fixes refactoring bug.
 ## Release `2020.64`
 
 > released: **2020-07-09 07:44**<br>
-> commits: **6 / [8eedf97eda...c73534ab01](https://github.com/OneGov/onegov-cloud/compare/8eedf97eda^...c73534ab01)**  
+> commits: **45 / [73a213f12b...c73534ab01](https://github.com/OneGov/onegov-cloud/compare/73a213f12b^...c73534ab01)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.64)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Foundation6
@@ -1840,7 +1900,7 @@ Adaption of all except one report view. Boxes and Forms are now added correctly 
 ## Release `2020.63`
 
 > released: **2020-06-30 15:23**<br>
-> commits: **2 / [e0b7235d3f...8ccbaafa73](https://github.com/OneGov/onegov-cloud/compare/e0b7235d3f^...8ccbaafa73)**  
+> commits: **13 / [e3cfa8747a...8ccbaafa73](https://github.com/OneGov/onegov-cloud/compare/e3cfa8747a^...8ccbaafa73)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.63)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -1854,7 +1914,7 @@ Fixes audit query, fixes non-localized course event repr, Adaptions for audit re
 ## Release `2020.62`
 
 > released: **2020-06-26 12:20**<br>
-> commits: **10 / [7aee249d6c...86888f7f6b](https://github.com/OneGov/onegov-cloud/compare/7aee249d6c^...86888f7f6b)**  
+> commits: **22 / [f482969da4...86888f7f6b](https://github.com/OneGov/onegov-cloud/compare/f482969da4^...86888f7f6b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.62)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -1891,7 +1951,7 @@ Mimic a Get request by redirecting the user to the new collection.
 ## Release `2020.60`
 
 > released: **2020-06-18 20:22**<br>
-> commits: **8 / [f2626f8640...c00ab10ea4](https://github.com/OneGov/onegov-cloud/compare/f2626f8640^...c00ab10ea4)**  
+> commits: **108 / [f2626f8640...c00ab10ea4](https://github.com/OneGov/onegov-cloud/compare/f2626f8640^...c00ab10ea4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.60)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -1902,7 +1962,103 @@ Fixes query for volunteers on /attendees/{activity_name}
 
 **`Bugfix`** | **[f2626f8640](https://github.com/onegov/onegov-cloud/commit/f2626f8640e1d0029eebd0ed5f8d76808dbcd9f2)**
 
+### Fsi
+
+🎉 **Adds toggle hidden courses button**
+
+The admin has now a button to toggle between all courses
+and the default view (not showing the ones hidden_from_public)
+
+**`Feature`** | **[351abc77ec](https://github.com/onegov/onegov-cloud/commit/351abc77ecf75c0a3f97e4a16a59d94e63d3f0b1)**
+
+🎉 **Lazy-load course events on /course**
+
+Lazy-load events when clicking on a course by scrolling or clicking on button.
+Improves caching for event loading.
+
+**`Feature`** | **[FSI-23](https://kanton-zug.atlassian.net/browse/FSI-23)** | **[43c899566d](https://github.com/onegov/onegov-cloud/commit/43c899566d1692021c49651190da1258ac532263)**
+
+🎉 **Improved filtering in audit of past course events**
+
+Filters hidden events or events from hidden courses.
+Show only confirmed events.
+
+**`Feature`** | **[FSI-22](https://kanton-zug.atlassian.net/browse/FSI-22)** | **[e1bb618aca](https://github.com/onegov/onegov-cloud/commit/e1bb618aca21f3f61c8f3ceb99efa3d707c9a744)**
+
+🎉 **Use js-enhanced MultiSelectFields**
+
+**`Feature`** | **[dfbeb87b7b](https://github.com/onegov/onegov-cloud/commit/dfbeb87b7bc10e763129a87655c897b89065cc1d)**
+
+🎉 **Improve topbar navigation for attendee overview**
+
+Add the admins, make text white on blue background.
+
+**`Feature`** | **[e3da6316aa](https://github.com/onegov/onegov-cloud/commit/e3da6316aa6c790b8ee224a630852d04cb18cb88)**
+
+🎉 **Improves view of subscriptions in attendee profile**
+
+Show max. 5 most recent subscriptions incl. link:
+
+- always if admin
+- else only if viewing user's own profile
+
+**`Feature`** | **[41ce7f3943](https://github.com/onegov/onegov-cloud/commit/41ce7f3943ddc6eccaefafc702cb3ce6a7976c5d)**
+
+🎉 **Adds improved audit view**
+
+Retrieve a list of attendees and their last attendence to a selected course.
+Features filtering by organisation and letter (last_name).
+
+**`Feature`** | **[30fccebcc7](https://github.com/onegov/onegov-cloud/commit/30fccebcc7fb7b8e4acb8ac7c7906bd566cf9704)**
+
+🎉 **Adds colored PDF for audit view**
+
+**`Feature`** | **[21ade874fd](https://github.com/onegov/onegov-cloud/commit/21ade874fd404c205dcb3eebe87ad7759cbe3ad4)**
+
+🎉 **Adds colored PDF for audit view**
+
+**`Feature`** | **[bdec3fd495](https://github.com/onegov/onegov-cloud/commit/bdec3fd495f7cca316682f111bb8b76478392984)**
+
+🎉 **Adds PDF for subscription collection**
+
+**`Feature`** | **[d476545964](https://github.com/onegov/onegov-cloud/commit/d476545964912057ae3cf5a3aee5924fd94b55c8)**
+
+🎉 **Adds caching of last chosen organisations in audit**
+
+Caches last chosen orgs and redirects user next time to the same collection
+
+**`Feature`** | **[d46b99545a](https://github.com/onegov/onegov-cloud/commit/d46b99545a805219c89a93d16c51f8cacf1cb93e)**
+
+🐞 **Improves confirmation of subscriptions**
+
+Toggle confirm subscriptions possible if:
+- is admin (unchanged)
+- event is confirmed (new)
+- event is in the past (opposite of before)
+
+**`Bugfix`** | **[FSI-26](https://kanton-zug.atlassian.net/browse/FSI-26)** | **[759af0133a](https://github.com/onegov/onegov-cloud/commit/759af0133aca3d7b604dc117a888e8fddd9e4342)**
+
+🐞 **Fixes course event representation (on form choices)**
+
+**`Bugfix`** | **[FSI-28](https://kanton-zug.atlassian.net/browse/FSI-28)** | **[da7e86f636](https://github.com/onegov/onegov-cloud/commit/da7e86f6367e9b55f721e28acb61230f3d8e28ee)**
+
+🏎 **Adding property source_id to attendee**
+
+In Forms, users are listed with their source_id. Reduces queries dramatically.
+
+**`Performance`** | **[7325c55f3d](https://github.com/onegov/onegov-cloud/commit/7325c55f3df86786fb0be360bd4e14b3bc94a1ba)**
+
 ### Org
+
+🎉 **Adds scrolling to username/email field in form**
+
+If there is a lot of content, focus and scroll to the email field.
+
+**`Feature`** | **[150b2ea19f](https://github.com/onegov/onegov-cloud/commit/150b2ea19f7f06c1ec54e4df90856fc379f17e60)**
+
+🎉 **Adds chosen.js support for SelectFields**
+
+**`Feature`** | **[2b82fdd6f7](https://github.com/onegov/onegov-cloud/commit/2b82fdd6f7d848937f211cc6bd98958872c8f079)**
 
 🐞 **Fixes bug where file entry is not None but an empty dict**
 
@@ -1974,7 +2130,7 @@ Test manually also for change requests of the files.
 ## Release `2020.56`
 
 > released: **2020-05-13 15:04**<br>
-> commits: **7 / [38feae1527...94c40f3668](https://github.com/OneGov/onegov-cloud/compare/38feae1527^...94c40f3668)**  
+> commits: **24 / [3c89c19d9d...94c40f3668](https://github.com/OneGov/onegov-cloud/compare/3c89c19d9d^...94c40f3668)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.56)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -2002,7 +2158,7 @@ Replace all the image url consequently on update. Fixes removing poster url when
 ## Release `2020.55`
 
 > released: **2020-05-11 08:33**<br>
-> commits: **3 / [c04602a89d...c7ec8af976](https://github.com/OneGov/onegov-cloud/compare/c04602a89d^...c7ec8af976)**  
+> commits: **18 / [c04602a89d...c7ec8af976](https://github.com/OneGov/onegov-cloud/compare/c04602a89d^...c7ec8af976)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.55)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2016,7 +2172,7 @@ Minor fixes and tests.
 ## Release `2020.54`
 
 > released: **2020-05-06 23:32**<br>
-> commits: **2 / [a588f63b57...442c4e9775](https://github.com/OneGov/onegov-cloud/compare/a588f63b57^...442c4e9775)**  
+> commits: **21 / [4d3ab9ca9e...442c4e9775](https://github.com/OneGov/onegov-cloud/compare/4d3ab9ca9e^...442c4e9775)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.54)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2030,7 +2186,7 @@ Adds Ticket settings to organisation model. Two status emails for tickets can be
 ## Release `2020.53`
 
 > released: **2020-05-06 10:29**<br>
-> commits: **5 / [2d4cd916d4...dde751266e](https://github.com/OneGov/onegov-cloud/compare/2d4cd916d4^...dde751266e)**  
+> commits: **20 / [2d4cd916d4...dde751266e](https://github.com/OneGov/onegov-cloud/compare/2d4cd916d4^...dde751266e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.53)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Event
@@ -2048,7 +2204,7 @@ Adds Ticket settings to organisation model. Two status emails for tickets can be
 ## Release `2020.52`
 
 > released: **2020-05-05 08:28**<br>
-> commits: **3 / [30dd5086f9...e7545454a7](https://github.com/OneGov/onegov-cloud/compare/30dd5086f9^...e7545454a7)**  
+> commits: **7 / [8596014f47...e7545454a7](https://github.com/OneGov/onegov-cloud/compare/8596014f47^...e7545454a7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.52)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2062,7 +2218,7 @@ Adds a quota for allocations of Rooms so that multiple reservations per time slo
 ## Release `2020.51`
 
 > released: **2020-04-30 14:15**<br>
-> commits: **5 / [d22727d4ae...651af27668](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...651af27668)**  
+> commits: **24 / [d22727d4ae...651af27668](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...651af27668)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.51)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -2074,6 +2230,14 @@ Solves Problem of wrong label "Districts" in a vote with date 2020,
 but results using the entities from 2016.
 
 **`Bugfix`** | **[7de0e43cec](https://github.com/onegov/onegov-cloud/commit/7de0e43cec122dcda5f7615dfafcc37f7dab46d2)**
+
+### Fsi
+
+✨ **App.disable_password_reset to block pw reset views**
+
+- Use if all users are imported from auth_providers
+
+**`Other`** | **[94de6fc4a5](https://github.com/onegov/onegov-cloud/commit/94de6fc4a50f39ba3d49bf51ea8fafe545896e1e)**
 
 ### Onegov
 
@@ -2095,7 +2259,7 @@ but results using the entities from 2016.
 ## Release `2020.49`
 
 > released: **2020-04-24 09:33**<br>
-> commits: **5 / [f0b15642c0...df0c831228](https://github.com/OneGov/onegov-cloud/compare/f0b15642c0^...df0c831228)**  
+> commits: **10 / [f0b15642c0...df0c831228](https://github.com/OneGov/onegov-cloud/compare/f0b15642c0^...df0c831228)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.49)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2109,7 +2273,7 @@ Files uploaded with a UploadField defined in a directory are added as DiretoryFi
 ## Release `2020.48`
 
 > released: **2020-04-22 23:06**<br>
-> commits: **3 / [30952ea2bd...1a9e507db6](https://github.com/OneGov/onegov-cloud/compare/30952ea2bd^...1a9e507db6)**  
+> commits: **18 / [30952ea2bd...1a9e507db6](https://github.com/OneGov/onegov-cloud/compare/30952ea2bd^...1a9e507db6)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.48)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
@@ -2133,7 +2297,7 @@ Files uploaded with a UploadField defined in a directory are added as DiretoryFi
 ## Release `2020.46`
 
 > released: **2020-04-22 10:15**<br>
-> commits: **5 / [fa03e0d4ef...347cc50438](https://github.com/OneGov/onegov-cloud/compare/fa03e0d4ef^...347cc50438)**  
+> commits: **18 / [fa03e0d4ef...347cc50438](https://github.com/OneGov/onegov-cloud/compare/fa03e0d4ef^...347cc50438)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.46)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2146,10 +2310,16 @@ Files uploaded with a UploadField defined in a directory are added as DiretoryFi
 
 **`Feature`** | **[ONEGOV-5](#ONEGOV-5)** | **[c20b8a380a](https://github.com/onegov/onegov-cloud/commit/c20b8a380a88500ff9b3648c96c9f5c42bf51796)**
 
+### Winterthur
+
+🐞 **Fixes IE issue providing full path for filename**
+
+**`Bugfix`** | **[FW-79](https://stadt-winterthur.atlassian.net/browse/FW-79)** | **[e39f41fa38](https://github.com/onegov/onegov-cloud/commit/e39f41fa385055533f1d8b4f59cc5c15b022390f)**
+
 ## Release `2020.45`
 
 > released: **2020-04-09 10:20**<br>
-> commits: **6 / [eb6b6612a6...1a13643021](https://github.com/OneGov/onegov-cloud/compare/eb6b6612a6^...1a13643021)**  
+> commits: **27 / [eb6b6612a6...1a13643021](https://github.com/OneGov/onegov-cloud/compare/eb6b6612a6^...1a13643021)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.45)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2181,7 +2351,7 @@ For UploadFields defined in formcode, one can choose to display if a field shoul
 ## Release `2020.44`
 
 > released: **2020-04-04 07:07**<br>
-> commits: **4 / [6fac7588d4...c4216ba2b2](https://github.com/OneGov/onegov-cloud/compare/6fac7588d4^...c4216ba2b2)**  
+> commits: **7 / [b9b376348f...c4216ba2b2](https://github.com/OneGov/onegov-cloud/compare/b9b376348f^...c4216ba2b2)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.44)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -2207,8 +2377,14 @@ Integrates server-side length validation with a javascript counter for formcode 
 ## Release `2020.43`
 
 > released: **2020-04-02 13:00**<br>
-> commits: **4 / [94b3e7b77b...7753e17809](https://github.com/OneGov/onegov-cloud/compare/94b3e7b77b^...7753e17809)**  
+> commits: **10 / [94b3e7b77b...7753e17809](https://github.com/OneGov/onegov-cloud/compare/94b3e7b77b^...7753e17809)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.43)](https://buildkite.com/seantis/onegov-cloud)
+
+### Form
+
+🐞 **Fixes base_url for formcode js assets**
+
+**`Bugfix`** | **[9c68b4bc18](https://github.com/onegov/onegov-cloud/commit/9c68b4bc18824f1759d79276324967a06220707b)**
 
 ### Org
 
@@ -2255,7 +2431,7 @@ to the css syntax. They are not lazy loaded, but will be cached by the browser.
 ## Release `2020.40`
 
 > released: **2020-03-24 13:01**<br>
-> commits: **4 / [3b28334755...dc30694a00](https://github.com/OneGov/onegov-cloud/compare/3b28334755^...dc30694a00)**  
+> commits: **6 / [429c5856c1...dc30694a00](https://github.com/OneGov/onegov-cloud/compare/429c5856c1^...dc30694a00)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.40)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Town
@@ -2270,7 +2446,7 @@ to the css syntax. They are not lazy loaded, but will be cached by the browser.
 ## Release `2020.39`
 
 > released: **2020-03-23 11:46**<br>
-> commits: **5 / [d83aded397...0873416984](https://github.com/OneGov/onegov-cloud/compare/d83aded397^...0873416984)**  
+> commits: **12 / [d83aded397...0873416984](https://github.com/OneGov/onegov-cloud/compare/d83aded397^...0873416984)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.39)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -2282,6 +2458,18 @@ Replaces depreceated pyreact library.
 **`Feature`** | **[f0f777bdb8](https://github.com/onegov/onegov-cloud/commit/f0f777bdb8c10a0b4f414df700c1f9df2c702060)**
 
 ### Feriennet
+
+🐞 **Fixes non-localized dates on view /volunteer-cart**
+
+**`Bugfix`** | **[FER-848](https://issues.seantis.ch/browse/FER-848)** | **[855387936b](https://github.com/onegov/onegov-cloud/commit/855387936b27b60116e8e1a9514b3188790d598c)**
+
+🐞 **Unclosed tag in template**
+
+**`Bugfix`** | **[FER-852](https://issues.seantis.ch/browse/FER-852)** | **[bcf17bafe7](https://github.com/onegov/onegov-cloud/commit/bcf17bafe77fbca52e8a701fed691e92ef78479b)**
+
+🐞 **Hide past dates on /activities/volunteer**
+
+**`Bugfix`** | **[FER-847](https://issues.seantis.ch/browse/FER-847)** | **[5d38123ee7](https://github.com/onegov/onegov-cloud/commit/5d38123ee7c8aeb098ccdc7d39d8a1bf5e9b620b)**
 
 ✨ **Minor Fixes**
 
@@ -2295,7 +2483,7 @@ Replaces depreceated pyreact library.
 ## Release `2020.38`
 
 > released: **2020-03-18 12:10**<br>
-> commits: **2 / [ff8d897a2d...46625efdf3](https://github.com/OneGov/onegov-cloud/compare/ff8d897a2d^...46625efdf3)**  
+> commits: **8 / [2754025adc...46625efdf3](https://github.com/OneGov/onegov-cloud/compare/2754025adc^...46625efdf3)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.38)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -2305,6 +2493,12 @@ Replaces depreceated pyreact library.
 If the ElectionCompound is after_pukelsheim, hides by default the votes from the list table on the ElectionCompound. Also if after_pukelheim, the bar chart shows only the mandates not the sum of all ListResult.votes.
 
 **`Feature`** | **[ff8d897a2d](https://github.com/onegov/onegov-cloud/commit/ff8d897a2da2cd561979033a05c1ec6064f054e6)**
+
+### Org
+
+🐞 **Fixes TimeField for EdgeBrowser**
+
+**`Bugfix`** | **[ZW-269](https://kanton-zug.atlassian.net/browse/ZW-269)** | **[4892319be4](https://github.com/onegov/onegov-cloud/commit/4892319be4114357219d16817b8ff4154d43ba8a)**
 
 ## Release `2020.37`
 
@@ -2321,7 +2515,7 @@ If the ElectionCompound is after_pukelsheim, hides by default the votes from the
 ## Release `2020.36`
 
 > released: **2020-03-17 11:19**<br>
-> commits: **4 / [c5769b4cb3...ed50ff6709](https://github.com/OneGov/onegov-cloud/compare/c5769b4cb3^...ed50ff6709)**  
+> commits: **9 / [b68ec4c8c9...ed50ff6709](https://github.com/OneGov/onegov-cloud/compare/b68ec4c8c9^...ed50ff6709)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.36)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2360,7 +2554,7 @@ for Doppelter Pukelsheim
 ## Release `2020.34`
 
 > released: **2020-03-11 16:34**<br>
-> commits: **2 / [9dceb83c5b...c0a99cf250](https://github.com/OneGov/onegov-cloud/compare/9dceb83c5b^...c0a99cf250)**  
+> commits: **13 / [6071aee7e0...c0a99cf250](https://github.com/OneGov/onegov-cloud/compare/6071aee7e0^...c0a99cf250)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.34)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -2392,7 +2586,7 @@ In SZ since 2020, entity and district are named the same. For elections of a com
 ## Release `2020.31`
 
 > released: **2020-03-10 08:12**<br>
-> commits: **2 / [10b8e57d50...b5760ebe22](https://github.com/OneGov/onegov-cloud/compare/10b8e57d50^...b5760ebe22)**  
+> commits: **7 / [31ca990f54...b5760ebe22](https://github.com/OneGov/onegov-cloud/compare/31ca990f54^...b5760ebe22)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.31)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -2406,7 +2600,7 @@ Majorz by district is using accounted_votes instead of accounted ballots. For pr
 ## Release `2020.30`
 
 > released: **2020-03-05 16:12**<br>
-> commits: **3 / [edeff88f92...ca149c611f](https://github.com/OneGov/onegov-cloud/compare/edeff88f92^...ca149c611f)**  
+> commits: **4 / [edeff88f92...ca149c611f](https://github.com/OneGov/onegov-cloud/compare/edeff88f92^...ca149c611f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.30)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -2420,7 +2614,7 @@ Editors and admins have to check attendance of attendees. Past courses are hidde
 ## Release `2020.29`
 
 > released: **2020-03-02 19:15**<br>
-> commits: **4 / [3970f94e5c...7468e0b9e4](https://github.com/OneGov/onegov-cloud/compare/3970f94e5c^...7468e0b9e4)**  
+> commits: **11 / [3970f94e5c...7468e0b9e4](https://github.com/OneGov/onegov-cloud/compare/3970f94e5c^...7468e0b9e4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.29)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -2447,7 +2641,7 @@ Also for compound election, the sum of allocated mandates will only consider com
 ## Release `2020.27`
 
 > released: **2020-02-20 17:04**<br>
-> commits: **2 / [c34ce0e627...d8d1024087](https://github.com/OneGov/onegov-cloud/compare/c34ce0e627^...d8d1024087)**  
+> commits: **5 / [85a589ab43...d8d1024087](https://github.com/OneGov/onegov-cloud/compare/85a589ab43^...d8d1024087)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.27)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -2462,7 +2656,7 @@ Also for compound election, the sum of allocated mandates will only consider com
 ## Release `2020.26`
 
 > released: **2020-02-18 14:35**<br>
-> commits: **5 / [0e7fa93022...840c5fff7a](https://github.com/OneGov/onegov-cloud/compare/0e7fa93022^...840c5fff7a)**  
+> commits: **9 / [0e7fa93022...840c5fff7a](https://github.com/OneGov/onegov-cloud/compare/0e7fa93022^...840c5fff7a)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.26)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -2491,10 +2685,17 @@ Fixes form input "send daily ticket statistics" and error in template when seein
 ## Release `2020.24`
 
 > released: **2020-02-11 17:16**<br>
-> commits: **2 / [458bc88d4a...70f2f36546](https://github.com/OneGov/onegov-cloud/compare/458bc88d4a^...70f2f36546)**  
+> commits: **5 / [1056afc2ba...70f2f36546](https://github.com/OneGov/onegov-cloud/compare/1056afc2ba^...70f2f36546)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.24)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
+
+🎉 **Adds creation of proporz elections from WP_Wahl**
+
+Based on the data in WP_Wahl and an existing `DataSource`, the endpoint `/create-wabsti-proporz` will create all elections,
+the election compound, and the all `DataSourceItems`. The same `DataSource` can then be used to upload the results.
+
+**`Feature`** | **[1056afc2ba](https://github.com/onegov/onegov-cloud/commit/1056afc2babb6bae0bf564ff594ddc3482adfa03)**
 
 🎉 **Adds auto-creation of election compound / proporz elections for WabstiC**
 
@@ -2505,7 +2706,7 @@ Based on the data in `WP_Wahl` and an existing DataSource, the endpoint `/create
 ## Release `2020.23`
 
 > released: **2020-02-10 17:25**<br>
-> commits: **4 / [1a03df3bc1...d07ea4e28b](https://github.com/OneGov/onegov-cloud/compare/1a03df3bc1^...d07ea4e28b)**  
+> commits: **5 / [a6d5dbbfff...d07ea4e28b](https://github.com/OneGov/onegov-cloud/compare/a6d5dbbfff^...d07ea4e28b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.23)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -2547,7 +2748,7 @@ Based on the data in `WP_Wahl` and an existing DataSource, the endpoint `/create
 ## Release `2020.18`
 
 > released: **2020-01-30 18:29**<br>
-> commits: **3 / [98512a4cf5...94fffb910d](https://github.com/OneGov/onegov-cloud/compare/98512a4cf5^...94fffb910d)**  
+> commits: **25 / [91870c07de...94fffb910d](https://github.com/OneGov/onegov-cloud/compare/91870c07de^...94fffb910d)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.18)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -2573,7 +2774,7 @@ Further changes:
 ## Release `2020.17`
 
 > released: **2020-01-30 07:42**<br>
-> commits: **8 / [2bfc0ed77a...ec65424f72](https://github.com/OneGov/onegov-cloud/compare/2bfc0ed77a^...ec65424f72)**  
+> commits: **15 / [f7e153a9db...ec65424f72](https://github.com/OneGov/onegov-cloud/compare/f7e153a9db^...ec65424f72)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.17)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -2585,7 +2786,7 @@ Further changes:
 ## Release `2020.16`
 
 > released: **2020-01-28 14:14**<br>
-> commits: **2 / [f60596884f...8e165127c5](https://github.com/OneGov/onegov-cloud/compare/f60596884f^...8e165127c5)**  
+> commits: **27 / [90539a0426...8e165127c5](https://github.com/OneGov/onegov-cloud/compare/90539a0426^...8e165127c5)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.16)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -2649,7 +2850,7 @@ This solves ONEGOV-CLOUD-3AM
 ## Release `2020.14`
 
 > released: **2020-01-24 06:34**<br>
-> commits: **12 / [3187fdea56...435b2985f8](https://github.com/OneGov/onegov-cloud/compare/3187fdea56^...435b2985f8)**  
+> commits: **16 / [3187fdea56...435b2985f8](https://github.com/OneGov/onegov-cloud/compare/3187fdea56^...435b2985f8)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.14)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -2723,7 +2924,7 @@ Uses an alternative approach to text-ellipsis than before.
 ## Release `2020.12`
 
 > released: **2020-01-21 17:11**<br>
-> commits: **7 / [dee367655e...eabde3ad06](https://github.com/OneGov/onegov-cloud/compare/dee367655e^...eabde3ad06)**  
+> commits: **16 / [dee367655e...eabde3ad06](https://github.com/OneGov/onegov-cloud/compare/dee367655e^...eabde3ad06)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.12)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -2786,7 +2987,7 @@ commit changes this, resulting in more compact prints.
 ## Release `2020.8`
 
 > released: **2020-01-20 13:10**<br>
-> commits: **2 / [12805c2f2e...ceefca4a3f](https://github.com/OneGov/onegov-cloud/compare/12805c2f2e^...ceefca4a3f)**  
+> commits: **8 / [c2ee895681...ceefca4a3f](https://github.com/OneGov/onegov-cloud/compare/c2ee895681^...ceefca4a3f)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.8)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -2841,7 +3042,7 @@ selected ones are.
 ## Release `2020.5`
 
 > released: **2020-01-16 12:14**<br>
-> commits: **3 / [0e6ae7daf1...e305d77e8b](https://github.com/OneGov/onegov-cloud/compare/0e6ae7daf1^...e305d77e8b)**  
+> commits: **27 / [a487313c7d...e305d77e8b](https://github.com/OneGov/onegov-cloud/compare/a487313c7d^...e305d77e8b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.5)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -2906,7 +3107,7 @@ The administrative costs cannot be manipulated in all_inclusive periods.
 ## Release `2020.2`
 
 > released: **2020-01-15 09:10**<br>
-> commits: **4 / [daf22a65f5...e5f6c436b8](https://github.com/OneGov/onegov-cloud/compare/daf22a65f5^...e5f6c436b8)**  
+> commits: **70 / [e04c8cedde...e5f6c436b8](https://github.com/OneGov/onegov-cloud/compare/e04c8cedde^...e5f6c436b8)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.2)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -3056,7 +3257,7 @@ volunteer submissions and manage their statuses.
 ## Release `2019.53`
 
 > released: **2019-12-17 13:57**<br>
-> commits: **3 / [14d3d9de02...c62c828a51](https://github.com/OneGov/onegov-cloud/compare/14d3d9de02^...c62c828a51)**  
+> commits: **5 / [14d3d9de02...c62c828a51](https://github.com/OneGov/onegov-cloud/compare/14d3d9de02^...c62c828a51)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.53)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -3080,7 +3281,7 @@ This should improve the clarity of our search results.
 ## Release `2019.52`
 
 > released: **2019-12-16 15:02**<br>
-> commits: **2 / [c5f8710c60...c66dbd3a70](https://github.com/OneGov/onegov-cloud/compare/c5f8710c60^...c66dbd3a70)**  
+> commits: **8 / [b2fa623161...c66dbd3a70](https://github.com/OneGov/onegov-cloud/compare/b2fa623161^...c66dbd3a70)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.52)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swisvotes
@@ -3092,7 +3293,7 @@ This should improve the clarity of our search results.
 ## Release `2019.51`
 
 > released: **2019-12-15 23:06**<br>
-> commits: **4 / [497c3d9581...286b2d3137](https://github.com/OneGov/onegov-cloud/compare/497c3d9581^...286b2d3137)**  
+> commits: **23 / [93541ce46b...286b2d3137](https://github.com/OneGov/onegov-cloud/compare/93541ce46b^...286b2d3137)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.51)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -3121,7 +3322,7 @@ Adapts views for deciding question.
 ## Release `2019.50`
 
 > released: **2019-12-14 15:44**<br>
-> commits: **9 / [c50857d184...2c694b27a9](https://github.com/OneGov/onegov-cloud/compare/c50857d184^...2c694b27a9)**  
+> commits: **13 / [a922932adf...2c694b27a9](https://github.com/OneGov/onegov-cloud/compare/a922932adf^...2c694b27a9)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.50)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -3164,7 +3365,7 @@ published. Before, this was reserved for administrators.
 ## Release `2019.48`
 
 > released: **2019-12-11 14:10**<br>
-> commits: **15 / [ead36cf8ec...11a07e9dcc](https://github.com/OneGov/onegov-cloud/compare/ead36cf8ec^...11a07e9dcc)**  
+> commits: **105 / [fb353ee199...11a07e9dcc](https://github.com/OneGov/onegov-cloud/compare/fb353ee199^...11a07e9dcc)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.48)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -3232,7 +3433,7 @@ streamlining common use-cases and offering more clarity.
 ## Release `2019.46`
 
 > released: **2019-12-04 11:52**<br>
-> commits: **4 / [96e14a3688...4fa9647ea2](https://github.com/OneGov/onegov-cloud/compare/96e14a3688^...4fa9647ea2)**  
+> commits: **13 / [d9d3c1f266...4fa9647ea2](https://github.com/OneGov/onegov-cloud/compare/d9d3c1f266^...4fa9647ea2)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.46)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -3247,7 +3448,7 @@ The accompanying javascript would generate invalid URLs.
 ## Release `2019.45`
 
 > released: **2019-12-03 18:13**<br>
-> commits: **9 / [87138a72a5...4fd31b78b4](https://github.com/OneGov/onegov-cloud/compare/87138a72a5^...4fd31b78b4)**  
+> commits: **70 / [e221511f87...4fd31b78b4](https://github.com/OneGov/onegov-cloud/compare/e221511f87^...4fd31b78b4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.45)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
@@ -3293,7 +3494,7 @@ public transport'. Removing the label altogether rectifies the problem.
 ## Release `2019.44`
 
 > released: **2019-12-02 12:53**<br>
-> commits: **3 / [d1e2208edb...d6c938c5f6](https://github.com/OneGov/onegov-cloud/compare/d1e2208edb^...d6c938c5f6)**  
+> commits: **5 / [d1e2208edb...d6c938c5f6](https://github.com/OneGov/onegov-cloud/compare/d1e2208edb^...d6c938c5f6)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.44)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -3365,7 +3566,7 @@ reliably.
 ## Release `2019.40`
 
 > released: **2019-11-26 09:05**<br>
-> commits: **9 / [df42fa39b6...ba91f9cc07](https://github.com/OneGov/onegov-cloud/compare/df42fa39b6^...ba91f9cc07)**  
+> commits: **13 / [df42fa39b6...ba91f9cc07](https://github.com/OneGov/onegov-cloud/compare/df42fa39b6^...ba91f9cc07)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.40)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -3401,7 +3602,7 @@ tenant is used in the browser.
 ## Release `2019.39`
 
 > released: **2019-11-22 13:58**<br>
-> commits: **256 / [4fa47c7b87...1986fcfd5b](https://github.com/OneGov/onegov-cloud/compare/4fa47c7b87^...1986fcfd5b)**  
+> commits: **258 / [6621950942...1986fcfd5b](https://github.com/OneGov/onegov-cloud/compare/6621950942^...1986fcfd5b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.39)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -3420,6 +3621,15 @@ logo of Appenzell Ausserrhoden could not be parsed reliably and needed
 to be replaced with a high-resolution PNG.
 
 **`Bugfix`** | **[7bc18af1e1](https://github.com/onegov/onegov-cloud/commit/7bc18af1e13809f945568c01aa4a8d9d24664d5f)**
+
+### Amtsblatt
+
+🎉 **Adjust issues order in some views**
+
+The issues order in the 'accepted' view as well as in the selection drop
+down is now in ascending order by date.
+
+**`Feature`** | **[ZW-246](https://kanton-zug.atlassian.net/browse/ZW-246)** | **[06cfc72501](https://github.com/onegov/onegov-cloud/commit/06cfc725014b72aba5b9630b2f86eaea7ab23f78)**
 
 ### Fsi
 
@@ -3558,7 +3768,7 @@ OneGov Cloud now uses Python 3.8 instead of 3.7.
 ## Release `2019.33`
 
 > released: **2019-10-30 09:56**<br>
-> commits: **6 / [0dc5b8fc9f...ac06bc140a](https://github.com/OneGov/onegov-cloud/compare/0dc5b8fc9f^...ac06bc140a)**  
+> commits: **7 / [6ca2f74c50...ac06bc140a](https://github.com/OneGov/onegov-cloud/compare/6ca2f74c50^...ac06bc140a)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.33)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -3603,7 +3813,7 @@ This is useful to add things like flyers or other information.
 ## Release `2019.31`
 
 > released: **2019-10-23 14:12**<br>
-> commits: **4 / [c898172a68...5949739a67](https://github.com/OneGov/onegov-cloud/compare/c898172a68^...5949739a67)**  
+> commits: **9 / [c898172a68...5949739a67](https://github.com/OneGov/onegov-cloud/compare/c898172a68^...5949739a67)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.31)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -3618,7 +3828,7 @@ much better performance.
 ## Release `2019.30`
 
 > released: **2019-10-23 10:39**<br>
-> commits: **2 / [816a404e04...117b19eb79](https://github.com/OneGov/onegov-cloud/compare/816a404e04^...117b19eb79)**  
+> commits: **21 / [28a50820f3...117b19eb79](https://github.com/OneGov/onegov-cloud/compare/28a50820f3^...117b19eb79)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.30)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -3697,7 +3907,7 @@ This enables some sites to go completely without top-bar.
 ## Release `2019.28`
 
 > released: **2019-10-15 09:42**<br>
-> commits: **3 / [af4ff8e167...67cc464e10](https://github.com/OneGov/onegov-cloud/compare/af4ff8e167^...67cc464e10)**  
+> commits: **4 / [4eba2a2f93...67cc464e10](https://github.com/OneGov/onegov-cloud/compare/4eba2a2f93^...67cc464e10)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.28)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -3749,7 +3959,7 @@ confused when he sees the login form again.
 ## Release `2019.25`
 
 > released: **2019-10-10 15:09**<br>
-> commits: **5 / [bfa6f6b0ff...453ac1ade7](https://github.com/OneGov/onegov-cloud/compare/bfa6f6b0ff^...453ac1ade7)**  
+> commits: **19 / [e20689123a...453ac1ade7](https://github.com/OneGov/onegov-cloud/compare/e20689123a^...453ac1ade7)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.25)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -3860,7 +4070,7 @@ A hyphen was inserted before and it didn't work on Firefox.
 ## Release `2019.21`
 
 > released: **2019-10-01 16:29**<br>
-> commits: **14 / [729c079a33...d7e90e52ba](https://github.com/OneGov/onegov-cloud/compare/729c079a33^...d7e90e52ba)**  
+> commits: **32 / [6261f67c2a...d7e90e52ba](https://github.com/OneGov/onegov-cloud/compare/6261f67c2a^...d7e90e52ba)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.21)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -3963,7 +4173,7 @@ It would work on certain Postgres releases, but not all.
 ## Release `2019.19`
 
 > released: **2019-09-24 16:58**<br>
-> commits: **5 / [75f6dd1a4c...bbe6bb9f78](https://github.com/OneGov/onegov-cloud/compare/75f6dd1a4c^...bbe6bb9f78)**  
+> commits: **65 / [c71124473b...bbe6bb9f78](https://github.com/OneGov/onegov-cloud/compare/c71124473b^...bbe6bb9f78)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.19)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -4032,7 +4242,7 @@ code. Bringing the following improvements:
 ## Release `2019.17`
 
 > released: **2019-09-19 11:27**<br>
-> commits: **11 / [d37cb83d40...c1168ff4c9](https://github.com/OneGov/onegov-cloud/compare/d37cb83d40^...c1168ff4c9)**  
+> commits: **102 / [d37cb83d40...c1168ff4c9](https://github.com/OneGov/onegov-cloud/compare/d37cb83d40^...c1168ff4c9)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.17)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -4140,7 +4350,7 @@ would throw an exception.
 ## Release `2019.13`
 
 > released: **2019-09-11 11:33**<br>
-> commits: **6 / [226c3dd0ff...3646bae845](https://github.com/OneGov/onegov-cloud/compare/226c3dd0ff^...3646bae845)**  
+> commits: **50 / [ca2983151a...3646bae845](https://github.com/OneGov/onegov-cloud/compare/ca2983151a^...3646bae845)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.13)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
@@ -4164,6 +4374,14 @@ Provides new widgets, mostly tables that can be used a `<iframe>`
 For the aggregated lists api, we deliver the % of `list_votes / total_votes` for one election in aggregated form. `total_votes` is now aggregated as the total of all `list_votes` across all lists rather than aggregated from `ElectionResults` as a function using counting valid - invalid - blank votes etc. It adds a couple of more fields to the api to directly evaluate if the results are correct.
 
 **`Bugfix`** | **[088d466583](https://github.com/onegov/onegov-cloud/commit/088d466583d071807adab92be8ebeb00d5da247d)**
+
+### Feature
+
+✨ **More Widgets from former repo branch wab_widgets**
+
+- not finished yet
+
+**`Other`** | **[ca2983151a](https://github.com/onegov/onegov-cloud/commit/ca2983151a67ced9d97ab95c601cefde363accc4)**
 
 ## Release `2019.12`
 
@@ -4208,7 +4426,7 @@ any error messages anymore at this point.
 ## Release `2019.10`
 
 > released: **2019-09-06 16:11**<br>
-> commits: **2 / [ac565ca225...ba85af9184](https://github.com/OneGov/onegov-cloud/compare/ac565ca225^...ba85af9184)**  
+> commits: **12 / [9e996885e3...ba85af9184](https://github.com/OneGov/onegov-cloud/compare/9e996885e3^...ba85af9184)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.10)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -4237,7 +4455,7 @@ which is too limiting for the general OneGov Cloud use.
 ## Release `2019.8`
 
 > released: **2019-09-06 12:43**<br>
-> commits: **2 / [a728bf78f8...75d00e69fc](https://github.com/OneGov/onegov-cloud/compare/a728bf78f8^...75d00e69fc)**  
+> commits: **18 / [b5575143d0...75d00e69fc](https://github.com/OneGov/onegov-cloud/compare/b5575143d0^...75d00e69fc)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.8)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
@@ -4283,7 +4501,7 @@ being generated and displayed in the directory contact.
 ## Release `2019.6`
 
 > released: **2019-09-04 10:24**<br>
-> commits: **2 / [0d57b12204...3d53d3b4b9](https://github.com/OneGov/onegov-cloud/compare/0d57b12204^...3d53d3b4b9)**  
+> commits: **36 / [6270251d59...3d53d3b4b9](https://github.com/OneGov/onegov-cloud/compare/6270251d59^...3d53d3b4b9)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.6)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -4297,7 +4515,7 @@ Hides clear statuses such as elected or number of mandates per list for proporz 
 ## Release `2019.5`
 
 > released: **2019-09-04 06:04**<br>
-> commits: **14 / [326bab40a2...a8937ba123](https://github.com/OneGov/onegov-cloud/compare/326bab40a2^...a8937ba123)**  
+> commits: **22 / [326bab40a2...a8937ba123](https://github.com/OneGov/onegov-cloud/compare/326bab40a2^...a8937ba123)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.5)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -4320,7 +4538,7 @@ seems that the public is more confused by this than anything.
 ## Release `2019.4`
 
 > released: **2019-08-30 15:31**<br>
-> commits: **11 / [5c3adde749...282ed75f8e](https://github.com/OneGov/onegov-cloud/compare/5c3adde749^...282ed75f8e)**  
+> commits: **34 / [c2297a2a97...282ed75f8e](https://github.com/OneGov/onegov-cloud/compare/c2297a2a97^...282ed75f8e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.4)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -4372,10 +4590,31 @@ It is now renderd outside our iFrame.
 ## Release `2019.3`
 
 > released: **2019-08-29 09:39**<br>
-> commits: **5 / [36ebdbfa71...4633aeb348](https://github.com/OneGov/onegov-cloud/compare/36ebdbfa71^...4633aeb348)**  
+> commits: **7 / [36ebdbfa71...4633aeb348](https://github.com/OneGov/onegov-cloud/compare/36ebdbfa71^...4633aeb348)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.3)](https://buildkite.com/seantis/onegov-cloud)
 
+### Applications
+
+✨ **Updates the version link in the footer**
+
+This applies to:
+
+* onegov.election_day
+* onegov.gazette
+* onegov.swissvotes
+* onegov.wtfs
+
+**`Other`** | **[61ff635472](https://github.com/onegov/onegov-cloud/commit/61ff63547291ac0b8be52529607a8f3ad39a7250)**
+
 ### Core
+
+🎉 **Adds `onegov.core.__version__`**
+
+This version identifier always contains the current version of the
+container. During development this information may be stale, as the
+version is only updated during the release process.
+
+**`Feature`** | **[5b7847c864](https://github.com/onegov/onegov-cloud/commit/5b7847c864c3d6e5589d6d74612df9f6d332089f)**
 
 🎉 **Adds `onegov.core.__version__`**
 
@@ -4388,7 +4627,7 @@ version is only updated during the release process.
 ## Release `2019.2`
 
 > released: **2019-08-28 10:04**<br>
-> commits: **6 / [69399e0e7a...50afe830eb](https://github.com/OneGov/onegov-cloud/compare/69399e0e7a^...50afe830eb)**  
+> commits: **7 / [69399e0e7a...50afe830eb](https://github.com/OneGov/onegov-cloud/compare/69399e0e7a^...50afe830eb)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.2)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
