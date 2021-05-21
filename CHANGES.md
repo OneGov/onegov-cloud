@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2021.52`
+
+> commits: **7 / [173c481049...9c6b2cd771](https://github.com/OneGov/onegov-cloud/compare/173c481049^...9c6b2cd771)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.52)](https://buildkite.com/seantis/onegov-cloud)
+
+### Ballot
+
+🎉 **Add limit parameter to election compound list results.**
+
+**`Feature`** | **[1e2d51d9a1](https://github.com/onegov/onegov-cloud/commit/1e2d51d9a16e3bee1e460c9b00c142f754906388)**
+
+### Core
+
+🎉 **Allow linking with additional query parameters.**
+
+**`Feature`** | **[c801b0ed2b](https://github.com/onegov/onegov-cloud/commit/c801b0ed2b7d782e207ac87e0c305d1b69f33c06)**
+
+### Form
+
+🐞 **Allow MultiCheckboxFieldRenderer to render unkown or outdated data.**
+
+**`Bugfix`** | **[173c481049](https://github.com/onegov/onegov-cloud/commit/173c481049c4a80fc2c4c6fa42cb9a10da870a16)**
+
+### Town6
+
+✨ **Hide news in top navigation.**
+
+**`Other`** | **[SEA-343](https://linear.app/seantis/issue/SEA-343)** | **[9c6b2cd771](https://github.com/onegov/onegov-cloud/commit/9c6b2cd77132b322850b0771dc19aacc5d53dfc0)**
+
 ## Release `2021.51`
 
-> commits: **15 / [8eaa83aa1c...0894294b9d](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...0894294b9d)**  
+> released: **2021-05-19 13:32**<br>
+> commits: **16 / [8eaa83aa1c...e9cd52c898](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...e9cd52c898)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.51)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
