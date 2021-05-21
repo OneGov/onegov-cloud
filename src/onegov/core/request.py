@@ -4,6 +4,7 @@ import morepath
 from cached_property import cached_property
 from datetime import timedelta
 from onegov.core.cache import lru_cache
+from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
     SignatureExpired,
@@ -172,9 +173,13 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return url
 
-    def link(self, *args, **kwargs):
+    def link(self, *args, query_params={}, **kwargs):
         """ Extends the default link generating function of Morepath. """
-        return self.transform(super().link(*args, **kwargs))
+        result = self.transform(super().link(*args, **kwargs))
+        for key, value in query_params.items():
+            result = append_query_param(result, key, value)
+            pass
+        return result
 
     def class_link(self, *args, **kwargs):
         """ Extends the default class link generating function of Morepath. """

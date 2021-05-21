@@ -98,6 +98,49 @@ def test_return_to(redis_url):
     assert c.get('/do-something').location == 'http://localhost/default'
 
 
+def test_link_with_query_parameters(redis_url):
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/')
+    class Root:
+        def __init__(self, foo=None):
+            self.foo = foo
+
+    @App.view(model=Root)
+    def homepage(self, request):
+        foo = Root(foo='bar')
+        return '\n'.join((
+            request.link(self),
+            request.link(self, query_params={'a': '1'}),
+            request.link(self, query_params={'a': '1', 'b': 2}),
+            request.link(foo),
+            request.link(foo, query_params={'a': '1'}),
+            request.link(foo, query_params={'a': '1', 'b': 2}),
+        ))
+
+    @App.view(model=Root, name='foo')
+    def do_something(self, request):
+        return request.redirect('/default')
+
+    App.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(identity_secure=False, redis_url=redis_url)
+
+    client = Client(app)
+    assert client.get('/').text == (
+        'http://localhost/\n'
+        'http://localhost/?a=1\n'
+        'http://localhost/?a=1&b=2\n'
+        'http://localhost/?foo=bar\n'
+        'http://localhost/?foo=bar&a=1\n'
+        'http://localhost/?foo=bar&a=1&b=2'
+    )
+
+
 def test_has_permission(redis_url):
 
     class App(Framework):
