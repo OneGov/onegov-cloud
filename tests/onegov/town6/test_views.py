@@ -77,3 +77,8 @@ def test_gobal_tools(client):
     client.login_admin()
     links = client.get('/').pyquery('.globals a')
     assert links != []
+
+
+def test_top_navigation(client):
+    links = client.get('/').pyquery('.side-navigation a span')
+    assert links.text() == 'Organisation Themen Kontakt Aktuelles'

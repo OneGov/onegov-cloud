@@ -12,7 +12,7 @@ from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org.models import (
     ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
-    ExportCollection, PublicationCollection, PageMove
+    ExportCollection, PublicationCollection, PageMove, News
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.utils import IMG_URLS
@@ -152,10 +152,15 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def top_navigation(self):
 
         def yield_children(page):
+            children = tuple()
+            if not isinstance(page, News):
+                children = tuple(
+                    yield_children(p)
+                    for p in self.exclude_invisible(page.children)
+                )
             return (
                 page, Link(page.title, self.request.link(page)),
-                tuple(yield_children(p) for p in
-                      self.exclude_invisible(page.children))
+                children
             )
         return tuple(yield_children(page) for page in self.root_pages)
 
