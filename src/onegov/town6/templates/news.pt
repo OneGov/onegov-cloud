@@ -38,4 +38,8 @@
          tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact None if children else layout.contact_html; coordinates page.coordinates" />
 
     </tal:b>
+
+    <tal:b metal:fill-slot="after-lead">
+          <p class="subheader">${layout.format_date(layout.model.published_or_created, 'date_long')}</p>
+    </tal:b>
 </div>
