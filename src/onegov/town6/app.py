@@ -2,6 +2,7 @@ from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
+from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
     OrgApp, org_content_security_policy
@@ -41,6 +42,13 @@ def get_static_directory():
 @TownApp.template_directory()
 def get_template_directory():
     return 'templates'
+
+
+@TownApp.template_variables()
+def get_template_variables(request):
+    return {
+        'global_tools': tuple(get_global_tools(request))
+    }
 
 
 @TownApp.setting(section='core', name='theme')

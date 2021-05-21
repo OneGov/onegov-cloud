@@ -68,3 +68,12 @@ def test_clipboard_separation(client):
     client.login_admin()
 
     assert 'paste-link' not in client.get('/topics/organisation')
+
+
+def test_gobal_tools(client):
+    links = client.get('/').pyquery('.globals a')
+    assert links == []
+
+    client.login_admin()
+    links = client.get('/').pyquery('.globals a')
+    assert links != []

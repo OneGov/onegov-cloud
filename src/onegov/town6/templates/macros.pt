@@ -173,6 +173,11 @@
             </a>
         </span>
     </tal:b>
+    <span tal:condition="not request.is_logged_in">
+        <a href="${layout.login_from_path()}" i18n:translate>
+            Login
+        </a>
+    </span>
     <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
         <a href="${about_url}" i18n:translate>
             About
@@ -453,7 +458,7 @@
         </div>
         <div class="card-section">
             <div>
-                <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.published_or_created, 'relative')}</small></h5>
+                <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.published_or_created, 'date_long')}</small></h5>
                 <a class="heading" href="${url}"><tal:b tal:switch="heading|'h5'">
                     <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
                     <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h4>

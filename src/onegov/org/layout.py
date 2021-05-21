@@ -302,6 +302,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         auth = Auth.from_request(self.request, to=to, skip=skip)
         return self.request.link(auth, 'login')
 
+    def login_from_path(self):
+        auth = Auth.from_request_path(self.request)
+        return self.request.link(auth, name='login')
+
     def export_formatter(self, format):
         """ Returns a formatter function which takes a value and returns
         the value ready for export.
