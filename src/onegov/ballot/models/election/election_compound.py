@@ -323,7 +323,7 @@ class ElectionCompound(
 
         return result
 
-    def get_list_results(self, order_by='votes'):
+    def get_list_results(self, limit=None, order_by='votes'):
         """ Returns the aggregated number of mandates and votes of all the
         lists.
 
@@ -373,6 +373,8 @@ class ElectionCompound(
         )
         query = query.group_by(union.c.name)
         query = query.order_by(desc(order_by))
+        if limit and limit > 0:
+            query = query.limit(limit)
         return query
 
     #: may be used to store a link related to this election
