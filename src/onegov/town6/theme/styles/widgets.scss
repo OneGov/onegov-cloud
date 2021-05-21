@@ -46,10 +46,6 @@ article.content .side-panel {
         padding-bottom: 1.4rem;
         padding-top: 1.4rem;
 
-        &:first-of-type {
-            padding-top: 0;
-        }
-
         &:last-of-type {
             padding-bottom: 0;
         }
@@ -63,4 +59,12 @@ article.content .side-panel {
     }
 
     .homepage-text {margin-top: .625rem}
+
+    // FIXME: hack to make the layout work with a slider
+
+    .grid-container.full {
+        &:first-of-type {
+            padding-top: 0;
+        }
+    }
 }
