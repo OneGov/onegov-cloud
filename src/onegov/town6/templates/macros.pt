@@ -173,6 +173,11 @@
             </a>
         </span>
     </tal:b>
+    <span tal:condition="not request.is_logged_in">
+        <a href="${layout.login_from_path()}" i18n:translate>
+            Login
+        </a>
+    </span>
     <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
         <a href="${about_url}" i18n:translate>
             About
