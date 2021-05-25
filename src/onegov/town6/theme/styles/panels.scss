@@ -231,6 +231,11 @@ $checklist-icon: "\f0ae";
         border-top: $morelist-border;
         padding-top: .5rem;
     }
+
+    .person-link {
+        color: $anchor-color;
+        line-height: inherit;
+    }
 }
 
 .page-content-sidebar {

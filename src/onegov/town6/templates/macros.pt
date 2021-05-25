@@ -595,7 +595,7 @@
             <h3 i18n:translate>People</h3>
             <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                 <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                    <a class="h5" href="${request.link(person)}">${person.title}</a>
+                    <a class="h5 person-link" href="${request.link(person)}">${person.title}</a>
                     <div>${person.context_specific_function}</div>
                 </li>
             </ul>
