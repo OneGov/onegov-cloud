@@ -74,11 +74,15 @@ $pdf-icon: '\f1c1';
         }
     }
 
-    .grid-x > .cell {
+    .global-header-flex {
 
         align-items: center;
         display: flex;
         justify-content: space-between;
+
+        .global-tools-menu {
+            flex-grow: 1;
+        }
 
         > ul {
             @include breakpoint(medium up) {

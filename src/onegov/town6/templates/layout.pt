@@ -97,28 +97,30 @@
                         <div class="grid-container">
                           <div class="grid-x grid-padding-x">
                               <div class="cell small-12" tal:define="header_options request.app.org.header_options or {}">
-                                  <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+                                  <div class="global-header-flex">
+                                    <div class="global-header hide-for-small-only" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
                                       <h4 tal:condition="header_options['left_header_name']|nothing">
                                           <a href="${header_options.get('left_header_url', '#')}"
                                              style="color:${color or '#fff'}; font-size: ${rem_size}rem">
                                                   ${header_options['left_header_name']}
                                           </a></h4>
+                                    </div>
+                                    <ul tal:condition="global_tools|nothing" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+                                      <li tal:repeat="tool global_tools">
+                                        <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
+                                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                                          <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
+                                              <li tal:repeat="link tool.links">
+                                                  <tal:b replace="structure link(layout)" />
+                                              </li>
+                                          </ul>
+                                        </tal:b>
+                                        <tal:b condition="tool.url|tool.id|nothing" define="link tool">
+                                          <tal:b replace="structure link(layout)" />
+                                        </tal:b>
+                                      </li>
+                                    </ul>
                                   </div>
-                                <ul tal:condition="global_tools|nothing" class="vertical medium-horizontal menu" data-responsive-menu="accordion medium-dropdown">
-                                  <li tal:repeat="tool global_tools">
-                                    <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                                      <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                                      <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
-                                          <li tal:repeat="link tool.links">
-                                              <tal:b replace="structure link(layout)" />
-                                          </li>
-                                      </ul>
-                                    </tal:b>
-                                    <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                                      <tal:b replace="structure link(layout)" />
-                                    </tal:b>
-                                  </li>
-                                </ul>
                               </div>
                             </div>
                         </div>
