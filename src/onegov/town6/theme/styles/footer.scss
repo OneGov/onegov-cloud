@@ -55,9 +55,12 @@ $footer-hover-color: $primary-fg-color;
 
 }
 
-// FIXME adds some padding for partner logos
 .partners {
     .card {
         padding: 20px;
+
+        @include breakpoint(small only) {
+            padding: 10px;
+        }
     }
 }
