@@ -119,3 +119,37 @@
         de: 'https://family.lidl.ch/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
         fr: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
         it: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+
+- name: WUP App
+  logo_url:
+    de: 'https://www.projuventute.ch/de/wup-app'
+    fr: 'https://www.projuventute.ch/de/wup-app'
+    it: 'https://www.projuventute.ch/de/wup-app'
+  mail_url:
+    de: 'https://www.projuventute.ch/de/wup-app'
+    fr: 'https://www.projuventute.ch/de/wup-app'
+    it: 'https://www.projuventute.ch/de/wup-app'
+  logo: sponsors/wup-logo-quer.svg
+  background: '#fff'
+  width: 200px
+  height: 80px
+  top: -5px
+  banners:
+    bookings:
+      src:
+        de: sponsors/wup-banner-de.png
+        fr: sponsors/wup-banner-de.png
+        it: sponsors/wup-banner-de.png
+      url:
+        de: 'https://www.projuventute.ch/de/wup-app'
+        fr: 'https://www.projuventute.ch/de/wup-app'
+        it: 'https://www.projuventute.ch/de/wup-app'
+    invoices:
+      src:
+        de: sponsors/wup-banner-de.png
+        fr: sponsors/wup-banner-de.png
+        it: sponsors/wup-banner-de.png
+      url:
+        de: 'https://www.projuventute.ch/de/wup-app'
+        fr: 'https://www.projuventute.ch/de/wup-app'
+        it: 'https://www.projuventute.ch/de/wup-app'
