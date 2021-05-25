@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x">
             <div class="small-12 medium-8 cell date-range-selector-target">
-                <span class="page-lead h5-size">
+                <span class="page-lead h5">
                     <tal:b condition="start != end">
                         ${layout.format_date(start, 'date_long')} - ${layout.format_date(end, 'date_long')}
                     </tal:b>

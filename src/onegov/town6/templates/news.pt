@@ -26,7 +26,7 @@
                 <tal:b metal:fill-slot="after-panels">
                     <div class="newsletter-sidepanel">
                         <a class="button expanded" href="${layout.newsletter_url}">
-                            <span class="h5-size" i18n:translate="">Newsletter Subscription</span>
+                            <span class="h5" i18n:translate="">Newsletter Subscription</span>
                         </a>
                     </div>
 

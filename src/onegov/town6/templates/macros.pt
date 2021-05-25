@@ -595,7 +595,7 @@
             <h3 i18n:translate>People</h3>
             <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                 <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                    <a class="h5-size" href="${request.link(person)}">${person.title}</a>
+                    <a class="h5" href="${request.link(person)}">${person.title}</a>
                     <div>${person.context_specific_function}</div>
                 </li>
             </ul>
@@ -609,7 +609,7 @@
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 cell page-content-main">
                 <div metal:define-slot="before-lead"></div>
-                <span class="page-lead h5-size" tal:condition="lead" tal:content="structure lead" />
+                <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
@@ -618,7 +618,7 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or show_side_panel">
             <div class="small-12 medium-8 cell page-content-main">
-                <span class="page-lead h5-size" tal:condition="lead" tal:content="structure lead" />
+                <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
@@ -1113,7 +1113,7 @@
             />
         </div>
         <div class="large-9 medium-8 small-7 cell calendar-text-column">
-            <h3 class="h4-size">
+            <h3 class="h4">
                 <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
@@ -1631,7 +1631,7 @@
 
         <ul class="forms-list">
             <li tal:repeat="record grouped[group]">
-                <a class="list-title h5-size" tal:attributes="href request.link(record)">
+                <a class="list-title h5" tal:attributes="href request.link(record)">
                         ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
                 <tal:b tal:define="lead record.meta.get('lead')">

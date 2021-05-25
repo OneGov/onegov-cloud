@@ -7,7 +7,7 @@
 
         <ul tal:condition="imagesets" class="with-lead">
             <li tal:repeat="imageset imagesets">
-                <a class="list-title h5-size" tal:attributes="href request.link(imageset)">${imageset.title}</a><metal:hint use-macro="layout.macros['access_hint']" tal:define="item imageset" />
+                <a class="list-title h5" tal:attributes="href request.link(imageset)">${imageset.title}</a><metal:hint use-macro="layout.macros['access_hint']" tal:define="item imageset" />
                 <div class="list-lead">${imageset.meta.get('lead')}</div>
             </li>
         </ul>

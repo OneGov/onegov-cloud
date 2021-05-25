@@ -31,7 +31,7 @@
                         </div>
 
                         <div>
-                            <a class="list-title h5-size" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
+                            <a class="list-title h5" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
                             <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
                                 <div class="list-lead">

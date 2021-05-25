@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="large-8 medium-8 cell">
-                <div class="page-lead h5-size">
+                <div class="page-lead h5">
                     <div>
                         ${layout.format_date(occurrence.localized_start, 'event')},
                         ${layout.format_time_range(occurrence.localized_start, occurrence.localized_end)}
