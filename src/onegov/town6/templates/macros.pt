@@ -1631,14 +1631,12 @@
 
         <ul class="forms-list">
             <li tal:repeat="record grouped[group]">
-
                 <a class="list-title h5-size" tal:attributes="href request.link(record)">
-                    ${record.title}
+                        ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
-                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-
-                <div class="list-lead" tal:content="structure layout.linkify(record.meta.get('lead'))">
-                </div>
+                <tal:b tal:define="lead record.meta.get('lead')">
+                    <div tal:condition="lead" class="list-lead" tal:content="structure layout.linkify(lead)"></div>
+                </tal:b>
             </li>
         </ul>
     </tal:b>
