@@ -9,28 +9,11 @@
 #homepage-tile-5 .tile-image { background-image: url(#{$tile-image-5});}
 #homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
 
-#topics {
-    margin: 1rem 0;
-}
-
-#topics ul {
-    @include clean-ul;
-    padding: 0;
-}
-
-#topics ul li {
-    border-bottom: 1px solid #f5f5f5;
-    font-weight: bold;
-    padding: 10px 0;
-}
-
-#topics ul li:last-of-type {
-    border: 0;
-}
 
 .homepage-tile {
     .card-section {
         padding-bottom: .5rem;
+        padding-top: .5rem;
     }
 
     .card-divider a {
