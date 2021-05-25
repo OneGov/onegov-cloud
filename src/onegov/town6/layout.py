@@ -78,7 +78,9 @@ class Layout(OrgLayout):
 
     @property
     def show_partners(self):
-        if self.on_homepage or self.request.is_admin:
+        if self.on_homepage:
+            return True
+        elif self.request.is_admin:
             return False
         if '<partner' not in self.org.homepage_structure:
             return False
