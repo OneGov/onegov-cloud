@@ -18,6 +18,17 @@
                     <td>${model.location}</td>
                 </tr>
                 <tr>
+                    <td class="min-width-column" i18n:translate>Mission type</td>
+                    <tal:b tal:switch="model.mission_type">
+                        <td id="mission-type" tal:case="'single'" i18n:translate="">Single mission</td>
+                        <td id="mission-type" tal:case="'multi'" i18n:translate="">Multi mission</td>
+                    </tal:b>
+                </tr>
+                <tr>
+                    <td i18n:translate="">Mission count</td>
+                    <td id="mission-count">${model.mission_count}</td>
+                </tr>
+                <tr>
                     <td class="min-width-column" i18n:translate>Mission nature</td>
                     <td>${model.nature}</td>
                 </tr>

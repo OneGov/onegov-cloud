@@ -16,6 +16,7 @@
                         <th class="min-width-column" i18n:translate>Date</th>
                         <th class="min-width-column" i18n:translate>Alarm</th>
                         <th class="min-width-column" i18n:translate>Duration</th>
+                        <th class="min-width-column" i18n:translate># Missions</th>
                         <th i18n:translate>Mission nature</th>
                         <th class="min-width-column" i18n:translate>Location</th>
                         <th class="min-width-column">
@@ -33,6 +34,9 @@
                         </td>
                         <td data-label="Duration" i18n:attributes="data-label" class="min-width-column">
                             ${report.readable_duration}
+                        </td>
+                        <td class="mission-count" data-label="# Missions" i18n:attributes="data-label">
+                            ${report.mission_count}
                         </td>
                         <td class="mission-nature" data-label="Mission nature" i18n:attributes="data-label">
                             <div><a href="${request.link(report)}">${report.nature}</a></div>

@@ -1,21 +1,20 @@
 import sedate
 
 from datetime import datetime
+from datetime import time
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import Form
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, StrictOptional
 from onegov.form.validators import WhitelistedMimeType
 from onegov.winterthur import _
 from onegov.winterthur.models import MissionReportFile
 from wtforms.fields import BooleanField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import TimeField
-from wtforms.fields.html5 import DecimalField
-from wtforms.fields.html5 import IntegerField
-from wtforms.fields.html5 import URLField
+from wtforms.fields.html5 import (
+    DateField, TimeField, DecimalField, IntegerField, URLField)
+from wtforms.fields import RadioField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
@@ -32,13 +31,27 @@ class MissionReportForm(Form):
         default=today,
         validators=[InputRequired()])
 
-    time = TimeField(
-        _("Time"),
-        validators=[InputRequired()])
+    time = TimeField(_("Time"), validators=[StrictOptional()])
 
     duration = DecimalField(
         _("Mission duration (h)"),
         validators=[InputRequired(), NumberRange(0, 10000)])
+
+    mission_type = RadioField(
+        _("Mission type"),
+        choices=[
+            ('single', _('Single')),
+            ('multi', _('Multi'))
+        ],
+        default='single',
+        validators=[InputRequired()]
+    )
+
+    mission_count = IntegerField(
+        _("Mission count"),
+        depends_on=('mission_type', 'multi'),
+        default=1
+    )
 
     nature = TextAreaField(
         _("Mission nature"),
@@ -62,7 +75,8 @@ class MissionReportForm(Form):
 
     @property
     def date(self):
-        dt = datetime.combine(self.day.data, self.time.data)
+        dt = datetime.combine(
+            self.day.data, self.time.data or time(hour=0, minute=0))
         return sedate.replace_timezone(dt, timezone='Europe/Zurich')
 
     @date.setter
@@ -74,6 +88,21 @@ class MissionReportForm(Form):
     def on_request(self):
         if self.request.app.hide_civil_defence_field:
             self.delete_field('civil_defence')
+
+    def ensure_correct_time(self):
+        if not self.day.data:
+            return
+        if self.mission_type.data == 'single' and not self.time.data:
+            self.time.errors.append(_('This field is required.'))
+            return False
+
+    def ensure_correct_mission_count(self):
+        if self.mission_type.data == 'single':
+            if self.mission_count.data > 1:
+                self.mission_count.errors.append(
+                    _('Mission count must be one for single mission')
+                )
+                return False
 
 
 class MissionReportVehicleForm(Form):

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-11-13 11:04+0100\n"
+"POT-Creation-Date: 2021-05-26 11:35+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -75,6 +75,18 @@ msgstr "Zeit"
 msgid "Mission duration (h)"
 msgstr "Einsatzdauer (h)"
 
+msgid "Mission type"
+msgstr "Einsatz-Kategorie"
+
+msgid "Single"
+msgstr "Einfach"
+
+msgid "Multi"
+msgstr "Mehrfach"
+
+msgid "Mission count"
+msgstr "Zahl der Einsätze"
+
 msgid "Mission nature"
 msgstr "Einsatzart"
 
@@ -89,6 +101,12 @@ msgstr "Personal Bereitschaft"
 
 msgid "Civil Defence involvement"
 msgstr "Beteiligung Zivilschutz"
+
+msgid "This field is required."
+msgstr ""
+
+msgid "Mission count must be one for single mission"
+msgstr "Die Anzahl Einsätze muss 1 sein bei normalen Einsätzen"
 
 msgid "Name"
 msgstr "Name"
@@ -231,6 +249,12 @@ msgstr "Suche in ${directory}"
 msgid "Alarm"
 msgstr "Alarm"
 
+msgid "Single mission"
+msgstr "Regulär"
+
+msgid "Multi mission"
+msgstr "Mehrfach-Einsatz"
+
 msgid "Mission duration"
 msgstr "Einsatzdauer"
 
@@ -263,6 +287,9 @@ msgstr "Total Einsätze im Jahr ${year}"
 
 msgid "Duration"
 msgstr "Dauer"
+
+msgid "# Missions"
+msgstr "# Einsätze"
 
 msgid "Pictures"
 msgstr "Fotos"
