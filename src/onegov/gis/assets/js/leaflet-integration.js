@@ -60,7 +60,6 @@ L.VectorMarkers.Icon = L.Icon.extend({
 });
 
 L.VectorMarkers.icon = function(options) {
-    console.log(options);
     return new L.VectorMarkers.Icon(options);
 };
 
