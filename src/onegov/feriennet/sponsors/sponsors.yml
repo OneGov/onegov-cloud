@@ -122,13 +122,13 @@
 
 - name: WUP App
   logo_url:
-    de: 'https://www.projuventute.ch/de/wup-app'
-    fr: 'https://www.projuventute.ch/de/wup-app'
-    it: 'https://www.projuventute.ch/de/wup-app'
+    de: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+    fr: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+    it: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
   mail_url:
-    de: 'https://www.projuventute.ch/de/wup-app'
-    fr: 'https://www.projuventute.ch/de/wup-app'
-    it: 'https://www.projuventute.ch/de/wup-app'
+    de: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+    fr: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+    it: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
   logo: sponsors/wup-logo-quer.svg
   background: '#fff'
   width: 200px
@@ -141,15 +141,15 @@
         fr: sponsors/wup-banner-de.png
         it: sponsors/wup-banner-de.png
       url:
-        de: 'https://www.projuventute.ch/de/wup-app'
-        fr: 'https://www.projuventute.ch/de/wup-app'
-        it: 'https://www.projuventute.ch/de/wup-app'
+        de: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+        fr: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+        it: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
     invoices:
       src:
         de: sponsors/wup-banner-de.png
         fr: sponsors/wup-banner-de.png
         it: sponsors/wup-banner-de.png
       url:
-        de: 'https://www.projuventute.ch/de/wup-app'
-        fr: 'https://www.projuventute.ch/de/wup-app'
-        it: 'https://www.projuventute.ch/de/wup-app'
+        de: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+        fr: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+        it: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
