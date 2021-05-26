@@ -104,6 +104,12 @@ body {
     min-height: 100%;
 }
 
+// FIXME: Spacing for small screens
+.grid-container {
+ 	padding-right: .9375rem !important;
+ 	padding-left: .9375rem !important;
+ }
+
 main {
     align-items: stretch;
     display: flex;
