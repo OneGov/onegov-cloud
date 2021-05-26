@@ -1,5 +1,46 @@
 # Changes
 
+## Release `2021.53`
+
+> commits: **49 / [30d9fb132b...5cce0552c0](https://github.com/OneGov/onegov-cloud/compare/30d9fb132b^...5cce0552c0)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.53)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds WUP App banner DE only**
+
+Shows german banner version for all languages.
+
+**`Feature`** | **[FER-958](https://issues.seantis.ch/browse/FER-958)** | **[c05ea64481](https://github.com/onegov/onegov-cloud/commit/c05ea6448111adea2142c85817f0562bcea324a0)**
+
+### Fsi
+
+🎉 **Handle inactive users**
+
+- adds inactive field to attendee
+- set users missing in ldap to inactive
+- filter inactive attendees from some views
+
+**`Feature`** | **[FSI-45](https://kanton-zug.atlassian.net/browse/FSI-45)** | **[33788f532b](https://github.com/onegov/onegov-cloud/commit/33788f532ba35537644f1c928a0ddf189b100b60)**
+
+### Org
+
+🎉 **Add hashtag filter to news.**
+
+**`Feature`** | **[SEA-250](https://linear.app/seantis/issue/SEA-250)** | **[d6813417d7](https://github.com/onegov/onegov-cloud/commit/d6813417d77d9c9f810ce0be7244445c0867dd0e)**
+
+### Town6
+
+🐞 **Fixes access hint in UI on path /forms**
+
+**`Bugfix`** | **[SEA-335](https://linear.app/seantis/issue/SEA-335)** | **[617e32254e](https://github.com/onegov/onegov-cloud/commit/617e32254e53291eff664eb12555a509b45cc11a)**
+
+### Winterthur
+
+🎉 **Extends mission reports with type and mission count**
+
+**`Feature`** | **[001072616e](https://github.com/onegov/onegov-cloud/commit/001072616e4036cbdb353608009e0fa9c5955e77)**
+
 ## Release `2021.52`
 
 > released: **2021-05-21 11:27**<br>
