@@ -393,7 +393,7 @@ def close_ticket(self, request):
                 ticket=self,
                 request=request,
                 template='mail_ticket_closed.pt',
-                subject=_("Your request has been closed")
+                subject=_("Your request has been closed.")
             )
             if email_missing:
                 request.alert(_("The submitter email is not available"))

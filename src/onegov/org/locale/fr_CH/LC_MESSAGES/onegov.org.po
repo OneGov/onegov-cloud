@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-19 09:08+0200\n"
+"POT-Creation-Date: 2021-05-26 09:37+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4318,9 +4318,6 @@ msgstr "Le ticket ne peut pas être clôturé car il est en attente"
 msgid "You have closed ticket ${number}"
 msgstr "Vous avez clôturé ${number} ticket(s)"
 
-msgid "Your ticket has been closed"
-msgstr "Votre ticket a été fermé"
-
 msgid "The submitter email is not available"
 msgstr "L'adresse e-mail de l'expéditeur n'est pas disponible"
 
@@ -4409,85 +4406,3 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
-
-#~ msgid ""
-#~ "Stable urls are important. Here you can change the path to your site. A "
-#~ "total of ${number} pages are affected."
-#~ msgstr ""
-#~ "Les urls stables sont importantes. Vous pouvez modifier ici le chemin "
-#~ "d'accès à votre site. Un total de ${number} pages sont concernées."
-
-#~ msgid "Used for text in html body"
-#~ msgstr "Utilisé dans les paragraphes"
-
-#~ msgid "Disable news and hide the entry in the navigation"
-#~ msgstr "Désactiver les 'nouvelles' et masquer l'entrée dans la navigation"
-
-#~ msgid "All other topics can be hidden in their settings"
-#~ msgstr "Tous les autres sujets peuvent être cachés dans leurs paramètres"
-
-#~ msgid "Site Navigation Settings"
-#~ msgstr "Paramètres navigation du site"
-
-#~ msgid "Chosen entries: ${count}"
-#~ msgstr "Entrées sélectionnées: ${count}"
-
-#~ msgid ""
-#~ "Exports all entries of this directory. The resulting zipfile contains the "
-#~ "selected format as well as metadata and images/files if the directory "
-#~ "contains any."
-#~ msgstr ""
-#~ "Exporte toutes les entrées de ce dossier. Le fichier zip généré contient "
-#~ "les formats sélectionnés ainsi que les métadonnées et les images/fichiers "
-#~ "du dossier, s'il en contient."
-
-#~ msgid "created"
-#~ msgstr "créé"
-
-#~ msgid "Reservation Daypass"
-#~ msgstr "Réreservation Carte journalière"
-
-#~ msgid "Check ticket status"
-#~ msgstr "Vérifier l'état du ticket"
-
-#~ msgid "Your ticket has received a payment."
-#~ msgstr "Votre ticket a reçu un paiement."
-
-#~ msgid "Your ticket was marked as unpaid."
-#~ msgstr "Votre ticket a été marqué non payé."
-
-#~ msgid ""
-#~ "Your ticket's payment has been refunded. Note that it might take a few "
-#~ "days until your refunded amount is shown on your credit card bill."
-#~ msgstr ""
-#~ "Votre ticket vous a été remboursé. Notez qu'il peut se passer quelques "
-#~ "jours avant que le montant du remboursement ne figure sur votre relevé de "
-#~ "carte de crédit."
-
-#~ msgid "visit the ticket status page"
-#~ msgstr "visitez la page de statut du ticket"
-
-#~ msgid "visit the ticket page"
-#~ msgstr "visitez la page du ticket"
-
-#~ msgid "Your ticket has been closed."
-#~ msgstr "Votre ticket a été fermé."
-
-#~ msgid "Your ticket's timeline has been archived for future reference:"
-#~ msgstr ""
-#~ "L'historique de votre ticket a été archivé pour des références futures :"
-
-#~ msgid "Ticket Timeline"
-#~ msgstr "Historique du ticket"
-
-#~ msgid "A new ticket has been opened:"
-#~ msgstr "Un nouveau ticket a été ouvert :"
-
-#~ msgid "Request-ID"
-#~ msgstr "ID de la demande"
-
-#~ msgid "Your ticket has been opened"
-#~ msgstr "Votre ticket a été ouvert"
-
-#~ msgid "Ticket Number"
-#~ msgstr "Numéro du ticket"

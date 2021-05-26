@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-03-01 11:11+0100\n"
+"POT-Creation-Date: 2021-05-26 09:33+0200\n"
 "PO-Revision-Date: 2020-03-24 11:39+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -83,20 +83,11 @@ msgstr "Url de eDéménagement"
 msgid "Hide Publications on Homepage"
 msgstr "Masquer les publications sur la page d'accueil"
 
-msgid "Number of events displayed on homepage"
-msgstr "Nombre d'événements affichés sur la page d'accueil"
+msgid "Maximum number of events displayed on homepage"
+msgstr "Nombre maximal d'événements affichés sur la page d'accueil"
 
-msgid "Number of news entries on homepage"
-msgstr "Nombre des nouvelles sur la page d'accueil"
+msgid "Maximum number of news entries on homepage"
+msgstr "Nombre maximal des nouvelles sur la page d'accueil"
 
 msgid "Homepage"
 msgstr "Page d'accueil"
-
-#~ msgid "Directories"
-#~ msgstr "Répertoires"
-
-#~ msgid "Topics"
-#~ msgstr "Sujets"
-
-#~ msgid "Catalog A-Z"
-#~ msgstr "Catalogue de A à Z"

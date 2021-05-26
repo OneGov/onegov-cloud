@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-05-11 08:46+0200\n"
+"POT-Creation-Date: 2021-05-26 09:33+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -45,7 +45,7 @@ msgid "Hide chat for chosen roles"
 msgstr "Cacher le Chat pour les rôles choisis"
 
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 msgid "Editor"
 msgstr "Rédacteur"
@@ -629,6 +629,9 @@ msgstr "Vous êtes ici"
 msgid "Privacy Protection"
 msgstr "Protection des données"
 
+msgid "Login"
+msgstr "Connexion"
+
 msgid "About"
 msgstr "Impressum"
 
@@ -636,7 +639,7 @@ msgid "Contact"
 msgstr "Contact"
 
 msgid "more"
-msgstr ""
+msgstr "plus"
 
 msgid "Opening Hours"
 msgstr "Horaires d'ouverture"
@@ -1367,6 +1370,12 @@ msgstr "E-mails de tickets désactivés."
 msgid "Ticket e-mails enabled."
 msgstr "E-mails de tickets activés."
 
+msgid "Your search returned no results."
+msgstr "Votre recherche n'a donné aucun résultat."
+
+msgid "Hashtags"
+msgstr "Hashtags"
+
 msgid "Years"
 msgstr "Années"
 
@@ -1578,9 +1587,6 @@ msgid ""
 msgstr ""
 "La recherche est actuellement indisponible en raison de difficultés "
 "techniques. Veuillez excuser le dérangement et réessayer plus tard."
-
-msgid "Your search returned no results."
-msgstr "Votre recherche n'a donné aucun résultat."
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Sélectionnez les images qui devraient être affichées dans cet album."
@@ -1858,6 +1864,9 @@ msgstr "Général"
 msgid "Favicon"
 msgstr "Favicon"
 
+msgid "Social Media"
+msgstr "Réseaux sociaux"
+
 msgid "Links"
 msgstr ""
 
@@ -1887,9 +1896,3 @@ msgstr "Paramètres de la newsletter"
 
 msgid "Link Migration"
 msgstr ""
-
-#~ msgid "Contacts and Photos"
-#~ msgstr "Contacts et photos"
-
-#~ msgid "Impressions"
-#~ msgstr "Impressions"

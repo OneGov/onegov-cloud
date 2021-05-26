@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-19 09:08+0200\n"
+"POT-Creation-Date: 2021-05-26 09:37+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3180,7 +3180,7 @@ msgstr ""
 "wieder."
 
 msgid "Your search returned no results."
-msgstr "Zu Ihrer Suche wurde nichts gefunden"
+msgstr "Zu Ihrer Suche wurde nichts gefunden."
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
@@ -4301,9 +4301,6 @@ msgstr ""
 msgid "You have closed ticket ${number}"
 msgstr "Sie haben das Ticket ${number} abgeschlossen"
 
-msgid "Your ticket has been closed"
-msgstr "Ihr Ticket wurde geschlossen"
-
 msgid "The submitter email is not available"
 msgstr "Die Email des Antragstellers fehlt"
 
@@ -4393,104 +4390,3 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Model"
-#~ msgstr "Model"
-
-#~ msgid "External and internal links"
-#~ msgstr "Externe und interne Seiten"
-
-#~ msgid "Unhealthy"
-#~ msgstr "Fehlerhaft"
-
-#~ msgid ""
-#~ "Stable urls are important. Here you can change the path to your site. A "
-#~ "total of ${number} pages are affected."
-#~ msgstr ""
-#~ "Stabile Url's sind wichtig. Hier können sie den Url-Pfad zu dieser Seite "
-#~ "ändern. Total ${number} Seiten sind davon betroffen."
-
-#~ msgid "Used for text in html body"
-#~ msgstr "Wird für Paragraphen verwendet"
-
-#~ msgid "Disable news and hide the entry in the navigation"
-#~ msgstr "'Aktuelles' deaktivieren und Eintrag in Navigation verstecken"
-
-#~ msgid "All other topics can be hidden in their settings"
-#~ msgstr "Alle anderen Themen können in ihren Einstellungen versteckt werden"
-
-#~ msgid "Site Navigation Settings"
-#~ msgstr "Einstellungen Seiten-Navigation"
-
-#~ msgid "Chosen entries: ${count}"
-#~ msgstr "Gewählte Einträge: ${count}"
-
-#~ msgid ""
-#~ "Exports all entries of this directory. The resulting zipfile contains the "
-#~ "selected format as well as metadata and images/files if the directory "
-#~ "contains any."
-#~ msgstr ""
-#~ "Exportiert alle Einträge dieses Verzeichnisses. Die resultierende Zip-"
-#~ "Datei enthält das gewählte Format sowie alle Metadaten und allfällige "
-#~ "Bilder/Dateien."
-
-#~ msgid "created"
-#~ msgstr "erstellt"
-
-#~ msgid ""
-#~ "Describes how this resource has be be picked up. This text is used on the "
-#~ "ticket status page to inform the user"
-#~ msgstr ""
-#~ "Beschreibt, wie die Reservationsresource abholt oder bezogen werden kann. "
-#~ "Dieser Text auf der Ticket-Status-Seite genutzt, um den Nutzer zu "
-#~ "informieren."
-
-#~ msgid "Describes how this resource has be be picked up"
-#~ msgstr "Beschreibt, wie diese Reservations-Resource abgeholt werden kann"
-
-#~ msgid "Reservation Daypass"
-#~ msgstr "Reservation Tageskarte"
-
-#~ msgid "Check ticket status"
-#~ msgstr "Ticket Status abfragen"
-
-#~ msgid "Your ticket has received a payment."
-#~ msgstr "Ihr Ticket hat eine Zahlung erhalten."
-
-#~ msgid "Your ticket was marked as unpaid."
-#~ msgstr "Ihr Ticket wurde als unbezahlt markiert."
-
-#~ msgid ""
-#~ "Your ticket's payment has been refunded. Note that it might take a few "
-#~ "days until your refunded amount is shown on your credit card bill."
-#~ msgstr ""
-#~ "Ihre Ticket Zahlung wurde rückerstattet. Bitte beachten Sie dass es ein "
-#~ "paar Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung "
-#~ "erscheint."
-
-#~ msgid "visit the ticket status page"
-#~ msgstr "öffnen Sie den Ticket Status"
-
-#~ msgid "visit the ticket page"
-#~ msgstr "öffnen Sie das Ticket"
-
-#~ msgid "Your ticket has been closed."
-#~ msgstr "Ihr Ticket wurde geschlossen."
-
-#~ msgid "Your ticket's timeline has been archived for future reference:"
-#~ msgstr "Der Verlauf ihres Tickets wurde als zukünftige Referenz archiviert:"
-
-#~ msgid "Ticket Timeline"
-#~ msgstr "Ticket Verlauf"
-
-#~ msgid "A new ticket has been opened:"
-#~ msgstr "Ein neues Ticket wurde für Sie eröffnet:"
-
-#~ msgid "Request-ID"
-#~ msgstr "Anfrage-ID"
-
-#~ msgid "Your ticket has been opened"
-#~ msgstr "Ihr Ticket wurde eröffnet"
-
-#~ msgid "Ticket Number"
-#~ msgstr "Ticket Nummer"

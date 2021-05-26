@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-05-11 08:46+0200\n"
+"POT-Creation-Date: 2021-05-26 09:33+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -630,6 +630,9 @@ msgstr "Sie sind hier"
 msgid "Privacy Protection"
 msgstr "Datenschutz"
 
+msgid "Login"
+msgstr "Anmelden"
+
 msgid "About"
 msgstr "Impressum"
 
@@ -637,7 +640,7 @@ msgid "Contact"
 msgstr "Kontakt"
 
 msgid "more"
-msgstr ""
+msgstr "mehr"
 
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
@@ -1369,6 +1372,12 @@ msgstr "Ticket E-Mails deaktiviert."
 msgid "Ticket e-mails enabled."
 msgstr "Ticket E-Mails aktiviert."
 
+msgid "Your search returned no results."
+msgstr "Zu Ihrer Suche wurde nichts gefunden."
+
+msgid "Hashtags"
+msgstr "Hashtags"
+
 msgid "Years"
 msgstr "Jahre"
 
@@ -1573,9 +1582,6 @@ msgstr ""
 "Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
 "Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später "
 "wieder."
-
-msgid "Your search returned no results."
-msgstr "Zu Ihrer Suche wurde nichts gefunden"
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
@@ -1851,6 +1857,9 @@ msgstr "Allgemein"
 msgid "Favicon"
 msgstr ""
 
+msgid "Social Media"
+msgstr "Soziale Medien"
+
 msgid "Links"
 msgstr ""
 
@@ -1880,9 +1889,3 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
-
-#~ msgid "Contacts and Photos"
-#~ msgstr "Kontakte und Fotos"
-
-#~ msgid "Impressions"
-#~ msgstr "Impressionen"

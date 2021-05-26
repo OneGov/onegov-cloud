@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 09:31+0200\n"
+"POT-Creation-Date: 2021-05-26 09:32+0200\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -347,9 +347,6 @@ msgstr ""
 
 msgid "Mark Pukelsheim Completed"
 msgstr ""
-
-msgid "Select either majorz or proporz elections."
-msgstr "Tscherni u las elecziuns da maiorz u las elecziuns da proporz."
 
 msgid "Notifications"
 msgstr "Communicaziuns"
