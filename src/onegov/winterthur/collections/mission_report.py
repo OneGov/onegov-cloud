@@ -6,7 +6,7 @@ from onegov.org.models.file import ImageFileCollection
 from onegov.winterthur.models import MissionReport
 from onegov.winterthur.models import MissionReportFile
 from onegov.winterthur.models import MissionReportVehicle
-from sqlalchemy import and_, or_, desc
+from sqlalchemy import and_, or_, desc, func
 
 
 class MissionReportFileCollection(ImageFileCollection):
@@ -99,8 +99,9 @@ class MissionReportCollection(GenericCollection, Pagination):
 
     def mission_count(self):
         """ The mission count, including hidden missions. """
-
-        return self.filter_by_year(super().query()).count()
+        query = self.filter_by_year(super().query())
+        return query.with_entities(
+            func.sum(MissionReport.mission_count)).scalar()
 
 
 class MissionReportVehicleCollection(GenericCollection):
