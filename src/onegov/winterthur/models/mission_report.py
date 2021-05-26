@@ -5,14 +5,13 @@ from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.file import File
 from onegov.org.models import AccessExtension
 from sedate import to_timezone
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Numeric
-from sqlalchemy import Text
+from sqlalchemy import (
+    Boolean, Column, ForeignKey, Integer, Numeric, Text, Enum
+)
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+MISSION_TYPES = ('single', 'multi')
 
 
 class MissionReportFile(File):
@@ -54,6 +53,16 @@ class MissionReport(Base, ContentMixin, AccessExtension):
 
     #: pictures of the mission
     pictures = associated(MissionReportFile, 'pictures', 'one-to-many')
+
+    # The number of missions on the same site during a day
+    mission_count = Column(Integer, nullable=False, default=1)
+
+    # the mission type
+    mission_type = Column(
+        Enum(*MISSION_TYPES, name='mission_type'),
+        nullable=False,
+        default='single'
+    )
 
     @property
     def title(self):
