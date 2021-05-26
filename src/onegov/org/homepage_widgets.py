@@ -306,21 +306,17 @@ class TilesWidget(object):
                     )
                 )
             elif page.type == 'news':
-                news_url = link(page)
-                years = (str(year) for year in page.years)
-
                 links = [
-                    Link(year, news_url + '?year=' + year, classes=classes)
-                    for year in years
+                    Link(str(year), link(page.for_year(year)), classes=classes)
+                    for year in page.all_years
                 ]
-
                 links.append(Link(
                     _("Newsletter"), link(NewsletterCollection(session)),
                     classes=classes
                 ))
 
                 yield Tile(
-                    page=Link(page.title, news_url),
+                    page=Link(page.title, link(page)),
                     number=ix + 1,
                     links=links
                 )

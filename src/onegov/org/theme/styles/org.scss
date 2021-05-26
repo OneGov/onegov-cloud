@@ -2242,6 +2242,28 @@ div#redactor-droparea {
         + li::before {
             content: '/';
         }
+
+        &.active {
+            font-weight: bold;
+        }
+    }
+}
+
+.news-tags {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    li {
+        display: inline;
+
+        ::before {
+            content: '#';
+        }
+
+        &.active {
+            font-weight: bold;
+        }
     }
 }
 

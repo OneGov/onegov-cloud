@@ -32,7 +32,7 @@ def test_news(client):
     page = page.click('Nachricht')
     page.form['title'] = "We have a new homepage"
     page.form['lead'] = "It is very good"
-    page.form['text'] = "It is lots of fun"
+    page.form['text'] = "It is lots of fun \n #fun"
     page = page.form.submit().follow()
 
     assert "We have a new homepage" in page.text
@@ -48,6 +48,7 @@ def test_news(client):
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" not in page.text
+    assert "/news?filter_tags=fun" in page.text
 
     page = client.get('/news/we-have-a-new-homepage')
     client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))

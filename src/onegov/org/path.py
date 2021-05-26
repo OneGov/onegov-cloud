@@ -122,15 +122,29 @@ def get_topic(app, absorb):
     return PageCollection(app.session()).by_path(absorb, ensure_type='topic')
 
 
-@OrgApp.path(model=News, path='/news', absorb=True)
-def get_news(app, absorb):
+@OrgApp.path(
+    model=News,
+    path='/news',
+    absorb=True,
+    converters=dict(
+        filter_years=[int], filter_tags=[str]
+    )
+)
+def get_news(app, absorb, filter_years, filter_tags):
     pages = PageCollection(app.session())
 
     old_path = '/{}/{}'.format('aktuelles', absorb)
     new_path = '/{}/{}'.format('news', absorb)
 
-    return pages.by_path(new_path, ensure_type='news')\
+    news = (
+        pages.by_path(new_path, ensure_type='news')
         or pages.by_path(old_path, ensure_type='news')
+    )
+    if news:
+        news.filter_years = filter_years
+        news.filter_tags = filter_tags
+
+    return news
 
 
 @OrgApp.path(model=GeneralFileCollection, path='/files')

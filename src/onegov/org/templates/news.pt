@@ -7,10 +7,15 @@
 
         <ul tal:condition="len(year_links) > 1" class="news-years">
             <tal:b repeat="link year_links">
-                <li tal:condition="link.active">
-                    <strong>${link.text}</strong>
+                <li tal:attributes="class 'active' if link.active else ''">
+                    <a href="${link.attrs['href']}">${link.text}</a>
                 </li>
-                <li tal:condition="not: link.active">
+            </tal:b>
+        </ul>
+
+        <ul tal:condition="len(tag_links)" class="news-tags">
+            <tal:b repeat="link tag_links">
+                <li tal:attributes="class 'active' if link.active else ''">
                     <a href="${link.attrs['href']}">${link.text}</a>
                 </li>
             </tal:b>

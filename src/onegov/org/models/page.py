@@ -1,4 +1,5 @@
-from onegov.core.orm.mixins import content_property
+from datetime import datetime
+from onegov.core.orm.mixins import content_property, meta_property
 from onegov.form import Form
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
@@ -13,9 +14,11 @@ from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.page import Page
 from onegov.search import SearchableContent
-from sqlalchemy import desc, func
-from sqlalchemy.dialects.postgresql import JSON
+from sedate import replace_timezone
+from sqlalchemy import desc, func, or_, and_
+from sqlalchemy.dialects.postgresql import array, JSON
 from sqlalchemy.orm import undefer, object_session
+from sqlalchemy_utils import observes
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
@@ -97,6 +100,15 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     text = content_property()
     url = content_property()
 
+    filter_years = []
+    filter_tags = []
+
+    hashtags = meta_property(default=list)
+
+    @observes('content')
+    def content_observer(self, files):
+        self.hashtags = self.es_tags or []
+
     @property
     def absorb(self):
         return ''.join(self.path.split('/', 1)[1:])
@@ -155,38 +167,86 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
         raise NotImplementedError
 
+    def for_year(self, year):
+        years = set(self.filter_years)
+        years = list(years - {year} if year in years else years | {year})
+        return News(
+            id=self.id,
+            title=self.title,
+            name=self.name,
+            filter_years=sorted(years),
+            filter_tags=sorted(self.filter_tags)
+        )
+
+    def for_tag(self, tag):
+        tags = set(self.filter_tags)
+        tags = list(tags - {tag} if tag in tags else tags | {tag})
+        return News(
+            id=self.id,
+            title=self.title,
+            name=self.name,
+            filter_years=sorted(self.filter_years),
+            filter_tags=sorted(tags)
+        )
+
     def news_query(self, limit=2, published_only=True):
         news = object_session(self).query(News)
         news = news.filter(Page.parent == self)
         if published_only:
             news = news.filter(
-                Page.publication_started == True,
-                Page.publication_ended == False
+                News.publication_started == True,
+                News.publication_ended == False
             )
-        news = news.order_by(desc(Page.published_or_created))
+
+        filter = []
+        for year in self.filter_years:
+            start = replace_timezone(datetime(year, 1, 1), 'UTC')
+            filter.append(
+                and_(
+                    News.created >= start,
+                    News.created < start.replace(year=year + 1)
+                )
+            )
+        if filter:
+            news = news.filter(or_(*filter))
+
+        if self.filter_tags:
+            news = news.filter(
+                News.meta['hashtags'].has_any(array(self.filter_tags))
+            )
+
+        news = news.order_by(desc(News.published_or_created))
         news = news.options(undefer('created'))
         news = news.options(undefer('content'))
         news = news.limit(limit)
 
         sticky = func.json_extract_path_text(
-            func.cast(Page.meta, JSON), 'is_visible_on_homepage') == 'true'
+            func.cast(News.meta, JSON), 'is_visible_on_homepage') == 'true'
 
         sticky_news = news.limit(None)
         sticky_news = sticky_news.filter(sticky)
 
         return news.union(sticky_news).order_by(
-            desc(Page.published_or_created))
+            desc(News.published_or_created))
 
     @property
-    def years(self):
+    def all_years(self):
         query = object_session(self).query(News)
         query = query.with_entities(
             func.date_part('year', Page.published_or_created))
         query = query.group_by(
             func.date_part('year', Page.published_or_created))
         query = query.filter(Page.parent == self)
-
         return sorted([int(r[0]) for r in query.all()], reverse=True)
+
+    @property
+    def all_tags(self):
+        query = object_session(self).query(News.meta['hashtags'])
+        query = query.filter(Page.parent == self)
+        hashtags = set()
+        for result in query.all():
+            hashtags.update(set(result[0]))
+        return sorted(hashtags)
 
 
 class AtoZPages(AtoZ):

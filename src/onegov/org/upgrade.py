@@ -177,3 +177,9 @@ def fix_directory_file_identity(context):
                     entry.files.append(new)
                     entry.content['values'][field.id]['data'] = f'@{new.id}'
                     entry.content.changed()
+
+
+@upgrade_task('Cache news hashtags in meta')
+def cache_news_hashtags_in_meta(context):
+    for news in context.session.query(News):
+        news.hashtags = news.es_tags or []

@@ -37,19 +37,86 @@ def test_clipboard(org_app):
     assert clipboard.url is None
 
 
-def test_news_years(session):
+def test_news(session):
 
     collection = PageCollection(session)
     news = collection.add_root("News", type='news')
-    one = collection.add(news, title="One", type='news')
-    two = collection.add(news, title="Two", type='news')
+    one = collection.add(
+        news,
+        title='One',
+        type='news',
+        lead='#one #both',
+    )
+    one.created = datetime(2016, 1, 1, tzinfo=utc)
+    two = collection.add(
+        news,
+        title='Two',
+        type='news',
+        text='#two #both'
+    )
+    two.created = datetime(2015, 3, 1, tzinfo=utc)
+    three = collection.add(
+        news,
+        title='Three',
+        type='news',
+        text='#three'
+    )
+    three.created = datetime(2015, 2, 1, tzinfo=utc)
+    three.publication_start = datetime(2015, 2, 2, tzinfo=utc)
+    three.publication_end = datetime(2015, 2, 4, tzinfo=utc)
+    four = collection.add(
+        news,
+        title='Four',
+        type='news',
+        text='#four'
+    )
+    four.created = datetime(2015, 1, 1, tzinfo=utc)
+    four.is_visible_on_homepage = True
 
-    assert news.years == [datetime.utcnow().year]
+    assert news.all_years == [2016, 2015]
+    assert news.all_tags == ['both', 'four', 'one', 'three', 'two']
 
-    one.created = datetime(2016, 2, 1, tzinfo=utc)
-    two.created = datetime(2015, 2, 1, tzinfo=utc)
+    assert news.for_year(2015).filter_years == [2015]
+    assert news.for_year(2015).filter_tags == []
+    assert news.for_tag('one').filter_years == []
+    assert news.for_tag('one').filter_tags == ['one']
+    news.filter_years = [2015]
+    news.filter_tags = ['one']
+    assert news.for_year(2015).filter_years == []
+    assert news.for_year(2015).filter_tags == ['one']
+    assert news.for_tag('one').filter_years == [2015]
+    assert news.for_tag('one').filter_tags == []
+    assert news.for_year(2016).filter_years == [2015, 2016]
+    assert news.for_year(2016).filter_tags == ['one']
+    assert news.for_tag('two').filter_years == [2015]
+    assert news.for_tag('two').filter_tags == ['one', 'two']
 
-    assert news.years == [2016, 2015]
+    news.filter_years = []
+    news.filter_tags = []
+    news.news_query(limit=None, published_only=False).count() == 4
+    news.news_query(limit=None, published_only=True).count() == 3
+    news.news_query(limit=0, published_only=True).count() == 1
+    news.news_query(limit=1, published_only=True).count() == 2
+    news.news_query(limit=2, published_only=True).count() == 2
+    news.news_query(limit=3, published_only=True).count() == 3
+
+    news.filter_years = [2016]
+    news.news_query(limit=None, published_only=False).count() == 1
+    news.filter_years = [2015]
+    news.news_query(limit=None, published_only=False).count() == 3
+    news.filter_years = [2015, 2016]
+    news.news_query(limit=None, published_only=False).count() == 4
+
+    news.filter_tags = ['one']
+    news.news_query(limit=None, published_only=False).count() == 1
+    news.filter_tags = ['both']
+    news.news_query(limit=None, published_only=False).count() == 2
+    news.filter_tags = ['both', 'three']
+    news.news_query(limit=None, published_only=False).count() == 3
+
+    news.filter_years = [2015]
+    news.filter_tags = ['both']
+    news.news_query(limit=None, published_only=False).one() == two
 
 
 def test_group_intervals():

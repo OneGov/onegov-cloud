@@ -2,20 +2,16 @@
 
 import morepath
 
-from datetime import datetime
-
-from webob.exc import HTTPNotFound
-
-from onegov.core.security import Public, Private
-from onegov.org.elements import Link
 from onegov.core.elements import Link as CoreLink
+from onegov.core.security import Public, Private
+from onegov.org import OrgApp
+from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
 from onegov.page import Page, PageCollection
-from onegov.org import OrgApp
-from sedate import replace_timezone
 from webob import exc
+from webob.exc import HTTPNotFound
 
 
 @OrgApp.view(model=Page, request_method='DELETE', permission=Private)
@@ -69,32 +65,33 @@ def view_topic(self, request, layout=None):
 def view_news(self, request, layout=None):
 
     layout = layout or NewsLayout(self, request)
-    years = self.years
 
-    try:
-        year = int(request.params['year'])
-    except (ValueError, KeyError):
-        year = years and years[0] or None
+    children = []
+    year_links = []
+    tag_links = []
+    if not self.parent:
+        query = self.news_query(limit=None)
+        if request.is_manager:
+            children = query.all()
+        else:
+            children = request.exclude_invisible(query.all())
 
-    query = self.news_query(limit=None)
+        year_links = [CoreLink(
+            text=str(year),
+            active=year in self.filter_years,
+            url=request.link(self.for_year(year)),
+            rounded=True
+        ) for year in self.all_years]
 
-    if year:
-        start = replace_timezone(datetime(year, 1, 1), 'UTC')
-        query = query.filter(Page.created >= start)
-        query = query.filter(Page.created < start.replace(year=year + 1))
+        tag_links = [CoreLink(
+            text=str(tag),
+            active=tag in self.filter_tags,
+            url=request.link(self.for_tag(tag)),
+            rounded=True
+        ) for tag in self.all_tags]
 
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
-        children = query.all()
-    else:
-        children = request.exclude_invisible(query.all())
-
-    year_links = [CoreLink(
-        text=str(year_),
-        active=year_ == year,
-        url=f'{request.link(self)}?year={year_}',
-        rounded=True
-    ) for year_ in years]
 
     return {
         'layout': layout,
@@ -103,6 +100,6 @@ def view_news(self, request, layout=None):
         'page': self,
         'children': children,
         'year_links': year_links,
-        'current_year': year,
+        'tag_links': tag_links,
         'get_lead': get_lead
     }
