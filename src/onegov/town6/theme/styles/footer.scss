@@ -6,6 +6,11 @@ $footer-hover-color: $primary-fg-color;
 
 .footer-container {
     background-color: $primary-color;
+    margin-top: 50px;
+}
+
+#page-root .footer-container {
+    margin-top: 0px;
 }
 
 .footer-content {
