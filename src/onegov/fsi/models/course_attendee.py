@@ -1,5 +1,6 @@
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
+from sqlalchemy import Boolean
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
@@ -44,6 +45,9 @@ class CourseAttendee(Base, ORMSearchable):
     # is null if its an external attendee
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
     user = relationship("User", backref=backref("attendee", uselist=False))
+
+    # mirrors user active property
+    active = Column(Boolean, nullable=False, default=True)
 
     # mirrors the source_id field from user due to performance reasons
     source_id = Column(Text, nullable=True)
@@ -163,8 +167,6 @@ class CourseAttendee(Base, ORMSearchable):
         """
         Will return query to filter for all upcoming courses the attendee
         has to refresh.
-
-        TODO: First implement a foreign key to itself or fk to model course
 
         This is necessary to answer:
             if one course, how many course events has an attendee:

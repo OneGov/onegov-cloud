@@ -22,25 +22,26 @@ class authAttendee:
         self.permissions = permissions or []
 
 
-def test_course_collection_1(session, course):
-    course(session, hidden_from_public=True, name='Hidden')
-    course1, data = course(session)
-    coll = CourseCollection(session)
+def test_course_collection(scenario):
+    scenario.add_course(hidden_from_public=True, name='Hidden')
+    scenario.add_course()
+    course1 = scenario.latest_course
+    coll = CourseCollection(scenario.session)
     # collection defaults to not return the hidden_from_public one's
     assert coll.query().count() == 1
     course1.hidden_from_public = True
-    session.flush()
     assert coll.by_id(course1.id) is not None
     assert coll.query().count() == 0
     coll.show_hidden_from_public = True
     assert coll.query().count() == 2
 
 
-def test_course_event_collection(session, course):
+def test_course_event_collection(session, scenario):
     now = utcnow()
+    course_id = scenario.add_course()
     new_course_events = (
         CourseEvent(
-            course_id=course(session)[0].id,
+            course_id=course_id,
             location=f'Address, Room {i}',
             start=now + timedelta(days=i),
             end=now + timedelta(days=i, hours=2),
@@ -80,22 +81,21 @@ def test_course_event_collection(session, course):
     assert event_coll.query().count() == 1
 
 
-def test_event_collection_add_placeholder(session, course_event):
+def test_event_collection_add_placeholder(scenario):
     # Test add_placeholder method
-    course_event, data = course_event(session)
-    # event_coll.add_placeholder('Placeholder', course_event)
-    # Tests the secondary join event.attendees as well
-    assert course_event.attendees.count() == 0
-    # assert course_event.subscriptions.count() == 1
+    scenario.add_course()
+    scenario.add_course_event(course=scenario.latest_course)
+    assert scenario.latest_event.attendees.count() == 0
 
 
-def test_attendee_collection(
-        session, attendee, external_attendee, editor_attendee):
+def test_attendee_collection(scenario):
 
-    att, data = attendee(session)
-    att_with_org, data = attendee(
-        session, organisation='A', first_name='A', last_name='A')
-    external, data = external_attendee(session)
+    scenario.add_attendee()
+    scenario.add_attendee(organisation='A', username='A@A.com')
+    assert scenario.latest_attendee.active
+    scenario.add_attendee(external=True)
+
+    session = scenario.session
 
     auth_admin = authAttendee(role='admin')
 
@@ -124,33 +124,36 @@ def test_attendee_collection(
     # Get all of them, but himself does not exist
     assert coll.query().count() == 0
 
-    # make the editor exist, and test if he gets himself
-    editor, data = editor_attendee(session, id=auth_editor.id)
+    # create and attendee with an editor as user
+    scenario.add_attendee(role='editor', id=auth_editor.id)
     assert coll.query().count() == 1
 
     # check if he can see attendee with organisation
+    editor = scenario.latest_attendee
     editor.permissions = ['A']
     coll = CourseAttendeeCollection(session, auth_attendee=editor)
     assert coll.attendee_permissions == ['A']
     assert coll.query().count() == 2
 
 
-def test_reservation_collection_query(
-        session, attendee, admin_attendee, editor_attendee, course_event,
-        future_course_reservation, external_attendee):
+def test_reservation_collection_query(scenario):
+    session = scenario.session
+    scenario.add_attendee(role='admin')
 
-    admin, data = admin_attendee(session)
-    editor, data = editor_attendee(session)
-    att, data = attendee(session)
-    external, data = external_attendee(session)
-    event, data = course_event(session)
-    future_course_reservation(
-        session, course_event_id=event.id, attendee_id=att.id)
+    scenario.add_course()
+    scenario.add_course_event(course=scenario.latest_course)
 
-    future_course_reservation(session, attendee_id=editor.id)
+    scenario.add_attendee(role='member')
+    att = scenario.latest_attendee
+    scenario.add_subscription(scenario.latest_event, att)
 
-    future_course_reservation(
-        session, course_event_id=event.id, attendee_id=external.id)
+    scenario.add_attendee(role='editor')
+    editor = scenario.latest_attendee
+    scenario.add_subscription(scenario.latest_event, editor)
+
+    scenario.add_attendee(external=True)
+    scenario.add_subscription(scenario.latest_event, scenario.latest_attendee)
+    scenario.commit()
 
     auth_attendee = authAttendee()
 
@@ -169,18 +172,18 @@ def test_reservation_collection_query(
     coll = SubscriptionsCollection(
         session,
         auth_attendee=auth_attendee,
-        course_event_id=event.id)
-    assert coll.query().count() == 2
+        course_event_id=scenario.latest_event.id)
+    assert coll.query().count() == 3
 
     # Test for editor with no permissions should see just his own
     auth_attendee = authAttendee(role='editor', id=editor.id)
     coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 1
 
-    # Add a the same organisation and get one entry more
+    # Add an organisation
     att.organisation = 'A'
     coll.auth_attendee.permissions = ['A']
-    assert coll.query().count() == 2
+    assert coll.query().count() == 1
 
     # Test editor wants to get his own
     coll = SubscriptionsCollection(
@@ -257,6 +260,11 @@ def test_audit_collection(scenario):
     # add some noise
     scenario.add_course_event(scenario.latest_course)
     scenario.add_attendee(external=True, username='h.r@giger.ch')
+
+    # Add inactive attendee
+    scenario.add_attendee(active=False)
+    inactive = scenario.latest_attendee
+
     scenario.commit()
     scenario.refresh()
 
@@ -291,7 +299,7 @@ def test_audit_collection(scenario):
 
     assert sorted(results) == sorted(
         (a.id, e.start) for a, e in
-        zip(scenario.attendees, scenario.course_events[:3])
+        zip(scenario.active_attendees, scenario.course_events[:3])
     )
 
     # add a subscription also for this attendee, but not completed
@@ -327,7 +335,7 @@ def test_audit_collection(scenario):
     # Check for admin
     audits.auth_attendee = fake_admin
     audits.organisations = []
-    assert audits.query().count() == len(scenario.attendees)
+    assert audits.query().count() == len(scenario.active_attendees)
     audits.organisations = ['AA']
     assert audits.query().count() == 1
     # get the one having ln starting with ZZZ

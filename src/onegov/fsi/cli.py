@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from operator import or_
 
 import click
 from sedate import replace_timezone
@@ -11,6 +12,7 @@ from onegov.fsi.ims_import import parse_ims_data, import_ims_data, \
     import_teacher_data, with_open, parse_date, validate_integer, parse_status
 from onegov.fsi.models import CourseAttendee, CourseEvent
 from onegov.fsi.models.course_attendee import external_attendee_org
+from onegov.user import User
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
 
@@ -326,9 +328,27 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
 
             yield from map_entries(connection.entries)
 
+    def handle_inactive(synced_ids):
+        inactive = session.query(User).filter(User.id not in synced_ids)
+        inactive = inactive.filter(or_(
+            User.source == 'ldap',
+            User.role == 'member'
+        ))
+        for ix, user_ in enumerate(inactive):
+            user_.active = False
+            att = user_.attendee
+            if att:
+                att.active = False
+
+            if ix % 200 == 0:
+                app.es_indexer.process()
+
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
+
+    synced_users = []
+
     for ix, data in enumerate(users(client.connection)):
 
         if data['type'] == 'ldap':
@@ -349,11 +369,15 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             session=session,
             username=data['mail'],
             role=data['role'],
-            force_role=force_role)
+            force_role=force_role,
+            force_active=True
+        )
+
+        synced_users.append(user.id)
 
         if not user.attendee:
             is_editor = user.role == 'editor'
-            permissions = is_editor and external_attendee_org or None
+            permissions = is_editor and [external_attendee_org] or None
             user.attendee = CourseAttendee(permissions=permissions)
 
         user.attendee.first_name = data['first_name']
@@ -365,4 +389,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
 
         if ix % 200 == 0:
             app.es_indexer.process()
+
+    handle_inactive(synced_users)
+
     # log.info(f'LDAP users imported (#{count})')

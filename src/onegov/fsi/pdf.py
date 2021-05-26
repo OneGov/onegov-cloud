@@ -61,7 +61,6 @@ class FsiPdf(Pdf):
 
         def get_row(subscription):
             row = [str(subscription)]
-            sent = False
             att = subscription.attendee
             row.append(att and att.source_id or "")
 
@@ -72,6 +71,8 @@ class FsiPdf(Pdf):
                     layout.format_date(event.start, 'datetime')
                 )
                 sent = event.info_template.last_sent
+            else:
+                sent = chosen_event.info_template.last_sent
 
             row.append(
                 translate(layout.format_status(

@@ -146,10 +146,27 @@ class NotificationTemplateLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        return [
-            Link(_('Edit'), self.request.link(self.model, name='edit'),
-                 attrs={'class': 'edit-link'})
-        ]
+        links = []
+        view_name = self.request.view_name
+
+        if view_name != 'edit':
+            links.append(
+                Link(
+                    _('Edit'),
+                    self.request.link(self.model, name='edit'),
+                    attrs={'class': 'edit-link'}
+                )
+            )
+        if view_name != 'send' and self.model.type == 'info':
+            links.append(
+                Link(
+                    _('Send'),
+                    self.request.link(self.model, name='send'),
+                    attrs={'class': 'email-link'},
+                )
+            )
+
+        return links
 
 
 class EditNotificationTemplateLayout(NotificationTemplateLayout):

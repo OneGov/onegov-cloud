@@ -4,6 +4,7 @@ from wtforms.validators import InputRequired
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.fsi import _
+from cached_property import cached_property
 
 
 class NotificationForm(Form):
@@ -38,16 +39,17 @@ class NotificationTemplateSendForm(Form):
 
     @property
     def has_recipients(self):
-        return bool(self.model.course_event.attendees.count())
+        return len(self.attendees) > 0
 
-    @property
-    def recipients_keys(self):
-        return [a.id for a in self.model.course_event.attendees]
+    @cached_property
+    def attendees(self):
+        return [a for a in self.model.course_event.attendees if a.active]
 
-    @property
+    @cached_property
     def recipients_choices(self):
-        return [(a.id, a.email) for a in self.model.course_event.attendees]
+        return [(a.id, a.email) for a in self.attendees]
 
     def on_request(self):
-        self.recipients.choices = self.recipients_choices
-        self.recipients.data = self.recipients_keys
+        choices = self.recipients_choices
+        self.recipients.choices = choices
+        self.recipients.data = [c[0] for c in choices]

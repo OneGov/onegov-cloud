@@ -10,7 +10,7 @@ from onegov.fsi.models import CourseAttendee, CourseSubscription, \
 class AuditCollection(GenericCollection, Pagination):
     """
     Displays the list of attendees filtered by a course and organisation
-    for evauluation if they subscribed and completed a course event.
+    for evaluation if they subscribed and completed a course event.
 
     The organisation filter should also be exact and not fuzzy.
 
@@ -19,7 +19,7 @@ class AuditCollection(GenericCollection, Pagination):
     batch_size = 20
 
     def __init__(self, session, course_id, auth_attendee, organisations=None,
-                 letter=None, page=0):
+                 letter=None, page=0, exclude_inactive=True):
         super().__init__(session)
         self.page = page
 
@@ -32,6 +32,7 @@ class AuditCollection(GenericCollection, Pagination):
         # e.g. SD / STVA or nothing in case of editor
         self.organisations = organisations or []
         self.letter = letter.upper() if letter else None
+        self.exclude_inactive = exclude_inactive
 
     def subset(self):
         return self.query()
@@ -47,7 +48,8 @@ class AuditCollection(GenericCollection, Pagination):
             course_id=self.course_id,
             auth_attendee=self.auth_attendee,
             organisations=self.organisations,
-            letter=self.letter
+            letter=self.letter,
+            exclude_inactive=self.exclude_inactive
         )
 
     def by_letter_and_orgs(self, letter=None, orgs=None):
@@ -57,7 +59,8 @@ class AuditCollection(GenericCollection, Pagination):
             course_id=self.course_id,
             auth_attendee=self.auth_attendee,
             organisations=orgs if orgs is not None else self.organisations,
-            letter=letter or self.letter
+            letter=letter or self.letter,
+            exclude_inactive=self.exclude_inactive
         )
 
     def by_letter(self, letter):
@@ -67,7 +70,8 @@ class AuditCollection(GenericCollection, Pagination):
             course_id=self.course_id,
             auth_attendee=self.auth_attendee,
             organisations=self.organisations,
-            letter=letter
+            exclude_inactive=self.exclude_inactive,
+            letter=letter,
         )
 
     def __eq__(self, other):
@@ -76,6 +80,7 @@ class AuditCollection(GenericCollection, Pagination):
             self.course_id == other.course_id,
             self.auth_attendee == other.auth_attendee,
             self.organisations == other.organisations,
+            self.exclude_inactive == other.exclude_inactive,
             self.letter == other.letter
         ))
 
@@ -165,6 +170,8 @@ class AuditCollection(GenericCollection, Pagination):
                 ).startswith(self.letter)
             )
         query = self.filter_attendees_by_role(query)
+        if self.exclude_inactive:
+            query = query.filter(CourseAttendee.active == True)
         query = query.join(
             last, CourseAttendee.id == last.c.attendee_id, isouter=True)
         query = query.order_by(

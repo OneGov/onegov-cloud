@@ -7,14 +7,7 @@ from onegov.fsi.models.course_notification_template import get_template_default
 from onegov.fsi.models.course_subscription import CourseSubscription
 
 
-def test_attendee_as_external(session, external_attendee):
-    external, data = external_attendee(session)
-    # Test the backrefs and how they work
-    assert external.user_id is None
-    assert external.user is None
-
-
-def test_attendee_1(
+def test_attendee(
         session, attendee, future_course_event, member, course_event):
     # past_event = course_event(session)
     course_event = future_course_event(session)
@@ -50,71 +43,59 @@ def test_attendee_1(
     assert attendee.subscriptions.count() == 1
 
 
-def test_course_event_1(session, course, course_event, attendee):
-    attendee_, data = attendee(session)
-    course, data = course(session)
-    event, data = course_event(session)
-    delta = datetime.timedelta(days=265)
+def test_course_event(scenario):
 
-    assert event.attendees.count() == 0
-    assert event.subscriptions.count() == 0
+    scenario.add_attendee()
+    scenario.add_course(name='Course')
+    scenario.add_course_event(scenario.latest_course, max_attendees=20)
+    delta = datetime.timedelta(days=366)
 
     # Add a participant via a subscription
-    placeholder = CourseSubscription(
-        dummy_desc='Placeholder', course_event_id=event.id)
-    session.add_all((
-        placeholder,
-        CourseSubscription(course_event_id=event.id, attendee_id=attendee_.id)
-    ))
-    session.flush()
+    event = scenario.latest_event
+    scenario.add_subscription(event, None, dummy_desc='Placeholder')
+    scenario.add_subscription(event, scenario.latest_attendee)
 
-    assert event.subscriptions.count() == 2
-    assert event.attendees.count() == 1
-    assert event.available_seats == 20 - 2
+    # Add inactive attendee
+    scenario.add_attendee(active=False)
+    scenario.add_subscription(event, scenario.latest_attendee)
+
+    scenario.commit()
+    scenario.refresh()
+
+    event = scenario.latest_event
+    assert event.subscriptions.count() == 3
+    assert event.attendees.count() == 2
+    assert event.available_seats == 20 - 3
     assert event.possible_subscribers().first() is None
 
     # Test possible and excluded subscribers
-    attendee_2, data = attendee(session, first_name='2')
-    assert event.possible_subscribers().first() == attendee_2
-    assert event.possible_subscribers(external_only=True).count() == 0
+    scenario.add_attendee(username='2@example.org')
+    attendee_2 = scenario.latest_attendee
 
-    event2, data = course_event(
-        session, start=event.start + delta, end=event.end + delta)
+    # event = scenario.latest_event
+    assert event.course
+    assert event.possible_subscribers(year=event.end.year).all() == [attendee_2]
 
-    assert event2.excluded_subscribers(as_uids=False).all() == []
-    # assert event2.possible_subscribers().first() == attendee_2
-
-    # Add attendee2 also to event, so that can not book event2
-    year = event.start.year
-    assert year == event2.start.year
-    assert event2.subscriptions.first() is None
-    session.add(
-        CourseSubscription(
-            attendee_id=attendee_2.id,
-            course_event_id=event.id
-        )
+    scenario.add_course_event(
+        scenario.latest_course,
+        start=event.start + delta, end=event.end + delta,
+        max_attendees=20
     )
-    session.flush()
+    event2 = scenario.latest_event
 
-    # Subscription in for event2 has impact on possible bookers in event
-    other_subscribers = event.attendees.all()
-    assert event2.excluded_subscribers(
-        as_uids=False, year=year).all() == other_subscribers
-    assert event2.can_book(attendee_, year=year) is False
+    # Event for a year later, exclude the one who has a subscription to this
+    # course
+    assert event.possible_subscribers(year=event.end.year + 1).count() == 1
+    assert event2.possible_subscribers(year=event.end.year).count() == 1
+    assert event2.possible_subscribers(year=event.end.year + 1).count() == 2
+    assert event.possible_subscribers(external_only=True).count() == 0
+    assert event.excluded_subscribers().count() == 2
+    assert event2.possible_subscribers().first() == attendee_2
 
-    assert attendee_ in event.attendees.all()
-    assert event.can_book(attendee_, year=year) is False
-
-    # Test course behind the event
-    assert event.name == event.course.name
-    assert event.description == event.course.description
-    assert event.course == course
-
-    assert course.events.all() == [event, event2]
-    assert course.future_events.all() == []
+    assert scenario.latest_course.future_events.count() == 2
 
 
-def test_reservation_1(session, attendee, course_event):
+def test_subscription(session, attendee, course_event):
     attendee = attendee(session)
     course_event = course_event(session)
     res = CourseSubscription(
@@ -149,7 +130,7 @@ def test_cascading_attendee_deletion(session, db_mock_session):
     assert session.query(CourseSubscription).count() == 1
 
 
-def test_notification_templates_1(session, course_event):
+def test_notification_templates(session, course_event):
     event, data = course_event(session)
     assert len(event.notification_templates) == 4
     assert event.info_template
