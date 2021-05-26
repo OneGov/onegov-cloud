@@ -205,7 +205,7 @@ class ServicesWidget(object):
                 layout.org.meta.get('online_counter_label')
                 or _("Forms and applications")
             ),
-            classes=('online-counter', 'h5-size')
+            classes=('online-counter', 'h5')
         )
 
         # only if there are publications, will we enable the link to them
@@ -217,7 +217,7 @@ class ServicesWidget(object):
                     layout.org.meta.get('publications_label')
                     or _("Official Documents")
                 ),
-                classes=('publications', 'h5-size')
+                classes=('publications', 'h5')
             )
 
         yield Link(
@@ -227,7 +227,7 @@ class ServicesWidget(object):
                 layout.org.meta.get('reservations_label')
                 or _("Daypasses and rooms")
             ),
-            classes=('reservations', 'h5-size')
+            classes=('reservations', 'h5')
         )
 
         if layout.org.meta.get('e_move_url'):
@@ -238,7 +238,7 @@ class ServicesWidget(object):
                     layout.org.meta.get('e_move_label')
                     or _("Move with eMovingCH")
                 ),
-                classes=('e-move', 'h5-size')
+                classes=('e-move', 'h5')
             )
 
         resources = ResourceCollection(layout.app.libres_context)
@@ -255,7 +255,7 @@ class ServicesWidget(object):
                     layout.org.meta.get('daypass_label')
                     or _("Generalabonnement for Towns")
                 ),
-                classes=('sbb-daypass', 'h5-size')
+                classes=('sbb-daypass', 'h5')
             )
 
     def get_variables(self, layout):
@@ -292,7 +292,7 @@ class ContactsAndAlbumsWidget(object):
                         text=_("People"),
                         url=request.class_link(PersonCollection),
                         subtitle=_("All contacts"),
-                        classes=('h5-size',)
+                        classes=('h5',)
                     )
                 ]
             )
