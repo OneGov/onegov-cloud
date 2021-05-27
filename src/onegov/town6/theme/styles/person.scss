@@ -14,6 +14,7 @@ $person-email-icon: '\f0e0';
         background: $topbar-bg-color;
         height: 9rem;
         overflow: hidden;
+        position: relative;
         width: 9rem;
 
         // this would be nicer with object-position and object-fit, but IE
@@ -27,7 +28,11 @@ $person-email-icon: '\f0e0';
 
         .fa-user {
             color: $white;
-            font-size: 200px;
+            font-size: 10rem;
+            left: 50%;
+            position: absolute;
+            top: 1rem;
+            transform: translate(-50%);
         }
     }
 
@@ -91,9 +96,13 @@ $person-email-icon: '\f0e0';
 @include breakpoint(small only) {
     .person-card {
         .person-card-portrait {
-            height: calc(100vw - 6rem);
+            height: calc(100vw - 7rem);
             margin: 0 auto 1em;
-            width: calc(100vw - 6rem);
+            width: calc(100vw - 7rem);
+
+            .fa-user {
+                font-size: calc(100vw - 6rem);
+            }
         }
     }
 }
@@ -107,11 +116,15 @@ $person-email-icon: '\f0e0';
 
     .person-card-portrait {
         height: 5rem;
+        position: relative;
         text-align: center;
         width: 5rem;
 
         .fa-user {
-            font-size: 80px;
+            font-size: 5rem;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%);
         }
     }
 
