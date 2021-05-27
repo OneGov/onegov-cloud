@@ -26,6 +26,7 @@ def town_content_security_policy():
     policy = org_content_security_policy()
     policy.child_src.add('https://dialog.scoutsss.com/')
     policy.child_src.add('https://business.scoutsss.com/')
+    policy.img_src.add('https://business.scoutsss.com/')
     return policy
 
 
