@@ -366,6 +366,7 @@ footer {
 /* Card component tuning */
 .card-section {
     @include clean-ul;
+
     h4,
     h5,
     h6 {

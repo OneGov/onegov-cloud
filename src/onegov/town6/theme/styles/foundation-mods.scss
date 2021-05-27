@@ -116,7 +116,11 @@ $header-styles: (
 /*
     Grid
 */
-$grid-container: rem-calc(1100);
+$global-width: rem-calc(1100);
+$grid-margin-gutters: (
+    small: 2rem,
+    medium: 2rem
+);
 
 /*
     Anchors
