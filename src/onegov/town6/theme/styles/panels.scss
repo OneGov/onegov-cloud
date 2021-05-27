@@ -85,7 +85,9 @@ $publications-icon: '\f1ea';
 .side-panel {
 
     @include clean-ul;
-    margin-bottom: 1rem;
+    @include breakpoint(medium up) {
+        margin-bottom: 1rem;
+    }
 
     .contacts-albums-panel ul.panel-links.more-list {
         padding: 0;

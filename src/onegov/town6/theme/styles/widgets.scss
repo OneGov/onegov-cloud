@@ -30,6 +30,12 @@ article.content .side-panel {
     }
 }
 
+#after-panels {
+    @include breakpoint(small only) {
+        padding-bottom: .625rem;
+    }
+}
+
 .homepage {
 
     .full.primary {
