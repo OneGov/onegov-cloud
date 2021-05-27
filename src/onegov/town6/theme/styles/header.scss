@@ -64,7 +64,6 @@ $pdf-icon: '\f1c1';
         padding: 0;
     }
 
-    min-height: $globals-height;
     padding: .5rem;
 
     a {
@@ -79,9 +78,20 @@ $pdf-icon: '\f1c1';
         align-items: center;
         display: flex;
         justify-content: space-between;
+        min-height: $globals-height;
+
+        @include breakpoint(small only) {
+            &.centered {
+                justify-content: center;
+            }
+        }
 
         .global-tools-menu {
             flex-grow: 1;
+        }
+
+        .global-header .h4 {
+            margin-bottom: 0;
         }
 
         > ul {
@@ -97,6 +107,7 @@ $pdf-icon: '\f1c1';
                     height: 100%;
                     line-height: $globals-height;
                     padding: 0 1rem;
+                    white-space: nowrap;
                     @include breakpoint(medium up) {
                         align-items: center;
                         display: flex;
