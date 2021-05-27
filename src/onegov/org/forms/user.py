@@ -9,6 +9,7 @@ from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
 from onegov.user import User
 from onegov.user import UserCollection
+from re import match
 from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
@@ -195,14 +196,16 @@ class ManageUserGroupForm(Form):
         for permission in model.ticket_permissions:
             session.delete(permission)
         for permission in self.ticket_permissions.data:
-            handler_code, group = permission.split('-')
-            session.add(
-                TicketPermission(
-                    handler_code=handler_code,
-                    group=group or None,
-                    user_group=model
+            match_ = match(r'(.[^-]*)-(.*)', permission)
+            if match_:
+                handler_code, group = match_.groups()
+                session.add(
+                    TicketPermission(
+                        handler_code=handler_code,
+                        group=group or None,
+                        user_group=model
+                    )
                 )
-            )
 
     def apply_model(self, model):
         self.name.data = model.name
