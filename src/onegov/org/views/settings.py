@@ -236,16 +236,15 @@ def handle_migrate_links(self, request, form, layout=None):
             old_uri=form.old_domain.data,
             new_uri=request.domain
         )
-        found_by_model = migration.migrate_site_collection(test_only)
-        found = sum(found_by_model.values())
+        total, grouped = migration.migrate_site_collection(test_only)
 
         if not test_only:
             request.success(
-                _('Migrated ${number} links', mapping={'number': found}))
+                _('Migrated ${number} links', mapping={'number': total}))
             return request.redirect(request.link(self, name='settings'))
 
         test_results = _('Total of ${number} links found.',
-                         mapping={'number': found})
+                         mapping={'number': total})
 
     return {
         'title': _('Link Migration'),
