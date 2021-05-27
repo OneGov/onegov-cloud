@@ -3,6 +3,7 @@ from tests.shared import Client as BaseClient
 from sedate import replace_timezone
 from datetime import datetime as dt
 
+from tests.shared.utils import open_in_browser
 
 
 class Client(BaseClient):
@@ -56,7 +57,7 @@ def test_view_mission_reports(winterthur_app):
     page.form['mission_count'] = 5
     entry = page.form.submit().follow()
     # setting the time for the date to midnight
-    assert '00:00' in entry
+    assert '-' in entry.pyquery('tr td:last-of-type')[1].text
     assert entry.pyquery('#mission-count')[0].text == '5'
     assert entry.pyquery('#mission-type')[0].text == 'Mehrfach-Einsatz'
 
