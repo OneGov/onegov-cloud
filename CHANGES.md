@@ -1,8 +1,31 @@
 # Changes
 
+## Release `2021.54`
+
+> commits: **23 / [0f1e7e0776...e88b2128b7](https://github.com/OneGov/onegov-cloud/compare/0f1e7e0776^...e88b2128b7)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.54)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+✨ **Improves screen widgets.**
+
+- Adds a generic text and logo widget
+- Adds map widgets for votes
+- Allows to set classes to widgets
+- Allows to limit candidates and list charts
+
+**`Other`** | **[0a90662330](https://github.com/onegov/onegov-cloud/commit/0a90662330308eaafe0e9e39553b42929c361cd3)**
+
+### Org
+
+🐞 **Fixes user group form throwing an error for forms with hyphens.**
+
+**`Bugfix`** | **[fd4637a07d](https://github.com/onegov/onegov-cloud/commit/fd4637a07de486aeae4d9ab6c517c8510e3caebc)**
+
 ## Release `2021.53`
 
-> commits: **49 / [30d9fb132b...5cce0552c0](https://github.com/OneGov/onegov-cloud/compare/30d9fb132b^...5cce0552c0)**  
+> released: **2021-05-26 12:13**<br>
+> commits: **50 / [30d9fb132b...be09de2c39](https://github.com/OneGov/onegov-cloud/compare/30d9fb132b^...be09de2c39)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.53)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
