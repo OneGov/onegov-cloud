@@ -79,14 +79,12 @@ class Layout(OrgLayout):
     @property
     def show_partners(self):
         if self.on_homepage:
+            if '<partner' in self.org.homepage_structure:
+                # The widget is rendered
+                return False
+        if self.org.always_show_partners and not self.request.is_admin:
             return True
-        elif self.request.is_admin:
-            return False
-        if '<partner' not in self.org.homepage_structure:
-            return False
-        if not self.org.always_show_partners:
-            return False
-        return True
+        return False
 
     @cached_property
     def search_keybindings_help(self):
