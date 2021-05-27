@@ -2082,28 +2082,29 @@
 <div class="autostick chat" tal:condition="layout.show_chat">
     <tal:b tal:switch="layout.org.chat_type">
         <tal:b tal:case="'scoutss'">
-            <div tal:condition="layout.org.chat_type"
+            <div
                     class="scoutsss-dialog"
                     data-bgcolor="${layout.org.chat_bg_color or layout.primary_color}"
                     data-videobubble="false"
-                    data-videoclickicon="true"
+                    data-videoclickicon="false"
                     data-notifications="false"
                     data-video="false"
                     data-videourl=""
-                    data-delay="2"
+                    data-delay="3"
                     data-videodelay="0"
                     data-transparent="false"
                     data-draggable="true"
                     data-size="medium"
                     data-click="widget"
-                    data-onclose="button"
+                    data-onclose="avatar"
                     data-header="default"
                     data-showicon="1"
                     data-title="${layout.org.chat_title or 'Chat'}"
                     data-placement="bottom-right"
                     data-code="${layout.org.chat_customer_id}"
-                    data-img="https://s3.eu-west-1.amazonaws.com/scoutsss.prod/media-library/7e7e6570-61bf-11e7-bbc6-cd7b356496c5/Avatar-b6d82db0-45b5-11eb-b3b4-75dbbd27017e.png">
-                </div>
+                    data-img="https://s3.eu-west-1.amazonaws.com/scoutsss.prod/media-library/a5a38020-9e8b-11ea-8881-d1ae9b15eb8c/Gemeinde%20Ebikon%20Favicon%202-12dc4500-b8bc-11eb-8e08-f1eba26582a9.jpg"
+                    data-bubbleclose="true">
+            </div>
         </tal:b>
     </tal:b>
 </div>
