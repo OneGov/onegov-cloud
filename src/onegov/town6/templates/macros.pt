@@ -346,10 +346,10 @@
             </a>
         </tal:b>
         <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="Submit" class="button" i18n:attributes="value">
+            <input type="submit" value="Submit" class="button expanded" i18n:attributes="value">
         </tal:b>
         <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="button" role="button">
+            <input type="submit" value="${button_text}" class="button expanded" role="button">
         </tal:b>
     </form>
 </metal:form>
