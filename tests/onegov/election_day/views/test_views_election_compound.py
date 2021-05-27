@@ -60,6 +60,25 @@ def test_view_election_compound_elected_candidates(election_day_app_gr):
     assert "Hinterrhein" in candidates
 
 
+def test_view_election_compound_lists(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_election_compound(client)
+
+    for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
+        lists = client.get(f'/elections/elections/lists-data{suffix}')
+        assert {r['text']: r['value'] for r in lists.json['results']} == {
+            'FDP': 16, 'CVP': 12
+        }
+
+    lists = client.get('/elections/elections/lists-data?limit=1')
+    assert {r['text']: r['value'] for r in lists.json['results']} == {
+        'FDP': 16
+    }
+
+
 def test_view_election_compound_party_strengths(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()

@@ -6,7 +6,6 @@ from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
-from sqlalchemy.orm import object_session
 
 
 @ElectionDayApp.json(
@@ -18,7 +17,12 @@ def view_election_lists_data(self, request):
 
     """" View the lists as JSON. Used to for the lists bar chart. """
 
-    return get_lists_data(self, request)
+    try:
+        limit = int(request.params.get('limit'))
+    except (TypeError, ValueError):
+        limit = None
+
+    return get_lists_data(self, limit=limit)
 
 
 @ElectionDayApp.html(
@@ -58,7 +62,7 @@ def view_election_lists_table(self, request):
 
     return {
         'election': self,
-        'lists': get_list_results(self, object_session(self)),
+        'lists': get_list_results(self),
         'layout': DefaultLayout(self, request),
         'type': 'election-table',
         'scope': 'lists',
@@ -80,7 +84,7 @@ def view_election_lists(self, request):
     return {
         'election': self,
         'layout': layout,
-        'lists': get_list_results(self, object_session(self)),
+        'lists': get_list_results(self),
     }
 
 

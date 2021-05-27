@@ -26,20 +26,9 @@
 
             <div class="row" tal:condition="layout.show_map">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
-                    <div class="entities-map"
-                        data-canton="${layout.principal.id}"
-                        data-mapurl="${layout.get_topojson_link(layout.principal.id, vote.date.year)}"
-                        data-dataurl="${request.link(ballot, name='by-entity')}"
-                        data-embed-link="Embed"
-                        data-embed-source="${layout.entities_map_link}"
-                        data-thumbs="true"
-                        data-color-scale="rb"
-                        data-label-left-hand="Nay"
-                        data-label-right-hand="Yay"
-                        data-label-expats="Expats"
-                        i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
-                        >
-                    </div>
+
+                    <div metal:use-macro="layout.macros['ballot-entities-map']" tal:define="embed True"/>
+
                     <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
                         <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
                     </a>

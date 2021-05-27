@@ -7,6 +7,7 @@ from onegov.election_day import _
 from onegov.election_day.models import Screen
 from onegov.election_day.models.screen import ScreenType
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PanelField
 from onegov.form.validators import UniqueColumnValue
 from wtforms import IntegerField
@@ -83,7 +84,7 @@ class ScreenForm(Form):
         default='simple_vote'
     )
 
-    simple_vote = RadioField(
+    simple_vote = ChosenSelectField(
         _('Vote'),
         choices=[],
         validators=[
@@ -92,7 +93,7 @@ class ScreenForm(Form):
         depends_on=('type', 'simple_vote'),
     )
 
-    complex_vote = RadioField(
+    complex_vote = ChosenSelectField(
         _('Vote'),
         choices=[],
         validators=[
@@ -101,7 +102,7 @@ class ScreenForm(Form):
         depends_on=('type', 'complex_vote'),
     )
 
-    majorz_election = RadioField(
+    majorz_election = ChosenSelectField(
         _('Election'),
         choices=[],
         validators=[
@@ -110,7 +111,7 @@ class ScreenForm(Form):
         depends_on=('type', 'majorz_election'),
     )
 
-    proporz_election = RadioField(
+    proporz_election = ChosenSelectField(
         _('Election'),
         choices=[],
         validators=[
@@ -119,7 +120,7 @@ class ScreenForm(Form):
         depends_on=('type', 'proporz_election'),
     )
 
-    election_compound = RadioField(
+    election_compound = ChosenSelectField(
         _('Compound of Elections'),
         choices=[],
         validators=[
@@ -236,6 +237,8 @@ class ScreenForm(Form):
         self.css.data = model.css
 
     def on_request(self):
+        self.request.include('chosen')
+
         session = self.request.session
 
         query = session.query(Vote).filter_by(type='simple')
@@ -269,18 +272,18 @@ class ScreenForm(Form):
             for election_compound in query
         ]
 
-        self.tags_simple_vote.text = '\n'.join(
-            sorted([tag for tag in self.get_widgets('simple_vote')])
-        )
-        self.tags_complex_vote.text = '\n'.join(
-            sorted([tag for tag in self.get_widgets('complex_vote')])
-        )
-        self.tags_majorz_election.text = '\n'.join(
-            sorted([tag for tag in self.get_widgets('majorz_election')])
-        )
-        self.tags_proporz_election.text = '\n'.join(
-            sorted([tag for tag in self.get_widgets('proporz_election')])
-        )
-        self.tags_election_compound.text = '\n'.join(
-            sorted([tag for tag in self.get_widgets('election_compound')])
-        )
+        self.tags_simple_vote.text = '\n'.join(sorted([
+            tag.usage for tag in self.get_widgets('simple_vote').values()
+        ]))
+        self.tags_complex_vote.text = '\n'.join(sorted([
+            tag.usage for tag in self.get_widgets('complex_vote').values()
+        ]))
+        self.tags_majorz_election.text = '\n'.join(sorted([
+            tag.usage for tag in self.get_widgets('majorz_election').values()
+        ]))
+        self.tags_proporz_election.text = '\n'.join(sorted([
+            tag.usage for tag in self.get_widgets('proporz_election').values()
+        ]))
+        self.tags_election_compound.text = '\n'.join(sorted([
+            tag.usage for tag in self.get_widgets('election_compound').values()
+        ]))

@@ -1,14 +1,15 @@
+import os
 import tarfile
+
 from datetime import date
 from io import BytesIO
+from onegov.core.utils import module_path
+from onegov.core.utils import append_query_param
+from onegov.election_day.formats import import_election_wabstic_proporz
+from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 from unittest.mock import Mock
 from webtest.forms import Upload
-
-from onegov.core.utils import module_path
-from onegov.election_day.formats import import_election_wabstic_proporz
-import os
-# Helpers
-from onegov.election_day.models import Canton, Municipality
 
 
 def print_errors(errors):
@@ -196,13 +197,16 @@ class DummyRequest(object):
         self.params = {}
         self.default_locale = 'de_CH'
 
-    def link(self, model, name=''):
+    def link(self, model, name='', query_params={}):
         class_name = model.__class__.__name__
         if class_name == 'Canton' or class_name == 'Municipality':
             class_name = 'Principal'
-        return '{}/{}'.format(
+        result = '{}/{}'.format(
             class_name, name or getattr(model, 'id', 'archive')
         )
+        for key, value in query_params.items():
+            result = append_query_param(result, key, value)
+        return result
 
     def translate(self, text):
         try:

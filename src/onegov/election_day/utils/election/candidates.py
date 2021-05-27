@@ -39,7 +39,7 @@ def get_candidates_results(election, session):
     return result
 
 
-def get_candidates_data(election, request):
+def get_candidates_data(election, limit=None):
     """" Get the candidates as JSON. Used to for the candidates bar chart. """
 
     colors = election.colors
@@ -88,6 +88,9 @@ def get_candidates_data(election, request):
             for list_id, name in session.query(List.id, List.name)
             if name in election.colors
         }
+
+    if limit and limit > 0:
+        candidates = candidates.limit(limit)
 
     return {
         'results': [

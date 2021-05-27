@@ -119,7 +119,7 @@ class PdfGenerator():
     def add_tacit_election(self, principal, election, pdf):
 
         # Candidates
-        data = get_candidates_data(election, None)
+        data = get_candidates_data(election)
         if data and data.get('results'):
             pdf.h2(_('Candidates'))
             pdf.spacer()

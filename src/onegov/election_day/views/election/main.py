@@ -155,7 +155,7 @@ def view_election_json(self, request):
                 'name': item[0],
                 'votes': item[1],
                 'id': item[2],
-            } for item in get_list_results(self, session)
+            } for item in get_list_results(self)
         ]
 
         data['list_connections'] = [

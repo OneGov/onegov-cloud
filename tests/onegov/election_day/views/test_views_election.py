@@ -48,6 +48,20 @@ def test_view_election_candidates(election_day_app_gr):
         "Engler Stefan", "20", "Schmid Martin", "18"
     )))
 
+    for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
+        candidates = client.get(
+            f'/election/majorz-election/candidates-data{suffix}'
+        )
+        assert {r['text']: r['value'] for r in candidates.json['results']} == {
+            'Engler Stefan': 20, 'Schmid Martin': 18
+        }
+    candidates = client.get(
+        '/election/majorz-election/candidates-data?limit=1'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Engler Stefan': 20
+    }
+
     chart = client.get('/election/majorz-election/candidates-chart')
     assert '/election/majorz-election/candidates' in chart
 
@@ -55,6 +69,12 @@ def test_view_election_candidates(election_day_app_gr):
     assert all((expected in candidates for expected in (
         "Caluori Corina", "1", "Casanova Angela", "0"
     )))
+
+    for suffix in ('', '?limit=', '?limit=a', '?limit=0', '?limit=1'):
+        candidates = client.get(
+            f'/election/proporz-election/candidates-data{suffix}'
+        )
+        assert candidates.json['results'] == []
 
     chart = client.get('/election/proporz-election/candidates-chart')
     assert '/election/proporz-election/candidates' in chart
@@ -204,8 +224,17 @@ def test_view_election_lists(election_day_app_gr):
     main = client.get('/election/proporz-election/lists')
     assert '<h3>Listen</h3>' in main
 
-    lists = client.get('/election/proporz-election/lists-data')
-    assert all((expected in lists for expected in ("FDP", "8", "CVP", "6")))
+    for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
+        lists = client.get(f'/election/proporz-election/lists-data{suffix}')
+        assert {r['text']: r['value'] for r in lists.json['results']} == {
+            'FDP': 8,
+            'CVP': 6
+        }
+
+    lists = client.get('/election/proporz-election/lists-data?limit=1')
+    assert {r['text']: r['value'] for r in lists.json['results']} == {
+        'FDP': 8,
+    }
 
     chart = client.get('/election/proporz-election/lists-chart')
     assert chart.status_code == 200

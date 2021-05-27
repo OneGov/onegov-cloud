@@ -99,8 +99,9 @@ class ElectionDayApp(Framework, FormApp, UserApp):
         return self.cache.get_or_create('logo', self.load_logo)
 
     def load_logo(self):
-        if self.filestorage.isfile(self.principal.logo):
-            return FilestorageFile(self.principal.logo)
+        logo = self.principal.logo
+        if logo and self.filestorage.isfile(logo):
+            return FilestorageFile(logo)
 
     @property
     def theme_options(self):

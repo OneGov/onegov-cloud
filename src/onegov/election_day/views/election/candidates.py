@@ -30,7 +30,12 @@ def view_election_candidates_data(self, request):
 
     """
 
-    return get_candidates_data(self, request)
+    try:
+        limit = int(request.params.get('limit'))
+    except (TypeError, ValueError):
+        limit = None
+
+    return get_candidates_data(self, limit=limit)
 
 
 @ElectionDayApp.html(

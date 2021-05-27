@@ -12,11 +12,17 @@ from onegov.election_day.screen_widgets import (
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    VoteCounterProposalDistrictsMap,
+    VoteCounterProposalEntitiesMap,
     VoteCounterProposalEntitiesTableWidget,
     VoteCounterProposalResultBarWidget,
     VoteCounterProposalTitleWidget,
+    VoteProposalDistrictsMap,
+    VoteProposalEntitiesMap,
     VoteProposalEntitiesTableWidget,
     VoteProposalResultBarWidget,
+    VoteTieBreakerDistrictsMap,
+    VoteTieBreakerEntitiesMap,
     VoteTieBreakerEntitiesTableWidget,
     VoteTieBreakerResultBarWidget,
     VoteTieBreakerTitleWidget
@@ -27,11 +33,27 @@ from tests.onegov.election_day.common import DummyRequest
 def test_vote_widgets(election_day_app, import_test_datasets):
     structure = """
         <row>
-            <column span="1"><title /></column>
-            <column span="1"><progress /></column>
-            <column span="1"><counted-entities /></column>
-            <column span="1"><vote-proposal-entities-table /></column>
-            <column span="1"><vote-proposal-result-bar /></column>
+            <column span="1">
+                <title class="my-class-1"/>
+            </column>
+            <column span="1">
+                <progress class="my-class-2"/>
+            </column>
+            <column span="1">
+                <counted-entities class="my-class-3"/>
+            </column>
+            <column span="1">
+                <vote-proposal-entities-table class="my-class-4"/>
+            </column>
+            <column span="1">
+                <vote-proposal-result-bar class="my-class-5"/>
+            </column>
+            <column span="1">
+                <vote-proposal-entities-map class="my-class-6"/>
+            </column>
+            <column span="1">
+                <vote-proposal-districts-map class="my-class-7"/>
+            </column>
         </row>
     """
     widgets = [
@@ -42,6 +64,8 @@ def test_vote_widgets(election_day_app, import_test_datasets):
         TitleWidget(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
+        VoteProposalDistrictsMap(),
+        VoteProposalEntitiesMap(),
     ]
 
     # Empty
@@ -60,6 +84,7 @@ def test_vote_widgets(election_day_app, import_test_datasets):
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'embed': False,
         'entities': '',
         'request': request
     }
@@ -68,8 +93,17 @@ def test_vote_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>Vote</span>' in result
+    assert '>Vote</span>' in result
     assert 'Not yet counted' in result
+    assert 'data-dataurl="Ballot/by-entity"' in result
+    assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -94,6 +128,7 @@ def test_vote_widgets(election_day_app, import_test_datasets):
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'embed': False,
         'entities': 'Baar',
         'request': request
     }
@@ -102,14 +137,23 @@ def test_vote_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>simple_internal_ndg-intermediate</span>' in result
+    assert '>simple_internal_ndg-intermediate</span>' in result
     assert '1 of 11' in result
-    assert '<div>Baar</div>' in result
+    assert '>Baar</span>' in result
     assert 'ballot-entities-table' in result
     assert 'data-text="4447"' in result
     assert 'Not yet counted' in result
     assert 'ballot-result-bar' in result
     assert '68.22%' in result
+    assert 'data-dataurl="Ballot/by-entity"' in result
+    assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -134,6 +178,7 @@ def test_vote_widgets(election_day_app, import_test_datasets):
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'embed': False,
         'entities': (
             'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
             'Steinhausen, Unterägeri, Walchwil, Zug'
@@ -145,7 +190,7 @@ def test_vote_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>simple_internal_ndg</span>' in result
+    assert '>simple_internal_ndg</span>' in result
     assert '11 of 11' in result
     assert (
         'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
@@ -156,22 +201,71 @@ def test_vote_widgets(election_day_app, import_test_datasets):
     assert 'Not yet counted' not in result
     assert 'ballot-result-bar' in result
     assert '69.26%' in result
+    assert 'data-dataurl="Ballot/by-entity"' in result
+    assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
 
 
 def test_complex_vote_widgets(election_day_app, import_test_datasets):
     structure = """
         <row>
-            <column span="1"><title /></column>
-            <column span="1"><progress /></column>
-            <column span="1"><counted-entities /></column>
-            <column span="1"><vote-proposal-entities-table /></column>
-            <column span="1"><vote-proposal-result-bar /></column>
-            <column span="1"><vote-counter-proposal-title /></column>
-            <column span="1"><vote-counter-proposal-entities-table /></column>
-            <column span="1"><vote-counter-proposal-result-bar /></column>
-            <column span="1"><vote-tie-breaker-title /></column>
-            <column span="1"><vote-tie-breaker-entities-table /></column>
-            <column span="1"><vote-tie-breaker-result-bar /></column>
+            <column span="1">
+                <title class="my-class-1"/>
+            </column>
+            <column span="1">
+                <progress class="my-class-2"/>
+            </column>
+            <column span="1">
+                <counted-entities class="my-class-3"/>
+            </column>
+            <column span="1">
+                <vote-proposal-entities-table class="my-class-4"/>
+            </column>
+            <column span="1">
+                <vote-proposal-result-bar class="my-class-5"/>
+            </column>
+            <column span="1">
+                <vote-proposal-entities-map class="my-class-5"/>
+            </column>
+            <column span="1">
+                <vote-proposal-districts-map class="my-class-6"/>
+            </column>
+            <column span="1">
+                <vote-counter-proposal-title class="my-class-7"/>
+            </column>
+            <column span="1">
+                <vote-counter-proposal-entities-table class="my-class-8"/>
+            </column>
+            <column span="1">
+                <vote-counter-proposal-result-bar class="my-class-9"/>
+            </column>
+            <column span="1">
+                <vote-counter-proposal-entities-map class="my-class-a"/>
+            </column>
+            <column span="1">
+                <vote-counter-proposal-districts-map class="my-class-b"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-title class="my-class-c"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-entities-table class="my-class-d"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-result-bar class="my-class-e"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-entities-map class="my-class-f"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-districts-map class="my-class-g"/>
+            </column>
         </row>
     """
     widgets = [
@@ -187,7 +281,13 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
         VoteProposalResultBarWidget(),
         VoteTieBreakerEntitiesTableWidget(),
         VoteTieBreakerResultBarWidget(),
-        VoteTieBreakerTitleWidget()
+        VoteTieBreakerTitleWidget(),
+        VoteCounterProposalDistrictsMap(),
+        VoteCounterProposalEntitiesMap(),
+        VoteProposalDistrictsMap(),
+        VoteProposalEntitiesMap(),
+        VoteTieBreakerDistrictsMap(),
+        VoteTieBreakerEntitiesMap(),
     ]
 
     # Empty
@@ -209,6 +309,7 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
         'proposal': model.proposal,
         'counter_proposal': model.counter_proposal,
         'tie_breaker': model.tie_breaker,
+        'embed': False,
         'entities': '',
         'request': request
     }
@@ -217,10 +318,28 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>Proposal</span>' in result
-    assert '<span>Counter Proposal</span>' in result
-    assert '<span>Tie Breaker</span>' in result
+    assert '>Proposal</span>' in result
+    assert '>Counter Proposal</span>' in result
+    assert '>Tie Breaker</span>' in result
     assert 'Not yet counted' in result
+    assert 'data-dataurl="Ballot/by-entity"' in result
+    assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result
+    assert 'my-class-e' in result
+    assert 'my-class-f' in result
+    assert 'my-class-g' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -248,6 +367,7 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
         'proposal': model.proposal,
         'counter_proposal': model.counter_proposal,
         'tie_breaker': model.tie_breaker,
+        'embed': False,
         'entities': 'Baar',
         'request': request
     }
@@ -256,9 +376,9 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>complex_internal_mundart-intermediate</span>' in result
+    assert '>complex_internal_mundart-intermediate</span>' in result
     assert '1 of 11' in result
-    assert '<div>Baar</div>' in result
+    assert '>Baar</span>' in result
     assert 'ballot-entities-table' in result
     assert 'data-text="2483"' in result
     assert 'Not yet counted' in result
@@ -268,6 +388,24 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
     assert '60.55%' in result
     assert 'data-text="2254"' in result
     assert '38.37%' in result
+    assert 'data-dataurl="Ballot/by-entity"' in result
+    assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result
+    assert 'my-class-e' in result
+    assert 'my-class-f' in result
+    assert 'my-class-g' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -295,6 +433,7 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
         'proposal': model.proposal,
         'counter_proposal': model.counter_proposal,
         'tie_breaker': model.tie_breaker,
+        'embed': False,
         'entities': (
             'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
             'Steinhausen, Unterägeri, Walchwil, Zug'
@@ -306,7 +445,7 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>complex_internal_mundart</span>' in result
+    assert '>complex_internal_mundart</span>' in result
     assert '11 of 11' in result
     assert (
         'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
@@ -321,3 +460,21 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
     assert '62.48%' in result
     assert 'data-text="2254"' in result
     assert '37.00%' in result
+    assert 'data-dataurl="Ballot/by-entity"' in result
+    assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result
+    assert 'my-class-e' in result
+    assert 'my-class-f' in result
+    assert 'my-class-g' in result

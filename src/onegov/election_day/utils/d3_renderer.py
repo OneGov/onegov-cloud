@@ -125,7 +125,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = get_lists_data(item, None)
+            data = get_lists_data(item)
             if data and data.get('results'):
                 chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
@@ -134,7 +134,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = get_candidates_data(item, None)
+            data = get_candidates_data(item)
             if data and data.get('results'):
                 chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart

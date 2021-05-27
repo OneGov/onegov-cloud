@@ -1052,6 +1052,11 @@ def test_list_results(session):
         ('Kwik-E-Major', 0, 333),
         ('Burns burns!', 5, 200)
     ]
+    assert election_compound.get_list_results(limit=None).all() == [
+        ('Quimby Again!', 3, 1560),
+        ('Kwik-E-Major', 0, 333),
+        ('Burns burns!', 5, 200)
+    ]
     assert election_compound.get_list_results(limit=-5).all() == [
         ('Quimby Again!', 3, 1560),
         ('Kwik-E-Major', 0, 333),

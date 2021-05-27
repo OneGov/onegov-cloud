@@ -33,7 +33,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="result ballot.results">
+            <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
                     <td class="column-entity">${layout.format_name(result)}</td>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
@@ -90,7 +90,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="result ballot.results_by_district">
+            <tr tal:repeat="result ballot.results_by_district" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
                     <td>${layout.format_name(result)}</td>
                     <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
@@ -124,6 +124,73 @@
         </tfoot>
     </table>
 </metal:ballot-districts-table>
+
+<metal:ballot-entities-map define-macro="ballot-entities-map" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="embed">
+        <div class="entities-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, ballot.vote.date.year)}"
+            data-dataurl="${request.link(ballot, name='by-entity')}"
+            data-embed-link="Embed"
+            data-embed-source="${layout.entities_map_link}"
+            data-thumbs="true"
+            data-color-scale="rb"
+            data-label-left-hand="Nay"
+            data-label-right-hand="Yay"
+            data-label-expats="Expats"
+            i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
+            >
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not: embed">
+        <div class="entities-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, ballot.vote.date.year)}"
+            data-dataurl="${request.link(ballot, name='by-entity')}"
+            data-thumbs="true"
+            data-color-scale="rb"
+            data-label-left-hand="Nay"
+            data-label-right-hand="Yay"
+            data-label-expats="Expats"
+            i18n:attributes="data-label-left-hand; data-label-right-hand; data-label-expats"
+            >
+        </div>
+    </tal:block>
+</metal:ballot-entities-map>
+
+<metal:ballot-districts-map define-macro="ballot-districts-map" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="embed">
+        <div class="districts-map"
+            data-canton="${layout.app.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.app.principal.id, ballot.vote.date.year)}"
+            data-dataurl="${request.link(ballot, name='by-district')}"
+            data-embed-link="Embed"
+            data-embed-source="${layout.districts_map_link}"
+            data-thumbs="true"
+            data-color-scale="rb"
+            data-label-left-hand="Nay"
+            data-label-right-hand="Yay"
+            data-label-expats="Expats"
+            i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
+            >
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not: embed">
+        <div class="districts-map"
+            data-canton="${layout.app.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.app.principal.id, ballot.vote.date.year)}"
+            data-dataurl="${request.link(ballot, name='by-district')}"
+            data-thumbs="true"
+            data-color-scale="rb"
+            data-label-left-hand="Nay"
+            data-label-right-hand="Yay"
+            data-label-expats="Expats"
+            i18n:attributes="data-label-left-hand; data-label-right-hand; data-label-expats"
+            >
+        </div>
+    </tal:block>
+</metal:ballot-districts-map>
+
 
 <metal:election-connections-table define-macro="election-connections-table" i18n:domain="onegov.election_day">
     <div class="embedded-widget">
@@ -214,7 +281,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="result layout.results">
+            <tr tal:repeat="result layout.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:block condition="not: result.counted">
                     <td>${layout.format_name(result)}</td>
                     <td tal:condition="show_district and layout.has_districts">${result.district}</td>
@@ -399,34 +466,38 @@
 </metal:ballot-result-bar>
 
 <metal:candidates-chart define-macro="candidates-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="embed">
-        <div class="bar-chart"
-            i18n:attributes="data-embed-link"
-            data-dataurl="${request.link(model, name='candidates-data')}"
-            data-embed-link="Embed"
-            data-embed-source="${request.link(model, name='candidates-chart')}">
-        </div>
-    </tal:block>
-    <tal:block tal:condition="not: embed">
-        <div class="bar-chart"
-            data-dataurl="${request.link(model, name='candidates-data')}">
-        </div>
+    <tal:block tal:define="limit limit|''">
+        <tal:block tal:condition="embed">
+            <div class="bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit})}"
+                data-embed-link="Embed"
+                data-embed-source="${request.link(model, name='candidates-chart')}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="bar-chart"
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit})}">
+            </div>
+        </tal:block>
     </tal:block>
 </metal:candidates-chart i18n:domain="onegov.election_day">
 
 <metal:lists-chart define-macro="lists-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="embed">
-        <div class="bar-chart"
-            i18n:attributes="data-embed-link"
-            data-dataurl="${request.link(model, name='lists-data')}"
-            data-embed-link="Embed"
-            data-embed-source="${request.link(model, name='lists-chart')}">
-        </div>
-    </tal:block>
-    <tal:block tal:condition="not: embed">
-        <div class="bar-chart"
-            data-dataurl="${request.link(model, name='lists-data')}">
-        </div>
+    <tal:block tal:define="limit limit|''">
+        <tal:block tal:condition="embed">
+            <div class="bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit})}"
+                data-embed-link="Embed"
+                data-embed-source="${request.link(model, name='lists-chart')}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="bar-chart"
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit})}">
+            </div>
+        </tal:block>
     </tal:block>
 </metal:lists-chart i18n:domain="onegov.election_day">
 

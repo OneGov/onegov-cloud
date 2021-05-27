@@ -38,7 +38,7 @@
                         <td>${screen.number}</td>
                         <td>${screen.group}</td>
                         <td>${screen.description}</td>
-                        <td tal:condition="screen.model">${screen.model.title}</td>
+                        <td tal:condition="screen.model"><a href="${request.link(screen.model, 'edit')}">${screen.model.title}</a></td>
                         <td tal:condition="not: screen.model">-</td>
                         <td class="right-aligned">
                             <ul class="actions" data-title="Actions" i18n:attributes="data-title">

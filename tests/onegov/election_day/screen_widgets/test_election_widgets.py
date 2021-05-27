@@ -29,11 +29,24 @@ from tests.onegov.election_day.common import DummyRequest
 def test_majorz_election_widgets(election_day_app, import_test_datasets):
     structure = """
         <row>
-            <column span="1"><title /></column>
-            <column span="1"><progress /></column>
-            <column span="1"><counted-entities /></column>
-            <column span="1"><election-candidates-table /></column>
-            <column span="1"><election-candidates-chart /></column>
+            <column span="1">
+                <title class="my-class-1"/>
+            </column>
+            <column span="1">
+                <progress class="my-class-2"/>
+            </column>
+            <column span="1">
+                <counted-entities class="my-class-3"/>
+            </column>
+            <column span="1">
+                <election-candidates-table class="my-class-4"/>
+            </column>
+            <column span="1">
+                <election-candidates-chart class="my-class-5"/>
+            </column>
+            <column span="1">
+                <election-candidates-chart class="my-class-6" limit="2"/>
+            </column>
         </row>
     """
     widgets = [
@@ -72,7 +85,13 @@ def test_majorz_election_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>Election</span>' in result
+    assert '>Election</span>' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -121,7 +140,14 @@ def test_majorz_election_widgets(election_day_app, import_test_datasets):
     assert 'election-candidates-table' in result
     assert 'data-text="10693"' in result
     assert '>n.a.</td>' in result
-    assert 'data-dataurl="Election/candidates-data"' in result
+    assert 'data-dataurl="Election/candidates-data?limit=0"' in result
+    assert 'data-dataurl="Election/candidates-data?limit=02"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -176,19 +202,46 @@ def test_majorz_election_widgets(election_day_app, import_test_datasets):
     assert 'election-candidates-table' in result
     assert 'data-text="24132"' in result
     assert '>n.a.</td>' not in result
-    assert 'data-dataurl="Election/candidates-data"' in result
+    assert 'data-dataurl="Election/candidates-data?limit=0"' in result
+    assert 'data-dataurl="Election/candidates-data?limit=02"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
 
 
 def test_proporz_election_widgets(election_day_app, import_test_datasets):
     structure = """
         <row>
-            <column span="1"><title /></column>
-            <column span="1"><progress /></column>
-            <column span="1"><counted-entities /></column>
-            <column span="1"><election-candidates-table /></column>
-            <column span="1"><election-candidates-chart /></column>
-            <column span="1"><election-lists-table /></column>
-            <column span="1"><election-lists-chart /></column>
+            <column span="1">
+                <title class="my-class-1"/>
+            </column>
+            <column span="1">
+                <progress class="my-class-2"/>
+            </column>
+            <column span="1">
+                <counted-entities class="my-class-3"/>
+            </column>
+            <column span="1">
+                <election-candidates-table class="my-class-4"/>
+            </column>
+            <column span="1">
+                <election-candidates-chart class="my-class-5"/>
+            </column>
+            <column span="1">
+                <election-candidates-chart class="my-class-6" limit="2"/>
+            </column>
+            <column span="1">
+                <election-lists-table class="my-class-7"/>
+            </column>
+            <column span="1">
+                <election-lists-chart class="my-class-8"/>
+            </column>
+            <column span="1">
+                <election-lists-chart class="my-class-9" limit="3"/>
+            </column>
         </row>
     """
     widgets = [
@@ -231,7 +284,16 @@ def test_proporz_election_widgets(election_day_app, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>Election</span>' in result
+    assert '>Election</span>' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -343,10 +405,21 @@ def test_proporz_election_widgets(election_day_app, import_test_datasets):
     assert 'election-candidates-table' in result
     assert 'data-text="1514"' in result
     assert '>n.a.</td>' in result
-    assert 'data-dataurl="ProporzElection/candidates-data"' in result
+    assert 'data-dataurl="ProporzElection/candidates-data?limit=0"' in result
+    assert 'data-dataurl="ProporzElection/candidates-data?limit=02"' in result
     assert 'election-lists-table' in result
     assert 'data-text="13532"' in result
-    assert 'data-dataurl="ProporzElection/lists-data"' in result
+    assert 'data-dataurl="ProporzElection/lists-data?limit=0"' in result
+    assert 'data-dataurl="ProporzElection/lists-data?limit=03"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -464,22 +537,50 @@ def test_proporz_election_widgets(election_day_app, import_test_datasets):
     assert 'election-candidates-table' in result
     assert 'data-text="3240"' in result
     assert '>n.a.</td>' not in result
-    assert 'data-dataurl="ProporzElection/candidates-data"' in result
+    assert 'data-dataurl="ProporzElection/candidates-data?limit=0"' in result
+    assert 'data-dataurl="ProporzElection/candidates-data?limit=02"' in result
     assert 'election-lists-table' in result
     assert 'data-text="30532"' in result
-    assert 'data-dataurl="ProporzElection/lists-data"' in result
+    assert 'data-dataurl="ProporzElection/lists-data?limit=0"' in result
+    assert 'data-dataurl="ProporzElection/lists-data?limit=03"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
 
 def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     structure = """
         <row>
-            <column span="1"><title /></column>
-            <column span="1"><progress /></column>
-            <column span="1"><counted-entities /></column>
-            <column span="1"><election-compound-candidates-table /></column>
-            <column span="1"><election-compound-districts-table /></column>
-            <column span="1"><election-compound-lists-table /></column>
-            <column span="1"><election-compound-lists-chart /></column>
+            <column span="1">
+                <title class="my-class-1"/>
+            </column>
+            <column span="1">
+                <progress class="my-class-2"/>
+            </column>
+            <column span="1">
+                <counted-entities class="my-class-3"/>
+            </column>
+            <column span="1">
+                <election-compound-candidates-table class="my-class-4"/>
+            </column>
+            <column span="1">
+                <election-compound-districts-table class="my-class-5"/>
+            </column>
+            <column span="1">
+                <election-compound-lists-table class="my-class-6"/>
+            </column>
+            <column span="1">
+                <election-compound-lists-chart class="my-class-7"/>
+            </column>
+            <column span="1">
+                <election-compound-lists-chart class="my-class-8" limit="2"/>
+            </column>
         </row>
     """
     widgets = [
@@ -524,7 +625,15 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>Compound</span>' in result
+    assert '>Compound</span>' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
     # Add intermediate results
     election_1, errors = import_test_datasets(
@@ -619,7 +728,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>Compound</span>' in result
+    assert '>Compound</span>' in result
     assert '1 of 2' in result
     assert f'<div>{e_2}</div>'
     assert 'election-compound-candidates-table' in result
@@ -632,7 +741,16 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'election-compound-lists-table' in result
     assert 'data-text="31515"' in result
     assert '>n.a.</td>' in result
-    assert 'data-dataurl="ElectionCompound/lists-data"' in result
+    assert 'data-dataurl="ElectionCompound/lists-data?limit=0"' in result
+    assert 'data-dataurl="ElectionCompound/lists-data?limit=02"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
     # Add final results
     election_1, errors = import_test_datasets(
@@ -714,7 +832,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
-    assert '<span>Compound</span>' in result
+    assert '>Compound</span>' in result
     assert '2 of 2' in result
     assert f'<div>{e_1}, {e_2}</div>'
     assert 'election-compound-candidates-table' in result
@@ -727,4 +845,13 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'election-compound-lists-table' in result
     assert 'data-text="87135"' in result
     assert '>n.a.</td>' not in result
-    assert 'data-dataurl="ElectionCompound/lists-data"' in result
+    assert 'data-dataurl="ElectionCompound/lists-data?limit=0"' in result
+    assert 'data-dataurl="ElectionCompound/lists-data?limit=02"' in result
+    assert 'my-class-1' in result
+    assert 'my-class-2' in result
+    assert 'my-class-3' in result
+    assert 'my-class-4' in result
+    assert 'my-class-5' in result
+    assert 'my-class-6' in result
+    assert 'my-class-7' in result
+    assert 'my-class-8' in result
