@@ -63,12 +63,14 @@ class OpenGraphMixin:
     @property
     def og_image_width(self):
         if self.og_image:
-            return self.og_image.reference.size[0].replace('px', '')
+            size = getattr(self.og_image.reference, 'size', None)
+            return size and size[0].replace('px', '') or None
 
     @property
     def og_image_height(self):
         if self.og_image:
-            return self.og_image.reference.size[1].replace('px', '')
+            size = getattr(self.og_image.reference, 'size', None)
+            return size and size[1].replace('px', '') or None
 
     @cached_property
     def og_locale(self):
