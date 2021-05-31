@@ -388,3 +388,15 @@ dl.field-display > dt {
         margin-left: .5rem;
     }
 }
+
+/*
+Fix for very long fieldset of people
+*/
+
+#fieldset-people .formfields {
+    max-height: 600px;
+    overflow-y: scroll;
+    @include breakpoint(small only) {
+        max-height: 300px;
+    }
+}
