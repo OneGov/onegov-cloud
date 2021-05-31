@@ -92,6 +92,7 @@ class ActivityTicket(OrgTicketMixin, Ticket):
 class VacationActivityHandler(Handler):
 
     handler_title = _("Activities")
+    code_title = _("Activities")
 
     @cached_property
     def collection(self):

@@ -729,9 +729,31 @@ class OrgTicketSettingsForm(Form):
         render_kw={'disabled': True}
     )
 
+    def code_title(self, code):
+        """ Renders a better translation for handler_codes.
+        Note that the registry of handler_codes is global and not all handlers
+        might are used in this app. The translations give a hint whether the
+        handler is used/defined in the app using this form.
+        A better translation is only then possible.
+        """
+        trs = getattr(handlers.registry[code], 'code_title', None)
+        if not trs:
+            return code
+        translated = self.request.translate(trs)
+        if str(trs) == translated:
+            # Code not used by app
+            return code
+        return f'{code} - {translated}'
+
     def on_request(self):
-        choices = tuple((key, key) for key in handlers.registry.keys())
-        self.ticket_auto_accepts.choices = [('RSV', 'RSV')]
+
+        choices = tuple(
+            (key, self.code_title(key)) for key in handlers.registry.keys()
+        )
+        auto_accept_choices = ('RSV',)
+        self.ticket_auto_accepts.choices = [
+            (key, self.code_title(key)) for key in auto_accept_choices
+        ]
         self.tickets_skip_opening_email.choices = choices
 
         permissions = sorted([

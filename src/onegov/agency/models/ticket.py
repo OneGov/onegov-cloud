@@ -32,6 +32,7 @@ class PersonMutationTicket(OrgTicketMixin, Ticket):
 class AgencyMutationHandler(Handler):
 
     handler_title = _("Agency")
+    code_title = _("Agencies")
 
     @cached_property
     def collection(self):
@@ -82,6 +83,7 @@ class AgencyMutationHandler(Handler):
 class PersonMutationHandler(Handler):
 
     handler_title = _("Person")
+    code_title = _("People")
 
     @cached_property
     def collection(self):

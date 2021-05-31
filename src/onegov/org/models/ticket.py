@@ -105,6 +105,7 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 class FormSubmissionHandler(Handler):
 
     handler_title = _("Form Submissions")
+    code_title = _("Forms")
 
     @cached_property
     def collection(self):
@@ -286,6 +287,7 @@ class FormSubmissionHandler(Handler):
 class ReservationHandler(Handler):
 
     handler_title = _("Reservations")
+    code_title = _("Reservations")
 
     @cached_property
     def resource(self):
@@ -518,6 +520,7 @@ class ReservationHandler(Handler):
 class EventSubmissionHandler(Handler):
 
     handler_title = _("Events")
+    code_title = _("Events")
 
     @cached_property
     def collection(self):
@@ -669,6 +672,7 @@ class EventSubmissionHandler(Handler):
 class DirectoryEntryHandler(Handler):
 
     handler_title = _("Directory Entry Submissions")
+    code_title = _("Directory Entry Submissions")
 
     @cached_property
     def collection(self):
