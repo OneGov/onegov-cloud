@@ -85,9 +85,14 @@ def view_ticket(self, request, layout=None):
     layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
+    edit_amount_url = None
 
     if payment and payment.source == 'manual':
         payment_button = manual_payment_button(payment, layout)
+        if request.is_admin:
+            edit_amount_url = layout.csrf_protected_url(
+                request.link(payment, name='change-net-amount')
+            )
 
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
@@ -109,6 +114,7 @@ def view_ticket(self, request, layout=None):
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
+        'edit_amount_url': edit_amount_url
     }
 
 
