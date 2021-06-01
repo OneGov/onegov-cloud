@@ -511,7 +511,7 @@ def get_common_asset():
     yield 'toggle.js'
     yield 'common.js'
     yield '_blank.js'
-    yield 'form-length-counter.js'
+    yield 'forms.js'
 
 
 @OrgApp.webasset('accordion')
