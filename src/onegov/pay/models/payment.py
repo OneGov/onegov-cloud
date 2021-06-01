@@ -60,7 +60,7 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
 
     @property
     def net_amount(self):
-        return self.amount - self.fee
+        return Decimal(self.amount) - self.fee
 
     @hybrid_property
     def paid(self):
