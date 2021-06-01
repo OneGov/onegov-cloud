@@ -701,6 +701,7 @@ def keywords_first(keywords):
             return keywords.index(v) - len(keywords), ''
         except ValueError:
             return 0, v
+    return sort_key
 
 
 def hashtag_elements(request, text):
