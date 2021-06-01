@@ -486,7 +486,7 @@ def test_user_group_form(session):
 
     session.add(
         FormDefinition(
-            title='A',
+            title='A-1',
             name='a',
             definition='# A',
             order=0,
@@ -506,7 +506,7 @@ def test_user_group_form(session):
     ]
     assert ('EVN-', 'EVN') in form.ticket_permissions.choices
     assert ('FRM-', 'FRM') in form.ticket_permissions.choices
-    assert ('FRM-A', 'FRM: A') in form.ticket_permissions.choices
+    assert ('FRM-A-1', 'FRM: A-1') in form.ticket_permissions.choices
     assert ('PER-', 'PER') in form.ticket_permissions.choices
 
     # apply / update
@@ -520,7 +520,7 @@ def test_user_group_form(session):
 
     form.name.data = 'A/B'
     form.users.data = [str(user_a.id), str(user_b.id)]
-    form.ticket_permissions.data = ['EVN-', 'FRM-ABC']
+    form.ticket_permissions.data = ['EVN-', 'FRM-A-B']
 
     form.update_model(group)
     assert group.users.count() == 2
@@ -532,7 +532,7 @@ def test_user_group_form(session):
     form.apply_model(group)
     assert form.name.data == 'A/B'
     assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
-    assert set(form.ticket_permissions.data) == {'EVN-', 'FRM-ABC'}
+    assert set(form.ticket_permissions.data) == {'EVN-', 'FRM-A-B'}
 
     user_a.logout_all_sessions.reset_mock()
     user_b.logout_all_sessions.reset_mock()
