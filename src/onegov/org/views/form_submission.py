@@ -79,8 +79,11 @@ def get_hints(layout, window):
                 })
 
 
-@OrgApp.form(model=FormDefinition, template='form.pt', permission=Public,
-             form=lambda self, request: self.form_class)
+@OrgApp.form(
+    model=FormDefinition,
+    template='form.pt', permission=Public,
+    form=lambda self, request: self.form_class
+)
 def handle_defined_form(self, request, form, layout=None):
     """ Renders the empty form and takes input, even if it's not valid, stores
     it as a pending submission and redirects the user to the view that handles
