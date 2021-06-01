@@ -513,6 +513,7 @@ def get_common_asset():
     yield '_blank.js'
     yield 'forms.js'
     yield 'internal_link_check.js'
+    yield 'tickets.js'
 
 
 @OrgApp.webasset('accordion')
