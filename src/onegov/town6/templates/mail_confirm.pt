@@ -11,10 +11,7 @@
         <p i18n:translate>Plese click the following link to confirm your subscription:</p>
         <p><a class="btn-primary" href="${request.link(subscription, 'confirm')}" i18n:translate>Confirm subscription</a></p>
 
-        <p i18n:translate>If you did not subscribe to this newsletter you can simply ignore this e-mail. We will not bother you again.</p>
-
-        <p i18n:translate>Best regards,</p>
-        <tal:b metal:use-macro="layout.macros['sender']" />
+        <p i18n:translate>If you did not subscribe to this newsletter you can simply ignore this e-mail.</p>
 
     </tal:b>
 </div>

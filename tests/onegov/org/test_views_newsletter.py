@@ -119,6 +119,9 @@ def test_newsletter_signup(client):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
 
+    assert 'Mit freundlichen Grüssen' not in message
+    assert 'Das OneGov Cloud Team' not in message
+
     confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
 
     # try an illegal token first

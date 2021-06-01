@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-05-26 09:33+0200\n"
+"POT-Creation-Date: 2021-06-01 10:28+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1047,14 +1047,10 @@ msgstr "Anmeldung bestätigen"
 
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
-"mail. We will not bother you again."
+"mail."
 msgstr ""
 "Falls Sie sich nicht für diesen Newsletter angemeldet haben können Sie diese "
-"E-Mail einfach ignorieren. Wir werden Sie in diesem Fall nicht weiter "
-"belästigen."
-
-msgid "Best regards,"
-msgstr "Mit freundlichen Grüssen,"
+"E-Mail einfach ignorieren."
 
 msgid "Good morning,"
 msgstr "Guten Morgen"
@@ -1889,3 +1885,6 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Best regards,"
+#~ msgstr "Mit freundlichen Grüssen,"
