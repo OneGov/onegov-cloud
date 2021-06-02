@@ -176,6 +176,34 @@ schools = {
 }
 
 
+@cli.command(name='test-ldap')
+@click.argument('base')
+@click.option('--ldap-server', required=True)
+@click.option('--ldap-username', required=True)
+@click.option('--ldap-password', required=True)
+def test_ldap(base, ldap_server, ldap_username, ldap_password):
+    client = LDAPClient(ldap_server, ldap_username, ldap_password)
+    client.try_configuration()
+    mapping = {
+        'uid': 'source_id',
+        'zgXGivenName': 'first_name',
+        'zgXSurname': 'last_name',
+        'mail': 'mail',
+        'zgXDirektionAbk': 'directorate',
+        'zgXAmtAbk': 'agency',
+        'zgXAbteilung': 'department',
+    }
+    attributes = [*mapping.keys(), 'groupMembership']
+
+    success = client.connection.search(
+        base, "(objectClass=*)", attributes=attributes)
+    if not success:
+        print('Search not successfull')
+        return
+    for ix, entry in enumerate(client.connection.entries):
+        print(json.dumps(entry.entry_attributes_as_dict, indent=4))
+
+
 @cli.command(name='fetch-users', context_settings={'singular': True})
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
