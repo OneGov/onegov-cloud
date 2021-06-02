@@ -246,7 +246,15 @@ def do_import(path, clear):
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
 @click.option('--ldap-password', required=True)
-def fetch_users_cli(ldap_server, ldap_username, ldap_password):
+@click.option('--admin-group', required=True, help='group id for role admin')
+@click.option('--editor-group', required=True, help='group id for role editor')
+def fetch_users_cli(
+        ldap_server,
+        ldap_username,
+        ldap_password,
+        admin_group,
+        editor_group
+):
     """ Updates the list of users/course attendees by fetching matching users
     from a remote LDAP server.
 
@@ -259,12 +267,12 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
             --ldap-server 'ldaps://1.2.3.4' \\
             --ldap-username 'foo' \\
             --ldap-password 'bar' \\
+            --admin-group 'ou=Admins' \\
+            --editor-group 'ou=Editors'
 
     """
 
     def execute(request, app):
-        admin_group = 'cn=onegovcloud_admin,ou=uebersetzerverz,o=appl'
-        editor_group = 'cn=onegovcloud_edit,ou=uebersetzerverz,o=appl'
         fetch_users(
             app,
             request.session,

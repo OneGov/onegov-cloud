@@ -180,8 +180,17 @@ schools = {
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
 @click.option('--ldap-password', required=True)
+@click.option('--admin-group', required=True, help='group id for role admin')
+@click.option('--editor-group', required=True, help='group id for role editor')
 @click.option('--verbose', is_flag=True, default=False)
-def fetch_users_cli(ldap_server, ldap_username, ldap_password, verbose):
+def fetch_users_cli(
+        ldap_server,
+        ldap_username,
+        ldap_password,
+        admin_group,
+        editor_group,
+        verbose
+):
     """ Updates the list of users/course attendees by fetching matching users
     from a remote LDAP server.
 
@@ -194,12 +203,12 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password, verbose):
             --ldap-server 'ldaps://1.2.3.4' \\
             --ldap-username 'foo' \\
             --ldap-password 'bar' \\
+            --admin-group 'ou=Admins' \\
+            --editor-group 'ou=Editors'
 
     """
 
     def execute(request, app):
-        admin_group = 'cn=ACC_OneGovCloud_admin,ou=kursverwaltung,o=appl'
-        editor_group = 'cn=ACC_OneGovCloud_edit,ou=kursverwaltung,o=appl'
         fetch_users(
             app,
             request.session,
@@ -367,6 +376,8 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
+
+    synced_users = []
 
     for ix, data in enumerate(users(client.connection)):
 
