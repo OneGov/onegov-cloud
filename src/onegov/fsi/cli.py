@@ -179,7 +179,8 @@ schools = {
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
 @click.option('--ldap-password', required=True)
-def fetch_users_cli(ldap_server, ldap_username, ldap_password):
+@click.option('--verbose', is_flag=True, default=False)
+def fetch_users_cli(ldap_server, ldap_username, ldap_password, verbose):
     """ Updates the list of users/course attendees by fetching matching users
     from a remote LDAP server.
 
@@ -205,7 +206,8 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
             ldap_username,
             ldap_password,
             admin_group,
-            editor_group
+            editor_group,
+            verbose
         )
 
     return execute
