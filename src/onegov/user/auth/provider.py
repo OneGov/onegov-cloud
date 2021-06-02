@@ -221,10 +221,9 @@ def spawn_ldap_client(**cfg):
 
 
 def ensure_user(source, source_id, session, username, role, force_role=True,
-                realname=None, force_active=True):
+                realname=None, force_active=False):
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
-
     """
 
     users = UserCollection(session)
