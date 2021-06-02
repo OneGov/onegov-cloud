@@ -1,5 +1,6 @@
+import json
 from datetime import date, datetime, timezone
-from operator import or_
+from sqlalchemy import or_, and_
 
 import click
 from sedate import replace_timezone
@@ -343,11 +344,15 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             yield from map_entries(connection.entries)
 
     def handle_inactive(synced_ids):
-        inactive = session.query(User).filter(User.id not in synced_ids)
-        inactive = inactive.filter(or_(
-            User.source == 'ldap',
-            User.role == 'member'
-        ))
+        inactive = session.query(User).filter(
+            and_(
+                User.id.notin_(synced_ids),
+                or_(
+                    User.source == 'ldap',
+                    User.role == 'member'
+                )
+            )
+        )
         for ix, user_ in enumerate(inactive):
             if verbose:
                 print(f'Inactive: {user_.username}')
@@ -362,8 +367,6 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
-
-    synced_users = []
 
     for ix, data in enumerate(users(client.connection)):
 
@@ -388,6 +391,9 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             force_role=force_role,
             force_active=True
         )
+
+        if data['mail'] == 'sibylle.wettstein@aba-zug.ch':
+            print(user)
 
         synced_users.append(user.id)
 
