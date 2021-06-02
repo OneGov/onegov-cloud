@@ -212,7 +212,7 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
 
 
 def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
-                admin_group=None, editor_group=None):
+                admin_group=None, editor_group=None, verbose=False):
     """ Implements the fetch-users cli command. """
 
     mapping = {
@@ -246,19 +246,31 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
         return None
 
     def excluded(entry):
+        mail = entry.entry_attributes_as_dict.get('mail')
+
+        if not mail:
+            if verbose:
+                print('Excluded: No Mail')
+            return True
+
         if entry.entry_dn.count(',') <= 1:
+            if verbose:
+                print(f'Excluded entry_dn.count(",") <= 1: {str(mail)}')
             return True
 
         if 'ou=HRdeleted' in entry.entry_dn:
+            if verbose:
+                print(f'Excluded HRdeleted: {str(mail)}')
             return True
 
         if 'ou=Other' in entry.entry_dn:
+            if verbose:
+                print(f'Excluded ou=Other: {str(mail)}')
             return True
 
-        if not entry.entry_attributes_as_dict.get('mail'):
-            return True
-
-        if not user_type(entry.entry_attributes_as_dict['mail'][0]):
+        if not user_type(mail[0]):
+            if verbose:
+                print(f'Excluded no usertype for mail: {str(mail)}')
             return True
 
     def scalar(value):
@@ -335,6 +347,8 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             User.role == 'member'
         ))
         for ix, user_ in enumerate(inactive):
+            if verbose:
+                print(f'Inactive: {user_.username}')
             user_.active = False
             att = user_.attendee
             if att:
