@@ -1,8 +1,63 @@
 # Changes
 
+## Release `2021.56`
+
+> commits: **24 / [d8fadefb86...f693893cd7](https://github.com/OneGov/onegov-cloud/compare/d8fadefb86^...f693893cd7)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.56)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🎉 **Adds a shell command.**
+
+**`Feature`** | **[eb9048e73c](https://github.com/onegov/onegov-cloud/commit/eb9048e73c8ac3b00b3bebfd7a8d64bc027d8112)**
+
+### Form
+
+🎉 **Make radio field renderer more robust**
+
+**`Feature`** | **[c263089438](https://github.com/onegov/onegov-cloud/commit/c2630894386b3e0ea3a9d6b3ee4c0f99fb59eff1)**
+
+✨ **Adds https to empty url input fields**
+
+**`Other`** | **[SEA-313](https://linear.app/seantis/issue/SEA-313)** | **[f034646fdb](https://github.com/onegov/onegov-cloud/commit/f034646fdb5a16be04998c94ad8694b783822710)**
+
+### Org
+
+✨ **Changes newsletter confirm mail end text (incl. Town6)**
+
+- Remove best regards
+- removes sender
+
+**`Other`** | **[SEA-359](https://linear.app/seantis/issue/SEA-359)** | **[69fcb45fe9](https://github.com/onegov/onegov-cloud/commit/69fcb45fe9e399b7efb7ec248e949ec4d6f61441)**
+
+✨ **Adds working link check for internal links**
+
+Requests internal urls with ajax calls.
+
+**`Improvement`** | **[SEA-331](https://linear.app/seantis/issue/SEA-331)** | **[67b24f7526](https://github.com/onegov/onegov-cloud/commit/67b24f75269916d5793a51d213d8e7a8bb63c20c)**
+
+### Ticket
+
+🎉 **Adds translations for handler codes**
+
+Render a better translation for each handler code if it is used by the app and translations exist.
+
+**`Feature`** | **[SEA-364](https://linear.app/seantis/issue/SEA-364)** | **[085924de20](https://github.com/onegov/onegov-cloud/commit/085924de20b2cf30e27cd5577f48df966c26bc95)**
+
+### Town6
+
+🎉 **Reduce height of form field people**
+
+**`Feature`** | **[SEA-361](https://linear.app/seantis/issue/SEA-361)** | **[644a67e676](https://github.com/onegov/onegov-cloud/commit/644a67e67636349691efc17950480a980eecfc4b)**
+
+🎉 **Adds title and hide-title to partners widget**
+
+**`Feature`** | **[SEA-373](https://linear.app/seantis/issue/SEA-373)** | **[a1bcdb09db](https://github.com/onegov/onegov-cloud/commit/a1bcdb09dbb4a1b6729e9cb50e8fa9dd0c3661b4)**
+
 ## Release `2021.55`
 
-> commits: **4 / [e42dc76114...2098a0b44c](https://github.com/OneGov/onegov-cloud/compare/e42dc76114^...2098a0b44c)**  
+> released: **2021-05-31 12:00**<br>
+> commits: **5 / [e42dc76114...a7b04bb8e2](https://github.com/OneGov/onegov-cloud/compare/e42dc76114^...a7b04bb8e2)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.55)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2021.54`
