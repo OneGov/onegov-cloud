@@ -23,5 +23,3 @@ $('input[data-max-length],textarea[data-max-length]').each(function() {
         }
     });
 });
-
-$('input[type="url"]').each(function () { $(this).val() || $(this).val('https://') });
