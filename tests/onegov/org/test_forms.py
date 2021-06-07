@@ -560,7 +560,7 @@ def test_settings_ticket_permissions(session):
     session.add(p_2)
     session.flush()
 
-    request = Bunch(session=session)
+    request = Bunch(session=session, translate=lambda x: str(x))
     form = OrgTicketSettingsForm()
     form.request = request
     form.on_request()
