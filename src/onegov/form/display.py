@@ -141,9 +141,12 @@ class UploadFieldRenderer(BaseRenderer):
 class RadioFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
-        return "✓ " + self.escape(self.translate(
-            field, dict(field.choices)[field.data]
-        ))
+        try:
+            return "✓ " + self.escape(self.translate(
+                field, dict(field.choices)[field.data]
+            ))
+        except Exception:
+            return "✓ ?"
 
 
 @registry.register_for('MultiCheckboxField')
