@@ -234,7 +234,10 @@ def test_volunteers(browser, scenario):
     # once activated, it is public
     browser.login_admin()
     browser.visit('/feriennet-settings')
-    browser.fill_form({'volunteers': 'enabled'})
+    browser.fill_form({
+        'volunteers': 'enabled',
+        'tos_url': 'https://example.org/tos'
+    })
     browser.find_by_value("Absenden").click()
 
     browser.visit('/')
