@@ -398,3 +398,13 @@ def upgrade(group_context, dry_run):
         yield run_upgrade
 
     return tuple(upgrade_steps())
+
+
+@cli.command()
+def shell():
+    """ Enters the shell """
+
+    def _shell(request, app):
+        breakpoint()
+
+    return _shell
