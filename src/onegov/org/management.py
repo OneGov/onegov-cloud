@@ -205,8 +205,6 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         self.domain = self.request.domain
         self.extractor = URLExtract()
 
-        self.unhealthy_urls_stats = None
-        self._started = time.time()
         self.timeout = ClientTimeout(
             total=total_timout
         )
@@ -218,10 +216,6 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     @property
     def external_only(self):
         return self.link_type == 'external'
-
-    @staticmethod
-    def stats_obj():
-        return
 
     def internal_link(self, url):
         return self.domain in url
@@ -252,18 +246,23 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                         self.filter_urls(urls)
                     )
 
+    def url_list_generator(self):
+        for name, model_link, urls in self.find_urls():
+            for url in urls:
+                yield LinkCheck(name, model_link, url)
+
     def unhealthy_urls(self):
-        """ We check the urls in the backend, since in the frontend we run into
-        the content-security-policy. """
+        """ We check the urls in the backend, unless they are internal.
+         In that case, we can not do that since we do not have async support.
+         Otherwise returns the LinkChecks with empty statistics for use in
+         the frontend.
+         """
+        assert self.link_type, 'link_type must be set'
+        started = time.time()
 
         total_count = 0
         error_count = 0
         not_okay_status = 0
-
-        def url_list_generator():
-            for name, model_link, urls in self.find_urls():
-                for url in urls:
-                    yield LinkCheck(name, model_link, url)
 
         def handle_errors(check, exception):
             nonlocal total_count
@@ -283,20 +282,29 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                 not_okay_status += 1
             return check
 
-        urls = async_aiohttp_get_all(
-            urls=tuple(url_list_generator()),
-            response_attr='status',
-            callback=on_success,
-            handle_exceptions=handle_errors,
-            timeout=self.timeout
-        )
+        if self.link_type == 'external':
+            urls = async_aiohttp_get_all(
+                urls=tuple(self.url_list_generator()),
+                response_attr='status',
+                callback=on_success,
+                handle_exceptions=handle_errors,
+                timeout=self.timeout
+            )
+            stats = self.Statistic(
+                total=total_count,
+                error=error_count,
+                nok=not_okay_status,
+                ok=total_count - error_count - not_okay_status,
+                duration=time.time() - started
+            )
+        else:
+            urls = tuple(self.url_list_generator())
+            stats = self.Statistic(
+                total=0,
+                error=0,
+                nok=0,
+                ok=0,
+                duration=time.time() - started
+            )
 
-        self.unhealthy_urls_stats = self.Statistic(
-            total=total_count,
-            error=error_count,
-            nok=not_okay_status,
-            ok=total_count - error_count - not_okay_status,
-            duration=time.time() - self._started
-        )
-
-        return tuple(check for check in urls if check.status != 200)
+        return stats, tuple(check for check in urls if check.status != 200)

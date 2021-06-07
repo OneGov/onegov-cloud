@@ -16,15 +16,28 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>${stats.total}</td>
-                    <td>${stats.ok}</td>
-                    <td>${stats.nok}</td>
-                    <td>${stats.error}</td>
+                    <td id="total">${stats.total}</td>
+                    <td id="ok">${stats.ok}</td>
+                    <td id="nok">${stats.nok}</td>
+                    <td id="error-count">${stats.error}</td>
                     <td>${round(stats.duration, 1)}</td>
                 </tr>
             </tbody>
         </table>
-        <table class="link-check-results">
+        <table
+                tal:condition="check_responses"
+                class="link-check-results"
+                tal:attributes="data-link-check (True if healthcheck.internal_only else None)"
+                data-check-total="#total"
+                data-check-ok="#ok"
+                data-check-nok="#nok"
+                data-check-error="#error-count"
+                data-check-error-msg="[data-error]"
+                data-ok-class="ok"
+                data-nok-class="nok"
+                data-status-selector=".link-status"
+                data-remove-delay="1500"
+        >
           <thead>
             <tr>
               <th width="150" i18n:translate="">Path</th>
@@ -33,11 +46,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr tal:repeat="result check_responses">
+            <tr tal:repeat="result check_responses" tal:attributes="data-check-url (result.url if healthcheck.internal_only else None)">
                 <td><a href="${result.link}" target="_blank">${result.name}</a></td>
-                <td>${result.message or ''}</td>
+                <td data-error>${result.message or ''}</td>
                 <td tal:define="url result.url">
-                    <a class="link-status nok ${internal_link(url) and 'internal'}" href="${url}" target="_blank">${truncate(url)}</a>
+                    <a class="link-status ${healthcheck.internal_link(url) and 'internal'} ${result.status and result.status != 200 and 'nok' or ''}" href="${url}" target="_blank">${truncate(url)}</a>
                 </td>
             </tr>
           </tbody>

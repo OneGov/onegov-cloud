@@ -41,11 +41,11 @@ def test_link_health_check(org_app):
         "Invalid: $URL",
     ]
 
+    external_exp = [valid[0]] + not_found + invalid_domain
+    internal_exp = [valid[1]]
+
     links = valid + invalid_fmt + not_found + invalid_domain
     assert len(fragments) == len(links)
-    fetched_count = len(links) - len(invalid_fmt)
-    error_count = len(invalid_domain)
-    nok_count = len(not_found)
 
     text = "\n".join(
         f.replace('$URL', u) for f, u in zip(fragments, links))
@@ -53,30 +53,23 @@ def test_link_health_check(org_app):
     page = pages.query().first()
     page.lead = text
 
-    check = LinkHealthCheck(request)
+    check = LinkHealthCheck(request, 'external')
+
     found_urls = check.extractor.find_urls(text, only_unique=True)
     assert found_urls == valid + not_found + invalid_domain
 
     urls = tuple(check.find_urls())
-    assert urls == (('Topic', 'URL-Topic', found_urls),)
+    assert urls == (('Topic', 'URL-Topic', tuple(external_exp)),)
 
-    all_results = check.unhealthy_urls()
-    stats = check.unhealthy_urls_stats
-
-    print(all_results[0])
-    print(stats)
-    assert stats.total == fetched_count
-    assert stats.ok == len(valid)
-    assert stats.nok == nok_count
-    assert stats.error == error_count
-
-    # check filters
+    # check internal
     check.link_type = 'internal'
     urls = tuple(check.find_urls())
-    filtered = tuple([u for u in found_urls if test_domain in u])
-    assert urls == (('Topic', 'URL-Topic', filtered),)
+    assert urls == (('Topic', 'URL-Topic', tuple(internal_exp)),)
+    stats, all_results = check.unhealthy_urls()
 
-    check.link_type = 'external'
-    urls = tuple(check.find_urls())
-    filtered = tuple([u for u in found_urls if test_domain not in u])
-    assert urls == (('Topic', 'URL-Topic', filtered),)
+    # handled by js in the frontend, so the stats are basically empty
+    assert len(all_results) == len(internal_exp)
+    assert stats.total == 0
+    assert stats.ok == 0
+    assert stats.nok == 0
+    assert stats.error == 0

@@ -262,12 +262,14 @@ def handle_migrate_links(self, request, form, layout=None):
     permission=Secret, form=LinkHealthCheckForm)
 def handle_link_health_check(self, request, form, layout=None):
 
-    check_responses = None
     healthcheck = LinkHealthCheck(request)
+    check_responses = None
+    stats = None
 
     if form.submitted(request):
-        healthcheck.link_type = form.scope.data
-        check_responses = healthcheck.unhealthy_urls()
+        link_type = form.scope.data
+        healthcheck.link_type = link_type
+        stats, check_responses = healthcheck.unhealthy_urls()
 
     url_max_len = 80
 
@@ -281,7 +283,7 @@ def handle_link_health_check(self, request, form, layout=None):
         'form': form,
         'layout': layout or DefaultLayout(self, request),
         'check_responses': check_responses,
-        'internal_link': healthcheck.internal_link,
         'truncate': truncate,
-        'stats': healthcheck.unhealthy_urls_stats
+        'stats': stats,
+        'healthcheck': healthcheck
     }
