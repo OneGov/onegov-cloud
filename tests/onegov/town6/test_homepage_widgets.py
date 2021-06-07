@@ -49,3 +49,27 @@ def test_focus_widget():
         'image_url', 'None;',
     ))
     assert f'tal:define="{defined}"' in result
+
+
+def test_partner_widget():
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+    result = transform_structure(widgets, """
+        <partners />
+    """)
+    assert 'tal:define="title \'\'; show_title True;"' in result
+
+    result = transform_structure(widgets, """
+        <partners title="TEST" />
+    """)
+    assert 'tal:define="title \'TEST\'; show_title True;"' in result
+
+    result = transform_structure(widgets, """
+            <partners hide-title="True" />
+        """)
+    assert 'tal:define="title \'\'; show_title False;"' in result

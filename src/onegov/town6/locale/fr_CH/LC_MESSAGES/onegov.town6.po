@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-06-01 10:27+0200\n"
+"POT-Creation-Date: 2021-06-07 14:49+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -644,6 +644,9 @@ msgstr "plus"
 msgid "Opening Hours"
 msgstr "Horaires d'ouverture"
 
+msgid "Partner"
+msgstr "Partenaire"
+
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -1050,9 +1053,6 @@ msgid ""
 msgstr ""
 "Si vous ne vous êtes pas abonné à cette lettre d'informations, vous pouvez "
 "tout simplement ignorer cet e-mail."
-
-msgid "Best regards,"
-msgstr "Cordialement,"
 
 msgid "Good morning,"
 msgstr "Bonjour,"
@@ -1897,12 +1897,12 @@ msgstr "Paramètres de la newsletter"
 msgid "Link Migration"
 msgstr ""
 
+#~ msgid "Best regards,"
+#~ msgstr "Cordialement,"
+
 #~ msgid ""
 #~ "If you did not subscribe to this newsletter you can simply ignore this e-"
 #~ "mail. We will not bother you again."
 #~ msgstr ""
 #~ "Si vous ne vous êtes pas abonné à cette lettre d'informations, vous "
 #~ "pouvez tout simplement ignorer cet e-mail."
-
-#~ msgid "Best regards,"
-#~ msgstr "Cordialement,"

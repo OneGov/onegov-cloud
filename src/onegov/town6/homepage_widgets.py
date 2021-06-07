@@ -173,9 +173,34 @@ class EventsWidget(object):
 class PartnerWidget(object):
 
     template = """
-            <xsl:template match="partners">
-                <metal:block use-macro="layout.macros['partner-cards']" />
-            </xsl:template>
+        <xsl:template match="partners">
+            <xsl:variable name="apos">'</xsl:variable>
+            <xsl:variable name="show_title">
+                <xsl:choose>
+                     <xsl:when test="@hide-title">
+                        <xsl:value-of
+                        select="'False'" />
+                    </xsl:when>
+                     <xsl:otherwise>
+                        <xsl:value-of select="'True'" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <metal:block use-macro="layout.macros['partner-cards']">
+            <xsl:attribute name="tal:define">
+            <xsl:value-of
+            select="concat(
+                'title ', 
+                $apos, 
+                @title, 
+                $apos, 
+                '; ', 
+                'show_title ', 
+                $show_title, 
+                ';')" />
+          </xsl:attribute>
+            </metal:block>
+        </xsl:template>
     """
 
     def get_variables(self, layout):
