@@ -69,7 +69,7 @@ def test_homepage(client):
     assert 'Aktuelles' in homepage
     assert 'Alle Beiträge' in homepage
     assert 'Ausgewählte Themen' in homepage
-    assert 'Partners' in homepage
+    assert 'Partner' in homepage
 
     # Test chatbot on homepage
     assert not homepage.pyquery('.chatbot')
