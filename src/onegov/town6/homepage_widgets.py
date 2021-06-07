@@ -190,13 +190,13 @@ class PartnerWidget(object):
             <xsl:attribute name="tal:define">
             <xsl:value-of
             select="concat(
-                'title ', 
-                $apos, 
-                @title, 
-                $apos, 
-                '; ', 
-                'show_title ', 
-                $show_title, 
+                'title ',
+                $apos,
+                @title,
+                $apos,
+                '; ',
+                'show_title ',
+                $show_title,
                 ';')" />
           </xsl:attribute>
             </metal:block>
