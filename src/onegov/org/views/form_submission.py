@@ -3,6 +3,7 @@
 import morepath
 
 from onegov.core.security import Public, Private
+from onegov.org.cli import close_ticket
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
@@ -260,6 +261,9 @@ def handle_complete_submission(self, request):
             self.meta.changed()
 
             collection = FormCollection(request.session)
+            submission_id = self.id
+
+            # Expunges the submission from the session
             collection.submissions.complete_submission(self)
 
             # make sure accessing the submission doesn't flush it, because
@@ -284,6 +288,27 @@ def handle_complete_submission(self, request):
                     'show_submission': self.meta['show_submission']
                 }
             )
+            if request.auto_accept(ticket):
+                try:
+                    ticket.accept_ticket(request.auto_accept_user)
+                    # We need to reload the object with the correct polymorphic
+                    # type
+                    submission = collection.submissions.by_id(
+                        submission_id, state='complete', current_only=True
+                    )
+                    # We can not use the view since it needs a valid
+                    # csrf token
+                    handle_submission_action(
+                        submission, request, 'confirmed', True
+                    )
+
+                except Exception:
+                    request.warning(_("Your request could not be "
+                                      "accepted automatically!"))
+                else:
+                    close_ticket(
+                        ticket, request.auto_accept_user, request
+                    )
 
             request.success(_("Thank you for your submission!"))
 
@@ -314,8 +339,9 @@ def handle_cancel_registration(self, request):
     return handle_submission_action(self, request, 'cancelled')
 
 
-def handle_submission_action(self, request, action):
-    request.assert_valid_csrf_token()
+def handle_submission_action(self, request, action, ignore_csrf=False):
+    if not ignore_csrf:
+        request.assert_valid_csrf_token()
 
     if action == 'confirmed':
         subject = _("Your registration has been confirmed")

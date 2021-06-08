@@ -25,6 +25,7 @@ from wtforms.fields.html5 import EmailField, URLField, IntegerField
 from wtforms_components import ColorField
 
 from onegov.ticket import handlers
+from onegov.user import User
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
@@ -707,6 +708,11 @@ class OrgTicketSettingsForm(Form):
         choices=[],
     )
 
+    auto_closing_user = ChosenSelectField(
+        label=_("User used to auto-accept tickets"),
+        choices=[]
+    )
+
     tickets_skip_opening_email = MultiCheckboxField(
         label=_("Block email confirmation when "
                 "this ticket category is opened"),
@@ -750,7 +756,7 @@ class OrgTicketSettingsForm(Form):
         choices = tuple(
             (key, self.code_title(key)) for key in handlers.registry.keys()
         )
-        auto_accept_choices = ('RSV',)
+        auto_accept_choices = ('RSV', 'FRM')
         self.ticket_auto_accepts.choices = [
             (key, self.code_title(key)) for key in auto_accept_choices
         ]
@@ -765,6 +771,12 @@ class OrgTicketSettingsForm(Form):
         ], key=lambda x: x[1])
         self.permissions.choices = permissions
         self.permissions.default = [p[0] for p in permissions]
+
+        user_q = self.request.session.query(User).filter_by(role='admin')
+        user_q = user_q.order_by(User.created.desc())
+        self.auto_closing_user.choices = [
+            (u.username, u.title) for u in user_q
+        ]
 
 
 class NewsletterSettingsForm(Form):

@@ -49,5 +49,14 @@ class OrgRequest(CoreRequest):
         return self.session.query(User).filter_by(role='admin').order_by(
             User.created).first()
 
+    @cached_property
+    def auto_accept_user(self):
+        username = self.app.org.auto_closing_user
+        usr = None
+        if username:
+            usr = self.session.query(User)
+            usr = usr.filter_by(username=username, role='admin').first()
+        return usr or self.first_admin_available
+
     def auto_accept(self, ticket):
         return ticket.handler_code in (self.app.org.ticket_auto_accepts or [])

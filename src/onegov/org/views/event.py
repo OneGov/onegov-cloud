@@ -200,13 +200,13 @@ def view_event(self, request, layout=None):
 
         if request.auto_accept(ticket):
             try:
-                ticket.accept_ticket(request.first_admin_available)
+                ticket.accept_ticket(request.auto_accept_user)
                 request.view(self, name='publish')
             except Exception:
                 request.warning(_("Your request could not be "
                                   "accepted automatically!"))
             else:
-                close_ticket(ticket, request.first_admin_available, request)
+                close_ticket(ticket, request.auto_accept_user, request)
 
         request.success(_("Thank you for your submission!"))
 

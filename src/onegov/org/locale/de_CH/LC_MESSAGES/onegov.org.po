@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-01 10:18+0200\n"
+"POT-Creation-Date: 2021-06-08 16:32+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1237,6 +1237,9 @@ msgstr "Bitte geben Sie nur Tag und Monat ein"
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
 msgstr "Akteptiere und schliesse Ticket automatisch für diese Kategorien"
+
+msgid "User used to auto-accept tickets"
+msgstr "Benutzer für das automatische Akzeptieren von Tickets"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
@@ -2674,9 +2677,6 @@ msgid ""
 msgstr ""
 "Falls Sie sich nicht für diesen Newsletter angemeldet haben können Sie diese "
 "E-Mail einfach ignorieren."
-
-msgid "Best regards,"
-msgstr "Mit freundlichen Grüssen,"
 
 msgid "Good morning,"
 msgstr "Guten Morgen"
@@ -4389,3 +4389,6 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Best regards,"
+#~ msgstr "Mit freundlichen Grüssen,"

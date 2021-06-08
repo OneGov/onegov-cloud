@@ -6,8 +6,10 @@ from freezegun import freeze_time
 from webtest import Upload
 
 from onegov.form import FormCollection, as_internal_id
-from onegov.ticket import TicketCollection
-from tests.shared.utils import create_image
+from onegov.ticket import TicketCollection, Ticket
+from onegov.user import UserCollection
+from tests.onegov.org.common import get_mail
+from tests.shared.utils import create_image, open_in_browser
 
 
 def test_view_form_alert(client):
@@ -595,6 +597,7 @@ def test_registration_change_limit_after_submissions(client):
 
 def test_registration_ticket_workflow(client):
     collection = FormCollection(client.app.session())
+    users = UserCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', textwrap.dedent("""
         E-Mail *= @@@
@@ -607,12 +610,11 @@ def test_registration_ticket_workflow(client):
         limit=10,
         overflow=False
     )
-
+    username = 'automaton@example.org'
+    user_id = users.add(username, 'testing', 'admin').id
     transaction.commit()
 
-    client.login_editor()
-
-    def register(e_mail, name, include_data_in_email):
+    def register(client, data_in_email, auto_accept=False):
 
         with freeze_time('2018-01-01'):
             page = client.get('/form/meetup')
@@ -620,12 +622,14 @@ def test_registration_ticket_workflow(client):
             page.form['name'] = 'Foobar'
             page = page.form.submit().follow()
 
-            page.form['send_by_email'] = include_data_in_email
-            page.form.submit().follow()
-
+            page.form['send_by_email'] = data_in_email
+            page = page.form.submit().follow()
+        if auto_accept:
+            return page
         return client.get('/tickets/ALL/open').click("Annehmen").follow()
 
-    page = register('info@example.org', 'Foobar', include_data_in_email=True)
+    client.login_editor()
+    page = register(client, data_in_email=True)
 
     assert "bestätigen" in page
     assert "ablehnen" in page
@@ -641,14 +645,14 @@ def test_registration_ticket_workflow(client):
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
-    page = page.click("Anmeldung stornieren").follow()
+    page.click("Anmeldung stornieren").follow()
 
     msg = client.app.smtp.sent[-1]
     assert 'Ihre Anmeldung für "Meetup" wurde storniert' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
-    page = register('info@example.org', 'Foobar', include_data_in_email=False)
+    page = register(client, data_in_email=False)
 
     msg = client.app.smtp.sent[-1]
     assert "Ihre Anfrage wurde unter der folgenden Referenz registriert" in msg
@@ -660,6 +664,29 @@ def test_registration_ticket_workflow(client):
     assert 'Ihre Anmeldung für "Meetup" wurde abgelehnt' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" not in msg
+
+    # Test auto accept reservations for forms
+    # views in order:
+    # - /form/meetup
+    # - /form-preview/{id} mit submit convert Pending in CompleteFormSubmission
+    # confirm link: request.link(self.submission, 'confirm-registration')
+
+    client.login_admin()
+    settings = client.get('/ticket-settings')
+    # skip_opening_email has not effect for the auto-accept setting
+    # this opening mail is never sent, instead the confirmation directly
+    settings.form['ticket_auto_accepts'] = ['FRM']
+    settings.form['auto_closing_user'] = username
+    settings.form.submit().follow()
+
+    client = client.spawn()
+    page = register(client, False, auto_accept=True)
+    mail = get_mail(client.app.smtp.outbox, -1)
+    assert '_Meetup=3A_Ihre_Anmeldung_wurde_best=C3=A4tigt?=' in mail['subject']
+    assert 'Ihr Anliegen wurde abgeschlossen' in page
+
+    # check ownership of the ticket
+    client.app.session().query(Ticket).filter_by(user_id=user_id).one()
 
 
 def test_registration_not_in_front_of_queue(client):

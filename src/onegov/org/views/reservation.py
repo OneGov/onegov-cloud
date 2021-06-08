@@ -455,13 +455,13 @@ def finalize_reservation(self, request):
 
         if request.auto_accept(ticket):
             try:
-                ticket.accept_ticket(request.first_admin_available)
+                ticket.accept_ticket(request.auto_accept_user)
                 request.view(reservations[0], name='accept')
             except Exception:
                 request.warning(_("Your request could not be "
                                   "accepted automatically!"))
             else:
-                close_ticket(ticket, request.first_admin_available, request)
+                close_ticket(ticket, request.auto_accept_user, request)
 
         request.success(_("Thank you for your reservation!"))
 
