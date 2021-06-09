@@ -55,6 +55,8 @@ from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.models.external_link import ExternalLinkCollection, \
+    ExternalLink
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -657,3 +659,14 @@ def get_dashboard(request):
 
     if dashboard.is_available:
         return dashboard
+
+
+@OrgApp.path(model=ExternalLinkCollection, path='/external-links')
+def get_external_link_collection(request, to=None, title=None):
+    return ExternalLinkCollection(request.session, to=to, title=title)
+
+
+@OrgApp.path(model=ExternalLink, path='/external-link/{id}',
+             converters=dict(id=UUID))
+def get_external_link(request, id):
+    return ExternalLinkCollection(request.session).by_id(id)
