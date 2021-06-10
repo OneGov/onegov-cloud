@@ -662,8 +662,8 @@ def get_dashboard(request):
 
 
 @OrgApp.path(model=ExternalLinkCollection, path='/external-links')
-def get_external_link_collection(request, to=None, title=None):
-    return ExternalLinkCollection(request.session, to=to, title=title)
+def get_external_link_collection(request):
+    return ExternalLinkCollection(request.session)
 
 
 @OrgApp.path(model=ExternalLink, path='/external-link/{id}',

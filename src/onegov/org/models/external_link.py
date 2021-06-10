@@ -51,14 +51,10 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 class ExternalLinkCollection(GenericCollection):
 
     def __init__(
-            self, session, member_of=None, group=None, to=None, title=None):
+            self, session, member_of=None, group=None):
         super().__init__(session)
         self.member_of = member_of
         self.group = group
-
-        # used to redirect and the views
-        self.to = to
-        self.title = title
 
     @property
     def model_class(self):
