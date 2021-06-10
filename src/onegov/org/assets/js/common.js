@@ -254,3 +254,41 @@ $('.side-panel .expand-people a').on('click', function(e) {
     e.preventDefault()
     $(e.target).parent().parent().children().filter('.hideable').toggleClass('hidden')
 });
+
+// qr code modals
+function addModalImage(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt +';base64,' + rawData;
+    parent.append($(`<img class="qr" src="${src}">`));
+}
+
+function addModalDownload(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt +';base64,' + rawData;
+    var title = window.document.title;
+    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
+}
+
+$('.qr-code-link').each(function () {
+    var el = $(this);
+    var imageParentID = el.data('image-parent');
+    var imageParent = $(`#${imageParentID}`);
+    var payload = el.data('payload') || window.location.href;
+    var endpoint = el.data('endpoint');
+    var fmt = 'png';
+
+    el.on('click', function () {
+        if (imageParent.find('img.qr').length) return
+        $.ajax({
+            type: "GET",
+            contentType: "image/" + fmt,
+            url: `${endpoint}?encoding=base64&image_fmt=${fmt}&payload=${payload}`,
+            statusCode : {
+                200: function (resp) {
+                    addModalImage(imageParent, resp, fmt);
+                    addModalDownload(imageParent, resp, fmt);
+                }
+            }
+        }).fail(function(jqXHR) {
+            console.log(jqXHR.statusMessage);
+        })
+    })
+})
