@@ -81,7 +81,7 @@
 $more-link-icon: "\f054";
 
 @mixin more-link-after {
-    a::after {
+    a:not(.edit-link)::after {
         @include icon-bold($more-link-icon);
         float: right;
   }
@@ -114,6 +114,7 @@ $morelist-default-padding: .5rem 0;
         padding: $padding;
 
         .list-lead {
+            display: inline-block;
             max-width: 90%;
         }
 
@@ -131,7 +132,7 @@ $morelist-default-padding: .5rem 0;
         }
 
 
-        a {
+        a:not(.edit-link) {
             display: inline-block;
             font-weight: bold;
             width: 100%;
