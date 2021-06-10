@@ -15,6 +15,7 @@ from onegov.org.models import (
     ExportCollection, PublicationCollection, PageMove, News
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.utils import IMG_URLS
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
@@ -451,6 +452,14 @@ class FormCollectionLayout(DefaultLayout):
             Link(_("Forms"), '#')
         ]
 
+    @property
+    def forms_url(self):
+        return self.request.class_link(FormCollection)
+
+    @property
+    def external_forms(self):
+        return ExternalLinkCollection(self.request.session)
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
@@ -462,6 +471,19 @@ class FormCollectionLayout(DefaultLayout):
                             text=_("Form"),
                             url=self.request.link(
                                 self.model,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-form'}
+                        ),
+                        Link(
+                            text=_("External form"),
+                            url=self.request.link(
+                                self.external_forms,
+                                query_params={
+                                    'to': self.forms_url,
+                                    'title': self.request.translate(
+                                        _("New external form"))
+                                },
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}

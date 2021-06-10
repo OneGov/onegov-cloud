@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-08 16:32+0200\n"
+"POT-Creation-Date: 2021-06-10 08:56+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -337,7 +337,7 @@ msgid "Pattern"
 msgstr "Muster"
 
 msgid "External Link"
-msgstr "Externer Link"
+msgstr "Externe Verknüpfung"
 
 msgid "Visible"
 msgstr "Sichtbar"
@@ -615,14 +615,32 @@ msgstr "Das Publikationsende muss in der Zukunft liegen"
 msgid "Publication start must be prior to end"
 msgstr "Der Start der Publikation muss vor ihrem Ende liegen"
 
+msgid "Describes briefly what this entry is about"
+msgstr "Beschreibt kurz um was es beim Eintrag geht"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Url pointing to another website"
+msgstr "Url, der auf eine andere Website zeigt"
+
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Used to group this link in the overview"
+msgstr "Wird benutzt, um diesen Link in der Übersicht zu gruppieren"
+
+msgid "Name of the list view this link will be shown"
+msgstr "Name der Ansicht, wo dieser Eintrag erscheinen soll"
+
+msgid "Forms"
+msgstr "Formulare"
+
 msgid "Describes what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
 
 msgid "Text"
 msgstr "Text"
-
-msgid "Group"
-msgstr "Gruppe"
 
 msgid "Used to group the form in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
@@ -783,9 +801,6 @@ msgstr ""
 
 msgid "Recipient"
 msgstr "Empfänger"
-
-msgid "URL"
-msgstr "URL"
 
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
@@ -1432,9 +1447,6 @@ msgstr "den ganzen Tag"
 msgid "Homepage"
 msgstr "Startseite"
 
-msgid "Forms"
-msgstr "Formulare"
-
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -1468,6 +1480,12 @@ msgstr "Anmeldungszeitraum"
 
 msgid "Form"
 msgstr "Formular"
+
+msgid "External form"
+msgstr "Externes Formular"
+
+msgid "New external form"
+msgstr "Neues externes Formular"
 
 msgid "Person"
 msgstr "Person"
@@ -2172,7 +2190,7 @@ msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
 msgid "External link"
-msgstr "Externer Link"
+msgstr "Externe Verknüpfung"
 
 msgid "More information"
 msgstr "Weiterführende Informationen"
@@ -3745,6 +3763,15 @@ msgstr "Zugriff verweigert"
 msgid "Not Found"
 msgstr "Seite nicht gefunden"
 
+msgid "Added a new external form"
+msgstr "Neues externes Formular hinzugefügt"
+
+msgid "New external link"
+msgstr "Neuer externer Link"
+
+msgid "Edit external link"
+msgstr "Externe Verknüpfung bearbeiten"
+
 msgid "Manage Photo Albums"
 msgstr "Fotoalben verwalten"
 
@@ -3771,6 +3798,9 @@ msgstr "Diese Datei hat bereits eine digital Signatur"
 
 msgid "Your Yubikey could not be validated"
 msgstr "Ihr Yubikey konnte nicht validiert werden"
+
+msgid "Edit external form"
+msgstr "Externes Formular editieren"
 
 msgid "A form with this name already exists"
 msgstr "Ein Formular mit diesem Namen existiert bereits"
@@ -4389,6 +4419,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Add external form"
+#~ msgstr "Externes Formular hinzufügen"
 
 #~ msgid "Best regards,"
 #~ msgstr "Mit freundlichen Grüssen,"

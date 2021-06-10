@@ -37,6 +37,7 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
+from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
 from onegov.org.utils import IMG_URLS
@@ -890,6 +891,14 @@ class FormCollectionLayout(DefaultLayout):
             Link(_("Forms"), '#')
         ]
 
+    @property
+    def forms_url(self):
+        return self.request.class_link(FormCollection)
+
+    @property
+    def external_forms(self):
+        return ExternalLinkCollection(self.request.session)
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
@@ -901,6 +910,19 @@ class FormCollectionLayout(DefaultLayout):
                             text=_("Form"),
                             url=self.request.link(
                                 self.model,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-form'}
+                        ),
+                        Link(
+                            text=_("External form"),
+                            url=self.request.link(
+                                self.external_forms,
+                                query_params={
+                                    'to': self.forms_url,
+                                    'title': self.request.translate(
+                                        _("New external form"))
+                                },
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}

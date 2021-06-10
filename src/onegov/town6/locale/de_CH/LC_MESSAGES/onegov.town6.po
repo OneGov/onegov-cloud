@@ -459,7 +459,7 @@ msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
 msgid "External link"
-msgstr "Externer Link"
+msgstr "Externe Verknüpfung"
 
 msgid "More information"
 msgstr "Weiterführende Informationen"

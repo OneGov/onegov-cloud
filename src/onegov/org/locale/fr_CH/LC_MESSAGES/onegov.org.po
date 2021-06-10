@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-08 16:32+0200\n"
+"POT-Creation-Date: 2021-06-10 08:56+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -618,14 +618,32 @@ msgstr "La fin de la publication doit être dans le futur"
 msgid "Publication start must be prior to end"
 msgstr "Le début de la publication doit être antérieur à la fin"
 
+msgid "Describes briefly what this entry is about"
+msgstr "Décrit brièvement cette entrée"
+
+msgid "URL"
+msgstr "Lien"
+
+msgid "Url pointing to another website"
+msgstr "Url qui pointe vers une page externe"
+
+msgid "Group"
+msgstr "Groupe"
+
+msgid "Used to group this link in the overview"
+msgstr "Utilisé pour regrouper le lien dans la vue d'ensemble"
+
+msgid "Name of the list view this link will be shown"
+msgstr "Nom de la vue d'ensemble où ce lien apparaît"
+
+msgid "Forms"
+msgstr "Formulaires"
+
 msgid "Describes what this form is about"
 msgstr "Décrit le contenu de ce formulaire"
 
 msgid "Text"
 msgstr "Texte"
-
-msgid "Group"
-msgstr "Groupe"
 
 msgid "Used to group the form in the overview"
 msgstr "Utilisé pour grouper la formulaire dans la vue d'ensemble"
@@ -786,9 +804,6 @@ msgstr ""
 
 msgid "Recipient"
 msgstr "Destinataire"
-
-msgid "URL"
-msgstr "Lien"
 
 msgid "Describes what this page is about"
 msgstr "Décrit de quoi parle cette page"
@@ -1436,9 +1451,6 @@ msgstr "toute la journée"
 msgid "Homepage"
 msgstr "Page d'accueil"
 
-msgid "Forms"
-msgstr "Formulaires"
-
 msgid "Edit"
 msgstr "Modifier"
 
@@ -1472,6 +1484,12 @@ msgstr "Fenêtres d'inscription"
 
 msgid "Form"
 msgstr "Formulaire"
+
+msgid "External form"
+msgstr "Formulaire externe"
+
+msgid "New external form"
+msgstr "Nouveau formulaire externe"
 
 msgid "Person"
 msgstr "Personne"
@@ -3761,6 +3779,15 @@ msgstr "Accès refusé"
 msgid "Not Found"
 msgstr "Pas trouvé"
 
+msgid "Added a new external form"
+msgstr "A ajouté un nouveau formulaire externe"
+
+msgid "New external link"
+msgstr "Noveau lien externe"
+
+msgid "Edit external link"
+msgstr "Modifier le lien externe "
+
 msgid "Manage Photo Albums"
 msgstr "Gérer les albums photos"
 
@@ -3787,6 +3814,9 @@ msgstr "Ce fichier a déjà une signature électronique."
 
 msgid "Your Yubikey could not be validated"
 msgstr "Votre Yubikey n'a pas pu être validé."
+
+msgid "Edit external form"
+msgstr "Modifier le formulaire externe"
 
 msgid "A form with this name already exists"
 msgstr "Un formulaire avec ce nom existe déjà"
@@ -4406,6 +4436,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Add external form"
+#~ msgstr "Ajouter un formulaire externe"
 
 #~ msgid "Best regards,"
 #~ msgstr "Cordialement,"
