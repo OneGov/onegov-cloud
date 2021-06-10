@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import content_property, ContentMixin, \
+from onegov.core.orm.mixins import ContentMixin, \
     TimestampMixin, meta_property
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
