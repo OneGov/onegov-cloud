@@ -35,6 +35,8 @@ def edit_external_link(self, request, form, layout=None):
         to = request.params.get('to')
         return redirect(to or request.link(request.app.org))
 
+    form.process(obj=self)
+
     layout = layout or DefaultLayout(self, request)
     return {
         'layout': layout,
