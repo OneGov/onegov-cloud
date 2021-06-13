@@ -30,6 +30,7 @@
                 <th data-tablesaw-priority="4" i18n:translate="" class="column-invalid right-aligned">Invalid</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">Yes %</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">No %</th>
+                <th data-tablesaw-priority="5" i18n:translate="turnout_vote" class="column-turnout right-aligned" tal:condition="layout.completed">Turnout</th>
             </tr>
         </thead>
         <tbody>
@@ -50,6 +51,7 @@
                     <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
                     <td class="column-yeas-percentage right-aligned">${layout.format_number(result.yeas_percentage)}</td>
                     <td class="column-nays-percentage right-aligned">${layout.format_number(result.nays_percentage)}</td>
+                    <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(result.turnout)}</td>
                 </tal:b>
             </tr>
         </tbody>
@@ -66,6 +68,7 @@
                 <td class="column-invalid right-aligned">${layout.format_number(ballot.invalid)}</td>
                 <td class="column-yeas-percentage right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
                 <td class="column-nays-percentage right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
+                <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(ballot.turnout)}</td>
             </tr>
         </tfoot>
     </table>
@@ -103,8 +106,8 @@
                     <td class="right-aligned">${layout.format_number(result.nays)}</td>
                     <td class="right-aligned">${layout.format_number(result.empty)}</td>
                     <td class="right-aligned">${layout.format_number(result.invalid)}</td>
-                    <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
-                    <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
+                    <td class="right-aligned">${layout.format_number(result.yeas_percentage)} %</td>
+                    <td class="right-aligned">${layout.format_number(result.nays_percentage)} %</td>
                 </tal:b>
             </tr>
         </tbody>
@@ -118,8 +121,8 @@
                 <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
-                <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
-                <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
+                <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)} %</td>
+                <td class="right-aligned">${layout.format_number(ballot.nays_percentage)} %</td>
             </tr>
         </tfoot>
     </table>
