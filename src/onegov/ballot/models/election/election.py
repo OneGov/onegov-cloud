@@ -140,7 +140,7 @@ class Election(Base, ContentMixin, TimestampMixin,
         query = query.filter(ElectionResult.counted.is_(True))
         query = query.filter(ElectionResult.election_id == self.id)
         query = query.order_by(ElectionResult.name)
-        return [result.name for result in query.all()]
+        return [result.name for result in query.all() if result.name]
 
     @property
     def has_results(self):

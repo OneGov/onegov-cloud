@@ -139,6 +139,7 @@ class ManageLayout(DefaultLayout):
     def __init__(self, model, request):
         super().__init__(model, request)
         self.request.include('backend_common')
+        self.request.include('chosen')
         self.breadcrumbs = [
             (_("Manage"), super().manage_link, 'unavailable'),
         ]

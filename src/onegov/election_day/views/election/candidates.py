@@ -6,6 +6,7 @@ from onegov.election_day.hidden_by_principal import \
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from sqlalchemy.orm import object_session
@@ -30,12 +31,11 @@ def view_election_candidates_data(self, request):
 
     """
 
-    try:
-        limit = int(request.params.get('limit'))
-    except (TypeError, ValueError):
-        limit = None
+    limit = get_parameter(request, 'limit', int, None)
+    lists = get_parameter(request, 'lists', list, None)
+    elected = get_parameter(request, 'elected', bool, None)
 
-    return get_candidates_data(self, limit=limit)
+    return get_candidates_data(self, limit=limit, lists=lists, elected=elected)
 
 
 @ElectionDayApp.html(

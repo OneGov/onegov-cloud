@@ -33,7 +33,7 @@ class ScreenType:
         if self.type == 'complex_vote':
             return ('generic', 'vote', 'complex_vote')
         if self.type == 'majorz_election':
-            return ('generic', 'election')
+            return ('generic', 'election', 'majorz_election')
         if self.type == 'proporz_election':
             return ('generic', 'election', 'proporz_election')
         return ('generic', 'election_compound')

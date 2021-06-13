@@ -180,7 +180,7 @@ class Vote(Base, ContentMixin, TimestampMixin,
         query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
         query = query.order_by(BallotResult.name)
         query = query.distinct()
-        return [result.name for result in query.all()]
+        return [result.name for result in query.all() if result.name]
 
     #: the total yeas
     yeas = summarized_property('yeas')

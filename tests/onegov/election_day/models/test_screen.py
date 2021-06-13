@@ -43,7 +43,9 @@ def test_screen(session):
     assert screen.model == election
     assert screen.description == 'My Screen'
     assert screen.css == 'h1 { font-size: 20em; }'
-    assert screen.screen_type.categories == ('generic', 'election')
+    assert screen.screen_type.categories == (
+        'generic', 'election', 'majorz_election'
+    )
     assert screen.last_modified == datetime(2020, 1, 2, 4, tzinfo=timezone.utc)
 
     with freeze_time('2020-01-03 04:00'):

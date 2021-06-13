@@ -92,7 +92,7 @@ def get_aggregated_list_results(election, session, use_checks=False):
     }
 
 
-def get_list_results(election, limit=None):
+def get_list_results(election, limit=None, names=None):
     """ Returns the aggregated list results as list. """
 
     if isinstance(election, ElectionCompound):
@@ -105,15 +105,17 @@ def get_list_results(election, limit=None):
         List.name, List.votes.label('votes'),
         List.list_id, List.number_of_mandates
     )
-    result = result.order_by(desc(List.votes))
     result = result.filter(List.election_id == election.id)
+    if names:
+        result = result.filter(List.name.in_(names))
+    result = result.order_by(desc(List.votes))
     if limit and limit > 0:
         result = result.limit(limit)
 
     return result
 
 
-def get_lists_data(election, limit=None, mandates_only=False):
+def get_lists_data(election, limit=None, names=None, mandates_only=False):
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     completed = election.completed
@@ -123,28 +125,35 @@ def get_lists_data(election, limit=None, mandates_only=False):
     if isinstance(election, ElectionCompound):
         if not mandates_only:
             return {
-                'results': [{
-                    'text': list_.name,
-                    'value': list_.votes,
-                    'value2': list_.number_of_mandates,
-                    'class': 'active' if completed else 'inactive',
-                    'color': colors.get(list_.name) or default_color
-                } for list_ in election.get_list_results(
-                    limit=limit
-                )]
+                'results': [
+                    {
+                        'text': list_.name,
+                        'value': list_.votes,
+                        'value2': list_.number_of_mandates,
+                        'class': 'active' if completed else 'inactive',
+                        'color': colors.get(list_.name) or default_color
+                    }
+                    for list_ in election.get_list_results(
+                        limit=limit, names=names
+                    )
+                ]
             }
         else:
             return {
-                'results': [{
-                    'text': list_.name,
-                    'value': list_.number_of_mandates,
-                    'value2': None,
-                    'class': 'active' if completed else 'inactive',
-                    'color': colors.get(list_.name) or default_color
-                } for list_ in election.get_list_results(
-                    limit=limit,
-                    order_by='number_of_mandates'
-                )]
+                'results': [
+                    {
+                        'text': list_.name,
+                        'value': list_.number_of_mandates,
+                        'value2': None,
+                        'class': 'active' if completed else 'inactive',
+                        'color': colors.get(list_.name) or default_color
+                    }
+                    for list_ in election.get_list_results(
+                        limit=limit,
+                        names=names,
+                        order_by='number_of_mandates'
+                    )
+                ]
             }
 
     if election.type == 'majorz':
@@ -155,16 +164,19 @@ def get_lists_data(election, limit=None, mandates_only=False):
         }
 
     return {
-        'results': [{
-            'text': list_.name,
-            'value': list_.votes,
-            'value2': list_.number_of_mandates if completed else None,
-            'class': (
-                'active' if completed and list_.number_of_mandates
-                else 'inactive'
-            ),
-            'color': colors.get(list_.name) or default_color
-        } for list_ in get_list_results(election, limit=limit)],
+        'results': [
+            {
+                'text': list_.name,
+                'value': list_.votes,
+                'value2': list_.number_of_mandates if completed else None,
+                'class': (
+                    'active' if completed and list_.number_of_mandates
+                    else 'inactive'
+                ),
+                'color': colors.get(list_.name) or default_color
+            }
+            for list_ in get_list_results(election, limit=limit, names=names)
+        ],
         'majority': None,
         'title': election.title
     }

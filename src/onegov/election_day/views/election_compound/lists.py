@@ -3,6 +3,7 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout, ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
 
@@ -16,13 +17,12 @@ def view_election_compound_lists_data(self, request):
 
     """" View the lists as JSON. Used to for the lists bar chart. """
 
-    try:
-        limit = int(request.params.get('limit'))
-    except (TypeError, ValueError):
-        limit = None
+    limit = get_parameter(request, 'limit', int, None)
+    names = get_parameter(request, 'names', list, None)
 
     return get_lists_data(
-        self, limit=limit, mandates_only=self.after_pukelsheim
+        self, limit=limit, names=names,
+        mandates_only=self.after_pukelsheim
     )
 
 

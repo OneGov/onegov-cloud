@@ -1067,6 +1067,24 @@ def test_list_results(session):
         ('Kwik-E-Major', 0, 333),
     ]
 
+    # ... names
+    assert election_compound.get_list_results(names=[]).all() == [
+        ('Quimby Again!', 3, 1560),
+        ('Kwik-E-Major', 0, 333),
+        ('Burns burns!', 5, 200)
+    ]
+    assert election_compound.get_list_results(names=None).all() == [
+        ('Quimby Again!', 3, 1560),
+        ('Kwik-E-Major', 0, 333),
+        ('Burns burns!', 5, 200)
+    ]
+    assert election_compound.get_list_results(
+        names=['Quimby Again!', 'Kwik-E-Major', 'All others']
+    ).all() == [
+        ('Quimby Again!', 3, 1560),
+        ('Kwik-E-Major', 0, 333),
+    ]
+
     # ... order_by
     assert election_compound.get_list_results(
         order_by='number_of_mandates'
@@ -1076,10 +1094,11 @@ def test_list_results(session):
         ('Kwik-E-Major', 0, 333)
     ]
 
-    # ... limit & order_by
+    # ... limit & names & order_by
     assert election_compound.get_list_results(
         limit=1,
+        names=['Quimby Again!'],
         order_by='number_of_mandates'
     ).all() == [
-        ('Burns burns!', 5, 200),
+        ('Quimby Again!', 3, 1560),
     ]

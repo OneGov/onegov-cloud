@@ -1,6 +1,9 @@
 from onegov.ballot import Candidate
+from onegov.ballot import CandidateResult
 from onegov.ballot import Election
+from onegov.ballot import ElectionResult
 from onegov.ballot import List
+from onegov.core.utils import groupbylist
 from sqlalchemy import desc
 from sqlalchemy.orm import object_session
 
@@ -39,13 +42,30 @@ def get_candidates_results(election, session):
     return result
 
 
-def get_candidates_data(election, limit=None):
-    """" Get the candidates as JSON. Used to for the candidates bar chart. """
+def get_candidates_data(election, limit=None, lists=None, elected=None):
+    """" Get the candidates as JSON. Used to for the candidates bar chart.
 
-    colors = election.colors
-    default_color = '#999' if election.colors else ''
+    Allows to optionally
+    - return only the first ``limit`` results.
+    - return only results for candidates within the given list names (proporz)
+      or party names (majorz).
+    - return only elected candidates. If not specified, only elected candidates
+      are returned for proporz elections, all for majorz elections.
+
+    """
 
     session = object_session(election)
+
+    list_names = {}
+    colors = election.colors
+    default_color = '#999' if election.colors else ''
+    if election.type == 'proporz':
+        list_names = dict(session.query(List.id, List.name).all())
+        colors = {
+            list_id: election.colors[name]
+            for list_id, name in list_names.items()
+            if name in election.colors
+        }
 
     candidates = session.query(
         Candidate.family_name,
@@ -71,6 +91,19 @@ def get_candidates_data(election, limit=None):
             Candidate.first_name
         )
 
+    if lists:
+        if election.type == 'majorz':
+            candidates = candidates.filter(Candidate.party.in_(lists))
+        else:
+            list_ids = {
+                id_ for id_, name in list_names.items() if name in lists
+            }
+            candidates = candidates.filter(Candidate.list_id.in_(list_ids))
+
+    elected = election.type == 'proporz' if elected is None else elected
+    if elected:
+        candidates = candidates.filter(Candidate.elected == True)
+
     majority = 0
     if (
         election.type == 'majorz'
@@ -79,15 +112,6 @@ def get_candidates_data(election, limit=None):
         and election.completed
     ):
         majority = election.absolute_majority
-
-    if election.type == 'proporz':
-        candidates = candidates.filter(Candidate.elected == True)
-
-        colors = {
-            list_id: election.colors[name]
-            for list_id, name in session.query(List.id, List.name)
-            if name in election.colors
-        }
 
     if limit and limit > 0:
         candidates = candidates.limit(limit)
@@ -140,3 +164,37 @@ def get_elected_candidates(election_compound, session):
     elected = elected.filter(Candidate.elected.is_(True))
 
     return elected
+
+
+def get_candidates_results_by_entity(election):
+    """ Returns the candidates results by entity. """
+
+    session = object_session(election)
+
+    candidates = session.query(
+        Candidate.family_name,
+        Candidate.first_name,
+        Candidate.votes.label('votes')
+    )
+    candidates = candidates.order_by(
+        Candidate.family_name,
+        Candidate.first_name
+    )
+    candidates = candidates.filter(Candidate.election_id == election.id)
+
+    results = session.query(
+        ElectionResult.name,
+        Candidate.family_name,
+        Candidate.first_name,
+        CandidateResult.votes
+    )
+    results = results.outerjoin(Candidate, ElectionResult)
+    results = results.filter(ElectionResult.election_id == election.id)
+    results = results.filter(Candidate.election_id == election.id)
+    results = results.order_by(
+        ElectionResult.name,
+        Candidate.family_name,
+        Candidate.first_name
+    )
+
+    return candidates.all(), groupbylist(results, key=lambda x: x[0])

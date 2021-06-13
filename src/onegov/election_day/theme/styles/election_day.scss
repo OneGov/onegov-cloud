@@ -915,6 +915,10 @@ ul.pagination li.last {
 /*
     Chosen
 */
+.field-type-chosenselectfield .chosen-select {
+    display: none !important;
+}
+
 .chosen-container {
     margin: 0 0 1rem;
 }

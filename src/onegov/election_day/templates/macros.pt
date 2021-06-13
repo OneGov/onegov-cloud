@@ -351,6 +351,7 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
+        tal:define="lists [n.strip() for n in lists.split(',') if n.strip()]|[]"
         >
         <thead>
             <tr>
@@ -362,22 +363,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
-                <td class="column-candidate">${candidate.family_name} ${candidate.first_name}</td>
-                <td tal:condition="not:layout.tacit" class="column-votes right-aligned" data-text="${candidate.votes}">${layout.format_number(candidate.votes)}</td>
-                <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>
-                <td tal:condition="layout.proporz" class="column-list right-aligned">${candidate.name}</td>
-                <tal:block tal:switch="election.completed">
-                    <tal:block tal:case="True">
-                        <td class="column-elected answer accepted right-aligned" tal:condition="candidate.elected is True" i18n:translate="">Yes</td>
-                        <td class="column-elected answer rejected right-aligned" tal:condition="candidate.elected is False" i18n:translate="">No</td>
-                        <td class="column-elected answer right-aligned" tal:condition="candidate.elected is None" i18n:translate=""></td>
+            <tal:block tal:repeat="candidate candidates">
+                <tr tal:condition="not lists or candidate.party in lists or candidate.name in lists" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
+                    <td class="column-candidate">${candidate.family_name} ${candidate.first_name}</td>
+                    <td tal:condition="not:layout.tacit" class="column-votes right-aligned" data-text="${candidate.votes}">${layout.format_number(candidate.votes)}</td>
+                    <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>
+                    <td tal:condition="layout.proporz" class="column-list right-aligned">${candidate.name}</td>
+                    <tal:block tal:switch="election.completed">
+                        <tal:block tal:case="True">
+                            <td class="column-elected answer accepted right-aligned" tal:condition="candidate.elected is True" i18n:translate="">Yes</td>
+                            <td class="column-elected answer rejected right-aligned" tal:condition="candidate.elected is False" i18n:translate="">No</td>
+                            <td class="column-elected answer right-aligned" tal:condition="candidate.elected is None" i18n:translate=""></td>
+                        </tal:block>
+                        <tal:block tal:case="False">
+                            <td class="column-elected right-aligned" i18n:translate>n.a.</td>
+                        </tal:block>
                     </tal:block>
-                    <tal:block tal:case="False">
-                        <td class="column-elected right-aligned" i18n:translate>n.a.</td>
-                    </tal:block>
-                </tal:block>
-            </tr>
+                </tr>
+            </tal:block>
         </tbody>
         <tfoot>
             <tr class="more" tal:condition="not: election.tacit">
@@ -390,12 +393,48 @@
     </table>
 </metal:election-candidates-table>
 
+<metal:election-candidates-by-entity-table define-macro="election-candidates-by-entity-table" i18n:domain="onegov.election_day">
+    <table
+        tal:condition="layout.has_candidates"
+        class="election-candidates-by-entity-table results tablesaw sortable"
+        data-tablesaw-mode="columntoggle"
+        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+        data-tablesaw-minimap=""
+        tal:define="candidates candidates_by_entites[0]; results candidates_by_entites[1]"
+        >
+        <thead>
+            <tr>
+                <td data-tablesaw-priority="persist" class="column-entity" i18n:translate="">${layout.principal.label('entity')}</td>
+                <td data-tablesaw-priority="1" class="column-candidate right-aligned" tal:repeat="candidate candidates">${candidate.family_name} ${candidate.first_name}</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="result results">
+                <td class="column-entity" i18n:translate="">${result[0]}</td>
+                <td class="column-candidate right-aligned" tal:repeat="candidate result[1]">${layout.format_number(candidate.votes)}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="column-entity" i18n:translate="">${layout.principal.label('entity')}</td>
+                <td class="column-candidate right-aligned" tal:repeat="candidate candidates">${candidate.family_name} ${candidate.first_name}</td>
+            </tr>
+            <tr>
+                <td class="column-entity" i18n:translate="">Total</td>
+                <td class="column-candidate right-aligned" tal:repeat="candidate candidates">${layout.format_number(candidate.votes)}</td>
+            </tr>
+        </tfoot>
+    </table>
+</metal:election-candidates-by-entity-table>
+
+
 <metal:election-lists-table define-macro="election-lists-table" i18n:domain="onegov.election_day">
     <table
         class="election-lists-table results tablesaw sortable"
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
+        tal:define="names [n.strip() for n in names.split(',') if n.strip()]|[]"
         >
         <thead>
             <tr>
@@ -405,12 +444,14 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="list lists">
-                <td class="column-list">${list.name}</td>
-                <td class="right-aligned column-votes" data-text="${list.votes or 0}">${layout.format_number(list.votes or 0)}</td>
-                <td tal:condition="election.completed" class="column-mandates right-aligned">${list.number_of_mandates}</td>
-                <td tal:condition="not: election.completed" class="column-mandates right-aligned" i18n:translate>n.a.</td>
-            </tr>
+            <tal:block tal:repeat="list lists">
+                <tr tal:condition="not names or list.name in names">
+                    <td class="column-list">${list.name}</td>
+                    <td class="right-aligned column-votes" data-text="${list.votes or 0}">${layout.format_number(list.votes or 0)}</td>
+                    <td tal:condition="election.completed" class="column-mandates right-aligned">${list.number_of_mandates}</td>
+                    <td tal:condition="not: election.completed" class="column-mandates right-aligned" i18n:translate>n.a.</td>
+                </tr>
+            </tal:block>
         </tbody>
     </table>
 </metal:election-lists-table>
@@ -421,6 +462,7 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
+        tal:define="names names|''"
         >
         <thead>
             <tr>
@@ -431,12 +473,14 @@
         </thead>
         <tbody>
             <tr tal:repeat="list lists">
-                <td class="column-list">${list.name}</td>
-                <td class="column-votes right-aligned" data-text="${list.votes or 0}">${layout.format_number(list.votes or 0)}</td>
-                <tal:b tal:switch="python: (election.after_pukelsheim or election.completed)">
-                    <td tal:case="True" class="column-mandates right-aligned">${list.number_of_mandates}</td>
-                    <td tal:case="False" class="column-mandates right-aligned" i18n:translate>n.a.</td>
-                </tal:b>
+                <tal:block tal:condition="not names or list.name in [n.strip() for n in names.split(',')]">
+                    <td class="column-list">${list.name}</td>
+                    <td class="column-votes right-aligned" data-text="${list.votes or 0}">${layout.format_number(list.votes or 0)}</td>
+                    <tal:b tal:switch="python: (election.after_pukelsheim or election.completed)">
+                        <td tal:case="True" class="column-mandates right-aligned">${list.number_of_mandates}</td>
+                        <td tal:case="False" class="column-mandates right-aligned" i18n:translate>n.a.</td>
+                    </tal:b>
+                </tal:block>
             </tr>
         </tbody>
     </table>
@@ -466,36 +510,36 @@
 </metal:ballot-result-bar>
 
 <metal:candidates-chart define-macro="candidates-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''">
+    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|'';">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit})}"
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected})}"
                 data-embed-link="Embed"
                 data-embed-source="${request.link(model, name='candidates-chart')}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit})}">
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected})}">
             </div>
         </tal:block>
     </tal:block>
 </metal:candidates-chart i18n:domain="onegov.election_day">
 
 <metal:lists-chart define-macro="lists-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''">
+    <tal:block tal:define="limit limit|''; names names|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit})}"
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names})}"
                 data-embed-link="Embed"
                 data-embed-source="${request.link(model, name='lists-chart')}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit})}">
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names})}">
             </div>
         </tal:block>
     </tal:block>

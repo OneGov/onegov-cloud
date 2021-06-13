@@ -2,6 +2,7 @@ from datetime import date
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
+from onegov.election_day.utils.election import get_candidates_results_by_entity
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
@@ -32,6 +33,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         'SVP': '#3f841a',
     }
 
+    # get_candidates_results
     assert tuple(get_candidates_results(election, session)) == (
         (('Hegglin', 'Peter', True, 'CVP', 24132, None, None),
          ('Eder', 'Joachim', True, 'FDP', 23620, None, None),
@@ -41,6 +43,7 @@ def test_election_utils_majorz(import_test_datasets, session):
          ('Thöni', 'Stefan', False, 'Piraten', 1709, None, None))
     )
 
+    # get_candidates_data
     expected = [
         {
             'class': 'active',
@@ -84,18 +87,45 @@ def test_election_utils_majorz(import_test_datasets, session):
         'title': 'majorz_internal_staenderatswahl-2015-parties',
         'results': expected,
     }
+
+    # ... invalid filters
     for limit in (0, None, -3):
         assert get_candidates_data(election, limit=limit) == {
             'majority': 18191,
             'title': 'majorz_internal_staenderatswahl-2015-parties',
             'results': expected,
         }
+    for lists in ([], None):
+        assert get_candidates_data(election, lists=lists) == {
+            'majority': 18191,
+            'title': 'majorz_internal_staenderatswahl-2015-parties',
+            'results': expected,
+        }
+
+    # ... valid filters
     assert get_candidates_data(election, limit=3) == {
         'majority': 18191,
         'title': 'majorz_internal_staenderatswahl-2015-parties',
         'results': expected[:3],
     }
+    assert get_candidates_data(election, lists=['SP', 'ALG', 'GLP']) == {
+        'majority': 18191,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': expected[3:5],
+    }
+    assert get_candidates_data(election, elected=True) == {
+        'majority': 18191,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': expected[:2],
+    }
+    assert get_candidates_data(election, limit=1,
+                               lists=['SP', 'ALG', 'GLP']) == {
+        'majority': 18191,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': expected[3:4],
+    }
 
+    # get_list_results
     assert tuple(get_list_results(election)) == tuple()
     assert tuple(get_list_results(election, limit=0)) == tuple()
     assert tuple(get_list_results(election, limit=None)) == tuple()
@@ -106,17 +136,122 @@ def test_election_utils_majorz(import_test_datasets, session):
         'title': 'majorz_internal_staenderatswahl-2015-parties',
         'results': [],
     }
+
+    # ... invalid filters
     for limit in (0, None, -3):
         assert get_lists_data(election, limit=limit) == {
             'majority': None,
             'title': 'majorz_internal_staenderatswahl-2015-parties',
             'results': [],
         }
+
+    # ... valid filters
     assert get_lists_data(election, limit=3) == {
         'majority': None,
         'title': 'majorz_internal_staenderatswahl-2015-parties',
         'results': [],
     }
+
+    # get_candidates_results_by_entity
+    candidates, entities = get_candidates_results_by_entity(election)
+    assert candidates == [
+        ('Brandenberg', 'Manuel', 10997),
+        ('Eder', 'Joachim', 23620),
+        ('Gysel', 'Barbara', 6612),
+        ('Hegglin', 'Peter', 24132),
+        ('Lustenberger', 'Andreas', 5691),
+        ('Thöni', 'Stefan', 1709)
+    ]
+    assert entities == [
+        ('Baar', [
+            ('Baar', 'Brandenberg', 'Manuel', 2100),
+            ('Baar', 'Eder', 'Joachim', 4237),
+            ('Baar', 'Gysel', 'Barbara', 1264),
+            ('Baar', 'Hegglin', 'Peter', 4207),
+            ('Baar', 'Lustenberger', 'Andreas', 1269),
+            ('Baar', 'Thöni', 'Stefan', 320)
+        ]),
+        ('Cham', [
+            ('Cham', 'Brandenberg', 'Manuel', 1404),
+            ('Cham', 'Eder', 'Joachim', 2726),
+            ('Cham', 'Gysel', 'Barbara', 888),
+            ('Cham', 'Hegglin', 'Peter', 2905),
+            ('Cham', 'Lustenberger', 'Andreas', 685),
+            ('Cham', 'Thöni', 'Stefan', 232)
+        ]),
+        ('Hünenberg', [
+            ('Hünenberg', 'Brandenberg', 'Manuel', 881),
+            ('Hünenberg', 'Eder', 'Joachim', 2098),
+            ('Hünenberg', 'Gysel', 'Barbara', 540),
+            ('Hünenberg', 'Hegglin', 'Peter', 2205),
+            ('Hünenberg', 'Lustenberger', 'Andreas', 397),
+            ('Hünenberg', 'Thöni', 'Stefan', 140)
+        ]),
+        ('Menzingen', [
+            ('Menzingen', 'Brandenberg', 'Manuel', 460),
+            ('Menzingen', 'Eder', 'Joachim', 1042),
+            ('Menzingen', 'Gysel', 'Barbara', 198),
+            ('Menzingen', 'Hegglin', 'Peter', 1376),
+            ('Menzingen', 'Lustenberger', 'Andreas', 190),
+            ('Menzingen', 'Thöni', 'Stefan', 54)
+        ]),
+        ('Neuheim', [
+            ('Neuheim', 'Brandenberg', 'Manuel', 235),
+            ('Neuheim', 'Eder', 'Joachim', 453),
+            ('Neuheim', 'Gysel', 'Barbara', 92),
+            ('Neuheim', 'Hegglin', 'Peter', 511),
+            ('Neuheim', 'Lustenberger', 'Andreas', 94),
+            ('Neuheim', 'Thöni', 'Stefan', 26)
+        ]),
+        ('Oberägeri', [
+            ('Oberägeri', 'Brandenberg', 'Manuel', 656),
+            ('Oberägeri', 'Eder', 'Joachim', 1380),
+            ('Oberägeri', 'Gysel', 'Barbara', 191),
+            ('Oberägeri', 'Hegglin', 'Peter', 1276),
+            ('Oberägeri', 'Lustenberger', 'Andreas', 150),
+            ('Oberägeri', 'Thöni', 'Stefan', 72)
+        ]),
+        ('Risch', [
+            ('Risch', 'Brandenberg', 'Manuel', 1041),
+            ('Risch', 'Eder', 'Joachim', 1797),
+            ('Risch', 'Gysel', 'Barbara', 391),
+            ('Risch', 'Hegglin', 'Peter', 1730),
+            ('Risch', 'Lustenberger', 'Andreas', 362),
+            ('Risch', 'Thöni', 'Stefan', 137)
+        ]),
+        ('Steinhausen', [
+            ('Steinhausen', 'Brandenberg', 'Manuel', 789),
+            ('Steinhausen', 'Eder', 'Joachim', 1827),
+            ('Steinhausen', 'Gysel', 'Barbara', 523),
+            ('Steinhausen', 'Hegglin', 'Peter', 1883),
+            ('Steinhausen', 'Lustenberger', 'Andreas', 490),
+            ('Steinhausen', 'Thöni', 'Stefan', 171)
+        ]),
+        ('Unterägeri', [
+            ('Unterägeri', 'Brandenberg', 'Manuel', 860),
+            ('Unterägeri', 'Eder', 'Joachim', 2054),
+            ('Unterägeri', 'Gysel', 'Barbara', 320),
+            ('Unterägeri', 'Hegglin', 'Peter', 1779),
+            ('Unterägeri', 'Lustenberger', 'Andreas', 258),
+            ('Unterägeri', 'Thöni', 'Stefan', 85)
+        ]),
+        ('Walchwil', [
+            ('Walchwil', 'Brandenberg', 'Manuel', 416),
+            ('Walchwil', 'Eder', 'Joachim', 756),
+            ('Walchwil', 'Gysel', 'Barbara', 151),
+            ('Walchwil', 'Hegglin', 'Peter', 801),
+            ('Walchwil', 'Lustenberger', 'Andreas', 93),
+            ('Walchwil', 'Thöni', 'Stefan', 39)
+        ]),
+        ('Zug', [
+            ('Zug', 'Brandenberg', 'Manuel', 2155),
+            ('Zug', 'Eder', 'Joachim', 5250),
+            ('Zug', 'Gysel', 'Barbara', 2054),
+            ('Zug', 'Hegglin', 'Peter', 5459),
+            ('Zug', 'Lustenberger', 'Andreas', 1703),
+            ('Zug', 'Thöni', 'Stefan', 433)
+        ])
+    ]
 
 
 def test_election_utils_proporz(import_test_datasets, session):
@@ -138,6 +273,7 @@ def test_election_utils_proporz(import_test_datasets, session):
         'SVP': '#3f841a',
     }
 
+    # get_candidates_results
     assert tuple(get_candidates_results(election, session)) == (
         ('Lustenberger', 'Andreas', False, '', 3240, 'ALG', '1'),
         ('Estermann', 'Astrid', False, '', 1327, 'ALG', '1'),
@@ -191,6 +327,7 @@ def test_election_utils_proporz(import_test_datasets, session):
         ('Thöni', 'Stefan', False, '', 488, 'Piraten', '9')
     )
 
+    # get_candidates_data
     expected = [
         {
             'class': 'active',
@@ -216,18 +353,60 @@ def test_election_utils_proporz(import_test_datasets, session):
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': expected,
     }
+
+    # ... invalid filters
     for limit in (0, None, -3):
         assert get_candidates_data(election, limit=limit) == {
             'majority': 0,
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
         }
-    assert get_candidates_data(election, limit=3) == {
+    for lists in ([], None):
+        assert get_candidates_data(election, lists=lists) == {
+            'majority': 0,
+            'title': 'proporz_internal_nationalratswahlen-2015',
+            'results': expected,
+        }
+
+    # ... valid filters
+    assert get_candidates_data(election, limit=2) == {
         'majority': 0,
         'title': 'proporz_internal_nationalratswahlen-2015',
-        'results': expected[:3],
+        'results': expected[:2],
+    }
+    assert get_candidates_data(election, lists=['FDP Ost', 'CVP', 'GLP']) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': expected[1:],
+    }
+    assert len(get_candidates_data(election, elected=False)['results']) == 50
+    assert get_candidates_data(election, limit=1,
+                               lists=['FDP Ost', 'CVP', 'GLP']) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': expected[1:2],
+    }
+    assert get_candidates_data(election, limit=2, elected=False,
+                               lists=['CVP']) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'text': 'Pfister Gerhard',
+                'value': 16134
+            },
+            {
+                'class': 'inactive',
+                'color': '#ff6300',
+                'text': 'Barmet-Schelbert Monika',
+                'value': 4093
+            }
+        ]
     }
 
+    # get_list_results
     expected = (
         ('SVP', 30532, '15', 1),
         ('CVP', 24335, '4', 1),
@@ -248,10 +427,24 @@ def test_election_utils_proporz(import_test_datasets, session):
         ('SP Migrant.', 347, '14', 0)
     )
     assert tuple(get_list_results(election)) == expected
+
+    # ... invalid filters
     for limit in (0, None, -3):
         assert tuple(get_list_results(election, limit=limit)) == expected
-    assert tuple(get_list_results(election, limit=3)) == expected[:3]
+    for names in ([], None):
+        assert tuple(get_list_results(election, names=names)) == expected
 
+    # ... valid filters
+    assert tuple(get_list_results(election, limit=3)) == expected[:3]
+    names = ['SP Juso', 'SP Alle', 'SP Männer', 'SP Frauen']
+    assert tuple(get_list_results(election, names=names)) == tuple(
+        (e for e in expected if e[0] in names)
+    )
+    assert tuple(get_list_results(election, limit=2, names=names)) == tuple(
+        (e for e in expected if e[0] in names)
+    )[:2]
+
+    # get_lists_data
     expected = [
         {
             'class': 'active',
@@ -377,16 +570,37 @@ def test_election_utils_proporz(import_test_datasets, session):
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': expected,
     }
+
+    # ... invalid filters
     for limit in (0, None, -3):
         assert get_lists_data(election, limit=limit) == {
             'majority': None,
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
         }
+    for names in ([], None):
+        assert get_lists_data(election, names=names) == {
+            'majority': None,
+            'title': 'proporz_internal_nationalratswahlen-2015',
+            'results': expected,
+        }
+
+    # ... valid filters
     assert get_lists_data(election, limit=3) == {
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': expected[:3],
+    }
+    names = ['SP Juso', 'SP Alle', 'SP Männer', 'SP Frauen']
+    assert get_lists_data(election, names=names) == {
+        'majority': None,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [e for e in expected if e['text'] in names],
+    }
+    assert get_lists_data(election, limit=2, names=names) == {
+        'majority': None,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [e for e in expected if e['text'] in names][:2],
     }
 
 

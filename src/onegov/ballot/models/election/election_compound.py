@@ -323,7 +323,7 @@ class ElectionCompound(
 
         return result
 
-    def get_list_results(self, limit=None, order_by='votes'):
+    def get_list_results(self, limit=None, names=None, order_by='votes'):
         """ Returns the aggregated number of mandates and votes of all the
         lists.
 
@@ -338,12 +338,10 @@ class ElectionCompound(
             func.sum(List.number_of_mandates).label('number_of_mandates'),
             literal_column('0').label('votes')
         )
-        mandates = mandates.join(
-            ElectionCompound.associations
-        )
-        mandates = mandates.filter(
-            ElectionCompound.id == self.id,
-        )
+        mandates = mandates.join(ElectionCompound.associations)
+        mandates = mandates.filter(ElectionCompound.id == self.id)
+        if names:
+            mandates = mandates.filter(List.name.in_(names))
         mandates = mandates.join(Election, List)
         mandates = mandates.group_by(List.name)
 
@@ -353,12 +351,10 @@ class ElectionCompound(
             literal_column('0').label('number_of_mandates'),
             func.sum(ListResult.votes).label('votes')
         )
-        votes = votes.join(
-            ElectionCompound.associations
-        )
-        votes = votes.filter(
-            ElectionCompound.id == self.id,
-        )
+        votes = votes.join(ElectionCompound.associations)
+        votes = votes.filter(ElectionCompound.id == self.id)
+        if names:
+            votes = votes.filter(List.name.in_(names))
         votes = votes.join(Election, List, ListResult)
         votes = votes.group_by(List.name)
 

@@ -100,3 +100,28 @@ def add_local_results(source, target, principal, session):
                 target.local_answer = answer
                 target.local_yeas_percentage = yeas
                 target.local_nays_percentage = 100 - yeas
+
+
+def get_parameter(request, name, type_, default):
+    if type_ == int:
+        try:
+            return int(request.params.get(name))
+        except Exception:
+            return default
+
+    if type_ == list:
+        try:
+            result = request.params[name].split(',')
+            result = [item.strip() for item in result if item.strip()]
+            return result if result else default
+        except Exception:
+            return default
+
+    if type_ == bool:
+        try:
+            result = request.params[name].lower().strip()
+            return result in ('true', '1') if result else default
+        except Exception:
+            return default
+
+    raise NotImplementedError()

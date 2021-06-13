@@ -1,6 +1,7 @@
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election import get_candidates_results
+from onegov.election_day.utils.election import get_candidates_results_by_entity
 from onegov.election_day.utils.election import get_elected_candidates
 from onegov.election_day.utils.election import get_list_results
 
@@ -13,14 +14,14 @@ class ElectionCandidatesTableWidget(ModelBoundWidget):
     tag = 'election-candidates-table'
     template = """
         <xsl:template match="election-candidates-table">
-            <div class="{@class}">
+            <div class="{@class}" tal:define="lists '{@lists}'">
                 <tal:block
                     metal:use-macro="layout.macros['election-candidates-table']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-candidates-table class=""/>'
+    usage = '<election-candidates-table class="" lists=","/>'
 
     def get_variables(self, layout):
         model = self.model or layout.model
@@ -66,6 +67,32 @@ class ElectionCompoundCandidatesTableWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
+    tag='election-candidates-by-entity-table',
+    category='majorz_election'
+)
+class ElectionCandidatesByEntityTableWidget(ModelBoundWidget):
+    tag = 'election-candidates-by-entity-table'
+    template = """
+        <xsl:template match="election-candidates-by-entity-table">
+            <div class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['election-candidates-by-entity-table']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-candidates-by-entity-table class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        candidates_by_entites = get_candidates_results_by_entity(model)
+        return {
+            'election': model,
+            'candidates_by_entites': candidates_by_entites,
+        }
+
+
+@ElectionDayApp.screen_widget(
     tag='election-lists-table',
     category='proporz_election'
 )
@@ -73,14 +100,14 @@ class ElectionListsTableWidget(ModelBoundWidget):
     tag = 'election-lists-table'
     template = """
         <xsl:template match="election-lists-table">
-            <div class="{@class}">
+            <div class="{@class}" tal:define="names '{@names}'">
                 <tal:block
                     metal:use-macro="layout.macros['election-lists-table']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-lists-table class=""/>'
+    usage = '<election-lists-table class="" names=","/>'
 
     def get_variables(self, layout):
         model = self.model or layout.model
@@ -99,14 +126,14 @@ class ElectionCompoundListsTableWidget(ModelBoundWidget):
     tag = 'election-compound-lists-table'
     template = """
         <xsl:template match="election-compound-lists-table">
-            <div class="{@class}">
+            <div class="{@class}" tal:define="names '{@names}'">
                 <tal:block
                     metal:use-macro="layout.macros['election-compound-lists-table']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-compound-lists-table class=""/>'
+    usage = '<election-compound-lists-table class="" names=","/>'
 
     def get_variables(self, layout):
         model = self.model or layout.model
@@ -162,14 +189,19 @@ class ElectionCandidatesChartWidget(ChartWidget):
     tag = 'election-candidates-chart'
     template = """
         <xsl:template match="election-candidates-chart">
-            <div class="{@class}" tal:define="limit '0{@limit}'">
+            <div class="{@class}"
+                 tal:define="limit '0{@limit}';
+                             lists '{@lists}';
+                             elected '{@elected}'">
                 <tal:block
                     metal:use-macro="layout.macros['candidates-chart']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-candidates-chart limit="" class=""/>'
+    usage = (
+        '<election-candidates-chart limit="" lists="," elected="" class=""/>'
+    )
 
 
 @ElectionDayApp.screen_widget(
@@ -180,14 +212,16 @@ class ElectionListsChartWidget(ChartWidget):
     tag = 'election-lists-chart'
     template = """
         <xsl:template match="election-lists-chart">
-            <div class="{@class}" tal:define="limit '0{@limit}'">
+            <div class="{@class}"
+                 tal:define="limit '0{@limit}'; names '{@names}'"
+                 >
                 <tal:block
                     metal:use-macro="layout.macros['lists-chart']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-lists-chart limit="" class=""/>'
+    usage = '<election-lists-chart limit="" names="," class=""/>'
 
 
 @ElectionDayApp.screen_widget(
@@ -198,11 +232,13 @@ class ElectionCompoundListsChartWidget(ChartWidget):
     tag = 'election-compound-lists-chart'
     template = """
         <xsl:template match="election-compound-lists-chart">
-            <div class="{@class}" tal:define="limit '0{@limit}'">
+            <div class="{@class}"
+                 tal:define="limit '0{@limit}'; names '{@names}'"
+                 >
                 <tal:block
                     metal:use-macro="layout.macros['lists-chart']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-compound-lists-chart limit="" class=""/>'
+    usage = '<election-compound-lists-chart limit="" names="," class=""/>'

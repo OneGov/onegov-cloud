@@ -237,8 +237,6 @@ class ScreenForm(Form):
         self.css.data = model.css
 
     def on_request(self):
-        self.request.include('chosen')
-
         session = self.request.session
 
         query = session.query(Vote).filter_by(type='simple')
