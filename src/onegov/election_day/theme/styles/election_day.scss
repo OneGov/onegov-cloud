@@ -520,7 +520,7 @@ figcaption {
     Voting Factoids
 */
 .factoids {
-    font-size: .9rem;
+    font-size: 1rem;
     margin-bottom: .5rem;
 
     strong {
@@ -663,14 +663,16 @@ ul.breadcrumbs {
     margin-bottom: 2em;
     padding-left: 0;
 
+    > * {
+        font-size: 1rem;
+        line-height: 1rem;
+        text-transform: none;
+    }
+
     &.back-links {
         background-color: $white-smoke;
         margin-bottom: 1em;
 
-        > * {
-            font-size: .875rem;
-            line-height: 1rem;
-        }
     }
 
 }
