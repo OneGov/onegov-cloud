@@ -824,7 +824,6 @@ class FormSubmissionLayout(DefaultLayout):
 
         qr_link = QrCodeLink(
             text=_("QR"),
-            title=_("QrCode for this site"),
             url=self.request.link(self.model),
             attrs={'class': 'qr-code-link'}
         )
