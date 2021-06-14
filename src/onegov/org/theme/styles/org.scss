@@ -1558,6 +1558,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$qr-code-icon: '\f029';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1633,7 +1634,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
 
     a::before {
         display: inline-block;
-        margin-right: 1ex;
+        margin-right: .8ex;
         text-align: center;
         width: 15px;
     }
@@ -1682,7 +1683,9 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
+    .qr-code-link::before { @include icon($qr-code-icon); }
 }
+
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
 .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
@@ -6077,4 +6080,12 @@ $link-status-nok-icon: '\f06a';
 table.link-check-results,
 table.link-check-stats {
     width: 100%;
+}
+
+/* Modal QR */
+
+.qr-image {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
 }
