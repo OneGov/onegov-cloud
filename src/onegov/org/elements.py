@@ -2,8 +2,11 @@
 macros.
 
 """
+from random import choice
 
 from lxml.html import builder, tostring
+
+from onegov.core.elements import Element
 from onegov.org import _
 from purl import URL
 
@@ -121,6 +124,35 @@ class Link(AccessMixin):
             a.attrib[key] = request.translate(value)
 
         return tostring(a)
+
+
+class QrCodeLink(Element, AccessMixin):
+    """ Implements a the qr code link that shows a modal with the QrCode.
+        Thu url is sent to the qr endpoint url which generates the image
+        and sends it back.
+    """
+
+    id = 'qr_code_link'
+
+    __slots__ = [
+        'active',
+        'attributes',
+        'classes',
+        'text',
+        'url',
+        'title'
+    ]
+
+    def __init__(self, text, url, title=None, attrs=None, traits=(), **props):
+        attrs = attrs or {}
+        attrs['href'] = '#'
+        attrs['data-payload'] = url
+        attrs['data-reveal-id'] = ''.join(
+            choice('abcdefghi') for i in range(8))
+        attrs['data-image-parent'] = f"qr-{attrs['data-reveal-id']}"
+
+        super().__init__(text, attrs, traits, **props)
+        self.title = title
 
 
 class DeleteLink(Link):

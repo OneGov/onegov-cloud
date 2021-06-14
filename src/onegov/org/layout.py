@@ -12,6 +12,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
+from onegov.org.elements import QrCodeLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -43,6 +44,7 @@ from onegov.org.theme.org_theme import user_options
 from onegov.org.utils import IMG_URLS
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
+from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
@@ -597,6 +599,10 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
             Link(r.title, self.request.link(r)) for r in self.root_pages
         )
 
+    @cached_property
+    def qr_endpoint(self):
+        return self.request.class_link(QrCode)
+
 
 class DefaultMailLayoutMixin:
     def unsubscribe_link(self, username):
@@ -816,6 +822,13 @@ class FormSubmissionLayout(DefaultLayout):
             attrs={'class': 'edit-link'}
         )
 
+        qr_link = QrCodeLink(
+            text=_("QR"),
+            title=_("QrCode for this site"),
+            url=self.request.link(self.model),
+            attrs={'class': 'qr-code-link'}
+        )
+
         if self.form.has_submissions(with_state='complete'):
             delete_link = Link(
                 text=_("Delete"),
@@ -879,7 +892,13 @@ class FormSubmissionLayout(DefaultLayout):
             ]
         )
 
-        return [edit_link, delete_link, export_link, registration_windows_link]
+        return [
+            edit_link,
+            delete_link,
+            export_link,
+            registration_windows_link,
+            qr_link
+        ]
 
 
 class FormCollectionLayout(DefaultLayout):

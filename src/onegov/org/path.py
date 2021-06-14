@@ -61,6 +61,7 @@ from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
+from onegov.qrcode import QrCode
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
 from onegov.reservation import Resource
@@ -670,3 +671,18 @@ def get_external_link_collection(request):
              converters=dict(id=UUID))
 def get_external_link(request, id):
     return ExternalLinkCollection(request.session).by_id(id)
+
+
+@OrgApp.path(model=QrCode, path='/qrcode',
+             converters=dict(border=int, box_size=int))
+def get_qr_code(app, payload, border=None, box_size=None, fill_color=None,
+                back_color=None, img_format=None, encoding=None):
+    return QrCode(
+        payload,
+        border=border,
+        box_size=box_size,
+        fill_color=fill_color,
+        back_color=back_color,
+        img_format=img_format,
+        encoding=encoding
+    )
