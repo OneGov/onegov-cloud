@@ -603,10 +603,6 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def qr_endpoint(self):
         return self.request.class_link(QrCode)
 
-    @cached_property
-    def qr_title(self):
-        return self.og_title
-
 
 class DefaultMailLayoutMixin:
     def unsubscribe_link(self, username):
