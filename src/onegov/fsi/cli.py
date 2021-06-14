@@ -431,9 +431,6 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             force_active=True
         )
 
-        if data['mail'] == 'sibylle.wettstein@aba-zug.ch':
-            print(user)
-
         synced_users.append(user.id)
 
         if not user.attendee:
@@ -445,6 +442,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
         user.attendee.last_name = data['last_name']
         user.attendee.organisation = data['organisation']
         user.attendee.source_id = source_id
+        user.attendee.active = user.active
 
         count += 1
 
