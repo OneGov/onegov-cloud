@@ -15,4 +15,17 @@
     <img tal:attributes="e.attrs" />
 </metal:b>
 
+<metal:b define-macro="qr_code_link">
+    <a tal:attributes="e.attrs" data-endpoint="${layout.qr_endpoint}">
+        ${e.text or ''}
+    </a>
+    <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id e.attrs['data-reveal-id']">
+        <tal:block metal:fill-slot="modal_content">
+            <div id="${e.attrs['data-image-parent']}" class="qr-image">
+                <h1 tal:condition="e.title|nothing">${e.title}</h1>
+            </div>
+        </tal:block>
+    </tal:block>
+</metal:b>
+
 </xml>

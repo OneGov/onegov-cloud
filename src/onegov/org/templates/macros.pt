@@ -1964,14 +1964,3 @@
     <a class="close-reveal-modal" aria-label="Close" i18n:attributes="aria-label">&#215;</a>
 </div>
 </metal:modal>
-
-<metal:modal define-macro="qr_code_link" tal:define="img_parent_id 'qr-' + link_id">
-    <a class="qr-code-link" href="#" data-reveal-id="${link_id}" tal:attributes="data-payload payload|nothing; data-endpoint layout.qr_endpoint; data-image-parent img_parent_id">
-        <i class="fa fa-qrcode" aria-hidden="true"></i>
-    </a>
-    <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id link_id">
-        <tal:block metal:fill-slot="modal_content">
-            <div id="${img_parent_id}" class="qr-image"></div>
-        </tal:block>
-    </tal:block>
-</metal:modal>
