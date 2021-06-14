@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
-from onegov.core.security import Private, Secret
+from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
@@ -156,7 +156,7 @@ def run_export(session, start, end, nested, formatter):
     model=Payment,
     name='change-net-amount',
     request_method='POST',
-    permission=Secret
+    permission=Private
 )
 def change_payment_amount(self, request):
     request.assert_valid_csrf_token()
