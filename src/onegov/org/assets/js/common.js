@@ -280,7 +280,7 @@ $('.qr-code-link').each(function () {
         $.ajax({
             type: "GET",
             contentType: "image/" + fmt,
-            url: `${endpoint}?encoding=base64&image_fmt=${fmt}&payload=${payload}`,
+            url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
             statusCode : {
                 200: function (resp) {
                     addModalImage(imageParent, resp, fmt);

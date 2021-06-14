@@ -6088,4 +6088,13 @@ table.link-check-stats {
     align-items: center;
     display: flex;
     flex-direction: column;
+
+    img.qr {
+        border: 5px solid $black;
+        box-sizing: border-box;
+    }
+
+    a.button.qr {
+        margin-top: 1.5em;
+    }
 }
