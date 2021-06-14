@@ -586,8 +586,8 @@
         <div metal:define-slot="before-panels"></div>
         <div class="side-panel contact-panel" tal:condition="contact or coordinates or location">
             <h3 i18n:translate tal:condition="contact">Contact</h3>
-            <div class="contact-panel-content">
-                <tal:b condition="contact" content="structure contact" />
+            <div class="contact-panel-content" tal:condition="contact">
+                <tal:b content="structure contact" />
             </div>
             <br tal:condition="coordinates and contact" />
             <h3 i18n:translate tal:condition="not contact">Map</h3>
