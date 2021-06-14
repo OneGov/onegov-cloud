@@ -1,8 +1,68 @@
 # Changes
 
+## Release `2021.57`
+
+> commits: **36 / [49f8a81daa...1dd67d5dcf](https://github.com/OneGov/onegov-cloud/compare/49f8a81daa^...1dd67d5dcf)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.57)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🎉 **Improve widgets.**
+
+- Candidates chart: Add option for all/only elected.
+- Candidates chart: Add filter for list/party names.
+- Candidates table: Add filter for list/party names.
+- Lists chart: Add filter for list/party names.
+- Lists table: Add filter for list/party names.
+- Counted Entities: Hide expats.
+- Add a candidate results by entities table for majorz elections.
+
+**`Feature`** | **[426c0ea062](https://github.com/onegov/onegov-cloud/commit/426c0ea06231c724e6dc5949e54c961a6f268581)**
+
+🎉 **Show turnouts for votes.**
+
+**`Feature`** | **[c51dd2c5fc](https://github.com/onegov/onegov-cloud/commit/c51dd2c5fc7eb8db338435ab2a852f789dc0d45c)**
+
+### Org
+
+🎉 **Adds setting to auto-close FRM tickets for FormSubmissions**
+
+- Adds choice of admins in /ticket-settings that handles
+auto-closing tickets
+
+**`Feature`** | **[SEA-376](https://linear.app/seantis/issue/SEA-376)** | **[49f8a81daa](https://github.com/onegov/onegov-cloud/commit/49f8a81daa2c3f7442b3425ce6e9ed3f20e22fe9)**
+
+🎉 **Adds external link model**
+
+External links can be mixed in other collection views. It features a `member_of` attribute that denotes the collection name it should appear in.
+Adds such links to the collection on `/forms`. Also applies for town6.
+
+**`Feature`** | **[SEA-382](https://linear.app/seantis/issue/SEA-382)** | **[00b7d22113](https://github.com/onegov/onegov-cloud/commit/00b7d22113d21fc5454375da7b36e615a9359f83)**
+
+🎉 **Adds external link model**
+
+External links can be mixed in other collection views. It features a `member_of` attribute that denotes the collection name it should appear in.
+Adds such links to the collection on `/forms`. Also applies for town6.
+
+**`Feature`** | **[SEA-382](https://linear.app/seantis/issue/SEA-382)** | **[990f2f11bb](https://github.com/onegov/onegov-cloud/commit/990f2f11bb9cf176fa5ca685c492863ece4fede5)**
+
+🎉 **Adds qr-code endoint and QrCodeLink Element**
+
+A clickable link that sends an url as payload to the qr-endpoint and shows
+the Qr Code in a modal.
+
+Adds Qr link to editbar on /form/{name} for managers.
+
+**`Feature`** | **[SEA-380](https://linear.app/seantis/issue/SEA-380)** | **[937c7266e3](https://github.com/onegov/onegov-cloud/commit/937c7266e3d3b621185c506f1c6f9e185bcd97e7)**
+
+🎉 **Adds edit button for payment amount in ticket view**
+
+**`Feature`** | **[SEA-360](https://linear.app/seantis/issue/SEA-360)** | **[df815ed43b](https://github.com/onegov/onegov-cloud/commit/df815ed43b47ffdd51cb04462b56fc5b9f7093b2)**
+
 ## Release `2021.56`
 
-> commits: **24 / [d8fadefb86...f693893cd7](https://github.com/OneGov/onegov-cloud/compare/d8fadefb86^...f693893cd7)**  
+> released: **2021-06-07 17:20**<br>
+> commits: **25 / [d8fadefb86...e2836955ce](https://github.com/OneGov/onegov-cloud/compare/d8fadefb86^...e2836955ce)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.56)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
