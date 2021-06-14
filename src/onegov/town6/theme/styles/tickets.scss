@@ -576,3 +576,24 @@ button {
 .field-display-label {
     font-weight: bold;
 }
+
+/*
+    Styles for inline js form on tickets page
+ */
+#edit-ticket-amount {
+    cursor: pointer;
+    margin-left: .25em;
+}
+
+#confirm-ticket-amount {
+    cursor: pointer;
+    font-size: 120%;
+    margin-left: .25em;
+}
+
+.ticket-payment-amount {
+    input {
+        display: inline-block;
+        width: 50%;
+    }
+}

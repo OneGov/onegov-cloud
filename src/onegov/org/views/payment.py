@@ -1,10 +1,11 @@
 from collections import OrderedDict
+from decimal import Decimal
 from functools import partial
 from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
-from onegov.org.layout import PaymentCollectionLayout
+from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage
 from onegov.core.elements import Link
@@ -149,6 +150,22 @@ def run_export(session, start, end, nested, formatter):
         return r
 
     return tuple(transform(p, links[p.id]) for p in payments)
+
+
+@OrgApp.json(
+    model=Payment,
+    name='change-net-amount',
+    request_method='POST',
+    permission=Private
+)
+def change_payment_amount(self, request):
+    request.assert_valid_csrf_token()
+    net_amount = Decimal(request.params['netAmount'])
+    assert net_amount - self.fee > 0
+    self.amount = net_amount - self.fee
+
+    format_ = DefaultLayout(self, request).format_number
+    return {'net_amount': f"{format_(self.net_amount)} {self.currency}"}
 
 
 @OrgApp.view(
