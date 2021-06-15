@@ -205,7 +205,6 @@ def test_ldap(base, search_filter, ldap_server, ldap_username, ldap_password,
         'zgXDirektionAbk': 'directorate',
         'zgXAmtAbk': 'agency',
         'zgXAbteilung': 'department',
-        'zgXServiceSubscription': 'is_teacher'
     }
     attributes = [*mapping.keys(), 'groupMembership', 'zgXServiceSubscription']
 
