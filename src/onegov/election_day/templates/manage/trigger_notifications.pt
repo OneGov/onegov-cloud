@@ -13,7 +13,7 @@
             <p i18n:translate>Last notifications:</p>
             <ul tal:condition="last_notifications">
                 <tal:block tal:repeat="model last_notifications">
-                    <li tal:repeat="last_notification last_notifications[model]">${layout.format_date(last_notification.last_change, 'datetime_long')}: ${last_notification.type} ${model.title} (${layout.format_date(last_notification.last_modified, 'datetime_long')})</li>
+                    <li tal:repeat="last_notification last_notifications[model]">${model.title} ${layout.format_date(last_notification.last_change, 'datetime_long')}: ${last_notification.type} (${layout.format_date(last_notification.last_modified, 'datetime_long')})</li>
                 </tal:block>
             </ul>
         </div>

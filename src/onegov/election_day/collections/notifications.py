@@ -33,25 +33,9 @@ class NotificationCollection(object):
             )
         else:
             query = query.order_by(
-                Notification.last_modified, Notification.type
+                Notification.last_change.desc(), Notification.type
             )
 
-        return query.all()
-
-    def all_by_election(self, election):
-        """ Returns all notifications ordered by timestamp and type. """
-
-        query = self.query()
-        query = query.filter(Notification.election_id == election.id)
-        query = query.order_by(Notification.last_modified, Notification.type)
-        return query.all()
-
-    def all_by_vote(self, vote):
-        """ Returns all notifications ordered by timestamp and type. """
-
-        query = self.query()
-        query = query.filter(Notification.vote_id == vote.id)
-        query = query.order_by(Notification.last_modified, Notification.type)
         return query.all()
 
     def trigger(self, request, model, options):
