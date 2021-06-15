@@ -56,6 +56,18 @@ class TriggerNotificationsForm(TriggerNotificationForm):
             return max((latest_election, latest_vote))
         return latest_election or latest_vote
 
+    def available_elections(self, session):
+        query = session.query(Election)
+        query = query.order_by(Election.shortcode)
+        query = query.filter(Election.date == self.latest_date(session))
+        return query
+
+    def available_votes(self, session):
+        query = session.query(Vote)
+        query = query.order_by(Vote.shortcode)
+        query = query.filter(Vote.date == self.latest_date(session))
+        return query
+
     def election_models(self, session):
         if not self.elections.data:
             return []
@@ -80,20 +92,12 @@ class TriggerNotificationsForm(TriggerNotificationForm):
         super(TriggerNotificationsForm, self).on_request()
 
         session = self.request.session
-        latest_date = self.latest_date(session)
-
-        query = session.query(Election)
-        query = query.order_by(Election.shortcode)
-        query = query.filter(Election.date == latest_date)
         self.elections.choices = [
             (election.id, election.title)
-            for election in query
+            for election in self.available_elections(session)
         ]
 
-        query = session.query(Vote)
-        query = query.order_by(Vote.shortcode)
-        query = query.filter(Vote.date == latest_date)
         self.votes.choices = [
             (vote.id, vote.title)
-            for vote in query
+            for vote in self.available_votes(session)
         ]

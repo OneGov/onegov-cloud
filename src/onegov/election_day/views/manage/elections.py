@@ -158,7 +158,8 @@ def delete_election(self, request, form):
 @ElectionDayApp.manage_form(
     model=Election,
     name='trigger',
-    form=TriggerNotificationForm
+    form=TriggerNotificationForm,
+    template='manage/trigger_notification.pt'
 )
 def trigger_election(self, request, form):
     """ Trigger the notifications related to an election. """
@@ -177,7 +178,7 @@ def trigger_election(self, request, form):
     title = _("Trigger notifications")
     button_class = 'primary'
 
-    if notifications.by_election(self):
+    if notifications.by_model(self):
         callout = _(
             "There are no changes since the last time the notifications "
             "have been triggered!"
@@ -197,5 +198,6 @@ def trigger_election(self, request, form):
         'callout': callout,
         'button_text': title,
         'button_class': button_class,
-        'cancel': layout.manage_model_link
+        'cancel': layout.manage_model_link,
+        'last_notifications': notifications.by_model(self, False)
     }

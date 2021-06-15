@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-26 09:32+0200\n"
+"POT-Creation-Date: 2021-06-15 13:23+0200\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -710,11 +710,23 @@ msgstr "Vid"
 msgid "Invalid"
 msgstr "Nunvalaivel"
 
+#. Default: Turnout
+#. Default: Voter turnout
+#.
+msgid "turnout_vote"
+msgstr "Participaziun a la votaziun"
+
 msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"
 
 msgid "Total"
 msgstr "Total"
+
+msgid "Nay"
+msgstr "NA"
+
+msgid "Yay"
+msgstr "GEA"
 
 msgid "List connection"
 msgstr "Colliaziun da glistas"
@@ -858,11 +870,6 @@ msgstr "Dumonda decisiva a favur da l'iniziativa"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Dumonda decisiva a favur da la cuntraproposta"
-
-#. Default: Voter turnout
-#.
-msgid "turnout_vote"
-msgstr "Participaziun a la votaziun"
 
 #. Default: eligible Voters
 #.
@@ -1034,6 +1041,9 @@ msgstr "Anc nagins abunents."
 msgid "Locale"
 msgstr "Regiun linguistica"
 
+msgid "Last notifications:"
+msgstr ""
+
 msgid "Create token"
 msgstr "Crear in token"
 
@@ -1063,12 +1073,6 @@ msgstr "Duvrai per plaschair il suandant format:"
 
 msgid "No map available for this year."
 msgstr "Per quest onn n'è disponibla nagina carta."
-
-msgid "Nay"
-msgstr "NA"
-
-msgid "Yay"
-msgstr "GEA"
 
 msgid "Blank list"
 msgstr "Glista en blanco"

@@ -32,29 +32,29 @@ def test_notification_collection_trigger(session):
         )
         vote = session.query(Vote).one()
 
-        assert collection.by_election(election) == []
-        assert collection.by_vote(vote) == []
+        assert collection.by_model(election) == []
+        assert collection.by_model(election, current=False) == []
 
         # No notifications configured
         request = DummyRequest()
         collection.trigger(request, election, all_)
         collection.trigger(request, vote, all_)
 
-        assert collection.by_election(election) == []
-        assert collection.by_vote(vote) == []
+        assert collection.by_model(election) == []
+        assert collection.by_model(election, current=False) == []
 
         # Add a webhook
         request.app.principal.webhooks = {'http://abc.com/1': None}
         collection.trigger(request, election, all_)
         collection.trigger(request, vote, all_)
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].election_id == election.id
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].vote_id == vote.id
@@ -63,9 +63,9 @@ def test_notification_collection_trigger(session):
         # 'webhooks' not selected
         collection.trigger(request, election, ('email', 'sms'))
         collection.trigger(request, vote, ('email', 'sms'))
-        notifications = collection.by_election(election)
-        assert len(collection.by_election(election)) == 1
-        assert len(collection.by_vote(vote)) == 1
+        notifications = collection.by_model(election)
+        assert len(collection.by_model(election)) == 1
+        assert len(collection.by_model(vote)) == 1
 
     with freeze_time("2009-01-01"):
         # Change the election and vote titles
@@ -73,8 +73,8 @@ def test_notification_collection_trigger(session):
         election.title = "An election"
         session.flush()
 
-        assert collection.by_election(election) == []
-        assert collection.by_vote(vote) == []
+        assert collection.by_model(election) == []
+        assert collection.by_model(vote) == []
 
         # Add a email, SMS notification and webhook
         request = DummyRequest(session=session)
@@ -86,13 +86,13 @@ def test_notification_collection_trigger(session):
         collection.trigger(request, election, all_)
         collection.trigger(request, vote, all_)
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert len(notifications) == 3
         assert [n.type for n in notifications] == ['email', 'sms', 'webhooks']
         assert all(n.election_id == election.id for n in notifications)
         assert all(n.last_modified.year == 2009 for n in notifications)
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert len(notifications) == 3
         assert [n.type for n in notifications] == ['email', 'sms', 'webhooks']
         assert all(n.vote_id == vote.id for n in notifications)
@@ -102,12 +102,12 @@ def test_notification_collection_trigger(session):
         collection.trigger(request, election, ('sms', 'webhooks'))
         collection.trigger(request, vote, ('sms', 'webhooks'))
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks'
         ]
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks'
         ]
@@ -116,15 +116,18 @@ def test_notification_collection_trigger(session):
         collection.trigger(request, election, ('email', 'webhooks'))
         collection.trigger(request, vote, ('email', 'webhooks'))
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks', 'email', 'webhooks'
         ]
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks', 'email', 'webhooks'
         ]
+
+    assert len(collection.by_model(election, current=False)) == 8
+    assert len(collection.by_model(vote, current=False)) == 8
 
 
 def test_notification_collection_trigger_summarized(session):
@@ -153,28 +156,28 @@ def test_notification_collection_trigger_summarized(session):
         )
         vote = session.query(Vote).one()
 
-        assert collection.by_election(election) == []
-        assert collection.by_vote(vote) == []
+        assert collection.by_model(election) == []
+        assert collection.by_model(vote) == []
 
         # No notifications configured
         request = DummyRequest()
         collection.trigger_summarized(request, [], [], all_)
         collection.trigger_summarized(request, [election], [vote], all_)
 
-        assert collection.by_election(election) == []
-        assert collection.by_vote(vote) == []
+        assert collection.by_model(election) == []
+        assert collection.by_model(vote) == []
 
         # Add a webhook
         request.app.principal.webhooks = {'http://abc.com/1': None}
         collection.trigger_summarized(request, [election], [vote], all_)
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].election_id == election.id
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].vote_id == vote.id
@@ -184,9 +187,9 @@ def test_notification_collection_trigger_summarized(session):
         collection.trigger_summarized(
             request, [election], [vote], ('email', 'sms')
         )
-        notifications = collection.by_election(election)
-        assert len(collection.by_election(election)) == 1
-        assert len(collection.by_vote(vote)) == 1
+        notifications = collection.by_model(election)
+        assert len(collection.by_model(election)) == 1
+        assert len(collection.by_model(vote)) == 1
 
     with freeze_time("2009-01-01"):
         # Change the election and vote titles
@@ -194,8 +197,8 @@ def test_notification_collection_trigger_summarized(session):
         election.title = "An election"
         session.flush()
 
-        assert collection.by_election(election) == []
-        assert collection.by_vote(vote) == []
+        assert collection.by_model(election) == []
+        assert collection.by_model(vote) == []
 
         # Add a email, SMS notification and webhook
         request = DummyRequest(session=session)
@@ -206,13 +209,13 @@ def test_notification_collection_trigger_summarized(session):
         request.app.principal.webhooks = {'http://abc.com/1': None}
         collection.trigger_summarized(request, [election], [vote], all_)
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert len(notifications) == 3
         assert [n.type for n in notifications] == ['email', 'sms', 'webhooks']
         assert all(n.election_id == election.id for n in notifications)
         assert all(n.last_modified.year == 2009 for n in notifications)
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert len(notifications) == 3
         assert [n.type for n in notifications] == ['email', 'sms', 'webhooks']
         assert all(n.vote_id == vote.id for n in notifications)
@@ -223,12 +226,12 @@ def test_notification_collection_trigger_summarized(session):
             request, [election], [vote], ('sms', 'webhooks')
         )
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks'
         ]
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks'
         ]
@@ -237,12 +240,12 @@ def test_notification_collection_trigger_summarized(session):
         collection.trigger(request, election, ('email', 'webhooks'))
         collection.trigger(request, vote, ('email', 'webhooks'))
 
-        notifications = collection.by_election(election)
+        notifications = collection.by_model(election)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks', 'email', 'webhooks'
         ]
 
-        notifications = collection.by_vote(vote)
+        notifications = collection.by_model(vote)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks', 'sms', 'webhooks', 'email', 'webhooks'
         ]

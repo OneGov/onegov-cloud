@@ -1,3 +1,5 @@
+from onegov.ballot import Election
+from onegov.ballot import Vote
 from onegov.election_day import _
 from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import Notification
@@ -13,27 +15,44 @@ class NotificationCollection(object):
     def query(self):
         return self.session.query(Notification)
 
-    def by_election(self, election):
-        """ Returns the notification for the given election and its
-        modification times.
+    def by_model(self, model, current=True):
+        """ Returns the notification for the given election or vote and its
+        modification times. Only returns the current by default.
 
         """
 
-        return self.query().filter(
-            Notification.election_id == election.id,
-            Notification.last_modified == election.last_modified
-        ).all()
+        query = self.query()
+        if isinstance(model, Election):
+            query = query.filter(Notification.election_id == model.id)
+        if isinstance(model, Vote):
+            query = query.filter(Notification.vote_id == model.id)
 
-    def by_vote(self, vote):
-        """ Returns the notification for the given vote and its modification
-        time.
+        if current:
+            query = query.filter(
+                Notification.last_modified == model.last_modified
+            )
+        else:
+            query = query.order_by(
+                Notification.last_modified, Notification.type
+            )
 
-        """
+        return query.all()
 
-        return self.query().filter(
-            Notification.vote_id == vote.id,
-            Notification.last_modified == vote.last_modified
-        ).all()
+    def all_by_election(self, election):
+        """ Returns all notifications ordered by timestamp and type. """
+
+        query = self.query()
+        query = query.filter(Notification.election_id == election.id)
+        query = query.order_by(Notification.last_modified, Notification.type)
+        return query.all()
+
+    def all_by_vote(self, vote):
+        """ Returns all notifications ordered by timestamp and type. """
+
+        query = self.query()
+        query = query.filter(Notification.vote_id == vote.id)
+        query = query.order_by(Notification.last_modified, Notification.type)
+        return query.all()
 
     def trigger(self, request, model, options):
         """ Triggers and adds the selected notifications. """

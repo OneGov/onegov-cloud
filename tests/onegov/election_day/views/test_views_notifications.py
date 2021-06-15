@@ -35,7 +35,9 @@ def test_view_notifications_votes(election_day_app):
     trigger.form['notifications'] = ['webhooks']
     trigger.form.submit()
 
-    assert "erneut auslösen" in client.get('/vote/vote/trigger')
+    form = client.get('/vote/vote/trigger')
+    assert "erneut auslösen" in form
+    assert ": webhooks (" in form
 
     upload_vote(client, False)
     assert "erneut auslösen" not in client.get('/vote/vote/trigger')
@@ -106,7 +108,9 @@ def test_view_notifications_elections(election_day_app_gr):
     trigger.form['notifications'] = ['webhooks']
     trigger.form.submit()
 
-    assert "erneut auslösen" in client.get('/election/majorz-election/trigger')
+    form = client.get('/election/majorz-election/trigger')
+    assert "erneut auslösen" in form
+    assert ": webhooks (" in form
 
     upload_majorz_election(client, False)
     assert "erneut auslösen" not in client.get(
@@ -256,3 +260,12 @@ def test_view_notifications_summarized(election_day_app):
         'Les nouveaux résultats sont disponibles sur http://example.com'
         in contents
     )
+
+    manage = client.get('/trigger-notifications')
+    assert "erneut auslösen" in manage
+    assert "email Regierungsratswahl" in manage
+    assert "sms Regierungsratswahl" in manage
+    assert "webhooks Regierungsratswahl" in manage
+    assert "email Unternehmenssteuerreformgesetz" in manage
+    assert "sms Unternehmenssteuerreformgesetz" in manage
+    assert "webhooks Unternehmenssteuerreformgesetz" in manage

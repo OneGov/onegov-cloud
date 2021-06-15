@@ -1054,3 +1054,11 @@ ul.pagination li.last {
 .columns {
     min-height: 1px;
 }
+
+/*
+    Warning panels
+*/
+.panel.warning {
+    background-color: lighten($warning-color, 10%);
+    border-color: darken($warning-color, 10%);
+}

@@ -10,8 +10,8 @@ from onegov.election_day.models import Principal
 @ElectionDayApp.manage_form(
     model=Principal,
     name='trigger-notifications',
-    template='form.pt',
-    form=TriggerNotificationsForm
+    form=TriggerNotificationsForm,
+    template='manage/trigger_notifications.pt'
 )
 def view_trigger_notficiations(self, request, form):
 
@@ -20,8 +20,8 @@ def view_trigger_notficiations(self, request, form):
     layout = ManageLayout(self, request)
     session = request.session
 
+    notifications = NotificationCollection(session)
     if form.submitted(request):
-        notifications = NotificationCollection(session)
         notifications.trigger_summarized(
             request,
             form.election_models(session),
@@ -34,6 +34,30 @@ def view_trigger_notficiations(self, request, form):
     latest_date = form.latest_date(session)
     latest_date = layout.format_date(latest_date, 'date_long')
 
+    warn = False
+    last_notifications = {}
+    for election in form.available_elections(session):
+        last_notifications[election] = notifications.by_model(election, False)
+        if notifications.by_model(election):
+            warn = True
+    for vote in form.available_votes(session):
+        last_notifications[vote] = notifications.by_model(vote, False)
+        if notifications.by_model(vote):
+            warn = True
+
+    callout = ''
+    message = ''
+    button_class = 'primary'
+    if warn:
+        callout = _(
+            "There are no changes since the last time the notifications "
+            "have been triggered!"
+        )
+        message = _(
+            "Do you really want to retrigger the notfications?",
+        )
+        button_class = 'alert'
+
     return {
         'layout': layout,
         'form': form,
@@ -42,5 +66,9 @@ def view_trigger_notficiations(self, request, form):
             "Elections and votes on ${date}",
             mapping={'date': latest_date}
         ),
-        'cancel': layout.manage_link
+        'cancel': layout.manage_link,
+        'button_class': button_class,
+        'callout': callout,
+        'message': message,
+        'last_notifications': last_notifications
     }

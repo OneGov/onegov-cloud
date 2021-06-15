@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-26 09:32+0200\n"
+"POT-Creation-Date: 2021-06-15 13:23+0200\n"
 "PO-Revision-Date: 2021-04-01 10:23+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -711,11 +711,23 @@ msgstr "Vide"
 msgid "Invalid"
 msgstr "Invalide"
 
+#. Default: Turnout
+#. Default: Voter turnout
+#.
+msgid "turnout_vote"
+msgstr "Participation au vote"
+
 msgid "Not yet counted"
 msgstr "Pas encore compté"
 
 msgid "Total"
 msgstr "Total"
+
+msgid "Nay"
+msgstr "Non"
+
+msgid "Yay"
+msgstr "Oui"
 
 msgid "List connection"
 msgstr "Connexion de listes"
@@ -860,11 +872,6 @@ msgstr "Jeu décisif en faveur de l'initiative"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Jeu décisif en faveur de le contre-projet"
-
-#. Default: Voter turnout
-#.
-msgid "turnout_vote"
-msgstr "Participation au vote"
 
 #. Default: eligible Voters
 #.
@@ -1034,6 +1041,9 @@ msgstr "Pas encore d’abonnés."
 msgid "Locale"
 msgstr "Locaux"
 
+msgid "Last notifications:"
+msgstr "Les dernières notifications :"
+
 msgid "Create token"
 msgstr "Créer un token"
 
@@ -1063,12 +1073,6 @@ msgstr "Veuillez utiliser le format suivant:"
 
 msgid "No map available for this year."
 msgstr "Aucune carte disponible pour cette année."
-
-msgid "Nay"
-msgstr "Non"
-
-msgid "Yay"
-msgstr "Oui"
 
 msgid "Blank list"
 msgstr "Liste vierge"
