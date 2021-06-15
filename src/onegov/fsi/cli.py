@@ -177,11 +177,24 @@ schools = {
 
 
 @cli.command(name='test-ldap')
-@click.argument('base')
+@click.option('--base', multiple=True)
+@click.option('--search-filter', required=True, default="(objectClass=*)")
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
 @click.option('--ldap-password', required=True)
-def test_ldap(base, ldap_server, ldap_username, ldap_password):
+@click.option('--sort-by', required=True, default='mail')
+def test_ldap(base, search_filter, ldap_server, ldap_username, ldap_password,
+              sort_by):
+    """
+    Examples:
+    Search for an email: (mail=walter.roderer@zg.ch)
+    Search for names: (&(zgXGivenName=Vorname)(zgXSurname=Nachname))
+    Search for mail ending in: (mail=*@phgz.ch)
+    """
+
+    def sort_func(entry):
+        return entry.entry_attributes_as_dict[sort_by]
+
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     mapping = {
@@ -192,16 +205,20 @@ def test_ldap(base, ldap_server, ldap_username, ldap_password):
         'zgXDirektionAbk': 'directorate',
         'zgXAmtAbk': 'agency',
         'zgXAbteilung': 'department',
+        'zgXServiceSubscription': 'is_teacher'
     }
-    attributes = [*mapping.keys(), 'groupMembership']
+    attributes = [*mapping.keys(), 'groupMembership', 'zgXServiceSubscription']
 
-    success = client.connection.search(
-        base, "(objectClass=*)", attributes=attributes)
-    if not success:
-        print('Search not successfull')
-        return
-    for ix, entry in enumerate(client.connection.entries):
-        print(json.dumps(entry.entry_attributes_as_dict, indent=4))
+    for ba in base:
+        success = client.connection.search(
+            ba, search_filter, attributes=attributes)
+        if not success:
+            print(f'Search not successfull in base {ba}')
+            continue
+        for ix, entry in enumerate(
+                sorted(client.connection.entries, key=sort_func)
+        ):
+            print(json.dumps(entry.entry_attributes_as_dict, indent=4))
 
 
 @cli.command(name='fetch-users', context_settings={'singular': True})
