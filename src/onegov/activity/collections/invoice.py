@@ -124,7 +124,6 @@ class InvoiceCollection(GenericCollection):
         )).options(joinedload(InvoiceItem.payments))
 
         sync_invoice_items(items, capture=False)
-        print("foo2")
 
     def add(self, period_id=None, user_id=None, flush=True, optimistic=False):
         invoice = Invoice(
