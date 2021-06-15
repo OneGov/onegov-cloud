@@ -31,6 +31,7 @@ def view_upload(self, request, form):
 
     status = 'open'
     map_available = True
+    last_change = self.last_result_change
     if form.submitted(request):
         session = request.session
         principal = request.app.principal
@@ -102,6 +103,7 @@ def view_upload(self, request, form):
             transaction.abort()
         else:
             status = 'success'
+            last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
                 request.app.principal.name,
@@ -121,5 +123,6 @@ def view_upload(self, request, form):
         'errors': errors,
         'status': status,
         'vote': self,
-        'map_available': map_available
+        'map_available': map_available,
+        'last_change': last_change
     }

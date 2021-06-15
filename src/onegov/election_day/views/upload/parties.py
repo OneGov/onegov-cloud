@@ -24,6 +24,7 @@ def view_upload_election_party_results(self, request, form):
     errors = []
 
     status = 'open'
+    last_change = self.last_result_change
     if form.submitted(request):
         errors = import_party_results(
             self,
@@ -39,6 +40,7 @@ def view_upload_election_party_results(self, request, form):
             transaction.abort()
         else:
             status = 'success'
+            last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
                 request.app.principal.name,
@@ -57,7 +59,8 @@ def view_upload_election_party_results(self, request, form):
         'cancel': layout.manage_model_link,
         'errors': errors,
         'status': status,
-        'election': self
+        'election': self,
+        'last_change': last_change
     }
 
 
@@ -74,6 +77,7 @@ def view_upload_election_compound_party_results(self, request, form):
     errors = []
 
     status = 'open'
+    last_change = self.last_result_change
     if form.submitted(request):
         errors = import_party_results(
             self,
@@ -89,6 +93,7 @@ def view_upload_election_compound_party_results(self, request, form):
             transaction.abort()
         else:
             status = 'success'
+            last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
                 request.app.principal.name,
@@ -108,5 +113,6 @@ def view_upload_election_compound_party_results(self, request, form):
         'errors': errors,
         'status': status,
         'show_trigger': False,
-        'election': self
+        'election': self,
+        'last_change': last_change
     }

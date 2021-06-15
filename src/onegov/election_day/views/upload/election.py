@@ -50,6 +50,7 @@ def view_upload_majorz_election(self, request, form):
     form.adjust(request.app.principal, self)
 
     status = 'open'
+    last_change = self.last_result_change
     if form.submitted(request):
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, map_required=False):
@@ -113,6 +114,7 @@ def view_upload_majorz_election(self, request, form):
                 transaction.abort()
             else:
                 status = 'success'
+                last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
                     request.app.principal.name,
@@ -131,7 +133,8 @@ def view_upload_majorz_election(self, request, form):
         'cancel': layout.manage_model_link,
         'errors': errors,
         'status': status,
-        'election': self
+        'election': self,
+        'last_change': last_change
     }
 
 
@@ -152,6 +155,7 @@ def view_upload_proporz_election(self, request, form):
     form.adjust(request.app.principal, self)
 
     status = 'open'
+    last_change = self.last_result_change
     if form.submitted(request):
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, map_required=False):
@@ -218,6 +222,7 @@ def view_upload_proporz_election(self, request, form):
                 transaction.abort()
             else:
                 status = 'success'
+                last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
                     request.app.principal.name,
@@ -236,5 +241,6 @@ def view_upload_proporz_election(self, request, form):
         'cancel': layout.manage_model_link,
         'errors': errors,
         'status': status,
-        'election': self
+        'election': self,
+        'last_change': last_change
     }

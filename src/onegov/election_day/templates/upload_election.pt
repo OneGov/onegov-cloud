@@ -7,6 +7,10 @@
         <h1>${title}</h1>
         <h2 class="subheader" i18n:translate="">Upload results</h2>
 
+        <div class="panel">
+            <span i18n:translate="">Last change</span>: ${layout.format_date(last_change, 'datetime_long')}
+        </div>
+
         <div class="after-upload" tal:condition="status == 'success'">
             <div class="alert-box success" i18n:translate="">
                 Your results were uploaded successfully.
