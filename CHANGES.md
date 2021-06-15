@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2021.58`
+
+> commits: **5 / [5efda0b90f...b2abe8b3de](https://github.com/OneGov/onegov-cloud/compare/5efda0b90f^...b2abe8b3de)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.58)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election Day
+
+🎉 **Show when the last update date on the upload forms.**
+
+**`Feature`** | **[ZW-320](https://kanton-zug.atlassian.net/browse/ZW-320)** | **[e43a5de27b](https://github.com/onegov/onegov-cloud/commit/e43a5de27b2ea0b230776abfe547ec1d7ca8c211)**
+
+🎉 **Show the last notifications on the notification screens.**
+
+**`Feature`** | **[ZW-320](https://kanton-zug.atlassian.net/browse/ZW-320)** | **[b2abe8b3de](https://github.com/onegov/onegov-cloud/commit/b2abe8b3de39eb84dbd32be83986e47042ae6f3b)**
+
 ## Release `2021.57`
 
-> commits: **36 / [49f8a81daa...1dd67d5dcf](https://github.com/OneGov/onegov-cloud/compare/49f8a81daa^...1dd67d5dcf)**  
+> released: **2021-06-14 14:10**<br>
+> commits: **37 / [49f8a81daa...8961c85922](https://github.com/OneGov/onegov-cloud/compare/49f8a81daa^...8961c85922)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.57)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
