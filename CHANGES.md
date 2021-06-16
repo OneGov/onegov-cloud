@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2021.59`
+
+> commits: **11 / [90f7a384b6...673cf13b7b](https://github.com/OneGov/onegov-cloud/compare/90f7a384b6^...673cf13b7b)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.59)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+✨ **Improve styling of memberships.**
+
+**`Other`** | **[STAKABS-27](https://kt-bs.atlassian.net/browse/STAKABS-27)** | **[82f59fdfce](https://github.com/onegov/onegov-cloud/commit/82f59fdfce82d7ff3be518454d589ea9ca53557f)**
+
+### Feriennet
+
+🐞 **Fixes export of invoice items**
+
+Prevents double entries by joining on activity and invoice references.
+
+**`Bugfix`** | **[f3caf5e2f7](https://github.com/onegov/onegov-cloud/commit/f3caf5e2f7cff8734054f0705966fb303f2c4e3f)**
+
+### Winterthur
+
+✨ **Adapts UI for multi missions**
+
+- Make time field required
+- Always display correct time
+- Remove mission count from /mission-reports table
+
+**`Other`** | **[673cf13b7b](https://github.com/onegov/onegov-cloud/commit/673cf13b7b55738536554cedf022e7f4d1576561)**
+
 ## Release `2021.58`
 
-> commits: **5 / [5efda0b90f...b2abe8b3de](https://github.com/OneGov/onegov-cloud/compare/5efda0b90f^...b2abe8b3de)**  
+> released: **2021-06-15 15:53**<br>
+> commits: **6 / [5efda0b90f...d8ebec8a12](https://github.com/OneGov/onegov-cloud/compare/5efda0b90f^...d8ebec8a12)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.58)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election Day
