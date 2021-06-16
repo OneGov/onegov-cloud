@@ -1,4 +1,5 @@
-from onegov.activity import InvoiceCollection, PeriodCollection
+from onegov.activity import InvoiceCollection, PeriodCollection, \
+    InvoiceReference
 from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.exports.booking import BookingExport
@@ -6,6 +7,22 @@ from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
 
 
 def test_exports(client, scenario):
+    # add old period
+    scenario.add_period(
+        confirmed=True,
+        all_inclusive=False,
+        active=False
+    )
+
+    # We simulate the creation of the same activity in another period earlier
+    # The db constraints a unique name, but by changing the title later,
+    # we end up with the situation we test here
+    scenario.add_activity(
+        title="Foobar",
+        name='foofoobar',
+        state='accepted', tags=['CAMP']
+    )
+
     scenario.add_period(
         confirmed=True,
         all_inclusive=False
@@ -20,6 +37,11 @@ def test_exports(client, scenario):
 
     scenario.add_activity(
         title="Foobar", state='accepted', tags=['CAMP', 'Family Camp'])
+    scenario.add_occasion()
+
+    # Adding another occasion in the same period for the activity to test
+    # export of InvoiceItems when joined with activities filtered by the occ
+    # occasion of that period
     scenario.add_occasion()
     scenario.add_booking(state='accepted', cost=250)
     scenario.commit()
@@ -62,7 +84,7 @@ def test_exports(client, scenario):
         form=Bunch(selected_period=scenario.latest_period),
         session=session
     )
-    data = {k: v for k, v in list(rows)[0]}
+    data = dict(list(rows)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
 
     # Create invoices
@@ -78,5 +100,27 @@ def test_exports(client, scenario):
         form=Bunch(selected_period=scenario.latest_period),
         session=session
     )
-    data = {k: v for k, v in list(items)[0]}
+    data = dict(list(items)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
+
+    invoices = InvoiceCollection(session, scenario.latest_period.id)
+    invoice = invoices.query().first()
+    invoice.references.append(InvoiceReference(
+        reference='zzzzzAAAAaaaa',
+        schema='esr-v1',
+        bucket='esr-v1'
+    ))
+
+    # Export invoice items with tags
+    items = list(InvoiceItemExport().run(
+        form=Bunch(selected_period=scenario.latest_period),
+        session=session
+    ))
+
+    # Prevent double exporting each invoice item when joined with the
+    # references on invoice if there are multiple references which is
+    # not an edge case
+    assert len(items) == 1
+    data = dict(items[0])
+    assert len(data['Invoice Item References'].splitlines()) == 2
+
