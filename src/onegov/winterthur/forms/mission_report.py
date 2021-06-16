@@ -1,11 +1,10 @@
 import sedate
 
 from datetime import datetime
-from datetime import time
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import Form
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.validators import FileSizeLimit, StrictOptional
+from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.winterthur import _
 from onegov.winterthur.models import MissionReportFile
@@ -31,7 +30,10 @@ class MissionReportForm(Form):
         default=today,
         validators=[InputRequired()])
 
-    time = TimeField(_("Time"), validators=[StrictOptional()])
+    time = TimeField(
+        _("Time"),
+        validators=[InputRequired()]
+    )
 
     duration = DecimalField(
         _("Mission duration (h)"),
@@ -75,8 +77,7 @@ class MissionReportForm(Form):
 
     @property
     def date(self):
-        dt = datetime.combine(
-            self.day.data, self.time.data or time(hour=0, minute=0))
+        dt = datetime.combine(self.day.data, self.time.data)
         return sedate.replace_timezone(dt, timezone='Europe/Zurich')
 
     @date.setter
@@ -88,13 +89,6 @@ class MissionReportForm(Form):
     def on_request(self):
         if self.request.app.hide_civil_defence_field:
             self.delete_field('civil_defence')
-
-    def ensure_correct_time(self):
-        if not self.day.data:
-            return
-        if self.mission_type.data == 'single' and not self.time.data:
-            self.time.errors.append(_('This field is required.'))
-            return False
 
     def ensure_correct_mission_count(self):
         if self.mission_type.data == 'single':

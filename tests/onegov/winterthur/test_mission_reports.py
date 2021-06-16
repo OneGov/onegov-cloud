@@ -55,9 +55,10 @@ def test_view_mission_reports(winterthur_app):
     # change the mode to multi
     page.form['mission_type'] = 'multi'
     page.form['mission_count'] = 5
+    page.form['time'] = '00:00'
     entry = page.form.submit().follow()
     # setting the time for the date to midnight
-    assert '-' in entry.pyquery('tr td:last-of-type')[1].text
+    assert '00:00' in entry.pyquery('tr td:last-of-type')[1].text
     assert entry.pyquery('#mission-count')[0].text == '5'
     assert entry.pyquery('#mission-type')[0].text == 'Mehrfach-Einsatz'
 
