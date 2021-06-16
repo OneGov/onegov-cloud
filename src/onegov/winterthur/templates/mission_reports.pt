@@ -30,7 +30,7 @@
                             ${report.local_date.strftime('%d.%m.%Y')}
                         </td>
                         <td data-label="Alarm" i18n:attributes="data-label" class="min-width-column" tal:define="hour report.local_date.strftime('%H:%M')">
-                            ${'-' if hour == '00:00' else hour}
+                            ${hour}
                         </td>
                         <td data-label="Duration" i18n:attributes="data-label" class="min-width-column">
                             ${report.readable_duration}

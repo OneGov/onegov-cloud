@@ -11,7 +11,7 @@
                 </tr>
                 <tr>
                     <td class="min-width-column" i18n:translate>Alarm</td>
-                    <td tal:define="hour model.local_date.strftime('%H:%M')">${'-' if hour == '00:00' else hour}</td>
+                    <td tal:define="hour model.local_date.strftime('%H:%M')">${hour}</td>
                 </tr>
                 <tr>
                     <td class="min-width-column" i18n:translate>Location</td>
