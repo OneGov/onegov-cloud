@@ -293,10 +293,10 @@ msgid "User TOS Accepted"
 msgstr "Benutzer AGB akzeptiert"
 
 msgid "Invoice Item Group"
-msgstr "Rechungsposition Gruppe"
+msgstr "Rechnungsposition Gruppe"
 
 msgid "Invoice Item Text"
-msgstr "Rechungsposition Text"
+msgstr "Rechnungsposition Text"
 
 msgid "Invoice Item Paid"
 msgstr "Rechnungsposition Bezahlt"
