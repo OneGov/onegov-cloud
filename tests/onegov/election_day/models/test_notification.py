@@ -356,7 +356,7 @@ def test_email_notification_vote(election_day_app, session):
         notification = EmailNotification()
         notification.trigger(request, simple_vote)
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
-            'Abstimmung - Abgelehnt',
+            'Abstimmung - abgelehnt',
             'Votazione - Respinto',
             'Votaziun - Refusà',
             'Vote - Refusé'
@@ -372,8 +372,8 @@ def test_email_notification_vote(election_day_app, session):
         notification.trigger(request, complex_vote)
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Project cun cuntraproposta - Refusà',
-            'Vorlage mit Gegenentwurf - Abgelehnt',
             'Vorlage mit Gegenentwurf - Respinto',
+            'Vorlage mit Gegenentwurf - abgelehnt',
             'Vote avec contre-projet - Refusé'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)

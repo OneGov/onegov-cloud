@@ -210,25 +210,25 @@ class Canton(Principal):
         if value == 'entities':
             return _("Municipalities")
         if value == 'district':
+            if self.id == 'bl':
+                return _("district_label_bl")
             if self.id == 'gr':
-                return _("district_label_gr", default="District")
-            if self.id == 'sg':
-                return _("district_label_sg", default="Constituency")
+                return _("district_label_gr")
             if self.id == 'sz':
                 if year and year >= 2020:
                     return _("Municipality")
-                return _("district_label_sz", default="District")
-            return _("district_label_default", default="Constituency")
+                return _("district_label_sz")
+            return _("District")
         if value == 'districts':
+            if self.id == 'bl':
+                return _("districts_label_bl")
             if self.id == 'gr':
-                return _("districts_label_gr", default="Districts")
-            if self.id == 'sg':
-                return _("districts_label_sg", default="Constituencies")
+                return _("districts_label_gr")
             if self.id == 'sz':
                 if year and year >= 2020:
                     return _("Municipalities")
-                return _("districts_label_sz", default="Districts")
-            return _("districts_label_default", default="Constituencies")
+                return _("districts_label_sz")
+            return _("Districts")
         return ''
 
 

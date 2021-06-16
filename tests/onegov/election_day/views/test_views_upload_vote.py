@@ -45,7 +45,7 @@ def test_upload_vote_unknown_result(election_day_app):
     result = ' '.join([td.text for td in result.pyquery('td')])
 
     assert "Noch keine Resultate" not in result
-    assert "Zug Abgelehnt" in result
+    assert "Zug abgelehnt" in result
     assert "Oberägeri Noch nicht ausgezählt" in result
     assert archive.query().one().progress == (1, 11)
 

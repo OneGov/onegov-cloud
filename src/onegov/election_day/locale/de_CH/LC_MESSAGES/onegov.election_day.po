@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-15 13:23+0200\n"
+"POT-Creation-Date: 2021-06-16 08:15+0200\n"
 "PO-Revision-Date: 2021-04-01 10:22+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -471,10 +471,10 @@ msgid "Final results"
 msgstr "Schlussresultate"
 
 msgid "Accepted"
-msgstr "Angenommen"
+msgstr "angenommen"
 
 msgid "Rejected"
-msgstr "Abgelehnt"
+msgstr "abgelehnt"
 
 msgid "Counter proposal accepted"
 msgstr "Gegenentwurf angenommen"
@@ -532,36 +532,28 @@ msgstr "Neue Zwischenresultate verfügbar auf ${url}"
 msgid "Municipalities"
 msgstr "Gemeinden"
 
-#. Default: District
+msgid "district_label_bl"
+msgstr "Bezirk"
+
 msgid "district_label_gr"
 msgstr "Region"
 
-#. Default: Constituency
-msgid "district_label_sg"
-msgstr "Wahlkreis"
-
-#. Default: District
 msgid "district_label_sz"
 msgstr "Bezirk"
 
-#. Default: Constituency
-msgid "district_label_default"
+msgid "District"
 msgstr "Wahlkreis"
 
-#. Default: Districts
+msgid "districts_label_bl"
+msgstr "Bezirke"
+
 msgid "districts_label_gr"
 msgstr "Regionen"
 
-#. Default: Constituencies
-msgid "districts_label_sg"
-msgstr "Wahlkreise"
-
-#. Default: Districts
 msgid "districts_label_sz"
 msgstr "Bezirke"
 
-#. Default: Constituencies
-msgid "districts_label_default"
+msgid "Districts"
 msgstr "Wahlkreise"
 
 msgid "Communal"
@@ -701,10 +693,10 @@ msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
 msgid "Yeas"
-msgstr "Ja Stimmen"
+msgstr "Ja-Stimmen"
 
 msgid "Nays"
-msgstr "Nein Stimmen"
+msgstr "Nein-Stimmen"
 
 msgid "Empty"
 msgstr "Leer"
@@ -1374,3 +1366,9 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid "district_label_sg"
+#~ msgstr "Wahlkreis"
+
+#~ msgid "districts_label_sg"
+#~ msgstr "Wahlkreise"

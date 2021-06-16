@@ -352,36 +352,97 @@ def test_principal_notifications_enabled():
 
 
 def test_principal_label(election_day_app):
-    # Only test the label/principal combination which are really used
 
     def translate(text, locale):
         translator = election_day_app.translations.get(locale)
         return text.interpolate(translator.gettext(text))
 
-    principal = Canton(name='gr', canton='gr')
+    # Default (Canton)
+    principal = Canton(name='sg', canton='sg')
     for label, locale, result in (
         ('entity', 'de_CH', 'Gemeinde'),
+        ('entity', 'fr_CH', 'Commune'),
         ('entity', 'it_CH', 'Comune'),
         ('entity', 'rm_CH', 'Vischnanca'),
         ('entities', 'de_CH', 'Gemeinden'),
+        ('entities', 'fr_CH', 'Communes'),
+        ('entities', 'it_CH', 'Comuni'),
+        ('entities', 'rm_CH', 'Vischnancas'),
+        ('district', 'de_CH', 'Wahlkreis'),
+        ('district', 'fr_CH', 'Circonscription électorale'),
+        ('district', 'it_CH', 'Distretto elettorale'),
+        ('district', 'rm_CH', 'Circul electoral'),
+        ('districts', 'de_CH', 'Wahlkreise'),
+        ('districts', 'fr_CH', 'Circonscriptions électorales'),
+        ('districts', 'it_CH', 'Distretti elettorali'),
+        ('districts', 'rm_CH', 'Circuls electorals'),
+    ):
+        assert translate(principal.label(label), locale) == result
+
+    # BL
+    principal = Canton(name='bl', canton='bl')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entity', 'fr_CH', 'Commune'),
+        ('entity', 'it_CH', 'Comune'),
+        ('entity', 'rm_CH', 'Vischnanca'),
+        ('entities', 'de_CH', 'Gemeinden'),
+        ('entities', 'fr_CH', 'Communes'),
+        ('entities', 'it_CH', 'Comuni'),
+        ('entities', 'rm_CH', 'Vischnancas'),
+        ('district', 'de_CH', 'Bezirk'),
+        ('district', 'fr_CH', 'District électoral'),
+        ('district', 'it_CH', 'Distretto elettorale'),
+        ('district', 'rm_CH', 'Circul electoral'),
+        ('districts', 'de_CH', 'Bezirke'),
+        ('districts', 'fr_CH', 'Districts électorales'),
+        ('districts', 'it_CH', 'Distretti elettorali'),
+        ('districts', 'rm_CH', 'Circuls electorals'),
+    ):
+        assert translate(principal.label(label, year=2019), locale) == result
+
+    # GR
+    principal = Canton(name='gr', canton='gr')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entity', 'fr_CH', 'Commune'),
+        ('entity', 'it_CH', 'Comune'),
+        ('entity', 'rm_CH', 'Vischnanca'),
+        ('entities', 'de_CH', 'Gemeinden'),
+        ('entities', 'fr_CH', 'Communes'),
         ('entities', 'it_CH', 'Comuni'),
         ('entities', 'rm_CH', 'Vischnancas'),
         ('district', 'de_CH', 'Region'),
+        ('district', 'fr_CH', 'Région'),
         ('district', 'it_CH', 'Regione'),
         ('district', 'rm_CH', 'Regiun'),
         ('districts', 'de_CH', 'Regionen'),
+        ('districts', 'fr_CH', 'Régions'),
         ('districts', 'it_CH', 'Regioni'),
         ('districts', 'rm_CH', 'Regiuns'),
     ):
         assert translate(principal.label(label), locale) == result
 
+    # SZ
     with freeze_time("2019-10-12 00:00"):
         principal = Canton(name='sz', canton='sz')
         for label, locale, result in (
             ('entity', 'de_CH', 'Gemeinde'),
+            ('entity', 'fr_CH', 'Commune'),
+            ('entity', 'it_CH', 'Comune'),
+            ('entity', 'rm_CH', 'Vischnanca'),
             ('entities', 'de_CH', 'Gemeinden'),
+            ('entities', 'fr_CH', 'Communes'),
+            ('entities', 'it_CH', 'Comuni'),
+            ('entities', 'rm_CH', 'Vischnancas'),
             ('district', 'de_CH', 'Bezirk'),
+            ('district', 'fr_CH', 'District électoral'),
+            ('district', 'it_CH', 'Distretto elettorale'),
+            ('district', 'rm_CH', 'Circul electoral'),
             ('districts', 'de_CH', 'Bezirke'),
+            ('districts', 'fr_CH', 'Districts électorales'),
+            ('districts', 'it_CH', 'Distretti elettorali'),
+            ('districts', 'rm_CH', 'Circuls electorals'),
         ):
             assert translate(principal.label(label), locale) == result
 
@@ -389,34 +450,38 @@ def test_principal_label(election_day_app):
     principal = Canton(name='sz', canton='sz')
     for label, locale, result in (
         ('entity', 'de_CH', 'Gemeinde'),
+        ('entity', 'fr_CH', 'Commune'),
+        ('entity', 'it_CH', 'Comune'),
+        ('entity', 'rm_CH', 'Vischnanca'),
         ('entities', 'de_CH', 'Gemeinden'),
+        ('entities', 'fr_CH', 'Communes'),
+        ('entities', 'it_CH', 'Comuni'),
+        ('entities', 'rm_CH', 'Vischnancas'),
         ('district', 'de_CH', 'Bezirk'),
+        ('district', 'fr_CH', 'District électoral'),
+        ('district', 'it_CH', 'Distretto elettorale'),
+        ('district', 'rm_CH', 'Circul electoral'),
         ('districts', 'de_CH', 'Bezirke'),
+        ('districts', 'fr_CH', 'Districts électorales'),
+        ('districts', 'it_CH', 'Distretti elettorali'),
+        ('districts', 'rm_CH', 'Circuls electorals'),
     ):
         assert translate(principal.label(label, year=2019), locale) == result
 
     for label, locale, result in (
-            ('district', 'de_CH', 'Gemeinde'),
-            ('districts', 'de_CH', 'Gemeinden'),
+        ('district', 'de_CH', 'Gemeinde'),
+        ('district', 'fr_CH', 'Commune'),
+        ('district', 'it_CH', 'Comune'),
+        ('district', 'rm_CH', 'Vischnanca'),
+        ('districts', 'de_CH', 'Gemeinden'),
+        ('districts', 'de_CH', 'Gemeinden'),
+        ('districts', 'fr_CH', 'Communes'),
+        ('districts', 'it_CH', 'Comuni'),
+        ('districts', 'rm_CH', 'Vischnancas'),
     ):
         assert translate(principal.label(label, year=2020), locale) == result
 
-    principal = Canton(name='sg', canton='sg')
-    for label, locale, result in (
-        ('entity', 'de_CH', 'Gemeinde'),
-        ('entities', 'de_CH', 'Gemeinden'),
-        ('district', 'de_CH', 'Wahlkreis'),
-        ('districts', 'de_CH', 'Wahlkreise'),
-    ):
-        assert translate(principal.label(label), locale) == result
-
-    principal = Canton(name='Zug', canton='zg')
-    for label, locale, result in (
-        ('entity', 'de_CH', 'Gemeinde'),
-        ('entities', 'de_CH', 'Gemeinden')
-    ):
-        assert translate(principal.label(label), locale) == result
-
+    # Bern
     principal = Municipality(name='Be', municipality='351')
     for label, locale, result in (
         ('entity', 'de_CH', 'Stadtteil'),
