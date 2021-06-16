@@ -263,9 +263,6 @@ def test_view_notifications_summarized(election_day_app):
 
     manage = client.get('/trigger-notifications')
     assert "erneut auslösen" in manage
-    assert "email Regierungsratswahl" in manage
-    assert "sms Regierungsratswahl" in manage
-    assert "webhooks Regierungsratswahl" in manage
-    assert "email Unternehmenssteuerreformgesetz" in manage
-    assert "sms Unternehmenssteuerreformgesetz" in manage
-    assert "webhooks Unternehmenssteuerreformgesetz" in manage
+    assert ": email (" in manage
+    assert ": sms (" in manage
+    assert ": webhooks (" in manage
