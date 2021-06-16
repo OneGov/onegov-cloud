@@ -1,11 +1,10 @@
 import sedate
 
 from datetime import datetime
-from datetime import time
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import Form
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.validators import FileSizeLimit, StrictOptional
+from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.winterthur import _
 from onegov.winterthur.models import MissionReportFile
