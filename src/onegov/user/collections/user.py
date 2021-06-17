@@ -96,7 +96,9 @@ class UserCollection(object):
             The arguments given to this function are the attributes of the
             :class:`~onegov.user.models.User` class with the same name.
         """
-        assert username and password and role
+        assert username
+        assert password
+        assert role
 
         if self.exists(username):
             raise ExistingUserError(username)
