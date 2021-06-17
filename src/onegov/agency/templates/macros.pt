@@ -22,9 +22,9 @@
 
             <tal:block tal:condition="children">
                 <h3 i18n:translate>Suborganizations</h3>
-                <ul class="children" data-sortable data-sortable-url="${layout.move_agency_url_template}">
+                <ul class="children">
                     <tal:block tal:repeat="child children">
-                        <li tal:condition="child.access == 'public' or request.is_logged_in" data-sortable-id="${child.id}">
+                        <li tal:condition="child.access == 'public' or request.is_logged_in">
                             <a href="${request.link(child)}">${child.title}</a>
                         </li>
                     </tal:block>
@@ -33,9 +33,9 @@
 
             <tal:block tal:condition="memberships">
                 <h3 i18n:translate>People</h3>
-                <ul class="memberships" data-sortable data-sortable-url="${layout.move_membership_within_agency_url_template}">
+                <ul class="memberships">
                     <tal:block tal:repeat="membership memberships">
-                        <li tal:condition="(membership.access == 'public' and membership.person.access == 'public') or request.is_logged_in" data-sortable-id="${membership.id}">
+                        <li tal:condition="(membership.access == 'public' and membership.person.access == 'public') or request.is_logged_in">
                             <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>, <a href="${request.link(membership)}">${membership.title}</a>
                             <span tal:condition="membership.prefix|None">${membership.prefix}</span>
                             <a tal:condition="request.is_manager_for_model(agency)" href="${request.link(membership, name='edit')}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
@@ -144,9 +144,9 @@
                         </tal:block>
                         <dt tal:condition="memberships" i18n:translate>Memberships</dt>
                         <dd>
-                            <ul data-sortable data-sortable-url="${layout.move_membership_within_person_url_template}">
+                            <ul>
                                 <tal:block tal:repeat="membership memberships">
-                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership" data-sortable-id="${membership.id}"
+                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership"
                                             tal:define="agency_path layout.agency_path(membership.agency)|None; full_path request.app.org.agency_path_display_on_people">
                                         <a tal:define="full_path_ full_path and agency_path" href="${request.link(membership.agency)}" title="${agency_path if not full_path else ''}">${membership.agency.title if not full_path_ else agency_path}</a> -
                                         <a tal:define="title membership.title or layout.default_membership_title" href="${request.link(membership)}">${title}</a>

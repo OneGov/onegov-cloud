@@ -48,6 +48,11 @@ class PersonLayout(OrgPersonLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    text=_("Sort"),
+                    url=self.request.link(self.model, 'sort'),
+                    attrs={'class': 'sort'}
+                ),
+                Link(
                     text=_("Delete"),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
@@ -112,7 +117,7 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin, NavTreeMixin):
                     attrs={'class': 'create-pdf'}
                 ),
                 Link(
-                    text=_("Sort root agencies"),
+                    text=_("Sort"),
                     url=self.request.link(self.model, 'sort'),
                     attrs={'class': 'sort'}
                 ),
@@ -185,6 +190,11 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     text=_("Move"),
                     url=self.request.link(self.model.proxy(), 'move'),
                     attrs={'class': 'move'}
+                ),
+                Link(
+                    text=_("Sort"),
+                    url=self.request.link(self.model.proxy(), 'sort'),
+                    attrs={'class': 'sort'}
                 ),
                 Link(
                     text=_("Delete"),

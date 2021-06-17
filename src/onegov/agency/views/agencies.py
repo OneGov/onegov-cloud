@@ -61,16 +61,23 @@ def view_agencies(self, request):
 
 @AgencyApp.html(
     model=ExtendedAgencyCollection,
-    template='root_agencies.pt',
+    template='sort.pt',
     name='sort',
     permission=Private
 )
-def view_sort_root_agencies(self, request):
+def view_agencies_sort(self, request):
+    layout = AgencyCollectionLayout(self, request)
 
     return {
-        'title': _("Sort root agencies"),
-        'agencies': self.roots,
-        'layout': AgencyCollectionLayout(self, request)
+        'title': _("Sort"),
+        'layout': layout,
+        'items': (
+            (
+                _('Agencies'),
+                layout.move_agency_url_template,
+                ((agency.id, agency.title) for agency in self.roots)
+            ),
+        )
     }
 
 
@@ -85,6 +92,38 @@ def view_agency(self, request):
         'title': self.title,
         'agency': self,
         'layout': AgencyLayout(self, request)
+    }
+
+
+@AgencyApp.html(
+    model=ExtendedAgency,
+    template='sort.pt',
+    name='sort',
+    permission=Private
+)
+def view_agency_sort(self, request):
+    layout = AgencyLayout(self, request)
+    return {
+        'title': self.title,
+        'layout': layout,
+        'items': (
+            (
+                _('Suborganizations'),
+                layout.move_agency_url_template,
+                ((agency.id, agency.title) for agency in self.children)
+            ),
+            (
+                _('Memberships'),
+                layout.move_membership_within_agency_url_template,
+                (
+                    (
+                        membership.id,
+                        f'{membership.person.title} - {membership.title}'
+                    )
+                    for membership in self.memberships
+                )
+            ),
+        )
     }
 
 

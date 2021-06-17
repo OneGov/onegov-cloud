@@ -180,6 +180,34 @@ def view_person(self, request):
     }
 
 
+@AgencyApp.html(
+    model=ExtendedPerson,
+    template='sort.pt',
+    name='sort',
+    permission=Public
+)
+def view_sort_person(self, request):
+    layout = ExtendedPersonLayout(self, request)
+
+    return {
+        'title': _("Sort"),
+        'layout': layout,
+        'items': (
+            (
+                _('Memberships'),
+                layout.move_membership_within_person_url_template,
+                (
+                    (
+                        membership.id,
+                        f'{membership.agency.title} - {membership.title}'
+                    )
+                    for membership in self.memberships_by_agency
+                )
+            ),
+        )
+    }
+
+
 @AgencyApp.form(
     model=ExtendedPersonCollection,
     name='new',

@@ -118,8 +118,8 @@ def test_views(client):
     assert 'Ständerat' in sr
 
     # ... sort agencies
-    sort = client.get('/organizations').click('Hauptorganisationen sortieren')
-    url = sort.pyquery('ul.agencies').attr('data-sortable-url')
+    sort = client.get('/organizations').click('Sortieren')
+    url = sort.pyquery('ul[data-sortable]').attr('data-sortable-url')
 
     url = url.replace('%7Bsubject_id%7D', '2')
     url = url.replace('%7Bdirection%7D', 'below')

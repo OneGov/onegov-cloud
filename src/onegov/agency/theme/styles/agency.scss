@@ -8,7 +8,6 @@ $arrow-right: '\f061';
 .agencies {
     list-style: none;
     margin-left: 0;
-
 }
 
 .agency-list-card {
@@ -69,7 +68,24 @@ ul.hidden-people span {
     }
 }
 
-li[data-sortable-id] a,
+ul[data-sortable] {
+    list-style: none;
+    margin-left: 0;
+}
+
+li[data-sortable-id] {
+    background: $white-smoke;
+    border: 1px dashed $gainsboro;
+    cursor: grab;
+    margin-bottom: 1em;
+    padding: .25rem;
+
+    &::before {
+        @include icon('\f0dc');
+        color: $aluminum;
+    }
+}
+
 ul.sortable-multi-checkbox li label {
     cursor: grab;
 }

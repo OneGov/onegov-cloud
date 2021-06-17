@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-04 10:32+0200\n"
+"POT-Creation-Date: 2021-06-17 08:02+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -130,6 +130,9 @@ msgstr "Person löschen"
 msgid "Edit"
 msgstr "Bearbeiten"
 
+msgid "Sort"
+msgstr "Sortieren"
+
 msgid "Delete"
 msgstr "Löschen"
 
@@ -138,9 +141,6 @@ msgstr "Startseite"
 
 msgid "Create PDF"
 msgstr "PDF erstellen"
-
-msgid "Sort root agencies"
-msgstr "Hauptorganisationen sortieren"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -162,9 +162,6 @@ msgstr "Verschieben"
 
 msgid "Membership"
 msgstr "Mitgliedschaft"
-
-msgid "Sort"
-msgstr "Sortieren"
 
 msgid "Suborganizations"
 msgstr "Unterorganisationen"
@@ -294,12 +291,8 @@ msgstr "Abgeschlossen"
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
-msgid ""
-"Sort the root agencies per drag and drop. Sub-organisations can be sorted by "
-"clicking on one of the root agencies."
-msgstr ""
-"Sortieren sie die Hauptorganisationen per Drag & Drop. Um "
-"Unterorganisationen zu sortieren, klicken sie auf eine Hauptorganisation."
+msgid "Sort the items using drag and drop."
+msgstr "Sortieren sie die Elemente mittels Drag & Drop."
 
 msgid "Added a new agency"
 msgstr "Eine neue Organisation wurde hinzufügt"
