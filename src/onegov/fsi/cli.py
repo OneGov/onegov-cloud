@@ -178,7 +178,7 @@ schools = {
 
 @cli.command(name='test-ldap')
 @click.option('--base', multiple=True)
-@click.option('--search-filter', required=True, default="(objectClass=*)")
+@click.option('--search-filter', default='')
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
 @click.option('--ldap-password', required=True)
@@ -207,7 +207,7 @@ def test_ldap(base, search_filter, ldap_server, ldap_username, ldap_password,
         'zgXAbteilung': 'department',
     }
     attributes = [*mapping.keys(), 'groupMembership', 'zgXServiceSubscription']
-
+    count = 0
     for ba in base:
         success = client.connection.search(
             ba, search_filter, attributes=attributes)
@@ -218,6 +218,8 @@ def test_ldap(base, search_filter, ldap_server, ldap_username, ldap_password,
                 sorted(client.connection.entries, key=sort_func)
         ):
             print(json.dumps(entry.entry_attributes_as_dict, indent=4))
+            count += 1
+    print(f'Found {count} entries')
 
 
 @cli.command(name='fetch-users', context_settings={'singular': True})
@@ -384,7 +386,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
 
     def users(connection):
         attributes = [*mapping.keys(), 'groupMembership']
-        bases = ('ou=SchulNet,o=Extern', 'ou=Kanton,o=KTZG')
+        bases = ('o=Extern', 'ou=Kanton,o=KTZG')
 
         for base in bases:
             success = connection.search(
