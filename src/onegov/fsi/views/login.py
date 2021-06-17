@@ -1,7 +1,6 @@
 from onegov.core.security import Public
 from onegov.fsi import _
 from onegov.fsi.app import FsiApp
-from onegov.fsi.cli import schools
 from onegov.org.views.auth import handle_login as handle_login_base
 from onegov.user import Auth
 from onegov.user.forms import LoginForm
@@ -20,13 +19,13 @@ class FsiLoginForm(LoginForm):
         username = self.username.data
         if not username or '@' not in username:
             return login_data
-        domain = f"@{username.split('@', 1)[1]}"
-        if domain in schools:
-            return {
-                'skip_providers': True,
-                **login_data
-            }
-        return login_data
+        if username.endswith('@zg.ch'):
+            return login_data
+
+        return {
+            'skip_providers': True,
+            **login_data
+        }
 
 
 @FsiApp.form(model=Auth, name='login', template='login.pt', permission=Public,
