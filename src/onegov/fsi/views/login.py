@@ -22,6 +22,9 @@ class FsiLoginForm(LoginForm):
         if username.endswith('@zg.ch'):
             return login_data
 
+        # Make sure the username is lowered
+        login_data['username'] = login_data['username'].lower()
+
         return {
             'skip_providers': True,
             **login_data
