@@ -191,8 +191,8 @@ class KK(SogcConverter):
                 path = 'content/debtor/person/addressForeign'
                 result += self.p(
                     '<br>'.join([
-                        self.get('{path}/addressCustomText'),
-                        self.get('{path}/country/name/de')
+                        self.get(f'{path}/addressCustomText'),
+                        self.get(f'{path}/country/name/de')
                     ]),
                     subtitle="Wohnsitz",
                     subtitle_break=True
