@@ -14,4 +14,8 @@
         padding-left: 2em;
         text-indent: -2em;
     }
+
+    a:not(:last-child):not(:nth-last-child(-n+2))::after {
+        content: ' > ';
+    }
 }

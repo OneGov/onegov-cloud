@@ -301,30 +301,26 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
 
 class AgencyPathMixin(object):
 
-    def get_ancestors(
-            self, item, with_item=True, levels=None, exclude_invisible=False):
+    def get_ancestors(self, item, with_item=True, levels=None):
 
         for ix, ancestor in enumerate(item.ancestors, 1):
-            if not exclude_invisible:
-                if not levels:
-                    yield Link(ancestor.title, self.request.link(ancestor))
-                elif ix in levels:
-                    yield Link(ancestor.title, self.request.link(ancestor))
+            if levels is None:
+                yield Link(ancestor.title, self.request.link(ancestor))
+            elif ix in levels:
+                yield Link(ancestor.title, self.request.link(ancestor))
 
-            elif self.request.is_visible(ancestor):
-                if not levels:
-                    yield Link(ancestor.title, self.request.link(ancestor))
-                elif ix in levels:
-                    yield Link(ancestor.title, self.request.link(ancestor))
         if with_item:
-            if not exclude_invisible:
-                yield Link(item.title, self.request.link(item))
-            elif self.request.is_visible(item):
-                yield Link(item.title, self.request.link(item))
+            yield Link(item.title, self.request.link(item))
 
-    def agency_path(self, agency, sep=' > ', with_item=True, levels=None):
-        return sep.join((
-            ln.text for ln in self.get_ancestors(agency, with_item, levels)
+    def parent_path(self, agency):
+        levels = self.request.app.org.agency_display_levels
+        return ' > '.join((
+            ln.text for ln in self.get_ancestors(agency, False, levels)
+        ))
+
+    def agency_path(self, agency):
+        return ' > '.join((
+            ln.text for ln in self.get_ancestors(agency)
         ))
 
 

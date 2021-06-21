@@ -146,9 +146,12 @@
                         <dd>
                             <ul>
                                 <tal:block tal:repeat="membership memberships">
-                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership"
-                                            tal:define="agency_path layout.agency_path(membership.agency)|None; full_path request.app.org.agency_path_display_on_people">
-                                        <a tal:define="full_path_ full_path and agency_path" href="${request.link(membership.agency)}" title="${agency_path if not full_path else ''}">${membership.agency.title if not full_path_ else agency_path}</a> -
+                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" tal:define="full_path request.app.org.agency_path_display_on_people" class="person-card-membership">
+                                        <a tal:condition="not: full_path" href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)}">${membership.agency.title}</a>
+                                        <tal:block tal:condition="full_path" tal:repeat="element layout.get_ancestors(membership.agency)">
+                                            <tal:block replace="structure element(layout)" />
+                                        </tal:block>
+                                        -
                                         <a tal:define="title membership.title or layout.default_membership_title" href="${request.link(membership)}">${title}</a>
                                     </li>
                                 </tal:block>
@@ -200,8 +203,8 @@
         <a href="${request.link(result)}">${result.title}</a>
         <p tal:define="memberships result.memberships_by_agency">
             <tal:block tal:repeat="membership memberships">
-                <span tal:condition="(membership.access == 'public' and membership.agency.access == 'public') or request.is_logged_in" tal:define="display_levels request.app.org.agency_display_levels; sep ' > '">
-                    <tal:b tal:condition="display_levels" tal:define="path layout.agency_path(membership.agency, sep, with_item=False, levels=display_levels)">${path + sep if path else ''}</tal:b>${membership.title} ${membership.agency.title}<br>
+                <span tal:condition="(membership.access == 'public' and membership.agency.access == 'public') or request.is_logged_in">
+                    <tal:b tal:define="path layout.parent_path(membership.agency)">${path + ' > ' if path else ''}</tal:b>${membership.title} ${membership.agency.title}<br>
                 </span>
             </tal:block>
             <span tal:condition="not:memberships|nothing" i18n:translate>People</span>
