@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2021.60`
+
+> commits: **7 / [5ca599442b...3769935af9](https://github.com/OneGov/onegov-cloud/compare/5ca599442b^...3769935af9)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.60)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Add dedicated views for sorting.**
+
+**`Feature`** | **[5239cb98f6](https://github.com/onegov/onegov-cloud/commit/5239cb98f6529141f1016cef05da17e25658f352)**
+
+### Fsi
+
+✨ **Adapts ldap sync for teachers**
+
+- maps organisation by ldap base and filters
+- adapts login for teachers
+- adds helper class to query from config (json) for ldap sync
+
+**`Other`** | **[FSI-2](https://kanton-zug.atlassian.net/browse/FSI-2)** | **[3769935af9](https://github.com/onegov/onegov-cloud/commit/3769935af921df1639daa21a96a324695ec813d0)**
+
+### Gazette
+
+🐞 **Fixes SOGC importer.**
+
+**`Bugfix`** | **[842352cd19](https://github.com/onegov/onegov-cloud/commit/842352cd19dae4a5912408e40084a9ce12cbcfc4)**
+
 ## Release `2021.59`
 
-> commits: **11 / [90f7a384b6...673cf13b7b](https://github.com/OneGov/onegov-cloud/compare/90f7a384b6^...673cf13b7b)**  
+> released: **2021-06-16 11:31**<br>
+> commits: **12 / [90f7a384b6...47f659af71](https://github.com/OneGov/onegov-cloud/compare/90f7a384b6^...47f659af71)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.59)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
