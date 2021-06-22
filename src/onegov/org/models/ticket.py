@@ -14,6 +14,42 @@ from purl import URL
 from sqlalchemy.orm import object_session
 
 
+class TicketDeletionError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class TicketDeletionMixin:
+
+    @property
+    def ticket_deletable(self):
+        return not self.undecided and self.ticket.state == 'closed'
+
+    @property
+    def support_ticket_delete(self):
+        return hasattr(self, f'delete_ticket_{self.ticket.handler_code}')
+
+    def delete(self):
+        if not self.ticket_deletable:
+            raise TicketDeletionError(
+                _("This ticket is undecided or not closed")
+            )
+
+        # Call specific implementation of each handler code
+        if not self.support_ticket_delete:
+            raise TicketDeletionError(
+                _("Deletion for ticket of this type is not supported")
+            )
+        getattr(self, f'delete_ticket_{self.ticket.handler_code}')()
+
+        messages = MessageCollection(
+            self.session, channel_id=self.ticket.number)
+
+        for message in messages.query():
+            messages.delete(message)
+        self.session.delete(self.ticket)
+
+
 def ticket_submitter(ticket):
     handler = ticket.handler
     mail = handler.deleted and ticket.snapshot.get('email') or handler.email
@@ -102,7 +138,7 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('FRM')
-class FormSubmissionHandler(Handler):
+class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Form Submissions")
     code_title = _("Forms")
@@ -669,7 +705,7 @@ class EventSubmissionHandler(Handler):
 
 
 @handlers.registered_handler('DIR')
-class DirectoryEntryHandler(Handler):
+class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Directory Entry Submissions")
     code_title = _("Directory Entry Submissions")

@@ -20,7 +20,7 @@ from onegov.org.layout import TicketsLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
-from onegov.org.models.ticket import ticket_submitter
+from onegov.org.models.ticket import ticket_submitter, TicketDeletionError
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
@@ -451,6 +451,30 @@ def mute_ticket(self, request):
         }))
 
     return morepath.redirect(request.link(self))
+
+
+@OrgApp.view(model=Ticket, name='delete', permission=Private)
+def delete_ticket(self, request):
+    request.assert_valid_csrf_token()
+    assert self.state == 'closed'
+
+    # check the handler
+    if self.handler.undecided:
+        request.error(_("This ticket requires a decision, but no "
+                                "decision has been made yet."))
+        return morepath.redirect(request.link(self))
+
+    # let the handler delete the ticket and ticket messages
+    try:
+        self.handler.delete()
+    except TicketDeletionError as err:
+        request.error(err.message)
+        return morepath.redirect(request.link(self))
+
+    request.success(_("Ticket successfully deleted"))
+
+    return morepath.redirect(
+        request.link(TicketCollection(request.session, state='closed')))
 
 
 @OrgApp.view(model=Ticket, name='unmute', permission=Private)
