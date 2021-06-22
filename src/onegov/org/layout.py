@@ -1104,6 +1104,14 @@ class TicketLayout(DefaultLayout):
                     url=self.request.link(self.model, 'reopen'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
+                handler = self.model.handler
+                if handler.support_ticket_delete:
+                    links.append(Link(
+                        text=_("Delete"),
+                        url=self.csrf_protected_url(
+                            self.request.link(self.model, 'delete')),
+                        attrs={'class': ('ticket-button', 'ticket-delete')}
+                    ))
 
             # ticket notes are always enabled
             links.append(
