@@ -10,8 +10,9 @@ cli = command_group()
 
 
 @cli.command(context_settings={'default_selector': '*'})
+@click.option('--fail', is_flag=True, default=False, help='Fail on errors')
 @pass_group_context
-def reindex(group_context):
+def reindex(group_context, fail):
     """ Reindexes all objects in the elasticsearch database. """
 
     def run_reindex(request, app):
@@ -22,7 +23,7 @@ def reindex(group_context):
         print(click.style(title, underline=True))
 
         start = utcnow()
-        request.app.es_perform_reindex()
+        request.app.es_perform_reindex(fail)
 
         print(f"took {utcnow() - start}")
 

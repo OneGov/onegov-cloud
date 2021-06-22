@@ -342,10 +342,12 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def es_perform_reindex(self):
+    def es_perform_reindex(self, fail=False):
         """ Reindexes all content.
 
         This is a heavy operation and should be run with consideration.
+
+        By default, all exceptions during reindex are silently ignored.
 
         """
 
@@ -379,10 +381,16 @@ class ElasticsearchApp(morepath.App):
                 session.bind.dispose()
 
         # by loading models in threads we can speed up the whole process
-        with ThreadPoolExecutor() as e:
-            e.map(reindex_model, (
-                m for b in self.session_manager.bases
-                  for m in searchable_sqlalchemy_models(b)))
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(
+                reindex_model, (
+                    model
+                    for base in self.session_manager.bases
+                    for model in searchable_sqlalchemy_models(base)
+                )
+            )
+            if fail:
+                tuple(results)
 
         self.es_indexer.bulk_process()
 
