@@ -647,6 +647,13 @@ def view_tickets(self, request, layout=None):
                 active=self.state == id,
                 attrs={'class': 'ticket-filter-' + id}
             )
+        if self.state == 'closed':
+            yield Link(
+                text=_("Deletable"),
+                url=request.link(self.for_deletion(not self.deleting)),
+                active=self.deleting,
+                attrs={'class': 'ticket-filter-deletable'}
+            )
 
     def get_handlers():
         nonlocal groups
@@ -720,6 +727,9 @@ def view_tickets(self, request, layout=None):
     else:
         raise NotImplementedError
 
+    if not self.state == 'closed':
+        self.deleting = False
+
     handlers = tuple(get_handlers())
     owners = tuple(get_owners())
     filters = tuple(get_filters())
@@ -736,6 +746,7 @@ def view_tickets(self, request, layout=None):
         'owners': owners,
         'tickets_title': tickets_title,
         'tickets_state': self.state,
+        'deleting_tickets': self.deleting,
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'handler': handler,
