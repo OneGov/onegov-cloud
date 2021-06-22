@@ -320,7 +320,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('RSV')
-class ReservationHandler(Handler):
+class ReservationHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Reservations")
     code_title = _("Reservations")
@@ -553,7 +553,7 @@ class ReservationHandler(Handler):
 
 
 @handlers.registered_handler('EVN')
-class EventSubmissionHandler(Handler):
+class EventSubmissionHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Events")
     code_title = _("Events")
