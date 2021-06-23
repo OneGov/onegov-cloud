@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2021.61`
+
+> commits: **3 / [8f72c8071f...be06e1c517](https://github.com/OneGov/onegov-cloud/compare/8f72c8071f^...be06e1c517)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.61)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Display individual links to all parent agencies of a membership.**
+
+**`Feature`** | **[STAKABS-30](https://kt-bs.atlassian.net/browse/STAKABS-30)** | **[8f72c8071f](https://github.com/onegov/onegov-cloud/commit/8f72c8071f5e7890a66c18d324b9da5edab23a21)**
+
+### Search
+
+🎉 **Add a CLI argument to fail on reindexing errors.**
+
+**`Feature`** | **[455a4c6463](https://github.com/onegov/onegov-cloud/commit/455a4c6463a853649763bcf90dc3b04302a86057)**
+
 ## Release `2021.60`
 
-> commits: **7 / [5ca599442b...3769935af9](https://github.com/OneGov/onegov-cloud/compare/5ca599442b^...3769935af9)**  
+> released: **2021-06-21 09:16**<br>
+> commits: **8 / [5ca599442b...ff0ec616f5](https://github.com/OneGov/onegov-cloud/compare/5ca599442b^...ff0ec616f5)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.60)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
