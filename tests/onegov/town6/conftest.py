@@ -87,6 +87,18 @@ def es_town_app(request):
 
 def create_town_app(request, use_elasticsearch):
     app = create_app(TownApp, request, use_elasticsearch=False)
+    app.configure_payment_providers(**{
+        'payment_providers_enabled': True,
+        'payment_provider_defaults': {
+            'stripe_connect': {
+                'client_id': 'foo',
+                'client_secret': 'foo',
+                'oauth_gateway': 'https://oauth.example.org',
+                'oauth_gateway_auth': 'foo',
+                'oauth_gateway_secret': 'bar'
+            }
+        }
+    })
     session = app.session()
 
     forms = request.getfixturevalue('forms')
