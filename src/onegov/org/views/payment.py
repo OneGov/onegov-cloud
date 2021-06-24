@@ -160,6 +160,7 @@ def run_export(session, start, end, nested, formatter):
 )
 def change_payment_amount(self, request):
     request.assert_valid_csrf_token()
+    assert not self.paid
     net_amount = Decimal(request.params['netAmount'])
     assert net_amount - self.fee > 0
     self.amount = net_amount - self.fee
