@@ -77,7 +77,7 @@ class PaymentCollection(GenericCollection, Pagination):
                 getattr(link.table.columns, link.key)
             ).filter(
                 link.table.columns.payment_id.in_(tuple(
-                    p.id for p in self.batch
+                    p.id for p in batch
                 ))
             )
 
