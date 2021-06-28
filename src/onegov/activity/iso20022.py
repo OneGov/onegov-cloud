@@ -237,8 +237,10 @@ def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
         if t.currency != currency:
             yield t
             continue
-
-        if t.tid in paid_transaction_ids:
+        if t.tid and t.tid in paid_transaction_ids:
+            # what if tid is None?
+            # it so happened that the records uploaded were marked as paid
+            # for all records with tid = None since it was in paid_transactions
             t.paid = True
             t.username = paid_transaction_ids[t.tid]
             t.confidence = 1
