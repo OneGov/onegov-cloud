@@ -1,3 +1,6 @@
+from datetime import date
+
+from onegov.pay import PaymentCollection
 from tests.onegov.org.conftest import create_org_app
 
 from onegov.core.security import Secret
@@ -5,6 +8,7 @@ from onegov.org.app import OrgApp
 from onegov.org.forms import ExportForm
 from onegov.org.models import Export
 from tests.shared import Client as BaseClient
+import transaction
 
 
 class Client(BaseClient):
@@ -60,3 +64,59 @@ def test_export(request):
 
     page = editor.get('/export/my-export', status=403)
     assert "Ihnen fehlt die nötige Berechtigung" in page
+
+
+def test_exports_view(client):
+    client.get('/exports', status=403)
+
+    client.login_editor()
+    exports = client.get('/exports')
+    assert 'Zahlungen' in exports
+
+
+def test_payments_export(client):
+    client.login_editor()
+    session = client.app.session()
+    assert client.app.payment_providers_enabled
+    exports = client.get('/payments').click('Export')
+    exports.form['start'] = '2021-01-01'
+    end = date.today().strftime('%Y-%m-%d')
+    exports.form['end'] = end
+    exports.form['file_format'] = 'json'
+
+    resp = exports.form.submit()
+    assert resp.json == []
+
+    payments = PaymentCollection(session)
+
+    # exceed the batch size of the query, ordered by desc created
+    states = ('open', 'paid', 'failed', 'cancelled')
+    sources = ('manual',)
+    for ix, state in enumerate(states, start=1):
+        for source in sources:
+            payments.add(source=source, amount=ix, state=state)
+
+    transaction.commit()
+    resp = exports.form.submit().json
+    assert len(resp) == len(states) * len(sources)
+
+    # oldest entry is the first
+    entry = resp[-1]
+    assert entry.pop('Datum erstellt')
+    assert entry == {
+        'Referenz Ticket': None,
+        'Email Antragsteller': None,
+        'Kategorie Ticket': None,
+        'Status Ticket': None,
+        'Ticket entschieden': None,
+        'ID beim Zahlungsanbieter': None,
+        'Status': 'Offen',
+        'Währung': 'CHF',
+        'Betrag': 1.0,
+        'Netto Betrag': 1.0,
+        'Gebühr': 0,
+        'Zahlungsanbieter': 'Manuell',
+        'Herkunft': 'manual',
+        'Ausbezahlt': None,
+        'Referenzen': [],
+    }

@@ -10,6 +10,7 @@ from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.org.exports.base import OrgExport
 from onegov.org.models import (
     ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
     ExportCollection, PublicationCollection, PageMove, News
@@ -1754,7 +1755,7 @@ class PaymentCollectionLayout(DefaultLayout):
             links.append(
                 Link(
                     text=_("Export"),
-                    url=self.request.link(self.model, 'export'),
+                    url=self.request.class_link(OrgExport, {'id': 'payments'}),
                     attrs={'class': 'export-link'}
                 )
             )
