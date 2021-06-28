@@ -1,17 +1,28 @@
 import os
+from datetime import date, timedelta
+from uuid import uuid4
 
 import onegov.ticket
 import transaction
 import pytest
 
+from onegov.chat import MessageCollection
 from onegov.core.elements import Element
+from onegov.core.utils import Bunch
+from onegov.form import FormDefinition, FormDefinitionCollection, \
+    FormCollection, FormSubmissionCollection, FormRegistrationWindow, \
+    FormSubmission
 from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
+from onegov.org.models import TicketMessage
+from onegov.org.views.ticket import delete_ticket
+from onegov.ticket import TicketCollection
 from onegov.user import User
 from pytest_localserver.http import WSGIServer
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client as BaseClient
+from tests.shared.scenario import BaseScenario
 from tests.shared.utils import create_app
 from yaml import dump
 
@@ -174,3 +185,223 @@ def render_element(request):
         return client.get('/element')
 
     return render
+
+
+class Scenario(BaseScenario):
+    cached_attributes = (
+        'tickets',
+        'forms',
+        'form_submissions',
+        'users',
+        'directories',
+        'events',
+        'reservations',
+    )
+
+    def __init__(self, session, test_password, handler_code=None, client=None):
+        super().__init__(session, test_password)
+        self.session = session
+        self.handler_code = handler_code
+        self.tickets_c = TicketCollection(self.session)
+        self.messages_c = MessageCollection(self.session)
+        self.form_definitions_ = FormDefinitionCollection(self.session)
+        self.forms_c = FormCollection(self.session)
+
+        self.tickets = []
+        self.forms = []
+        self.form_submissions = []
+        self.registration_windows = []
+        self.users = []
+        self.directories = []
+        self.events = []
+        self.reservations = []
+
+        self.admin = session.query(User).filter_by(role='admin').first()
+        self.member = session.query(User).filter_by(role='member').first()
+        self.ticket_state = None
+        self.request = Bunch(
+            session=self.session, translate=lambda x: x,
+            is_admin=True,
+            assert_valid_csrf_token=lambda: True,
+            warning=lambda x: str(x),
+            success=lambda x: str(x)
+        )
+        self.client = client
+
+    def add_user(self, **kwargs):
+        user = self.add(User, password=self.test_password, **kwargs)
+        self.users.append(user)
+        return self.latest_user
+
+    def add_admin(self, username='admin@example.org'):
+        return self.add_user(role='admin', username=username)
+
+    def add_member(self, username='member@example.org'):
+        return self.add_user(role='member', username=username)
+
+    def handler_data_FRM(self, **options):
+        return {}
+
+    def handler_data_EVN(self, **options):
+        return {}
+
+    def handler_data_DIR(self, **options):
+        # can also be empty
+        return {
+            'state': options.get('state', 'adopted'),
+            'directory': options.get('directory'),
+            'entry_name': options.get('entry_name')
+        }
+
+    def handler_data_AGN(self, **options):
+        raise {}
+
+    def handler_data_RSV(self, **options):
+        return {}
+
+    def handler_data(self, **options):
+        return getattr(self, f'handler_data_{self.handler_code}')(**options)
+
+    def add_ticket(self, obj=None, handler_id=None, **handler_data):
+        ticket = getattr(self, f'add_ticket_{self.handler_code}')(
+            obj=obj, handler_id=handler_id, **handler_data
+        )
+        self.tickets.append(ticket)
+        return self.latest_ticket
+
+    def add_ticket_FRM(self, submission=None, handler_id=None, owner=None, **handler_data):
+        """ Adds a ticket for the latest form submission """
+
+        if not handler_id:
+            submission = submission or self.latest_form_submission
+
+        handler_id = handler_id or submission.id
+        assert handler_id
+        owner = owner or self.latest_user
+        self.request.current_username = owner.username
+
+        with self.session.no_autoflush:
+            ticket = TicketCollection(self.session).open_ticket(
+                handler_code=self.handler_code,
+                handler_id=handler_id,
+                **handler_data
+            )
+            TicketMessage.create(ticket, self.request, 'opened')
+        return ticket
+
+    def add_form(self, **kwargs):
+        title = kwargs.get('title')
+        if not title:
+            kwargs['title'] = 'A-1'
+            kwargs.setdefault('name', 'a')
+        kwargs.setdefault('definition', 'E-Mail * = @@@')
+
+        form = self.form_definitions_.add(
+            type='custom',
+            **kwargs
+        )
+        self.forms.append(form)
+        return self.latest_form
+
+    def add_reservations(self):
+        pass
+
+    def add_directory(self):
+        pass
+
+    def add_registration_window(self, form=None, **kwargs):
+        form = form or self.latest_form
+
+        today = date.today()
+        kwargs.setdefault('start', today)
+        kwargs.setdefault('end', kwargs['start'] + timedelta(days=10))
+
+        window = form.add_registration_window(**kwargs)
+        self.registration_windows.append(window)
+        return self.registration_windows[-1]
+
+    def add_form_submission(self, definition=None, user=None,
+                            window_id=None, **kwargs):
+        """ Create a form submission for the definition definition. Only supports
+         adding submission for existing definitions. And we dont care about the
+          submission content. """
+        if not definition:
+            definition = self.latest_form
+        assert definition
+
+        window = definition.current_registration_window
+        if not window_id and window:
+            window_id = window.id
+
+        user = user or self.latest_user
+
+        state = kwargs.get('state', 'complete')
+        email = kwargs.get('email', user.username)
+        meta = kwargs.get('meta')
+        spots = kwargs.get('spots')
+        title = kwargs.get('title', 'FormSubmission')
+
+        submission_class = FormSubmission.get_polymorphic_class(
+            state, FormSubmission
+        )
+        submission = submission_class()
+        submission.id = uuid4()
+        submission.title = title
+        submission.name = definition.name
+        submission.state = state
+        submission.meta = meta or {}
+        submission.email = email
+        submission.registration_window_id = window_id
+        submission.spots = spots
+        submission.payment_method = 'manual'
+        submission.definition = definition.definition
+
+        submission.extensions = definition.extensions
+        self.session.add(submission)
+
+        # skip adding data
+
+        self.session.flush()
+
+        self.form_submissions.append(submission)
+
+        return self.latest_form_submission
+
+    def accept_ticket(self, ticket=None, user=None):
+        ticket = ticket or self.latest_ticket
+        ticket.accept_ticket(user or self.latest_user)
+
+    def close_ticket(self, ticket=None):
+        ticket = ticket or self.latest_ticket
+        ticket.close_ticket()
+
+    def reopen_ticket(self, ticket=None, user=None):
+        ticket = ticket or self.latest_ticket
+        ticket.reopen_ticket(user or self.latest_user)
+
+    def delete_ticket(self, ticket=None):
+        """Using the view function allows to check for TicketDeletionError's """
+        ticket = ticket or self.tickets[-1]
+        delete_ticket(ticket, self.request)
+
+    @property
+    def latest_form(self):
+        return self.forms[-1] if self.forms else None
+
+    @property
+    def latest_user(self):
+        return self.users[-1] if self.users else None
+
+    @property
+    def latest_form_submission(self):
+        return self.form_submissions[-1] if self.form_submissions else None
+
+    @property
+    def latest_ticket(self):
+        return self.tickets[-1] if self.tickets else None
+
+
+@pytest.fixture()
+def scenario(request, client):
+    test_password = request.getfixturevalue('test_password')
+    return Scenario(client.app.session(), test_password, client=client)
