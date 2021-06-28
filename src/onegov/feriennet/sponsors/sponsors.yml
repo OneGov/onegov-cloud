@@ -138,18 +138,18 @@
     bookings:
       src:
         de: sponsors/wup-banner-de.png
-        fr: sponsors/wup-banner-de.png
-        it: sponsors/wup-banner-de.png
+        fr: sponsors/concordia-banner-fr.jpg
+        it: sponsors/concordia-banner-it.jpg
       url:
         de: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
-        fr: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
-        it: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+        fr: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-fr'
+        it: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-it'
     invoices:
       src:
         de: sponsors/wup-banner-de.png
-        fr: sponsors/wup-banner-de.png
-        it: sponsors/wup-banner-de.png
+        fr: sponsors/lidl-banner-fr.png
+        it: sponsors/lidl-banner-it.png
       url:
         de: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
-        fr: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
-        it: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
+        fr: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+        it: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
