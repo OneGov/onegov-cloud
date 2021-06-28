@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-28 07:58+0200\n"
+"POT-Creation-Date: 2021-06-28 14:25+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -139,8 +139,8 @@ msgstr "Montant net"
 msgid "Fee"
 msgstr "Tarif"
 
-msgid "Disbursed"
-msgstr "Décaissé"
+msgid "Date Paid"
+msgstr ""
 
 msgid "References"
 msgstr ""
@@ -2599,6 +2599,9 @@ msgstr "à ${time}"
 
 msgid "Object"
 msgstr "Objet"
+
+msgid "Disbursed"
+msgstr "Décaissé"
 
 msgid "Digital Signature"
 msgstr "Signature électronique"

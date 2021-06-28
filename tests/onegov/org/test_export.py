@@ -116,7 +116,6 @@ def test_payments_export(client):
         'Netto Betrag': 1.0,
         'Gebühr': 0,
         'Zahlungsanbieter': 'Manuell',
-        'Herkunft': 'manual',
-        'Ausbezahlt': None,
+        'Datum Bezahlt': None,
         'Referenzen': [],
     }

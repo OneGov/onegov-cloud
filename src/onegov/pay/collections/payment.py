@@ -91,7 +91,7 @@ class PaymentCollection(GenericCollection, Pagination):
         return payment_links
 
     def payment_links_by_subset(self, subset=None):
-        subset = subset or self.subset
+        subset = subset or self.subset()
         return self.payment_links_for(subset)
 
     def payment_links_by_batch(self, batch=None):

@@ -38,12 +38,18 @@ def provider_title(payment, providers):
 )
 class PaymentsExport(OrgExport):
 
+    """
+    Date Paid:
+    - for manual payments, we don't know exactly, assuming the last_modified
+      date is state is paid
+    """
+
     def query(self, session, start, end):
         tickets = TicketCollection(session)
         coll = PaymentCollection(session, start=start, end=end)
         payments = tuple(coll.subset())
 
-        payment_links = coll.payment_links_by_batch(payments)
+        payment_links = coll.payment_links_by_subset(payments)
         get_ticket = partial(ticket_by_link, tickets)
         pr = {
             provider.id: provider
