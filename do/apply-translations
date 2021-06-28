@@ -73,6 +73,8 @@ def apply_translations(src, target, overwrite, dry_run):
     Use the source and target names of onegov modules to transfer
     translations that appear in both.
 
+    Example: apply-translations --src org --target town6
+
     """
     src_locals = f'{base}/{src}/locale'
     langs = [

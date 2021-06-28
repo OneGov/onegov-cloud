@@ -24,6 +24,7 @@ from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
+from onegov.org.exports.base import OrgExport
 from onegov.org.models import ExportCollection
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -2172,7 +2173,7 @@ class PaymentCollectionLayout(DefaultLayout):
             links.append(
                 Link(
                     text=_("Export"),
-                    url=self.request.link(self.model, 'export'),
+                    url=self.request.class_link(OrgExport, {'id': 'payments'}),
                     attrs={'class': 'export-link'}
                 )
             )

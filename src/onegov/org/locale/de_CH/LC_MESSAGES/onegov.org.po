@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-10 11:06+0200\n"
+"POT-Creation-Date: 2021-06-28 14:25+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -117,6 +117,60 @@ msgstr "Diese Seite ist Geheim"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+msgid "Source"
+msgstr "Herkunft"
+
+msgid "ID Payment Provider"
+msgstr "ID beim Zahlungsanbieter"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Currency"
+msgstr "Währung"
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Net Amount"
+msgstr "Netto Betrag"
+
+msgid "Fee"
+msgstr "Gebühr"
+
+msgid "Date Paid"
+msgstr "Datum Bezahlt"
+
+msgid "References"
+msgstr "Referenzen"
+
+msgid "Created Date"
+msgstr "Datum erstellt"
+
+msgid "Reference Ticket"
+msgstr "Referenz Ticket"
+
+msgid "Submitter Email"
+msgstr "Email Antragsteller"
+
+msgid "Category Ticket"
+msgstr "Kategorie Ticket"
+
+msgid "Status Ticket"
+msgstr "Status Ticket"
+
+msgid "Ticket decided"
+msgstr "Ticket entschieden"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Exports payments and tickets"
+msgstr "Exportiert Zahlungen und Tickets"
+
 msgid "Mo"
 msgstr "Mo"
 
@@ -173,12 +227,6 @@ msgstr "Ausser an"
 
 msgid "On holidays"
 msgstr "An Feiertagen"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
 
 msgid "Start date before end date"
 msgstr "Start Datum vor Ende"
@@ -359,9 +407,6 @@ msgstr "Kostenlos"
 
 msgid "Price per submission"
 msgstr "Preis pro Eingabe"
-
-msgid "Currency"
-msgstr "Währung"
 
 msgid "Users may send change requests"
 msgstr "Benutzer können Änderungen vorschlagen"
@@ -1450,6 +1495,9 @@ msgstr "Startseite"
 msgid "Edit"
 msgstr "Bearbeiten"
 
+msgid "QR"
+msgstr ""
+
 msgid "Delete"
 msgstr "Löschen"
 
@@ -2133,9 +2181,6 @@ msgstr ""
 msgid "Change Url"
 msgstr "Url ändern"
 
-msgid "Source"
-msgstr "Herkunft"
-
 msgid "Subject"
 msgstr "Betreff"
 
@@ -2159,9 +2204,6 @@ msgstr "Zahlung"
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
-
-msgid "Fee"
-msgstr "Gebühr"
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -2354,9 +2396,6 @@ msgstr "Fehler"
 
 msgid "Duration [s]"
 msgstr "Abfragedauer [s]"
-
-msgid "Status"
-msgstr ""
 
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
@@ -2557,9 +2596,6 @@ msgstr "um ${time}"
 msgid "Object"
 msgstr "Objekt"
 
-msgid "Net Amount"
-msgstr "Netto Betrag"
-
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
@@ -2650,6 +2686,9 @@ msgstr "${name} ist nicht in unserer Datenbank"
 
 msgid "Accept"
 msgstr "Annehmen"
+
+msgid "Close"
+msgstr "Schliessen"
 
 msgid "Hello!"
 msgstr "Guten Tag"
@@ -3293,9 +3332,6 @@ msgstr "${count} Notiz"
 
 msgid "${count} notes"
 msgstr "${count} Notizen"
-
-msgid "Amount"
-msgstr "Betrag"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

@@ -59,17 +59,11 @@ class PaymentCollection(GenericCollection, Pagination):
     def page_by_index(self, index):
         return self.__class__(self.session, self.source, index)
 
-    def payment_links_by_batch(self, batch=None):
+    def payment_links_for(self, items):
         """ A more efficient way of loading all links of the given batch
-        (compared to loading payment.links one by one).
+              (compared to loading payment.links one by one).
 
         """
-
-        batch = batch or self.batch
-
-        if not batch:
-            return None
-
         payment_links = defaultdict(list)
 
         for link in Payment.registered_links.values():
@@ -77,7 +71,7 @@ class PaymentCollection(GenericCollection, Pagination):
                 getattr(link.table.columns, link.key)
             ).filter(
                 link.table.columns.payment_id.in_(tuple(
-                    p.id for p in self.batch
+                    p.id for p in items
                 ))
             )
 
@@ -95,3 +89,15 @@ class PaymentCollection(GenericCollection, Pagination):
                     payment_links[payments.id].append(record)
 
         return payment_links
+
+    def payment_links_by_subset(self, subset=None):
+        subset = subset or self.subset()
+        return self.payment_links_for(subset)
+
+    def payment_links_by_batch(self, batch=None):
+        batch = batch or self.batch
+
+        if not batch:
+            return None
+
+        return self.payment_links_for(batch)
