@@ -7,6 +7,8 @@ $('[data-items-deletable]').each(function () {
     var seletableItems = self.find('[data-url]');
     var checkboxSelector = self.data('checkbox-selector')
     var requestMethod = self.data('request-method') || 'DELETE'
+    var modalTarget = self.data('confirm-modal');
+    var confirmModal = modalTarget ? $(modalTarget): undefined
 
     var checked = function(item, new_state) {
         var el = item.find(checkboxSelector);
@@ -67,6 +69,12 @@ $('[data-items-deletable]').each(function () {
         })
     }
 
+    readyElement.on('click', function () {
+        if(modalTarget && $(this).hasClass('ready')) {
+            confirmModal.foundation('reveal', 'open');
+        }
+    })
+
     trigger.on('click', function () {
 
         var onSuccess = function (resp, item){
@@ -78,5 +86,8 @@ $('[data-items-deletable]').each(function () {
             if (!checked(el)) return
             callforDeletion(el, onSuccess);
         })
+        if(modalTarget) {
+            confirmModal.foundation('reveal', 'close');
+        }
     })
 })

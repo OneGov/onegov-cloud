@@ -2569,6 +2569,7 @@ $ticket-filter-icon-mr: .5em;
     }
 
     #delete-box {
+        align-items: flex-start;
         display: flex;
         flex-direction: column;
 
@@ -2631,6 +2632,10 @@ $ticket-filter-icon-mr: .5em;
 
         dd + dd {
             margin-left: .75em;
+        }
+
+        dd + a {
+            padding: 0.5rem;
         }
 
         button {
