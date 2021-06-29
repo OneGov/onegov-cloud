@@ -256,13 +256,12 @@
             <div class="details">
                 <a href="${request.link(agency)}" i18n:translate="">Show agency</a>
             </div>
-            <ul class="memberships" tal:condition="memberships">
-               <li class="person" tal:repeat="membership memberships">
-                   <tal:b tal:define="person membership.person">
-                       <a href="${request.link(person)}">${person.title}</a>
-                   </tal:b>
-               </li>
-            </ul>
+            <table class="memberships" tal:condition="memberships">
+               <tr tal:repeat="membership memberships">
+                   <td class="person"><a href="${request.link(membership.person)}">${membership.person.title}</a></td>
+                   <td><a tal:condition="membership.person.function" href="${request.link(membership.person)}">${membership.person.function}</a></td>
+               </tr>
+            </table>
             <ul class="children" tal:condition="children">
                 <tal:block tal:repeat="child children">
                     <li class="child" tal:condition="child.access == 'public' or request.is_logged_in">

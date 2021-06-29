@@ -122,6 +122,18 @@ ul.agency-nav {
         margin-left: 1rem;
     }
 
+    table.memberships {
+        margin-left: 1rem;
+
+        tr {
+            background: $white;
+        }
+
+        td {
+            border: 0;
+        }
+    }
+
     .person {
 
         padding: .25rem;
