@@ -1,7 +1,7 @@
 $('[data-items-deletable]').each(function () {
     var self = $(this);
     var trigger = $(self.data('trigger'));
-    var selectAll = self.find(self.data('select-all'));
+    var selectAll = $(self.data('select-all'));
     var removeItem = self.data('remove');
     var seletableItems = self.find('[data-url]');
     var checkboxSelector = self.data('checkbox-selector')
