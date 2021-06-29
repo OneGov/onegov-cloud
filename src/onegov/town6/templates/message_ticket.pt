@@ -23,6 +23,9 @@
                 <tal:b case="'unmuted'" i18n:translate>
                     Ticket e-mails enabled.
                 </tal:b>
+                <tal:b case="'change-net-amount'" i18n:translate>
+                    Payment amount changed.
+                </tal:b>
             </tal:b>
         </metal:b>
     </metal:b>

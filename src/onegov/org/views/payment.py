@@ -7,13 +7,14 @@ from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
 from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import PaymentMessage
+from onegov.org.models import PaymentMessage, TicketMessage
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
+from webob import exc
 
 
 EMAIL_SUBJECTS = {
@@ -162,10 +163,19 @@ def change_payment_amount(self, request):
     request.assert_valid_csrf_token()
     assert not self.paid
     net_amount = Decimal(request.params['netAmount'])
-    assert net_amount - self.fee > 0
-    self.amount = net_amount - self.fee
-
     format_ = DefaultLayout(self, request).format_number
+
+    if net_amount <= 0 or (net_amount - self.fee) <= 0:
+        raise exc.HTTPBadRequest("amount negative")
+
+    links = self.links
+    if links:
+        tickets = TicketCollection(request.session)
+        ticket = ticket_by_link(tickets, links[0])
+        if ticket:
+            TicketMessage.create(ticket, request, 'change-net-amount')
+
+    self.amount = net_amount - self.fee
     return {'net_amount': f"{format_(self.net_amount)} {self.currency}"}
 
 
