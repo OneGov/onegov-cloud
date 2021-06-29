@@ -53,7 +53,7 @@ class PaymentCollection(GenericCollection, Pagination):
         return q
 
     @property
-    def page_index(self, page):
+    def page_index(self):
         return self.page
 
     def page_by_index(self, index):
