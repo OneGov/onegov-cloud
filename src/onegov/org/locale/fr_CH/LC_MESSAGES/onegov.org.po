@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-29 16:11+0200\n"
+"POT-Creation-Date: 2021-06-29 18:59+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -677,9 +677,6 @@ msgstr "Utilisé pour regrouper le lien dans la vue d'ensemble"
 
 msgid "Name of the list view this link will be shown"
 msgstr "Nom de la vue d'ensemble où ce lien apparaît"
-
-msgid "Forms"
-msgstr "Formulaires"
 
 msgid "Describes what this form is about"
 msgstr "Décrit le contenu de ce formulaire"
@@ -1493,6 +1490,9 @@ msgstr "toute la journée"
 msgid "Homepage"
 msgstr "Page d'accueil"
 
+msgid "Forms"
+msgstr "Formulaires"
+
 msgid "Edit"
 msgstr "Modifier"
 
@@ -1753,6 +1753,12 @@ msgstr "Supprimer l'entrée"
 
 msgid "Dashboard"
 msgstr "Dashboard"
+
+msgid "Do you really want to delete this external link?"
+msgstr "Voulez-vous vraiment supprimer ce lien externe?"
+
+msgid "Delete external link"
+msgstr "Supprimer lien externe"
 
 msgid "The submission was adopted"
 msgstr "La proposition a été adoptée"
@@ -3892,7 +3898,7 @@ msgstr ""
 "soumissions à et une plage de temps spécifique."
 
 msgid "Do you really want to delete this registration window?"
-msgstr "Voulez-vous vraiment supprimer cette fenêtre d'inscription ?"
+msgstr "Voulez-vous vraiment supprimer cette fenêtre d'inscription?"
 
 msgid "Existing submissions will be disassociated."
 msgstr "Les soumissions existantes seront dissociées."

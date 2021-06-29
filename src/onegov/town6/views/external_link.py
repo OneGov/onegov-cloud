@@ -1,9 +1,8 @@
 from onegov.org.views.external_link import handle_new_external_link, \
-    edit_external_link
+    edit_external_link, get_external_link_form
 from onegov.town6 import TownApp
 from onegov.core.security import Private
-from onegov.org.forms.external_link import ExternalLinkForm
-from onegov.town6.layout import DefaultLayout
+from onegov.town6.layout import DefaultLayout, ExternalLinkLayout
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink
 )
@@ -11,7 +10,7 @@ from onegov.org.models.external_link import (
 
 @TownApp.form(
     model=ExternalLinkCollection, name='new', template='form.pt',
-    permission=Private, form=ExternalLinkForm)
+    permission=Private, form=get_external_link_form)
 def town_handle_new_external_link(self, request, form):
     return handle_new_external_link(
         self, request, form, layout=DefaultLayout(self, request)
@@ -20,8 +19,8 @@ def town_handle_new_external_link(self, request, form):
 
 @TownApp.form(
     model=ExternalLink, name='edit', template='form.pt',
-    permission=Private, form=ExternalLinkForm)
+    permission=Private, form=get_external_link_form)
 def town_edit_external_link(self, request, form):
     return edit_external_link(
-        self, request, form, layout=DefaultLayout(self, request)
+        self, request, form, layout=ExternalLinkLayout(self, request)
     )

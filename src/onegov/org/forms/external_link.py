@@ -4,6 +4,8 @@ from wtforms import StringField, TextAreaField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import InputRequired
 
+from onegov.org.models.external_link import ExternalLinkCollection
+
 
 class ExternalLinkForm(Form):
 
@@ -30,5 +32,11 @@ class ExternalLinkForm(Form):
 
     member_of = SelectField(
         label=_("Name of the list view this link will be shown"),
-        choices=[('FormCollection', _("Forms"))]
+        choices=[]
     )
+
+    def on_request(self):
+        self.member_of.choices = [
+            (id_, self.request.translate(_(name)))
+            for id_, name in ExternalLinkCollection.form_choices()
+        ]

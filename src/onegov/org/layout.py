@@ -911,10 +911,6 @@ class FormCollectionLayout(DefaultLayout):
         ]
 
     @property
-    def forms_url(self):
-        return self.request.class_link(FormCollection)
-
-    @property
     def external_forms(self):
         return ExternalLinkCollection(self.request.session)
 
@@ -938,7 +934,6 @@ class FormCollectionLayout(DefaultLayout):
                             url=self.request.link(
                                 self.external_forms,
                                 query_params={
-                                    'to': self.forms_url,
                                     'title': self.request.translate(
                                         _("New external form"))
                                 },
@@ -2561,3 +2556,30 @@ class ImageFileCollectionLayout(DefaultLayout):
         request.include('upload')
         request.include('editalttext')
         super().__init__(model, request)
+
+
+class ExternalLinkLayout(DefaultLayout):
+
+    @property
+    def editbar_links(self):
+        return [
+            Link(
+                _("Delete"),
+                self.csrf_protected_url(self.request.link(self.model)),
+                traits=(
+                    Confirm(
+                        _("Do you really want to delete this external link?"),
+                        _("This cannot be undone."),
+                        _("Delete external link"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.class_link(
+                            ExternalLinkCollection.target(self.model)
+                        )
+                    )
+                ),
+                attrs={'class': ('ticket-delete',)}
+            )
+        ]

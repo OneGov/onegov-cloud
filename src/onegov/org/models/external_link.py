@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import ContentMixin, \
     TimestampMixin, meta_property
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
+from onegov.form import FormCollection
 from onegov.org.models import AccessExtension
 from onegov.search import SearchableContent
 from sqlalchemy import Column, Text
@@ -31,7 +32,7 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
     title = Column(Text, nullable=False)
     url = Column(Text, nullable=False)
 
-    # For example the collection name this model should appear in
+    # The collection name this model should appear in
     member_of = Column(Text, nullable=True)
     group = Column(Text, nullable=True)
 
@@ -50,15 +51,42 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
 class ExternalLinkCollection(GenericCollection):
 
+    supported_collections = (
+        FormCollection,
+    )
+
     def __init__(
             self, session, member_of=None, group=None):
         super().__init__(session)
         self.member_of = member_of
         self.group = group
 
+    @staticmethod
+    def translatable_name(model_class):
+        """ Most collections have a base model whose name can be guessed
+         from the collection name. """
+        name = model_class.__name__.lower()
+        name = name.replace('collection', '').rstrip('s')
+        return f'{name.capitalize()}s'
+
+    @classmethod
+    def form_choices(cls):
+        return tuple(
+            (m.__name__, cls.translatable_name(m))
+            for m in cls.supported_collections
+        )
+
+    @classmethod
+    def collection_by_name(cls):
+        return {m.__name__: m for m in cls.supported_collections}
+
     @property
     def model_class(self):
         return ExternalLink
+
+    @classmethod
+    def target(cls, external_link):
+        return cls.collection_by_name()[external_link.member_of]
 
     def query(self):
         query = super().query()
@@ -69,5 +97,9 @@ class ExternalLinkCollection(GenericCollection):
         return query
 
     @classmethod
-    def for_model(cls, session, model, **kwargs):
-        return cls(session, member_of=model.__class__.__name__, **kwargs)
+    def for_model(cls, session, model_class, **kwargs):
+        """ It would be better to use the tablename, but the collections do
+        not always implement the property model_class. """
+
+        assert model_class in cls.supported_collections, model_class.__name__
+        return cls(session, member_of=model_class.__name__, **kwargs)

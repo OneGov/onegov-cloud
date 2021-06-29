@@ -2158,3 +2158,30 @@ class ImageFileCollectionLayout(DefaultLayout):
         super().__init__(model, request)
         request.include('upload')
         request.include('editalttext')
+
+
+class ExternalLinkLayout(DefaultLayout):
+
+    @property
+    def editbar_links(self):
+        return [
+            Link(
+                _("Delete"),
+                self.csrf_protected_url(self.request.link(self.model)),
+                traits=(
+                    Confirm(
+                        _("Do you really want to delete this external link?"),
+                        _("This cannot be undone."),
+                        _("Delete external link"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.class_link(
+                            ExternalLinkCollection.target(self.model)
+                        )
+                    )
+                ),
+                attrs={'class': ('ticket-delete',)}
+            )
+        ]

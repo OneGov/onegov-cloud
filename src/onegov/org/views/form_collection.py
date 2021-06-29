@@ -33,7 +33,9 @@ def view_form_collection(self, request, layout=None):
 
     ext_forms = group_by_column(
         request,
-        query=ExternalLinkCollection.for_model(request.session, self).query(),
+        query=ExternalLinkCollection.for_model(
+            request.session, FormCollection
+        ).query(),
         group_column=ExternalLink.group,
         sort_column=ExternalLink.order
     )

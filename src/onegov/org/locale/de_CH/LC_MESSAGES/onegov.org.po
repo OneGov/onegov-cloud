@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-29 16:11+0200\n"
+"POT-Creation-Date: 2021-06-29 18:59+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -674,9 +674,6 @@ msgstr "Wird benutzt, um diesen Link in der Übersicht zu gruppieren"
 
 msgid "Name of the list view this link will be shown"
 msgstr "Name der Ansicht, wo dieser Eintrag erscheinen soll"
-
-msgid "Forms"
-msgstr "Formulare"
 
 msgid "Describes what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
@@ -1489,6 +1486,9 @@ msgstr "den ganzen Tag"
 msgid "Homepage"
 msgstr "Startseite"
 
+msgid "Forms"
+msgstr "Formulare"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -1753,6 +1753,12 @@ msgstr "Eintrag löschen"
 
 msgid "Dashboard"
 msgstr "Dashboard"
+
+msgid "Do you really want to delete this external link?"
+msgstr "Wollen sie die externe Verknüpfung wirklich löschen?"
+
+msgid "Delete external link"
+msgstr "Verknüpfung löschen"
 
 msgid "The submission was adopted"
 msgstr "Der Eintrag wurde übernommen"
@@ -3815,7 +3821,7 @@ msgid "Added a new external form"
 msgstr "Neues externes Formular hinzugefügt"
 
 msgid "New external link"
-msgstr "Neuer externer Link"
+msgstr "Neue externe Verknüpfung"
 
 msgid "Edit external link"
 msgstr "Externe Verknüpfung bearbeiten"
