@@ -90,6 +90,8 @@ $accept-ticket-icon: $open-ticket-icon;
 $close-ticket-icon-hover: '\f058';
 $reopen-ticket-icon: $accept-ticket-icon;
 $reopen-ticket-icon-hover: $accept-ticket-icon-hover;
+$delete-ticket-icon: '\f1f8';
+$delete-ticket-icon-active: '\f00c';
 $all-handler-icon: '\f069';
 $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
@@ -246,6 +248,14 @@ tr.ticket:hover {
     }
 }
 
+.ticket-delete {
+
+    &::before {
+        @include icon-bold($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+}
+
 
 /*
     Tickets filter dropdown
@@ -253,12 +263,18 @@ tr.ticket:hover {
 
 
 /* ticket filter fake table header */
-.ticket-filters {
 
+$ticket-filters-padding: .5rem;
+
+.ticket-filters {
+    align-items: center;
     background-color: $table-striped-background;
     display: flex;
     justify-content: space-between;
-    padding: .5rem;
+    //padding: $table-padding;
+    //padding-right: rem-calc(10);
+    padding: rem-calc(12 12 12 0);
+
 
     .dropdown-pane {
         max-width: 275px;
@@ -331,6 +347,57 @@ tr.ticket:hover {
             right: .9rem;
         }
     }
+
+    .right-side {
+        align-items: center;
+        display: flex;
+        justify-content: flex-end;
+
+        input[type="checkbox"] {
+            margin: 0;
+        }
+
+        @include breakpoint(small only) {
+            align-items: flex-end;
+            flex-direction: column;
+        }
+    }
+
+    #delete-box {
+        display: flex;
+        flex-direction: column;
+        margin-left: 1em;
+        margin-right: rem-calc(3);
+
+        #do-delete {
+            &.ready {
+                color: $alert-color;
+                cursor: pointer;
+                &::before { @include icon-bold($delete-ticket-icon); }
+            }
+
+            &::before {
+                @include icon-bold($delete-ticket-icon);
+            }
+        }
+    }
+
+    .ticket-filter-deletable::before {
+        @include icon-bold($delete-ticket-icon);
+        padding-right: .8ex;
+    }
+
+    li.active .ticket-filter-deletable::before {
+        @include icon-bold($delete-ticket-icon-active);
+    }
+
+    li.active .ticket-filter-deletable {
+        background: $alert-color;
+
+        &:hover {
+            background: scale-color($alert-color, $lightness: -6%);
+        }
+    }
 }
 
 
@@ -350,7 +417,6 @@ button {
 }
 
 .selected-owner {
-    //margin-left: 1rem !important;
 
     &.secondary {
         ::before {
