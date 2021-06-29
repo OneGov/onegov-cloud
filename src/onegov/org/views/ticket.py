@@ -2,6 +2,7 @@ from datetime import date
 
 import morepath
 from morepath import Response
+from purl import URL
 
 from onegov.chat import MessageCollection
 from onegov.core.utils import normalize_for_url
@@ -116,6 +117,28 @@ def view_ticket(self, request, layout=None):
         ),
         'edit_amount_url': edit_amount_url
     }
+
+
+@OrgApp.view(model=Ticket, permission=Private, request_method='DELETE')
+def delete_ticket(self, request):
+    request.assert_valid_csrf_token()
+    assert self.state == 'closed'
+
+    # check the handler
+    if self.handler.undecided:
+        request.warning(_("This ticket requires a decision, but no "
+                        "decision has been made yet."))
+        return
+
+    messages = MessageCollection(
+        request.session, channel_id=self.number)
+
+    for message in messages.query():
+        messages.delete(message)
+
+    request.session.delete(self)
+    if not request.params.get('quiet'):
+        request.success(_("Ticket successfully deleted"))
 
 
 def manual_payment_button(payment, layout):
@@ -617,11 +640,21 @@ def view_tickets(self, request, layout=None):
 
     def get_filters():
         for id, text in TICKET_STATES.items():
+            # Make some room in the ui
+            if self.deleting and id == 'open':
+                continue
             yield Link(
                 text=text,
                 url=request.link(self.for_state(id)),
                 active=self.state == id,
                 attrs={'class': 'ticket-filter-' + id}
+            )
+        if self.state == 'closed':
+            yield Link(
+                text=_("Deletable"),
+                url=request.link(self.for_deletion(not self.deleting)),
+                active=self.deleting,
+                attrs={'class': 'ticket-filter-deletable'}
             )
 
     def get_handlers():
@@ -696,24 +729,34 @@ def view_tickets(self, request, layout=None):
     else:
         raise NotImplementedError
 
+    if not self.state == 'closed':
+        self.deleting = False
+
     handlers = tuple(get_handlers())
     owners = tuple(get_owners())
     filters = tuple(get_filters())
 
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    layout = layout or TicketsLayout(self, request)
+
+    def delete_link(ticket):
+        url = URL(request.link(ticket)).query_param('quiet', '1')
+        return layout.csrf_protected_url(url.as_string())
 
     return {
         'title': _("Tickets"),
-        'layout': layout or TicketsLayout(self, request),
+        'layout': layout,
         'tickets': self.batch,
         'filters': filters,
         'handlers': handlers,
         'owners': owners,
         'tickets_title': tickets_title,
         'tickets_state': self.state,
+        'deleting_tickets': self.deleting,
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'handler': handler,
-        'owner': owner
+        'owner': owner,
+        'delete_link': delete_link
     }

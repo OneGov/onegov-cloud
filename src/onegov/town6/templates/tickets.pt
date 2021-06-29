@@ -3,6 +3,13 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'delete-confirm-modal'">
+            <tal:block metal:fill-slot="modal_content">
+                <h3 i18n:translate="">Delete all selected tickets?</h3>
+                <br>
+                <button id="do-delete-confirmed" type="button" class="button alert" i18n:translate>Delete</button>
+            </tal:block>
+        </tal:block>
         <div class="ticket-filters">
 
             <ul class="menu">
@@ -14,40 +21,54 @@
                 </tal:b>
             </ul>
             <div>
-                <span>
-                    <button type="button" data-toggle="owners" class="${has_owner_filter and 'primary radius button small' or 'secondary radius button small'} selected-owner">
-                        <span i18n:translate class="show-for-sr">Owner:</span>
-                        <span>${owner.text}</span>
-                    </button>
-                    <div id="owners" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
-                        <ul class="f-dropdown disable-scroll">
-                            <li tal:repeat="link owners">
-                                <a href="${link.attrs.href}" class="${repeat.link.start and 'ALL-link' or 'ticket-group-filter'}">
-                                    <tal:b condition="link.model|nothing">
-                                        <metal:identicon use-macro="layout.macros.identicon" tal:define="initials link.model.initials; username link.model.username" />
-                                    </tal:b>
+                <div class="right-side">
+                    <span>
+                        <button type="button" data-toggle="owners" class="${has_owner_filter and 'primary radius button small' or 'secondary radius button small'} selected-owner">
+                            <span i18n:translate class="show-for-sr">Owner:</span>
+                            <span>${owner.text}</span>
+                        </button>
+                        <div id="owners" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
+                            <ul class="f-dropdown disable-scroll">
+                                <li tal:repeat="link owners">
+                                    <a href="${link.attrs.href}" class="${repeat.link.start and 'ALL-link' or 'ticket-group-filter'}">
+                                        <tal:b condition="link.model|nothing">
+                                            <metal:identicon use-macro="layout.macros.identicon" tal:define="initials link.model.initials; username link.model.username" />
+                                        </tal:b>
 
-                                    ${link.text}
-                                </a>
-                            </li>
-                        </ul>
+                                        ${link.text}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </span>
+                    <span>
+                        <button type="button" data-toggle="handlers" class="${has_handler_filter and 'primary radius button small' or 'secondary radius button small'} selected-handler">
+                            <span i18n:translate class="show-for-sr">Kind:</span>
+                            <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
+                        </button>
+                        <div id="handlers" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
+                            <ul class="f-dropdown disable-scroll">
+                                <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
+                            </ul>
+                        </div>
+                    </span>
+                    <div id="delete-box" tal:condition="deleting_tickets">
+                        <a id="do-delete"></a>
+                        <input id="select-all" type="checkbox">
                     </div>
-                </span>
-
-                <span>
-                    <button type="button" data-toggle="handlers" class="${has_handler_filter and 'primary radius button small' or 'secondary radius button small'} selected-handler">
-                        <span i18n:translate class="show-for-sr">Kind:</span>
-                        <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
-                    </button>
-                    <div id="handlers" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
-                        <ul class="f-dropdown disable-scroll">
-                            <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
-                        </ul>
-                    </div>
-                </span>
+                </div>
             </div>
         </div>
-        <table class="tickets-table stack tickets-state-${tickets_state}">
+        <table class="tickets-table stack tickets-state-${tickets_state}"
+               data-items-deletable
+               data-select-all="#select-all"
+               data-trigger="#do-delete-confirmed"
+               data-ready="#do-delete"
+               data-remove="true"
+               data-checkbox-selector="input"
+               data-request-method="DELETE"
+               data-confirm-modal="#delete-confirm-modal"
+        >
             <tbody>
                 <tal:b condition="not:tickets">
                     <tr>

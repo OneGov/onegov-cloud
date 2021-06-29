@@ -189,6 +189,7 @@ def get_common_asset():
     yield 'forms.js'
     yield 'internal_link_check.js'
     yield 'tickets.js'
+    yield 'items_deletable.js'
 
 
 @TownApp.webasset('editor')

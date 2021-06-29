@@ -3,12 +3,29 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <table class="tickets-table tickets-state-${tickets_state}">
+        <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'delete-confirm-modal'">
+            <tal:block metal:fill-slot="modal_content">
+                <h3 i18n:translate="">Delete all selected tickets?</h3>
+                <br>
+                <button id="do-delete-confirmed" type="button" class="button alert" i18n:translate>Delete</button>
+            </tal:block>
+        </tal:block>
+
+        <table class="tickets-table tickets-state-${tickets_state}"
+               data-items-deletable
+               data-select-all="#select-all"
+               data-trigger="#do-delete-confirmed"
+               data-ready="#do-delete"
+               data-remove="true"
+               data-checkbox-selector="input"
+               data-request-method="DELETE"
+               data-confirm-modal="#delete-confirm-modal"
+        >
             <thead>
                 <tr>
                     <th colspan="6">
                         <div class="row ticket-filters">
-                            <div class="columns small-12 medium-6">
+                            <div class="columns small-12 medium-7">
                                 <dl class="sub-nav">
                                     <dt class="show-for-sr" i18n:translate>State:</dt>
                                     <tal:b repeat="link filters">
@@ -18,7 +35,7 @@
                                     </tal:b>
                                 </dl>
                             </div>
-                            <div class="columns small-12 medium-6">
+                            <div class="columns small-12 medium-5">
                                 <span>
                                     <button href="#" data-dropdown="owners" aria-controls="owners" aria-expanded="false" class="${has_owner_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-owner">
                                         <span i18n:translate class="show-for-sr">Owner:</span>
@@ -47,6 +64,12 @@
                                     </ul>
                                 </span>
                             </div>
+                        </div>
+                    </th>
+                    <th tal:condition="deleting_tickets" >
+                        <div id="delete-box">
+                            <a id="do-delete"></a>
+                            <input id="select-all" type="checkbox">
                         </div>
                     </th>
                 </tr>

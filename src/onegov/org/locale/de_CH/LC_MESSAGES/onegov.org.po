@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-28 14:25+0200\n"
+"POT-Creation-Date: 2021-06-28 16:02+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -116,9 +116,6 @@ msgstr "Diese Seite ist Geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
-
-msgid "Source"
-msgstr "Herkunft"
 
 msgid "ID Payment Provider"
 msgstr "ID beim Zahlungsanbieter"
@@ -1561,6 +1558,12 @@ msgstr "Ticket abschliessen"
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
 
+msgid "Do you really want to delete this ticket?"
+msgstr "Möchten Sie das Ticket wirklich löschen?"
+
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
@@ -2180,6 +2183,9 @@ msgstr ""
 
 msgid "Change Url"
 msgstr "Url ändern"
+
+msgid "Source"
+msgstr "Herkunft"
 
 msgid "Subject"
 msgstr "Betreff"
@@ -4306,6 +4312,9 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
+msgid "Ticket successfully deleted"
+msgstr "Ticket erfolgreich gelöscht"
+
 msgid "Mark as paid"
 msgstr "Als bezahlt markieren"
 
@@ -4419,6 +4428,9 @@ msgstr "Ihre Anfrage wurde bereits geschlossen"
 
 msgid "Your message has been received"
 msgstr "Ihre Nachricht wurde übermittelt"
+
+msgid "Deletable"
+msgstr "Löschbar"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"

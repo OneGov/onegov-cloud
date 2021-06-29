@@ -9,7 +9,7 @@ from onegov.form import FormCollection, as_internal_id
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from tests.onegov.org.common import get_mail
-from tests.shared.utils import create_image, open_in_browser
+from tests.shared.utils import create_image
 
 
 def test_view_form_alert(client):

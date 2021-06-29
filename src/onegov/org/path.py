@@ -270,9 +270,10 @@ def get_ticket(app, handler_code, id):
         id, ensure_handler_code=handler_code)
 
 
-@OrgApp.path(model=TicketCollection, path='/tickets/{handler}/{state}')
+@OrgApp.path(model=TicketCollection, path='/tickets/{handler}/{state}',
+             converters=dict(deleting=bool))
 def get_tickets(app, handler='ALL', state='open', page=0, group=None,
-                owner=None, extra_parameters=None):
+                owner=None, extra_parameters=None, deleting=None):
     return TicketCollection(
         app.session(),
         handler=handler,
@@ -280,7 +281,8 @@ def get_tickets(app, handler='ALL', state='open', page=0, group=None,
         page=page,
         group=group,
         owner=owner or '*',
-        extra_parameters=extra_parameters
+        extra_parameters=extra_parameters,
+        deleting=deleting
     )
 
 

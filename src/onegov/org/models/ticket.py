@@ -14,6 +14,13 @@ from purl import URL
 from sqlalchemy.orm import object_session
 
 
+class TicketDeletionMixin:
+
+    @property
+    def ticket_deletable(self):
+        return not self.undecided and self.ticket.state == 'closed'
+
+
 def ticket_submitter(ticket):
     handler = ticket.handler
     mail = handler.deleted and ticket.snapshot.get('email') or handler.email
@@ -102,7 +109,7 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('FRM')
-class FormSubmissionHandler(Handler):
+class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Form Submissions")
     code_title = _("Forms")
@@ -284,7 +291,7 @@ class FormSubmissionHandler(Handler):
 
 
 @handlers.registered_handler('RSV')
-class ReservationHandler(Handler):
+class ReservationHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Reservations")
     code_title = _("Reservations")
@@ -517,7 +524,7 @@ class ReservationHandler(Handler):
 
 
 @handlers.registered_handler('EVN')
-class EventSubmissionHandler(Handler):
+class EventSubmissionHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Events")
     code_title = _("Events")
@@ -669,7 +676,7 @@ class EventSubmissionHandler(Handler):
 
 
 @handlers.registered_handler('DIR')
-class DirectoryEntryHandler(Handler):
+class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Directory Entry Submissions")
     code_title = _("Directory Entry Submissions")
