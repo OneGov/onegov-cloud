@@ -2132,3 +2132,12 @@
     </tal:b>
 </ol>
 </metal:progress_indicator>
+
+<metal:modal define-macro="modal">
+<div id="${modal_id}" class="reveal" data-reveal>
+    <tal:block metal:define-slot="modal_content"></tal:block>
+    <button class="close-button" data-close aria-label="Close" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+</metal:modal>
