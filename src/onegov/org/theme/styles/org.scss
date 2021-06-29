@@ -2517,38 +2517,36 @@ $pending-ticket-icon: '\f192';
 $closed-ticket-icon: '\f05d';
 $all-ticket-icon: '\f055';
 
+$ticket-filter-icon-mr: .5em;
 
 .ticket-filter-open::before {
     @include icon($open-ticket-icon);
-    margin-right: .5ex;
-    padding-right: .8ex;
+    margin-right: $ticket-filter-icon-mr;
 }
 
 .ticket-filter-pending::before {
     @include icon($pending-ticket-icon);
-    margin-right: .5ex;
-    padding-right: .8ex;
+    margin-right: $ticket-filter-icon-mr;
 }
 
 .ticket-filter-closed::before {
     @include icon($closed-ticket-icon);
-    margin-right: .5ex;
-    padding-right: .8ex;
+    margin-right: $ticket-filter-icon-mr;
 }
 
 .ticket-filter-all::before {
     @include icon($all-ticket-icon);
-    margin-right: .5ex;
-    padding-right: .8ex;
+    margin-right: $ticket-filter-icon-mr;
 }
 
 .ticket-filter-deletable::before {
     @include icon($delete-ticket-icon);
-    padding-right: .8ex;
+    margin-right: $ticket-filter-icon-mr;
 }
 
-dd.active .ticket-filter-deletable::before {
+.active .ticket-filter-deletable::before {
     @include icon($delete-ticket-icon-active);
+    margin-right: $ticket-filter-icon-mr;
 }
 
 
