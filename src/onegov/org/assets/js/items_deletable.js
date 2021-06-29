@@ -1,6 +1,7 @@
 $('[data-items-deletable]').each(function () {
     var self = $(this);
     var trigger = $(self.data('trigger'));
+    var readyElement = $(self.data('ready'));
     var selectAll = $(self.data('select-all'));
     var removeItem = self.data('remove');
     var seletableItems = self.find('[data-url]');
@@ -23,9 +24,9 @@ $('[data-items-deletable]').each(function () {
 
     var updateReady = function (ready) {
         if(ready) {
-            trigger.addClass('ready');
+            readyElement.addClass('ready');
         } else {
-            trigger.removeClass('ready');
+            readyElement.removeClass('ready');
         }
     }
 
@@ -69,7 +70,6 @@ $('[data-items-deletable]').each(function () {
     trigger.on('click', function () {
 
         var onSuccess = function (resp, item){
-            console.log(resp);
             if(removeItem) item.remove();
         }
 
