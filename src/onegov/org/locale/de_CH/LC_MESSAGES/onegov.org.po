@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-29 15:09+0200\n"
+"POT-Creation-Date: 2021-06-29 16:11+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3041,6 +3041,9 @@ msgstr "Ticket E-Mails deaktiviert."
 
 msgid "Ticket e-mails enabled."
 msgstr "Ticket E-Mails aktiviert."
+
+msgid "Payment amount changed."
+msgstr "Zahlungsbetrag geändert."
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
