@@ -54,6 +54,7 @@ class Message(Base):
     #: a single optional file associated with this message
     file = associated(File, 'file', 'one-to-one')
 
+    # Todo: deprecated
     __mapper_args__ = {
         'order_by': id
     }
