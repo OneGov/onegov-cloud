@@ -8,6 +8,7 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.ballot import get_ballot_data_by_entity
+from webob.exc import HTTPNotFound
 
 
 @ElectionDayApp.html(
@@ -91,7 +92,11 @@ def view_vote_entities_map_proposal(self, request):
 
     """ A static link to the map of the proposal. """
 
-    return redirect(request.link(self.proposal, name='entities-map'))
+    ballot = getattr(self, 'proposal', None)
+    if ballot:
+        return redirect(request.link(ballot, name='entities-map'))
+
+    raise HTTPNotFound()
 
 
 @ElectionDayApp.html(
@@ -103,7 +108,11 @@ def view_vote_entities_map_counter_proposal(self, request):
 
     """ A static link to the map of the counter proposal. """
 
-    return redirect(request.link(self.counter_proposal, name='entities-map'))
+    ballot = getattr(self, 'counter_proposal', None)
+    if ballot:
+        return redirect(request.link(ballot, name='entities-map'))
+
+    raise HTTPNotFound()
 
 
 @ElectionDayApp.html(
@@ -115,7 +124,11 @@ def view_vote_entities_map_tie_breaker(self, request):
 
     """ A static link to the map of the tie breaker. """
 
-    return redirect(request.link(self.tie_breaker, name='entities-map'))
+    ballot = getattr(self, 'tie_breaker', None)
+    if ballot:
+        return redirect(request.link(ballot, name='entities-map'))
+
+    raise HTTPNotFound()
 
 
 @ElectionDayApp.json(
@@ -174,7 +187,7 @@ def view_ballot_as_table(self, request):
 
     return {
         'ballot': self,
-        'layout': DefaultLayout(self, request),
+        'layout': VoteLayout(self.vote, request, f'{self.type}-entities'),
         'type': 'ballot-table',
         'year': self.vote.date.year,
         'scope': 'entities',
@@ -190,7 +203,11 @@ def view_vote_entities_table_proposal(self, request):
 
     """ A static link to the table by entities of the proposal. """
 
-    return redirect(request.link(self.proposal, name='entities-table'))
+    ballot = getattr(self, 'proposal', None)
+    if ballot:
+        return redirect(request.link(ballot, name='entities-table'))
+
+    raise HTTPNotFound()
 
 
 @ElectionDayApp.html(
@@ -202,7 +219,11 @@ def view_vote_entities_table_counter_proposal(self, request):
 
     """ A static link to the table by entities of the counter proposal. """
 
-    return redirect(request.link(self.counter_proposal, name='entities-table'))
+    ballot = getattr(self, 'counter_proposal', None)
+    if ballot:
+        return redirect(request.link(ballot, name='entities-table'))
+
+    raise HTTPNotFound()
 
 
 @ElectionDayApp.html(
@@ -214,7 +235,11 @@ def view_vote_entities_table_tie_breaker(self, request):
 
     """ A static link to the table of the tie breaker. """
 
-    return redirect(request.link(self.tie_breaker, name='entities-table'))
+    ballot = getattr(self, 'tie_breaker', None)
+    if ballot:
+        return redirect(request.link(ballot, name='entities-table'))
+
+    raise HTTPNotFound()
 
 
 @ElectionDayApp.svg_file(model=Ballot, name='entities-map-svg')
