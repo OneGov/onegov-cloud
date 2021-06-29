@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-28 16:02+0200\n"
+"POT-Creation-Date: 2021-06-29 15:09+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3364,6 +3364,9 @@ msgstr ""
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
+
+msgid "Delete all selected tickets?"
+msgstr "Alle ausgewählten Tickets löschen?"
 
 msgid "State:"
 msgstr "Status:"
