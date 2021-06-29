@@ -2,6 +2,7 @@ from datetime import date
 
 import morepath
 from morepath import Response
+from purl import URL
 
 from onegov.chat import MessageCollection
 from onegov.core.utils import normalize_for_url
@@ -20,7 +21,7 @@ from onegov.org.layout import TicketsLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
-from onegov.org.models.ticket import ticket_submitter, TicketDeletionError
+from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
@@ -116,6 +117,28 @@ def view_ticket(self, request, layout=None):
         ),
         'edit_amount_url': edit_amount_url
     }
+
+
+@OrgApp.view(model=Ticket, permission=Private, request_method='DELETE')
+def delete_ticket(self, request):
+    request.assert_valid_csrf_token()
+    assert self.state == 'closed'
+
+    # check the handler
+    if self.handler.undecided:
+        request.warning(_("This ticket requires a decision, but no "
+                        "decision has been made yet."))
+        return
+
+    messages = MessageCollection(
+        request.session, channel_id=self.number)
+
+    for message in messages.query():
+        messages.delete(message)
+
+    request.session.delete(self)
+    if not request.params.get('quiet'):
+        request.success(_("Ticket successfully deleted"))
 
 
 def manual_payment_button(payment, layout):
@@ -453,30 +476,6 @@ def mute_ticket(self, request):
     return morepath.redirect(request.link(self))
 
 
-@OrgApp.view(model=Ticket, name='delete', permission=Private)
-def delete_ticket(self, request):
-    request.assert_valid_csrf_token()
-    assert self.state == 'closed'
-
-    # check the handler
-    if self.handler.undecided:
-        request.error(_("This ticket requires a decision, but no "
-                                "decision has been made yet."))
-        return morepath.redirect(request.link(self))
-
-    # let the handler delete the ticket and ticket messages
-    try:
-        self.handler.delete()
-    except TicketDeletionError as err:
-        request.error(err.message)
-        return morepath.redirect(request.link(self))
-
-    request.success(_("Ticket successfully deleted"))
-
-    return morepath.redirect(
-        request.link(TicketCollection(request.session, state='closed')))
-
-
 @OrgApp.view(model=Ticket, name='unmute', permission=Private)
 def unmute_ticket(self, request):
     self.muted = False
@@ -641,6 +640,9 @@ def view_tickets(self, request, layout=None):
 
     def get_filters():
         for id, text in TICKET_STATES.items():
+            # Make some room in the ui
+            if self.deleting and id == 'open':
+                continue
             yield Link(
                 text=text,
                 url=request.link(self.for_state(id)),
@@ -736,10 +738,15 @@ def view_tickets(self, request, layout=None):
 
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    layout = layout or TicketsLayout(self, request)
+
+    def delete_link(ticket):
+        url = URL(request.link(ticket)).query_param('quiet', '1')
+        return layout.csrf_protected_url(url.as_string())
 
     return {
         'title': _("Tickets"),
-        'layout': layout or TicketsLayout(self, request),
+        'layout': layout,
         'tickets': self.batch,
         'filters': filters,
         'handlers': handlers,
@@ -750,5 +757,6 @@ def view_tickets(self, request, layout=None):
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'handler': handler,
-        'owner': owner
+        'owner': owner,
+        'delete_link': delete_link
     }

@@ -37,11 +37,7 @@ class TicketCollectionPagination(Pagination):
         if not self.deleting:
             return query
 
-        def deletable(t):
-            h = t.handler
-            return h.support_ticket_delete and h.ticket_deletable
-
-        return tuple(t for t in query if deletable(t))
+        return tuple(t for t in query if t.handler.ticket_deletable)
 
     def subset(self):
         query = self.query()

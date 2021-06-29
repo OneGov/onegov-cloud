@@ -66,12 +66,14 @@ def test_tickets(client):
 
     tickets_page = client.get('/tickets/ALL/open')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
+    assert not tickets_page.pyquery('a.ticket-filter-deletable')
 
     ticket_page = tickets_page.click('Annehmen').follow()
     assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     tickets_page = client.get('/tickets/ALL/pending')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
+    assert not tickets_page.pyquery('a.ticket-filter-deletable')
 
     page = client.get('/')
     assert page.pyquery('.open-tickets').attr('data-count') == '0'
@@ -121,9 +123,20 @@ def test_tickets(client):
 
     assert 'Abgeschlossen' in ticket_page
     tickets_page = client.get('/tickets/ALL/closed')
-    assert len(tickets_page.pyquery('tr.ticket')) == 1
+
+    # the toggle for the deletion of the current subset
+    assert tickets_page.pyquery('a.ticket-filter-deletable')
+    ticket_rows = tickets_page.pyquery('tr.ticket')
+    assert len(ticket_rows) == 1
+    assert ticket_rows.attr('data-url')
+
+    # check subset of ticket which is still decided since it has no
+    # registration window
+    deleting = tickets_page.click('Löschbar')
+    assert deleting.pyquery('tr.ticket')
 
     ticket_page = client.get(ticket_url)
+    assert ticket_page.pyquery('.ticket-button.ticket-delete')
     ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
 
     tickets_page = client.get('/tickets/ALL/pending')
@@ -140,6 +153,10 @@ def test_tickets(client):
 
     assert "Ihre Anfrage wurde wieder " in message
     assert '/status' in message
+
+    # delete the ticket
+    client.get(ticket_url).click('Ticket abschliessen').follow()
+    client.get(ticket_url).click('Löschen')
 
 
 def test_ticket_states_idempotent(client):

@@ -2505,6 +2505,8 @@ $close-ticket-icon: '\f1db';
 $close-ticket-icon-hover: '\f05d';
 $reopen-ticket-icon: '\f1db';
 $reopen-ticket-icon-hover: '\f192';
+$delete-ticket-icon: '\f1f8';
+$delete-ticket-icon-active: '\f00c';
 $all-handler-icon: '\f069';
 $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
@@ -2515,29 +2517,40 @@ $pending-ticket-icon: '\f192';
 $closed-ticket-icon: '\f05d';
 $all-ticket-icon: '\f055';
 
+
 .ticket-filter-open::before {
     @include icon($open-ticket-icon);
-    margin-right: 1ex;
+    margin-right: .5ex;
     padding-right: .8ex;
 }
 
 .ticket-filter-pending::before {
     @include icon($pending-ticket-icon);
-    margin-right: 1ex;
+    margin-right: .5ex;
     padding-right: .8ex;
 }
 
 .ticket-filter-closed::before {
     @include icon($closed-ticket-icon);
-    margin-right: 1ex;
+    margin-right: .5ex;
     padding-right: .8ex;
 }
 
 .ticket-filter-all::before {
     @include icon($all-ticket-icon);
-    margin-right: 1ex;
+    margin-right: .5ex;
     padding-right: .8ex;
 }
+
+.ticket-filter-deletable::before {
+    @include icon($delete-ticket-icon);
+    padding-right: .8ex;
+}
+
+dd.active .ticket-filter-deletable::before {
+    @include icon($delete-ticket-icon-active);
+}
+
 
 .no-tickets {
     border: 0;
@@ -2548,6 +2561,38 @@ $all-ticket-icon: '\f055';
 
 .tickets-table {
     width: 100%;
+
+    dd.active .ticket-filter-deletable {
+        background: $alert-color;
+
+        &:hover {
+            background: scale-color($alert-color, $lightness: -6%);
+        }
+    }
+
+    #delete-box {
+        display: flex;
+        flex-direction: column;
+
+        input {
+            margin-top: 1ex;
+        }
+
+        #do-delete {
+            color: $sub-nav-font-color;
+
+            &.ready {
+                color: $alert-color;
+                cursor: pointer;
+                &::before { @include icon($delete-ticket-icon); }
+            }
+
+            &::before {
+                @include icon($delete-ticket-icon);
+            }
+        }
+    }
+
 
     td {
         vertical-align: top;
@@ -2577,7 +2622,8 @@ $all-ticket-icon: '\f055';
 
     th {
         button,
-        dl {
+        dl,
+        input[type="checkbox"] {
             margin: 0;
         }
 
@@ -2685,6 +2731,15 @@ tr.ticket:hover {
 
     &:hover::before {
         content: $reopen-ticket-icon-hover;
+    }
+}
+
+.ticket-delete {
+    float: right;
+
+    &::before {
+        @include icon($delete-ticket-icon);
+        margin-right: 1ex;
     }
 }
 
