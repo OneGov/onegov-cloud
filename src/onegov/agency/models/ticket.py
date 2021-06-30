@@ -6,7 +6,7 @@ from onegov.agency.layout import ExtendedPersonLayout
 from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
-from onegov.org.models.ticket import OrgTicketMixin
+from onegov.org.models.ticket import OrgTicketMixin, TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
@@ -29,7 +29,7 @@ class PersonMutationTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('AGN')
-class AgencyMutationHandler(Handler):
+class AgencyMutationHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Agency")
     code_title = _("Agencies")
@@ -80,7 +80,7 @@ class AgencyMutationHandler(Handler):
 
 
 @handlers.registered_handler('PER')
-class PersonMutationHandler(Handler):
+class PersonMutationHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Person")
     code_title = _("People")

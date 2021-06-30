@@ -6,7 +6,7 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.ticket import OrgTicketMixin
+from onegov.org.models.ticket import OrgTicketMixin, TicketDeletionMixin
 from onegov.search import SearchableContent
 from onegov.ticket import handlers, Handler, Ticket
 
@@ -89,7 +89,7 @@ class ActivityTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('FER')
-class VacationActivityHandler(Handler):
+class VacationActivityHandler(Handler, TicketDeletionMixin):
 
     handler_title = _("Activities")
     code_title = _("Activities")
