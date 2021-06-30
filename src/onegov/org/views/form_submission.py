@@ -299,12 +299,13 @@ def handle_complete_submission(self, request):
                     # We can not use the view since it needs a valid
                     # csrf token
                     handle_submission_action(
-                        submission, request, 'confirmed', True
+                        submission, request, 'confirmed', True, raises=True
                     )
 
-                except Exception:
-                    request.warning(_("Your request could not be "
-                                      "accepted automatically!"))
+                except ValueError:
+                    if request.is_manager:
+                        request.warning(_("Your request could not be "
+                                          "accepted automatically!"))
                 else:
                     close_ticket(
                         ticket, request.auto_accept_user, request
@@ -339,7 +340,8 @@ def handle_cancel_registration(self, request):
     return handle_submission_action(self, request, 'cancelled')
 
 
-def handle_submission_action(self, request, action, ignore_csrf=False):
+def handle_submission_action(self, request, action, ignore_csrf=False,
+                             raises=False):
     if not ignore_csrf:
         request.assert_valid_csrf_token()
 
@@ -392,6 +394,8 @@ def handle_submission_action(self, request, action, ignore_csrf=False):
 
         request.success(success)
     else:
+        if raises:
+            raise ValueError(request.translate(failure))
         request.alert(failure)
 
     return request.redirect(request.link(self))
