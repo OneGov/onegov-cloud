@@ -296,8 +296,6 @@ def handle_complete_submission(self, request):
                     submission = collection.submissions.by_id(
                         submission_id, state='complete', current_only=True
                     )
-                    # We can not use the view since it needs a valid
-                    # csrf token
                     handle_submission_action(
                         submission, request, 'confirmed', True, raises=True
                     )
