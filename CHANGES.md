@@ -1,8 +1,70 @@
 # Changes
 
+## Release `2021.62`
+
+> commits: **35 / [b0e5d8eb3d...871e3844fe](https://github.com/OneGov/onegov-cloud/compare/b0e5d8eb3d^...871e3844fe)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.62)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Show function in organisations overview.**
+
+**`Feature`** | **[STAKABS-28](https://kt-bs.atlassian.net/browse/STAKABS-28)** | **[f95e9cef90](https://github.com/onegov/onegov-cloud/commit/f95e9cef9069c6952129c0d4f0ea371fbde48f68)**
+
+### Election Day
+
+🐞 **Fix embedded vote views and make them more robust.**
+
+**`Bugfix`** | **[df405aa72f](https://github.com/onegov/onegov-cloud/commit/df405aa72f65d24ec506e5a7f23e3f65c4de429e)**
+
+### Event
+
+🐞 **Fix virtual occurence being None if event is still far from today.**
+
+**`Bugfix`** | **[1506e8e05f](https://github.com/onegov/onegov-cloud/commit/1506e8e05f597e1345d794b12feba4ea8627d1b9)**
+
+### Feriennet
+
+🐞 **Fixes empty transaction tid's from xml matching paid transactions without tid**
+
+**`Bugfix`** | **[23b6f0991d](https://github.com/onegov/onegov-cloud/commit/23b6f0991d26a883b4032157d05ada58a5bedf1c)**
+
+### Org
+
+🎉 **Adds export views for payments (and tickets)**
+
+**`Feature`** | **[SEA-428](https://linear.app/seantis/issue/SEA-428)** | **[b78b88a419](https://github.com/onegov/onegov-cloud/commit/b78b88a41949ed4a4b63ed2a758302fd1e2445b9)**
+
+🎉 **Adds export view for payments**
+
+Exports manual and stripe payments with ticket information.
+
+**`Feature`** | **[SEA-428](https://linear.app/seantis/issue/SEA-428)** | **[fd0ebcef42](https://github.com/onegov/onegov-cloud/commit/fd0ebcef42e3f01bfc08ed418d6a38b402652c7e)**
+
+🎉 **Adds ticket deletion feature (incl. town6)**
+
+- Only applies for decided and closed tickets
+- Delete Button on a single ticket
+- Batch Deletion on the tickets table with confirmation modal
+- Adds modal macro to town6
+
+**`Feature`** | **[SEA-378](https://linear.app/seantis/issue/SEA-378)** | **[08007f1b8a](https://github.com/onegov/onegov-cloud/commit/08007f1b8a91ba94adb1cf78c4d6298f28d0868c)**
+
+🎉 **Adds ticket message when changing payment amount**
+
+**`Feature`** | **[26d0343e53](https://github.com/onegov/onegov-cloud/commit/26d0343e53de45da11a470d2db2d04dde52211d1)**
+
+✨ **Improves external links integration**
+
+- Adds Access section to external link forms
+- Adds delete button to edit view
+
+**`Other`** | **[5f5f454c11](https://github.com/onegov/onegov-cloud/commit/5f5f454c11541405273df15b84e20451ec654824)**
+
 ## Release `2021.61`
 
-> commits: **3 / [8f72c8071f...be06e1c517](https://github.com/OneGov/onegov-cloud/compare/8f72c8071f^...be06e1c517)**  
+> released: **2021-06-23 19:40**<br>
+> commits: **4 / [8f72c8071f...59aa2da559](https://github.com/OneGov/onegov-cloud/compare/8f72c8071f^...59aa2da559)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.61)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
