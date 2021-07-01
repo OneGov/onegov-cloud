@@ -23,8 +23,9 @@ class OrgExport(Export):
         yield _("Net Amount"), round(payment.net_amount, 2)
         yield _("Fee"), round(payment.fee, 2)
 
+        payment_date = payment_date_paid(payment)
         yield _("Payment Provider"), provider_title
-        yield _("Date Paid"), payment_date_paid(payment).date()
+        yield _("Date Paid"), payment_date and payment_date.date()
         yield _("References"), [l.payable_reference for l in links]
         yield _("Created Date"), payment.created.date()
 
