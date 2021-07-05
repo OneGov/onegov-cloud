@@ -101,6 +101,7 @@ class Organisation(Base, TimestampMixin):
     # Ticket options
     ticket_auto_accepts = meta_property()
     tickets_skip_opening_email = meta_property()
+    tickets_skip_closing_email = meta_property()
     mute_all_tickets = meta_property()
     ticket_always_notify = meta_property(default=True)
     # username for the user supposed to automatically handle tickets
