@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2021.63`
+
+> commits: **9 / [8bc8876629...7333cb11f1](https://github.com/OneGov/onegov-cloud/compare/8bc8876629^...7333cb11f1)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.63)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Show full breadcrumb navigation.**
+
+**`Feature`** | **[STAKABS-26](https://kt-bs.atlassian.net/browse/STAKABS-26)** | **[6094289084](https://github.com/onegov/onegov-cloud/commit/6094289084b4b9c580bb47a5cb0a2fe3c99fd639)**
+
+### Org
+
+🎉 **Adds ellipsis to typeahead.**
+
+**`Feature`** | **[STAKABS-29](https://kt-bs.atlassian.net/browse/STAKABS-29)** | **[42eacf219d](https://github.com/onegov/onegov-cloud/commit/42eacf219df3740d0ac0b6829c0edbe0c86878c7)**
+
 ## Release `2021.62`
 
-> commits: **35 / [b0e5d8eb3d...871e3844fe](https://github.com/OneGov/onegov-cloud/compare/b0e5d8eb3d^...871e3844fe)**  
+> released: **2021-06-30 10:37**<br>
+> commits: **36 / [b0e5d8eb3d...97989eb6fb](https://github.com/OneGov/onegov-cloud/compare/b0e5d8eb3d^...97989eb6fb)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.62)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
