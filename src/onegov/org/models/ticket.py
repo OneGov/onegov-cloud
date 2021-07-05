@@ -268,6 +268,13 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
                         )
                     )
                 )
+            extra.append(
+                Link(
+                    text=_("Registration Window"),
+                    url=request.link(window),
+                    attrs={'class': 'edit-link'}
+                )
+            )
 
         edit_link = URL(request.link(self.submission))
         edit_link = edit_link.query_param('edit', '').as_string()
