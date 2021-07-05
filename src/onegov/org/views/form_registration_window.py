@@ -270,7 +270,7 @@ def view_cancel_submissions_for_registration_window(self, request):
 
         handle_submission_action(
             submission, request, action, ignore_csrf=True, raises=True,
-            no_messages=True
+            no_messages=True, force_email=ticket.muted
         )
         count += 1
     if count:
