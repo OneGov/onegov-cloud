@@ -13,7 +13,7 @@ from sqlalchemy import desc
 
 from onegov.org.views.form_submission import handle_submission_action
 from onegov.org.mail import send_transactional_html_mail
-from onegov.org.views.ticket import accept_ticket
+from onegov.org.views.ticket import accept_ticket, send_email_if_enabled
 from onegov.ticket import TicketCollection
 
 
@@ -276,6 +276,14 @@ def view_cancel_submissions_for_registration_window(self, request):
         )
         if ticket:
             close_ticket(ticket, request.current_user, request)
+            # same behaviour as when closing ticket normally
+            # to disable mail on ticket close, there is a ticket-setting
+            send_email_if_enabled(
+                ticket=self,
+                request=request,
+                template='mail_ticket_closed.pt',
+                subject=_("Your request has been closed.")
+            )
         count += 1
     if count:
         request.success(
