@@ -336,6 +336,8 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
 
     @property
     def step_position(self):
+        if self.request.view_name in ('send-message',):
+            return
         if self.model.__class__.__name__ == 'CustomFormDefinition':
             return 1
         return 2
