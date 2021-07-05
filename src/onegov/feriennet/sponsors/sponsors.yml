@@ -81,8 +81,8 @@
         it: sponsors/concordia-banner-it.jpg
       url:
         de: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-        fr: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-fr'
-        it: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-it'
+        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-fr'
+        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-it'
       tracker:
         de: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
         fr: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
@@ -148,8 +148,8 @@
         it: sponsors/concordia-banner-it.jpg
       url:
         de: 'https://www.projuventute.ch/de/wup-app?utm_source=feriennet&utm_medium=banner&utm_campaign=wup'
-        fr: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-fr'
-        it: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-it'
+        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-fr'
+        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-it'
     invoices:
       src:
         de: sponsors/wup-banner-de.png
