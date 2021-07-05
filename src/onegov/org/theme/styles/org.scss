@@ -3598,7 +3598,7 @@ ul.search-results {
         }
 
         // highlight links when hovering
-        &:hover {
+        &:not(:last-child):hover {
             background-color: $topbar-bg-color !important;
 
             a {

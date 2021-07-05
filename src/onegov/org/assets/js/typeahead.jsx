@@ -42,6 +42,7 @@ var TypeaheadList = React.createClass({
                         </li>
                     );
                 })}
+                <li>…</li>
             </ul>
         );
     },
