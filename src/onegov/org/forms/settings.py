@@ -735,6 +735,15 @@ class OrgTicketSettingsForm(Form):
         render_kw={'disabled': True}
     )
 
+    def ensure_not_muted_and_auto_accept(self):
+        if self.mute_all_tickets.data is True \
+                and self.ticket_auto_accepts.data:
+            self.mute_all_tickets.errors.append(
+                _("Mute tickets individually if the auto-accept feature is "
+                  "enabled.")
+            )
+            return False
+
     def code_title(self, code):
         """ Renders a better translation for handler_codes.
         Note that the registry of handler_codes is global and not all handlers
