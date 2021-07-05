@@ -339,7 +339,7 @@ def handle_cancel_registration(self, request):
 
 
 def handle_submission_action(self, request, action, ignore_csrf=False,
-                             raises=False):
+                             raises=False, no_messages=False):
     if not ignore_csrf:
         request.assert_valid_csrf_token()
 
@@ -389,11 +389,12 @@ def handle_submission_action(self, request, action, ignore_csrf=False,
         )
 
         SubmissionMessage.create(ticket, request, action)
-
-        request.success(success)
+        if not no_messages:
+            request.success(success)
     else:
         if raises:
             raise ValueError(request.translate(failure))
-        request.alert(failure)
+        if not no_messages:
+            request.alert(failure)
 
     return request.redirect(request.link(self))

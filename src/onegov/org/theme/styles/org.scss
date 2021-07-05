@@ -1684,6 +1684,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
+    .cancel::before { @include icon($disabled-icon); }
 }
 
 

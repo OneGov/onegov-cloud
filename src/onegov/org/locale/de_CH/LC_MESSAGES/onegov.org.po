@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-29 18:59+0200\n"
+"POT-Creation-Date: 2021-07-05 13:58+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -694,7 +694,22 @@ msgid "By registration window"
 msgstr "Nach Anmeldezeitraum"
 
 msgid "Registration Window"
-msgstr "Anmeldungszeitraum"
+msgstr "Anmeldezeitraum"
+
+msgid "Your message"
+msgstr "Ihre Nachricht"
+
+msgid "Send to attendees with status"
+msgstr "Sende Nachricht an Teilnehmende mit Status"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "Cancelled"
+msgstr "Storniert"
+
+msgid "No email receivers found for the selection"
+msgstr "Keine Empfänger für die getroffene Auswahl"
 
 msgid "Limit the number of attendees"
 msgstr "Anzahl Teilnehmer limitieren"
@@ -1346,9 +1361,6 @@ msgstr "Anhang"
 msgid "Message"
 msgstr "Nachricht"
 
-msgid "Your message"
-msgstr "Ihre Nachricht"
-
 msgid "The message is empty"
 msgstr "Die Nachricht ist leer"
 
@@ -1521,7 +1533,7 @@ msgid "Export"
 msgstr "Export"
 
 msgid "Registration Windows"
-msgstr "Anmeldungszeitraum"
+msgstr "Anmeldezeitraum"
 
 msgid "Form"
 msgstr "Formular"
@@ -3879,6 +3891,36 @@ msgid ""
 "specific time-range."
 msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
 
+msgid "General Message"
+msgstr "Allgemeine Nachricht"
+
+#, python-format
+msgid "Successfully sent ${count} emails"
+msgstr "Erfolgreich ${count} E-Mails gesendet"
+
+msgid "Send E-Mail to attendees"
+msgstr "E-Mail an Teilnehmende senden"
+
+msgid "Email attendees"
+msgstr "E-Mail an Teilnehmende"
+
+msgid "Cancel Registration Window"
+msgstr "Anmeldezeitraum absagen"
+
+msgid ""
+"You really want to cancel all confirmed and deny all open submissions for "
+"this registration window?"
+msgstr ""
+"Möchten Sie alle bestätigten Anmeldungen stornieren und alle offenen "
+"ablehnen?"
+
+msgid ""
+"Each attendee will receive a ticket email unless ticket messages are not "
+"muted."
+msgstr ""
+"Jeder Teilnehmer wird eine Ticket-Email erhalten, sofern Tickets nicht "
+"stummgeschaltet sind."
+
 msgid "Do you really want to delete this registration window?"
 msgstr "Möchten Sie den Anmeldezeitraum wirklich entfernen?"
 
@@ -3888,14 +3930,22 @@ msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
 msgid "Delete registration window"
 msgstr "Anmeldezeitraum entfernen"
 
-msgid "Confirmed"
-msgstr "Bestätigt"
+msgid "This registration window can't be deleted."
+msgstr "Dieser Anmeldezeitraum kann nicht gelöscht werden."
 
-msgid "Cancelled"
-msgstr "Storniert"
+msgid ""
+"There are confirmed or open submissions associated with it. Cancel the "
+"registration window first."
+msgstr ""
+"Bereits bestätigte oder offene Anmeldungen wären betroffen. Sagen Sie den "
+"Zeitraum zuerst ab."
 
 msgid "Edit Registration Window"
 msgstr "Anmeldezeitraum bearbeiten"
+
+#, python-format
+msgid "${count} submissions cancelled / denied over the ticket system"
+msgstr "${count} Anmeldungen storniert / abgelehnt über das Ticket-System"
 
 msgid "The registration window was deleted"
 msgstr "Der Anmeldezeitraum wurde gelöscht"
@@ -4479,6 +4529,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Cancel registration window"
+#~ msgstr "Anmeldezeitraum stornieren"
 
 #~ msgid "Add external form"
 #~ msgstr "Externes Formular hinzufügen"
