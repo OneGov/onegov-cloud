@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-05 15:22+0200\n"
+"POT-Creation-Date: 2021-07-05 15:46+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1307,11 +1307,24 @@ msgid ""
 "Accept request and close ticket automatically for these ticket categories"
 msgstr "Akteptiere und schliesse Ticket automatisch für diese Kategorien"
 
+msgid ""
+"If auto-accepting is not possible, the ticket will be in state pending. Also "
+"note, that after the ticket is closed, the submitter can't send any messages."
+msgstr ""
+"Wenn das automatische Akzeptieren nicht möglich ist, verbleibt ein Ticket in "
+"Bearbeitung. Bedenken Sie weiter, dass nach Abschluss des Tickets von der "
+"antragstellenden Person keine Nachrichten mehr gesendet werden können."
+
 msgid "User used to auto-accept tickets"
 msgstr "Benutzer für das automatische Akzeptieren von Tickets"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
+
+msgid "This is enabled by default for tickets that get accepted automatically"
+msgstr ""
+"Für automatisch akzeptierte Tickets wird standardmässig keine "
+"Eröffnungsnachricht verschickt"
 
 msgid "Mute all tickets"
 msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"

@@ -705,6 +705,9 @@ class OrgTicketSettingsForm(Form):
     ticket_auto_accepts = MultiCheckboxField(
         label=_("Accept request and close ticket automatically "
                 "for these ticket categories"),
+        description=_("If auto-accepting is not possible, the ticket will be "
+                      "in state pending. Also note, that after the ticket is "
+                      "closed, the submitter can't send any messages."),
         choices=[],
     )
 
@@ -717,6 +720,8 @@ class OrgTicketSettingsForm(Form):
         label=_("Block email confirmation when "
                 "this ticket category is opened"),
         choices=[],
+        description=_("This is enabled by default for tickets that get "
+                      "accepted automatically")
     )
 
     mute_all_tickets = BooleanField(
