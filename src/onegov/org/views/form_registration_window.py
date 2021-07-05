@@ -4,11 +4,13 @@ from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import FormSubmission
 from onegov.org import OrgApp, _
+from onegov.org.cli import close_ticket
 from onegov.org.forms import FormRegistrationWindowForm
 from onegov.org.forms.form_registration import FormRegistrationMessageForm
 from onegov.org.layout import FormSubmissionLayout
 from onegov.core.elements import Link, Confirm, Intercooler, Block
 from sqlalchemy import desc
+
 from onegov.org.views.form_submission import handle_submission_action
 from onegov.org.mail import send_transactional_html_mail
 from onegov.org.views.ticket import accept_ticket
@@ -272,6 +274,8 @@ def view_cancel_submissions_for_registration_window(self, request):
             submission, request, action, ignore_csrf=True, raises=True,
             no_messages=True, force_email=ticket.muted
         )
+        if ticket:
+            close_ticket(ticket, request.current_user, request)
         count += 1
     if count:
         request.success(
