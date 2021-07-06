@@ -129,9 +129,35 @@ class ContactExtension(ContentExtension):
         self.content['contact'] = value
 
         if value:
-            self.content['contact_html'] = '<ul><li>{}</li></ul>'.format(
-                '</li><li>'.join(linkify(value).splitlines())
-            )
+            elements = []
+            temp_li = []
+
+            def ul(inner, bulleted=False):
+                return f'<ul class="bulleted">{inner}</ul>' if bulleted \
+                    else f'<ul>{inner}</ul>'
+
+            def li(inner):
+                return f'<li>{inner}</li>'
+
+            was_bulleted = False
+            for line in linkify(value).splitlines():
+                now_bullet = line.startswith('-')
+                if now_bullet:
+                    line = line.lstrip('-')
+                    if not was_bulleted and temp_li:
+                        elements.append(ul(''.join(temp_li)))
+                        temp_li = []
+                elif was_bulleted and temp_li:
+                    elements.append(ul(''.join(temp_li), bulleted=True))
+                    temp_li = []
+
+                temp_li.append(li(line))
+                was_bulleted = now_bullet
+
+            if temp_li:
+                elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
+
+            self.content['contact_html'] = ''.join(elements)
         else:
             self.content['contact_html'] = ""
 
@@ -145,7 +171,10 @@ class ContactExtension(ContentExtension):
             contact = TextAreaField(
                 label=_("Address"),
                 fieldset=_("Contact"),
-                render_kw={'rows': 5}
+                render_kw={'rows': 5},
+                description=_("- '-' will be converted to a bulleted list\n"
+                              "- Urls will be transformed into links\n"
+                              "- Emails and phone numbers as well")
             )
 
         return ContactPageForm

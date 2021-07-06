@@ -89,6 +89,12 @@ $publications-icon: '\f1ea';
         margin-bottom: 1rem;
     }
 
+    ul.bulleted {
+        list-style-type: disc;
+        margin-left: 1.5rem;
+        margin-top: .25rem;
+    }
+
     .contacts-albums-panel ul.panel-links.more-list {
         padding: 0;
     }
@@ -114,6 +120,7 @@ $publications-icon: '\f1ea';
         .panel-links {
             background-color: $primary-color;
             color: $primary-fg-color;
+
             .h5 {
                 margin-bottom: 0;
             }

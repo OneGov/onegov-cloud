@@ -1379,7 +1379,15 @@ ul.panel-links {
     > ul {
         list-style-type: none;
         margin: 0;
-        padding: .5rem 1rem .75rem;
+
+        &:first-of-type {
+            padding: .5rem 1rem .75rem;
+        }
+
+        &.bulleted {
+            list-style-type: disc;
+            margin-left: 2rem;
+        }
 
         li {
             font-size: .875rem;
@@ -1484,15 +1492,17 @@ ul.panel-links {
     }
 
     &.without-title {
-        > ul {
-            padding: 0 0 1rem;
-
+        > ul:first-of-type {
             li:first-child {
                 @include primary-color-background;
                 margin-bottom: 1rem;
                 padding: .75rem 1rem;
                 text-transform: uppercase;
             }
+        }
+
+        > ul:not(.bulleted) {
+            padding: 0 0 .25rem;
 
             li {
                 min-height: .5rem;
@@ -1502,6 +1512,10 @@ ul.panel-links {
                     margin-top: .25rem;
                 }
             }
+        }
+
+        > ul:last-of-type {
+            padding: 0 0 1rem;
         }
     }
 }
