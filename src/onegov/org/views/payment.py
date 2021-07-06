@@ -1,3 +1,4 @@
+import decimal
 from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
@@ -162,8 +163,11 @@ def run_export(session, start, end, nested, formatter):
 def change_payment_amount(self, request):
     request.assert_valid_csrf_token()
     assert not self.paid
-    net_amount = Decimal(request.params['netAmount'])
     format_ = DefaultLayout(self, request).format_number
+    try:
+        net_amount = Decimal(request.params['netAmount'])
+    except decimal.ConversionSyntax:
+        return {'net_amount': f"{format_(self.net_amount)} {self.currency}"}
 
     if net_amount <= 0 or (net_amount - self.fee) <= 0:
         raise exc.HTTPBadRequest("amount negative")
