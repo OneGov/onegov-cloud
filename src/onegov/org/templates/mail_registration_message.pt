@@ -1,0 +1,24 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p tal:condition="action=='general-message'">
+            ${message}
+        </p>
+
+        <p>
+            <hr class="large">
+
+            <dl class="field-display">
+                <dt i18n:translate="">Registration</dt>
+                <dd><a href="${request.link(model.form)}">${model.form.title}</a></dd>
+                <dt i18n:translate="">Registration Window</dt>
+                <dd>${layout.format_date_range(model.registration_window.start, model.registration_window.end)}</dd>
+            </dl>
+
+            <hr class="large">
+        </p>
+    </tal:b>
+</div>
