@@ -1,8 +1,25 @@
 # Changes
 
+## Release `2021.64`
+
+> commits: **19 / [24957f62a8...5f03e68f30](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...5f03e68f30)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.64)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Improves message sending for tickets and forms**
+
+- Adds Email message form to form registration windows
+- Adds /ticket-settings to skip ticket closing emails
+- Adds batch cancellation for attendees of form registration windows
+- Applies for town6 as well
+
+**`Feature`** | **[SEA-379](https://linear.app/seantis/issue/SEA-379)** | **[1748d18bad](https://github.com/onegov/onegov-cloud/commit/1748d18bad7f6bba9cb31131d479178a1a85b351)**
+
 ## Release `2021.63`
 
-> commits: **9 / [8bc8876629...7333cb11f1](https://github.com/OneGov/onegov-cloud/compare/8bc8876629^...7333cb11f1)**  
+> released: **2021-07-05 11:18**<br>
+> commits: **10 / [8bc8876629...efee5c2710](https://github.com/OneGov/onegov-cloud/compare/8bc8876629^...efee5c2710)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.63)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
