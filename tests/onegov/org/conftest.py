@@ -9,9 +9,8 @@ import pytest
 from onegov.chat import MessageCollection
 from onegov.core.elements import Element
 from onegov.core.utils import Bunch
-from onegov.form import FormDefinition, FormDefinitionCollection, \
-    FormCollection, FormSubmissionCollection, FormRegistrationWindow, \
-    FormSubmission
+from onegov.form import FormDefinitionCollection, \
+    FormCollection, FormSubmission
 from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
@@ -81,10 +80,12 @@ class Client(BaseClient):
         return reserve
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def handlers():
-    yield onegov.ticket.handlers
+    before = onegov.ticket.handlers.registry
     onegov.ticket.handlers.registry = {}
+    yield onegov.ticket.handlers
+    onegov.ticket.handlers.registry = before
 
 
 @pytest.fixture(scope='function')

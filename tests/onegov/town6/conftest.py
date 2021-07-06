@@ -43,10 +43,12 @@ class Client(BaseClient):
         return reserve
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def handlers():
-    yield onegov.ticket.handlers
+    before = onegov.ticket.handlers.registry
     onegov.ticket.handlers.registry = {}
+    yield onegov.ticket.handlers
+    onegov.ticket.handlers.registry = before
 
 
 @pytest.fixture(scope='session')
