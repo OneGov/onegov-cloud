@@ -56,7 +56,7 @@ def add_ticket_message(request, ticket, text):
     return message
 
 
-def test_ticket_pdf(org_app, handlers):
+def test_ticket_pdf(org_app):
 
     session = org_app.session()
     libres_context = org_app.libres_context
