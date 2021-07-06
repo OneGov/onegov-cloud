@@ -114,6 +114,9 @@ $publications-icon: '\f1ea';
         .panel-links {
             background-color: $primary-color;
             color: $primary-fg-color;
+            .h5 {
+                margin-bottom: 0;
+            }
         }
 
         li {
