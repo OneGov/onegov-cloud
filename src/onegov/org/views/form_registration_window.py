@@ -279,7 +279,7 @@ def view_cancel_submissions_for_registration_window(self, request):
             # same behaviour as when closing ticket normally
             # to disable mail on ticket close, there is a ticket-setting
             send_email_if_enabled(
-                ticket=self,
+                ticket=ticket,
                 request=request,
                 template='mail_ticket_closed.pt',
                 subject=_("Your request has been closed.")
