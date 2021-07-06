@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-29 18:59+0200\n"
+"POT-Creation-Date: 2021-07-05 18:04+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -699,6 +699,21 @@ msgstr "Par fenêtre d'inscription"
 msgid "Registration Window"
 msgstr "Fenêtre d'inscription"
 
+msgid "Your message"
+msgstr "Votre message"
+
+msgid "Send to attendees with status"
+msgstr "Envoyer aux participants avec le statut"
+
+msgid "Confirmed"
+msgstr "Confirmé"
+
+msgid "Cancelled"
+msgstr "Annulé"
+
+msgid "No email receivers found for the selection"
+msgstr "Aucun destinataire d'email trouvé pour la sélection"
+
 msgid "Limit the number of attendees"
 msgstr "Limiter le nombre de participants"
 
@@ -1296,11 +1311,27 @@ msgid ""
 msgstr ""
 "Accepter la demande et fermer le ticket automatiquement pour ces catégories"
 
+msgid ""
+"If auto-accepting is not possible, the ticket will be in state pending. Also "
+"note, that after the ticket is closed, the submitter can't send any messages."
+msgstr ""
+"Si l'auto-acceptation n'est pas possible, le ticket sera en état d'attente. "
+"Notez également qu'après la fermeture du ticket, l'expéditeur ne peut plus "
+"envoyer de messages."
+
 msgid "User used to auto-accept tickets"
 msgstr "Utilisateur pour l'acceptation automatique des tickets"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr "N'envoyez pas d'e-mail lorsque cette catégorie de billets est ouverte"
+
+msgid "This is enabled by default for tickets that get accepted automatically"
+msgstr ""
+"Cette option est activée par défaut pour les tickets qui sont acceptés "
+"automatiquement."
+
+msgid "Block email confirmation when this ticket category is closed"
+msgstr "N'envoyez pas d'e-mail lorsque cette catégorie de billets est fermée"
 
 msgid "Mute all tickets"
 msgstr "Désactiver tous les emails de statut pour les tickets"
@@ -1312,6 +1343,11 @@ msgstr ""
 
 msgid "Categories restriced by user group settings"
 msgstr "Catégories restreintes par les paramètres du groupe d'utilisateurs"
+
+msgid "Mute tickets individually if the auto-accept feature is enabled."
+msgstr ""
+"Mettez les tickets en sourdine individuellement si la fonction d'acceptation "
+"automatique est activée."
 
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"
@@ -1351,9 +1387,6 @@ msgstr "Pièce jointe"
 
 msgid "Message"
 msgstr "Message"
-
-msgid "Your message"
-msgstr "Votre message"
 
 msgid "The message is empty"
 msgstr "Le message est vide"
@@ -3897,6 +3930,36 @@ msgstr ""
 "Les fenêtres d'inscription limitent les formulaires à un nombre déterminé de "
 "soumissions à et une plage de temps spécifique."
 
+msgid "General Message"
+msgstr "Message général"
+
+#, python-format
+msgid "Successfully sent ${count} emails"
+msgstr "Envoi réussi de ${count} emails"
+
+msgid "Send E-Mail to attendees"
+msgstr "Envoyer un message aux participants"
+
+msgid "Email attendees"
+msgstr "E-Mail aux participants"
+
+msgid "Cancel Registration Window"
+msgstr "Annuler le fenêtre d'inscription"
+
+msgid ""
+"You really want to cancel all confirmed and deny all open submissions for "
+"this registration window?"
+msgstr ""
+"Voulez-vous vraiment annuler toutes les inscriptions confirmées et refuser "
+"toutes les inscriptions ouvertes?"
+
+msgid ""
+"Each attendee will receive a ticket email unless ticket messages are not "
+"muted."
+msgstr ""
+"Chaque participant recevra un ticket email, sauf si les messages du ticket "
+"ne sont pas mis en sourdine."
+
 msgid "Do you really want to delete this registration window?"
 msgstr "Voulez-vous vraiment supprimer cette fenêtre d'inscription?"
 
@@ -3906,14 +3969,23 @@ msgstr "Les soumissions existantes seront dissociées."
 msgid "Delete registration window"
 msgstr "Supprimer la fenêtre d'enregistrement"
 
-msgid "Confirmed"
-msgstr "Confirmé"
+msgid "This registration window can't be deleted."
+msgstr "Ce fenêtre d'inscription ne peut être supprimé."
 
-msgid "Cancelled"
-msgstr "Annulé"
+msgid ""
+"There are confirmed or open submissions associated with it. Cancel the "
+"registration window first."
+msgstr ""
+"Il y a des inscriptions confirmées ou ouvertes pour ce fenêtre "
+"d'inscription. Annulez-le d'abord."
 
 msgid "Edit Registration Window"
 msgstr "Modifier la fenêtre d'inscription"
+
+#, python-format
+msgid "${count} submissions cancelled / denied over the ticket system"
+msgstr ""
+"${count} inscriptions sont été annulées / refusée via le system de ticket"
 
 msgid "The registration window was deleted"
 msgstr "La fenêtre d'inscription a été supprimée"
@@ -4276,17 +4348,6 @@ msgstr "Paramètres de la newsletter"
 msgid "Ticket Settings"
 msgstr "Paramètres tickets"
 
-msgid ""
-"Accepting and closing tickets automatically should be used with care! This "
-"means that anonymous users can influence the page content without user "
-"interaction of an admin! Best activate this setting just for a limited "
-"period of time."
-msgstr ""
-"L'acceptation et la fermeture automatique des tickets doivent être utilisées "
-"avec précaution ! Cela signifie que les utilisateurs anonymes peuvent "
-"influencer le contenu de la page sans l'intervention d'un administrateur ! "
-"Il est préférable d'activer ce paramètre uniquement pour une période limitée."
-
 msgid "Header"
 msgstr "En-tête"
 
@@ -4496,6 +4557,21 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid ""
+#~ "Accepting and closing tickets automatically should be used with care! "
+#~ "This means that anonymous users can influence the page content without "
+#~ "user interaction of an admin! Best activate this setting just for a "
+#~ "limited period of time."
+#~ msgstr ""
+#~ "L'acceptation et la fermeture automatique des tickets doivent être "
+#~ "utilisées avec précaution ! Cela signifie que les utilisateurs anonymes "
+#~ "peuvent influencer le contenu de la page sans l'intervention d'un "
+#~ "administrateur ! Il est préférable d'activer ce paramètre uniquement pour "
+#~ "une période limitée."
+
+#~ msgid "Cancel registration window"
+#~ msgstr "Annuler le fenêtre d'inscription"
 
 #~ msgid "Add external form"
 #~ msgstr "Ajouter un formulaire externe"

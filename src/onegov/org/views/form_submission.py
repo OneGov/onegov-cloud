@@ -338,8 +338,9 @@ def handle_cancel_registration(self, request):
     return handle_submission_action(self, request, 'cancelled')
 
 
-def handle_submission_action(self, request, action, ignore_csrf=False,
-                             raises=False):
+def handle_submission_action(
+        self, request, action, ignore_csrf=False, raises=False,
+        no_messages=False, force_email=False):
     if not ignore_csrf:
         request.assert_valid_csrf_token()
 
@@ -385,15 +386,17 @@ def handle_submission_action(self, request, action, ignore_csrf=False,
                 'form': self.form_obj,
                 'show_submission': self.meta.get('show_submission')
             },
-            subject=subject
+            subject=subject,
+            force=force_email
         )
 
         SubmissionMessage.create(ticket, request, action)
-
-        request.success(success)
+        if not no_messages:
+            request.success(success)
     else:
         if raises:
             raise ValueError(request.translate(failure))
-        request.alert(failure)
+        if not no_messages:
+            request.alert(failure)
 
     return request.redirect(request.link(self))

@@ -131,12 +131,6 @@ def handle_newsletter_settings(self, request, form, layout=None):
 def handle_ticket_settings(self, request, form, layout=None):
     resp = handle_generic_settings(
         self, request, form, _("Ticket Settings"), layout)
-    if request.method == 'GET':
-        resp['callout'] = _(
-            "Accepting and closing tickets automatically should be used "
-            "with care! This means that anonymous users can influence the "
-            "page content without user interaction of an admin! "
-            "Best activate this setting just for a limited period of time.")
     return resp
 
 

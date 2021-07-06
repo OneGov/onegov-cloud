@@ -360,6 +360,7 @@ $editbar-fg-color-active: $white;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
+    .cancel::before { @include icon-bold($disabled-icon); }
 }
 
 

@@ -614,11 +614,14 @@ def test_registration_ticket_workflow(client):
     user_id = users.add(username, 'testing', 'admin').id
     transaction.commit()
 
-    def register(client, data_in_email, auto_accept=False):
+    count = 0
 
+    def register(client, data_in_email, auto_accept=False):
+        nonlocal count
+        count += 1
         with freeze_time('2018-01-01'):
             page = client.get('/form/meetup')
-            page.form['e_mail'] = 'info@example.org'
+            page.form['e_mail'] = f'info{count}@example.org'
             page.form['name'] = 'Foobar'
             page = page.form.submit().follow()
 
@@ -665,6 +668,9 @@ def test_registration_ticket_workflow(client):
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" not in msg
 
+    # create one undecided submission
+    open_registration = register(client, False, auto_accept=True)
+
     # Test auto accept reservations for forms
     # views in order:
     # - /form/meetup
@@ -687,6 +693,29 @@ def test_registration_ticket_workflow(client):
 
     # check ownership of the ticket
     client.app.session().query(Ticket).filter_by(user_id=user_id).one()
+
+    # Reopen the last
+    client.login_editor()
+    page = client.get('/tickets/ALL/closed')
+    last_ticket = page.pyquery('td.ticket-number-plain a').attr('href')
+    ticket = client.get(last_ticket).click('Ticket wieder öffnen').follow()
+    window = ticket.click('Anmeldezeitraum')
+    assert 'Offen (1)' in window
+    assert 'Bestätigt (1)' in window
+    assert 'Storniert (2)' in window
+
+    message = window.click('E-Mail an Teilnehmende')
+    message.form['message'] = 'Message for all the attendees'
+    message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
+    page = message.form.submit().follow()
+    assert 'Erfolgreich 4 E-Mails gesendet' in page
+    mail = get_mail(client.app.smtp.outbox, -1)
+    assert 'Message for all the attendees' in mail['html']
+    assert 'Allgemeine Nachricht' in mail['subject']
+
+    # navigate to the registration window an cancel all
+    window.click('Anmeldezeitraum absagen')
+    assert 'Storniert (4)' in client.get(window.request.url)
 
 
 def test_registration_not_in_front_of_queue(client):

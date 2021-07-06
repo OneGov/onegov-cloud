@@ -705,6 +705,9 @@ class OrgTicketSettingsForm(Form):
     ticket_auto_accepts = MultiCheckboxField(
         label=_("Accept request and close ticket automatically "
                 "for these ticket categories"),
+        description=_("If auto-accepting is not possible, the ticket will be "
+                      "in state pending. Also note, that after the ticket is "
+                      "closed, the submitter can't send any messages."),
         choices=[],
     )
 
@@ -717,6 +720,16 @@ class OrgTicketSettingsForm(Form):
         label=_("Block email confirmation when "
                 "this ticket category is opened"),
         choices=[],
+        description=_("This is enabled by default for tickets that get "
+                      "accepted automatically")
+    )
+
+    tickets_skip_closing_email = MultiCheckboxField(
+        label=_("Block email confirmation when "
+                "this ticket category is closed"),
+        choices=[],
+        description=_("This is enabled by default for tickets that get "
+                      "accepted automatically")
     )
 
     mute_all_tickets = BooleanField(
@@ -734,6 +747,15 @@ class OrgTicketSettingsForm(Form):
         choices=[],
         render_kw={'disabled': True}
     )
+
+    def ensure_not_muted_and_auto_accept(self):
+        if self.mute_all_tickets.data is True \
+                and self.ticket_auto_accepts.data:
+            self.mute_all_tickets.errors.append(
+                _("Mute tickets individually if the auto-accept feature is "
+                  "enabled.")
+            )
+            return False
 
     def code_title(self, code):
         """ Renders a better translation for handler_codes.
@@ -761,6 +783,7 @@ class OrgTicketSettingsForm(Form):
             (key, self.code_title(key)) for key in auto_accept_choices
         ]
         self.tickets_skip_opening_email.choices = choices
+        self.tickets_skip_closing_email.choices = choices
 
         permissions = sorted([
             (

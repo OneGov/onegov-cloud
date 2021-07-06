@@ -158,7 +158,7 @@ msgid "Export"
 msgstr "Export"
 
 msgid "Registration Windows"
-msgstr "Anmeldungszeitraum"
+msgstr "Anmeldezeitraum"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -1232,7 +1232,7 @@ msgid "Registration"
 msgstr "Anmeldung"
 
 msgid "Registration Window"
-msgstr "Anmeldungszeitraum"
+msgstr "Anmeldezeitraum"
 
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"

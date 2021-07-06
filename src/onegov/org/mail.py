@@ -53,16 +53,20 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
         if ticket.muted:
             return
 
-        skip_handler_codes = org.tickets_skip_opening_email or []
+        skip_handler_codes_o = org.tickets_skip_opening_email or []
+        skip_handler_codes_c = org.tickets_skip_closing_email or []
         opened = ticket.state == 'open'
-        if opened and ticket.handler_code in skip_handler_codes:
+        if opened and ticket.handler_code in skip_handler_codes_o:
             return
 
         if opened and request.auto_accept(ticket):
             return
 
-        if ticket.state == 'closed' and request.auto_accept(ticket):
-            return
+        if ticket.state == 'closed':
+            if request.auto_accept(ticket):
+                return
+            if ticket.handler_code in skip_handler_codes_c:
+                return
 
         if request.current_username in receivers:
             if len(receivers) == 1:
