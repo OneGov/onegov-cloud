@@ -139,6 +139,22 @@ input[data-street-search]::placeholder {
     }
 }
 
+.publication-nav {
+    button.dropdown.dropdown {
+        background: $gray-light;
+        font-size: 1rem;
+
+        &::after {
+            border-color: $primary-color transparent transparent;
+        }
+
+        &:hover,
+        &:focus {
+            color: $black;
+        }
+    }
+}
+
 /*
     Streets view
 */
