@@ -7,7 +7,6 @@ from onegov.org.cli import close_ticket
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
-    FormDefinition,
     PendingFormSubmission,
     CompleteFormSubmission
 )
@@ -39,91 +38,6 @@ def get_price(request, form, submission):
             total = Price(**submission.meta['price'])
 
     return request.app.adjust_price(total)
-
-
-def get_hints(layout, window):
-    if not window:
-        return
-
-    if window.in_the_past:
-        yield 'stop', _("The registration has ended")
-    elif not window.enabled:
-        yield 'stop', _("The registration is closed")
-
-    if window.enabled and window.in_the_future:
-        yield 'date', _("The registration opens on ${day}, ${date}", mapping={
-            'day': layout.format_date(window.start, 'weekday_long'),
-            'date': layout.format_date(window.start, 'date_long')
-        })
-
-    if window.enabled and window.in_the_present:
-        yield 'date', _("The registration closes on ${day}, ${date}", mapping={
-            'day': layout.format_date(window.end, 'weekday_long'),
-            'date': layout.format_date(window.end, 'date_long')
-        })
-
-        if window.limit and window.overflow:
-            yield 'count', _("There's a limit of ${count} attendees", mapping={
-                'count': window.limit
-            })
-
-        if window.limit and not window.overflow:
-            spots = window.available_spots
-
-            if spots == 0:
-                yield 'stop', _("There are no spots left")
-            elif spots == 1:
-                yield 'count', _("There is one spot left")
-            else:
-                yield 'count', _("There are ${count} spots left", mapping={
-                    'count': spots
-                })
-
-
-@OrgApp.form(
-    model=FormDefinition,
-    template='form.pt', permission=Public,
-    form=lambda self, request: self.form_class
-)
-def handle_defined_form(self, request, form, layout=None):
-    """ Renders the empty form and takes input, even if it's not valid, stores
-    it as a pending submission and redirects the user to the view that handles
-    pending submissions.
-
-    """
-
-    collection = FormCollection(request.session)
-
-    if not self.current_registration_window:
-        spots = 0
-        enabled = True
-    else:
-        spots = 1
-        enabled = self.current_registration_window.accepts_submissions(spots)
-
-    if enabled and request.POST:
-        submission = collection.submissions.add(
-            self.name, form, state='pending', spots=spots)
-
-        return morepath.redirect(request.link(submission))
-
-    layout = layout or FormSubmissionLayout(self, request)
-
-    return {
-        'layout': layout,
-        'title': self.title,
-        'form': enabled and form,
-        'definition': self,
-        'form_width': 'small',
-        'lead': layout.linkify(self.meta.get('lead')),
-        'text': self.content.get('text'),
-        'people': self.people,
-        'contact': self.contact_html,
-        'coordinates': self.coordinates,
-        'hints': tuple(get_hints(layout, self.current_registration_window)),
-        'hints_callout': not enabled,
-        'button_text': _('Continue')
-    }
 
 
 @OrgApp.html(model=PendingFormSubmission, template='submission.pt',
