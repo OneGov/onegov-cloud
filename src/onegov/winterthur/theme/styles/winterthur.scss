@@ -185,7 +185,7 @@ input[data-street-search]::placeholder {
         font-size: 20px;
     }
 
-    tbody tr:nth-fo-type(even) {
+    tbody tr:nth-of-type(even) {
         background: $table-even-bg-color;
     }
 }
