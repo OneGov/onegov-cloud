@@ -367,6 +367,13 @@ class LinksSettingsForm(Form):
             'User will stay on the page when opening images and files')
     )
 
+    disable_page_refs = BooleanField(
+        label=_("Disable page references"),
+        description=_(
+            "Disable showing the copy link '#' for the site reference. "
+            "The references themselves will still work.")
+    )
+
 
 class HeaderSettingsForm(Form):
 

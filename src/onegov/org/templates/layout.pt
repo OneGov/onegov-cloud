@@ -197,6 +197,7 @@
 
         <footer>
           <metal:footer use-macro="layout.macros['footer']" />
+        <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
         </footer>
 
       </main>

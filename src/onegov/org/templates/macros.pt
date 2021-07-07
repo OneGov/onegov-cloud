@@ -1518,8 +1518,11 @@
 </metal:directory_error>
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.org">
-    <tal:b repeat="group grouped" tal:define="link_func link_func|request.link">
-        <h2 tal:condition="len(grouped) > 1">${group}</h2>
+    <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False">
+        <h2 tal:condition="len(grouped) > 1" id="${group}">
+            ${group}
+            <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
+        </h2>
 
         <ul class="with-lead">
             <li tal:repeat="record grouped[group]">
@@ -1968,3 +1971,14 @@
     <a class="close-reveal-modal" aria-label="Close" i18n:attributes="aria-label">&#215;</a>
 </div>
 </metal:modal>
+
+<metal:pageref define-macro="pageref" i18n:domain="onegov.org">
+    <div
+        class="pageref"
+        title="Copy to clipboard"
+        i18n:attributes="title"
+        data-clipboard-action="copy"
+        data-clipboard-text="${request.url + '#' + pageref_id}"
+        tal:condition="not: layout.org.disable_page_refs"
+    ></div>
+</metal:pageref>

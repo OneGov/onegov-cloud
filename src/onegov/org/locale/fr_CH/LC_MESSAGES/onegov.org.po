@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-06 09:22+0200\n"
-"PO-Revision-Date: 2021-07-06 07:52+0200\n"
+"POT-Creation-Date: 2021-07-07 13:26+0200\n"
+"PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -1199,6 +1199,16 @@ msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
 msgid "User will stay on the page when opening images and files"
 msgstr ""
 "L'utilisateur reste sur la page lorsqu'il ouvre des images et des fichiers"
+
+msgid "Disable page references"
+msgstr "Désactiver les références de page"
+
+msgid ""
+"Disable showing the copy link '#' for the site reference. The references "
+"themselves will still work."
+msgstr ""
+"Désactiver le lien pour copier la référence de page. Les références elles-"
+"mêmes fonctionneront toujours."
 
 msgid "Title header left side"
 msgstr "Titre dans en-tête, face gauche"
@@ -2447,6 +2457,9 @@ msgstr ""
 "peuvent être organisés à nouveau, avec un nombre limité de places et les "
 "mesures de protection spécifiées."
 
+msgid "Copied to Clipboard!"
+msgstr "Copié dans le presse-papiers!"
+
 msgid "Total"
 msgstr ""
 
@@ -2750,6 +2763,9 @@ msgstr "Accepter"
 
 msgid "Close"
 msgstr ""
+
+msgid "Copy to clipboard"
+msgstr "Copier dans le presse-papiers"
 
 msgid "Hello!"
 msgstr "Bonjour"
@@ -4581,6 +4597,12 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid ""
+#~ "Forgot something or have a special request? Add a message to the ticket."
+#~ msgstr ""
+#~ "Vous avez oublié quelque chose ou avez une demande spéciale ? Ajoutez un "
+#~ "message a la demande."
 
 #~ msgid "'-' will be converted to a bulleted list"
 #~ msgstr "'-' sera converti en list à puces"
