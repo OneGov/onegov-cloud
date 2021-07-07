@@ -2,7 +2,7 @@
 
 ## Release `2021.64`
 
-> commits: **19 / [24957f62a8...5f03e68f30](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...5f03e68f30)**  
+> commits: **24 / [24957f62a8...13f0c322cc](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...13f0c322cc)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.64)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -15,6 +15,14 @@
 - Applies for town6 as well
 
 **`Feature`** | **[SEA-379](https://linear.app/seantis/issue/SEA-379)** | **[1748d18bad](https://github.com/onegov/onegov-cloud/commit/1748d18bad7f6bba9cb31131d479178a1a85b351)**
+
+🎉 **Adds bullet list to contact panel**
+
+- Changes contact_html and adds a class to ul if the input contains '-'.
+- Adds md explanation to contact form field
+- applies for town6 as well
+
+**`Feature`** | **[SEA-430](https://linear.app/seantis/issue/SEA-430)** | **[b08f2be09f](https://github.com/onegov/onegov-cloud/commit/b08f2be09f5c11e4d9b425245660919ad22121fc)**
 
 ## Release `2021.63`
 
