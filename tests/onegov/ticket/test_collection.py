@@ -1,5 +1,6 @@
-from unittest.mock import Mock
 from onegov.ticket import Handler, Ticket, TicketCollection
+from onegov.user import UserCollection
+from unittest.mock import Mock
 
 
 class EchoHandler(Handler):
@@ -341,3 +342,46 @@ def test_available_groups(session):
     assert collection.for_group('two').available_groups() == ('one', 'two')
     assert collection.available_groups('FOO') == ('one', )
     assert collection.available_groups('BAR') == ('two', )
+
+
+def test_filtering(session):
+    users = UserCollection(session)
+    user_a = users.add(username='a', role='editor', password='pwd')
+    user_b = users.add(username='b', role='editor', password='pwd')
+
+    for handler_id, (state, group, handler_code, owner) in enumerate((
+        ('open', 'one', 'FOO', user_a),
+        ('pending', 'one', 'BAR', user_a),
+        ('closed', 'one', 'FOO', user_b),
+        ('open', 'two', 'FOO', None),
+        ('closed', 'two', 'BAR', user_a),
+        ('closed', 'two', 'BAR', user_b),
+        ('closed', 'two', 'BAR', None),
+    )):
+        session.add(
+            Ticket(
+                number=f'{handler_code}-1000-{handler_id}',
+                title='test',
+                group=group,
+                handler_code=handler_code,
+                handler_id=handler_id,
+                state=state,
+                user=owner
+            )
+        )
+
+    TicketCollection(session).subset().count() == 2
+    TicketCollection(session, state='all').subset().count() == 7
+    TicketCollection(session, state='open').subset().count() == 2
+    TicketCollection(session, state='pending').subset().count() == 1
+    TicketCollection(session, state='closed').subset().count() == 4
+    TicketCollection(session, state='!open').subset().count() == 5
+    TicketCollection(session, state='!pending').subset().count() == 6
+    TicketCollection(session, state='!closed').subset().count() == 3
+    TicketCollection(session, group='one').subset().count() == 3
+    TicketCollection(session, group='two').subset().count() == 4
+    TicketCollection(session, handler='ALL').subset().count() == 7
+    TicketCollection(session, handler='FOO').subset().count() == 3
+    TicketCollection(session, handler='BAR').subset().count() == 4
+    TicketCollection(session, owner=user_a.id).subset().count() == 3
+    TicketCollection(session, owner=user_b.id).subset().count() == 2

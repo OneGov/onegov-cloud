@@ -1121,6 +1121,13 @@ class TicketLayout(DefaultLayout):
                         attrs={'class': ('ticket-button', 'ticket-delete')}
                     ))
 
+            if self.model.state != 'closed':
+                links.append(Link(
+                    text=_("Assign ticket"),
+                    url=self.request.link(self.model, 'assign'),
+                    attrs={'class': ('ticket-button', 'ticket-assign')},
+                ))
+
             # ticket notes are always enabled
             links.append(
                 Link(

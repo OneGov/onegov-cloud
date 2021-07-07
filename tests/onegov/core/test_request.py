@@ -159,7 +159,13 @@ def test_has_permission(redis_url):
             'secret': Secret
         }[request.params.get('permission')]
 
-        return request.has_permission(self, permission) and 'true' or 'false'
+        user = request.params.get('user')
+        if user:
+            user = Bunch(id=user, group_id=None, role=None)
+
+        if request.has_permission(self, permission, user):
+            return 'true'
+        return 'false'
 
     @App.view(model=Root, permission=Public, name='login')
     def login(self, request):
@@ -192,10 +198,16 @@ def test_has_permission(redis_url):
     app.configure_application(identity_secure=False, redis_url=redis_url)
 
     c = Client(app)
+
     assert c.get('/?permission=public').text == 'true'
     assert c.get('/?permission=personal').text == 'false'
     assert c.get('/?permission=private').text == 'false'
     assert c.get('/?permission=secret').text == 'false'
+
+    assert c.get('/?user=foo&permission=public').text == 'true'
+    assert c.get('/?user=foo&permission=personal').text == 'true'
+    assert c.get('/?user=foo&permission=private').text == 'true'
+    assert c.get('/?user=foo&permission=secret').text == 'true'
 
     c.get('/login')
 

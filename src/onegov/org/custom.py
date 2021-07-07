@@ -136,6 +136,22 @@ def get_global_tools(request):
 
         links.append(
             Link(
+                _("My Tickets"),
+                request.class_link(
+                    TicketCollection, {
+                        'handler': 'ALL',
+                        'state': '!closed',
+                        'owner': request.current_user.id.hex
+                    },
+                ),
+                attrs={
+                    'class': ('my-tickets'),
+                }
+            )
+        )
+
+        links.append(
+            Link(
                 _("Open Tickets"),
                 request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'open'}

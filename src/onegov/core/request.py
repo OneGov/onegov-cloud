@@ -452,15 +452,21 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns the user agent, parsed by ua-parser. """
         return user_agent_parser.Parse(self.user_agent or "")
 
-    def has_permission(self, model, permission):
-        """ Returns True if the current user has the given permission on the
-        given model.
+    def has_permission(self, model, permission, user=None):
+        """ Returns True if the current or given user has the given permission
+        on the given model.
 
         """
         if permission is None:
             return True
 
-        return self.app._permits(self.identity, model, permission)
+        identity = self.identity
+        if user:
+            identity = self.app.application_bound_identity(
+                user.id, user.group_id, user.role
+            )
+
+        return self.app._permits(identity, model, permission)
 
     def has_access_to_url(self, url):
         """ Returns true if the current user has access to the given url.

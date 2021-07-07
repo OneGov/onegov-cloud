@@ -1,24 +1,23 @@
-from datetime import date
-
 import morepath
-from morepath import Response
-from purl import URL
 
+from datetime import date
+from morepath import Response
 from onegov.chat import MessageCollection
-from onegov.core.utils import normalize_for_url
 from onegov.core.custom import json
+from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private
+from onegov.core.utils import normalize_for_url
 from onegov.org import _, OrgApp
-from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.org.constants import TICKET_STATES
-from onegov.org.forms import TicketNoteForm
-from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import InternalTicketChatMessageForm
+from onegov.org.forms import TicketAssignmentForm
+from onegov.org.forms import TicketChatMessageForm
+from onegov.org.forms import TicketNoteForm
+from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
-from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
 from onegov.org.models.ticket import ticket_submitter
@@ -28,6 +27,7 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
+from purl import URL
 from sqlalchemy import select
 
 
@@ -489,6 +489,21 @@ def unmute_ticket(self, request):
     return morepath.redirect(request.link(self))
 
 
+@OrgApp.form(model=Ticket, name='assign', permission=Private,
+             form=TicketAssignmentForm, template='form.pt')
+def assign_ticket(self, request, form, layout=None):
+    if form.submitted(request):
+        self.user_id = form.user.data
+        request.success(_("Ticket assigned"))
+        return morepath.redirect(request.link(self))
+
+    return {
+        'title': _("Assign ticket"),
+        'layout': layout or TicketLayout(self, request),
+        'form': form,
+    }
+
+
 @OrgApp.form(model=Ticket, name='message-to-submitter', permission=Private,
              form=InternalTicketChatMessageForm, template='form.pt')
 def message_to_submitter(self, request, form, layout=None):
@@ -639,13 +654,21 @@ def view_tickets(self, request, layout=None):
         groups[handler].sort(key=lambda g: normalize_for_url(g))
 
     def get_filters():
+        yield Link(
+            text=_("My"),
+            url=request.link(
+                self.for_state('!closed').for_owner(request.current_user.id)
+            ),
+            active=self.state == '!closed',
+            attrs={'class': 'ticket-filter-my'}
+        )
         for id, text in TICKET_STATES.items():
             # Make some room in the ui
             if self.deleting and id == 'open':
                 continue
             yield Link(
                 text=text,
-                url=request.link(self.for_state(id)),
+                url=request.link(self.for_state(id).for_owner(None)),
                 active=self.state == id,
                 attrs={'class': 'ticket-filter-' + id}
             )
@@ -726,6 +749,8 @@ def view_tickets(self, request, layout=None):
         tickets_title = _("Closed Tickets")
     elif self.state == 'all':
         tickets_title = _("All Tickets")
+    elif self.state == '!closed':
+        tickets_title = _("My Tickets")
     else:
         raise NotImplementedError
 

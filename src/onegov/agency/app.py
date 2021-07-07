@@ -117,6 +117,11 @@ def get_i18n_localedirs():
     return [mine] + get_org_i18n_localedirs()
 
 
+@AgencyApp.setting(section='org', name='ticket_manager_roles')
+def get_ticket_manager_roles():
+    return ('admin', 'editor', 'member')
+
+
 @AgencyApp.webasset_output()
 def get_webasset_output():
     return 'assets/bundles'

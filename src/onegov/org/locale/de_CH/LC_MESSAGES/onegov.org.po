@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-06 16:46+0200\n"
+"POT-Creation-Date: 2021-07-06 09:22+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -92,6 +92,9 @@ msgstr ""
 
 msgid "Management"
 msgstr "Verwaltung"
+
+msgid "My Tickets"
+msgstr "Meine Tickets"
 
 msgid "Open Tickets"
 msgstr "Offene Tickets"
@@ -1392,6 +1395,9 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
+msgid "User"
+msgstr "Benutzer"
+
 msgid "Admin"
 msgstr "Administrator"
 
@@ -1598,6 +1604,9 @@ msgstr "Möchten Sie das Ticket wirklich löschen?"
 msgid "Delete Ticket"
 msgstr "Ticket löschen"
 
+msgid "Assign ticket"
+msgstr "Ticket zuweisen"
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
@@ -1729,9 +1738,6 @@ msgstr "Benutzerverwaltung"
 
 msgid "Create Signup Link"
 msgstr "Neuer Registrationslink"
-
-msgid "User"
-msgstr "Benutzer"
 
 msgid "User group"
 msgstr "Benutzergruppe"
@@ -4478,6 +4484,9 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
 
+msgid "Ticket assigned"
+msgstr "Ticket zugewiesen"
+
 msgid "The ticket has already been closed"
 msgstr "Das Ticket wurde bereits geschlossen"
 
@@ -4509,6 +4518,9 @@ msgstr "Ihre Anfrage wurde bereits geschlossen"
 
 msgid "Your message has been received"
 msgstr "Ihre Nachricht wurde übermittelt"
+
+msgid "My"
+msgstr "Meine"
 
 msgid "Deletable"
 msgstr "Löschbar"

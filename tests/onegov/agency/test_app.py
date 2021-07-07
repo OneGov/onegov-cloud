@@ -6,12 +6,14 @@ from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
+from onegov.core.utils import Bunch
 
 
 class DummyRequest():
     is_logged_in = False
     is_manager = False
     is_admin = False
+    current_user = Bunch(id=Bunch(hex='abcd'))
     path = ''
 
     def class_link(self, cls, name=''):
@@ -53,7 +55,8 @@ def test_app_custom(agency_app):
         {'Peter': ['User Profile', 'Logout']},
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
                         'Hidden contents']},
-        {'Tickets': ['Open Tickets', 'Pending Tickets', 'Closed Tickets']}
+        {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
+                     'Closed Tickets']}
     ]
 
     request.is_admin = True
@@ -63,7 +66,8 @@ def test_app_custom(agency_app):
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
                         'Settings', 'Users', 'User groups', 'Link Check',
                         'Hidden contents']},
-        {'Tickets': ['Open Tickets', 'Pending Tickets', 'Closed Tickets']}
+        {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
+                     'Closed Tickets']}
     ]
 
 

@@ -84,6 +84,8 @@ $ticket-number-bg: $yellow-light;
     Tickets list
 */
 $accept-ticket-icon-hover: '\f192';
+$assign-ticket-icon: '\f007';
+$assign-ticket-icon-hover: $assign-ticket-icon;
 $close-ticket-icon: '\f111';
 $open-ticket-icon: $close-ticket-icon;
 $accept-ticket-icon: $open-ticket-icon;
@@ -98,9 +100,24 @@ $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
 $dir-handler-icon: '\f07b';
 $pending-ticket-icon: $accept-ticket-icon-hover;
+$my-ticket-icon: '\f2bd';
 
 $closed-ticket-icon: $close-ticket-icon-hover;
 $all-ticket-icon: '\f055';
+
+.my-tickets::before {
+    @include icon($my-ticket-icon);
+    font-size: 1.25rem;
+    height: 22px;
+    line-height: 22px;
+    margin-right: 6px !important;
+    width: 25px;
+}
+
+.ticket-filter-my::before {
+    @include icon($my-ticket-icon);
+    width: 2 * $default-icon-width;
+}
 
 .ticket-filter-open::before {
     @include icon($open-ticket-icon);
@@ -260,6 +277,20 @@ tr.ticket:hover {
         margin-right: 1ex;
     }
 }
+
+.ticket-assign {
+    float: right;
+
+    &::before {
+        @include icon($assign-ticket-icon);
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        content: $assign-ticket-icon-hover;
+    }
+}
+
 
 
 /*

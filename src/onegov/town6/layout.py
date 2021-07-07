@@ -637,6 +637,12 @@ class TicketLayout(DefaultLayout):
                     )
 
                 links.append(Link(
+                    text=_("Assign ticket"),
+                    url=self.request.link(self.model, 'assign'),
+                    attrs={'class': ('ticket-button', 'ticket-assign')}
+                ))
+
+                links.append(Link(
                     text=_("Close ticket"),
                     url=self.request.link(self.model, 'close'),
                     attrs={'class': ('ticket-button', 'ticket-close')},

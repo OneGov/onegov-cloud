@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-06 16:46+0200\n"
-"PO-Revision-Date: 2021-04-30 10:55+0200\n"
+"POT-Creation-Date: 2021-07-06 09:22+0200\n"
+"PO-Revision-Date: 2021-07-06 07:52+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 2.4.3\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "Open"
 msgstr "Ouvert"
@@ -93,6 +93,9 @@ msgstr ""
 
 msgid "Management"
 msgstr "Gestion"
+
+msgid "My Tickets"
+msgstr "Mes tickets"
 
 msgid "Open Tickets"
 msgstr "Ouvrir les tickets"
@@ -1397,6 +1400,9 @@ msgstr "M'avertir des réponses"
 msgid "Setting \"Always notify\" is active"
 msgstr "Le paramètre \"Toujours notifier\" est actif"
 
+msgid "User"
+msgstr "Utilisateur"
+
 msgid "Admin"
 msgstr "Admin"
 
@@ -1594,10 +1600,13 @@ msgid "Reopen ticket"
 msgstr "Ré-ouvrir le ticket"
 
 msgid "Do you really want to delete this ticket?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer ce ticket ?"
 
 msgid "Delete Ticket"
-msgstr ""
+msgstr "Supprimer le ticket"
+
+msgid "Assign ticket"
+msgstr "Attribuer le ticket"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
@@ -1728,9 +1737,6 @@ msgstr "Gestion de l'utilisateur"
 
 msgid "Create Signup Link"
 msgstr "Créez un lien d'inscription"
-
-msgid "User"
-msgstr "Utilisateur"
 
 msgid "User group"
 msgstr "Groupe d'utilisateurs"
@@ -4493,6 +4499,9 @@ msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Vous avez activé les e-mails pour le ticket ${number}"
 
+msgid "Ticket assigned"
+msgstr "Ticket attribué"
+
 msgid "The ticket has already been closed"
 msgstr "Le ticket a déjà été fermé"
 
@@ -4524,6 +4533,9 @@ msgstr "Votre demand a déjà été clòturée. "
 
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
+
+msgid "My"
+msgstr "Mes"
 
 msgid "Deletable"
 msgstr ""

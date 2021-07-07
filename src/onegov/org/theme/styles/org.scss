@@ -2516,6 +2516,8 @@ $ticket-number-bg: $yellow-light;
 */
 $accept-ticket-icon: '\f1db';
 $accept-ticket-icon-hover: '\f192';
+$assign-ticket-icon: '\f2c0';
+$assign-ticket-icon-hover: '\f007';
 $close-ticket-icon: '\f1db';
 $close-ticket-icon-hover: '\f05d';
 $reopen-ticket-icon: '\f1db';
@@ -2527,12 +2529,27 @@ $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
 $dir-handler-icon: '\f114';
+$my-ticket-icon: '\f2be';
 $open-ticket-icon: '\f10c';
 $pending-ticket-icon: '\f192';
 $closed-ticket-icon: '\f05d';
 $all-ticket-icon: '\f055';
 
 $ticket-filter-icon-mr: .5em;
+
+.my-tickets::before {
+    @include icon($my-ticket-icon);
+    font-size: 1.25rem;
+    height: 22px;
+    line-height: 22px;
+    margin-right: 6px !important;
+    width: 25px;
+}
+
+.ticket-filter-my::before {
+    @include icon($my-ticket-icon);
+    margin-right: $ticket-filter-icon-mr;
+}
 
 .ticket-filter-open::before {
     @include icon($open-ticket-icon);
@@ -2760,6 +2777,20 @@ tr.ticket:hover {
         margin-right: 1ex;
     }
 }
+
+.ticket-assign {
+    float: right;
+
+    &::before {
+        @include icon($assign-ticket-icon);
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        content: $assign-ticket-icon-hover;
+    }
+}
+
 
 /*
     Tickets filter dropdown

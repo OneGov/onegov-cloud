@@ -11,6 +11,7 @@ from onegov.org.forms import FormRegistrationWindowForm
 from onegov.org.forms import ManageUserGroupForm
 from onegov.org.forms import RoomAllocationEditForm
 from onegov.org.forms import RoomAllocationForm
+from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms.allocation import AllocationFormHelpers
 from onegov.org.forms.settings import OrgTicketSettingsForm
 from onegov.ticket import TicketPermission
@@ -570,3 +571,21 @@ def test_settings_ticket_permissions(session):
         (p_1.id.hex, 'PER'),
     ]
     assert form.permissions.default == [p_2.id.hex, p_1.id.hex]
+
+
+def test_ticket_assignment_form(session):
+    users = UserCollection(session)
+    users.add(username='a', password='pwd', role='admin')
+    users.add(username='e', password='pwd', role='editor')
+    users.add(username='m', password='pwd', role='member')
+
+    request = Bunch(
+        session=session,
+        has_permission=lambda m, p, u: u.role != 'member'
+    )
+    form = TicketAssignmentForm()
+    form.model = None
+    form.request = request
+    form.on_request()
+
+    assert sorted([name for id_, name in form.user.choices]) == ['a', 'e']

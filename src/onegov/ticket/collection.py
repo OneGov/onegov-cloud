@@ -46,7 +46,10 @@ class TicketCollectionPagination(Pagination):
         query = query.options(undefer(Ticket.created))
 
         if self.state != 'all':
-            query = query.filter(Ticket.state == self.state)
+            if self.state.startswith('!'):
+                query = query.filter(Ticket.state != self.state.strip('!'))
+            else:
+                query = query.filter(Ticket.state == self.state)
 
         if self.group != None:
             query = query.filter(Ticket.group == self.group)

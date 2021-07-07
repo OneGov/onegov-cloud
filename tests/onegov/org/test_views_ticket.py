@@ -576,7 +576,7 @@ def test_disable_tickets(client):
 
     # open a ticket
     page = client.get('/form/newsletter')
-    page.form['e_mail'] = 'hans.maulwurf@simpson.com'
+    page.form['e_mail'] = 'hans.maulwurf@simpsons.com'
     page = page.form.submit().follow().form.submit().follow()
     ticket_number = page.pyquery('.ticket-number').text()
     assert ticket_number.startswith('FRM-')
@@ -585,7 +585,7 @@ def test_disable_tickets(client):
     client.login_editor()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpson.com' not in page
+    assert 'hans.maulwurf@simpsons.com' not in page
     assert 'Annehmen' not in page
 
     client.logout()
@@ -593,5 +593,41 @@ def test_disable_tickets(client):
     client.login_admin()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpson.com' in page
-    assert 'hans.maulwurf@simpson.com' in page.click('Annehmen').follow()
+    assert 'hans.maulwurf@simpsons.com' in page
+    assert 'hans.maulwurf@simpsons.com' in page.click('Annehmen').follow()
+
+
+def test_assign_tickets(client):
+    client.login_admin()
+
+    # add form
+    manage = client.get('/forms/new')
+    manage.form['title'] = 'newsletter'
+    manage.form['definition'] = 'E-Mail *= @@@'
+    manage = manage.form.submit()
+
+    client.logout()
+
+    # open a ticket
+    page = client.get('/form/newsletter')
+    page.form['e_mail'] = 'hans.maulwurf@simpsons.com'
+    page = page.form.submit().follow().form.submit().follow()
+    ticket_number = page.pyquery('.ticket-number').text()
+    assert ticket_number.startswith('FRM-')
+
+    #  assign ticket
+    client.login_admin()
+
+    manage = client.get('/tickets/ALL/open').click(ticket_number)
+    manage = manage.click('Ticket zuweisen')
+    manage.form['user'].select(text='editor@example.org')
+    manage.form.submit()
+
+    client.logout()
+
+    # check visibility
+    client.login_editor()
+
+    page = client.get('/')
+    page = client.get('/').click('Meine Tickets')
+    assert ticket_number in page

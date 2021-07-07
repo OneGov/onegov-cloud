@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-06-07 14:49+0200\n"
+"POT-Creation-Date: 2021-07-07 08:46+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -163,6 +163,12 @@ msgstr "Anmeldezeitraum"
 msgid "Add"
 msgstr "Hinzufügen"
 
+msgid "External form"
+msgstr "Externes Formular"
+
+msgid "New external form"
+msgstr "Neues externes Formular"
+
 msgid "Person"
 msgstr "Person"
 
@@ -189,8 +195,17 @@ msgstr ""
 msgid "Close ticket"
 msgstr "Ticket abschliessen"
 
+msgid "Assign ticket"
+msgstr "Ticket zuweisen"
+
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
+
+msgid "Do you really want to delete this ticket?"
+msgstr "Möchten Sie das Ticket wirklich löschen?"
+
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -438,6 +453,12 @@ msgstr "Eintrag löschen"
 
 msgid "Dashboard"
 msgstr "Dashboard"
+
+msgid "Do you really want to delete this external link?"
+msgstr "Wollen sie die externe Verknüpfung wirklich löschen?"
+
+msgid "Delete external link"
+msgstr "Verknüpfung löschen"
 
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
@@ -1371,6 +1392,9 @@ msgstr "Ticket E-Mails deaktiviert."
 msgid "Ticket e-mails enabled."
 msgstr "Ticket E-Mails aktiviert."
 
+msgid "Payment amount changed."
+msgstr "Zahlungsbetrag geändert."
+
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden."
 
@@ -1739,6 +1763,9 @@ msgstr ""
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
+
+msgid "Delete all selected tickets?"
+msgstr "Alle ausgewählten Tickets löschen?"
 
 msgid "State:"
 msgstr "Status:"

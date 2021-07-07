@@ -1,13 +1,17 @@
 from onegov.chat import MessageFile
+from onegov.core.security import Private
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
 from onegov.form.validators import FileSizeLimit
 from onegov.org import _
-from wtforms import BooleanField, TextAreaField
-from wtforms import validators, ValidationError
-
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
+from onegov.user import UserCollection
+from wtforms import BooleanField
+from wtforms import TextAreaField
+from wtforms import ValidationError
+from wtforms import validators
 
 
 class TicketNoteForm(Form):
@@ -61,3 +65,25 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
             else:
                 self.notify.render_kw = {'disabled': True}
             self.notify.description = _('Setting "Always notify" is active')
+
+
+class TicketAssignmentForm(Form):
+
+    user = ChosenSelectField(
+        _('User'),
+        choices=[],
+        validators=[
+            validators.InputRequired()
+        ],
+    )
+
+    def on_request(self):
+        self.user.choices = [
+            (
+                str(user.id),
+                f'{user.title} ({user.group.name})' if user.group
+                else user.title
+            )
+            for user in UserCollection(self.request.session).query()
+            if self.request.has_permission(self.model, Private, user)
+        ]
