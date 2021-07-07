@@ -5,6 +5,6 @@
     <tal:b metal:fill-slot="content">
         <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
 
-        <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped forms" />
+        <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped forms; add_pagerefs True" />
     </tal:b>
 </div>
