@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-06 09:22+0200\n"
+"POT-Creation-Date: 2021-07-07 10:12+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1853,6 +1853,7 @@ msgstr ""
 "- '-' wird in eine Aufzählung umgewandelt\n"
 "- Urls werden zu Hyperlinks konvertiert\n"
 "- E-Mails und Telefon-Nummern ebenfalls"
+
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
 
@@ -3412,6 +3413,12 @@ msgstr ""
 
 msgid "Request Reference"
 msgstr "Referenz Anfrage"
+
+msgid "Forgot something or have a special request?"
+msgstr "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen?"
+
+msgid "Add a message to the ticket."
+msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
 
 msgid ""
 "Forgot something or have a special request? Add a message to the ticket."

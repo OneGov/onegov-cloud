@@ -40,10 +40,16 @@
                 </div>
 
                 <tal:b condition="ticket.state != 'closed'">
-                    <div class="panel" i18n:translate>
-                        Forgot something or have a special request? Add a message to the ticket.
+                    <div class="panel">
+                        <span i18n:translate>Forgot something or have a special request?</span>
+                        <a href="javascript:;" data-reveal-id="send-message" i18n:translate>Add a message to the ticket.</a>
                     </div>
-                    <div metal:use-macro="layout.macros['form']" />
+
+                    <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'send-message'">
+                        <tal:block metal:fill-slot="modal_content">
+                            <div metal:use-macro="layout.macros['form']" />
+                        </tal:block>
+                    </tal:block>
                 </tal:b>
 
                 <p class="panel" tal:condition="ticket.state == 'closed'" i18n:translate style="text-align: center;">

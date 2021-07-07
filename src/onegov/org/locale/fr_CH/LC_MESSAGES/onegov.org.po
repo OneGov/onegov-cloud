@@ -3422,6 +3422,12 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Référence"
 
+msgid "Forgot something or have a special request?"
+msgstr "Vous avez oublié quelque chose ou avez une demande spéciale?"
+
+msgid "Add a message to the ticket."
+msgstr "Ajoutez un message a la demande."
+
 msgid ""
 "Forgot something or have a special request? Add a message to the ticket."
 msgstr ""

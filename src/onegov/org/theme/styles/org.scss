@@ -6224,3 +6224,12 @@ table.link-check-stats {
         width: 50%;
     }
 }
+
+/*
+    Styles for form macro inside modal
+*/
+.reveal-modal form {
+    .columns {
+        padding-left: 0 !important;
+    }
+}
