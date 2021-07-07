@@ -2152,5 +2152,6 @@
         i18n:attributes="title"
         data-clipboard-action="copy"
         data-clipboard-text="${request.url + '#' + pageref_id}"
+        tal:condition="not: layout.org.disable_page_refs"
     ></div>
 </metal:pageref>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-07 11:57+0200\n"
+"POT-Creation-Date: 2021-07-07 13:26+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1197,6 +1197,16 @@ msgstr "Dateien in separatem Fenster öffnen"
 
 msgid "User will stay on the page when opening images and files"
 msgstr "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"
+
+msgid "Disable page references"
+msgstr "Seitenreferenzen deaktivieren"
+
+msgid ""
+"Disable showing the copy link '#' for the site reference. The references "
+"themselves will still work."
+msgstr ""
+"Versteckt den Kopier-Link '#' für die Seitenreferenz. Die Referenzen an sich "
+"funktionieren weiterhin."
 
 msgid "Title header left side"
 msgstr "Titel Kopfzeile links"
