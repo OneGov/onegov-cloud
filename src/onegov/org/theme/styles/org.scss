@@ -1350,13 +1350,13 @@ ul.panel-links {
     }
 }
 
+.hidden {
+    display: none;
+}
+
 .side-panel {
     border: 1px solid $gray;
     margin-bottom: 2rem;
-
-    .hidden {
-        display: none;
-    }
 
     h2,
     h3 {
@@ -4841,7 +4841,8 @@ h2 + div.timeline {
     .side-nav,
     div.push,
     .counts,
-    .top-bar {
+    .top-bar,
+    .flash-message {
         display: none !important;
     }
 
@@ -6232,4 +6233,43 @@ table.link-check-stats {
     .columns {
         padding-left: 0 !important;
     }
+}
+
+$pageref-icon: '\f292';
+$pageref-color: $topbar-link-bg-hover;
+$pageref-color-hover: $iron;
+
+.pageref {
+    color: $pageref-color;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 70%;
+    transition: color 250ms;
+    z-index: 1;
+
+    &:hover,
+    &:focus {
+        color: $pageref-color-hover;
+    }
+
+    &::after {
+        @include icon($pageref-icon);
+    };
+}
+
+/*
+ Status field fixed to show temporary message
+*/
+
+.flash-message {
+    background-color: $black-light;
+    bottom: 0;
+    color: $white;
+    font-size: 80%;
+    max-width: 200px;
+    padding: .5rem 1rem;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    white-space: nowrap;
 }

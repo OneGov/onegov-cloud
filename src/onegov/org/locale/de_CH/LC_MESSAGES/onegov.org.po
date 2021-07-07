@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-07 10:12+0200\n"
+"POT-Creation-Date: 2021-07-07 11:57+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2446,6 +2446,9 @@ msgstr ""
 "Veranstaltungen durchgeführt werden, mit begrenzter Platzzahl und den "
 "vorgegebenen Schutzmassnahmen."
 
+msgid "Copied to Clipboard!"
+msgstr "In die Zwischenablage kopiert!"
+
 msgid "Total"
 msgstr ""
 
@@ -2750,6 +2753,9 @@ msgstr "Annehmen"
 
 msgid "Close"
 msgstr "Schliessen"
+
+msgid "Copy to clipboard"
+msgstr "In die Zwischenablage kopieren"
 
 msgid "Hello!"
 msgstr "Guten Tag"
@@ -3419,12 +3425,6 @@ msgstr "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen?"
 
 msgid "Add a message to the ticket."
 msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
-
-msgid ""
-"Forgot something or have a special request? Add a message to the ticket."
-msgstr ""
-"Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen? Dann fügen "
-"Sie der Anfrage eine Nachricht hinzu."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
@@ -4567,6 +4567,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid ""
+#~ "Forgot something or have a special request? Add a message to the ticket."
+#~ msgstr ""
+#~ "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen? Dann "
+#~ "fügen Sie der Anfrage eine Nachricht hinzu."
 
 #~ msgid ""
 #~ "- '-' will be converted to a bulleted list\n"

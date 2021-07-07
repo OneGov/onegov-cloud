@@ -480,6 +480,7 @@ def get_common_asset():
     yield 'jquery.datetimepicker.css'
     yield 'locale.js'
     yield 'modernizr.js'
+    yield 'clipboard.js'
     yield 'jquery.js'
     yield 'foundation.js'
     yield 'foundation.alert.js'

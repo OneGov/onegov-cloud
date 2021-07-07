@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-06 09:22+0200\n"
-"PO-Revision-Date: 2021-07-06 07:52+0200\n"
+"POT-Creation-Date: 2021-07-07 11:57+0200\n"
+"PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -2447,6 +2447,9 @@ msgstr ""
 "peuvent être organisés à nouveau, avec un nombre limité de places et les "
 "mesures de protection spécifiées."
 
+msgid "Copied to Clipboard!"
+msgstr "Copié dans le presse-papiers!"
+
 msgid "Total"
 msgstr ""
 
@@ -2750,6 +2753,9 @@ msgstr "Accepter"
 
 msgid "Close"
 msgstr ""
+
+msgid "Copy to clipboard"
+msgstr "Copier dans le presse-papiers"
 
 msgid "Hello!"
 msgstr "Bonjour"
@@ -4581,6 +4587,12 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid ""
+#~ "Forgot something or have a special request? Add a message to the ticket."
+#~ msgstr ""
+#~ "Vous avez oublié quelque chose ou avez une demande spéciale ? Ajoutez un "
+#~ "message a la demande."
 
 #~ msgid "'-' will be converted to a bulleted list"
 #~ msgstr "'-' sera converti en list à puces"
