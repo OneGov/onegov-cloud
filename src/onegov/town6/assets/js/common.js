@@ -245,3 +245,15 @@ $(document).ready(function() {
         })
     });
 });
+
+var page_refs = new ClipboardJS('.pageref');
+page_refs.on('success', function(e) {
+    // var success_msg = e.trigger.getAttribute('data-on-success');
+    var msgContainer = $('#clipboard-copy')
+    msgContainer.toggleClass('hidden');
+    setTimeout(
+        function () { msgContainer.toggleClass('hidden'); },
+        1500
+    )
+    e.clearSelection();
+});
