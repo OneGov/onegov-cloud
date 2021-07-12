@@ -166,7 +166,7 @@ def change_payment_amount(self, request):
     format_ = DefaultLayout(self, request).format_number
     try:
         net_amount = Decimal(request.params['netAmount'])
-    except decimal.ConversionSyntax:
+    except decimal.InvalidOperation:
         return {'net_amount': f"{format_(self.net_amount)} {self.currency}"}
 
     if net_amount <= 0 or (net_amount - self.fee) <= 0:
