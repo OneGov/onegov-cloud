@@ -556,17 +556,49 @@ def test_excel_export_not_logged_in(client):
 @mark.flaky(reruns=3)
 def test_basic_search(client_with_es):
     client = client_with_es
+
     client.login_admin()
-    new = client.get('/people').click("Person", href='new')
-    new.form['academic_title'] = "Dr."
-    new.form['first_name'] = "Nick"
-    new.form['last_name'] = "Rivera"
-    new.form.submit().follow()
+
+    page = client.get('/settings').click("Organisationen", index=1)
+    page.form['agency_phone_internal_digits'] = 4
+    page.form.submit()
+
+    manage = client.get('/people').click('Person', href='new')
+    manage.form['function'] = 'Doctor'
+    manage.form['first_name'] = 'Nick'
+    manage.form['last_name'] = 'Rivera'
+    manage.form['phone'] = '+12 34 567 89 01'
+    manage.form['phone_direct'] = '+12 34 567 89 11'
+    manage.form.submit()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Hospital Springfield'
+    manage = manage.form.submit().follow()
+
+    manage = manage.click('Mitgliedschaft', href='new')
+    manage.form['title'] = 'Anesthetist'
+    manage.form['person_id'].select(text='Rivera Nick')
+    manage.form.submit()
 
     client.app.es_client.indices.refresh(index='_all')
-
     client = client.spawn()
-    client.get('/search?q=Nick')
+
+    # Test search results
+    assert 'Rivera' in client.get('/search?q=Nick')
+    assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' in client.get('/search?q=Doctor')
+    assert 'Nick' in client.get('/search?q=+12345678901')
+    assert 'Nick' in client.get('/search?q=0345678901')
+    assert 'Nick' in client.get('/search?q=8911')
+    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
+    assert 'Nick' in client.get('/search?q=Anesthetist')
+
+    # Test suggestions
+    assert 'Nick Rivera (Doctor)' in client.get('/search/suggest?q=Nic').json
+    assert 'Rivera Nick (Doctor)' in client.get('/search/suggest?q=Riv').json
+    assert '8911 Rivera Nick (Doctor)' in client.get(
+        '/search/suggest?q=89'
+    ).json
 
 
 def test_footer_settings_custom_links(client):

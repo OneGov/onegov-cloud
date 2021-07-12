@@ -7,7 +7,8 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
-from wtforms import BooleanField, RadioField
+from wtforms import BooleanField, IntegerField, RadioField
+from wtforms.validators import Optional, NumberRange
 
 
 class AgencySettingsForm(Form):
@@ -66,6 +67,27 @@ class AgencySettingsForm(Form):
         choices=[]
     )
 
+    agency_phone_internal_digits = IntegerField(
+        label=_(
+            'Use the last digits as internal phone numbers '
+            '(leave empty to disable)'
+        ),
+        fieldset=_('Customize search results'),
+        validators=[
+            NumberRange(min=1),
+            Optional()
+        ],
+    )
+
+    agency_phone_internal_field = RadioField(
+        label=_('Field used for internal phone numbers'),
+        fieldset=_('Customize search results'),
+        choices=[
+            ('phone_direct', _('Direct Phone Number')),
+            ('phone', _('Phone')),
+        ],
+    )
+
     agency_path_display_on_people = BooleanField(
         label=_('Show full agency path'),
         description=_('Always show the full path of the memberships agency'),
@@ -99,6 +121,12 @@ class AgencySettingsForm(Form):
         self.agency_display.data = [
             str(num) for num in obj.agency_display_levels or []
         ]
+
+        self.agency_phone_internal_digits.data = \
+            obj.agency_phone_internal_digits
+        self.agency_phone_internal_field.data = \
+            obj.agency_phone_internal_field
+
         self.agency_path_display_on_people.data = \
             obj.agency_path_display_on_people
 
@@ -114,6 +142,10 @@ class AgencySettingsForm(Form):
         obj.agency_display_levels = [
             int(num) for num in self.agency_display.data
         ]
+        obj.agency_phone_internal_digits = \
+            self.agency_phone_internal_digits.data
+        obj.agency_phone_internal_field = \
+            self.agency_phone_internal_field.data
         obj.agency_path_display_on_people = \
             self.agency_path_display_on_people.data
         obj.pdf_underline_links = self.underline_links.data

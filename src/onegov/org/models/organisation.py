@@ -129,6 +129,10 @@ class Organisation(Base, TimestampMixin):
     # Setting if show full agency path on people detail view
     agency_path_display_on_people = meta_property(default=False)
 
+    # Setting to index the last digits of the phone number as ES suggestion
+    agency_phone_internal_digits = meta_property()
+    agency_phone_internal_field = meta_property(default='phone_direct')
+
     # Favicon urls for favicon macro
     favicon_win_url = meta_property()
     favicon_mac_url = meta_property()
