@@ -1,8 +1,50 @@
 # Changes
 
+## Release `2021.65`
+
+> commits: **16 / [fd3d3fef03...e1757c4fdb](https://github.com/OneGov/onegov-cloud/compare/fd3d3fef03^...e1757c4fdb)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.65)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Add direct phone number to search index.**
+
+There are two new settings to enable direct phone numbers in the search 
+index. Direct phone numbers are simply the last n digits of the phone or 
+direct phone number. Direct phone numbers are suggest when searching.
+
+**`Feature`** | **[STAKABS-33](https://kt-bs.atlassian.net/browse/STAKABS-33)** | **[7db6e64a97](https://github.com/onegov/onegov-cloud/commit/7db6e64a97a0413bca3a91cf1c01b65c046a4627)**
+
+### Org
+
+🎉 **Add ticket inbox and ticket assignments.**
+
+Adds a 'My Tickets' views where all pending and open tickets of the 
+currently logged-in user are displayed. Furthermore, it's now possible 
+to assign a ticket to another user.
+
+**`Feature`** | **[STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25)** | **[fd3d3fef03](https://github.com/onegov/onegov-cloud/commit/fd3d3fef031741b56bf2927de212ffbd5f8f7082)**
+
+🎉 **Adds modal for message form on ticket status page**
+
+**`Feature`** | **[SEA-429](https://linear.app/seantis/issue/SEA-429)** | **[76df37e465](https://github.com/onegov/onegov-cloud/commit/76df37e46506821da8c992246b2b54fcac967476)**
+
+🎉 **Adds copy links for page references**
+
+- adds page reference settings to /link-settings
+- enbales '#' copy links on /forms and /resources if grouped
+- applies for town6 as well
+
+**`Feature`** | **[SEA-446](https://linear.app/seantis/issue/SEA-446)** | **[9f82d1df5d](https://github.com/onegov/onegov-cloud/commit/9f82d1df5d6483e9dae84abd117e2de58ce99da3)**
+
+🎉 **Adds change-url form to /form/{form-name} to change name of the form**
+
+**`Feature`** | **[SEA-381](https://linear.app/seantis/issue/SEA-381)** | **[4934115701](https://github.com/onegov/onegov-cloud/commit/49341157014507b03b90eedf389f1da138157591)**
+
 ## Release `2021.64`
 
-> commits: **24 / [24957f62a8...13f0c322cc](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...13f0c322cc)**  
+> released: **2021-07-07 08:09**<br>
+> commits: **25 / [24957f62a8...8f423f4785](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...8f423f4785)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.64)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
