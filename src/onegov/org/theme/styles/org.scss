@@ -806,11 +806,16 @@ form {
         margin-left: 1.25rem;
     }
 
-    .long-field-help,
-    .long-field-help p {
-        color: $steel;
-        font-size: .8rem;
-        margin: .25rem 0 .5rem;
+    .long-field-help {
+        p,
+        li {
+            color: $steel;
+            font-size: .8rem;
+        }
+
+        p {
+            margin: .25rem 0 .5rem;
+        }
     }
 
     .group-label {
