@@ -183,6 +183,7 @@ class FormSubmissionCollection(object):
             assert registration_window.accepts_submissions(spots)
 
         # look up the right class depending on the type
+        # Todo: isn't it the type and not the state to use here?
         submission_class = FormSubmission.get_polymorphic_class(
             state, FormSubmission
         )

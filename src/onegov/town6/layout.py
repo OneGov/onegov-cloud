@@ -423,6 +423,12 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
             attrs={'class': 'export-link'}
         )
 
+        change_url_link = Link(
+            text=_("Change Url"),
+            url=self.request.link(self.form, name='change-url'),
+            attrs={'class': 'internal-url'}
+        )
+
         registration_windows_link = LinkGroup(
             title=_("Registration Windows"),
             links=[
@@ -443,7 +449,13 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
             ]
         )
 
-        return [edit_link, delete_link, export_link, registration_windows_link]
+        return [
+            edit_link,
+            delete_link,
+            export_link,
+            change_url_link,
+            registration_windows_link,
+        ]
 
 
 class FormCollectionLayout(DefaultLayout):

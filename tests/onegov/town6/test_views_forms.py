@@ -62,11 +62,11 @@ def test_registration_ticket_workflow(client):
 
     count = 0
 
-    def register(client, data_in_email, auto_accept=False):
+    def register(client, data_in_email, auto_accept=False, url='/form/meetup'):
         nonlocal count
         count += 1
         with freeze_time('2018-01-01'):
-            page = client.get('/form/meetup')
+            page = client.get(url)
             page.form['e_mail'] = f'info{count}@example.org'
             page.form['name'] = 'Foobar'
             page = page.form.submit().follow()
@@ -140,8 +140,24 @@ def test_registration_ticket_workflow(client):
     # check ownership of the ticket
     client.app.session().query(Ticket).filter_by(user_id=user_id).one()
 
-    # Reopen the last
     client.login_editor()
+    # We rename the form and check if everything still works
+    rename_page = client.get('/form/meetup').click('Url ändern')
+    assert rename_page.form['name'].value == 'meetup'
+
+    rename_page = rename_page.form.submit()
+    assert 'Bitte geben sie einen neuen Namen an' in rename_page
+
+    rename_page.form['name'] = 'ME'
+    rename_page = rename_page.form.submit()
+    assert 'Ungültiger Name. Ein gültiger Vorschlag ist' in rename_page
+
+    rename_page.form['name'] = 'meetings'
+    rename_page = rename_page.form.submit().follow()
+    new_url = rename_page.request.url
+    assert 'meetings' in new_url
+
+    # Reopen the last
     page = client.get('/tickets/ALL/closed')
     last_ticket = page.pyquery('td.ticket-number-plain a').attr('href')
     ticket = client.get(last_ticket).click('Ticket wieder öffnen').follow()

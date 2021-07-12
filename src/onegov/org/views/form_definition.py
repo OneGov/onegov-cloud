@@ -6,6 +6,7 @@ from onegov.form import FormCollection, FormDefinition
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
+from onegov.org.forms.form_definition import FormDefinitionUrlForm
 from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
 from onegov.org.models import CustomFormDefinition
 from webob import exc
@@ -61,6 +62,60 @@ def get_hints(layout, window):
                 yield 'count', _("There are ${count} spots left", mapping={
                     'count': spots
                 })
+
+
+def handle_form_change_name(form, session, new_name):
+    """ We also have to deal with the already existing tickets. """
+    new_form = form.for_new_name(new_name)
+    session.add(new_form)
+    session.flush()
+
+    submissions = form.submissions
+    windows = form.registration_windows
+
+    with session.no_autoflush:
+        # This placed elsewhere will not work
+        form.submissions = []
+        form.registration_windows = []
+
+        # assigning the whole list directly will not work
+        for s in submissions:
+            s.name = new_name
+            new_form.submissions.append(s)
+        for w in windows:
+            w.name = new_name
+            new_form.registration_windows.append(w)
+
+    session.flush()
+
+    assert not form.submissions
+    assert not form.registration_windows
+    return new_form
+
+
+@OrgApp.form(
+    model=FormDefinition, form=FormDefinitionUrlForm,
+    template='form.pt', permission=Private,
+    name='change-url'
+)
+def handle_change_form_name(self, request, form, layout=None):
+    """Since the name used for the url is the primary key, we create a new
+    FormDefinition to make our live easier """
+    site_title = _('Change Url')
+    if form.submitted(request):
+        new_form = handle_form_change_name(
+            self, request.session, form.name.data
+        )
+        request.session.delete(self)
+        return request.redirect(request.link(new_form))
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': layout or FormEditorLayout(self, request),
+        'form': form,
+        'title': site_title,
+    }
 
 
 @OrgApp.form(

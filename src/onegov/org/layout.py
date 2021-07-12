@@ -872,6 +872,12 @@ class FormSubmissionLayout(DefaultLayout):
             attrs={'class': 'export-link'}
         )
 
+        change_url_link = Link(
+            text=_("Change Url"),
+            url=self.request.link(self.form, name='change-url'),
+            attrs={'class': 'internal-url'}
+        )
+
         registration_windows_link = LinkGroup(
             title=_("Registration Windows"),
             links=[
@@ -896,6 +902,7 @@ class FormSubmissionLayout(DefaultLayout):
             edit_link,
             delete_link,
             export_link,
+            change_url_link,
             registration_windows_link,
             qr_link
         ]

@@ -1,7 +1,9 @@
 from onegov.core.security import Private, Public
 from onegov.form import FormCollection, FormDefinition
+from onegov.org.forms.form_definition import FormDefinitionUrlForm
 from onegov.org.views.form_definition import get_form_class, \
-    handle_new_definition, handle_edit_definition, handle_defined_form
+    handle_new_definition, handle_edit_definition, handle_defined_form, \
+    handle_change_form_name
 from onegov.town6 import TownApp
 from onegov.town6.layout import FormEditorLayout, FormSubmissionLayout
 
@@ -24,4 +26,14 @@ def town_handle_new_definition(self, request, form):
               form=get_form_class, name='edit')
 def town_handle_edit_definition(self, request, form):
     return handle_edit_definition(
+        self, request, form, FormEditorLayout(self, request))
+
+
+@TownApp.form(
+    model=FormDefinition, form=FormDefinitionUrlForm,
+    template='form.pt', permission=Private,
+    name='change-url'
+)
+def town_handle_change_form_name(self, request, form):
+    return handle_change_form_name(
         self, request, form, FormEditorLayout(self, request))

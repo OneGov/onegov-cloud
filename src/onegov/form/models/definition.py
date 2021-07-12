@@ -45,6 +45,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     submissions = relationship('FormSubmission', backref='form')
 
     #: link between forms and registration windows
+    # Todo: remove order_by SADeprecation Warning
     registration_windows = relationship(
         'FormRegistrationWindow',
         backref='form',
@@ -143,3 +144,18 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
         self.registration_windows.append(window)
 
         return window
+
+    def for_new_name(self, name):
+        return self.__class__(
+            name=name,
+            title=self.title,
+            definition=self.definition,
+            group=self.group,
+            order=self.order,
+            checksum=self.checksum,
+            type=self.type,
+            meta=self.meta,
+            content=self.content,
+            payment_method=self.payment_method,
+            created=self.created
+        )
