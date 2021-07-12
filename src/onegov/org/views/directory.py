@@ -8,6 +8,7 @@ from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryZipArchive
+from onegov.directory.archive import DirectoryFileNotFound
 from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
@@ -619,11 +620,22 @@ def view_zip_file(self, request):
 
     with NamedTemporaryFile() as f:
         archive = DirectoryZipArchive(f.name + '.zip', format, transform)
-        archive.write(
-            self.directory,
-            entry_filter=request.exclude_invisible,
-            query=self.query()
-        )
+        try:
+            archive.write(
+                self.directory,
+                entry_filter=request.exclude_invisible,
+                query=self.query()
+            )
+        except DirectoryFileNotFound as err:
+            entry = self.by_name(err.entry_name)
+            entry_url = request.link(entry, name='edit')
+            request.alert(
+                _("You have been redirect to this entry because "
+                  "it could not be exported due to missing file ${name}. "
+                  "Please re-upload them and try again",
+                  mapping={'name': err.filename})
+            )
+            return request.redirect(entry_url)
 
         response = render_file(str(archive.path), request)
 

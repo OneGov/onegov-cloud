@@ -22,6 +22,13 @@ from tempfile import TemporaryDirectory, NamedTemporaryFile
 UNKNOWN_FIELD = object()
 
 
+class DirectoryFileNotFound(FileNotFoundError):
+    def __init__(self, file_id, entry_name, filename):
+        self.file_id = file_id,
+        self.entry_name = entry_name
+        self.filename = filename
+
+
 class FieldParser(object):
     """ Parses records read by the directory archive reader. """
 
@@ -278,7 +285,10 @@ class DirectoryArchiveWriter(object):
                 if field.type == 'fileinput':
                     if value:
                         file_id = value['data'].lstrip('@')
-                        value = paths[file_id] = file_path(entry, field, value)
+                        value = paths[file_id] = dict(
+                            path=file_path(entry, field, value),
+                            entry_name=entry.name
+                        )
                     else:
                         value = None
 
@@ -328,21 +338,27 @@ class DirectoryArchiveWriter(object):
 
         try:
             for f in files:
-                folder, name = paths[f.id].split('/', 1)
+                folder, name = paths[f.id]['path'].split('/', 1)
                 folder = self.path / folder
 
                 if not folder.exists():
                     folder.mkdir()
 
                 # support both local files and others (memory/remote)
-                if hasattr(f.reference.file, '_file_path'):
-                    src = os.path.abspath(f.reference.file._file_path)
-                else:
-                    tmp = NamedTemporaryFile()
-                    tmp.write(f.reference.file.read())
-                    tempfiles.append(tmp)
+                try:
+                    if hasattr(f.reference.file, '_file_path'):
+                        src = os.path.abspath(f.reference.file._file_path)
+                    else:
+                        tmp = NamedTemporaryFile()
+                        tmp.write(f.reference.file.read())
+                        tempfiles.append(tmp)
+                        src = tmp.name
 
-                    src = tmp.name
+                except IOError:
+                    raise DirectoryFileNotFound(
+                        file_id=f.id, entry_name=paths[f.id]['entry_name'],
+                        filename=name
+                    )
 
                 dst = str(folder / name)
 

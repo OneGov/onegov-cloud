@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-07 13:26+0200\n"
+"POT-Creation-Date: 2021-07-12 16:16+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -687,6 +687,19 @@ msgstr "Text"
 msgid "Used to group the form in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
 
+msgid "Url path"
+msgstr "Url Pfad"
+
+msgid "Please fill out a new name"
+msgstr "Bitte geben sie einen neuen Namen an"
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Ein Eintrag mit diesem Namen existiert bereits"
+
 msgid "Selection"
 msgstr "Auswahl"
 
@@ -868,21 +881,8 @@ msgstr "Zeige Einleitung auf übergeordneter Seite"
 msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
 
-msgid "Url path"
-msgstr "Url Pfad"
-
 msgid "Test run"
 msgstr "Testlauf"
-
-msgid "Please fill out a new name"
-msgstr "Bitte geben sie einen neuen Namen an"
-
-#, python-format
-msgid "Invalid name. A valid suggestion is: ${name}"
-msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
-
-msgid "An entry with the same name exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -1570,6 +1570,9 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
+msgid "Change Url"
+msgstr "Url ändern"
+
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
 
@@ -2245,9 +2248,6 @@ msgstr ""
 "Diese Seite hat Unterseiten. Nur Administratoren können Seiten mit "
 "Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
-
-msgid "Change Url"
-msgstr "Url ändern"
 
 msgid "Source"
 msgstr "Herkunft"
@@ -3791,6 +3791,15 @@ msgstr ""
 "und allfällige Bilder/Dateien."
 
 #, python-format
+msgid ""
+"You have been redirect to this entry because it could not be exported due to "
+"missing file ${name}. Please re-upload them and try again"
+msgstr ""
+"Sie wurden auf diesen Eintrag weitergeleitet weil dieser nicht exportiert "
+"werden konnte aufgrund der fehlenden Datei ${name}. Bitte laden sie diese "
+"nochmals hoch und probieren Sie es erneut"
+
+#, python-format
 msgid "The column ${name} is missing"
 msgstr "Die Spalte ${name} fehlt"
 
@@ -3921,6 +3930,34 @@ msgstr "Ihr Yubikey konnte nicht validiert werden"
 msgid "Edit external form"
 msgstr "Externes Formular editieren"
 
+msgid "The registration has ended"
+msgstr "Die Anmeldung ist nicht mehr möglich"
+
+msgid "The registration is closed"
+msgstr "Zur Zeit keine Anmeldung möglich"
+
+#, python-format
+msgid "The registration opens on ${day}, ${date}"
+msgstr "Die Anmeldung beginnt am ${day}, ${date}"
+
+#, python-format
+msgid "The registration closes on ${day}, ${date}"
+msgstr "Die Anmeldung endet am ${day}, ${date}"
+
+#, python-format
+msgid "There's a limit of ${count} attendees"
+msgstr "Die Anmeldung ist auf ${count} Teilnehmer begrenzt"
+
+msgid "There are no spots left"
+msgstr "Keine Plätze mehr verfügbar"
+
+msgid "There is one spot left"
+msgstr "Es ist noch ein Platz verfügbar"
+
+#, python-format
+msgid "There are ${count} spots left"
+msgstr "Es sind noch ${count} Plätze verfügbar"
+
 msgid "A form with this name already exists"
 msgstr "Ein Formular mit diesem Namen existiert bereits"
 
@@ -4002,34 +4039,6 @@ msgstr "${count} Anmeldungen storniert / abgelehnt über das Ticket-System"
 
 msgid "The registration window was deleted"
 msgstr "Der Anmeldezeitraum wurde gelöscht"
-
-msgid "The registration has ended"
-msgstr "Die Anmeldung ist nicht mehr möglich"
-
-msgid "The registration is closed"
-msgstr "Zur Zeit keine Anmeldung möglich"
-
-#, python-format
-msgid "The registration opens on ${day}, ${date}"
-msgstr "Die Anmeldung beginnt am ${day}, ${date}"
-
-#, python-format
-msgid "The registration closes on ${day}, ${date}"
-msgstr "Die Anmeldung endet am ${day}, ${date}"
-
-#, python-format
-msgid "There's a limit of ${count} attendees"
-msgstr "Die Anmeldung ist auf ${count} Teilnehmer begrenzt"
-
-msgid "There are no spots left"
-msgstr "Keine Plätze mehr verfügbar"
-
-msgid "There is one spot left"
-msgstr "Es ist noch ein Platz verfügbar"
-
-#, python-format
-msgid "There are ${count} spots left"
-msgstr "Es sind noch ${count} Plätze verfügbar"
 
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"
