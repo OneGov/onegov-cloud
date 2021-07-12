@@ -875,7 +875,7 @@ msgid "Test run"
 msgstr "Testlauf"
 
 msgid "Please fill out a new name"
-msgstr "Bitte geben sie einen neuen Namen an."
+msgstr "Bitte geben sie einen neuen Namen an"
 
 #, python-format
 msgid "Invalid name. A valid suggestion is: ${name}"
