@@ -48,7 +48,6 @@ steps:
 
     if: |
         build.message =~ /visualtest/ ||
-          build.message =~ /percy/ ||
           build.branch == "master"
     env:
       CONTAINER: "onegov-cloud:head"
