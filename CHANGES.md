@@ -1,8 +1,44 @@
 # Changes
 
+## Release `2021.66`
+
+> commits: **5 / [a9b7ec37d4...28c1acc0cb](https://github.com/OneGov/onegov-cloud/compare/a9b7ec37d4^...28c1acc0cb)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.66)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Prevents server error on directory export if files are missing**
+
+Will redirect the user to the broken directory entry with missing file hint
+
+**`Bugfix`** | **[FW-92](https://stadt-winterthur.atlassian.net/browse/FW-92)** | **[a9b7ec37d4](https://github.com/onegov/onegov-cloud/commit/a9b7ec37d43944c4b61f3faba30ccc8b9aa7ef6f)**
+
+✨ **Show pagerefs only for logged in users**
+
+- change default to hide the pagerefs
+- Update settings explanation
+
+**`Other`** | **[a8bd9f916b](https://github.com/onegov/onegov-cloud/commit/a8bd9f916bfb73e646d8d13d52a67aca902cd205)**
+
+### Town6
+
+🎉 **Adds QrCode link to town6**
+
+- Adds Qr Edit Bar Link to /form/{name}
+
+**`Feature`** | **[SEA-380](https://linear.app/seantis/issue/SEA-380)** | **[aef24f862b](https://github.com/onegov/onegov-cloud/commit/aef24f862b20fdbcdf9b772d9303f704ab03a83e)**
+
+✨ **Improve form styling**
+
+- center checkboxes and labels vertical axis
+- Fix long field help indentation for checkboxes
+
+**`Other`** | **[570166bc4d](https://github.com/onegov/onegov-cloud/commit/570166bc4d7cb4905bb249112ecbb9174fbc702f)**
+
 ## Release `2021.65`
 
-> commits: **16 / [fd3d3fef03...e1757c4fdb](https://github.com/OneGov/onegov-cloud/compare/fd3d3fef03^...e1757c4fdb)**  
+> released: **2021-07-12 14:24**<br>
+> commits: **17 / [fd3d3fef03...cc2737b26a](https://github.com/OneGov/onegov-cloud/compare/fd3d3fef03^...cc2737b26a)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2021.65)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
