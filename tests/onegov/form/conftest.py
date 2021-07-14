@@ -134,6 +134,7 @@ def form_app(request):
 @pytest.fixture(scope='function')
 def browser(browser, form_app_url):
     browser.baseurl = form_app_url
+    browser.app_name = 'form'
     yield browser
 
 

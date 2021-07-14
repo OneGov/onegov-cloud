@@ -70,6 +70,7 @@ def client(town_app):
 @pytest.fixture(scope='function')
 def browser(browser, town_app_url):
     browser.baseurl = town_app_url
+    browser.app_name = 'town6'
     yield browser
 
 

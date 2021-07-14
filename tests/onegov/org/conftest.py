@@ -111,6 +111,7 @@ def client_with_es(es_org_app):
 @pytest.fixture(scope='function')
 def browser(browser, org_app_url):
     browser.baseurl = org_app_url
+    browser.app_name = 'org'
     yield browser
 
 

@@ -51,6 +51,7 @@ def es_feriennet_app(request):
 @pytest.fixture(scope='function')
 def browser(browser, feriennet_app_url):
     browser.baseurl = feriennet_app_url
+    browser.app_name = 'feriennet'
     yield browser
 
 
