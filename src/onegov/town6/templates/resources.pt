@@ -7,7 +7,7 @@
 
         <div class="grid-x" tal:condition="resources">
             <div class="cell small-12 medium-7">
-                <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped resources; add_pagerefs True" />
+                <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped resources; add_pagerefs request.is_logged_in" />
             </div>
         </div>
     </tal:b>

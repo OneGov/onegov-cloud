@@ -371,7 +371,8 @@ class LinksSettingsForm(Form):
         label=_("Disable page references"),
         description=_(
             "Disable showing the copy link '#' for the site reference. "
-            "The references themselves will still work.")
+            "The references themselves will still work. "
+            "Those references are only showed for logged in users.")
     )
 
 
