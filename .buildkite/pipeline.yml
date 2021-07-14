@@ -36,6 +36,21 @@ steps:
       CONTAINER: "onegov-cloud:head"
       CONTAINER_TEST_SCRIPT: ".buildkite/jest"
 
+  # run visual tests
+  - command: "test-container"
+    label: "Visual Testing"
+
+    agents:
+      - queue=generic
+
+    if: |
+        build.message =~ /visualtest/ ||
+          build.message =~ /percy/ ||
+          build.branch == "master"
+    env:
+      CONTAINER: "onegov-cloud:head"
+      CONTAINER_TEST_SCRIPT: ".buildkite/percy"
+
   # run the python tests
   - command: "test-container"
     label: "Testing"

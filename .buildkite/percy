@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# automatically open the log output group if there's an error
+trap 'echo "^^^ +++"' ERR
+
+[ -z "${PERCY_ONEGOV_TOKEN}" ] || echo "PERCY_TOKEN enabled"
+export PERCY_BRANCH="$BUILDKITE_BRANCH"
+
+# install test requirements
+# shellcheck disable=SC2086
+echo "--- Installing requirements :redis: :postgres: :java: :chrome:"
+rm /etc/apt/preferences
+install-packages \
+    wget \
+    apparmor \
+    curl \
+    git-core \
+    postgresql \
+    redis \
+    openjdk-8-jre-headless \
+    gcc \
+    libc-dev \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libdrm2 \
+    libgbm1 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcb-dri3-0 \
+    libxshmfence1 \
+    libxss1 \
+    xdg-utils
+
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+dpkg -i google-chrome-stable_current_amd64.deb
+
+# configure JAVA_HOME
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+
+# Redis needs to be running
+redis-server --daemonize yes
+
+# this needs to be set on Google Cloud for unknown reasons
+echo '127.0.0.1 localhost' >> /etc/hosts
+
+# switch to virtual environment
+cd /app
+
+# shellcheck disable=SC1091
+source bin/activate
+
+# install testing dependencies
+echo "--- Installing dependencies :python:"
+cd /app/src
+pip install '.[test]' \
+    nodeenv \
+    --quiet
+
+# reset the build assets again (like in the upstream container script),
+# because pip install will undo that change
+find ../lib -type d -iname assets -print0 | xargs -0 chmod a+w
+
+# run the tests as a separate user
+export LC_ALL="C.UTF-8"
+export LANG="C.UTF-8"
+
+adduser --disabled-password --gecos "" test
+
+export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
+
+echo "--- Installing node"
+node=$(nodeenv --list 2>&1 | tr '\t' '\n' | grep -E '^12' | tail -n 1)
+
+nodeenv --node="$node" /tmp/node
+
+echo "--- Installing dependencies"
+cd /app/src/tests/visual_testing
+/tmp/node/bin/npm install
+
+echo "--- Running Percy"
+/tmp/node/bin/npm test
