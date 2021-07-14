@@ -56,6 +56,8 @@ steps:
   - command: "test-container"
     label: "Testing"
 
+    if: build.message !~ /skip tests/
+
     parallelism: 4
 
     agents:
