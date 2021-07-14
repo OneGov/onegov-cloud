@@ -37,6 +37,7 @@ steps:
       CONTAINER_TEST_SCRIPT: ".buildkite/jest"
 
   # run visual tests
+  # https://buildkite.com/docs/pipelines/conditionals#conditionals-in-pipelines
   - command: "test-container"
     label: "Visual Testing"
 
