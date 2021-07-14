@@ -79,7 +79,7 @@ export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 [ -z "${PERCY_ONEGOV_TOKEN}" ] || echo "PERCY_TOKEN enabled"
 export PERCY_BRANCH="$BUILDKITE_BRANCH"
 
-run-as "$(id -u test)":test py.test \
+run-as "$(id -u test)":test pytest \
     -o cache_dir=/tmp/pytest \
     --test-group "$GROUP" \
     --test-group-count "$GROUP_COUNT" \
