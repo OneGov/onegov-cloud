@@ -271,6 +271,7 @@ class DirectoryArchiveWriter(object):
 
         fields = directory.fields
         paths = {}
+        fid_to_entry = {}
 
         def file_path(entry, field, value):
             return '{folder}/{name}{ext}'.format(
@@ -285,10 +286,8 @@ class DirectoryArchiveWriter(object):
                 if field.type == 'fileinput':
                     if value:
                         file_id = value['data'].lstrip('@')
-                        value = paths[file_id] = dict(
-                            path=file_path(entry, field, value),
-                            entry_name=entry.name
-                        )
+                        value = paths[file_id] = file_path(entry, field, value)
+                        fid_to_entry[file_id] = entry.name
                     else:
                         value = None
 
@@ -317,9 +316,9 @@ class DirectoryArchiveWriter(object):
         write = getattr(self, 'write_{}'.format(self.format))
         write(self.path / 'data.{}'.format(self.format), data)
 
-        self.write_paths(object_session(directory), paths)
+        self.write_paths(object_session(directory), paths, fid_to_entry)
 
-    def write_paths(self, session, paths):
+    def write_paths(self, session, paths, fid_to_entry=None):
         """ Writes the given files to the archive path.
 
         :param session:
@@ -328,7 +327,8 @@ class DirectoryArchiveWriter(object):
         :param paths:
             A dictionary with each key being a file id and each value
             being a path where this file id should be written to.
-
+        :param paths:
+            A dictionary with the mapping of the file id to the entry name
         """
 
         files = paths and session.query(File).filter(File.id.in_(paths)) or []
@@ -338,7 +338,7 @@ class DirectoryArchiveWriter(object):
 
         try:
             for f in files:
-                folder, name = paths[f.id]['path'].split('/', 1)
+                folder, name = paths[f.id].split('/', 1)
                 folder = self.path / folder
 
                 if not folder.exists():
@@ -356,7 +356,7 @@ class DirectoryArchiveWriter(object):
 
                 except IOError:
                     raise DirectoryFileNotFound(
-                        file_id=f.id, entry_name=paths[f.id]['entry_name'],
+                        file_id=f.id, entry_name=fid_to_entry[f.id],
                         filename=name
                     )
 
