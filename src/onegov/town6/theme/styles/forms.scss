@@ -19,6 +19,17 @@ span.error {
 
 form {
 
+    label input,
+    li input {
+        position: relative;
+        vertical-align: middle;
+
+        &[type="checkbox"],
+        &[type="radio"] {
+            margin-bottom: .25rem;
+        }
+    }
+
     label {
 
         min-width: 75%;
@@ -45,7 +56,7 @@ form {
 
         li input[type="checkbox"],
         li input[type="radio"] {
-            margin: 0;
+            margin-bottom: .25rem;
         }
     }
 
@@ -61,9 +72,7 @@ form {
     }
 
     .field-type-booleanfield {
-        [type="checkbox"] {
-            margin-bottom: 0;
-        }
+        margin-bottom: .5rem;
     }
 
     .field-help {
@@ -72,11 +81,15 @@ form {
         margin-left: 1.6rem;
     }
 
+    input + .label-text + .field-help {
+        margin-left: 1.8rem;
+    }
+
     .long-field-help,
     .long-field-help p {
         color: $steel;
         font-size: .8rem;
-        margin: .25rem 0 .5rem;
+        margin: 0 0 .5rem;
     }
 
     input.invalid,
@@ -202,9 +215,6 @@ form {
             margin-top: .25rem !important;
         }
     }
-    /*
-    <--
-    */
 }
 
 /*
