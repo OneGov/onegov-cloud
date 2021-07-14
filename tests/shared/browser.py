@@ -3,13 +3,44 @@ import shutil
 import time
 
 from contextlib import suppress
+from cached_property import cached_property
 from http.client import RemoteDisconnected
 from onegov.core.utils import module_path
 from time import sleep
+from os import environ
+from percy import percy_snapshot
 
 
 with open(module_path('tests.shared', 'drop_file.js')) as f:
     JS_DROP_FILE = f.read()
+
+
+class PercySnapshot:
+
+    def __init__(self):
+        self.inactive = environ.get('PERCY_TOKEN') and False or True
+
+    def snapshot(
+            self, browser, name=None, use_page_title=True, use_url=False
+    ):
+        if self.inactive:
+            return
+
+        if not name:
+            if use_url:
+                name = browser.url
+            elif use_page_title:
+                name = browser.title
+
+        assert name
+
+        # must be set in the fixtures manually before yielding
+        app = browser.app_name
+        msg = f"{app.capitalize()}: {name}"
+        percy_snapshot(
+            driver=browser.driver,
+            name=msg
+        )
 
 
 class InjectedBrowserExtension(object):
@@ -117,6 +148,18 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
     def logout(self):
         self.get('/auth/logout')
+
+    @cached_property
+    def percy(self):
+        return PercySnapshot()
+
+    def snapshot(self, name=None, use_url=False):
+        """ Creates a snapshot of the current page.
+        The default name is using the application name and the page title.
+        If use_url is set, use the site url instead of the page title to name
+        the image.
+        """
+        self.percy.snapshot(browser=self, name=name, use_url=use_url)
 
     def wait_for_js_variable(self, variable, timeout=10.0):
         """ Wait until the given javascript variable is no longer undefined """

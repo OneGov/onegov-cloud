@@ -33,8 +33,6 @@ from tests.shared.postgresql import Postgresql
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
 
-from tests.shared.visual_testing import PercySnapshot
-
 try:
     from elasticsearch import Elasticsearch
 except ImportError:
@@ -503,11 +501,6 @@ def browser(webdriver, webdriver_options, webdriver_executable_path,
 
     with browser_extension.spawn(Browser, webdriver, **config) as browser:
         yield browser
-
-
-@pytest.fixture(scope='session')
-def percy():
-    return PercySnapshot()
 
 
 @pytest.fixture(scope="function")
