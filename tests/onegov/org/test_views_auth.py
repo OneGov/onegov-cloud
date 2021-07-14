@@ -19,20 +19,12 @@ def test_view_login(client):
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
     response.form.set('username', 'admin@example.org')
-    response = response.form.submit()
-    assert response.status_code == 200
-    assert "E-Mail Adresse" in response
-    assert "Passwort" in response
-    assert "Dieses Feld wird benötigt." in response
-    assert client.get('/auth/logout', expect_errors=True).status_code == 403
-
-    response.form.set('username', 'admin@example.org')
     response.form.set('password', 'hunter2')
     response = response.form.submit()
 
     assert response.status_code == 302
     assert client.logout().status_code == 302
-    assert client.get('/auth/logout', expect_errors=True).status_code == 403
+    client.get('/auth/logout', status=403)
 
 
 def test_login(client):
@@ -45,6 +37,7 @@ def test_login(client):
     login_page = login_page.form.submit()
 
     assert "Dieses Feld wird benötigt" in login_page.text
+    client.get('/auth/logout', status=403)
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'wrong'
