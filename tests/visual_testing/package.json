@@ -1,0 +1,9 @@
+{
+  "name": "visual_testing",
+  "scripts": {
+    "test": "node_modules/@percy/cli/bin/run exec -- pytest ../../tests -k browser"
+  },
+  "devDependencies": {
+    "@percy/cli": "^1.0.0-beta.58"
+  }
+}

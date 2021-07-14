@@ -272,6 +272,14 @@ To update the snapshots after changes, run:
 
     npm test -- --update-snapshot
 
+### Visual Browser Testing with BrowserStack
+
+To run visual browser tests locally selecting a subset:
+
+    do/visualtest -k browser
+
+This command is a wrapper for `percy exec -- pytest "$@"`.
+
 ## Translations 🌍
 
 To extract the translation strings of an already configured module:

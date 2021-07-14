@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODULE_PATH=tests/visual_testing
+
+if [[ ! -d "$MODULE_PATH/node_modules" ]]; then
+  cd $MODULE_PATH
+  echo "Installing dependencies from $MODULE_PATH"
+  npm install
+  cd -
+fi
+
+if [[ -z "${PERCY_TOKEN}" ]]; then
+    echo "export PERCY_TOKEN in order to run visual tests"
+    exit 1
+fi
+
+if [[ -z "${PERCY_BRANCH}" ]]; then
+    export PERCY_BRANCH=local
+fi
+
+$MODULE_PATH/node_modules/@percy/cli/bin/run exec -- pytest "$@"

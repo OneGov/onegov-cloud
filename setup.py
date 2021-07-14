@@ -186,6 +186,7 @@ setup(
             'mock',
             'more.itsdangerous',
             'morepath',
+            'percy-selenium',
             'port-for',
             'psutil',
             'pyquery',
