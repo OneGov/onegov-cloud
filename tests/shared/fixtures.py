@@ -505,7 +505,7 @@ def browser(webdriver, webdriver_options, webdriver_executable_path,
         yield browser
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def percy():
     return PercySnapshot()
 
