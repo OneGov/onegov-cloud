@@ -56,6 +56,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f382';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$qr-code-icon: '\f029';
 
 .globals {
     @include primary-color-background;
@@ -361,6 +362,7 @@ $editbar-fg-color-active: $white;
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
+    .qr-code-link::before { @include icon-bold($qr-code-icon); }
 }
 
 

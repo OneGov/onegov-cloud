@@ -10,6 +10,7 @@ from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.org.elements import QrCodeLink
 from onegov.org.exports.base import OrgExport
 from onegov.org.models import (
     ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
@@ -21,6 +22,7 @@ from onegov.org.utils import IMG_URLS
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.people import PersonCollection
+from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
@@ -183,6 +185,10 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
     def show_label(self, field):
         return True
+
+    @cached_property
+    def qr_endpoint(self):
+        return self.request.class_link(QrCode)
 
 
 class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
@@ -380,6 +386,12 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
             attrs={'class': 'edit-link'}
         )
 
+        qr_link = QrCodeLink(
+            text=_("QR"),
+            url=self.request.link(self.model),
+            attrs={'class': 'qr-code-link'}
+        )
+
         if self.form.has_submissions(with_state='complete'):
             delete_link = Link(
                 text=_("Delete"),
@@ -455,6 +467,7 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
             export_link,
             change_url_link,
             registration_windows_link,
+            qr_link
         ]
 
 

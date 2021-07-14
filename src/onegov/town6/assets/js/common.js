@@ -246,6 +246,44 @@ $(document).ready(function() {
     });
 });
 
+// qr code modals
+function addModalImage(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt +';base64,' + rawData;
+    parent.append($(`<img class="qr" src="${src}">`));
+}
+
+function addModalDownload(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt +';base64,' + rawData;
+    var title = window.document.title;
+    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
+}
+
+$('.qr-code-link').each(function () {
+    var el = $(this);
+    var imageParentID = el.data('image-parent');
+    var imageParent = $(`#${imageParentID}`);
+    var payload = el.data('payload') || window.location.href;
+    var endpoint = el.data('endpoint');
+    var fmt = 'png';
+
+    el.on('click', function () {
+        if (imageParent.find('img.qr').length) return
+        $.ajax({
+            type: "GET",
+            contentType: "image/" + fmt,
+            url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
+            statusCode : {
+                200: function (resp) {
+                    addModalImage(imageParent, resp, fmt);
+                    addModalDownload(imageParent, resp, fmt);
+                }
+            }
+        }).fail(function(jqXHR) {
+            console.log(jqXHR.statusMessage);
+        })
+    })
+})
+
 var page_refs = new ClipboardJS('.pageref');
 page_refs.on('success', function(e) {
     // var success_msg = e.trigger.getAttribute('data-on-success');
