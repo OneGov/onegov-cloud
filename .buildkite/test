@@ -76,6 +76,8 @@ set +x
 
 export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
+[ -z "${PERCY_ONEGOV_TOKEN}" ] || echo "PERCY_TOKEN enabled"
+
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
     --test-group "$GROUP" \
