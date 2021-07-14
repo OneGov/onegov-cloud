@@ -19,6 +19,8 @@ steps:
     agents:
       - queue=generic
 
+    if: build.message !~ /skip lint/
+
     env:
       CONTAINER: "onegov-cloud:head"
       CONTAINER_TEST_SCRIPT: ".buildkite/lint"
