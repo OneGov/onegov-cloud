@@ -63,7 +63,6 @@ def test_browse_directory_uploads(browser, org_app, field, percy):
     browser.fill('name', "Seven Seas Motel")
     browser.fill('description', "First victim of Ice Truck Killer")
     browser.fill('photo', photo.name)
-    percy.snapshot(browser, "Filled out form with image upload")
     browser.find_by_value("Absenden").click()
 
     assert browser.is_text_present("Seven Seas Motel")
