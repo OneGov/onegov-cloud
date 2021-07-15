@@ -62,7 +62,7 @@ def test_registration_ticket_workflow(client):
 
     count = 0
 
-    def register(client, data_in_email, auto_accept=False, url='/form/meetup'):
+    def register(client, data_in_email, accept_ticket=True, url='/form/meetup'):
         nonlocal count
         count += 1
         with freeze_time('2018-01-01'):
@@ -73,11 +73,13 @@ def test_registration_ticket_workflow(client):
 
             page.form['send_by_email'] = data_in_email
             page = page.form.submit().follow()
-        if auto_accept:
+        if not accept_ticket:
             return page
         return client.get('/tickets/ALL/open').click("Annehmen").follow()
 
     client.login_editor()
+
+    # user info1
     page = register(client, data_in_email=True)
 
     assert "bestätigen" in page
@@ -101,6 +103,7 @@ def test_registration_ticket_workflow(client):
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
+    # user info2
     page = register(client, data_in_email=False)
 
     msg = client.app.smtp.sent[-1]
@@ -115,7 +118,7 @@ def test_registration_ticket_workflow(client):
     assert "Foobar" not in msg
 
     # create one undecided submission
-    open_registration = register(client, False, auto_accept=True)
+    open_registration = register(client, False, accept_ticket=False)
 
     # Test auto accept reservations for forms
     # views in order:
@@ -132,7 +135,7 @@ def test_registration_ticket_workflow(client):
     settings.form.submit().follow()
 
     client = client.spawn()
-    page = register(client, False, auto_accept=True)
+    page = register(client, False, accept_ticket=False)
     mail = get_mail(client.app.smtp.outbox, -1)
     assert '_Meetup=3A_Ihre_Anmeldung_wurde_best=C3=A4tigt?=' in mail['subject']
     assert 'Ihr Anliegen wurde abgeschlossen' in page
@@ -178,3 +181,13 @@ def test_registration_ticket_workflow(client):
     # navigate to the registration window an cancel all
     window.click('Anmeldezeitraum absagen')
     assert 'Storniert (4)' in client.get(window.request.url)
+
+    # Try deleting the form with active registrations window
+    form_page = client.get('/form/meetings')
+    assert 'Dies kann nicht rückgängig gemacht werden.' in \
+           form_page.pyquery('.delete-link.confirm').attr('data-confirm-extra')
+
+    form_delete_link = form_page.pyquery(
+        '.delete-link.confirm').attr('ic-delete-from')
+
+    client.delete(form_delete_link, status=200)

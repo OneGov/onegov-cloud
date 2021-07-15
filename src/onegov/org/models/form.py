@@ -5,6 +5,7 @@ from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HoneyPotExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.search import SearchableContent
+from onegov.ticket import TicketCollection
 
 
 class BuiltinFormDefinition(FormDefinition, AccessExtension,
@@ -34,3 +35,28 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
     @property
     def extensions(self):
         return tuple(set(super().extensions + ['honeypot']))
+
+
+def submission_deletable(submission, session):
+    """ CustomFormDefinition are normally linked to a ticket.
+
+    Submissions without registration window do not require a decision. The
+    ticket state decides, whether the form definition can be deleted to
+    provide some safeguard.
+
+    With registration window, we can check if the submission is decided and
+    can close the ticket even if it is still pending.
+    """
+    tickets = TicketCollection(session)
+    ticket = tickets.by_handler_id(submission.id.hex)
+    if submission.registration_window_id:
+        if not ticket:
+            return True
+        if ticket.state == 'open':
+            return False
+        if ticket.handler.undecided:
+            return False
+
+    elif ticket and ticket.state != 'closed':
+        return False
+    return ticket
