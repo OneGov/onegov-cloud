@@ -235,8 +235,11 @@
             <dt i18n:translate>Path</dt>
             <dd><span tal:repeat="ancestor agency.ancestors">${ancestor.title}</span> <span>${agency.title}</span></dd>
 
-            <dt i18n:translate>Message</dt>
-            <dd tal:content="structure message"></dd>
+            <dt tal:condition="message" i18n:translate>Message</dt>
+            <dd tal:condition="message" tal:content="structure message"></dd>
+
+            <dt tal:condition="proposed_changes" i18n:translate>Proposed changes</dt>
+            <dd tal:condition="proposed_changes" tal:repeat="change proposed_changes">${labels.get(change, change)}: ${proposed_changes[change]}</dd>
         </dl>
     </metal:display_agency_mutation>
 
@@ -246,8 +249,11 @@
             <dt i18n:translate>Person</dt>
             <dd><a href="${request.link(person)}">${person.title}</a></dd>
 
-            <dt i18n:translate>Message</dt>
-            <dd tal:content="structure message"></dd>
+            <dt tal:condition="message" i18n:translate>Message</dt>
+            <dd tal:condition="message" tal:content="structure message"></dd>
+
+            <dt tal:condition="proposed_changes" i18n:translate>Proposed changes</dt>
+            <dd tal:condition="proposed_changes" tal:repeat="change proposed_changes">${labels.get(change, change)}: ${proposed_changes[change]}</dd>
         </dl>
     </metal:display_person_mutation>
 

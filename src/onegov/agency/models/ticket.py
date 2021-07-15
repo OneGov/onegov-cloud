@@ -3,10 +3,14 @@ from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.layout import AgencyLayout
 from onegov.agency.layout import ExtendedPersonLayout
+from onegov.agency.models import AgencyMutation
+from onegov.agency.models import PersonMutation
+from onegov.core.elements import Link
 from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
-from onegov.org.models.ticket import OrgTicketMixin, TicketDeletionMixin
+from onegov.org.models.ticket import OrgTicketMixin
+from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
@@ -42,13 +46,36 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
     def agency(self):
         return self.collection.by_id(self.data['handler_data']['id'])
 
+    @cached_property
+    def mutation(self):
+        if self.agency:
+            return AgencyMutation(None, self.agency.id, self.ticket.id)
+
     @property
     def deleted(self):
         return self.agency is None
 
     @cached_property
     def email(self):
-        return self.data['handler_data']['submitter_email']
+        return (
+            self.data['handler_data'].get('submitter_email', '')
+            or self.data['handler_data'].get('email', '')
+        )
+
+    @cached_property
+    def message(self):
+        return (
+            self.data['handler_data'].get('submitter_message', '')
+            or self.data['handler_data'].get('message', '')
+        )
+
+    @cached_property
+    def proposed_changes(self):
+        return self.data['handler_data'].get('proposed_changes', {})
+
+    @cached_property
+    def state(self):
+        return self.data.get('state')
 
     @property
     def title(self):
@@ -64,19 +91,45 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
 
     def get_summary(self, request):
         layout = AgencyLayout(self.agency, request)
-        message = self.data['handler_data']['submitter_message']
         return render_macro(
             layout.macros['display_agency_mutation'],
             request,
             {
                 'agency': self.agency,
-                'message': linkify(message).replace('\n', '<br>'),
+                'message': linkify(self.message).replace('\n', '<br>'),
+                'proposed_changes': self.proposed_changes,
+                'labels': self.mutation.labels,
                 'layout': layout
             }
         )
 
     def get_links(self, request):
-        return []
+        if self.deleted:
+            return []
+
+        links = [
+            Link(
+                text=_("Edit agency"),
+                url=request.return_here(
+                    request.link(self.agency.proxy(), 'edit')
+                ),
+                attrs={'class': 'edit-link'}
+            )
+        ]
+
+        # todo: activity message?
+        if self.proposed_changes and self.state is None:
+            links.append(
+                Link(
+                    text=_("Apply proposed changes"),
+                    url=request.return_here(
+                        request.link(self.mutation, 'apply')
+                    ),
+                    attrs={'class': 'accept-link'},
+                )
+            )
+
+        return links
 
 
 @handlers.registered_handler('PER')
@@ -93,13 +146,36 @@ class PersonMutationHandler(Handler, TicketDeletionMixin):
     def person(self):
         return self.collection.by_id(self.data['handler_data']['id'])
 
+    @cached_property
+    def mutation(self):
+        if self.person:
+            return PersonMutation(None, self.person.id, self.ticket.id)
+
     @property
     def deleted(self):
         return self.person is None
 
     @cached_property
     def email(self):
-        return self.data['handler_data']['submitter_email']
+        return (
+            self.data['handler_data'].get('submitter_email', '')
+            or self.data['handler_data'].get('email', '')
+        )
+
+    @cached_property
+    def message(self):
+        return (
+            self.data['handler_data'].get('submitter_message', '')
+            or self.data['handler_data'].get('message', '')
+        )
+
+    @cached_property
+    def proposed_changes(self):
+        return self.data['handler_data'].get('proposed_changes', {})
+
+    @cached_property
+    def state(self):
+        return self.data.get('state')
 
     @property
     def title(self):
@@ -115,16 +191,41 @@ class PersonMutationHandler(Handler, TicketDeletionMixin):
 
     def get_summary(self, request):
         layout = ExtendedPersonLayout(self.person, request)
-        message = self.data['handler_data']['submitter_message']
         return render_macro(
             layout.macros['display_person_mutation'],
             request,
             {
                 'person': self.person,
-                'message': linkify(message).replace('\n', '<br>'),
+                'message': linkify(self.message).replace('\n', '<br>'),
+                'proposed_changes': self.proposed_changes,
+                'labels': self.mutation.labels,
                 'layout': layout
             }
         )
 
     def get_links(self, request):
-        return []
+        if self.deleted:
+            return []
+
+        links = [
+            Link(
+                text=_("Edit person"),
+                url=request.return_here(
+                    request.link(self.person, 'edit')
+                ),
+                attrs={'class': 'edit-link'}
+            )
+        ]
+
+        # todo: activity message?
+        if self.proposed_changes and self.state is None:
+            links.append(
+                Link(
+                    text=_("Apply proposed changes"),
+                    url=request.return_here(
+                        request.link(self.mutation, 'apply')
+                    ),
+                    attrs={'class': 'accept-link'},
+                )
+            )
+        return links
