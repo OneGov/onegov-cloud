@@ -4,7 +4,7 @@ set -euo pipefail
 # automatically open the log output group if there's an error
 trap 'echo "^^^ +++"' ERR
 
-[ -z "${PERCY_ONEGOV_TOKEN}" ] || echo "PERCY_TOKEN enabled"
+export PERCY_TOKEN="$PERCY_ONEGOV_TOKEN"
 export PERCY_BRANCH="$BUILDKITE_BRANCH"
 
 # install test requirements
@@ -69,7 +69,6 @@ export LANG="C.UTF-8"
 
 adduser --disabled-password --gecos "" test
 
-export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
 echo "--- Installing node"
 node=$(nodeenv --list 2>&1 | tr '\t' '\n' | grep -E '^12' | tail -n 1)
