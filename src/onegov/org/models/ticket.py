@@ -165,6 +165,8 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def undecided(self):
+        if self.deleted:
+            return False
 
         # submissions without registration window do not present a decision
         if not self.submission.registration_window:
