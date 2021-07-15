@@ -114,6 +114,10 @@ class FormDefinitionCollection(object):
         if not with_submissions:
             submissions = submissions.filter(FormSubmission.state == 'pending')
 
+        # fails if there are linked files in files_for_submissions_files
+        for submission in submissions:
+            for file in submission.files:
+                self.session.delete(file)
         submissions.delete()
 
         if with_registration_windows:
