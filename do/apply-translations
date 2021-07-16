@@ -64,11 +64,11 @@ def fusion_po(src, target, lang, dry_run=False, overwrite=False):
 
 
 @click.command()
-@click.option('--src', required=True)
+@click.option('--source', required=True)
 @click.option('--target', required=True)
 @click.option('--overwrite', is_flag=True, default=False)
 @click.option('--dry-run', is_flag=True, default=False)
-def apply_translations(src, target, overwrite, dry_run):
+def apply_translations(source, target, overwrite, dry_run):
     """
     Use the source and target names of onegov modules to transfer
     translations that appear in both.
@@ -76,13 +76,16 @@ def apply_translations(src, target, overwrite, dry_run):
     Example: apply-translations --src org --target town6
 
     """
-    src_locals = f'{base}/{src}/locale'
-    langs = [
-        f for f in os.listdir(src_locals) if not f.endswith('.pot')
-    ]
+    langs = {
+        f for f in os.listdir(f'{base}/{source}/locale')
+        if not f.endswith('.pot')
+    } & {
+        f for f in os.listdir(f'{base}/{target}/locale')
+        if not f.endswith('.pot')
+    }
 
     for lang in langs:
-        fusion_po(src, target, lang, dry_run, overwrite)
+        fusion_po(source, target, lang, dry_run, overwrite)
 
 
 if __name__ == '__main__':
