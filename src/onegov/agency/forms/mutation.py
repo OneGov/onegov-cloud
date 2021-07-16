@@ -162,10 +162,11 @@ class ApplyMutationForm(Form):
     )
 
     def on_request(self):
-        translate = self.request.translate
-        labels = self.model.labels
-        self.changes.choices = (
-            (name, f'{translate(labels[name])}: {value}')
+        def translate(name):
+            return self.request.translate(self.model.labels.get(name, name))
+
+        self.changes.choices = tuple(
+            (name, f'{translate(name)}: {value}')
             for name, value in self.model.changes.items()
         )
 

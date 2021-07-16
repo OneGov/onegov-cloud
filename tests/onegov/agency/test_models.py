@@ -1,14 +1,17 @@
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMove
+from onegov.agency.models import AgencyMutation
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
+from onegov.agency.models import PersonMutation
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
 from onegov.core.utils import Bunch
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import Person
+from onegov.ticket import Ticket
 from onegov.user.models import RoleMapping
 from onegov.user.models import User
 from onegov.user.models import UserGroup
@@ -355,3 +358,82 @@ def test_membership_move_within_person(session):
 
     siblings = membership.siblings_by_agency.all()
     assert len(siblings) == 3
+
+
+def test_agency_muation(session):
+    agency = ExtendedAgency(
+        title='Test Agency',
+        name='test-agency',
+        portrait='This is a test\nagency.'
+    )
+    ticket = Ticket(
+        number='AGN-1000-0000',
+        title='AGN-1000-0000',
+        group='AGN-1000-0000',
+        handler_code='AGN',
+        handler_id='1',
+        handler_data={
+            'handler_data': {
+                'proposed_changes': {'title': 'Agency'}
+            }
+        }
+    )
+    session.add(agency)
+    session.add(ticket)
+    session.flush()
+
+    mutation = AgencyMutation(session, agency.id, ticket.id)
+    assert mutation.target == agency
+    assert mutation.ticket == ticket
+    assert mutation.changes == {'title': 'Agency'}
+    assert mutation.labels
+
+    mutation.apply(['title', 'xyz'])
+    assert agency.title == 'Agency'
+    assert ticket.handler_data['state'] == 'applied'
+
+
+def test_person_mutation(session):
+    person = ExtendedPerson(
+        first_name='Test First Name',
+        last_name='Test Last Name',
+        function='Test Function'
+    )
+    ticket = Ticket(
+        number='PER-1000-0000',
+        title='PER-1000-0000',
+        group='PER-1000-0000',
+        handler_code='PER',
+        handler_id='1',
+        handler_data={
+            'handler_data': {
+                'proposed_changes': {
+                    'first_name': 'First Name',
+                    'last_name': 'Last Name',
+                    'function': 'Function',
+                    'academic_title': 'Academic Title'
+                }
+            }
+        }
+    )
+    session.add(person)
+    session.add(ticket)
+    session.flush()
+
+    mutation = PersonMutation(session, person.id, ticket.id)
+    assert mutation.target == person
+    assert mutation.ticket == ticket
+    assert mutation.changes == {
+        'first_name': 'First Name',
+        'last_name': 'Last Name',
+        'function': 'Function',
+        'academic_title': 'Academic Title'
+    }
+    assert mutation.labels
+
+    mutation.apply(['first_name', 'last_name', 'academic_title', 'xyz'])
+    assert person.first_name == 'First Name'
+    assert person.last_name == 'Last Name'
+    assert person.function == 'Test Function'
+    assert person.academic_title == 'Academic Title'
+    assert ticket.handler_data['state'] == 'applied'

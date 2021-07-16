@@ -1,14 +1,17 @@
 from cgi import FieldStorage
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.forms import AgencyMutationForm
+from onegov.agency.forms import ApplyMutationForm
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.forms import MoveAgencyForm
-from onegov.agency.forms import MutationForm
+from onegov.agency.forms import PersonMutationForm
 from onegov.agency.forms import UserGroupForm
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
+from onegov.core.utils import Bunch
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from tempfile import TemporaryFile
@@ -46,7 +49,7 @@ class DummyRequest(object):
         pass
 
     def translate(self, text):
-        return text.interpolate()
+        return text.interpolate() if hasattr(text, 'interpolate') else text
 
     def has_permission(self, model, permission):
         permissions = self.permissions.get(model.__class__.__name__, [])
@@ -280,29 +283,122 @@ def test_membership_form_choices(session):
     ]
 
 
-def test_mutation_form():
-    form = MutationForm(DummyPostData({
-        'email': 'info@hospital-springfield.org',
-        'message': "Nick Rivera's retired."
+def test_agency_mutation_form():
+    form = AgencyMutationForm(DummyPostData({
+        'submitter_email': 'info@hospital-springfield.org',
+        'submitter_message': 'There is a typo in the name!',
+        'title': 'Hospital Springfield'
     }))
+    form.model = ExtendedAgency(title='Hopital Springfield')
+    form.request = DummyRequest(None)
+    form.on_request()
+
+    assert set(form.proposal_fields.keys()) == {'title'}
+    assert form.title.description == 'Hopital Springfield'
+    assert form.proposed_changes == {'title': 'Hospital Springfield'}
     assert form.get_useful_data() == {
-        'email': 'info@hospital-springfield.org',
-        'message': "Nick Rivera's retired."
+        'submitter_email': 'info@hospital-springfield.org',
+        'submitter_message': 'There is a typo in the name!',
+        'title': 'Hospital Springfield'
     }
     assert form.validate()
 
-    # honeypot
-    form = MutationForm(DummyPostData({
-        'email': 'info@hospital-springfield.org',
-        'message': "Nick Rivera's retired.",
+    # No content
+    form = AgencyMutationForm(DummyPostData({
+        'submitter_email': 'info@hospital-springfield.org',
+    }))
+    assert not form.validate()
+
+    # Honeypot
+    form = AgencyMutationForm(DummyPostData({
+        'submitter_email': 'info@hospital-springfield.org',
+        'submitter_message': "Nick Rivera's retired.",
         'delay': '10'
     }))
     form.request = DummyRequest(None)
-    assert form.get_useful_data() == {
-        'email': 'info@hospital-springfield.org',
-        'message': "Nick Rivera's retired."
-    }
     assert not form.validate()
+
+
+def test_person_mutation_form():
+    form = PersonMutationForm(DummyPostData({
+        'submitter_email': 'info@hospital-springfield.org',
+        'submitter_message': 'There is a typo in the name!',
+        'first_name': 'nick',
+        'last_name': 'Rivera',
+        'academic_title': 'Dr.'
+    }))
+    form.model = ExtendedPerson(first_name="Nick", last_name="Riviera")
+    form.request = DummyRequest(None)
+    form.on_request()
+
+    assert set(form.proposal_fields.keys()) == {
+        'function', 'website', 'political_party', 'salutation', 'email',
+        'notes', 'first_name', 'last_name', 'born', 'phone',
+        'parliamentary_group', 'address', 'profession', 'phone_direct',
+        'academic_title'
+    }
+    assert form.first_name.description == 'Nick'
+    assert form.last_name.description == 'Riviera'
+    assert form.academic_title.description is None
+    assert form.proposed_changes == {
+        'academic_title': 'Dr.', 'first_name': 'nick', 'last_name': 'Rivera'
+    }
+    assert form.get_useful_data() == {
+        'submitter_email': 'info@hospital-springfield.org',
+        'submitter_message': 'There is a typo in the name!',
+        'salutation': '',
+        'academic_title': 'Dr.',
+        'first_name': 'nick',
+        'last_name': 'Rivera',
+        'function': '',
+        'email': '',
+        'phone': '',
+        'phone_direct': '',
+        'born': '',
+        'profession': '',
+        'political_party': '',
+        'parliamentary_group': '',
+        'website': '',
+        'address': '',
+        'notes': ''
+    }
+    assert form.validate()
+
+    # No content
+    form = PersonMutationForm(DummyPostData({
+        'submitter_email': 'info@hospital-springfield.org',
+    }))
+    assert not form.validate()
+
+    # Honeypot
+    form = PersonMutationForm(DummyPostData({
+        'submitter_email': 'info@hospital-springfield.org',
+        'submitter_message': "Nick Rivera's retired.",
+        'delay': '10'
+    }))
+    form.request = DummyRequest(None)
+    assert not form.validate()
+
+
+def test_apply_muation_form():
+    form = ApplyMutationForm(DummyPostData({'changes': ['a', 'b']}))
+    form.request = DummyRequest(None)
+    form.model = Bunch(
+        labels={'a': 'A', 'c': 'C'},
+        changes={'a': 'X', 'b': 'Y', 'c': 'Z'},
+        apply=MagicMock()
+    )
+    form.on_request()
+    assert form.changes.choices == (
+        ('a', 'A: X'), ('b', 'b: Y'), ('c', 'C: Z')
+    )
+    assert form.changes.data == ['a', 'b']
+
+    form.apply_model()
+    assert form.changes.data == ['a', 'b', 'c']
+
+    form.update_model()
+    assert form.model.apply.called
 
 
 def test_user_group_form(session):
