@@ -117,7 +117,6 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
             )
         ]
 
-        # todo: activity message?
         if self.proposed_changes and self.state is None:
             links.append(
                 Link(
@@ -217,7 +216,6 @@ class PersonMutationHandler(Handler, TicketDeletionMixin):
             )
         ]
 
-        # todo: activity message?
         if self.proposed_changes and self.state is None:
             links.append(
                 Link(

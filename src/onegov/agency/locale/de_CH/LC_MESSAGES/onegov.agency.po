@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-06-23 08:32+0200\n"
+"POT-Creation-Date: 2021-07-16 08:51+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -106,11 +106,75 @@ msgstr "Präfix"
 msgid "This field is required."
 msgstr "Das ist ein Pflichtfeld."
 
+msgid ""
+"This form can be used to report mutations to the data. You can either leave "
+"us a message or directly suggest changes to the corresponding fields."
+msgstr ""
+"Mit diesem Formular können Sie Mutationen melden. Sie können uns entweder "
+"eine Nachricht hinterlassen oder direkt Änderungen an den entsprechenden "
+"Einträgen vorschlagen."
+
+msgid "Your contact details"
+msgstr "Ihre Kontaktangaben"
+
 msgid "E-Mail"
 msgstr "E-Mail"
 
+msgid "Your message"
+msgstr "Ihre Nachricht"
+
 msgid "Message"
 msgstr "Nachricht"
+
+msgid "Please enter a message or suggest some changes using the fields below."
+msgstr ""
+"Bitte geben Sie entweder eine Nachricht oder mindestens einen "
+"Änderungsvorschlag in die unten stehenden Felder ein."
+
+msgid "Proposed changes"
+msgstr "Vorgeschlagene Änderungen"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Direct Phone Number"
+msgstr "Direktnummer"
+
+msgid "Born"
+msgstr "Jahrgang"
+
+msgid "Profession"
+msgstr "Beruf"
+
+msgid "Political Party"
+msgstr "Politische Partei"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Notes"
+msgstr "Bemerkungen"
 
 msgid "People with memberships can't be deleted"
 msgstr "Personen mit Mitgliedschaften können nicht gelöscht werden"
@@ -201,6 +265,15 @@ msgstr "Mitglied"
 msgid "Mutation"
 msgstr "Mutation"
 
+msgid "Edit agency"
+msgstr "Organisation bearbeiten"
+
+msgid "Apply proposed changes"
+msgstr "Vorgeschlagene Änderungen übernehmen"
+
+msgid "Edit person"
+msgstr "Person bearbeiten"
+
 msgid "No agencies added yet."
 msgstr "Es wurden noch keine Organisationen hinzugefügt."
 
@@ -234,41 +307,11 @@ msgstr "Keine versteckten Inhalte."
 msgid "Memberships"
 msgstr "Mitgliedschaften"
 
-msgid "Salutation"
-msgstr "Anrede"
-
-msgid "Academic Title"
-msgstr "Akademischer Titel"
-
-msgid "Profession"
-msgstr "Beruf"
-
-msgid "Political Party"
-msgstr "Politische Partei"
-
-msgid "Parliamentary Group"
-msgstr "Fraktion"
-
-msgid "Born"
-msgstr "Jahrgang"
-
-msgid "Address"
-msgstr "Adresse"
-
 msgid "Email"
 msgstr "E-Mail"
 
-msgid "Phone"
-msgstr "Telefon"
-
 msgid "Direct Phone"
 msgstr "Direktnummer"
-
-msgid "Website"
-msgstr "Webseite"
-
-msgid "Notes"
-msgstr "Bemerkungen"
 
 msgid "Mutation report"
 msgstr "Mutationsmeldung"
@@ -341,6 +384,9 @@ msgstr "Ihr Ticket wurde eröffnet"
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
 
+msgid "Proposed changes applied."
+msgstr "Vorgeschlagene Änderungen übernommen."
+
 msgid "Excel file created"
 msgstr "Excel-Datei wurde erzeugt"
 
@@ -407,9 +453,6 @@ msgstr ""
 
 msgid "Field used for internal phone numbers"
 msgstr "Für interne Rufnummern verwendetes Feld"
-
-msgid "Direct Phone Number"
-msgstr "Direktnummer"
 
 msgid "Show full agency path"
 msgstr "Zeige ganzen Organisationspfad"
