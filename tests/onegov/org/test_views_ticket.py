@@ -615,7 +615,7 @@ def test_assign_tickets(client):
     ticket_number = page.pyquery('.ticket-number').text()
     assert ticket_number.startswith('FRM-')
 
-    #  assign ticket
+    # assign ticket
     client.login_admin()
 
     manage = client.get('/tickets/ALL/open').click(ticket_number)
@@ -631,3 +631,11 @@ def test_assign_tickets(client):
     page = client.get('/').click('Meine Tickets')
     page = page.click(ticket_number)
     assert "Ticket zugewiesen (editor@example.org)" in page
+
+    # check mail
+    assert len(client.app.smtp.outbox) == 2
+    message = get_mail(client.app.smtp.outbox, 1)
+    assert message['subject'] == (
+        f'{ticket_number} / newsletter: Sie haben ein neues Ticket'
+    )
+    assert message['to'] == 'editor@example.org'

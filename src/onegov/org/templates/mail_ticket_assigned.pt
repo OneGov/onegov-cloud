@@ -1,0 +1,11 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p>
+            <span i18n:translate>You have a new ticket</span>: <a href="${request.link(ticket)}">${ticket.number}</a>
+        </p>
+    </tal:b>
+</div>
