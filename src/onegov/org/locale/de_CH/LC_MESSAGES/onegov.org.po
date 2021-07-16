@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-14 06:17+0200\n"
+"POT-Creation-Date: 2021-07-16 08:01+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2993,6 +2993,9 @@ msgstr "Die folgenden Reservationen wurden angenommen:"
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
+msgid "You have a new ticket"
+msgstr "Sie haben ein neues Ticket"
+
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
 
@@ -3108,6 +3111,9 @@ msgstr "Ticket geschlossen."
 
 msgid "Ticket reopened."
 msgstr "Ticket wieder geöffnet."
+
+msgid "Ticket assigned"
+msgstr "Ticket zugewiesen"
 
 msgid "Ticket e-mails disabled."
 msgstr "Ticket E-Mails deaktiviert."
@@ -4511,9 +4517,6 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 #, python-format
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
-
-msgid "Ticket assigned"
-msgstr "Ticket zugewiesen"
 
 msgid "The ticket has already been closed"
 msgstr "Das Ticket wurde bereits geschlossen"
