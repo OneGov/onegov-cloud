@@ -493,7 +493,13 @@ def unmute_ticket(self, request):
              form=TicketAssignmentForm, template='form.pt')
 def assign_ticket(self, request, form, layout=None):
     if form.submitted(request):
+        old_owner = self.user.username if self.user else ''
         self.user_id = form.user.data
+        TicketMessage.create(
+            self, request, 'assigned',
+            old_owner=old_owner,
+            new_owner=form.username
+        )
         request.success(_("Ticket assigned"))
         return morepath.redirect(request.link(self))
 

@@ -130,8 +130,8 @@ class TicketMessage(Message, TicketMessageMixin):
     }
 
     @classmethod
-    def create(cls, ticket, request, change):
-        return super().create(ticket, request, change=change)
+    def create(cls, ticket, request, change, **extra_meta):
+        return super().create(ticket, request, change=change, **extra_meta)
 
 
 class ReservationMessage(Message, TicketMessageMixin):

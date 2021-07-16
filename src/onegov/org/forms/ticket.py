@@ -7,6 +7,7 @@ from onegov.form.filters import strip_whitespace
 from onegov.form.validators import FileSizeLimit
 from onegov.org import _
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
+from onegov.user import User
 from onegov.user import UserCollection
 from wtforms import BooleanField
 from wtforms import TextAreaField
@@ -76,6 +77,12 @@ class TicketAssignmentForm(Form):
             validators.InputRequired()
         ],
     )
+
+    @property
+    def username(self):
+        if self.user.data in [choice[0] for choice in self.user.choices]:
+            query = self.request.session.query(User.username)
+            return query.filter_by(id=self.user.data).scalar()
 
     def on_request(self):
         self.user.choices = [

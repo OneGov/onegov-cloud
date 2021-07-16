@@ -628,6 +628,6 @@ def test_assign_tickets(client):
     # check visibility
     client.login_editor()
 
-    page = client.get('/')
     page = client.get('/').click('Meine Tickets')
-    assert ticket_number in page
+    page = page.click(ticket_number)
+    assert "Ticket zugewiesen (editor@example.org)" in page

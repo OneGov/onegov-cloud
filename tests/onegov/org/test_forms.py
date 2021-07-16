@@ -575,7 +575,7 @@ def test_settings_ticket_permissions(session):
 
 def test_ticket_assignment_form(session):
     users = UserCollection(session)
-    users.add(username='a', password='pwd', role='admin')
+    user_a = users.add(username='a', password='pwd', role='admin')
     users.add(username='e', password='pwd', role='editor')
     users.add(username='m', password='pwd', role='member')
 
@@ -583,9 +583,10 @@ def test_ticket_assignment_form(session):
         session=session,
         has_permission=lambda m, p, u: u.role != 'member'
     )
-    form = TicketAssignmentForm()
+    form = TicketAssignmentForm(data={'user': user_a.id})
     form.model = None
     form.request = request
     form.on_request()
 
     assert sorted([name for id_, name in form.user.choices]) == ['a', 'e']
+    assert form.username == 'a'
