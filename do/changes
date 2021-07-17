@@ -207,7 +207,7 @@ def changelog(folder, new):
     if new == 'Unreleased':
         print("## Unreleased")
     else:
-        print(f"## `{new.rsplit('-', 1)[-1]}`")
+        print(f"## {new.rsplit('-', 1)[-1]}")
     print("")
     changelog_commits(new, repository, repository.head.commit, tags[0].commit,
                       date.today())
@@ -235,7 +235,7 @@ def changelog_commits(release, repository, newer, older, release_date):
     lo = commits[0].hexsha[:10]
     hi = commits[-1].hexsha[:10]
     url = f'https://github.com/OneGov/onegov-cloud/compare/{lo}^...{hi}'
-    print(f"`{format_datetime(release_date)}` | [{lo}...{hi}]({url})")
+    print(f"{format_datetime(release_date)} | [{lo}...{hi}]({url})")
     print("")
 
     # parse the commit messages
