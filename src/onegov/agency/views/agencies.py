@@ -5,6 +5,7 @@ from morepath.request import Response
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
+from onegov.agency.forms import AgencyMutationForm
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.forms import MoveAgencyForm
@@ -19,6 +20,10 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org.elements import Link
+from onegov.org.mail import send_ticket_mail
+from onegov.org.models import TicketMessage
+from onegov.ticket import TicketCollection
+from uuid import uuid4
 
 
 def get_agency_form_class(model, request):
@@ -262,6 +267,8 @@ def edit_agency(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.success(_("Your changes were saved"))
+        if 'return-to' in request.GET:
+            return request.redirect(request.url)
         return redirect(request.link(self))
 
     if not form.errors:
@@ -276,7 +283,6 @@ def edit_agency(self, request, form):
         'title': self.title,
         'form': form,
         'button_text': _('Update')
-
     }
 
 
@@ -442,3 +448,49 @@ def delete_agency(self, request):
 def execute_agency_move(self, request):
     request.assert_valid_csrf_token()
     self.execute()
+
+
+@AgencyApp.form(
+    model=ExtendedAgency,
+    name='report-change',
+    template='form.pt',
+    permission=Public,
+    form=AgencyMutationForm
+)
+def report_agency_change(self, request, form):
+    if form.submitted(request):
+        session = request.session
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='AGN',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'id': str(self.id),
+                    'submitter_email': form.submitter_email.data,
+                    'submitter_message': form.submitter_message.data,
+                    'proposed_changes': form.proposed_changes
+                }
+            )
+            TicketMessage.create(ticket, request, 'opened')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(form.submitter_email.data, ),
+            ticket=ticket
+        )
+
+        request.success(_("Thank you for your submission!"))
+        return redirect(request.link(ticket, 'status'))
+
+    layout = AgencyLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Report change"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("Report change"),
+        'lead': self.title,
+        'form': form
+    }

@@ -379,7 +379,7 @@ def test_view_pdf_settings(client):
     assert get_pdf() == 'Govikon\n0\nPlaceholder for table of contents\n'
 
 
-def test_view_report_change(client):
+def test_view_mutations(client):
     # Add data
     client.login_admin()
 
@@ -390,7 +390,7 @@ def test_view_report_change(client):
     person = new.form.submit().follow()
 
     new = client.get('/organizations').click("Organisation", href='new')
-    new.form['title'] = "Hospital Springfield"
+    new.form['title'] = "Hospital"
     agency = new.form.submit().follow()
 
     new = agency.click("Mitgliedschaft", href='new')
@@ -408,59 +408,67 @@ def test_view_report_change(client):
     new.form['agencies'].select_multiple(texts=["School"])
     new.form.submit().follow()
 
-    # Report agency change
-    change = agency.click("Mutation melden")
-    change.form['email'] = "info@hospital-springfield.com"
-
-    long_message = """
+    # Report agency mutation
+    message = """
     I saw some errors. Check
     - https://mywebsite.com
     Contact me under +41 77 777 77 77
     """.strip()
-    linkified = linkify(long_message).replace('\n', '<br>')
-
-    change.form['message'] = long_message
+    change = agency.click("Mutation melden")
+    change.form['submitter_email'] = "info@hospital-springfield.com"
+    change.form['submitter_message'] = message
+    change.form['title'] = 'Hospital Springfield'
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
     agency_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
-    agency_ticket = client.get(agency_ticket_number)
-    assert "Mutationsmeldung" in agency_ticket
-    assert "Hospital Springfield" in agency_ticket
-    assert linkified in agency_ticket
-    assert "info@hospital-springfield.com" in agency_ticket
-    agency_ticket = agency_ticket.click("Ticket annehmen").follow()
-    agency_ticket = agency_ticket.click("Ticket abschliessen").follow()
+    manage = client.get(agency_ticket_number)
+    assert "Mutationsmeldung" in manage
+    assert "Titel: Hospital Springfield" in manage
+    assert linkify(message).replace('\n', '<br>') in manage
+    assert "info@hospital-springfield.com" in manage
+    manage = manage.click("Ticket annehmen").follow()
+    manage = manage.click("Vorgeschlagene Änderungen übernehmen")
+    manage = manage.form.submit().follow()
+    manage = manage.click("Ticket abschliessen").follow()
+
+    assert 'Hospital Springfield' in client.get('/organizations')
 
     # ... with honeypot filled
     change = agency.click("Mutation melden")
-    change.form['email'] = "info@hospital-springfield.com"
+    change.form['submitter_email'] = "info@hospital-springfield.com"
+    change.form['submitter_message'] = 'xyz'
     change.form['delay'] = 'abc'
-    change.form['message'] = 'xyz'
     change = change.form.submit().maybe_follow()
     assert "Vielen Dank für Ihre Eingabe!" not in change
 
     # Report person change
     change = person.click("Mutation melden")
-    change.form['email'] = "info@hospital-springfield.com"
-    change.form['message'] = "Dr. Rivera's retired."
+    change.form['submitter_email'] = "info@hospital-springfield.com"
+    change.form['submitter_message'] = "Rivera's got some troubles"
+    change.form['function'] = 'Janitor'
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
     person_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
-    person_ticket = client.get(person_ticket_number)
-    assert "Mutationsmeldung" in person_ticket
-    assert "Rivera Nick" in person_ticket
-    assert "Dr. Rivera's retired." in person_ticket
-    assert "info@hospital-springfield.com" in person_ticket
-    person_ticket = person_ticket.click("Ticket annehmen").follow()
-    person_ticket = person_ticket.click("Ticket abschliessen").follow()
+    manage = client.get(person_ticket_number)
+    assert "Mutationsmeldung" in manage
+    assert "Rivera Nick" in manage
+    assert "Rivera's got some troubles" in manage
+    assert "info@hospital-springfield.com" in manage
+    assert "Funktion: Janitor" in manage
+    manage = manage.click("Ticket annehmen").follow()
+    manage = manage.click("Vorgeschlagene Änderungen übernehmen")
+    manage = manage.form.submit().follow()
+    manage = manage.click("Ticket abschliessen").follow()
+
+    assert 'Janitor' in client.get('/people')
 
     # ... with honeypot filled
     change = person.click("Mutation melden")
-    change.form['email'] = "info@hospital-springfield.com"
+    change.form['submitter_email'] = "info@hospital-springfield.com"
+    change.form['submitter_message'] = 'xyz'
     change.form['delay'] = 'abc'
-    change.form['message'] = 'xyz'
     change = change.form.submit().maybe_follow()
     assert "Vielen Dank für Ihre Eingabe!" not in change
 
@@ -477,19 +485,20 @@ def test_view_report_change(client):
     agency.click("Löschen")
     person.click("Löschen")
 
-    ticket = client.get(agency_ticket_number)
-    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
-    assert "Mutationsmeldung" in ticket
-    assert "Hospital Springfield" in ticket
-    assert linkified in ticket
-    assert "info@hospital-springfield.com" in ticket
+    manage = client.get(agency_ticket_number)
+    assert "Der hinterlegte Datensatz wurde entfernt." in manage
+    assert "Mutationsmeldung" in manage
+    assert "Titel: Hospital Springfield" in manage
+    assert linkify(message).replace('\n', '<br>') in manage
+    assert "info@hospital-springfield.com" in manage
 
-    ticket = client.get(person_ticket_number)
-    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
-    assert "Mutationsmeldung" in ticket
-    assert "Rivera Nick" in ticket
-    assert "Dr. Rivera's retired." in ticket
-    assert "info@hospital-springfield.com" in ticket
+    manage = client.get(person_ticket_number)
+    assert "Der hinterlegte Datensatz wurde entfernt." in manage
+    assert "Mutationsmeldung" in manage
+    assert "Rivera Nick" in manage
+    assert "Rivera's got some troubles" in manage
+    assert "info@hospital-springfield.com" in manage
+    assert "Funktion: Janitor" in manage
 
 
 def test_disable_report_changes(client):

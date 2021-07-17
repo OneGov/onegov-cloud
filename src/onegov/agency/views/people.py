@@ -3,10 +3,12 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
 from morepath import redirect
+from morepath.request import Response
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.excel_export import export_person_xlsx
+from onegov.agency.forms import PersonMutationForm
 from onegov.agency.layout import ExtendedPersonCollectionLayout
 from onegov.agency.layout import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
@@ -15,9 +17,13 @@ from onegov.core.security import Public
 from onegov.form import Form
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import AtoZ
+from onegov.org.models import TicketMessage
+from onegov.ticket import TicketCollection
 from unidecode import unidecode
-from morepath.request import Response
+from uuid import uuid4
+
 
 from onegov.org.views.people import handle_delete_person as \
     org_handle_delete_person
@@ -180,6 +186,7 @@ def view_person(self, request):
     }
 
 
+# todo: Public????
 @AgencyApp.html(
     model=ExtendedPerson,
     template='sort.pt',
@@ -246,6 +253,8 @@ def edit_person(self, request, form):
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
+        if 'return-to' in request.GET:
+            return request.redirect(request.url)
         return redirect(request.link(self))
     else:
         form.process(obj=self)
@@ -271,3 +280,49 @@ def handle_delete_person(self, request):
         request.error(_("People with memberships can't be deleted"))
         return
     return org_handle_delete_person(self, request)
+
+
+@AgencyApp.form(
+    model=ExtendedPerson,
+    name='report-change',
+    template='form.pt',
+    permission=Public,
+    form=PersonMutationForm
+)
+def report_person_change(self, request, form):
+    if form.submitted(request):
+        session = request.session
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='PER',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'id': str(self.id),
+                    'submitter_email': form.submitter_email.data,
+                    'submitter_message': form.submitter_message.data,
+                    'proposed_changes': form.proposed_changes
+                }
+            )
+            TicketMessage.create(ticket, request, 'opened')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(form.submitter_email.data, ),
+            ticket=ticket
+        )
+
+        request.success(_("Thank you for your submission!"))
+        return redirect(request.link(ticket, 'status'))
+
+    layout = ExtendedPersonLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Report change"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("Report change"),
+        'lead': self.title,
+        'form': form
+    }

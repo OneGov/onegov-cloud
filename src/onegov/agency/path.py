@@ -4,7 +4,9 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMembershipMoveWithinPerson
 from onegov.agency.models import AgencyMove
+from onegov.agency.models import AgencyMutation
 from onegov.agency.models import AgencyProxy
+from onegov.agency.models import PersonMutation
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import AgencyMembershipCollection
@@ -91,3 +93,21 @@ def get_membership_move_for_person(app, subject_id, direction, target_id):
         target_id,
         direction
     )
+
+
+@AgencyApp.path(
+    model=AgencyMutation,
+    path='/mutation/agency/{target_id}/{ticket_id}',
+    converters=dict(target_id=int, ticket_id=UUID)
+)
+def get_agency_mutation(app, target_id, ticket_id):
+    return AgencyMutation(app.session(), target_id, ticket_id)
+
+
+@AgencyApp.path(
+    model=PersonMutation,
+    path='/mutation/person/{target_id}/{ticket_id}',
+    converters=dict(target_id=UUID, ticket_id=UUID)
+)
+def get_person_mutation(app, target_id, ticket_id):
+    return PersonMutation(app.session(), target_id, ticket_id)
