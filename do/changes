@@ -8,6 +8,7 @@ import sys
 from attr import attrs
 from itertools import groupby, tee
 from typing import Optional
+from datetime import date
 
 
 COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z6_\- ]{2,18}: ')
@@ -81,19 +82,6 @@ class ChangelogCommit(object):
             link=link,
             note=note
         )
-
-    @property
-    def emoji(self):
-        if self.type_id == 'feature':
-            return '🎉'
-
-        if self.type_id == 'performance':
-            return '🏎'
-
-        if self.type_id == 'bugfix':
-            return '🐞'
-
-        return '✨'
 
     @property
     def short(self):
@@ -198,7 +186,7 @@ def release_date(tag):
 
 
 def format_datetime(dt):
-    return dt.strftime("%Y-%m-%d %H:%M")
+    return dt.strftime("%Y-%m-%d")
 
 
 def parse_commit(commit):
@@ -217,25 +205,23 @@ def changelog(folder, new):
 
     # not yet released
     if new == 'Unreleased':
-        print(f"## Unreleased")
+        print("## Unreleased")
     else:
-        print(f"## Release `{new.rsplit('-', 1)[-1]}`")
+        print(f"## `{new.rsplit('-', 1)[-1]}`")
     print("")
+    changelog_commits(new, repository, repository.head.commit, tags[0].commit,
+                      date.today())
 
-    changelog_commits(new, repository, repository.head.commit, tags[0].commit)
-
-    # releases (the last version is not included by design)
-    for newer, older in pairwise(tags):
-        print(f"## Release `{release_number(newer)}`")
+    # last 50 releases (the last version is not included by design)
+    for newer, older in pairwise(tags[:50]):
+        print(f"## {release_number(newer)}")
         print("")
 
-        # print the release overview
-        print(f"> released: **{format_datetime(release_date(newer))}**<br>")
-
-        changelog_commits(newer.name, repository, newer.commit, older.commit)
+        changelog_commits(newer.name, repository, newer.commit, older.commit,
+                          release_date(newer))
 
 
-def changelog_commits(release, repository, newer, older):
+def changelog_commits(release, repository, newer, older, release_date):
     commits = commits_between(repository, newer, older)
     commits = tuple(commits)
 
@@ -245,16 +231,11 @@ def changelog_commits(release, repository, newer, older):
         print("")
         return
 
-    # show the commit range
+    # print the release overview
     lo = commits[0].hexsha[:10]
     hi = commits[-1].hexsha[:10]
     url = f'https://github.com/OneGov/onegov-cloud/compare/{lo}^...{hi}'
-    print(f"> commits: **{len(commits)} / [{lo}...{hi}]({url})**  ")
-    print((
-        f"> [![Build status](https://badge.buildkite.com"
-        f"/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg"
-        f"?branch={release})](https://buildkite.com/seantis/onegov-cloud)"
-    ))
+    print(f"`{format_datetime(release_date)}` | [{lo}...{hi}]({url})")
     print("")
 
     # parse the commit messages
@@ -272,19 +253,19 @@ def changelog_commits(release, repository, newer, older):
         print("")
 
         for c in commit:
-            print(f"{c.emoji} **{c.title}**")
+            print(f"##### {c.title}")
             print("")
 
             if c.note:
                 print(c.note)
                 print("")
 
-            print(f"**`{c.type}`**", end='')
+            print(f"`{c.type}`", end='')
 
             if c.link:
-                print(f" | **[{c.link}]({c.link_url})**", end='')
+                print(f" | [{c.link}]({c.link_url})", end='')
 
-            print(f" | **[{c.short}]({c.url})**")
+            print(f" | [{c.short}]({c.url})")
             print("")
 
 
