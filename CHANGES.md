@@ -2,11 +2,7 @@
 
 ## 2021.67
 
-No changes since last release
-
-## 2021.67
-
-2021-07-17 | [a20fdb76e6...1cc14ad7ec](https://github.com/OneGov/onegov-cloud/compare/a20fdb76e6^...1cc14ad7ec)
+`2021-07-17` | [a20fdb76e6...1cc14ad7ec](https://github.com/OneGov/onegov-cloud/compare/a20fdb76e6^...1cc14ad7ec)
 
 ### Agency
 
@@ -28,7 +24,7 @@ Users can directly propose changes to fields of agencies and people. Redactors c
 
 ## 2021.66
 
-2021-07-14 | [a9b7ec37d4...4fbfdfc306](https://github.com/OneGov/onegov-cloud/compare/a9b7ec37d4^...4fbfdfc306)
+`2021-07-14` | [a9b7ec37d4...4fbfdfc306](https://github.com/OneGov/onegov-cloud/compare/a9b7ec37d4^...4fbfdfc306)
 
 ### Org
 
@@ -62,14 +58,14 @@ Will redirect the user to the broken directory entry with missing file hint
 
 ## 2021.65
 
-2021-07-12 | [fd3d3fef03...cc2737b26a](https://github.com/OneGov/onegov-cloud/compare/fd3d3fef03^...cc2737b26a)
+`2021-07-12` | [fd3d3fef03...cc2737b26a](https://github.com/OneGov/onegov-cloud/compare/fd3d3fef03^...cc2737b26a)
 
 ### Agency
 
 ##### Add direct phone number to search index.
 
-There are two new settings to enable direct phone numbers in the search 
-index. Direct phone numbers are simply the last n digits of the phone or 
+There are two new settings to enable direct phone numbers in the search
+index. Direct phone numbers are simply the last n digits of the phone or
 direct phone number. Direct phone numbers are suggest when searching.
 
 `Feature` | [STAKABS-33](https://kt-bs.atlassian.net/browse/STAKABS-33) | [7db6e64a97](https://github.com/onegov/onegov-cloud/commit/7db6e64a97a0413bca3a91cf1c01b65c046a4627)
@@ -78,8 +74,8 @@ direct phone number. Direct phone numbers are suggest when searching.
 
 ##### Add ticket inbox and ticket assignments.
 
-Adds a 'My Tickets' views where all pending and open tickets of the 
-currently logged-in user are displayed. Furthermore, it's now possible 
+Adds a 'My Tickets' views where all pending and open tickets of the
+currently logged-in user are displayed. Furthermore, it's now possible
 to assign a ticket to another user.
 
 `Feature` | [STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25) | [fd3d3fef03](https://github.com/onegov/onegov-cloud/commit/fd3d3fef031741b56bf2927de212ffbd5f8f7082)
@@ -102,7 +98,7 @@ to assign a ticket to another user.
 
 ## 2021.64
 
-2021-07-07 | [24957f62a8...8f423f4785](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...8f423f4785)
+`2021-07-07` | [24957f62a8...8f423f4785](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...8f423f4785)
 
 ### Org
 
@@ -125,7 +121,7 @@ to assign a ticket to another user.
 
 ## 2021.63
 
-2021-07-05 | [8bc8876629...efee5c2710](https://github.com/OneGov/onegov-cloud/compare/8bc8876629^...efee5c2710)
+`2021-07-05` | [8bc8876629...efee5c2710](https://github.com/OneGov/onegov-cloud/compare/8bc8876629^...efee5c2710)
 
 ### Agency
 
@@ -141,7 +137,7 @@ to assign a ticket to another user.
 
 ## 2021.62
 
-2021-06-30 | [b0e5d8eb3d...97989eb6fb](https://github.com/OneGov/onegov-cloud/compare/b0e5d8eb3d^...97989eb6fb)
+`2021-06-30` | [b0e5d8eb3d...97989eb6fb](https://github.com/OneGov/onegov-cloud/compare/b0e5d8eb3d^...97989eb6fb)
 
 ### Agency
 
@@ -201,7 +197,7 @@ Exports manual and stripe payments with ticket information.
 
 ## 2021.61
 
-2021-06-23 | [8f72c8071f...59aa2da559](https://github.com/OneGov/onegov-cloud/compare/8f72c8071f^...59aa2da559)
+`2021-06-23` | [8f72c8071f...59aa2da559](https://github.com/OneGov/onegov-cloud/compare/8f72c8071f^...59aa2da559)
 
 ### Agency
 
@@ -217,7 +213,7 @@ Exports manual and stripe payments with ticket information.
 
 ## 2021.60
 
-2021-06-21 | [5ca599442b...ff0ec616f5](https://github.com/OneGov/onegov-cloud/compare/5ca599442b^...ff0ec616f5)
+`2021-06-21` | [5ca599442b...ff0ec616f5](https://github.com/OneGov/onegov-cloud/compare/5ca599442b^...ff0ec616f5)
 
 ### Agency
 
@@ -243,7 +239,7 @@ Exports manual and stripe payments with ticket information.
 
 ## 2021.59
 
-2021-06-16 | [90f7a384b6...47f659af71](https://github.com/OneGov/onegov-cloud/compare/90f7a384b6^...47f659af71)
+`2021-06-16` | [90f7a384b6...47f659af71](https://github.com/OneGov/onegov-cloud/compare/90f7a384b6^...47f659af71)
 
 ### Agency
 
@@ -271,7 +267,7 @@ Prevents double entries by joining on activity and invoice references.
 
 ## 2021.58
 
-2021-06-15 | [5efda0b90f...d8ebec8a12](https://github.com/OneGov/onegov-cloud/compare/5efda0b90f^...d8ebec8a12)
+`2021-06-15` | [5efda0b90f...d8ebec8a12](https://github.com/OneGov/onegov-cloud/compare/5efda0b90f^...d8ebec8a12)
 
 ### Election Day
 
@@ -285,7 +281,7 @@ Prevents double entries by joining on activity and invoice references.
 
 ## 2021.57
 
-2021-06-14 | [49f8a81daa...8961c85922](https://github.com/OneGov/onegov-cloud/compare/49f8a81daa^...8961c85922)
+`2021-06-14` | [49f8a81daa...8961c85922](https://github.com/OneGov/onegov-cloud/compare/49f8a81daa^...8961c85922)
 
 ### Election Day
 
@@ -343,7 +339,7 @@ Adds Qr link to editbar on /form/{name} for managers.
 
 ## 2021.56
 
-2021-06-07 | [d8fadefb86...e2836955ce](https://github.com/OneGov/onegov-cloud/compare/d8fadefb86^...e2836955ce)
+`2021-06-07` | [d8fadefb86...e2836955ce](https://github.com/OneGov/onegov-cloud/compare/d8fadefb86^...e2836955ce)
 
 ### Core
 
@@ -396,11 +392,11 @@ Render a better translation for each handler code if it is used by the app and t
 
 ## 2021.55
 
-2021-05-31 | [e42dc76114...a7b04bb8e2](https://github.com/OneGov/onegov-cloud/compare/e42dc76114^...a7b04bb8e2)
+`2021-05-31` | [e42dc76114...a7b04bb8e2](https://github.com/OneGov/onegov-cloud/compare/e42dc76114^...a7b04bb8e2)
 
 ## 2021.54
 
-2021-05-27 | [0f1e7e0776...a714dceda7](https://github.com/OneGov/onegov-cloud/compare/0f1e7e0776^...a714dceda7)
+`2021-05-27` | [0f1e7e0776...a714dceda7](https://github.com/OneGov/onegov-cloud/compare/0f1e7e0776^...a714dceda7)
 
 ### Election Day
 
@@ -421,7 +417,7 @@ Render a better translation for each handler code if it is used by the app and t
 
 ## 2021.53
 
-2021-05-26 | [30d9fb132b...be09de2c39](https://github.com/OneGov/onegov-cloud/compare/30d9fb132b^...be09de2c39)
+`2021-05-26` | [30d9fb132b...be09de2c39](https://github.com/OneGov/onegov-cloud/compare/30d9fb132b^...be09de2c39)
 
 ### Feriennet
 
@@ -461,7 +457,7 @@ Shows german banner version for all languages.
 
 ## 2021.52
 
-2021-05-21 | [173c481049...2eb3f14319](https://github.com/OneGov/onegov-cloud/compare/173c481049^...2eb3f14319)
+`2021-05-21` | [173c481049...2eb3f14319](https://github.com/OneGov/onegov-cloud/compare/173c481049^...2eb3f14319)
 
 ### Ballot
 
@@ -497,7 +493,7 @@ Shows german banner version for all languages.
 
 ## 2021.51
 
-2021-05-19 | [8eaa83aa1c...e9cd52c898](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...e9cd52c898)
+`2021-05-19` | [8eaa83aa1c...e9cd52c898](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...e9cd52c898)
 
 ### Agency
 
@@ -509,7 +505,7 @@ Shows german banner version for all languages.
 
 ##### Add honeypot fields.
 
-A honey pot field is hidden using CSS and therefore not visible for 
+A honey pot field is hidden using CSS and therefore not visible for
 users
 but bots (probably). We expect this field to be empty at any
 time and throw an error if provided as well as adding a log message to
@@ -539,7 +535,7 @@ optionally ban the IP.
 
 ## 2021.50
 
-2021-05-13 | [f767eccb86...ab32040507](https://github.com/OneGov/onegov-cloud/compare/f767eccb86^...ab32040507)
+`2021-05-13` | [f767eccb86...ab32040507](https://github.com/OneGov/onegov-cloud/compare/f767eccb86^...ab32040507)
 
 ### Org
 
@@ -551,7 +547,7 @@ Invalidating a dogpile cache region only works for the current process.
 
 ## 2021.49
 
-2021-05-11 | [7cd3771161...c707683eae](https://github.com/OneGov/onegov-cloud/compare/7cd3771161^...c707683eae)
+`2021-05-11` | [7cd3771161...c707683eae](https://github.com/OneGov/onegov-cloud/compare/7cd3771161^...c707683eae)
 
 ### Core
 
@@ -573,8 +569,8 @@ Serialization and deserialization now take place within the CacheRegion so that 
 
 ##### Adds permissions for tickets.
 
-User groups have now a setting to restrain access to specific ticket 
-categories. If one is defined, only users within groups with that 
+User groups have now a setting to restrain access to specific ticket
+categories. If one is defined, only users within groups with that
 setting has access to the tickets in that category.
 
 `Feature` | [SEA-254](https://linear.app/seantis/issue/SEA-254) | [b901fc94c5](https://github.com/onegov/onegov-cloud/commit/b901fc94c516c4539d0127214059d8785176a6c0)
@@ -593,7 +589,7 @@ setting has access to the tickets in that category.
 
 ## 2021.48
 
-2021-05-03 | [bf9ae82dfd...336d7dc053](https://github.com/OneGov/onegov-cloud/compare/bf9ae82dfd^...336d7dc053)
+`2021-05-03` | [bf9ae82dfd...336d7dc053](https://github.com/OneGov/onegov-cloud/compare/bf9ae82dfd^...336d7dc053)
 
 ### Town6
 
@@ -611,13 +607,13 @@ setting has access to the tickets in that category.
 
 ## 2021.47
 
-2021-04-29 | [4f4f381207...184621e882](https://github.com/OneGov/onegov-cloud/compare/4f4f381207^...184621e882)
+`2021-04-29` | [4f4f381207...184621e882](https://github.com/OneGov/onegov-cloud/compare/4f4f381207^...184621e882)
 
 ### Election Day
 
 ##### Add screens.
 
-Screens allow to show tables, charts and other widgets for a given vote 
+Screens allow to show tables, charts and other widgets for a given vote
 or election in a flexible way.
 
 `Feature` | [SEA-147](https://linear.app/seantis/issue/SEA-147) | [d3be6d7077](https://github.com/onegov/onegov-cloud/commit/d3be6d70771e0615b3373096eb2a714d2fd66055)
@@ -628,7 +624,7 @@ or election in a flexible way.
 
 ## 2021.46
 
-2021-04-27 | [5dd6c63404...f6b9143271](https://github.com/OneGov/onegov-cloud/compare/5dd6c63404^...f6b9143271)
+`2021-04-27` | [5dd6c63404...f6b9143271](https://github.com/OneGov/onegov-cloud/compare/5dd6c63404^...f6b9143271)
 
 ### Org
 
@@ -659,7 +655,7 @@ for a whole day with multiple quantities possible per allocation.
 
 ## 2021.45
 
-2021-04-23 | [db4286be42...a05fa442cd](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...a05fa442cd)
+`2021-04-23` | [db4286be42...a05fa442cd](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...a05fa442cd)
 
 ### Election Day
 
@@ -675,7 +671,7 @@ for a whole day with multiple quantities possible per allocation.
 
 ## 2021.44
 
-2021-04-21 | [374e89a420...1fc3b1a099](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...1fc3b1a099)
+`2021-04-21` | [374e89a420...1fc3b1a099](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...1fc3b1a099)
 
 ### Core
 
@@ -710,7 +706,7 @@ For news and topics, adds option to change the url path independant from the pag
 
 ## 2021.43
 
-2021-04-21 | [47e62bf74e...2effac2bd6](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...2effac2bd6)
+`2021-04-21` | [47e62bf74e...2effac2bd6](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...2effac2bd6)
 
 ### Form
 
@@ -728,15 +724,15 @@ Fixes IconField in DirectoryForm town6.
 
 ## 2021.42
 
-2021-04-15 | [4d9fa2f5ff...e5d040398b](https://github.com/OneGov/onegov-cloud/compare/4d9fa2f5ff^...e5d040398b)
+`2021-04-15` | [4d9fa2f5ff...e5d040398b](https://github.com/OneGov/onegov-cloud/compare/4d9fa2f5ff^...e5d040398b)
 
 ## 2021.41
 
-2021-04-15 | [28790c3ee9...dba3ab2168](https://github.com/OneGov/onegov-cloud/compare/28790c3ee9^...dba3ab2168)
+`2021-04-15` | [28790c3ee9...dba3ab2168](https://github.com/OneGov/onegov-cloud/compare/28790c3ee9^...dba3ab2168)
 
 ## 2021.40
 
-2021-04-14 | [f59ab70a55...f442d02925](https://github.com/OneGov/onegov-cloud/compare/f59ab70a55^...f442d02925)
+`2021-04-14` | [f59ab70a55...f442d02925](https://github.com/OneGov/onegov-cloud/compare/f59ab70a55^...f442d02925)
 
 ### Agencies
 
@@ -752,9 +748,9 @@ Fixes IconField in DirectoryForm town6.
 
 ##### Removes possibility to create majorz election compounds.
 
-Currently, one can define election compounds with majorz elections but 
-these don't contain lists results, which we display. Since such 
-compounds are historically possible, but are not really a use case at 
+Currently, one can define election compounds with majorz elections but
+these don't contain lists results, which we display. Since such
+compounds are historically possible, but are not really a use case at
 the moment, we drop this feature.
 
 `Bugfix` | [fb9c2824a7](https://github.com/onegov/onegov-cloud/commit/fb9c2824a7ef1871e3f29444408ee8f9838dae67)
@@ -799,7 +795,7 @@ Adds step sequence registry. Defines 3 steps for forms, event suggestions, and n
 
 ## 2021.39
 
-2021-04-06 | [575884a9a5...c05630558a](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...c05630558a)
+`2021-04-06` | [575884a9a5...c05630558a](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...c05630558a)
 
 ### Election Day
 
@@ -831,7 +827,7 @@ On topic A with child B, show the B's lead on /topics/a if enabled in the settin
 
 ## 2021.38
 
-2021-04-01 | [a54d571901...28f8485e85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...28f8485e85)
+`2021-04-01` | [a54d571901...28f8485e85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...28f8485e85)
 
 ### Election Day
 
@@ -867,15 +863,15 @@ Use abbreviations for weekdays.
 
 ## 2021.37
 
-2021-03-30 | [52585f5d2c...51c603749f](https://github.com/OneGov/onegov-cloud/compare/52585f5d2c^...51c603749f)
+`2021-03-30` | [52585f5d2c...51c603749f](https://github.com/OneGov/onegov-cloud/compare/52585f5d2c^...51c603749f)
 
 ## 2021.36
 
-2021-03-25 | [2b1f49a369...0db36afcee](https://github.com/OneGov/onegov-cloud/compare/2b1f49a369^...0db36afcee)
+`2021-03-25` | [2b1f49a369...0db36afcee](https://github.com/OneGov/onegov-cloud/compare/2b1f49a369^...0db36afcee)
 
 ## 2021.35
 
-2021-03-24 | [d90b0247fb...a634faaf40](https://github.com/OneGov/onegov-cloud/compare/d90b0247fb^...a634faaf40)
+`2021-03-24` | [d90b0247fb...a634faaf40](https://github.com/OneGov/onegov-cloud/compare/d90b0247fb^...a634faaf40)
 
 ### Org
 
@@ -885,11 +881,11 @@ Use abbreviations for weekdays.
 
 ## 2021.34
 
-2021-03-23 | [01c2811fad...2b4e103fb5](https://github.com/OneGov/onegov-cloud/compare/01c2811fad^...2b4e103fb5)
+`2021-03-23` | [01c2811fad...2b4e103fb5](https://github.com/OneGov/onegov-cloud/compare/01c2811fad^...2b4e103fb5)
 
 ## 2021.33
 
-2021-03-23 | [f784f15bb6...6f15672fb2](https://github.com/OneGov/onegov-cloud/compare/f784f15bb6^...6f15672fb2)
+`2021-03-23` | [f784f15bb6...6f15672fb2](https://github.com/OneGov/onegov-cloud/compare/f784f15bb6^...6f15672fb2)
 
 ### Org
 
@@ -917,7 +913,7 @@ Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
 
 ## 2021.32
 
-2021-03-19 | [0bcfc993fe...88af288eef](https://github.com/OneGov/onegov-cloud/compare/0bcfc993fe^...88af288eef)
+`2021-03-19` | [0bcfc993fe...88af288eef](https://github.com/OneGov/onegov-cloud/compare/0bcfc993fe^...88af288eef)
 
 ### Election Day
 
@@ -937,11 +933,11 @@ Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
 
 ## 2021.31
 
-2021-03-17 | [c22a982b96...9ea8a9d53e](https://github.com/OneGov/onegov-cloud/compare/c22a982b96^...9ea8a9d53e)
+`2021-03-17` | [c22a982b96...9ea8a9d53e](https://github.com/OneGov/onegov-cloud/compare/c22a982b96^...9ea8a9d53e)
 
 ## 2021.30
 
-2021-03-17 | [7157f0f0e3...144e0bb5b4](https://github.com/OneGov/onegov-cloud/compare/7157f0f0e3^...144e0bb5b4)
+`2021-03-17` | [7157f0f0e3...144e0bb5b4](https://github.com/OneGov/onegov-cloud/compare/7157f0f0e3^...144e0bb5b4)
 
 ### Directory
 
@@ -954,7 +950,7 @@ Fixes sql alchemy observer calling migration of entries twice when triggering th
 
 ## 2021.29
 
-2021-03-16 | [4d722f9b3f...6e2a9a9aa5](https://github.com/OneGov/onegov-cloud/compare/4d722f9b3f^...6e2a9a9aa5)
+`2021-03-16` | [4d722f9b3f...6e2a9a9aa5](https://github.com/OneGov/onegov-cloud/compare/4d722f9b3f^...6e2a9a9aa5)
 
 ### Org
 
@@ -1008,7 +1004,7 @@ Summary:
 
 ## 2021.28
 
-2021-03-12 | [b16f503db2...eab8ec4369](https://github.com/OneGov/onegov-cloud/compare/b16f503db2^...eab8ec4369)
+`2021-03-12` | [b16f503db2...eab8ec4369](https://github.com/OneGov/onegov-cloud/compare/b16f503db2^...eab8ec4369)
 
 ### Election Day
 
@@ -1018,7 +1014,7 @@ Summary:
 
 ## 2021.27
 
-2021-03-11 | [783a05f22d...6f77624b93](https://github.com/OneGov/onegov-cloud/compare/783a05f22d^...6f77624b93)
+`2021-03-11` | [783a05f22d...6f77624b93](https://github.com/OneGov/onegov-cloud/compare/783a05f22d^...6f77624b93)
 
 ### Election Day
 
@@ -1037,7 +1033,7 @@ Adds tests for all formats for the roundtrip.
 
 ## 2021.26
 
-2021-03-10 | [640f8b1b67...cd35dde238](https://github.com/OneGov/onegov-cloud/compare/640f8b1b67^...cd35dde238)
+`2021-03-10` | [640f8b1b67...cd35dde238](https://github.com/OneGov/onegov-cloud/compare/640f8b1b67^...cd35dde238)
 
 ### Org
 
@@ -1061,7 +1057,7 @@ Adds additional fields to ticket pdf and ticket view.
 
 ## 2021.25
 
-2021-03-01 | [dd199312fb...70b85a9b97](https://github.com/OneGov/onegov-cloud/compare/dd199312fb^...70b85a9b97)
+`2021-03-01` | [dd199312fb...70b85a9b97](https://github.com/OneGov/onegov-cloud/compare/dd199312fb^...70b85a9b97)
 
 ### Election Day
 
@@ -1071,7 +1067,7 @@ Adds additional fields to ticket pdf and ticket view.
 
 ## 2021.24
 
-2021-02-25 | [35fac7f40f...b8d872e9cd](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...b8d872e9cd)
+`2021-02-25` | [35fac7f40f...b8d872e9cd](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...b8d872e9cd)
 
 ### Org
 
@@ -1093,7 +1089,7 @@ Fixes issue for browsers not using default by themselves (IE11).
 
 ## 2021.23
 
-2021-02-16 | [9a6179524e...1c525760cf](https://github.com/OneGov/onegov-cloud/compare/9a6179524e^...1c525760cf)
+`2021-02-16` | [9a6179524e...1c525760cf](https://github.com/OneGov/onegov-cloud/compare/9a6179524e^...1c525760cf)
 
 ### Swissvotes
 
@@ -1103,7 +1099,7 @@ Fixes issue for browsers not using default by themselves (IE11).
 
 ## 2021.22
 
-2021-02-15 | [c025d2954e...a1d5d27ced](https://github.com/OneGov/onegov-cloud/compare/c025d2954e^...a1d5d27ced)
+`2021-02-15` | [c025d2954e...a1d5d27ced](https://github.com/OneGov/onegov-cloud/compare/c025d2954e^...a1d5d27ced)
 
 ### Swissvotes
 
@@ -1125,7 +1121,7 @@ Fixes issue for browsers not using default by themselves (IE11).
 
 ## 2021.21
 
-2021-02-11 | [13aae131a1...a278187144](https://github.com/OneGov/onegov-cloud/compare/13aae131a1^...a278187144)
+`2021-02-11` | [13aae131a1...a278187144](https://github.com/OneGov/onegov-cloud/compare/13aae131a1^...a278187144)
 
 ### Org
 
@@ -1141,7 +1137,7 @@ Fixes issue for browsers not using default by themselves (IE11).
 
 ## 2021.20
 
-2021-02-10 | [eb99ea1ef8...52896c2160](https://github.com/OneGov/onegov-cloud/compare/eb99ea1ef8^...52896c2160)
+`2021-02-10` | [eb99ea1ef8...52896c2160](https://github.com/OneGov/onegov-cloud/compare/eb99ea1ef8^...52896c2160)
 
 ### Form
 
@@ -1157,7 +1153,7 @@ Fixes issue for browsers not using default by themselves (IE11).
 
 ## 2021.19
 
-2021-02-10 | [a1d6a50697...f6af388d87](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...f6af388d87)
+`2021-02-10` | [a1d6a50697...f6af388d87](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...f6af388d87)
 
 ### Org
 
@@ -1189,4 +1185,3 @@ Create PDF from (snapshotted) tickets and its messages. Does not iclude any file
 ##### Use thumbnails for additional poster material.
 
 `Feature` | [VOTES-74](https://issues.seantis.ch/browse/VOTES-74) | [3d7ba8e004](https://github.com/onegov/onegov-cloud/commit/3d7ba8e004d87082967c0556d66b12101879e2f4)
-
