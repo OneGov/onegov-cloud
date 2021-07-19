@@ -215,6 +215,15 @@ form {
             margin-top: .25rem !important;
         }
     }
+
+    input.editorjs {
+        display: none;
+    }
+
+    .editorjs-wrapper {
+        @include form-element;
+        height: 100%;
+    }
 }
 
 /*

@@ -15,6 +15,7 @@ setup(
         'onegov.chat',
         'onegov.core',
         'onegov.directory',
+        'onegov.editorjs',
         'onegov.election_day',
         'onegov.event',
         'onegov.feriennet',

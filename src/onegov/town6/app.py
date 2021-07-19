@@ -1,6 +1,7 @@
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.utils import module_path
+from onegov.editorjs.integration import EditorJsApp
 from onegov.foundation6.integration import FoundationApp
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
@@ -9,7 +10,7 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
 from onegov.town6.theme import TownTheme
 
 
-class TownApp(OrgApp, FoundationApp):
+class TownApp(OrgApp, FoundationApp, EditorJsApp):
 
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
@@ -203,6 +204,18 @@ def get_editor_asset():
     yield 'redactor.fr.js'
     yield 'input_with_button.js'
     yield 'editor.js'
+
+
+@TownApp.webasset('editorjs')
+def get_editorjs_asset():
+    yield 'editorjs.min.js'
+    yield 'editorjs.header.min.js'
+    yield 'editorjs.list.min.js'
+    yield 'editorjs.code.min.js'
+    yield 'editorjs.embed.min.js'
+    yield 'editorjs.image.min.js'
+    yield 'editorjs.raw.min.js'
+    yield 'editorjs-init.js'
 
 
 @TownApp.webasset('scoutss-chatbot')

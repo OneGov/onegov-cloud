@@ -27,6 +27,7 @@ LEVELS = (
         'onegov.ballot',
         'onegov.chat',
         'onegov.directory',
+        'onegov.editorjs',
         'onegov.event',
         'onegov.file',
         'onegov.form',

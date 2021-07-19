@@ -7,14 +7,16 @@ from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryEntry
-from onegov.directory.models.directory import DirectoryFile
+from onegov.directory.models.directory import DirectoryFile, Directory
 from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
+from onegov.page import Page
 from onegov.reservation import Resource
 from sqlalchemy.orm import undefer
 from onegov.core.crypto import random_token
+from lxml.html import fragments_fromstring
 
 
 @upgrade_task('Move from town to organisation', always_run=True)
@@ -186,3 +188,32 @@ def cache_news_hashtags_in_meta(context):
             news.hashtags = news.es_tags or []
     except Exception:
         pass
+
+
+@upgrade_task('Migrate all html fields to editor js')
+def upgrade_html_fields_to_editor_js(context):
+    fields_to_model = {
+        'text': [Resource, Directory, Page, FormDefinition],
+        'homepage_cover': [Organisation],
+        'submissions_guideline': [Directory],
+        'change_requests_guideline': [Directory],
+    }
+
+    seen_tags = set()
+
+    def migrate(html):
+        if not html:
+            return
+        fragments = fragments_fromstring(html)
+        for frag in fragments:
+            seen_tags.add(frag.tag)
+
+    session = context.session
+
+    for attr, models in fields_to_model.items():
+        for m in models:
+            for item in session.query(m):
+                migrate(getattr(item, attr))
+
+    print(seen_tags)
+    assert False

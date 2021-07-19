@@ -5,6 +5,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify, paragraphify
+from onegov.editorjs.models import editorjs_meta
 from onegov.org.theme import user_options
 from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
@@ -158,6 +159,8 @@ class Organisation(Base, TimestampMixin):
     chat_customer_id = meta_property()
     hide_chat_for_roles = meta_property(default=tuple)
     disable_chat = meta_property(default=False)
+
+    editor_js_test = editorjs_meta()
 
     @property
     def public_identity(self):
