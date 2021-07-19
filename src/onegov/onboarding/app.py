@@ -11,8 +11,8 @@ class OnboardingApp(Framework, LibresIntegration, DepotApp, ElasticsearchApp):
 
     def configure_onboarding(self, **cfg):
         self.onboarding = cfg['onboarding']
-        assert 'onegov.town' in self.onboarding
-        assert 'namespace' in self.onboarding['onegov.town']
+        assert 'onegov.town6' in self.onboarding
+        assert 'namespace' in self.onboarding['onegov.town6']
 
 
 @OnboardingApp.static_directory()
@@ -34,7 +34,7 @@ def get_theme():
 def get_i18n_localedirs():
     return [
         utils.module_path('onegov.onboarding', 'locale'),
-        utils.module_path('onegov.town', 'locale'),
+        utils.module_path('onegov.town6', 'locale'),
         utils.module_path('onegov.org', 'locale'),
         utils.module_path('onegov.form', 'locale'),
         utils.module_path('onegov.user', 'locale')

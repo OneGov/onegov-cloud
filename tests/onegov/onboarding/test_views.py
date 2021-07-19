@@ -3,7 +3,7 @@ import onegov.onboarding
 
 from onegov.core.utils import Bunch, scan_morepath_modules
 from tests.shared import utils
-from onegov.town import TownApp
+from onegov.town6 import TownApp
 from webtest import TestApp as Client
 
 
@@ -86,11 +86,11 @@ def test_town_create(onboarding_app, temporary_directory, smtp, redis_url):
     username = 'admin@example.org'
     password = a.pyquery('.product dd:nth-child(4)').text()
 
-    scan_morepath_modules(onegov.town.TownApp)
-    morepath.commit(onegov.town.TownApp)
+    scan_morepath_modules(onegov.town6.TownApp)
+    morepath.commit(onegov.town6.TownApp)
 
     town = TownApp()
-    town.namespace = onboarding_app.onboarding['onegov.town']['namespace']
+    town.namespace = onboarding_app.onboarding['onegov.town6']['namespace']
     town.configure_application(
         dsn=onboarding_app.dsn,
         filestorage='fs.osfs.OSFS',
@@ -109,7 +109,6 @@ def test_town_create(onboarding_app, temporary_directory, smtp, redis_url):
     c = Client(town)
     p = c.get('/')
 
-    assert "Willkommen bei der OneGov Cloud" in p
     assert "New York" in p
 
     p = c.get('/auth/login')

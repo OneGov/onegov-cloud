@@ -27,8 +27,8 @@ def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url, redis_url):
         depot_backend='depot.io.memory.MemoryFileStorage',
         redis_url=redis_url,
         onboarding={
-            'onegov.town': {
-                'namespace': 'town_' + uuid4().hex,
+            'onegov.town6': {
+                'namespace': 'town6_' + uuid4().hex,
                 'domain': 'example.org',
                 'configuration': {
                     'depot_backend': 'depot.io.memory.MemoryFileStorage'
