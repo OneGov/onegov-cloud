@@ -18,7 +18,7 @@ class TicketDeletionMixin:
 
     @property
     def ticket_deletable(self):
-        return not self.undecided and self.ticket.state == 'closed'
+        return self.deleted
 
 
 def ticket_submitter(ticket):
