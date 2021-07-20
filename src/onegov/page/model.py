@@ -8,8 +8,9 @@ from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm.abstract import AdjacencyList
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.form.mixins import UTCPublicationMixin
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import UTCPublicationMixin
 
 
 class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):

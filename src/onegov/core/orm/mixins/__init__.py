@@ -1,11 +1,11 @@
-from onegov.core.orm.mixins.content import (
-    content_property,
-    ContentMixin,
-    data_property,
-    dict_property,
-    meta_property,
-)
+from onegov.core.orm.mixins.content import content_property
+from onegov.core.orm.mixins.content import ContentMixin
+from onegov.core.orm.mixins.content import data_property
+from onegov.core.orm.mixins.content import dict_property
+from onegov.core.orm.mixins.content import meta_property
+from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.orm.mixins.timestamp import TimestampMixin
+
 
 __all__ = [
     'content_property',
@@ -14,4 +14,5 @@ __all__ = [
     'dict_property',
     'meta_property',
     'TimestampMixin',
+    'UTCPublicationMixin',
 ]
