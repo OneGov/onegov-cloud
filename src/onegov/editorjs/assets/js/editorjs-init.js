@@ -66,7 +66,6 @@ $('.editorjs').each(function () {
     }
     const editor = new EditorJS(config)
      wrapper.mouseleave(function () {
-         console.log(editor.render())
         editor.save().then((outputData) => {
             if (config.readOnly) return;
             let text = JSON.stringify(outputData);
