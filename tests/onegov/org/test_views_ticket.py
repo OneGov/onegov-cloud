@@ -133,10 +133,10 @@ def test_tickets(client):
     # check subset of ticket which is still decided since it has no
     # registration window
     deleting = tickets_page.click('Löschbar')
-    assert deleting.pyquery('tr.ticket')
+    assert not deleting.pyquery('tr.ticket')
 
     ticket_page = client.get(ticket_url)
-    assert ticket_page.pyquery('.ticket-button.ticket-delete')
+    assert not ticket_page.pyquery('.ticket-button.ticket-delete')
     ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
 
     tickets_page = client.get('/tickets/ALL/pending')
@@ -156,7 +156,7 @@ def test_tickets(client):
 
     # delete the ticket
     client.get(ticket_url).click('Ticket abschliessen').follow()
-    client.get(ticket_url).click('Löschen')
+    # client.get(ticket_url).click('Löschen')
 
 
 def test_ticket_states_idempotent(client):
