@@ -18,10 +18,13 @@
                             <ul>
                                 <li tal:repeat="submission submissions">
                                     <div>
-                                        <strong>
-                                            <a href="${request.link(submission, 'ticket')}">
+                                        <strong tal:define="ticket_url ticket_link(submission)">
+                                            <a tal:condition="ticket_url" href="${request.link(submission, 'ticket')}">
                                                 ${submission.title}
                                             </a>
+                                            <tal:b tal:condition="not: ticket_url">
+                                                ${submission.title}
+                                            </tal:b>
                                         </strong>
                                     </div>
                                     <div>

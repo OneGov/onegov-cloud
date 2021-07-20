@@ -9,7 +9,7 @@ from onegov.form import FormCollection, as_internal_id
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from tests.onegov.org.common import get_mail
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, open_in_browser
 
 
 def test_view_form_alert(client):
@@ -731,7 +731,22 @@ def test_registration_ticket_workflow(client):
 
     # navigate to the registration window an cancel all
     window.click('Anmeldezeitraum absagen')
-    assert 'Storniert (4)' in client.get(window.request.url)
+    page = client.get(window.request.url)
+    assert 'Storniert (4)' in page
+
+    ticket_url = page.pyquery('.field-display a:first-of-type').attr('href')
+
+    # we have the case since the ticket deletion mixin that there might be
+    # a submission without the ticket
+    session = client.app.session()
+    session.query(Ticket).delete('fetch')
+    transaction.commit()
+
+    # the link to the deleted ticket is gone from the view
+    page = client.get(window.request.url)
+    assert not page.pyquery('.field-display a')
+
+    client.get(ticket_url, status=404)
 
 
 def test_registration_not_in_front_of_queue(client):

@@ -203,6 +203,12 @@ def view_registration_window(self, request, layout=None):
 
     layout.editbar_links = editbar_links
 
+    tickets = TicketCollection(request.session)
+
+    def ticket_link(subm):
+        ticket = tickets.by_handler_id(subm.id.hex)
+        return ticket and request.link(ticket) or None
+
     return {
         'layout': layout,
         'title': title,
@@ -212,7 +218,8 @@ def view_registration_window(self, request, layout=None):
             (_("Open"), 'open'),
             (_("Confirmed"), 'confirmed'),
             (_("Cancelled"), 'cancelled'),
-        )
+        ),
+        'ticket_link': ticket_link
     }
 
 
