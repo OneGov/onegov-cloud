@@ -493,12 +493,26 @@ def unmute_ticket(self, request):
 def archive_ticket(self, request):
     assert not self.archived
     self.archived = True
+    TicketMessage.create(self, request, 'archive')
+    request.success(
+        _("You archived ticket ${number}", mapping={
+            'number': self.number
+        }))
+
+    return morepath.redirect(request.link(self))
 
 
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
 def un_archive_ticket(self, request):
     assert self.archived
     self.archived = False
+    TicketMessage.create(self, request, 'unarchive')
+    request.success(
+        _("You recovered ticket ${number} from the archive", mapping={
+            'number': self.number
+        }))
+
+    return morepath.redirect(request.link(self))
 
 
 @OrgApp.form(model=Ticket, name='assign', permission=Private,
