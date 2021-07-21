@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-21 16:09+0200\n"
+"POT-Creation-Date: 2021-07-21 16:34+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -90,6 +90,9 @@ msgstr "Groupes d'utilisateurs"
 
 msgid "Link Check"
 msgstr ""
+
+msgid "Ticket Archive"
+msgstr "Archive des tickets"
 
 msgid "Management"
 msgstr "Gestion"
@@ -1619,7 +1622,9 @@ msgstr "Voulez-vous vraiment supprimer ce ticket ?"
 
 msgid ""
 "All data associated with this ticket will be deleted. This cannot be undone."
-msgstr "Toutes les données associées à ce ticket seront supprimées. Cette opération ne peut être annulée."
+msgstr ""
+"Toutes les données associées à ce ticket seront supprimées. Cette opération "
+"ne peut être annulée."
 
 msgid "Delete Ticket"
 msgstr "Supprimer le ticket"

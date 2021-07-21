@@ -158,6 +158,7 @@ $qr-code-icon: '\f029';
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon-bold('\f0fa'); }
+    .ticket-archive::before { @include icon-bold('\f1c6'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

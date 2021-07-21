@@ -343,6 +343,7 @@ $globals-height: 2.5rem;
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon('\f0fa'); }
+    .ticket-archive::before { @include icon('\f1c6'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

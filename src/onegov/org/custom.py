@@ -5,6 +5,7 @@ from onegov.org.models import GeneralFileCollection, ImageFileCollection, \
     Organisation
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
 
@@ -122,6 +123,15 @@ def get_global_tools(request):
                     _("Link Check"),
                     request.class_link(Organisation, name='link-check'),
                     attrs={'class': 'link-check'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _("Ticket Archive"),
+                    request.class_link(
+                        ArchivedTicketsCollection, {'handler': 'ALL'}),
+                    attrs={'class': 'ticket-archive'}
                 )
             )
 
