@@ -397,21 +397,21 @@ $ticket-filters-padding: .5rem;
         }
     }
 
-    #delete-box {
+    #action-box {
         display: flex;
         flex-direction: column;
         margin-left: 1em;
+    }
 
-        #do-delete {
-            &.ready {
-                color: $alert-color;
-                cursor: pointer;
-                &::before { @include icon-bold($delete-ticket-icon); }
-            }
+    #do-action {
+        &.ready {
+            color: $alert-color;
+            cursor: pointer;
+            &::before { @include icon-bold($delete-ticket-icon); }
+        }
 
-            &::before {
-                @include icon-bold($delete-ticket-icon);
-            }
+        &::before {
+            @include icon-bold($delete-ticket-icon);
         }
     }
 
