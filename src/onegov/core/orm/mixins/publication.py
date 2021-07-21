@@ -1,5 +1,5 @@
 from sedate import utcnow
-from sqlalchemy import Column, case, func
+from sqlalchemy import Column, case, func, and_, not_
 from sqlalchemy.ext.hybrid import hybrid_property
 from onegov.core.orm.types import UTCDateTime
 
@@ -43,3 +43,7 @@ class UTCPublicationMixin:
     @hybrid_property
     def published(self):
         return self.publication_started and not self.publication_ended
+
+    @published.expression
+    def published(cls):
+        return and_(cls.publication_started, not_(cls.publication_ended))

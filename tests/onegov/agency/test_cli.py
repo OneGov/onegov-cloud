@@ -3,10 +3,7 @@ from click.testing import CliRunner
 from onegov.agency.cli import cli
 from onegov.org.cli import cli as org_cli
 from onegov.org.models import Organisation
-from onegov.people.models import Agency
-from onegov.people.models import Person
 from pathlib import Path
-from unittest.mock import patch
 
 
 @pytest.mark.skip('Provide the files if you want to test this import again')

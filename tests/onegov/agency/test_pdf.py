@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import timedelta
 from freezegun import freeze_time
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -6,6 +7,7 @@ from onegov.agency.pdf import AgencyPdfAr
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from PyPDF2 import PdfFileReader
+from sedate import utcnow
 
 
 def test_pdf_page_break_on_level(session):
@@ -138,7 +140,7 @@ def test_agency_pdf_default(session):
     )
 
 
-def test_agency_pdf_default_hidden(session):
+def test_agency_pdf_default_hidden_by_access(session):
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
         last_name="Aeschi",
@@ -170,6 +172,61 @@ def test_agency_pdf_default_hidden(session):
 
     nr.add_person(aeschi.id, "Mitglied von Zug")
     sr.add_person(eder.id, "Ständerat für Zug", access='private')
+
+    file = AgencyPdfDefault.from_agencies(
+        agencies=[bund],
+        title="Staatskalender",
+        toc=False,
+        exclude=[]
+    )
+    reader = PdfFileReader(file)
+    pdf = '\n'.join([
+        reader.getPage(page).extractText()
+        for page in range(reader.getNumPages())
+    ])
+    assert "Bundesrat" not in pdf
+    assert "Nationalrat" in pdf
+    assert "Ständerat" in pdf
+    assert "Mitglied von Zug" not in pdf
+    assert "Aeschi" not in pdf
+    assert "Ständerat für Zug" not in pdf
+    assert "Eder" not in pdf
+
+
+def test_agency_pdf_default_hidden_by_publication(session):
+    then = utcnow() + timedelta(days=7)
+
+    people = ExtendedPersonCollection(session)
+    aeschi = people.add(
+        last_name="Aeschi",
+        first_name="Thomas",
+        publication_start=then
+    )
+    eder = people.add(
+        last_name="Eder",
+        first_name="Joachim"
+    )
+
+    agencies = ExtendedAgencyCollection(session)
+    bund = agencies.add_root(title="Bundesbehörden")
+    agencies.add(
+        parent=bund,
+        title="Bundesrat",
+        publication_start=utcnow() + timedelta(days=7)
+    )
+    nr = agencies.add(
+        parent=bund,
+        title="Nationalrat",
+        export_fields=['membership.title', 'person.title']
+    )
+    sr = agencies.add(
+        parent=bund,
+        title="Ständerat",
+        export_fields=['membership.title', 'person.title']
+    )
+
+    nr.add_person(aeschi.id, "Mitglied von Zug")
+    sr.add_person(eder.id, "Ständerat für Zug", publication_start=then)
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[bund],

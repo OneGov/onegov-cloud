@@ -6,6 +6,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.extensions import PublicationExtension
 from onegov.people import Agency
 from onegov.user import RoleMapping
 from sqlalchemy.orm import object_session
@@ -18,7 +19,7 @@ class AgencyPdf(File):
     __mapper_args__ = {'polymorphic_identity': 'agency_pdf'}
 
 
-class ExtendedAgency(Agency, AccessExtension):
+class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     """ An extended version of the standard agency from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
@@ -27,7 +28,7 @@ class ExtendedAgency(Agency, AccessExtension):
 
     @property
     def es_public(self):
-        return self.access == 'public'
+        return self.access == 'public' and self.published
 
     #: Defines which fields of a membership and person should be exported to
     #: the PDF. The fields are expected to contain two parts seperated by a

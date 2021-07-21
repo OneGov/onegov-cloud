@@ -1,7 +1,9 @@
+from datetime import timedelta
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
+from sedate import utcnow
 from string import ascii_uppercase
 
 
@@ -118,3 +120,10 @@ def test_extended_people_exclude_hidden(session):
 
     person.access = 'public'
     assert people.query().count() == 1
+
+    person.publication_start = utcnow() + timedelta(days=7)
+    assert people.query().count() == 0
+
+    person.publication_start = None
+    person.publication_end = utcnow() - timedelta(days=7)
+    assert people.query().count() == 0

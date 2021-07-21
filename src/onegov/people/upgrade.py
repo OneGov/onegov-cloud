@@ -3,10 +3,14 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 import itertools
+
 from onegov.core.orm.types import JSON
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
-from onegov.people import AgencyMembership, Agency
-from sqlalchemy import Column, Integer
+from onegov.people import Agency
+from onegov.people import AgencyMembership
+from sqlalchemy import Column
+from sqlalchemy import Integer
 from sqlalchemy import Text
 
 
@@ -136,3 +140,14 @@ def add_order_within_person_column(context):
             Column('order_within_person', Integer, nullable=False),
             default=get_index
         )
+
+
+@upgrade_task('Adds publication dates to agency models')
+def add_publication_dates_to_agency_models(context):
+    for table in ('agencies', 'agency_memberships', 'people'):
+        for column in ('publication_start', 'publication_end'):
+            if not context.has_column(table, column):
+                context.operations.add_column(
+                    table,
+                    Column(column, UTCDateTime, nullable=True)
+                )

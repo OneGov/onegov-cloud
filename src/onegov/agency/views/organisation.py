@@ -7,9 +7,10 @@ from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private
 from onegov.org.elements import Link
+from onegov.org.models import Organisation
 from onegov.people import AgencyMembership
 from onegov.people import AgencyMembershipCollection
-from onegov.org.models import Organisation
+from sqlalchemy import or_
 
 
 @AgencyApp.html(
@@ -23,7 +24,10 @@ def view_hidden_agencies(self, request):
 
     agencies = ExtendedAgencyCollection(session).query()
     agencies = agencies.filter(
-        ExtendedAgency.meta['access'] != 'public'
+        or_(
+            ExtendedAgency.meta['access'] != 'public',
+            ExtendedAgency.published.is_(False)
+        )
     )
     agencies = agencies.order_by(None).order_by(ExtendedAgency.title)
     agencies = agencies.all()
@@ -32,14 +36,20 @@ def view_hidden_agencies(self, request):
         order_by='order_within_agency'
     )
     memberships = memberships.filter(
-        AgencyMembership.meta['access'] != 'public'
+        or_(
+            AgencyMembership.meta['access'] != 'public',
+            AgencyMembership.published.is_(False)
+        )
     )
     memberships = memberships.order_by(None).order_by(AgencyMembership.title)
     memberships = memberships.all()
 
     people = ExtendedPersonCollection(session).query()
     people = people.filter(
-        ExtendedPerson.meta['access'] != 'public'
+        or_(
+            ExtendedPerson.meta['access'] != 'public',
+            ExtendedPerson.published.is_(False)
+        )
     )
     people = people.order_by(None).order_by(
         ExtendedPerson.last_name,

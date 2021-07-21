@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timedelta
 from io import BytesIO
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
@@ -251,7 +253,7 @@ def test_views(client):
     assert "noch keine Organisationen" in client.get('/organizations')
 
 
-def test_views_hidden(client):
+def test_views_hidden_by_access(client):
     # Add data
     client.login_editor()
 
@@ -298,11 +300,18 @@ def test_views_hidden(client):
     assert "Nationalrat Zug" in child_membership
     assert "Aeschi Thomas" in child_membership
 
+    # Test listing of hidden items
     hidden = client.get('/').click("Versteckte Inhalte")
     assert "Nationalrat" in hidden
     assert "Mitglied von Zug" in hidden
     assert "Nationalrat Zug" in hidden
     assert "Aeschi Thomas" in hidden
+
+    # Test hints
+    assert 'nicht öffentlich' in client.get(person.request.url)
+    assert 'nicht öffentlich' in client.get(child.request.url)
+    assert 'nicht öffentlich' in client.get(root_membership.request.url)
+    assert 'nicht öffentlich' in client.get(child_membership.request.url)
 
     # Test forbidden views
     client.logout()
@@ -313,8 +322,101 @@ def test_views_hidden(client):
 
     # Test hiding
     assert "Aeschi" not in client.get('/people')
-    assert "Nationalrat" not in client.get('/organizations')
-    assert "Versteckte Einträge" not in client.get('/')
+    assert "Nationalrat" not in client.get(bund.request.url)
+
+    # Hide root
+    client.login_editor()
+    manage = client.get(bund.request.url).click('Bearbeiten')
+    manage.form['access'] = 'private'
+    manage.form.submit()
+    assert 'nicht öffentlich' in client.get(bund.request.url)
+    client.logout()
+    client.get(bund.request.url, status=403)
+    assert "Bundesrat" not in client.get('/organizations')
+
+
+def test_views_hidden_by_publication(client):
+    next_week = datetime.now() + timedelta(days=7)
+
+    # Add data
+    client.login_editor()
+
+    new_person = client.get('/people').click('Person', href='new')
+    new_person.form['first_name'] = 'Thomas'
+    new_person.form['last_name'] = 'Aeschi'
+    new_person.form['publication_start'] = next_week.isoformat()
+    person = new_person.form.submit().follow()
+    assert 'Thomas' in person
+    assert 'Aeschi' in person
+    assert 'Aeschi' in client.get('/people')
+
+    new_agency = client.get('/organizations').click('Organisation', href='new')
+    new_agency.form['title'] = 'Bundesbehörden'
+    bund = new_agency.form.submit().follow()
+    assert 'Bundesbehörden' in bund
+
+    new_agency = bund.click('Organisation', href='new')
+    new_agency.form['title'] = 'Nationalrat'
+    new_agency.form['publication_start'] = next_week.isoformat()
+    child = new_agency.form.submit().follow()
+    assert 'Nationalrat' in child
+    assert 'Nationalrat' in client.get(bund.request.url)
+
+    new_membership = bund.click("Mitgliedschaft", href='new')
+    new_membership.form['title'] = "Mitglied von Zug"
+    new_membership.form['person_id'].select(text="Aeschi Thomas")
+    new_membership.form['publication_start'] = next_week.isoformat()
+    agency = new_membership.form.submit().follow()
+    assert "Mitglied von Zug" in agency
+    assert "Aeschi Thomas" in agency
+    root_membership = agency.click("Mitglied von Zug")
+    assert "Mitglied von Zug" in root_membership
+    assert "Aeschi Thomas" in root_membership
+
+    new_membership = child.click("Mitgliedschaft", href='new')
+    new_membership.form['title'] = "Nationalrat Zug"
+    new_membership.form['person_id'].select(text="Aeschi Thomas")
+    new_membership.form['publication_start'] = next_week.isoformat()
+    agency = new_membership.form.submit().follow()
+    assert "Nationalrat Zug" in agency
+    assert "Aeschi Thomas" in agency
+    child_membership = agency.click("Nationalrat Zug")
+    assert "Nationalrat Zug" in child_membership
+    assert "Aeschi Thomas" in child_membership
+
+    # Test listing of hidden items
+    hidden = client.get('/').click("Versteckte Inhalte")
+    assert "Nationalrat" in hidden
+    assert "Mitglied von Zug" in hidden
+    assert "Nationalrat Zug" in hidden
+    assert "Aeschi Thomas" in hidden
+
+    # Test hints
+    assert 'nicht publiziert' in client.get(person.request.url)
+    assert 'nicht publiziert' in client.get(child.request.url)
+    assert 'nicht publiziert' in client.get(root_membership.request.url)
+    assert 'nicht publiziert' in client.get(child_membership.request.url)
+
+    # Test forbidden views
+    client.logout()
+    client.get(person.request.url, status=403)
+    client.get(child.request.url, status=403)
+    client.get(root_membership.request.url, status=403)
+    client.get(child_membership.request.url, status=403)
+
+    # Test hiding
+    assert "Aeschi" not in client.get('/people')
+    assert "Nationalrat" not in client.get(bund.request.url)
+
+    # Hide root
+    client.login_editor()
+    manage = client.get(bund.request.url).click('Bearbeiten')
+    manage.form['publication_start'] = next_week.isoformat()
+    manage.form.submit()
+    assert 'nicht publiziert' in client.get(bund.request.url)
+    client.logout()
+    client.get(bund.request.url, status=403)
+    assert "Bundesrat" not in client.get('/organizations')
 
 
 def test_view_pdf_settings(client):
