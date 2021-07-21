@@ -3,11 +3,11 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'archive-confirm-modal'">
+        <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'delete-confirm-modal'">
             <tal:block metal:fill-slot="modal_content">
-                <h3 i18n:translate="">Archive all selected tickets?</h3>
+                <h3 i18n:translate="">Delete all selected tickets?</h3>
                 <br>
-                <button id="do-action-confirmed" type="button" class="button alert" i18n:translate>Archive</button>
+                <button id="do-action-confirmed" type="button" class="button alert" i18n:translate>Delete</button>
             </tal:block>
         </tal:block>
         <div class="ticket-filters">
@@ -52,8 +52,8 @@
                             </ul>
                         </div>
                     </span>
-                    <div id="action-box" tal:condition="archive_tickets" title="Archive selected" i18n:attributes="title">
-                        <a id="do-action" class="archive"></a>
+                    <div id="action-box" tal:condition="deleting_tickets" title="Delete selected" i18n:attributes="title">
+                        <a id="do-action" class="delete"></a>
                         <input id="select-all" type="checkbox">
                     </div>
                 </div>
@@ -66,8 +66,8 @@
                data-ready="#do-action"
                data-remove="true"
                data-checkbox-selector="input"
-               data-request-method="POST"
-               data-confirm-modal="#archive-confirm-modal"
+               data-request-method="DELETE"
+               data-confirm-modal="#delete-confirm-modal"
         >
             <tbody>
                 <tal:b condition="not:tickets">

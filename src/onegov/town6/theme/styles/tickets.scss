@@ -101,6 +101,7 @@ $evn-handler-icon: '\f133';
 $dir-handler-icon: '\f07b';
 $pending-ticket-icon: $accept-ticket-icon-hover;
 $my-ticket-icon: '\f2bd';
+$ticket-archive-icon: '\f1c6';
 
 $closed-ticket-icon: $close-ticket-icon-hover;
 $all-ticket-icon: '\f055';
@@ -410,9 +411,18 @@ $ticket-filters-padding: .5rem;
             &::before { @include icon-bold($delete-ticket-icon); }
         }
 
-        &::before {
-            @include icon-bold($delete-ticket-icon);
+        &.delete {
+            &::before {
+                @include icon-bold($delete-ticket-icon);
+            }
         }
+
+        &.archive {
+            &::before {
+                @include icon($ticket-archive-icon);
+            }
+        }
+
     }
 
     li.active .ticket-filter-deletable::before {

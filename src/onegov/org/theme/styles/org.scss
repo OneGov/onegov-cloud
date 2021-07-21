@@ -2539,7 +2539,7 @@ $open-ticket-icon: '\f10c';
 $pending-ticket-icon: '\f192';
 $closed-ticket-icon: '\f05d';
 $all-ticket-icon: '\f055';
-
+$ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
 
 .my-tickets::before {
@@ -2624,8 +2624,16 @@ $ticket-filter-icon-mr: .5em;
             &::before { @include icon($delete-ticket-icon); }
         }
 
-        &::before {
-            @include icon($delete-ticket-icon);
+        &.delete {
+            &::before {
+                @include icon($delete-ticket-icon);
+            }
+        }
+
+        &.archive {
+            &::before {
+                @include icon($ticket-archive-icon);
+            }
         }
     }
 
