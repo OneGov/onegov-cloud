@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-07-07 08:46+0200\n"
+"POT-Creation-Date: 2021-07-21 16:24+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -129,6 +129,9 @@ msgstr "Formulare"
 msgid "Edit"
 msgstr "Bearbeiten"
 
+msgid "QR"
+msgstr ""
+
 msgid "Delete"
 msgstr "Löschen"
 
@@ -157,6 +160,9 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
+msgid "Change Url"
+msgstr "Url ändern"
+
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
 
@@ -184,19 +190,19 @@ msgstr "Tickets"
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
-msgid "Do you really want to close this ticket?"
-msgstr "Möchten Sie dieses Ticket wirklich schliessen?"
+msgid "This ticket can't be closed."
+msgstr ""
 
 msgid "This ticket requires a decision, but no decision has been made yet."
 msgstr ""
 "Dieses Ticket verlangt nach einer Entscheidung, aber bisher wurde keine "
 "Entscheidung gefällt."
 
-msgid "Close ticket"
-msgstr "Ticket abschliessen"
-
 msgid "Assign ticket"
 msgstr "Ticket zuweisen"
+
+msgid "Close ticket"
+msgstr "Ticket abschliessen"
 
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
@@ -463,6 +469,21 @@ msgstr "Verknüpfung löschen"
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
+msgid "Delete all selected tickets?"
+msgstr "Alle ausgewählten Tickets löschen?"
+
+msgid "State:"
+msgstr "Status:"
+
+msgid "Owner:"
+msgstr "Besitzer:"
+
+msgid "Kind:"
+msgstr "Art:"
+
+msgid "Delete selected"
+msgstr "Selektierte löschen"
+
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
 
@@ -629,6 +650,9 @@ msgstr "Logo"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Copied to Clipboard!"
+msgstr "In die Zwischenablage kopiert!"
 
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
@@ -1030,6 +1054,9 @@ msgstr "Fokus"
 
 msgid "Available options for the focus widget:"
 msgstr "Verfügbare Optionen für das Fokus-Widget:"
+
+msgid "Copy to clipboard"
+msgstr "In die Zwischenablage kopieren"
 
 msgid "Hello!"
 msgstr "Guten Tag"
@@ -1755,26 +1782,20 @@ msgstr "Referenz Anfrage"
 msgid "Subject"
 msgstr "Betreff"
 
-msgid ""
-"Forgot something or have a special request? Add a message to the ticket."
-msgstr ""
-"Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen? Dann fügen "
-"Sie der Anfrage eine Nachricht hinzu."
+msgid "Forgot something or have a special request?"
+msgstr "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen?"
+
+msgid "Add a message to the ticket."
+msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
 
-msgid "Delete all selected tickets?"
-msgstr "Alle ausgewählten Tickets löschen?"
+msgid "Archive all selected tickets?"
+msgstr ""
 
-msgid "State:"
-msgstr "Status:"
-
-msgid "Owner:"
-msgstr "Besitzer:"
-
-msgid "Kind:"
-msgstr "Art:"
+msgid "Archive selected"
+msgstr "Selektierte Archivieren"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -1915,6 +1936,15 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Do you really want to close this ticket?"
+#~ msgstr "Möchten Sie dieses Ticket wirklich schliessen?"
+
+#~ msgid ""
+#~ "Forgot something or have a special request? Add a message to the ticket."
+#~ msgstr ""
+#~ "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen? Dann "
+#~ "fügen Sie der Anfrage eine Nachricht hinzu."
 
 #~ msgid "Best regards,"
 #~ msgstr "Mit freundlichen Grüssen,"
