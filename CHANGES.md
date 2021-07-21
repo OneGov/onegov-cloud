@@ -1,8 +1,30 @@
 # Changes
 
+## 2021.69
+
+`2021-07-21` | [ce47e0802a...8b59fe2a9e](https://github.com/OneGov/onegov-cloud/compare/ce47e0802a^...8b59fe2a9e)
+
+### Agency
+
+##### Add publication windows to people, agencies and memberships.
+
+Agency: Add publication windows to people, agencies and memberships.
+
+`Feature` | [STAKABS-32](https://kt-bs.atlassian.net/browse/STAKABS-32) | [8b59fe2a9e](https://github.com/onegov/onegov-cloud/commit/8b59fe2a9e52b2e68d1076c54a7d4727a511b453)
+
+### Org
+
+##### Enable sensible defaults for ticket deletion
+
+- Restrict ticket on tickets here data has been removed and are closed
+- Tickets can not be closed when still requiering a decision
+- Fix error on registration window view if ticket to submission is missing
+
+`Bugfix` | [SEA-378](https://linear.app/seantis/issue/SEA-378) | [7ea2a293a1](https://github.com/onegov/onegov-cloud/commit/7ea2a293a1c7bcb6fec15a2d839038c0a2d8759d)
+
 ## 2021.68
 
-`2021-07-20` | [f9a40771a4...554a65007e](https://github.com/OneGov/onegov-cloud/compare/f9a40771a4^...554a65007e)
+`2021-07-20` | [f9a40771a4...9c0b161b06](https://github.com/OneGov/onegov-cloud/compare/f9a40771a4^...9c0b161b06)
 
 ### Onboarding
 
@@ -1160,39 +1182,4 @@ Fixes issue for browsers not using default by themselves (IE11).
 ##### Extends directory config to hide labels in main view
 
 `Feature` | [SEA-92](https://linear.app/seantis/issue/SEA-92) | [eb99ea1ef8](https://github.com/onegov/onegov-cloud/commit/eb99ea1ef84535cae1652f5dc0189e2784bd1b9d)
-
-## 2021.19
-
-`2021-02-10` | [a1d6a50697...f6af388d87](https://github.com/OneGov/onegov-cloud/compare/a1d6a50697^...f6af388d87)
-
-### Org
-
-##### Improves newsletter sending (for news)
-
-Adds preview to newsletter sending form. Adds option to choose
-newsletter item text instead of the lead when sending a newsletter.
-
-`Feature` | [SEA-109](https://linear.app/seantis/issue/SEA-109) | [67bacc49f9](https://github.com/onegov/onegov-cloud/commit/67bacc49f961c342442233b9cc7db69f500c543d)
-
-##### Adds the form data to confirmation email in reservations
-
-`Feature` | [SEA-112](https://linear.app/seantis/issue/SEA-112) | [c6527d2f71](https://github.com/onegov/onegov-cloud/commit/c6527d2f7100d4bb54559c1d06438fb0b2f932da)
-
-##### Enable pick up information display for resources
-
-Shows pick up hint if available on /ticket/../status instead of general info.
-
-`Feature` | [SEA-97](https://linear.app/seantis/issue/SEA-97) | [97d1a480ac](https://github.com/onegov/onegov-cloud/commit/97d1a480ac2aea93472c0c80af2327ab8a79b87a)
-
-##### Adds generic PDF's for tickets
-
-Create PDF from (snapshotted) tickets and its messages. Does not iclude any files into the PDF.
-
-`Feature` | [SEA-89](https://linear.app/seantis/issue/SEA-89) | [d3ea0464b2](https://github.com/onegov/onegov-cloud/commit/d3ea0464b2e4d32d70cf32107e7bc0bf8b4d8649)
-
-### Swissvotes
-
-##### Use thumbnails for additional poster material.
-
-`Feature` | [VOTES-74](https://issues.seantis.ch/browse/VOTES-74) | [3d7ba8e004](https://github.com/onegov/onegov-cloud/commit/3d7ba8e004d87082967c0556d66b12101879e2f4)
 
