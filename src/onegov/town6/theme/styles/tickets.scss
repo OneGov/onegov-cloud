@@ -292,7 +292,14 @@ tr.ticket:hover {
     }
 }
 
+.ticket-archive {
+    float: right;
 
+    &::before {
+        @include icon($ticket-archive-icon);
+        margin-right: 1ex;
+    }
+}
 
 /*
     Tickets filter dropdown

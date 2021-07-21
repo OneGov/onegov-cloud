@@ -2542,6 +2542,7 @@ $closed-ticket-icon: '\f05d';
 $all-ticket-icon: '\f055';
 $ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
+$archive-ticket-icon: '\f1c6';
 
 .my-tickets::before {
     @include icon($my-ticket-icon);
@@ -2802,6 +2803,13 @@ tr.ticket:hover {
 
     &:hover::before {
         content: $assign-ticket-icon-hover;
+    }
+}
+
+.ticket-archive {
+    &::before {
+        @include icon($archive-ticket-icon);
+        margin-right: 1ex;
     }
 }
 

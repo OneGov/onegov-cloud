@@ -61,6 +61,6 @@ def town_view_tickets(self, request):
 
 
 @TownApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
-             permission=Private)
+              permission=Private)
 def town_view_archived_tickets(self, request):
     return view_archived_tickets(self, request, TicketsLayout(self, request))

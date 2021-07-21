@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-21 16:34+0200\n"
+"POT-Creation-Date: 2021-07-21 17:34+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1616,6 +1616,12 @@ msgstr "Ticket abschliessen"
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
 
+msgid "Archive ticket"
+msgstr "Ticket archivieren"
+
+msgid "Recover from archive"
+msgstr "Aus dem Archiv holen"
+
 msgid "Do you really want to delete this ticket?"
 msgstr "Möchten Sie das Ticket wirklich löschen?"
 
@@ -3148,6 +3154,12 @@ msgstr "Ticket E-Mails aktiviert."
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
 
+msgid "Ticket archived."
+msgstr "Ticket archiviert."
+
+msgid "Ticket recovered from archive."
+msgstr "Ticket aus dem Archiv geholt."
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
@@ -4535,6 +4547,14 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 #, python-format
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
+
+#, python-format
+msgid "You archived ticket ${number}"
+msgstr "Sie haben das Ticket ${number} archiviert"
+
+#, python-format
+msgid "You recovered ticket ${number} from the archive"
+msgstr "Sie haben Ticket ${number} aus dem Archiv geholt"
 
 msgid "The ticket has already been closed"
 msgstr "Das Ticket wurde bereits geschlossen"
