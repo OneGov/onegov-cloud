@@ -18,7 +18,13 @@ class TicketDeletionMixin:
 
     @property
     def ticket_deletable(self):
-        return not self.undecided and self.ticket.state == 'closed'
+        return self.deleted and self.ticket.state == 'closed'
+
+    def prepare_delete_ticket(self):
+        """The handler knows best what to do when a ticket is called for
+        deletion. """
+        assert self.ticket_deletable
+        pass
 
 
 def ticket_submitter(ticket):
@@ -168,6 +174,29 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
             return True
 
         return False
+
+    def prepare_delete_ticket(self):
+        if self.submission:
+            for file in self.submission.files:
+                self.session.delete(file)
+            self.session.delete(self.submission)
+
+    @property
+    def ticket_deletable(self):
+        """Todo: Finalize implementing ticket deletion """
+        if self.deleted:
+            return True
+        return False
+        #  ...for later when deletion will be available
+        if not self.ticket.state == 'closed':
+            return False
+        if self.payment:
+            # For now we do not handle this case since payment might be
+            # needed for exports
+            return False
+        if self.undecided:
+            return False
+        return True
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)

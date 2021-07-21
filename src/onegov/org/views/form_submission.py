@@ -16,6 +16,7 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.pay import Price
 from purl import URL
+from webob.exc import HTTPNotFound
 
 
 def copy_query(request, url, fields):
@@ -231,6 +232,8 @@ def handle_complete_submission(self, request):
 @OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)
 def view_submission_ticket(self, request):
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+    if not ticket:
+        raise HTTPNotFound()
     return request.redirect(request.link(ticket))
 
 

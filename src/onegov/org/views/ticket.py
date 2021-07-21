@@ -121,20 +121,19 @@ def view_ticket(self, request, layout=None):
 
 @OrgApp.view(model=Ticket, permission=Private, request_method='DELETE')
 def delete_ticket(self, request):
+    """ Deleting a ticket means getting rid of all the data associated with it
+    """
     request.assert_valid_csrf_token()
     assert self.state == 'closed'
-
-    # check the handler
-    if self.handler.undecided:
-        request.warning(_("This ticket requires a decision, but no "
-                        "decision has been made yet."))
-        return
+    assert self.handler.ticket_deletable
 
     messages = MessageCollection(
         request.session, channel_id=self.number)
 
     for message in messages.query():
         messages.delete(message)
+
+    self.handler.prepare_delete_ticket()
 
     request.session.delete(self)
     if not request.params.get('quiet'):

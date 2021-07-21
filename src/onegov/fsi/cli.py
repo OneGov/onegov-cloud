@@ -359,6 +359,12 @@ def test_ldap(base, search_filter, ldap_server, ldap_username, ldap_password,
     Search for an email: (mail=walter.roderer@zg.ch)
     Search for names: (&(zgXGivenName=Vorname)(zgXSurname=Nachname))
     Search for mail ending in: (mail=*@phgz.ch)
+
+    onegov-fsi --select /fsi/zug test-ldap --base 'ou=Kanton,o=KTZG' \
+      --ldap-server 'ldaps://.....' \
+      --ldap-username 'user' \
+      --ldap-password 'xxxx' --search-filter "(mail=*@zg.ch)"
+
     """
 
     def sort_func(entry):

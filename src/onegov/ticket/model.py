@@ -73,6 +73,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: true if the notifications for this ticket should be muted
     muted = Column(Boolean, nullable=False, default=False)
 
+    #: if the ticket is archived
+    archived = Column(Boolean, nullable=False, default=False)
+
     # override the created attribute from the timestamp mixin - we don't want
     # it to be deferred by default because we usually need it
     @declared_attr

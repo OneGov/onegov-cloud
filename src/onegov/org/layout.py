@@ -1082,13 +1082,12 @@ class TicketLayout(DefaultLayout):
 
                 if self.model.handler.undecided:
                     traits = (
-                        Confirm(
-                            _("Do you really want to close this ticket?"),
+                        Block(
+                            _("This ticket can't be closed."),
                             _(
                                 "This ticket requires a decision, but no "
                                 "decision has been made yet."
                             ),
-                            _("Close ticket"),
                             _("Cancel")
                         ),
                     )
@@ -1114,7 +1113,8 @@ class TicketLayout(DefaultLayout):
                         traits=(
                             Confirm(
                                 _("Do you really want to delete this ticket?"),
-                                _("This cannot be undone."),
+                                _("All data associated with this ticket will "
+                                  "be deleted. This cannot be undone."),
                                 _("Delete Ticket"),
                                 _("Cancel")
                             ),
