@@ -674,11 +674,23 @@ class TicketLayout(DefaultLayout):
                 ))
 
             elif self.model.state == 'closed':
-                links.append(Link(
-                    text=_("Reopen ticket"),
-                    url=self.request.link(self.model, 'reopen'),
-                    attrs={'class': ('ticket-button', 'ticket-reopen')}
-                ))
+                if not self.model.archived:
+                    links.append(Link(
+                        text=_("Reopen ticket"),
+                        url=self.request.link(self.model, 'reopen'),
+                        attrs={'class': ('ticket-button', 'ticket-reopen')}
+                    ))
+                    links.append(Link(
+                        text=_("Archive ticket"),
+                        url=self.request.link(self.model, 'archive'),
+                        attrs={'class': ('ticket-button', 'ticket-archive')})
+                    )
+                else:
+                    links.append(Link(
+                        text=_('Recover from archive'),
+                        url=self.request.link(self.model, 'unarchive'),
+                        attrs={'class': ('ticket-button', 'ticket-reopen')}
+                    ))
                 handler = self.model.handler
                 if handler.ticket_deletable:
                     links.append(Link(
