@@ -1,5 +1,15 @@
 # Changes
 
+## 2021.68
+
+`2021-07-20` | [f9a40771a4...554a65007e](https://github.com/OneGov/onegov-cloud/compare/f9a40771a4^...554a65007e)
+
+### Onboarding
+
+##### Change to town6
+
+`Other` | [SEA-265](https://linear.app/seantis/issue/SEA-265) | [554a65007e](https://github.com/onegov/onegov-cloud/commit/554a65007e75e763e39a0c5085bb5c3c48d9b8b9)
+
 ## 2021.67
 
 `2021-07-17` | [a20fdb76e6...1cc14ad7ec](https://github.com/OneGov/onegov-cloud/compare/a20fdb76e6^...1cc14ad7ec)
@@ -64,8 +74,8 @@ Will redirect the user to the broken directory entry with missing file hint
 
 ##### Add direct phone number to search index.
 
-There are two new settings to enable direct phone numbers in the search
-index. Direct phone numbers are simply the last n digits of the phone or
+There are two new settings to enable direct phone numbers in the search 
+index. Direct phone numbers are simply the last n digits of the phone or 
 direct phone number. Direct phone numbers are suggest when searching.
 
 `Feature` | [STAKABS-33](https://kt-bs.atlassian.net/browse/STAKABS-33) | [7db6e64a97](https://github.com/onegov/onegov-cloud/commit/7db6e64a97a0413bca3a91cf1c01b65c046a4627)
@@ -74,8 +84,8 @@ direct phone number. Direct phone numbers are suggest when searching.
 
 ##### Add ticket inbox and ticket assignments.
 
-Adds a 'My Tickets' views where all pending and open tickets of the
-currently logged-in user are displayed. Furthermore, it's now possible
+Adds a 'My Tickets' views where all pending and open tickets of the 
+currently logged-in user are displayed. Furthermore, it's now possible 
 to assign a ticket to another user.
 
 `Feature` | [STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25) | [fd3d3fef03](https://github.com/onegov/onegov-cloud/commit/fd3d3fef031741b56bf2927de212ffbd5f8f7082)
@@ -505,7 +515,7 @@ Shows german banner version for all languages.
 
 ##### Add honeypot fields.
 
-A honey pot field is hidden using CSS and therefore not visible for
+A honey pot field is hidden using CSS and therefore not visible for 
 users
 but bots (probably). We expect this field to be empty at any
 time and throw an error if provided as well as adding a log message to
@@ -569,8 +579,8 @@ Serialization and deserialization now take place within the CacheRegion so that 
 
 ##### Adds permissions for tickets.
 
-User groups have now a setting to restrain access to specific ticket
-categories. If one is defined, only users within groups with that
+User groups have now a setting to restrain access to specific ticket 
+categories. If one is defined, only users within groups with that 
 setting has access to the tickets in that category.
 
 `Feature` | [SEA-254](https://linear.app/seantis/issue/SEA-254) | [b901fc94c5](https://github.com/onegov/onegov-cloud/commit/b901fc94c516c4539d0127214059d8785176a6c0)
@@ -613,7 +623,7 @@ setting has access to the tickets in that category.
 
 ##### Add screens.
 
-Screens allow to show tables, charts and other widgets for a given vote
+Screens allow to show tables, charts and other widgets for a given vote 
 or election in a flexible way.
 
 `Feature` | [SEA-147](https://linear.app/seantis/issue/SEA-147) | [d3be6d7077](https://github.com/onegov/onegov-cloud/commit/d3be6d70771e0615b3373096eb2a714d2fd66055)
@@ -748,9 +758,9 @@ Fixes IconField in DirectoryForm town6.
 
 ##### Removes possibility to create majorz election compounds.
 
-Currently, one can define election compounds with majorz elections but
-these don't contain lists results, which we display. Since such
-compounds are historically possible, but are not really a use case at
+Currently, one can define election compounds with majorz elections but 
+these don't contain lists results, which we display. Since such 
+compounds are historically possible, but are not really a use case at 
 the moment, we drop this feature.
 
 `Bugfix` | [fb9c2824a7](https://github.com/onegov/onegov-cloud/commit/fb9c2824a7ef1871e3f29444408ee8f9838dae67)
@@ -1185,3 +1195,4 @@ Create PDF from (snapshotted) tickets and its messages. Does not iclude any file
 ##### Use thumbnails for additional poster material.
 
 `Feature` | [VOTES-74](https://issues.seantis.ch/browse/VOTES-74) | [3d7ba8e004](https://github.com/onegov/onegov-cloud/commit/3d7ba8e004d87082967c0556d66b12101879e2f4)
+

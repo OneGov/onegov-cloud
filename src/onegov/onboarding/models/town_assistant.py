@@ -9,7 +9,7 @@ from onegov.onboarding.errors import AlreadyExistsError
 from onegov.onboarding.forms import FinishForm, TownForm
 from onegov.onboarding.layout import MailLayout
 from onegov.onboarding.models.assistant import Assistant
-from onegov.town.initial_content import create_new_organisation
+from onegov.town6.initial_content import create_new_organisation
 from onegov.org.models import Organisation
 from onegov.user import UserCollection
 
@@ -17,7 +17,7 @@ _valid_subdomain = re.compile(r'^[a-z0-9]+[a-z0-9-]+[a-z0-9]+$')
 
 
 class TownAssistant(Assistant):
-    """ An assistant guiding a user through onegov.town onboarding. """
+    """ An assistant guiding a user through onegov.town6 onboarding. """
 
     @Assistant.step(form=TownForm)
     def first_step(self, request, form):
@@ -114,7 +114,7 @@ class TownAssistant(Assistant):
 
     @property
     def config(self):
-        return self.app.onboarding['onegov.town']
+        return self.app.onboarding['onegov.town6']
 
     def get_subdomain(self, name):
         return utils.normalize_for_url(name)
