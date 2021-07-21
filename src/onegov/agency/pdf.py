@@ -50,7 +50,7 @@ class AgencyPdfDefault(Pdf):
             pdf.table_of_contents()
             pdf.pagebreak()
         for agency in agencies:
-            if agency.access == 'private':
+            if agency.access == 'private' or not agency.published:
                 continue
             pdf.agency(agency, exclude,
                        content_so_far=False,
@@ -69,6 +69,7 @@ class AgencyPdfDefault(Pdf):
             if (
                 membership.access == 'private'
                 or membership.person.access == 'private'
+                or not membership.published
             ):
                 continue
 
@@ -147,7 +148,7 @@ class AgencyPdfDefault(Pdf):
             self.end_keeptogether()
 
         for child in agency.children:
-            if child.access == 'private':
+            if child.access == 'private' or not child.published:
                 continue
             child_has_content = self.agency(
                 child, exclude, level + 1, has_content,

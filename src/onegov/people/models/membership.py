@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -13,7 +14,8 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
+                       UTCPublicationMixin):
     """ A membership to an agency. """
 
     __tablename__ = 'agency_memberships'

@@ -1,9 +1,11 @@
 from onegov.core.orm.mixins import meta_property
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.extensions import PublicationExtension
 from onegov.people import AgencyMembership
 
 
-class ExtendedAgencyMembership(AgencyMembership, AccessExtension):
+class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
+                               PublicationExtension):
     """ An extended version of the standard membership from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
@@ -15,9 +17,13 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension):
         if self.agency:
             if self.agency.meta.get('access', 'public') != 'public':
                 return False
+            if not self.agency.published:
+                return False
 
         if self.person:
             if self.person.meta.get('access', 'public') != 'public':
+                return False
+            if not self.person.published:
                 return False
 
         return self.access == 'public'

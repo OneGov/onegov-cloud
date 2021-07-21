@@ -1,10 +1,11 @@
+from onegov.org.models import Organisation
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.extensions import PublicationExtension
 from onegov.people import Person
 from sqlalchemy.orm import object_session
-from onegov.org.models import Organisation
 
 
-class ExtendedPerson(Person, AccessExtension):
+class ExtendedPerson(Person, AccessExtension, PublicationExtension):
     """ An extended version of the standard person from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
@@ -13,7 +14,7 @@ class ExtendedPerson(Person, AccessExtension):
 
     @property
     def es_public(self):
-        return self.access == 'public'
+        return self.access == 'public' and self.published
 
     es_properties = {
         'title': {'type': 'text'},

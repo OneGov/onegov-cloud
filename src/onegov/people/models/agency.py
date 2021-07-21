@@ -3,6 +3,7 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
@@ -19,7 +20,8 @@ class AgencyOrganigram(File):
     __mapper_args__ = {'polymorphic_identity': 'agency_organigram'}
 
 
-class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
+class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
+             UTCPublicationMixin):
     """ An agency (organization) containing people through memberships. """
 
     __tablename__ = 'agencies'

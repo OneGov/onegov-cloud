@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -11,7 +12,8 @@ from vobject.vcard import Address
 from vobject.vcard import Name
 
 
-class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
+             UTCPublicationMixin):
     """ A person. """
 
     __tablename__ = 'people'

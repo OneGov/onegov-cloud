@@ -62,7 +62,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
                 or_(
                     ExtendedPerson.meta['access'] == 'public',
                     ExtendedPerson.meta['access'] == None,
-                )
+                ),
+                ExtendedPerson.published == True
             )
         if self.letter:
             query = query.filter(

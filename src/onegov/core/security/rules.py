@@ -17,6 +17,9 @@ def has_permission_not_logged_in(app, identity, model, permission):
     if getattr(model, 'access', None) == 'private':
         return False
 
+    if getattr(model, 'published', None) == False:
+        return False
+
     return permission in app.settings.roles.anonymous
 
 

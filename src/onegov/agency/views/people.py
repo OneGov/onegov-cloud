@@ -186,12 +186,11 @@ def view_person(self, request):
     }
 
 
-# todo: Public????
 @AgencyApp.html(
     model=ExtendedPerson,
     template='sort.pt',
     name='sort',
-    permission=Public
+    permission=Private
 )
 def view_sort_person(self, request):
     layout = ExtendedPersonLayout(self, request)

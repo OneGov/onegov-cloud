@@ -92,6 +92,8 @@ class ExtendedAgencyForm(Form):
                 model.organigram_file = self.organigram.raw_data[-1].file
         if hasattr(self, 'access'):
             model.access = self.access.data
+        model.publication_start = self.publication_start.data
+        model.publication_end = self.publication_end.data
 
     def reorder_export_fields(self):
         titles = dict(self.export_fields.choices)
@@ -114,6 +116,8 @@ class ExtendedAgencyForm(Form):
             self.organigram.data = self.organigram.process_fieldstorage(fs)
         if hasattr(self, 'access'):
             self.access.data = model.access
+        self.publication_start.process_data(model.publication_start)
+        self.publication_end.process_data(model.publication_end)
 
         self.reorder_export_fields()
 
