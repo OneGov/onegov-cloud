@@ -70,6 +70,7 @@ class AgencyPdfDefault(Pdf):
                 membership.access == 'private'
                 or membership.person.access == 'private'
                 or not membership.published
+                or not membership.person.published
             ):
                 continue
 

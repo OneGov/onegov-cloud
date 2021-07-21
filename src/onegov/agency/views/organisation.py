@@ -26,7 +26,7 @@ def view_hidden_agencies(self, request):
     agencies = agencies.filter(
         or_(
             ExtendedAgency.meta['access'] != 'public',
-            ExtendedAgency.published == False
+            ExtendedAgency.published.is_(False)
         )
     )
     agencies = agencies.order_by(None).order_by(ExtendedAgency.title)
@@ -38,7 +38,7 @@ def view_hidden_agencies(self, request):
     memberships = memberships.filter(
         or_(
             AgencyMembership.meta['access'] != 'public',
-            AgencyMembership.published == False
+            AgencyMembership.published.is_(False)
         )
     )
     memberships = memberships.order_by(None).order_by(AgencyMembership.title)
@@ -48,7 +48,7 @@ def view_hidden_agencies(self, request):
     people = people.filter(
         or_(
             ExtendedPerson.meta['access'] != 'public',
-            ExtendedPerson.published == False
+            ExtendedPerson.published.is_(False)
         )
     )
     people = people.order_by(None).order_by(

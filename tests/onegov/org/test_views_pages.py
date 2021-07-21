@@ -177,7 +177,7 @@ def test_hide_page(client):
         edit_page.form['publication_end'] = '2019-02-01T00:00'
         edit_page.form.submit().follow()
 
-    anonymous.get(page_url, status=404)
+    anonymous.get(page_url, status=403)
     anon = client.spawn()
     page = anon.get('/topics/organisation')
 
