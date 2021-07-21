@@ -66,7 +66,7 @@
                data-ready="#do-action"
                data-remove="true"
                data-checkbox-selector="input"
-               data-request-method="POST"
+               data-request-method="GET"
                data-confirm-modal="#archive-confirm-modal"
         >
             <tbody>
