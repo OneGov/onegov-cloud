@@ -257,9 +257,9 @@ def delete_form_definition(self, request):
         ticket = submission_deletable(submission, request.session)
         if ticket is False:
             raise exc.HTTPMethodNotAllowed()
-
-        close_ticket(ticket, request.current_user, request)
-        ticket.create_snapshot(request)
+        if ticket is not True:
+            close_ticket(ticket, request.current_user, request)
+            ticket.create_snapshot(request)
 
     def handle_submissions(submissions):
         for s in submissions:
