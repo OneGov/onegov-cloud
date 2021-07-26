@@ -1,8 +1,53 @@
 # Changes
 
+## 2021.70
+
+`2021-07-26` | [0301017794...f2c661324f](https://github.com/OneGov/onegov-cloud/compare/0301017794^...f2c661324f)
+
+### Org
+
+##### Adds Ticket Archive
+
+- Adds batch archving to /tickets
+- Enable Deletion of tickets in /ticket-archive
+- Adds Ticket Archive to management links
+- Migrates archived state to ticket.state
+
+`Feature` | [SEA-378](https://linear.app/seantis/issue/SEA-378) | [f208f1530e](https://github.com/onegov/onegov-cloud/commit/f208f1530e8c3b409a902216ef4b328aea75fa7c)
+
+##### Adds deletion of form definitions
+
+Makes deleting of forms definitions with submission, files and registration window possible.
+Tickets are snapshotted before object is deleted.
+
+`Feature` | [SEA_392](#SEA_392) | [ca5893a81b](https://github.com/onegov/onegov-cloud/commit/ca5893a81b3f3d731d8d6f98c4215c21e38ee383)
+
+### Ticket
+
+##### Adapt TicketCollection for archived
+
+- return ticket count filtered by archived
+- Adds TicketsArchive collection
+
+`Other` | [16599a2e51](https://github.com/onegov/onegov-cloud/commit/16599a2e5101ca6d96b33d740665100da1414a18)
+
+### Town6
+
+##### Adds deletion of forms with submissions
+
+- Adds check of a form definition with submissions is deletable
+- Changes delete button on town6 /form/{name} accordingly
+- Use safeguard for forms without registration windows: All tickets must be closed
+Deleting forms submissions that have a registration window only possible when:
+- no tickets of any submissions are open. In that case, the user is supposed to cancel the window first.
+- there are no undecided submission
+Before deleting the submission, a ticket snapshot is made and all tickets of any submissions are closed.
+
+`Feature` | [SEA-392](https://linear.app/seantis/issue/SEA-392) | [2616c517bb](https://github.com/onegov/onegov-cloud/commit/2616c517bb29d185ad97508fe3e7cd96b6e76798)
+
 ## 2021.69
 
-`2021-07-21` | [ce47e0802a...8b59fe2a9e](https://github.com/OneGov/onegov-cloud/compare/ce47e0802a^...8b59fe2a9e)
+`2021-07-21` | [ce47e0802a...25cd05cfa7](https://github.com/OneGov/onegov-cloud/compare/ce47e0802a^...25cd05cfa7)
 
 ### Agency
 
@@ -1166,20 +1211,4 @@ Fixes issue for browsers not using default by themselves (IE11).
 ##### Add slider to frontpage.
 
 `Feature` | [VOTES-79](https://issues.seantis.ch/browse/VOTES-79) | [abaf934683](https://github.com/onegov/onegov-cloud/commit/abaf934683e4ab8fa0bf4c463df23a862af6eb43)
-
-## 2021.20
-
-`2021-02-10` | [eb99ea1ef8...52896c2160](https://github.com/OneGov/onegov-cloud/compare/eb99ea1ef8^...52896c2160)
-
-### Form
-
-##### Removes deprecated DateTimeField everywhere
-
-`Feature` | [SEA-111](https://linear.app/seantis/issue/SEA-111) | [9f4af033d2](https://github.com/onegov/onegov-cloud/commit/9f4af033d229b53fc22046166f4961d2fa79b4bb)
-
-### Org
-
-##### Extends directory config to hide labels in main view
-
-`Feature` | [SEA-92](https://linear.app/seantis/issue/SEA-92) | [eb99ea1ef8](https://github.com/onegov/onegov-cloud/commit/eb99ea1ef84535cae1652f5dc0189e2784bd1b9d)
 
