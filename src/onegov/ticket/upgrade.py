@@ -90,16 +90,7 @@ def add_muted_state_to_ticket(context):
 
 @upgrade_task('Add archived flag to ticket')
 def add_archived_flag_to_ticket(context):
-    if context.has_column('tickets', 'archived'):
-        return False
-
-    context.add_column_with_defaults(
-        'tickets', Column(
-            'archived',
-            Boolean,
-            nullable=False,
-            default=False
-        ), default=lambda x: False)
+    pass
 
 
 @upgrade_task('Add archived as a state and remove flag')
