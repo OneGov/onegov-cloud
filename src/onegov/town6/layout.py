@@ -283,8 +283,8 @@ class NewsLayout(AdjacencyListLayout):
 
     @cached_property
     def contact_html(self):
-        return self.model.contact_html or '<ul><li>{}</li></ul>'.format(
-            '</li><li>'.join(linkify(self.org.contact).splitlines())
+        return self.model.contact_html or to_html_ul(
+            self.org.contact, convert_dashes=False
         )
 
 
