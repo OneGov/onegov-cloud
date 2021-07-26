@@ -413,6 +413,54 @@ def paragraphify(text):
     ))
 
 
+def to_html_ul(value, convert_dashes=True):
+    """Linkify and convert to html.
+    If convert dashes is true, the html will treat
+
+    My list
+    - A
+    - B
+
+    like markdown converting it to individual ul's
+    """
+    if not value:
+        return ''
+    if not convert_dashes:
+        return '<ul><li>{}</li></ul>'.format(
+            '</li><li>'.join(linkify(value).splitlines())
+        )
+
+    elements = []
+    temp_li = []
+
+    def ul(inner, bulleted=False):
+        return f'<ul class="bulleted">{inner}</ul>' if bulleted \
+            else f'<ul>{inner}</ul>'
+
+    def li(inner):
+        return f'<li>{inner}</li>'
+
+    was_bulleted = False
+    for line in linkify(value).splitlines():
+        now_bullet = line.startswith('-')
+        if now_bullet:
+            line = line.lstrip('-')
+            if not was_bulleted and temp_li:
+                elements.append(ul(''.join(temp_li)))
+                temp_li = []
+        elif was_bulleted and temp_li:
+            elements.append(ul(''.join(temp_li), bulleted=True))
+            temp_li = []
+
+        temp_li.append(li(line))
+        was_bulleted = now_bullet
+
+    if temp_li:
+        elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
+
+    return ''.join(elements)
+
+
 def ensure_scheme(url, default='http'):
     """ Makes sure that the given url has a scheme in front, if none
     was provided.

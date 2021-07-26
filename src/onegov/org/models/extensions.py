@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
-from onegov.core.utils import linkify, normalize_for_url
+from onegov.core.utils import linkify, normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
@@ -127,39 +127,7 @@ class ContactExtension(ContentExtension):
     @contact.setter
     def contact(self, value):
         self.content['contact'] = value
-
-        if value:
-            elements = []
-            temp_li = []
-
-            def ul(inner, bulleted=False):
-                return f'<ul class="bulleted">{inner}</ul>' if bulleted \
-                    else f'<ul>{inner}</ul>'
-
-            def li(inner):
-                return f'<li>{inner}</li>'
-
-            was_bulleted = False
-            for line in linkify(value).splitlines():
-                now_bullet = line.startswith('-')
-                if now_bullet:
-                    line = line.lstrip('-')
-                    if not was_bulleted and temp_li:
-                        elements.append(ul(''.join(temp_li)))
-                        temp_li = []
-                elif was_bulleted and temp_li:
-                    elements.append(ul(''.join(temp_li), bulleted=True))
-                    temp_li = []
-
-                temp_li.append(li(line))
-                was_bulleted = now_bullet
-
-            if temp_li:
-                elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
-
-            self.content['contact_html'] = ''.join(elements)
-        else:
-            self.content['contact_html'] = ""
+        self.content['contact_html'] = to_html_ul(value, convert_dashes=True)
 
     @property
     def contact_html(self):
