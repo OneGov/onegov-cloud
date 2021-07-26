@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
-from onegov.core.utils import linkify, normalize_for_url, to_html_ul
+from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _

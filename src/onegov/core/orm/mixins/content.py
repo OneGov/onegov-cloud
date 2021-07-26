@@ -93,7 +93,7 @@ class dict_property(object):
             @content.setter
             def set_content(self, value):
                 self.meta['content'] = value
-                self.meta['content_html'] = to_html(value)
+                self.meta['content_html'] = to_html_ul(value)
 
             @content.deleter
             def del_content(self):
