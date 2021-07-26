@@ -18,6 +18,7 @@ from onegov.org.models import (
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection
+from onegov.org.models.form import submission_deletable
 from onegov.org.utils import IMG_URLS
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection, PaymentCollection
@@ -364,6 +365,13 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
         ]
 
     @cached_property
+    def can_delete_form(self):
+        return all(
+            submission_deletable(submission, self.request.session)
+            for submission in self.form.submissions
+        )
+
+    @cached_property
     def editbar_links(self):
 
         if not self.request.is_manager:
@@ -390,7 +398,7 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
             attrs={'class': 'qr-code-link'}
         )
 
-        if self.form.has_submissions(with_state='complete'):
+        if not self.can_delete_form:
             delete_link = Link(
                 text=_("Delete"),
                 attrs={'class': 'delete-link'},

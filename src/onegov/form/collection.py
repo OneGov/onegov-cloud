@@ -99,14 +99,22 @@ class FormDefinitionCollection(object):
 
         return form
 
-    def delete(self, name, with_submissions=False,
-               with_registration_windows=False):
+    def delete(
+            self,
+            name,
+            with_submissions=False,
+            with_registration_windows=False,
+            handle_submissions=None,
+            handle_registration_windows=None,
+    ):
         """ Delete the given form. Only possible if there are no submissions
         associated with it, or if ``with_submissions`` is True.
 
         Note that pending submissions are removed automatically, only complete
         submissions have a bearing on ``with_submissions``.
 
+        Pass two callbacks to handle additional logic before deleting the
+        objects.
         """
         submissions = self.session.query(FormSubmission)
         submissions = submissions.filter(FormSubmission.name == name)
@@ -114,11 +122,22 @@ class FormDefinitionCollection(object):
         if not with_submissions:
             submissions = submissions.filter(FormSubmission.state == 'pending')
 
+        if handle_submissions:
+            handle_submissions(submissions)
+
+        # fails if there are linked files in files_for_submissions_files
+        for submission in submissions:
+            for file in submission.files:
+                self.session.delete(file)
         submissions.delete()
 
         if with_registration_windows:
             registration_windows = self.session.query(FormRegistrationWindow)
             registration_windows = registration_windows.filter_by(name=name)
+
+            if handle_registration_windows:
+                handle_registration_windows(registration_windows)
+
             registration_windows.delete()
             self.session.flush()
 

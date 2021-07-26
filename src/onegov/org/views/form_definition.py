@@ -4,12 +4,15 @@ from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
 from onegov.org import _, OrgApp
+from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
 from onegov.org.forms.form_definition import FormDefinitionUrlForm
 from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
 from onegov.org.models import CustomFormDefinition
 from webob import exc
+
+from onegov.org.models.form import submission_deletable
 
 
 def get_form_class(model, request):
@@ -65,7 +68,6 @@ def get_hints(layout, window):
 
 
 def handle_form_change_name(form, session, new_name):
-    """ We also have to deal with the already existing tickets. """
     new_form = form.for_new_name(new_name)
     session.add(new_form)
     session.flush()
@@ -232,14 +234,40 @@ def handle_edit_definition(self, request, form, layout=None):
 @OrgApp.view(model=FormDefinition, request_method='DELETE',
              permission=Private)
 def delete_form_definition(self, request):
+    """
+    With introduction of cancelling submissions over the registration window,
+    we encourage the user to use this functionality to cancel all form
+    submissions through the ticket system.
+
+    This ensures all submissions are cancelled/denied and the tickets are
+    closed.In that case the ticket itself attached to the submission is
+    deletable.
+
+    If the customer wants to delete the form directly, we allow it now even
+    when there are completed submissions. In each case there is a ticket
+    associated with it we might take a snapshot before deleting it.
+    """
 
     request.assert_valid_csrf_token()
 
     if self.type != 'custom':
         raise exc.HTTPMethodNotAllowed()
 
-    if self.has_submissions(with_state='complete'):
-        raise exc.HTTPMethodNotAllowed()
+    def handle_ticket(submission):
+        ticket = submission_deletable(submission, request.session)
+        if ticket is False:
+            raise exc.HTTPMethodNotAllowed()
+        if ticket is not True:
+            close_ticket(ticket, request.current_user, request)
+            ticket.create_snapshot(request)
+
+    def handle_submissions(submissions):
+        for s in submissions:
+            handle_ticket(s)
 
     FormCollection(request.session).definitions.delete(
-        self.name, with_submissions=False, with_registration_windows=True)
+        self.name,
+        with_submissions=True,
+        with_registration_windows=True,
+        handle_submissions=handle_submissions
+    )
