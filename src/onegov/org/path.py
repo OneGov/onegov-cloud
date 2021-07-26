@@ -297,13 +297,12 @@ def get_archived_tickets(
     return ArchivedTicketsCollection(
         app.session(),
         handler=handler,
-        state='closed',
+        state='archived',
         page=page,
         group=group,
         owner=owner or '*',
         extra_parameters=extra_parameters,
         deleting=deleting,
-        archived=True
     )
 
 

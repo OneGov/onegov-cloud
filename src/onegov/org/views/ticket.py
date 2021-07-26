@@ -491,8 +491,7 @@ def unmute_ticket(self, request):
 
 @OrgApp.view(model=Ticket, name='archive', permission=Private)
 def archive_ticket(self, request):
-    assert not self.archived
-    self.archived = True
+    self.archive_ticket()
     TicketMessage.create(self, request, 'archive')
     request.success(
         _("You archived ticket ${number}", mapping={
@@ -504,8 +503,7 @@ def archive_ticket(self, request):
 
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
 def un_archive_ticket(self, request):
-    assert self.archived
-    self.archived = False
+    self.unarchive_ticket(request.current_user)
     TicketMessage.create(self, request, 'unarchive')
     request.success(
         _("You recovered ticket ${number} from the archive", mapping={
@@ -686,7 +684,7 @@ def get_filters(self, request):
         # Make some room in the ui
         if self.deleting and id == 'open':
             continue
-        if self.archived:
+        if self.state == 'archived':
             continue
         yield Link(
             text=text,
@@ -694,14 +692,13 @@ def get_filters(self, request):
             active=self.state == id,
             attrs={'class': 'ticket-filter-' + id}
         )
-    if self.state == 'closed':
-        if self.archived:
-            yield Link(
-                text=_("Deletable"),
-                url=request.link(self.for_deletion(not self.deleting)),
-                active=self.deleting,
-                attrs={'class': 'ticket-filter-deletable'}
-            )
+    if self.state == 'archived':
+        yield Link(
+            text=_("Deletable"),
+            url=request.link(self.for_deletion(not self.deleting)),
+            active=self.deleting,
+            attrs={'class': 'ticket-filter-deletable'}
+        )
 
 
 def get_groups(self, request, groups, handler):
@@ -829,7 +826,7 @@ def view_tickets(self, request, layout=None):
         'tickets_title': tickets_title,
         'tickets_state': self.state,
         'deleting_tickets': self.deleting,
-        'archive_tickets': not self.archived and self.state == 'closed',
+        'archive_tickets': self.state == 'closed',
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'handler': handler,

@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
-from sqlalchemy import Boolean, Column, Integer, Text
+from sqlalchemy import Boolean, Column, Integer, Text, Enum
 
 
 @upgrade_task('Add handler_id to ticket', always_run=True)
@@ -100,3 +100,46 @@ def add_archived_flag_to_ticket(context):
             nullable=False,
             default=False
         ), default=lambda x: False)
+
+
+@upgrade_task('Add archived as a state and remove flag')
+def add_archived_state_to_ticket(context):
+    if context.has_column('tickets', 'archived'):
+        context.operations.drop_column('tickets', 'archived')
+
+    old_type = Enum(
+        'open',
+        'pending',
+        'closed',
+        name='ticket_state'
+    )
+    new_type = Enum(
+        'open',
+        'pending',
+        'closed',
+        'archived',
+        name='ticket_state'
+    )
+    tmp_type = Enum(
+        'open',
+        'pending',
+        'closed',
+        'archived',
+        name='ticket_state_'
+    )
+    op = context.operations
+    tmp_type.create(op.get_bind(), checkfirst=False)
+
+    op.execute("""
+        ALTER  TABLE tickets ALTER COLUMN state TYPE ticket_state_
+        USING state::text::ticket_state_;
+    """)
+
+    old_type.drop(op.get_bind(), checkfirst=False)
+    new_type.create(context.operations.get_bind(), checkfirst=False)
+
+    op.execute("""
+        ALTER TABLE tickets ALTER COLUMN state TYPE ticket_state
+        USING state::text::ticket_state
+    """)
+    tmp_type.drop(context.operations.get_bind(), checkfirst=False)
