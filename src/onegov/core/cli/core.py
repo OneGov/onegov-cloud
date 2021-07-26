@@ -507,7 +507,7 @@ def command_group():
             print(e)
             sys.exit(1)
 
-    @command_group.resultcallback()
+    @command_group.result_callback()
     def process_results(processor, select, config):
         """ Calls the function returned by the command once for each
         application matching the selector.

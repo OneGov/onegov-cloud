@@ -13,7 +13,6 @@ from wtforms import validators, StringField, RadioField, \
 class GeneralSettingsForm(OrgGeneralSettingsForm):
     """ Defines the settings form for onegov org. """
 
-    # Todo: Add those fields after primary color
     body_font_family_ui = ChosenSelectField(
         label=_('Font family serif'),
         description=_('Used for text in html body'),

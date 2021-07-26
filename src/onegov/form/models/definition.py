@@ -45,7 +45,6 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     submissions = relationship('FormSubmission', backref='form')
 
     #: link between forms and registration windows
-    # Todo: remove order_by SADeprecation Warning
     registration_windows = relationship(
         'FormRegistrationWindow',
         backref='form',
