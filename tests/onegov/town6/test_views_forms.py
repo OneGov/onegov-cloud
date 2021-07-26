@@ -1,8 +1,6 @@
 import textwrap
 from datetime import date
 
-import pytest
-
 from onegov.form import FormCollection
 from onegov.ticket import Ticket
 from onegov.user import UserCollection
