@@ -37,8 +37,8 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
         return tuple(set(super().extensions + ['honeypot']))
 
 
-def submission_deletable(submission, session):
-    """ CustomFormDefinition are normally linked to a ticket.
+def submission_deletable(submission, session, payment_blocks=True):
+    """ CustomFormDefinition's are normally linked to a ticket.
 
     Submissions without registration window do not require a decision. The
     ticket state decides, whether the form definition can be deleted to
@@ -53,10 +53,11 @@ def submission_deletable(submission, session):
         if not ticket:
             return True
         if ticket.state == 'open':
-            return False
+            return ticket
         if ticket.handler.undecided:
             return False
-
     elif ticket and ticket.state != 'closed':
+        return False
+    if payment_blocks and submission.payment:
         return False
     return ticket
