@@ -125,15 +125,10 @@ def test_tickets(client):
     tickets_page = client.get('/tickets/ALL/closed')
 
     # the toggle for the deletion of the current subset
-    assert tickets_page.pyquery('a.ticket-filter-deletable')
+    assert not tickets_page.pyquery('a.ticket-filter-deletable')
     ticket_rows = tickets_page.pyquery('tr.ticket')
     assert len(ticket_rows) == 1
     assert ticket_rows.attr('data-url')
-
-    # check subset of ticket which is still decided since it has no
-    # registration window
-    deleting = tickets_page.click('Löschbar')
-    assert not deleting.pyquery('tr.ticket')
 
     ticket_page = client.get(ticket_url)
     assert not ticket_page.pyquery('.ticket-button.ticket-delete')
@@ -154,9 +149,27 @@ def test_tickets(client):
     assert "Ihre Anfrage wurde wieder " in message
     assert '/status' in message
 
-    # delete the ticket
+    # archive the ticket
     client.get(ticket_url).click('Ticket abschliessen').follow()
-    # client.get(ticket_url).click('Löschen')
+    ticket = client.get(ticket_url)
+    assert 'Löschen' not in ticket
+    ticket.click('Ticket archivieren').follow()
+
+    archived_ticket = client.get(ticket_url)
+    assert 'Ticket wieder öffnen' not in archived_ticket
+    archived_ticket = archived_ticket.click('Aus dem Archiv holen').follow()
+    assert 'aus dem Archiv geholt' in archived_ticket
+    archived_ticket.click('Ticket archivieren').follow()
+
+    archive = client.get('/tickets-archive/ALL')
+    assert archive.pyquery('tr.ticket')
+    assert archive.pyquery('a.ticket-filter-deletable')
+    archive = archive.click('Löschbar')
+    assert not archive.pyquery('tr.ticket')
+
+    # test security
+    anon = client.spawn()
+    anon.get(ticket_url + '/archive', status=403)
 
 
 def test_ticket_states_idempotent(client):

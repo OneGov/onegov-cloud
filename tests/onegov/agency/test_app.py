@@ -65,7 +65,7 @@ def test_app_custom(agency_app):
         {'Peter': ['User Profile', 'Logout']},
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
                         'Settings', 'Users', 'User groups', 'Link Check',
-                        'Hidden contents']},
+                        'Ticket Archive', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]

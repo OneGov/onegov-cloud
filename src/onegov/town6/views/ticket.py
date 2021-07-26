@@ -1,6 +1,8 @@
 from onegov.core.security import Public, Private
 from onegov.org.views.ticket import view_ticket, handle_new_note, \
-    handle_edit_note, message_to_submitter, view_ticket_status, view_tickets
+    handle_edit_note, message_to_submitter, view_ticket_status, view_tickets, \
+    view_archived_tickets
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import TicketNoteForm
 from onegov.org.forms import TicketChatMessageForm
@@ -56,3 +58,9 @@ def town_view_ticket_status(self, request, form):
               permission=Private)
 def town_view_tickets(self, request):
     return view_tickets(self, request, TicketsLayout(self, request))
+
+
+@TownApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
+              permission=Private)
+def town_view_archived_tickets(self, request):
+    return view_archived_tickets(self, request, TicketsLayout(self, request))

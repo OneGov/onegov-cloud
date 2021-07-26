@@ -1898,7 +1898,7 @@
 
 <metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.org">
     <tr tal:define="ticket_url request.link(ticket); has_access request.is_manager_for_model(ticket)"
-            class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}" tal:attributes="data-url delete_link(ticket) if has_access else nothing">
+            class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}" tal:attributes="data-url action_link(ticket) if has_access else nothing">
         <tal:block tal:condition="has_access">
           <td class="ticket-number-plain">
               <a href="${ticket_url}">
@@ -1940,7 +1940,7 @@
             ${ticket.number}
         </td>
       </tal:block>
-        <td tal:condition="deleting_tickets">
+        <td tal:condition="deleting_tickets or archive_tickets">
             <input tal:condition="has_access" type="checkbox">
         </td>
   </tr>

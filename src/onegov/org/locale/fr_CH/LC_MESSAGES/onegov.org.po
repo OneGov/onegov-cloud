@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-16 08:01+0200\n"
+"POT-Creation-Date: 2021-07-26 08:45+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -90,6 +90,9 @@ msgstr "Groupes d'utilisateurs"
 
 msgid "Link Check"
 msgstr ""
+
+msgid "Ticket Archive"
+msgstr "Archive des tickets"
 
 msgid "Management"
 msgstr "Gestion"
@@ -1602,8 +1605,8 @@ msgstr "Supprimer la personne"
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
 
-msgid "Do you really want to close this ticket?"
-msgstr "Voulez-vous vraiment fermer ce ticket?"
+msgid "This ticket can't be closed."
+msgstr ""
 
 msgid "This ticket requires a decision, but no decision has been made yet."
 msgstr "Ce ticket nécessite une décision, mais aucune n'a encore été prise."
@@ -1614,8 +1617,20 @@ msgstr "Fermer le ticket"
 msgid "Reopen ticket"
 msgstr "Ré-ouvrir le ticket"
 
+msgid "Archive ticket"
+msgstr "Archiver le ticket"
+
+msgid "Recover from archive"
+msgstr "Récupérer dans les archives"
+
 msgid "Do you really want to delete this ticket?"
 msgstr "Voulez-vous vraiment supprimer ce ticket ?"
+
+msgid ""
+"All data associated with this ticket will be deleted. This cannot be undone."
+msgstr ""
+"Toutes les données associées à ce ticket seront supprimées. Cette opération "
+"ne peut être annulée."
 
 msgid "Delete Ticket"
 msgstr "Supprimer le ticket"
@@ -2287,6 +2302,21 @@ msgstr "Sommaire"
 
 msgid "No rules defined."
 msgstr "Aucune règle définie."
+
+msgid "Delete all selected tickets?"
+msgstr "Supprimer tous les tickets sélectionnés ?"
+
+msgid "State:"
+msgstr "État :"
+
+msgid "Owner:"
+msgstr "Propriétaire :"
+
+msgid "Kind:"
+msgstr "Type :"
+
+msgid "Delete selected"
+msgstr "Supprimer la sélection"
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -3123,6 +3153,12 @@ msgstr "E-mails de tickets activés."
 msgid "Payment amount changed."
 msgstr "Modification du montant du paiement"
 
+msgid "Ticket archived."
+msgstr "Ticket a été archivé"
+
+msgid "Ticket recovered from archive."
+msgstr "Ticket récupéré dans les archives"
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
@@ -3455,17 +3491,14 @@ msgstr "Ajoutez un message a la demande."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
 
-msgid "Delete all selected tickets?"
-msgstr "Supprimer tous les tickets sélectionnés ?"
+msgid "Archive all selected tickets?"
+msgstr "Archiver tous les billets sélectionnés?"
 
-msgid "State:"
-msgstr "État :"
+msgid "Do archive"
+msgstr "Archiver"
 
-msgid "Owner:"
-msgstr "Propriétaire :"
-
-msgid "Kind:"
-msgstr "Type :"
+msgid "Archive selected"
+msgstr "Archiver la sélection"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -4532,6 +4565,14 @@ msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Vous avez activé les e-mails pour le ticket ${number}"
 
+#, python-format
+msgid "You archived ticket ${number}"
+msgstr "Vous avez archivé le ticket avec le numéro ${number}"
+
+#, python-format
+msgid "You recovered ticket ${number} from the archive"
+msgstr ""
+
 msgid "The ticket has already been closed"
 msgstr "Le ticket a déjà été fermé"
 
@@ -4576,8 +4617,11 @@ msgstr "Tous les tickets"
 msgid "All Users"
 msgstr "Tous les utilisateurs"
 
+msgid "Archived Tickets"
+msgstr "Tickets archivés"
+
 msgid "Added a new user group"
-msgstr ""
+msgstr "Un nouveau groupe d'utilisateurs a été ajouté"
 
 msgid "New user group"
 msgstr "Nouveau groupe d'utilisateurs"
@@ -4605,6 +4649,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Do you really want to close this ticket?"
+#~ msgstr "Voulez-vous vraiment fermer ce ticket?"
 
 #~ msgid ""
 #~ "Disable showing the copy link '#' for the site reference. The references "

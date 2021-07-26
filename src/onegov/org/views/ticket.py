@@ -25,6 +25,7 @@ from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
 from purl import URL
@@ -488,6 +489,30 @@ def unmute_ticket(self, request):
     return morepath.redirect(request.link(self))
 
 
+@OrgApp.view(model=Ticket, name='archive', permission=Private)
+def archive_ticket(self, request):
+    self.archive_ticket()
+    TicketMessage.create(self, request, 'archive')
+    request.success(
+        _("You archived ticket ${number}", mapping={
+            'number': self.number
+        }))
+
+    return morepath.redirect(request.link(self))
+
+
+@OrgApp.view(model=Ticket, name='unarchive', permission=Private)
+def un_archive_ticket(self, request):
+    self.unarchive_ticket(request.current_user)
+    TicketMessage.create(self, request, 'unarchive')
+    request.success(
+        _("You recovered ticket ${number} from the archive", mapping={
+            'number': self.number
+        }))
+
+    return morepath.redirect(request.link(self))
+
+
 @OrgApp.form(model=Ticket, name='assign', permission=Private,
              form=TicketAssignmentForm, template='form.pt')
 def assign_ticket(self, request, form, layout=None):
@@ -646,111 +671,123 @@ def view_ticket_status(self, request, form, layout=None):
     }
 
 
-@OrgApp.html(model=TicketCollection, template='tickets.pt',
-             permission=Private)
-def view_tickets(self, request, layout=None):
+def get_filters(self, request):
+    yield Link(
+        text=_("My"),
+        url=request.link(
+            self.for_state('!closed').for_owner(request.current_user.id)
+        ),
+        active=self.state == '!closed',
+        attrs={'class': 'ticket-filter-my'}
+    )
+    for id, text in TICKET_STATES.items():
+        # Make some room in the ui
+        if self.deleting and id == 'open':
+            continue
+        if self.state == 'archived':
+            continue
+        yield Link(
+            text=text,
+            url=request.link(self.for_state(id).for_owner(None)),
+            active=self.state == id,
+            attrs={'class': 'ticket-filter-' + id}
+        )
+    if self.state == 'archived':
+        yield Link(
+            text=_("Deletable"),
+            url=request.link(self.for_deletion(not self.deleting)),
+            active=self.deleting,
+            attrs={'class': 'ticket-filter-deletable'}
+        )
+
+
+def get_groups(self, request, groups, handler):
+    base = self.for_handler(handler)
+
+    for group in groups[handler]:
+        yield Link(
+            text=group,
+            url=request.link(base.for_group(group)),
+            active=self.handler == handler and self.group == group,
+            attrs={'class': ' '.join(
+                (handler + '-sub-link', 'ticket-group-filter')
+            )}
+        )
+
+
+def get_handlers(self, request, groups):
+
+    handlers = []
+
+    for key, handler in ticket_handlers.registry.items():
+        if key in groups:
+            handlers.append(
+                (key, request.translate(handler.handler_title)))
+
+    handlers.sort(key=lambda item: item[1])
+    handlers.insert(0, ('ALL', _("All Tickets")))
+
+    for id, text in handlers:
+        grouplinks = id != 'ALL' and tuple(
+            get_groups(self, request, groups, id))
+        parent = grouplinks and len(grouplinks) > 1
+        classes = parent and (id + '-link', 'is-parent') or (id + '-link',)
+
+        yield Link(
+            text=text,
+            url=request.link(self.for_handler(id).for_group(None)),
+            active=self.handler == id and self.group is None,
+            attrs={'class': ' '.join(classes)}
+        )
+
+        if parent:
+            yield from grouplinks
+
+
+def get_owners(self, request):
+
+    users = UserCollection(request.session)
+    users = users.by_roles(*request.app.settings.org.ticket_manager_roles)
+    users = users.order_by(User.title)
+
+    yield Link(
+        text=_("All Users"),
+        url=request.link(self.for_owner('*')),
+        active=self.owner == '*'
+    )
+
+    for user in users:
+        yield Link(
+            text=user.title,
+            url=request.link(self.for_owner(user.id)),
+            active=self.owner == user.id.hex,
+            model=user
+        )
+
+
+def groups_by_handler_code(session):
     query = as_selectable("""
-        SELECT
-            handler_code,                         -- Text
-            ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-        FROM tickets GROUP BY handler_code
-    """)
+            SELECT
+                handler_code,                         -- Text
+                ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
+            FROM tickets GROUP BY handler_code
+        """)
 
     groups = {
         r.handler_code: r.groups
-        for r in request.session.execute(select(query.c))
+        for r in session.execute(select(query.c))
     }
-
     for handler in groups:
         groups[handler].sort(key=lambda g: normalize_for_url(g))
 
-    def get_filters():
-        yield Link(
-            text=_("My"),
-            url=request.link(
-                self.for_state('!closed').for_owner(request.current_user.id)
-            ),
-            active=self.state == '!closed',
-            attrs={'class': 'ticket-filter-my'}
-        )
-        for id, text in TICKET_STATES.items():
-            # Make some room in the ui
-            if self.deleting and id == 'open':
-                continue
-            yield Link(
-                text=text,
-                url=request.link(self.for_state(id).for_owner(None)),
-                active=self.state == id,
-                attrs={'class': 'ticket-filter-' + id}
-            )
-        if self.state == 'closed':
-            yield Link(
-                text=_("Deletable"),
-                url=request.link(self.for_deletion(not self.deleting)),
-                active=self.deleting,
-                attrs={'class': 'ticket-filter-deletable'}
-            )
+    return groups
 
-    def get_handlers():
-        nonlocal groups
 
-        handlers = []
+@OrgApp.html(model=TicketCollection, template='tickets.pt',
+             permission=Private)
+def view_tickets(self, request, layout=None):
 
-        for key, handler in ticket_handlers.registry.items():
-            if key in groups:
-                handlers.append(
-                    (key, request.translate(handler.handler_title)))
-
-        handlers.sort(key=lambda item: item[1])
-        handlers.insert(0, ('ALL', _("All Tickets")))
-
-        for id, text in handlers:
-            grouplinks = id != 'ALL' and tuple(get_groups(id))
-            parent = grouplinks and len(grouplinks) > 1
-            classes = parent and (id + '-link', 'is-parent') or (id + '-link',)
-
-            yield Link(
-                text=text,
-                url=request.link(self.for_handler(id).for_group(None)),
-                active=self.handler == id and self.group is None,
-                attrs={'class': ' '.join(classes)}
-            )
-
-            if parent:
-                yield from grouplinks
-
-    def get_owners():
-
-        users = UserCollection(request.session)
-        users = users.by_roles(*request.app.settings.org.ticket_manager_roles)
-        users = users.order_by(User.title)
-
-        yield Link(
-            text=_("All Users"),
-            url=request.link(self.for_owner('*')),
-            active=self.owner == '*'
-        )
-
-        for user in users:
-            yield Link(
-                text=user.title,
-                url=request.link(self.for_owner(user.id)),
-                active=self.owner == user.id.hex,
-                model=user
-            )
-
-    def get_groups(handler):
-        base = self.for_handler(handler)
-
-        for group in groups[handler]:
-            yield Link(
-                text=group,
-                url=request.link(base.for_group(group)),
-                active=self.handler == handler and self.group == group,
-                attrs={'class': ' '.join(
-                    (handler + '-sub-link', 'ticket-group-filter')
-                )}
-            )
+    groups = groups_by_handler_code(request.session)
 
     if self.state == 'open':
         tickets_title = _("Open Tickets")
@@ -768,17 +805,16 @@ def view_tickets(self, request, layout=None):
     if not self.state == 'closed':
         self.deleting = False
 
-    handlers = tuple(get_handlers())
-    owners = tuple(get_owners())
-    filters = tuple(get_filters())
+    handlers = tuple(get_handlers(self, request, groups))
+    owners = tuple(get_owners(self, request))
+    filters = tuple(get_filters(self, request))
 
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
     layout = layout or TicketsLayout(self, request)
 
-    def delete_link(ticket):
-        url = URL(request.link(ticket)).query_param('quiet', '1')
-        return layout.csrf_protected_url(url.as_string())
+    def archive_link(ticket):
+        return layout.csrf_protected_url(request.link(ticket, name='archive'))
 
     return {
         'title': _("Tickets"),
@@ -790,9 +826,49 @@ def view_tickets(self, request, layout=None):
         'tickets_title': tickets_title,
         'tickets_state': self.state,
         'deleting_tickets': self.deleting,
+        'archive_tickets': self.state == 'closed',
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'handler': handler,
         'owner': owner,
-        'delete_link': delete_link
+        'action_link': archive_link
+    }
+
+
+@OrgApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
+             permission=Private)
+def view_archived_tickets(self, request, layout=None):
+
+    groups = groups_by_handler_code(request.session)
+
+    tickets_title = _("Archived Tickets")
+
+    handlers = tuple(get_handlers(self, request, groups))
+    owners = tuple(get_owners(self, request))
+    filters = tuple(get_filters(self, request))
+
+    handler = next((h for h in handlers if h.active), None)
+    owner = next((o for o in owners if o.active), None)
+    layout = layout or TicketsLayout(self, request)
+
+    def delete_link(ticket):
+        url = URL(request.link(ticket)).query_param('quiet', '1')
+        return layout.csrf_protected_url(url.as_string())
+
+    return {
+        'title': tickets_title,
+        'layout': layout,
+        'tickets': self.batch,
+        'filters': filters,
+        'handlers': handlers,
+        'owners': owners,
+        'tickets_title': tickets_title,
+        'tickets_state': self.state,
+        'deleting_tickets': self.deleting,
+        'archive_tickets': False,
+        'has_handler_filter': self.handler != 'ALL',
+        'has_owner_filter': self.owner != '*',
+        'handler': handler,
+        'owner': owner,
+        'action_link': delete_link
     }

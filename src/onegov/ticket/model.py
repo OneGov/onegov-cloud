@@ -73,9 +73,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: true if the notifications for this ticket should be muted
     muted = Column(Boolean, nullable=False, default=False)
 
-    #: if the ticket is archived
-    archived = Column(Boolean, nullable=False, default=False)
-
     # override the created attribute from the timestamp mixin - we don't want
     # it to be deferred by default because we usually need it
     @declared_attr
@@ -88,6 +85,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             'open',
             'pending',
             'closed',
+            'archived',
             name='ticket_state'
         ),
         nullable=False,
@@ -208,6 +206,20 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         self.last_state_change = self.timestamp()
         self.state = 'pending'
+        self.user = user
+
+    def archive_ticket(self):
+        if self.state != 'closed':
+            raise InvalidStateChange()
+
+        self.last_state_change = self.timestamp()
+        self.state = 'archived'
+
+    def unarchive_ticket(self, user):
+        if self.state != 'archived':
+            raise InvalidStateChange()
+        self.last_state_change = self.timestamp()
+        self.state = 'closed'
         self.user = user
 
     def create_snapshot(self, request):

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-16 08:01+0200\n"
+"POT-Creation-Date: 2021-07-26 08:45+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -89,6 +89,9 @@ msgstr "Benutzergruppen"
 
 msgid "Link Check"
 msgstr ""
+
+msgid "Ticket Archive"
+msgstr "Ticket-Archiv"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -1599,8 +1602,8 @@ msgstr "Person löschen"
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
-msgid "Do you really want to close this ticket?"
-msgstr "Möchten Sie dieses Ticket wirklich schliessen?"
+msgid "This ticket can't be closed."
+msgstr ""
 
 msgid "This ticket requires a decision, but no decision has been made yet."
 msgstr ""
@@ -1613,8 +1616,20 @@ msgstr "Ticket abschliessen"
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
 
+msgid "Archive ticket"
+msgstr "Ticket archivieren"
+
+msgid "Recover from archive"
+msgstr "Aus dem Archiv holen"
+
 msgid "Do you really want to delete this ticket?"
 msgstr "Möchten Sie das Ticket wirklich löschen?"
+
+msgid ""
+"All data associated with this ticket will be deleted. This cannot be undone."
+msgstr ""
+"Alle mit diesem Ticket verbundenen Daten werden gelöscht. Dies kann nicht "
+"rückgängig gemacht werden."
 
 msgid "Delete Ticket"
 msgstr "Ticket löschen"
@@ -2290,6 +2305,21 @@ msgstr "Zusammenfassung"
 
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
+
+msgid "Delete all selected tickets?"
+msgstr "Alle ausgewählten Tickets löschen?"
+
+msgid "State:"
+msgstr "Status:"
+
+msgid "Owner:"
+msgstr "Besitzer:"
+
+msgid "Kind:"
+msgstr "Art:"
+
+msgid "Delete selected"
+msgstr "Selektierte löschen"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -3124,6 +3154,12 @@ msgstr "Ticket E-Mails aktiviert."
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
 
+msgid "Ticket archived."
+msgstr "Ticket archiviert."
+
+msgid "Ticket recovered from archive."
+msgstr "Ticket aus dem Archiv geholt."
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
@@ -3447,17 +3483,14 @@ msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
 
-msgid "Delete all selected tickets?"
-msgstr "Alle ausgewählten Tickets löschen?"
+msgid "Archive all selected tickets?"
+msgstr "Alle ausgewählten Tickets archivieren?"
 
-msgid "State:"
-msgstr "Status:"
+msgid "Do archive"
+msgstr "Archivieren"
 
-msgid "Owner:"
-msgstr "Besitzer:"
-
-msgid "Kind:"
-msgstr "Art:"
+msgid "Archive selected"
+msgstr "Selektierte Archivieren"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -4518,6 +4551,14 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
 
+#, python-format
+msgid "You archived ticket ${number}"
+msgstr "Sie haben das Ticket ${number} archiviert"
+
+#, python-format
+msgid "You recovered ticket ${number} from the archive"
+msgstr "Sie haben Ticket ${number} aus dem Archiv geholt"
+
 msgid "The ticket has already been closed"
 msgstr "Das Ticket wurde bereits geschlossen"
 
@@ -4562,6 +4603,9 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
+msgid "Archived Tickets"
+msgstr "Archivierte Tickets"
+
 msgid "Added a new user group"
 msgstr "Benutzergruppe hinzugefügt"
 
@@ -4591,6 +4635,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Do you really want to close this ticket?"
+#~ msgstr "Möchten Sie dieses Ticket wirklich schliessen?"
 
 #~ msgid ""
 #~ "Disable showing the copy link '#' for the site reference. The references "

@@ -55,7 +55,7 @@ $('[data-items-deletable]').each(function () {
         });
     })
 
-    var callforDeletion = function(item, onSuccess){
+    var callforAction = function(item, onSuccess){
         $.ajax({
             type: requestMethod,
             url: item.data('url'),
@@ -84,7 +84,7 @@ $('[data-items-deletable]').each(function () {
         seletableItems.each(function () {
             var el = $(this);
             if (!checked(el)) return
-            callforDeletion(el, onSuccess);
+            callforAction(el, onSuccess);
         })
         if(modalTarget) {
             confirmModal.foundation('reveal', 'close');
