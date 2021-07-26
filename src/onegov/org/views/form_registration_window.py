@@ -277,11 +277,12 @@ def view_cancel_submissions_for_registration_window(self, request):
         if ticket and ticket.state == 'open':
             accept_ticket(ticket, request)
 
-        handle_submission_action(
-            submission, request, action, ignore_csrf=True, raises=True,
-            no_messages=True, force_email=ticket.muted
-        )
         if ticket:
+            handle_submission_action(
+                submission, request, action, ignore_csrf=True, raises=True,
+                no_messages=True, force_email=ticket.muted
+            )
+
             close_ticket(ticket, request.current_user, request)
             # same behaviour as when closing ticket normally
             # to disable mail on ticket close, there is a ticket-setting
