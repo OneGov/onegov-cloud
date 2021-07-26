@@ -54,11 +54,6 @@ class Message(Base):
     #: a single optional file associated with this message
     file = associated(File, 'file', 'one-to-one')
 
-    # Todo: deprecated
-    __mapper_args__ = {
-        'order_by': id
-    }
-
     # we need to override __hash__ and __eq__ to establish the equivalence of
     # polymorphic subclasses that differ - we need to compare the base class
     # with subclasses to work around a limitation of the association proxy
