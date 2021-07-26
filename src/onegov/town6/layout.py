@@ -4,7 +4,7 @@ from cached_property import cached_property
 from dateutil.rrule import rrulestr
 from dateutil import rrule
 
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, to_html_ul
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
@@ -263,9 +263,7 @@ class PageLayout(AdjacencyListLayout):
 
     @cached_property
     def contact_html(self):
-        return self.model.contact_html or '<ul><li>{}</li></ul>'.format(
-            '</li><li>'.join(linkify(self.org.contact).splitlines())
-        )
+        return self.model.contact_html or to_html_ul(self.org.contact)
 
 
 class NewsLayout(AdjacencyListLayout):
