@@ -414,17 +414,13 @@ def paragraphify(text):
 
 
 def to_html_ul(value, convert_dashes=True):
-    """Linkify and convert to html.
-    If convert dashes is true, the html will treat
-
-    My list
-    - A
-    - B
-
-    like markdown converting it to individual ul's
+    """ Linkify and convert to html ul.
     """
     if not value:
         return ''
+
+    value = value.replace('\r', '').strip('\n')
+
     if not convert_dashes:
         return '<ul><li>{}</li></ul>'.format(
             '</li><li>'.join(linkify(value).splitlines())
@@ -441,18 +437,22 @@ def to_html_ul(value, convert_dashes=True):
         return f'<li>{inner}</li>'
 
     was_bulleted = False
-    for line in linkify(value).splitlines():
+    for line in value.splitlines():
+        if not line:
+            continue
+        line = linkify(line)
         now_bullet = line.startswith('-')
-        if now_bullet:
-            line = line.lstrip('-')
-            if not was_bulleted and temp_li:
-                elements.append(ul(''.join(temp_li)))
+        line = line.lstrip('-').strip()
+        if now_bullet and was_bulleted:
+            temp_li.append(li(line))
+        elif now_bullet != was_bulleted:
+            if temp_li:
+                elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
                 temp_li = []
-        elif was_bulleted and temp_li:
-            elements.append(ul(''.join(temp_li), bulleted=True))
-            temp_li = []
+            temp_li.append(li(line))
+        else:
+            temp_li.append(li(line))
 
-        temp_li.append(li(line))
         was_bulleted = now_bullet
 
     if temp_li:

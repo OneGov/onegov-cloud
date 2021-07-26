@@ -1,4 +1,5 @@
 import re
+import textwrap
 
 import onegov.core
 import os.path
@@ -10,7 +11,7 @@ from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import Bunch, linkify_phone, _phone_ch
+from onegov.core.utils import Bunch, linkify_phone, _phone_ch, to_html_ul
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
@@ -417,3 +418,34 @@ def test_bunch():
     assert (Bunch(x=1, y=2) != Bunch(x=1, y=2)) is False
     assert (Bunch(x=1, y=2) != Bunch(x=2, y=2)) is True
     assert (Bunch(x=1, y=2) != Bunch(x=1, y=3)) is True
+
+
+def test_to_html_ul():
+
+    def li(*args):
+        if len(args) > 1:
+            return "".join(f'<li>{i}</li>' for i in args)
+        return f'<li>{args[0]}</li>'
+
+    text = "\n".join(('Title', 'A'))
+    assert to_html_ul(text) == f'<ul>{li("Title", "A")}</ul>'
+
+    text = "\n".join(('- Title', '-A', '-B'))
+    li_inner = li('Title', 'A', 'B')
+    assert to_html_ul(text) == f'<ul class="bulleted">{li_inner}</ul>'
+
+    # two lists
+    text = "\n".join(('-A', 'B'))
+    assert to_html_ul(text) == f'<ul class="bulleted">{li("A")}</ul>' \
+                               f'<ul>{li("B")}</ul>'
+    text = "\n".join(('A', '-B'))
+    assert to_html_ul(text) == f'<ul>{li("A")}</ul>' \
+                               f'<ul class="bulleted">{li("B")}</ul>'
+
+    # double new lines are ignored
+    text = "\n".join(('A', '', '', 'B'))
+    assert to_html_ul(text) == f'<ul>{li("A", "B")}</ul>'
+
+    text = "\n".join(('A', '', '', '-B'))
+    assert to_html_ul(text) == f'<ul>{li("A")}</ul>' \
+                               f'<ul class="bulleted">{li("B")}</ul>'
