@@ -94,10 +94,14 @@ def test_registration_window_adjacent(session):
     summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
     winter = forms.definitions.add('Witnercamp', definition="E-Mail = @@@")
 
-    summer.add_registration_window(date(2017, 4, 1), date(2017, 6, 30))
     summer.add_registration_window(date(2018, 4, 1), date(2018, 6, 30))
+    summer.add_registration_window(date(2017, 4, 1), date(2017, 6, 30))
 
     assert len(summer.registration_windows) == 2
+
+    # Test ordering ascending has not worked using order_by in the relationship
+    # of the model, should be 2017
+    assert summer.registration_windows[0].start.year == 2018
 
     winter.add_registration_window(date(2017, 4, 1), date(2017, 6, 30))
     winter.add_registration_window(date(2018, 4, 1), date(2018, 6, 30))
