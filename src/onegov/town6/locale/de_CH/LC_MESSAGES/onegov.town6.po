@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-07-21 16:24+0200\n"
+"POT-Creation-Date: 2021-07-26 10:01+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -206,6 +206,12 @@ msgstr "Ticket abschliessen"
 
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
+
+msgid "Archive ticket"
+msgstr "Ticket archivieren"
+
+msgid "Recover from archive"
+msgstr "Aus dem Archiv holen"
 
 msgid "Do you really want to delete this ticket?"
 msgstr "Möchten Sie das Ticket wirklich löschen?"
@@ -1422,6 +1428,12 @@ msgstr "Ticket E-Mails aktiviert."
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
 
+msgid "Ticket archived."
+msgstr "Ticket archiviert."
+
+msgid "Ticket recovered from archive."
+msgstr "Ticket aus dem Archiv geholt."
+
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden."
 
@@ -1792,7 +1804,10 @@ msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
 
 msgid "Archive all selected tickets?"
-msgstr ""
+msgstr "Alle ausgewählten Tickets archivieren?"
+
+msgid "Do Archive"
+msgstr "Archivieren"
 
 msgid "Archive selected"
 msgstr "Selektierte Archivieren"

@@ -7,7 +7,7 @@
             <tal:block metal:fill-slot="modal_content">
                 <h3 i18n:translate="">Archive all selected tickets?</h3>
                 <br>
-                <button id="do-action-confirmed" type="button" class="button alert" i18n:translate>Archive</button>
+                <button id="do-action-confirmed" type="button" class="button alert" i18n:translate>Do Archive</button>
             </tal:block>
         </tal:block>
         <div class="ticket-filters">
