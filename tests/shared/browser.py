@@ -1,4 +1,4 @@
-import os
+from os import environ, system
 import re
 import shutil
 import time
@@ -93,13 +93,16 @@ class ExtendedBrowser(InjectedBrowserExtension):
             'baseurl': self.baseurl
         }
 
-    def visit(self, url):
-        """ Overrides the default visit method to provied baseurl support. """
+    def visit(self, url, sleep_before_fail=0):
+        """ Overrides the default visit method to provided baseurl support.
+            halt_on_fail keeps the browser window open for some minutes
+            before failing the test.
+         """
         if self.baseurl and not url.startswith('http'):
             url = self.baseurl.rstrip('/') + url
 
         page = super().visit(url)
-        self.fail_on_console_errors()
+        self.fail_on_console_errors(sleep_before_fail)
         return page
 
     def login(self, username, password, to=None):
@@ -149,14 +152,19 @@ class ExtendedBrowser(InjectedBrowserExtension):
         input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
 
-    def fail_on_console_errors(self):
+    def fail_on_console_errors(self, sleep_before=0):
         filters = [
-            dict(level='SEVERE', rgpx="Content Security Policy")
+            dict(source='security', rgxp="Content Security Policy"),
+            dict(source='security', rgxp="Refused to connect"),
+            dict(source='network', rgxp="favicon.ico"),
+            dict(source='console-api', rgxp="crbug/1173575"),
+            dict(level='WARNING', rgxp="facebook"),
+            dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]
         error_msgs = self.get_console_log(filters)
-        assert not error_msgs, "\n".join(
-            (f"{i['level']}: {i['message']}" for i in error_msgs)
-        )
+        if error_msgs and environ.get('SHOW_BROWSER') == '1':
+            sleep(sleep_before)
+        assert not error_msgs, error_msgs
 
     def get_console_log(self, filters=None):
         """
@@ -211,4 +219,4 @@ def screen_shot(name, browser, open_file=True):
     programs = ('xviewer', )
     for p in programs:
         if shutil.which(p):
-            os.system(f'{p} {file} &')
+            system(f'{p} {file} &')
