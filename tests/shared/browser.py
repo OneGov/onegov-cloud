@@ -93,16 +93,19 @@ class ExtendedBrowser(InjectedBrowserExtension):
             'baseurl': self.baseurl
         }
 
-    def visit(self, url, sleep_before_fail=0):
+    def visit(
+            self, url, sleep_before_fail=0, expected_errors=None
+    ):
         """ Overrides the default visit method to provided baseurl support.
             halt_on_fail keeps the browser window open for some minutes
             before failing the test.
+            Use expected_errors as filters to pass the test.
          """
         if self.baseurl and not url.startswith('http'):
             url = self.baseurl.rstrip('/') + url
 
         page = super().visit(url)
-        self.fail_on_console_errors(sleep_before_fail)
+        self.fail_on_console_errors(sleep_before_fail, expected_errors)
         return page
 
     def login(self, username, password, to=None):
@@ -152,7 +155,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
         input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
 
-    def fail_on_console_errors(self, sleep_before=0):
+    def fail_on_console_errors(self, sleep_before=0, expected_errors=None):
         filters = [
             dict(source='security', rgxp="Content Security Policy"),
             dict(source='security', rgxp="Refused to connect"),
@@ -162,6 +165,8 @@ class ExtendedBrowser(InjectedBrowserExtension):
             dict(level='WARNING', rgxp=re.escape('react-with-addons.js')), # forms app
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]
+        expected_errors = expected_errors or []
+        filters = expected_errors + filters
         error_msgs = self.get_console_log(filters)
         if error_msgs and environ.get('SHOW_BROWSER') == '1':
             sleep(sleep_before)
@@ -199,8 +204,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         def include(item):
             for fil in filters:
-                filtered = apply_filter(fil, item)
-                if filtered:
+                if apply_filter(fil, item):
                     return False
             return True
 
