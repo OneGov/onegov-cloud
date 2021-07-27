@@ -22,7 +22,8 @@ def test_browse_activities(browser):
 
     # anonymous
     other = browser.clone()
-    other.visit('/timeline')
+    other.visit(
+        '/timeline', expected_errors=[{'rgxp': '/timeline - Failed'}])
 
     assert not other.is_text_present("Noch keine Aktivität")
 
