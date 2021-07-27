@@ -40,6 +40,7 @@ def update():
     pre_checks()
     module = Path(module_path('onegov.foundation6', 'foundation'))
     src = module / 'foundation'
+    vendor_src = module / 'vendor'
     src_bckp = module / 'foundation.bak'
     assets = module / 'assets'
 
@@ -66,11 +67,17 @@ def update():
 
     click.secho('Copy foundation js files')
     for name in foundation_js_files:
-        shutil.copyfile(assets / name, assets / f'{name}.bak')
+        shutil.move(assets / name, assets / f'{name}.bak')
         shutil.copyfile(
             node_root / 'dist' / 'js' / name,
             assets / name
         )
+
+    click.secho('Copy motion-ui files')
+    mui_src = node_root.parent / 'motion-ui' / 'src'
+    mui_dest = vendor_src / 'motion-ui'
+    shutil.move(mui_dest, vendor_src / 'motion-ui.bak')
+    shutil.copytree(mui_src, mui_dest)
 
     click.secho('Finished.', fg='green')
     click.secho('Remove .bak folder/file manually.', fg='green')
