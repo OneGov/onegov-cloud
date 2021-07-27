@@ -85,10 +85,10 @@ def form_app(request):
         html = """
             <!doctype html>
             <html>
-                <head></head>
+                <head><script type="text/javascript" src="{}"></script></head>
                 <body></body>
             </html>
-        """
+        """.format(react)
 
     @TestApp.path(path='/formcode-format')
     class FormcodeFormat(Content):
