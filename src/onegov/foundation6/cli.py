@@ -63,30 +63,29 @@ def update():
     # click.secho('Create a backup', fg='green')
     # shutil.copytree(src, src_bckp)
 
-    click.secho('Copy _vendor files')
-    shutil.copytree(
-        node_root / '_vendor',
-        src / '_vendor',
-        dirs_exist_ok=True
-    )
+    for name in ('scss', '_vendor'):
+        click.secho(f'Copy {name} files')
+        dest_ = src / 'foundation' / name
+        src_ = node_root / name
 
-    # click.secho('Copy scss files')
-    # shutil.copytree(node_root / 'scss', src / 'scss', dirs_exist_ok=True)
-    #
-    # click.secho('Copy foundation js files')
-    # for name in foundation_js_files:
-    #     # shutil.move(assets / name, assets / f'{name}.bak')
-    #     shutil.copyfile(
-    #         node_root / 'dist' / 'js' / name,
-    #         assets / name
-    #     )
-    #
-    # click.secho('Copy motion-ui files')
-    # mui_src = node_root.parent / 'motion-ui' / 'src'
-    # assert mui_src.is_dir()
-    # mui_dest = vendor_src / 'motion-ui'
-    # # shutil.move(mui_dest, vendor_src / 'motion-ui.bak')
-    # shutil.copytree(mui_src, mui_dest)
-    #
-    # click.secho('Finished.', fg='green')
-    # click.secho('Remove .bak folder/file manually.', fg='green')
+        assert src_.is_dir(), str(src_)
+        assert dest_.is_dir(), str(dest_)
+        shutil.copytree(src_, dest_, dirs_exist_ok=True)
+
+    click.secho('Copy foundation js files')
+    for name in foundation_js_files:
+        shutil.copyfile(
+            node_root / 'dist' / 'js' / name,
+            assets / name
+        )
+
+    click.secho('Copy motion-ui files')
+    mui_src = node_root.parent / 'motion-ui' / 'src'
+    assert mui_src.is_dir()
+    mui_dest = vendor_src / 'motion-ui'
+    assert mui_dest.is_dir()
+    shutil.copytree(mui_src, mui_dest, dirs_exist_ok=True)
+
+    click.secho('Run git add . to be sure everything is checked in.')
+    click.secho('To roll back the changes, just use the power of git!')
+    click.secho('Finished.', fg='green')
