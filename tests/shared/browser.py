@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import time
 
@@ -97,7 +98,9 @@ class ExtendedBrowser(InjectedBrowserExtension):
         if self.baseurl and not url.startswith('http'):
             url = self.baseurl.rstrip('/') + url
 
-        return super().visit(url)
+        page = super().visit(url)
+        self.fail_on_console_errors()
+        return page
 
     def login(self, username, password, to=None):
         """ Login a user through the usualy /auth/login path. """
@@ -145,6 +148,60 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
+
+    def fail_on_console_errors(self):
+        filters = [
+            dict(level='SEVERE', rgpx="Content Security Policy")
+        ]
+        error_msgs = self.get_console_log(filters)
+        assert not error_msgs, "\n".join(
+            (f"{i['level']}: {i['message']}" for i in error_msgs)
+        )
+
+    def get_console_log(self, filters=None):
+        """
+        Get the browsers console log.
+        Filter the message by using filters. The filter excludes the entry
+        if all criteria apply.
+        Filters have the form of the message itself excep for the rgxp key:
+
+        {'source': 'security', 'level': 'SEVERE'}
+        {'level': 'WARNING'}
+        {'level': 'SEVERE', 'rgxp': 'Content Security Policy'}
+
+        Use a regex expression to filter by the message of the error
+        """
+        messages = self.driver.get_log('browser')
+        if not messages:
+            return []
+
+        filters = filters or []
+
+        def apply_filter(fil, item):
+            checks = []
+            for k, v in fil.items():
+                if k == 'rgxp':
+                    checks.append(
+                        re.search(v, item['message']) and True or False
+                    )
+                else:
+                    checks.append(item.get(k) == v)
+            return all(checks)
+
+        def include(item):
+            for fil in filters:
+                filtered = apply_filter(fil, item)
+                if filtered:
+                    return False
+            return True
+
+        return [item for item in messages if include(item)]
+
+    def console_log(self, filters=None):
+        console_log = self.get_console_log(filters)
+        return "\n".join(
+            (f"{i['level']}: {i['message']}" for i in console_log)
+        )
 
 
 def screen_shot(name, browser, open_file=True):
