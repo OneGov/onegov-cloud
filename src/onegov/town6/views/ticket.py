@@ -1,10 +1,10 @@
 from onegov.core.security import Public, Private
 from onegov.org.views.ticket import view_ticket, handle_new_note, \
     handle_edit_note, message_to_submitter, view_ticket_status, view_tickets, \
-    view_archived_tickets
+    view_archived_tickets, assign_ticket
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import TownApp
-from onegov.org.forms import TicketNoteForm
+from onegov.org.forms import TicketNoteForm, TicketAssignmentForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import InternalTicketChatMessageForm
 from onegov.org.models import TicketNote
@@ -38,6 +38,15 @@ def town_handle_edit_note(self, request, form):
         self, request, form,
         TicketNoteLayout(self.ticket, request, _("New Note"))
     )
+
+
+@TownApp.form(
+    model=Ticket, name='assign', permission=Private,
+    form=TicketAssignmentForm, template='form.pt'
+)
+def town_assign_ticket(self, request, form):
+    return assign_ticket(
+        self, request, form, layout=TicketLayout(self, request))
 
 
 @TownApp.form(model=Ticket, name='message-to-submitter', permission=Private,
