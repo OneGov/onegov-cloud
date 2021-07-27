@@ -1,7 +1,7 @@
 import os
 import shutil
 import sys
-
+from pathlib import Path
 import click
 
 from onegov.core.cli import command_group
@@ -10,28 +10,40 @@ from onegov.core.utils import module_path
 cli = command_group()
 
 
-@cli.command(context_settings={
-    'matches_required': False,
-    'default_selector': '*'
-})
-def update():
-    """ Update helper for foundation6 using node and webpack """
+def pre_checks():
+    if 'v10' not in os.system('node --version'):
+        click.secho('Foundation CLI currently works with node version 10')
+        sys.exit()
+
+    if not shutil.which('npm'):
+        click.secho('Install npm package manager')
+        sys.exit()
+
     if not shutil.which('foundation'):
         click.secho('Install foundation cli first: '
                     'npm install -g foundation-cli')
         sys.exit()
 
-    if not shutil.which('yarn'):
-        click.secho('Install yarn package manager')
-        sys.exit()
 
-    foundation_src = module_path('onegov.foundation6', 'foundation/foundation')
-    foundation_bkp = module_path(
-        'onegov.foundation6', 'foundation/foundation.bak')
-    foundation_js = module_path('onegov.foundation6', 'precompiled')
-    js_name = 'foundation.min.js'
-    js_file = os.path.join(foundation_js, js_name)
-    js_file_bkp = os.path.join(foundation_js, js_name + '.bak')
+@cli.command(context_settings={
+    'matches_required': False,
+    'default_selector': '*'
+})
+def update():
+    """ Update helper for foundation6 using node and webpack.
+        By the time this cli is used, probabely things already changed and
+        it needs to be adapted.
+        Also some import might not work and have to be adapted manually.
+        The Backup files can always be consulted.
+     """
+
+    pre_checks()
+    module = Path(module_path('onegov.foundation6', 'foundation'))
+    src = module / 'foundation'
+    src_bckp = module / 'foundation.bak'
+    assets = module / 'assets'
+
+    foundation_js_files = ('foundation.min.js', 'foundation.js')
 
     os.chdir('/tmp')
     if not os.path.exists('/tmp/foundation-update'):
@@ -41,29 +53,24 @@ def update():
         )
 
     os.chdir('foundation-update')
+    node_root = Path('/tmp/foundation-update/node_modules/foundation-sites')
 
     click.secho('Create a backup', fg='green')
-    shutil.move(foundation_src, foundation_bkp)
-    if os.path.isfile(js_file):
-        shutil.move(js_file, js_file_bkp)
+    shutil.move(src, src_bckp)
+
+    click.secho('Copy _vendor files')
+    shutil.copytree(node_root / '_vendor', src / '_vendor')
 
     click.secho('Copy scss files')
-    shutil.copytree('node_modules/foundation-sites/_vendor',
-                    os.path.join(foundation_src, '_vendor'))
-    shutil.copytree('node_modules/foundation-sites/scss',
-                    os.path.join(foundation_src, 'scss'))
+    shutil.copytree(node_root / 'scss', src / 'scss')
 
-    click.secho('Bundle js file with gulp', fg='green')
-    os.system('yarn build')
-
-    shutil.copyfile('dist/assets/js/app.js', js_file)
-
-    # Finally we move the _settings from scss/settings on level above since
-    # otherwise the util import is wrong
-    old_settings = os.path.join(
-        foundation_src, 'scss', 'settings', '_settings.scss')
-    if os.path.isfile(old_settings):
-        shutil.move(old_settings, os.path.join(foundation_src, 'scss'))
+    click.secho('Copy foundation js files')
+    for name in foundation_js_files:
+        shutil.copyfile(assets / name, assets / f'{name}.bak')
+        shutil.copyfile(
+            node_root / 'dist' / 'js' / name,
+            assets / name
+        )
 
     click.secho('Finished.', fg='green')
     click.secho('Remove .bak folder/file manually.', fg='green')
