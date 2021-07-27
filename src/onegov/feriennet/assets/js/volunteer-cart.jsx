@@ -83,7 +83,9 @@ var VolunteerCart = React.createClass({
 });
 
 jQuery.fn.volunteerCart = function() {
+
     var container = $(this);
+    if (!container.get(0)) return
     var el = container.get(0).appendChild(document.createElement('div'));
 
     var cart = ReactDOM.render(
