@@ -91,7 +91,7 @@ def view_ticket(self, request, layout=None):
 
     if payment and payment.source == 'manual':
         payment_button = manual_payment_button(payment, layout)
-        if request.is_manager:
+        if request.is_manager and not payment.paid:
             edit_amount_url = layout.csrf_protected_url(
                 request.link(payment, name='change-net-amount')
             )
