@@ -50,13 +50,15 @@ def submission_deletable(submission, session, payment_blocks=True):
     tickets = TicketCollection(session)
     ticket = tickets.by_handler_id(submission.id.hex)
     if submission.registration_window_id:
+        if payment_blocks and submission.payment:
+            return False
         if not ticket:
             return True
         if ticket.state == 'open':
             return ticket
         if ticket.handler.undecided:
             return False
-    elif ticket and ticket.state != 'closed':
+    elif ticket and ticket.state not in ('closed', 'archived'):
         return False
     if payment_blocks and submission.payment:
         return False
