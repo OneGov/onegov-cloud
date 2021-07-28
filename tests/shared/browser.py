@@ -155,8 +155,9 @@ class ExtendedBrowser(InjectedBrowserExtension):
         input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
 
-    def fail_on_console_errors(self, sleep_before=0, expected_errors=None):
-        filters = [
+    @property
+    def failsafe_filters(self):
+        return [
             dict(source='security', rgxp="Content Security Policy"),
             dict(source='security', rgxp="Refused to connect"),
             dict(source='network', rgxp="favicon.ico"),
@@ -165,8 +166,10 @@ class ExtendedBrowser(InjectedBrowserExtension):
             dict(level='WARNING', rgxp=re.escape('react-with-addons.js')), # forms app
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]
+
+    def fail_on_console_errors(self, sleep_before=0, expected_errors=None):
         expected_errors = expected_errors or []
-        filters = expected_errors + filters
+        filters = expected_errors + self.failsafe_filters
         error_msgs = self.get_console_log(filters)
         if error_msgs and environ.get('SHOW_BROWSER') == '1':
             sleep(sleep_before)
