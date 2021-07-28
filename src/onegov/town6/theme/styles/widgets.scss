@@ -18,6 +18,10 @@
     background: $white-smoke;
 }
 
+.grid-container.full.darkgray {
+    background: $aluminum;
+}
+
 article.content .grid-container:last-of-type {
     @include breakpoint(medium up) {
         padding-bottom: 1.4rem;
