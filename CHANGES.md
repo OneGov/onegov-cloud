@@ -1,8 +1,28 @@
 # Changes
 
+## 2021.71
+
+`2021-07-28` | [7698b0add9...2acce24eba](https://github.com/OneGov/onegov-cloud/compare/7698b0add9^...2acce24eba)
+
+### Foundation6
+
+##### Updates jquery to version 3.6
+
+- Introduces browser console inspection in tests
+- Minor fixes in javascripts
+- Rework of foundation update cli command
+
+`Other` | [SEA-469](https://linear.app/seantis/issue/SEA-469) | [48209df535](https://github.com/onegov/onegov-cloud/commit/48209df535b842f0daa2e52540b261897ff003df)
+
+### Town6
+
+##### Adds color darkgray for <row-wide> homepage widget
+
+`Other` | [SEA_467](#SEA_467) | [2acce24eba](https://github.com/onegov/onegov-cloud/commit/2acce24eba094322714c4d08e375692fbfe0f266)
+
 ## 2021.70
 
-`2021-07-26` | [0301017794...f2c661324f](https://github.com/OneGov/onegov-cloud/compare/0301017794^...f2c661324f)
+`2021-07-26` | [0301017794...900d210a51](https://github.com/OneGov/onegov-cloud/compare/0301017794^...900d210a51)
 
 ### Org
 
@@ -1195,20 +1215,4 @@ Fixes issue for browsers not using default by themselves (IE11).
 ##### Add technical report of the post-vote poll.
 
 `Feature` | [VOTES-101](https://issues.seantis.ch/browse/VOTES-101) | [17aa9d45e3](https://github.com/onegov/onegov-cloud/commit/17aa9d45e32bcdf5c020b9dcd180958a16a4868d)
-
-## 2021.21
-
-`2021-02-11` | [13aae131a1...a278187144](https://github.com/OneGov/onegov-cloud/compare/13aae131a1^...a278187144)
-
-### Org
-
-##### Adds Qr-Code to ticket pdf
-
-`Feature` | [13aae131a1](https://github.com/onegov/onegov-cloud/commit/13aae131a1da6afd43266369671cfb5180ee7ab9)
-
-### Swissvotes
-
-##### Add slider to frontpage.
-
-`Feature` | [VOTES-79](https://issues.seantis.ch/browse/VOTES-79) | [abaf934683](https://github.com/onegov/onegov-cloud/commit/abaf934683e4ab8fa0bf4c463df23a862af6eb43)
 
