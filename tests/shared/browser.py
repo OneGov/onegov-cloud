@@ -1,4 +1,5 @@
-import os
+from os import environ, system
+import re
 import shutil
 import time
 
@@ -92,12 +93,20 @@ class ExtendedBrowser(InjectedBrowserExtension):
             'baseurl': self.baseurl
         }
 
-    def visit(self, url):
-        """ Overrides the default visit method to provied baseurl support. """
+    def visit(
+            self, url, sleep_before_fail=0, expected_errors=None
+    ):
+        """ Overrides the default visit method to provided baseurl support.
+            halt_on_fail keeps the browser window open for some minutes
+            before failing the test.
+            Use expected_errors as filters to pass the test.
+         """
         if self.baseurl and not url.startswith('http'):
             url = self.baseurl.rstrip('/') + url
 
-        return super().visit(url)
+        page = super().visit(url)
+        self.fail_on_console_errors(sleep_before_fail, expected_errors)
+        return page
 
     def login(self, username, password, to=None):
         """ Login a user through the usualy /auth/login path. """
@@ -146,6 +155,67 @@ class ExtendedBrowser(InjectedBrowserExtension):
         input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
 
+    def fail_on_console_errors(self, sleep_before=0, expected_errors=None):
+        filters = [
+            dict(source='security', rgxp="Content Security Policy"),
+            dict(source='security', rgxp="Refused to connect"),
+            dict(source='network', rgxp="favicon.ico"),
+            dict(source='console-api', rgxp="crbug/1173575"),
+            dict(level='WARNING', rgxp="facebook"),
+            dict(level='WARNING', rgxp=re.escape('react-with-addons.js')), # forms app
+            dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
+        ]
+        expected_errors = expected_errors or []
+        filters = expected_errors + filters
+        error_msgs = self.get_console_log(filters)
+        if error_msgs and environ.get('SHOW_BROWSER') == '1':
+            sleep(sleep_before)
+        assert not error_msgs, error_msgs
+
+    def get_console_log(self, filters=None):
+        """
+        Get the browsers console log.
+        Filter the message by using filters. The filter excludes the entry
+        if all criteria apply.
+        Filters have the form of the message itself excep for the rgxp key:
+
+        {'source': 'security', 'level': 'SEVERE'}
+        {'level': 'WARNING'}
+        {'level': 'SEVERE', 'rgxp': 'Content Security Policy'}
+
+        Use a regex expression to filter by the message of the error
+        """
+        messages = self.driver.get_log('browser')
+        if not messages:
+            return []
+
+        filters = filters or []
+
+        def apply_filter(fil, item):
+            checks = []
+            for k, v in fil.items():
+                if k == 'rgxp':
+                    checks.append(
+                        re.search(v, item['message']) and True or False
+                    )
+                else:
+                    checks.append(item.get(k) == v)
+            return all(checks)
+
+        def include(item):
+            for fil in filters:
+                if apply_filter(fil, item):
+                    return False
+            return True
+
+        return [item for item in messages if include(item)]
+
+    def console_log(self, filters=None):
+        console_log = self.get_console_log(filters)
+        return "\n".join(
+            (f"{i['level']}: {i['message']}" for i in console_log)
+        )
+
 
 def screen_shot(name, browser, open_file=True):
     file = browser.screenshot(f'/tmp/{name}.png', full=True)
@@ -154,4 +224,4 @@ def screen_shot(name, browser, open_file=True):
     programs = ('xviewer', )
     for p in programs:
         if shutil.which(p):
-            os.system(f'{p} {file} &')
+            system(f'{p} {file} &')
