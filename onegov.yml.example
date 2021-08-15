@@ -237,9 +237,9 @@ applications:
     configuration:
       <<: *global-config
 
-  - path: /fsi/*
+  - path: /onegov_fsi/*
     application: onegov.fsi.FsiApp
-    namespace: fsi
+    namespace: onegov_fsi
     configuration:
       <<: *global-config
 
@@ -279,7 +279,7 @@ applications:
     configuration:
       <<: *global-config
 
-  - path: /translator_directory/*
+  - path: /onegov_translator_directory/*
     application: onegov.translator_directory.TranslatorDirectoryApp
     namespace: translator_directory
     configuration:

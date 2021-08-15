@@ -185,12 +185,12 @@ Onegov cloud uses one database for all applications and instances.
 
 ## Setting up the application(s)
 
-**Town, Town6 and Org**
+**Org, Town, Town6, Agency, FSI and Translator Directory**
 
-Create a new organisation in the database together with a new admin:
+Create a new organisation in the database together with a new admin (adjust the path according to your configuration):
 
     onegov-org --select /onegov_org/govikon add "Gemeinde Govikon"
-    onegov-user --select /onegov_org/govikon add admin admin@example.org
+    onegov-user --select /onegov_org/govikon add admin admin@example.org --password test
 
 **Election Day and Swissvotes**
 
@@ -209,6 +209,10 @@ And open the local url in your browser:
 To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variable:
 
     export ONEGOV_DEVELOPMENT='1'
+
+Run the elastic search cluster and the SMTP server:
+
+    docker-compose up -d
 
 ## Updates
 
