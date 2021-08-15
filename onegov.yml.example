@@ -292,7 +292,7 @@ applications:
       <<: *global-config
 
       onboarding:
-        onegov.town:
+        onegov.town6:
           namespace: onegov_town
           domain: onegov.test
           configuration:
