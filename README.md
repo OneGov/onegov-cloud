@@ -1,4 +1,4 @@
-# OneGov Cloud 🌤
+# OneGov Cloud
 
 OneGov Cloud is a Swiss initiative to provide municipalities with open-source
 web-applications.
@@ -10,32 +10,25 @@ web-applications.
 You have reached the source of `onegov-cloud`. If that's not what you were
 looking for, you might appreciate these links:
 
-- **[Marketing site](https://onegovcloud.ch)**
-<br>For an executive summary
+- **[Marketing site](https://admin.digital)**
+<br>For an executive summary (in German)
 
 - **[Developer docs](https://onegovcloud.ch)**
 <br>For a technical overview and Python API docs
 
-- **[Showcase](https://govikon.onegovcloud.ch)**
-<br>Where we show of and blog about new features
-
-- **[Onboarding](https//start.onegovcloud.ch)**
-<br>Where you can start your own free instance
-
 - **[Changelog](CHANGES.md)**
 <br>Where you get a list of releases with relevant changes
+
+- **[Onboarding](https//start.onegovcloud.ch)**
+<br>Where you can start your own free instance of our solution for muncipalities
 
 ---
 
 [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![Netlify Status](https://api.netlify.com/api/v1/badges/ac49d4ad-681d-499f-a3e5-b60c89d98c74/deploy-status)](https://app.netlify.com/sites/onegov-cloud-docs/deploys)
 
-## Branches 🖖
+## Developing
 
-> ⚠️ Please note that the master branch of this repository can and will be
-> deployed often.
-> It is therefore imperative *not* to develop on the master branch.
-
-To create a new feature, start a new branch, named after the ticket:
+To create a new feature or bugfix, start a new branch, named after the ticket:
 
 * `ticket-101`
 * `fer-50`
@@ -46,19 +39,11 @@ Or if there really is no ticket, with an appropriate name:
 * `new-templating-engine`
 * `experimental-design`
 
-When ready to deploy, merge the branch as follows and provide a good commit
-message (see below):
+When ready to deploy, create a pull request with a good pull request message (see below) and, if possible, add some reviewers. If the review has passed, merge and **squash**.
 
-    git checkout master
-    git pull
-    git checkout ticket-101
-    git rebase master
-    git checkout master
-    git merge ticket-101 --edit -no-ff
+### Commit and Pull Request Messages
 
-### Commit Messages
-
-Commit messages are used to build the release history. For a commit to show
+**Commit messages** are used to build the release history. For a commit to show
 up in the release history, it needs to be written as follows:
 
     <Module>: <Message>
@@ -78,6 +63,8 @@ For example:
     LINK: 101
 
 Commits that do not follow this scheme are not included in the changelog.
+
+**Pull request messages** should contain the first line of the commit message (`<Module>: <Message>`) for the title and the rest for the message.
 
 **Module Name**
 
@@ -113,7 +100,7 @@ changelog in markdown. Your commit should be somewhere at the top.
 If the commit you did does not show up, check to make sure that the module
 name is valid (first character must be uppercase!).
 
-## Requirements ☝️
+## Requirements
 
 To run OneGov Cloud locally, you must meet the following requirements:
 
@@ -142,7 +129,7 @@ libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev
 libpoppler-cpp-dev pv libzbar0
 ```
 
-## Installation 🤘
+## Installation
 
 To install OneGov Cloud, you should first get the source:
 
@@ -175,13 +162,13 @@ export LDFLAGS="-L/usr/local/opt/openssl/lib"
 export CPPFLAGS="-I/usr/local/opt/openssl/include"
 ```
 
-## Configuration 👌
+## Configuration
 
 To configure your setup, copy the example configuration and adjust it to your needs:
 
     cp onegov.yml.example onegov.yml
 
-## Create database for onegov
+## Create a database for onegov
 
 Define a user `dev` and password `devpassword` using `dsn: postgresql://dev:devpassword@localhost:5432/onegov`
 in `onegov.yml`:
@@ -194,15 +181,24 @@ in `onegov.yml`:
     GRANT ALL PRIVILEGES ON DATABASE onegov TO dev;
     ALTER DATABASE onegov SET timezone TO 'UTC';
 
-Once you are happy, you can start your first organisation:
+Onegov cloud uses one database for all applications and instances.
+
+## Setting up the application(s)
+
+**Town, Town6 and Org**
+
+Create a new organisation in the database together with a new admin:
 
     onegov-org --select /onegov_org/govikon add "Gemeinde Govikon"
-
-Together with your first user:
-
     onegov-user --select /onegov_org/govikon add admin admin@example.org
 
-Then, start your local instance:
+**Election Day and Swissvotes**
+
+Create the `principal.yaml` and flush redis. You may want to add a user (see above).
+
+## Running the instance(s)
+
+Run the server:
 
     onegov-server
 
@@ -214,7 +210,7 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
 
     export ONEGOV_DEVELOPMENT='1'
 
-## Updates 🙌
+## Updates
 
 To run updates, you want to first update your sources:
 
@@ -228,7 +224,7 @@ Then, apply database changes.
 
     onegov-core upgrade
 
-## Tests 🤞
+## Tests
 
 ### Python
 
@@ -262,7 +258,7 @@ To use a RAM located database:
 
 ### JavaScript
 
-To run the javascript tests:
+To run the javascript tests (swissvotes and election day):
 
     cd tests/js
     npm install
@@ -272,7 +268,7 @@ To update the snapshots after changes, run:
 
     npm test -- --update-snapshot
 
-## Translations 🌍
+## Translations
 
 To extract the translation strings of an already configured module:
 
@@ -281,6 +277,10 @@ To extract the translation strings of an already configured module:
 To add a language to module:
 
     do/translate onegov.org fr_CH
+
+To synchronize between different modules:
+
+    do/apply-translations onegov.org onegov.town6
 
 Additionally, you can use <https://gengo.com> to translate English messages
 to other languages, like German, French or Italian.
@@ -306,7 +306,7 @@ Or:
     do/honyaku onegov.org fr_CH "The following are variables and should be left as is: ${example}"
 
 
-## Releases 🚀
+## Releases
 
 To create a new release, check the changelog first:
 
@@ -316,7 +316,7 @@ Then run the release script:
 
     do/release
 
-## License 🤝
+## License
 
 OneGov Cloud is released under the MIT license:
 
