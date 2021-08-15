@@ -257,29 +257,37 @@ class EventForm(Form):
 
         if self.start_date.data and self.end_date.data:
             if self.start_date.data > self.end_date.data:
-                message = _("The end date must be later than the start date.")
-                self.end_date.errors.append(message)
+                self.end_date.errors.append(
+                    _("The end date must be later than the start date.")
+                )
                 result = False
 
         if self.repeat.data == 'weekly':
             if self.weekly.data and self.start_date.data:
                 weekday = WEEKDAYS[self.start_date.data.weekday()][0]
                 if weekday not in self.weekly.data:
-                    message = _(
-                        "The weekday of the start date must be selected.")
-                    self.weekly.errors.append(message)
+                    self.weekly.errors.append(
+                        _("The weekday of the start date must be selected.")
+                    )
                     result = False
 
             if self.weekly.data and not self.end_date.data:
-                message = _(
-                    "Please set and end date if the event is recurring.")
-                self.end_date.errors.append(message)
+                self.end_date.errors.append(
+                    _("Please set and end date if the event is recurring.")
+                )
                 result = False
 
             if self.end_date.data and not self.weekly.data:
-                message = _(
-                    "Please select a weekday if the event is recurring.")
-                self.weekly.errors.append(message)
+                self.weekly.errors.append(
+                    _("Please select a weekday if the event is recurring.")
+                )
+                result = False
+
+        if self.repeat.data == 'dates':
+            try:
+                assert self.json_to_dates(self.dates.data)
+            except (AssertionError, ValueError):
+                self.repeat.errors.append(_("Invalid dates."))
                 result = False
 
         return result

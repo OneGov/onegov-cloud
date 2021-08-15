@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-26 08:45+0200\n"
+"POT-Creation-Date: 2021-08-15 09:02+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -626,6 +626,9 @@ msgstr "Bis Datum"
 
 msgid "Dates"
 msgstr "Daten"
+
+msgid "Invalid dates."
+msgstr "Ungültige Daten"
 
 msgid "The end date must be later than the start date."
 msgstr "Das Enddatum muss nach dem Startdatum liegen."
