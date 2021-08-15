@@ -133,7 +133,7 @@ libpoppler-cpp-dev pv libzbar0
 
 To install OneGov Cloud, you should first get the source:
 
-    git clone https://github.com/onegov/onegov-cloud
+    git clone git@github.com:OneGov/onegov-cloud.git
 
 Switch to the source folder:
 
@@ -141,7 +141,7 @@ Switch to the source folder:
 
 Next you want to create a virtual environment:
 
-    python -m venv venv
+    python3 -m venv venv
 
 Then you want to activate it:
 
