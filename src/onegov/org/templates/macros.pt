@@ -1935,7 +1935,7 @@
               </tal:b>
           </td>
           <td class="ticket-user" tal:condition="ticket.state != 'open'">
-              <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
+              <metal:identicon tal:condition="ticket.user" use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials|None; username ticket.user.username|None" />
           </td>
       </tal:block>
       <tal:block tal:condition="not has_access">
