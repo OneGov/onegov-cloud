@@ -1,8 +1,32 @@
 # Changes
 
+## 2021.72
+
+`2021-08-17` | [5daf5fdef3...30257b842e](https://github.com/OneGov/onegov-cloud/compare/5daf5fdef3^...30257b842e)
+
+### All
+
+##### Disable ticket deletion.
+
+`Bugfix` | [e7bae3e990](https://github.com/onegov/onegov-cloud/commit/e7bae3e9905c99d0fcf5db3ba1b8d60129989015)
+
+### Org
+
+##### Validate recurrence dates in event submission form.
+
+`Bugfix` | [0814cbe033](https://github.com/onegov/onegov-cloud/commit/0814cbe03395c9746e90a496200e8cff5444082e)
+
+##### Show ticket state of archived tickets.
+
+`Bugfix` | [2eafdc83d5](https://github.com/onegov/onegov-cloud/commit/2eafdc83d540846677dc2aaaa025fc555533a5f2)
+
+##### Fixes link migration labels.
+
+`Bugfix` | [SEA-357](https://linear.app/seantis/issue/SEA-357) | [33e0bdd6ec](https://github.com/onegov/onegov-cloud/commit/33e0bdd6ecf158a2f91ebffd807291362cb2fc68)
+
 ## 2021.71
 
-`2021-07-28` | [7698b0add9...2acce24eba](https://github.com/OneGov/onegov-cloud/compare/7698b0add9^...2acce24eba)
+`2021-07-28` | [7698b0add9...cda5a59e55](https://github.com/OneGov/onegov-cloud/compare/7698b0add9^...cda5a59e55)
 
 ### Foundation6
 
@@ -1193,26 +1217,4 @@ Fixes issue for browsers not using default by themselves (IE11).
 ##### Fixes various minor bugs.
 
 `Bugfix` | [402a3c117e](https://github.com/onegov/onegov-cloud/commit/402a3c117ea05b342c91bad17cbc2e8fe4d83fe5)
-
-## 2021.22
-
-`2021-02-15` | [c025d2954e...a1d5d27ced](https://github.com/OneGov/onegov-cloud/compare/c025d2954e^...a1d5d27ced)
-
-### Swissvotes
-
-##### Adds Die Mitte.
-
-`Feature` | [VOTES-98](https://issues.seantis.ch/browse/VOTES-98) | [2aa9ed9883](https://github.com/onegov/onegov-cloud/commit/2aa9ed98839a3b9b71365eb946beb64164d79257)
-
-##### Add aditional post-vote poll dataset formats.
-
-`Feature` | [VOTES-99](https://issues.seantis.ch/browse/VOTES-99) | [10c20c1026](https://github.com/onegov/onegov-cloud/commit/10c20c1026b5c6c6e83c3c46c4612fa9c07a07ed)
-
-##### Add additional post-vote poll codebook format.
-
-`Feature` | [VOTES-100](https://issues.seantis.ch/browse/VOTES-100) | [8600ae7e8d](https://github.com/onegov/onegov-cloud/commit/8600ae7e8df2b95ee35af6804a48f9506b138d87)
-
-##### Add technical report of the post-vote poll.
-
-`Feature` | [VOTES-101](https://issues.seantis.ch/browse/VOTES-101) | [17aa9d45e3](https://github.com/onegov/onegov-cloud/commit/17aa9d45e32bcdf5c020b9dcd180958a16a4868d)
 
