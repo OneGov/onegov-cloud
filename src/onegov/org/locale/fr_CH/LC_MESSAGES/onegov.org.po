@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-08-15 09:02+0200\n"
+"POT-Creation-Date: 2021-08-17 13:30+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -91,8 +91,8 @@ msgstr "Groupes d'utilisateurs"
 msgid "Link Check"
 msgstr ""
 
-msgid "Ticket Archive"
-msgstr "Archive des tickets"
+msgid "Archived Tickets"
+msgstr "Tickets archivés"
 
 msgid "Management"
 msgstr "Gestion"
@@ -629,9 +629,6 @@ msgstr "Jusqu'à"
 msgid "Dates"
 msgstr "Dates"
 
-msgid "Invalid dates."
-msgstr "Dates non valables."
-
 msgid "The end date must be later than the start date."
 msgstr "La date de fin doit être postérieure à la date de début."
 
@@ -644,6 +641,9 @@ msgstr "Veuillez préciser une date de fin si l'événement est récurrent."
 
 msgid "Please select a weekday if the event is recurring."
 msgstr "Veuillez choisir un jour de la semaine si l'événement est récurrent."
+
+msgid "Invalid dates."
+msgstr "Dates non valables."
 
 msgid "Add"
 msgstr "Ajouter"
@@ -2566,6 +2566,9 @@ msgstr "Demande de modification"
 
 msgid "New Entry"
 msgstr "Nouvelle entrée"
+
+msgid "Archived"
+msgstr "Archivé"
 
 msgid "Previous Page"
 msgstr "Page précédente"
@@ -4620,9 +4623,6 @@ msgstr "Tous les tickets"
 msgid "All Users"
 msgstr "Tous les utilisateurs"
 
-msgid "Archived Tickets"
-msgstr "Tickets archivés"
-
 msgid "Added a new user group"
 msgstr "Un nouveau groupe d'utilisateurs a été ajouté"
 
@@ -4652,43 +4652,3 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
-
-#~ msgid "Do you really want to close this ticket?"
-#~ msgstr "Voulez-vous vraiment fermer ce ticket?"
-
-#~ msgid ""
-#~ "Disable showing the copy link '#' for the site reference. The references "
-#~ "themselves will still work."
-#~ msgstr ""
-#~ "Désactiver le lien pour copier la référence de page. Les références elles-"
-#~ "mêmes fonctionneront toujours."
-
-#~ msgid ""
-#~ "Forgot something or have a special request? Add a message to the ticket."
-#~ msgstr ""
-#~ "Vous avez oublié quelque chose ou avez une demande spéciale ? Ajoutez un "
-#~ "message a la demande."
-
-#~ msgid "'-' will be converted to a bulleted list"
-#~ msgstr "'-' sera converti en list à puces"
-
-#~ msgid ""
-#~ "Accepting and closing tickets automatically should be used with care! "
-#~ "This means that anonymous users can influence the page content without "
-#~ "user interaction of an admin! Best activate this setting just for a "
-#~ "limited period of time."
-#~ msgstr ""
-#~ "L'acceptation et la fermeture automatique des tickets doivent être "
-#~ "utilisées avec précaution ! Cela signifie que les utilisateurs anonymes "
-#~ "peuvent influencer le contenu de la page sans l'intervention d'un "
-#~ "administrateur ! Il est préférable d'activer ce paramètre uniquement pour "
-#~ "une période limitée."
-
-#~ msgid "Cancel registration window"
-#~ msgstr "Annuler le fenêtre d'inscription"
-
-#~ msgid "Add external form"
-#~ msgstr "Ajouter un formulaire externe"
-
-#~ msgid "Best regards,"
-#~ msgstr "Cordialement,"

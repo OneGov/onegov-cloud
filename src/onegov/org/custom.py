@@ -128,7 +128,7 @@ def get_global_tools(request):
 
             links.append(
                 Link(
-                    _("Ticket Archive"),
+                    _("Archived Tickets"),
                     request.class_link(
                         ArchivedTicketsCollection, {'handler': 'ALL'}),
                     attrs={'class': 'ticket-archive'}

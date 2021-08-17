@@ -2462,6 +2462,7 @@ $person-email-icon: '\f003';
 $open-ticket-bg: $primary-color;
 $pending-ticket-bg: $blue-light;
 $closed-ticket-bg: $green-light;
+$archived-ticket-bg: $brown-light;
 $ticket-number-bg: $yellow-light;
 
 .ticket-number-plain {
@@ -2504,6 +2505,14 @@ $ticket-number-bg: $yellow-light;
         $padding: .25rem .5rem,
         $text-size: 1rem,
         $bg: $closed-ticket-bg
+    );
+}
+
+.ticket-state-archived {
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $archived-ticket-bg
     );
 }
 

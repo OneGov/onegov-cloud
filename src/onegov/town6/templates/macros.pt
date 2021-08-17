@@ -836,6 +836,9 @@
     <div i18n:translate tal:condition="ticket.state == 'closed'" class="ticket-state-closed">
         Closed
     </div>
+    <div i18n:translate tal:condition="ticket.state == 'archived'" class="ticket-state-archived">
+        Archived
+    </div>
 </metal:ticket_status>
 
 <metal:payment_status define-macro="payment_status" i18n:domain="onegov.town6">

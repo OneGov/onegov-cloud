@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-08-15 09:02+0200\n"
+"POT-Creation-Date: 2021-08-17 13:30+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -90,8 +90,8 @@ msgstr "Benutzergruppen"
 msgid "Link Check"
 msgstr ""
 
-msgid "Ticket Archive"
-msgstr "Ticket-Archiv"
+msgid "Archived Tickets"
+msgstr "Archivierte Tickets"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -627,9 +627,6 @@ msgstr "Bis Datum"
 msgid "Dates"
 msgstr "Daten"
 
-msgid "Invalid dates."
-msgstr "Ungültige Daten"
-
 msgid "The end date must be later than the start date."
 msgstr "Das Enddatum muss nach dem Startdatum liegen."
 
@@ -641,6 +638,9 @@ msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
 
 msgid "Please select a weekday if the event is recurring."
 msgstr "Bitte ein Wochentag auswählen für sich wiederholende Veranstaltungen."
+
+msgid "Invalid dates."
+msgstr "Ungültige Daten"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -2565,6 +2565,9 @@ msgstr "Änderungsvorschlag"
 
 msgid "New Entry"
 msgstr "Neuer Eintrag"
+
+msgid "Archived"
+msgstr "Archiviert"
 
 msgid "Previous Page"
 msgstr "Vorherige Seite"
@@ -4606,9 +4609,6 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
-msgid "Archived Tickets"
-msgstr "Archivierte Tickets"
-
 msgid "Added a new user group"
 msgstr "Benutzergruppe hinzugefügt"
 
@@ -4638,60 +4638,3 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Do you really want to close this ticket?"
-#~ msgstr "Möchten Sie dieses Ticket wirklich schliessen?"
-
-#~ msgid ""
-#~ "Disable showing the copy link '#' for the site reference. The references "
-#~ "themselves will still work."
-#~ msgstr ""
-#~ "Versteckt den Kopier-Link '#' für die Seitenreferenz. Die Referenzen an "
-#~ "sich funktionieren weiterhin."
-
-#~ msgid ""
-#~ "Forgot something or have a special request? Add a message to the ticket."
-#~ msgstr ""
-#~ "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen? Dann "
-#~ "fügen Sie der Anfrage eine Nachricht hinzu."
-
-#~ msgid ""
-#~ "- '-' will be converted to a bulleted list\n"
-#~ "- Urls will be transformed into links\n"
-#~ "- Phone numbers as well"
-#~ msgstr ""
-#~ "- '-' wird in eine Aufzählungsliste umgewandelt\n"
-#~ "- Urls werden zu Hyperlinks konvertiert\n"
-#~ "- E-Mails und Telefon-Nummern ebenfalls"
-
-#~ msgid ""
-#~ "- '-' will be converted to a bulleted list.\n"
-#~ "- Urls will be transformed into links\n"
-#~ "- Phone numbers as well"
-#~ msgstr ""
-#~ "'-' wird in eine Aufzahlungliste verwandelt\n"
-#~ "- Url's werden zu Hyperlinks formatiert\n"
-#~ "-Telefonnummern ebenso"
-
-#~ msgid "'-' will be converted to a bulleted list"
-#~ msgstr "'-' wird in eine Aufzählung verwandelt"
-
-#~ msgid ""
-#~ "Accepting and closing tickets automatically should be used with care! "
-#~ "This means that anonymous users can influence the page content without "
-#~ "user interaction of an admin! Best activate this setting just for a "
-#~ "limited period of time."
-#~ msgstr ""
-#~ "Das automatische Annehmen und Schließen von Tickets ist mit Vorsicht zu "
-#~ "genießen! Das bedeutet, dass anonyme Benutzer den Seiteninhalt ohne "
-#~ "Benutzerinteraktion eines Admins beeinflussen können! Aktivieren Sie "
-#~ "diese Einstellung am besten nur für einen begrenzten Zeitraum."
-
-#~ msgid "Cancel registration window"
-#~ msgstr "Anmeldezeitraum stornieren"
-
-#~ msgid "Add external form"
-#~ msgstr "Externes Formular hinzufügen"
-
-#~ msgid "Best regards,"
-#~ msgstr "Mit freundlichen Grüssen,"
