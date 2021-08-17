@@ -458,7 +458,7 @@ def fetch_users_cli(
 
 def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
                 admin_group=None, editor_group=None, verbose=False,
-                skip_deactivate=False, dry_run=False):
+                skip_deactivate=False, dry_run=False, add_attendee=True):
     """ Implements the fetch-users cli command. """
 
     admin_group = admin_group.lower()
@@ -546,16 +546,17 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
 
         synced_users.append(user.id)
 
-        if not user.attendee:
-            is_editor = user.role == 'editor'
-            permissions = is_editor and [external_attendee_org] or None
-            user.attendee = CourseAttendee(permissions=permissions)
+        if add_attendee:
+            if not user.attendee:
+                is_editor = user.role == 'editor'
+                permissions = is_editor and [external_attendee_org] or None
+                user.attendee = CourseAttendee(permissions=permissions)
 
-        user.attendee.first_name = data['first_name']
-        user.attendee.last_name = data['last_name']
-        user.attendee.organisation = data['organisation']
-        user.attendee.source_id = source_id
-        user.attendee.active = user.active
+            user.attendee.first_name = data['first_name']
+            user.attendee.last_name = data['last_name']
+            user.attendee.organisation = data['organisation']
+            user.attendee.source_id = source_id
+            user.attendee.active = user.active
 
         count += 1
         if not dry_run:

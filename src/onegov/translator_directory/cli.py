@@ -255,7 +255,7 @@ def fetch_users_cli(
         admin_group,
         editor_group
 ):
-    """ Updates the list of users/course attendees by fetching matching users
+    """ Updates the list of users by fetching matching users
     from a remote LDAP server.
 
     This is currently highly specific for the Canton of Zug and therefore most
@@ -280,7 +280,8 @@ def fetch_users_cli(
             ldap_username,
             ldap_password,
             admin_group,
-            editor_group
+            editor_group,
+            add_attendee=False
         )
 
     return execute
