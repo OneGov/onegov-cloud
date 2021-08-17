@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-08-17 15:13+0200\n"
+"POT-Creation-Date: 2021-08-17 16:11+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1373,8 +1373,8 @@ msgstr ""
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"
 
-msgid "Old domain"
-msgstr "Domaine vieux"
+msgid "New domain"
+msgstr "Nouveau domaine"
 
 msgid "Test migration"
 msgstr "Tester migration"
@@ -4447,8 +4447,10 @@ msgid "Total of ${number} links found."
 msgstr "Total de ${number} liens trouvés"
 
 #, python-format
-msgid "Migrates links to new domain ${domain}"
-msgstr "Migration des liens vers le nouveau domaine"
+msgid ""
+"Migrates links from the current domain \"${domain}\" to the given domain."
+msgstr ""
+"Fait migrer les liens du domaine actuel \"${domain}\" vers le domaine donné."
 
 msgid "Topics"
 msgstr "Sujets"
