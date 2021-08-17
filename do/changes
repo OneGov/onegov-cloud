@@ -145,6 +145,9 @@ class ChangelogCommit(object):
         if link.startswith('SEA-'):
             return f"https://linear.app/seantis/issue/{link}"
 
+        if link.startswith('OGC-'):
+            return f"https://linear.app/onegovcloud/issue/{link}"
+
         # default to a non-functioning link (they can be added later)
         return f'#{self.link}'
 
