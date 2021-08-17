@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-08-17 13:37+0200\n"
+"POT-Creation-Date: 2021-08-17 15:14+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -191,7 +191,7 @@ msgid "Accept ticket"
 msgstr "Accepter le ticket"
 
 msgid "This ticket can't be closed."
-msgstr ""
+msgstr "Ce ticket ne peut pas être fermé."
 
 msgid "This ticket requires a decision, but no decision has been made yet."
 msgstr "Ce ticket nécessite une décision, mais aucune n'a encore été prise."
@@ -210,12 +210,6 @@ msgstr "Archiver le ticket"
 
 msgid "Recover from archive"
 msgstr "Récupérer dans les archives"
-
-msgid "Do you really want to delete this ticket?"
-msgstr "Voulez-vous vraiment supprimer ce ticket ?"
-
-msgid "Delete Ticket"
-msgstr "Supprimer le ticket"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
@@ -471,9 +465,6 @@ msgstr "Supprimer lien externe"
 msgid "No rules defined."
 msgstr "Aucune règle définie."
 
-msgid "Delete all selected tickets?"
-msgstr "Supprimer tous les tickets sélectionnés ?"
-
 msgid "State:"
 msgstr "État :"
 
@@ -482,9 +473,6 @@ msgstr "Propriétaire :"
 
 msgid "Kind:"
 msgstr "Type :"
-
-msgid "Delete selected"
-msgstr "Supprimer la sélection"
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -1962,22 +1950,3 @@ msgstr "Paramètres de la newsletter"
 
 msgid "Link Migration"
 msgstr ""
-
-#~ msgid "Do you really want to close this ticket?"
-#~ msgstr "Voulez-vous vraiment fermer ce ticket?"
-
-#~ msgid ""
-#~ "Forgot something or have a special request? Add a message to the ticket."
-#~ msgstr ""
-#~ "Vous avez oublié quelque chose ou avez une demande spéciale? Ajoutez un "
-#~ "message a la demande."
-
-#~ msgid "Best regards,"
-#~ msgstr "Cordialement,"
-
-#~ msgid ""
-#~ "If you did not subscribe to this newsletter you can simply ignore this e-"
-#~ "mail. We will not bother you again."
-#~ msgstr ""
-#~ "Si vous ne vous êtes pas abonné à cette lettre d'informations, vous "
-#~ "pouvez tout simplement ignorer cet e-mail."

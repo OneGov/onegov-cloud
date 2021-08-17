@@ -149,11 +149,6 @@ $all-ticket-icon: '\f055';
     width: 2 * $default-icon-width;
 }
 
-.ticket-filter-deletable::before {
-    @include icon-bold($delete-ticket-icon);
-    width: 2 * $default-icon-width;
-}
-
 .no-tickets {
     border: 0;
     height: 400px;
@@ -277,14 +272,6 @@ tr.ticket:hover {
 
     &:hover::before {
         content: $reopen-ticket-icon-hover;
-    }
-}
-
-.ticket-delete {
-
-    &::before {
-        @include icon-bold($delete-ticket-icon);
-        margin-right: 1ex;
     }
 }
 
@@ -437,18 +424,6 @@ $ticket-filters-padding: .5rem;
             }
         }
 
-    }
-
-    li.active .ticket-filter-deletable::before {
-        @include icon-bold($delete-ticket-icon-active);
-    }
-
-    li.active .ticket-filter-deletable {
-        background: $alert-color;
-
-        &:hover {
-            background: scale-color($alert-color, $lightness: -6%);
-        }
     }
 }
 

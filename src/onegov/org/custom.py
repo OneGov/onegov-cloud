@@ -126,14 +126,14 @@ def get_global_tools(request):
                 )
             )
 
-            links.append(
-                Link(
-                    _("Archived Tickets"),
-                    request.class_link(
-                        ArchivedTicketsCollection, {'handler': 'ALL'}),
-                    attrs={'class': 'ticket-archive'}
-                )
+        links.append(
+            Link(
+                _("Archived Tickets"),
+                request.class_link(
+                    ArchivedTicketsCollection, {'handler': 'ALL'}),
+                attrs={'class': 'ticket-archive'}
             )
+        )
 
         yield LinkGroup(_("Management"), classes=('management', ), links=links)
 
@@ -150,7 +150,7 @@ def get_global_tools(request):
                 request.class_link(
                     TicketCollection, {
                         'handler': 'ALL',
-                        'state': '!closed',
+                        'state': 'unfinished',
                         'owner': request.current_user.id.hex
                     },
                 ),

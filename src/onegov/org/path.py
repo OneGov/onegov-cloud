@@ -271,10 +271,9 @@ def get_ticket(app, handler_code, id):
         id, ensure_handler_code=handler_code)
 
 
-@OrgApp.path(model=TicketCollection, path='/tickets/{handler}/{state}',
-             converters=dict(deleting=bool))
+@OrgApp.path(model=TicketCollection, path='/tickets/{handler}/{state}')
 def get_tickets(app, handler='ALL', state='open', page=0, group=None,
-                owner=None, extra_parameters=None, deleting=None):
+                owner=None, extra_parameters=None):
     return TicketCollection(
         app.session(),
         handler=handler,
@@ -283,17 +282,15 @@ def get_tickets(app, handler='ALL', state='open', page=0, group=None,
         group=group,
         owner=owner or '*',
         extra_parameters=extra_parameters,
-        deleting=deleting
     )
 
 
 @OrgApp.path(
-    model=ArchivedTicketsCollection, path='/tickets-archive/{handler}',
-    converters=dict(deleting=bool)
+    model=ArchivedTicketsCollection, path='/tickets-archive/{handler}'
 )
 def get_archived_tickets(
         app, handler='ALL', page=0, group=None, owner=None,
-        extra_parameters=None, deleting=None):
+        extra_parameters=None):
     return ArchivedTicketsCollection(
         app.session(),
         handler=handler,
@@ -301,8 +298,7 @@ def get_archived_tickets(
         page=page,
         group=group,
         owner=owner or '*',
-        extra_parameters=extra_parameters,
-        deleting=deleting,
+        extra_parameters=extra_parameters
     )
 
 

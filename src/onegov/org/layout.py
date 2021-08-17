@@ -1124,29 +1124,6 @@ class TicketLayout(DefaultLayout):
                     url=self.request.link(self.model, 'unarchive'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
-            if self.model.state in ('archived', 'closed'):
-                handler = self.model.handler
-                if handler.ticket_deletable:
-                    links.append(Link(
-                        _("Delete"),
-                        self.csrf_protected_url(self.request.link(self.model)),
-                        traits=(
-                            Confirm(
-                                _("Do you really want to delete this ticket?"),
-                                _("All data associated with this ticket will "
-                                  "be deleted. This cannot be undone."),
-                                _("Delete Ticket"),
-                                _("Cancel")
-                            ),
-                            Intercooler(
-                                request_method='DELETE',
-                                redirect_after=self.request.link(
-                                    self.collection
-                                )
-                            )
-                        ),
-                        attrs={'class': ('ticket-button', 'ticket-delete')}
-                    ))
 
             if self.model.state != 'closed':
                 links.append(Link(

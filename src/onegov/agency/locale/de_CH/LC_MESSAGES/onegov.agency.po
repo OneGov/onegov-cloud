@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-07-16 08:51+0200\n"
+"POT-Creation-Date: 2021-08-17 15:33+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -322,17 +322,11 @@ msgstr "Pfad"
 msgid "Show agency"
 msgstr "Organisation anzeigen"
 
-msgid "Accept"
-msgstr "Annehmen"
-
-msgid "Pending"
-msgstr "In Bearbeitung"
-
-msgid "Closed"
-msgstr "Abgeschlossen"
-
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
+
+msgid "Proposed changes applied."
+msgstr "Vorgeschlagene Änderungen übernommen."
 
 msgid "Sort the items using drag and drop."
 msgstr "Sortieren sie die Elemente mittels Drag & Drop."
@@ -383,9 +377,6 @@ msgstr "Ihr Ticket wurde eröffnet"
 
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
-
-msgid "Proposed changes applied."
-msgstr "Vorgeschlagene Änderungen übernommen."
 
 msgid "Excel file created"
 msgstr "Excel-Datei wurde erzeugt"

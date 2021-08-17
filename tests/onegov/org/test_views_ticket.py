@@ -66,14 +66,12 @@ def test_tickets(client):
 
     tickets_page = client.get('/tickets/ALL/open')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
-    assert not tickets_page.pyquery('a.ticket-filter-deletable')
 
     ticket_page = tickets_page.click('Annehmen').follow()
     assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     tickets_page = client.get('/tickets/ALL/pending')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
-    assert not tickets_page.pyquery('a.ticket-filter-deletable')
 
     page = client.get('/')
     assert page.pyquery('.open-tickets').attr('data-count') == '0'
@@ -125,13 +123,11 @@ def test_tickets(client):
     tickets_page = client.get('/tickets/ALL/closed')
 
     # the toggle for the deletion of the current subset
-    assert not tickets_page.pyquery('a.ticket-filter-deletable')
     ticket_rows = tickets_page.pyquery('tr.ticket')
     assert len(ticket_rows) == 1
     assert ticket_rows.attr('data-url')
 
     ticket_page = client.get(ticket_url)
-    assert not ticket_page.pyquery('.ticket-button.ticket-delete')
     ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
 
     tickets_page = client.get('/tickets/ALL/pending')
@@ -160,12 +156,6 @@ def test_tickets(client):
     archived_ticket = archived_ticket.click('Aus dem Archiv holen').follow()
     assert 'aus dem Archiv geholt' in archived_ticket
     archived_ticket.click('Ticket archivieren').follow()
-
-    archive = client.get('/tickets-archive/ALL')
-    assert archive.pyquery('tr.ticket')
-    assert archive.pyquery('a.ticket-filter-deletable')
-    archive = archive.click('Löschbar')
-    assert not archive.pyquery('tr.ticket')
 
     # test security
     anon = client.spawn()

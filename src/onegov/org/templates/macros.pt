@@ -1943,9 +1943,9 @@
             ${ticket.number}
         </td>
       </tal:block>
-        <td tal:condition="deleting_tickets or archive_tickets">
-            <input tal:condition="has_access" type="checkbox">
-        </td>
+      <td tal:condition="archive_tickets">
+          <input tal:condition="has_access" type="checkbox">
+      </td>
   </tr>
 </metal:tickets_table_row>
 

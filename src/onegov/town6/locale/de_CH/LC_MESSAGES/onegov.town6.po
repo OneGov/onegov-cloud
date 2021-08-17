@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-08-17 13:37+0200\n"
+"POT-Creation-Date: 2021-08-17 15:14+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -191,7 +191,7 @@ msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
 msgid "This ticket can't be closed."
-msgstr ""
+msgstr "Dieses Ticket kann nicht abgeschlossen werden."
 
 msgid "This ticket requires a decision, but no decision has been made yet."
 msgstr ""
@@ -212,12 +212,6 @@ msgstr "Ticket archivieren"
 
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
-
-msgid "Do you really want to delete this ticket?"
-msgstr "Möchten Sie das Ticket wirklich löschen?"
-
-msgid "Delete Ticket"
-msgstr "Ticket löschen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -475,9 +469,6 @@ msgstr "Verknüpfung löschen"
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
-msgid "Delete all selected tickets?"
-msgstr "Alle ausgewählten Tickets löschen?"
-
 msgid "State:"
 msgstr "Status:"
 
@@ -486,9 +477,6 @@ msgstr "Besitzer:"
 
 msgid "Kind:"
 msgstr "Art:"
-
-msgid "Delete selected"
-msgstr "Selektierte löschen"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -1954,15 +1942,3 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
-
-#~ msgid "Do you really want to close this ticket?"
-#~ msgstr "Möchten Sie dieses Ticket wirklich schliessen?"
-
-#~ msgid ""
-#~ "Forgot something or have a special request? Add a message to the ticket."
-#~ msgstr ""
-#~ "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen? Dann "
-#~ "fügen Sie der Anfrage eine Nachricht hinzu."
-
-#~ msgid "Best regards,"
-#~ msgstr "Mit freundlichen Grüssen,"

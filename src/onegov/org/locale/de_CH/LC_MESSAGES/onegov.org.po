@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-08-17 13:30+0200\n"
+"POT-Creation-Date: 2021-08-17 15:13+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1606,7 +1606,7 @@ msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
 msgid "This ticket can't be closed."
-msgstr ""
+msgstr "Dieses Ticket kann nicht abgeschlossen werden."
 
 msgid "This ticket requires a decision, but no decision has been made yet."
 msgstr ""
@@ -1624,18 +1624,6 @@ msgstr "Ticket archivieren"
 
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
-
-msgid "Do you really want to delete this ticket?"
-msgstr "Möchten Sie das Ticket wirklich löschen?"
-
-msgid ""
-"All data associated with this ticket will be deleted. This cannot be undone."
-msgstr ""
-"Alle mit diesem Ticket verbundenen Daten werden gelöscht. Dies kann nicht "
-"rückgängig gemacht werden."
-
-msgid "Delete Ticket"
-msgstr "Ticket löschen"
 
 msgid "Assign ticket"
 msgstr "Ticket zuweisen"
@@ -2309,9 +2297,6 @@ msgstr "Zusammenfassung"
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
-msgid "Delete all selected tickets?"
-msgstr "Alle ausgewählten Tickets löschen?"
-
 msgid "State:"
 msgstr "Status:"
 
@@ -2320,9 +2305,6 @@ msgstr "Besitzer:"
 
 msgid "Kind:"
 msgstr "Art:"
-
-msgid "Delete selected"
-msgstr "Selektierte löschen"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -4472,8 +4454,21 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
+
+msgid "This ticket is not deletable."
+msgstr "Dieses Ticket kann nicht gelöscht werden."
+
 msgid "Ticket successfully deleted"
 msgstr "Ticket erfolgreich gelöscht"
+
+msgid ""
+"Do you really want to delete this ticket? All data associated with this "
+"ticket will be deleted. This cannot be undone."
+msgstr ""
+"Möchten Sie das Ticket wirklich löschen? Alle mit diesem Ticket verbundenen "
+"Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden."
 
 msgid "Mark as paid"
 msgstr "Als bezahlt markieren"
@@ -4599,9 +4594,6 @@ msgstr "Ihre Nachricht wurde übermittelt"
 
 msgid "My"
 msgstr "Meine"
-
-msgid "Deletable"
-msgstr "Löschbar"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"

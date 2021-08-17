@@ -12,7 +12,7 @@ from uuid import UUID
 class TicketCollectionPagination(Pagination):
 
     def __init__(self, session, page=0, state='open', handler='ALL',
-                 group=None, owner='*', deleting=None, extra_parameters=None):
+                 group=None, owner='*', extra_parameters=None):
         self.session = session
         self.page = page
         self.state = state
@@ -20,7 +20,6 @@ class TicketCollectionPagination(Pagination):
         self.handlers = global_handlers
         self.group = group
         self.owner = owner
-        self.deleting = deleting
 
         if self.handler != 'ALL':
             self.extra_parameters = extra_parameters or {}
@@ -33,26 +32,19 @@ class TicketCollectionPagination(Pagination):
             self.page == other.page,
         ))
 
-    def transform_batch_query(self, query):
-        """ We transform the query before returning as a
-        tuple in self.batch()
-        """
-        if not self.deleting:
-            return query
-
-        return tuple(t for t in query if t.handler.ticket_deletable)
-
     def subset(self):
         query = self.query()
         query = query.order_by(desc(Ticket.created))
         query = query.options(joinedload(Ticket.user))
         query = query.options(undefer(Ticket.created))
 
-        if self.state != 'all':
-            if self.state.startswith('!'):
-                query = query.filter(Ticket.state != self.state.strip('!'))
-            else:
-                query = query.filter(Ticket.state == self.state)
+        if self.state == 'unfinished':
+            query = query.filter(
+                Ticket.state != 'closed',
+                Ticket.state != 'archived'
+            )
+        elif self.state != 'all':
+            query = query.filter(Ticket.state == self.state)
 
         if self.group != None:
             query = query.filter(Ticket.group == self.group)
@@ -78,7 +70,7 @@ class TicketCollectionPagination(Pagination):
     def page_by_index(self, index):
         return self.__class__(
             self.session, index, self.state, self.handler, self.group,
-            self.owner, self.deleting, self.extra_parameters
+            self.owner, self.extra_parameters
         )
 
     def available_groups(self, handler='*'):
@@ -93,19 +85,19 @@ class TicketCollectionPagination(Pagination):
     def for_state(self, state):
         return self.__class__(
             self.session, 0, state, self.handler, self.group, self.owner,
-            self.deleting, self.extra_parameters
+            self.extra_parameters
         )
 
     def for_handler(self, handler):
         return self.__class__(
             self.session, 0, self.state, handler, self.group, self.owner,
-            self.deleting, self.extra_parameters
+            self.extra_parameters
         )
 
     def for_group(self, group):
         return self.__class__(
             self.session, 0, self.state, self.handler, group, self.owner,
-            self.deleting, self.extra_parameters
+            self.extra_parameters
         )
 
     def for_owner(self, owner):
@@ -114,13 +106,7 @@ class TicketCollectionPagination(Pagination):
 
         return self.__class__(
             self.session, 0, self.state, self.handler, self.group, owner,
-            self.deleting, self.extra_parameters
-        )
-
-    def for_deletion(self, deleting):
-        return self.__class__(
-            self.session, self.page, 'closed', self.handler, self.group,
-            self.owner, deleting, self.extra_parameters
+            self.extra_parameters
         )
 
 

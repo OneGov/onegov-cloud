@@ -2587,17 +2587,6 @@ $archive-ticket-icon: '\f1c6';
     margin-right: $ticket-filter-icon-mr;
 }
 
-.ticket-filter-deletable::before {
-    @include icon($delete-ticket-icon);
-    margin-right: $ticket-filter-icon-mr;
-}
-
-.active .ticket-filter-deletable::before {
-    @include icon($delete-ticket-icon-active);
-    margin-right: $ticket-filter-icon-mr;
-}
-
-
 .no-tickets {
     border: 0;
     height: 400px;
@@ -2607,14 +2596,6 @@ $archive-ticket-icon: '\f1c6';
 
 .tickets-table {
     width: 100%;
-
-    dd.active .ticket-filter-deletable {
-        background: $alert-color;
-
-        &:hover {
-            background: scale-color($alert-color, $lightness: -6%);
-        }
-    }
 
     #action-box {
         align-items: flex-start;
@@ -2790,15 +2771,6 @@ tr.ticket:hover {
 
     &:hover::before {
         content: $reopen-ticket-icon-hover;
-    }
-}
-
-.ticket-delete {
-    float: right;
-
-    &::before {
-        @include icon($delete-ticket-icon);
-        margin-right: 1ex;
     }
 }
 

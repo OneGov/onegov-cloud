@@ -18,7 +18,7 @@ class TicketDeletionMixin:
 
     @property
     def ticket_deletable(self):
-        return self.deleted and self.ticket.state == 'closed'
+        return self.deleted and self.ticket.state == 'archived'
 
     def prepare_delete_ticket(self):
         """The handler knows best what to do when a ticket is called for
@@ -190,7 +190,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
             return True
         return False
         #  ...for later when deletion will be available
-        if not self.ticket.state == 'closed':
+        if not self.ticket.state == 'archived':
             return False
         if self.payment:
             # For now we do not handle this case since payment might be

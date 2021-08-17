@@ -375,9 +375,7 @@ def test_filtering(session):
     TicketCollection(session, state='open').subset().count() == 2
     TicketCollection(session, state='pending').subset().count() == 1
     TicketCollection(session, state='closed').subset().count() == 4
-    TicketCollection(session, state='!open').subset().count() == 5
-    TicketCollection(session, state='!pending').subset().count() == 6
-    TicketCollection(session, state='!closed').subset().count() == 3
+    TicketCollection(session, state='unfinished').subset().count() == 5
     TicketCollection(session, group='one').subset().count() == 3
     TicketCollection(session, group='two').subset().count() == 4
     TicketCollection(session, handler='ALL').subset().count() == 7

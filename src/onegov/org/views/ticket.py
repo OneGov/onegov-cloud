@@ -6,8 +6,9 @@ from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.orm import as_selectable
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import normalize_for_url
+from onegov.form import Form
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import InternalTicketChatMessageForm
@@ -120,25 +121,47 @@ def view_ticket(self, request, layout=None):
     }
 
 
-@OrgApp.view(model=Ticket, permission=Private, request_method='DELETE')
-def delete_ticket(self, request):
+@OrgApp.form(model=Ticket, permission=Secret, template='form.pt',
+             name='delete', form=Form)
+def delete_ticket(self, request, form, layout=None):
     """ Deleting a ticket means getting rid of all the data associated with it
     """
-    request.assert_valid_csrf_token()
-    assert self.state == 'closed'
-    assert self.handler.ticket_deletable
 
-    messages = MessageCollection(
-        request.session, channel_id=self.number)
+    layout = layout or TicketLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Delete Ticket"), '#'))
+    layout.editbar_links = None
 
-    for message in messages.query():
-        messages.delete(message)
+    if not self.handler.ticket_deletable:
+        return {
+            'layout': layout,
+            'title': _("Delete Ticket"),
+            'callout': _("This ticket is not deletable."),
+            'form': None
+        }
 
-    self.handler.prepare_delete_ticket()
+    if form.submitted(request):
+        messages = MessageCollection(request.session, channel_id=self.number)
 
-    request.session.delete(self)
-    if not request.params.get('quiet'):
+        for message in messages.query():
+            messages.delete(message)
+
+        self.handler.prepare_delete_ticket()
+
+        request.session.delete(self)
         request.success(_("Ticket successfully deleted"))
+        return morepath.redirect(
+            request.link(TicketCollection(request.session))
+        )
+
+    return {
+        'layout': layout,
+        'title': _("Delete Ticket"),
+        'callout': _(
+            "Do you really want to delete this ticket? All data associated "
+            "with this ticket will be deleted. This cannot be undone."
+        ),
+        'form': form
+    }
 
 
 def manual_payment_button(payment, layout):
@@ -675,29 +698,17 @@ def get_filters(self, request):
     yield Link(
         text=_("My"),
         url=request.link(
-            self.for_state('!closed').for_owner(request.current_user.id)
+            self.for_state('unfinished').for_owner(request.current_user.id)
         ),
-        active=self.state == '!closed',
+        active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}
     )
     for id, text in TICKET_STATES.items():
-        # Make some room in the ui
-        if self.deleting and id == 'open':
-            continue
-        if self.state == 'archived':
-            continue
         yield Link(
             text=text,
             url=request.link(self.for_state(id).for_owner(None)),
             active=self.state == id,
             attrs={'class': 'ticket-filter-' + id}
-        )
-    if self.state == 'archived':
-        yield Link(
-            text=_("Deletable"),
-            url=request.link(self.for_deletion(not self.deleting)),
-            active=self.deleting,
-            attrs={'class': 'ticket-filter-deletable'}
         )
 
 
@@ -786,29 +797,10 @@ def groups_by_handler_code(session):
 @OrgApp.html(model=TicketCollection, template='tickets.pt',
              permission=Private)
 def view_tickets(self, request, layout=None):
-
     groups = groups_by_handler_code(request.session)
-
-    if self.state == 'open':
-        tickets_title = _("Open Tickets")
-    elif self.state == 'pending':
-        tickets_title = _("Pending Tickets")
-    elif self.state == 'closed':
-        tickets_title = _("Closed Tickets")
-    elif self.state == 'all':
-        tickets_title = _("All Tickets")
-    elif self.state == '!closed':
-        tickets_title = _("My Tickets")
-    else:
-        raise NotImplementedError
-
-    if not self.state == 'closed':
-        self.deleting = False
-
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
     filters = tuple(get_filters(self, request))
-
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
     layout = layout or TicketsLayout(self, request)
@@ -823,9 +815,7 @@ def view_tickets(self, request, layout=None):
         'filters': filters,
         'handlers': handlers,
         'owners': owners,
-        'tickets_title': tickets_title,
         'tickets_state': self.state,
-        'deleting_tickets': self.deleting,
         'archive_tickets': self.state == 'closed',
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
@@ -838,37 +828,28 @@ def view_tickets(self, request, layout=None):
 @OrgApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
              permission=Private)
 def view_archived_tickets(self, request, layout=None):
-
     groups = groups_by_handler_code(request.session)
-
-    tickets_title = _("Archived Tickets")
-
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
-    filters = tuple(get_filters(self, request))
-
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
     layout = layout or TicketsLayout(self, request)
 
-    def delete_link(ticket):
-        url = URL(request.link(ticket)).query_param('quiet', '1')
-        return layout.csrf_protected_url(url.as_string())
+    def action_link(ticket):
+        return ''
 
     return {
-        'title': tickets_title,
+        'title': _("Archived Tickets"),
         'layout': layout,
         'tickets': self.batch,
-        'filters': filters,
+        'filters': [],
         'handlers': handlers,
         'owners': owners,
-        'tickets_title': tickets_title,
         'tickets_state': self.state,
-        'deleting_tickets': self.deleting,
         'archive_tickets': False,
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'handler': handler,
         'owner': owner,
-        'action_link': delete_link
+        'action_link': action_link
     }
