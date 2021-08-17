@@ -29,7 +29,6 @@ from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
-from purl import URL
 from sqlalchemy import select
 
 
