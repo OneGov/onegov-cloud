@@ -1,8 +1,36 @@
 # Changes
 
+## 2021.73
+
+`2021-08-19` | [75541aaa4f...e1555bf852](https://github.com/OneGov/onegov-cloud/compare/75541aaa4f^...e1555bf852)
+
+### Core
+
+##### Add namespace parameter to transfer command.
+
+`Feature` | [9dd82a4809](https://github.com/onegov/onegov-cloud/commit/9dd82a48096256c0ccfba09c35320424a9c95c66)
+
+### Election Day
+
+##### Log exceptions when creating media rather than failing.
+
+`Bugfix` | [48cc67dbc8](https://github.com/onegov/onegov-cloud/commit/48cc67dbc8707fd92655b67978d3c9bb6c075432)
+
+### Org
+
+##### Fixes ticket view throwing an error for tickets with no users.
+
+`Bugfix` | [84fe7d58b3](https://github.com/onegov/onegov-cloud/commit/84fe7d58b36f0aae88a94d91a6253b3b85cd1a1f)
+
+### Translatordirectory
+
+##### Don't create FSI course attendees when importing from the ldap.
+
+`Bugfix` | [OGC-24](https://linear.app/onegovcloud/issue/OGC-24) | [75541aaa4f](https://github.com/onegov/onegov-cloud/commit/75541aaa4f53ec93663321d67da4daeeff6798ab)
+
 ## 2021.72
 
-`2021-08-17` | [5daf5fdef3...30257b842e](https://github.com/OneGov/onegov-cloud/compare/5daf5fdef3^...30257b842e)
+`2021-08-17` | [5daf5fdef3...11ed322b63](https://github.com/OneGov/onegov-cloud/compare/5daf5fdef3^...11ed322b63)
 
 ### All
 
@@ -1207,14 +1235,4 @@ Fixes issue for browsers not using default by themselves (IE11).
 ##### Fix vote attachments fallback URLs.
 
 `Bugfix` | [VOTES-102](https://issues.seantis.ch/browse/VOTES-102) | [5a9d001dcf](https://github.com/onegov/onegov-cloud/commit/5a9d001dcf32379250ffe8a5272479cc2c92d080)
-
-## 2021.23
-
-`2021-02-16` | [9a6179524e...1c525760cf](https://github.com/OneGov/onegov-cloud/compare/9a6179524e^...1c525760cf)
-
-### Swissvotes
-
-##### Fixes various minor bugs.
-
-`Bugfix` | [402a3c117e](https://github.com/onegov/onegov-cloud/commit/402a3c117ea05b342c91bad17cbc2e8fe4d83fe5)
 
