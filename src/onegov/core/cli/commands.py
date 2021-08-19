@@ -140,16 +140,20 @@ def sendmail(group_context,
     'default_selector': '*'
 })
 @click.argument('server')
-@click.option('--remote-config', default='/var/lib/onegov-cloud/onegov.yml')
+@click.option('--remote-config', default='/var/lib/onegov-cloud/onegov.yml',
+              help='Location of the remote config file')
 @click.option('--confirm/--no-confirm', default=True,
               help="Ask for confirmation (disabling this is dangerous!)")
 @click.option('--no-filestorage', default=False, is_flag=True,
               help="Do not transfer the files")
 @click.option('--no-database', default=False, is_flag=True,
               help="Do not transfer the database")
+@click.option('--namespace', default=[], multiple=True,
+              help="Only transfer the this namespace")
 @pass_group_context
 def transfer(group_context,
-             server, remote_config, confirm, no_filestorage, no_database):
+             server, remote_config, confirm, no_filestorage, no_database,
+             namespace):
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -162,6 +166,8 @@ def transfer(group_context,
 
     So if you have a 'cities' namespace locally and a 'towns' namespace on
     the remote, nothing will happen.
+
+    It's also possible to transfer only a given set of namespaces.
 
     WARNING: This may delete local content!
 
@@ -307,6 +313,9 @@ def transfer(group_context,
 
     # transfer the data
     for local_cfg in group_context.appcfgs:
+
+        if namespace and local_cfg.namespace not in namespace:
+            continue
 
         if local_cfg.namespace not in remote_applications:
             continue
