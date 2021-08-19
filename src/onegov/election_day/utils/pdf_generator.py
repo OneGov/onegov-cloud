@@ -1019,11 +1019,13 @@ class PdfGenerator():
                         self.generate_pdf(item, path, locale)
                         self.sign_pdf(path)
                         log.info("{} created".format(filename))
-                    except Exception as ex:
+                    except Exception:
+                        log.exception("Could not create {} ({})".format(
+                            filename, item.title
+                        ))
                         # Don't leave probably broken PDFs laying around
                         if fs.exists(path):
                             fs.remove(path)
-                        raise ex
 
         # Delete old PDFs
         existing = fs.listdir(self.pdf_dir)
