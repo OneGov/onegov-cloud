@@ -10,14 +10,9 @@ SUPPORTED_YEARS = list(range(2002, 2021 + 1))
 SUPPORTED_YEARS_MAP = list(range(2013, 2021 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 
-SUPPORTED_YEARS_MAP_SG = list(range(2004, 2021 + 1))
-SUPPORTED_YEARS_NO_MAP_SG = list(
-    set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_SG)
-)
-
-SUPPORTED_YEARS_MAP_ZG = list(range(2004, 2021 + 1))
-SUPPORTED_YEARS_NO_MAP_ZG = list(
-    set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ZG)
+SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2021 + 1))
+SUPPORTED_YEARS_NO_MAP_ADDITIONAL = list(
+    set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ADDITIONAL)
 )
 
 
@@ -294,33 +289,25 @@ def test_principal_years_available():
         assert principal.is_year_available(year, map_required=False)
 
     # Cantons
-    for canton in Canton.CANTONS - {'sg', 'zg'}:
+    for canton in Canton.CANTONS:
         principal = Canton(name=canton, canton=canton)
 
-        for year in SUPPORTED_YEARS_NO_MAP:
-            assert not principal.is_year_available(year)
-            assert principal.is_year_available(year, map_required=False)
-        for year in SUPPORTED_YEARS_MAP:
-            assert principal.is_year_available(year)
-            assert principal.is_year_available(year, map_required=False)
-
-    # Canton SG
-    principal = Canton(name='sg', canton='sg')
-    for year in SUPPORTED_YEARS_NO_MAP_SG:
-        assert not principal.is_year_available(year)
-        assert principal.is_year_available(year, map_required=False)
-    for year in SUPPORTED_YEARS_MAP_SG:
-        assert principal.is_year_available(year)
-        assert principal.is_year_available(year, map_required=False)
-
-    # Canton ZG
-    principal = Canton(name='zg', canton='sg')
-    for year in SUPPORTED_YEARS_NO_MAP_ZG:
-        assert not principal.is_year_available(year)
-        assert principal.is_year_available(year, map_required=False)
-    for year in SUPPORTED_YEARS_MAP_ZG:
-        assert principal.is_year_available(year)
-        assert principal.is_year_available(year, map_required=False)
+        if canton in {'bl', 'sg', 'zg'}:
+            # Canton with additional map data
+            for year in SUPPORTED_YEARS_NO_MAP_ADDITIONAL:
+                assert not principal.is_year_available(year)
+                assert principal.is_year_available(year, map_required=False)
+            for year in SUPPORTED_YEARS_MAP_ADDITIONAL:
+                assert principal.is_year_available(year)
+                assert principal.is_year_available(year, map_required=False)
+        else:
+            # Canton with normal map data
+            for year in SUPPORTED_YEARS_NO_MAP:
+                assert not principal.is_year_available(year)
+                assert principal.is_year_available(year, map_required=False)
+            for year in SUPPORTED_YEARS_MAP:
+                assert principal.is_year_available(year)
+                assert principal.is_year_available(year, map_required=False)
 
 
 def test_principal_notifications_enabled():
