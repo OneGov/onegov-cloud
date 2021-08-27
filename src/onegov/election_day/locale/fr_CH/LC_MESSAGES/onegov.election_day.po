@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-16 08:15+0200\n"
+"POT-Creation-Date: 2021-08-27 08:18+0200\n"
 "PO-Revision-Date: 2021-04-01 10:23+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1026,6 +1026,9 @@ msgstr "Nouvel écran"
 
 msgid "No screens yet."
 msgstr "Pas encore d’écrans."
+
+msgid "Export"
+msgstr "Export"
 
 msgid "No subscribers yet."
 msgstr "Pas encore d’abonnés."

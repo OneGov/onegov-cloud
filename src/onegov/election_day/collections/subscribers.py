@@ -93,6 +93,14 @@ class SubscriberCollection(SubscriberCollectionPagination):
 
         self.session.flush()
 
+    def export(self):
+        """ Returns all data connected to these subscribers. """
+
+        return [
+            {'address': subscriber.address, 'locale': subscriber.locale}
+            for subscriber in self.query()
+        ]
+
 
 class EmailSubscriberCollection(SubscriberCollection):
 

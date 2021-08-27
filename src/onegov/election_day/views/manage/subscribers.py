@@ -1,4 +1,5 @@
 from morepath import redirect
+from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import EmailSubscriberCollection
@@ -22,7 +23,8 @@ def view_sms_subscribers(self, request):
         'address_title': _("Phone number"),
         'count': self.query().count(),
         'subscribers': self.batch,
-        'term': self.term
+        'term': self.term,
+        'export': request.link(self, 'export')
     }
 
 
@@ -40,7 +42,38 @@ def view_email_subscribers(self, request):
         'address_title': _("Email"),
         'count': self.query().count(),
         'subscribers': self.batch,
-        'term': self.term
+        'term': self.term,
+        'export': request.link(self, 'export')
+    }
+
+
+@ElectionDayApp.csv_file(
+    model=SmsSubscriberCollection,
+    name='export',
+    permission=Private
+)
+def export_sms_subscribers(self, request):
+
+    """ Export all SMS subscribers as a CSV. """
+
+    return {
+        'data': self.export(),
+        'name': 'sms-subscribers'
+    }
+
+
+@ElectionDayApp.csv_file(
+    model=EmailSubscriberCollection,
+    name='export',
+    permission=Private
+)
+def export_email_subscribers(self, request):
+
+    """ Export all email subscribers as a CSV. """
+
+    return {
+        'data': self.export(),
+        'name': 'email-subscribers'
     }
 
 
@@ -50,7 +83,7 @@ def view_email_subscribers(self, request):
 )
 def delete_subscriber(self, request, form):
 
-    """ Delete a single subsriber. """
+    """ Delete a single subscriber. """
 
     layout = ManageSubscribersLayout(self, request)
 

@@ -248,6 +248,7 @@ applications:
     namespace: onegov_election_day
     configuration:
       <<: *global-config
+      sms_directory: '/usr/local/var/onegov/sms'
 
   - path: /onegov_gazette/*
     application: onegov.gazette.GazetteApp

@@ -16,6 +16,9 @@
                         </h1>
                     </div>
                     <div class="small-12 medium-3 columns">
+                        <ul class="top-actions text-right">
+                            <li><a class="action-export" href="${export}" i18n:translate>Export</a></li>
+                        </ul>
                         <form style="margin-top: 1em;">
                             <div class="row collapse">
                                 <div class="small-10 columns">

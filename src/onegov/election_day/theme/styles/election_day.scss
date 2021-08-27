@@ -721,6 +721,12 @@ ul.actions {
         font-family: 'FontAwesome';
         margin-right: .75ex;
     }
+
+    .action-export::before {
+        content: '\f019';
+        font-family: 'FontAwesome';
+        margin-right: .75ex;
+    }
 }
 
 /*

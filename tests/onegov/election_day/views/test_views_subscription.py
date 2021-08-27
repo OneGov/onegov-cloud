@@ -93,6 +93,13 @@ def test_view_manage_email_subscription(election_day_app):
     assert '123@example.org' in manage
     assert '456@example.org' in manage
 
+    response = client.get('/manage/subscribers/email/export')
+    assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert response.headers['Content-Disposition'] == \
+        'inline; filename=email-subscribers.csv'
+    assert '123@example.org' in response.text
+    assert '456@example.org' in response.text
+
     manage = client.get('/manage/subscribers/email?term=23')
     assert '123@example.org' in manage
     assert '456@example.org' not in manage
@@ -185,6 +192,13 @@ def test_view_manage_sms_subscription(election_day_app):
     manage = client.get('/manage/subscribers/sms')
     assert '+41791112233' in manage
     assert '+41791112244' in manage
+
+    response = client.get('/manage/subscribers/sms/export')
+    assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert response.headers['Content-Disposition'] == \
+        'inline; filename=sms-subscribers.csv'
+    assert '+41791112233' in response.text
+    assert '+41791112244' in response.text
 
     manage = client.get('/manage/subscribers/sms?term=2233')
     assert '+41791112233' in manage

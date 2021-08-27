@@ -272,3 +272,49 @@ def test_subscriber_collection_term(session):
     assert collection.query().one().address == 'user33@example.org'
     collection = SmsSubscriberCollection(session, term='33')
     assert collection.query().one().address == '+41791112233'
+
+
+def test_subscriber_collection_export(session):
+    request_de = DummyRequest(locale='de_CH')
+    request_fr = DummyRequest(locale='fr_CH')
+
+    # Add email subscribers
+    collection = EmailSubscriberCollection(session)
+    collection.subscribe('a@example.org', request_de, confirm=False)
+    collection.subscribe('b@example.org', request_de, confirm=False)
+    collection.subscribe('c@example.org', request_fr, confirm=False)
+
+    # Add SMS subscribers
+    collection = SmsSubscriberCollection(session)
+    collection.subscribe('+41791112201', request_de, confirm=False)
+    collection.subscribe('+41791112202', request_fr, confirm=False)
+    collection.subscribe('+41791112203', request_fr, confirm=False)
+
+    assert SubscriberCollection(session).query().count() == 6
+
+    # Test email export
+    data = EmailSubscriberCollection(session).export()
+    assert sorted(data, key=lambda x: x['address']) == [
+        {'address': 'a@example.org', 'locale': 'de_CH'},
+        {'address': 'b@example.org', 'locale': 'de_CH'},
+        {'address': 'c@example.org', 'locale': 'fr_CH'},
+    ]
+
+    # Test SMS export
+    data = SmsSubscriberCollection(session).export()
+    assert sorted(data, key=lambda x: x['address']) == [
+        {'address': '+41791112201', 'locale': 'de_CH'},
+        {'address': '+41791112202', 'locale': 'fr_CH'},
+        {'address': '+41791112203', 'locale': 'fr_CH'},
+    ]
+
+    # Test mixed export
+    data = SubscriberCollection(session).export()
+    assert sorted(data, key=lambda x: x['address']) == [
+        {'address': '+41791112201', 'locale': 'de_CH'},
+        {'address': '+41791112202', 'locale': 'fr_CH'},
+        {'address': '+41791112203', 'locale': 'fr_CH'},
+        {'address': 'a@example.org', 'locale': 'de_CH'},
+        {'address': 'b@example.org', 'locale': 'de_CH'},
+        {'address': 'c@example.org', 'locale': 'fr_CH'},
+    ]
