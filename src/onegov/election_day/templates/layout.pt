@@ -37,15 +37,27 @@ metal:define-macro="layout">
     <script metal:use-macro="layout.macros['tablesaw_translations']" />
 </head>
 <body>
-    <div tal:condition="not request.browser_session.get('headerless')" class="row header">
-        <div class="small-12 medium-4 medium-push-8 columns text-right">
-            <a href="${layout.principal.base}" class="back-to-base" tal:condition="layout.principal.base|nothing">${layout.principal.base_domain}</a>
-        </div>
-        <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
-            <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
-            </a>
-        </div>
+    <div tal:condition="not request.browser_session.get('headerless')" class="row header" tal:define="position request.app.principal.logo_position|'left'">
+        <tal:block tal:condition="position == 'left'">
+            <div class="small-12 medium-4 medium-push-8 columns text-right">
+                <a href="${layout.principal.base}" class="back-to-base" tal:condition="layout.principal.base|nothing">${layout.principal.base_domain}</a>
+            </div>
+            <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
+                <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
+                    <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                </a>
+            </div>
+        </tal:block>
+        <tal:block tal:condition="position == 'right'">
+            <div class="small-12 columns text-right">
+                <a href="${layout.principal.base}" class="back-to-base" tal:condition="layout.principal.base|nothing">${layout.principal.base_domain}</a>
+            </div>
+            <div class="small-12 columns text-right small-only-text-center">
+                <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
+                    <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                </a>
+            </div>
+        </tal:block>
     </div>
 
     <div class="before-content">

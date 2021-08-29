@@ -64,6 +64,7 @@ class Principal(object):
         entities=None,
         name=None,
         logo=None,
+        logo_position='left',
         color='#000',
         base=None,
         analytics=None,
@@ -88,6 +89,7 @@ class Principal(object):
         self.entities = entities
         self.name = name
         self.logo = logo
+        self.logo_position = logo_position
         self.color = color
         self.base = base
         self.analytics = analytics
