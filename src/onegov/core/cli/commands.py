@@ -148,12 +148,11 @@ def sendmail(group_context,
               help="Do not transfer the files")
 @click.option('--no-database', default=False, is_flag=True,
               help="Do not transfer the database")
-@click.option('--namespace', default=[], multiple=True,
-              help="Only transfer the this namespace")
+@click.option('--transfer-schema', help="Only transfer this schema")
 @pass_group_context
 def transfer(group_context,
              server, remote_config, confirm, no_filestorage, no_database,
-             namespace):
+             transfer_schema):
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -167,11 +166,15 @@ def transfer(group_context,
     So if you have a 'cities' namespace locally and a 'towns' namespace on
     the remote, nothing will happen.
 
-    It's also possible to transfer only a given set of namespaces.
+    It's also possible to transfer only a given schema, e.g. '/town/govikon' or
+    '/town/*'. But beware, global files are copied in any case!
 
     WARNING: This may delete local content!
 
     """
+
+    if transfer_schema:
+        transfer_schema = transfer_schema.strip('/').replace('/', '-')
 
     if not shutil.which('pv'):
         print("")
@@ -221,6 +224,7 @@ def transfer(group_context,
         if shutil.which('pv'):
             recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
 
+        print(f"Copying {remote}/{glob}")
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     def transfer_database(remote_db, local_db, schema_glob='*'):
@@ -247,6 +251,7 @@ def transfer(group_context,
             recv = f"sudo -u postgres {recv}"
 
         for schema in schemas:
+            print(f"Prepare transfering database schema {schema}")
             drop = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'
             drop = f"echo '{drop}' | {recv}"
 
@@ -258,10 +263,10 @@ def transfer(group_context,
         if shutil.which('pv'):
             recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
 
+        print("Transfering database")
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     def transfer_storage_of_app(local_cfg, remote_cfg):
-
         remote_storage = remote_cfg.configuration.get('filestorage')
         local_storage = local_cfg.configuration.get('filestorage')
 
@@ -272,14 +277,12 @@ def transfer(group_context,
             remote_storage = os.path.join(remote_dir, remote_fs['root_path'])
             local_storage = os.path.join('.', local_fs['root_path'])
 
-            transfer_storage(
-                remote_storage, local_storage, glob='global-*')
+            transfer_storage(remote_storage, local_storage, glob='global-*')
 
-            transfer_storage(
-                remote_storage, local_storage, glob=f'{local_cfg.namespace}*')
+            glob = transfer_schema or f'{local_cfg.namespace}*'
+            transfer_storage(remote_storage, local_storage, glob=glob)
 
     def transfer_depot_storage_of_app(local_cfg, remote_cfg):
-
         depot_local_storage = 'depot.io.local.LocalFileStorage'
         remote_backend = remote_cfg.configuration.get('depot_backend')
         local_backend = local_cfg.configuration.get('depot_backend')
@@ -291,8 +294,8 @@ def transfer(group_context,
             remote_storage = os.path.join(remote_dir, remote_depot)
             local_storage = os.path.join('.', local_depot)
 
-            transfer_storage(
-                remote_storage, local_storage, glob=f'{local_cfg.namespace}*')
+            glob = transfer_schema or f'{local_cfg.namespace}*'
+            transfer_storage(remote_storage, local_storage, glob=glob)
 
     def transfer_database_of_app(local_cfg, remote_cfg):
         if 'dsn' not in remote_cfg.configuration:
@@ -308,13 +311,13 @@ def transfer(group_context,
         local_db = local_cfg.configuration['dsn'].split('/')[-1]
         remote_db = remote_cfg.configuration['dsn'].split('/')[-1]
 
-        transfer_database(
-            remote_db, local_db, schema_glob=f'{local_cfg.namespace}*')
+        schema_glob = transfer_schema or f'{local_cfg.namespace}*'
+        transfer_database(remote_db, local_db, schema_glob=schema_glob)
 
     # transfer the data
     for local_cfg in group_context.appcfgs:
 
-        if namespace and local_cfg.namespace not in namespace:
+        if transfer_schema and local_cfg.namespace not in transfer_schema:
             continue
 
         if local_cfg.namespace not in remote_applications:
