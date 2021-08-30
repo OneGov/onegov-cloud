@@ -25,6 +25,12 @@ class DummyRequest():
     def transform(self, url):
         return url
 
+    def include(self, asset):
+        pass
+
+    def exclude_invisible(self, items):
+        return []
+
 
 def test_app_custom(agency_app):
     def as_text(items):
