@@ -1,8 +1,32 @@
 # Changes
 
+## 2021.74
+
+`2021-08-30` | [6ed7b747d4...9e83c9ed1b](https://github.com/OneGov/onegov-cloud/compare/6ed7b747d4^...9e83c9ed1b)
+
+### Core
+
+##### Replace namespace parameter of transfer command with schema parameter.
+
+`Feature` | [9493b3f02d](https://github.com/onegov/onegov-cloud/commit/9493b3f02dd55f1c105fd0f442e7bc31ddde170f)
+
+### Election Day
+
+##### Add map data for 2004-2012.
+
+`Feature` | [OGC-71](https://linear.app/onegovcloud/issue/OGC-71) | [6ed7b747d4](https://github.com/onegov/onegov-cloud/commit/6ed7b747d4168e6c25098fd434db062fcd6e0485)
+
+##### Add subscriber export.
+
+`Feature` | [OGC-59](https://linear.app/onegovcloud/issue/OGC-59) | [c5760bbc35](https://github.com/onegov/onegov-cloud/commit/c5760bbc3541dc146ce973de224a9419bcfe130f)
+
+##### Make logo position configurable.
+
+`Feature` | [OGC-32](https://linear.app/onegovcloud/issue/OGC-32) | [9e83c9ed1b](https://github.com/onegov/onegov-cloud/commit/9e83c9ed1bdf749eeee23f1b32d49da06007187f)
+
 ## 2021.73
 
-`2021-08-19` | [75541aaa4f...e1555bf852](https://github.com/OneGov/onegov-cloud/compare/75541aaa4f^...e1555bf852)
+`2021-08-19` | [75541aaa4f...121a1c22f7](https://github.com/OneGov/onegov-cloud/compare/75541aaa4f^...121a1c22f7)
 
 ### Core
 
@@ -1213,26 +1237,4 @@ Adds additional fields to ticket pdf and ticket view.
 ##### Adds missing pagination in election archive search.
 
 `Bugfix` | [179d4513ab](https://github.com/onegov/onegov-cloud/commit/179d4513abe4c8f62a51fa45a2f9e60b19b30d1b)
-
-## 2021.24
-
-`2021-02-25` | [35fac7f40f...b8d872e9cd](https://github.com/OneGov/onegov-cloud/compare/35fac7f40f^...b8d872e9cd)
-
-### Org
-
-##### Adds default value for homepage left header color
-
-Fixes issue for browsers not using default by themselves (IE11).
-
-`Bugfix` | [2188aaa7fa](https://github.com/onegov/onegov-cloud/commit/2188aaa7face029ff760683fb901ace3b571dd2d)
-
-### Swissvotes
-
-##### Sort posters by links.
-
-`Bugfix` | [VOTES-102](https://issues.seantis.ch/browse/VOTES-102) | [511c1c875a](https://github.com/onegov/onegov-cloud/commit/511c1c875abe8817696126185b8d71b8c7d3958e)
-
-##### Fix vote attachments fallback URLs.
-
-`Bugfix` | [VOTES-102](https://issues.seantis.ch/browse/VOTES-102) | [5a9d001dcf](https://github.com/onegov/onegov-cloud/commit/5a9d001dcf32379250ffe8a5272479cc2c92d080)
 
