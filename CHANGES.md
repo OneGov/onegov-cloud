@@ -1,8 +1,18 @@
 # Changes
 
+## 2021.75
+
+`2021-08-31` | [77256a0752...974f95c7d0](https://github.com/OneGov/onegov-cloud/compare/77256a0752^...974f95c7d0)
+
+### Agency
+
+##### Enable topics (without sidebar).
+
+`Feature` | [OGC-26](https://linear.app/onegovcloud/issue/OGC-26) | [77256a0752](https://github.com/onegov/onegov-cloud/commit/77256a075296b6e3fddc7f5c03ee71c4ae5d663b)
+
 ## 2021.74
 
-`2021-08-30` | [6ed7b747d4...9e83c9ed1b](https://github.com/OneGov/onegov-cloud/compare/6ed7b747d4^...9e83c9ed1b)
+`2021-08-30` | [6ed7b747d4...d79ede1b6f](https://github.com/OneGov/onegov-cloud/compare/6ed7b747d4^...d79ede1b6f)
 
 ### Core
 
@@ -1227,14 +1237,4 @@ Adds additional fields to ticket pdf and ticket view.
 ##### Improves directory export with filter panel
 
 `Feature` | [eb0aacba50](https://github.com/onegov/onegov-cloud/commit/eb0aacba508759cf40d208b1b357d0cd27f24436)
-
-## 2021.25
-
-`2021-03-01` | [dd199312fb...70b85a9b97](https://github.com/OneGov/onegov-cloud/compare/dd199312fb^...70b85a9b97)
-
-### Election Day
-
-##### Adds missing pagination in election archive search.
-
-`Bugfix` | [179d4513ab](https://github.com/onegov/onegov-cloud/commit/179d4513abe4c8f62a51fa45a2f9e60b19b30d1b)
 
