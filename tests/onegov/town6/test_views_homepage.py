@@ -15,7 +15,9 @@ def test_homepage(client):
         </column>
         <column span="4">
             <panel>
-                <services />
+                <services>
+                    <link url="https://admin.digital">admin.digital</link>
+                </services>
             </panel>
         </column>
     </row>
@@ -66,6 +68,7 @@ def test_homepage(client):
     assert 'Veranstaltungen' in homepage
     assert 'Fokus' in homepage
     assert 'Dienstleistungen' in homepage
+    assert 'admin.digital' in homepage
     assert 'Aktuelles' in homepage
     assert 'Alle Beiträge' in homepage
     assert 'Ausgewählte Themen' in homepage

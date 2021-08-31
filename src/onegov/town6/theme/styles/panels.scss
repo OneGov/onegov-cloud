@@ -79,6 +79,7 @@ $tasks-icon: "\f0ae";
 $calendar-icon: "\f133";
 $emove-icon: "\f472";
 $train-icon: "\f238";
+$link-icon: "\f35d";
 $publications-icon: '\f1ea';
 
 
@@ -105,6 +106,7 @@ $publications-icon: '\f1ea';
         a.reservations::before { @include icon-bold($calendar-icon); }
         a.e-move::before { @include icon-bold($emove-icon); }
         a.sbb-daypass::before { @include icon-bold($train-icon); }
+        a.generic::before { @include icon-bold($link-icon); }
 
         a::before {
             margin-right: $panel-icon-margin-right;

@@ -213,11 +213,21 @@ class ServicesWidget(object):
         <xsl:template match="services">
             <div class="services-panel">
                 <h3 tal:content="services_panel.title"></h3>
-
-                <metal:block use-macro="layout.macros['panel-links']"
-                    tal:define="panel services_panel; show_subtitle False;
-                     as_callout True"
-                />
+                <ul class="panel-links callout">
+                    <li tal:repeat="link services_panel.links">
+                        <tal:b content="structure link(layout)" />
+                    </li>
+                    <xsl:for-each select="link">
+                        <li>
+                            <a class="generic h5">
+                                <xsl:attribute name="href">
+                                    <xsl:value-of select="@url" />
+                                </xsl:attribute>
+                                <xsl:value-of select="node()" />
+                            </a>
+                        </li>
+                    </xsl:for-each>
+                </ul>
             </div>
         </xsl:template>
     """
