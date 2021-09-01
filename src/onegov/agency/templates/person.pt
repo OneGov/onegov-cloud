@@ -29,6 +29,15 @@
                    </dl>
                </div>
 
+               <div class="borderless-side-panel">
+                   <h2 i18n:translate="">Exports</h2>
+                   <ul class="person-export-list">
+                       <li>
+                           <a href="${request.link(person, name='vcard')}" i18n:translate>Export a vCard of this person</a>
+                       </li>
+                   </ul>
+               </div>
+
             </div>
         </div>
     </tal:block>
