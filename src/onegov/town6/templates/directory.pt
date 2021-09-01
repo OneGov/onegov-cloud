@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <p tal:condition="directory.lead">${directory.lead}</p>
+        <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
 
         <div class="grid-x reverse-on-mobile">
             <div class="cell medium-8">

@@ -11,7 +11,7 @@
                     <li tal:repeat="directory directories">
                         <a class="list-title h5" tal:attributes="href link(directory)">${directory.title}</a>
                         <metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
-                        <div class="list-lead">${directory.lead}</div>
+                        <div class="list-lead" tal:content="structure layout.linkify(directory.lead)" />
                     </li>
                 </ul>
             </tal:b>
