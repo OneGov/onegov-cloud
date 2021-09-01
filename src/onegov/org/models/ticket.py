@@ -421,7 +421,7 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
     @property
     def group(self):
-        return self.resource.title
+        return self.resource.title if self.resource else None
 
     @classmethod
     def handle_extra_parameters(cls, session, query, extra_parameters):
