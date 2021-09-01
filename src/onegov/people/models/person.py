@@ -182,7 +182,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         ]
         if memberships and include_memberships:
             line = result.add('org')
-            line.value = memberships
+            line.value = ['; '.join(memberships)]
             line.charset_param = 'utf-8'
 
         return result
