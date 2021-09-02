@@ -34,22 +34,22 @@ class Principal(object):
     Example config in a yaml file::
 
         hidden_elements:
-                  always:
-                    candidate-by-entity:
-                      chart_percentages: true
-                  intermediate_results:
-                    connections:
-                      chart: false
-                    candidates:
-                      chart: false
+          always:
+            candidate-by-entity:
+              chart_percentages: true
+          intermediate_results:
+            connections:
+              chart: false
+            candidates:
+              chart: false
 
     publish_intermediate_results: Optionally renders svg and pdf for
     intermediate results. Example::
 
         publish_intermediate_results:
-            vote: true
-            election: true
-            election_compound: true
+          vote: true
+          election: true
+          election_compound: true
 
     Defaults to false if nothing specified
 
@@ -146,7 +146,7 @@ class Principal(object):
             return True
         return False
 
-    def label(self, value, year=None):
+    def label(self, value):
         raise NotImplementedError()
 
     @cached_property
@@ -206,7 +206,7 @@ class Canton(Principal):
             **kwargs
         )
 
-    def label(self, value, year=None):
+    def label(self, value):
         if value == 'entity':
             return _("Municipality")
         if value == 'entities':
@@ -217,8 +217,6 @@ class Canton(Principal):
             if self.id == 'gr':
                 return _("district_label_gr")
             if self.id == 'sz':
-                if year and year >= 2020:
-                    return _("Municipality")
                 return _("district_label_sz")
             return _("District")
         if value == 'districts':
@@ -227,8 +225,6 @@ class Canton(Principal):
             if self.id == 'gr':
                 return _("districts_label_gr")
             if self.id == 'sz':
-                if year and year >= 2020:
-                    return _("Municipalities")
                 return _("districts_label_sz")
             return _("Districts")
         return ''
@@ -285,7 +281,7 @@ class Municipality(Principal):
             **kwargs
         )
 
-    def label(self, value, year=None):
+    def label(self, value):
         if value == 'entity':
             return _("Quarter") if self.has_quarters else _("Municipality")
         if value == 'entities':

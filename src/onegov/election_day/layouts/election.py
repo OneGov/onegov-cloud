@@ -38,6 +38,14 @@ class ElectionLayout(DetailLayout):
             'data'
         )
 
+    @cached_property
+    def has_districts(self):
+        if not self.principal.has_districts:
+            return False
+        if self.model.domain == 'region':
+            return self.model.distinct
+        return True
+
     def title(self, tab=None):
         tab = (self.tab if tab is None else tab) or ''
 
@@ -60,7 +68,7 @@ class ElectionLayout(DetailLayout):
         if tab.endswith('-by-entity'):
             return self.principal.label('entities')
         if tab.endswith('-by-district'):
-            return self.districts_label
+            return self.app.principal.label('districts')
         if tab.endswith('-panachage'):
             return _("Panachage")
         if tab == 'connections':
@@ -95,7 +103,6 @@ class ElectionLayout(DetailLayout):
                 and self.has_districts
                 and self.proporz
                 and not self.tacit
-                and not self.districts_are_entities
             )
         if tab == 'candidate-by-entity':
             return (
@@ -109,7 +116,6 @@ class ElectionLayout(DetailLayout):
                 and self.show_map
                 and self.has_districts
                 and not self.tacit
-                and not self.districts_are_entities
             )
         if tab == 'connections':
             return (

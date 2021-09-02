@@ -29,6 +29,14 @@ class ElectionCompoundForm(Form):
         ]
     )
 
+    aggregated_by_entity = BooleanField(
+        label=_(
+            "Elections contain results for single municipalities rather than "
+            "(partial) districts"
+        ),
+        render_kw=dict(force_simple=True),
+    )
+
     date = DateField(
         label=_("Date"),
         validators=[
@@ -201,6 +209,7 @@ class ElectionCompoundForm(Form):
 
     def update_model(self, model):
         model.domain = self.domain.data
+        model.aggregated_by_entity = self.aggregated_by_entity.data
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
@@ -251,6 +260,7 @@ class ElectionCompoundForm(Form):
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
         self.domain.data = model.domain
+        self.aggregated_by_entity.data = model.aggregated_by_entity
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link

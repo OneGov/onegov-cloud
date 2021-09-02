@@ -463,7 +463,7 @@ class PdfGenerator():
             pdf.results(
                 [
                     principal.label('entity'),
-                    principal.label('district', election.date.year),
+                    principal.label('district'),
                     _('Turnout'),
                     _('eligible Voters'),
                     _('Accounted Votes'),
@@ -488,7 +488,7 @@ class PdfGenerator():
             pdf.results(
                 [
                     principal.label('entity'),
-                    principal.label('district', election.date.year),
+                    principal.label('district'),
                     _('Received Ballots'),
                     _('Accounted Ballots'),
                     _('Blank Ballots'),
@@ -519,15 +519,28 @@ class PdfGenerator():
         def format_name(item):
             return item.name if item.entity_id else pdf.translate(_("Expats"))
 
+        def label(value):
+            if compound.aggregated_by_entity and value == 'district':
+                return principal.label('entity')
+            if compound.aggregated_by_entity and value == 'districts':
+                return principal.label('entities')
+            return principal.label(value)
+
+        def election_title(election):
+            result = election.results.first()
+            if result:
+                if compound.aggregated_by_entity:
+                    return result.name
+                else:
+                    return election.district
+            return _("Results")
+
         majorz = False
         if compound.elections and compound.elections[0].type == 'majorz':
             majorz = True
 
         districts = {
-            election.id: (
-                election.results.first().district
-                or election.results.first().name
-            )
+            election.id: election_title(election)
             for election in compound.elections if election.results.first()
         }
 
@@ -540,11 +553,16 @@ class PdfGenerator():
         pdf.spacer()
 
         # Districts
-        pdf.h2(principal.label('districts', compound.date.year))
+        pdf.h2(label('districts'))
         pdf.results(
-            [principal.label('district', compound.date.year), _('Mandates')],
-            [[e.title, e.allocated_mandates(consider_completed=True)]
-             for e in compound.elections],
+            [label('district'), _('Mandates')],
+            [
+                [
+                    election_title(e),
+                    e.allocated_mandates(consider_completed=True)
+                ]
+                for e in compound.elections
+            ],
             [None, 2 * cm],
             pdf.style.table_results_1
         )
@@ -558,7 +576,7 @@ class PdfGenerator():
                 [
                     _('Candidate'),
                     _('Party'),
-                    principal.label('district', compound.date.year),
+                    label('district'),
                 ],
                 [[
                     '{} {}'.format(r[0], r[1]),
@@ -573,7 +591,7 @@ class PdfGenerator():
                 [
                     _('Candidate'),
                     _('List'),
-                    principal.label('district'),
+                    label('district'),
                 ],
                 [[
                     '{} {}'.format(r[0], r[1]),
@@ -904,7 +922,7 @@ class PdfGenerator():
 
                 # Districts
                 if principal.has_districts:
-                    subtitle(principal.label('districts', vote.date.year))
+                    subtitle(principal.label('districts'))
                     pdf.spacer()
                     pdf.results(
                         [
