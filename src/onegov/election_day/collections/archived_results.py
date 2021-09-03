@@ -275,7 +275,6 @@ class SearchableArchivedResultCollection(
             date_=None,
             from_date=None,
             to_date=None,
-            types=None,
             item_type=None,
             domains=None,
             term=None,
@@ -286,7 +285,6 @@ class SearchableArchivedResultCollection(
         super().__init__(session, date_=date_)
         self.from_date = from_date
         self.to_date = to_date or date.today()
-        self.types = types
         self.item_type = item_type
         self.domains = domains
         self.term = term
@@ -301,10 +299,6 @@ class SearchableArchivedResultCollection(
     def subset(self):
         return self.query()
 
-    @staticmethod
-    def allowed_item_types():
-        return tuple(a[0] for a in ArchivedResult.types_of_results)
-
     @property
     def page_index(self):
         return self.page
@@ -315,7 +309,6 @@ class SearchableArchivedResultCollection(
             date_=self.date,
             from_date=self.from_date,
             to_date=self.to_date,
-            types=self.types,
             item_type=self.item_type,
             domains=self.domains,
             term=self.term,
@@ -323,21 +316,6 @@ class SearchableArchivedResultCollection(
             locale=self.locale,
             page=index
         )
-
-    def group_items(self, items, request):
-        compounded = {
-            id_ for item in items for id_ in getattr(item, 'elections', [])
-        }
-
-        items = dict(
-            votes=tuple(v for v in items if v.type == 'vote'),
-            elections=tuple(
-                e for e in items if e.type in ['election', 'election_compound']
-                if e.url not in compounded
-            )
-        )
-
-        return items
 
     @staticmethod
     def term_to_tsquery_string(term):
@@ -393,92 +371,83 @@ class SearchableArchivedResultCollection(
 
     @property
     def term_filter(self):
-        assert self.term
-        assert self.locale
         term = SearchableArchivedResultCollection.term_to_tsquery_string(
-            self.term)
-        # The title is a translations hybrid, .title is a shorthand
+            self.term
+        )
         return (
             SearchableArchivedResultCollection.filter_text_by_locale(
-                ArchivedResult.shortcode, term, self.locale),
+                ArchivedResult.shortcode, term, self.locale
+            ),
             SearchableArchivedResultCollection.filter_text_by_locale(
-                ArchivedResult.title, term, self.locale)
+                ArchivedResult.title, term, self.locale
+            )
         )
 
-    def check_from_date_to_date(self):
-        if not self.to_date or not self.from_date:
-            return
-
-        if self.to_date > date.today():
-            self.to_date = date.today()
-        if self.from_date > self.to_date:
-            self.from_date = self.to_date
-
-    def query(self, no_filter=False, sort=True):
-
-        if no_filter:
-            return self.session.query(ArchivedResult)
-        assert self.to_date, 'to_date must have a datetime.date value'
-
-        self.check_from_date_to_date()
-        order = ('federation', 'canton', 'region', 'municipality')
-        if self.app_principal_domain == 'municipality':
-            order = ('municipality', 'federation', 'canton', 'region')
-
-        def generate_cases():
-            return tuple(
-                (ArchivedResult.domain == opt, ind) for
-                ind, opt in enumerate(order, 1)
-            )
-
+    def query(self):
         query = self.session.query(ArchivedResult)
 
         if self.item_type:
-            # Treat compound election as elections
-            if self.item_type == 'vote':
-                query = query.filter(ArchivedResult.type == self.item_type)
-            else:
+            if self.item_type == 'election':
                 query = query.filter(ArchivedResult.type.in_(
                     ('election', 'election_compound')
                 ))
 
-        elif self.types and len(self.types) != len(
-                ArchivedResult.types_of_results):
-            query = query.filter(ArchivedResult.type.in_(self.types))
-        if self.domains and (len(self.domains) != len(
-                ArchivedResult.types_of_domains)):
-            query = query.filter(ArchivedResult.domain.in_(self.domains))
+                # exclude elections already covered by election compounds
+                exclude = self.session.query(ArchivedResult.meta['elections'])
+                exclude = [result[0] for result in exclude if result[0]]
+                exclude = [item for items in exclude for item in items]
+                exclude = [item.split('/')[-1] for item in exclude]
+                if exclude:
+                    query = query.filter(
+                        ArchivedResult.meta['id'].notin_(exclude)
+                    )
+            else:
+                query = query.filter(ArchivedResult.type == self.item_type)
+
+        if self.domains:
+            if len(self.domains) != len(ArchivedResult.types_of_domains):
+                query = query.filter(ArchivedResult.domain.in_(self.domains))
+
+        if self.to_date:
+            if self.to_date > date.today():
+                self.to_date = date.today()
+            if self.to_date != date.today():
+                query = query.filter(ArchivedResult.date <= self.to_date)
+
         if self.from_date:
+            if self.to_date and self.from_date > self.to_date:
+                self.from_date = self.to_date
             query = query.filter(ArchivedResult.date >= self.from_date)
-        if self.to_date != date.today():
-            query = query.filter(ArchivedResult.date <= self.to_date)
 
-        is_vote = (self.item_type == 'vote'
-                   or (self.types and 'vote' in self.types))
+        if self.answers:
+            if self.item_type == 'vote':
+                if len(self.answers) != len(ArchivedResult.types_of_answers):
+                    query = query.filter(
+                        ArchivedResult.type == 'vote',
+                        ArchivedResult.meta['answer'].astext.in_(self.answers)
+                    )
 
-        answer_matters = (
-            self.answers and len(self.answers) != len(
-                ArchivedResult.types_of_answers))
-
-        if answer_matters and is_vote:
-            vote_answer = ArchivedResult.meta['answer'].astext
-            query = query.filter(
-                ArchivedResult.type == 'vote',
-                vote_answer.in_(self.answers))
         if self.term:
             query = query.filter(or_(*self.term_filter))
 
-        if sort:
-            query = query.order_by(
-                ArchivedResult.date.desc(),
-                case(generate_cases())
+        # order by date and type
+        order = ('federation', 'canton', 'region', 'municipality')
+        if self.app_principal_domain == 'municipality':
+            order = ('municipality', 'federation', 'canton', 'region')
+        query = query.order_by(
+            ArchivedResult.date.desc(),
+            case(
+                tuple(
+                    (ArchivedResult.domain == opt, ind) for
+                    ind, opt in enumerate(order, 1)
+                )
             )
+        )
         return query
 
     def reset_query_params(self):
         self.from_date = None
         self.to_date = date.today()
-        self.types = None
         self.item_type = None
         self.domains = None
         self.term = None
@@ -487,7 +456,7 @@ class SearchableArchivedResultCollection(
 
     @classmethod
     def for_item_type(cls, session, item_type, **kwargs):
-        if item_type not in cls.allowed_item_types():
-            return None
-        kwargs['item_type'] = item_type
-        return cls(session, **kwargs)
+        allowed_item_types = [a[0] for a in ArchivedResult.types_of_results]
+        if item_type in allowed_item_types:
+            kwargs['item_type'] = item_type
+            return cls(session, **kwargs)

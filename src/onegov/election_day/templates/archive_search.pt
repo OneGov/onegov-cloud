@@ -16,7 +16,6 @@
             <div class="columns small-12 small-centered">
                 <div class="row" tal:condition="form|nothing">
                     <div class="columns small-12 small-centered">
-<!--?                        Start of Tab macro code -->
                         <div class="tab-navigation clearfix" tal:condition="layout.menu">
                             <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
                                 <section class="top-bar-section">
@@ -38,11 +37,10 @@
                         <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET';button_class 'right'"/>
                     </div>
 
-                    <strong tal:condition="archive_items" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</strong>
+                    <strong tal:condition="results" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</strong>
                     <hr>
 
                     <tal:b tal:condition="item_type == 'vote'">
-                        <!--? BEGIN VOTING TABLE   -->
                         <table class="votes tablesaw" data-tablesaw-mode="stack">
                             <thead>
                                 <tr>
@@ -57,16 +55,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tal:b tal:repeat="vote archive_items['votes']">
+                                <tal:b tal:repeat="vote results">
                                         <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
                                             <td class="top-aligned" tal:define="prefix vote.title_prefix(request)">
                                                 <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
                                             </td>
                                             <td class="top-aligned" >${layout.format_date(vote.date, 'date')}</td>
-                                            <td class="top-aligned"  tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
-                                            <td class="top-aligned"  tal:condition="vote.domain == 'region'" i18n:translate>Regional</td>
-                                            <td class="top-aligned"  tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
-                                            <td class="top-aligned"  tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
+                                            <td class="top-aligned" tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
+                                            <td class="top-aligned" tal:condition="vote.domain == 'region'" i18n:translate>Regional</td>
+                                            <td class="top-aligned" tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
+                                            <td class="top-aligned" tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
                                             <td class="top-aligned">
                                                 <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
                                             </td>
@@ -98,20 +96,24 @@
                     </tal:b>
 
                     <tal:b tal:condition="item_type in ['election', 'election_compound']">
-                        <!--? BEGIN ELECTIONS TABLE   -->
                         <table class="overview election tablesaw" data-tablesaw-mode="stack" tal:condition="item_type == 'election'">
                             <thead>
                                 <tr>
                                     <th i18n:translate="">Election</th>
+                                    <th i18n:translate="">Domain</th>
                                     <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Counted</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr tal:repeat="election archive_items['elections']">
+                                <tr tal:repeat="election results">
                                     <td class="top-aligned" tal:define="prefix election.title_prefix(request)">
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
                                     </td>
+                                    <td class="top-aligned" tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
+                                    <td class="top-aligned" tal:condition="election.domain == 'region'" i18n:translate>Regional</td>
+                                    <td class="top-aligned" tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
+                                    <td class="top-aligned" tal:condition="election.domain == 'municipality'" i18n:translate>Communal</td>
                                     <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>

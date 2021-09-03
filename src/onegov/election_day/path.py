@@ -18,12 +18,10 @@ from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import ScreenCollection
+from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
-from onegov.election_day.collections.archived_results import (
-    SearchableArchivedResultCollection
-)
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.models import Principal
@@ -251,7 +249,6 @@ def get_archive_by_year(app, date):
     converters=dict(
         from_date=extended_date_converter,
         to_date=extended_date_converter,
-        types=[str],
         domains=[str],
         answers=[str],
         page=int
@@ -262,7 +259,6 @@ def get_archive_search(
         from_date=None,
         to_date=None,
         answers=None,
-        types=None,
         item_type=None,
         domains=None,
         term=None,
@@ -274,7 +270,6 @@ def get_archive_search(
         to_date=to_date,
         from_date=from_date,
         answers=answers,
-        types=types,
         domains=domains,
         term=term,
         page=page

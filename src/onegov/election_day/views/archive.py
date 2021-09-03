@@ -145,10 +145,8 @@ def view_archive_search(self, request, form):
     day. It's the landing page.
     """
 
-    # layout = DefaultLayout(self, request)
     layout = ArchiveLayout(self, request)
     self.locale = request.locale
-    results = self.batch
 
     if not form.errors:
         form.apply_model(self)
@@ -161,7 +159,6 @@ def view_archive_search(self, request, form):
         'layout': layout,
         'form': form,
         'form_method': 'GET',
-        'archive_items': self.group_items(results, request),
         'item_count': self.subset_count,
-        'archive_link': request.link(self)
+        'results': self.batch
     }

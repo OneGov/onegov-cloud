@@ -33,17 +33,6 @@ class ArchiveSearchForm(Form):
         render_kw={'size': 4}
     )
 
-    # Is always hidden since item_type in url will filter the types
-    types = MultiCheckboxField(
-        label=_("Type"),
-        render_kw={'size': 4, 'clear': False, 'hidden': True},
-        choices=ArchivedResult.types_of_results,
-        description=_(
-            "Compound of elections field summarizes all related elections"
-            " in one. To display all elections,"
-            " uncheck 'Compound of Elections'")
-    )
-
     domains = MultiCheckboxField(
         label=_("Domain"),
         render_kw={'size': 8, 'clear': False},
@@ -76,10 +65,8 @@ class ArchiveSearchForm(Form):
         self.from_date.data = model.from_date
         self.to_date.data = model.to_date
         self.answers.data = model.answers
-        self.types.data = model.types
         self.domains.data = model.domains
 
         self.select_all('domains')
-        self.select_all('types')
         self.select_all('answers')
         self.toggle_hidden_fields(model)
