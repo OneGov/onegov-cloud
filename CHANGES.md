@@ -1,8 +1,56 @@
 # Changes
 
+## 2021.77
+
+`2021-09-03` | [7cd8cedb85...5632c37fd4](https://github.com/OneGov/onegov-cloud/compare/7cd8cedb85^...5632c37fd4)
+
+### Agency
+
+##### Enable vCard export of people.
+
+`Feature` | [ZW-328](https://kanton-zug.atlassian.net/browse/ZW-328) | [ec335a2d4d](https://github.com/onegov/onegov-cloud/commit/ec335a2d4d392bddff1a05e6e20386a03aa4d21f)
+
+### Election Day
+
+##### Fix static data of canton SZ for 2020.
+
+This requires to re-upload results from 2020.
+
+`Bugfix` | [OGC-41](https://linear.app/onegovcloud/issue/OGC-41) | [223001a3a8](https://github.com/onegov/onegov-cloud/commit/223001a3a82cd9873cc4fee68953dcfcd95d347d)
+
+##### Fix archive search pagination.
+
+`Bugfix` | [OGC-43](https://linear.app/onegovcloud/issue/OGC-43) | [893be82f16](https://github.com/onegov/onegov-cloud/commit/893be82f1622fd4fff1c88a50f81b3d2f0896a03)
+
+### Org
+
+##### Linkify directory leads.
+
+`Feature` | [ZW-326](https://kanton-zug.atlassian.net/browse/ZW-326) | [0e8affad78](https://github.com/onegov/onegov-cloud/commit/0e8affad78831d6fc855de1f128fc365dbbb6be0)
+
+##### Fixes creating a PDF of a reservation ticket throwing an error if the resource has been deleted.
+
+`Bugfix` | [7cd8cedb85](https://github.com/onegov/onegov-cloud/commit/7cd8cedb8520020658e41613c90624b312bc12d0)
+
+##### Fixes styling of sidepanel titles with links.
+
+`Bugfix` | [FW-93](https://stadt-winterthur.atlassian.net/browse/FW-93) | [4b8c005c15](https://github.com/onegov/onegov-cloud/commit/4b8c005c15967cb638fcb458d104f38639464c1f)
+
+### People
+
+##### Fix vCard export of organizations.
+
+`Bugfix` | [678963bf06](https://github.com/onegov/onegov-cloud/commit/678963bf06106e43a20994278520a8457e6bd4c5)
+
+### Swissvotes
+
+##### Adds favicon.
+
+`Feature` | [SWI-22](#SWI-22) | [5632c37fd4](https://github.com/onegov/onegov-cloud/commit/5632c37fd4bb4a773fe10427405724857aa65b3e)
+
 ## 2021.76
 
-`2021-08-31` | [ba603604f7...ba603604f7](https://github.com/OneGov/onegov-cloud/compare/ba603604f7^...ba603604f7)
+`2021-08-31` | [ba603604f7...a87288c7de](https://github.com/OneGov/onegov-cloud/compare/ba603604f7^...a87288c7de)
 
 ### Town6
 
@@ -1204,23 +1252,4 @@ Summary:
 ##### Invalidate pages cache after modifying elections and votes.
 
 `Bugfix` | [SEA-184](https://linear.app/seantis/issue/SEA-184) | [93b6863c91](https://github.com/onegov/onegov-cloud/commit/93b6863c91d5540f1fd45b42086bbd6e23fc9a2c)
-
-## 2021.27
-
-`2021-03-11` | [783a05f22d...6f77624b93](https://github.com/OneGov/onegov-cloud/compare/783a05f22d^...6f77624b93)
-
-### Election Day
-
-##### Adds nice error pages in case PDF and SVG files are not ready yet.
-
-`Feature` | [SEA-182](https://linear.app/seantis/issue/SEA-182) | [cf5febc17a](https://github.com/onegov/onegov-cloud/commit/cf5febc17aca0b40f4846b3ce977ce770b05721b)
-
-### Org
-
-##### Improves directory import and export
-
-Fixes MissingColumnsError with import using csv/xlsx formats and some characters in labels.
-Adds tests for all formats for the roundtrip.
-
-`Bugfix` | [ff6ba08b35](https://github.com/onegov/onegov-cloud/commit/ff6ba08b35be708f9ab859150767e199a94f938e)
 
