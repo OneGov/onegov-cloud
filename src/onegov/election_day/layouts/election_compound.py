@@ -101,7 +101,7 @@ class ElectionCompoundLayout(DetailLayout):
                 return result.name
             else:
                 return election.district
-        return _("Results")
+        return election.title
 
     @cached_property
     def has_party_results(self):
