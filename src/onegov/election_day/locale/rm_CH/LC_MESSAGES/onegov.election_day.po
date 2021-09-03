@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-27 08:18+0200\n"
+"POT-Creation-Date: 2021-09-02 07:42+0200\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -267,8 +267,14 @@ msgstr "Elecziun taciturna"
 msgid "Expats"
 msgstr "Svizzers a l'exteriur"
 
+msgid "The election contains seperate results for expats."
+msgstr ""
+
 msgid "Distinct district"
 msgstr "Clera regiun"
+
+msgid "The election contains results of a whole district."
+msgstr ""
 
 msgid "Doppelter Pukelsheim"
 msgstr ""
@@ -329,6 +335,11 @@ msgstr ""
 
 msgid "Cantonal"
 msgstr "Plaun chantunal"
+
+msgid ""
+"Elections contain results for single municipalities rather than (partial) "
+"districts"
+msgstr ""
 
 msgid "Elections"
 msgstr "Elecziuns"
@@ -1374,9 +1385,3 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
-
-#~ msgid "district_label_sg"
-#~ msgstr "Circul electoral"
-
-#~ msgid "districts_label_sg"
-#~ msgstr "Circuls electorals"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-27 08:18+0200\n"
+"POT-Creation-Date: 2021-09-02 07:42+0200\n"
 "PO-Revision-Date: 2021-04-01 10:24+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -265,8 +265,14 @@ msgstr "Elezione tacita"
 msgid "Expats"
 msgstr "Svizzeri all'estero"
 
+msgid "The election contains seperate results for expats."
+msgstr "L'elezione contiene risultati separati per gli espatriati."
+
 msgid "Distinct district"
 msgstr "Distretto Unico"
+
+msgid "The election contains results of a whole district."
+msgstr "L'elezione contiene i risultati di un intero distretto."
 
 msgid "Doppelter Pukelsheim"
 msgstr ""
@@ -327,6 +333,13 @@ msgstr "Definizioni di colore non valide"
 
 msgid "Cantonal"
 msgstr "Cantonale"
+
+msgid ""
+"Elections contain results for single municipalities rather than (partial) "
+"districts"
+msgstr ""
+"Le elezioni contengono risultati per singoli comuni piuttosto che per "
+"distretti (parziali)"
 
 msgid "Elections"
 msgstr "Elezioni"
@@ -1369,9 +1382,3 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
-
-#~ msgid "district_label_sg"
-#~ msgstr "Distretto elettorale"
-
-#~ msgid "districts_label_sg"
-#~ msgstr "Distretti elettorali"

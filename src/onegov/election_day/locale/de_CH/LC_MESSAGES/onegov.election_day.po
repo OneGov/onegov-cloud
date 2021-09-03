@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-27 08:18+0200\n"
+"POT-Creation-Date: 2021-09-02 07:42+0200\n"
 "PO-Revision-Date: 2021-04-01 10:22+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -266,8 +266,14 @@ msgstr "Stille Wahl"
 msgid "Expats"
 msgstr "Auslandschweizer"
 
+msgid "The election contains seperate results for expats."
+msgstr "Die Wahl enthält gesonderte Ergebnisse für Auslandsschweizer."
+
 msgid "Distinct district"
 msgstr "Eindeutiger Wahlkreis"
+
+msgid "The election contains results of a whole district."
+msgstr "Die Wahl enthält Ergebnisse für einen gesamten Wahlkreis."
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
@@ -328,6 +334,13 @@ msgstr "Ungültige Farbdefinitionen"
 
 msgid "Cantonal"
 msgstr "Kantonal"
+
+msgid ""
+"Elections contain results for single municipalities rather than (partial) "
+"districts"
+msgstr ""
+"Wahlen enthalten Ergebnisse einzelner Gemeinden und nicht (Teilen von) "
+"Wahlkreisen"
 
 msgid "Elections"
 msgstr "Wahlen"
@@ -1369,9 +1382,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid "district_label_sg"
-#~ msgstr "Wahlkreis"
-
-#~ msgid "districts_label_sg"
-#~ msgstr "Wahlkreise"

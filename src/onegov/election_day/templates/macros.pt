@@ -82,7 +82,7 @@
         data-tablesaw-minimap="">
         <thead>
             <tr>
-                <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district', ballot.vote.date.year)}</th>
+                <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="left-aligned">Result</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
@@ -246,7 +246,7 @@
         >
         <thead>
             <tr>
-                <th data-tablesaw-priority="persist" i18n:translate="" class="column-district left-aligned">${layout.principal.label('district')}</th>
+                <th data-tablesaw-priority="persist" i18n:translate="" class="column-district left-aligned">${layout.label('district')}</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.proporz" data-sorter="false">Mandates</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.majorz" data-sorter="false">Seats</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-counted right-aligned" data-sorter="false">Counted</th>
@@ -254,7 +254,7 @@
         </thead>
         <tbody>
             <tr tal:repeat="election election_compound.elections">
-                <td class="column-district left-aligned"><a href="${request.link(election)}">${election.district}</a></td>
+                <td class="column-district left-aligned"><a href="${request.link(election)}">${layout.election_title(election)}</a></td>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates(consider_completed=True), election.number_of_mandates)" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress; enable_y_n True" /></td>
             </tr>
@@ -268,12 +268,11 @@
     data-tablesaw-mode="columntoggle"
     data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
     data-tablesaw-minimap=""
-    tal:define="show_district not:layout.districts_are_entities"
     >
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="show_district and layout.has_districts">${layout.principal.label('district')}</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
@@ -287,12 +286,12 @@
             <tr tal:repeat="result layout.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:block condition="not: result.counted">
                     <td>${layout.format_name(result)}</td>
-                    <td tal:condition="show_district and layout.has_districts">${result.district}</td>
+                    <td tal:condition="layout.has_districts">${result.district}</td>
                     <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                 </tal:block>
                 <tal:block condition="result.counted">
                     <td>${layout.format_name(result)}</td>
-                    <td tal:condition="show_district and layout.has_districts">${result.district}</td>
+                    <td tal:condition="layout.has_districts">${result.district}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
                     <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
                     <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
@@ -306,7 +305,7 @@
         <tfoot tal:condition="layout.summarize">
             <tr class="total">
                 <td i18n:translate="">Total</td>
-                <td tal:condition="show_district and layout.has_districts"></td>
+                <td tal:condition="layout.has_districts"></td>
                 <td class="right-aligned">${layout.format_number(election.eligible_voters)}</td>
                 <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
                 <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
@@ -331,7 +330,7 @@
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-candidate">Candidate</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-party right-aligned" tal:condition="layout.majorz">Party</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-list right-aligned" tal:condition="layout.proporz">List</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-district right-aligned">${layout.principal.label('district')}</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-district right-aligned">${layout.label('district')}</th>
             </tr>
         </thead>
         <tbody>

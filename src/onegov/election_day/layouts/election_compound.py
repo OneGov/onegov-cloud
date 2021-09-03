@@ -43,13 +43,20 @@ class ElectionCompoundLayout(DetailLayout):
             for result in e.results:
                 yield result
 
+    def label(self, value):
+        if self.model.aggregated_by_entity and value == 'district':
+            return self.principal.label('entity')
+        if self.model.aggregated_by_entity and value == 'districts':
+            return self.principal.label('entities')
+        return self.principal.label(value)
+
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
 
         if tab == 'lists':
             return _("Lists")
         if tab == 'districts':
-            return self.districts_label
+            return self.label('districts')
         if tab == 'candidates':
             return _("Elected candidates")
         if tab == 'mandate-allocation':
@@ -84,10 +91,17 @@ class ElectionCompoundLayout(DetailLayout):
             )
         if tab == 'parties-panachage':
             return self.model.panachage_results.first() is not None
-        if tab == 'statistics':
-            return self.districts_are_entities
 
         return True
+
+    def election_title(self, election):
+        result = election.results.first()
+        if result:
+            if self.model.aggregated_by_entity:
+                return result.name
+            else:
+                return election.district
+        return _("Results")
 
     @cached_property
     def has_party_results(self):

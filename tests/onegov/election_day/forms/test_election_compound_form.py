@@ -124,6 +124,7 @@ def test_election_compound_form_model(session, related_link_labels):
     model.title_translations['rm_CH'] = 'Elections (RM)'
     model.date = date(2012, 1, 1)
     model.domain = 'canton'
+    model.aggregated_by_entity = True
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
@@ -147,6 +148,7 @@ def test_election_compound_form_model(session, related_link_labels):
     assert form.election_rm.data == 'Elections (RM)'
     assert form.date.data == date(2012, 1, 1)
     assert form.domain.data == 'canton'
+    assert form.aggregated_by_entity.data == True
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
     assert form.related_link_label_de.data == 'DE'
@@ -169,6 +171,7 @@ def test_election_compound_form_model(session, related_link_labels):
     form.election_rm.data = 'Some Elections (RM)'
     form.date.data = date(2016, 1, 1)
     form.domain.data = 'canton'
+    form.aggregated_by_entity.data = False
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
     form.show_party_strengths.data = False
@@ -194,6 +197,7 @@ def test_election_compound_form_model(session, related_link_labels):
     assert model.title_translations['rm_CH'] == 'Some Elections (RM)'
     assert model.date == date(2016, 1, 1)
     assert model.domain == 'canton'
+    assert model.aggregated_by_entity == False
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
     assert model.pukelsheim_completed is False

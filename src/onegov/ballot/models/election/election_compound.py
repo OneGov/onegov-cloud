@@ -131,6 +131,10 @@ class ElectionCompound(
     #: Defines optional colors for parties
     colors = meta_property('colors', default=dict)
 
+    #: If true, an election represents a single entity rather than a (partial)
+    #: district
+    aggregated_by_entity = meta_property('aggregated_by_entity', default=False)
+
     @property
     def elections(self):
         elections = [association.election for association in self.associations]

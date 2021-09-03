@@ -46,7 +46,6 @@ def test_election_compound_layout_1(session):
     assert layout.majorz is False
     assert layout.proporz is False
     assert layout.has_party_results is False
-    assert layout.districts_are_entities is False
     assert layout.tab_visible('statistics') is False
     assert request.app.principal.hidden_tabs == {'elections': ['lists']}
     assert layout.hide_tab('lists') is True
@@ -145,11 +144,13 @@ def test_election_compound_layout_menu_majorz(session):
     assert ElectionCompoundLayout(compound, request).menu == [
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
     assert ElectionCompoundLayout(compound, request, 'data').menu == [
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', True, [])
     ]
 
@@ -185,11 +186,13 @@ def test_election_compound_layout_menu_proporz(session):
     assert ElectionCompoundLayout(compound, request).menu == [
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
     assert ElectionCompoundLayout(compound, request, 'data').menu == [
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', True, [])
     ]
 
@@ -210,6 +213,7 @@ def test_election_compound_layout_menu_proporz(session):
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
@@ -220,6 +224,7 @@ def test_election_compound_layout_menu_proporz(session):
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
         ('Party strengths', 'ElectionCompound/party-strengths', False, []),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
@@ -234,6 +239,7 @@ def test_election_compound_layout_menu_proporz(session):
             []
         ),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 

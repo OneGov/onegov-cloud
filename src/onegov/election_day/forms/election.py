@@ -71,11 +71,13 @@ class ElectionForm(Form):
 
     expats = BooleanField(
         label=_("Expats"),
+        description=_("The election contains seperate results for expats."),
         render_kw=dict(force_simple=True)
     )
 
     distinct = BooleanField(
         label=_("Distinct district"),
+        description=_("The election contains results of a whole district."),
         render_kw=dict(force_simple=True),
         depends_on=('domain', 'region'),
     )

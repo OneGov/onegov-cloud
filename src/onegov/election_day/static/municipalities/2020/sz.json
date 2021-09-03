@@ -8,99 +8,99 @@
         "name": "Gersau"
     },
     "1321": {
-        "district": "Feusisberg",
+        "district": "H\u00f6fe",
         "name": "Feusisberg"
     },
     "1322": {
-        "district": "Freienbach",
+        "district": "H\u00f6fe",
         "name": "Freienbach"
     },
     "1323": {
-        "district": "Wollerau",
+        "district": "H\u00f6fe",
         "name": "Wollerau"
     },
     "1331": {
-        "district": "K\u00fcssnacht",
-        "name": "K\u00fcssnacht"
+        "district": "K\u00fcssnacht (SZ)",
+        "name": "K\u00fcssnacht (SZ)"
     },
     "1341": {
-        "district": "Altendorf",
+        "district": "March",
         "name": "Altendorf"
     },
     "1342": {
-        "district": "Galgenen",
+        "district": "March",
         "name": "Galgenen"
     },
     "1343": {
-        "district": "Innerthal",
+        "district": "March",
         "name": "Innerthal"
     },
     "1344": {
-        "district": "Lachen",
+        "district": "March",
         "name": "Lachen"
     },
     "1345": {
-        "district": "Reichenburg",
+        "district": "March",
         "name": "Reichenburg"
     },
     "1346": {
-        "district": "Sch\u00fcbelbach",
+        "district": "March",
         "name": "Sch\u00fcbelbach"
     },
     "1347": {
-        "district": "Tuggen",
+        "district": "March",
         "name": "Tuggen"
     },
     "1348": {
-        "district": "Vorderthal",
+        "district": "March",
         "name": "Vorderthal"
     },
     "1349": {
-        "district": "Wangen",
-        "name": "Wangen"
+        "district": "March",
+        "name": "Wangen (SZ)"
     },
     "1361": {
-        "district": "Alpthal",
+        "district": "Schwyz",
         "name": "Alpthal"
     },
     "1362": {
-        "district": "Arth",
+        "district": "Schwyz",
         "name": "Arth"
     },
     "1363": {
-        "district": "Illgau",
+        "district": "Schwyz",
         "name": "Illgau"
     },
     "1364": {
-        "district": "Ingenbohl",
+        "district": "Schwyz",
         "name": "Ingenbohl"
     },
     "1365": {
-        "district": "Lauerz",
+        "district": "Schwyz",
         "name": "Lauerz"
     },
     "1366": {
-        "district": "Morschach",
+        "district": "Schwyz",
         "name": "Morschach"
     },
     "1367": {
-        "district": "Muotathal",
+        "district": "Schwyz",
         "name": "Muotathal"
     },
     "1368": {
-        "district": "Oberiberg",
+        "district": "Schwyz",
         "name": "Oberiberg"
     },
     "1369": {
-        "district": "Riemenstalden",
+        "district": "Schwyz",
         "name": "Riemenstalden"
     },
     "1370": {
-        "district": "Rothenthurm",
+        "district": "Schwyz",
         "name": "Rothenthurm"
     },
     "1371": {
-        "district": "Sattel",
+        "district": "Schwyz",
         "name": "Sattel"
     },
     "1372": {
@@ -108,15 +108,15 @@
         "name": "Schwyz"
     },
     "1373": {
-        "district": "Steinen",
+        "district": "Schwyz",
         "name": "Steinen"
     },
     "1374": {
-        "district": "Steinerberg",
+        "district": "Schwyz",
         "name": "Steinerberg"
     },
     "1375": {
-        "district": "Unteriberg",
+        "district": "Schwyz",
         "name": "Unteriberg"
     }
 }

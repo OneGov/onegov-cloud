@@ -35,7 +35,7 @@ class VoteLayout(DetailLayout):
         if tab == 'entities':
             return self.principal.label('entities')
         if tab == 'districts':
-            return self.districts_label
+            return self.app.principal.label('districts')
         if tab.startswith('proposal'):
             return _("Proposal")
         if tab.startswith('counter-proposal'):
@@ -53,7 +53,7 @@ class VoteLayout(DetailLayout):
         if tab.endswith('-entities') and self.has_districts:
             return self.principal.label('entities')
         if tab.endswith('-districts'):
-            return self.districts_label
+            return self.app.principal.label('districts')
 
         return ''
 
@@ -73,9 +73,6 @@ class VoteLayout(DetailLayout):
             return self.type == 'complex'
         if tab == 'tie-breaker-entities':
             return self.type == 'complex'
-
-        if 'districts' in tab and self.districts_are_entities:
-            return False
 
         if tab == 'districts':
             return self.has_districts and self.type == 'simple'
