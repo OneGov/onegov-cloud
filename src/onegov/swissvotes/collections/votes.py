@@ -414,7 +414,10 @@ class SwissVoteCollection(Pagination):
                 )
             )
 
-        query = query.order_by(self.order_by)
+        query = query.order_by(
+            self.order_by,
+            SwissVote.bfs_number.desc()
+        )
 
         return query
 
