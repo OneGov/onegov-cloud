@@ -278,10 +278,10 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url):
 
     result = run_command(cfg_path, 'govikon', ['reindex'])
     assert result.exit_code == 0
-    assert "Reindexed vote 1.00" in result.output
+    assert "Reindexed 1 document(s) @ vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "abstimmungstex" in vote.text_voting_text_de_CH
 
     with open(vote.voting_text.reference.file._file_path, 'wb') as file:
         pdf = Pdf(file)
@@ -290,14 +290,14 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url):
         pdf.generate()
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "abstimmungstex" in vote.text_voting_text_de_CH
 
     result = run_command(cfg_path, 'govikon', ['reindex'])
     assert result.exit_code == 0
-    assert "Reindexed vote 1.00" in result.output
+    assert "Reindexed 1 document(s) @ vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
-    assert "realisa" in vote.searchable_text_de_CH
+    assert "realisa" in vote.text_voting_text_de_CH
 
 
 @patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, set((4, 5))))

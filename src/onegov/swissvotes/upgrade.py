@@ -430,3 +430,34 @@ def add_die_mittel_columns(context):
             'swissvotes',
             Column('national_council_share_mitte', Numeric(13, 10))
         )
+
+
+@upgrade_task('Refactor tsvector columns')
+def refactor_tsvector_columns(context):
+    columns = (
+        'searchable_text_de_CH',
+        'searchable_text_fr_CH'
+    )
+    for column in columns:
+        if context.has_column('swissvotes', column):
+            context.operations.drop_column('swissvotes', column)
+
+    columns = (
+        'text_voting_text_de_CH',
+        'text_voting_text_fr_CH',
+        'text_brief_description_de_CH',
+        'text_brief_description_fr_CH',
+        'text_federal_council_message_de_CH',
+        'text_federal_council_message_fr_CH',
+        'text_parliamentary_debate_de_CH',
+        'text_parliamentary_debate_fr_CH',
+        'text_realization_de_CH',
+        'text_realization_fr_CH',
+        'text_preliminary_examination_de_CH',
+        'text_preliminary_examination_fr_CH'
+    )
+    for column in columns:
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes', Column(column, TSVECTOR())
+            )
