@@ -148,6 +148,12 @@ class ChangelogCommit(object):
         if link.startswith('OGC-'):
             return f"https://linear.app/onegovcloud/issue/{link}"
 
+        if link.startswith('SWI-'):
+            return f"https://linear.app/swissvotes/issue/{link}"
+
+        if link.startswith('PRO-'):
+            return f"https://linear.app/projuventute/issue/{link}"
+
         # default to a non-functioning link (they can be added later)
         return f'#{self.link}'
 
