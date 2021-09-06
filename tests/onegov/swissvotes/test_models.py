@@ -801,8 +801,8 @@ def test_model_vote(session, sample_vote):
 
     assert vote.policy_areas == [
         PolicyArea('4.42.421'),
-        PolicyArea('10.103.1035'),
-        PolicyArea('10.103.1033')
+        PolicyArea('10.103.1033'),
+        PolicyArea('10.103.1035')
     ]
 
     assert vote.results_cantons['Rejected'] == [

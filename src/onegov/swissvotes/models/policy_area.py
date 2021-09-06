@@ -49,6 +49,12 @@ class PolicyArea(object):
     def __eq__(self, other):
         return self.value == other.value
 
+    def __gt__(self, other):
+        return self.descriptor_decimal > other.descriptor_decimal
+
+    def __lt__(self, other):
+        return not self.__gt__(other)
+
     @cached_property
     def level(self):
         return self.value.count('.') + 1

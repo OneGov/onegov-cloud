@@ -305,9 +305,9 @@ def test_layout_default(swissvotes_app):
         descriptor_3_level_3=Decimal('10.33'),
     )
     assert layout.format_policy_areas(vote) == (
-        '<span title="d-1-10 &gt; d-2-103 &gt; d-3-1033">d-1-10</span>,<br>'
         '<span title="d-1-4">d-1-4</span>,<br>'
-        '<span title="d-1-8 &gt; d-2-83">d-1-8</span>'
+        '<span title="d-1-8 &gt; d-2-83">d-1-8</span>,<br>'
+        '<span title="d-1-10 &gt; d-2-103 &gt; d-3-1033">d-1-10</span>'
     )
 
     vote = SwissVote(

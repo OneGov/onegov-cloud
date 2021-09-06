@@ -119,7 +119,7 @@ class DefaultLayout(ChameleonLayout):
 
     def format_policy_areas(self, vote):
         paths = [area.label_path for area in vote.policy_areas]
-        paths = groupbylist(sorted(paths), key=lambda x: x[0])
+        paths = groupbylist(paths, key=lambda x: x[0])
 
         translate = self.request.translate
         return ",<br>".join([

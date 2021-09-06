@@ -363,7 +363,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 if area:
                     result.append(area)
                     break
-        return result
+
+        return sorted(result)
 
     # Result
     _result = Column('result', Integer)
