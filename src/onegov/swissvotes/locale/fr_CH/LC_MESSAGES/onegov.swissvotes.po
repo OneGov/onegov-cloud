@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-02-15 11:20+0100\n"
+"POT-Creation-Date: 2021-09-06 10:07+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1782,11 +1782,11 @@ msgstr "Carte interactive de l’Office fédéral de la statistique"
 msgid "Display the map"
 msgstr "Présenter la carte"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit avec des résultats d'analyse"
-
 msgid "Technical report"
 msgstr "Rapport technique"
+
+msgid "Cockpit with selected results"
+msgstr "Cockpit avec des résultats d'analyse"
 
 msgid "Filter"
 msgstr "Filtre de recherche"
@@ -1797,8 +1797,16 @@ msgstr "Résultats"
 msgid "Date"
 msgstr "Date"
 
+#. Default: Voting result
+msgid "voting_result_hyphenated"
+msgstr "Résultat de la votation"
+
 msgid "Yeas Percentage People"
 msgstr "Pourcentage de \"oui\""
+
+#. Default: Turnout
+msgid "turnout_hyphenated"
+msgstr "Partici&shy;pation"
 
 msgid "Wrong username or password"
 msgstr "Nom d'utilisateur ou mot de passe incorrect"

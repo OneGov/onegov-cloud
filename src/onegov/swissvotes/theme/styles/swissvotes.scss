@@ -276,9 +276,15 @@ svg text {
 }
 
 /*
+    Hyphenation
+*/
+.hyphened {
+    hyphens: auto;
+}
+
+/*
     Museum für Gestaltung image gallery
 */
-
 $modal-padding-sm: 50px;
 $modal-padding: 25px;
 $modal-padding-md: 70px;

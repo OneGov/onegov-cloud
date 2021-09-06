@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-02-15 11:20+0100\n"
+"POT-Creation-Date: 2021-09-06 10:07+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1778,11 +1778,11 @@ msgstr "Interaktive Karte des Bundesamts für Statistik"
 msgid "Display the map"
 msgstr "Karte anzeigen"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit mit Analyseergebnissen"
-
 msgid "Technical report"
 msgstr "Technischer Bericht"
+
+msgid "Cockpit with selected results"
+msgstr "Cockpit mit Analyseergebnissen"
 
 msgid "Filter"
 msgstr "Filtern"
@@ -1793,8 +1793,16 @@ msgstr "Resultate"
 msgid "Date"
 msgstr "Datum"
 
+#. Default: Voting result
+msgid "voting_result_hyphenated"
+msgstr "Abstimmungs&shy;ergebnis"
+
 msgid "Yeas Percentage People"
 msgstr "Ja-Anteil Volk"
+
+#. Default: Turnout
+msgid "turnout_hyphenated"
+msgstr "Stimmbe&shy;teiligung"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
