@@ -168,7 +168,7 @@ def reindex_attachments(group_context, verbose):
     def _reindex(request, app):
         votes = SwissVoteCollection(app)
         for vote in votes.query():
-            count = vote.vectorize_files()
+            count = vote.reindex_filex()
             if count or verbose:
                 click.secho(
                     f'Reindexed {count} document(s) @ vote {vote.bfs_number}',

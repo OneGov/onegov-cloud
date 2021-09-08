@@ -43,9 +43,6 @@ def add_tsvector_columns(context):
                 'swissvotes', Column(column, TSVECTOR())
             )
 
-    for vote in context.app.session().query(SwissVote):
-        vote.vectorize_files()
-
 
 @upgrade_task('Add parliament position columns')
 def add_parliament_position_columns(context):

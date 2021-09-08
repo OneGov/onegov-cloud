@@ -14,7 +14,6 @@ from onegov.swissvotes.models.file import LocalizedFile
 from onegov.swissvotes.models.file import LocalizedFiles
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.region import Region
-from re import match
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import func
@@ -1036,7 +1035,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             for locale in ('de_CH', 'fr_CH')
         }
 
-    def vectorize_files(self):
+    def reindex_filex(self):
         """ Extract the text from the indexed files and store it. """
 
         count = 0
@@ -1059,7 +1058,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @observes('files')
     def files_observer(self, files):
-        self.vectorize_files()
+        self.reindex_filex()
 
     def get_file(self, name, locale=None, fallback=True):
         """ Returns the requested localized file.
