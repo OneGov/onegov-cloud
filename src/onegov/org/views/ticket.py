@@ -631,14 +631,13 @@ def view_ticket_pdf(self, request):
              permission=Public, form=TicketChatMessageForm)
 def view_ticket_status(self, request, form, layout=None):
 
+    title = ''
     if self.state == 'open':
         title = _("Your request has been submitted")
     elif self.state == 'pending':
         title = _("Your request is currently pending")
-    elif self.state == 'closed':
+    elif self.state == 'closed' or self.state == 'archived':
         title = _("Your request has been processed")
-    else:
-        raise NotImplementedError
 
     if request.is_logged_in:
         status_text = _("Ticket Status")
