@@ -1375,7 +1375,7 @@ msgstr "Initiative populaire"
 msgid "Direct counter-proposal"
 msgstr "Contre-projet direct"
 
-msgid "Deciding question"
+msgid "Tie-breaker"
 msgstr "Question subsidiaire"
 
 msgid "Rejected"

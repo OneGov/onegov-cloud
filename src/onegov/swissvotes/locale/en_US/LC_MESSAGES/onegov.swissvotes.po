@@ -1368,8 +1368,8 @@ msgstr "Popular initiative"
 msgid "Direct counter-proposal"
 msgstr "Direct counter-proposal"
 
-msgid "Deciding question"
-msgstr "Deciding question"
+msgid "Tie-breaker"
+msgstr "Tie-breaker"
 
 msgid "Rejected"
 msgstr "Rejected"

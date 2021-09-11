@@ -201,7 +201,7 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_vote_deciding_question(swissvotes_app, sample_vote):
+def test_view_vote_tie_breaker(swissvotes_app, sample_vote):
     sample_vote._legal_form = 5
 
     swissvotes_app.session().add(sample_vote)

@@ -49,7 +49,7 @@ class encoded_property(object):
 
     def __get__(self, instance, owner):
         value = getattr(instance, f'_{self.name}')
-        return instance.codes(self.name, instance.deciding_question).get(value)
+        return instance.codes(self.name).get(value)
 
 
 class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
@@ -82,14 +82,11 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     ORGANIZATION_NO_LONGER_EXISTS = 9999
 
     @staticmethod
-    def codes(attribute, deciding_question=False):
+    def codes(attribute):
         """ Returns the codes for the given attribute as defined in the code
         book.
-        deciding_question is a switch needed for three votes as of 2019.
 
         """
-
-        dc = deciding_question
 
         if attribute == 'legal_form':
             return OrderedDict((
@@ -97,32 +94,36 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (2, _("Optional referendum")),
                 (3, _("Popular initiative")),
                 (4, _("Direct counter-proposal")),
-                (5, _("Deciding question")),
+                (5, _("Tie-breaker")),
             ))
         if attribute == 'result_cantons_accepted':
             return OrderedDict((
-                (0, _("Rejected") if not dc
-                    else _("Preferred the counter-proposal")),
-                (1, _("Accepted") if not dc
-                    else _("Preferred the popular initiative")),
+                (0, _("Rejected")),
+                (1, _("Accepted")),
                 (3, _("Majority of the cantons not necessary")),
+                # todo: "preferred" doesn't seem right for results
+                (8, _("Preferred the counter-proposal")),
+                (9, _("Preferred the popular initiative"))
             ))
 
         if attribute == 'result_accepted':
             return OrderedDict((
-                (0, _("Rejected") if not dc
-                    else _("For the counter-proposal")),
-                (1, _("Accepted") if not dc
-                    else _("For the initiative")),
+                (0, _("Rejected")),
+                (1, _("Accepted")),
+                # todo: "for the" doesn't seem right for results
+                (8, _("For the counter-proposal")),
+                (9, _("For the initiative")),
             ))
 
+        # todo: why all these result / accepted cases?
         if attribute == 'result' or attribute.endswith('_accepted'):
             return OrderedDict((
-                (0, _("Rejected") if not dc
-                    else _("Preferred the counter-proposal")),
-                (1, _("Accepted") if not dc
-                    else _("Preferred the popular initiative")),
+                (0, _("Rejected")),
+                (1, _("Accepted")),
+                (8, _("Preferred the counter-proposal")),
+                (9, _("Preferred the popular initiative"))
             ))
+
         if attribute == 'department_in_charge':
             return OrderedDict((
                 (1, _("Federal Department of Foreign Affairs (FDFA)")),
@@ -137,31 +138,34 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                       "Energy and Communications (DETEC)")),
                 (8, _("Federal Chancellery (FCh)")),
             ))
-        if (attribute == 'position_federal_council'
-                or attribute == 'position_national_council'
-                or attribute == 'position_council_of_states'):
+        if attribute in (
+            'position_federal_council',
+            'position_national_council',
+            'position_council_of_states'
+        ):
             return OrderedDict((
-                (1, _("Accepting") if not dc
-                    else _("Preference for the popular initiative")),
-                (2, _("Rejecting") if not dc
-                    else _("Preference for the counter-proposal")),
-                (3, _("None"))
+                (1, _("Accepting")),
+                (2, _("Rejecting")),
+                (3, _("None")),
+                (8, _("Preference for the counter-proposal")),
+                (9, _("Preference for the popular initiative")),
             ))
 
+        # todo: use the definition above?
         if attribute == 'position_parliament':
             return OrderedDict((
-                (1, _("Accepting") if not dc
-                    else _("Preference for the popular initiative")),
-                (2, _("Rejecting") if not dc
-                    else _("Preference for the counter-proposal")),
+                (1, _("Accepting")),
+                (2, _("Rejecting")),
+                (8, _("Preference for the counter-proposal")),
+                (9, _("Preference for the popular initiative")),
             ))
         if attribute == 'recommendation':
-            # Added ordering how it should be displayed in strengths table
+            # Sorted by how it should be displayed in strengths table
             return OrderedDict((
-                (1, _("Preference for the popular initiative")
-                    if deciding_question else _("Yea")),
-                (2, _("Preference for the counter-proposal")
-                    if deciding_question else _("Nay")),
+                (1, _("Yea")),
+                (9, _("Preference for the popular initiative")),
+                (2, _("Nay")),
+                (8, _("Preference for the counter-proposal")),
                 (4, _("Empty")),
                 (5, _("Free vote")),
                 (3, _("None")),
@@ -222,11 +226,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         except ValueError:
             pass
 
-    @property
-    def deciding_question(self):
-        return self._legal_form == 5
-
-    # Additional links added late 2019
     curia_vista_de = Column(Text)
     curia_vista_fr = Column(Text)
     bkresults_de = Column(Text)
@@ -658,7 +657,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             if value is not None:
                 result.setdefault(value, []).append(Region(canton))
 
-        codes = self.codes('result_accepted', self.deciding_question)
+        codes = self.codes('result_accepted')
         return OrderedDict([
             (codes[key], result[key])
             for key in sorted(result.keys())
@@ -701,7 +700,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     def get_recommendation(self, name):
         """ Get the recommendations by name. """
-        return self.codes('recommendation', self.deciding_question).get(
+        return self.codes('recommendation').get(
             self.recommendations.get(name)
         )
 
@@ -717,7 +716,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def group_recommendations(self, recommendations, ignore_unknown=False):
         """ Group the given recommendations by slogan. """
 
-        codes = self.codes('recommendation', self.deciding_question)
+        codes = self.codes('recommendation')
         recommendation_codes = list(codes.keys())
 
         def by_recommendation(reco):
