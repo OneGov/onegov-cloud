@@ -27,6 +27,11 @@
         justify-content: space-between;
     }
 
+    .subheader small {
+        color: $body-font-color;
+        font-style: italic;
+    }
+
     .heading {
         color: $body-font-color;
 
