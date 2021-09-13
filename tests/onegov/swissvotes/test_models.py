@@ -1001,18 +1001,8 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.voting_booklet is None
     assert vote.voting_text is None
     assert vote.files == []
-    assert vote.text_voting_text_de_CH is None
-    assert vote.text_voting_text_fr_CH is None
-    assert vote.text_brief_description_de_CH is None
-    assert vote.text_brief_description_fr_CH is None
-    assert vote.text_federal_council_message_de_CH is None
-    assert vote.text_federal_council_message_fr_CH is None
-    assert vote.text_parliamentary_debate_de_CH is None
-    assert vote.text_parliamentary_debate_fr_CH is None
-    assert vote.text_realization_de_CH is None
-    assert vote.text_realization_fr_CH is None
-    assert vote.text_preliminary_examination_de_CH is None
-    assert vote.text_preliminary_examination_fr_CH is None
+    assert vote.searchable_text_de_CH is None
+    assert vote.searchable_text_fr_CH is None
 
     assert set(vote.localized_files().keys()) == {
         'ad_analysis',
@@ -1036,21 +1026,13 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'voting_text'
     }
 
-    assert set(vote.indexed_files['de_CH']) == {
+    assert vote.indexed_files == {
         'brief_description',
         'federal_council_message',
         'parliamentary_debate',
-        'preliminary_examination',
         'realization',
         'voting_text',
-    }
-    assert set(vote.indexed_files['fr_CH']) == {
-        'brief_description',
-        'federal_council_message',
-        'parliamentary_debate',
-        'preliminary_examination',
-        'realization',
-        'voting_text',
+        'preliminary_examination'
     }
 
     # Upload de_CH
@@ -1065,9 +1047,10 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.brief_description.name == 'brief_description-de_CH'
     assert vote.parliamentary_debate.name == 'parliamentary_debate-de_CH'
     assert vote.voting_text.name == 'voting_text-de_CH'
-    assert "abstimmungstex" in vote.text_voting_text_de_CH
-    assert "kurschbeschreib" in vote.text_brief_description_de_CH
-    assert "parlamentdebatt" in vote.text_parliamentary_debate_de_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "parlamentdebatt" in vote.searchable_text_de_CH
+    assert vote.searchable_text_fr_CH == ''
 
     # Upload fr_CH
     swissvotes_app.session_manager.current_locale = 'fr_CH'
@@ -1078,10 +1061,10 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert len(vote.files) == 5
     assert vote.voting_text is None
     assert vote.realization.name == 'realization-fr_CH'
-    assert "abstimmungstex" in vote.text_voting_text_de_CH
-    assert "kurschbeschreib" in vote.text_brief_description_de_CH
-    assert "parlamentdebatt" in vote.text_parliamentary_debate_de_CH
-    assert "réalis" in vote.text_realization_fr_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "parlamentdebatt" in vote.searchable_text_de_CH
+    assert "réalis" in vote.searchable_text_fr_CH
 
     del vote.realization
     vote.federal_council_message = attachments['federal_council_message']
@@ -1094,12 +1077,12 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.federal_council_message.name == 'federal_council_message-fr_CH'
     assert vote.resolution.name == 'resolution-fr_CH'
     assert vote.voting_booklet.name == 'voting_booklet-fr_CH'
-    assert "abstimmungstex" in vote.text_voting_text_de_CH
-    assert "kurschbeschreib" in vote.text_brief_description_de_CH
-    assert "parlamentdebatt" in vote.text_parliamentary_debate_de_CH
-    assert "réalis" not in vote.text_realization_fr_CH
-    assert "conseil" in vote.text_federal_council_message_fr_CH
-    assert "fédéral" in vote.text_federal_council_message_fr_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "parlamentdebatt" in vote.searchable_text_de_CH
+    assert "réalis" not in vote.searchable_text_fr_CH
+    assert "conseil" in vote.searchable_text_fr_CH
+    assert "fédéral" in vote.searchable_text_fr_CH
 
     assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
     assert vote.get_file('ad_analysis', 'fr_CH').name == 'ad_analysis-de_CH'

@@ -1008,57 +1008,41 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     campaign_material_nay = FileSubCollection()
 
     # searchable attachment texts
-    # we don't include the voting booklet, resolution and ad analysis as
-    # they might contain other votes from the same day!
-    text_voting_text_de_CH = deferred(Column(TSVECTOR))
-    text_voting_text_fr_CH = deferred(Column(TSVECTOR))
-    text_brief_description_de_CH = deferred(Column(TSVECTOR))
-    text_brief_description_fr_CH = deferred(Column(TSVECTOR))
-    text_federal_council_message_de_CH = deferred(Column(TSVECTOR))
-    text_federal_council_message_fr_CH = deferred(Column(TSVECTOR))
-    text_parliamentary_debate_de_CH = deferred(Column(TSVECTOR))
-    text_parliamentary_debate_fr_CH = deferred(Column(TSVECTOR))
-    text_realization_de_CH = deferred(Column(TSVECTOR))
-    text_realization_fr_CH = deferred(Column(TSVECTOR))
-    text_preliminary_examination_de_CH = deferred(Column(TSVECTOR))
-    text_preliminary_examination_fr_CH = deferred(Column(TSVECTOR))
+    searchable_text_de_CH = deferred(Column(TSVECTOR))
+    searchable_text_fr_CH = deferred(Column(TSVECTOR))
 
-    @cached_property
-    def indexed_files(self):
-        """ Returns all indexed files per locale. """
+    indexed_files = {
+        'voting_text',
+        'brief_description',
+        'federal_council_message',
+        'parliamentary_debate',
+        # we don't include the voting booklet, resolution and ad analysis
+        # - they might contain other votes from the same day!
+        'realization',
+        'preliminary_examination'
+    }
 
-        return {
-            locale: [
-                attribute for attribute in self.localized_files()
-                if f'text_{attribute}_{locale}' in SwissVote.__dict__
-            ]
-            for locale in ('de_CH', 'fr_CH')
-        }
-
-    def reindex_filex(self):
+    def vectorize_files(self):
         """ Extract the text from the indexed files and store it. """
 
-        count = 0
-        for locale, attributes in self.indexed_files.items():
-            language = {'de_CH': 'german', 'fr_CH': 'french'}.get(locale)
-            for attribute in attributes:
-                file = SwissVote.__dict__[attribute].__get_by_locale__(
-                    self, locale
-                )
-                text = ''
-                if file:
-                    text = extract_pdf_info(file.reference.file)[1] or ''
-                    count += 1
-                setattr(
-                    self,
-                    f'text_{attribute}_{locale}',
-                    func.to_tsvector(language, text)
-                )
-        return count
+        for locale, language in (('de_CH', 'german'), ('fr_CH', 'french')):
+            files = [
+                SwissVote.__dict__[file].__get_by_locale__(self, locale)
+                for file in self.indexed_files
+            ]
+            text = ' '.join([
+                extract_pdf_info(file.reference.file)[1] or ''
+                for file in files if file
+            ]).strip()
+            setattr(
+                self,
+                f'searchable_text_{locale}',
+                func.to_tsvector(language, text)
+            )
 
     @observes('files')
     def files_observer(self, files):
-        self.reindex_filex()
+        self.vectorize_files()
 
     def get_file(self, name, locale=None, fallback=True):
         """ Returns the requested localized file.

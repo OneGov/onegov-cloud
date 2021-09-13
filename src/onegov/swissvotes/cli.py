@@ -160,20 +160,15 @@ def import_attachments(group_context, folder):
 
 
 @cli.command('reindex')
-@click.option('--verbose', is_flag=True, default=False)
 @pass_group_context
-def reindex_attachments(group_context, verbose):
+def reindex_attachments(group_context):
     """ Reindexes the attachments. """
 
     def _reindex(request, app):
         votes = SwissVoteCollection(app)
         for vote in votes.query():
-            count = vote.reindex_filex()
-            if count or verbose:
-                click.secho(
-                    f'Reindexed {count} document(s) @ vote {vote.bfs_number}',
-                    fg='green' if count else None
-                )
+            vote.vectorize_files()
+            click.secho(f'Reindexed vote {vote.bfs_number}', fg='green')
 
     return _reindex
 
