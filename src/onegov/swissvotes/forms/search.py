@@ -14,14 +14,29 @@ from wtforms.fields.html5 import DateField
 
 class SearchForm(Form):
 
-    from_date = DateField(
-        label=_("From date"),
-        render_kw={'size': 6, 'clear': False}
+    term = StringField(
+        label=_("Text Search"),
+        render_kw={'size': 6, 'clear': False},
     )
 
-    to_date = DateField(
-        label=_("To date"),
-        render_kw={'size': 6}
+    full_text = RadioField(
+        label=_("Full Text"),
+        choices=(
+            (1, _("Yes")),
+            (0, _("No")),
+        ),
+        coerce=bool,
+        render_kw={'size': 6},
+        description=_(
+            "Searches all text fields and attachments. Select «No» to limit "
+            "the search to title, keyword, vote number, and procedure number."
+        ),
+    )
+
+    policy_area = PolicyAreaField(
+        label=_("Policy area"),
+        choices=[],
+        render_kw={'size': 6, 'clear': True}
     )
 
     legal_form = MultiCheckboxField(
@@ -36,29 +51,14 @@ class SearchForm(Form):
         render_kw={'size': 6}
     )
 
-    policy_area = PolicyAreaField(
-        label=_("Policy area"),
-        choices=[],
+    from_date = DateField(
+        label=_("From date"),
         render_kw={'size': 6, 'clear': False}
     )
 
-    term = StringField(
-        label=_("Text Search"),
-        render_kw={'size': 4, 'clear': False},
-    )
-
-    full_text = RadioField(
-        label=_("Full Text"),
-        choices=(
-            (1, _("Yes")),
-            (0, _("No")),
-        ),
-        coerce=bool,
-        render_kw={'size': 2},
-        description=_(
-            "Searches all text fields and attachments. Select «No» to limit "
-            "the search to title, keyword, vote number, and procedure number."
-        )
+    to_date = DateField(
+        label=_("To date"),
+        render_kw={'size': 6}
     )
 
     position_federal_council = MultiCheckboxField(
