@@ -106,25 +106,6 @@ html {
         height: 1.7rem;
 
     }
-
-    h1 > div {
-        margin-bottom: 2rem;
-    }
-
-    .answer {
-        color: $white-smoke;
-        padding: 10px;
-        font-size: 1rem;
-    }
-
-    .answer.accepted {
-        background: $accepted-color;
-    }
-
-    .answer.rejected {
-        background: $rejected-color;
-    }
-        
 }
 
 
