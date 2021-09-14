@@ -20,40 +20,41 @@ from reportlab.platypus import ListFlowable
 from reportlab.platypus import Paragraph
 
 LONGEST_TABLE_CELL_TEXT = """
-OpenID is an open standard and decentralized authentication protocol. 
-Promoted by the non-profit OpenID Foundation, it allows users to be 
-authenticated by co-operating sites (known as relying parties, or RP) 
-using a third-party service, eliminating the need for webmasters to 
-provide their own ad hoc login systems, and allowing users to log into 
-multiple unrelated websites without having to have a separate identity 
-and password for each.[1] Users create accounts by selecting an OpenID 
-identity provider[1] and then use those accounts to sign onto any website that 
-accepts OpenID authentication. Several large organizations either issue or 
+OpenID is an open standard and decentralized authentication protocol.
+Promoted by the non-profit OpenID Foundation, it allows users to be
+authenticated by co-operating sites (known as relying parties, or RP)
+using a third-party service, eliminating the need for webmasters to
+provide their own ad hoc login systems, and allowing users to log into
+multiple unrelated websites without having to have a separate identity
+and password for each.[1] Users create accounts by selecting an OpenID
+identity provider[1] and then use those accounts to sign onto any website that
+accepts OpenID authentication. Several large organizations either issue or
 accept OpenIDs on their websites, according to the OpenID Foundation.[2]
 
-The OpenID standard provides a framework for the communication that must take 
-place between the identity provider and the OpenID acceptor 
-(the "relying party").[3] An extension to the standard 
-(the OpenID Attribute Exchange) facilitates the transfer of user attributes, 
-such as name and gender, from the OpenID identity provider to the relying party 
-(each relying party may request a different set of attributes, depending on 
-its requirements).[4] The OpenID protocol does not rely on a central authority 
-to authenticate a user's identity. Moreover, neither services nor the OpenID 
-standard may mandate a specific means by which to authenticate users, 
-allowing for approaches ranging from the common (such as passwords) to the 
+The OpenID standard provides a framework for the communication that must take
+place between the identity provider and the OpenID acceptor
+(the "relying party").[3] An extension to the standard
+(the OpenID Attribute Exchange) facilitates the transfer of user attributes,
+such as name and gender, from the OpenID identity provider to the relying party
+(each relying party may request a different set of attributes, depending on
+its requirements).[4] The OpenID protocol does not rely on a central authority
+to authenticate a user's identity. Moreover, neither services nor the OpenID
+standard may mandate a specific means by which to authenticate users,
+allowing for approaches ranging from the common (such as passwords) to the
 novel (such as smart cards or biometrics).
 
-The final version of OpenID is OpenID 2.0, finalized and published in December 
-2007.[5] The term OpenID may also refer to an identifier as specified in the 
-OpenID standard; these identifiers take the form of a unique Uniform Resource 
-Identifier (URI), and are managed by some "OpenID provider" that handles 
-authentication.[1] 
+The final version of OpenID is OpenID 2.0, finalized and published in December
+2007.[5] The term OpenID may also refer to an identifier as specified in the
+OpenID standard; these identifiers take the form of a unique Uniform Resource
+Identifier (URI), and are managed by some "OpenID provider" that handles
+authentication.[1]
 
-The OpenID standard provides a framework for the communication that must take 
-place between the identity provider and the OpenID acceptor 
+The OpenID standard provides a framework for the communication that must take
+place between the identity provider and the OpenID acceptor
 (the "relying party").[3]
 
 """
+
 
 def test_pdf_fit_size():
 
@@ -402,8 +403,8 @@ def test_pdf_mini_html():
         'Donec non enim in turpis pulvinar facilisis. Ut felis. Aliquam\n'
         '1\nLorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
         '2\nAliquam tincidunt mauris eu risus.\n'
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean\n'
-        '\nLorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean\n•'
+        '\nLorem ipsum dolor sit amet, consectetuer adipiscing elit.\n•'
         '\nAliquam tincidunt mauris eu risus.\n'
     )
 
@@ -624,7 +625,7 @@ def test_page_fn_footer():
     file.seek(0)
     reader = PdfFileReader(file)
     assert reader.getNumPages() == 1
-    assert reader.getPage(0).extractText() == f'© {year} author\n1\n'
+    assert reader.getPage(0).extractText() == f'• {year} author\n1\n'
 
 
 def test_page_fn_header_and_footer():
@@ -640,8 +641,8 @@ def test_page_fn_header_and_footer():
     file.seek(0)
     reader = PdfFileReader(file)
     assert reader.getNumPages() == 2
-    assert reader.getPage(0).extractText() == f'title\n© {year} author\n1\n'
-    assert reader.getPage(1).extractText() == f'title\n© {year} author\n2\n'
+    assert reader.getPage(0).extractText() == f'title\n• {year} author\n1\n'
+    assert reader.getPage(1).extractText() == f'title\n• {year} author\n2\n'
 
 
 @mark.parametrize("path", [
@@ -692,5 +693,5 @@ def test_page_fn_header_logo_and_footer(path):
     reader = PdfFileReader(file)
     assert reader.getNumPages() == 1
     assert reader.getPage(0).extractText() == (
-        f'onegov.ch\n© {year} author\n1\n'
+        f'onegov.ch\n• {year} author\n1\n'
     )
