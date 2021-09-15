@@ -126,7 +126,7 @@ brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv
 ```shell
 sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev
 libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev
-libpoppler-cpp-dev pv libzbar0
+libpoppler-cpp-dev pv libzbar0 openssl libssl-dev
 ```
 
 ## Installation
