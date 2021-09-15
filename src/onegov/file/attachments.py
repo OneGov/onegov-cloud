@@ -71,6 +71,7 @@ def sanitize_svg_images(file, content, content_type):
 
 
 def extract_pdf_info(content):
+    content.seek(0)
     pages = pdftotext.PDF(content)
     return len(pages), '\n'.join(pages).strip(' \t\r\n').replace('\0', '')
 
