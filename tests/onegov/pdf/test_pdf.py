@@ -2,13 +2,13 @@ from copy import deepcopy
 from datetime import date
 from io import BytesIO
 from onegov.core.utils import module_path
-from onegov.file.attachments import extract_pdf_info
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header
 from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import page_fn_header_logo
 from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf
+from onegov.pdf.utils import extract_pdf_info
 from pdfdocument.document import MarkupParagraph
 from pdfrw import PdfReader
 from pytest import mark

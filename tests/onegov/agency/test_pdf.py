@@ -6,6 +6,7 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.pdf import AgencyPdfAr
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
+from onegov.pdf.utils import extract_pdf_info
 from PyPDF2 import PdfFileReader
 from sedate import utcnow
 
@@ -179,11 +180,7 @@ def test_agency_pdf_default_hidden_by_access(session):
         toc=False,
         exclude=[]
     )
-    reader = PdfFileReader(file)
-    pdf = '\n'.join([
-        reader.getPage(page).extractText()
-        for page in range(reader.getNumPages())
-    ])
+    _, pdf = extract_pdf_info(file)
     assert "Bundesrat" not in pdf
     assert "Nationalrat" in pdf
     assert "Ständerat" in pdf
@@ -234,11 +231,7 @@ def test_agency_pdf_default_hidden_by_publication(session):
         toc=False,
         exclude=[]
     )
-    reader = PdfFileReader(file)
-    pdf = '\n'.join([
-        reader.getPage(page).extractText()
-        for page in range(reader.getNumPages())
-    ])
+    _, pdf = extract_pdf_info(file)
     assert "Bundesrat" not in pdf
     assert "Nationalrat" in pdf
     assert "Ständerat" in pdf
@@ -292,27 +285,22 @@ def test_agency_pdf_ar(session):
         toc=True,
         exclude=[]
     )
-    reader = PdfFileReader(file)
-    assert reader.getNumPages() == 2
-
-    page1 = reader.getPage(0).extractText()
-    page2 = reader.getPage(1).extractText()
-    assert page1 == (
-        f'Druckdatum: {date.today():%d.%m.%Y}\n1\n'
-        'Staatskalender\n2\n'
-        '1 Bundesbehörden\n2\n'
-        '1.1 Nationalrat\n2\n'
-        '1.2 Ständerat\n'
-    )
-    assert page2 == (
+    assert extract_pdf_info(file) == (
+        2,
+        f'Staatskalender\n'
+        f'1 Bundesbehörden       2\n'
+        f'1.1 Nationalrat        2\n'
+        f'1.2 Ständerat          2\n'
+        f'Druckdatum: {date.today():%d.%m.%Y} 1\n'
+        f'\n'
         f'Staatskalender Kanton Appenzell Ausserrhoden\n'
-        f'Druckdatum: {date.today():%d.%m.%Y}\n2\n'
         f'1 Bundesbehörden\n'
         f'1.1 Nationalrat\n'
         f'Portrait NR\n'
-        f'Mitglied von AR\nAeschi Thomas\n'
+        f'Mitglied von AR                        Aeschi Thomas\n'
         f'1.2 Ständerat\n'
         f'Joachim, Eder, FDP\n'
+        f'Druckdatum: {date.today():%d.%m.%Y}                               2'
     )
 
 
@@ -359,24 +347,19 @@ def test_agency_pdf_zg(session):
         toc=True,
         exclude=[]
     )
-    reader = PdfFileReader(file)
-    pdf = '\n'.join([
-        reader.getPage(page).extractText()
-        for page in range(reader.getNumPages())
-    ])
-
-    assert pdf == (
-        f'Staatskalender\n2\n'
-        f'1 Bundesbehörden\n2\n'
-        f'1.1 Nationalrat\n2\n'
-        f'1.2 Ständerat\n\n'
+    assert extract_pdf_info(file) == (
+        2,
         f'Staatskalender\n'
-        f'Druckdatum: {date.today():%d.%m.%Y}\n2\n'
+        f'1 Bundesbehörden 2\n'
+        f'1.1 Nationalrat  2\n'
+        f'1.2 Ständerat    2\n'
+        f'\n'
         f'1 Bundesbehörden\n'
         f'1.1 Nationalrat\n'
         f'Portrait NR\n'
-        f'Mitglied von Zug\n'
-        f'Aeschi Thomas\n'
+        f'Mitglied von Zug       Aeschi Thomas\n'
         f'1.2 Ständerat\n'
         f'Joachim, Eder, FDP\n'
+        f'Staatskalender\n'
+        f'Druckdatum: {date.today():%d.%m.%Y}               2'
     )

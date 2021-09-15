@@ -1,5 +1,3 @@
-import pdftotext
-
 from depot.fields.upload import UploadedFile
 from depot.io import utils
 from depot.io.interfaces import FileStorage
@@ -13,6 +11,7 @@ from onegov.file.utils import IMAGE_MIME_TYPES
 from onegov.file.utils import word_count
 from PIL import Image
 from tempfile import SpooledTemporaryFile
+from onegov.pdf.utils import extract_pdf_info
 
 
 IMAGE_MAX_SIZE = 2048
@@ -68,12 +67,6 @@ def sanitize_svg_images(file, content, content_type):
         content = BytesIO(sane_svg.encode('utf-8'))
 
     return content
-
-
-def extract_pdf_info(content):
-    content.seek(0)
-    pages = pdftotext.PDF(content)
-    return len(pages), '\n'.join(pages).strip(' \t\r\n').replace('\0', '')
 
 
 def store_extract_and_pages(file, content, content_type):

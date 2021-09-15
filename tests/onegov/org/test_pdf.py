@@ -1,17 +1,13 @@
 from datetime import datetime, date
-
-from PyPDF2 import PdfFileReader
-from webob.multidict import MultiDict
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection
 from onegov.org.models import TicketMessage, TicketChatMessage
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from tests.onegov.pdf.test_pdf import LONGEST_TABLE_CELL_TEXT
-from tests.shared.utils import open_pdf
-
-
+from webob.multidict import MultiDict
 
 
 def open_ticket(request, token, handler_code, create_message=True):
@@ -132,11 +128,8 @@ def test_ticket_pdf(org_app):
     assert submission
 
     pdf = TicketPdf.from_ticket(request, ticket)
-    # open_pdf(pdf)
 
-    reader = PdfFileReader(pdf)
-    assert reader.getNumPages() == 2
-    page = reader.getPage(0).extractText()
+    _, page = extract_pdf_info(pdf)
     assert 'John' in page
     assert 'Data' in page
 
