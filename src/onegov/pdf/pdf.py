@@ -5,12 +5,14 @@ from functools import partial
 from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import StringIO
 from lxml import etree
+from onegov.core.utils import module_path
 from onegov.pdf.flowables import InlinePDF
 from onegov.pdf.page_functions import empty_page_fn
 from onegov.pdf.templates import Template
 from pdfdocument.document import Empty
 from pdfdocument.document import MarkupParagraph
 from pdfdocument.document import PDFDocument
+from pdfdocument.document import register_fonts_from_paths
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
@@ -57,6 +59,15 @@ class Pdf(PDFDocument):
         self.link_color = link_color
         self.underline_links = underline_links
         self.underline_width = underline_width
+
+        path = module_path('onegov.pdf', 'fonts')
+        register_fonts_from_paths(
+            font_name='Helvetica',
+            regular=f'{path}/Helvetica.ttf',
+            italic=f'{path}/Helvetica-Oblique.ttf',
+            bold=f'{path}/Helvetica-Bold.ttf',
+            bolditalic=f'{path}/Helvetica-BoldOblique.ttf',
+        )
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
                          **kwargs):

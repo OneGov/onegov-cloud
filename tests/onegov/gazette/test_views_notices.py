@@ -3,8 +3,8 @@ import transaction
 from freezegun import freeze_time
 from io import BytesIO
 from onegov.gazette.models import GazetteNotice
+from onegov.pdf.utils import extract_pdf_info
 from openpyxl import load_workbook
-from PyPDF2 import PdfFileReader
 from tests.onegov.gazette.common import login_admin
 from tests.onegov.gazette.common import login_editor_1
 from tests.onegov.gazette.common import login_editor_2
@@ -513,14 +513,18 @@ def test_view_notices_pdf_preview(gazette_app):
         assert response.headers['Content-Disposition'] == \
             'inline; filename=amtsblatt-govikon.pdf'
 
-        reader = PdfFileReader(BytesIO(response.body))
-        assert [page.extractText() for page in reader.pages] == [
-            '© 2017 Govikon\n1\n'
-            'xxx\nErneuerungswahlen\n1. Oktober 2017\n'
-            'Govikon, 1. Januar 2019\nState Chancellerist\n'
-            'xxx\nKantonsratswahlen\n10. Oktober 2017\n'
-            'Govikon, 1. Januar 2019\nState Chancellerist\n'
-        ]
+        assert extract_pdf_info(BytesIO(response.body)) == (
+            1,
+            'xxx   Erneuerungswahlen\n'
+            '      1. Oktober 2017\n'
+            '      Govikon, 1. Januar 2019\n'
+            '      State Chancellerist\n'
+            'xxx   Kantonsratswahlen\n'
+            '      10. Oktober 2017\n'
+            '      Govikon, 1. Januar 2019\n'
+            '      State Chancellerist\n'
+            '© 2017 Govikon                1'
+        )
 
 
 def test_view_notices_index(gazette_app):
@@ -565,25 +569,25 @@ def test_view_notices_index(gazette_app):
         assert response.headers['Content-Disposition'] == \
             'inline; filename=amtsblatt-govikon.pdf'
 
-        reader = PdfFileReader(BytesIO(response.body))
-        assert [page.extractText() for page in reader.pages] == [
-            (
-                '© 2017 Govikon\n1\nAmtsblatt\nStichwortverzeichnis\n'
-                'Organisationen\n'
-                'C\n'
-                'Civic Community  2017-44-1, 2017-45-2\n'
-                'M\n'
-                'Municipality  2017-45-3, 2017-46-4\n'
-            ),
-            (
-                'Amtsblatt\n© 2017 Govikon\n2\n'
-                'Rubriken\n'
-                'E\n'
-                'Education  2017-44-1, 2017-45-2\n'
-                'S\n'
-                'Submissions  2017-45-3, 2017-46-4\n'
-            )
-        ]
+        assert extract_pdf_info(BytesIO(response.body)) == (
+            2,
+            'Amtsblatt\n'
+            'Stichwortverzeichnis\n'
+            'Organisationen\n'
+            'C\n'
+            'Civic Community 2017-44-1, 2017-45-2\n'
+            'M\n'
+            'Municipality 2017-45-3, 2017-46-4\n'
+            '© 2017 Govikon                       1\n'
+            '\n'
+            'Amtsblatt\n'
+            'Rubriken\n'
+            'E\n'
+            'Education 2017-44-1, 2017-45-2\n'
+            'S\n'
+            'Submissions 2017-45-3, 2017-46-4\n'
+            '© 2017 Govikon                   2'
+        )
 
 
 def test_view_notices_statistics(gazette_app):
