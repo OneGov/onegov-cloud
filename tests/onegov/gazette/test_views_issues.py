@@ -1,8 +1,8 @@
 from datetime import datetime
 from freezegun import freeze_time
 from io import BytesIO
+from onegov.pdf.utils import extract_pdf_info
 from openpyxl import load_workbook
-from PyPDF2 import PdfFileReader
 from pyquery import PyQuery as pq
 from tests.onegov.gazette.common import login_editor_1
 from tests.onegov.gazette.common import login_publisher
@@ -212,34 +212,16 @@ def test_view_issues_publish(gazette_app):
 
         manage = manage.click(href='2017-44.pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '1\nnotice-0\n'
-            'Text\n'
-            'Govikon, 1. Januar 2019\n'
-            'State Chancellerist\n'
-        )
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 44, 03.11.2017' in pdf
+        assert 'notice-0' in pdf
 
         manage = client.get('/issues')
         manage = manage.click('2017-44.pdf', href='print-only-pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-        )
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 44, 03.11.2017' in pdf
+        assert 'notice-0' not in pdf
 
         notice_0 = client.get('/notice/notice-0')
         notice_1 = client.get('/notice/notice-1')
@@ -259,43 +241,18 @@ def test_view_issues_publish(gazette_app):
 
         manage = manage.click(href='2017-46.pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-            '1 Publikation(en) mit besonders schützenswerten Daten sind '
-            'online nicht verfügbar. Sie stehen\nin Papierform bei der '
-            'Staatskanzlei, Seestrasse 2, 6300 Zug, zur Verfügung oder '
-            'können unter\namtsblatt@zg.ch abonniert werden.\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '2\nDiese Meldung ist nur in der Papierversion erhältlich.\n'
-        )
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 46, 17.11.2017' in pdf
+        assert 'schützenswerten' in pdf
+        assert 'Papierversion' in pdf
 
         manage = client.get('/issues')
         manage = manage.click('2017-46.pdf', href='print-only-pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
-            '1 Publikation(en) mit besonders schützenswerten Daten gemäss '
-            'BGS 152.3 §7 Abs. 2.\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '2\nnotice-1\n'
-            'Text\n'
-            'Govikon, 1. Januar 2019\n'
-            'State Chancellerist\n'
-        )
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 46, 17.11.2017' in pdf
+        assert 'schützenswerten' in pdf
+        assert 'Papierversion' not in pdf
 
         notice_0 = client.get('/notice/notice-0')
         notice_1 = client.get('/notice/notice-1')
@@ -316,47 +273,19 @@ def test_view_issues_publish(gazette_app):
 
         manage = manage.click(href='2017-45.pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 45, 10.11.2017\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-            '1 Publikation(en) mit besonders schützenswerten Daten sind '
-            'online nicht verfügbar. Sie stehen\nin Papierform bei der '
-            'Staatskanzlei, Seestrasse 2, 6300 Zug, zur Verfügung oder '
-            'können unter\namtsblatt@zg.ch abonniert werden.\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '2\nnotice-0\n'
-            'Text\n'
-            'Govikon, 1. Januar 2019\n'
-            'State Chancellerist\n'
-            '3\nDiese Meldung ist nur in der Papierversion erhältlich.\n'
-        )
+        assert manage.content_type == 'application/pdf'
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 45, 10.11.2017' in pdf
+        assert 'schützenswerten' in pdf
+        assert 'Papierversion' in pdf
 
         manage = client.get('/issues')
         manage = manage.click('2017-45.pdf', href='print-only-pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 45, 10.11.2017\n'
-            '1 Publikation(en) mit besonders schützenswerten Daten gemäss '
-            'BGS 152.3 §7 Abs. 2.\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '3\nnotice-1\n'
-            'Text\n'
-            'Govikon, 1. Januar 2019\n'
-            'State Chancellerist\n'
-        )
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 45, 10.11.2017' in pdf
+        assert 'schützenswerten' in pdf
+        assert 'notice-1' in pdf
 
         notice_0 = client.get('/notice/notice-0')
         notice_1 = client.get('/notice/notice-1')
@@ -379,44 +308,15 @@ def test_view_issues_publish(gazette_app):
 
         manage = manage.click(href='2017-46.pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-            '1 Publikation(en) mit besonders schützenswerten Daten sind '
-            'online nicht verfügbar. Sie stehen\nin Papierform bei der '
-            'Staatskanzlei, Seestrasse 2, 6300 Zug, zur Verfügung oder '
-            'können unter\namtsblatt@zg.ch abonniert werden.\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '4\nDiese Meldung ist nur in der Papierversion erhältlich.\n'
-        )
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 46, 17.11.2017' in pdf
+        assert 'schützenswerten' in pdf
 
         manage = client.get('/issues')
         manage = manage.click('2017-46.pdf', href='print-only-pdf')
         assert manage.content_type == 'application/pdf'
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-
-        assert text == (
-            'onegov.ch\n'
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
-            '1 Publikation(en) mit besonders schützenswerten Daten gemäss '
-            'BGS 152.3 §7 Abs. 2.\n'
-            'Das elektronischer Amtsblatt steht unter www.amtsblattzug.ch '
-            'zur Verfügung.\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '4\nnotice-1\n'
-            'Text\n'
-            'Govikon, 1. Januar 2019\n'
-            'State Chancellerist\n'
-        )
+        _, pdf = extract_pdf_info(BytesIO(manage.body))
+        assert 'Amtsblatt Nr. 46, 17.11.2017' in pdf
 
         notice_0 = client.get('/notice/notice-0')
         notice_1 = client.get('/notice/notice-1')

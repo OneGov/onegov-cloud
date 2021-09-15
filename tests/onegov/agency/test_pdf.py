@@ -7,7 +7,6 @@ from onegov.agency.pdf import AgencyPdfAr
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.pdf.utils import extract_pdf_info
-from PyPDF2 import PdfFileReader
 from sedate import utcnow
 
 
@@ -61,24 +60,21 @@ def test_agency_pdf_default(session):
         exclude=[],
         page_break_on_level=1
     )
-    reader = PdfFileReader(file)
-    assert reader.getNumPages() == 2, 'No page break since its on level 1'
-    page1_toc = reader.getPage(0).extractText()
-    page2 = reader.getPage(1).extractText()
-
-    assert "Staatskalender" in page1_toc
-    assert "1 Bundesbehörden" in page1_toc
-    assert "1.1 Nationalrat" in page1_toc
-    assert "1.2 Ständerat" in page1_toc
-    assert "1 Bundesbehörden" in page2
-    assert "1.1 Nationalrat" in page2
-    assert "Portrait NR" in page2
-    assert "Mitglied von Zug" in page2
-    assert "Aeschi Thomas" in page2
-    assert "SVP" not in page2
-    assert "1.2 Ständerat" in page2
-    assert "Ständerat für Zug" not in page2
-    assert "Joachim, Eder, FDP" in page2
+    pages, pdf = extract_pdf_info(file)
+    assert pages == 2
+    assert "Staatskalender" in pdf
+    assert "1 Bundesbehörden" in pdf
+    assert "1.1 Nationalrat" in pdf
+    assert "1.2 Ständerat" in pdf
+    assert "1 Bundesbehörden" in pdf
+    assert "1.1 Nationalrat" in pdf
+    assert "Portrait NR" in pdf
+    assert "Mitglied von Zug" in pdf
+    assert "Aeschi Thomas" in pdf
+    assert "SVP" not in pdf
+    assert "1.2 Ständerat" in pdf
+    assert "Ständerat für Zug" not in pdf
+    assert "Joachim, Eder, FDP" in pdf
 
     # test page break on level 2
     file = AgencyPdfDefault.from_agencies(
@@ -88,12 +84,11 @@ def test_agency_pdf_default(session):
         exclude=[],
         page_break_on_level=2
     )
-    reader = PdfFileReader(file)
-    assert reader.getNumPages() == 3, 'No page break since its on level 1'
-    page3 = reader.getPage(2).extractText()
-    assert "1.2 Ständerat" in page3
-    assert "Ständerat für Zug" not in page3
-    assert "Joachim, Eder, FDP" in page3
+    pages, pdf = extract_pdf_info(file)
+    assert pages == 3
+    assert "1.2 Ständerat" in pdf
+    assert "Ständerat für Zug" not in pdf
+    assert "Joachim, Eder, FDP" in pdf
 
     # test page break on level 1 with succeeding headers
     file = AgencyPdfDefault.from_agencies(
@@ -103,10 +98,10 @@ def test_agency_pdf_default(session):
         exclude=[],
         page_break_on_level=1
     )
-    reader = PdfFileReader(file)
-    assert reader.getNumPages() == 3, 'Page break since its on level 1'
-    assert "2 Kanton" in reader.getPage(2).extractText()
-    assert "2 Kanton" in reader.getPage(0).extractText()
+    pages, pdf = extract_pdf_info(file)
+    assert pages == 3
+    assert "2 Kanton" in pdf
+    assert "2 Kanton" in pdf
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[nr, sr],
@@ -114,11 +109,7 @@ def test_agency_pdf_default(session):
         toc=False,
         exclude=['political_party']
     )
-    reader = PdfFileReader(file)
-    pdf = '\n'.join([
-        reader.getPage(page).extractText()
-        for page in range(reader.getNumPages())
-    ])
+    pages, pdf = extract_pdf_info(file)
     assert "Staatskalender" in pdf
     assert "Bundesbehörden" not in pdf
     assert "FDP" not in pdf
@@ -130,15 +121,12 @@ def test_agency_pdf_default(session):
         toc=False,
         exclude=[]
     )
-    reader = PdfFileReader(file)
-    pdf = '\n'.join([
-        reader.getPage(page).extractText()
-        for page in range(reader.getNumPages())
-    ])
-    assert reader.getNumPages() == 1
-    assert pdf == (
-        '1\nNationalrat\nPortrait NR\nMitglied von Zug\nAeschi Thomas\n'
-    )
+    pages, pdf = extract_pdf_info(file)
+    assert pages == 1
+    assert 'Nationalrat' in pdf
+    assert 'Portrait NR' in pdf
+    assert 'Mitglied von Zug' in pdf
+    assert 'Aeschi Thomas' in pdf
 
 
 def test_agency_pdf_default_hidden_by_access(session):

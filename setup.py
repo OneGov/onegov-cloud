@@ -176,7 +176,6 @@ setup(
         ],
         'test': [
             'Pillow!=5.4.0',
-            'PyPDF2',
             'coverage',
             'faker',
             'findimports',

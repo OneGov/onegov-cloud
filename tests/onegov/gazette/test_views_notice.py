@@ -1,6 +1,7 @@
 from freezegun import freeze_time
 from io import BytesIO
 from onegov.gazette.models import GazetteNotice
+from onegov.pdf.utils import extract_pdf_info
 from tests.onegov.gazette.common import accept_notice
 from tests.onegov.gazette.common import edit_notice
 from tests.onegov.gazette.common import edit_notice_unrestricted
@@ -8,7 +9,6 @@ from tests.onegov.gazette.common import login_users
 from tests.onegov.gazette.common import publish_issue
 from tests.onegov.gazette.common import reject_notice
 from tests.onegov.gazette.common import submit_notice
-from PyPDF2 import PdfFileReader
 
 
 def test_view_notice(gazette_app):
@@ -326,11 +326,14 @@ def test_view_notice_pdf_preview(gazette_app):
         assert response.headers['Content-Disposition'] == \
             'inline; filename=amtsblatt-govikon-titel.pdf'
 
-        reader = PdfFileReader(BytesIO(response.body))
-        assert [page.extractText() for page in reader.pages] == [
-            '© 2018 Govikon\n1\nxxx\nTitel\n1. Oktober 2017\n'
-            'Govikon, 1. Januar 2019\nState Chancellerist\n'
-        ]
+        assert extract_pdf_info(BytesIO(response.body)) == (
+            1,
+            'xxx   Titel\n'
+            '      1. Oktober 2017\n'
+            '      Govikon, 1. Januar 2019\n'
+            '      State Chancellerist\n'
+            '© 2018 Govikon                1'
+        )
 
 
 def test_view_notice_delete(gazette_app):

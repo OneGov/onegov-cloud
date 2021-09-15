@@ -1,3 +1,5 @@
+import pdftotext
+
 from depot.fields.upload import UploadedFile
 from depot.io import utils
 from depot.io.interfaces import FileStorage
