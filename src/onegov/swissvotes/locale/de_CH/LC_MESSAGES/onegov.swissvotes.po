@@ -1802,7 +1802,7 @@ msgstr "Ja-Anteil Volk"
 
 #. Default: Turnout
 msgid "turnout_hyphenated"
-msgstr "Stimmbe&shy;teiligung"
+msgstr "Stimm&shy;beteiligung"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
