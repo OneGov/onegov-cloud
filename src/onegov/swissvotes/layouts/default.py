@@ -123,9 +123,6 @@ class DefaultLayout(ChameleonLayout):
             paths.setdefault(path[0], [])
             paths[path[0]].append(path)
 
-        paths_ = [area.label_path for area in vote.policy_areas]
-        paths_ = groupbylist(paths_, key=lambda x: x[0])
-
         translate = self.request.translate
         return ",<br>".join([
             "<span title=\"{}\">{}</span>".format(
