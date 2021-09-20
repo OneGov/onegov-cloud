@@ -335,9 +335,9 @@ def test_layout_format_policy_areas():
         descriptor_3_level_3=Decimal('10.33'),
     )
     assert layout.format_policy_areas(vote) == (
-        '<span title="d-1-10 &gt; d-2-103">d-1-10</span>,<br>'
-        '<span title="d-1-8">d-1-8</span>,<br>'
-        '<span title="d-1-10 &gt; d-2-103 &gt; d-3-1033">d-1-10</span>'
+        '<span title="d-1-10 &gt; d-2-103 &#10;&#10;d-1-10 &gt;'
+        ' d-2-103 &gt; d-3-1033">d-1-10</span>,<br>'
+        '<span title="d-1-8">d-1-8</span>'
     )
 
 

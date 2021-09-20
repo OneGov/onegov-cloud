@@ -118,8 +118,13 @@ class DefaultLayout(ChameleonLayout):
         return result
 
     def format_policy_areas(self, vote):
-        paths = [area.label_path for area in vote.policy_areas]
-        paths = groupbylist(paths, key=lambda x: x[0])
+        paths = {}
+        for path in [area.label_path for area in vote.policy_areas]:
+            paths.setdefault(path[0], [])
+            paths[path[0]].append(path)
+
+        paths_ = [area.label_path for area in vote.policy_areas]
+        paths_ = groupbylist(paths_, key=lambda x: x[0])
 
         translate = self.request.translate
         return ",<br>".join([
@@ -130,7 +135,7 @@ class DefaultLayout(ChameleonLayout):
                 ]),
                 translate(value)
             )
-            for value, titles in paths
+            for value, titles in paths.items()
         ])
 
     def format_bfs_number(self, number, decimal_places=None):
