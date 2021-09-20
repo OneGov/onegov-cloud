@@ -6,7 +6,6 @@ from numbers import Integral
 from onegov.core.elements import Link
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
-from onegov.core.utils import groupbylist
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
