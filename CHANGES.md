@@ -1,8 +1,18 @@
 # Changes
 
+## 2021.79
+
+`2021-09-20` | [e866168c6f...e14d8bd615](https://github.com/OneGov/onegov-cloud/compare/e866168c6f^...e14d8bd615)
+
+### Swissvotes
+
+##### Group policy areas if possible.
+
+`Feature` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [e866168c6f](https://github.com/onegov/onegov-cloud/commit/e866168c6fa0683fc8e0461f7a22b5589338529b)
+
 ## 2021.78
 
-`2021-09-16` | [203549ce6f...657e96ee47](https://github.com/OneGov/onegov-cloud/compare/203549ce6f^...657e96ee47)
+`2021-09-16` | [203549ce6f...42f73969e2](https://github.com/OneGov/onegov-cloud/compare/203549ce6f^...42f73969e2)
 
 ### Election Day
 
@@ -1240,58 +1250,4 @@ Adds support for migration when fieldsets are removed or added. Improve test cov
 Fixes sql alchemy observer calling migration of entries twice when triggering the migration.
 
 `Bugfix` | [SEA-195](https://linear.app/seantis/issue/SEA-195) | [d7a436dfff](https://github.com/onegov/onegov-cloud/commit/d7a436dfff1ad8b9d09ffa784150be91f7c9206b)
-
-## 2021.29
-
-`2021-03-16` | [4d722f9b3f...6e2a9a9aa5](https://github.com/OneGov/onegov-cloud/compare/4d722f9b3f^...6e2a9a9aa5)
-
-### Org
-
-##### Fixes embedding youtu.be links not generating iframes
-
-`Bugfix` | [SEA-178](https://linear.app/seantis/issue/SEA-178) | [656bc95e19](https://github.com/onegov/onegov-cloud/commit/656bc95e1915addc9d4e314d39f44375615e686e)
-
-### Town
-
-##### Adds event limit to homepage settings
-
-`Other` | [SEA-19](https://linear.app/seantis/issue/SEA-19) | [bcec43f330](https://github.com/onegov/onegov-cloud/commit/bcec43f3308c2bcea7bb8686683f622c072921a1)
-
-### Town6
-
-##### Introdcues town6 redesign
-
-Summary:
-
-- Top News site is now editable (only contact and address available)
-- Ctrl+Shift+F keyboard shortcut to open search
-- Customizable homepage structure (like in org)
-- Colors neutral, gray and primary can be chosen in homepage widgets as background
-- Sticky editbar for constant visibility
-- Nested side navigation with all layers with sorting
-- New sidepanel for /news and /topics page showing address and contact
-- Contact panel on the right is always shown for news and topics since the address is always displayed
-- improved auto-opening menues
-- improved mobile-friendliness (e.g. ticket table)
-- improved globals toolbar with some animations
-
-`Feature` | [SEA-131](https://linear.app/seantis/issue/SEA-131) | [a3af64722f](https://github.com/onegov/onegov-cloud/commit/a3af64722f603f4c5ca81f7b7eeb4f26867bddcd)
-
-##### Adds option to display partners on all pages
-
-- Hide it for admins in order not to clutter the page
-
-`Other` | [df9dc9f9ee](https://github.com/onegov/onegov-cloud/commit/df9dc9f9ee57445cad3e3229a325e21d4be2f817)
-
-##### Adds option to display partners on all pages
-
-- Hide it for admins in order not to clutter the page
-
-`Other` | [29979c0681](https://github.com/onegov/onegov-cloud/commit/29979c0681787bac4a1f870c8dabe5885134fd09)
-
-##### Adds option to display partners on all pages
-
-- Hide it for admins in order not to clutter the page
-
-`Other` | [9d6a9135be](https://github.com/onegov/onegov-cloud/commit/9d6a9135bebade37332ba5e329a1fc952175c1f6)
 
