@@ -108,6 +108,14 @@ $publications-icon: '\f1ea';
         a.sbb-daypass::before { @include icon-bold($train-icon); }
         a.generic::before { @include icon-bold($link-icon); }
 
+        a.fa {
+            font-family: inherit;
+
+            &::before {
+                font-family: 'Font Awesome 5 Free';
+            }
+        }
+
         a::before {
             margin-right: $panel-icon-margin-right;
             padding-right: $panel-icon-padding-right;

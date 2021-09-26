@@ -218,8 +218,11 @@ class ServicesWidget(object):
                         <tal:b content="structure link(layout)" />
                     </li>
                     <xsl:for-each select="link">
-                        <li>
-                            <a class="generic h5">
+                        <li tal:define="icon '{@icon}'">
+                            <a tal:attributes="
+                                class ('h5 fa fa-' + icon) if icon
+                                      else 'generic h5'
+                                ">
                                 <xsl:attribute name="href">
                                     <xsl:value-of select="@url" />
                                 </xsl:attribute>
