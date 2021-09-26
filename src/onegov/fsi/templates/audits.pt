@@ -37,6 +37,7 @@
                                     <th class="text-left" i18n:translate="">Last Event</th>
                                     <th class="text-center" i18n:translate="">Attended</th>
                                     <th class="text-left" i18n:translate="">Due by (every <span i18n:name="refresh_interval">${layout.format_refresh_interval(model.course.refresh_interval)}</span>)</th>
+                                    <th class="text-left" i18n:translate="">Next Subscription</th>
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="result results">
@@ -54,6 +55,9 @@
                                                     <span class="${'text-orange' if date.year == now.year and result.event_completed else 'text-green'}" tal:condition="now < date">${date.year}</span>
                                                 </tal:b>
                                                 <span class="text-red" tal:condition="not: date">${now.year}</span>
+                                            </td>
+                                            <td tal:define="next_subscription next_subscriptions.get(result.id, None)">
+                                                <span tal:condition="next_subscription" class="next-subscription">${layout.format_date(next_subscription, 'date')}</span>
                                             </td>
                                         </tr>
                                     </tal:b>
