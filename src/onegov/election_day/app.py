@@ -159,7 +159,7 @@ def get_i18n_default_locale():
 @ElectionDayApp.tween_factory(
     under=content_security_policy_tween_factory
 )
-def enable_iframes_tween_factory(app, handler):
+def enable_iframes_and_analytics_tween_factory(app, handler):
     iframe_paths = (
         r'/ballot/.*',
         r'/vote/.*',
@@ -169,8 +169,8 @@ def enable_iframes_tween_factory(app, handler):
 
     iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
 
-    def enable_iframes_tween(request):
-        """ Enables iframes on matching paths. """
+    def enable_iframes_and_analytics_tween(request):
+        """ Enables iframes and analytics. """
 
         result = handler(request)
 
@@ -178,9 +178,14 @@ def enable_iframes_tween_factory(app, handler):
             request.content_security_policy.frame_ancestors.add('http://*')
             request.content_security_policy.frame_ancestors.add('https://*')
 
+        if app.principal and app.principal.analytics_domain:
+            request.content_security_policy.connect_src.add(
+                app.principal.analytics_domain
+            )
+
         return result
 
-    return enable_iframes_tween
+    return enable_iframes_and_analytics_tween
 
 
 @ElectionDayApp.tween_factory(

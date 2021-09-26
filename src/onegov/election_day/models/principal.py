@@ -68,6 +68,7 @@ class Principal(object):
         color='#000',
         base=None,
         analytics=None,
+        analytics_domain=None,
         has_districts=True,
         use_maps=False,
         fetch=None,
@@ -93,6 +94,7 @@ class Principal(object):
         self.color = color
         self.base = base
         self.analytics = analytics
+        self.analytics_domain = analytics_domain
         self.has_districts = has_districts
         self.use_maps = use_maps
         self.fetch = fetch or {}
