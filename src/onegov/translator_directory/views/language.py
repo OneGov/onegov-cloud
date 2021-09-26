@@ -1,5 +1,5 @@
 from onegov.core.elements import Link
-from onegov.core.security import Secret, Personal
+from onegov.core.security import Secret, Private
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.forms.language import LanguageForm
@@ -36,7 +36,7 @@ def add_new_language(self, request, form):
 @TranslatorDirectoryApp.html(
     model=LanguageCollection,
     template='languages.pt',
-    permission=Personal,
+    permission=Private,
 )
 def view_languages(self, request):
 
