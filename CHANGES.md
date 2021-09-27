@@ -1,8 +1,42 @@
 # Changes
 
+## 2021.81
+
+`2021-09-27` | [d52dfb0ec4...52375c494f](https://github.com/OneGov/onegov-cloud/compare/d52dfb0ec4^...52375c494f)
+
+### Election Day
+
+##### Add menu entry for updating archived results.
+
+`Feature` | [d52dfb0ec4](https://github.com/onegov/onegov-cloud/commit/d52dfb0ec47c1dfd859cda56a1e81b5e9cf1ad1b)
+
+##### Make pages cache expiration time configurable and add a menu entry for busting the cache.
+
+`Feature` | [974c9b1bab](https://github.com/onegov/onegov-cloud/commit/974c9b1babdc48cabd758ed8bdba8750b7a7fa82)
+
+##### Fix admin view permissions.
+
+`Bugfix` | [6e96f971df](https://github.com/onegov/onegov-cloud/commit/6e96f971dfa653e4a4ad572c8a566a46877e3cfe)
+
+##### Set a default value for CSP Connect Source.
+
+`Bugfix` | [b5278a0cb2](https://github.com/onegov/onegov-cloud/commit/b5278a0cb2ded8f2eb1797aa1d92c137a1c0f45a)
+
+### Form
+
+##### Add a CSS field.
+
+`Feature` | [288fa08778](https://github.com/onegov/onegov-cloud/commit/288fa087782056fb4afe990f2d436a2549cea1a8)
+
+### User
+
+##### Add change role CLI command.
+
+`Feature` | [f5078d8d29](https://github.com/onegov/onegov-cloud/commit/f5078d8d2976c57fa6319735408b64c764dc733e)
+
 ## 2021.80
 
-`2021-09-27` | [6886672d66...deec0bc8c7](https://github.com/OneGov/onegov-cloud/compare/6886672d66^...deec0bc8c7)
+`2021-09-27` | [6886672d66...a5bbfb99ff](https://github.com/OneGov/onegov-cloud/compare/6886672d66^...a5bbfb99ff)
 
 ### Election Day
 
@@ -1269,8 +1303,4 @@ Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
 ##### Allows multi line panels.
 
 `Feature` | [3d54946a45](https://github.com/onegov/onegov-cloud/commit/3d54946a45336a5b958c9ac1eaf91371806f918d)
-
-## 2021.31
-
-`2021-03-17` | [c22a982b96...9ea8a9d53e](https://github.com/OneGov/onegov-cloud/compare/c22a982b96^...9ea8a9d53e)
 
