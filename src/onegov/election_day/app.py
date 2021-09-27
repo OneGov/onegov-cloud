@@ -3,6 +3,7 @@ import re
 
 from datetime import datetime
 from dectate import directive
+from more.content_security import SELF
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework
 from onegov.core import utils
@@ -181,6 +182,7 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
             request.content_security_policy.frame_ancestors.add('http://*')
             request.content_security_policy.frame_ancestors.add('https://*')
 
+        request.content_security_policy.connect_src.add(SELF)
         if app.principal:
             for domain in getattr(app.principal, 'csp_script_src', []):
                 request.content_security_policy.script_src.add(domain)
