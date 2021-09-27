@@ -1,8 +1,44 @@
 # Changes
 
+## 2021.80
+
+`2021-09-27` | [6886672d66...deec0bc8c7](https://github.com/OneGov/onegov-cloud/compare/6886672d66^...deec0bc8c7)
+
+### Election Day
+
+##### Add CSP Connect Source option for analytics.
+
+`Feature` | [OGC-102](https://linear.app/onegovcloud/issue/OGC-102) | [b9f9df8a0a](https://github.com/onegov/onegov-cloud/commit/b9f9df8a0ad1d04abbf34370fa02cf6055c6932f)
+
+##### Add CSP Script Source option for analytics.
+
+`Feature` | [OGC-102](https://linear.app/onegovcloud/issue/OGC-102) | [deec0bc8c7](https://github.com/onegov/onegov-cloud/commit/deec0bc8c70eb1870b562e9e8b1347bc66e2d896)
+
+### Fsi
+
+##### Show next course subscription in the audit view.
+
+`Feature` | [ZW-332](https://kanton-zug.atlassian.net/browse/ZW-332) | [e9b8eac575](https://github.com/onegov/onegov-cloud/commit/e9b8eac5751d68f4daa0a86bbb50b8b127e6e277)
+
+### Org
+
+##### Removes corona banner from event directory.
+
+`Other` | [ZW-333](https://kanton-zug.atlassian.net/browse/ZW-333) | [f373b76021](https://github.com/onegov/onegov-cloud/commit/f373b76021cb33890d4d843f3681037c505db4d2)
+
+### Town6
+
+##### Allow custom icons for custom service panel links.
+
+`Feature` | [OGC-99](https://linear.app/onegovcloud/issue/OGC-99) | [a39af439fa](https://github.com/onegov/onegov-cloud/commit/a39af439fae03502096de17577b9f8ccfbaa6d66)
+
+##### Change color of news background and date.
+
+`Other` | [OGC-78](https://linear.app/onegovcloud/issue/OGC-78) | [6886672d66](https://github.com/onegov/onegov-cloud/commit/6886672d66a5bf2cf44a2fbf62d60cfb2e349328)
+
 ## 2021.79
 
-`2021-09-20` | [e866168c6f...e14d8bd615](https://github.com/OneGov/onegov-cloud/compare/e866168c6f^...e14d8bd615)
+`2021-09-20` | [e866168c6f...3da2c725ff](https://github.com/OneGov/onegov-cloud/compare/e866168c6f^...3da2c725ff)
 
 ### Swissvotes
 
@@ -1237,17 +1273,4 @@ Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
 ## 2021.31
 
 `2021-03-17` | [c22a982b96...9ea8a9d53e](https://github.com/OneGov/onegov-cloud/compare/c22a982b96^...9ea8a9d53e)
-
-## 2021.30
-
-`2021-03-17` | [7157f0f0e3...144e0bb5b4](https://github.com/OneGov/onegov-cloud/compare/7157f0f0e3^...144e0bb5b4)
-
-### Directory
-
-##### Improves directory migration greatly
-
-Adds support for migration when fieldsets are removed or added. Improve test coverage for directory migration.
-Fixes sql alchemy observer calling migration of entries twice when triggering the migration.
-
-`Bugfix` | [SEA-195](https://linear.app/seantis/issue/SEA-195) | [d7a436dfff](https://github.com/onegov/onegov-cloud/commit/d7a436dfff1ad8b9d09ffa784150be91f7c9206b)
 
