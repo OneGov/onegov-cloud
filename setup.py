@@ -70,6 +70,7 @@ setup(
         'click',
         'colour',
         'cssmin',
+        'cssutils',
         'dill!=0.2.7',
         'dogpile.cache',
         'dukpy',

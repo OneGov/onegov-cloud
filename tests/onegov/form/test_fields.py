@@ -10,6 +10,7 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import CssField
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import HtmlField
@@ -209,3 +210,21 @@ def test_honeypot_field():
         assert not field.validate(form)
         assert field.errors == ['Invalid value']
         log.info.assert_called_with('Honeypot used by 1.1.1.1')
+
+
+def test_css_field():
+    form = Form()
+    field = CssField()
+    field = field.bind(form, 'css')
+    field.data = ''
+
+    assert field() == '<textarea id="css" name="css"></textarea>'
+    assert field.validate(form)
+
+    field.data = '* { x'
+    assert not field.validate(form)
+    assert field.errors
+
+    field.data = '* { font-weight: bold }'
+    assert field.validate(form)
+    assert not field.errors

@@ -8,6 +8,7 @@ from onegov.election_day.models import Screen
 from onegov.election_day.models.screen import ScreenType
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import CssField
 from onegov.form.fields import PanelField
 from onegov.form.validators import UniqueColumnValue
 from wtforms import IntegerField
@@ -172,7 +173,7 @@ class ScreenForm(Form):
         ],
     )
 
-    css = TextAreaField(
+    css = CssField(
         label=_('Additional CSS'),
         render_kw={'rows': 10},
     )
