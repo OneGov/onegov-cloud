@@ -107,7 +107,7 @@ class ManageLayout(DefaultLayout):
                 self.request.link(
                     self.principal, name='trigger-notifications'
                 ),
-                isinstance(self.model, Principal),
+                'trigger-notifications' in self.request.url,
                 []
             ))
             result.append((
@@ -116,7 +116,6 @@ class ManageLayout(DefaultLayout):
                 (
                     isinstance(self.model, SmsSubscriberCollection)
                     or isinstance(self.model, EmailSubscriberCollection)
-                    or isinstance(self.model, Principal)
                 ),
                 submenu
             ))
@@ -127,6 +126,23 @@ class ManageLayout(DefaultLayout):
             isinstance(self.model, ScreenCollection),
             []
         ))
+
+        if self.request.is_secret(self.model):
+            submenu = [
+                (
+                    _("Update archived results"),
+                    self.request.link(self.principal, 'update-results'),
+                    'update-results' in self.request.url,
+                    []
+                )
+            ]
+
+            result.append((
+                _("Administration"),
+                '',
+                False,
+                submenu
+            ))
 
         return result
 

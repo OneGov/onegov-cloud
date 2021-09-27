@@ -186,7 +186,7 @@ class DummyApp(object):
 class DummyRequest(object):
 
     def __init__(self, session=None, app=None, locale='de',
-                 is_logged_in=False):
+                 is_logged_in=False, is_secret=False, url=''):
         self.includes = []
         self.session = session
         self.app = app or DummyApp(session=self.session)
@@ -196,6 +196,8 @@ class DummyRequest(object):
             self.app.session = Mock(return_value=session)
         self.params = {}
         self.default_locale = 'de_CH'
+        self.is_secret = lambda x: is_secret
+        self.url = url
 
     def link(self, model, name='', query_params={}):
         class_name = model.__class__.__name__

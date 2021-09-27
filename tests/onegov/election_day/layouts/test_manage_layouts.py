@@ -336,3 +336,19 @@ def test_manage_layouts(session):
         ('Manage', 'VoteCollection/archive', 'unavailable'),
         ('Screens', 'ScreenCollection/archive', '')
     ]
+
+    # Admin
+    layout = ManageScreensLayout(None, DummyRequest(is_secret=True))
+    assert layout.menu[-1] == (
+        'Administration',
+        '',
+        False,
+        [
+            (
+                'Update archived results',
+                'DummyPrincipal/update-results',
+                False,
+                []
+            )
+        ]
+    )

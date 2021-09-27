@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-02 07:42+0200\n"
+"POT-Creation-Date: 2021-09-27 08:13+0200\n"
 "PO-Revision-Date: 2021-04-01 10:22+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -219,19 +219,14 @@ msgstr "Bis Datum"
 msgid "Voting result"
 msgstr "Wahlresultat"
 
-msgid "Type"
-msgstr "Art"
-
-msgid ""
-"Compound of elections field summarizes all related elections in one. To "
-"display all elections, uncheck 'Compound of Elections'"
-msgstr ""
-
 msgid "Domain"
 msgstr "Ebene"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Type"
+msgstr "Art"
 
 msgid "No votes yet."
 msgstr "Noch keine Abstimmungen erfasst."
@@ -518,6 +513,12 @@ msgstr "Abonnenten"
 
 msgid "Screens"
 msgstr "Screens"
+
+msgid "Update archived results"
+msgstr "Archiv aktualisieren"
+
+msgid "Administration"
+msgstr "Admin"
 
 msgid "Manage"
 msgstr "Verwalten"
@@ -1154,8 +1155,12 @@ msgstr ""
 msgid "Results updated."
 msgstr "Resultate aktualisiert."
 
-msgid "Update results"
-msgstr "Resultate aktualisieren"
+msgid ""
+"The results on the home page and in the archive are cached and need to be "
+"updated after a domain change, for example."
+msgstr ""
+"Die Resultate auf der Startseite und im Archiv werden zwischengespeichert "
+"und müssen z.B. nach einem Domain-Wechsel aktualisiert werden."
 
 msgid "Data source added."
 msgstr "Datenquelle hinzugefügt."

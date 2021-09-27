@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-02 07:42+0200\n"
+"POT-Creation-Date: 2021-09-27 08:13+0200\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -220,19 +220,14 @@ msgstr "Fin ils"
 msgid "Voting result"
 msgstr "Resultat da l'elecziun"
 
-msgid "Type"
-msgstr "Gener"
-
-msgid ""
-"Compound of elections field summarizes all related elections in one. To "
-"display all elections, uncheck 'Compound of Elections'"
-msgstr ""
-
 msgid "Domain"
 msgstr "Plaun"
 
 msgid "Name"
 msgstr "Denominaziun"
+
+msgid "Type"
+msgstr "Gener"
 
 msgid "No votes yet."
 msgstr "I n'èn registradas anc naginas votaziuns."
@@ -512,6 +507,12 @@ msgid "Subscribers"
 msgstr "Abunents"
 
 msgid "Screens"
+msgstr ""
+
+msgid "Update archived results"
+msgstr ""
+
+msgid "Administration"
 msgstr ""
 
 msgid "Manage"
@@ -1153,8 +1154,10 @@ msgstr ""
 msgid "Results updated."
 msgstr "Actualisà ils resultats."
 
-msgid "Update results"
-msgstr "Actualisar ils resultats"
+msgid ""
+"The results on the home page and in the archive are cached and need to be "
+"updated after a domain change, for example."
+msgstr ""
 
 msgid "Data source added."
 msgstr "Agiuntà la funtauna da datas."
