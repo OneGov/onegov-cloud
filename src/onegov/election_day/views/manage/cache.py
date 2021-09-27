@@ -1,4 +1,5 @@
 from morepath import redirect
+from onegov.core.security import Secret
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.forms import EmptyForm
@@ -10,7 +11,8 @@ from onegov.election_day.models import Principal
     model=Principal,
     name='clear-cache',
     template='form.pt',
-    form=EmptyForm
+    form=EmptyForm,
+    permission=Secret
 )
 def view_clear_pages_cache(self, request, form):
 

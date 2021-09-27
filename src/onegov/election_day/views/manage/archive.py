@@ -1,4 +1,5 @@
 from morepath import redirect
+from onegov.core.security import Secret
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
@@ -11,7 +12,8 @@ from onegov.election_day.models import Principal
     model=Principal,
     name='update-results',
     template='form.pt',
-    form=EmptyForm
+    form=EmptyForm,
+    permission=Secret
 )
 def view_update_results(self, request, form):
 
