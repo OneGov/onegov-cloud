@@ -68,7 +68,6 @@ class Principal(object):
         color='#000',
         base=None,
         analytics=None,
-        analytics_domain=None,
         has_districts=True,
         use_maps=False,
         fetch=None,
@@ -80,6 +79,8 @@ class Principal(object):
         open_data=None,
         hidden_elements=None,
         publish_intermediate_results=None,
+        csp_script_src=None,
+        csp_connect_src=None,
         **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -94,7 +95,6 @@ class Principal(object):
         self.color = color
         self.base = base
         self.analytics = analytics
-        self.analytics_domain = analytics_domain
         self.has_districts = has_districts
         self.use_maps = use_maps
         self.fetch = fetch or {}
@@ -110,6 +110,8 @@ class Principal(object):
             'election': False,
             'election_compound': False
         }
+        self.csp_script_src = csp_script_src or []
+        self.csp_connect_src = csp_connect_src or []
 
     @classmethod
     def from_yaml(cls, yaml_source):

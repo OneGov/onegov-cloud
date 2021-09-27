@@ -178,10 +178,11 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
             request.content_security_policy.frame_ancestors.add('http://*')
             request.content_security_policy.frame_ancestors.add('https://*')
 
-        if app.principal and app.principal.analytics_domain:
-            request.content_security_policy.connect_src.add(
-                app.principal.analytics_domain
-            )
+        if app.principal:
+            for domain in app.principal.csp_script_src:
+                request.content_security_policy.script_src.add(domain)
+            for domain in app.principal.csp_connect_src:
+                request.content_security_policy.connect_src.add(domain)
 
         return result
 
