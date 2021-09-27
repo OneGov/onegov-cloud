@@ -349,6 +349,12 @@ def test_manage_layouts(session):
                 'DummyPrincipal/update-results',
                 False,
                 []
+            ),
+            (
+                'Clear cache',
+                'DummyPrincipal/clear-cache',
+                False,
+                []
             )
         ]
     )

@@ -118,8 +118,11 @@ class ElectionDayApp(Framework, FormApp, UserApp):
 
     @property
     def pages_cache(self):
-        """ A five minute cache for pages. """
-        return self.get_cache('pages', expiration_time=300)
+        """ A cache for pages. """
+        expiration_time = 300
+        if self.principal and hasattr(self.principal, 'cache_expiration_time'):
+            expiration_time = self.principal.cache_expiration_time
+        return self.get_cache('pages', expiration_time)
 
 
 @ElectionDayApp.static_directory()

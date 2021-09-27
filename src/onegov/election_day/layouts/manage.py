@@ -134,6 +134,12 @@ class ManageLayout(DefaultLayout):
                     self.request.link(self.principal, 'update-results'),
                     'update-results' in self.request.url,
                     []
+                ),
+                (
+                    _("Clear cache"),
+                    self.request.link(self.principal, 'clear-cache'),
+                    'clear-cache' in self.request.url,
+                    []
                 )
             ]
 
