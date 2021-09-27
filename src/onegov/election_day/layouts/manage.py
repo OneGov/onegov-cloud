@@ -12,7 +12,6 @@ from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.models import EmailSubscriber
-from onegov.election_day.models import Principal
 from onegov.election_day.models import SmsSubscriber
 
 
