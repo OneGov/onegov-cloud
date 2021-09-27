@@ -90,6 +90,25 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',
+        'change-role', 'admin@example.org',
+        'editor'
+    ])
+
+    assert result.exit_code == 0
+    assert "admin@example.org's role was changed" in result.output
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list'
+    ])
+    assert result.exit_code == 0
+    assert '[admin]' not in result.output
+    assert '[editor]' in result.output
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
         'delete', 'admin@example.org'
     ])
 
