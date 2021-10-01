@@ -1,0 +1,96 @@
+#
+# Italian translations for OneGov Cloud package
+# Copyright (C) 2021 Seantis GmbH
+# This file is distributed under the same license as the OneGov Cloud package.
+# Marc <marc.sommerhalder@seantis.ch>, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: OneGov Cloud 1.0\n"
+"POT-Creation-Date: 2021-09-21 08:37+0200\n"
+"PO-Revision-Date: 2021-09-21 08:37+0200\n"
+"Last-Translator: Marc <marc.sommerhalder@seantis.ch>\n"
+"Language-Team: Italian\n"
+"Language: it_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Online Counter"
+msgstr "Banco online"
+
+msgid "Forms and applications"
+msgstr "Moduli e richieste"
+
+msgid "Publications"
+msgstr "Pubblicazioni"
+
+msgid "Official Documents"
+msgstr "Documenti ufficiali"
+
+msgid "Reservations"
+msgstr "Prenotazioni"
+
+msgid "Daypasses and rooms"
+msgstr "Pass giornalieri e camere"
+
+msgid "E-Move"
+msgstr "E-Trasloco"
+
+msgid "Move with eMovingCH"
+msgstr "Trasferisciti con eTraslocoCH"
+
+msgid "SBB Daypass"
+msgstr "Pass giornaliero SBB"
+
+msgid "Generalabonnement for Towns"
+msgstr "Abbonamento generale per le città"
+
+msgid "Services"
+msgstr "Servizi"
+
+msgid "Contacts and Photos"
+msgstr "Contatti e foto"
+
+msgid "People"
+msgstr "Persone"
+
+msgid "All contacts"
+msgstr "Tutti i contatti"
+
+msgid "Photo Albums"
+msgstr "Album di foto"
+
+msgid "Impressions"
+msgstr "Impressioni"
+
+msgid "Online Counter Label"
+msgstr "Etichetta Banco online"
+
+msgid "Reservations Label"
+msgstr "Etichetta Prenotazioni"
+
+msgid "SBB Daypass Label"
+msgstr "Etichetta Pass giornaliero SBB"
+
+msgid "Publications Label"
+msgstr "Etichetta Pubblicazioni"
+
+msgid "E-Move Label"
+msgstr "Etichetta E-Trasloco"
+
+msgid "E-Move Url"
+msgstr "URL E-Trasloco"
+
+msgid "Hide Publications on Homepage"
+msgstr "Nascondi Pubblicazioni nella pagina iniziale"
+
+msgid "Maximum number of events displayed on homepage"
+msgstr "Numero massimo di eventi mostrati nella pagina iniziale"
+
+msgid "Maximum number of news entries on homepage"
+msgstr "Numero massimo di notizie nella pagina iniziale"
+
+msgid "Homepage"
+msgstr "Pagina iniziale"

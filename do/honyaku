@@ -28,7 +28,7 @@ function main() {
     fi
 
     if [[ "$locale" == "" ]]; then
-        echo "Please pass in a langauge to translate (e.g. do/honyaku onegov.org fr_CH)"
+        echo "Please pass in a language to translate (e.g. do/honyaku onegov.org fr_CH)"
         help
     fi
 

@@ -14,6 +14,7 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
     locales = {
         'de_CH': 'content/de.yaml',
         'fr_CH': 'content/fr.yaml',
+        'it_CH': 'content/it.yaml',
     }
 
     path = path or module_path('onegov.town6', locales[locale])
@@ -31,6 +32,7 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
     form_locales = {
         'de_CH': 'forms/builtin/de',
         'fr_CH': 'forms/builtin/fr',
+        'it_CH': 'forms/builtin/it',
     }
 
     forms = forms or builtin_form_definitions(

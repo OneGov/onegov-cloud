@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-08-17 16:10+0200\n"
+"POT-Creation-Date: 2021-09-20 17:52+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1060,6 +1060,9 @@ msgstr "Deutsch"
 
 msgid "French"
 msgstr "Französisch"
+
+msgid "Italian"
+msgstr "Italienisch"
 
 msgid "Column width left side"
 msgstr "Breite linke Seite"

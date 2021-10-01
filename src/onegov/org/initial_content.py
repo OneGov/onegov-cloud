@@ -36,6 +36,7 @@ def create_new_organisation(app, name, create_files=True, path=None,
     locales = {
         'de_CH': 'content/de.yaml',
         'fr_CH': 'content/fr.yaml',
+        'it_CH': 'content/it.yaml',
     }
 
     path = path or module_path('onegov.org', locales[locale])
@@ -109,6 +110,7 @@ def builtin_form_definitions(path=None, locale='de_CH'):
     locales = {
         'de_CH': 'forms/builtin/de',
         'fr_CH': 'forms/builtin/fr',
+        'it_CH': 'forms/builtin/it',
     }
 
     path = path or module_path('onegov.org', locales[locale])

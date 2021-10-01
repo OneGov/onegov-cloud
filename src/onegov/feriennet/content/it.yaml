@@ -1,0 +1,158 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Über uns
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird die Organisation beschrieben.
+  - title: Teilnahmebedingungen
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website werden die Teilnahmebedingungen ausgeführt.
+  - title: Sponsoren
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website werden bestehende Sponsoren genannt und
+        mögliche neue Sponsoren informiert.
+  - title: Spende
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website besteht die Möglichkeit einen
+        Spendenaufruf zu tätigen oder Mitglieder für den Verein anzuwerben.
+  - title: Aktuelles
+    type: news
+    name: news
+    meta:
+      trait: news
+  - title: Wir haben eine neue Webseite!
+    parent: news
+    type: news
+    meta:
+      trait: news
+    content:
+      lead: >
+        Die neue Webseite läuft auf Feriennet, der Buchungsplattform für
+        betreute Ferienangebote der Stiftung Pro Juventute.
+      text: |
+        <p>
+          Feriennet ist die umfassende, komplett webbasierte Softwarelösung
+          für die einfache, zeit- und kostensparende Organisation von
+          betreuten Ferienangeboten.
+        </p>
+        <p>
+          Weitere Informationen auf
+          <a href="https://www.projuventute.ch/de">
+            www.projuventute.ch
+          </a>
+        </p>
+
+filesets:
+  - title: Startseiten-Bilder
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Diese Bilder werden auf der Startseite angezeigt.
+      view: grid
+    files:
+      - path: images/1zr3wnstnvy-aaron-burden.jpg
+        note: "Ein Teilnehmer beim Malen"
+      - path: images/hn5ytnkwuxw-markus-spiske.jpg
+        note: "Der stets beliebte Fotografiekurs"
+      - path: images/rx2vjcjqtxi-elissa-algora.jpg
+        note: "Skifahren im Winterlager des {organisation}"
+      - path: images/sahbl2upxco-ashton-bingham.jpg
+        note: "Faszination Wasser"
+
+organisation:
+  theme_options:
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Ferienpass Musterlingen
+      Musterstrasse 39
+      8000 Musterlingen
+      044 256 77 77
+    contact_html: >
+      Ferienpass Musterlingen<br>
+      Musterstrasse 39<br>
+      8000 Musterlingen<br>
+      044 256 77 77
+    opening_hours: |
+      Wunschphase: 1.-27.5.2017
+      Zuteilung: 28.-30.5.2017
+      Buchungsphase: 1.-15.6.2017
+      Fakturierung: 16.6.2017
+      Ferienpass: 17.7.-20.8.2017
+    opening_hours_html: |
+      Wunschphase: 1.-27.5.2017<br>
+      Zuteilung: 28.-30.5.2017<br>
+      Buchungsphase: 1.-15.6.2017<br>
+      Fakturierung: 16.6.2017<br>
+      Ferienpass: 17.7.-20.8.2017
+    facebook_url: https://de-de.facebook.com/ProJuventute.ch
+    homepage_structure: |
+      <row>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <registration />
+
+          <panel>
+            <links>
+                <link url="./people"
+                    description="Personen">
+                    Team
+                </link>
+                <link url="./form/kontakt"
+                    description="Anfragen">
+                    Kontakt
+                </link>
+                <link url="./news"
+                    description="Neuigkeiten">
+                    Aktuelles
+                </link>
+                <link url="./photoalbums"
+                    description="Impressionen">
+                    Fotoalben
+                </link>
+            </links>
+          </panel>
+        </column>
+      </row>

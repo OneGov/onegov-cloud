@@ -64,9 +64,11 @@ class GeneralSettingsForm(Form):
         label=_("Languages"),
         choices=(
             ('de_CH', _("German")),
-            ('fr_CH', _("French"))
+            ('fr_CH', _("French")),
+            ('it_CH', _("Italian"))
         ),
-        validators=[validators.InputRequired()])
+        validators=[validators.InputRequired()]
+    )
 
     @property
     def theme_options(self):

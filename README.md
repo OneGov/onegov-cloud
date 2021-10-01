@@ -310,6 +310,18 @@ Or:
     do/honyaku onegov.org fr_CH "The following are variables and should be left as is: ${example}"
 
 
+### Import / Export of Translations (XLSX)
+
+First, install poxls (pip/pipx) and gettext (package manager).
+
+Export the current translations to a XLSX
+
+    do/translations-to-excel onegov.org translations.xlsx
+
+Update the current translation with the given XLSX
+
+    do/translations-from-excel onegov.org translations.xlsx
+
 ## Releases
 
 To create a new release, check the changelog first:

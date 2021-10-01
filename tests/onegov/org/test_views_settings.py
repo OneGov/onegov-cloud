@@ -88,3 +88,11 @@ def test_switch_languages(client):
     page = client.get('/general-settings')
     assert 'Allemand' in page
     assert 'Deutsch' not in page
+
+    page.form['locales'] = 'it_CH'
+    page.form.submit().follow()
+
+    page = client.get('/general-settings')
+    assert 'Tedesco' in page
+    assert 'Allemand' not in page
+    assert 'Deutsch' not in page

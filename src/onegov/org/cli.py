@@ -60,8 +60,11 @@ cli = command_group()
 
 @cli.command(context_settings={'creates_path': True})
 @click.argument('name')
-@click.option('--locale',
-              default='de_CH', type=click.Choice(['de_CH', 'fr_CH']))
+@click.option(
+    '--locale',
+    default='de_CH',
+    type=click.Choice(['de_CH', 'fr_CH', 'it_CH'])
+)
 @pass_group_context
 def add(group_context, name, locale):
     """ Adds an org with the given name to the database. For example:
@@ -94,7 +97,7 @@ def delete(group_context):
 
     def delete_org(request, app):
 
-        org = app.org.title
+        org = getattr(app.org, 'title', 'this organisation')
         confirmation = "Do you really want to DELETE {}?".format(org)
 
         if not click.confirm(confirmation):

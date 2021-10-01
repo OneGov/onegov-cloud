@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+function script-path() {
+    echo "$( cd "$(dirname "$0")" ; pwd -P )"
+}
+
+function repository-path() {
+    dirname "$(script-path)"
+}
+
+function help() {
+    echo ""
+    echo "Usage: do/translations-from-excel MODULE-NAME OUTPUT-FILE"
+    echo ""
+
+    exit 1
+}
+
+function main() {
+    local module="${1-}"
+    local filename="${2-}"
+
+    if [[ "$module" == "" ]]; then
+        echo "Please pass in a module (e.g. do/translations-from-excel onegov.org translations.xlsx)"
+        help
+    fi
+
+    if [[ "$filename" == "" ]]; then
+        echo "Please pass in a filename to translate (e.g. do/translations-from-excel onegov.org translations.xlsx)"
+        help
+    fi
+
+    local localepath
+    localepath="$(repository-path)/src/${module/\./\/}/locale/*"
+
+    local locale
+    local tempfile
+    local pofile
+    for path in $localepath; do
+        if [ -d "$path" ]; then
+            locale=$(basename "$path")
+            tempfile="/tmp/$module-$locale.po"
+            pofile="$path/LC_MESSAGES/$module.po"
+            xls-to-po "$locale" "$filename" "$tempfile"
+            msgmerge "$tempfile" "$pofile" -o "$pofile"
+        fi
+    done
+}
+
+main "$@"

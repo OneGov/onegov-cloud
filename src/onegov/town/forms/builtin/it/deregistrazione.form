@@ -1,0 +1,40 @@
+Deregistrazione partenza all'estero
+-----------------------------------
+
+# Dati personali
+Nome * = ___
+Cognome * = ___
+Data di nascita * = YYYY.MM.DD
+
+# Indirizzo fino ad ora
+Via (incl. numero civico) finora * = ___
+Codice postale / Città finora * = ___
+
+# Altre persone
+Con coniuge(i) / figli =
+    [ ] Coniuge/i
+        Coniuge(in) = ...
+    [ ] Bambini
+        Bambini = ...
+
+# Indirizzo nuovo
+Data di partenza * = YYYY.MM.DD
+Durata del soggiorno all'estero * =
+    (x) Definito
+    ( ) Indefinito
+    ( ) Mesi previsti
+        Durata in mesi = ___
+
+Via (incl. numero civico) nuovo * = ___
+Codice postale / Città nuovo * = ___
+Paese nuovo * = ___
+
+# Indirizzo di contatto domestico
+c/o = ___
+Via (incl. numero civico) = ___
+Codice postale / Città = ___
+
+# Contatto e osservazioni
+Telefono * = ___
+E-mail * = @@@
+Osservazione = ...
