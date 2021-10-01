@@ -141,6 +141,19 @@
     </div>
 </metal:footer_sponsors>
 
+<metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
+    <div class="row footer-links">
+      <div class="small-12 columns">
+        <span>&copy; Pro Juventute ${layout.today().year}</span>
+        <span>
+            <a href="${request.link(layout.org, 'privacy-protection')}" i18n:translate>
+                Privacy Protection
+            </a>
+        </span>
+      </div>
+    </div>
+</metal:footer_links>
+
 <metal:bosw_award define-macro="bosw_award" i18n:domain="onegov.feriennet">
     <tal:b condition="request.locale.startswith('de')">
         <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet" class="bosw-award">
