@@ -1,8 +1,44 @@
 # Changes
 
+## 2021.82
+
+`2021-10-01` | [00040c2121...df95d7405d](https://github.com/OneGov/onegov-cloud/compare/00040c2121^...df95d7405d)
+
+### Election Day
+
+##### Add reply to mail address configuration option.
+
+`Feature` | [OGC-105](https://linear.app/onegovcloud/issue/OGC-105) | [9b3b786cef](https://github.com/onegov/onegov-cloud/commit/9b3b786cefb74946e1fcb6c8a90082d6fc9e6523)
+
+##### Add custom CSS configuration option.
+
+`Feature` | [OGC-104](https://linear.app/onegovcloud/issue/OGC-104) | [be9c791a96](https://github.com/onegov/onegov-cloud/commit/be9c791a96f90c3c96e79820c087aa836d13b0c1)
+
+### Feriennet
+
+##### Adds privacy protection page.
+
+`Feature` | [PRO-887](https://linear.app/projuventute/issue/PRO-887) | [9fa319962a](https://github.com/onegov/onegov-cloud/commit/9fa319962a46474f90146253543e583eaeb84671)
+
+##### Changes banners.
+
+`Other` | [PRO-952](https://linear.app/projuventute/issue/PRO-952) | [2c1c5f05ee](https://github.com/onegov/onegov-cloud/commit/2c1c5f05ee8959cfb3b4835c6a5797151452d977)
+
+### Fsi
+
+##### Link next subscription in audit view.
+
+`Feature` | [ZW-332](https://kanton-zug.atlassian.net/browse/ZW-332) | [df95d7405d](https://github.com/onegov/onegov-cloud/commit/df95d7405d5a6514fb95cff6a8181e483e581f6f)
+
+### Org
+
+##### Add Italian.
+
+`Feature` | [PRO-805](https://linear.app/projuventute/issue/PRO-805) | [00040c2121](https://github.com/onegov/onegov-cloud/commit/00040c212114090e548e823a81dcde75a45f913c)
+
 ## 2021.81
 
-`2021-09-27` | [d52dfb0ec4...52375c494f](https://github.com/OneGov/onegov-cloud/compare/d52dfb0ec4^...52375c494f)
+`2021-09-27` | [d52dfb0ec4...cd55d0249a](https://github.com/OneGov/onegov-cloud/compare/d52dfb0ec4^...cd55d0249a)
 
 ### Election Day
 
@@ -1283,24 +1319,4 @@ Adds publication hints.
 Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
 
 `Feature` | [SEA-18](https://linear.app/seantis/issue/SEA-18) | [490c282f4f](https://github.com/onegov/onegov-cloud/commit/490c282f4fbfbe46644bcbdffbfe0d9470bef225)
-
-## 2021.32
-
-`2021-03-19` | [0bcfc993fe...88af288eef](https://github.com/OneGov/onegov-cloud/compare/0bcfc993fe^...88af288eef)
-
-### Election Day
-
-##### Add colors to list and candidate bar charts.
-
-`Feature` | [SEA-162](https://linear.app/seantis/issue/SEA-162) | [3f05403a28](https://github.com/onegov/onegov-cloud/commit/3f05403a2840a0471ccb4613cd74b732fe98be3d)
-
-##### Don't export empty party panachage results.
-
-`Bugfix` | [SEA-202](https://linear.app/seantis/issue/SEA-202) | [d0bbc71167](https://github.com/onegov/onegov-cloud/commit/d0bbc711676d21e28d75cba604a3e4c1701b4ac7)
-
-### Form
-
-##### Allows multi line panels.
-
-`Feature` | [3d54946a45](https://github.com/onegov/onegov-cloud/commit/3d54946a45336a5b958c9ac1eaf91371806f918d)
 
