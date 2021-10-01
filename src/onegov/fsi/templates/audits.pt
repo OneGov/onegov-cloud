@@ -57,7 +57,9 @@
                                                 <span class="text-red" tal:condition="not: date">${now.year}</span>
                                             </td>
                                             <td tal:define="next_subscription next_subscriptions.get(result.id, None)">
-                                                <span tal:condition="next_subscription" class="next-subscription">${layout.format_date(next_subscription, 'date')}</span>
+                                                <tal:b tal:condition="next_subscription">
+                                                    <a href="${next_subscription[0]}" class="next-subscription">${layout.format_date(next_subscription[1], 'date')}</a>
+                                                </tal:b>
                                             </td>
                                         </tr>
                                     </tal:b>

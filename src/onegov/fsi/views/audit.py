@@ -76,7 +76,10 @@ def invite_attendees_for_event(self, request, form):
         query = query.order_by(CourseEvent.start)
         for event in query:
             for attendee in event.attendees.with_entities(CourseAttendee.id):
-                next_subscriptions.setdefault(attendee[0], event.start)
+                next_subscriptions.setdefault(
+                    attendee[0],
+                    (request.link(event), event.start)
+                )
 
     return {
         'layout': layout,
