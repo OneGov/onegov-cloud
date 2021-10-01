@@ -82,6 +82,7 @@ class Principal(object):
         csp_script_src=None,
         csp_connect_src=None,
         cache_expiration_time=300,
+        reply_to=None,
         **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -114,6 +115,7 @@ class Principal(object):
         self.csp_script_src = csp_script_src or []
         self.csp_connect_src = csp_connect_src or []
         self.cache_expiration_time = cache_expiration_time
+        self.reply_to = reply_to
 
     @classmethod
     def from_yaml(cls, yaml_source):

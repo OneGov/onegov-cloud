@@ -136,7 +136,8 @@ class EmailNotification(Notification):
 
         reply_to = '{} <{}>'.format(
             request.app.principal.name,
-            request.app.mail['marketing']['sender']
+            request.app.principal.reply_to
+            or request.app.mail['marketing']['sender']
         )
 
         for locale in request.app.locales:

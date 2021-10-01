@@ -83,7 +83,10 @@ def handle_password_reset_request(self, request, form):
             request.app.send_transactional_email(
                 subject=request.translate(_("Password reset")),
                 receivers=(user.username, ),
-                reply_to=request.app.mail['transactional']['sender'],
+                reply_to=(
+                    request.app.principal.reply_to
+                    or request.app.mail['transactional']['sender']
+                ),
                 content=render_template(
                     'mail_password_reset.pt',
                     request,

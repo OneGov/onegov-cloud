@@ -154,6 +154,7 @@ class DummyPrincipal(object):
         self.wabsti_import = False
         self.has_districts = False
         self._is_year_available = True
+        self.reply_to = None
 
     @property
     def notifications(self):
