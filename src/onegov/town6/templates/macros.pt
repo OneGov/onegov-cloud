@@ -743,7 +743,7 @@
                 </a>
             </li>
             <li tal:condition="person.function" class="person-card-function">
-                <em>${person.function}</em>
+                ${person.function}
             </li>
             <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                 <a href="mailto:${person.email}">${person.email}</a>
