@@ -44,13 +44,13 @@ article.content .side-panel {
 
     .home-focus {
         margin-bottom: 1rem;
-    }
 
-    .home-focus > div > div {
-        background: $white-smoke;
-        height: 100%;
-        padding: 1rem;
-        padding-bottom: 0;
+        .focus-widget {
+            background: $white-smoke;
+            height: 100%;
+            padding: 1rem;
+            padding-bottom: 0;
+        }
     }
 
     .full.primary {
