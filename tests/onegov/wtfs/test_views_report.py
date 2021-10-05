@@ -73,68 +73,68 @@ def test_views_report(client):
 
     # Boxes
     view = get_report('boxes', '2019-01-01', '2019-01-05')
-    assert "1111" in view
-    assert "2222" in view
-    assert "3333" in view
-    assert "8888" in view
+    assert ">1111</td>" in view
+    assert ">2222</td>" in view
+    assert ">3333</td>" in view
+    assert ">8888</td>" in view
 
     view = get_report('boxes', '2019-01-06', '2019-01-10')
-    assert "1111" not in view
-    assert "2222" not in view
-    assert "3333" not in view
-    assert "8888" not in view
+    assert ">1111</td>" not in view
+    assert ">2222</td>" not in view
+    assert ">3333</td>" not in view
+    assert ">8888</td>" not in view
 
     # Boxes and forms
     view = get_report('boxes_and_forms', '2019-01-01', '2019-01-05')
-    assert "8888" in view
-    assert "9504" in view
-    assert "9603" in view
-    assert "9702" in view
-    assert "9801" in view
+    assert ">8888</td>" in view
+    assert ">9504</td>" in view
+    assert ">9603</td>" in view
+    assert ">9702</td>" in view
+    assert ">9801</td>" in view
 
     view = get_report('boxes_and_forms', '2019-01-06', '2019-01-10')
-    assert "8888" not in view
-    assert "9504" not in view
-    assert "9603" not in view
-    assert "9702" not in view
-    assert "9801" not in view
+    assert ">8888</td>" not in view
+    assert ">9504</td>" not in view
+    assert ">9603</td>" not in view
+    assert ">9702</td>" not in view
+    assert ">9801</td>" not in view
 
     # Forms
     view = get_report('forms', '2019-01-01', '2019-01-05')
-    assert "9504" in view
-    assert "9603" in view
-    assert "9702" in view
+    assert ">9504</td>" in view
+    assert ">9603</td>" in view
+    assert ">9702</td>" in view
 
     view = get_report('forms', '2019-01-06', '2019-01-10')
-    assert "9504" not in view
-    assert "9603" not in view
-    assert "9702" not in view
+    assert ">9504</td>" not in view
+    assert ">9603</td>" not in view
+    assert ">9702</td>" not in view
 
     # All forms
     view = get_report('all_forms', '2019-01-01', '2019-01-05')
-    assert "9504" in view
-    assert "9603" in view
-    assert "9702" in view
+    assert ">9504</td>" in view
+    assert ">9603</td>" in view
+    assert ">9702</td>" in view
 
     view = get_report('all_forms', '2019-01-06', '2019-01-10')
-    assert "9504" not in view
-    assert "9603" not in view
-    assert "9702" not in view
+    assert ">9504</td>" not in view
+    assert ">9603</td>" not in view
+    assert ">9702</td>" not in view
 
     # By delivery
     view = get_report('delivery', '2019-01-01', '2019-01-05')
-    assert "8888" in view
-    assert "9504" in view
-    assert "9603" in view
-    assert "9702" in view
-    assert "9801" in view
+    assert ">8888</td>" in view
+    assert ">9504</td>" in view
+    assert ">9603</td>" in view
+    assert ">9702</td>" in view
+    assert ">9801</td>" in view
 
     view = get_report('delivery', '2019-01-06', '2019-01-10')
-    assert "8888" not in view
-    assert "9504" not in view
-    assert "9603" not in view
-    assert "9702" not in view
-    assert "9801" not in view
+    assert ">8888</td>" not in view
+    assert ">9504</td>" not in view
+    assert ">9603</td>" not in view
+    assert ">9702</td>" not in view
+    assert ">9801</td>" not in view
 
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')

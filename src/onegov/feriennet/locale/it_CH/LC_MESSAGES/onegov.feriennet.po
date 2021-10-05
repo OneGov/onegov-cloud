@@ -1,3 +1,13 @@
+# This file was generated from translations.onegov.org_it.xlsx
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2021-09-20 17:52+0200\n"
+"PO-Revision-Date: 2021-09-27 13:23+0200\n"
+"Language: it_CH\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: xls-to-po 1.0\n"
+
 msgid "Partner of Pro Juventute"
 msgstr ""
 
@@ -1753,6 +1763,9 @@ msgstr ""
 msgid "Feriennet Partner"
 msgstr ""
 
+msgid "Privacy Protection"
+msgstr ""
+
 msgid "Best of Swiss Web Award 2019"
 msgstr ""
 
@@ -2301,6 +2314,11 @@ msgstr ""
 msgid "Booking Limit of ${name}"
 msgstr ""
 
+msgid "The user account must be opened by a parent or guardian of full age."
+msgstr ""
+"L'account utente deve essere aperto da una persona maggiorenne con autorità "
+"parentale."
+
 msgid "Add manual booking"
 msgstr ""
 
@@ -2720,10 +2738,13 @@ msgstr ""
 msgid "ESR identification number"
 msgstr ""
 
-msgid "Require the political municipality in the userprofile"
-msgstr ""
+msgid "Full age required for registration"
+msgstr "Età completa richiesta per la registrazione"
 
 msgid "Userprofile"
+msgstr ""
+
+msgid "Require the political municipality in the userprofile"
 msgstr ""
 
 msgid "Parents can see the contacts of other parents in the same activity"

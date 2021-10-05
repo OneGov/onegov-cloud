@@ -23,10 +23,19 @@ $event-image-max-height: 150px;
         border-top: 1px solid $iron;
     }
 
+    .date-place {
+        flex: none;
+        font-size: 97%;
+        font-weight: bold;
+        padding: 1rem;
+        i { width: $events-icon-width; }
+    }
+
     .image-placeholder {
         display: flex;
         justify-content: center;
         max-height: $event-image-max-height;
+        padding: 30px 15px;
 
         .far {
             color: $iron;
@@ -44,8 +53,8 @@ $event-image-max-height: 150px;
         }
 
         a {
+            font-size: 967;
             font-weight: bold;
-            white-space: nowrap;
             i { width: $events-icon-width; }
         }
     }

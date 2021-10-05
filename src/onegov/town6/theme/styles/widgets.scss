@@ -42,6 +42,17 @@ article.content .side-panel {
 
 .homepage {
 
+    .home-focus {
+        margin-bottom: 1rem;
+
+        .focus-widget {
+            background: $white-smoke;
+            height: 100%;
+            padding: 1rem;
+            padding-bottom: 0;
+        }
+    }
+
     .full.primary {
         @include primary-color-background;
     }

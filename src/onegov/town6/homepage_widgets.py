@@ -350,81 +350,83 @@ class DirectoriesWidget(OrgDirectoriesWidget):
 class FocusWidget(object):
 
     template = """
-         <xsl:template match="focus">
+    <xsl:template match="focus">
+        <div class="focus-widget">
             <xsl:choose>
-              <xsl:when test="@hide-title"></xsl:when>
-              <xsl:otherwise>
+                <xsl:when test="@hide-title"></xsl:when>
+                <xsl:otherwise>
                 <h3>
-                  <xsl:choose>
+                    <xsl:choose>
                     <xsl:when test="@title">
-                      <xsl:value-of select="@title" />
-                   </xsl:when>
-                   <xsl:otherwise>
-                     <metal:block use-macro="layout.macros['focus-title']" />
-                   </xsl:otherwise>
-                  </xsl:choose>
+                        <xsl:value-of select="@title" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <metal:block
+                        use-macro="layout.macros['focus-title']" />
+                    </xsl:otherwise>
+                    </xsl:choose>
                 </h3>
-              </xsl:otherwise>
+                </xsl:otherwise>
             </xsl:choose>
             <xsl:variable name="apos">'</xsl:variable>
             <xsl:variable name="image_src">
                 <xsl:choose>
-                     <xsl:when test="@image-src">
+                        <xsl:when test="@image-src">
                         <xsl:value-of
                         select="concat($apos, @image-src, $apos)" />
                     </xsl:when>
-                     <xsl:otherwise>
+                        <xsl:otherwise>
                         <xsl:value-of select="'None'" />
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
             <xsl:variable name="image_url">
                 <xsl:choose>
-                     <xsl:when test="@image-url">
+                        <xsl:when test="@image-url">
                         <xsl:value-of
                         select="concat($apos, @image-url, $apos)" />
                     </xsl:when>
-                     <xsl:otherwise>
+                        <xsl:otherwise>
                         <xsl:value-of select="'None'" />
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
             <xsl:variable name="no_title">
                 <xsl:choose>
-                     <xsl:when test="@hide-title">
+                        <xsl:when test="@hide-title">
                         <xsl:value-of select="'True'" />
                     </xsl:when>
-                     <xsl:otherwise>
+                        <xsl:otherwise>
                         <xsl:value-of select="'False'" />
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
             <xsl:variable name="no_lead">
                 <xsl:choose>
-                     <xsl:when test="@hide-lead">
+                        <xsl:when test="@hide-lead">
                         <xsl:value-of select="'True'" />
                     </xsl:when>
-                     <xsl:otherwise>
+                        <xsl:otherwise>
                         <xsl:value-of select="'False'" />
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
             <xsl:variable name="no_text">
                 <xsl:choose>
-                     <xsl:when test="@hide-text">
+                        <xsl:when test="@hide-text">
                         <xsl:value-of select="'True'" />
                     </xsl:when>
-                     <xsl:otherwise>
+                        <xsl:otherwise>
                         <xsl:value-of select="'False'" />
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
             <metal:block use-macro="layout.macros['focus-panel']">
-              <xsl:attribute name="tal:define">
+                <xsl:attribute name="tal:define">
                 <xsl:value-of
                 select="concat(
-                  'page_path ',
-                   $apos,
+                    'page_path ',
+                    $apos,
                     @page-path,
                     $apos,
                     '; ',
@@ -444,9 +446,15 @@ class FocusWidget(object):
                     $image_url,
                     ';'
                     )"/>
-              </xsl:attribute>
+                </xsl:attribute>
             </metal:block>
-        </xsl:template>
+            <xsl:for-each select="text">
+                <p class="homepage-text">
+                    <xsl:apply-templates select="node()"/>
+                </p>
+            </xsl:for-each>
+        </div>
+    </xsl:template>
     """
 
     def get_variables(self, layout):

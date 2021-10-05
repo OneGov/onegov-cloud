@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-14 15:11+0100\n"
+"POT-Creation-Date: 2021-10-05 07:54+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -601,8 +601,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "AGB"
 
@@ -1875,6 +1875,9 @@ msgstr "Pro Juventute Logo"
 msgid "Feriennet Partner"
 msgstr "Feriennet Partner"
 
+msgid "Privacy Protection"
+msgstr ""
+
 msgid "Best of Swiss Web Award 2019"
 msgstr ""
 
@@ -2461,6 +2464,11 @@ msgstr "Teilnehmer bearbeiten"
 msgid "Booking Limit of ${name}"
 msgstr "Buchungslimite von ${name}"
 
+msgid "The user account must be opened by a parent or guardian of full age."
+msgstr ""
+"Das Benutzerkonto muss durch eine erziehungsberechtigte, volljährige Person "
+"eröffnet werden."
+
 msgid "Add manual booking"
 msgstr "Manuelle Buchung hinzufügen"
 
@@ -2918,11 +2926,14 @@ msgstr "ESR Teilnehmernummer"
 msgid "ESR identification number"
 msgstr "ESR Identifikationsnummer"
 
-msgid "Require the political municipality in the userprofile"
-msgstr "Verlange die politische Gemeinde im Benutzerprofil"
+msgid "Full age required for registration"
+msgstr "Volljährigkeit bei der Registrierung notwendig"
 
 msgid "Userprofile"
 msgstr "Benutzerprofil"
+
+msgid "Require the political municipality in the userprofile"
+msgstr "Verlange die politische Gemeinde im Benutzerprofil"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
