@@ -228,7 +228,7 @@ button.open-active {
 
 .leaflet-control.leaflet-control-geocoder .leaflet-control-geocoder-icon::before {
     content: "\f002";
-    font-family: "Font Awesome 5 free";
+    font-family: "Fontawesome";
     font-weight: bold;
     font-size: .875rem;
     margin-left: 4px;
