@@ -46,7 +46,10 @@
         fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-fr'
         it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-it'
 
-- name: CREDIT SUISSE
+- name:
+    de: Viva Kids | Credit Suisse Schweiz
+    fr: Viva Kids | Credit Suisse
+    it: Viva Kids | Credit Suisse Svizzera
   logo_url:
     de: 'https://www.credit-suisse.com/ch/de/privatkunden/konto-karten/viva-kids.html'
     fr: 'https://www.credit-suisse.com/ch/fr/clients-prives/compte-cartes/viva-kids.html'
