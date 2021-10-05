@@ -1,8 +1,48 @@
 # Changes
 
+## 2021.83
+
+`2021-10-05` | [2694731697...8e3330b068](https://github.com/OneGov/onegov-cloud/compare/2694731697^...8e3330b068)
+
+### Feriennet
+
+##### Adds option to display full age callout on registration.
+
+`Feature` | [PRO-945](https://linear.app/projuventute/issue/PRO-945) | [5e3550f46b](https://github.com/onegov/onegov-cloud/commit/5e3550f46bd4e9ce7a1d641746bbd3ff3732a676)
+
+##### Update CS sponsor links.
+
+`Other` | [PRO-952](https://linear.app/projuventute/issue/PRO-952) | [4033a93fbd](https://github.com/onegov/onegov-cloud/commit/4033a93fbd719624dcbfd6e55dbc766c25f2f6a7)
+
+##### Update CS sponsor texts.
+
+`Other` | [PRO-952](https://linear.app/projuventute/issue/PRO-952) | [6842579caf](https://github.com/onegov/onegov-cloud/commit/6842579caf3c01dfa3dece547c0845e98aecd3e2)
+
+### Town6
+
+##### Remove cursive tag form person function
+
+`Other` | [OGC-100](https://linear.app/onegovcloud/issue/OGC-100) | [2694731697](https://github.com/onegov/onegov-cloud/commit/2694731697505a9db74e9060ea884a3ed6dd93df)
+
+##### Fix drag and drop icon on navigation.
+
+`Other` | [OGC-66](https://linear.app/onegovcloud/issue/OGC-66) | [6bbe0e49f3](https://github.com/onegov/onegov-cloud/commit/6bbe0e49f3e964d73ae49ffd3672e84098a64be8)
+
+##### Add background to focus widget.
+
+`Other` | [OGC-86](https://linear.app/onegovcloud/issue/OGC-86) | [2c40b88ea6](https://github.com/onegov/onegov-cloud/commit/2c40b88ea6571ee2234667474b4a8f00cdb6172c)
+
+##### Fix event styling.
+
+`Bugfix` | [OGC-79](https://linear.app/onegovcloud/issue/OGC-79) | [20f671c95a](https://github.com/onegov/onegov-cloud/commit/20f671c95ad7db33c44a0bed4e546d3b168b74c0)
+
+##### Fix search icon on map.
+
+`Bugfix` | [OGC-77](https://linear.app/onegovcloud/issue/OGC-77) | [8e3330b068](https://github.com/onegov/onegov-cloud/commit/8e3330b0684b67cd000f1fe94bd895728b6dca83)
+
 ## 2021.82
 
-`2021-10-01` | [00040c2121...df95d7405d](https://github.com/OneGov/onegov-cloud/compare/00040c2121^...df95d7405d)
+`2021-10-01` | [00040c2121...2808cfe924](https://github.com/OneGov/onegov-cloud/compare/00040c2121^...2808cfe924)
 
 ### Election Day
 
@@ -1291,32 +1331,4 @@ Use abbreviations for weekdays.
 ## 2021.34
 
 `2021-03-23` | [01c2811fad...2b4e103fb5](https://github.com/OneGov/onegov-cloud/compare/01c2811fad^...2b4e103fb5)
-
-## 2021.33
-
-`2021-03-23` | [f784f15bb6...6f15672fb2](https://github.com/OneGov/onegov-cloud/compare/f784f15bb6^...6f15672fb2)
-
-### Org
-
-##### Adds publication dates to pages (topics, news)
-
-Makes predefined topics and news editable with constraints. Removes site-navigation setting for news.
-Pages are filtered by publication and access property. Any page or news can be hidden.
-Adds publication hints.
-
-`Feature` | [SEA-179](https://linear.app/seantis/issue/SEA-179) | [f3c1724333](https://github.com/onegov/onegov-cloud/commit/f3c17243330cddef639d802c468f2cbb87e1ef69)
-
-### Tonw6
-
-##### Improve test coverage, minor ui fixes
-
-`Bugfix` | [f8754b24af](https://github.com/onegov/onegov-cloud/commit/f8754b24afdbb6e788157f7e1eed8831306fc7c7)
-
-### Town6
-
-##### Adds focus widget
-
-Features `image-src`, `image-url`, `hide-lead`, `hide-title`, `hide-text.
-
-`Feature` | [SEA-18](https://linear.app/seantis/issue/SEA-18) | [490c282f4f](https://github.com/onegov/onegov-cloud/commit/490c282f4fbfbe46644bcbdffbfe0d9470bef225)
 
