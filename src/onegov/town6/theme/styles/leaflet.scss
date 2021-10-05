@@ -1,10 +1,12 @@
 /*
     Leaflet customisation
 */
-.leaflet-popup-content a {
-    color: $anchor-font-color !important;
 
-    &:hover {
-        color: $anchor-font-color-hover !important;
-    }
+.leaflet-top.leaflet-top,
+.leaflet-bottom.leaflet-bottom {
+    z-index: 998;
+}
+
+.town-6 .leaflet-control.leaflet-control-geocoder .leaflet-control-geocoder-icon::before {
+    font-family: "Font Awesome 5 free";
 }
