@@ -54,6 +54,10 @@ class FeriennetSettingsForm(Form):
         depends_on=('bank_reference_schema', 'raiffeisen-v1')
     )
 
+    require_full_age_for_registration = BooleanField(
+        label=_("Full age required for registration"),
+        fieldset=_("Userprofile"))
+
     show_political_municipality = BooleanField(
         label=_("Require the political municipality in the userprofile"),
         fieldset=_("Userprofile"))
@@ -136,6 +140,7 @@ class FeriennetSettingsForm(Form):
 
         attributes = (
             ('show_political_municipality', False),
+            ('require_full_age_for_registration', False),
             ('show_related_contacts', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
             ('bank_account', ''),
@@ -163,6 +168,7 @@ class FeriennetSettingsForm(Form):
 
         attributes = (
             'show_political_municipality',
+            'require_full_age_for_registration',
             'show_related_contacts',
             'public_organiser_data',
             'bank_account',

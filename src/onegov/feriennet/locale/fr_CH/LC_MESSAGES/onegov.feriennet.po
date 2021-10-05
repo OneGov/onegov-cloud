@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-14 15:11+0100\n"
+"POT-Creation-Date: 2021-10-05 07:54+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -603,8 +603,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "terms et conditions"
 
@@ -1897,6 +1897,9 @@ msgstr "Logo Pro Juventute"
 msgid "Feriennet Partner"
 msgstr "Partenaire de Réseau vacances"
 
+msgid "Privacy Protection"
+msgstr ""
+
 msgid "Best of Swiss Web Award 2019"
 msgstr "Prix du Best of Swiss Web 2019"
 
@@ -2483,6 +2486,9 @@ msgstr "Modifier le participant"
 msgid "Booking Limit of ${name}"
 msgstr "Limite de réservation de ${name}"
 
+msgid "The user account must be opened by a parent or guardian of full age."
+msgstr "Le compte utilisateur doit être ouvert par un parent ou un tuteur majeur."
+
 msgid "Add manual booking"
 msgstr "Ajouter une réservation manuelle"
 
@@ -2938,11 +2944,14 @@ msgstr "Numéro de participant BVR"
 msgid "ESR identification number"
 msgstr "Numéro d'identification BVR"
 
-msgid "Require the political municipality in the userprofile"
-msgstr "Commune politique requise dans le profil de l'utilisateur"
+msgid "Full age required for registration"
+msgstr "Âge complet requis pour l'inscription"
 
 msgid "Userprofile"
 msgstr "Profil d'utilisateur"
+
+msgid "Require the political municipality in the userprofile"
+msgstr "Commune politique requise dans le profil de l'utilisateur"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""

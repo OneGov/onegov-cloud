@@ -13,8 +13,8 @@ from onegov.core.custom import json
 from onegov.feriennet.utils import NAME_SEPARATOR
 from onegov.file import FileCollection
 from onegov.pay import Payment
-from tests.shared import utils
 from psycopg2.extras import NumericRange
+from tests.shared import utils
 from webtest import Upload
 
 
@@ -106,7 +106,6 @@ def test_wwf_fixed_pass_system(client, scenario):
         assert 'Die Buchungsphase ist jetzt bis am' in page
         assert 'Gebucht (1)' in page
         assert 'Blockiert (1)' in page
-
 
 
 def test_view_permissions():
@@ -2720,3 +2719,37 @@ def test_attendee_view(scenario, client, attendee_owner):
     page.form['first_name'] = 'Max'
     page = page.form.submit()
     assert "Sie haben bereits ein Kind mit diesem Namen eingegeben" in page
+
+
+def test_registration(client):
+    client.app.enable_user_registration = True
+
+    register = client.get('/auth/register')
+    assert 'volljährige Person eröffnet werden' not in register
+
+    client.login_admin()
+    page = client.get('/feriennet-settings')
+    page.form['require_full_age_for_registration'] = True
+    page.form.submit()
+    client.logout()
+
+    register = client.get('/auth/register')
+    assert 'volljährige Person eröffnet werden' in register
+    register.form['username'] = 'user@example.org'
+    register.form['password'] = 'p@ssw0rd'
+    register.form['confirm'] = 'p@ssw0rd'
+
+    assert "Vielen Dank" in register.form.submit().follow()
+
+    message = client.get_email(0, 1)
+    assert "Anmeldung bestätigen" in message
+
+    expr = r'href="[^"]+">Anmeldung bestätigen</a>'
+    url = re.search(expr, message).group()
+    url = client.extract_href(url)
+
+    assert "Konto wurde aktiviert" in client.get(url).follow()
+    assert "Konto wurde bereits aktiviert" in client.get(url).follow()
+
+    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+    assert "Ihr Benutzerprofil ist unvollständig" in logged_in
