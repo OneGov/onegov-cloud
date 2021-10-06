@@ -228,6 +228,10 @@ Then, apply database changes.
 
     onegov-core upgrade
 
+To list database changes since a release:
+
+    git diff release-2021.60 -- '**upgrade.py'
+
 ## Tests
 
 ### Python
