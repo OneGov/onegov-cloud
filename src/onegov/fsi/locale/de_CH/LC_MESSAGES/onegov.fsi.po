@@ -207,7 +207,7 @@ msgid "Shortcode"
 msgstr "Kürzel"
 
 msgid "Last Event"
-msgstr "Letzte Durchführung"
+msgstr "Letzte Teilnahme"
 
 msgid "Attended"
 msgstr "Besucht"
@@ -453,7 +453,7 @@ msgid "By last name"
 msgstr "Nach Nachname"
 
 msgid "Next Subscription"
-msgstr "Nächste Anmeldung"
+msgstr "Nächste Teilnahme"
 
 msgid "h"
 msgstr "Uhr"
