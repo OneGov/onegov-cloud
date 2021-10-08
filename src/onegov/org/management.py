@@ -10,6 +10,7 @@ from urlextract import URLExtract
 from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
+from onegov.people import AgencyCollection
 
 
 class ModelsWithLinksMixin:
@@ -245,6 +246,14 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                         self.request.link(entry),
                         self.filter_urls(urls)
                     )
+        for agency in AgencyCollection(self.request.session).query():
+            urls = self.extractor.find_urls(agency.portrait, only_unique=True)
+            if urls:
+                yield (
+                    'Agency',
+                    self.request.link(agency),
+                    self.filter_urls(urls)
+                )
 
     def url_list_generator(self):
         for name, model_link, urls in self.find_urls():
