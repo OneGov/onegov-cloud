@@ -241,3 +241,18 @@ def add_stats_column(context):
 
     context.session.flush()
     context.operations.drop_column('files', 'pages')
+
+
+@upgrade_task('Add publication column')
+def add_publication_column(context):
+    if not context.has_column('files', 'publication'):
+        context.operations.add_column(
+            'files',
+            Column(
+                'publication',
+                Boolean,
+                nullable=False,
+                default=False,
+                server_default='FALSE'
+            )
+        )

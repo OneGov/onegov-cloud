@@ -5409,6 +5409,16 @@ h2 + div.timeline {
             color: $red-dark;
         }
 
+        &.is-a-publication {
+            background: $blue-light;
+            color: $blue-dark;
+        }
+
+        &.is-not-a-publication {
+            background: $gray-pastel;
+            color: $black-light;
+        }
+
         &.is-signed {
             background: $yellow-pastel;
             color: darken($orange-dark, 20%);

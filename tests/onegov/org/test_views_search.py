@@ -100,7 +100,7 @@ def test_basic_autocomplete(client_with_es):
     assert client.get('/search/suggest?q=Fl').json == ["Flash Gordon"]
 
 
-def test_search_signed_files(client_with_es):
+def test_search_publication_files(client_with_es):
     client = client_with_es
     client.login_admin()
 
@@ -118,7 +118,7 @@ def test_search_signed_files(client_with_es):
 
     transaction.begin()
     pdf = FileCollection(client.app.session()).query().one()
-    pdf.signed = True
+    pdf.publication = True
     transaction.commit()
 
     client.app.es_indexer.process()

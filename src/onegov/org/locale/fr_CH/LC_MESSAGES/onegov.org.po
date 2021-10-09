@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-09-20 17:52+0200\n"
+"POT-Creation-Date: 2021-10-09 09:10+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2470,13 +2470,6 @@ msgstr ""
 "Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
 "rouge."
 
-msgid "corona_message"
-msgstr ""
-"Selon la décision du Conseil fédéral du 14 avril, les manifestations "
-"pourront à nouveau avoir lieu à partir du 19 avril 2021. Les événements "
-"peuvent être organisés à nouveau, avec un nombre limité de places et les "
-"mesures de protection spécifiées."
-
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
 
@@ -2710,6 +2703,9 @@ msgstr "Date de publication :"
 
 msgid "Reset"
 msgstr "Réinitialiser"
+
+msgid "Not a publication"
+msgstr "Pas une publication"
 
 msgid "Content"
 msgstr "Contenu"

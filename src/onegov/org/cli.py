@@ -1394,3 +1394,23 @@ def migrate_links_cli(group_context, old_uri, dry_run):
             click.secho('Nothing found')
 
     return execute
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@pass_group_context
+@click.option('--dry-run', is_flag=True, default=False)
+def migrate_publications(group_context, dry_run):
+    """ Marks signed files for publication. """
+
+    def mark_as_published(request, app):
+        session = request.session
+        files = session.query(File).filter_by(signed=True).all()
+        for file in files:
+            file.publication = True
+        if files:
+            click.echo(
+                f'{session.info["schema"]}: '
+                f'Marked {len(files)} signed files for publication'
+            )
+
+    return mark_as_published
