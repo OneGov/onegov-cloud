@@ -1,8 +1,38 @@
 # Changes
 
+## 2021.84
+
+`2021-10-09` | [9f2b0880f1...280fac05e4](https://github.com/OneGov/onegov-cloud/compare/9f2b0880f1^...280fac05e4)
+
+### Fsi
+
+##### Update translations.
+
+`Other` | [ZW-339](https://kanton-zug.atlassian.net/browse/ZW-339) | [217851ab6a](https://github.com/onegov/onegov-cloud/commit/217851ab6ad2f357e69700d0e6ec0aa1a217ec2e)
+
+### Org
+
+##### Also check the agency's portrait links with the link checker.
+
+`Feature` | [82dbf59880](https://github.com/onegov/onegov-cloud/commit/82dbf59880c23f610f311c1ee2cc878c8f4168d6)
+
+##### Add flag for marking files for publication.
+
+`Feature` | [OGC-112](https://linear.app/onegovcloud/issue/OGC-112) | [280fac05e4](https://github.com/onegov/onegov-cloud/commit/280fac05e4476dc4ef4bbbc5a50fda84ff9b3afb)
+
+### Town6
+
+##### Adds missing styling.
+
+`Bugfix` | [OGC-77](https://linear.app/onegovcloud/issue/OGC-77) | [bf1e6eb60b](https://github.com/onegov/onegov-cloud/commit/bf1e6eb60b0b44b35afd97bace215596750d1c5d)
+
+##### Fix file details not visible.
+
+`Bugfix` | [9b276379f1](https://github.com/onegov/onegov-cloud/commit/9b276379f1835fd92fcf14b7860d716e9dc73497)
+
 ## 2021.83
 
-`2021-10-05` | [2694731697...8e3330b068](https://github.com/OneGov/onegov-cloud/compare/2694731697^...8e3330b068)
+`2021-10-05` | [2694731697...de2d88d38e](https://github.com/OneGov/onegov-cloud/compare/2694731697^...de2d88d38e)
 
 ### Feriennet
 
@@ -1327,8 +1357,4 @@ Use abbreviations for weekdays.
 ##### Make sure field placeholder and descriptions are rendered correctly
 
 `Bugfix` | [SEA-220](https://linear.app/seantis/issue/SEA-220) | [d90b0247fb](https://github.com/onegov/onegov-cloud/commit/d90b0247fb1a740f4f8395b4cb518cad11e8ce26)
-
-## 2021.34
-
-`2021-03-23` | [01c2811fad...2b4e103fb5](https://github.com/OneGov/onegov-cloud/compare/01c2811fad^...2b4e103fb5)
 
