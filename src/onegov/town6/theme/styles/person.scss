@@ -96,9 +96,9 @@ $person-email-icon: '\f0e0';
 @include breakpoint(small only) {
     .person-card {
         .person-card-portrait {
-            height: calc(100vw - 7rem);
-            margin: 0 auto 1em;
-            width: calc(100vw - 7rem);
+            height: calc(100vw - 12rem);
+            margin-bottom: 1.5rem;
+            width: calc(100vw - 12rem);
 
             .fa-user {
                 font-size: calc(100vw - 6rem);
