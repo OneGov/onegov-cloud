@@ -406,6 +406,11 @@ class HeaderSettingsForm(Form):
         default=1
     )
 
+    left_header_announcement = StringField(
+        label=_("Announcement"),
+        fieldset=_("Title header left side"),
+    )
+
     @property
     def header_options(self):
         return {
