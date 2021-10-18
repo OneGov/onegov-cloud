@@ -1,7 +1,7 @@
 $accepted-color: #0571b0;
 $rejected-color: #ca0020;
 $footer-border-color: #d8d8d8;
-$body-font-color: #222;
+$light-font-color: #999;
 
 /*
     get rid of the jump that is introduced when switching from a site with
@@ -38,10 +38,10 @@ html {
 */
 .ballot-result-bar {
     margin-bottom: 2em;
+    color: $light-font-color;
 
     dl dt {
         margin-bottom: 0;
-        opacity: .5;
     }
 
     dl dd {
@@ -503,10 +503,9 @@ figcaption {
     SVG Downloads
 */
 .svg-download {
-    color: $body-font-color;
+    color: $light-font-color;
     display: block;
     font-size: .8rem;
-    opacity: .5;
     text-align: right;
 
     i.fa {
@@ -521,9 +520,8 @@ figcaption {
     font-size: .8rem;
 
     a {
-        color: $body-font-color;
+        color: $light-font-color;
         display: block;
-        opacity: .5;
         text-align: right;
     }
 
