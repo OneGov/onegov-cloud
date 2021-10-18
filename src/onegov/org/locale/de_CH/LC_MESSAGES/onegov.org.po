@@ -1234,6 +1234,12 @@ msgstr "Relative Schriftgrösse"
 msgid "Announcement"
 msgstr "Ankündigung"
 
+msgid "Announcement bg color"
+msgstr "Hintergrundfarbe der Ankündigung"
+
+msgid "Announcement font color"
+msgstr "Schriftfarbe der Ankündigung"
+
 msgid "Homepage Image #1"
 msgstr "Startseiten Bild #1"
 

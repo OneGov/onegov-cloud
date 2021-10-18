@@ -93,8 +93,11 @@
             <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
             <main>
                 <header id="header" tal:define="header_options request.app.org.header_options or {}">
-                    <div id="announcement">
-                         ${header_options['left_header_announcement']}
+                    <div tal:condition="header_options.get('left_header_announcement', '')" id="announcement"
+                         style="color: ${header_options.get('left_header_announcement_font_color')}; background-color: ${header_options.get('left_header_announcement_bg_color')};">
+                             <div class="grid-container">
+                                    ${header_options['left_header_announcement']}
+                             </div>
                     </div>
                     <div id="globals" class="globals" tal:define="toolbox global_tools|False">
                         <div class="grid-container">

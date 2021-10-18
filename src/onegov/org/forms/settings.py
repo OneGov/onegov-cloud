@@ -411,6 +411,16 @@ class HeaderSettingsForm(Form):
         fieldset=_("Title header left side"),
     )
 
+    left_header_announcement_bg_color = ColorField(
+        label=_("Announcement bg color"),
+        fieldset=_("Title header left side")
+    )
+
+    left_header_announcement_font_color = ColorField(
+        label=_("Announcement font color"),
+        fieldset=_("Title header left side")
+    )
+
     @property
     def header_options(self):
         return {
@@ -418,7 +428,9 @@ class HeaderSettingsForm(Form):
             'left_header_url': self.left_header_url.data or None,
             'left_header_color': self.left_header_color.data.get_hex(),
             'left_header_rem': self.left_header_rem.data,
-            'left_header_announcement': self.left_header_announcement.data
+            'left_header_announcement': self.left_header_announcement.data,
+            'left_header_announcement_bg_color': self.left_header_announcement_bg_color.data.get_hex(),
+            'left_header_announcement_font_color': self.left_header_announcement_font_color.data.get_hex()
         }
 
     @header_options.setter
@@ -431,6 +443,12 @@ class HeaderSettingsForm(Form):
         self.left_header_rem.data = options.get('left_header_rem', 1)
         self.left_header_announcement.data = options.get(
             'left_header_announcement', ""
+        )
+        self.left_header_announcement_bg_color.data = options.get(
+            'left_header_announcement_bg_color', '#FBBC05'
+        )
+        self.left_header_announcement_font_color.data = options.get(
+            'left_header_announcement_font_color', '#000000'
         )
 
     def populate_obj(self, model):
