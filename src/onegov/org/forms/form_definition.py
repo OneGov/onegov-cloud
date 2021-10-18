@@ -29,6 +29,13 @@ class FormDefinitionBaseForm(Form):
         validators=[validators.InputRequired(), ValidFormDefinition()],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
+    pick_up = TextAreaField(
+        label=_("Pick-Up"),
+        description=_("Describes how this resource can be picked up. "
+                      "This text is used on the ticket status page to "
+                      "inform the user")
+    )
+
 
 class FormDefinitionForm(merge_forms(
     FormDefinitionBaseForm,
