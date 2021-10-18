@@ -411,7 +411,13 @@ $globals-height: 2.5rem;
         height: 7em;
         object-fit: contain;
     }
+
 }
+
+     #announcement {
+        padding: 1rem;
+        text-align: center;
+     }
 
 #redactor-modal-box footer {
     // the redactor also contains a footer which doesn't need a specific height
