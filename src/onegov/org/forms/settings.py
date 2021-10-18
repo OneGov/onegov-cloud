@@ -417,7 +417,8 @@ class HeaderSettingsForm(Form):
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
             'left_header_color': self.left_header_color.data.get_hex(),
-            'left_header_rem': self.left_header_rem.data
+            'left_header_rem': self.left_header_rem.data,
+            'left_header_announcement': self.left_header_announcement.data
         }
 
     @header_options.setter
@@ -425,8 +426,12 @@ class HeaderSettingsForm(Form):
         self.left_header_name.data = options.get('left_header_name')
         self.left_header_url.data = options.get('left_header_url')
         self.left_header_color.data = options.get(
-            'left_header_color', '#000000')
+            'left_header_color', '#000000'
+        )
         self.left_header_rem.data = options.get('left_header_rem', 1)
+        self.left_header_announcement.data = options.get(
+            'left_header_announcement', ""
+        )
 
     def populate_obj(self, model):
         super().populate_obj(model)
