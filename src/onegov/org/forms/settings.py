@@ -408,17 +408,17 @@ class HeaderSettingsForm(Form):
 
     left_header_announcement = StringField(
         label=_("Announcement"),
-        fieldset=_("Title header left side"),
+        fieldset=_("Announcement"),
     )
 
     left_header_announcement_bg_color = ColorField(
         label=_("Announcement bg color"),
-        fieldset=_("Title header left side")
+        fieldset=_("Announcement")
     )
 
     left_header_announcement_font_color = ColorField(
         label=_("Announcement font color"),
-        fieldset=_("Title header left side")
+        fieldset=_("Announcement")
     )
 
     @property
@@ -429,8 +429,10 @@ class HeaderSettingsForm(Form):
             'left_header_color': self.left_header_color.data.get_hex(),
             'left_header_rem': self.left_header_rem.data,
             'left_header_announcement': self.left_header_announcement.data,
-            'left_header_announcement_bg_color': self.left_header_announcement_bg_color.data.get_hex(),
-            'left_header_announcement_font_color': self.left_header_announcement_font_color.data.get_hex()
+            'left_header_announcement_bg_color': 
+                self.left_header_announcement_bg_color.data.get_hex(),
+            'left_header_announcement_font_color':
+                self.left_header_announcement_font_color.data.get_hex()
         }
 
     @header_options.setter
