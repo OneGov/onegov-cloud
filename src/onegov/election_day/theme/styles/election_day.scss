@@ -1,7 +1,6 @@
 $accepted-color: #0571b0;
 $rejected-color: #ca0020;
 $footer-border-color: #d8d8d8;
-$light-font-color: #999;
 
 /*
     get rid of the jump that is introduced when switching from a site with
@@ -38,7 +37,7 @@ html {
 */
 .ballot-result-bar {
     margin-bottom: 2em;
-    color: $light-font-color;
+    color: $aluminum;
 
     dl dt {
         margin-bottom: 0;
@@ -503,7 +502,7 @@ figcaption {
     SVG Downloads
 */
 .svg-download {
-    color: $light-font-color;
+    color: $aluminum;
     display: block;
     font-size: .8rem;
     text-align: right;
@@ -520,7 +519,7 @@ figcaption {
     font-size: .8rem;
 
     a {
-        color: $light-font-color;
+        color: $aluminum;
         display: block;
         text-align: right;
     }
