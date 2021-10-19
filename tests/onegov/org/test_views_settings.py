@@ -82,11 +82,15 @@ def test_settings(client):
     settings.form['left_header_announcement_bg_color'] = bg_color
     settings.form['left_header_announcement_font_color'] = color
     page = settings.form.submit().follow()
-    assert f'<a href="https://govikon.ch" ' \
-           f'style="color:{color}; font-size: 2.5rem">' in page
+    assert (
+            f'<a href="https://govikon.ch" '
+            f'style="color:{color}; font-size: 2.5rem">' in page
+    )
     assert text in page
-    assert f'<div id="announcement" style="color: {color}; ' \
-           f'background-color: {bg_color};">' in page
+    assert (
+            f'<div id="announcement" style="color: {color}; '
+            f'background-color: {bg_color};">' in page
+    )
     
 
 def test_switch_languages(client):
