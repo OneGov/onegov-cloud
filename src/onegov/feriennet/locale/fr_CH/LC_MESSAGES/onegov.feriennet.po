@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-05 16:39+0200\n"
+"POT-Creation-Date: 2021-10-21 09:03+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2946,7 +2946,7 @@ msgid "ESR identification number"
 msgstr "Numéro d'identification BVR"
 
 msgid "Full age required for registration"
-msgstr "Âge complet requis pour l'inscription"
+msgstr "Inscription des bénévoles"
 
 msgid "Userprofile"
 msgstr "Profil d'utilisateur"
@@ -3012,17 +3012,3 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
-
-#~ msgid "The minium age cannot be higher than the maximum age"
-#~ msgstr "L'âge minimum ne peut être plus élevé que l'âge maximum"
-
-#~ msgid "An commitment by Rega"
-#~ msgstr "Un engagement de la Rega"
-
-#~ msgid "I know that after confirmation, bills can only be adjusted manually."
-#~ msgstr ""
-#~ "Je sais qu'après confirmation, les factures ne peuvent être ajustées que "
-#~ "manuellement."
-
-#~ msgid "Users with bookings"
-#~ msgstr "Utilisateurs qui ont des réservations"
