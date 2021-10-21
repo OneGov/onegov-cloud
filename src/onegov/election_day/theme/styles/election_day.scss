@@ -36,8 +36,8 @@ html {
     Ballot Result Bar
 */
 .ballot-result-bar {
-    margin-bottom: 2em;
     color: $aluminum;
+    margin-bottom: 2em;
 
     dl dt {
         margin-bottom: 0;
@@ -549,8 +549,8 @@ figcaption {
     }
 
     span {
+        color: $aluminum;
         font-weight: bold;
-        opacity: .5;
     }
 }
 
