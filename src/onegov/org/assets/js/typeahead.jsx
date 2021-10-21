@@ -42,7 +42,7 @@ var TypeaheadList = React.createClass({
                         </li>
                     );
                 })}
-                <li>…</li>
+                <li class="dots"><button type="submit">…</button></li>
             </ul>
         );
     },
