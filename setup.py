@@ -119,7 +119,7 @@ setup(
         'psycopg2',
         'purl',
         'pycurl',
-        'pyparsing',
+        'pyparsing<3.0.0',
         'pyquery',
         'qrcode',
         'python-dateutil',
