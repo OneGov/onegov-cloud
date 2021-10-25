@@ -201,14 +201,14 @@
 
     <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.agency">
         <a href="${request.link(result)}">${result.title}</a>
-        <p tal:define="memberships result.memberships_by_agency">
+        <ul tal:define="memberships result.memberships_by_agency" class="memberships">
             <tal:block tal:repeat="membership memberships">
-                <span tal:condition="(membership.access == 'public' and membership.published and membership.agency.access == 'public' and membership.agency.published) or request.is_logged_in">
+                <li tal:condition="(membership.access == 'public' and membership.published and membership.agency.access == 'public' and membership.agency.published) or request.is_logged_in">
                     <tal:b tal:define="path layout.parent_path(membership.agency)">${path + ' > ' if path else ''}</tal:b>${membership.title} ${membership.agency.title}<br>
-                </span>
+                </li>
             </tal:block>
             <span tal:condition="not:memberships|nothing" i18n:translate>People</span>
-        </p>
+        </ul>
     </metal:search_result_people>
 
     <metal:search_result_agencies define-macro="search_result_agencies" i18n:domain="onegov.agency">
@@ -262,12 +262,11 @@
             <div class="details">
                 <a href="${request.link(agency)}" i18n:translate="">Show agency</a>
             </div>
-            <table class="memberships" tal:condition="memberships">
-               <tr tal:repeat="membership memberships">
-                   <td class="person"><a href="${request.link(membership.person)}">${membership.person.title}</a></td>
-                   <td><a tal:condition="membership.person.function" href="${request.link(membership.person)}">${membership.person.function}</a></td>
-               </tr>
-            </table>
+            <ul class="memberships fa-ul" tal:condition="memberships">
+               <li tal:repeat="membership memberships" class="person"><span class="fa-li"><i class="fa fa-user-circle"></i></span>
+                   <b><a href="${request.link(membership.person)}">${membership.person.title}</a></b><tal:block tal:condition="membership.person.function">, <a href="${request.link(membership.person)}">${membership.person.function}</a></tal:block>
+               </li>
+            </ul>
             <ul class="children" tal:condition="children">
                 <tal:block tal:repeat="child children">
                     <li class="child" tal:condition="(child.access == 'public' and child.published) or request.is_logged_in">

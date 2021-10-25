@@ -1338,7 +1338,7 @@ msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
-msgstr "Akzeptiere und schliesse Ticket automatisch für diese Kategorien"
+msgstr "Akzeptiere und schliesse Tickets automatisch für diese Kategorien"
 
 msgid ""
 "If auto-accepting is not possible, the ticket will be in state pending. Also "

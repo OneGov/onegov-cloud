@@ -30,7 +30,7 @@ article.content .grid-container:last-of-type {
 
 article.content .side-panel {
     @include breakpoint(small only) {
-        padding-top: .625rem;
+        padding-top: 4rem;
     }
 }
 
@@ -42,14 +42,28 @@ article.content .side-panel {
 
 .homepage {
 
-    .home-focus {
-        margin-bottom: 1rem;
+    .focus-widget {
+        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .15);
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 2rem);
+        margin-bottom: 2rem;
 
-        .focus-widget {
-            background: $white-smoke;
-            height: 100%;
-            padding: 1rem;
-            padding-bottom: 0;
+        &> * {
+            padding: 0 1rem;
+        }
+
+        .focus-image {
+            order: 0;
+            padding: 0;
+        }
+
+        h3 {
+            order: 1;
+        }
+
+        p {
+            order: 2;
         }
     }
 

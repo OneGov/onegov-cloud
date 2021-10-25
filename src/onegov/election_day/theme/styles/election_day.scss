@@ -36,11 +36,11 @@ html {
     Ballot Result Bar
 */
 .ballot-result-bar {
+    color: $aluminum;
     margin-bottom: 2em;
 
     dl dt {
         margin-bottom: 0;
-        opacity: .5;
     }
 
     dl dd {
@@ -502,6 +502,7 @@ figcaption {
     SVG Downloads
 */
 .svg-download {
+    color: $aluminum;
     display: block;
     font-size: .8rem;
     text-align: right;
@@ -518,6 +519,7 @@ figcaption {
     font-size: .8rem;
 
     a {
+        color: $aluminum;
         display: block;
         text-align: right;
     }
@@ -547,8 +549,8 @@ figcaption {
     }
 
     span {
+        color: $aluminum;
         font-weight: bold;
-        opacity: .5;
     }
 }
 

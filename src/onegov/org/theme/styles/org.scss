@@ -3645,6 +3645,18 @@ ul.search-results {
     li {
         padding: 0 5px;
 
+        button {
+            background: transparent;
+            border: 0;
+            color: $primary-color;
+            text-align: left;
+            width: 100%;
+
+            &:hover {
+                font-weight: bold;
+            }
+        }
+
         // highlight links with the active class
         &.active {
             background-color: $topbar-bg-color;
@@ -3656,7 +3668,7 @@ ul.search-results {
         }
 
         // highlight links when hovering
-        &:not(:last-child):hover {
+        &:hover {
             background-color: $topbar-bg-color !important;
 
             a {

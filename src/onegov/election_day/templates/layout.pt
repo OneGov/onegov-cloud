@@ -53,7 +53,7 @@ metal:define-macro="layout">
             <div class="small-12 columns text-right">
                 <a href="${layout.principal.base}" class="back-to-base" tal:condition="layout.principal.base|nothing">${layout.principal.base_domain}</a>
             </div>
-            <div class="small-12 columns text-right small-only-text-center">
+            <div class="small-12 columns text-right">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
                     <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
