@@ -42,20 +42,20 @@ article.content .side-panel {
 
 .homepage {
 
-    div:not(.medium-12) > .focus-widget {
-        box-shadow: 0 8px 17px 0 rgba(0,0,0,.15);
+    .focus-widget {
+        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .15);
+        /*display: flex;
+        flex-direction: column;*/
         height: calc(100% - 2rem);
         margin-bottom: 2rem;
-        display: flex;
-        flex-direction: column;
 
         &> * {
             padding: 0 1rem;
         }
 
         .focus-image {
-            padding: 0;
             order: 0;
+            padding: 0;
         }
 
         h3 {
