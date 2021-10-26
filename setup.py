@@ -121,6 +121,7 @@ setup(
         'pycurl',
         'pyparsing<3.0.0',
         'pyquery',
+        'qrbill',
         'qrcode',
         'python-dateutil',
         'python-magic>=0.4.17',
