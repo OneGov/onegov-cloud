@@ -78,7 +78,7 @@ class FormDefinitionCollection(object):
         return self.session.query(FormDefinition)
 
     def add(self, title, definition, type=None, meta=None, content=None,
-            name=None, payment_method='manual'):
+            name=None, payment_method='manual', pick_up=None):
         """ Add the given form to the database. """
 
         # look up the right class depending on the type
@@ -90,6 +90,7 @@ class FormDefinitionCollection(object):
         form.meta = meta or {}
         form.content = content or {}
         form.payment_method = payment_method
+        form.pick_up = pick_up
 
         # try to parse the form (which will throw errors if there are problems)
         assert form.form_class
