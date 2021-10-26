@@ -413,6 +413,11 @@ $globals-height: 2.5rem;
     }
 }
 
+#announcement {
+    padding: 1rem;
+    text-align: center;
+}
+
 #redactor-modal-box footer {
     // the redactor also contains a footer which doesn't need a specific height
     height: auto;
@@ -3019,7 +3024,7 @@ button {
             }
 
             &.fc-day-top,
-            &.fc-day-header, {
+            &.fc-day-header {
                 background: $yellow-light !important;
                 opacity: 1;
             }
