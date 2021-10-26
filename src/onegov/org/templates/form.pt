@@ -32,7 +32,7 @@
         </tal:b>
 
         <div class="panel callout" tal:condition="form.callout|callout|nothing">
-             <p>${form.callout|callout}</p>
+             <p tal:content="structure form.callout|callout"></p>
         </div>
 
         <div class="panel" tal:condition="helptext|nothing">

@@ -2,13 +2,14 @@
 import morepath
 
 from morepath.request import Response
+from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
-from onegov.org.forms import EventForm
-from onegov.org.layout import EventLayout
+from onegov.org.forms import EventForm, EventImportForm
+from onegov.org.layout import EventLayout, OccurrencesLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
@@ -356,3 +357,67 @@ def view_latest_event(self, request):
             return morepath.redirect(request.link(occurrence))
 
     return morepath.redirect(request.link(occurrence))
+
+
+@OrgApp.form(
+    model=OccurrenceCollection,
+    name='import',
+    template='form.pt',
+    form=EventImportForm,
+    permission=Private
+)
+def handle_import_events(self, request, form, layout=None):
+    # terms = _(
+    #     "Only events taking place inside the town or events related to "
+    #     "town societies are published. Events which are purely commercial are "
+    #     "not published. There's no right to be published and already "
+    #     "published events may be removed from the page without notification "
+    #     "or reason."
+    # )
+
+    if form.submitted(request):
+        # event = EventCollection(self.session).add(
+        #     title=form.title.data,
+        #     start=form.start,
+        #     end=form.end,
+        #     timezone=form.timezone,
+        # )
+        #
+        # event.meta.update({'session_id': get_session_id(request)})
+        # form.populate_obj(event)
+
+        # return morepath.redirect(request.link(event))
+        pass
+
+    layout = layout or OccurrencesLayout(self, request)
+    # layout.editbar_links = []
+
+    # todo: replace the existing export!
+    callout = Link(_('Example'), request.link(self, 'import-example'))(request)
+
+    return {
+        'layout': layout,
+        'callout': callout,
+        # 'title': self.title,
+        'title': _('Import events'),
+        'form': form,
+        'form_width': 'large',
+        # 'lead': terms,
+        'button_text': _('Continue')
+    }
+
+
+@OrgApp.html(
+    model=OccurrenceCollection,
+    name='import-example',
+    permission=Public
+)
+def handle_import_example_events(self, request):
+    form = EventImportForm()
+    form.request = request
+
+    return Response(
+        convert_list_of_dicts_to_csv(form.export()),
+        content_type='text/csv',
+        content_disposition=f'inline; filename=example.csv'
+    )

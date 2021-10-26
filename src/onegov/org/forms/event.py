@@ -1,21 +1,31 @@
 import json
+import transaction
 
 from cached_property import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
+from onegov.core.csv import convert_excel_to_csv
+from onegov.core.csv import CSVFile
+from onegov.event.collections import EventCollection
 from onegov.event.models import EventFile
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TimeField
+from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from sedate import replace_timezone, to_timezone
-from wtforms import RadioField, StringField, TextAreaField, validators
-from wtforms.fields.html5 import DateField, EmailField
-from onegov.form.fields import TimeField
+from wtforms import BooleanField
+from wtforms import RadioField
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms import validators
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import EmailField
 
 
 TAGS = [(tag, tag) for tag in (
@@ -404,3 +414,111 @@ class EventForm(Form):
                 } for ix, d in enumerate(dates)
             ]
         })
+
+
+class EventImportForm(Form):
+
+    # create ticket?
+
+    clear = BooleanField(
+        label=_("Clear"),
+        default=False
+    )
+
+    dry_run = BooleanField(
+        label=_("Dry Run"),
+        default=False
+    )
+
+    file = UploadField(
+        label=_("Import"),
+        validators=[
+            validators.DataRequired(),
+            WhitelistedMimeType({
+                'application/zip',
+                'application/octet-stream'
+                # todo:
+            }),
+            FileSizeLimit(10 * 1024 * 1024)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    @property
+    def headers(self):
+        return {
+            'title': self.request.translate(_("Title")),
+            'description': self.request.translate(_("Description")),
+            'location': self.request.translate(_("Venue")),
+            'price': self.request.translate(_("Price")),
+            'organizer': self.request.translate(("Organizer")),
+            'organizer_email': self.request.translate(_("Organizer E-Mail")),
+            'tags': self.request.translate(_("Tags")),
+            'localized_start': self.request.translate(_("From")),
+            'localized_end': self.request.translate(_("To")),
+        }
+
+    def export(self):
+        events = EventCollection(self.request.session)
+        headers = self.headers
+
+        def get(event, attribute):
+            result = getattr(event, attribute)
+            if isinstance(result, datetime):
+                # todo: remove timezone or maybe format nicer
+                result = result.isoformat()
+            if isinstance(result, (list, tuple)):
+                result = ', '.join(result)
+            result = result or ''
+            result = result.strip()
+            return result
+
+        result = []
+        for event in events.query():
+            result.append({
+                title: get(event, attribute)
+                for attribute, title in headers.items()
+            })
+
+        return result
+
+    def run_import(self):
+        headers = self.headers
+        session = self.request.session
+        events = EventCollection(session)
+
+        if self.clear.data:
+            for event in events.query():
+                session.delete(event)
+
+        csvfile = convert_excel_to_csv(self.file.data)
+        csv = CSVFile(csvfile, expected_headers=headers.values())
+        lines = list(csv.lines)
+        columns = {
+            key: csv.as_valid_identifier(value)
+            for key, value in headers.items()
+        }
+
+        count = 0
+        for line in lines:
+            # add submitter from user
+            # add timezone (fixed)
+            import pdb; pdb.set_trace()
+            count += 1
+            email = getattr(line, columns['email'])
+            realname = getattr(line, columns['name'])
+            group = getattr(line, columns['group'])
+            group = added_groups[group] if group else None
+            users.add(
+                username=email,
+                realname=realname,
+                group=group,
+                password=random_password(),
+                role='member',
+            )
+
+        if self.dry_run.data:
+            transaction.abort()
+        # )
+
+        return count
