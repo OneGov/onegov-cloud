@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-21 09:03+0200\n"
+"POT-Creation-Date: 2021-10-25 10:27+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2945,6 +2945,9 @@ msgstr "Numéro de participant BVR"
 msgid "ESR identification number"
 msgstr "Numéro d'identification BVR"
 
+msgid "QR-Bill (experimental)"
+msgstr ""
+
 msgid "Full age required for registration"
 msgstr "Inscription des bénévoles"
 
@@ -3001,6 +3004,29 @@ msgstr "Activé"
 
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Le numéro d'identification BVR doit être long de 3-6 caractères"
+
+msgid "QR-Bills require an IBAN"
+msgstr ""
+
+msgid "Not a valid IBAN"
+msgstr ""
+
+msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
+msgstr ""
+
+msgid "This IBAN cannot be used for QR-Bills without ESR"
+msgstr ""
+
+msgid "This IBAN cannot be used for QR-Bills with ESR"
+msgstr ""
+
+msgid "QR-Bills require a beneficiary"
+msgstr ""
+
+msgid ""
+"QR-Bills require the beneficiary to be in the form: name, street number, "
+"code city"
+msgstr ""
 
 msgid "Feriennet"
 msgstr "Réseau Vacances"
