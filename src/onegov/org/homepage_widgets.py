@@ -297,7 +297,7 @@ class TilesWidget(object):
                         c for c in children if c.access == 'public'
                     )
 
-                yield Tile(
+                tile = Tile(
                     page=Link(page.title, link(page)),
                     number=ix + 1,
                     links=tuple(
@@ -305,6 +305,14 @@ class TilesWidget(object):
                         for c in children
                     )
                 )
+
+                showtile = False
+                if len(tile.links) > 0:
+                    showtile = True
+
+                if showtile:
+                    yield tile
+
             elif page.type == 'news':
                 links = [
                     Link(str(year), link(page.for_year(year)), classes=classes)
