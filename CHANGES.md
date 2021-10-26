@@ -1,8 +1,56 @@
 # Changes
 
+## 2021.85
+
+`2021-10-26` | [e5f5ab1c8b...bcd3f7f7a1](https://github.com/OneGov/onegov-cloud/compare/e5f5ab1c8b^...bcd3f7f7a1)
+
+### Agency
+
+##### Minor visual improvements.
+
+* Add dividing line for memberships
+* Make design of people in organizations prettier
+* Make "..." in search suggestions clickable
+
+`Other` | [OGC-27](https://linear.app/onegovcloud/issue/OGC-27) | [b6611d708e](https://github.com/onegov/onegov-cloud/commit/b6611d708ec14af109af1835d0ebbb1020fae1e3)
+
+### Election Day
+
+##### Change color of embed and SVG download links.
+
+`Other` | [OGC-107](https://linear.app/onegovcloud/issue/OGC-107) | [bf0eb67a9e](https://github.com/onegov/onegov-cloud/commit/bf0eb67a9ed8d5617427dc8a7745d460cedfddf2)
+
+### Feriennet
+
+##### Update translations.
+
+`Other` | [PRO-805](https://linear.app/projuventute/issue/PRO-805) | [1c53617f11](https://github.com/onegov/onegov-cloud/commit/1c53617f110b5a9fb0f6193bcd7314bd5f6dc70b)
+
+### Org
+
+##### Add Announcement Banner.
+
+`Feature` | [OGC-106](https://linear.app/onegovcloud/issue/OGC-106) | [bcd3f7f7a1](https://github.com/onegov/onegov-cloud/commit/bcd3f7f7a1c8a3f7719bb4842eb0af09b1b7a637)
+
+### Town6
+
+##### Equalize size of partner images in footer.
+
+`Other` | [SEA-471](https://linear.app/seantis/issue/SEA-471) | [acca4f5291](https://github.com/onegov/onegov-cloud/commit/acca4f52914f67d3b209010d1eec21b765fe0330)
+
+##### Improve focus widgets.
+
+`Other` | [OGC-86](https://linear.app/onegovcloud/issue/OGC-86) | [36019142bf](https://github.com/onegov/onegov-cloud/commit/36019142bfadf17f5ebff89988d5ed2783e5d3bc)
+
+### Winterthur
+
+##### Update address import URL.
+
+`Other` | [FW-95](https://stadt-winterthur.atlassian.net/browse/FW-95) | [3044f0f510](https://github.com/onegov/onegov-cloud/commit/3044f0f510aee60ffa30975be14652e6bf5b8752)
+
 ## 2021.84
 
-`2021-10-09` | [9f2b0880f1...280fac05e4](https://github.com/OneGov/onegov-cloud/compare/9f2b0880f1^...280fac05e4)
+`2021-10-09` | [9f2b0880f1...a2b3a5bcbb](https://github.com/OneGov/onegov-cloud/compare/9f2b0880f1^...a2b3a5bcbb)
 
 ### Fsi
 
@@ -1347,14 +1395,4 @@ Use abbreviations for weekdays.
 ## 2021.36
 
 `2021-03-25` | [2b1f49a369...0db36afcee](https://github.com/OneGov/onegov-cloud/compare/2b1f49a369^...0db36afcee)
-
-## 2021.35
-
-`2021-03-24` | [d90b0247fb...a634faaf40](https://github.com/OneGov/onegov-cloud/compare/d90b0247fb^...a634faaf40)
-
-### Org
-
-##### Make sure field placeholder and descriptions are rendered correctly
-
-`Bugfix` | [SEA-220](https://linear.app/seantis/issue/SEA-220) | [d90b0247fb](https://github.com/onegov/onegov-cloud/commit/d90b0247fb1a740f4f8395b4cb518cad11e8ce26)
 
