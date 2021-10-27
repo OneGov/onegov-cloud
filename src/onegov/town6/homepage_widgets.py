@@ -352,22 +352,6 @@ class FocusWidget(object):
     template = """
     <xsl:template match="focus">
         <div class="focus-widget">
-            <xsl:choose>
-                <xsl:when test="@hide-title"></xsl:when>
-                <xsl:otherwise>
-                <h3>
-                    <xsl:choose>
-                    <xsl:when test="@title">
-                        <xsl:value-of select="@title" />
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <metal:block
-                        use-macro="layout.macros['focus-title']" />
-                    </xsl:otherwise>
-                    </xsl:choose>
-                </h3>
-                </xsl:otherwise>
-            </xsl:choose>
             <xsl:variable name="apos">'</xsl:variable>
             <xsl:variable name="image_src">
                 <xsl:choose>
@@ -448,6 +432,22 @@ class FocusWidget(object):
                     )"/>
                 </xsl:attribute>
             </metal:block>
+            <xsl:choose>
+                <xsl:when test="@hide-title"></xsl:when>
+                <xsl:otherwise>
+                <h3>
+                    <xsl:choose>
+                    <xsl:when test="@title">
+                        <xsl:value-of select="@title" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <metal:block
+                        use-macro="layout.macros['focus-title']" />
+                    </xsl:otherwise>
+                    </xsl:choose>
+                </h3>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:for-each select="text">
                 <p class="homepage-text">
                     <xsl:apply-templates select="node()"/>

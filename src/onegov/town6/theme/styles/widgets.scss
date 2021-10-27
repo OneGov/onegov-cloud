@@ -44,8 +44,6 @@ article.content .side-panel {
 
     .focus-widget {
         box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .15);
-        display: flex;
-        flex-direction: column;
         height: calc(100% - 2rem);
         margin-bottom: 2rem;
 
@@ -54,16 +52,13 @@ article.content .side-panel {
         }
 
         .focus-image {
-            order: 0;
             padding: 0;
-        }
-
-        h3 {
-            order: 1;
+            padding-bottom: 1rem;
         }
 
         p {
-            order: 2;
+            margin: 0;
+            padding-bottom: 1rem;
         }
     }
 
@@ -84,10 +79,6 @@ article.content .side-panel {
         &:last-of-type {
             padding-bottom: 0;
         }
-    }
-
-    .focus-image {
-        margin-bottom: .625rem;
     }
 
     .grid-container.full {
