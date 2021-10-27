@@ -1,22 +1,21 @@
 page-default: &lorem-ipsum
   text: |
     <p>
-      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
-      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
-      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+      Lontano dalle montagne di parole, lontano dai paesi di vocali e
+      consonanti, vivono i testi ciechi. Vivono isolati a Buchstabhausen sulla
+      costa del Semantik, un grande oceano linguistico.
     </p>
 
     <p>
-      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
-      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
-      in dem einem gebratene Satzteile in den Mund fliegen.
+      Un piccolo ruscello chiamato Duden scorre attraverso il loro villaggio e
+      li rifornisce del necessario Regelialien. È una terra paradisiaca dove i
+      frammenti di frasi fritte ti volano in bocca.
     </p>
 
     <p>
-      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
-      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
-      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
-      hinaus zu gehen in die weite Grammatik.
+      Un piccolo ruscello chiamato Duden scorre attraverso il loro villaggio e
+      li rifornisce del necessario Regelialien. È una terra paradisiaca dove i
+      frammenti di frasi fritte ti volano in bocca.
     </p>
 
 pages:

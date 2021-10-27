@@ -173,6 +173,7 @@ setup(
             'flake8'
         ],
         'docs': [
+            'docutils==0.17',
             'alabaster',
             'sphinx<3.4.0',
         ],
