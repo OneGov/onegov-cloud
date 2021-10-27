@@ -26,6 +26,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     #: the form as parsable string
     definition = Column(Text, nullable=False)
 
+    #: hint on how to get to the resource
+    pick_up = content_property()
+
     #: the group to which this resource belongs to (may be any kind of string)
     group = Column(Text, nullable=True)
 
