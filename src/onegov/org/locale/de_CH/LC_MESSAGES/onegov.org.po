@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-27 10:20+0200\n"
+"POT-Creation-Date: 2021-10-27 15:26+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4216,13 +4216,13 @@ msgid "${count} events will be imported"
 msgstr "${count} Veranstaltungen werden importiert"
 
 #, python-format
-msgid "${count} events have been imported"
-msgstr "Es wurden ${count} Veranstaltung importiert"
+msgid "${count} events imported"
+msgstr "${count} Veranstaltungen importiert"
 
-msgid "The same format as the export (CSV/XLSX) can be used for the import."
+msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
-"Für den Import kann das gleiche Format wie für den Export (CSV/XLSX) "
-"verwendet werden."
+"Für den Import kann das gleiche Format wie für den Export (XLSX) verwendet "
+"werden."
 
 msgid "Your payment has been received"
 msgstr "Ihre Zahlung ist eingegangen"

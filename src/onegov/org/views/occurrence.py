@@ -211,7 +211,7 @@ def import_occurrences(self, request, form, layout=None):
             ))
         else:
             request.success(_(
-                '${count} events have been imported',
+                '${count} events imported',
                 mapping={'count': count}
             ))
             return redirect(request.link(self))
@@ -221,7 +221,7 @@ def import_occurrences(self, request, form, layout=None):
     return {
         'layout': layout,
         'callout': _(
-            'The same format as the export (CSV/XLSX) can be used for the '
+            'The same format as the export (XLSX) can be used for the '
             'import.'
         ),
         'title': _('Import'),

@@ -442,7 +442,6 @@ class EventImportForm(Form):
             WhitelistedMimeType({
                 'application/excel',
                 'application/vnd.ms-excel',
-                'text/plain',
                 (
                     'application/'
                     'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -450,7 +449,8 @@ class EventImportForm(Form):
                 'application/vnd.ms-office',
                 'application/octet-stream',
                 'application/zip',
-                'text/csv'
+                'text/csv',
+                'text/plain',
             }),
             FileSizeLimit(10 * 1024 * 1024)
         ],

@@ -1,7 +1,7 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-10-27 10:20+0200\n"
+"POT-Creation-Date: 2021-10-27 15:28+0200\n"
 "PO-Revision-Date: 2021-09-27 13:23+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4226,12 +4226,12 @@ msgid "${count} events will be imported"
 msgstr "Gli eventi ${count} saranno importati"
 
 #, python-format
-msgid "${count} events have been imported"
+msgid "${count} events imported"
 msgstr "${conteggio} eventi sono stati importati"
 
-msgid "The same format as the export (CSV/XLSX) can be used for the import."
+msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
-"Lo stesso formato dell'esportazione (CSV/XLSX) può essere usato per "
+"Lo stesso formato dell'esportazione (XLSX) può essere usato per "
 "l'importazione."
 
 msgid "Your payment has been received"
