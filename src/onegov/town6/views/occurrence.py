@@ -5,9 +5,9 @@ from onegov.core.security import Public, Private
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.town6.layout import OccurrenceLayout
 from onegov.org.views.occurrence import view_occurrences, view_occurrence, \
-    export_occurrences
+    export_occurrences, import_occurrences
 from onegov.town6 import TownApp
-from onegov.org.forms import ExportForm
+from onegov.org.forms import ExportForm, EventImportForm
 from onegov.town6.layout import OccurrencesLayout
 
 
@@ -28,4 +28,11 @@ def town_view_occurrence(self, request):
               form=ExportForm, template='export.pt')
 def town_export_occurrences(self, request, form):
     return export_occurrences(
+        self, request, form, OccurrencesLayout(self, request))
+
+
+@TownApp.form(model=OccurrenceCollection, name='import', permission=Private,
+              form=EventImportForm, template='form.pt')
+def town_import_occurrences(self, request, form):
+    return import_occurrences(
         self, request, form, OccurrencesLayout(self, request))
