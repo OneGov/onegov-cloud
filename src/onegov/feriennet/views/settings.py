@@ -10,6 +10,10 @@ from onegov.form.validators import Stdnum
 from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
+from onegov.feriennet.qrbill import qr_iban
+from onegov.feriennet.qrbill import swiss_iban
+from onegov.feriennet.qrbill import beneficiary_to_creditor
+from stdnum import iban
 from wtforms.fields import BooleanField, StringField, RadioField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import InputRequired
@@ -52,6 +56,11 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Payment"),
         validators=[InputRequired()],
         depends_on=('bank_reference_schema', 'raiffeisen-v1')
+    )
+
+    bank_qr_bill = BooleanField(
+        label=_("QR-Bill (experimental)"),
+        fieldset=_("Payment")
     )
 
     require_full_age_for_registration = BooleanField(
@@ -135,6 +144,48 @@ class FeriennetSettingsForm(Form):
                 ))
                 return False
 
+    def ensure_valid_qr_bill_settings(self):
+        if self.bank_qr_bill.data:
+            if not self.bank_account.data:
+                self.bank_qr_bill.errors.append(_("QR-Bills require an IBAN"))
+                return False
+
+            if not iban.is_valid(self.bank_account.data):
+                self.bank_account.errors.append(_("Not a valid IBAN"))
+                return False
+
+            if not swiss_iban(self.bank_account.data):
+                self.bank_account.errors.append(_(
+                    "QR-Bills require a Swiss or Lichteinstein IBAN"
+                ))
+                return False
+
+            if qr_iban(self.bank_account.data):
+                if self.bank_reference_schema.data == 'feriennet-v1':
+                    self.bank_account.errors.append(_(
+                        "This IBAN cannot be used for QR-Bills without ESR"
+                    ))
+                    return False
+            else:
+                if self.bank_reference_schema.data != 'feriennet-v1':
+                    self.bank_account.errors.append(_(
+                        "This IBAN cannot be used for QR-Bills with ESR"
+                    ))
+                    return False
+
+            if not self.bank_beneficiary.data:
+                self.bank_qr_bill.errors.append(_(
+                    "QR-Bills require a beneficiary"
+                ))
+                return False
+
+            if not beneficiary_to_creditor(self.bank_beneficiary.data):
+                self.bank_beneficiary.errors.append(_(
+                    "QR-Bills require the beneficiary to be in the form: "
+                    "name, street number, code city"
+                ))
+                return False
+
     def process_obj(self, obj):
         super().process_obj(obj)
 
@@ -148,6 +199,7 @@ class FeriennetSettingsForm(Form):
             ('bank_reference_schema', 'feriennet-v1'),
             ('bank_esr_participant_number', ''),
             ('bank_esr_identification_number', ''),
+            ('bank_qr_bill', False),
             ('tos_url', ''),
             ('donation', True),
             ('donation_amounts', DEFAULT_DONATION_AMOUNTS),
@@ -176,6 +228,7 @@ class FeriennetSettingsForm(Form):
             'bank_reference_schema',
             'bank_esr_participant_number',
             'bank_esr_identification_number',
+            'bank_qr_bill',
             'tos_url',
             'donation',
             'donation_amounts',

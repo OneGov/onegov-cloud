@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-09 09:10+0200\n"
+"POT-Creation-Date: 2021-10-25 13:40+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1231,6 +1231,15 @@ msgstr "Schriftfarbe"
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
 
+msgid "Announcement"
+msgstr "Ankündigung"
+
+msgid "Announcement bg color"
+msgstr "Hintergrundfarbe der Ankündigung"
+
+msgid "Announcement font color"
+msgstr "Schriftfarbe der Ankündigung"
+
 msgid "Homepage Image #1"
 msgstr "Startseiten Bild #1"
 
@@ -1329,7 +1338,7 @@ msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
-msgstr "Akzeptiere und schliesse Ticket automatisch für diese Kategorien"
+msgstr "Akzeptiere und schliesse Tickets automatisch für diese Kategorien"
 
 msgid ""
 "If auto-accepting is not possible, the ticket will be in state pending. Also "

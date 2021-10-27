@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-09 09:10+0200\n"
+"POT-Creation-Date: 2021-10-25 13:40+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1232,6 +1232,15 @@ msgstr "Couleur de la police"
 
 msgid "Relative font size"
 msgstr "Taille de police relative"
+
+msgid "Announcement"
+msgstr "Annonce"
+
+msgid "Announcement bg color"
+msgstr "Couleur de fond de l'annonce"
+
+msgid "Announcement font color"
+msgstr "Couleur de la police de l'annonce"
 
 msgid "Homepage Image #1"
 msgstr "Image n°1 de page d'accueil"

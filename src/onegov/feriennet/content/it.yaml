@@ -20,110 +20,111 @@ page-default: &lorem-ipsum
     </p>
 
 pages:
-  - title: Über uns
+  - title: Chi siamo
     type: topic
     meta:
       trait: page
     content:
       <<: *lorem-ipsum
       lead: >
-        In diesem Bereich der Website wird die Organisation beschrieben.
-  - title: Teilnahmebedingungen
+        Questa area del sito web descrive le attività dell'organizzazione.
+  - title: Condizioni di adesione
     type: topic
     meta:
       trait: page
     content:
       <<: *lorem-ipsum
       lead: >
-        In diesem Bereich der Website werden die Teilnahmebedingungen ausgeführt.
-  - title: Sponsoren
+        In questa sezione del sito vengono esposte le condizioni di
+        partecipazione.
+  - title: Sponsor
     type: topic
     meta:
       trait: page
     content:
       <<: *lorem-ipsum
       lead: >
-        In diesem Bereich der Website werden bestehende Sponsoren genannt und
-        mögliche neue Sponsoren informiert.
-  - title: Spende
+        In questa parte del sito si citano gli sponsor esistenti e si informano
+        i possibili nuovi sponsor.
+  - title: Donazione
     type: topic
     meta:
       trait: page
     content:
       <<: *lorem-ipsum
       lead: >
-        In diesem Bereich der Website besteht die Möglichkeit einen
-        Spendenaufruf zu tätigen oder Mitglieder für den Verein anzuwerben.
-  - title: Aktuelles
+        In questa sezione del sito, è possibile fare un invito a donare o a
+        reclutare membri per l'associazione.
+  - title: Notizie
     type: news
     name: news
     meta:
       trait: news
-  - title: Wir haben eine neue Webseite!
+  - title: Abbiamo un nuovo sito web!
     parent: news
     type: news
     meta:
       trait: news
     content:
       lead: >
-        Die neue Webseite läuft auf Feriennet, der Buchungsplattform für
-        betreute Ferienangebote der Stiftung Pro Juventute.
+        Il nuovo sito web opera su Feriennet, la piattaforma di prenotazione
+        della Fondazione Pro Juventute per campi e colonie di vacanze.
       text: |
         <p>
-          Feriennet ist die umfassende, komplett webbasierte Softwarelösung
-          für die einfache, zeit- und kostensparende Organisation von
-          betreuten Ferienangeboten.
+          Feriennet è la soluzione software completa e interamente online per
+          l'organizzazione semplice, in termini di tempo e di costi, per campi
+          e colonie di vacanze.
         </p>
         <p>
-          Weitere Informationen auf
-          <a href="https://www.projuventute.ch/de">
+          Ulteriori informazioni su
+          <a href="https://www.projuventute.ch/it">
             www.projuventute.ch
           </a>
         </p>
 
 filesets:
-  - title: Startseiten-Bilder
+  - title: Immagini della pagina iniziale
     type: image
     meta:
       show_images_on_homepage: true
-      lead: Diese Bilder werden auf der Startseite angezeigt.
+      lead: Queste immagini sono visualizzate sulla home page iniziale.
       view: grid
     files:
       - path: images/1zr3wnstnvy-aaron-burden.jpg
-        note: "Ein Teilnehmer beim Malen"
+        note: "Un partecipante che dipinge"
       - path: images/hn5ytnkwuxw-markus-spiske.jpg
-        note: "Der stets beliebte Fotografiekurs"
+        note: "L'amato corso di fotografia"
       - path: images/rx2vjcjqtxi-elissa-algora.jpg
-        note: "Skifahren im Winterlager des {organisation}"
+        note: "Sciare alla colonia invernale di {organisation}"
       - path: images/sahbl2upxco-ashton-bingham.jpg
-        note: "Faszination Wasser"
+        note: "Il fascino dell'acqua"
 
 organisation:
   theme_options:
     primary-color: '#006fba'
   meta:
     contact: |
-      Ferienpass Musterlingen
+      Lasciapassare vacanze Musterlingen
       Musterstrasse 39
       8000 Musterlingen
       044 256 77 77
     contact_html: >
-      Ferienpass Musterlingen<br>
+      Lasciapassare vacanze Musterlingen<br>
       Musterstrasse 39<br>
       8000 Musterlingen<br>
       044 256 77 77
     opening_hours: |
-      Wunschphase: 1.-27.5.2017
-      Zuteilung: 28.-30.5.2017
-      Buchungsphase: 1.-15.6.2017
-      Fakturierung: 16.6.2017
-      Ferienpass: 17.7.-20.8.2017
+      Fase delle richieste: 1.-27.5.2017
+      Assgenazione: 28.-30.5.2017
+      Fase di prenotazione: 1.-15.6.2017
+      Fatturazione: 16.6.2017
+      Lasciapassare vacanze: 17.7.-20.8.2017
     opening_hours_html: |
-      Wunschphase: 1.-27.5.2017<br>
-      Zuteilung: 28.-30.5.2017<br>
-      Buchungsphase: 1.-15.6.2017<br>
-      Fakturierung: 16.6.2017<br>
-      Ferienpass: 17.7.-20.8.2017
+      Fase delle richieste: 1.-27.5.2017<br>
+      Assgenazione: 28.-30.5.2017<br>
+      Fase di prenotazione: 1.-15.6.2017<br>
+      Fatturazione: 16.6.2017<br>
+      Lasciapassare vacanze: 17.7.-20.8.2017
     facebook_url: https://de-de.facebook.com/ProJuventute.ch
     homepage_structure: |
       <row>
@@ -137,20 +138,20 @@ organisation:
           <panel>
             <links>
                 <link url="./people"
-                    description="Personen">
+                    description="Persone">
                     Team
                 </link>
                 <link url="./form/kontakt"
-                    description="Anfragen">
-                    Kontakt
+                    description="Richieste">
+                    Contatto
                 </link>
                 <link url="./news"
-                    description="Neuigkeiten">
-                    Aktuelles
+                    description="Novità">
+                    Attualità
                 </link>
                 <link url="./photoalbums"
-                    description="Impressionen">
-                    Fotoalben
+                    description="Impressioni">
+                    Foto
                 </link>
             </links>
           </panel>
