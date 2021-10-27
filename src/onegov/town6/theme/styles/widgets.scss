@@ -30,7 +30,7 @@ article.content .grid-container:last-of-type {
 
 article.content .side-panel {
     @include breakpoint(small only) {
-        padding-top: .625rem;
+        padding-top: 4rem;
     }
 }
 

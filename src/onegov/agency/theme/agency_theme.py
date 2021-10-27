@@ -11,7 +11,8 @@ class AgencyTheme(OrgTheme):
             'agency',
             'chosen',
             'people',
-            'ticket'
+            'ticket',
+            'search'
         ]
 
     @property

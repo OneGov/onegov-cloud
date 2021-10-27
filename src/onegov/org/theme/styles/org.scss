@@ -413,6 +413,11 @@ $globals-height: 2.5rem;
     }
 }
 
+#announcement {
+    padding: 1rem;
+    text-align: center;
+}
+
 #redactor-modal-box footer {
     // the redactor also contains a footer which doesn't need a specific height
     height: auto;
@@ -3019,7 +3024,7 @@ button {
             }
 
             &.fc-day-top,
-            &.fc-day-header, {
+            &.fc-day-header {
                 background: $yellow-light !important;
                 opacity: 1;
             }
@@ -3640,6 +3645,18 @@ ul.search-results {
     li {
         padding: 0 5px;
 
+        button {
+            background: transparent;
+            border: 0;
+            color: $primary-color;
+            text-align: left;
+            width: 100%;
+
+            &:hover {
+                font-weight: bold;
+            }
+        }
+
         // highlight links with the active class
         &.active {
             background-color: $topbar-bg-color;
@@ -3651,7 +3668,7 @@ ul.search-results {
         }
 
         // highlight links when hovering
-        &:not(:last-child):hover {
+        &:hover {
             background-color: $topbar-bg-color !important;
 
             a {

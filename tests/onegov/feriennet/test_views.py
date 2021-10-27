@@ -2753,3 +2753,42 @@ def test_registration(client):
 
     logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
     assert "Ihr Benutzerprofil ist unvollständig" in logged_in
+
+
+def test_view_qrbill(client, scenario):
+    scenario.add_period(title="Ferienpass 2017", confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Dustin", username='admin@example.org')
+    scenario.add_booking(
+        state='accepted', cost=100, username='admin@example.org'
+    )
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/').click('Fakturierung')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    page = client.get('/userprofile')
+    page.form['salutation'] = 'mr'
+    page.form['first_name'] = 'foo'
+    page.form['last_name'] = 'bar'
+    page.form['zip_code'] = '123'
+    page.form['place'] = 'abc'
+    page.form['address'] = 'abc'
+    page.form['emergency'] = '123456789 Admin'
+    page.form.submit()
+
+    page = client.get('/feriennet-settings')
+    page.form['bank_qr_bill'] = True
+    page.form['bank_account'] = 'CH5604835012345678009'
+    page.form['bank_beneficiary'] = (
+        'Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel'
+    )
+    page.form.submit()
+
+    page = client.get('/my-bills?username=admin@example.org')
+    assert '<img class="qr-bill" src="data:image/svg+xml;base64,' in page

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-05 16:39+0200\n"
+"POT-Creation-Date: 2021-10-25 10:27+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2945,8 +2945,11 @@ msgstr "Numéro de participant BVR"
 msgid "ESR identification number"
 msgstr "Numéro d'identification BVR"
 
+msgid "QR-Bill (experimental)"
+msgstr ""
+
 msgid "Full age required for registration"
-msgstr "Âge complet requis pour l'inscription"
+msgstr "Inscription des bénévoles"
 
 msgid "Userprofile"
 msgstr "Profil d'utilisateur"
@@ -3002,6 +3005,29 @@ msgstr "Activé"
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Le numéro d'identification BVR doit être long de 3-6 caractères"
 
+msgid "QR-Bills require an IBAN"
+msgstr ""
+
+msgid "Not a valid IBAN"
+msgstr ""
+
+msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
+msgstr ""
+
+msgid "This IBAN cannot be used for QR-Bills without ESR"
+msgstr ""
+
+msgid "This IBAN cannot be used for QR-Bills with ESR"
+msgstr ""
+
+msgid "QR-Bills require a beneficiary"
+msgstr ""
+
+msgid ""
+"QR-Bills require the beneficiary to be in the form: name, street number, "
+"code city"
+msgstr ""
+
 msgid "Feriennet"
 msgstr "Réseau Vacances"
 
@@ -3012,17 +3038,3 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
-
-#~ msgid "The minium age cannot be higher than the maximum age"
-#~ msgstr "L'âge minimum ne peut être plus élevé que l'âge maximum"
-
-#~ msgid "An commitment by Rega"
-#~ msgstr "Un engagement de la Rega"
-
-#~ msgid "I know that after confirmation, bills can only be adjusted manually."
-#~ msgstr ""
-#~ "Je sais qu'après confirmation, les factures ne peuvent être ajustées que "
-#~ "manuellement."
-
-#~ msgid "Users with bookings"
-#~ msgstr "Utilisateurs qui ont des réservations"

@@ -189,6 +189,11 @@
                                         </li>
                                     </tal:b>
                                 </ul>
+                                <tal:b tal:condition="qr_bill">
+                                    <tal:b tal:define="bill qr_bill(invoice)">
+                                        <img class="qr-bill" tal:condition="bill" src="data:image/svg+xml;base64,${bill}">
+                                    </tal:b>
+                                </tal:b>
                             </div>
                         </div>
                     </div>

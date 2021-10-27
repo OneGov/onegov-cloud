@@ -75,12 +75,18 @@
     <div class="ie-11-wrapper">
       <main>
 
-        <header>
+        <header tal:define="header_options request.app.org.header_options or {}" >
+          <div tal:condition="header_options.get('left_header_announcement', '')"
+               id="announcement"
+               style="color: ${header_options.get('left_header_announcement_font_color', '#000000')};
+                      background-color: ${header_options.get('left_header_announcement_bg_color', '#FBBC05')};">
+              <div class="grid-container">
+                ${header_options['left_header_announcement']}
+              </div>
+          </div>
           <div class="globals">
             <div class="row">
-              <div class="columns small-12"
-              tal:define="header_options request.app.org.header_options or {}"
-              >
+              <div class="columns small-12">
                   <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
                       <h4 tal:condition="header_options['left_header_name']|nothing"><a
                               href="${header_options.get('left_header_url', '#')}"

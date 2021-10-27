@@ -10,9 +10,13 @@
     }
 
     .person-card-membership {
-        margin-bottom: 0;
-        padding-left: 2em;
-        text-indent: -2em;
+        border-bottom: 1px dashed rgba(28, 57, 71, .53);
+        margin-bottom: .5rem;
+        padding-bottom: .4rem;
+    }
+
+    .person-card-membership:last-child {
+        border-bottom: 0;
     }
 
     a:not(:last-child):not(:nth-last-child(-n+2))::after {

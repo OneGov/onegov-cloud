@@ -13,7 +13,7 @@ looking for, you might appreciate these links:
 - **[Marketing site](https://admin.digital)**
 <br>For an executive summary (in German)
 
-- **[Developer docs](https://onegovcloud.ch)**
+- **[Developer docs](https://docs.onegovcloud.ch)**
 <br>For a technical overview and Python API docs
 
 - **[Changelog](CHANGES.md)**

@@ -59,19 +59,38 @@ def test_settings(client):
     settings = client.get('/analytics-settings')
     assert '<script>alert("Hi!");</script>' in settings.text
 
+    # header settings
     color = '#006fbb'
+    bg_color = '#008263'
+    text = 'This is an announcement which appears on top of the page'
     settings = client.get('/header-settings')
+
     # test default not giving the color
     assert settings.form['left_header_color'].value == '#000000'
+    assert settings.form['left_header_announcement_bg_color'].value == (
+        '#FBBC05'
+    )
+    assert settings.form['left_header_announcement_font_color'].value == (
+        '#000000'
+    )
 
     settings.form['left_header_name'] = 'Homepage of Govikon'
     settings.form['left_header_url'] = 'https://govikon.ch'
     settings.form['left_header_rem'] = 2.5
     settings.form['left_header_color'] = color
+    settings.form['left_header_announcement'] = text
+    settings.form['left_header_announcement_bg_color'] = bg_color
+    settings.form['left_header_announcement_font_color'] = color
     page = settings.form.submit().follow()
-
-    assert f'<a href="https://govikon.ch" ' \
-           f'style="color:{color}; font-size: 2.5rem">' in page
+    assert (
+        f'<a href="https://govikon.ch" '
+        f'style="color:{color}; font-size: 2.5rem">'
+    ) in page
+    assert text in page
+    assert (
+        f'<div id="announcement" style="color: {color}; '
+        f'background-color: {bg_color};">'
+    ) in page
 
 
 def test_switch_languages(client):
