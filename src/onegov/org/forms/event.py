@@ -4,10 +4,11 @@ import transaction
 from cached_property import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
+from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
-from onegov.event.collections import EventCollection
+from onegov.event.collections import EventCollection, OccurrenceCollection
 from onegov.event.models import EventFile
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -18,6 +19,7 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
+from onegov.ticket import TicketCollection
 from sedate import replace_timezone, to_timezone
 from wtforms import BooleanField
 from wtforms import RadioField
@@ -418,15 +420,18 @@ class EventForm(Form):
 
 class EventImportForm(Form):
 
-    # create ticket?
-
     clear = BooleanField(
         label=_("Clear"),
+        description=_(
+            "Delete imported events before importing. This does not delete "
+            "otherwise imported events and submitted events."
+        ),
         default=False
     )
 
     dry_run = BooleanField(
         label=_("Dry Run"),
+        description=_("Do not actually import the events."),
         default=False
     )
 
@@ -435,9 +440,17 @@ class EventImportForm(Form):
         validators=[
             validators.DataRequired(),
             WhitelistedMimeType({
+                'application/excel',
+                'application/vnd.ms-excel',
+                'text/plain',
+                (
+                    'application/'
+                    'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                ),
+                'application/vnd.ms-office',
+                'application/octet-stream',
                 'application/zip',
-                'application/octet-stream'
-                # todo:
+                'text/csv'
             }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
@@ -454,29 +467,34 @@ class EventImportForm(Form):
             'organizer': self.request.translate(("Organizer")),
             'organizer_email': self.request.translate(_("Organizer E-Mail")),
             'tags': self.request.translate(_("Tags")),
-            'localized_start': self.request.translate(_("From")),
-            'localized_end': self.request.translate(_("To")),
+            'start': self.request.translate(_("From")),
+            'end': self.request.translate(_("To")),
         }
 
-    def export(self):
-        events = EventCollection(self.request.session)
+    def run_export(self):
+        occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
 
-        def get(event, attribute):
-            result = getattr(event, attribute)
+        def get(occurrence, attribute):
+            if attribute in ('start', 'end'):
+                attribute = f'localized_{attribute}'
+            result = (
+                getattr(occurrence, attribute, None)
+                or getattr(occurrence.event, attribute, None)
+            )
             if isinstance(result, datetime):
-                # todo: remove timezone or maybe format nicer
-                result = result.isoformat()
-            if isinstance(result, (list, tuple)):
+                result = result.strftime("%d.%m.%Y %H:%M")
+            if attribute == 'tags':
+                result = [self.request.translate(_(tag)) for tag in result]
                 result = ', '.join(result)
             result = result or ''
             result = result.strip()
             return result
 
         result = []
-        for event in events.query():
+        for occurrence in occurrences.query():
             result.append({
-                title: get(event, attribute)
+                title: get(occurrence, attribute)
                 for attribute, title in headers.items()
             })
 
@@ -486,12 +504,18 @@ class EventImportForm(Form):
         headers = self.headers
         session = self.request.session
         events = EventCollection(session)
+        tags = {self.request.translate(tag[0]): tag[0] for tag in TAGS}
+        tickets = TicketCollection(session)
 
         if self.clear.data:
             for event in events.query():
+                if event.source:
+                    continue
+                if tickets.by_handler_id(event.id.hex):
+                    continue
                 session.delete(event)
 
-        csvfile = convert_excel_to_csv(self.file.data)
+        csvfile = convert_excel_to_csv(self.file.file)
         csv = CSVFile(csvfile, expected_headers=headers.values())
         lines = list(csv.lines)
         columns = {
@@ -499,26 +523,34 @@ class EventImportForm(Form):
             for key, value in headers.items()
         }
 
+        def get(line, column, attribute):
+            result = getattr(line, column)
+            if attribute in ('start', 'end'):
+                result = parse(result)
+            if attribute == 'tags':
+                result = result.split(', ')
+                result = [tags.get(tag, None) for tag in result]
+                result = [tag for tag in result if tag]
+            return result
+
         count = 0
-        for line in lines:
-            # add submitter from user
-            # add timezone (fixed)
-            import pdb; pdb.set_trace()
-            count += 1
-            email = getattr(line, columns['email'])
-            realname = getattr(line, columns['name'])
-            group = getattr(line, columns['group'])
-            group = added_groups[group] if group else None
-            users.add(
-                username=email,
-                realname=realname,
-                group=group,
-                password=random_password(),
-                role='member',
-            )
+        errors = []
+        for number, line in enumerate(lines, start=1):
+            try:
+                kwargs = {
+                    attribute: get(line, column, attribute)
+                    for attribute, column in columns.items()
+                }
+                kwargs['timezone'] = 'Europe/Zurich'
+                event = events.add(**kwargs)
+                event.meta['submitter_email'] = self.request.current_username
+                event.submit()
+                event.publish()
+                count += 1
+            except Exception:
+                errors.append(str(number))
 
-        if self.dry_run.data:
+        if self.dry_run.data or errors:
             transaction.abort()
-        # )
 
-        return count
+        return count, errors
