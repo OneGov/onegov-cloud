@@ -1,8 +1,18 @@
 # Changes
 
+## 2021.86
+
+`2021-10-26` | [fdc1567f8b...fdc1567f8b](https://github.com/OneGov/onegov-cloud/compare/fdc1567f8b^...fdc1567f8b)
+
+### Feriennet
+
+##### Add experimental support for QR-bills.
+
+`Feature` | [PRO-667](https://linear.app/projuventute/issue/PRO-667) | [fdc1567f8b](https://github.com/onegov/onegov-cloud/commit/fdc1567f8becdf25e65a2d3674b738b32782eea7)
+
 ## 2021.85
 
-`2021-10-26` | [e5f5ab1c8b...bcd3f7f7a1](https://github.com/OneGov/onegov-cloud/compare/e5f5ab1c8b^...bcd3f7f7a1)
+`2021-10-26` | [e5f5ab1c8b...7cc20c08b2](https://github.com/OneGov/onegov-cloud/compare/e5f5ab1c8b^...7cc20c08b2)
 
 ### Agency
 
@@ -1391,8 +1401,4 @@ Use abbreviations for weekdays.
 ## 2021.37
 
 `2021-03-30` | [52585f5d2c...51c603749f](https://github.com/OneGov/onegov-cloud/compare/52585f5d2c^...51c603749f)
-
-## 2021.36
-
-`2021-03-25` | [2b1f49a369...0db36afcee](https://github.com/OneGov/onegov-cloud/compare/2b1f49a369^...0db36afcee)
 

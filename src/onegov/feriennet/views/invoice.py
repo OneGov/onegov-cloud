@@ -8,6 +8,7 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.forms import DonationForm
 from onegov.feriennet.layout import DonationLayout
 from onegov.feriennet.layout import InvoiceLayout
+from onegov.feriennet.qrbill import generate_qr_bill
 from onegov.feriennet.views.shared import users_for_select_element
 from onegov.pay import process_payment, INSUFFICIENT_FUNDS
 from onegov.user import User
@@ -109,6 +110,7 @@ def view_my_invoices(self, request):
 
     beneficiary = request.app.org.meta.get('bank_beneficiary')
     payment_provider = request.app.default_payment_provider
+    qr_bill_enabled = request.app.org.meta.get('bank_qr_bill', False)
     layout = InvoiceLayout(self, request, title)
 
     def payment_button(title, price):
@@ -136,6 +138,9 @@ def view_my_invoices(self, request):
             'username': user.username,
         })
 
+    def qr_bill(invoice):
+        return generate_qr_bill(self.schema.name, request, user, invoice)
+
     return {
         'title': title,
         'layout': layout,
@@ -148,7 +153,8 @@ def view_my_invoices(self, request):
         'payment_provider': payment_provider,
         'payment_button': payment_button,
         'beneficiary': beneficiary,
-        'invoice_bucket': request.app.invoice_bucket()
+        'invoice_bucket': request.app.invoice_bucket(),
+        'qr_bill': qr_bill if qr_bill_enabled else None,
     }
 
 
