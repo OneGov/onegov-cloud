@@ -526,7 +526,7 @@ class EventImportForm(Form):
         def get(line, column, attribute):
             result = getattr(line, column)
             if attribute in ('start', 'end'):
-                result = parse(result)
+                result = parse(result, dayfirst=True)
             if attribute == 'tags':
                 result = result.split(', ')
                 result = [tags.get(tag, None) for tag in result]
