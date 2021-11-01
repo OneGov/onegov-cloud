@@ -47,8 +47,6 @@ def get_newsletter_form(model, request):
 
     def publications():
         q = PublicationCollection(request.session).query()
-        q = q.filter(File.published == True)
-        q = q.filter(File.signed == True)
         q = q.order_by(desc(File.created))
 
         return q

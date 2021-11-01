@@ -1544,13 +1544,18 @@ class OccurrencesLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
-            return (
+            return [
+                Link(
+                    text=_("Import"),
+                    url=self.request.link(self.model, 'import'),
+                    attrs={'class': 'import-link'}
+                ),
                 Link(
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
-                ),
-            )
+                )
+            ]
 
 
 class OccurrenceLayout(EventBaseLayout):

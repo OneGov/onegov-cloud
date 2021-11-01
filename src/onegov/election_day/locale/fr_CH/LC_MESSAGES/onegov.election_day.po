@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-02 07:42+0200\n"
+"POT-Creation-Date: 2021-09-27 09:03+0200\n"
 "PO-Revision-Date: 2021-04-01 10:23+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -218,19 +218,14 @@ msgstr "A"
 msgid "Voting result"
 msgstr "Résultat de la votation"
 
-msgid "Type"
-msgstr "Type"
-
-msgid ""
-"Compound of elections field summarizes all related elections in one. To "
-"display all elections, uncheck 'Compound of Elections'"
-msgstr ""
-
 msgid "Domain"
 msgstr "Echelon"
 
 msgid "Name"
 msgstr "Nom"
+
+msgid "Type"
+msgstr "Type"
 
 msgid "No votes yet."
 msgstr "Pas de votations actuellement."
@@ -517,6 +512,15 @@ msgstr "Abonnés"
 
 msgid "Screens"
 msgstr "Écrans"
+
+msgid "Update archived results"
+msgstr "Mise à jour des résultats archivés"
+
+msgid "Clear cache"
+msgstr "Effacer le cache"
+
+msgid "Administration"
+msgstr "Admin"
 
 msgid "Manage"
 msgstr "Gérer"
@@ -1157,8 +1161,26 @@ msgstr ""
 msgid "Results updated."
 msgstr "Résultats mis à jour."
 
-msgid "Update results"
-msgstr "Mettre à jour les résultats"
+msgid ""
+"The results on the home page and in the archive are cached and need to be "
+"updated after a domain change, for example."
+msgstr ""
+"Les résultats sur la page d'accueil et dans les archives sont mis en cache "
+"et doivent être mis à jour après un changement de domaine, par exemple."
+
+msgid "Cache cleared."
+msgstr "Cache effacé."
+
+#, python-format
+msgid ""
+"Elections and votes are cached for ${expiration} seconds. The cache is "
+"automatically cleared for new results and other updates. It is not normally "
+"necessary to clear the cache yourself."
+msgstr ""
+"Les élections et les votes sont mis en cache pendant ${expiration} secondes. "
+"Le cache est automatiquement vidé pour les nouveaux résultats et autres "
+"mises à jour. Il n'est normalement pas nécessaire de vider le cache vous-"
+"même."
 
 msgid "Data source added."
 msgstr "Source de données ajoutée."

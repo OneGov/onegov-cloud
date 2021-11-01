@@ -64,9 +64,11 @@ class GeneralSettingsForm(Form):
         label=_("Languages"),
         choices=(
             ('de_CH', _("German")),
-            ('fr_CH', _("French"))
+            ('fr_CH', _("French")),
+            ('it_CH', _("Italian"))
         ),
-        validators=[validators.InputRequired()])
+        validators=[validators.InputRequired()]
+    )
 
     @property
     def theme_options(self):
@@ -404,13 +406,33 @@ class HeaderSettingsForm(Form):
         default=1
     )
 
+    left_header_announcement = StringField(
+        label=_("Announcement"),
+        fieldset=_("Announcement"),
+    )
+
+    left_header_announcement_bg_color = ColorField(
+        label=_("Announcement bg color"),
+        fieldset=_("Announcement")
+    )
+
+    left_header_announcement_font_color = ColorField(
+        label=_("Announcement font color"),
+        fieldset=_("Announcement")
+    )
+
     @property
     def header_options(self):
         return {
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
             'left_header_color': self.left_header_color.data.get_hex(),
-            'left_header_rem': self.left_header_rem.data
+            'left_header_rem': self.left_header_rem.data,
+            'left_header_announcement': self.left_header_announcement.data,
+            'left_header_announcement_bg_color':
+                self.left_header_announcement_bg_color.data.get_hex(),
+            'left_header_announcement_font_color':
+                self.left_header_announcement_font_color.data.get_hex()
         }
 
     @header_options.setter
@@ -418,8 +440,18 @@ class HeaderSettingsForm(Form):
         self.left_header_name.data = options.get('left_header_name')
         self.left_header_url.data = options.get('left_header_url')
         self.left_header_color.data = options.get(
-            'left_header_color', '#000000')
+            'left_header_color', '#000000'
+        )
         self.left_header_rem.data = options.get('left_header_rem', 1)
+        self.left_header_announcement.data = options.get(
+            'left_header_announcement', ""
+        )
+        self.left_header_announcement_bg_color.data = options.get(
+            'left_header_announcement_bg_color', '#FBBC05'
+        )
+        self.left_header_announcement_font_color.data = options.get(
+            'left_header_announcement_font_color', '#000000'
+        )
 
     def populate_obj(self, model):
         super().populate_obj(model)

@@ -6,7 +6,7 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.core.utils import Bunch
-from onegov.file.attachments import extract_pdf_info
+from onegov.pdf.utils import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.file import FileSubCollection
@@ -362,8 +362,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 if area:
                     result.append(area)
                     break
-
-        return sorted(result)
+        return result
 
     # Result
     _result = Column('result', Integer)

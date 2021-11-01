@@ -11,6 +11,7 @@ def create_new_organisation(app, name, create_files=True, path=None,
     locales = {
         'de_CH': 'content/de.yaml',
         'fr_CH': 'content/fr.yaml',
+        'it_CH': 'content/it.yaml',
     }
 
     path = path or module_path('onegov.feriennet', locales[locale])
@@ -63,6 +64,26 @@ def create_new_organisation(app, name, create_files=True, path=None,
                 Telefon *= ___
                 Émail *= @@@
                 Message *= ...[12]
+            """),
+            type='builtin'
+        )
+    elif locale == 'it_CH':
+        forms.add(
+            name='kontakt',
+            title="Kontakt",
+            meta={
+                'lead': (
+                    "Haben Sie Fragen oder eine Anregung? "
+                    "Rufen Sie uns einfach an oder benutzen Sie dieses "
+                    "Formular."
+                )
+            },
+            definition=textwrap.dedent("""\
+                Vorname *= ___
+                Nachname *= ___
+                Telefon *= ___
+                E-Mail *= @@@
+                Mitteilung *= ...[12]
             """),
             type='builtin'
         )

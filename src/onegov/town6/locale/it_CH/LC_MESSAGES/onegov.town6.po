@@ -1,0 +1,1954 @@
+# This file was generated from translations.town6.xlsx
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2021-10-09 08:59+0200\n"
+"PO-Revision-Date: 2021-09-27 16:02+0200\n"
+"Language: it_CH\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: xls-to-po 1.0\n"
+
+msgid "Font family serif"
+msgstr "Font famiglia serif"
+
+msgid "Used for text in html body"
+msgstr "Usato per il testo nel corpo html"
+
+msgid "Font family sans-serif"
+msgstr "Font famiglia sans-serif"
+
+msgid "Used for all the headings"
+msgstr "Usato per tutti i titoli"
+
+msgid "Supported Chat Integrations"
+msgstr "Integrazioni di chat supportate"
+
+msgid "Chat title"
+msgstr "Titolo della chat"
+
+msgid "Chat background color"
+msgstr "Colore di sfondo della chat"
+
+msgid "Customer-ID"
+msgstr "ID cliente"
+
+msgid "Hide chat for chosen roles"
+msgstr "Nascondi la chat per i ruoli scelti"
+
+msgid "Admin"
+msgstr "Amministratore"
+
+msgid "Editor"
+msgstr "Redattore"
+
+msgid "Member"
+msgstr "Membro"
+
+msgid "Disable the chat"
+msgstr "Disattivare la chat"
+
+#, fuzzy
+msgid "Events"
+msgstr "Evento"
+
+msgid "All events"
+msgstr "Tutti gli eventi"
+
+msgid "Online Counter"
+msgstr "Banco online"
+
+msgid "Forms and applications"
+msgstr "Moduli e richieste"
+
+msgid "Publications"
+msgstr "Pubblicazioni"
+
+msgid "Official Documents"
+msgstr "Documenti ufficiali"
+
+msgid "Reservations"
+msgstr "Prenotazioni"
+
+msgid "Daypasses and rooms"
+msgstr "Pass giornalieri e camere"
+
+msgid "E-Move"
+msgstr "E-Trasloco"
+
+msgid "Move with eMovingCH"
+msgstr "Trasferisciti con eTraslocoCH"
+
+msgid "SBB Daypass"
+msgstr "Pass giornaliero SBB"
+
+msgid "Generalabonnement for Towns"
+msgstr "Abbonamento generale per le città"
+
+msgid "Services"
+msgstr "Servizi"
+
+msgid "Contacts"
+msgstr "Contatti"
+
+msgid "People"
+msgstr "Persone"
+
+#, fuzzy
+msgid "All contacts"
+msgstr "Contatti"
+
+msgid "back"
+msgstr "indietro"
+
+#, python-format
+msgid "Press ${shortcut} to open Search"
+msgstr "Premi ${shortcut} per aprire Cerca"
+
+msgid "Homepage"
+msgstr "Pagina principale"
+
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "Form"
+msgstr "Modulo"
+
+msgid "Check"
+msgstr "Controlla"
+
+msgid "Forms"
+msgstr "Moduli"
+
+msgid "Edit"
+msgstr "Modifica"
+
+msgid "QR"
+msgstr "QR"
+
+msgid "Delete"
+msgstr "Elimina"
+
+msgid "This form can't be deleted."
+msgstr "Questo modulo non può essere eliminato."
+
+msgid ""
+"There are submissions associated with the form. Those need to be removed "
+"first."
+msgstr ""
+"Sono presenti invii associati al modulo. Questi devono essere rimossi prima "
+"di tutto."
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Do you really want to delete this form?"
+msgstr "Vuoi davvero eliminare questo modulo?"
+
+msgid "This cannot be undone."
+msgstr "L'operazione non può essere annullata."
+
+msgid "Delete form"
+msgstr "Elimina modulo"
+
+msgid "Export"
+msgstr "Esporta"
+
+msgid "Change Url"
+msgstr "Modifica URL"
+
+msgid "Registration Windows"
+msgstr "Finestre di registrazione"
+
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "External form"
+msgstr "Modulo esterno"
+
+msgid "New external form"
+msgstr "Nuovo modulo esterno"
+
+msgid "Person"
+msgstr "Persona"
+
+msgid "Do you really want to delete this person?"
+msgstr "Vuoi davvero eliminare questa persona?"
+
+msgid "Delete person"
+msgstr "Elimina persona"
+
+msgid "Tickets"
+msgstr "Biglietti"
+
+msgid "Accept ticket"
+msgstr "Accetta il biglietto"
+
+msgid "This ticket can't be closed."
+msgstr "Questo biglietto non può essere chiuso."
+
+msgid "This ticket requires a decision, but no decision has been made yet."
+msgstr ""
+"Questo biglietto richiede una decisione, ma nessuna decisione è stata ancora "
+"presa."
+
+msgid "Assign ticket"
+msgstr "Assegna il biglietto"
+
+msgid "Close ticket"
+msgstr "Chiudi il biglietto"
+
+msgid "Reopen ticket"
+msgstr "Riapri il biglietto"
+
+msgid "Archive ticket"
+msgstr "Archivia il biglietto"
+
+msgid "Recover from archive"
+msgstr "Recupera dall'archivio"
+
+msgid "New Note"
+msgstr "Nuova nota"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "Confirmation"
+msgstr "Conferma"
+
+msgid "New Message"
+msgstr "Nuovo messaggio"
+
+msgid "Ticket Status"
+msgstr "Stato del biglietto"
+
+msgid "Recipients"
+msgstr "Destinatari"
+
+msgid "Room"
+msgstr "Camera"
+
+msgid "Daypass"
+msgstr "Biglietto giornaliero"
+
+msgid "Resource Item"
+msgstr "Elemento risorsa"
+
+#, fuzzy
+msgid "Notifications"
+msgstr "Conferma"
+
+msgid "E-Mail Recipient"
+msgstr "E-mail del destinatario"
+
+msgid "Do you really want to delete this resource?"
+msgstr "Vuoi davvero eliminare questa risorsa?"
+
+msgid "Delete resource"
+msgstr "Elimina risorsa"
+
+msgid "This resource can't be deleted."
+msgstr "Non può essere eliminata."
+
+msgid "There are existing reservations associated with this resource"
+msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
+
+msgid "Clean up"
+msgstr "Ripulisci"
+
+msgid "Occupancy"
+msgstr "Occupazione"
+
+msgid "Subscribe"
+msgstr "Iscriviti"
+
+msgid "Rules"
+msgstr "Regole"
+
+msgid "Rule"
+msgstr "Regola"
+
+msgid "Edit allocation"
+msgstr "Modifica allocazione"
+
+msgid "Do you really want to delete this allocation?"
+msgstr "Vuoi davvero eliminare questa allocazione?"
+
+msgid "Delete allocation"
+msgstr "Elimina allocazione"
+
+msgid "Mo"
+msgstr "Lu"
+
+msgid "Tu"
+msgstr "Ma"
+
+msgid "We"
+msgstr "Me"
+
+msgid "Th"
+msgstr "Gi"
+
+msgid "Fr"
+msgstr "Ve"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "Do"
+
+#, python-format
+msgid "Every ${days} until ${end}"
+msgstr "Ogni ${days} fino al ${end}"
+
+msgid "This event can't be editet."
+msgstr "Questo evento non può essere modificato."
+
+msgid "Imported events can not be editet."
+msgstr "Gli eventi importati non possono essere modificati."
+
+msgid "Do you really want to delete this event?"
+msgstr "Desideri davvero eliminare questo evento?"
+
+msgid "Delete event"
+msgstr "Elimina evento"
+
+msgid "This event can't be deleted."
+msgstr "Questo evento non può essere eliminato."
+
+msgid "To remove this event, go to the ticket and reject it."
+msgstr "Per rimuovere questo evento, vai al biglietto e rifiutalo."
+
+msgid "Withdraw event"
+msgstr "Ritira evento"
+
+msgid "Do you really want to withdraw this event?"
+msgstr "Vuoi davvero ritirare questo evento?"
+
+msgid "You can re-publish an imported event later."
+msgstr "Puoi ripubblicare un evento importato in un secondo momento."
+
+msgid "Re-publish event"
+msgstr "Ripubblica l'evento"
+
+#, fuzzy
+msgid "Newsletter"
+msgstr "Abbonamento alla newsletter"
+
+msgid "New"
+msgstr "Nuovo"
+
+msgid "Subscribers"
+msgstr "Iscritti"
+
+msgid "Send"
+msgstr "Invia"
+
+msgid "Test"
+msgstr "Test"
+
+msgid "Delete newsletter"
+msgstr "Elimina newsletter"
+
+msgid "Photo Albums"
+msgstr "Album fotografici"
+
+msgid "Manage images"
+msgstr "Gestisci immagini"
+
+msgid "Photo Album"
+msgstr "Album fotografico"
+
+msgid "Choose images"
+msgstr "Scegli le immagini"
+
+msgid "Delete photo album"
+msgstr "Elimina l'album fotografico"
+
+msgid "Usermanagement"
+msgstr "Gestione utenti"
+
+msgid "Create Signup Link"
+msgstr "Crea collegamento di iscrizione"
+
+msgid "User"
+msgstr "Utente"
+
+msgid "User groups"
+msgstr "Gruppi di utenti"
+
+msgid "User group"
+msgstr "Gruppo di utenti"
+
+msgid "Do you really want to delete this user group?"
+msgstr "Vuoi davvero eliminare questo gruppo di utenti?"
+
+msgid "Delete user group"
+msgstr "Elimina gruppo di utenti"
+
+msgid "Exports"
+msgstr "Esportazioni"
+
+msgid "Payment Providers"
+msgstr "Provider di servizi di pagamento"
+
+msgid "Payments"
+msgstr "Pagamenti"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgid "Payment Provider"
+msgstr "Elaboratore dei pagamenti"
+
+msgid "Synchronise"
+msgstr "Sincronizza"
+
+msgid "Timeline"
+msgstr "Timeline"
+
+msgid "Directories"
+msgstr "Cartelle"
+
+msgid "Directory"
+msgstr "Cartella"
+
+msgid "Configure"
+msgstr "Configura"
+
+msgid "Import"
+msgstr "Importa"
+
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Desideri davvero eliminare \"${title}\"?"
+
+msgid "All entries will be deleted as well!"
+msgstr "Anche tutti gli elementi verranno eliminati!"
+
+msgid "Delete directory"
+msgstr "Elimina la cartella"
+
+msgid "Entry"
+msgstr "Elemento"
+
+msgid "Published"
+msgstr "Pubblicato"
+
+msgid "Upcoming"
+msgstr "In arrivo"
+
+msgid "Past"
+msgstr "Passato"
+
+msgid "Publication"
+msgstr "Pubblicazione"
+
+msgid "Choose filter"
+msgstr "Scegli filtro"
+
+msgid "Delete entry"
+msgstr "Elimina elemento"
+
+msgid "Dashboard"
+msgstr "Pannello di controllo"
+
+msgid "Do you really want to delete this external link?"
+msgstr "Vuoi davvero eliminare questo collegamento esterno?"
+
+msgid "Delete external link"
+msgstr "Elimina collegamento esterno"
+
+msgid "No rules defined."
+msgstr "Nessuna regola definita."
+
+msgid "State:"
+msgstr "Stato:"
+
+msgid "Owner:"
+msgstr "Proprietario:"
+
+msgid "Kind:"
+msgstr "Tipo:"
+
+msgid "No directories defined yet."
+msgstr "Nessuna cartella ancora definita."
+
+msgid "No entries found."
+msgstr "Non è stato trovato nessun risultato."
+
+msgid "Further Information"
+msgstr "Ulteriori informazioni"
+
+msgid "Propose entry"
+msgstr "Proponi un elemento"
+
+msgid "Something missing? Propose a new entry."
+msgstr "Manca qualcosa? Proponi un nuovo elemento."
+
+msgid "External link"
+msgstr "Collegamento esterno"
+
+#, fuzzy
+msgid "More information"
+msgstr "Conferma"
+
+msgid "Change Request"
+msgstr "Richiesta di modifica"
+
+msgid "Found an error? Propose a change to this entry."
+msgstr "Trovato un errore? Proponi una modifica a questo elemento."
+
+msgid ""
+"Your edit requires a migration of existing entries. Please confirm the "
+"following changes."
+msgstr ""
+"La tua modifica richiede una migrazione degli elementi esistenti. Conferma "
+"le seguenti modifiche."
+
+msgid ""
+"Changes are detected using a heuristic. Therefore it is possible that your "
+"changes were misdetected. If in doubt, press cancel and try to change the "
+"directory in small increments."
+msgstr ""
+"Le modifiche vengono rilevate utilizzando un'euristica. Pertanto è possibile "
+"che le modifiche siano state rilevate erroneamente. In caso di dubbio, premi "
+"annulla e prova a modificare la cartella in incrementi di dimensioni ridotte."
+
+msgid "For additional safety you can also download a backup before continuing:"
+msgstr ""
+"Per maggiore sicurezza puoi anche scaricare un backup prima di proseguire:"
+
+msgid "Download backup"
+msgstr "Scarica il backup"
+
+msgid ""
+"There was an error while migrating your directory! You can fix the displayed "
+"entries in a separate window and then continue here."
+msgstr ""
+"Si è verificato un errore durante la migrazione della cartella! Puoi "
+"correggere gli elementi visualizzati in una finestra separata e poi "
+"proseguire qui."
+
+msgid "Added:"
+msgstr "Aggiunto:"
+
+msgid "Removed:"
+msgstr "Rimosso:"
+
+msgid "Renamed:"
+msgstr "Rinominato:"
+
+msgid "Changed:"
+msgstr "Modificato:"
+
+#, fuzzy
+msgid "Confirm"
+msgstr "Conferma"
+
+msgid "There was an error while importing your directory!"
+msgstr "Si è verificato un errore durante l'importazione della cartella!"
+
+msgid ""
+"Please review your data and press \"Complete\" to finalize the process. If "
+"there's anything you'd like to change, click on \"Edit\" to return to the "
+"filled-out form."
+msgstr ""
+"Esamina di nuovo i dati e premi \"Completa\" per finalizzare il processo. Se "
+"c'è qualcosa che desideri modificare, fai clic su \"Modifica\" per tornare "
+"al modulo compilato."
+
+msgid ""
+"The image shown in the list view is a square. To have your image shown fully "
+"in the list view, you need to use a square image."
+msgstr ""
+"L'immagine mostrata nella visualizzazione elenco è un quadrato. Per "
+"visualizzare l'immagine nella sua interezza nella visualizzazione elenco, è "
+"necessario utilizzare un'immagine quadrata."
+
+msgid "Complete"
+msgstr "Completato"
+
+msgid "No exports available."
+msgstr "Nessuna esportazione disponibile."
+
+msgid "Upload"
+msgstr "Carica"
+
+msgid "Just Uploaded"
+msgstr "Appena caricato"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Extension"
+msgstr "Estensione"
+
+msgid "Upload Date"
+msgstr "Data di caricamento"
+
+#, fuzzy
+msgid "All Files"
+msgstr "Tutti gli articoli"
+
+msgid "No files uploaded yet"
+msgstr "Nessun file caricato"
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr "Stai cercando di aprire una pagina per la quale non sei autorizzato."
+
+msgid "Please follow this link to login with a different user."
+msgstr "Segui questo collegamento per accedere con un altro utente."
+
+msgid "Please follow this link to login."
+msgstr "Segui questo collegamento per accedere."
+
+msgid "No forms defined yet."
+msgstr "Nessun modulo ancora definito."
+
+msgid ""
+"To edit the image descriptions, click on one, enter your descrption and "
+"press return. To abort press escape."
+msgstr ""
+"Per modificare le descrizioni delle immagini, fai clic su una di esse, "
+"inserisci la descrizione e premi Invio. Per interrompere premere Esc."
+
+msgid "No images uploaded yet"
+msgstr "Nessuna immagine caricata"
+
+msgid "This album does not contain any images yet."
+msgstr "Questo album non contiene ancora nessuna immagine."
+
+msgid "No photo albums defined yet."
+msgstr "Nessun album fotografico ancora definito."
+
+msgid "Search"
+msgstr "Cerca"
+
+#, fuzzy
+msgid "Skip navigation"
+msgstr "Migrazione dei link"
+
+msgid "Back to the homepage"
+msgstr "Torna alla pagina principale"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
+
+msgid "Copied to Clipboard!"
+msgstr "Copiato negli appunti!"
+
+msgid "Don't have an account yet?"
+msgstr "Non hai ancora un account?"
+
+msgid "Register now"
+msgstr "Iscriviti subito"
+
+msgid "Forgot your password?"
+msgstr "Hai dimenticato la password?"
+
+msgid "Reset password"
+msgstr "Reimposta la password"
+
+msgid "Alternatives"
+msgstr "Alternative"
+
+msgid "You are here"
+msgstr "Ti trovi qui"
+
+msgid "Privacy Protection"
+msgstr "Tutela della privacy"
+
+msgid "Login"
+msgstr "Accedi"
+
+msgid "About"
+msgstr "Chi Siamo"
+
+#, fuzzy
+msgid "Contact"
+msgstr "Contatti"
+
+msgid "more"
+msgstr "più"
+
+msgid "Opening Hours"
+msgstr "Orari di Apertura"
+
+#, fuzzy
+msgid "Partner"
+msgstr "Visualizzazione dei partner"
+
+msgid "Submit"
+msgstr "Invia"
+
+msgid "Drop files to upload"
+msgstr "Trascina e rilascia il file da caricare"
+
+msgid "read more"
+msgstr "leggere di più"
+
+msgid "Latest news"
+msgstr "Ultime notizie"
+
+msgid "All articles"
+msgstr "Tutti gli articoli"
+
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
+
+msgid "This site is private"
+msgstr "Questo sito è privato"
+
+msgid "This site is secret"
+msgstr "Questo sito è segreto"
+
+msgid "This site is not published."
+msgstr "Questo sito non è pubblicato."
+
+msgid "This site is not public."
+msgstr "Questo sito non è pubblico."
+
+msgid ""
+"This site contains no lead. Leads are used for lists and search results."
+msgstr ""
+"Questo sito non contiene estratti. Per gli elenchi e i risultati di ricerca "
+"vengono utilizzati gli estratti."
+
+msgid "Map"
+msgstr "Mappa"
+
+msgid "Total Amount"
+msgstr "Importo totale"
+
+msgid "Change request"
+msgstr "Richiesta di modifica"
+
+msgid "New Entry"
+msgstr "Nuovo elemento"
+
+msgid "Open"
+msgstr "Aperto"
+
+msgid "Pending"
+msgstr "In attesa"
+
+msgid "Closed"
+msgstr "Chiuso"
+
+#, fuzzy
+msgid "Archived"
+msgstr "Fare Archivio"
+
+msgid "Paid"
+msgstr "Pagato"
+
+msgid "Failed"
+msgstr "Fallito"
+
+msgid "Refunded"
+msgstr "Rimborsato"
+
+msgid "Manual"
+msgstr "Manuale"
+
+msgid "Ticket"
+msgstr "Biglietto"
+
+msgid "Previous Page"
+msgstr "Pagina precedente"
+
+msgid "You're on page"
+msgstr "Sei sulla pagina"
+
+msgid "Next Page"
+msgstr "Pagina successiva"
+
+msgid ""
+"Persons living outside the following zipcodes may only reserve this "
+"allocation on the ${date}: ${zipcodes}"
+msgstr ""
+"Le persone che vivono al di fuori dei seguenti codici postali possono "
+"prenotare questa allocazione solo il ${date}: ${zipcodes}"
+
+msgid "Quota"
+msgstr "Quota"
+
+msgid "State"
+msgstr "Stato"
+
+msgid "Initiated"
+msgstr "Avviato"
+
+msgid "Submitted"
+msgstr "Inviato"
+
+msgid "Withdrawn"
+msgstr "Ritirato"
+
+msgid "Submitter"
+msgstr "Mittente"
+
+msgid "Title"
+msgstr "Titolo"
+
+msgid "Description"
+msgstr "Descrizione"
+
+msgid "List Preview"
+msgstr "Anteprima elenco"
+
+msgid "Image"
+msgstr "Immagine"
+
+msgid "Additional Information"
+msgstr "Informazioni aggiuntive"
+
+#, fuzzy
+msgid "Location"
+msgstr "Conferma"
+
+msgid "Price"
+msgstr "Prezzo"
+
+msgid "Organizer"
+msgstr "Organizzatore"
+
+msgid "Organizer E-Mail"
+msgstr "E-mail dell'organizzatore"
+
+msgid "Tags"
+msgstr "Tag"
+
+msgid "Date and time"
+msgstr "Data e ora"
+
+msgid "Recurrence"
+msgstr "Ricorrenza"
+
+#, fuzzy
+msgid "All dates"
+msgstr "Tutti gli articoli"
+
+msgid "No events found."
+msgstr "Nessun evento trovato."
+
+msgid "From"
+msgstr "Dalle"
+
+msgid "To"
+msgstr "A"
+
+msgid "Filter by date"
+msgstr "Filtro per data"
+
+msgid "Administrator"
+msgstr "Amministratore"
+
+msgid "Administrators"
+msgstr "Amministratori"
+
+msgid "Editors"
+msgstr "Redattori"
+
+msgid "Members"
+msgstr "Membri"
+
+msgid "Close (Esc)"
+msgstr "Chiudi (Esc)"
+
+msgid "Share"
+msgstr "Condividi"
+
+msgid "Toggle fullscreen"
+msgstr "Attiva/disattiva schermo intero"
+
+msgid "Zoom in/out"
+msgstr "Ingrandisci/riduci"
+
+msgid ""
+"This space holds images from your photo-albums. To show photos add a few "
+"photos to an album and mark it as available for the homepage."
+msgstr ""
+"Questo spazio contiene le immagini dei tuoi album fotografici. Per mostrare "
+"le foto, aggiungi alcune foto a un album e contrassegnalo come disponibile "
+"per la home page."
+
+msgid "Digitally signed"
+msgstr "Firmato digitalmente"
+
+msgid "${count} page"
+msgstr "${count} pagina"
+
+msgid "${count} pages"
+msgstr "${count} pagine"
+
+msgid "Further occurrences:"
+msgstr "Ulteriori occorrenze:"
+
+msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time. All information on this page has "
+"been sent to your e-mail address."
+msgstr ""
+"La tua richiesta sarà elaborata a breve. Puoi tornare a questa pagina in "
+"qualsiasi momento per visualizzare lo stato del processo. Tutte le "
+"informazioni su questa pagina sono state inviate al tuo indirizzo e-mail."
+
+msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time."
+msgstr ""
+"La tua richiesta sarà elaborata a breve. Puoi tornare a questa pagina in "
+"qualsiasi momento per visualizzare lo stato del processo."
+
+msgid ""
+"Your request has been completed. If you asked for documents to be sent to "
+"your address, they should arrive shortly. If you asked to pick up documents "
+"at the municipality, the are now ready to be picked up."
+msgstr ""
+"La tua richiesta è stata completata. Se hai chiesto di inviare i documenti "
+"al tuo indirizzo, dovrebbero arrivare a breve. Se hai chiesto di ritirare i "
+"documenti presso il comune, ora sono pronti per essere ritirati."
+
+msgid "Privacy"
+msgstr "Privacy"
+
+msgid "Send me my entered data by e-mail."
+msgstr "Inviami i dati inseriti tramite e-mail."
+
+msgid "Payment"
+msgstr "Pagamento"
+
+msgid "Pay Online Now"
+msgstr "Paga ora online"
+
+msgid "Credit Card Fee"
+msgstr "Commissione sulla carta di credito"
+
+msgid "Pay Offline later"
+msgstr "Paga offline successivamente"
+
+msgid "at ${time}"
+msgstr "alle ${time}"
+
+msgid "Object"
+msgstr "Oggetto"
+
+msgid "Net Amount"
+msgstr "Importo netto"
+
+msgid "Fee"
+msgstr "Tariffa"
+
+msgid "Created"
+msgstr "Creato"
+
+msgid "Disbursed"
+msgstr "Erogato"
+
+msgid "Digital Signature"
+msgstr "Firma digitale"
+
+msgid "Access"
+msgstr "Accesso"
+
+msgid "Public"
+msgstr "Pubblico"
+
+msgid "Private"
+msgstr "Privata"
+
+msgid "Will be published on:"
+msgstr "Verrà pubblicato il:"
+
+msgid "Publication date:"
+msgstr "Data di pubblicazione:"
+
+msgid "Reset"
+msgstr "Ripristina"
+
+msgid "Not a publication"
+msgstr "Non una pubblicazione"
+
+#, fuzzy
+msgid "Content"
+msgstr "Contatti"
+
+msgid "1 page"
+msgstr "1 pagina"
+
+msgid "Contains no readable text"
+msgstr "Non contiene testo leggibile"
+
+msgid "1 word"
+msgstr "1 parola"
+
+msgid "${count} words"
+msgstr "${count} parole"
+
+msgid "Do you really want to delete this file?"
+msgstr "Vuoi davvero eliminare questo file?"
+
+msgid "Delete File"
+msgstr "Elimina file"
+
+msgid "Please provide the new name for the file"
+msgstr "Indica il nuovo nome del file"
+
+msgid "Rename"
+msgstr "Rinomina"
+
+msgid "Digitally signed by ${signee} on ${date}"
+msgstr "Firmato digitalmente da ${signee} il ${date}"
+
+msgid "Please enter your yubikey to digitally sign this file"
+msgstr "Inserisci il tuo yubikey per firmare digitalmente questo file"
+
+msgid "Sign"
+msgstr "Firma"
+
+msgid "Plug your YubiKey into a USB slot and press it."
+msgstr "Collega il dispositivo YubiKey a una porta USB e premi."
+
+msgid ""
+"Published and digitally signed documents can be discovered through the site-"
+"search and in the list of digitally signed documents. This action will be "
+"logged and cannot be undone."
+msgstr ""
+"I documenti pubblicati e firmati digitalmente possono essere individuati "
+"tramite la ricerca nel sito e nell'elenco dei documenti firmati "
+"digitalmente. Questa operazione verrà registrata e non può essere annullata."
+
+msgid "Unsigned"
+msgstr "Non firmato"
+
+msgid "Sign now"
+msgstr "Firma ora"
+
+#, fuzzy
+msgid "You are not authorised to digitally sign documents"
+msgstr "Inserisci il tuo yubikey per firmare digitalmente questo file"
+
+msgid "Click to add a description"
+msgstr "Clicca per aggiungere una descrizione"
+
+msgid "Do you really want to delete the image?"
+msgstr "Vuoi davvero eliminare l'immagine?"
+
+msgid "Delete Image"
+msgstr "Elimina immagine"
+
+msgid "${name} was digitally signed on ${date}"
+msgstr "${name} è stato firmato digitalmente il ${date}"
+
+msgid "${name} is not in our database"
+msgstr "${name} non è contenuto nel nostro database"
+
+msgid "Accept"
+msgstr "Accetta"
+
+msgid "Focus"
+msgstr "Messa a fuoco"
+
+msgid "Available options for the focus widget:"
+msgstr "Opzioni disponibili per il widget di messa a fuoco:"
+
+msgid "Copy to clipboard"
+msgstr "Copia negli appunti"
+
+msgid "Hello!"
+msgstr "Ciao!"
+
+msgid "Your e-mail address was just used to create an account on ${homepage}."
+msgstr ""
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
+"${homepage}."
+
+msgid "To activate your account, click confirm below:"
+msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
+
+#, fuzzy
+msgid "Confirm my account"
+msgstr "Conferma"
+
+msgid ""
+"If you believe this is an error, ignore this message and we'll never bother "
+"you again."
+msgstr ""
+"Se ritieni che si tratti di un errore, ignora questo messaggio e non ti "
+"disturberemo mai più."
+
+msgid "Hello"
+msgstr "Ciao"
+
+msgid ""
+"You are recieving this mail because you subscribed to the following "
+"newsletter:"
+msgstr "Ricevi questa mail perché sei iscritto alla seguente newsletter:"
+
+msgid "Plese click the following link to confirm your subscription:"
+msgstr "Fai clic sul seguente collegamento per confermare l'iscrizione:"
+
+#, fuzzy
+msgid "Confirm subscription"
+msgstr "Conferma"
+
+msgid ""
+"If you did not subscribe to this newsletter you can simply ignore this e-"
+"mail."
+msgstr ""
+"Se non ti sei iscritto a questa newsletter puoi semplicemente ignorare "
+"questa e-mail."
+
+msgid "Good morning,"
+msgstr "Buongiorno,"
+
+msgid "The following reservations are scheduled for today."
+msgstr "Per oggi sono previste le seguenti prenotazioni."
+
+msgid "Whole day"
+msgstr "Giorno intero"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "No reservations today."
+msgstr "Nessuna prenotazione oggi."
+
+msgid "Have a great day!"
+msgstr "Ti auguro una buona giornata!"
+
+msgid ""
+"This is the daily reservation overview for ${organisation}. If you no longer "
+"want to receive this e-mail please contact an administrator so they can "
+"remove you from the recipients list."
+msgstr ""
+"Questa è la panoramica delle prenotazioni giornaliere per ${organisation}. "
+"Se non desideri più ricevere questa e-mail, contatta un amministratore in "
+"modo che possa rimuoverti dall'elenco dei destinatari."
+
+msgid "This is what happend on the ${org} website yesterday:"
+msgstr "Questo è quello che è successo ieri sul sito web di ${org}:"
+
+msgid "This is what happend on the ${org} website over the weekend:"
+msgstr ""
+"Questo è quello che è successo sul sito web ${org} durante il fine settimana:"
+
+msgid "tickets were opened."
+msgstr "biglietti sono stati aperti."
+
+msgid "ticket was opened."
+msgstr "biglietto è stato aperto."
+
+msgid "tickets were accepted."
+msgstr "biglietti sono stati accettati."
+
+msgid "ticket was accepted."
+msgstr "biglietto è stato accettato."
+
+msgid "tickets were closed."
+msgstr "biglietti sono stati chiusi."
+
+msgid "ticket was closed."
+msgstr "biglietto è stato chiuso."
+
+msgid "There are currently ${currently_open} tickets open and"
+msgstr "Al momento ci sono ${currently_open} biglietti aperti e"
+
+msgid "There is currently ${currently_open} ticket open and"
+msgstr "Al momento c'è ${currently_open} biglietto aperto e"
+
+msgid "tickets are pending."
+msgstr "biglietti sono in sospeso."
+
+msgid "ticket is pending."
+msgstr "biglietto è in sospeso."
+
+msgid "Have a great week!"
+msgstr "Ti auguro una buona settimana!"
+
+msgid ""
+"This is the daily OneGov Cloud status e-mail. If you don't want to receive "
+"this e-mail you may deactivate it by clicking on"
+msgstr ""
+"Questa è l'e-mail di stato quotidiana di OneGov Cloud. Se non vuoi ricevere "
+"questa e-mail puoi disattivarla cliccando su"
+
+msgid "unsubscribe"
+msgstr "annulla l'iscrizione"
+
+msgid "Or by changing the settings in your user profile."
+msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
+
+msgid "Your directory submission has been adopted:"
+msgstr "L'invio della cartella è stato adottato:"
+
+msgid "Check request status"
+msgstr "Controlla lo stato della richiesta"
+
+msgid "Your change request has been applied:"
+msgstr "La richiesta di modifica è stata applicata:"
+
+msgid "Your directory submission has unfortunately been rejected:"
+msgstr "L'invio della cartella è stato rifiutato:"
+
+msgid "Your event has been accepted:"
+msgstr "L'evento è stato accettato:"
+
+msgid "Your event has unfortunately been rejected:"
+msgstr "Purtroppo l'evento è stato rifiutato:"
+
+msgid "The OneGov Cloud Team"
+msgstr "Il team di OneGov Cloud"
+
+msgid "An administrator just created a new account on ${org} for you."
+msgstr "Un amministratore ha appena creato per te un nuovo account su ${org}."
+
+msgid "Your username is ${email}."
+msgstr "Il tuo nome utente è ${email}."
+
+msgid "Click on the following link to set your account password:"
+msgstr "Fai clic sul seguente link per impostare la password dell'account:"
+
+msgid "Set Account Password"
+msgstr "Imposta la password dell'account"
+
+msgid ""
+"If the password link has expired, you can also request a new password here:"
+msgstr ""
+"Se il collegamento della password è scaduto, puoi richiedere una nuova "
+"password qui:"
+
+msgid "To use your account you need the Yubikey with the serial ${number}"
+msgstr ""
+"Per utilizzare il tuo account hai bisogno di Yubikey con il seriale ${number}"
+
+msgid ""
+"You are receiving this e-mail because you signed up for the ${org} "
+"newsletter."
+msgstr ""
+"Ricevi questa e-mail perché ti sei registrato alla newsletter di ${org}."
+
+msgid "Click here to view web version."
+msgstr "Clicca qui per visualizzare la versione web."
+
+msgid "Click here to unsubscribe."
+msgstr "Clicca qui per annullare l'iscrizione."
+
+msgid "Click the following link to set a new password:"
+msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr "Se desideri modificare la password, ignora questa e-mail."
+
+msgid "Your request has received a payment."
+msgstr "La tua richiesta ha ricevuto un pagamento."
+
+msgid "Your request was marked as unpaid."
+msgstr "La tua richiesta è stata contrassegnata come non pagata."
+
+msgid ""
+"Your request's payment has been refunded. Note that it might take a few days "
+"until your refunded amount is shown on your credit card bill."
+msgstr ""
+"Il pagamento della tua richiesta è stato rimborsato. Tieni presente che "
+"potrebbero essere necessari alcuni giorni prima che l'importo rimborsato "
+"venga visualizzato sull'estratto conto della carta di credito."
+
+msgid "Amount:"
+msgstr "Importo:"
+
+msgid "Your registration for \"${title}\" has been confirmed."
+msgstr "La tua registrazione per \"${title}\" è stata confermata."
+
+msgid "Your registration for \"${title}\" has been denied."
+msgstr "La tua registrazione per \"${title}\" è stata rifiutata."
+
+msgid "Your registration for \"${title}\" has been cancelled."
+msgstr "La tua registrazione per \"${title}\" è stata annullata."
+
+msgid "Registration"
+msgstr "Registrazione"
+
+msgid "Registration Window"
+msgstr "Finestra di registrazione"
+
+msgid "The ticket number is"
+msgstr "Il numero del biglietto è"
+
+msgid "The following reservations have been accepted:"
+msgstr "Sono state accettate le seguenti prenotazioni:"
+
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
+
+msgid "A message has been sent regarding ${ref}:"
+msgstr "È stato inviato un messaggio relativo a ${ref}:"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Per favore ${link} per rispondere."
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request status page"
+msgstr "visita la pagina di richiesta dello stato"
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "visita la pagina di richiesta"
+
+msgid "Your request has been closed."
+msgstr "La richiesta è stata chiusa."
+
+msgid "Your requests's timeline has been archived for future reference:"
+msgstr ""
+"La cronologia delle richieste è stata archiviata per riferimento futuro:"
+
+msgid "Request Timeline"
+msgstr "Cronologia delle richieste"
+
+msgid "Thank you for your request."
+msgstr "Ti ringraziamo per la tua richiesta."
+
+msgid "Your request has been registered with the following reference:"
+msgstr "La tua richiesta è stata registrata con il seguente riferimento:"
+
+msgid ""
+"We will send another e-mail once your ticket has been completed. In the "
+"meantime you can check the status of your ticket at any time:"
+msgstr ""
+"Ti invieremo un'altra e-mail una volta che il tuo biglietto sarà stato "
+"completato. Nel frattempo puoi controllare in qualsiasi momento lo stato del "
+"tuo biglietto:"
+
+msgid "Your request has been reopened"
+msgstr "La tua richiesta è stata riaperta"
+
+msgid "Directory entry adopted."
+msgstr "Elemento della cartella adottato."
+
+msgid "Change request applied."
+msgstr "Richiesta di modifica applicata."
+
+msgid "Directory entry rejected."
+msgstr "Elemento della cartella rifiutato."
+
+#. Canonical text for ${event} is: "Event"
+msgid "${event} published."
+msgstr "${event} pubblicato."
+
+#. Used in sentence: "${event} published."
+#. Used in sentence: "${event} deleted."
+#. Used in sentence: "${event} withdrawn."
+msgid "Event"
+msgstr "Evento"
+
+#. Canonical text for ${event} is: "Event"
+msgid "${event} deleted."
+msgstr "${event} eliminato."
+
+#. Canonical text for ${event} is: "Event"
+msgid "${event} withdrawn."
+msgstr "${event} ritirato."
+
+msgid "File signed."
+msgstr "File firmato."
+
+msgid "Signed file removed."
+msgstr "File firmato rimosso."
+
+msgid "${amount} marked as paid."
+msgstr "${amount} contrassegnato come pagato."
+
+msgid "${amount} marked as unpaid."
+msgstr "${amount} contrassegnato come non pagato."
+
+msgid "${amount} captured."
+msgstr "${amount} acquisito."
+
+msgid "${amount} refunded."
+msgstr "${amount} rimborsato."
+
+msgid "1 reservation accepted."
+msgstr "1 prenotazione accettata."
+
+msgid "${count} reservations accepted."
+msgstr "${count} prenotazioni accettate."
+
+msgid "1 reservation rejected."
+msgstr "1 prenotazione rifiutata."
+
+msgid "${count} reservations rejected."
+msgstr "${count} prenotazioni rifiutate."
+
+msgid "Registration confirmed."
+msgstr "Iscrizione confermata."
+
+msgid "Registration denied."
+msgstr "Iscrizione negata."
+
+msgid "Registration cancelled."
+msgstr "Registrazione annullata."
+
+msgid "Ticket opened."
+msgstr "Biglietto aperto."
+
+msgid "Ticket accepted."
+msgstr "Biglietto accettato."
+
+msgid "Ticket closed."
+msgstr "Biglietto chiuso."
+
+msgid "Ticket reopened."
+msgstr "Biglietto riaperto."
+
+msgid "Ticket e-mails disabled."
+msgstr "E-mail dei biglietti disabilitate."
+
+msgid "Ticket e-mails enabled."
+msgstr "E-mail dei biglietti abilitate."
+
+msgid "Payment amount changed."
+msgstr "Importo del pagamento modificato."
+
+msgid "Ticket archived."
+msgstr "Biglietto archiviato."
+
+msgid "Ticket recovered from archive."
+msgstr "Biglietto recuperato dall'archivio."
+
+msgid "Your search returned no results."
+msgstr "La tua ricerca non ha restituito alcun risultato."
+
+msgid "Hashtags"
+msgstr "Hashtags"
+
+msgid "Years"
+msgstr "Anni"
+
+msgid "Newsletter Subscription"
+msgstr "Abbonamento alla newsletter"
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Al momento ci sono ${count} destinatari registrati."
+
+#, fuzzy
+msgid "Archive"
+msgstr "Fare Archivio"
+
+msgid "No newsletters yet."
+msgstr "Ancora nessuna newsletter."
+
+msgid "Not yet sent."
+msgstr "Non ancora inviato."
+
+msgid ""
+"The user ${username} was created successfully. Please write down the user's "
+"password, as it won't be shown to you again:"
+msgstr ""
+"L'utente ${username} è stato creato correttamente. Annota la password "
+"dell'utente, poiché non ti verrà più mostrata:"
+
+msgid "Password:"
+msgstr "Password:"
+
+msgid ""
+"The user ${username} was created successfully. An e-mail has been sent to "
+"the user with login instructions."
+msgstr ""
+"L'utente ${username} è stato creato correttamente. Una e-mail con le "
+"istruzioni per l'accesso è stata inviata all'utente."
+
+msgid "Back to usermanagement"
+msgstr "Torna alla gestione degli utenti"
+
+msgid ""
+"Sorry, the page you are looking for could not be found. Try checking the URL "
+"for errors or use the search box on the top."
+msgstr ""
+"Spiacenti, la pagina che stai cercando non è stata trovata. Prova a "
+"controllare l'URL per eventuali errori o utilizza la casella di ricerca in "
+"alto."
+
+msgid "Export this event"
+msgstr "Esporta questo evento"
+
+msgid "Export all occurrences of this event"
+msgstr "Esporta tutte le occorrenze di questo evento"
+
+msgid "All occurrences of this event"
+msgstr "Tutte le occorrenze di questo evento"
+
+msgid "Origin"
+msgstr "Origine"
+
+msgid "This is an imported event"
+msgstr "Questo è un evento importato"
+
+msgid "Tag"
+msgstr "Tag"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Export these events"
+msgstr "Esporta questi eventi"
+
+msgid "Submit your event"
+msgstr "Invia il tuo evento"
+
+msgid "Submit your own event"
+msgstr "Invia il tuo evento"
+
+msgid "No payment providers defined."
+msgstr "Nessun fornitore di servizi di pagamento definito."
+
+msgid "Connected:"
+msgstr "Connesso:"
+
+msgid "Fee:"
+msgstr "Imposta:"
+
+msgid "No payments yet."
+msgstr "Nessun pagamento ancora."
+
+msgid "No people added yet."
+msgstr "Nessuna persona aggiunta ancora."
+
+msgid "Export a vCard of this person"
+msgstr "Esporta una vCard di questa persona"
+
+msgid "No publications"
+msgstr "Nessuna pubblicazione"
+
+#, fuzzy
+msgid "Information"
+msgstr "Conferma"
+
+msgid ""
+"You can search through the content of all listed files by using the search "
+"on the top right."
+msgstr ""
+"Puoi cercare all'interno del contenuto di tutti i file elencati utilizzando "
+"la ricerca in alto a destra."
+
+msgid ""
+"All files have been digitally signed. The digital signature of a downloaded "
+"file can be viewed in Adobe Acrobat Reader or by dragging an already "
+"downloaded file into the field below:"
+msgstr ""
+"Tutti i file sono stati firmati digitalmente. La firma digitale di un file "
+"scaricato può essere visualizzata in Adobe Acrobat Reader oppure trascinando "
+"un file già scaricato nel campo sottostante:"
+
+msgid "Drop files to verify them"
+msgstr "Rilascia i file per verificarli"
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+"Gli abbonati possono sempre annullare l'iscrizione tramite un collegamento "
+"mostrato in fondo alla newsletter. Se annulli qui la loro iscrizione, questi "
+"non riceveranno alcun avviso."
+
+msgid "Unsubscribe"
+msgstr "Annulla iscrizione"
+
+msgid "No dates found, please select dates in the calendar first"
+msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
+
+msgid "Go to calendar"
+msgstr "Vai al calendario"
+
+msgid ""
+"The following link can be used to subscribe to the reservations of this "
+"calendar. It can be used by anyone that knows the link in multiple calendar "
+"applications."
+msgstr ""
+"Il seguente collegamento può essere utilizzato per iscriversi alle "
+"prenotazioni di questo calendario. Può essere utilizzato da chiunque conosca "
+"il collegamento in più applicazioni di calendario."
+
+msgid ""
+"Note that we have no control over how often calendar applications update the "
+"calendars they are subscribed to (if they update at all). Therefore the "
+"information shown in the calendar may be wrong or out of date. Use it at "
+"your own risk."
+msgstr ""
+"Tieni presente che non abbiamo alcun controllo sulla frequenza con cui le "
+"applicazioni di calendario aggiornano i calendari a cui sono iscritte (né "
+"sul fatto che si aggiornino). Pertanto, le informazioni mostrate nel "
+"calendario potrebbero essere errate o non aggiornate. Usale tuo rischio."
+
+msgid "Reservations must be made at least one day in advance."
+msgstr ""
+"Le prenotazioni devono essere effettuate con almeno un giorno di anticipo."
+
+msgid "Reservations must be made at least one hour in advance."
+msgstr ""
+"Le prenotazioni devono essere effettuate con almeno un'ora di anticipo."
+
+msgid "Reservations must be made at least ${n} days in advance."
+msgstr ""
+"Le prenotazioni devono essere effettuate con almeno ${n} giorni di anticipo."
+
+msgid "Reservations must be made at least ${n} hours in advance."
+msgstr ""
+"Le prenotazioni devono essere effettuate con almeno ${n} ore di anticipo."
+
+msgid "Select a free time span in the calendar below to create an allocation."
+msgstr ""
+"Seleziona un periodo di tempo libero nel calendario sottostante per creare "
+"un'allocazione."
+
+msgid "Removes all unreserved allocations between the start and end date."
+msgstr ""
+"Rimuove tutte le allocazioni non riservate tra la data di inizio e di fine."
+
+msgid "Utilised"
+msgstr "Utilizzato"
+
+msgid ""
+"The following recipients receive a daily e-mail sent at 06:00 containing the "
+"reservation data for all reservations of the day."
+msgstr ""
+"I seguenti destinatari ricevono una e-mail giornaliera inviata alle ore 6:00 "
+"contenente i dati di prenotazione per tutte le prenotazioni del giorno."
+
+msgid "No recipients defined yet."
+msgstr "Nessun destinatario ancora definito."
+
+msgid "No reservation resources defined yet."
+msgstr "Nessuna risorsa di prenotazione ancora definita."
+
+msgid ""
+"Searching is currently unavailable due to technical difficulties. Please "
+"excuse the inconvenience and try again later."
+msgstr ""
+"La ricerca non è attualmente disponibile a causa di difficoltà tecniche. Ci "
+"scusiamo dell'inconveniente, riprova più tardi."
+
+msgid "Select the images that should be shown inside this album."
+msgstr ""
+"Seleziona le immagini che dovrebbero essere mostrate all'interno di questo "
+"album."
+
+#, fuzzy
+msgid "Confirm selection"
+msgstr "Conferma"
+
+msgid "This newsletter has not been sent yet."
+msgstr "Questa newsletter non è stata ancora inviata."
+
+msgid "First sent ${time_ago}."
+msgstr "Inviato per la prima volta ${time_ago}."
+
+msgid "This newsletter was sent to ${n} subscribers."
+msgstr "Questa newsletter è stata inviata a ${n} iscritti."
+
+msgid "All subscribers have already received this newsletter."
+msgstr "Tutti gli iscritti hanno già ricevuto questa newsletter."
+
+msgid "The newsletter is scheduled to be sent on ${time}"
+msgstr "L'invio della newsletter è programmato per le ${time}"
+
+msgid "Preview"
+msgstr "Anteprima"
+
+msgid ""
+"Check the email text. You can use the full news text instead of the leading "
+"if you want. You will find this setting in the edit menu of the news item."
+msgstr ""
+"Controlla il testo dell'email. Se lo desideri, puoi utilizzare il testo "
+"completo delle notizie anziché l'estratto. Troverai questa impostazione nel "
+"menu di modifica della notizia."
+
+msgid "Delivery"
+msgstr "Distribuzione"
+
+msgid "The newsletter was already sent to the following addresses:"
+msgstr "La newsletter è già stata inviata ai seguenti indirizzi:"
+
+msgid ""
+"A signup link allows anyone to sign up with a specific role. Those signups "
+"are limited by time and count but they still present a security risk. Be "
+"sure to only share this link with people you trust."
+msgstr ""
+"Un collegamento di registrazione consente a chiunque di iscriversi con un "
+"ruolo specifico. Queste registrazioni sono limitate nel tempo e nel numero, "
+"ma presentano comunque un rischio per la sicurezza. Assicurati di "
+"condividere questo collegamento solo con persone di cui ti fidi."
+
+msgid ""
+"Your signup link has been created as follows. Please copy it before "
+"continuing, it won't be shown to you again:"
+msgstr ""
+"Il tuo collegamento di registrazione è stato creato come segue. Copialo "
+"prima di proseguire, non ti verrà più mostrato:"
+
+msgid ""
+"The record behind this ticket was removed. The following information is a "
+"snapshot kept for future reference."
+msgstr ""
+"Il record su cui è basato questo biglietto è stato rimosso. Le seguenti "
+"informazioni sono un'istantanea conservata per riferimento futuro."
+
+msgid "No activities yet."
+msgstr "Ancora nessuna attività."
+
+msgid "Ticket updates by e-mail"
+msgstr "Il biglietto si aggiorna tramite e-mail"
+
+msgid "Disable E-Mails"
+msgstr "Disabilita i messaggi e-mail"
+
+msgid "No ticket updates by e-mail"
+msgstr "Nessun aggiornamento dei biglietti tramite e-mail"
+
+msgid "Enable E-Mails"
+msgstr "Abilita i messaggi e-mail"
+
+msgid "E-Mails can not be sent for tickets of imported events"
+msgstr "Non è possibile inviare e-mail per biglietti di eventi importati"
+
+msgid "Send Message"
+msgstr "Invia messaggio"
+
+msgid "Messages cannot be sent when the ticket is closed"
+msgstr "I messaggi non possono essere inviati quando il biglietto è chiuso"
+
+msgid "Please reopen the ticket to send a message"
+msgstr "Riapri il biglietto per inviare un messaggio"
+
+msgid "Messages cannot be sent for imported events"
+msgstr "Non è possibile inviare messaggi per eventi importati"
+
+msgid "${count} received"
+msgstr "${count} ricevuti"
+
+msgid "${count} sent"
+msgstr "${count} inviati"
+
+msgid "${count} note"
+msgstr "${count} nota"
+
+msgid "${count} notes"
+msgstr "${count} note"
+
+msgid "Amount"
+msgstr "Importo"
+
+msgid "Source"
+msgstr "Fonte"
+
+msgid "Group"
+msgstr "Gruppo"
+
+msgid "Owner"
+msgstr "Proprietario"
+
+msgid "Reaction Time"
+msgstr "Tempo di reazione"
+
+msgid "Process Time"
+msgstr "Tempo di elaborazione"
+
+msgid "Summary"
+msgstr "Riepilogo"
+
+msgid ""
+"You are editing a note created by someone else. By saving your changes you "
+"will become the author of the whole note."
+msgstr ""
+"Stai modificando una nota creata da qualcun altro. Salvando le modifiche "
+"diventerai l'autore dell'intera nota."
+
+msgid ""
+"Notes are private and only shown to logged-in members. URLs and e-mail "
+"addresses are turned into links."
+msgstr ""
+"Le note sono private e vengono mostrate solo ai membri che hanno effettuato "
+"l'accesso. Gli URL e gli indirizzi e-mail vengono trasformati in "
+"collegamenti."
+
+msgid "Pick-Up"
+msgstr "Prelievo"
+
+msgid "Request Reference"
+msgstr "Riferimento della richiesta"
+
+msgid "Subject"
+msgstr "Oggetto"
+
+msgid "Forgot something or have a special request?"
+msgstr "Hai dimenticato qualcosa o hai una richiesta speciale?"
+
+msgid "Add a message to the ticket."
+msgstr "Aggiungi un messaggio al biglietto."
+
+msgid "New messages have been disabled because the ticket has been closed."
+msgstr ""
+"I nuovi messaggi sono stati disabilitati perché il biglietto è stato chiuso."
+
+msgid "Archive all selected tickets?"
+msgstr "Archiviare tutti i biglietti selezionati?"
+
+msgid "Do Archive"
+msgstr "Fare Archivio"
+
+msgid "Archive selected"
+msgstr "Archivio selezionato"
+
+msgid ""
+"You've reached this site because you are logged in. Visitors are "
+"automatically redirected to the following link:"
+msgstr ""
+"Hai raggiunto questo sito perché sei autenticato. I visitatori vengono "
+"reindirizzati automaticamente al seguente collegamento:"
+
+msgid ""
+"You are not automatically redirected so you have a chance to edit or delete "
+"this link."
+msgstr ""
+"Non vieni reindirizzato automaticamente, quindi hai la possibilità di "
+"modificare o eliminare questo collegamento."
+
+msgid "Active"
+msgstr "Attivo"
+
+msgid "Inactive"
+msgstr "Inattivo"
+
+msgid "Role"
+msgstr "Ruolo"
+
+msgid "local"
+msgstr "locale"
+
+msgid "None"
+msgstr "Nessuno"
+
+msgid "No links found."
+msgstr "Nessun collegamento trovato."
+
+msgid "Select an item to view it"
+msgstr "Seleziona un elemento per visualizzarlo"
+
+msgid "Users"
+msgstr "Utenti"
+
+msgid "Ticket permissions"
+msgstr "Permessi sul biglietto"
+
+msgid "All"
+msgstr "Tutti"
+
+msgid "View"
+msgstr "Visualizza"
+
+msgid "Yubikey"
+msgstr "Yubikey"
+
+msgid "Username"
+msgstr "Nome utente"
+
+msgid "Identicon"
+msgstr "Icona identificativa"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "New Recipient"
+msgstr "Nuovo destinatario"
+
+msgid "Edit Recipient"
+msgstr "Modifica il destinatario"
+
+msgid "Online Counter Label"
+msgstr "Etichetta Banco online"
+
+msgid "Reservations Label"
+msgstr "Etichetta Prenotazioni"
+
+msgid "SBB Daypass Label"
+msgstr "Etichetta Pass giornaliero SBB"
+
+msgid "Publications Label"
+msgstr "Etichetta Pubblicazioni"
+
+msgid "E-Move Label"
+msgstr "Etichetta E-Trasloco"
+
+msgid "E-Move Url"
+msgstr "URL E-Trasloco"
+
+msgid "Hide Publications on Homepage"
+msgstr "Nascondi Pubblicazioni nella pagina iniziale"
+
+msgid "Number of events displayed on homepage"
+msgstr "Numero di eventi visualizzati sulla homepage"
+
+msgid "Number of news entries on homepage"
+msgstr "Numero di voci di notizie sulla homepage"
+
+msgid "Show partners on all pages"
+msgstr "Mostra i partner su tutte le pagine"
+
+msgid "Shows the footer on all pages but for admins"
+msgstr "Mostra il piè di pagina su tutte le pagine ma per gli amministratori"
+
+msgid "Partner display"
+msgstr "Visualizzazione dei partner"
+
+msgid "General"
+msgstr "Generale"
+
+msgid "Favicon"
+msgstr "Favicon"
+
+msgid "Social Media"
+msgstr "Social media"
+
+msgid "Links"
+msgstr "Collegamenti"
+
+msgid "Chat"
+msgstr "Chat"
+
+msgid "Header"
+msgstr "Intestazione"
+
+msgid "Footer"
+msgstr "Piè di pagina"
+
+msgid "Modules"
+msgstr "Moduli"
+
+msgid "Analytics"
+msgstr "Analitica"
+
+msgid "Holidays"
+msgstr "Festività"
+
+msgid "Ticket Settings"
+msgstr "Impostazioni del biglietto"
+
+#, fuzzy
+msgid "Newsletter Settings"
+msgstr "Abbonamento alla newsletter"
+
+msgid "Link Migration"
+msgstr "Migrazione dei link"

@@ -7,6 +7,7 @@ from onegov.core.custom import json
 from onegov.core.directives import HtmlHandleFormAction
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.security import Secret
 from onegov.election_day.forms import EmptyForm
 from webob.exc import HTTPAccepted
 
@@ -19,7 +20,8 @@ class ManageHtmlAction(HtmlAction):
     """
 
     def __init__(self, model, **kwargs):
-        kwargs['permission'] = Private
+        permission = kwargs.get('permission')
+        kwargs['permission'] = Secret if permission == Secret else Private
         super().__init__(model, **kwargs)
 
 
@@ -31,7 +33,8 @@ class ManageFormAction(HtmlHandleFormAction):
     """
 
     def __init__(self, model, **kwargs):
-        kwargs['permission'] = Private
+        permission = kwargs.get('permission')
+        kwargs['permission'] = Secret if permission == Secret else Private
         kwargs['template'] = kwargs.get('template', 'form.pt')
         kwargs['form'] = kwargs.get('form', EmptyForm)
         super().__init__(model, **kwargs)

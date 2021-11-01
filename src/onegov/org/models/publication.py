@@ -17,7 +17,9 @@ class PublicationCollection(GenericCollection):
         return File
 
     def query(self):
-        query = super().query().filter_by(published=True, signed=True).filter(
+        query = super().query().filter(
+            self.model_class.published.is_(True),
+            self.model_class.publication.is_(True),
             text("reference->>'content_type' = :content_type").bindparams(
                 content_type='application/pdf'
             )

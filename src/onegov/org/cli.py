@@ -60,8 +60,11 @@ cli = command_group()
 
 @cli.command(context_settings={'creates_path': True})
 @click.argument('name')
-@click.option('--locale',
-              default='de_CH', type=click.Choice(['de_CH', 'fr_CH']))
+@click.option(
+    '--locale',
+    default='de_CH',
+    type=click.Choice(['de_CH', 'fr_CH', 'it_CH'])
+)
 @pass_group_context
 def add(group_context, name, locale):
     """ Adds an org with the given name to the database. For example:
@@ -94,7 +97,7 @@ def delete(group_context):
 
     def delete_org(request, app):
 
-        org = app.org.title
+        org = getattr(app.org, 'title', 'this organisation')
         confirmation = "Do you really want to DELETE {}?".format(org)
 
         if not click.confirm(confirmation):
@@ -1391,3 +1394,23 @@ def migrate_links_cli(group_context, old_uri, dry_run):
             click.secho('Nothing found')
 
     return execute
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@pass_group_context
+@click.option('--dry-run', is_flag=True, default=False)
+def migrate_publications(group_context, dry_run):
+    """ Marks signed files for publication. """
+
+    def mark_as_published(request, app):
+        session = request.session
+        files = session.query(File).filter_by(signed=True).all()
+        for file in files:
+            file.publication = True
+        if files:
+            click.echo(
+                f'{session.info["schema"]}: '
+                f'Marked {len(files)} signed files for publication'
+            )
+
+    return mark_as_published

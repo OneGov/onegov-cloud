@@ -393,6 +393,7 @@ def test_email_notification_election(election_day_app, session):
 
         principal = election_day_app.principal
         principal.email_notification = True
+        principal.reply_to = 'reply-to@example.org'
         election_day_app.cache.set('principal', principal)
 
         session.add(
@@ -460,7 +461,7 @@ def test_email_notification_election(election_day_app, session):
             ('rm@examp.le',)
         ]
         assert set([call[2]['reply_to'] for call in mock.mock_calls]) == {
-            'Kanton Govikon <mails@govikon.ch>'
+            'Kanton Govikon <reply-to@example.org>'
         }
         assert set([
             call[2]['headers']['List-Unsubscribe-Post']
@@ -678,6 +679,7 @@ def test_sms_notification(request, election_day_app, session):
 
         principal = election_day_app.principal
         principal.sms_notification = 'https://wab.ch.ch'
+        # use the default reply_to
         election_day_app.cache.set('principal', principal)
 
         session.add(

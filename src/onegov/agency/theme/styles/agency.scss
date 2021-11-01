@@ -122,32 +122,17 @@ ul.agency-nav {
         margin-left: 1rem;
     }
 
-    table.memberships {
-        margin-left: 1rem;
-
-        tr {
-            background: $white;
-        }
-
-        td {
-            border: 0;
-        }
+    .memberships {
+        margin-bottom: 1rem;
+        margin-left: 2.4rem;
     }
 
     .person {
 
         padding: .25rem;
 
-        a {
-            &::before {
-                @include icon($person-icon);
-                color: $anchor-font-color;
-                margin-right: .25rem;
-            }
-
-            &:hover {
-                color: $anchor-font-color-hover;
-            }
+        a:hover {
+            color: $anchor-font-color-hover;
         }
     }
 
@@ -192,7 +177,7 @@ ul.agency-nav {
 }
 
 /*
-    breadcrumbs
+    Breadcrumbs
 */
 
 .breadcrumbs {

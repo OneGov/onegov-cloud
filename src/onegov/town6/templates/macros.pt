@@ -261,10 +261,31 @@
 </metal:partners>
 
 <metal:events define-macro="event-item-card">
-    <div class="card" data-equalizer-watch>
-        <div class="card-section">
-            <div><a href="${item.url}"><i class="far fa-calendar-alt"></i>${item.subtitle}</a></div>
-            <div tal:condition="item.location"><a href="${item.url}"><i class="fas fa-map-marker-alt"></i>${item.location}</a></div>
+    <div class="card">
+        <div class="date-place" data-equalizer-watch>
+            <a href="${item.url}">
+                <div class="grid-x">
+                    <div class="cell small-1 medium-2">
+                        <i class="far fa-calendar-alt"></i>
+                    </div>
+                    <div class="cell small-11 medium-10">
+                        ${item.subtitle}
+                    </div>
+                </div>
+            </a>
+            <a tal:condition="item.location" href="${item.url}">
+                <div class="grid-x">
+                    <div class="cell small-1 medium-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="cell small-11 medium-10">
+                        ${item.location}
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="card-section" style="display:none;" >
+            ${item.location}
         </div>
         <img class="contained" tal:condition="item.image_url" src="${item.image_url}">
         <div class="image-placeholder card-section contained" tal:condition="not: item.image_url">
@@ -284,12 +305,10 @@
                 <small tal:content="structure all_events_link(layout)" />
             </h3>
         </div>
-        <div class="cell small-12 large-3 medium-4 event-item" tal:repeat="item event_panel.links">
+        <div class="cell small-12 large-3 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
     </div>
-
-
 </metal:panel>
 
 <metal:card define-macro="directory-card">
@@ -396,9 +415,11 @@
     <div tal:define="show_title show_title|nothing">
         <h3 i18n:translate class="${'' if show_title else 'show-for-sr'}">Selected Topics</h3>
         <div class="grid-x grid-padding-x" data-equalizer data-equalize-on="medium">
-            <div class="cell small-12 medium-6 large-4 homepage-tile" tal:repeat="item tiles">
-                <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
-            </div>
+            <tal:block tal:repeat="item tiles">
+                <div class="cell small-12 medium-6 large-4 homepage-tile" tal:condition="item.links">
+                    <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
+                </div>
+            </tal:block>    
         </div>
     </div>
 </metal:homepage-tiles>
@@ -743,7 +764,7 @@
                 </a>
             </li>
             <li tal:condition="person.function" class="person-card-function">
-                <em>${person.function}</em>
+                ${person.function}
             </li>
             <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                 <a href="mailto:${person.email}">${person.email}</a>
@@ -1710,51 +1731,76 @@
             </div>
         </tal:b>
 
-            <h3 i18n:translate tal:condition="not: hide_publication|False">Publication</h3>
-            <div class="publication" tal:define="
-                post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
-                publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
-            " tal:condition="not: hide_publication|False">
-                <div tal:condition="file.published" class="file-status-tag">
-                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                       class="is-published">
-                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
-                    </a>
+            <tal:block tal:condition="not: hide_publication|False">
+
+                <h3 i18n:translate>Access</h3>
+                <div class="publication" tal:define="
+                    post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+                    publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);"
+                    >
+                    <div tal:condition="file.published" class="file-status-tag">
+                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
+                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           class="is-published">
+                            <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
+                        </a>
+                    </div>
+                    <div tal:condition="not:file.published" class="file-status-tag">
+                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
+                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           class="is-not-published">
+                            <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
+                        </a>
+                    </div>
+
+                    <div class="publication-settings ${publish_date and 'publication-date-set' or 'publication-date-not-set'}" tal:condition="not:file.published">
+                        <form method="POST">
+                            <fieldset>
+                                <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
+                                <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
+
+                                <div class="publication-settings-input">
+                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
+
+                                    <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                        <option tal:condition="not:publish_date"></option>
+                                        <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
+                                            <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
+                                        </tal:b>
+                                    </select>
+
+                                    <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                        <i class="far fa-times-circle"></i>
+                                        <span class="show-for-sr" i18n:translate>Reset</span>
+                                    </a>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
                 </div>
-                <div tal:condition="not:file.published" class="file-status-tag">
-                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                       class="is-not-published">
-                        <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
-                    </a>
+
+                <h3 i18n:translate>Publication</h3>
+                <div class="publication" tal:define="
+                    post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+                    publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);"
+                    >
+                    <div tal:condition="file.publication" class="file-status-tag">
+                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
+                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           class="is-a-publication">
+                            <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
+                        </a>
+                    </div>
+                    <div tal:condition="not:file.publication" class="file-status-tag">
+                        <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
+                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           class="is-not-a-publication">
+                            <i class="far fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
+                        </a>
+                    </div>
                 </div>
 
-            <div class="publication-settings ${publish_date and 'publication-date-set' or 'publication-date-not-set'}" tal:condition="not:file.published">
-                <form method="POST">
-                    <fieldset>
-                        <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
-                        <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
-
-                        <div class="publication-settings-input">
-                            <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
-
-                            <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                <option tal:condition="not:publish_date"></option>
-                                <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
-                                    <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
-                                </tal:b>
-                            </select>
-
-                            <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                <i class="far fa-times-circle"></i>
-                                <span class="show-for-sr" i18n:translate>Reset</span>
-                            </a>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
-        </div>
+            </tal:block>
 
         <tal:b condition="file.reference['content_type'] == 'application/pdf'">
             <h3 i18n:translate>Content</h3>
@@ -1909,7 +1955,7 @@
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}" data-toggle="#details-${file_number}" class="untoggled">
+                <a id="button-${file_number}">
                     <i class="fa fa-chevron-down" aria-hidden="true"></i>
                 </a>
             </td>
@@ -1920,7 +1966,7 @@
                 ${format_date(file_upload)}
             </td>
         </tr>
-        <tr id="details-${file_number}" style="display: none;">
+        <tr id="details-${file_number}">
             <td colspan="4">
                 <div ic-trigger-from="#button-${file_number}"
                      ic-trigger-on="click once"
@@ -1930,7 +1976,7 @@
                 </div>
             </td>
         </tr>
-        <tr style="display: none"></tr> <!--! keeps odd/even shading on track -->
+
     </tal:b>
 </metal:file_info>
 
@@ -2088,7 +2134,9 @@
                 title="..."<br>
                 hide-title=""<br>
                 hide-lead=""<br>
-                hide-text="" /&gt;
+                hide-text="" &gt;<br>
+                &emsp;&lt;text&gt;...&lt;/text&gt;<br>
+                &lt;/focus&gt;
             </code>
         </div>
     </tal:b>

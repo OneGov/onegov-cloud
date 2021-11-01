@@ -19,7 +19,7 @@
 }
 
 .grid-container.full.darkgray {
-    background: $aluminum;
+    background: $light-gray;
 }
 
 article.content .grid-container:last-of-type {
@@ -30,7 +30,7 @@ article.content .grid-container:last-of-type {
 
 article.content .side-panel {
     @include breakpoint(small only) {
-        padding-top: .625rem;
+        padding-top: 4rem;
     }
 }
 
@@ -41,6 +41,26 @@ article.content .side-panel {
 }
 
 .homepage {
+
+    .focus-widget {
+        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .15);
+        height: calc(100% - 2rem);
+        margin-bottom: 2rem;
+
+        &> * {
+            padding: 0 1rem;
+        }
+
+        .focus-image {
+            padding: 0;
+            padding-bottom: 1rem;
+        }
+
+        p {
+            margin: 0;
+            padding-bottom: 1rem;
+        }
+    }
 
     .full.primary {
         @include primary-color-background;
@@ -59,10 +79,6 @@ article.content .side-panel {
         &:last-of-type {
             padding-bottom: 0;
         }
-    }
-
-    .focus-image {
-        margin-bottom: .625rem;
     }
 
     .grid-container.full {

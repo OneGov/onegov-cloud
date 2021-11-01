@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-01-14 15:11+0100\n"
+"POT-Creation-Date: 2021-10-25 10:27+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -209,7 +209,7 @@ msgid "Occasion Cost"
 msgstr "Durchführung Kosten"
 
 msgid "Occasion Custom Booking Cost"
-msgstr ""
+msgstr "Durchführung Kosten personalisiert"
 
 msgid "Occasion Meeting Point"
 msgstr "Durchführung Treffpunkt"
@@ -601,8 +601,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "AGB"
 
@@ -613,7 +613,8 @@ msgid "Add a new attendee"
 msgstr "Neuen Teilnehmer erfassen"
 
 msgid "The TOS must be accepted to create a booking."
-msgstr "Die AGB müssen akzeptiert werden, bevor Buchung gemacht werden können."
+msgstr ""
+"Die AGB müssen akzeptiert werden, bevor Buchungen gemacht werden können."
 
 msgid ""
 "Your userprofile is not complete. It needs to be complete before signing up "
@@ -1875,11 +1876,14 @@ msgstr "Pro Juventute Logo"
 msgid "Feriennet Partner"
 msgstr "Feriennet Partner"
 
-msgid "Best of Swiss Web Award 2019"
+msgid "Privacy Protection"
 msgstr ""
 
+msgid "Best of Swiss Web Award 2019"
+msgstr "Best of Swiss Web Award 2019"
+
 msgid "OneGov.ch Award"
-msgstr ""
+msgstr "OneGov.ch Award"
 
 msgid "Platform"
 msgstr "Plattform"
@@ -2461,6 +2465,11 @@ msgstr "Teilnehmer bearbeiten"
 msgid "Booking Limit of ${name}"
 msgstr "Buchungslimite von ${name}"
 
+msgid "The user account must be opened by a parent or guardian of full age."
+msgstr ""
+"Das Benutzerkonto muss durch eine erziehungsberechtigte, volljährige Person "
+"eröffnet werden."
+
 msgid "Add manual booking"
 msgstr "Manuelle Buchung hinzufügen"
 
@@ -2543,6 +2552,7 @@ msgstr "${amount} rückerstatten"
 
 msgid "Could not import payments. Check your import data."
 msgstr ""
+"Zahlungen konnten nicht importiert werden. Überprüfen Sie die Import-Daten."
 
 #, python-format
 msgid "Imported ${count} payments"
@@ -2918,11 +2928,17 @@ msgstr "ESR Teilnehmernummer"
 msgid "ESR identification number"
 msgstr "ESR Identifikationsnummer"
 
-msgid "Require the political municipality in the userprofile"
-msgstr "Verlange die politische Gemeinde im Benutzerprofil"
+msgid "QR-Bill (experimental)"
+msgstr "QR-Rechnung (experimentell)"
+
+msgid "Full age required for registration"
+msgstr "Helfer Registration"
 
 msgid "Userprofile"
 msgstr "Benutzerprofil"
+
+msgid "Require the political municipality in the userprofile"
+msgstr "Verlange die politische Gemeinde im Benutzerprofil"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
@@ -2970,6 +2986,31 @@ msgstr "Aktiviert"
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Die ESR Identifikationsnummer muss 3-6 Zeichen lang sein"
 
+msgid "QR-Bills require an IBAN"
+msgstr "QR-Rechnungen erfordern eine IBAN"
+
+msgid "Not a valid IBAN"
+msgstr "Ungültige IBAN"
+
+msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
+msgstr "QR-Rechnungen benötigen eine Schweizer oder Lichteinstein-IBAN"
+
+msgid "This IBAN cannot be used for QR-Bills without ESR"
+msgstr "Diese IBAN kann nicht für QR-Rechnungen ohne ESR verwendet werden"
+
+msgid "This IBAN cannot be used for QR-Bills with ESR"
+msgstr "Diese IBAN kann nicht für QR-Rechnungen mit ESR verwendet werden"
+
+msgid "QR-Bills require a beneficiary"
+msgstr "QR-Rechnungen erfordern einen Begünstigten"
+
+msgid ""
+"QR-Bills require the beneficiary to be in the form: name, street number, "
+"code city"
+msgstr ""
+"QR-Rechnungen erfordern die Angabe des Begünstigten in der Form: Name, "
+"Straße, Code Stadt"
+
 msgid "Feriennet"
 msgstr "Feriennet"
 
@@ -2980,29 +3021,3 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
-
-#~ msgid "Holiday Camp"
-#~ msgstr "Ferienlager"
-
-#~ msgid "The minium age cannot be higher than the maximum age"
-#~ msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"
-
-#~ msgid "An commitment by Rega"
-#~ msgstr "Ein Engagement der Rega"
-
-#~ msgid "Registraion and further information"
-#~ msgstr "Registrierung und weitere Informationen"
-
-#~ msgid "${count} Accepted Bookings per Attendee"
-#~ msgstr "${count} Angenommene Buchungen pro Teilnehmer"
-
-#~ msgid "I know that after confirmation, bills can only be adjusted manually."
-#~ msgstr ""
-#~ "Mir ist bewusst dass Rechnungen nach Abschluss nur noch manuell angepasst "
-#~ "werden können."
-
-#~ msgid "Users with bookings"
-#~ msgstr "Benutzer mit Buchungen"
-
-#~ msgid "Volunteer"
-#~ msgstr "Helfer"

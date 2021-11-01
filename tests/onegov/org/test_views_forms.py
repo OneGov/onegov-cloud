@@ -97,7 +97,7 @@ def test_submit_form(client):
         First name * = ___
         Last name * = ___
         E-Mail * = @@@
-    """), type='custom')
+    """), type='custom', pick_up='pickup test message')
 
     transaction.commit()
 
@@ -129,6 +129,7 @@ def test_submit_form(client):
     # make sure a ticket has been created
     assert 'FRM-' in ticket_page
     assert 'ticket-state-open' in ticket_page
+    assert 'pickup test message' in ticket_page
 
     tickets = TicketCollection(client.app.session()).by_handler_code('FRM')
     assert len(tickets) == 1

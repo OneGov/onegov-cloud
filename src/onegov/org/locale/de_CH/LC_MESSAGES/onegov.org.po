@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-08-17 16:10+0200\n"
+"POT-Creation-Date: 2021-10-27 15:26+0200\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -21,6 +21,9 @@ msgstr "In Bearbeitung"
 
 msgid "Closed"
 msgstr "Abgeschlossen"
+
+msgid "Archived"
+msgstr "Archiviert"
 
 msgid "All"
 msgstr "Alle"
@@ -648,6 +651,23 @@ msgstr "Hinzufügen"
 msgid "Remove"
 msgstr "Entfernen"
 
+msgid "Clear"
+msgstr "Löschen"
+
+msgid ""
+"Delete imported events before importing. This does not delete otherwise "
+"imported events and submitted events."
+msgstr ""
+"Löscht importierte Veranstaltungen vor dem Importieren. Anderweitig "
+"importierte Veranstaltungen und gemeldete Veranstaltungen werden dadurch "
+"nicht gelöscht."
+
+msgid "Dry Run"
+msgstr "Probelauf"
+
+msgid "Do not actually import the events."
+msgstr "Die Veranstaltungen werden nicht gespeichert."
+
 msgid "Map"
 msgstr "Karte"
 
@@ -1061,6 +1081,9 @@ msgstr "Deutsch"
 msgid "French"
 msgstr "Französisch"
 
+msgid "Italian"
+msgstr "Italienisch"
+
 msgid "Column width left side"
 msgstr "Breite linke Seite"
 
@@ -1228,6 +1251,15 @@ msgstr "Schriftfarbe"
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
 
+msgid "Announcement"
+msgstr "Ankündigung"
+
+msgid "Announcement bg color"
+msgstr "Hintergrundfarbe der Ankündigung"
+
+msgid "Announcement font color"
+msgstr "Schriftfarbe der Ankündigung"
+
 msgid "Homepage Image #1"
 msgstr "Startseiten Bild #1"
 
@@ -1326,7 +1358,7 @@ msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
-msgstr "Akzeptiere und schliesse Ticket automatisch für diese Kategorien"
+msgstr "Akzeptiere und schliesse Tickets automatisch für diese Kategorien"
 
 msgid ""
 "If auto-accepting is not possible, the ticket will be in state pending. Also "
@@ -2467,12 +2499,6 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-msgid "corona_message"
-msgstr ""
-"Laut Bundesratsentscheid vom 14. April dürfen ab 19. April 2021 wieder "
-"Veranstaltungen durchgeführt werden, mit begrenzter Platzzahl und den "
-"vorgegebenen Schutzmassnahmen."
-
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
@@ -2547,9 +2573,6 @@ msgstr "Änderungsvorschlag"
 
 msgid "New Entry"
 msgstr "Neuer Eintrag"
-
-msgid "Archived"
-msgstr "Archiviert"
 
 msgid "Previous Page"
 msgstr "Vorherige Seite"
@@ -2707,6 +2730,9 @@ msgstr "Publikationsdatum:"
 
 msgid "Reset"
 msgstr "Zurücksetzen"
+
+msgid "Not a publication"
+msgstr "keine Publikation"
 
 msgid "Content"
 msgstr "Inhalt"
@@ -4180,6 +4206,23 @@ msgstr "Veranstaltungs-Export"
 
 msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
+
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr "Die folgende(n) Zeile(n) enthalten ungültige Daten: ${lines}"
+
+#, python-format
+msgid "${count} events will be imported"
+msgstr "${count} Veranstaltungen werden importiert"
+
+#, python-format
+msgid "${count} events imported"
+msgstr "${count} Veranstaltungen importiert"
+
+msgid "The same format as the export (XLSX) can be used for the import."
+msgstr ""
+"Für den Import kann das gleiche Format wie für den Export (XLSX) verwendet "
+"werden."
 
 msgid "Your payment has been received"
 msgstr "Ihre Zahlung ist eingegangen"

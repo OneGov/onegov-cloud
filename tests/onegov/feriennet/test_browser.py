@@ -1,8 +1,10 @@
 import time
 
 from psycopg2.extras import NumericRange
+from pytest import mark
 
 
+@mark.flaky(reruns=3)
 def test_browse_matching(browser, scenario):
     scenario.add_period(title="Ferienpass 2016")
 
@@ -71,6 +73,7 @@ def test_browse_matching(browser, scenario):
     assert 'finished prebooking' in browser.html
 
 
+@mark.flaky(reruns=3)
 def test_browse_billing(browser, scenario, postgres):
     scenario.add_period(title="Ferienpass 2016", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')

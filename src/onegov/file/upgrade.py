@@ -11,12 +11,13 @@ from onegov.core.orm.types import UTCDateTime, JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
 from onegov.file import File, FileCollection
-from onegov.file.attachments import get_svg_size_or_default, extract_pdf_info
+from onegov.file.attachments import get_svg_size_or_default
 from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.integration import DepotApp
 from onegov.file.utils import content_type_from_fileobj
 from onegov.file.utils import get_image_size
 from onegov.file.utils import word_count
+from onegov.pdf.utils import extract_pdf_info
 from PIL import Image
 from sqlalchemy import Boolean, Column, Integer, Text, text, select
 from sqlalchemy.orm import load_only
@@ -240,3 +241,18 @@ def add_stats_column(context):
 
     context.session.flush()
     context.operations.drop_column('files', 'pages')
+
+
+@upgrade_task('Add publication column')
+def add_publication_column(context):
+    if not context.has_column('files', 'publication'):
+        context.operations.add_column(
+            'files',
+            Column(
+                'publication',
+                Boolean,
+                nullable=False,
+                default=False,
+                server_default='FALSE'
+            )
+        )

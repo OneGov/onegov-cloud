@@ -1,0 +1,244 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Lontano dalle montagne di parole, lontano dai paesi di vocali e
+      consonanti, vivono i testi ciechi. Vivono isolati a Buchstabhausen sulla
+      costa del Semantik, un grande oceano linguistico.
+    </p>
+
+    <p>
+      Un piccolo ruscello chiamato Duden scorre attraverso il loro villaggio e
+      li rifornisce del necessario Regelialien. È una terra paradisiaca dove i
+      frammenti di frasi fritte ti volano in bocca.
+    </p>
+
+    <p>
+      Nemmeno l'onnipotente punteggiatura regola i testi ciechi - una vita
+      assolutamente non ortografica. Un giorno, però, una piccola linea di
+      testo fittizio, il suo nome era Lorem Ipsum, decise di uscire nella
+      vasta grammatica.
+    </p>
+
+pages:
+  - title: Vivere e alloggiare
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Questa sezione del sito web mostra argomenti e servizi
+        dell'amministrazione che sono dedicati alla vita quotidiana e al
+        vivere nel comune.
+
+  - title: Educazione e società
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        I nostri cittadini sono il capitale del nostro comune. Il comune di
+        Govikon ha un'offerta educativa aggiornata e una rete diversificata
+        di servizi sociali.
+
+  - title: Politica e amministrazione
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Questa sezione del sito web serve a presentare il comune politico
+        e l'amministrazione.
+
+  - title: Tempo libero e turismo
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Questa sezione del sito web fornisce informazioni su attività per il
+        tempo libero, club, strutture sportive, attrazioni culturali e
+        turistiche.
+
+  - title: Ritratto ed economia
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Questa sezione del sito presenta il comune (storia, costumi, mappa
+        locale, ecc.) e l'economia del comune.
+
+  - title: Notizie
+    type: news
+    name: news
+    meta:
+      trait: news
+
+  - title: Benvenuti nella nuvola di OneGov
+    parent: news
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Lo sportello online per il tuo comune è ora disponibile. Per i primi
+        passi, maggiori informazioni e una breve panoramica basta cliccare sul
+        titolo di questo messaggio.
+      text: >
+        <h2>Primi passi</h2>
+        <p>
+              I seguenti suggerimenti ti aiuteranno ad orientarti nel Cloud
+              di OneGov. Se preferisci farlo da solo, sentiti libero di
+              saltare questi passaggi.
+        </p>
+
+        <h3>Entrare</h3>
+
+        <p>
+          Ora puoi accedere con il tuo indirizzo e-mail. Hai dimenticato la
+          tua password? Nessun problema,
+          <a href="/request-password">resettatelo</a>.
+        </p>
+
+        <h3>Personalizzare il look and feel</h3>
+
+        <p>
+          OneGov Cloud può essere impostato a proprio piacimento.
+          Puoi cambiare il logo, le immagini della home page e altro
+          nelle <a href="/settings">impostazioni</a>.
+        </p>
+
+        <h3>Presenta la tua comunità</h3>
+
+        <p>
+          Clicca su <strong>Vivere e alloggiare</strong> nella navigazione e
+          poi <strong>Add > Theme</strong> proprio sotto la navigazione
+          principale. Non vedi <strong>Add</strong>? Allora devi prima
+          registrarti.
+        </p>
+
+        <h3>Compilare un modulo</h3>
+
+        <p>
+          Nello <a href="/forms">Sportello Online</a> c'è tutta una serie di
+          moduli che i cittadini possono compilare. Compila un modulo e si
+          aprirà un ticket.
+        </p>
+
+        <p>
+          Nei biglietti puoi quindi modificare
+          <a href="/tickets/ALL/open">il biglietto</a>. A proposito: puoi
+          aggiungere i tuoi moduli in qualsiasi momento. I moduli forniti
+          sono solo suggerimenti.
+        </p>
+
+        <h3>Informazioni sulla tua istanza OneGov Cloud</h3>
+
+        <p>
+          C'è molto di più da scoprire - non vogliamo svelare tutto a questo punto.
+        </p>
+
+        <p>
+          La tua istanza di OneGov Cloud funziona su un ambiente di prova,
+          che scade al più presto dopo due settimane. Così puoi testare
+          OneGov Cloud a tuo piacimento.
+        </p>
+
+        <p>
+          Anche se l'istanza di prova è accessibile a tutti, ci assicuriamo
+          che non sia trovata dai motori di ricerca.
+        </p>
+
+        <p>
+          Se avete domande, non esitate a contattarci::
+        </p>
+
+        <p>
+          <strong>Fabian Reinhard</strong><br>
+          Pilatusstrasse 3 <br>
+          6003 Luzern <br>
+          +41 41 511 22 50 <br>
+          <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+        </p>
+
+        <h3>Come continuare</h3>
+
+        <p>
+          Se possiamo convincervi, contattateci e possiamo trasferire il
+          vostro ambiente di prova in un ambiente produttivo. Ne saremmo molto
+          contenti!
+        </p>
+
+filesets:
+  - title: Immagini della home page
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Queste immagini sono visualizzate nella pagina iniziale.
+      view: grid
+    files:
+      - path: images/38hrjv7gg2w-eric-jan-van-dorp.jpg
+        note: "{organisation} in inverno"
+      - path: images/himwr1n0dzq-martin-sattler.jpg
+        note: "Sopra il lago {organisation}"
+      - path: images/bhnxfaencti-eddy-klaus.jpg
+        note: "Al mercato dell'arte di  {organisation}"
+      - path: images/p0sruan6cfi-samuel-zeller.jpg
+        note: "La navigazione ha una tradizione a {organisation}"
+
+organisation:
+  theme_options:
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Fabian Reinhard
+      Pilatusstrasse 3
+      6003 Luzern
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Pilatusstrasse 3<br>
+      6003 Luzern<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Lunedì - venerdì 09:00 - 17:00
+    opening_hours_html: Lunedì - venerdì 09:00 - 17:00
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row>
+        <column span="12">
+          <slider />
+        </column>
+      </row>
+      <row>
+        <column span="8">
+            <row>
+                <column span="6">
+                    <news />
+                </column>
+                <column span="6">
+                    <events />
+                </column>
+            </row>
+            <line />
+            <homepage-tiles />
+        </column>
+        <column span="4">
+          <panel>
+            <services />
+          </panel>
+          <panel>
+            <contacts_and_albums />
+          </panel>
+          <panel>
+            <directories />
+          </panel>
+        </column>
+      </row>

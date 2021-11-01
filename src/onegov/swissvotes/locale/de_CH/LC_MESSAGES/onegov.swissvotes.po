@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-09-06 10:07+0200\n"
+"POT-Creation-Date: 2021-11-01 07:44+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -144,21 +144,6 @@ msgstr "Titel"
 msgid "Content"
 msgstr "Inhalt"
 
-msgid "From date"
-msgstr "Von"
-
-msgid "To date"
-msgstr "Bis"
-
-msgid "Legal form"
-msgstr "Rechtsform"
-
-msgid "Voting result"
-msgstr "Abstimmungsergebnis"
-
-msgid "Policy area"
-msgstr "Politikbereich"
-
 msgid "Text Search"
 msgstr "Textsuche"
 
@@ -177,6 +162,21 @@ msgid ""
 msgstr ""
 "Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
 "Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
+
+msgid "Policy area"
+msgstr "Politikbereich"
+
+msgid "Legal form"
+msgstr "Rechtsform"
+
+msgid "Voting result"
+msgstr "Abstimmungsergebnis"
+
+msgid "From date"
+msgstr "Von"
+
+msgid "To date"
+msgstr "Bis"
 
 msgid "Position of the Federal Council"
 msgstr "Position des Bundesrats"
@@ -1784,6 +1784,18 @@ msgstr "Technischer Bericht"
 msgid "Cockpit with selected results"
 msgstr "Cockpit mit Analyseergebnissen"
 
+msgid ""
+"Due to data protection requirements, Swissvotes publishes a slightly reduced "
+"version of this dataset. Access to the full version might be possible for "
+"research purposes; see the Swissvotes codebook for more details on this "
+"(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
+msgstr ""
+"Aus Gründen des Datenschutzes wird auf Swissvotes eine leicht reduzierte "
+"Version dieses Datensatzes veröffentlicht. Für Forschungszwecke ist unter "
+"Umständen der Zugang zum vollständigen Datensatz möglich; Sie finden die "
+"näheren Angaben dazu im Swissvotes-Codebuch (www.swissvotes.ch/page/dataset/"
+"codebook-de.pdf)."
+
 msgid "Filter"
 msgstr "Filtern"
 
@@ -1802,7 +1814,7 @@ msgstr "Ja-Anteil Volk"
 
 #. Default: Turnout
 msgid "turnout_hyphenated"
-msgstr "Stimmbe&shy;teiligung"
+msgstr "Stimm&shy;beteiligung"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

@@ -83,10 +83,11 @@ def get_top_navigation(request):
         url=request.class_link(TranslatorCollection)
     )
 
-    yield Link(
-        text=_('Languages'),
-        url=request.class_link(LanguageCollection)
-    )
+    if request.is_manager:
+        yield Link(
+            text=_('Languages'),
+            url=request.class_link(LanguageCollection)
+        )
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation

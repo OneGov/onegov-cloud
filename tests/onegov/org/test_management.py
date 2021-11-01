@@ -1,3 +1,4 @@
+from onegov.people import AgencyCollection
 from onegov.core.utils import Bunch
 from onegov.org.management import LinkHealthCheck
 from onegov.page import PageCollection
@@ -16,6 +17,7 @@ def test_link_health_check(org_app):
 
     request = get_request()
     pages = PageCollection(request.session)
+    agencies = AgencyCollection(request.session)
 
     valid = [
         'www.discord.com',
@@ -47,24 +49,36 @@ def test_link_health_check(org_app):
     links = valid + invalid_fmt + not_found + invalid_domain
     assert len(fragments) == len(links)
 
-    text = "\n".join(
-        f.replace('$URL', u) for f, u in zip(fragments, links))
+    text = "\n".join(f.replace('$URL', u) for f, u in zip(fragments, links))
 
     page = pages.query().first()
     page.lead = text
 
+    agencies.add(
+        title='Test',
+        parent=None,
+        portrait='<a href="http://www.google.com"></a>'
+    )
+
+    # check external
     check = LinkHealthCheck(request, 'external')
 
     found_urls = check.extractor.find_urls(text, only_unique=True)
     assert found_urls == valid + not_found + invalid_domain
 
     urls = tuple(check.find_urls())
-    assert urls == (('Topic', 'URL-Topic', tuple(external_exp)),)
+    assert urls == (
+        ('Topic', 'URL-Topic', tuple(external_exp)),
+        ('Agency', 'URL-Agency', ('http://www.google.com',))
+    )
 
     # check internal
     check.link_type = 'internal'
     urls = tuple(check.find_urls())
-    assert urls == (('Topic', 'URL-Topic', tuple(internal_exp)),)
+    assert urls == (
+        ('Topic', 'URL-Topic', tuple(internal_exp)),
+        ('Agency', 'URL-Agency', tuple())
+    )
     stats, all_results = check.unhealthy_urls()
 
     # handled by js in the frontend, so the stats are basically empty

@@ -677,8 +677,11 @@ def view_ticket_status(self, request, form, layout=None):
     )
 
     pick_up_hint = None
-    if hasattr(self.handler, 'resource') and self.handler.resource:
+    if getattr(self.handler, 'resource', None):
         pick_up_hint = self.handler.resource.pick_up
+    if getattr(self.handler, 'submission', None):
+        if getattr(self.handler.submission, 'form', None):
+            pick_up_hint = self.handler.submission.form.pick_up
 
     return {
         'title': title,

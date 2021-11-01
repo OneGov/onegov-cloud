@@ -13,18 +13,18 @@ services:
                 soft: -1
                 hard: -1
         ports:
-            - 9200:9200
-            - 9300:9300
+            - "9200:9200"
+            - "9300:9300"
         volumes:
             - data01:/usr/share/elasticsearch/data
 
     smtp4dev:
-        image: rnwood/smtp4dev:v3
+        image: rnwood/smtp4dev:latest
         restart: always
         ports:
-            - 8081:80
-            - 1025:25
-            - 143:143
+            - "8081:80"
+            - "1025:25"
+            - "143:143"
         volumes:
             - smtp4dev-data:/smtp4dev
 
@@ -35,7 +35,7 @@ services:
             - OPENSSL_CONF=/etc/ssl
         working_dir: /app
         ports:
-            - 1337:1337
+            - "1337:1337"
 
 
 volumes:

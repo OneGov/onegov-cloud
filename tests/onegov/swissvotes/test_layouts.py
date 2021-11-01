@@ -294,6 +294,10 @@ def test_layout_default(swissvotes_app):
     assert layout.format_bfs_number(Decimal('100.1')) == '100.1'
     assert layout.format_bfs_number(Decimal('100.12')) == '100.1'
 
+
+def test_layout_format_policy_areas():
+    layout = DefaultLayout(None, DummyRequest())
+
     assert layout.format_policy_areas(SwissVote()) == ''
 
     vote = SwissVote(
@@ -320,6 +324,20 @@ def test_layout_default(swissvotes_app):
     assert layout.format_policy_areas(vote) == (
         '<span title="d-1-10 &gt; d-2-103 &#10;&#10;'
         'd-1-10 &gt; d-2-103 &gt; d-3-1033">d-1-10</span>'
+    )
+
+    vote = SwissVote(
+        descriptor_1_level_1=Decimal('10'),
+        descriptor_1_level_2=Decimal('10.3'),
+        descriptor_2_level_1=Decimal('8'),
+        descriptor_3_level_1=Decimal('10'),
+        descriptor_3_level_2=Decimal('10.3'),
+        descriptor_3_level_3=Decimal('10.33'),
+    )
+    assert layout.format_policy_areas(vote) == (
+        '<span title="d-1-10 &gt; d-2-103 &#10;&#10;d-1-10 &gt;'
+        ' d-2-103 &gt; d-3-1033">d-1-10</span>,<br>'
+        '<span title="d-1-8">d-1-8</span>'
     )
 
 

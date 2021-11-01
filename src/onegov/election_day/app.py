@@ -3,6 +3,7 @@ import re
 
 from datetime import datetime
 from dectate import directive
+from more.content_security import SELF
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework
 from onegov.core import utils
@@ -118,8 +119,11 @@ class ElectionDayApp(Framework, FormApp, UserApp):
 
     @property
     def pages_cache(self):
-        """ A five minute cache for pages. """
-        return self.get_cache('pages', expiration_time=300)
+        """ A cache for pages. """
+        expiration_time = 300
+        if self.principal and hasattr(self.principal, 'cache_expiration_time'):
+            expiration_time = self.principal.cache_expiration_time
+        return self.get_cache('pages', expiration_time)
 
 
 @ElectionDayApp.static_directory()
@@ -159,7 +163,7 @@ def get_i18n_default_locale():
 @ElectionDayApp.tween_factory(
     under=content_security_policy_tween_factory
 )
-def enable_iframes_tween_factory(app, handler):
+def enable_iframes_and_analytics_tween_factory(app, handler):
     iframe_paths = (
         r'/ballot/.*',
         r'/vote/.*',
@@ -169,8 +173,8 @@ def enable_iframes_tween_factory(app, handler):
 
     iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
 
-    def enable_iframes_tween(request):
-        """ Enables iframes on matching paths. """
+    def enable_iframes_and_analytics_tween(request):
+        """ Enables iframes and analytics. """
 
         result = handler(request)
 
@@ -178,9 +182,16 @@ def enable_iframes_tween_factory(app, handler):
             request.content_security_policy.frame_ancestors.add('http://*')
             request.content_security_policy.frame_ancestors.add('https://*')
 
+        request.content_security_policy.connect_src.add(SELF)
+        if app.principal:
+            for domain in getattr(app.principal, 'csp_script_src', []):
+                request.content_security_policy.script_src.add(domain)
+            for domain in getattr(app.principal, 'connect_src', []):
+                request.content_security_policy.connect_src.add(domain)
+
         return result
 
-    return enable_iframes_tween
+    return enable_iframes_and_analytics_tween
 
 
 @ElectionDayApp.tween_factory(

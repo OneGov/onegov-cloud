@@ -123,7 +123,7 @@ class GeneralFile(File, SearchableFile):
 
     @property
     def es_public(self):
-        return self.published and self.signed
+        return self.published and self.publication
 
 
 class ImageFile(File):

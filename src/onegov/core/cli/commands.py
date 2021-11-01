@@ -228,12 +228,7 @@ def transfer(group_context,
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     def transfer_database(remote_db, local_db, schema_glob='*'):
-        send = f"ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}"
-        send = f"{send} --no-owner --no-privileges"
-        send = f"{send} --quote-all-identifiers --no-sync"
-
-        recv = f"psql -d {local_db} -v ON_ERROR_STOP=1"
-
+        # Get available schemas
         query = 'SELECT schema_name FROM information_schema.schemata'
 
         lst = f'sudo -u postgres psql {remote_db} -t -c "{query}"'
@@ -245,25 +240,33 @@ def transfer(group_context,
         schemas = (s for s in schemas if fnmatch(s, schema_glob))
         schemas = tuple(schemas)
 
+        # Prepare send command
+        send = f"ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}"
+        send = f"{send} --no-owner --no-privileges"
+        send = f"{send} --quote-all-identifiers --no-sync"
         send = f'{send} --schema {" --schema ".join(schemas)}'
 
+        # Prepare receive command
+        recv = f"psql -d {local_db} -v ON_ERROR_STOP=1"
         if platform.system() == 'Linux':
             recv = f"sudo -u postgres {recv}"
 
+        # Drop existing schemas
         for schema in schemas:
-            print(f"Prepare transfering database schema {schema}")
+            print(f"Drop local database schema {schema}")
             drop = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'
             drop = f"echo '{drop}' | {recv}"
 
             subprocess.check_call(
                 drop, shell=True,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL)
+                stderr=subprocess.DEVNULL
+            )
 
+        # Transfer
+        print("Transfering database")
         if shutil.which('pv'):
             recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
-
-        print("Transfering database")
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     def transfer_storage_of_app(local_cfg, remote_cfg):

@@ -13,7 +13,7 @@ looking for, you might appreciate these links:
 - **[Marketing site](https://admin.digital)**
 <br>For an executive summary (in German)
 
-- **[Developer docs](https://onegovcloud.ch)**
+- **[Developer docs](https://docs.onegovcloud.ch)**
 <br>For a technical overview and Python API docs
 
 - **[Changelog](CHANGES.md)**
@@ -126,7 +126,7 @@ brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv
 ```shell
 sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev
 libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev
-libpoppler-cpp-dev pv libzbar0
+libpoppler-cpp-dev pv libzbar0 openssl libssl-dev
 ```
 
 ## Installation
@@ -228,6 +228,10 @@ Then, apply database changes.
 
     onegov-core upgrade
 
+To list database changes since a release:
+
+    git diff release-2021.60 -- '**upgrade.py'
+
 ## Tests
 
 ### Python
@@ -309,6 +313,18 @@ Or:
 
     do/honyaku onegov.org fr_CH "The following are variables and should be left as is: ${example}"
 
+
+### Import / Export of Translations (XLSX)
+
+First, install poxls (pip/pipx) and gettext (package manager).
+
+Export the current translations to a XLSX
+
+    do/translations-to-excel onegov.org translations.xlsx
+
+Update the current translation with the given XLSX
+
+    do/translations-from-excel onegov.org translations.xlsx
 
 ## Releases
 

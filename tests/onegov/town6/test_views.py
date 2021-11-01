@@ -82,3 +82,31 @@ def test_gobal_tools(client):
 def test_top_navigation(client):
     links = client.get('/').pyquery('.side-navigation a span')
     assert links.text() == 'Organisation Themen Kontakt Aktuelles'
+
+
+def test_announcement(client):
+    client.login_admin()
+
+    color = '#006fbb'
+    bg_color = '#008263'
+    text = 'This is an announcement which appears on top of the page'
+    settings = client.get('/header-settings')
+
+    # test default not giving the color
+    assert settings.form['left_header_announcement_bg_color'].value == (
+        '#FBBC05'
+    )
+    assert settings.form['left_header_announcement_font_color'].value == (
+        '#000000'
+    )
+
+    settings.form['left_header_announcement'] = text
+    settings.form['left_header_announcement_bg_color'] = bg_color
+    settings.form['left_header_announcement_font_color'] = color
+    page = settings.form.submit().follow()
+
+    assert text in page
+    assert (
+        f'<div id="announcement" style="color: {color}; '
+        f'background-color: {bg_color};">'
+    ) in page

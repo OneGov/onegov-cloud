@@ -46,15 +46,18 @@
         fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-fr'
         it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-it'
 
-- name: CREDIT SUISSE
+- name:
+    de: Viva Kids | Credit Suisse Schweiz
+    fr: Viva Kids | Credit Suisse
+    it: Viva Kids | Credit Suisse Svizzera
   logo_url:
-    de: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
-    fr: 'https://www.credit-suisse.com/corporate/fr/responsibility/economy-society/commitments-in-switzerland.html'
-    it: 'https://www.credit-suisse.com/corporate/it/responsibility/economy-society/commitments-in-switzerland.html'
+    de: 'https://www.credit-suisse.com/ch/de/privatkunden/konto-karten/viva-kids.html'
+    fr: 'https://www.credit-suisse.com/ch/fr/clients-prives/compte-cartes/viva-kids.html'
+    it: 'https://www.credit-suisse.com/ch/it/clienti-privati/conto-carte/viva-kids.html'
   mail_url:
-    de: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
-    fr: 'https://www.credit-suisse.com/corporate/fr/responsibility/economy-society/commitments-in-switzerland.html'
-    it: 'https://www.credit-suisse.com/corporate/it/responsibility/economy-society/commitments-in-switzerland.html'
+    de: 'https://www.credit-suisse.com/ch/de/privatkunden/konto-karten/viva-kids.html'
+    fr: 'https://www.credit-suisse.com/ch/fr/clients-prives/compte-cartes/viva-kids.html'
+    it: 'https://www.credit-suisse.com/ch/it/clienti-privati/conto-carte/viva-kids.html'
   logo: sponsors/credit-suisse.svg
   background: '#fff'
   width: 200px
@@ -63,30 +66,22 @@
   banners:
     bookings:
       src:
-        de: sponsors/credit-suisse-banner.png
-        fr: sponsors/lidl-banner-fr.png
-        it: sponsors/lidl-banner-it.png
+        de: sponsors/credit-suisse-banner-de.png
+        fr: sponsors/credit-suisse-banner-fr.png
+        it: sponsors/credit-suisse-banner-it.png
       url:
-        de: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-        fr: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
-        it: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
-      tracker:
-        de: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-        fr: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-        it: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375153;dc_trk_aid=405204988;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        de: 'https://www.credit-suisse.com/ch/de/privatkunden/konto-karten/viva-kids.html'
+        fr: 'https://www.credit-suisse.com/ch/fr/clients-prives/compte-cartes/viva-kids.html'
+        it: 'https://www.credit-suisse.com/ch/it/clienti-privati/conto-carte/viva-kids.html'
     invoices:
       src:
-        de: sponsors/credit-suisse-banner.png
-        fr: sponsors/concordia-banner-fr.jpg
-        it: sponsors/concordia-banner-it.jpg
+        de: sponsors/credit-suisse-banner-de.png
+        fr: sponsors/credit-suisse-banner-fr.png
+        it: sponsors/credit-suisse-banner-it.png
       url:
-        de: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-fr'
-        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-banfnpj-2021-0-projuventute-it'
-      tracker:
-        de: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-        fr: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-        it: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375153;dc_trk_aid=405204988;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        de: 'https://www.credit-suisse.com/ch/de/privatkunden/konto-karten/viva-kids.html'
+        fr: 'https://www.credit-suisse.com/ch/fr/clients-prives/compte-cartes/viva-kids.html'
+        it: 'https://www.credit-suisse.com/ch/it/clienti-privati/conto-carte/viva-kids.html'
 
 
 - name:

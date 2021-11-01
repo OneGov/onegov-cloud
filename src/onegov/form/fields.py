@@ -1,8 +1,8 @@
 import inspect
-
 import phonenumbers
 import sedate
 
+from cssutils.css import CSSStyleSheet
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import as_fileintent
@@ -25,11 +25,11 @@ from wtforms import SelectMultipleField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import widgets
+from wtforms_components import TimeField as DefaultTimeField
 from wtforms.fields import Field
+from wtforms.fields.html5 import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
-from wtforms_components import TimeField as DefaultTimeField
-from wtforms.fields.html5 import DateTimeLocalField as DateTimeLocalFieldBase
 
 FIELDS_NO_RENDERED_PLACEHOLDER = (
     'MultiCheckboxField', 'RadioField', 'OrderedMultiCheckboxField',
@@ -201,6 +201,17 @@ class HtmlField(TextAreaField):
 
     def pre_validate(self, form):
         self.data = sanitize_html(self.data)
+
+
+class CssField(TextAreaField):
+    """ A textfield with css validation. """
+
+    def post_validate(self, form, validation_stopped):
+        if self.data:
+            try:
+                CSSStyleSheet().cssText = self.data
+            except Exception as e:
+                raise ValueError(str(e))
 
 
 class TagsField(StringField):

@@ -26,6 +26,7 @@ metal:define-macro="layout">
     -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
+    <style tal:condition="request.app.principal.custom_css">${request.app.principal.custom_css}</style>
     <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn">
         Sentry.init({
@@ -52,7 +53,7 @@ metal:define-macro="layout">
             <div class="small-12 columns text-right">
                 <a href="${layout.principal.base}" class="back-to-base" tal:condition="layout.principal.base|nothing">${layout.principal.base_domain}</a>
             </div>
-            <div class="small-12 columns text-right small-only-text-center">
+            <div class="small-12 columns text-right">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
                     <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>

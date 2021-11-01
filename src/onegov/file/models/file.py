@@ -106,6 +106,9 @@ class File(Base, Associable, TimestampMixin):
     #: hour through a cronjob (see :mod:`onegov.core.cronjobs`)!
     publish_date = Column(UTCDateTime, nullable=True)
 
+    #: true if marked for publication
+    publication = Column(Boolean, nullable=False, default=False)
+
     #: true if the file was digitally signed in the onegov cloud
     #:
     #: (the file could be signed without this being true, but that would

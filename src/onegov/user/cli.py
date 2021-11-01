@@ -251,6 +251,26 @@ def change_yubikey(username, yubikey):
     return change
 
 
+@cli.command(name='change-role', context_settings={'singular': True})
+@click.argument('username')
+@click.argument('role')
+def change_role(username, role):
+    """ Changes the role of the given username. """
+
+    def change(request, app):
+        users = UserCollection(app.session())
+
+        if not users.exists(username):
+            abort("{} does not exist".format(username))
+
+        user = users.by_username(username)
+        user.role = role
+
+        click.secho("{}'s role was changed".format(username), fg='green')
+
+    return change
+
+
 @cli.command(name='list-sessions', context_settings={'singular': True})
 def list_sessions():
     """ Lists all sessions of all users. """

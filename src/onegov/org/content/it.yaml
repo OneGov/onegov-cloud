@@ -1,0 +1,140 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Lontano dalle montagne di parole, lontano dai paesi di vocali e
+      consonanti, vivono i testi ciechi. Vivono isolati a Buchstabhausen sulla
+      costa del Semantik, un grande oceano linguistico.
+    </p>
+
+    <p>
+      Un piccolo ruscello chiamato Duden scorre attraverso il loro villaggio e
+      li rifornisce del necessario Regelialien. È una terra paradisiaca dove i
+      frammenti di frasi fritte ti volano in bocca.
+    </p>
+
+    <p>
+      Nemmeno l'onnipotente punteggiatura regola i testi ciechi - una vita
+      assolutamente non ortografica. Un giorno, però, una piccola linea di
+      testo fittizio, il suo nome era Lorem Ipsum, decise di uscire nella
+      vasta grammatica.
+    </p>
+
+pages:
+  - title: Organizzazione
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Questa sezione del sito descrive l'organizzazione.
+  - title: Argomenti
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Questa sezione del sito web dettaglia i temi principali
+        dell'organizzazione.
+  - title: Contatta
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Questa sezione del sito descrive come contattare l'organizzazione.
+  - title: Notizie
+    type: news
+    name: news
+    meta:
+      trait: news
+  - title: Abbiamo un nuovo sito web!
+    parent: news
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Il nuovo sito web gira sulla piattaforma OneGov Cloud.
+
+filesets:
+  - title: Immagini della home page
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Queste immagini sono visualizzate sulla home page.
+      view: grid
+    files:
+      - path: images/3bearyu-muo-daiga-ellaby.jpg
+        note: "Barbecue"
+      - path: images/hzgs56ze49s-anthony-delanoix.jpg
+        note: "Concerto di beneficenza"
+      - path: images/jwimshwif14-jeff-sheldon.jpg
+        note: "Apprendimento permanente con {organisation}"
+      - path: images/tdvsbpscg7c-tim-napier.jpg
+        note: "La sala è disponibile per il noleggio"
+
+organisation:
+  theme_options:
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Fabian Reinhard
+      Pilatusstrasse 3
+      6003 Luzern
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Pilatusstrasse 3<br>
+      6003 Luzern<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Lunedì - venerdì 09:00 - 17:00
+    opening_hours_html: Lunedì - venerdì 09:00 - 17:00
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <panel>
+            <links title="Servizi">
+              <link url="./forms"
+                    description="Richieste &amp; feedback">
+                    Moduli
+              </link>
+              <link url="./resources"
+                    description="Camere &amp; biglietti giornalieri">
+                    Prenotazioni
+              </link>
+            </links>
+          </panel>
+
+          <panel>
+            <events />
+          </panel>
+
+          <panel>
+            <links title="Contatti &amp; foto">
+              <link url="./people"
+                    description="Tutti i contatti">
+                Persone
+              </link>
+              <link url="./photoalbums"
+                    description="Impressioni">
+                Album di foto
+              </link>
+            </links>
+          </panel>
+
+          <panel>
+            <directories />
+          </panel>
+        </column>
+      </row>

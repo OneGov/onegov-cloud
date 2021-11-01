@@ -12,9 +12,9 @@ from onegov.gazette.pdf import IssuePdf
 from onegov.gazette.pdf import IssuePrintOnlyPdf
 from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.pdf import Pdf
-from tests.onegov.gazette.conftest import LOGO
-from PyPDF2 import PdfFileReader
+from onegov.pdf.utils import extract_pdf_info
 from sedate import utcnow
+from tests.onegov.gazette.conftest import LOGO
 from unittest.mock import patch
 
 
@@ -89,12 +89,17 @@ def test_notices_pdf_from_notice(gazette_app):
     with freeze_time("2018-01-01 12:00"):
         request = DummyRequest(session, gazette_app.principal)
         file = NoticesPdf.from_notice(notice, request)
-        reader = PdfFileReader(file)
-        assert [page.extractText() for page in reader.pages] == [
-            '© 2018 Govikon\n1\n'
-            'xxx\ntitle\ntext\nplace, 1. Januar 2017\nauthor\n',
-            '© 2018 Govikon\n2\n'
-        ]
+        assert extract_pdf_info(file) == (
+            2,
+            'xxx   title\n'
+            '      text\n'
+            '      place, 1. Januar 2017\n'
+            '      author\n'
+            '© 2018 Govikon              1\n'
+            '\n'
+            '             attachment\n'
+            '© 2018 Govikon          2'
+        )
 
 
 def test_notices_pdf_from_notices(gazette_app):
@@ -129,35 +134,42 @@ def test_notices_pdf_from_notices(gazette_app):
         request = DummyRequest(session, gazette_app.principal)
         notices = GazetteNoticeCollection(session)
         file = NoticesPdf.from_notices(notices, request)
-        reader = PdfFileReader(file)
-        assert [page.extractText() for page in reader.pages] == [
-            (
-                '© 2018 Govikon\n1\n'
-                'xxx\nfirst title\nfirst text\n'
-                'first place, 1. Januar 2017\nfirst author\n'
-            ),
-            '© 2018 Govikon\n2\n',
-            (
-                '© 2018 Govikon\n3\n'
-                'xxx\nsecond title\nsecond text\n'
-                'second place, 2. Januar 2017\nsecond author\n'
-            )
-        ]
+        assert extract_pdf_info(file) == (
+            3,
+            'xxx   first title\n'
+            '      first text\n'
+            '      first place, 1. Januar 2017\n'
+            '      first author\n'
+            '© 2018 Govikon                    1\n'
+            '\n'
+            '             first attachment\n'
+            '© 2018 Govikon                2\n'
+            '\n'
+            'xxx   second title\n'
+            '      second text\n'
+            '      second place, 2. Januar 2017\n'
+            '      second author\n'
+            '© 2018 Govikon                     3'
+        )
 
         file = NoticesPdf.from_notices(
             notices.for_order('title', 'desc'), request
         )
-        reader = PdfFileReader(file)
-        assert [page.extractText() for page in reader.pages] == [
-            (
-                '© 2018 Govikon\n1\n'
-                'xxx\nsecond title\nsecond text\n'
-                'second place, 2. Januar 2017\nsecond author\n'
-                'xxx\nfirst title\nfirst text\n'
-                'first place, 1. Januar 2017\nfirst author\n'
-            ),
-            '© 2018 Govikon\n2\n'
-        ]
+        assert extract_pdf_info(file) == (
+            2,
+            'xxx   second title\n'
+            '      second text\n'
+            '      second place, 2. Januar 2017\n'
+            '      second author\n'
+            'xxx   first title\n'
+            '      first text\n'
+            '      first place, 1. Januar 2017\n'
+            '      first author\n'
+            '© 2018 Govikon                     1\n'
+            '\n'
+            '             first attachment\n'
+            '© 2018 Govikon                2'
+        )
 
 
 def test_index_pdf_from_notices(gazette_app):
@@ -197,25 +209,25 @@ def test_index_pdf_from_notices(gazette_app):
         request = DummyRequest(session, gazette_app.principal)
         notices = GazetteNoticeCollection(session)
         file = IndexPdf.from_notices(notices, request)
-        reader = PdfFileReader(file)
-        assert [page.extractText() for page in reader.pages] == [
-            (
-                '© 2018 Govikon\n1\nGazette\nIndex\n'
-                'Organizations\n'
-                'C\n'
-                'Civic Community  2017-40-2, 2017-42-4\n'
-                'S\n'
-                'State Chancellery  2017-40-1, 2017-41-3\n'
-            ),
-            (
-                'Gazette\n© 2018 Govikon\n2\n'
-                'Categories\n'
-                'C\n'
-                'Complaints  2017-40-1, 2017-41-3\n'
-                'E\n'
-                'Education  2017-40-2, 2017-42-4\n'
-            )
-        ]
+        assert extract_pdf_info(file) == (
+            2,
+            'Gazette\n'
+            'Index\n'
+            'Organizations\n'
+            'C\n'
+            'Civic Community 2017-40-2, 2017-42-4\n'
+            'S\n'
+            'State Chancellery 2017-40-1, 2017-41-3\n'
+            '© 2018 Govikon                         1\n'
+            '\n'
+            'Gazette\n'
+            'Categories\n'
+            'C\n'
+            'Complaints 2017-40-1, 2017-41-3\n'
+            'E\n'
+            'Education 2017-40-2, 2017-42-4\n'
+            '© 2018 Govikon                  2'
+        )
 
 
 def test_issues_pdf_h():
@@ -423,10 +435,43 @@ def test_issues_pdf_unfold_data(session):
     assert extract_pdf_story(pdf) == expected
 
     pdf.generate()
-    file.seek(0)
-    reader = PdfFileReader(file)
-    text = ''.join([page.extractText() for page in reader.pages])
-    assert text.strip() == '\n'.join(expected)
+    assert extract_pdf_info(file) == (
+        2,
+        'title-1\n'
+        '   title-1-1\n'
+        '1  title-1-1-a\n'
+        '   text-1-1-a\n'
+        '   title-1-1-1\n'
+        '   title-1-2\n'
+        '2  title-1-2-a\n'
+        '   text-1-2-a\n'
+        '3  title-1-2-b\n'
+        '   text-1-2-b\n'
+        '4  title-1-2-c\n'
+        '   text-1-2-c\n'
+        '5  title-1-2-1-a\n'
+        '   text-1-2-1-a\n'
+        '6  title-1-2-1-b\n'
+        '   text-1-2-1-b\n'
+        '   title-2\n'
+        '7  title-2-a\n'
+        '   text-2-a\n'
+        '8  title-2-1-a\n'
+        '   text-2-1-a\n'
+        '9  title-2-2-a\n'
+        '   text-2-2-a\n'
+        '10 title-2-3-a\n'
+        '   text-2-3-a\n'
+        '11 title-3-a\n'
+        '   text-3-a\n'
+        '12 title-3-b\n'
+        '   text-3-b\n'
+        '13 title-3-c\n'
+        '   text-3-c\n'
+        '\n'
+        '14 title-3-d\n'
+        '   text-3-d'
+    )
 
 
 def test_issues_pdf_query_notices(session, issues, organizations, categories):
@@ -591,90 +636,130 @@ def test_issues_pdf_from_issue(gazette_app):
     with freeze_time("2017-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=40).one()
         file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
-        reader = PdfFileReader(file)
-        assert [page.extractText() for page in reader.pages] == [
-            # page 1
-            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
-            'The electronic official gazette is available at '
+        assert extract_pdf_info(file) == (
+            5,
+            'onegov.ch\n'
+            '      Gazette No. 40, 06.10.2017\n'
+            '      The electronic official gazette is available at '
             'www.amtsblattzug.ch.\n'
-            '1 publication(s) with particularly sensitive data are not '
-            'available online. They are available in\npaper form from the '
-            'State Chancellery, Seestrasse 2, 6300 Zug, or can be subscribed '
-            'to at\namtsblatt@zg.ch.\n'
-            'State Chancellery\n'
-            'Complaints\n'
-            '5\n100-10\n2017-40-1, 2017-41-4\n'
-            '6\nThis official notice is only available in the print version.\n'
-            'Civic Community\n'
-            'Complaints\n'
-            '7\n200-10\n2017-40-2, 2017-41-3\n',
-            # page 2 (-a-)
-            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n2\n',
-            # page 3
-            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n3\n'
-            'Churches\n'
-            'Evangelical Reformed Parish\n'
-            'Education\n'
-            '8\n410-11\n2017-40-4, 2017-41-1\n',
-            # page 4 (-c-)
-            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n4\n',
-            # page 5 (-d-)
-            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n5\n'
-        ]
+            '      1 publication(s) with particularly sensitive data are not '
+            'available '
+            'online. They are available in\n'
+            '      paper form from the State Chancellery, Seestrasse 2, 6300 '
+            'Zug, or can '
+            'be subscribed to at\n'
+            '      amtsblatt@zg.ch.\n'
+            '      State Chancellery\n'
+            '      Complaints\n'
+            '5     100-10\n'
+            '      2017-40-1, 2017-41-4\n'
+            '6     This official notice is only available in the print '
+            'version.\n'
+            '      Civic Community\n'
+            '      Complaints\n'
+            '7     200-10\n'
+            '      2017-40-2, 2017-41-3\n'
+            '© 2017 '
+            'Govikon                                                         '
+            '                                 '
+            '1\n'
+            '\n'
+            'Gazette No. 40, 06.10.2017\n'
+            '              -a-\n'
+            '© 2017 Govikon             2\n'
+            '\n'
+            'Gazette No. 40, 06.10.2017\n'
+            '      Churches\n'
+            '      Evangelical Reformed Parish\n'
+            '      Education\n'
+            '8     410-11\n'
+            '      2017-40-4, 2017-41-1\n'
+            '© 2017 Govikon                    3\n'
+            '\n'
+            'Gazette No. 40, 06.10.2017\n'
+            '              -c-\n'
+            '© 2017 Govikon             4\n'
+            '\n'
+            'Gazette No. 40, 06.10.2017\n'
+            '              -d-\n'
+            '© 2017 Govikon             5'
+        )
 
         issue = session.query(Issue).filter_by(number=41).one()
         file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
-        reader = PdfFileReader(file)
-        test_issues_pdf_from_issue
-        assert [page.extractText() for page in reader.pages] == [
-            # page 1
-            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
-            'The electronic official gazette is available at '
+        assert extract_pdf_info(file) == (
+            6,
+            'onegov.ch\n'
+            '      Gazette No. 41, 13.10.2017\n'
+            '      The electronic official gazette is available at '
             'www.amtsblattzug.ch.\n'
-            '1 publication(s) with particularly sensitive data are not '
-            'available online. They are available in\npaper form from the '
-            'State Chancellery, Seestrasse 2, 6300 Zug, or can be subscribed '
-            'to at\namtsblatt@zg.ch.\n'
-            'State Chancellery\n'
-            'Complaints\n'
-            '5\nThis official notice is only available in the print version.\n'
-            '6\n100-10\n2017-40-1, 2017-41-4\n'
-            'Civic Community\n'
-            'Complaints\n'
-            '7\n200-10\n2017-40-2, 2017-41-3\n',
-            # page 2 (-a-)
-            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n2\n',
-            # page 3
-            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n3\n'
-            'Churches\n'
-            'Evangelical Reformed Parish\n'
-            'Education\n'
-            '8\n410-11\n2017-40-4, 2017-41-1\n',
-            # page 4 (-c-)
-            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n4\n',
-            # page 5 (-d-)
-            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n5\n',
-            # page 6
-            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n6\n'
-            'Sikh Community\n'
-            'Education\n'
-            '9\n420-11\n2017-41-5, 2017-42-1\n'
-        ]
+            '      1 publication(s) with particularly sensitive data are '
+            'not available '
+            'online. They are available in\n'
+            '      paper form from the State Chancellery, Seestrasse 2, '
+            '6300 Zug, or can '
+            'be subscribed to at\n'
+            '      amtsblatt@zg.ch.\n'
+            '      State Chancellery\n'
+            '      Complaints\n'
+            '5     This official notice is only available in the print '
+            'version.\n'
+            '6     100-10\n'
+            '      2017-40-1, 2017-41-4\n'
+            '      Civic Community\n'
+            '      Complaints\n'
+            '7     200-10\n'
+            '      2017-40-2, 2017-41-3\n'
+            '© 2017 '
+            'Govikon                                                    '
+            '                                      '
+            '1\n'
+            '\n'
+            'Gazette No. 41, 13.10.2017\n'
+            '              -a-\n'
+            '© 2017 Govikon             2\n'
+            '\n'
+            'Gazette No. 41, 13.10.2017\n'
+            '      Churches\n'
+            '      Evangelical Reformed Parish\n'
+            '      Education\n'
+            '8     410-11\n'
+            '      2017-40-4, 2017-41-1\n'
+            '© 2017 Govikon                    3\n'
+            '\n'
+            'Gazette No. 41, 13.10.2017\n'
+            '              -c-\n'
+            '© 2017 Govikon             4\n'
+            '\n'
+            'Gazette No. 41, 13.10.2017\n'
+            '              -d-\n'
+            '© 2017 Govikon             5\n'
+            '\n'
+            'Gazette No. 41, 13.10.2017\n'
+            '      Sikh Community\n'
+            '      Education\n'
+            '9     420-11\n'
+            '      2017-41-5, 2017-42-1\n'
+            '© 2017 Govikon             6'
+        )
 
     with freeze_time("2018-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=42).one()
         file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
-        reader = PdfFileReader(file)
-        test_issues_pdf_from_issue
-        assert [page.extractText() for page in reader.pages] == [
-            'onegov.ch\n© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
-            'The electronic official gazette is available at '
+        assert extract_pdf_info(file) == (
+            1,
+            'onegov.ch\n'
+            '      Gazette No. 42, 20.10.2017\n'
+            '      The electronic official gazette is available at '
             'www.amtsblattzug.ch.\n'
-            'Churches\n'
-            'Sikh Community\n'
-            'Education\n'
-            '5\n420-11\n2017-41-5, 2017-42-1\n'
-        ]
+            '      Churches\n'
+            '      Sikh Community\n'
+            '      Education\n'
+            '5     420-11\n'
+            '      2017-41-5, 2017-42-1\n'
+            '© 2018 Govikon                                        '
+            '                     1'
+        )
 
 
 def test_issues_po_pdf_query_notices(session, issues, organizations,
@@ -805,45 +890,60 @@ def test_issues_po_pdf_from_issue(gazette_app):
         file = IssuePrintOnlyPdf.from_issue(
             issue, DummyRequest(session, principal)
         )
-        reader = PdfFileReader(file)
-        file.seek(0)
-        assert [page.extractText() for page in reader.pages] == [
-            # page 1
-            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
-            '1 publication(s) with particularly sensitive data according '
-            'to BGS 152.3 §7 Abs. 2.\n'
-            'The electronic official gazette is available at '
+
+        assert extract_pdf_info(file) == (
+            1,
+            'onegov.ch\n'
+            '      Gazette No. 40, 06.10.2017\n'
+            '      1 publication(s) with particularly sensitive data '
+            'according to BGS '
+            '152.3 §7 Abs. 2.\n'
+            '      The electronic official gazette is available at '
             'www.amtsblattzug.ch.\n'
-            'State Chancellery\n'
-            'Complaints\n'
-            '3\n100-10\n2017-40-3, 2017-41-2\n'
-        ]
+            '      State Chancellery\n'
+            '      Complaints\n'
+            '3     100-10\n'
+            '      2017-40-3, 2017-41-2\n'
+            '© 2017 '
+            'Govikon                                                     '
+            '                       '
+            '1'
+        )
 
         issue = session.query(Issue).filter_by(number=41).one()
         file = IssuePrintOnlyPdf.from_issue(
             issue, DummyRequest(session, principal)
         )
-        reader = PdfFileReader(file)
-        assert [page.extractText() for page in reader.pages] == [
-            # page 1
-            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
-            '1 publication(s) with particularly sensitive data according '
-            'to BGS 152.3 §7 Abs. 2.\n'
-            'The electronic official gazette is available at '
+        assert extract_pdf_info(file) == (
+            1,
+            'onegov.ch\n'
+            '      Gazette No. 41, 13.10.2017\n'
+            '      1 publication(s) with particularly sensitive data '
+            'according to BGS '
+            '152.3 §7 Abs. 2.\n'
+            '      The electronic official gazette is available at '
             'www.amtsblattzug.ch.\n'
-            'State Chancellery\n'
-            'Complaints\n'
-            '2\n100-10\n2017-40-3, 2017-41-2\n'
-        ]
+            '      State Chancellery\n'
+            '      Complaints\n'
+            '2     100-10\n'
+            '      2017-40-3, 2017-41-2\n'
+            '© 2017 '
+            'Govikon                                                     '
+            '                       '
+            '1'
+        )
 
     with freeze_time("2018-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=42).one()
         file = IssuePrintOnlyPdf.from_issue(
             issue, DummyRequest(session, principal)
         )
-        reader = PdfFileReader(file)
-        assert [page.extractText() for page in reader.pages] == [
-            'onegov.ch\n© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
-            'The electronic official gazette is available at '
+        assert extract_pdf_info(file) == (
+            1,
+            'onegov.ch\n'
+            '      Gazette No. 42, 20.10.2017\n'
+            '      The electronic official gazette is available at '
             'www.amtsblattzug.ch.\n'
-        ]
+            '© 2018 Govikon                                               '
+            '              1'
+        )

@@ -13,8 +13,8 @@ from onegov.core.custom import json
 from onegov.feriennet.utils import NAME_SEPARATOR
 from onegov.file import FileCollection
 from onegov.pay import Payment
-from tests.shared import utils
 from psycopg2.extras import NumericRange
+from tests.shared import utils
 from webtest import Upload
 
 
@@ -106,7 +106,6 @@ def test_wwf_fixed_pass_system(client, scenario):
         assert 'Die Buchungsphase ist jetzt bis am' in page
         assert 'Gebucht (1)' in page
         assert 'Blockiert (1)' in page
-
 
 
 def test_view_permissions():
@@ -2720,3 +2719,76 @@ def test_attendee_view(scenario, client, attendee_owner):
     page.form['first_name'] = 'Max'
     page = page.form.submit()
     assert "Sie haben bereits ein Kind mit diesem Namen eingegeben" in page
+
+
+def test_registration(client):
+    client.app.enable_user_registration = True
+
+    register = client.get('/auth/register')
+    assert 'volljährige Person eröffnet werden' not in register
+
+    client.login_admin()
+    page = client.get('/feriennet-settings')
+    page.form['require_full_age_for_registration'] = True
+    page.form.submit()
+    client.logout()
+
+    register = client.get('/auth/register')
+    assert 'volljährige Person eröffnet werden' in register
+    register.form['username'] = 'user@example.org'
+    register.form['password'] = 'p@ssw0rd'
+    register.form['confirm'] = 'p@ssw0rd'
+
+    assert "Vielen Dank" in register.form.submit().follow()
+
+    message = client.get_email(0, 1)
+    assert "Anmeldung bestätigen" in message
+
+    expr = r'href="[^"]+">Anmeldung bestätigen</a>'
+    url = re.search(expr, message).group()
+    url = client.extract_href(url)
+
+    assert "Konto wurde aktiviert" in client.get(url).follow()
+    assert "Konto wurde bereits aktiviert" in client.get(url).follow()
+
+    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+    assert "Ihr Benutzerprofil ist unvollständig" in logged_in
+
+
+def test_view_qrbill(client, scenario):
+    scenario.add_period(title="Ferienpass 2017", confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Dustin", username='admin@example.org')
+    scenario.add_booking(
+        state='accepted', cost=100, username='admin@example.org'
+    )
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/').click('Fakturierung')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    page = client.get('/userprofile')
+    page.form['salutation'] = 'mr'
+    page.form['first_name'] = 'foo'
+    page.form['last_name'] = 'bar'
+    page.form['zip_code'] = '123'
+    page.form['place'] = 'abc'
+    page.form['address'] = 'abc'
+    page.form['emergency'] = '123456789 Admin'
+    page.form.submit()
+
+    page = client.get('/feriennet-settings')
+    page.form['bank_qr_bill'] = True
+    page.form['bank_account'] = 'CH5604835012345678009'
+    page.form['bank_beneficiary'] = (
+        'Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel'
+    )
+    page.form.submit()
+
+    page = client.get('/my-bills?username=admin@example.org')
+    assert '<img class="qr-bill" src="data:image/svg+xml;base64,' in page

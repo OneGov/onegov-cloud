@@ -6,6 +6,7 @@ from onegov.org.forms.allocation import RoomAllocationForm
 from onegov.org.forms.directory import DirectoryForm
 from onegov.org.forms.directory import DirectoryImportForm
 from onegov.org.forms.event import EventForm
+from onegov.org.forms.event import EventImportForm
 from onegov.org.forms.form_definition import FormDefinitionForm
 from onegov.org.forms.form_export import FormSubmissionsExport
 from onegov.org.forms.form_registration import FormRegistrationWindowForm
@@ -48,6 +49,7 @@ __all__ = [
     'DirectoryForm',
     'DirectoryImportForm',
     'EventForm',
+    'EventImportForm',
     'ExportForm',
     'FooterSettingsForm',
     'FormDefinitionForm',

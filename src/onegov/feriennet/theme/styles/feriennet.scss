@@ -319,10 +319,6 @@ ul.single-line {
     }
 }
 
-.footer-links .columns {
-    visibility: hidden;
-}
-
 /*
     activities list
 */
@@ -2113,6 +2109,11 @@ $booking-left-margin: 2rem;
             display: inline-block;
             min-width: 9rem;
         }
+    }
+
+    .qr-bill {
+        margin-top: 1rem;
+        width: 100%;
     }
 }
 

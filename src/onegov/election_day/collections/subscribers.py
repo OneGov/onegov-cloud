@@ -127,7 +127,8 @@ class EmailSubscriberCollection(SubscriberCollection):
             receivers=(subscriber.address, ),
             reply_to='{} <{}>'.format(
                 request.app.principal.name,
-                request.app.mail['marketing']['sender']
+                request.app.principal.reply_to
+                or request.app.mail['marketing']['sender']
             ),
             content=render_template(
                 'mail_subscribed.pt',

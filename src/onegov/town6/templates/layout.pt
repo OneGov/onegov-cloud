@@ -62,7 +62,7 @@
     </tal:b>
 </head>
 
-<body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
+<body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
     <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
 
@@ -92,11 +92,19 @@
         <div class="off-canvas-content" data-off-canvas-content>
             <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
             <main>
-                <header id="header">
+                <header id="header" tal:define="header_options request.app.org.header_options or {}">
+                    <div tal:condition="header_options.get('left_header_announcement', '')"
+                         id="announcement"
+                         style="color: ${header_options.get('left_header_announcement_font_color', '#000000')};
+                                background-color: ${header_options.get('left_header_announcement_bg_color', '#FBBC05')};">
+                             <div class="grid-container">
+                                    ${header_options['left_header_announcement']}
+                             </div>
+                    </div>
                     <div id="globals" class="globals" tal:define="toolbox global_tools|False">
                         <div class="grid-container">
                           <div class="grid-x grid-padding-x">
-                              <div class="cell small-12" tal:define="header_options request.app.org.header_options or {}">
+                              <div class="cell small-12">
                                   <div class="global-header-flex ${'' if toolbox else 'centered'}">
                                     <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
                                       <tal:b tal:condition="header_options['left_header_name']|nothing">

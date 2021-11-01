@@ -36,15 +36,15 @@ html {
     Ballot Result Bar
 */
 .ballot-result-bar {
+    color: $aluminum;
     margin-bottom: 2em;
 
     dl dt {
         margin-bottom: 0;
-        opacity: .5;
     }
 
     dl dd {
-        font-size: 240%;
+        font-size: 2.75rem;
         font-weight: bold;
         margin-bottom: -6px;
     }
@@ -74,6 +74,10 @@ html {
 
     .columns {
         padding: 0 1em;
+    }
+
+    h1 {
+        font-size: 1.75rem;
     }
 
     h1 small {
@@ -108,6 +112,21 @@ html {
 /*
     Homepage
 */
+
+h2 {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 1rem;
+    font-weight: bold;
+}
 
 .homepage {
     h2 {
@@ -483,6 +502,7 @@ figcaption {
     SVG Downloads
 */
 .svg-download {
+    color: $aluminum;
     display: block;
     font-size: .8rem;
     text-align: right;
@@ -499,6 +519,7 @@ figcaption {
     font-size: .8rem;
 
     a {
+        color: $aluminum;
         display: block;
         text-align: right;
     }
@@ -528,8 +549,8 @@ figcaption {
     }
 
     span {
+        color: $aluminum;
         font-weight: bold;
-        opacity: .5;
     }
 }
 

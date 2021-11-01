@@ -1,21 +1,33 @@
 import json
+import transaction
 
 from cached_property import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
+from dateutil.parser import parse
 from dateutil.rrule import rrulestr
+from onegov.core.csv import convert_excel_to_csv
+from onegov.core.csv import CSVFile
+from onegov.event.collections import EventCollection, OccurrenceCollection
 from onegov.event.models import EventFile
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TimeField
+from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
+from onegov.ticket import TicketCollection
 from sedate import replace_timezone, to_timezone
-from wtforms import RadioField, StringField, TextAreaField, validators
-from wtforms.fields.html5 import DateField, EmailField
-from onegov.form.fields import TimeField
+from wtforms import BooleanField
+from wtforms import RadioField
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms import validators
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import EmailField
 
 
 TAGS = [(tag, tag) for tag in (
@@ -404,3 +416,141 @@ class EventForm(Form):
                 } for ix, d in enumerate(dates)
             ]
         })
+
+
+class EventImportForm(Form):
+
+    clear = BooleanField(
+        label=_("Clear"),
+        description=_(
+            "Delete imported events before importing. This does not delete "
+            "otherwise imported events and submitted events."
+        ),
+        default=False
+    )
+
+    dry_run = BooleanField(
+        label=_("Dry Run"),
+        description=_("Do not actually import the events."),
+        default=False
+    )
+
+    file = UploadField(
+        label=_("Import"),
+        validators=[
+            validators.DataRequired(),
+            WhitelistedMimeType({
+                'application/excel',
+                'application/vnd.ms-excel',
+                (
+                    'application/'
+                    'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                ),
+                'application/vnd.ms-office',
+                'application/octet-stream',
+                'application/zip',
+                'text/csv',
+                'text/plain',
+            }),
+            FileSizeLimit(10 * 1024 * 1024)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    @property
+    def headers(self):
+        return {
+            'title': self.request.translate(_("Title")),
+            'description': self.request.translate(_("Description")),
+            'location': self.request.translate(_("Venue")),
+            'price': self.request.translate(_("Price")),
+            'organizer': self.request.translate(("Organizer")),
+            'organizer_email': self.request.translate(_("Organizer E-Mail")),
+            'tags': self.request.translate(_("Tags")),
+            'start': self.request.translate(_("From")),
+            'end': self.request.translate(_("To")),
+        }
+
+    def run_export(self):
+        occurrences = OccurrenceCollection(self.request.session)
+        headers = self.headers
+
+        def get(occurrence, attribute):
+            if attribute in ('start', 'end'):
+                attribute = f'localized_{attribute}'
+            result = (
+                getattr(occurrence, attribute, None)
+                or getattr(occurrence.event, attribute, None)
+            )
+            if isinstance(result, datetime):
+                result = result.strftime("%d.%m.%Y %H:%M")
+            if attribute == 'tags':
+                result = [self.request.translate(_(tag)) for tag in result]
+                result = ', '.join(result)
+            result = result or ''
+            result = result.strip()
+            return result
+
+        result = []
+        for occurrence in occurrences.query():
+            result.append({
+                title: get(occurrence, attribute)
+                for attribute, title in headers.items()
+            })
+
+        return result
+
+    def run_import(self):
+        headers = self.headers
+        session = self.request.session
+        events = EventCollection(session)
+        tags = {self.request.translate(tag[0]): tag[0] for tag in TAGS}
+        tickets = TicketCollection(session)
+
+        if self.clear.data:
+            for event in events.query():
+                if event.source:
+                    continue
+                if tickets.by_handler_id(event.id.hex):
+                    continue
+                session.delete(event)
+
+        csvfile = convert_excel_to_csv(self.file.file)
+        csv = CSVFile(csvfile, expected_headers=headers.values())
+        lines = list(csv.lines)
+        columns = {
+            key: csv.as_valid_identifier(value)
+            for key, value in headers.items()
+        }
+
+        def get(line, column, attribute):
+            result = getattr(line, column)
+            if attribute in ('start', 'end'):
+                result = parse(result, dayfirst=True)
+            if attribute == 'tags':
+                result = result.split(', ')
+                result = [tags.get(tag, None) for tag in result]
+                result = [tag for tag in result if tag]
+            return result
+
+        count = 0
+        errors = []
+        for number, line in enumerate(lines, start=1):
+            try:
+                kwargs = {
+                    attribute: get(line, column, attribute)
+                    for attribute, column in columns.items()
+                }
+                kwargs['timezone'] = 'Europe/Zurich'
+                event = events.add(**kwargs)
+                event.meta['submitter_email'] = self.request.current_username
+                event.submit()
+                event.publish()
+                count += 1
+            except Exception:
+                errors.append(str(number))
+
+        if self.dry_run.data or errors:
+            transaction.abort()
+
+        return count, errors

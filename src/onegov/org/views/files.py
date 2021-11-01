@@ -178,6 +178,13 @@ def handle_unpublish(self, request):
     self.published = False
 
 
+@OrgApp.view(model=GeneralFile, permission=Private, name='toggle-publication',
+             request_method='POST')
+def toggle_publication(self, request):
+    request.assert_valid_csrf_token()
+    self.publication = not self.publication
+
+
 @OrgApp.view(model=GeneralFile, permission=Private, name='update-publish-date',
              request_method='POST')
 def handle_update_publish_date(self, request):

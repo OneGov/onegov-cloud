@@ -32,7 +32,7 @@
 .flash > a::after {
     @include prefix(animation-duration, .7s);
     @include prefix(animation-fill-mode, forwards);
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     margin-left: 5px;
 }
 

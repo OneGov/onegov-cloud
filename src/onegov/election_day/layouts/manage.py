@@ -12,7 +12,6 @@ from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.models import EmailSubscriber
-from onegov.election_day.models import Principal
 from onegov.election_day.models import SmsSubscriber
 
 
@@ -107,7 +106,7 @@ class ManageLayout(DefaultLayout):
                 self.request.link(
                     self.principal, name='trigger-notifications'
                 ),
-                isinstance(self.model, Principal),
+                'trigger-notifications' in self.request.url,
                 []
             ))
             result.append((
@@ -116,7 +115,6 @@ class ManageLayout(DefaultLayout):
                 (
                     isinstance(self.model, SmsSubscriberCollection)
                     or isinstance(self.model, EmailSubscriberCollection)
-                    or isinstance(self.model, Principal)
                 ),
                 submenu
             ))
@@ -127,6 +125,29 @@ class ManageLayout(DefaultLayout):
             isinstance(self.model, ScreenCollection),
             []
         ))
+
+        if self.request.is_secret(self.model):
+            submenu = [
+                (
+                    _("Update archived results"),
+                    self.request.link(self.principal, 'update-results'),
+                    'update-results' in self.request.url,
+                    []
+                ),
+                (
+                    _("Clear cache"),
+                    self.request.link(self.principal, 'clear-cache'),
+                    'clear-cache' in self.request.url,
+                    []
+                )
+            ]
+
+            result.append((
+                _("Administration"),
+                '',
+                False,
+                submenu
+            ))
 
         return result
 

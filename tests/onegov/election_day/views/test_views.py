@@ -457,3 +457,12 @@ def test_view_screen(election_day_app):
 
     view = client.get('/screen/10')
     assert 'Einfache Vorlage' in view
+
+
+def test_view_custom_css(election_day_app):
+    principal = election_day_app.principal
+    principal.custom_css = 'tr { display: none }'
+    election_day_app.cache.set('principal', principal)
+
+    client = Client(election_day_app)
+    assert '<style>tr { display: none }</style>' in client.get('/')

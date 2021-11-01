@@ -1,0 +1,27 @@
+Registrazione
+-------------
+
+# Dati personali
+Nome * = ___
+Cognome * = ___
+E-mail * = @@@
+Numero AVS = # ch.ssn
+Data di nascita * = YYYY.MM.DD
+
+# Indirizzo
+Via (incl. numero civico) * = ___
+Codice postale / Città * = ___
+
+# personale
+Dieta =
+    (x) Tutti
+    ( ) Vegetariano
+    ( ) Vegano
+
+Stili di musica =
+    [ ] Pop
+    [ ] Roccia
+    [ ] Rap
+
+# Altro
+Commenti = ...

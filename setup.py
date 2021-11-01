@@ -70,6 +70,7 @@ setup(
         'click',
         'colour',
         'cssmin',
+        'cssutils',
         'dill!=0.2.7',
         'dogpile.cache',
         'dukpy',
@@ -118,8 +119,9 @@ setup(
         'psycopg2',
         'purl',
         'pycurl',
-        'pyparsing',
+        'pyparsing<3.0.0',
         'pyquery',
+        'qrbill',
         'qrcode',
         'python-dateutil',
         'python-magic>=0.4.17',
@@ -171,12 +173,12 @@ setup(
             'flake8'
         ],
         'docs': [
+            'docutils==0.17',
             'alabaster',
             'sphinx<3.4.0',
         ],
         'test': [
             'Pillow!=5.4.0',
-            'PyPDF2',
             'coverage',
             'faker',
             'findimports',

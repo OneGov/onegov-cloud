@@ -4,6 +4,7 @@ TICKET_STATES = {
     'open': _("Open"),
     'pending': _("Pending"),
     'closed': _("Closed"),
+    'archived': _("Archived"),
     'all': _("All")
 }
 
