@@ -250,7 +250,7 @@
                     <tr tal:condition="vote.recommendations_parties">
                         <th class="column-30" i18n:translate>Recommendations of the Parties</th>
                         <td>
-                            <dl tal:repeat="(recommendation, parties) vote.recommendations_parties.items()">
+                            <dl tal:repeat="(recommendation, parties) vote.recommendations_parties.items()" class="recommendation">
                                 <dt>${recommendation}</dt>
                                 <dd tal:repeat="party parties"><tal:block tal:content="structure party.html(request)" /></dd>
                             </dl>
@@ -287,7 +287,7 @@
                     <tr tal:condition="vote.recommendations_associations">
                         <th class="column-30" i18n:translate>Further Recommendations</th>
                         <td>
-                            <dl tal:repeat="(recommendation, associations) vote.recommendations_associations.items()">
+                            <dl tal:repeat="(recommendation, associations) vote.recommendations_associations.items()" class="recommendation">
                                 <dt>${recommendation}</dt>
                                 <dd tal:repeat="association associations"><tal:block tal:content="structure association.html(request)" /></dd>
                             </dl>
@@ -296,7 +296,7 @@
                     <tr tal:condition="vote.recommendations_divergent_parties">
                         <th class="column-30" i18n:translate>Divergent branches</th>
                         <td>
-                            <dl tal:repeat="(recommendation, branches) vote.recommendations_divergent_parties.items()">
+                            <dl tal:repeat="(recommendation, branches) vote.recommendations_divergent_parties.items()"  class="recommendation">
                                 <dt>${recommendation}</dt>
                                 <dd tal:repeat="(actor, canton) branches"><tal:block tal:content="structure actor.html(request)" /> <tal:block tal:content="structure canton.html(request)" /></dd>
                             </dl>
