@@ -1,8 +1,28 @@
 # Changes
 
+## 2021.88
+
+`2021-11-01` | [2cb5fe49f8...4f7e6264c4](https://github.com/OneGov/onegov-cloud/compare/2cb5fe49f8^...4f7e6264c4)
+
+### Org
+
+##### Fix event import date/time parsing.
+
+`Bugfix` | [OGC_88](#OGC_88) | [dd73a9d6c6](https://github.com/onegov/onegov-cloud/commit/dd73a9d6c681fc73e6dd3d3b0217c2094b34d9aa)
+
+### Swissvotes
+
+##### Add post-vote poll dataset hint.
+
+`Feature` | [SWI-19](https://linear.app/swissvotes/issue/SWI-19) | [2cb5fe49f8](https://github.com/onegov/onegov-cloud/commit/2cb5fe49f8f2be2e1d84c582b4c6cbf0900326aa)
+
+##### Add blank lines between recommendations.
+
+`Feature` | [SWI-19](https://linear.app/swissvotes/issue/SWI-19) | [04a03e5df1](https://github.com/onegov/onegov-cloud/commit/04a03e5df14c25b541933783e26be7e3eeed23ff)
+
 ## 2021.87
 
-`2021-11-01` | [4a1d5d96e7...2349458016](https://github.com/OneGov/onegov-cloud/compare/4a1d5d96e7^...2349458016)
+`2021-11-01` | [4a1d5d96e7...e9d1328651](https://github.com/OneGov/onegov-cloud/compare/4a1d5d96e7^...e9d1328651)
 
 ### Feriennet
 
@@ -1391,40 +1411,4 @@ Adds option to /ticket-settings to disable sending notifications for external me
 On topic A with child B, show the B's lead on /topics/a if enabled in the settings of B.
 
 `Feature` | [SEA-249](https://linear.app/seantis/issue/SEA-249) | [468544435f](https://github.com/onegov/onegov-cloud/commit/468544435f5165cbd2b6bad408a314a515951028)
-
-## 2021.38
-
-`2021-04-01` | [a54d571901...28f8485e85](https://github.com/OneGov/onegov-cloud/compare/a54d571901^...28f8485e85)
-
-### Election Day
-
-##### Fixes mandates of list in election compounds counted incorrectly.
-
-`Bugfix` | [49f2ac6f85](https://github.com/onegov/onegov-cloud/commit/49f2ac6f85d3907e0a0cd4dd29a437e5e3e47241)
-
-### Org
-
-##### Fixes error rendering ticket pdf summary table
-
-- limits ticket messages to 2000 chars
-- Adds suppoert for max counter display on textarea
-- Fixes padding right of .message
-
-`Bugfix` | [SEA-243](https://linear.app/seantis/issue/SEA-243) | [823ae76786](https://github.com/onegov/onegov-cloud/commit/823ae767868a88dc9e45d96a641e9905e313a6a2)
-
-### Pdf
-
-##### Limits trustedSchemes for reportlab
-
-Mitigates CVE-2020-28463.
-
-`Other` | [OPS-349](#OPS-349) | [9822f014a3](https://github.com/onegov/onegov-cloud/commit/9822f014a3562b4a5c1ccb32513477a009444f13)
-
-### Town6
-
-##### Fixes wrapping dates in event cards
-
-Use abbreviations for weekdays.
-
-`Improvement` | [SEA-244](https://linear.app/seantis/issue/SEA-244) | [5b0e4bc6aa](https://github.com/onegov/onegov-cloud/commit/5b0e4bc6aa3e72dea15c4e3d76ff9b8ea06b417b)
 
