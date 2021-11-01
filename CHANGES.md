@@ -1,8 +1,38 @@
 # Changes
 
+## 2021.87
+
+`2021-11-01` | [4a1d5d96e7...2349458016](https://github.com/OneGov/onegov-cloud/compare/4a1d5d96e7^...2349458016)
+
+### Feriennet
+
+##### Update Italian translations.
+
+`Other` | [PRO-805](https://linear.app/projuventute/issue/PRO-805) | [4a1d5d96e7](https://github.com/onegov/onegov-cloud/commit/4a1d5d96e7bc4d4dd1b46dfeb246cd9a9fd3285f)
+
+### Org
+
+##### Add ticket pickup hint.
+
+`Feature` | [OGC-103](https://linear.app/onegovcloud/issue/OGC-103) | [c0dbb1cedb](https://github.com/onegov/onegov-cloud/commit/c0dbb1cedb17848c0b44e90f5064e6f4923a8f2d)
+
+##### Add import for events.
+
+`Feature` | [OGC-88](https://linear.app/onegovcloud/issue/OGC-88) | [9fad3a64a1](https://github.com/onegov/onegov-cloud/commit/9fad3a64a1ced1292493e384637bd9aacd14a6e0)
+
+### Town6
+
+##### Improve focus widgets.
+
+`Other` | [OGC-86](https://linear.app/onegovcloud/issue/OGC-86) | [a08eb1021c](https://github.com/onegov/onegov-cloud/commit/a08eb1021cf17a774e21163260c4ba0a30056a58)
+
+##### Fix homepage tiles layout.
+
+`Bugfix` | [OGC-115](https://linear.app/onegovcloud/issue/OGC-115) | [b82085deef](https://github.com/onegov/onegov-cloud/commit/b82085deefbd62ee7021063720564e39b5d09070)
+
 ## 2021.86
 
-`2021-10-26` | [fdc1567f8b...fdc1567f8b](https://github.com/OneGov/onegov-cloud/compare/fdc1567f8b^...fdc1567f8b)
+`2021-10-26` | [fdc1567f8b...3f171e8f67](https://github.com/OneGov/onegov-cloud/compare/fdc1567f8b^...3f171e8f67)
 
 ### Feriennet
 
@@ -1397,8 +1427,4 @@ Mitigates CVE-2020-28463.
 Use abbreviations for weekdays.
 
 `Improvement` | [SEA-244](https://linear.app/seantis/issue/SEA-244) | [5b0e4bc6aa](https://github.com/onegov/onegov-cloud/commit/5b0e4bc6aa3e72dea15c4e3d76ff9b8ea06b417b)
-
-## 2021.37
-
-`2021-03-30` | [52585f5d2c...51c603749f](https://github.com/OneGov/onegov-cloud/compare/52585f5d2c^...51c603749f)
 
