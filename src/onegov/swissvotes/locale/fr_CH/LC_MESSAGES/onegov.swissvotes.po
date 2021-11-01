@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-09-06 10:07+0200\n"
+"POT-Creation-Date: 2021-11-01 07:44+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -143,21 +143,6 @@ msgstr "Titre"
 msgid "Content"
 msgstr "Contenu"
 
-msgid "From date"
-msgstr "De"
-
-msgid "To date"
-msgstr "A"
-
-msgid "Legal form"
-msgstr "Type de processus"
-
-msgid "Voting result"
-msgstr "Résultat de la votation"
-
-msgid "Policy area"
-msgstr "Domaine politique"
-
 msgid "Text Search"
 msgstr "Texte"
 
@@ -177,6 +162,21 @@ msgstr ""
 "Recherche dans l'intégralité du texte, pièces jointes comprises. "
 "Sélectionnez \"non\" si vous souhaitez limiter la recherche au titre, mot-"
 "clé, numéro de vote et numéro de procédure."
+
+msgid "Policy area"
+msgstr "Domaine politique"
+
+msgid "Legal form"
+msgstr "Type de processus"
+
+msgid "Voting result"
+msgstr "Résultat de la votation"
+
+msgid "From date"
+msgstr "De"
+
+msgid "To date"
+msgstr "A"
 
 msgid "Position of the Federal Council"
 msgstr "Position du Conseil fédéral"
@@ -1787,6 +1787,18 @@ msgstr "Rapport technique"
 
 msgid "Cockpit with selected results"
 msgstr "Cockpit avec des résultats d'analyse"
+
+msgid ""
+"Due to data protection requirements, Swissvotes publishes a slightly reduced "
+"version of this dataset. Access to the full version might be possible for "
+"research purposes; see the Swissvotes codebook for more details on this "
+"(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
+msgstr ""
+"Pour des raisons de protection des données, une version réduite de cet "
+"ensemble de données est publiée sur Swissvotes. L’accès à l’ensemble des "
+"données est éventuellement possible à des fins de recherche; vous trouverez "
+"davantage d’informations à ce propos dans le codebook de Swissvotes (www."
+"swissvotes.ch/page/dataset/codebook-de.pdf)."
 
 msgid "Filter"
 msgstr "Filtre de recherche"
