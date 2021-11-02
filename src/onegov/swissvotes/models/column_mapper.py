@@ -833,6 +833,7 @@ class ColumnMapper(object):
             ('post_vote_poll_link_fr', 'nach_cockpit_f'),
             ('post_vote_poll_link_en', 'nach_cockpit_e'),
             ('procedure_number', 'gesch_nr'),
+            ('brief_description_title', 'kurzbetitel'),
         ))
 
     def set_value(self, vote, attribute, value):
