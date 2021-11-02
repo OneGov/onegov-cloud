@@ -4,7 +4,7 @@ import morepath
 
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
-from onegov.org import OrgApp
+from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
@@ -42,6 +42,13 @@ def view_topic(self, request, layout=None):
 
     if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
+        layout.editbar_links.append(
+            Link(
+                _("Sort"),
+                request.link(self, 'sort'),
+                classes=('edit-link', )
+            )
+        )
         children = self.children
     else:
         children = request.exclude_invisible(
@@ -103,3 +110,25 @@ def view_news(self, request, layout=None):
         'tag_links': tag_links,
         'get_lead': get_lead
     }
+
+
+# @OrgApp.html(
+#     model=Topic,
+#     template='sort.pt',
+#     name='sort',
+#     permission=Private
+# )
+# def view_topics_sort(self, request):
+#     layout = PageLayout(self, request)
+
+#     return {
+#         'title': _("Sort"),
+#         'layout': layout,
+#         'items': (
+#             (
+#                 _('Topics'),
+#                 layout.move_agency_url_template,
+#                 ((agency.id, agency.title) for agency in self.roots)
+#             ),
+#         )
+#     }

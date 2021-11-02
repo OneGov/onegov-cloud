@@ -95,9 +95,12 @@ class Link(AccessMixin):
 
             a.attrib['ic-delete-from'] = url.as_string()
 
-        if self.classes or extra_classes:
-            classes = self.classes + (extra_classes or tuple())
-            a.attrib['class'] = ' '.join(classes)
+        classes = []
+        if self.classes:
+            classes.extend(self.classes)
+        if extra_classes:
+            classes.extend(extra_classes)
+        a.attrib['class'] = ' '.join(classes)
 
         # add the access hint if needed
         if self.access == 'private':
