@@ -42,11 +42,12 @@ def view_topic(self, request, layout=None):
 
     if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
-        layout.editbar_links.append(
+        layout.editbar_links.insert(
+            len(layout.editbar_links) - 1,
             Link(
                 _("Sort"),
                 request.link(self, 'sort'),
-                classes=('edit-link', )
+                classes=('sort-link', )
             )
         )
         children = self.children

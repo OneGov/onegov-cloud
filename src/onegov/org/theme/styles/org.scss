@@ -1575,6 +1575,7 @@ $payments-icon: '\f09d';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
+$sort-link-icon: '\f074';
 $sync-icon: '\f021';
 $subscribe-link-icon: '\f0c1';
 $test-link-icon: '\f0e9';
@@ -1699,6 +1700,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
+    .sort-link::before { @include icon($sort-link-icon); }
     .subscribe-link::before { @include icon($subscribe-link-icon); }
     .test-link::before { @include icon($test-link-icon); }
     .rule-link::before { @include icon($rule-link-icon); }
@@ -3019,7 +3021,7 @@ button {
             }
 
             &.fc-day-top,
-            &.fc-day-header, {
+            &.fc-day-header {
                 background: $yellow-light !important;
                 opacity: 1;
             }
