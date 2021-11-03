@@ -295,7 +295,6 @@ msgstr "Voce di fattura testo"
 
 msgid "Invoice Item Paid"
 msgstr "Voce di fattura pagata"
-msgstr "Voce di fattura testo"
 
 msgid "Invoice Item Paid"
 msgstr "Data di pagamento"
