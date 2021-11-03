@@ -7,8 +7,8 @@ from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import SwissVote
 from pytest import mark
+from tests.shared import Client
 from unittest.mock import patch
-from webtest import TestApp as Client
 from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
 
@@ -38,7 +38,7 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert "Datensatz aktualisiert (659 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (673 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
