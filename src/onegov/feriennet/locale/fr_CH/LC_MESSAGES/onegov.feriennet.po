@@ -302,6 +302,9 @@ msgstr "Texte facture"
 msgid "Invoice Item Paid"
 msgstr "Facture payée"
 
+msgid "Invoice Item Payment Date"
+msgstr "Date de paiement"
+
 msgid "Invoice Item Transaction ID"
 msgstr "Référence de transaction facture"
 

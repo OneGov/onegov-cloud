@@ -301,6 +301,9 @@ msgstr "Rechnungsposition Text"
 msgid "Invoice Item Paid"
 msgstr "Rechnungsposition Bezahlt"
 
+msgid "Invoice Item Payment Date"
+msgstr "Bezahlungsdatum"
+
 msgid "Invoice Item Transaction ID"
 msgstr "Rechnungsposition Transaktions ID"
 

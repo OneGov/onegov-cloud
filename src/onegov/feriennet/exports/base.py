@@ -172,6 +172,7 @@ class FeriennetExport(Export):
         yield _("Invoice Item Group"), item.group
         yield _("Invoice Item Text"), item.text
         yield _("Invoice Item Paid"), item.paid
+        yield _("Invoice Item Payment Date"), 'test'
         yield _("Invoice Item Transaction ID"), item.tid or ''
         yield _("Invoice Item Source"), item.source or ''
         yield _("Invoice Item Unit"), item.unit
