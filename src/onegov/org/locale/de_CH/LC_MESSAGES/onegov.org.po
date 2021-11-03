@@ -1584,6 +1584,9 @@ msgstr "Export"
 msgid "Change Url"
 msgstr "Url ändern"
 
+msgid "Sort"
+msgstr "Sortieren"
+
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
 

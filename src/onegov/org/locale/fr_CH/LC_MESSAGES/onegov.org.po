@@ -1587,6 +1587,9 @@ msgstr "Exporter"
 msgid "Change Url"
 msgstr "Changer Url"
 
+msgid "Sort"
+msgstr "Trier"
+
 msgid "Registration Windows"
 msgstr "Fenêtres d'inscription"
 

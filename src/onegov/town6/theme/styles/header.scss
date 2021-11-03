@@ -49,6 +49,7 @@ $payments-icon: $payment-provider-icon;
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d8';
+$sort-link-icon: '\f074';
 $sync-icon: '\f2f1';
 $subscribe-link-icon: '\f0f3';
 $test-link-icon: '\f4da';
@@ -354,6 +355,7 @@ $editbar-fg-color-active: $white;
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
+    .sort-link::before { @include icon($sort-link-icon); font-weight: bold; }
     .subscribe-link::before { @include icon-bold($subscribe-link-icon); }
     .test-link::before { @include icon($test-link-icon); }
     .rule-link::before { @include icon-bold($rule-link-icon); }
