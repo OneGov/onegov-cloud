@@ -183,6 +183,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     title_fr = Column(Text, nullable=False)
     short_title_de = Column(Text, nullable=False)
     short_title_fr = Column(Text, nullable=False)
+    brief_description_title = Column(Text)
     keyword = Column(Text)
     votes_on_same_day = Column(Integer, nullable=False)
     _legal_form = Column('legal_form', Integer, nullable=False)

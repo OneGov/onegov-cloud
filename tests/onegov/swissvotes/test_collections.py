@@ -861,6 +861,7 @@ def test_votes_export(swissvotes_app):
         result_cantons_nays=Decimal('24.5'),
         result_cantons_yeas_p=Decimal('60.01'),
         swissvoteslink='https://example.com/122.0',
+        brief_description_title='Kurzbeschreibung'
     )
     vote.result_ag_eligible_voters = 101
     vote.result_ag_votes_valid = 102
@@ -1671,6 +1672,7 @@ def test_votes_export(swissvotes_app):
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',
         'titel_kurz_f': 'V F',
+        'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
         'anzahl': '2',
         'rechtsform': '1',
@@ -2510,6 +2512,7 @@ def test_votes_export(swissvotes_app):
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',
         'titel_kurz_f': 'V F',
+        'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
         'anzahl': 2.0,
         'rechtsform': 1.0,

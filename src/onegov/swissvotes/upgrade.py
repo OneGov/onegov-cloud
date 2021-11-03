@@ -430,3 +430,12 @@ def add_die_mittel_columns(context):
             'swissvotes',
             Column('national_council_share_mitte', Numeric(13, 10))
         )
+
+
+@upgrade_task('Adds brief description title column')
+def add_brief_description_title(context):
+    if not context.has_column('swissvotes', 'brief_description_title'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('brief_description_title', Text())
+        )
