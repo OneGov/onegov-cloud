@@ -2949,7 +2949,7 @@ msgid "QR-Bill (experimental)"
 msgstr ""
 
 msgid "Full age required for registration"
-msgstr "Inscription des bénévoles"
+msgstr "Âge complet requis pour l'inscription"
 
 msgid "Userprofile"
 msgstr "Profil d'utilisateur"

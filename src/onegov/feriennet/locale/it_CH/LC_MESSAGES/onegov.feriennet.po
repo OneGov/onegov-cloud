@@ -2924,9 +2924,8 @@ msgstr "Numero di identificazione PVR"
 msgid "QR-Bill (experimental)"
 msgstr ""
 
-#, fuzzy
 msgid "Full age required for registration"
-msgstr "Registrazione aiutante"
+msgstr "Età completa richiesta per la registrazione"
 
 msgid "Userprofile"
 msgstr "Profilo utente"
