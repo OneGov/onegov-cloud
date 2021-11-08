@@ -37,14 +37,12 @@ def view_vote(self, request):
     next = query.order_by(SwissVote.bfs_number.asc())
     next = next.filter(SwissVote.bfs_number > self.bfs_number).first()
 
-    bfs_map = self.bfs_map(request.locale)
-    bfs_map_host = self.bfs_map_host(request.locale)
-    if bfs_map_host:
-        request.content_security_policy.default_src |= {bfs_map_host}
+    if self.bfs_map_host:
+        request.content_security_policy.default_src |= {self.bfs_map_host}
 
     return {
         'layout': layout,
-        'bfs_map': bfs_map,
+        'bfs_map': self.bfs_map,
         'prev': prev,
         'next': next,
         'map_preview': request.link(StaticFile('images/map-preview.png')),

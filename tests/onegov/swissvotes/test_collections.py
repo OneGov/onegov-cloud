@@ -1616,12 +1616,21 @@ def test_votes_export(swissvotes_app):
     vote.national_council_share_unknown = Decimal('28.20')
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
-    vote.curia_vista_de = 'curiavista_de'
-    vote.curia_vista_fr = 'curiavista_fr'
-    vote.bkresults_de = 'bkresults_de'
-    vote.bkresults_fr = 'bkresults_fr'
-    vote.bkchrono_de = 'bkchrono_de'
-    vote.bkchrono_fr = 'bkchrono_fr'
+    vote.link_curia_vista_de = 'https://curia.vista/de'
+    vote.link_curia_vista_fr = 'https://curia.vista/fr'
+    vote.link_bk_results_de = 'https://bk.results/de'
+    vote.link_bk_results_fr = 'https://bk.results/fr'
+    vote.link_bk_chrono_de = 'https://bk.chrono/de'
+    vote.link_bk_chrono_fr = 'https://bk.chrono/fr'
+    vote.link_federal_council_de = 'https://federal.council/de'
+    vote.link_federal_council_fr = 'https://federal.council/fr'
+    vote.link_federal_council_en = 'https://federal.council/en'
+    vote.link_federal_departement_de = 'https://federal.departement/de'
+    vote.link_federal_departement_fr = 'https://federal.departement/fr'
+    vote.link_federal_departement_en = 'https://federal.departement/en'
+    vote.link_federal_office_de = 'https://federal.office/de'
+    vote.link_federal_office_fr = 'https://federal.office/fr'
+    vote.link_federal_office_en = 'https://federal.office/en'
     vote.posters_mfg_yea = (
         'https://museum.ch/objects/1 '
         'https://museum.ch/objects/2'
@@ -1638,9 +1647,9 @@ def test_votes_export(swissvotes_app):
         'https://sozialarchiv.ch/objects/3 '
         'https://sozialarchiv.ch/objects/4'
     )
-    vote.post_vote_poll_link_de = 'https://post.vote.poll/de'
-    vote.post_vote_poll_link_fr = 'https://post.vote.poll/fr'
-    vote.post_vote_poll_link_en = 'https://post.vote.poll/en'
+    vote.link_post_vote_poll_de = 'https://post.vote.poll/de'
+    vote.link_post_vote_poll_fr = 'https://post.vote.poll/fr'
+    vote.link_post_vote_poll_en = 'https://post.vote.poll/en'
     vote.media_ads_total = 1001
     vote.media_ads_per_issue = Decimal('10.02')
     vote.media_ads_yea = 1003
@@ -1732,10 +1741,10 @@ def test_votes_export(swissvotes_app):
         'be-japroz': '10,8',
         'be-nein': '107',
         'be-stimmen': '103',
-        'bkchrono-de': 'bkchrono_de',
-        'bkchrono-fr': 'bkchrono_fr',
-        'bkresults-de': 'bkresults_de',
-        'bkresults-fr': 'bkresults_fr',
+        'bkchrono-de': 'https://bk.chrono/de',
+        'bkchrono-fr': 'https://bk.chrono/fr',
+        'bkresults-de': 'https://bk.results/de',
+        'bkresults-fr': 'https://bk.results/fr',
         'bl-annahme': '0',
         'bl-berecht': '101',
         'bl-bet': '10,4',
@@ -1752,8 +1761,17 @@ def test_votes_export(swissvotes_app):
         'bs-japroz': '10,8',
         'bs-nein': '107',
         'bs-stimmen': '103',
-        'curiavista-de': 'curiavista_de',
-        'curiavista-fr': 'curiavista_fr',
+        'curiavista-de': 'https://curia.vista/de',
+        'curiavista-fr': 'https://curia.vista/fr',
+        'info_br-de': 'https://federal.council/de',
+        'info_br-fr': 'https://federal.council/fr',
+        'info_br-en': 'https://federal.council/en',
+        'info_dep-de': 'https://federal.departement/de',
+        'info_dep-fr': 'https://federal.departement/fr',
+        'info_dep-en': 'https://federal.departement/en',
+        'info_amt-de': 'https://federal.office/de',
+        'info_amt-fr': 'https://federal.office/fr',
+        'info_amt-en': 'https://federal.office/en',
         'fr-annahme': '0',
         'fr-berecht': '101',
         'fr-bet': '10,4',
@@ -2572,10 +2590,10 @@ def test_votes_export(swissvotes_app):
         'be-japroz': 10.8,
         'be-nein': 107.0,
         'be-stimmen': 103.0,
-        'bkchrono-de': 'bkchrono_de',
-        'bkchrono-fr': 'bkchrono_fr',
-        'bkresults-de': 'bkresults_de',
-        'bkresults-fr': 'bkresults_fr',
+        'bkchrono-de': 'https://bk.chrono/de',
+        'bkchrono-fr': 'https://bk.chrono/fr',
+        'bkresults-de': 'https://bk.results/de',
+        'bkresults-fr': 'https://bk.results/fr',
         'bl-annahme': 0.0,
         'bl-berecht': 101.0,
         'bl-bet': 10.4,
@@ -2592,8 +2610,17 @@ def test_votes_export(swissvotes_app):
         'bs-japroz': 10.8,
         'bs-nein': 107.0,
         'bs-stimmen': 103.0,
-        'curiavista-de': 'curiavista_de',
-        'curiavista-fr': 'curiavista_fr',
+        'curiavista-de': 'https://curia.vista/de',
+        'curiavista-fr': 'https://curia.vista/fr',
+        'info_br-de': 'https://federal.council/de',
+        'info_br-fr': 'https://federal.council/fr',
+        'info_br-en': 'https://federal.council/en',
+        'info_dep-de': 'https://federal.departement/de',
+        'info_dep-fr': 'https://federal.departement/fr',
+        'info_dep-en': 'https://federal.departement/en',
+        'info_amt-de': 'https://federal.office/de',
+        'info_amt-fr': 'https://federal.office/fr',
+        'info_amt-en': 'https://federal.office/en',
         'fr-annahme': 0.0,
         'fr-berecht': 101.0,
         'fr-bet': 10.4,
