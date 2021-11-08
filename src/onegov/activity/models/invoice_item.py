@@ -4,6 +4,7 @@ from onegov.core.orm.types import UUID
 from onegov.pay import PayableManyTimes
 from sqlalchemy import Boolean
 from sqlalchemy import Column
+from sqlalchemy import Date
 from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
 from sqlalchemy import Text
@@ -41,6 +42,9 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
 
     #: true if paid
     paid = Column(Boolean, nullable=False, default=False)
+
+    #: the payment date
+    payment_date = Column(Date, nullable=True)
 
     #: the transaction id if paid through a bank or online transaction
     tid = Column(Text, nullable=True)
