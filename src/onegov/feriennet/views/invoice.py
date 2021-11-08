@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import date
 from onegov.activity import Period, Invoice, InvoiceItem, InvoiceCollection, \
     PeriodCollection
 from onegov.core.security import Personal, Secret
@@ -187,6 +188,7 @@ def handle_payment(self, request):
 
             item.payments.append(payment)
             item.source = provider.type
+            item.payment_date = date.today()
             item.paid = True
 
         request.success(_("Your payment has been received. Thank you!"))

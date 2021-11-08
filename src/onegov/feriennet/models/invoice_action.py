@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from datetime import date
 from onegov.activity import InvoiceItem
 
 
@@ -75,6 +76,7 @@ class InvoiceAction(object):
         self.assert_safe_to_change(targets)
 
         for target in targets:
+            target.payment_date = date.today()
             target.paid = True
 
     def execute_mark_unpaid(self, targets):
