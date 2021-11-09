@@ -846,11 +846,6 @@ def test_votes_export(swissvotes_app):
         descriptor_3_level_2=Decimal('10.3'),
         descriptor_3_level_3=Decimal('10.33'),
         _result=1,
-        result_eligible_voters=2,
-        result_votes_empty=3,
-        result_votes_invalid=4,
-        result_votes_valid=5,
-        result_votes_total=6,
         result_turnout=Decimal('20.01'),
         _result_people_accepted=1,
         result_people_yeas=8,
@@ -863,213 +858,31 @@ def test_votes_export(swissvotes_app):
         swissvoteslink='https://example.com/122.0',
         brief_description_title='Kurzbeschreibung'
     )
-    vote.result_ag_eligible_voters = 101
-    vote.result_ag_votes_valid = 102
-    vote.result_ag_votes_total = 103
-    vote.result_ag_turnout = Decimal('10.40')
-    vote.result_ag_yeas = 105
-    vote.result_ag_nays = 107
-    vote.result_ag_yeas_p = Decimal('10.80')
     vote._result_ag_accepted = 0
-    vote.result_ai_eligible_voters = 101
-    vote.result_ai_votes_valid = 102
-    vote.result_ai_votes_total = 103
-    vote.result_ai_turnout = Decimal('10.40')
-    vote.result_ai_yeas = 105
-    vote.result_ai_nays = 107
-    vote.result_ai_yeas_p = Decimal('10.80')
     vote._result_ai_accepted = 0
-    vote.result_ar_eligible_voters = 101
-    vote.result_ar_votes_valid = 102
-    vote.result_ar_votes_total = 103
-    vote.result_ar_turnout = Decimal('10.40')
-    vote.result_ar_yeas = 105
-    vote.result_ar_nays = 107
-    vote.result_ar_yeas_p = Decimal('10.80')
     vote._result_ar_accepted = 0
-    vote.result_be_eligible_voters = 101
-    vote.result_be_votes_valid = 102
-    vote.result_be_votes_total = 103
-    vote.result_be_turnout = Decimal('10.40')
-    vote.result_be_yeas = 105
-    vote.result_be_nays = 107
-    vote.result_be_yeas_p = Decimal('10.80')
     vote._result_be_accepted = 0
-    vote.result_bl_eligible_voters = 101
-    vote.result_bl_votes_valid = 102
-    vote.result_bl_votes_total = 103
-    vote.result_bl_turnout = Decimal('10.40')
-    vote.result_bl_yeas = 105
-    vote.result_bl_nays = 107
-    vote.result_bl_yeas_p = Decimal('10.80')
     vote._result_bl_accepted = 0
-    vote.result_bs_eligible_voters = 101
-    vote.result_bs_votes_valid = 102
-    vote.result_bs_votes_total = 103
-    vote.result_bs_turnout = Decimal('10.40')
-    vote.result_bs_yeas = 105
-    vote.result_bs_nays = 107
-    vote.result_bs_yeas_p = Decimal('10.80')
     vote._result_bs_accepted = 0
-    vote.result_fr_eligible_voters = 101
-    vote.result_fr_votes_valid = 102
-    vote.result_fr_votes_total = 103
-    vote.result_fr_turnout = Decimal('10.40')
-    vote.result_fr_yeas = 105
-    vote.result_fr_nays = 107
-    vote.result_fr_yeas_p = Decimal('10.80')
     vote._result_fr_accepted = 0
-    vote.result_ge_eligible_voters = 101
-    vote.result_ge_votes_valid = 102
-    vote.result_ge_votes_total = 103
-    vote.result_ge_turnout = Decimal('10.40')
-    vote.result_ge_yeas = 105
-    vote.result_ge_nays = 107
-    vote.result_ge_yeas_p = Decimal('10.80')
     vote._result_ge_accepted = 0
-    vote.result_gl_eligible_voters = 101
-    vote.result_gl_votes_valid = 102
-    vote.result_gl_votes_total = 103
-    vote.result_gl_turnout = Decimal('10.40')
-    vote.result_gl_yeas = 105
-    vote.result_gl_nays = 107
-    vote.result_gl_yeas_p = Decimal('10.80')
     vote._result_gl_accepted = 0
-    vote.result_gr_eligible_voters = 101
-    vote.result_gr_votes_valid = 102
-    vote.result_gr_votes_total = 103
-    vote.result_gr_turnout = Decimal('10.40')
-    vote.result_gr_yeas = 105
-    vote.result_gr_nays = 107
-    vote.result_gr_yeas_p = Decimal('10.80')
     vote._result_gr_accepted = 0
-    vote.result_ju_eligible_voters = 101
-    vote.result_ju_votes_valid = 102
-    vote.result_ju_votes_total = 103
-    vote.result_ju_turnout = Decimal('10.40')
-    vote.result_ju_yeas = 105
-    vote.result_ju_nays = 107
-    vote.result_ju_yeas_p = Decimal('10.80')
     vote._result_ju_accepted = 0
-    vote.result_lu_eligible_voters = 101
-    vote.result_lu_votes_valid = 102
-    vote.result_lu_votes_total = 103
-    vote.result_lu_turnout = Decimal('10.40')
-    vote.result_lu_yeas = 105
-    vote.result_lu_nays = 107
-    vote.result_lu_yeas_p = Decimal('10.80')
     vote._result_lu_accepted = 0
-    vote.result_ne_eligible_voters = 101
-    vote.result_ne_votes_valid = 102
-    vote.result_ne_votes_total = 103
-    vote.result_ne_turnout = Decimal('10.40')
-    vote.result_ne_yeas = 105
-    vote.result_ne_nays = 107
-    vote.result_ne_yeas_p = Decimal('10.80')
     vote._result_ne_accepted = 0
-    vote.result_nw_eligible_voters = 101
-    vote.result_nw_votes_valid = 102
-    vote.result_nw_votes_total = 103
-    vote.result_nw_turnout = Decimal('10.40')
-    vote.result_nw_yeas = 105
-    vote.result_nw_nays = 107
-    vote.result_nw_yeas_p = Decimal('10.80')
     vote._result_nw_accepted = 0
-    vote.result_ow_eligible_voters = 101
-    vote.result_ow_votes_valid = 102
-    vote.result_ow_votes_total = 103
-    vote.result_ow_turnout = Decimal('10.40')
-    vote.result_ow_yeas = 105
-    vote.result_ow_nays = 107
-    vote.result_ow_yeas_p = Decimal('10.80')
     vote._result_ow_accepted = 0
-    vote.result_sg_eligible_voters = 101
-    vote.result_sg_votes_valid = 102
-    vote.result_sg_votes_total = 103
-    vote.result_sg_turnout = Decimal('10.40')
-    vote.result_sg_yeas = 105
-    vote.result_sg_nays = 107
-    vote.result_sg_yeas_p = Decimal('10.80')
     vote._result_sg_accepted = 0
-    vote.result_sh_eligible_voters = 101
-    vote.result_sh_votes_valid = 102
-    vote.result_sh_votes_total = 103
-    vote.result_sh_turnout = Decimal('10.40')
-    vote.result_sh_yeas = 105
-    vote.result_sh_nays = 107
-    vote.result_sh_yeas_p = Decimal('10.80')
     vote._result_sh_accepted = 0
-    vote.result_so_eligible_voters = 101
-    vote.result_so_votes_valid = 102
-    vote.result_so_votes_total = 103
-    vote.result_so_turnout = Decimal('10.40')
-    vote.result_so_yeas = 105
-    vote.result_so_nays = 107
-    vote.result_so_yeas_p = Decimal('10.80')
     vote._result_so_accepted = 0
-    vote.result_sz_eligible_voters = 101
-    vote.result_sz_votes_valid = 102
-    vote.result_sz_votes_total = 103
-    vote.result_sz_turnout = Decimal('10.40')
-    vote.result_sz_yeas = 105
-    vote.result_sz_nays = 107
-    vote.result_sz_yeas_p = Decimal('10.80')
     vote._result_sz_accepted = 0
-    vote.result_tg_eligible_voters = 101
-    vote.result_tg_votes_valid = 102
-    vote.result_tg_votes_total = 103
-    vote.result_tg_turnout = Decimal('10.40')
-    vote.result_tg_yeas = 105
-    vote.result_tg_nays = 107
-    vote.result_tg_yeas_p = Decimal('10.80')
     vote._result_tg_accepted = 0
-    vote.result_ti_eligible_voters = 101
-    vote.result_ti_votes_valid = 102
-    vote.result_ti_votes_total = 103
-    vote.result_ti_turnout = Decimal('10.40')
-    vote.result_ti_yeas = 105
-    vote.result_ti_nays = 107
-    vote.result_ti_yeas_p = Decimal('10.80')
     vote._result_ti_accepted = 0
-    vote.result_ur_eligible_voters = 101
-    vote.result_ur_votes_valid = 102
-    vote.result_ur_votes_total = 103
-    vote.result_ur_turnout = Decimal('10.40')
-    vote.result_ur_yeas = 105
-    vote.result_ur_nays = 107
-    vote.result_ur_yeas_p = Decimal('10.80')
     vote._result_ur_accepted = 0
-    vote.result_vd_eligible_voters = 101
-    vote.result_vd_votes_valid = 102
-    vote.result_vd_votes_total = 103
-    vote.result_vd_turnout = Decimal('10.40')
-    vote.result_vd_yeas = 105
-    vote.result_vd_nays = 107
-    vote.result_vd_yeas_p = Decimal('10.80')
     vote._result_vd_accepted = 0
-    vote.result_vs_eligible_voters = 101
-    vote.result_vs_votes_valid = 102
-    vote.result_vs_votes_total = 103
-    vote.result_vs_turnout = Decimal('10.40')
-    vote.result_vs_yeas = 105
-    vote.result_vs_nays = 107
-    vote.result_vs_yeas_p = Decimal('10.80')
     vote._result_vs_accepted = 0
-    vote.result_zg_eligible_voters = 101
-    vote.result_zg_votes_valid = 102
-    vote.result_zg_votes_total = 103
-    vote.result_zg_turnout = Decimal('10.40')
-    vote.result_zg_yeas = 105
-    vote.result_zg_nays = 107
-    vote.result_zg_yeas_p = Decimal('10.80')
     vote._result_zg_accepted = 0
-    vote.result_zh_eligible_voters = 101
-    vote.result_zh_votes_valid = 102
-    vote.result_zh_votes_total = 103
-    vote.result_zh_turnout = Decimal('10.40')
-    vote.result_zh_yeas = 105
-    vote.result_zh_nays = 107
-    vote.result_zh_yeas_p = Decimal('10.80')
     vote._result_zh_accepted = 0
     vote._department_in_charge = 1
     vote.procedure_number = '24.557'
@@ -1651,17 +1464,9 @@ def test_votes_export(swissvotes_app):
     vote.link_post_vote_poll_fr = 'https://post.vote.poll/fr'
     vote.link_post_vote_poll_en = 'https://post.vote.poll/en'
     vote.media_ads_total = 1001
-    vote.media_ads_per_issue = Decimal('10.02')
-    vote.media_ads_yea = 1003
-    vote.media_ads_nay = 1004
-    vote.media_ads_neutral = 1005
     vote.media_ads_yea_p = Decimal('10.06')
     vote.media_coverage_articles_total = 1007
-    vote.media_coverage_articles_d = 1008
-    vote.media_coverage_articles_f = 1009
     vote.media_coverage_tonality_total = Decimal('10.10')
-    vote.media_coverage_tonality_d = Decimal('10.11')
-    vote.media_coverage_tonality_f = Decimal('10.12')
 
     votes.session.flush()
     votes.session.expire_all()
@@ -1697,12 +1502,7 @@ def test_votes_export(swissvotes_app):
         'volk': '1',
         'stand': '1',
         'annahme': '1',
-        'berecht': '2',
-        'stimmen': '6',
         'bet': '20,01',
-        'leer': '3',
-        'ungultig': '4',
-        'gultig': '5',
         'volkja': '8',
         'volknein': '9',
         'volkja-proz': '40,01',
@@ -1710,57 +1510,15 @@ def test_votes_export(swissvotes_app):
         'kt-nein': '24,5',
         'ktjaproz': '60,01',
         'ag-annahme': '0',
-        'ag-berecht': '101',
-        'ag-bet': '10,4',
-        'ag-gultig': '102',
-        'ag-ja': '105',
-        'ag-japroz': '10,8',
-        'ag-nein': '107',
-        'ag-stimmen': '103',
         'ai-annahme': '0',
-        'ai-berecht': '101',
-        'ai-bet': '10,4',
-        'ai-gultig': '102',
-        'ai-ja': '105',
-        'ai-japroz': '10,8',
-        'ai-nein': '107',
-        'ai-stimmen': '103',
         'ar-annahme': '0',
-        'ar-berecht': '101',
-        'ar-bet': '10,4',
-        'ar-gultig': '102',
-        'ar-ja': '105',
-        'ar-japroz': '10,8',
-        'ar-nein': '107',
-        'ar-stimmen': '103',
         'be-annahme': '0',
-        'be-berecht': '101',
-        'be-bet': '10,4',
-        'be-gultig': '102',
-        'be-ja': '105',
-        'be-japroz': '10,8',
-        'be-nein': '107',
-        'be-stimmen': '103',
         'bkchrono-de': 'https://bk.chrono/de',
         'bkchrono-fr': 'https://bk.chrono/fr',
         'bkresults-de': 'https://bk.results/de',
         'bkresults-fr': 'https://bk.results/fr',
         'bl-annahme': '0',
-        'bl-berecht': '101',
-        'bl-bet': '10,4',
-        'bl-gultig': '102',
-        'bl-ja': '105',
-        'bl-japroz': '10,8',
-        'bl-nein': '107',
-        'bl-stimmen': '103',
         'bs-annahme': '0',
-        'bs-berecht': '101',
-        'bs-bet': '10,4',
-        'bs-gultig': '102',
-        'bs-ja': '105',
-        'bs-japroz': '10,8',
-        'bs-nein': '107',
-        'bs-stimmen': '103',
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
         'info_br-de': 'https://federal.council/de',
@@ -1773,165 +1531,25 @@ def test_votes_export(swissvotes_app):
         'info_amt-fr': 'https://federal.office/fr',
         'info_amt-en': 'https://federal.office/en',
         'fr-annahme': '0',
-        'fr-berecht': '101',
-        'fr-bet': '10,4',
-        'fr-gultig': '102',
-        'fr-ja': '105',
-        'fr-japroz': '10,8',
-        'fr-nein': '107',
-        'fr-stimmen': '103',
         'ge-annahme': '0',
-        'ge-berecht': '101',
-        'ge-bet': '10,4',
-        'ge-gultig': '102',
-        'ge-ja': '105',
-        'ge-japroz': '10,8',
-        'ge-nein': '107',
-        'ge-stimmen': '103',
         'gl-annahme': '0',
-        'gl-berecht': '101',
-        'gl-bet': '10,4',
-        'gl-gultig': '102',
-        'gl-ja': '105',
-        'gl-japroz': '10,8',
-        'gl-nein': '107',
-        'gl-stimmen': '103',
         'gr-annahme': '0',
-        'gr-berecht': '101',
-        'gr-bet': '10,4',
-        'gr-gultig': '102',
-        'gr-ja': '105',
-        'gr-japroz': '10,8',
-        'gr-nein': '107',
-        'gr-stimmen': '103',
         'ju-annahme': '0',
-        'ju-berecht': '101',
-        'ju-bet': '10,4',
-        'ju-gultig': '102',
-        'ju-ja': '105',
-        'ju-japroz': '10,8',
-        'ju-nein': '107',
-        'ju-stimmen': '103',
         'lu-annahme': '0',
-        'lu-berecht': '101',
-        'lu-bet': '10,4',
-        'lu-gultig': '102',
-        'lu-ja': '105',
-        'lu-japroz': '10,8',
-        'lu-nein': '107',
-        'lu-stimmen': '103',
         'ne-annahme': '0',
-        'ne-berecht': '101',
-        'ne-bet': '10,4',
-        'ne-gultig': '102',
-        'ne-ja': '105',
-        'ne-japroz': '10,8',
-        'ne-nein': '107',
-        'ne-stimmen': '103',
         'nw-annahme': '0',
-        'nw-berecht': '101',
-        'nw-bet': '10,4',
-        'nw-gultig': '102',
-        'nw-ja': '105',
-        'nw-japroz': '10,8',
-        'nw-nein': '107',
-        'nw-stimmen': '103',
         'ow-annahme': '0',
-        'ow-berecht': '101',
-        'ow-bet': '10,4',
-        'ow-gultig': '102',
-        'ow-ja': '105',
-        'ow-japroz': '10,8',
-        'ow-nein': '107',
-        'ow-stimmen': '103',
         'sg-annahme': '0',
-        'sg-berecht': '101',
-        'sg-bet': '10,4',
-        'sg-gultig': '102',
-        'sg-ja': '105',
-        'sg-japroz': '10,8',
-        'sg-nein': '107',
-        'sg-stimmen': '103',
         'sh-annahme': '0',
-        'sh-berecht': '101',
-        'sh-bet': '10,4',
-        'sh-gultig': '102',
-        'sh-ja': '105',
-        'sh-japroz': '10,8',
-        'sh-nein': '107',
-        'sh-stimmen': '103',
         'so-annahme': '0',
-        'so-berecht': '101',
-        'so-bet': '10,4',
-        'so-gultig': '102',
-        'so-ja': '105',
-        'so-japroz': '10,8',
-        'so-nein': '107',
-        'so-stimmen': '103',
         'sz-annahme': '0',
-        'sz-berecht': '101',
-        'sz-bet': '10,4',
-        'sz-gultig': '102',
-        'sz-ja': '105',
-        'sz-japroz': '10,8',
-        'sz-nein': '107',
-        'sz-stimmen': '103',
         'tg-annahme': '0',
-        'tg-berecht': '101',
-        'tg-bet': '10,4',
-        'tg-gultig': '102',
-        'tg-ja': '105',
-        'tg-japroz': '10,8',
-        'tg-nein': '107',
-        'tg-stimmen': '103',
         'ti-annahme': '0',
-        'ti-berecht': '101',
-        'ti-bet': '10,4',
-        'ti-gultig': '102',
-        'ti-ja': '105',
-        'ti-japroz': '10,8',
-        'ti-nein': '107',
-        'ti-stimmen': '103',
         'ur-annahme': '0',
-        'ur-berecht': '101',
-        'ur-bet': '10,4',
-        'ur-gultig': '102',
-        'ur-ja': '105',
-        'ur-japroz': '10,8',
-        'ur-nein': '107',
-        'ur-stimmen': '103',
         'vd-annahme': '0',
-        'vd-berecht': '101',
-        'vd-bet': '10,4',
-        'vd-gultig': '102',
-        'vd-ja': '105',
-        'vd-japroz': '10,8',
-        'vd-nein': '107',
-        'vd-stimmen': '103',
         'vs-annahme': '0',
-        'vs-berecht': '101',
-        'vs-bet': '10,4',
-        'vs-gultig': '102',
-        'vs-ja': '105',
-        'vs-japroz': '10,8',
-        'vs-nein': '107',
-        'vs-stimmen': '103',
         'zg-annahme': '0',
-        'zg-berecht': '101',
-        'zg-bet': '10,4',
-        'zg-gultig': '102',
-        'zg-ja': '105',
-        'zg-japroz': '10,8',
-        'zg-nein': '107',
-        'zg-stimmen': '103',
         'zh-annahme': '0',
-        'zh-berecht': '101',
-        'zh-bet': '10,4',
-        'zh-gultig': '102',
-        'zh-ja': '105',
-        'zh-japroz': '10,8',
-        'zh-nein': '107',
-        'zh-stimmen': '103',
         'dep': '1',
         'gesch_nr': '24.557',
         'br-pos': '1',
@@ -2496,17 +2114,9 @@ def test_votes_export(swissvotes_app):
         'nach_cockpit_f': 'https://post.vote.poll/fr',
         'nach_cockpit_e': 'https://post.vote.poll/en',
         'inserate-total': '1001',
-        'inserate-je-ausgabe': '10,02',
-        'inserate-ja': '1003',
-        'inserate-nein': '1004',
-        'inserate-neutral': '1005',
         'inserate-jaanteil': '10,06',
         'mediares-tot': '1007',
-        'mediares-d': '1008',
-        'mediares-f': '1009',
         'mediaton-tot': '10,1',
-        'mediaton-d': '10,11',
-        'mediaton-f': '10,12',
     }
     assert csv == expected
 
@@ -2546,12 +2156,7 @@ def test_votes_export(swissvotes_app):
         'volk': 1.0,
         'stand': 1.0,
         'annahme': 1.0,
-        'berecht': 2.0,
-        'stimmen': 6.0,
         'bet': 20.01,
-        'leer': 3.0,
-        'ungultig': 4.0,
-        'gultig': 5.0,
         'volkja': 8.0,
         'volknein': 9.0,
         'volkja-proz': 40.01,
@@ -2559,57 +2164,15 @@ def test_votes_export(swissvotes_app):
         'kt-nein': 24.5,
         'ktjaproz': 60.01,
         'ag-annahme': 0.0,
-        'ag-berecht': 101.0,
-        'ag-bet': 10.4,
-        'ag-gultig': 102.0,
-        'ag-ja': 105.0,
-        'ag-japroz': 10.8,
-        'ag-nein': 107.0,
-        'ag-stimmen': 103.0,
         'ai-annahme': 0.0,
-        'ai-berecht': 101.0,
-        'ai-bet': 10.4,
-        'ai-gultig': 102.0,
-        'ai-ja': 105.0,
-        'ai-japroz': 10.8,
-        'ai-nein': 107.0,
-        'ai-stimmen': 103.0,
         'ar-annahme': 0.0,
-        'ar-berecht': 101.0,
-        'ar-bet': 10.4,
-        'ar-gultig': 102.0,
-        'ar-ja': 105.0,
-        'ar-japroz': 10.8,
-        'ar-nein': 107.0,
-        'ar-stimmen': 103.0,
         'be-annahme': 0.0,
-        'be-berecht': 101.0,
-        'be-bet': 10.4,
-        'be-gultig': 102.0,
-        'be-ja': 105.0,
-        'be-japroz': 10.8,
-        'be-nein': 107.0,
-        'be-stimmen': 103.0,
         'bkchrono-de': 'https://bk.chrono/de',
         'bkchrono-fr': 'https://bk.chrono/fr',
         'bkresults-de': 'https://bk.results/de',
         'bkresults-fr': 'https://bk.results/fr',
         'bl-annahme': 0.0,
-        'bl-berecht': 101.0,
-        'bl-bet': 10.4,
-        'bl-gultig': 102.0,
-        'bl-ja': 105.0,
-        'bl-japroz': 10.8,
-        'bl-nein': 107.0,
-        'bl-stimmen': 103.0,
         'bs-annahme': 0.0,
-        'bs-berecht': 101.0,
-        'bs-bet': 10.4,
-        'bs-gultig': 102.0,
-        'bs-ja': 105.0,
-        'bs-japroz': 10.8,
-        'bs-nein': 107.0,
-        'bs-stimmen': 103.0,
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
         'info_br-de': 'https://federal.council/de',
@@ -2622,165 +2185,25 @@ def test_votes_export(swissvotes_app):
         'info_amt-fr': 'https://federal.office/fr',
         'info_amt-en': 'https://federal.office/en',
         'fr-annahme': 0.0,
-        'fr-berecht': 101.0,
-        'fr-bet': 10.4,
-        'fr-gultig': 102.0,
-        'fr-ja': 105.0,
-        'fr-japroz': 10.8,
-        'fr-nein': 107.0,
-        'fr-stimmen': 103.0,
         'ge-annahme': 0.0,
-        'ge-berecht': 101.0,
-        'ge-bet': 10.4,
-        'ge-gultig': 102.0,
-        'ge-ja': 105.0,
-        'ge-japroz': 10.8,
-        'ge-nein': 107.0,
-        'ge-stimmen': 103.0,
         'gl-annahme': 0.0,
-        'gl-berecht': 101.0,
-        'gl-bet': 10.4,
-        'gl-gultig': 102.0,
-        'gl-ja': 105.0,
-        'gl-japroz': 10.8,
-        'gl-nein': 107.0,
-        'gl-stimmen': 103.0,
         'gr-annahme': 0.0,
-        'gr-berecht': 101.0,
-        'gr-bet': 10.4,
-        'gr-gultig': 102.0,
-        'gr-ja': 105.0,
-        'gr-japroz': 10.8,
-        'gr-nein': 107.0,
-        'gr-stimmen': 103.0,
         'ju-annahme': 0.0,
-        'ju-berecht': 101.0,
-        'ju-bet': 10.4,
-        'ju-gultig': 102.0,
-        'ju-ja': 105.0,
-        'ju-japroz': 10.8,
-        'ju-nein': 107.0,
-        'ju-stimmen': 103.0,
         'lu-annahme': 0.0,
-        'lu-berecht': 101.0,
-        'lu-bet': 10.4,
-        'lu-gultig': 102.0,
-        'lu-ja': 105.0,
-        'lu-japroz': 10.8,
-        'lu-nein': 107.0,
-        'lu-stimmen': 103.0,
         'ne-annahme': 0.0,
-        'ne-berecht': 101.0,
-        'ne-bet': 10.4,
-        'ne-gultig': 102.0,
-        'ne-ja': 105.0,
-        'ne-japroz': 10.8,
-        'ne-nein': 107.0,
-        'ne-stimmen': 103.0,
         'nw-annahme': 0.0,
-        'nw-berecht': 101.0,
-        'nw-bet': 10.4,
-        'nw-gultig': 102.0,
-        'nw-ja': 105.0,
-        'nw-japroz': 10.8,
-        'nw-nein': 107.0,
-        'nw-stimmen': 103.0,
         'ow-annahme': 0.0,
-        'ow-berecht': 101.0,
-        'ow-bet': 10.4,
-        'ow-gultig': 102.0,
-        'ow-ja': 105.0,
-        'ow-japroz': 10.8,
-        'ow-nein': 107.0,
-        'ow-stimmen': 103.0,
         'sg-annahme': 0.0,
-        'sg-berecht': 101.0,
-        'sg-bet': 10.4,
-        'sg-gultig': 102.0,
-        'sg-ja': 105.0,
-        'sg-japroz': 10.8,
-        'sg-nein': 107.0,
-        'sg-stimmen': 103.0,
         'sh-annahme': 0.0,
-        'sh-berecht': 101.0,
-        'sh-bet': 10.4,
-        'sh-gultig': 102.0,
-        'sh-ja': 105.0,
-        'sh-japroz': 10.8,
-        'sh-nein': 107.0,
-        'sh-stimmen': 103.0,
         'so-annahme': 0.0,
-        'so-berecht': 101.0,
-        'so-bet': 10.4,
-        'so-gultig': 102.0,
-        'so-ja': 105.0,
-        'so-japroz': 10.8,
-        'so-nein': 107.0,
-        'so-stimmen': 103.0,
         'sz-annahme': 0.0,
-        'sz-berecht': 101.0,
-        'sz-bet': 10.4,
-        'sz-gultig': 102.0,
-        'sz-ja': 105.0,
-        'sz-japroz': 10.8,
-        'sz-nein': 107.0,
-        'sz-stimmen': 103.0,
         'tg-annahme': 0.0,
-        'tg-berecht': 101.0,
-        'tg-bet': 10.4,
-        'tg-gultig': 102.0,
-        'tg-ja': 105.0,
-        'tg-japroz': 10.8,
-        'tg-nein': 107.0,
-        'tg-stimmen': 103.0,
         'ti-annahme': 0.0,
-        'ti-berecht': 101.0,
-        'ti-bet': 10.4,
-        'ti-gultig': 102.0,
-        'ti-ja': 105.0,
-        'ti-japroz': 10.8,
-        'ti-nein': 107.0,
-        'ti-stimmen': 103.0,
         'ur-annahme': 0.0,
-        'ur-berecht': 101.0,
-        'ur-bet': 10.4,
-        'ur-gultig': 102.0,
-        'ur-ja': 105.0,
-        'ur-japroz': 10.8,
-        'ur-nein': 107.0,
-        'ur-stimmen': 103.0,
         'vd-annahme': 0.0,
-        'vd-berecht': 101.0,
-        'vd-bet': 10.4,
-        'vd-gultig': 102.0,
-        'vd-ja': 105.0,
-        'vd-japroz': 10.8,
-        'vd-nein': 107.0,
-        'vd-stimmen': 103.0,
         'vs-annahme': 0.0,
-        'vs-berecht': 101.0,
-        'vs-bet': 10.4,
-        'vs-gultig': 102.0,
-        'vs-ja': 105.0,
-        'vs-japroz': 10.8,
-        'vs-nein': 107.0,
-        'vs-stimmen': 103.0,
         'zg-annahme': 0.0,
-        'zg-berecht': 101.0,
-        'zg-bet': 10.4,
-        'zg-gultig': 102.0,
-        'zg-ja': 105.0,
-        'zg-japroz': 10.8,
-        'zg-nein': 107.0,
-        'zg-stimmen': 103.0,
         'zh-annahme': 0.0,
-        'zh-berecht': 101.0,
-        'zh-bet': 10.4,
-        'zh-gultig': 102.0,
-        'zh-ja': 105.0,
-        'zh-japroz': 10.8,
-        'zh-nein': 107.0,
-        'zh-stimmen': 103.0,
         'dep': 1.0,
         'gesch_nr': '24.557',
         'br-pos': 1.0,
@@ -3346,17 +2769,9 @@ def test_votes_export(swissvotes_app):
         'nach_cockpit_f': 'https://post.vote.poll/fr',
         'nach_cockpit_e': 'https://post.vote.poll/en',
         'inserate-total': 1001,
-        'inserate-je-ausgabe': 10.02,
-        'inserate-ja': 1003,
-        'inserate-nein': 1004,
-        'inserate-neutral': 1005,
         'inserate-jaanteil': 10.06,
         'mediares-tot': 1007,
-        'mediares-d': 1008,
-        'mediares-f': 1009,
         'mediaton-tot': 10.10,
-        'mediaton-d': 10.11,
-        'mediaton-f': 10.12,
     }
     assert xlsx == expected
 
