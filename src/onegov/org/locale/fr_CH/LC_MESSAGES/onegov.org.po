@@ -4457,6 +4457,9 @@ msgstr ""
 msgid "Topics"
 msgstr "Sujets"
 
+msgid "Sort the items using drag and drop."
+msgstr "Triez les éléments par glisser-déposer."
+
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"
 msgstr "l'abonnement pour ${address} a bien été confirmé"
