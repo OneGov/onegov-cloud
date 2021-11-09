@@ -9,6 +9,7 @@ from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
+from onegov.org.models.editor import Editor
 from onegov.page import Page, PageCollection
 from webob import exc
 from webob.exc import HTTPNotFound
@@ -46,7 +47,7 @@ def view_topic(self, request, layout=None):
             len(layout.editbar_links) - 1,
             Link(
                 _("Sort"),
-                request.link(self, 'sort'),
+                request.link(Editor('sort', self)),
                 classes=('sort-link', )
             )
         )

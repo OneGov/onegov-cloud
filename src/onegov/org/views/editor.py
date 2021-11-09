@@ -5,6 +5,7 @@ from webob.exc import HTTPForbidden
 
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
+from onegov.core.elements import Link
 from onegov.org.forms.page import PageUrlForm
 from onegov.org.layout import EditorLayout
 from onegov.org.management import PageNameChange
@@ -38,8 +39,9 @@ def handle_page_form(self, request, form, layout=None):
         clipboard = Clipboard.from_session(request)
         src = clipboard.get_object()
         clipboard.clear()
-
         return handle_new_page(self, request, form, src, layout)
+    elif self.action == 'sort':
+        return morepath.redirect(request.link(self, 'sort'))
     else:
         raise NotImplementedError
 
@@ -147,4 +149,22 @@ def handle_change_page_url(self, request, form, layout=None):
         'form': form,
         'title': site_title,
         'callout': " ".join(request.translate(m) for m in messages)
+    }
+
+
+@OrgApp.html(
+    model=Editor,
+    template='sort.pt',
+    name='sort',
+    permission=Private
+)
+def view_topics_sort(self, request, layout=None):
+    layout = layout or EditorLayout(self, request, 'sort')
+
+    return {
+        'title': _("Sort"),
+        'layout': layout,
+        'links': tuple(
+            Link(r.title, request.link(r)) for r in self.page.children
+        )
     }

@@ -31,6 +31,27 @@
       </div>
 </metal:b>
 
+<metal:navigation define-macro="sort-items-nested">
+    <a tal:condition="children">
+        <span data-click-target="${link.attrs['href']}">${link.text}</span>
+        <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
+        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+    </a>
+    <tal:b tal:condition="not: children">
+        <a href="${link.attrs['href']}">
+            <span>${link.text}</span>
+            <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
+            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+        </a>
+    </tal:b>
+    <ul class="vertical menu nested" data-sortable data-sortable-url="${layout.sortable_url_template}" tal:condition="children">
+        <tal:b tal:repeat="(page, sublink, c) children">
+            <li data-sortable-id="${page.id}">
+                <metal:b use-macro="layout.macros['sort-items-nested']" tal:define="link sublink; children c" />
+            </li>
+        </tal:b>
+    </ul>
+</metal:navigation>
 
 <metal:navigation define-macro="side-navigation-nested">
     <a tal:condition="children">
