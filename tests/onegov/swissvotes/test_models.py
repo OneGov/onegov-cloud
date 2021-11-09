@@ -350,20 +350,10 @@ def test_model_vote(session, sample_vote):
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
     assert vote.bfs_map_fr == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
-    assert vote.bfs_map('xxx') == (
+    assert vote.bfs_map == (
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
-    assert vote.bfs_map('de_CH') == (
-        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
-    )
-    assert vote.bfs_map('en_US') == (
-        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
-    )
-    assert vote.bfs_map('fr_CH') == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
-    assert vote.bfs_map_host('xxx') == "https://www.atlas.bfs.admin.ch"
-    assert vote.bfs_map_host('de_CH') == "https://www.atlas.bfs.admin.ch"
-    assert vote.bfs_map_host('en_US') == "https://www.atlas.bfs.admin.ch"
-    assert vote.bfs_map_host('fr_CH') == ""
+    assert vote.bfs_map_host == "https://www.atlas.bfs.admin.ch"
     assert vote.posters_mfg_yea == (
         'https://yes.com/objects/1 '
         'https://yes.com/objects/2'
@@ -390,10 +380,13 @@ def test_model_vote(session, sample_vote):
         'https://no.com/objects/4': 'https://detail.com/4'
     }
     assert vote.swissvoteslink == 'https://example.com/122.0'
-    assert vote.bk_chrono == 'bkc_de'
-    assert vote.bk_results == 'bkr_de'
-    assert vote.curiavista == 'cv_de'
-    assert vote.post_vote_poll_link == 'https://post.vote.poll/de'
+    assert vote.link_bk_chrono == 'https://bk.chrono/de'
+    assert vote.link_bk_results == 'https://bk.results/de'
+    assert vote.link_curia_vista == 'https://curia.vista/de'
+    assert vote.link_federal_council == 'https://federal.council/de'
+    assert vote.link_federal_departement == 'https://federal.departement/de'
+    assert vote.link_federal_office == 'https://federal.office/de'
+    assert vote.link_post_vote_poll == 'https://post.vote.poll/de'
     assert vote.media_ads_total == 3001
     assert vote.media_ads_per_issue == Decimal('30.02')
     assert vote.media_ads_yea == 3003
@@ -411,18 +404,30 @@ def test_model_vote(session, sample_vote):
     vote.session_manager.current_locale = 'fr_CH'
     assert vote.title == "Vote FR"
     assert vote.short_title == "V F"
-    assert vote.bk_chrono == 'bkc_fr'
-    assert vote.bk_results == 'bkr_fr'
-    assert vote.curiavista == 'cv_fr'
-    assert vote.post_vote_poll_link == 'https://post.vote.poll/fr'
+    assert vote.bfs_map == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+    assert vote.bfs_map_host == ""  # parsing error
+    assert vote.link_bk_chrono == 'https://bk.chrono/fr'
+    assert vote.link_bk_results == 'https://bk.results/fr'
+    assert vote.link_curia_vista == 'https://curia.vista/fr'
+    assert vote.link_federal_council == 'https://federal.council/fr'
+    assert vote.link_federal_departement == 'https://federal.departement/fr'
+    assert vote.link_federal_office == 'https://federal.office/fr'
+    assert vote.link_post_vote_poll == 'https://post.vote.poll/fr'
 
     vote.session_manager.current_locale = 'en_US'
     assert vote.title == "Vote DE"
     assert vote.short_title == "V D"
-    assert vote.bk_chrono == 'bkc_de'
-    assert vote.bk_results == 'bkr_de'
-    assert vote.curiavista == 'cv_de'
-    assert vote.post_vote_poll_link == 'https://post.vote.poll/en'
+    assert vote.bfs_map == (
+        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+    )
+    assert vote.bfs_map_host == "https://www.atlas.bfs.admin.ch"
+    assert vote.link_bk_chrono == 'https://bk.chrono/de'
+    assert vote.link_bk_results == 'https://bk.results/de'
+    assert vote.link_curia_vista == 'https://curia.vista/de'
+    assert vote.link_federal_council == 'https://federal.council/en'
+    assert vote.link_federal_departement == 'https://federal.departement/en'
+    assert vote.link_federal_office == 'https://federal.office/en'
+    assert vote.link_post_vote_poll == 'https://post.vote.poll/en'
 
     vote.session_manager.current_locale = 'de_CH'
 
@@ -1145,7 +1150,8 @@ def test_model_column_mapper():
     mapper.set_value(vote, 'short_title_fr', 'short title fr')
     mapper.set_value(vote, 'keyword', 'keyword')
     mapper.set_value(vote, '_legal_form', 4)
-    mapper.set_value(vote, '!recommendations!fdp', 66)
+    mapper.set_value(vote, '!i!recommendations!fdp', 66)
+    mapper.set_value(vote, '!t!meta!link_bk_results_de', 'http://a.b')
 
     assert vote.bfs_number == Decimal('100.1')
     assert vote.date == date(2019, 1, 1)
@@ -1170,7 +1176,8 @@ def test_model_column_mapper():
     assert mapper.get_value(vote, 'short_title_fr') == 'short title fr'
     assert mapper.get_value(vote, 'keyword') == 'keyword'
     assert mapper.get_value(vote, '_legal_form') == 4
-    assert mapper.get_value(vote, '!recommendations!fdp') == 66
+    assert mapper.get_value(vote, '!i!recommendations!fdp') == 66
+    assert mapper.get_value(vote, '!t!meta!link_bk_results_de') == 'http://a.b'
 
     assert list(mapper.get_values(vote))[:26] == [
         Decimal('100.1'),
@@ -1212,8 +1219,8 @@ def test_model_column_mapper():
         ('votes_on_same_day', None),
         ('_legal_form', 4),
         ('anneepolitique', None),
-        ('bkchrono_de', None),
-        ('bkchrono_fr', None),
+        ('!t!meta!link_bk_chrono_de', None),
+        ('!t!meta!link_bk_chrono_fr', None),
         ('descriptor_1_level_1', None),
         ('descriptor_1_level_2', None),
         ('descriptor_1_level_3', None),
@@ -1240,8 +1247,8 @@ def test_model_column_mapper():
         ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None),
         ('anneepolitique', 'anneepolitique', 'TEXT', True, None, None),
-        ('bkchrono_de', 'bkchrono-de', 'TEXT', True, None, None),
-        ('bkchrono_fr', 'bkchrono-fr', 'TEXT', True, None, None),
+        ('!t!meta!link_bk_chrono_de', 'bkchrono-de', 'TEXT', True, None, None),
+        ('!t!meta!link_bk_chrono_fr', 'bkchrono-fr', 'TEXT', True, None, None),
         ('descriptor_1_level_1', 'd1e1', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_1_level_2', 'd1e2', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_1_level_3', 'd1e3', 'NUMERIC(8, 4)', True, 8, 4),
@@ -1256,10 +1263,9 @@ def test_model_column_mapper():
         ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
         ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None)
     ]
-
     assert list(mapper.items())[305] == (
-        '!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER', True,
-        None, None
+        '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
+        True, None, None
     )
 
 

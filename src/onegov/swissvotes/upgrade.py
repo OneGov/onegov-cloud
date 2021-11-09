@@ -439,3 +439,21 @@ def add_brief_description_title(context):
             'swissvotes',
             Column('brief_description_title', Text())
         )
+
+
+@upgrade_task('Moves links to meta')
+def move_links_to_meta(context):
+    columns = (
+        'bkchrono_de',
+        'bkchrono_fr',
+        'bkresults_de',
+        'bkresults_fr',
+        'curia_vista_de',
+        'curia_vista_fr',
+        'post_vote_poll_link_de',
+        'post_vote_poll_link_fr',
+        'post_vote_poll_link_en',
+    )
+    for column in columns:
+        if context.has_column('swissvotes', column):
+            context.operations.drop_column('swissvotes', column)

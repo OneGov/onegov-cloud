@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-01 07:44+0100\n"
+"POT-Creation-Date: 2021-11-08 06:37+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1662,6 +1662,18 @@ msgid ""
 "the success of the referendum"
 msgstr ""
 "Anzahl Tage vom Parlamentsbeschluss bis zum Beschluss über das Zustandekommen"
+
+msgid "Online information by the federal authorities"
+msgstr "Online-Informationen der Behörden"
+
+msgid "Link Federal Council"
+msgstr "Link Bundesrat"
+
+msgid "Link department"
+msgstr "Link Departement"
+
+msgid "Link federal office"
+msgstr "Link Bundesamt"
 
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"

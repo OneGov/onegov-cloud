@@ -52,6 +52,28 @@ class encoded_property(object):
         return instance.codes(self.name, instance.deciding_question).get(value)
 
 
+class localized_property(object):
+    """ A shorthand property to return a localized attribute. Requires at least
+    a `xxx_de` attribute and falls back to this.
+
+    Example:
+
+        class MyClass(object):
+            value_de = Column(Text)
+            value_fr = Column(Text)
+            value = localized_property()
+    """
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        lang = instance.session_manager.current_locale[:2]
+        attribute = f'{self.name}_{lang}'
+        if hasattr(instance, attribute):
+            return getattr(instance, attribute)
+        return getattr(instance, f'{self.name}_de', None)
+
+
 class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     """ A single vote as defined by the code book.
@@ -181,8 +203,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     legislation_decade = Column(INT4RANGE, nullable=False)
     title_de = Column(Text, nullable=False)
     title_fr = Column(Text, nullable=False)
+    title = localized_property()
     short_title_de = Column(Text, nullable=False)
     short_title_fr = Column(Text, nullable=False)
+    short_title = localized_property()
     brief_description_title = Column(Text)
     keyword = Column(Text)
     votes_on_same_day = Column(Integer, nullable=False)
@@ -192,34 +216,15 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
     bfs_map_fr = Column(Text)
+    bfs_map = localized_property()
     swissvoteslink = Column(Text)
 
     @property
-    def title(self):
-        if self.session_manager.current_locale == 'fr_CH':
-            return self.title_fr
-        else:
-            return self.title_de
-
-    @property
-    def short_title(self):
-        if self.session_manager.current_locale == 'fr_CH':
-            return self.short_title_fr
-        else:
-            return self.short_title_de
-
-    def bfs_map(self, locale):
-        """ Returns the link to the BFS map for the given locale. """
-
-        return self.bfs_map_fr if locale == 'fr_CH' else self.bfs_map_de
-
-    def bfs_map_host(self, locale):
+    def bfs_map_host(self):
         """ Returns the Host of the BFS Map link for CSP. """
 
         try:
-            return urlunparse(
-                list(urlparse(self.bfs_map(locale))[:2]) + ['', '', '', '']
-            )
+            return urlunparse(list(urlparse(self.bfs_map)[:2]) + 4 * [''])
         except ValueError:
             pass
 
@@ -227,34 +232,32 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def deciding_question(self):
         return self._legal_form == 5
 
-    # Additional links added late 2019
-    curia_vista_de = Column(Text)
-    curia_vista_fr = Column(Text)
-    bkresults_de = Column(Text)
-    bkresults_fr = Column(Text)
-    bkchrono_de = Column(Text)
-    bkchrono_fr = Column(Text)
-
-    @property
-    def curiavista(self):
-        if self.session_manager.current_locale == 'fr_CH':
-            return self.curia_vista_fr
-        else:
-            return self.curia_vista_de
-
-    @property
-    def bk_results(self):
-        if self.session_manager.current_locale == 'fr_CH':
-            return self.bkresults_fr
-        else:
-            return self.bkresults_de
-
-    @property
-    def bk_chrono(self):
-        if self.session_manager.current_locale == 'fr_CH':
-            return self.bkchrono_fr
-        else:
-            return self.bkchrono_de
+    # Additional links
+    link_curia_vista_de = meta_property()
+    link_curia_vista_fr = meta_property()
+    link_curia_vista = localized_property()
+    link_bk_results_de = meta_property()
+    link_bk_results_fr = meta_property()
+    link_bk_results = localized_property()
+    link_bk_chrono_de = meta_property()
+    link_bk_chrono_fr = meta_property()
+    link_bk_chrono = localized_property()
+    link_federal_council_de = meta_property()
+    link_federal_council_fr = meta_property()
+    link_federal_council_en = meta_property()
+    link_federal_council = localized_property()
+    link_federal_departement_de = meta_property()
+    link_federal_departement_fr = meta_property()
+    link_federal_departement_en = meta_property()
+    link_federal_departement = localized_property()
+    link_federal_office_de = meta_property()
+    link_federal_office_fr = meta_property()
+    link_federal_office_en = meta_property()
+    link_federal_office = localized_property()
+    link_post_vote_poll_de = meta_property()
+    link_post_vote_poll_fr = meta_property()
+    link_post_vote_poll_en = meta_property()
+    link_post_vote_poll = localized_property()
 
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea = Column(Text)
@@ -307,20 +310,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 )
         return result
 
-    # Post-vote poll
-    post_vote_poll_link_de = Column(Text)
-    post_vote_poll_link_fr = Column(Text)
-    post_vote_poll_link_en = Column(Text)
-
-    @property
-    def post_vote_poll_link(self):
-        if self.session_manager.current_locale == 'fr_CH':
-            return self.post_vote_poll_link_fr
-        elif self.session_manager.current_locale == 'en_US':
-            return self.post_vote_poll_link_en
-        else:
-            return self.post_vote_poll_link_de
-
     # Media
     media_ads_total = Column(Integer)
     media_ads_per_issue = deferred(Column(Numeric(13, 10)), group='dataset')
@@ -367,6 +356,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         return result
 
     # Result
+    # todo: drop unused
     _result = Column('result', Integer)
     result = encoded_property()
     result_eligible_voters = deferred(Column(Integer), group='dataset')
