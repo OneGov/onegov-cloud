@@ -1,4 +1,4 @@
-<<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
     <tal:block metal:fill-slot="title">
         ${title}
     </tal:block>
@@ -8,18 +8,12 @@
                 <div class="panel">
                     <p i18n:translate="">Sort the items using drag and drop.</p>
                 </div>
-                <dl tal:repeat="item items">
-                    <dt>${item[0]}</dt>
-                    <dd>
-                        <ul data-sortable data-sortable-url="${item[1]}">
-                            <li tal:repeat="subitem item[2]" data-sortable-id="${subitem[0]}">
-                                <strong>${subitem[1]}</strong>
-                            </li>
-                        </ul>
-                    </dd>
-                </dl>
+                <ul class="sort-items" data-sortable data-sortable-url="${layout.sortable_url_template}">
+                    <li tal:repeat="child page.children" data-sortable-id="${child.id}">
+                        ${child.title}
+                    </li>
+                </ul>
             </div>
         </div>
     </tal:block>
 </div>
->

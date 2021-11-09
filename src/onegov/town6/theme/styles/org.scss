@@ -481,3 +481,28 @@ $pageref-color-hover: $iron;
     text-align: center;
     white-space: nowrap;
 }
+
+/*
+    Sort topics
+*/
+.sort-items {
+    margin-left: 0;
+    list-style: none;
+
+    li {
+        background: #f5f5f5;
+        border: 1px dashed #ddd;
+        cursor: grab;
+        margin-bottom: 1em;
+        padding: .25rem .5rem;
+
+        &::before {
+            color: #999;
+            content: '\f0dc';
+            display: inline-block;
+            font-family: 'Font Awesome 5 Free';
+            font-weight: bold;
+            width: 1.5ex;
+        }
+    }
+}

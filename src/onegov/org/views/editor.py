@@ -164,7 +164,5 @@ def view_topics_sort(self, request, layout=None):
     return {
         'title': _("Sort"),
         'layout': layout,
-        'links': tuple(
-            Link(r.title, request.link(r)) for r in self.page.children
-        )
+        'page': self.page
     }
