@@ -44,8 +44,14 @@ article.content .side-panel {
 
     .focus-widget {
         box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .15);
+        color: $black;
         height: calc(100% - 2rem);
         margin-bottom: 2rem;
+        transition: all 200ms linear;
+
+        &:hover {
+            box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .3);
+        }
 
         &> * {
             padding: 0 1rem;
