@@ -2120,7 +2120,7 @@
             <p i18n:translate="">Available options for the focus widget:</p>
             <code>&lt;focus<br>
                 image-src="https://..."<br>
-                image-url="https://on-image-click.com"<br>
+                focus-url="https://on-image-click.com"<br>
                 title="..."<br>
                 hide-title=""<br>
                 hide-lead=""<br>
