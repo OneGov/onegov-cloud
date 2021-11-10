@@ -425,7 +425,6 @@ def sample_vote():
     vote._result_vd_accepted = 1
     vote._result_vs_accepted = 1
     vote._result_zg_accepted = 0
-    vote._department_in_charge = 1
     vote.procedure_number = '24.557'
     vote._position_federal_council = 1
     vote._position_parliament = 1
@@ -436,14 +435,9 @@ def sample_vote():
     vote.position_council_of_states_yeas = 30
     vote.position_council_of_states_nays = 40
     vote.duration_federal_assembly = 30
-    vote.duration_post_federal_assembly = 31
     vote.duration_initative_collection = 32
-    vote.duration_initative_federal_council = 33
-    vote.duration_initative_total = 34
     vote.duration_referendum_collection = 35
-    vote.duration_referendum_total = 36
     vote.signatures_valid = 40
-    vote.signatures_invalid = 41
     vote.recommendations = {
         'fdp': 1,
         'cvp': 1,

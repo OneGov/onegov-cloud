@@ -486,9 +486,6 @@ def test_model_vote(session, sample_vote):
     assert vote.result_zg_accepted == "Rejected"
     assert vote._result_zh_accepted is None
     assert vote.result_zh_accepted is None
-    assert vote._department_in_charge == 1
-    assert vote.department_in_charge == \
-        "Federal Department of Foreign Affairs (FDFA)"
     assert vote.procedure_number == '24.557'
     assert vote._position_federal_council == 1
     assert vote.position_federal_council == "Accepting"
@@ -503,14 +500,9 @@ def test_model_vote(session, sample_vote):
     assert vote.position_council_of_states_yeas == 30
     assert vote.position_council_of_states_nays == 40
     assert vote.duration_federal_assembly == 30
-    assert vote.duration_post_federal_assembly == 31
     assert vote.duration_initative_collection == 32
-    assert vote.duration_initative_federal_council == 33
-    assert vote.duration_initative_total == 34
     assert vote.duration_referendum_collection == 35
-    assert vote.duration_referendum_total == 36
     assert vote.signatures_valid == 40
-    assert vote.signatures_invalid == 41
     assert vote.recommendations == {
         'fdp': 1,
         'cvp': 1,
@@ -750,8 +742,6 @@ def test_model_vote_codes():
     assert SwissVote.codes('result_people_accepted')[0] == "Rejected"
     assert SwissVote.codes('result_cantons_accepted')[0] == "Rejected"
     assert SwissVote.codes('result_ai_accepted')[1] == "Accepted"
-    assert SwissVote.codes('department_in_charge')[8] == \
-        "Federal Chancellery (FCh)"
     assert SwissVote.codes('position_federal_council')[3] == "None"
     assert SwissVote.codes('position_parliament')[2] == "Rejecting"
     assert SwissVote.codes('position_national_council')[2] == "Rejecting"
@@ -963,7 +953,7 @@ def test_model_column_mapper():
     assert mapper.get_value(vote, '!i!recommendations!fdp') == 66
     assert mapper.get_value(vote, '!t!meta!link_bk_results_de') == 'http://a.b'
 
-    assert list(mapper.get_values(vote))[:22] == [
+    assert list(mapper.get_values(vote))[:21] == [
         Decimal('100.1'),
         date(2019, 1, 1),
         'short title de',
@@ -985,9 +975,8 @@ def test_model_column_mapper():
         None,
         None,
         None,
-        None,
     ]
-    assert list(mapper.get_items(vote))[:22] == [
+    assert list(mapper.get_items(vote))[:21] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
         ('short_title_de', 'short title de'),
@@ -1008,10 +997,9 @@ def test_model_column_mapper():
         ('descriptor_3_level_1', None),
         ('descriptor_3_level_2', None),
         ('descriptor_3_level_3', None),
-        ('_department_in_charge', None),
         ('_position_federal_council', None),
     ]
-    assert list(mapper.items())[:22] == [
+    assert list(mapper.items())[:21] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
         ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
@@ -1032,10 +1020,9 @@ def test_model_column_mapper():
         ('descriptor_3_level_1', 'd3e1', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_3_level_2', 'd3e2', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
-        ('_department_in_charge', 'dep', 'INTEGER', True, None, None),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
     ]
-    assert list(mapper.items())[301] == (
+    assert list(mapper.items())[295] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )

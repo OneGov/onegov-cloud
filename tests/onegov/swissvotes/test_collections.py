@@ -826,7 +826,6 @@ def test_votes_export(swissvotes_app):
     vote._result_vs_accepted = 0
     vote._result_zg_accepted = 0
     vote._result_zh_accepted = 0
-    vote._department_in_charge = 1
     vote.procedure_number = '24.557'
     vote._position_federal_council = 1
     vote._position_parliament = 1
@@ -837,14 +836,9 @@ def test_votes_export(swissvotes_app):
     vote.position_council_of_states_yeas = 30
     vote.position_council_of_states_nays = 40
     vote.duration_federal_assembly = 30
-    vote.duration_post_federal_assembly = 31
     vote.duration_initative_collection = 32
-    vote.duration_initative_federal_council = 33
-    vote.duration_initative_total = 34
     vote.duration_referendum_collection = 35
-    vote.duration_referendum_total = 36
     vote.signatures_valid = 40
-    vote.signatures_invalid = 41
     vote.recommendations = {
         'fdp': 1,
         'cvp': 1,
@@ -1486,7 +1480,6 @@ def test_votes_export(swissvotes_app):
         'vs-annahme': '0',
         'zg-annahme': '0',
         'zh-annahme': '0',
-        'dep': '1',
         'gesch_nr': '24.557',
         'br-pos': '1',
         'bv-pos': '1',
@@ -1497,14 +1490,9 @@ def test_votes_export(swissvotes_app):
         'srja': '30',
         'srnein': '40',
         'dauer_bv': '30',
-        'dauer_abst': '31',
         'i-dauer_samm': '32',
-        'i-dauer_br': '33',
-        'i-dauer_tot': '34',
         'fr-dauer_samm': '35',
-        'fr-dauer_tot': '36',
         'unter_g': '40',
-        'unter_u': '41',
         'p-fdp': '1',
         'p-cvp': '1',
         'p-sps': '1',
@@ -2133,7 +2121,6 @@ def test_votes_export(swissvotes_app):
         'vs-annahme': 0.0,
         'zg-annahme': 0.0,
         'zh-annahme': 0.0,
-        'dep': 1.0,
         'gesch_nr': '24.557',
         'br-pos': 1.0,
         'bv-pos': 1.0,
@@ -2144,14 +2131,9 @@ def test_votes_export(swissvotes_app):
         'srja': 30.0,
         'srnein': 40.0,
         'dauer_bv': 30.0,
-        'dauer_abst': 31.0,
         'i-dauer_samm': 32.0,
-        'i-dauer_br': 33.0,
-        'i-dauer_tot': 34.0,
         'fr-dauer_samm': 35.0,
-        'fr-dauer_tot': 36.0,
         'unter_g': 40.0,
-        'unter_u': 41.0,
         'p-fdp': 1.0,
         'p-cvp': 1.0,
         'p-sps': 1.0,

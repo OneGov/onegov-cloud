@@ -130,7 +130,6 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         '12',  # d3e1
         '12.5',  # d3e2
         '12.55',  # d3e3
-        '',  # dep
         '',  # br-pos
     ])
     workbook.close()

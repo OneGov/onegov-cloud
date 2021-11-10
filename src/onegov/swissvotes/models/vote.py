@@ -146,20 +146,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (1, _("Accepted") if not dc
                     else _("Preferred the popular initiative")),
             ))
-        if attribute == 'department_in_charge':
-            return OrderedDict((
-                (1, _("Federal Department of Foreign Affairs (FDFA)")),
-                (2, _("Federal Department of Home Affairs (FDHA)")),
-                (3, _("Federal Department of Justice and Police (FDJP)")),
-                (4, _("Federal Department of Defence, Civil Protection and "
-                      "Sport (DDPS)")),
-                (5, _("Federal Department of Finance (FDF)")),
-                (6, _("Federal Department of Economic Affairs, Education and "
-                      "Research (EAER)")),
-                (7, _("Federal Department of the Environment, Transport, "
-                      "Energy and Communications (DETEC)")),
-                (8, _("Federal Chancellery (FCh)")),
-            ))
         if (attribute == 'position_federal_council'
                 or attribute == 'position_national_council'
                 or attribute == 'position_council_of_states'):
@@ -423,8 +409,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         ])
 
     # Authorities
-    _department_in_charge = Column('department_in_charge', Integer)
-    department_in_charge = encoded_property()  # drop
     procedure_number = Column(Text)
     _position_federal_council = Column('position_federal_council', Integer)
     position_federal_council = encoded_property()
@@ -441,14 +425,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Duration
     duration_federal_assembly = Column(Integer)
-    duration_post_federal_assembly = Column(Integer)  # drop
     duration_initative_collection = Column(Integer)
-    duration_initative_federal_council = Column(Integer)  # drop
-    duration_initative_total = Column(Integer)  # drop
     duration_referendum_collection = Column(Integer)
-    duration_referendum_total = Column(Integer)  # drop
     signatures_valid = Column(Integer)
-    signatures_invalid = Column(Integer)  # drop
 
     # Voting recommendations
     recommendations = Column(JSON, nullable=False, default=dict)
@@ -581,6 +560,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Electoral strength
     national_council_election_year = Column(Integer)
+    # drop?
     national_council_share_fdp = Column(Numeric(13, 10))
     national_council_share_cvp = Column(Numeric(13, 10))
     national_council_share_sp = Column(Numeric(13, 10))

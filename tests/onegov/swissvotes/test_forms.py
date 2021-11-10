@@ -462,7 +462,6 @@ def test_update_dataset_form(session):
         '12',  # d3e1 / NUMERIC
         '12.5',  # d3e2 / NUMERIC
         '12.55',  # d3e3 / NUMERIC
-        '',  # dep
         '',  # br-pos
     ])
     workbook.close()

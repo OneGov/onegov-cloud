@@ -171,7 +171,6 @@ def test_swissvotes_dataset_field_types_and_missing_values():
             content,  # d3e1 / NUMERIC
             content,  # d3e2 / NUMERIC
             content,  # d3e3 / NUMERIC
-            content,  # dep
             content,  # br-pos
             'xxx'     # avoid being ignore because all cells are empty
         ])
@@ -238,7 +237,6 @@ def test_swissvotes_dataset_field_all_okay():
         '12',  # d3e1 / NUMERIC
         '12.5',  # d3e2 / NUMERIC
         '12.55',  # d3e3 / NUMERIC
-        '',  # dep
         '',  # br-pos
     ])
     worksheet.write_row(2, 0, [
@@ -262,7 +260,6 @@ def test_swissvotes_dataset_field_all_okay():
         '12',  # d3e1 / NUMERIC
         '12.5',  # d3e2 / NUMERIC
         '12.55',  # d3e3 / NUMERIC
-        '',  # dep
         '',  # br-pos
     ])
     workbook.close()
@@ -329,7 +326,6 @@ def test_swissvotes_dataset_skip_empty_columns():
         '12',  # d3e1 / NUMERIC
         '12.5',  # d3e2 / NUMERIC
         '12.55',  # d3e3 / NUMERIC
-        '',  # dep
         '',  # br-pos
     ])
     workbook.close()
