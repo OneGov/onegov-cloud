@@ -332,7 +332,6 @@ def sample_vote():
     vote.short_title_de = "V D"
     vote.short_title_fr = "V F"
     vote.keyword = "Keyword"
-    vote.votes_on_same_day = 2
     vote._legal_form = 1
     vote.initiator = "Initiator"
     vote.anneepolitique = "anneepolitique"
@@ -363,7 +362,6 @@ def sample_vote():
         'https://no.com/objects/3': 'https://detail.com/3',
         'https://no.com/objects/4': 'https://detail.com/4'
     }
-    vote.swissvoteslink = 'https://example.com/122.0'
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
     vote.link_bk_results_de = 'https://bk.results/de'
@@ -398,13 +396,10 @@ def sample_vote():
     vote._result = 1
     vote.result_turnout = Decimal('20.01')
     vote._result_people_accepted = 1
-    vote.result_people_yeas = 8
-    vote.result_people_nays = 9
     vote.result_people_yeas_p = Decimal('40.01')
     vote._result_cantons_accepted = 1
     vote.result_cantons_yeas = Decimal('1.5')
     vote.result_cantons_nays = Decimal('24.5')
-    vote.result_cantons_yeas_p = Decimal('60.01')
     vote._result_ag_accepted = 0
     vote._result_ai_accepted = 0
     vote._result_ar_accepted = 0

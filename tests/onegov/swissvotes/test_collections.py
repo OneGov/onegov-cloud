@@ -71,7 +71,6 @@ def test_votes(swissvotes_app):
             title_fr="Vote FR",
             short_title_de="V D",
             short_title_fr="V F",
-            votes_on_same_day=2,
             _legal_form=1
         )
 
@@ -82,7 +81,6 @@ def test_votes(swissvotes_app):
     assert vote.title_fr == "Vote FR"
     assert vote.short_title_de == "V D"
     assert vote.short_title_fr == "V F"
-    assert vote.votes_on_same_day == 2
     assert vote.legal_form == "Mandatory referendum"
 
     assert votes.last_modified == datetime(2019, 1, 1, 10, tzinfo=utc)
@@ -157,7 +155,6 @@ def test_votes_pagination(swissvotes_app):
             title_fr="Vote",
             short_title_de="Vote",
             short_title_fr="Vote",
-            votes_on_same_day=2,
             _legal_form=1
         )
 
@@ -330,7 +327,6 @@ def test_votes_query(swissvotes_app):
         title_fr="Vote sur cette question",
         short_title_de="diese Sache",
         short_title_fr="cette question",
-        votes_on_same_day=1,
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -356,7 +352,6 @@ def test_votes_query(swissvotes_app):
         short_title_fr="cette version",
         keyword="Variant A of X",
         initiator="The group that wants something",
-        votes_on_same_day=1,
         _legal_form=2,
         descriptor_1_level_1=Decimal('10'),
         descriptor_1_level_2=Decimal('10.3'),
@@ -378,7 +373,6 @@ def test_votes_query(swissvotes_app):
         short_title_de="Nochmals etwas anderes",
         short_title_fr="encore une autre version",
         keyword="Variant B of X",
-        votes_on_same_day=1,
         _legal_form=2,
         descriptor_3_level_1=Decimal('8'),
         descriptor_3_level_2=Decimal('8.3'),
@@ -475,7 +469,6 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="Vote on that one thing",
         short_title_de="Vote on that one thing",
         short_title_fr="Vote on that one thing",
-        votes_on_same_day=1,
         _legal_form=1,
     )
     votes.add(
@@ -486,7 +479,6 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="We want this version the thing",
         short_title_de="We want this version the thing",
         short_title_fr="We want this version the thing",
-        votes_on_same_day=1,
         _legal_form=2,
     )
     vote = votes.add(
@@ -497,7 +489,6 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="We want that version of the thing",
         short_title_de="We want that version of the thing",
         short_title_fr="We want that version of the thing",
-        votes_on_same_day=1,
         _legal_form=2,
     )
     for name, attachment in attachments.items():
@@ -530,7 +521,7 @@ def test_votes_order(swissvotes_app):
             title_fr=''.join(reversed(title)),
             short_title_de=title,
             short_title_fr=''.join(reversed(title)),
-            votes_on_same_day=1,
+
             _legal_form=index,
             _result=index,
             result_people_yeas_p=index / 10,
@@ -674,7 +665,6 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
-        votes_on_same_day=2,
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -694,7 +684,6 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
-        votes_on_same_day=2,
         _legal_form=1,
         descriptor_1_level_1=Decimal('10'),
         descriptor_1_level_2=Decimal('10.3'),
@@ -711,7 +700,6 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
-        votes_on_same_day=2,
         _legal_form=1,
         descriptor_3_level_1=Decimal('8'),
         descriptor_3_level_2=Decimal('8.3'),
@@ -735,7 +723,6 @@ def test_votes_update(swissvotes_app):
             title_fr="First",
             short_title_de="First",
             short_title_fr="First",
-            votes_on_same_day=2,
             _legal_form=1,
         ),
         SwissVote(
@@ -745,7 +732,6 @@ def test_votes_update(swissvotes_app):
             title_fr="Second",
             short_title_de="Second",
             short_title_fr="Second",
-            votes_on_same_day=2,
             _legal_form=1,
         )
     ])
@@ -761,7 +747,6 @@ def test_votes_update(swissvotes_app):
             title_fr="First",
             short_title_de="First",
             short_title_fr="First",
-            votes_on_same_day=2,
             _legal_form=1,
         )
     ])
@@ -776,7 +761,6 @@ def test_votes_update(swissvotes_app):
             title_fr="First vote",
             short_title_de="First vote",
             short_title_fr="First vote",
-            votes_on_same_day=2,
             _legal_form=1,
         )
     ])
@@ -795,7 +779,6 @@ def test_votes_export(swissvotes_app):
         short_title_de="V D",
         short_title_fr="V F",
         keyword="Keyword",
-        votes_on_same_day=2,
         _legal_form=1,
         initiator="Initiator",
         anneepolitique="anneepolitique",
@@ -811,14 +794,10 @@ def test_votes_export(swissvotes_app):
         _result=1,
         result_turnout=Decimal('20.01'),
         _result_people_accepted=1,
-        result_people_yeas=8,
-        result_people_nays=9,
         result_people_yeas_p=Decimal('40.01'),
         _result_cantons_accepted=1,
         result_cantons_yeas=Decimal('1.5'),
         result_cantons_nays=Decimal('24.5'),
-        result_cantons_yeas_p=Decimal('60.01'),
-        swissvoteslink='https://example.com/122.0',
         brief_description_title='Kurzbeschreibung'
     )
     vote._result_ag_accepted = 0
@@ -1449,7 +1428,6 @@ def test_votes_export(swissvotes_app):
         'titel_kurz_f': 'V F',
         'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
-        'anzahl': '2',
         'rechtsform': '1',
         'd1e1': '4',
         'd1e2': '4,2',
@@ -1464,12 +1442,9 @@ def test_votes_export(swissvotes_app):
         'stand': '1',
         'annahme': '1',
         'bet': '20,01',
-        'volkja': '8',
-        'volknein': '9',
         'volkja-proz': '40,01',
         'kt-ja': '1,5',
         'kt-nein': '24,5',
-        'ktjaproz': '60,01',
         'ag-annahme': '0',
         'ai-annahme': '0',
         'ar-annahme': '0',
@@ -2070,7 +2045,6 @@ def test_votes_export(swissvotes_app):
             'https://sozialarchiv.ch/objects/3 '
             'https://sozialarchiv.ch/objects/4'
         ),
-        'swissvoteslink': 'https://example.com/122.0',
         'nach_cockpit_d': 'https://post.vote.poll/de',
         'nach_cockpit_f': 'https://post.vote.poll/fr',
         'nach_cockpit_e': 'https://post.vote.poll/en',
@@ -2101,7 +2075,6 @@ def test_votes_export(swissvotes_app):
         'titel_kurz_f': 'V F',
         'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
-        'anzahl': 2.0,
         'rechtsform': 1.0,
         'd1e1': 4.0,
         'd1e2': 4.2,
@@ -2116,12 +2089,9 @@ def test_votes_export(swissvotes_app):
         'stand': 1.0,
         'annahme': 1.0,
         'bet': 20.01,
-        'volkja': 8.0,
-        'volknein': 9.0,
         'volkja-proz': 40.01,
         'kt-ja': 1.5,
         'kt-nein': 24.5,
-        'ktjaproz': 60.01,
         'ag-annahme': 0.0,
         'ai-annahme': 0.0,
         'ar-annahme': 0.0,
@@ -2723,7 +2693,6 @@ def test_votes_export(swissvotes_app):
             'https://sozialarchiv.ch/objects/3 '
             'https://sozialarchiv.ch/objects/4'
         ),
-        'swissvoteslink': 'https://example.com/122.0',
         'nach_cockpit_d': 'https://post.vote.poll/de',
         'nach_cockpit_f': 'https://post.vote.poll/fr',
         'nach_cockpit_e': 'https://post.vote.poll/en',

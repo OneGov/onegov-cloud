@@ -244,7 +244,6 @@ def test_model_swissvotes_file(swissvotes_app):
         short_title_de="V D",
         short_title_fr="V F",
         keyword="Keyword",
-        votes_on_same_day=2,
         _legal_form=1,
     )
     session.add(vote)
@@ -336,7 +335,6 @@ def test_model_vote(session, sample_vote):
     assert vote.short_title == "V D"
 
     assert vote.keyword == "Keyword"
-    assert vote.votes_on_same_day == 2
     assert vote._legal_form == 1
     assert vote.legal_form == "Mandatory referendum"
     assert vote.initiator == "Initiator"
@@ -374,7 +372,6 @@ def test_model_vote(session, sample_vote):
         'https://no.com/objects/3': 'https://detail.com/3',
         'https://no.com/objects/4': 'https://detail.com/4'
     }
-    assert vote.swissvoteslink == 'https://example.com/122.0'
     assert vote.link_bk_chrono == 'https://bk.chrono/de'
     assert vote.link_bk_results == 'https://bk.results/de'
     assert vote.link_curia_vista == 'https://curia.vista/de'
@@ -432,14 +429,11 @@ def test_model_vote(session, sample_vote):
     assert vote.result_turnout == Decimal('20.01')
     assert vote._result_people_accepted == 1
     assert vote.result_people_accepted == "Accepted"
-    assert vote.result_people_yeas == 8
-    assert vote.result_people_nays == 9
     assert vote.result_people_yeas_p == Decimal('40.01')
     assert vote._result_cantons_accepted == 1
     assert vote.result_cantons_accepted == "Accepted"
     assert vote.result_cantons_yeas == Decimal('1.5')
     assert vote.result_cantons_nays == Decimal('24.5')
-    assert vote.result_cantons_yeas_p == Decimal('60.01')
     assert vote._result_ag_accepted == 0
     assert vote.result_ag_accepted == "Rejected"
     assert vote._result_ai_accepted == 0
@@ -777,7 +771,6 @@ def test_model_vote_attachments(swissvotes_app, attachments,
             short_title_de="V D",
             short_title_fr="V F",
             keyword="Keyword",
-            votes_on_same_day=2,
             _legal_form=1,
         )
     )
@@ -970,7 +963,7 @@ def test_model_column_mapper():
     assert mapper.get_value(vote, '!i!recommendations!fdp') == 66
     assert mapper.get_value(vote, '!t!meta!link_bk_results_de') == 'http://a.b'
 
-    assert list(mapper.get_values(vote))[:24] == [
+    assert list(mapper.get_values(vote))[:22] == [
         Decimal('100.1'),
         date(2019, 1, 1),
         'short title de',
@@ -978,8 +971,6 @@ def test_model_column_mapper():
         'title de',
         'title fr',
         'keyword',
-        None,
-        None,
         4,
         None,
         None,
@@ -996,7 +987,7 @@ def test_model_column_mapper():
         None,
         None,
     ]
-    assert list(mapper.get_items(vote))[:24] == [
+    assert list(mapper.get_items(vote))[:22] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
         ('short_title_de', 'short title de'),
@@ -1004,8 +995,6 @@ def test_model_column_mapper():
         ('title_de', 'title de'),
         ('title_fr', 'title fr'),
         ('keyword', 'keyword'),
-        ('swissvoteslink', None),
-        ('votes_on_same_day', None),
         ('_legal_form', 4),
         ('anneepolitique', None),
         ('!t!meta!link_bk_chrono_de', None),
@@ -1022,7 +1011,7 @@ def test_model_column_mapper():
         ('_department_in_charge', None),
         ('_position_federal_council', None),
     ]
-    assert list(mapper.items())[:24] == [
+    assert list(mapper.items())[:22] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
         ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
@@ -1030,8 +1019,6 @@ def test_model_column_mapper():
         ('title_de', 'titel_off_d', 'TEXT', False, None, None),
         ('title_fr', 'titel_off_f', 'TEXT', False, None, None),
         ('keyword', 'stichwort', 'TEXT', True, None, None),
-        ('swissvoteslink', 'swissvoteslink', 'TEXT', True, None, None),
-        ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None),
         ('anneepolitique', 'anneepolitique', 'TEXT', True, None, None),
         ('!t!meta!link_bk_chrono_de', 'bkchrono-de', 'TEXT', True, None, None),
@@ -1048,7 +1035,7 @@ def test_model_column_mapper():
         ('_department_in_charge', 'dep', 'INTEGER', True, None, None),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
     ]
-    assert list(mapper.items())[303] == (
+    assert list(mapper.items())[301] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )

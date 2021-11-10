@@ -43,6 +43,8 @@ class encoded_property(object):
 
     """
 
+    # todo: set _xxx attribute ourselves!
+
     def __set_name__(self, owner, name):
         self.name = name
 
@@ -206,7 +208,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     short_title = localized_property()
     brief_description_title = Column(Text)
     keyword = Column(Text)
-    votes_on_same_day = Column(Integer, nullable=False)  # drop
     _legal_form = Column('legal_form', Integer, nullable=False)
     legal_form = encoded_property()
     initiator = Column(Text)
@@ -214,7 +215,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     bfs_map_de = Column(Text)
     bfs_map_fr = Column(Text)
     bfs_map = localized_property()
-    swissvoteslink = Column(Text)  # drop
 
     @property
     def bfs_map_host(self):
@@ -343,99 +343,66 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         return result
 
     # Result
-    # todo: drop unused
     _result = Column('result', Integer)
     result = encoded_property()
-
     result_turnout = Column(Numeric(13, 10))
-
     _result_people_accepted = Column('result_people_accepted', Integer)
     result_people_accepted = encoded_property()
-    result_people_yeas = Column(Integer)  # drop
-    result_people_nays = Column(Integer)  # drop
     result_people_yeas_p = Column(Numeric(13, 10))
-
     _result_cantons_accepted = Column('result_cantons_accepted', Integer)
     result_cantons_accepted = encoded_property()
     result_cantons_yeas = Column(Numeric(3, 1))
     result_cantons_nays = Column(Numeric(3, 1))
-    result_cantons_yeas_p = Column(Numeric(13, 10))  # drop
-
     _result_ag_accepted = Column('result_ag_accepted', Integer)
     result_ag_accepted = encoded_property()
-
     _result_ai_accepted = Column('result_ai_accepted', Integer)
     result_ai_accepted = encoded_property()
-
     _result_ar_accepted = Column('result_ar_accepted', Integer)
     result_ar_accepted = encoded_property()
-
     _result_be_accepted = Column('result_be_accepted', Integer)
     result_be_accepted = encoded_property()
-
     _result_bl_accepted = Column('result_bl_accepted', Integer)
     result_bl_accepted = encoded_property()
-
     _result_bs_accepted = Column('result_bs_accepted', Integer)
     result_bs_accepted = encoded_property()
-
     _result_fr_accepted = Column('result_fr_accepted', Integer)
     result_fr_accepted = encoded_property()
-
     _result_ge_accepted = Column('result_ge_accepted', Integer)
     result_ge_accepted = encoded_property()
-
     _result_gl_accepted = Column('result_gl_accepted', Integer)
     result_gl_accepted = encoded_property()
-
     _result_gr_accepted = Column('result_gr_accepted', Integer)
     result_gr_accepted = encoded_property()
-
     _result_ju_accepted = Column('result_ju_accepted', Integer)
     result_ju_accepted = encoded_property()
-
     _result_lu_accepted = Column('result_lu_accepted', Integer)
     result_lu_accepted = encoded_property()
-
     _result_ne_accepted = Column('result_ne_accepted', Integer)
     result_ne_accepted = encoded_property()
-
     _result_nw_accepted = Column('result_nw_accepted', Integer)
     result_nw_accepted = encoded_property()
-
     _result_ow_accepted = Column('result_ow_accepted', Integer)
     result_ow_accepted = encoded_property()
-
     _result_sg_accepted = Column('result_sg_accepted', Integer)
     result_sg_accepted = encoded_property()
-
     _result_sh_accepted = Column('result_sh_accepted', Integer)
     result_sh_accepted = encoded_property()
-
     _result_so_accepted = Column('result_so_accepted', Integer)
     result_so_accepted = encoded_property()
-
     _result_sz_accepted = Column('result_sz_accepted', Integer)
     result_sz_accepted = encoded_property()
-
     _result_tg_accepted = Column('result_tg_accepted', Integer)
     result_tg_accepted = encoded_property()
-
     _result_ti_accepted = Column('result_ti_accepted', Integer)
     result_ti_accepted = encoded_property()
-
     _result_ur_accepted = Column('result_ur_accepted', Integer)
     result_ur_accepted = encoded_property()
-
     _result_vd_accepted = Column('result_vd_accepted', Integer)
     result_vd_accepted = encoded_property()
-
     _result_vs_accepted = Column('result_vs_accepted', Integer)
     result_vs_accepted = encoded_property()
-
     _result_zg_accepted = Column('result_zg_accepted', Integer)
     result_zg_accepted = encoded_property()
-
     _result_zh_accepted = Column('result_zh_accepted', Integer)
     result_zh_accepted = encoded_property()
 
@@ -457,7 +424,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Authorities
     _department_in_charge = Column('department_in_charge', Integer)
-    department_in_charge = encoded_property()
+    department_in_charge = encoded_property()  # drop
     procedure_number = Column(Text)
     _position_federal_council = Column('position_federal_council', Integer)
     position_federal_council = encoded_property()
@@ -474,14 +441,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Duration
     duration_federal_assembly = Column(Integer)
-    duration_post_federal_assembly = Column(Integer)
+    duration_post_federal_assembly = Column(Integer)  # drop
     duration_initative_collection = Column(Integer)
-    duration_initative_federal_council = Column(Integer)
-    duration_initative_total = Column(Integer)
+    duration_initative_federal_council = Column(Integer)  # drop
+    duration_initative_total = Column(Integer)  # drop
     duration_referendum_collection = Column(Integer)
-    duration_referendum_total = Column(Integer)
+    duration_referendum_total = Column(Integer)  # drop
     signatures_valid = Column(Integer)
-    signatures_invalid = Column(Integer)
+    signatures_invalid = Column(Integer)  # drop
 
     # Voting recommendations
     recommendations = Column(JSON, nullable=False, default=dict)

@@ -73,7 +73,6 @@ def test_attachments_form(swissvotes_app, attachments):
         title_fr="Vote FR",
         short_title_de="V D",
         short_title_fr="V F",
-        votes_on_same_day=2,
         _legal_form=1,
     )
 
@@ -323,7 +322,6 @@ def test_search_form(swissvotes_app):
         'title_fr': "Vote FR",
         'short_title_de': "V D",
         'short_title_fr': "V F",
-        'votes_on_same_day': 2,
         '_legal_form': 1,
     }
     votes.add(
@@ -451,8 +449,6 @@ def test_update_dataset_form(session):
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
-        'link',  # swissvoteslink / TEXT
-        '2',  # anzahl / INTEGER
         '3',  # rechtsform / INTEGER
         '',  # anneepolitique / TEXT
         '',  # bkchrono-de / TEXT

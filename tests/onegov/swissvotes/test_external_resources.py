@@ -37,7 +37,6 @@ def test_posters_fetch(swissvotes_app):
         'title_fr': "Vote FR",
         'short_title_de': "V D",
         'short_title_fr': "V F",
-        'votes_on_same_day': 2,
         '_legal_form': 1,
     }
     vote_1 = votes.add(

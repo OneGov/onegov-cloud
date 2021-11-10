@@ -406,7 +406,6 @@ def test_layout_page_slides(swissvotes_app, slider_images):
             short_title_fr='Vote F',
             bfs_number=Decimal(bfs_number),
             date=date(1990, 6, 2),
-            votes_on_same_day=2,
             _legal_form=1
         ) for bfs_number in ('1', '2.1', '2.2')
     }
@@ -631,7 +630,6 @@ def test_layout_vote(swissvotes_app):
         short_title_fr="Vote F",
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        votes_on_same_day=2,
         _legal_form=1
     ))
     session.flush()
@@ -687,7 +685,6 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
         short_title_fr="Vote F",
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        votes_on_same_day=2,
         _legal_form=1
     )
     model.session_manager.current_locale = locale
@@ -714,7 +711,6 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
         short_title_fr="Vote F",
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        votes_on_same_day=2,
         _legal_form=1
     )
     model.session_manager.current_locale = 'de_CH'

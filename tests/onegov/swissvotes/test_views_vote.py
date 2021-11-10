@@ -231,7 +231,6 @@ def test_vote_upload(swissvotes_app, attachments):
             short_title_de="V D",
             short_title_fr="V F",
             keyword="Keyword",
-            votes_on_same_day=2,
             _legal_form=3,
             initiator="Initiator",
         )
@@ -308,7 +307,6 @@ def test_view_vote_pagination(swissvotes_app):
                 short_title_de="V D",
                 short_title_fr="V F",
                 keyword="Keyword",
-                votes_on_same_day=2,
                 _legal_form=3,
                 initiator="Initiator",
             )

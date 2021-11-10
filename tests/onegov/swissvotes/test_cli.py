@@ -179,7 +179,6 @@ def test_cli_import_attachments(session_manager, temporary_directory,
                 title_fr=f"Vote {number}",
                 short_title_de=f"Vote {number}",
                 short_title_fr=f"Vote {number}",
-                votes_on_same_day=3,
                 _legal_form=1,
             )
         )
@@ -249,7 +248,6 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
-        votes_on_same_day=3,
         _legal_form=1,
     )
 

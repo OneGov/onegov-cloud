@@ -658,7 +658,12 @@ def drop_unused_columns(context):
         'result_zh_nays',
         'result_zh_yeas_p',
         'legislation_number',
-        'legislation_decade'
+        'legislation_decade',
+        'swissvoteslink',
+        'votes_on_same_day',
+        'result_people_yeas',
+        'result_people_nays',
+        'result_cantons_yeas_p'
     )
     for column in columns:
         if context.has_column('swissvotes', column):

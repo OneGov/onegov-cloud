@@ -113,8 +113,8 @@ def test_swissvotes_dataset_field_missing_columns():
     field = field.bind(form, 'dataset')
     mapper = ColumnMapper()
     columns = [
-        value for value in mapper.columns.values()
-        if value != 'anzahl'
+        column for column in mapper.columns.values()
+        if column != 'anr'
     ]
 
     file = BytesIO()
@@ -136,7 +136,7 @@ def test_swissvotes_dataset_field_missing_columns():
     assert not field.validate(form)
     errors = [error.interpolate() for error in field.errors]
 
-    assert 'Some columns are missing: anzahl.' in errors
+    assert 'Some columns are missing: anr.' in errors
 
 
 def test_swissvotes_dataset_field_types_and_missing_values():
@@ -158,8 +158,6 @@ def test_swissvotes_dataset_field_types_and_missing_values():
             content,  # title_de / TEXT
             content,  # title_fr / TEXT
             content,  # stichwort / TEXT
-            content,  # swissvoteslink / TEXT
-            content,  # anzahl / INTEGER
             content,  # rechtsform / INTEGER
             content,  # anneepolitique / TEXT
             content,  # bkchrono-de / TEXT
@@ -196,7 +194,6 @@ def test_swissvotes_dataset_field_types_and_missing_values():
     assert "2:titel_kurz_d ∅" in error
     assert "2:titel_kurz_f ∅" in error
 
-    assert "2:anzahl ∅" in error
     assert "2:rechtsform ∅" in error
 
     assert "3:anr ∅" in error
@@ -228,8 +225,6 @@ def test_swissvotes_dataset_field_all_okay():
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
-        'link',  # swissvoteslink / TEXT
-        '2',  # anzahl / INTEGER
         '3',  # rechtsform / INTEGER
         '',  # anneepolitique / TEXT
         '',  # bkchrono-de / TEXT
@@ -254,8 +249,6 @@ def test_swissvotes_dataset_field_all_okay():
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
-        'link',  # swissvoteslink / TEXT
-        2,  # anzahl / INTEGER
         3,  # rechtsform
         '',  # anneepolitique / TEXT
         '',  # bkchrono-de / TEXT
@@ -291,7 +284,6 @@ def test_swissvotes_dataset_field_all_okay():
     assert field.data[0].short_title_de == 'titel_kurz_d'
     assert field.data[0].short_title_fr == 'titel_kurz_f'
     assert field.data[0].keyword == 'stichwort'
-    assert field.data[0].votes_on_same_day == 2
     assert field.data[0]._legal_form == 3
 
     assert field.data[1].bfs_number == Decimal('100.20')
@@ -301,7 +293,6 @@ def test_swissvotes_dataset_field_all_okay():
     assert field.data[1].short_title_de == 'titel_kurz_d'
     assert field.data[1].short_title_fr == 'titel_kurz_f'
     assert field.data[1].keyword == 'stichwort'
-    assert field.data[1].votes_on_same_day == 2
     assert field.data[1]._legal_form == 3
 
 
@@ -325,8 +316,6 @@ def test_swissvotes_dataset_skip_empty_columns():
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
-        'link',  # swissvoteslink / TEXT
-        '2',  # anzahl / INTEGER
         '3',  # rechtsform / INTEGER
         '',  # anneepolitique / TEXT
         '',  # bkchrono-de / TEXT
@@ -362,7 +351,6 @@ def test_swissvotes_dataset_skip_empty_columns():
     assert field.data[0].short_title_de == 'titel_kurz_d'
     assert field.data[0].short_title_fr == 'titel_kurz_f'
     assert field.data[0].keyword == 'stichwort'
-    assert field.data[0].votes_on_same_day == 2
     assert field.data[0]._legal_form == 3
 
 

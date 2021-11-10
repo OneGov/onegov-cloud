@@ -28,7 +28,6 @@ def test_app_dataset_caches(swissvotes_app):
             title_fr="Vote",
             short_title_de="Vote",
             short_title_fr="Vote",
-            votes_on_same_day=2,
             _legal_form=1
         )
 
@@ -44,7 +43,6 @@ def test_app_dataset_caches(swissvotes_app):
             title_fr="Vote",
             short_title_de="Vote",
             short_title_fr="Vote",
-            votes_on_same_day=2,
             _legal_form=1
         )
 

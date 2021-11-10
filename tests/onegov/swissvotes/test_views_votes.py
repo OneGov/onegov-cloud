@@ -117,8 +117,6 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
-        'link',  # swissvoteslink
-        '2',  # anzahl
         '3',  # rechtsform
         '',  # anneepolitique
         '',  # bkchrono-de
