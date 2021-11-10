@@ -2113,24 +2113,14 @@
 </metal:focus>
 
 <metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
-    <tal:b tal:define="page layout.page_by_path(page_path); page_url request.link(page) if page else None">
         <div class="focus-image" tal:condition="image_src">
-            <a href="${image_url or page_url}" tal:condition="image_url or page_url">
-                <img src="${image_src}" alt="Focus Image">
-            </a>
-            <img tal:condition="python: not image_url and not page_url" src="${image_src}" alt="Focus Image">
+            <img src="${image_src}" alt="Focus Image">
         </div>
-        <tal:b  tal:condition="page">
-            <h5 class="focus-title">${page.title}</h5>
-            <div class="focus-lead">${page.lead}</div>
-            <div class="focus-text" tal:content="structure page.text" />
-        </tal:b>
-        <div class="panel" tal:condition="python: not page and not image_src">
+        <div class="panel" tal:condition="python: not image_src">
             <p i18n:translate="">Available options for the focus widget:</p>
             <code>&lt;focus<br>
                 image-src="https://..."<br>
-                image-url="https://on-image-click.com"<br>
-                page-path="kontakte"<br>
+                focus-url="https://on-image-click.com"<br>
                 title="..."<br>
                 hide-title=""<br>
                 hide-lead=""<br>
@@ -2139,7 +2129,6 @@
                 &lt;/focus&gt;
             </code>
         </div>
-    </tal:b>
 </metal:focus>
 
 <metal:chat define-macro="chat">
