@@ -12,7 +12,7 @@ var locales = {
         "Until": "Bis",
         "Whole day": "Ganztägig",
         "Yes": "Ja",
-        "Add Suggestion": "Vorschlag Hinzufügen",
+        "Add Suggestion": "Vorschlag hinzufügen",
         "Goto date": "Zu Datum springen",
         "Image": "Bild",
         "File": "Datei",
