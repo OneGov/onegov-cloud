@@ -2,7 +2,6 @@ from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.views.vote import view_vote_percentages
-from psycopg2.extras import NumericRange
 from pytest import mark
 from re import findall
 from transaction import commit
@@ -227,8 +226,6 @@ def test_vote_upload(swissvotes_app, attachments):
         SwissVote(
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
             title_fr="Vote FR",
             short_title_de="V D",
@@ -306,8 +303,6 @@ def test_view_vote_pagination(swissvotes_app):
             SwissVote(
                 bfs_number=Decimal(number),
                 date=date(1990, 6, day),
-                legislation_number=4,
-                legislation_decade=NumericRange(1990, 1994),
                 title_de="Vote DE",
                 title_fr="Vote FR",
                 short_title_de="V D",

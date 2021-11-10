@@ -10,7 +10,6 @@ from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
-from psycopg2.extras import NumericRange
 from pytest import skip
 from pytz import utc
 
@@ -68,8 +67,6 @@ def test_votes(swissvotes_app):
             id=1,
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
             title_fr="Vote FR",
             short_title_de="V D",
@@ -81,8 +78,6 @@ def test_votes(swissvotes_app):
     assert vote.id == 1
     assert vote.bfs_number == Decimal('100.1')
     assert vote.date == date(1990, 6, 2)
-    assert vote.legislation_number == 4
-    assert vote.legislation_decade == NumericRange(1990, 1994)
     assert vote.title_de == "Vote DE"
     assert vote.title_fr == "Vote FR"
     assert vote.short_title_de == "V D"
@@ -158,8 +153,6 @@ def test_votes_pagination(swissvotes_app):
             id=id_,
             bfs_number=Decimal(f'{id_}'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote",
             title_fr="Vote",
             short_title_de="Vote",
@@ -333,8 +326,6 @@ def test_votes_query(swissvotes_app):
         id=1,
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Abstimmung über diese Sache",
         title_fr="Vote sur cette question",
         short_title_de="diese Sache",
@@ -359,8 +350,6 @@ def test_votes_query(swissvotes_app):
         id=2,
         bfs_number=Decimal('200.1'),
         date=date(1990, 9, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Wir wollen diese Version die Sache",
         title_fr="Nous voulons cette version de la chose",
         short_title_de="diese Version",
@@ -384,8 +373,6 @@ def test_votes_query(swissvotes_app):
         id=3,
         bfs_number=Decimal('200.2'),
         date=date(1990, 9, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Wir wollen nochmal etwas anderes",
         title_fr="Nous voulons encore une autre version de la chose",
         short_title_de="Nochmals etwas anderes",
@@ -484,8 +471,6 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         id=1,
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote on that one thing",
         title_fr="Vote on that one thing",
         short_title_de="Vote on that one thing",
@@ -497,8 +482,6 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         id=2,
         bfs_number=Decimal('200.1'),
         date=date(1990, 9, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="We want this version the thing",
         title_fr="We want this version the thing",
         short_title_de="We want this version the thing",
@@ -510,8 +493,6 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         id=3,
         bfs_number=Decimal('200.2'),
         date=date(1990, 9, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="We want that version of the thing",
         title_fr="We want that version of the thing",
         short_title_de="We want that version of the thing",
@@ -545,8 +526,6 @@ def test_votes_order(swissvotes_app):
             id=index,
             bfs_number=Decimal(str(index)),
             date=date(1990, 6, index),
-            legislation_number=1,
-            legislation_decade=NumericRange(1990, 1994),
             title_de=title,
             title_fr=''.join(reversed(title)),
             short_title_de=title,
@@ -691,8 +670,6 @@ def test_votes_available_descriptors(swissvotes_app):
         id=1,
         bfs_number=Decimal('1'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote",
         title_fr="Vote",
         short_title_de="Vote",
@@ -713,8 +690,6 @@ def test_votes_available_descriptors(swissvotes_app):
         id=2,
         bfs_number=Decimal('2'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote",
         title_fr="Vote",
         short_title_de="Vote",
@@ -732,8 +707,6 @@ def test_votes_available_descriptors(swissvotes_app):
         id=3,
         bfs_number=Decimal('3'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote",
         title_fr="Vote",
         short_title_de="Vote",
@@ -758,8 +731,6 @@ def test_votes_update(swissvotes_app):
         SwissVote(
             bfs_number=Decimal('1'),
             date=date(1990, 6, 1),
-            legislation_number=1,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="First",
             title_fr="First",
             short_title_de="First",
@@ -770,8 +741,6 @@ def test_votes_update(swissvotes_app):
         SwissVote(
             bfs_number=Decimal('2'),
             date=date(1990, 6, 1),
-            legislation_number=2,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Second",
             title_fr="Second",
             short_title_de="Second",
@@ -788,8 +757,6 @@ def test_votes_update(swissvotes_app):
         SwissVote(
             bfs_number=Decimal('1'),
             date=date(1990, 6, 1),
-            legislation_number=1,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="First",
             title_fr="First",
             short_title_de="First",
@@ -805,8 +772,6 @@ def test_votes_update(swissvotes_app):
         SwissVote(
             bfs_number=Decimal('1'),
             date=date(1990, 6, 1),
-            legislation_number=1,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="First vote",
             title_fr="First vote",
             short_title_de="First vote",
@@ -825,8 +790,6 @@ def test_votes_export(swissvotes_app):
     vote = votes.add(
         bfs_number=Decimal('100.1'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote DE",
         title_fr="Vote FR",
         short_title_de="V D",
@@ -1480,8 +1443,6 @@ def test_votes_export(swissvotes_app):
     expected = {
         'anr': '100,1',
         'datum': '02.06.1990',
-        'legislatur': '4',
-        'legisjahr': '1990-1994',
         'titel_off_d': 'Vote DE',
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',
@@ -2134,8 +2095,6 @@ def test_votes_export(swissvotes_app):
     expected = {
         'anr': 100.1,
         'datum': datetime(1990, 6, 2),
-        'legislatur': 4.0,
-        'legisjahr': '1990-1994',
         'titel_off_d': 'Vote DE',
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',

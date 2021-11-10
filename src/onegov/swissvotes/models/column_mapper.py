@@ -45,8 +45,6 @@ class ColumnMapper(object):
             ('descriptor_3_level_3', 'd3e3'),
             ('_department_in_charge', 'dep'),
             ('_position_federal_council', 'br-pos'),
-            ('legislation_number', 'legislatur'),
-            ('legislation_decade', 'legisjahr'),
             ('!t!meta!link_curia_vista_de', 'curiavista-de'),
             ('!t!meta!link_curia_vista_fr', 'curiavista-fr'),
             ('_position_parliament', 'bv-pos'),

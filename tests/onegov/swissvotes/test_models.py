@@ -16,7 +16,6 @@ from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
 from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
-from psycopg2.extras import NumericRange
 from translationstring import TranslationString
 
 
@@ -240,8 +239,6 @@ def test_model_swissvotes_file(swissvotes_app):
     vote = SwissVote(
         bfs_number=Decimal('100.1'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote DE",
         title_fr="Vote FR",
         short_title_de="V D",
@@ -329,8 +326,6 @@ def test_model_vote(session, sample_vote):
     assert vote.id == 1
     assert vote.bfs_number == Decimal('100.10')
     assert vote.date == date(1990, 6, 2)
-    assert vote.legislation_number == 4
-    assert vote.legislation_decade == NumericRange(1990, 1994)
     assert vote.title_de == "Vote DE"
     assert vote.title_fr == "Vote FR"
     assert vote.short_title_de == "V D"
@@ -777,8 +772,6 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         SwissVote(
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
             title_fr="Vote FR",
             short_title_de="V D",
@@ -947,8 +940,6 @@ def test_model_column_mapper():
 
     mapper.set_value(vote, 'bfs_number', Decimal('100.1'))
     mapper.set_value(vote, 'date', date(2019, 1, 1))
-    mapper.set_value(vote, 'legislation_number', 10)
-    mapper.set_value(vote, 'legislation_decade', NumericRange(1990, 1999))
     mapper.set_value(vote, 'title_de', 'title de')
     mapper.set_value(vote, 'title_fr', 'title fr')
     mapper.set_value(vote, 'short_title_de', 'short title de')
@@ -960,8 +951,6 @@ def test_model_column_mapper():
 
     assert vote.bfs_number == Decimal('100.1')
     assert vote.date == date(2019, 1, 1)
-    assert vote.legislation_number == 10
-    assert vote.legislation_decade == NumericRange(1990, 1999)
     assert vote.title_de == 'title de'
     assert vote.title_fr == 'title fr'
     assert vote.short_title_de == 'short title de'
@@ -972,9 +961,6 @@ def test_model_column_mapper():
 
     assert mapper.get_value(vote, 'bfs_number'), Decimal('100.1')
     assert mapper.get_value(vote, 'date') == date(2019, 1, 1)
-    assert mapper.get_value(vote, 'legislation_number') == 10
-    assert mapper.get_value(vote, 'legislation_decade') == NumericRange(1990,
-                                                                        1999)
     assert mapper.get_value(vote, 'title_de') == 'title de'
     assert mapper.get_value(vote, 'title_fr') == 'title fr'
     assert mapper.get_value(vote, 'short_title_de') == 'short title de'
@@ -984,7 +970,7 @@ def test_model_column_mapper():
     assert mapper.get_value(vote, '!i!recommendations!fdp') == 66
     assert mapper.get_value(vote, '!t!meta!link_bk_results_de') == 'http://a.b'
 
-    assert list(mapper.get_values(vote))[:26] == [
+    assert list(mapper.get_values(vote))[:24] == [
         Decimal('100.1'),
         date(2019, 1, 1),
         'short title de',
@@ -1009,10 +995,8 @@ def test_model_column_mapper():
         None,
         None,
         None,
-        10,
-        NumericRange(1990, 1999, '[)')
     ]
-    assert list(mapper.get_items(vote))[:26] == [
+    assert list(mapper.get_items(vote))[:24] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
         ('short_title_de', 'short title de'),
@@ -1037,10 +1021,8 @@ def test_model_column_mapper():
         ('descriptor_3_level_3', None),
         ('_department_in_charge', None),
         ('_position_federal_council', None),
-        ('legislation_number', 10),
-        ('legislation_decade', NumericRange(1990, 1999, '[)'))
     ]
-    assert list(mapper.items())[:26] == [
+    assert list(mapper.items())[:24] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
         ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
@@ -1065,10 +1047,8 @@ def test_model_column_mapper():
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
         ('_department_in_charge', 'dep', 'INTEGER', True, None, None),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
-        ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
-        ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None)
     ]
-    assert list(mapper.items())[305] == (
+    assert list(mapper.items())[303] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )

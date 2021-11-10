@@ -21,7 +21,6 @@ from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
-from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
@@ -199,8 +198,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     # Formal description
     bfs_number = Column(Numeric(8, 2), nullable=False)
     date = Column(Date, nullable=False)
-    legislation_number = Column(Integer, nullable=False)  # drop
-    legislation_decade = Column(INT4RANGE, nullable=False)  # drop
     title_de = Column(Text, nullable=False)
     title_fr = Column(Text, nullable=False)
     title = localized_property()

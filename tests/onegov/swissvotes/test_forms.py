@@ -12,7 +12,6 @@ from onegov.swissvotes.forms import UpdateDatasetForm
 from onegov.swissvotes.forms import UpdateExternalResourcesForm
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import TranslatablePage
-from psycopg2.extras import NumericRange
 from xlsxwriter.workbook import Workbook
 
 
@@ -70,8 +69,6 @@ def test_attachments_form(swissvotes_app, attachments):
         id=1,
         bfs_number=Decimal('1'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote DE",
         title_fr="Vote FR",
         short_title_de="V D",
@@ -322,8 +319,6 @@ def test_search_form(swissvotes_app):
     votes = SwissVoteCollection(swissvotes_app)
     kwargs = {
         'date': date(1990, 6, 2),
-        'legislation_number': 4,
-        'legislation_decade': NumericRange(1990, 1994),
         'title_de': "Vote DE",
         'title_fr': "Vote FR",
         'short_title_de': "V D",
@@ -473,8 +468,6 @@ def test_update_dataset_form(session):
         '12.55',  # d3e3 / NUMERIC
         '',  # dep
         '',  # br-pos
-        '1',  # legislatur / INTEGER
-        '2004-2008',  # legisjahr / INT4RANGE
     ])
     workbook.close()
     file.seek(0)

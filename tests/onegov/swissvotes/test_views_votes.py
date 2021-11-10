@@ -44,7 +44,6 @@ def test_view_update_votes(swissvotes_app, file):
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
     assert str(vote.bfs_number) == '82.20'
     assert vote.date.isoformat() == '1920-03-21'
-    assert vote.legislation_number == 25
     assert vote.title == (
         "Gegenentwurf zur Volksinitiative "
         "«für ein Verbot der Errichtung von Spielbanken»"
@@ -135,8 +134,6 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         '12.55',  # d3e3
         '',  # dep
         '',  # br-pos
-        '1',  # legislatur
-        '2004-2008',  # legisjahr
     ])
     workbook.close()
     file.seek(0)

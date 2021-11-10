@@ -30,7 +30,6 @@ from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
-from psycopg2.extras import NumericRange
 from pytest import mark
 
 
@@ -407,8 +406,6 @@ def test_layout_page_slides(swissvotes_app, slider_images):
             short_title_fr='Vote F',
             bfs_number=Decimal(bfs_number),
             date=date(1990, 6, 2),
-            legislation_number=10,
-            legislation_decade=NumericRange(1990, 1994),
             votes_on_same_day=2,
             _legal_form=1
         ) for bfs_number in ('1', '2.1', '2.2')
@@ -634,8 +631,6 @@ def test_layout_vote(swissvotes_app):
         short_title_fr="Vote F",
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        legislation_number=10,
-        legislation_decade=NumericRange(1990, 1994),
         votes_on_same_day=2,
         _legal_form=1
     ))
@@ -692,8 +687,6 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
         short_title_fr="Vote F",
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        legislation_number=10,
-        legislation_decade=NumericRange(1990, 1994),
         votes_on_same_day=2,
         _legal_form=1
     )
@@ -721,8 +714,6 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
         short_title_fr="Vote F",
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        legislation_number=10,
-        legislation_decade=NumericRange(1990, 1994),
         votes_on_same_day=2,
         _legal_form=1
     )

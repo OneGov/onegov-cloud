@@ -7,7 +7,6 @@ from onegov.form import Form
 from onegov.swissvotes.fields import PolicyAreaField
 from onegov.swissvotes.fields import SwissvoteDatasetField
 from onegov.swissvotes.models import ColumnMapper
-from psycopg2.extras import NumericRange
 from xlsxwriter.workbook import Workbook
 
 
@@ -176,8 +175,6 @@ def test_swissvotes_dataset_field_types_and_missing_values():
             content,  # d3e3 / NUMERIC
             content,  # dep
             content,  # br-pos
-            content,  # legislatur / INTEGER
-            content,  # legisjahr / INT4RANGE
             'xxx'     # avoid being ignore because all cells are empty
         ])
     workbook.close()
@@ -194,8 +191,6 @@ def test_swissvotes_dataset_field_types_and_missing_values():
 
     assert "2:anr ∅" in error
     assert "2:datum ∅" in error
-    assert "2:legislatur ∅" in error
-    assert "2:legisjahr ∅" in error
     assert "2:titel_off_d ∅" in error
     assert "2:titel_off_f ∅" in error
     assert "2:titel_kurz_d ∅" in error
@@ -206,8 +201,6 @@ def test_swissvotes_dataset_field_types_and_missing_values():
 
     assert "3:anr ∅" in error
     assert "3:datum ∅" in error
-    assert "3:legislatur ∅" in error
-    assert "3:legisjahr ∅" in error
     assert "3:titel_off_d ∅" in error
     assert "3:titel_off_f ∅" in error
     assert "3:titel_kurz_d ∅" in error
@@ -215,14 +208,6 @@ def test_swissvotes_dataset_field_types_and_missing_values():
 
     assert "4:anr 'x' ≠ numeric(8, 2)" in error
     assert "4:datum 'x' ≠ date" in error
-    assert "4:legislatur 'x' ≠ integer" in error
-    assert "4:legisjahr 'x' ≠ int4range" in error
-
-    assert "5:legisjahr '1' ≠ int4range" in error
-
-    assert "6:legisjahr '1' ≠ int4range" in error
-
-    assert "7:legisjahr '43446' ≠ int4range" in error
 
 
 def test_swissvotes_dataset_field_all_okay():
@@ -260,8 +245,6 @@ def test_swissvotes_dataset_field_all_okay():
         '12.55',  # d3e3 / NUMERIC
         '',  # dep
         '',  # br-pos
-        '1',  # legislatur / INTEGER
-        '2004-2008',  # legisjahr / INT4RANGE
     ])
     worksheet.write_row(2, 0, [
         100.2,  # anr / NUMERIC
@@ -288,8 +271,6 @@ def test_swissvotes_dataset_field_all_okay():
         '12.55',  # d3e3 / NUMERIC
         '',  # dep
         '',  # br-pos
-        1,  # legislatur / INTEGER
-        '2004-2008',  # legisjahr / INT4RANGE
     ])
     workbook.close()
     file.seek(0)
@@ -305,8 +286,6 @@ def test_swissvotes_dataset_field_all_okay():
 
     assert field.data[0].bfs_number == Decimal('100.10')
     assert field.data[0].date == date(2008, 2, 1)
-    assert field.data[0].legislation_number == 1
-    assert field.data[0].legislation_decade == NumericRange(2004, 2008)
     assert field.data[0].title_de == 'titel_off_d'
     assert field.data[0].title_fr == 'titel_off_f'
     assert field.data[0].short_title_de == 'titel_kurz_d'
@@ -317,8 +296,6 @@ def test_swissvotes_dataset_field_all_okay():
 
     assert field.data[1].bfs_number == Decimal('100.20')
     assert field.data[1].date == date(2008, 2, 1)
-    assert field.data[1].legislation_number == 1
-    assert field.data[1].legislation_decade == NumericRange(2004, 2008)
     assert field.data[1].title_de == 'titel_off_d'
     assert field.data[1].title_fr == 'titel_off_f'
     assert field.data[1].short_title_de == 'titel_kurz_d'
@@ -365,8 +342,6 @@ def test_swissvotes_dataset_skip_empty_columns():
         '12.55',  # d3e3 / NUMERIC
         '',  # dep
         '',  # br-pos
-        '1',  # legislatur / INTEGER
-        '2004-2008',  # legisjahr / INT4RANGE
     ])
     workbook.close()
     file.seek(0)
@@ -382,8 +357,6 @@ def test_swissvotes_dataset_skip_empty_columns():
 
     assert field.data[0].bfs_number == Decimal('100.10')
     assert field.data[0].date == date(2008, 2, 1)
-    assert field.data[0].legislation_number == 1
-    assert field.data[0].legislation_decade == NumericRange(2004, 2008)
     assert field.data[0].title_de == 'titel_off_d'
     assert field.data[0].title_fr == 'titel_off_f'
     assert field.data[0].short_title_de == 'titel_kurz_d'

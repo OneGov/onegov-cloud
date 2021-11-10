@@ -3,7 +3,6 @@ from datetime import datetime
 from decimal import Decimal
 from freezegun import freeze_time
 from onegov.swissvotes.collections import SwissVoteCollection
-from psycopg2.extras import NumericRange
 from pytz import utc
 
 
@@ -25,8 +24,6 @@ def test_app_dataset_caches(swissvotes_app):
             id=1,
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote",
             title_fr="Vote",
             short_title_de="Vote",
@@ -43,8 +40,6 @@ def test_app_dataset_caches(swissvotes_app):
             id=2,
             bfs_number=Decimal('100.2'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote",
             title_fr="Vote",
             short_title_de="Vote",

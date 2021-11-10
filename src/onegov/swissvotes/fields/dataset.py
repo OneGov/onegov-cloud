@@ -8,7 +8,6 @@ from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
 from openpyxl.utils.datetime import from_excel
-from psycopg2.extras import NumericRange
 
 
 class SwissvoteDatasetField(UploadField):
@@ -119,10 +118,6 @@ class SwissvoteDatasetField(UploadField):
                             value = int(value) if value else None
                         else:
                             value = int(cell.value)
-                    elif type_ == 'INT4RANGE':
-                        value = NumericRange(*[
-                            int(bound) for bound in cell.value.split('-')
-                        ])
                     elif type_.startswith('NUMERIC'):
                         if isinstance(cell.value, str):
                             value = cell.value
