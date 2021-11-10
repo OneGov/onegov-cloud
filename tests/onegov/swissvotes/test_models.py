@@ -16,7 +16,6 @@ from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
 from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
-from psycopg2.extras import NumericRange
 from translationstring import TranslationString
 
 
@@ -240,14 +239,11 @@ def test_model_swissvotes_file(swissvotes_app):
     vote = SwissVote(
         bfs_number=Decimal('100.1'),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote DE",
         title_fr="Vote FR",
         short_title_de="V D",
         short_title_fr="V F",
         keyword="Keyword",
-        votes_on_same_day=2,
         _legal_form=1,
     )
     session.add(vote)
@@ -329,8 +325,6 @@ def test_model_vote(session, sample_vote):
     assert vote.id == 1
     assert vote.bfs_number == Decimal('100.10')
     assert vote.date == date(1990, 6, 2)
-    assert vote.legislation_number == 4
-    assert vote.legislation_decade == NumericRange(1990, 1994)
     assert vote.title_de == "Vote DE"
     assert vote.title_fr == "Vote FR"
     assert vote.short_title_de == "V D"
@@ -341,7 +335,6 @@ def test_model_vote(session, sample_vote):
     assert vote.short_title == "V D"
 
     assert vote.keyword == "Keyword"
-    assert vote.votes_on_same_day == 2
     assert vote._legal_form == 1
     assert vote.legal_form == "Mandatory referendum"
     assert vote.initiator == "Initiator"
@@ -379,7 +372,6 @@ def test_model_vote(session, sample_vote):
         'https://no.com/objects/3': 'https://detail.com/3',
         'https://no.com/objects/4': 'https://detail.com/4'
     }
-    assert vote.swissvoteslink == 'https://example.com/122.0'
     assert vote.link_bk_chrono == 'https://bk.chrono/de'
     assert vote.link_bk_results == 'https://bk.results/de'
     assert vote.link_curia_vista == 'https://curia.vista/de'
@@ -388,17 +380,9 @@ def test_model_vote(session, sample_vote):
     assert vote.link_federal_office == 'https://federal.office/de'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/de'
     assert vote.media_ads_total == 3001
-    assert vote.media_ads_per_issue == Decimal('30.02')
-    assert vote.media_ads_yea == 3003
-    assert vote.media_ads_nay == 3004
-    assert vote.media_ads_neutral == 3005
     assert vote.media_ads_yea_p == Decimal('30.06')
     assert vote.media_coverage_articles_total == 3007
-    assert vote.media_coverage_articles_d == 3008
-    assert vote.media_coverage_articles_f == 3009
     assert vote.media_coverage_tonality_total == Decimal('30.10')
-    assert vote.media_coverage_tonality_d == Decimal('30.11')
-    assert vote.media_coverage_tonality_f == Decimal('30.12')
 
     # localized properties
     vote.session_manager.current_locale = 'fr_CH'
@@ -442,259 +426,66 @@ def test_model_vote(session, sample_vote):
     assert vote.descriptor_3_level_3 == Decimal('10.33')
     assert vote._result == 1
     assert vote.result == "Accepted"
-    assert vote.result_eligible_voters == 2
-    assert vote.result_votes_empty == 3
-    assert vote.result_votes_invalid == 4
-    assert vote.result_votes_valid == 5
-    assert vote.result_votes_total == 6
     assert vote.result_turnout == Decimal('20.01')
     assert vote._result_people_accepted == 1
     assert vote.result_people_accepted == "Accepted"
-    assert vote.result_people_yeas == 8
-    assert vote.result_people_nays == 9
     assert vote.result_people_yeas_p == Decimal('40.01')
     assert vote._result_cantons_accepted == 1
     assert vote.result_cantons_accepted == "Accepted"
     assert vote.result_cantons_yeas == Decimal('1.5')
     assert vote.result_cantons_nays == Decimal('24.5')
-    assert vote.result_cantons_yeas_p == Decimal('60.01')
-    assert vote.result_ag_eligible_voters == 101
-    assert vote.result_ag_votes_valid == 102
-    assert vote.result_ag_votes_total == 103
-    assert vote.result_ag_turnout == Decimal('10.40')
-    assert vote.result_ag_yeas == 105
-    assert vote.result_ag_nays == 107
-    assert vote.result_ag_yeas_p == Decimal('10.80')
     assert vote._result_ag_accepted == 0
     assert vote.result_ag_accepted == "Rejected"
-    assert vote.result_ai_eligible_voters == 101
-    assert vote.result_ai_votes_valid == 102
-    assert vote.result_ai_votes_total == 103
-    assert vote.result_ai_turnout == Decimal('10.40')
-    assert vote.result_ai_yeas == 105
-    assert vote.result_ai_nays == 107
-    assert vote.result_ai_yeas_p == Decimal('10.80')
     assert vote._result_ai_accepted == 0
     assert vote.result_ai_accepted == "Rejected"
-    assert vote.result_ar_eligible_voters == 101
-    assert vote.result_ar_votes_valid == 102
-    assert vote.result_ar_votes_total == 103
-    assert vote.result_ar_turnout == Decimal('10.40')
-    assert vote.result_ar_yeas == 105
-    assert vote.result_ar_nays == 107
-    assert vote.result_ar_yeas_p == Decimal('10.80')
     assert vote._result_ar_accepted == 0
     assert vote.result_ar_accepted == "Rejected"
-    assert vote.result_be_eligible_voters == 101
-    assert vote.result_be_votes_valid == 102
-    assert vote.result_be_votes_total == 103
-    assert vote.result_be_turnout == Decimal('10.40')
-    assert vote.result_be_yeas == 105
-    assert vote.result_be_nays == 107
-    assert vote.result_be_yeas_p == Decimal('10.80')
     assert vote._result_be_accepted == 0
     assert vote.result_be_accepted == "Rejected"
-    assert vote.result_bl_eligible_voters == 101
-    assert vote.result_bl_votes_valid == 102
-    assert vote.result_bl_votes_total == 103
-    assert vote.result_bl_turnout == Decimal('10.40')
-    assert vote.result_bl_yeas == 105
-    assert vote.result_bl_nays == 107
-    assert vote.result_bl_yeas_p == Decimal('10.80')
     assert vote._result_bl_accepted == 0
     assert vote.result_bl_accepted == "Rejected"
-    assert vote.result_bs_eligible_voters == 101
-    assert vote.result_bs_votes_valid == 102
-    assert vote.result_bs_votes_total == 103
-    assert vote.result_bs_turnout == Decimal('10.40')
-    assert vote.result_bs_yeas == 105
-    assert vote.result_bs_nays == 107
-    assert vote.result_bs_yeas_p == Decimal('10.80')
     assert vote._result_bs_accepted == 0
     assert vote.result_bs_accepted == "Rejected"
-    assert vote.result_fr_eligible_voters == 101
-    assert vote.result_fr_votes_valid == 102
-    assert vote.result_fr_votes_total == 103
-    assert vote.result_fr_turnout == Decimal('10.40')
-    assert vote.result_fr_yeas == 105
-    assert vote.result_fr_nays == 107
-    assert vote.result_fr_yeas_p == Decimal('10.80')
     assert vote._result_fr_accepted == 0
     assert vote.result_fr_accepted == "Rejected"
-    assert vote.result_ge_eligible_voters == 101
-    assert vote.result_ge_votes_valid == 102
-    assert vote.result_ge_votes_total == 103
-    assert vote.result_ge_turnout == Decimal('10.40')
-    assert vote.result_ge_yeas == 105
-    assert vote.result_ge_nays == 107
-    assert vote.result_ge_yeas_p == Decimal('10.80')
     assert vote._result_ge_accepted == 0
     assert vote.result_ge_accepted == "Rejected"
-    assert vote.result_gl_eligible_voters == 101
-    assert vote.result_gl_votes_valid == 102
-    assert vote.result_gl_votes_total == 103
-    assert vote.result_gl_turnout == Decimal('10.40')
-    assert vote.result_gl_yeas == 105
-    assert vote.result_gl_nays == 107
-    assert vote.result_gl_yeas_p == Decimal('10.80')
     assert vote._result_gl_accepted == 0
     assert vote.result_gl_accepted == "Rejected"
-    assert vote.result_gr_eligible_voters == 101
-    assert vote.result_gr_votes_valid == 102
-    assert vote.result_gr_votes_total == 103
-    assert vote.result_gr_turnout == Decimal('10.40')
-    assert vote.result_gr_yeas == 105
-    assert vote.result_gr_nays == 107
-    assert vote.result_gr_yeas_p == Decimal('10.80')
     assert vote._result_gr_accepted == 0
     assert vote.result_gr_accepted == "Rejected"
-    assert vote.result_ju_eligible_voters == 101
-    assert vote.result_ju_votes_valid == 102
-    assert vote.result_ju_votes_total == 103
-    assert vote.result_ju_turnout == Decimal('10.40')
-    assert vote.result_ju_yeas == 105
-    assert vote.result_ju_nays == 107
-    assert vote.result_ju_yeas_p == Decimal('10.80')
     assert vote._result_ju_accepted == 0
     assert vote.result_ju_accepted == "Rejected"
-    assert vote.result_lu_eligible_voters == 101
-    assert vote.result_lu_votes_valid == 102
-    assert vote.result_lu_votes_total == 103
-    assert vote.result_lu_turnout == Decimal('10.40')
-    assert vote.result_lu_yeas == 105
-    assert vote.result_lu_nays == 107
-    assert vote.result_lu_yeas_p == Decimal('10.80')
     assert vote._result_lu_accepted == 0
     assert vote.result_lu_accepted == "Rejected"
-    assert vote.result_ne_eligible_voters == 101
-    assert vote.result_ne_votes_valid == 102
-    assert vote.result_ne_votes_total == 103
-    assert vote.result_ne_turnout == Decimal('10.40')
-    assert vote.result_ne_yeas == 105
-    assert vote.result_ne_nays == 107
-    assert vote.result_ne_yeas_p == Decimal('10.80')
     assert vote._result_ne_accepted == 0
     assert vote.result_ne_accepted == "Rejected"
-    assert vote.result_nw_eligible_voters == 101
-    assert vote.result_nw_votes_valid == 102
-    assert vote.result_nw_votes_total == 103
-    assert vote.result_nw_turnout == Decimal('10.40')
-    assert vote.result_nw_yeas == 105
-    assert vote.result_nw_nays == 107
-    assert vote.result_nw_yeas_p == Decimal('10.80')
     assert vote._result_nw_accepted == 0
     assert vote.result_nw_accepted == "Rejected"
-    assert vote.result_ow_eligible_voters == 101
-    assert vote.result_ow_votes_valid == 102
-    assert vote.result_ow_votes_total == 103
-    assert vote.result_ow_turnout == Decimal('10.40')
-    assert vote.result_ow_yeas == 105
-    assert vote.result_ow_nays == 107
-    assert vote.result_ow_yeas_p == Decimal('10.80')
     assert vote._result_ow_accepted == 0
     assert vote.result_ow_accepted == "Rejected"
-    assert vote.result_sg_eligible_voters == 101
-    assert vote.result_sg_votes_valid == 102
-    assert vote.result_sg_votes_total == 103
-    assert vote.result_sg_turnout == Decimal('10.40')
-    assert vote.result_sg_yeas == 105
-    assert vote.result_sg_nays == 107
-    assert vote.result_sg_yeas_p == Decimal('10.80')
     assert vote._result_sg_accepted == 0
     assert vote.result_sg_accepted == "Rejected"
-    assert vote.result_sh_eligible_voters == 101
-    assert vote.result_sh_votes_valid == 102
-    assert vote.result_sh_votes_total == 103
-    assert vote.result_sh_turnout == Decimal('10.40')
-    assert vote.result_sh_yeas == 105
-    assert vote.result_sh_nays == 107
-    assert vote.result_sh_yeas_p == Decimal('10.80')
     assert vote._result_sh_accepted == 0
     assert vote.result_sh_accepted == "Rejected"
-    assert vote.result_so_eligible_voters == 101
-    assert vote.result_so_votes_valid == 102
-    assert vote.result_so_votes_total == 103
-    assert vote.result_so_turnout == Decimal('10.40')
-    assert vote.result_so_yeas == 105
-    assert vote.result_so_nays == 107
-    assert vote.result_so_yeas_p == Decimal('10.80')
     assert vote._result_so_accepted == 0
     assert vote.result_so_accepted == "Rejected"
-    assert vote.result_sz_eligible_voters == 101
-    assert vote.result_sz_votes_valid == 102
-    assert vote.result_sz_votes_total == 103
-    assert vote.result_sz_turnout == Decimal('10.40')
-    assert vote.result_sz_yeas == 105
-    assert vote.result_sz_nays == 107
-    assert vote.result_sz_yeas_p == Decimal('10.80')
     assert vote._result_sz_accepted == 0
     assert vote.result_sz_accepted == "Rejected"
-    assert vote.result_tg_eligible_voters == 101
-    assert vote.result_tg_votes_valid == 102
-    assert vote.result_tg_votes_total == 103
-    assert vote.result_tg_turnout == Decimal('10.40')
-    assert vote.result_tg_yeas == 105
-    assert vote.result_tg_nays == 107
-    assert vote.result_tg_yeas_p == Decimal('10.80')
     assert vote._result_tg_accepted == 0
     assert vote.result_tg_accepted == "Rejected"
-    assert vote.result_ti_eligible_voters == 101
-    assert vote.result_ti_votes_valid == 102
-    assert vote.result_ti_votes_total == 103
-    assert vote.result_ti_turnout == Decimal('10.40')
-    assert vote.result_ti_yeas == 105
-    assert vote.result_ti_nays == 107
-    assert vote.result_ti_yeas_p == Decimal('10.80')
     assert vote._result_ti_accepted == 0
     assert vote.result_ti_accepted == "Rejected"
-    assert vote.result_ur_eligible_voters == 101
-    assert vote.result_ur_votes_valid == 102
-    assert vote.result_ur_votes_total == 103
-    assert vote.result_ur_turnout == Decimal('10.40')
-    assert vote.result_ur_yeas == 105
-    assert vote.result_ur_nays == 107
-    assert vote.result_ur_yeas_p == Decimal('10.80')
     assert vote._result_ur_accepted == 0
     assert vote.result_ur_accepted == "Rejected"
-    assert vote.result_vd_eligible_voters == 101
-    assert vote.result_vd_votes_valid == 102
-    assert vote.result_vd_votes_total == 103
-    assert vote.result_vd_turnout == Decimal('10.40')
-    assert vote.result_vd_yeas == 105
-    assert vote.result_vd_nays == 107
-    assert vote.result_vd_yeas_p == Decimal('10.80')
     assert vote._result_vd_accepted == 1
     assert vote.result_vd_accepted == "Accepted"
-    assert vote.result_vs_eligible_voters == 101
-    assert vote.result_vs_votes_valid == 102
-    assert vote.result_vs_votes_total == 103
-    assert vote.result_vs_turnout == Decimal('10.40')
-    assert vote.result_vs_yeas == 105
-    assert vote.result_vs_nays == 107
-    assert vote.result_vs_yeas_p == Decimal('10.80')
     assert vote._result_vs_accepted == 1
     assert vote.result_vs_accepted == "Accepted"
-    assert vote.result_zg_eligible_voters == 101
-    assert vote.result_zg_votes_valid == 102
-    assert vote.result_zg_votes_total == 103
-    assert vote.result_zg_turnout == Decimal('10.40')
-    assert vote.result_zg_yeas == 105
-    assert vote.result_zg_nays == 107
-    assert vote.result_zg_yeas_p == Decimal('10.80')
     assert vote._result_zg_accepted == 0
     assert vote.result_zg_accepted == "Rejected"
-    assert vote.result_zh_eligible_voters == 101
-    assert vote.result_zh_votes_valid == 102
-    assert vote.result_zh_votes_total == 103
-    assert vote.result_zh_turnout == Decimal('10.40')
-    assert vote.result_zh_yeas == 105
-    assert vote.result_zh_nays == 107
-    assert vote.result_zh_yeas_p == Decimal('10.80')
     assert vote._result_zh_accepted is None
     assert vote.result_zh_accepted is None
-    assert vote._department_in_charge == 1
-    assert vote.department_in_charge == \
-        "Federal Department of Foreign Affairs (FDFA)"
     assert vote.procedure_number == '24.557'
     assert vote._position_federal_council == 1
     assert vote.position_federal_council == "Accepting"
@@ -709,14 +500,9 @@ def test_model_vote(session, sample_vote):
     assert vote.position_council_of_states_yeas == 30
     assert vote.position_council_of_states_nays == 40
     assert vote.duration_federal_assembly == 30
-    assert vote.duration_post_federal_assembly == 31
     assert vote.duration_initative_collection == 32
-    assert vote.duration_initative_federal_council == 33
-    assert vote.duration_initative_total == 34
     assert vote.duration_referendum_collection == 35
-    assert vote.duration_referendum_total == 36
     assert vote.signatures_valid == 40
-    assert vote.signatures_invalid == 41
     assert vote.recommendations == {
         'fdp': 1,
         'cvp': 1,
@@ -956,8 +742,6 @@ def test_model_vote_codes():
     assert SwissVote.codes('result_people_accepted')[0] == "Rejected"
     assert SwissVote.codes('result_cantons_accepted')[0] == "Rejected"
     assert SwissVote.codes('result_ai_accepted')[1] == "Accepted"
-    assert SwissVote.codes('department_in_charge')[8] == \
-        "Federal Chancellery (FCh)"
     assert SwissVote.codes('position_federal_council')[3] == "None"
     assert SwissVote.codes('position_parliament')[2] == "Rejecting"
     assert SwissVote.codes('position_national_council')[2] == "Rejecting"
@@ -972,14 +756,11 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         SwissVote(
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
             title_fr="Vote FR",
             short_title_de="V D",
             short_title_fr="V F",
             keyword="Keyword",
-            votes_on_same_day=2,
             _legal_form=1,
         )
     )
@@ -1142,8 +923,6 @@ def test_model_column_mapper():
 
     mapper.set_value(vote, 'bfs_number', Decimal('100.1'))
     mapper.set_value(vote, 'date', date(2019, 1, 1))
-    mapper.set_value(vote, 'legislation_number', 10)
-    mapper.set_value(vote, 'legislation_decade', NumericRange(1990, 1999))
     mapper.set_value(vote, 'title_de', 'title de')
     mapper.set_value(vote, 'title_fr', 'title fr')
     mapper.set_value(vote, 'short_title_de', 'short title de')
@@ -1155,8 +934,6 @@ def test_model_column_mapper():
 
     assert vote.bfs_number == Decimal('100.1')
     assert vote.date == date(2019, 1, 1)
-    assert vote.legislation_number == 10
-    assert vote.legislation_decade == NumericRange(1990, 1999)
     assert vote.title_de == 'title de'
     assert vote.title_fr == 'title fr'
     assert vote.short_title_de == 'short title de'
@@ -1167,9 +944,6 @@ def test_model_column_mapper():
 
     assert mapper.get_value(vote, 'bfs_number'), Decimal('100.1')
     assert mapper.get_value(vote, 'date') == date(2019, 1, 1)
-    assert mapper.get_value(vote, 'legislation_number') == 10
-    assert mapper.get_value(vote, 'legislation_decade') == NumericRange(1990,
-                                                                        1999)
     assert mapper.get_value(vote, 'title_de') == 'title de'
     assert mapper.get_value(vote, 'title_fr') == 'title fr'
     assert mapper.get_value(vote, 'short_title_de') == 'short title de'
@@ -1179,7 +953,7 @@ def test_model_column_mapper():
     assert mapper.get_value(vote, '!i!recommendations!fdp') == 66
     assert mapper.get_value(vote, '!t!meta!link_bk_results_de') == 'http://a.b'
 
-    assert list(mapper.get_values(vote))[:26] == [
+    assert list(mapper.get_values(vote))[:21] == [
         Decimal('100.1'),
         date(2019, 1, 1),
         'short title de',
@@ -1187,8 +961,6 @@ def test_model_column_mapper():
         'title de',
         'title fr',
         'keyword',
-        None,
-        None,
         4,
         None,
         None,
@@ -1203,11 +975,8 @@ def test_model_column_mapper():
         None,
         None,
         None,
-        None,
-        10,
-        NumericRange(1990, 1999, '[)')
     ]
-    assert list(mapper.get_items(vote))[:26] == [
+    assert list(mapper.get_items(vote))[:21] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
         ('short_title_de', 'short title de'),
@@ -1215,8 +984,6 @@ def test_model_column_mapper():
         ('title_de', 'title de'),
         ('title_fr', 'title fr'),
         ('keyword', 'keyword'),
-        ('swissvoteslink', None),
-        ('votes_on_same_day', None),
         ('_legal_form', 4),
         ('anneepolitique', None),
         ('!t!meta!link_bk_chrono_de', None),
@@ -1230,12 +997,9 @@ def test_model_column_mapper():
         ('descriptor_3_level_1', None),
         ('descriptor_3_level_2', None),
         ('descriptor_3_level_3', None),
-        ('_department_in_charge', None),
         ('_position_federal_council', None),
-        ('legislation_number', 10),
-        ('legislation_decade', NumericRange(1990, 1999, '[)'))
     ]
-    assert list(mapper.items())[:26] == [
+    assert list(mapper.items())[:21] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
         ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
@@ -1243,8 +1007,6 @@ def test_model_column_mapper():
         ('title_de', 'titel_off_d', 'TEXT', False, None, None),
         ('title_fr', 'titel_off_f', 'TEXT', False, None, None),
         ('keyword', 'stichwort', 'TEXT', True, None, None),
-        ('swissvoteslink', 'swissvoteslink', 'TEXT', True, None, None),
-        ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None),
         ('anneepolitique', 'anneepolitique', 'TEXT', True, None, None),
         ('!t!meta!link_bk_chrono_de', 'bkchrono-de', 'TEXT', True, None, None),
@@ -1258,12 +1020,9 @@ def test_model_column_mapper():
         ('descriptor_3_level_1', 'd3e1', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_3_level_2', 'd3e2', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
-        ('_department_in_charge', 'dep', 'INTEGER', True, None, None),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
-        ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
-        ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None)
     ]
-    assert list(mapper.items())[305] == (
+    assert list(mapper.items())[295] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )

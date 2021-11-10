@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-08 06:37+0100\n"
+"POT-Creation-Date: 2021-11-10 06:13+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1391,34 +1391,6 @@ msgstr "For the counter-proposal"
 
 msgid "For the initiative"
 msgstr "For the initiative"
-
-msgid "Federal Department of Foreign Affairs (FDFA)"
-msgstr "Federal Department of Foreign Affairs (FDFA)"
-
-msgid "Federal Department of Home Affairs (FDHA)"
-msgstr "Federal Department of Home Affairs (FDHA)"
-
-msgid "Federal Department of Justice and Police (FDJP)"
-msgstr "Federal Department of Justice and Police (FDJP)"
-
-msgid "Federal Department of Defence, Civil Protection and Sport (DDPS)"
-msgstr "Federal Department of Defence, Civil Protection and Sport (DDPS)"
-
-msgid "Federal Department of Finance (FDF)"
-msgstr "Federal Department of Finance (FDF)"
-
-msgid "Federal Department of Economic Affairs, Education and Research (EAER)"
-msgstr "Federal Department of Economic Affairs, Education and Research (EAER)"
-
-msgid ""
-"Federal Department of the Environment, Transport, Energy and Communications "
-"(DETEC)"
-msgstr ""
-"Federal Department of the Environment, Transport, Energy and Communications "
-"(DETEC)"
-
-msgid "Federal Chancellery (FCh)"
-msgstr "Federal Chancellery (FCh)"
 
 msgid "Accepting"
 msgstr "Accept"
