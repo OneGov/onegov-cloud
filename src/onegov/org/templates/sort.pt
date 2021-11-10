@@ -6,13 +6,14 @@
         <div class="row">
             <div class="columns medium-12">
                 <div class="panel">
-                    <p i18n:translate="">Sort the items using drag and drop.</p>
+                    <p i18n:translate="">Sort the items using drag and drop. The new positions are automatically saved directly after moving.</p>
                 </div>
                 <ul class="sort-items" data-sortable data-sortable-url="${layout.sortable_url_template}">
                     <li tal:repeat="child page.children" data-sortable-id="${child.id}">
                         ${child.title}
                     </li>
                 </ul>
+                <a class="button" i18n:translate="">Back to page</a>
             </div>
         </div>
     </tal:block>

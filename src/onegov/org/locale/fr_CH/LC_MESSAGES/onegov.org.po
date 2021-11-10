@@ -4460,6 +4460,9 @@ msgstr "Sujets"
 msgid "Sort the items using drag and drop."
 msgstr "Triez les éléments par glisser-déposer."
 
+msgid "Back to page"
+msgstr "Retour à la page"
+
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"
 msgstr "l'abonnement pour ${address} a bien été confirmé"

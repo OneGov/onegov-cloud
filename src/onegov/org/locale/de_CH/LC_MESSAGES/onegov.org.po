@@ -4442,8 +4442,11 @@ msgstr ""
 msgid "Topics"
 msgstr "Themen"
 
-msgid "Sort the items using drag and drop."
-msgstr "Sortieren Sie die Elemente mittels Drag & Drop."
+msgid "Sort the items using drag and drop. The new positions are automatically saved directly after moving."
+msgstr "Sortieren Sie die Elemente mittels Drag & Drop. Die neuen Positionen werden direkt nach dem Verschieben automatisch gespeichert."
+
+msgid "Back to page"
+msgstr "Zurück zur Seite"
 
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"
