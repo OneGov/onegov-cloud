@@ -83,6 +83,7 @@ class InvoiceAction(object):
         self.assert_safe_to_change(targets)
 
         for target in targets:
+            target.payment_date = None
             target.paid = False
             target.tid = None
             target.source = None
