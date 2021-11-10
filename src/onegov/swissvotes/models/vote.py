@@ -444,21 +444,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             for key in sorted(result.keys(), key=by_recommendation)
         ])
 
-    @staticmethod
-    def normalize_actor_share_suffix(actor):
-        """
-        One actor is called sps, but the table name is called
-        national_council_share_sp.
-        TODO: As soon as the table name is adjusted, this can be removed.
-        """
-        if actor == 'sps':
-            return 'sp'
-        return actor
-
     def get_actors_share(self, actor):
         assert isinstance(actor, str), 'Actor must be a string'
-        attr = 'national_council_share_' + \
-               self.normalize_actor_share_suffix(actor)
+        attr = f'national_council_share_{actor}'
         return getattr(self, attr, 0) or 0
 
     @cached_property
@@ -533,7 +521,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     # drop?
     national_council_share_fdp = Column(Numeric(13, 10))
     national_council_share_cvp = Column(Numeric(13, 10))
-    national_council_share_sp = Column(Numeric(13, 10))
+    national_council_share_sps = Column(Numeric(13, 10))
     national_council_share_svp = Column(Numeric(13, 10))
     national_council_share_lps = Column(Numeric(13, 10))
     national_council_share_ldu = Column(Numeric(13, 10))

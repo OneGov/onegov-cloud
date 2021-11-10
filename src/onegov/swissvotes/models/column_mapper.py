@@ -549,7 +549,7 @@ class ColumnMapper(object):
             ('national_council_election_year', 'nr-wahl'),
             ('national_council_share_fdp', 'w-fdp'),
             ('national_council_share_cvp', 'w-cvp'),
-            ('national_council_share_sp', 'w-sp'),
+            ('national_council_share_sps', 'w-sp'),
             ('national_council_share_svp', 'w-svp'),
             ('national_council_share_evp', 'w-evp'),
             ('national_council_share_csp', 'w-csp'),

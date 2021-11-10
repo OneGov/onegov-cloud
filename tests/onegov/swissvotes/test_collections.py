@@ -1336,7 +1336,7 @@ def test_votes_export(swissvotes_app):
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
     vote.national_council_share_cvp = Decimal('02.10')
-    vote.national_council_share_sp = Decimal('03.10')
+    vote.national_council_share_sps = Decimal('03.10')
     vote.national_council_share_svp = Decimal('04.10')
     vote.national_council_share_lps = Decimal('05.10')
     vote.national_council_share_ldu = Decimal('06.10')

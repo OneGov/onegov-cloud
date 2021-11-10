@@ -673,3 +673,14 @@ def drop_unused_columns(context):
     for column in columns:
         if context.has_column('swissvotes', column):
             context.operations.drop_column('swissvotes', column)
+
+
+@upgrade_task('Rename national council share sps column')
+def rename_national_council_share_sps_column(context):
+    old = 'national_council_share_sp'
+    new = 'national_council_share_sps'
+    if (
+        context.has_column('swissvotes', old)
+        and not context.has_column('swissvotes', new)
+    ):
+        context.operations.alter_column('swissvotes', old, new_column_name=new)
