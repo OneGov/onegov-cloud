@@ -9,10 +9,10 @@ msgstr ""
 "Generated-By: xls-to-po 1.0\n"
 
 msgid "Partner of Pro Juventute"
-msgstr ""
+msgstr "Partner di Pro Juventute"
 
 msgid "No active period"
-msgstr ""
+msgstr "Nessun periodo attivo"
 
 #, python-format
 msgid "Prebooking: ${dates}"
@@ -1921,10 +1921,10 @@ msgid "${count} attendees"
 msgstr "${count} Partecipante"
 
 msgid "${min_spots} - ${max_spots} participants"
-msgstr "${min_spot} - ${max_spot} Partecipanti"
+msgstr "${min_spots} - ${max_spots} Partecipanti"
 
 msgid "up to ${max_spots} participants"
-msgstr "fino a ${max_spot} partecipanti"
+msgstr "fino a ${max_spots} partecipanti"
 
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
@@ -1972,19 +1972,19 @@ msgid "Decrease the bookings priority"
 msgstr "Abbassare la priorità della prenotazione"
 
 msgid "Prebooking begins on ${date}."
-msgstr "La fase dei desideri inizia il ${data}."
+msgstr "La fase dei desideri inizia il ${date}."
 
 msgid "Prebooking is now active until ${date}."
-msgstr "La fase dei desideri è ora attiva fino a ${data}."
+msgstr "La fase dei desideri è ora attiva fino a ${date}."
 
 msgid "Prebooking has ended."
 msgstr "La fase dei desideri è finita."
 
 msgid "Booking begins on ${date}."
-msgstr "La fase di prenotazione inizia il ${data}."
+msgstr "La fase di prenotazione inizia il ${date}."
 
 msgid "Booking is now active until ${date}."
-msgstr "La fase di prenotazione è ora attiva fino a ${data}."
+msgstr "La fase di prenotazione è ora attiva fino a ${date}."
 
 msgid "Booking has ended."
 msgstr "La fase di prenotazione è finita."
@@ -1999,7 +1999,7 @@ msgstr ""
 "evento."
 
 msgid "The deadline for last-minute cancellations is the ${date}."
-msgstr "Le cancellazioni sono possibili fino a ${data}."
+msgstr "Le cancellazioni sono possibili fino a ${date}."
 
 msgid ""
 "Last-minute cancellations are possible up to ${days} days before each "
