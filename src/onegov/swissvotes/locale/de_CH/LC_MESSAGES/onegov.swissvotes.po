@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-10 06:13+0100\n"
+"POT-Creation-Date: 2021-11-11 09:45+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1376,38 +1376,32 @@ msgstr "Stichfrage"
 msgid "Rejected"
 msgstr "Abgelehnt"
 
-msgid "Preferred the counter-proposal"
-msgstr "Gegenentwurf bevorzugt"
-
 msgid "Accepted"
 msgstr "Angenommen"
-
-msgid "Preferred the popular initiative"
-msgstr "Initiative bevorzugt"
 
 msgid "Majority of the cantons not necessary"
 msgstr "Ständemehr nicht notwendig"
 
-msgid "For the counter-proposal"
+msgid "Counter-proposal preferred"
 msgstr "Gegenentwurf bevorzugt"
 
-msgid "For the initiative"
+msgid "Popular initiative preferred"
 msgstr "Initiative bevorzugt"
 
 msgid "Accepting"
 msgstr "Befürwortend"
 
-msgid "Preference for the popular initiative"
-msgstr "Bevorzugung der Volksinitiative"
-
 msgid "Rejecting"
 msgstr "Ablehnend"
+
+msgid "None"
+msgstr "Keine"
 
 msgid "Preference for the counter-proposal"
 msgstr "Bevorzugung des Gegenentwurfs"
 
-msgid "None"
-msgstr "Keine"
+msgid "Preference for the popular initiative"
+msgstr "Bevorzugung der Volksinitiative"
 
 msgid "Yea"
 msgstr "Ja"
@@ -1867,28 +1861,28 @@ msgid "${x}% yea"
 msgstr "${x}% Ja"
 
 #, python-format
-msgid "${x}% for the initiative"
-msgstr "${x}% für die Initiative"
-
-#, python-format
 msgid "${x}% nay"
 msgstr "${x}% Nein"
-
-#, python-format
-msgid "${x}% for the counter-proposal"
-msgstr "${x}% für den Gegenentwurf"
 
 #, python-format
 msgid "${x} yea"
 msgstr "${x} Ja"
 
 #, python-format
-msgid "${x} for the initiative"
-msgstr "${x} für die Initiative"
-
-#, python-format
 msgid "${x} nay"
 msgstr "${x} Nein"
+
+#, python-format
+msgid "${x}% for the initiative"
+msgstr "${x}% für die Initiative"
+
+#, python-format
+msgid "${x}% for the counter-proposal"
+msgstr "${x}% für den Gegenentwurf"
+
+#, python-format
+msgid "${x} for the initiative"
+msgstr "${x} für die Initiative"
 
 #, python-format
 msgid "${x} for the counter-proposal"

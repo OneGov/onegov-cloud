@@ -123,37 +123,21 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (4, _("Direct counter-proposal")),
                 (5, _("Tie-breaker")),
             ))
-        if attribute == 'result_cantons_accepted':
-            return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
-                (3, _("Majority of the cantons not necessary")),
-                # todo: "preferred" doesn't seem right for results
-                (8, _("Preferred the counter-proposal")),
-                (9, _("Preferred the popular initiative"))
-            ))
 
-        if attribute == 'result_accepted':
-            return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
-                # todo: "for the" doesn't seem right for results
-                (8, _("For the counter-proposal")),
-                (9, _("For the initiative")),
-            ))
-
-        # todo: why all these result / accepted cases?
         if attribute == 'result' or attribute.endswith('_accepted'):
             return OrderedDict((
                 (0, _("Rejected")),
                 (1, _("Accepted")),
-                (8, _("Preferred the counter-proposal")),
-                (9, _("Preferred the popular initiative"))
+                (3, _("Majority of the cantons not necessary")),
+                (8, _("Counter-proposal preferred")),
+                (9, _("Popular initiative preferred")),
             ))
+
         if attribute in (
+            'position_council_of_states',
             'position_federal_council',
             'position_national_council',
-            'position_council_of_states'
+            'position_parliament',
         ):
             return OrderedDict((
                 (1, _("Accepting")),
@@ -163,14 +147,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (9, _("Preference for the popular initiative")),
             ))
 
-        # todo: use the definition above?
-        if attribute == 'position_parliament':
-            return OrderedDict((
-                (1, _("Accepting")),
-                (2, _("Rejecting")),
-                (8, _("Preference for the counter-proposal")),
-                (9, _("Preference for the popular initiative")),
-            ))
         if attribute == 'recommendation':
             # Sorted by how it should be displayed in strengths table
             return OrderedDict((
