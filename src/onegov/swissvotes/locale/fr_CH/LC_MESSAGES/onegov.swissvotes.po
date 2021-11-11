@@ -1619,7 +1619,7 @@ msgstr "Durée entre le message du Conseil Fédéral et l’arrêté du Parlemen
 msgid "Parliament's position"
 msgstr "Position du Parlement"
 
-msgid "for the initiative"
+msgid "for the popular initiative"
 msgstr "pour l'initiative"
 
 msgid "for the counter-proposal"
@@ -1875,7 +1875,7 @@ msgid "${x} nay"
 msgstr "${x} Non"
 
 #, python-format
-msgid "${x}% for the initiative"
+msgid "${x}% for the popular initiative"
 msgstr "${x}% pour l'initiative"
 
 #, python-format
@@ -1883,7 +1883,7 @@ msgid "${x}% for the counter-proposal"
 msgstr "${x}% pour le contre-projet"
 
 #, python-format
-msgid "${x} for the initiative"
+msgid "${x} for the popular initiative"
 msgstr "${x} pour l'initiative"
 
 #, python-format

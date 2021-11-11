@@ -185,7 +185,7 @@
                                         (${vote.position_national_council_yeas} <tal:block i18n:translate>Yea</tal:block>, ${vote.position_national_council_nays} <tal:block i18n:translate>Nay</tal:block>)
                                     </tal:b>
                                     <tal:b tal:case="True">
-                                        (${vote.position_national_council_yeas} <tal:block i18n:translate>for the initiative</tal:block>, ${vote.position_national_council_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
+                                        (${vote.position_national_council_yeas} <tal:block i18n:translate>for the popular initiative</tal:block>, ${vote.position_national_council_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
                                     </tal:b>
                                 </tal:b>
                             </tal:block>
@@ -201,7 +201,7 @@
                                         (${vote.position_council_of_states_yeas} <tal:block i18n:translate>Yea</tal:block>, ${vote.position_council_of_states_nays} <tal:block i18n:translate>Nay</tal:block>)
                                     </tal:b>
                                     <tal:b tal:case="True">
-                                        (${vote.position_council_of_states_yeas} <tal:block i18n:translate>for the initiative</tal:block>, ${vote.position_council_of_states_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
+                                        (${vote.position_council_of_states_yeas} <tal:block i18n:translate>for the popular initiative</tal:block>, ${vote.position_council_of_states_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
                                     </tal:b>
                                 </tal:b>
                             </tal:block>
@@ -391,7 +391,7 @@
                                         (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>Yeas</tal:b>)
                                     </tal:b>
                                     <tal:b tal:case="True">
-                                        (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>for the initiative</tal:b>)
+                                        (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>for the popular initiative</tal:b>)
                                     </tal:b>
                                 </tal:b>
                             </tal:block>
@@ -408,7 +408,7 @@
                                           (${layout.format_number(vote.result_cantons_yeas, 1)} <tal:block i18n:translate>Yea</tal:block>, ${layout.format_number(vote.result_cantons_nays, 1)} <tal:block i18n:translate>Nay</tal:block>)
                                         </tal:b>
                                         <tal:b tal:case="True">
-                                          (${layout.format_number(vote.result_cantons_yeas, 1)} <tal:block i18n:translate>for the initiative</tal:block>, ${layout.format_number(vote.result_cantons_nays, 1)} <tal:block i18n:translate>for the counter-proposal</tal:block>)
+                                          (${layout.format_number(vote.result_cantons_yeas, 1)} <tal:block i18n:translate>for the popular initiative</tal:block>, ${layout.format_number(vote.result_cantons_nays, 1)} <tal:block i18n:translate>for the counter-proposal</tal:block>)
                                         </tal:b>
 
                                     </tal:b>

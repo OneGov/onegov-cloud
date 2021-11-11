@@ -80,9 +80,9 @@ def view_vote_percentages(self, request):
         yea_label_no_perc = _("${x} yea")
         nay_label_no_per = _("${x} nay")
         if self._legal_form == 5:
-            default_yea_label = _("${x}% for the initiative")
+            default_yea_label = _("${x}% for the popular initiative")
             default_nay_label = _("${x}% for the counter-proposal")
-            yea_label_no_perc = _("${x} for the initiative")
+            yea_label_no_perc = _("${x} for the popular initiative")
             nay_label_no_per = _("${x} for the counter-proposal")
 
         if percentage is not None:
@@ -185,14 +185,14 @@ def view_vote_percentages(self, request):
             yea_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending Yes ${x}%"
-            ) if not self._legal_form != 5 else _(
+            ) if self._legal_form != 5 else _(
                 "Electoral shares of parties: "
                 "Parties preferring the initiative ${x}%"
             ),
             nay_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending No ${x}%"
-            ) if not self._legal_form != 5 else _(
+            ) if self._legal_form != 5 else _(
                 "Electoral shares of parties: "
                 "Parties preferring the counter-proposal ${x}%"
             ),

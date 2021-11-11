@@ -1611,8 +1611,8 @@ msgstr ""
 msgid "Parliament's position"
 msgstr "Parliament's position"
 
-msgid "for the initiative"
-msgstr "for the initiative"
+msgid "for the popular initiative"
+msgstr "for the popular initiative"
 
 msgid "for the counter-proposal"
 msgstr "for the counter-proposal"
@@ -1865,16 +1865,16 @@ msgid "${x} nay"
 msgstr "${x} nay"
 
 #, python-format
-msgid "${x}% for the initiative"
-msgstr "${x}% for the initiative"
+msgid "${x}% for the popular initiative"
+msgstr "${x}% for the popular initiative"
 
 #, python-format
 msgid "${x}% for the counter-proposal"
 msgstr "${x}% for the counter-proposal"
 
 #, python-format
-msgid "${x} for the initiative"
-msgstr "${x} for the initiative"
+msgid "${x} for the popular initiative"
+msgstr "${x} for the popular initiative"
 
 #, python-format
 msgid "${x} for the counter-proposal"

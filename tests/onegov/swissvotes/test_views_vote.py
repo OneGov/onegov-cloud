@@ -212,11 +212,13 @@ def test_view_vote_tie_breaker(swissvotes_app, sample_vote):
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
 
-    assert "Wähleranteil des Lagers für Bevorzugung der Initiative" in page
-    assert "(40.01% für die Initiative)" in page
-    assert "(1.5 für die Initiative, 24.5 für den Gegenentwurf)" in page
-    assert "(10 für die Initiative, 20 für den Gegenentwurf)" in page
-    assert "(30 für die Initiative, 40 für den Gegenentwurf)" in page
+    assert (
+        "Wähleranteil des Lagers für Bevorzugung der Volksinitiative"
+    ) in page
+    assert "(40.01% für die Volksinitiative)" in page
+    assert "(1.5 für die Volksinitiative, 24.5 für den Gegenentwurf)" in page
+    assert "(10 für die Volksinitiative, 20 für den Gegenentwurf)" in page
+    assert "(30 für die Volksinitiative, 40 für den Gegenentwurf)" in page
 
 
 def test_vote_upload(swissvotes_app, attachments):
@@ -485,14 +487,14 @@ def test_view_vote_chart(session):
     assert results[0] == {
         'empty': False,
         'text': 'People', 'text_label': '',
-        'yea': 10.2, 'yea_label': '10.2% for the initiative',
+        'yea': 10.2, 'yea_label': '10.2% for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 89.8, 'nay_label': '89.8% for the counter-proposal',
     }
     assert results[1] == {
         'empty': False,
         'text': 'Cantons', 'text_label': '',
-        'yea': 90.4, 'yea_label': '23.5 for the initiative',
+        'yea': 90.4, 'yea_label': '23.5 for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 9.6, 'nay_label': '2.5 for the counter-proposal',
     }
@@ -502,14 +504,14 @@ def test_view_vote_chart(session):
     assert results[3] == {
         'empty': False,
         'text': 'National Council', 'text_label': '',
-        'yea': 74.5, 'yea_label': '149 for the initiative',
+        'yea': 74.5, 'yea_label': '149 for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 25.5, 'nay_label': '51 for the counter-proposal',
     }
     assert results[4] == {
         'empty': False,
         'text': 'Council of States', 'text_label': '',
-        'yea': 93.5, 'yea_label': '43 for the initiative',
+        'yea': 93.5, 'yea_label': '43 for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 6.5, 'nay_label': '3 for the counter-proposal',
     }

@@ -1386,7 +1386,7 @@ msgid "Counter-proposal preferred"
 msgstr "Gegenentwurf bevorzugt"
 
 msgid "Popular initiative preferred"
-msgstr "Initiative bevorzugt"
+msgstr "Volksinitiative bevorzugt"
 
 msgid "Accepting"
 msgstr "Befürwortend"
@@ -1614,8 +1614,8 @@ msgstr ""
 msgid "Parliament's position"
 msgstr "Position des Parlaments"
 
-msgid "for the initiative"
-msgstr "für die Initiative"
+msgid "for the popular initiative"
+msgstr "für die Volksinitiative"
 
 msgid "for the counter-proposal"
 msgstr "für den Gegenentwurf"
@@ -1650,7 +1650,7 @@ msgstr ""
 "haben"
 
 msgid "Electoral share of pro-initiative camp"
-msgstr "Wähleranteil des Lagers für Bevorzugung der Initiative"
+msgstr "Wähleranteil des Lagers für Bevorzugung der Volksinitiative"
 
 msgid ""
 "Cumulated electoral share of the parties which recommend to prefer the "
@@ -1873,16 +1873,16 @@ msgid "${x} nay"
 msgstr "${x} Nein"
 
 #, python-format
-msgid "${x}% for the initiative"
-msgstr "${x}% für die Initiative"
+msgid "${x}% for the popular initiative"
+msgstr "${x}% für die Volksinitiative"
 
 #, python-format
 msgid "${x}% for the counter-proposal"
 msgstr "${x}% für den Gegenentwurf"
 
 #, python-format
-msgid "${x} for the initiative"
-msgstr "${x} für die Initiative"
+msgid "${x} for the popular initiative"
+msgstr "${x} für die Volksinitiative"
 
 #, python-format
 msgid "${x} for the counter-proposal"
