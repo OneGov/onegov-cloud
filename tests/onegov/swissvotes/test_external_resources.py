@@ -5,7 +5,6 @@ from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
 from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.external_resources.posters import Posters
-from psycopg2.extras import NumericRange
 from pytest import raises
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -34,13 +33,10 @@ def test_posters_fetch(swissvotes_app):
     votes = SwissVoteCollection(swissvotes_app)
     kwargs = {
         'date': date(1990, 6, 2),
-        'legislation_number': 4,
-        'legislation_decade': NumericRange(1990, 1994),
         'title_de': "Vote DE",
         'title_fr': "Vote FR",
         'short_title_de': "V D",
         'short_title_fr': "V F",
-        'votes_on_same_day': 2,
         '_legal_form': 1,
     }
     vote_1 = votes.add(

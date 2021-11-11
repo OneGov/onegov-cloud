@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-01 07:44+0100\n"
+"POT-Creation-Date: 2021-11-10 06:13+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1399,37 +1399,6 @@ msgstr "Pour le contre-projet"
 msgid "For the initiative"
 msgstr "Pour l'initiative"
 
-msgid "Federal Department of Foreign Affairs (FDFA)"
-msgstr "Département fédéral des affaires étrangères (DFAE)"
-
-msgid "Federal Department of Home Affairs (FDHA)"
-msgstr "Département fédéral de l'intérieur (DFI)"
-
-msgid "Federal Department of Justice and Police (FDJP)"
-msgstr "Département fédéral de justice et police (DFJP)"
-
-msgid "Federal Department of Defence, Civil Protection and Sport (DDPS)"
-msgstr ""
-"Département fédéral de la défense, de la protection de la population et des "
-"sports (DDPS)"
-
-msgid "Federal Department of Finance (FDF)"
-msgstr "Département fédéral des finances (DFF)"
-
-msgid "Federal Department of Economic Affairs, Education and Research (EAER)"
-msgstr ""
-"Département fédéral de l'économie, de la formation et de la recherche (DEFR)"
-
-msgid ""
-"Federal Department of the Environment, Transport, Energy and Communications "
-"(DETEC)"
-msgstr ""
-"Département fédéral de l'environnement, des transports, de l'énergie et de "
-"la communication (DETEC)"
-
-msgid "Federal Chancellery (FCh)"
-msgstr "Chancellerie fédérale (ChF)"
-
 msgid "Accepting"
 msgstr "Accepter"
 
@@ -1668,6 +1637,18 @@ msgid ""
 msgstr ""
 "Durée entre l’arrêté du Parlement et l’arrêté constatant l’aboutissement du "
 "référendum"
+
+msgid "Online information by the federal authorities"
+msgstr "Informations en ligne des autorités"
+
+msgid "Link Federal Council"
+msgstr "Lien Conseil fédéral"
+
+msgid "Link department"
+msgstr "Lien département"
+
+msgid "Link federal office"
+msgstr "Lien office fédéral"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"

@@ -14,7 +14,6 @@ from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from pathlib import Path
-from psycopg2.extras import NumericRange
 from transaction import commit
 from unittest.mock import patch
 
@@ -176,13 +175,10 @@ def test_cli_import_attachments(session_manager, temporary_directory,
                 id=number,
                 bfs_number=Decimal(str(number)),
                 date=date(1990, 6, 2),
-                legislation_number=4,
-                legislation_decade=NumericRange(1990, 1994),
                 title_de=f"Vote {number}",
                 title_fr=f"Vote {number}",
                 short_title_de=f"Vote {number}",
                 short_title_fr=f"Vote {number}",
-                votes_on_same_day=3,
                 _legal_form=1,
             )
         )
@@ -248,13 +244,10 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url):
         id=1,
         bfs_number=Decimal(1),
         date=date(1990, 6, 2),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
         title_de="Vote",
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
-        votes_on_same_day=3,
         _legal_form=1,
     )
 

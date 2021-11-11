@@ -7,8 +7,8 @@ from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import SwissVote
 from pytest import mark
+from tests.shared import Client
 from unittest.mock import patch
-from webtest import TestApp as Client
 from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
 
@@ -38,13 +38,12 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert "Datensatz aktualisiert (659 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (673 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
     assert str(vote.bfs_number) == '82.20'
     assert vote.date.isoformat() == '1920-03-21'
-    assert vote.legislation_number == 25
     assert vote.title == (
         "Gegenentwurf zur Volksinitiative "
         "«für ein Verbot der Errichtung von Spielbanken»"
@@ -118,8 +117,6 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
-        'link',  # swissvoteslink
-        '2',  # anzahl
         '3',  # rechtsform
         '',  # anneepolitique
         '',  # bkchrono-de
@@ -133,10 +130,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         '12',  # d3e1
         '12.5',  # d3e2
         '12.55',  # d3e3
-        '',  # dep
         '',  # br-pos
-        '1',  # legislatur
-        '2004-2008',  # legisjahr
     ])
     workbook.close()
     file.seek(0)

@@ -84,7 +84,7 @@ class PeriodForm(Form):
             "A period without billing will hide all bills from regular users, "
             "so if you have used billing before and have open bills, your "
             "users won't find them. If in doubt, use billing without creating "
-            "any bills. "
+            "any bills."
         ),
         kind='callout',
         depends_on=('finalizable', '!y')
@@ -552,7 +552,7 @@ class PeriodForm(Form):
                 if getattr(self.model, field) != getattr(preview, field):
                     self.pass_system.errors.append(_(
                         "It is no longer possible to change the execution "
-                        "settings since the period has already been confirmed"
+                        "settings since the period has already been confirmed."
                     ))
                     return False
 
@@ -561,6 +561,6 @@ class PeriodForm(Form):
             if self.one_booking_per_day.data != 'no':
                 self.minutes_between.errors.append(_(
                     "It is not possible to have required minutes between "
-                    "bookings when limiting attendees to one activity per day"
+                    "bookings when limiting attendees to one activity per day."
                 ))
                 return False

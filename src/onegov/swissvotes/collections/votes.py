@@ -7,10 +7,8 @@ from onegov.core.collection import Pagination
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
-from psycopg2.extras import NumericRange
 from sqlalchemy import func
 from sqlalchemy import or_
-from sqlalchemy.orm import undefer_group
 from xlsxwriter.workbook import Workbook
 
 
@@ -462,7 +460,7 @@ class SwissVoteCollection(Pagination):
 
         added = 0
         updated = 0
-        query = self.session.query(SwissVote).options(undefer_group("dataset"))
+        query = self.session.query(SwissVote)
         existing = {vote.bfs_number: vote for vote in query}
         mapper = ColumnMapper()
         for vote in votes:
@@ -494,7 +492,7 @@ class SwissVoteCollection(Pagination):
         csv = writer(file)
         csv.writerow(mapper.columns.values())
 
-        query = self.query().options(undefer_group("dataset"))
+        query = self.query()
         query = query.order_by(None).order_by(SwissVote.bfs_number)
 
         for vote in query:
@@ -508,8 +506,6 @@ class SwissVoteCollection(Pagination):
                     row.append(f'{value:%d.%m.%Y}')
                 elif isinstance(value, int):
                     row.append(str(value))
-                elif isinstance(value, NumericRange):
-                    row.append(f'{value.lower}-{value.upper}')
                 elif isinstance(value, Decimal):
                     row.append(
                         f'{value:f}'.replace('.', ',').rstrip('0').rstrip(',')
@@ -525,7 +521,7 @@ class SwissVoteCollection(Pagination):
         worksheet = workbook.add_worksheet('DATA')
         worksheet.write_row(0, 0, mapper.columns.values())
 
-        query = self.query().options(undefer_group("dataset"))
+        query = self.query()
         query = query.order_by(None).order_by(SwissVote.bfs_number)
 
         row = 0
@@ -540,9 +536,5 @@ class SwissVoteCollection(Pagination):
                     worksheet.write_datetime(row, column_, value)
                 elif isinstance(value, int) or isinstance(value, Decimal):
                     worksheet.write_number(row, column_, value)
-                elif isinstance(value, NumericRange):
-                    worksheet.write_string(
-                        row, column_, f'{value.lower}-{value.upper}'
-                    )
 
         workbook.close()
