@@ -378,6 +378,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     recommendations = Column(JSON, nullable=False, default=dict)
     recommendations_other_yes = Column(Text)
     recommendations_other_no = Column(Text)
+    recommendations_other_counter_proposal = Column(Text)
+    recommendations_other_popular_initiative = Column(Text)
     recommendations_other_free = Column(Text)
     recommendations_divergent = Column(JSON, nullable=False, default=dict)
 
@@ -474,7 +476,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     def recommendations_associations(self):
         """ The recommendations of the associations grouped by slogans. """
 
-        def as_list(value, code):
+        def as_list(attribute, code):
+            value = getattr(self, f'recommendations_other_{attribute}')
             return [
                 (Actor(name.strip()), code)
                 for name in (value or '').split(',')
@@ -486,9 +489,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             (Actor(name), recommendations.get(name))
             for name in Actor.associations()
         ]
-        recommendations.extend(as_list(self.recommendations_other_yes, 1))
-        recommendations.extend(as_list(self.recommendations_other_no, 2))
-        recommendations.extend(as_list(self.recommendations_other_free, 5))
+        for attribute, code in (
+            ('yes', 1),
+            ('no', 2),
+            ('free', 5),
+            ('counter_proposal', 8),
+            ('popular_initiative', 9),
+        ):
+            recommendations.extend(as_list(attribute, code))
         return self.group_recommendations(recommendations, ignore_unknown=True)
 
     # Electoral strength

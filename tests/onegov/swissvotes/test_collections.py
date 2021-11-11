@@ -890,6 +890,8 @@ def test_votes_export(swissvotes_app):
     vote.recommendations_other_yes = "Pro Velo"
     vote.recommendations_other_no = "Biosuisse"
     vote.recommendations_other_free = "Pro Natura, Greenpeace"
+    vote.recommendations_other_counter_proposal = "Pro Juventute"
+    vote.recommendations_other_popular_initiative = "Pro Senectute"
     vote.recommendations_divergent = {
         'bdp_ag': 1,
         'bdp_ai': 1,
@@ -1542,6 +1544,8 @@ def test_votes_export(swissvotes_app):
         'p-others_yes': 'Pro Velo',
         'p-others_no': 'Biosuisse',
         'p-others_free': 'Pro Natura, Greenpeace',
+        'p-others_counterp': 'Pro Juventute',
+        'p-others_init': 'Pro Senectute',
         'pdev-bdp_AG': '1',
         'pdev-bdp_AI': '1',
         'pdev-bdp_AR': '1',
@@ -2184,6 +2188,8 @@ def test_votes_export(swissvotes_app):
         'p-others_yes': 'Pro Velo',
         'p-others_no': 'Biosuisse',
         'p-others_free': 'Pro Natura, Greenpeace',
+        'p-others_counterp': 'Pro Juventute',
+        'p-others_init': 'Pro Senectute',
         'pdev-bdp_AG': 1.0,
         'pdev-bdp_AI': 1.0,
         'pdev-bdp_AR': 1.0,

@@ -105,6 +105,8 @@ class ColumnMapper(object):
             ('recommendations_other_yes', 'p-others_yes'),
             ('recommendations_other_no', 'p-others_no'),
             ('recommendations_other_free', 'p-others_free'),
+            ('recommendations_other_counter_proposal', 'p-others_counterp'),
+            ('recommendations_other_popular_initiative', 'p-others_init'),
             ('!i!recommendations_divergent!bdp_ag', 'pdev-bdp_AG'),
             ('!i!recommendations_divergent!bdp_ai', 'pdev-bdp_AI'),
             ('!i!recommendations_divergent!bdp_ar', 'pdev-bdp_AR'),

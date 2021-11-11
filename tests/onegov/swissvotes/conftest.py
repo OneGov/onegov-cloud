@@ -488,6 +488,8 @@ def sample_vote():
     vote.recommendations_other_yes = "Pro Velo"
     vote.recommendations_other_no = None
     vote.recommendations_other_free = "Pro Natura, Greenpeace"
+    vote.recommendations_other_counter_proposal = "Pro Juventute"
+    vote.recommendations_other_popular_initiative = "Pro Senectute"
     vote.recommendations_divergent = {
         'edu_vso': 1,
         'fdp_ti': 1,

@@ -553,6 +553,8 @@ def test_model_vote(session, sample_vote):
     assert vote.recommendations_other_yes == "Pro Velo"
     assert vote.recommendations_other_no is None
     assert vote.recommendations_other_free == "Pro Natura, Greenpeace"
+    assert vote.recommendations_other_counter_proposal == "Pro Juventute"
+    assert vote.recommendations_other_popular_initiative == "Pro Senectute"
     assert vote.recommendations_divergent == {
         'edu_vso': 1,
         'fdp_ti': 1,
@@ -706,12 +708,14 @@ def test_model_vote(session, sample_vote):
         'Preference for the counter-proposal'
     ] == [
         Actor('acs'),
+        Actor('Pro Juventute'),
     ]
     assert vote.recommendations_associations['Nay'] == [Actor('eco')]
     assert vote.recommendations_associations[
         'Preference for the popular initiative'
     ] == [
-        Actor('tcs')
+        Actor('tcs'),
+        Actor('Pro Senectute'),
     ]
     assert vote.recommendations_associations['None'] == [
         Actor('sbv-usp'),
@@ -1050,7 +1054,7 @@ def test_model_column_mapper():
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
     ]
-    assert list(mapper.items())[295] == (
+    assert list(mapper.items())[297] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )
