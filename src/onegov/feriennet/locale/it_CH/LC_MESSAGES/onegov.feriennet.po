@@ -2922,7 +2922,7 @@ msgid "ESR identification number"
 msgstr "Numero di identificazione PVR"
 
 msgid "QR-Bill (experimental)"
-msgstr ""
+msgstr "Fattura QR (sperimentale)"
 
 msgid "Full age required for registration"
 msgstr "Età completa richiesta per la registrazione"
@@ -2981,27 +2981,29 @@ msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Il numero di identificazione PVR deve essere di 3-6 caratteri"
 
 msgid "QR-Bills require an IBAN"
-msgstr ""
+msgstr "Le fatture QR richiedono un IBAN"
 
 msgid "Not a valid IBAN"
-msgstr ""
+msgstr "IBAN non valido"
 
 msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
-msgstr ""
+msgstr "Le fatture QR richiedono un IBAN svizzero o del Lichteinstein"
 
 msgid "This IBAN cannot be used for QR-Bills without ESR"
-msgstr ""
+msgstr "Questo IBAN non può essere utilizzato per le fatture QR senza PVR"
 
 msgid "This IBAN cannot be used for QR-Bills with ESR"
-msgstr ""
+msgstr "Questo IBAN non può essere utilizzato per le fatture QR con PVR"
 
 msgid "QR-Bills require a beneficiary"
-msgstr ""
+msgstr "Le fatture QR richiedono un beneficiario"
 
 msgid ""
 "QR-Bills require the beneficiary to be in the form: name, street number, "
 "code city"
 msgstr ""
+"Le fatture QR richiedono che il beneficiario sia specificato nel modulo: "
+"Nome, Via, Codice postale, Città"
 
 msgid "Feriennet"
 msgstr "Feriennet"

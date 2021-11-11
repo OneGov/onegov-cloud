@@ -2946,7 +2946,7 @@ msgid "ESR identification number"
 msgstr "Numéro d'identification BVR"
 
 msgid "QR-Bill (experimental)"
-msgstr ""
+msgstr "QR-facture (expérimental)"
 
 msgid "Full age required for registration"
 msgstr "Âge complet requis pour l'inscription"
@@ -3006,27 +3006,29 @@ msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Le numéro d'identification BVR doit être long de 3-6 caractères"
 
 msgid "QR-Bills require an IBAN"
-msgstr ""
+msgstr "Les QR-factures nécessitent un IBAN"
 
 msgid "Not a valid IBAN"
-msgstr ""
+msgstr "IBAN non valide"
 
 msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
-msgstr ""
+msgstr "Les QR-factures nécessitent un IBAN en Suisse ou au Liechteinstein"
 
 msgid "This IBAN cannot be used for QR-Bills without ESR"
-msgstr ""
+msgstr "Ce IBAN ne peut pas être utilisé pour les QR-factures sans BVR"
 
 msgid "This IBAN cannot be used for QR-Bills with ESR"
-msgstr ""
+msgstr "Ce IBAN ne peut pas être utilisé pour les QR-factures avec BVR"
 
 msgid "QR-Bills require a beneficiary"
-msgstr ""
+msgstr "Les QR-factures nécessitent un bénéficiaire"
 
 msgid ""
 "QR-Bills require the beneficiary to be in the form: name, street number, "
 "code city"
 msgstr ""
+"Les QR-factures exigent les informations suivantes pour le bénéficiaire: "
+"nom, rue, code postal, lieu"
 
 msgid "Feriennet"
 msgstr "Réseau Vacances"
