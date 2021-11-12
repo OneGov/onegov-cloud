@@ -684,3 +684,15 @@ def rename_national_council_share_sps_column(context):
         and not context.has_column('swissvotes', new)
     ):
         context.operations.alter_column('swissvotes', old, new_column_name=new)
+
+
+@upgrade_task('Add more recommendation columns')
+def add_more_recommendation_columns(context):
+    for column in (
+        'recommendations_other_counter_proposal',
+        'recommendations_other_popular_initiative'
+    ):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes', Column(column, Text())
+            )

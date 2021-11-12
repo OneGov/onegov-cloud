@@ -18,14 +18,14 @@
                 </thead>
                 <tbody>
                     <tr tal:condition="vote.national_council_share_yeas">
-                            <tal:b tal:switch="vote.deciding_question">
+                            <tal:b tal:switch="vote._legal_form == 5">
                                 <td tal:case="False" i18n:translate>Yea</td>
                                 <td tal:case="True" i18n:translate>Preference for the popular initiative</td>
                             </tal:b>
                         <td>${layout.format_number(vote.national_council_share_yeas, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_nays">
-                        <tal:b tal:switch="vote.deciding_question">
+                        <tal:b tal:switch="vote._legal_form == 5">
                                 <td tal:case="False" i18n:translate>Nay</td>
                                 <td tal:case="True" i18n:translate>Preference for the counter-proposal</td>
                             </tal:b>

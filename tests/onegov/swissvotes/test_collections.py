@@ -319,7 +319,7 @@ def test_votes_term_filter(swissvotes_app):
 
 def test_votes_query(swissvotes_app):
     votes = SwissVoteCollection(swissvotes_app)
-    votes.add(
+    vote_1 = votes.add(
         id=1,
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
@@ -342,7 +342,7 @@ def test_votes_query(swissvotes_app):
         _position_national_council=2,
         _result=1,
     )
-    votes.add(
+    vote_2 = votes.add(
         id=2,
         bfs_number=Decimal('200.1'),
         date=date(1990, 9, 2),
@@ -364,7 +364,7 @@ def test_votes_query(swissvotes_app):
         _position_national_council=1,
         _result=1
     )
-    votes.add(
+    vote_3 = votes.add(
         id=3,
         bfs_number=Decimal('200.2'),
         date=date(1990, 9, 2),
@@ -453,6 +453,40 @@ def test_votes_query(swissvotes_app):
     assert count(term='group') == 0
     assert count(term='group', full_text=True) == 1
     assert count(term='The group that wants something', full_text=True) == 1
+
+    # test tie-breaker
+    vote_1._legal_form = 5
+    vote_1._position_federal_council = 8
+    vote_1._position_council_of_states = 8
+    vote_1._position_national_council = 8
+    assert count(legal_form=[5], position_federal_council=[2]) == 1
+    assert count(legal_form=[5], position_federal_council=[8]) == 1
+    assert count(legal_form=[5], position_federal_council=[1]) == 0
+    assert count(legal_form=[5], position_federal_council=[9]) == 0
+    assert count(legal_form=[5], position_council_of_states=[2]) == 1
+    assert count(legal_form=[5], position_council_of_states=[8]) == 1
+    assert count(legal_form=[5], position_council_of_states=[1]) == 0
+    assert count(legal_form=[5], position_council_of_states=[9]) == 0
+    assert count(legal_form=[5], position_national_council=[2]) == 1
+    assert count(legal_form=[5], position_national_council=[8]) == 1
+    assert count(legal_form=[5], position_national_council=[1]) == 0
+    assert count(legal_form=[5], position_national_council=[9]) == 0
+
+    vote_1._position_federal_council = 9
+    vote_1._position_council_of_states = 9
+    vote_1._position_national_council = 9
+    assert count(legal_form=[5], position_federal_council=[2]) == 0
+    assert count(legal_form=[5], position_federal_council=[8]) == 0
+    assert count(legal_form=[5], position_federal_council=[1]) == 1
+    assert count(legal_form=[5], position_federal_council=[9]) == 1
+    assert count(legal_form=[5], position_council_of_states=[2]) == 0
+    assert count(legal_form=[5], position_council_of_states=[8]) == 0
+    assert count(legal_form=[5], position_council_of_states=[1]) == 1
+    assert count(legal_form=[5], position_council_of_states=[9]) == 1
+    assert count(legal_form=[5], position_national_council=[2]) == 0
+    assert count(legal_form=[5], position_national_council=[8]) == 0
+    assert count(legal_form=[5], position_national_council=[1]) == 1
+    assert count(legal_form=[5], position_national_council=[9]) == 1
 
 
 def test_votes_query_attachments(swissvotes_app, attachments,
@@ -890,6 +924,8 @@ def test_votes_export(swissvotes_app):
     vote.recommendations_other_yes = "Pro Velo"
     vote.recommendations_other_no = "Biosuisse"
     vote.recommendations_other_free = "Pro Natura, Greenpeace"
+    vote.recommendations_other_counter_proposal = "Pro Juventute"
+    vote.recommendations_other_popular_initiative = "Pro Senectute"
     vote.recommendations_divergent = {
         'bdp_ag': 1,
         'bdp_ai': 1,
@@ -1542,6 +1578,8 @@ def test_votes_export(swissvotes_app):
         'p-others_yes': 'Pro Velo',
         'p-others_no': 'Biosuisse',
         'p-others_free': 'Pro Natura, Greenpeace',
+        'p-others_counterp': 'Pro Juventute',
+        'p-others_init': 'Pro Senectute',
         'pdev-bdp_AG': '1',
         'pdev-bdp_AI': '1',
         'pdev-bdp_AR': '1',
@@ -2184,6 +2222,8 @@ def test_votes_export(swissvotes_app):
         'p-others_yes': 'Pro Velo',
         'p-others_no': 'Biosuisse',
         'p-others_free': 'Pro Natura, Greenpeace',
+        'p-others_counterp': 'Pro Juventute',
+        'p-others_init': 'Pro Senectute',
         'pdev-bdp_AG': 1.0,
         'pdev-bdp_AI': 1.0,
         'pdev-bdp_AR': 1.0,

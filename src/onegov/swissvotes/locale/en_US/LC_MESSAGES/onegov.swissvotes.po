@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-10 06:13+0100\n"
+"POT-Creation-Date: 2021-11-11 09:45+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1368,44 +1368,38 @@ msgstr "Popular initiative"
 msgid "Direct counter-proposal"
 msgstr "Direct counter-proposal"
 
-msgid "Deciding question"
-msgstr "Deciding question"
+msgid "Tie-breaker"
+msgstr "Tie-breaker"
 
 msgid "Rejected"
 msgstr "Rejected"
 
-msgid "Preferred the counter-proposal"
-msgstr "Preferred the counter-proposal"
-
 msgid "Accepted"
 msgstr "Accepted"
-
-msgid "Preferred the popular initiative"
-msgstr "Preferred the popular initiative"
 
 msgid "Majority of the cantons not necessary"
 msgstr "Majority of the cantons not required"
 
-msgid "For the counter-proposal"
-msgstr "For the counter-proposal"
+msgid "Counter-proposal preferred"
+msgstr "Counter-proposal preferred"
 
-msgid "For the initiative"
-msgstr "For the initiative"
+msgid "Popular initiative preferred"
+msgstr "Popular initiative preferred"
 
 msgid "Accepting"
 msgstr "Accept"
 
-msgid "Preference for the popular initiative"
-msgstr "Preference for the popular initiative"
-
 msgid "Rejecting"
 msgstr "Reject"
+
+msgid "None"
+msgstr "None"
 
 msgid "Preference for the counter-proposal"
 msgstr "Preference for the counter-proposal"
 
-msgid "None"
-msgstr "None"
+msgid "Preference for the popular initiative"
+msgstr "Preference for the popular initiative"
 
 msgid "Yea"
 msgstr "Yes"
@@ -1617,8 +1611,8 @@ msgstr ""
 msgid "Parliament's position"
 msgstr "Parliament's position"
 
-msgid "for the initiative"
-msgstr "for the initiative"
+msgid "for the popular initiative"
+msgstr "for the popular initiative"
 
 msgid "for the counter-proposal"
 msgstr "for the counter-proposal"
@@ -1859,28 +1853,28 @@ msgid "${x}% yea"
 msgstr "${x}% yea"
 
 #, python-format
-msgid "${x}% for the initiative"
-msgstr "${x}% for the initiative"
-
-#, python-format
 msgid "${x}% nay"
 msgstr "${x}% nay"
-
-#, python-format
-msgid "${x}% for the counter-proposal"
-msgstr "${x}% for the counter-proposal"
 
 #, python-format
 msgid "${x} yea"
 msgstr "${x} yea"
 
 #, python-format
-msgid "${x} for the initiative"
-msgstr "${x} for the initiative"
-
-#, python-format
 msgid "${x} nay"
 msgstr "${x} nay"
+
+#, python-format
+msgid "${x}% for the popular initiative"
+msgstr "${x}% for the popular initiative"
+
+#, python-format
+msgid "${x}% for the counter-proposal"
+msgstr "${x}% for the counter-proposal"
+
+#, python-format
+msgid "${x} for the popular initiative"
+msgstr "${x} for the popular initiative"
 
 #, python-format
 msgid "${x} for the counter-proposal"

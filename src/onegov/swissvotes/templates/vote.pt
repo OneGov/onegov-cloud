@@ -180,12 +180,12 @@
                         <td>
                             ${vote.position_national_council}
                             <tal:block tal:condition="vote.position_national_council_yeas is not None and vote.position_national_council_nays is not None">
-                                <tal:b tal:switch="vote.deciding_question">
+                                <tal:b tal:switch="vote._legal_form == 5">
                                     <tal:b tal:case="False">
                                         (${vote.position_national_council_yeas} <tal:block i18n:translate>Yea</tal:block>, ${vote.position_national_council_nays} <tal:block i18n:translate>Nay</tal:block>)
                                     </tal:b>
                                     <tal:b tal:case="True">
-                                        (${vote.position_national_council_yeas} <tal:block i18n:translate>for the initiative</tal:block>, ${vote.position_national_council_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
+                                        (${vote.position_national_council_yeas} <tal:block i18n:translate>for the popular initiative</tal:block>, ${vote.position_national_council_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
                                     </tal:b>
                                 </tal:b>
                             </tal:block>
@@ -196,12 +196,12 @@
                         <td>
                             ${vote.position_council_of_states}
                             <tal:block tal:condition="vote.position_council_of_states_yeas is not None and vote.position_council_of_states_nays is not None">
-                                <tal:b tal:switch="vote.deciding_question">
+                                <tal:b tal:switch="vote._legal_form == 5">
                                     <tal:b tal:case="False">
                                         (${vote.position_council_of_states_yeas} <tal:block i18n:translate>Yea</tal:block>, ${vote.position_council_of_states_nays} <tal:block i18n:translate>Nay</tal:block>)
                                     </tal:b>
                                     <tal:b tal:case="True">
-                                        (${vote.position_council_of_states_yeas} <tal:block i18n:translate>for the initiative</tal:block>, ${vote.position_council_of_states_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
+                                        (${vote.position_council_of_states_yeas} <tal:block i18n:translate>for the popular initiative</tal:block>, ${vote.position_council_of_states_nays} <tal:block i18n:translate>for the counter-proposal</tal:block>)
                                     </tal:b>
                                 </tal:b>
                             </tal:block>
@@ -268,7 +268,7 @@
                     </tr>
                     <tr tal:condition="vote.national_council_share_yeas is not None or vote.has_national_council_share_data">
                         <th class="column-30">
-                            <tal:b tal:switch="vote.deciding_question">
+                            <tal:b tal:switch="vote._legal_form == 5">
                                 <tal:b tal:case="False">
                                     <span i18n:translate>Voter share of yes camp</span>
                                     <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Cumulated electoral share of the parties which recommend to vote Yes"><i class="fa fa-info" aria-hidden="true"></i></span>
@@ -386,12 +386,12 @@
                         <td>
                             ${vote.result_people_accepted}
                             <tal:block tal:condition="vote.result_people_yeas_p">
-                                <tal:b tal:switch="vote.deciding_question">
+                                <tal:b tal:switch="vote._legal_form == 5">
                                     <tal:b tal:case="False">
                                         (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>Yeas</tal:b>)
                                     </tal:b>
                                     <tal:b tal:case="True">
-                                        (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>for the initiative</tal:b>)
+                                        (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>for the popular initiative</tal:b>)
                                     </tal:b>
                                 </tal:b>
                             </tal:block>
@@ -403,12 +403,12 @@
                             <span class="result-cantons-accepted">
                                 ${vote.result_cantons_accepted}
                                 <tal:block tal:condition="vote.result_cantons_yeas is not None and vote.result_cantons_nays is not None">
-                                    <tal:b tal:switch="vote.deciding_question">
+                                    <tal:b tal:switch="vote._legal_form == 5">
                                         <tal:b tal:case="False">
                                           (${layout.format_number(vote.result_cantons_yeas, 1)} <tal:block i18n:translate>Yea</tal:block>, ${layout.format_number(vote.result_cantons_nays, 1)} <tal:block i18n:translate>Nay</tal:block>)
                                         </tal:b>
                                         <tal:b tal:case="True">
-                                          (${layout.format_number(vote.result_cantons_yeas, 1)} <tal:block i18n:translate>for the initiative</tal:block>, ${layout.format_number(vote.result_cantons_nays, 1)} <tal:block i18n:translate>for the counter-proposal</tal:block>)
+                                          (${layout.format_number(vote.result_cantons_yeas, 1)} <tal:block i18n:translate>for the popular initiative</tal:block>, ${layout.format_number(vote.result_cantons_nays, 1)} <tal:block i18n:translate>for the counter-proposal</tal:block>)
                                         </tal:b>
 
                                     </tal:b>

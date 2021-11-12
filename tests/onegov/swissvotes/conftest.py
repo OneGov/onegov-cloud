@@ -440,11 +440,11 @@ def sample_vote():
     vote.signatures_valid = 40
     vote.recommendations = {
         'fdp': 1,
-        'cvp': 1,
+        'cvp': 8,
         'sps': 1,
         'svp': 1,
         'lps': 2,
-        'ldu': 2,
+        'ldu': 9,
         'evp': 2,
         'csp': 3,
         'pda': 3,
@@ -480,14 +480,16 @@ def sample_vote():
         'kkjpd': 1,
         'bpuk': 1,
         'sbk': 1,
-        'acs': 1,
-        'tcs': 1,
+        'acs': 8,
+        'tcs': 9,
         'vcs': 1,
         'voev': 1
     }
     vote.recommendations_other_yes = "Pro Velo"
     vote.recommendations_other_no = None
     vote.recommendations_other_free = "Pro Natura, Greenpeace"
+    vote.recommendations_other_counter_proposal = "Pro Juventute"
+    vote.recommendations_other_popular_initiative = "Pro Senectute"
     vote.recommendations_divergent = {
         'edu_vso': 1,
         'fdp_ti': 1,

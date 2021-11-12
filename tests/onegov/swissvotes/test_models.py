@@ -505,11 +505,11 @@ def test_model_vote(session, sample_vote):
     assert vote.signatures_valid == 40
     assert vote.recommendations == {
         'fdp': 1,
-        'cvp': 1,
+        'cvp': 8,
         'sps': 1,
         'svp': 1,
         'lps': 2,
-        'ldu': 2,
+        'ldu': 9,
         'evp': 2,
         'csp': 3,
         'pda': 3,
@@ -545,14 +545,16 @@ def test_model_vote(session, sample_vote):
         'kkjpd': 1,
         'bpuk': 1,
         'sbk': 1,
-        'acs': 1,
-        'tcs': 1,
+        'acs': 8,
+        'tcs': 9,
         'vcs': 1,
         'voev': 1
     }
     assert vote.recommendations_other_yes == "Pro Velo"
     assert vote.recommendations_other_no is None
     assert vote.recommendations_other_free == "Pro Natura, Greenpeace"
+    assert vote.recommendations_other_counter_proposal == "Pro Juventute"
+    assert vote.recommendations_other_popular_initiative == "Pro Senectute"
     assert vote.recommendations_divergent == {
         'edu_vso': 1,
         'fdp_ti': 1,
@@ -627,18 +629,33 @@ def test_model_vote(session, sample_vote):
         Region('vs'),
     ]
     assert list(vote.recommendations_parties.keys()) == [
-        'Yea', 'Nay', 'Empty', 'Free vote', 'None', 'Neutral'
+        'Yea',
+        'Preference for the popular initiative',
+        'Nay',
+        'Preference for the counter-proposal',
+        'Empty',
+        'Free vote',
+        'None',
+        'Neutral'
     ]
     assert vote.recommendations_parties['Yea'] == [
-        Actor('cvp'),
         Actor('fdp'),
         Actor('sps'),
         Actor('svp'),
     ]
+    assert vote.recommendations_parties[
+        'Preference for the counter-proposal'
+    ] == [
+        Actor('cvp'),
+    ]
     assert vote.recommendations_parties['Nay'] == [
         Actor('evp'),
-        Actor('ldu'),
         Actor('lps'),
+    ]
+    assert vote.recommendations_parties[
+        'Preference for the popular initiative'
+    ] == [
+        Actor('ldu'),
     ]
     assert vote.recommendations_parties['None'] == [
         Actor('csp'),
@@ -660,10 +677,14 @@ def test_model_vote(session, sample_vote):
         Actor('kvp')
     ]
     assert list(vote.recommendations_associations.keys()) == [
-        'Yea', 'Nay', 'Free vote', 'None',
+        'Yea',
+        'Preference for the popular initiative',
+        'Nay',
+        'Preference for the counter-proposal',
+        'Free vote',
+        'None',
     ]
     assert vote.recommendations_associations['Yea'] == [
-        Actor('acs'),
         Actor('bpuk'),
         Actor('edk'),
         Actor('endk'),
@@ -677,14 +698,25 @@ def test_model_vote(session, sample_vote):
         Actor('sbk'),
         Actor('sodk'),
         Actor('ssv'),
-        Actor('tcs'),
         Actor('vcs'),
         Actor('vdk'),
         Actor('voev'),
         Actor('vpod'),
         Actor('Pro Velo')
     ]
+    assert vote.recommendations_associations[
+        'Preference for the counter-proposal'
+    ] == [
+        Actor('acs'),
+        Actor('Pro Juventute'),
+    ]
     assert vote.recommendations_associations['Nay'] == [Actor('eco')]
+    assert vote.recommendations_associations[
+        'Preference for the popular initiative'
+    ] == [
+        Actor('tcs'),
+        Actor('Pro Senectute'),
+    ]
     assert vote.recommendations_associations['None'] == [
         Actor('sbv-usp'),
         Actor('sgb'),
@@ -1022,7 +1054,7 @@ def test_model_column_mapper():
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
     ]
-    assert list(mapper.items())[295] == (
+    assert list(mapper.items())[297] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )
@@ -1030,7 +1062,9 @@ def test_model_column_mapper():
 
 def test_model_recommendation_order():
     recommendations = SwissVote.codes('recommendation')
-    assert list(recommendations.keys()) == [1, 2, 4, 5, 3, 66, 9999, None]
+    assert list(recommendations.keys()) == [
+        1, 9, 2, 8, 4, 5, 3, 66, 9999, None
+    ]
 
 
 def test_model_recommendations_parties(sample_vote):
