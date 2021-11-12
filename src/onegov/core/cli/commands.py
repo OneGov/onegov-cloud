@@ -49,7 +49,7 @@ def delete(group_context):
 
             for item in app.filestorage.listdir('.'):
                 if app.filestorage.isdir(item):
-                    app.filestorage.removedir(item, recursive=True, force=True)
+                    app.filestorage.removedir(item)
                 else:
                     app.filestorage.remove(item)
 
