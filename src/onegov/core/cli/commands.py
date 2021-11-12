@@ -11,7 +11,7 @@ from cached_property import cached_property
 from fnmatch import fnmatch
 from mailthon.middleware import TLS, Auth
 from onegov.core.cache import lru_cache
-from onegov.core.cli.core import command_group, pass_group_context
+from onegov.core.cli.core import command_group, pass_group_context, abort
 from onegov.core.mail import Postman
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
@@ -20,10 +20,61 @@ from onegov.core.upgrade import RawUpgradeRunner
 from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
 from smtplib import SMTPRecipientsRefused
+from sqlalchemy import create_engine
+from sqlalchemy.orm.session import close_all_sessions
 
 
 #: onegov.core's own command group
 cli = command_group()
+
+
+@cli.command()
+@pass_group_context
+def delete(group_context):
+    """ Deletes a single instance matching the selector.
+
+    Selectors matching multiple organisations are disabled for saftey reasons.
+
+    """
+
+    def delete_instance(request, app):
+
+        confirmation = "Do you really want to DELETE this instance?"
+
+        if not click.confirm(confirmation):
+            abort("Deletion process aborted")
+
+        if app.has_filestorage:
+            click.echo("Removing File Storage")
+
+            for item in app.filestorage.listdir('.'):
+                if app.filestorage.isdir(item):
+                    app.filestorage.removedir(item)
+                else:
+                    app.filestorage.remove(item)
+
+        if getattr(app, 'depot_storage_path', ''):
+            if app.bound_storage_path:
+                click.echo("Removing Depot Storage")
+                shutil.rmtree(str(app.bound_storage_path.absolute()))
+
+        if app.has_database_connection:
+            click.echo("Dropping Database Schema")
+
+            assert app.session_manager.is_valid_schema(app.schema)
+
+            close_all_sessions()
+            dsn = app.session_manager.dsn
+            app.session_manager.dispose()
+
+            engine = create_engine(dsn)
+            engine.execute('DROP SCHEMA "{}" CASCADE'.format(app.schema))
+            engine.raw_connection().invalidate()
+            engine.dispose()
+
+        click.echo("Instance was deleted successfully")
+
+    return delete_instance
 
 
 @cli.command(context_settings={

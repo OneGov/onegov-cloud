@@ -9,6 +9,7 @@ from datetime import timezone
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
+from onegov.core.cli.commands import cli as core_cli
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
 
@@ -74,7 +75,7 @@ def run_command(cfg_path, principal, commands):
     ] + commands)
 
 
-def test_add_instance(postgres_dsn, temporary_directory, redis_url):
+def test_manage_instances(postgres_dsn, temporary_directory, redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -87,6 +88,17 @@ def test_add_instance(postgres_dsn, temporary_directory, redis_url):
     result = run_command(cfg_path, 'govikon', ['add'])
     assert result.exit_code == 1
     assert "This selector may not reference an existing path" in result.output
+
+    result = CliRunner().invoke(
+        core_cli, [
+            '--config', cfg_path, '--select', '/onegov_election_day/govikon',
+            'delete'
+        ],
+        input='y\n'
+    )
+
+    assert result.exit_code == 0
+    assert "Instance was deleted successfully" in result.output
 
 
 def test_add_instance_missing_config(postgres_dsn, temporary_directory,
