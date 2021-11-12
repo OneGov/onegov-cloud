@@ -334,7 +334,8 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query(SwissVote)
 
-        def in_or_none(column, values):
+        def in_or_none(column, values, extra={}):
+            values = values + [x for y, x in extra.items() if y in values]
             statement = column.in_(values)
             if -1 in values:
                 statement = or_(statement, column.is_(None))
@@ -347,9 +348,6 @@ class SwissVoteCollection(Pagination):
         if self.legal_form:
             query = query.filter(SwissVote._legal_form.in_(self.legal_form))
         if self.result:
-            # XXX votes with deciding questions have not been properly added
-            # to the query view (no way to select for their results), so we
-            # always include them here
             query = query.filter(or_(
                 SwissVote._result.in_(self.result),
                 SwissVote._result == None,
@@ -394,21 +392,24 @@ class SwissVoteCollection(Pagination):
             query = query.filter(
                 in_or_none(
                     SwissVote._position_federal_council,
-                    self.position_federal_council
+                    self.position_federal_council,
+                    {1: 9, 2: 8}
                 )
             )
         if self.position_national_council:
             query = query.filter(
                 in_or_none(
                     SwissVote._position_national_council,
-                    self.position_national_council
+                    self.position_national_council,
+                    {1: 9, 2: 8}
                 )
             )
         if self.position_council_of_states:
             query = query.filter(
                 in_or_none(
                     SwissVote._position_council_of_states,
-                    self.position_council_of_states
+                    self.position_council_of_states,
+                    {1: 9, 2: 8}
                 )
             )
 

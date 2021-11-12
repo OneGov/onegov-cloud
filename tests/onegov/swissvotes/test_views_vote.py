@@ -480,7 +480,7 @@ def test_view_vote_chart(session):
         )
     }
 
-    # Test deciding question
+    # Test tie-breaker
     model._legal_form = 5
     results = view_vote_percentages(model, request)['results']
 

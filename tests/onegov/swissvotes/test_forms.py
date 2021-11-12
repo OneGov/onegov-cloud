@@ -290,7 +290,7 @@ def test_search_form(swissvotes_app):
         (2, 'Optional referendum'),
         (3, 'Popular initiative'),
         (4, 'Direct counter-proposal'),
-        (5, 'Tie breaker'),
+        (5, 'Tie-breaker'),
     ]
     assert form.result.choices == [
         (0, 'Rejected'),
