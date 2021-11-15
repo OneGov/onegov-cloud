@@ -5,6 +5,7 @@ from click.testing import CliRunner
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
+from onegov.core.cli.commands import cli as core_cli
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
@@ -83,17 +84,16 @@ def test_cli_delete_instance(postgres_dsn, temporary_directory, redis_url):
     assert result.exit_code == 0
     assert "Instance was created successfully" in result.output
 
-    result = run_command(cfg_path, 'govikon', ['delete'], 'n')
-    assert result.exit_code == 1
-    assert "Deletion process aborted" in result.output
+    result = CliRunner().invoke(
+        core_cli, [
+            '--config', cfg_path, '--select', '/onegov_swissvotes/govikon',
+            'delete'
+        ],
+        input='y\n'
+    )
 
-    result = run_command(cfg_path, 'govikon', ['delete'], 'y')
     assert result.exit_code == 0
     assert "Instance was deleted successfully" in result.output
-
-    result = run_command(cfg_path, 'govikon', ['delete'], 'y')
-    assert result.exit_code == 1
-    assert "Selector doesn't match any paths, aborting." in result.output
 
 
 def test_cli_import_attachments(session_manager, temporary_directory,
@@ -132,7 +132,9 @@ def test_cli_import_attachments(session_manager, temporary_directory,
     create_file(folder / 'another_text' / '100.pdf')
     create_file(folder / '100.pdf')
 
-    result = run_command(cfg_path, 'govikon', ['import', str(folder)])
+    result = run_command(
+        cfg_path, 'govikon', ['import-attachments', str(folder)]
+    )
     assert result.exit_code == 0
 
     assert "1 for voting_text/de_CH/001.pdf" in result.output
@@ -185,7 +187,9 @@ def test_cli_import_attachments(session_manager, temporary_directory,
         session.flush()
     commit()
 
-    result = run_command(cfg_path, 'govikon', ['import', str(folder)])
+    result = run_command(
+        cfg_path, 'govikon', ['import-attachments', str(folder)]
+    )
     assert result.exit_code == 0
     assert "Added federal_council_message/de_CH/1.0.pdf" in result.output
     assert "Added federal_council_message/de_CH/2.0.pdf" in result.output

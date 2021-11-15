@@ -962,7 +962,7 @@ def test_model_column_mapper():
     mapper.set_value(vote, 'keyword', 'keyword')
     mapper.set_value(vote, '_legal_form', 4)
     mapper.set_value(vote, '!i!recommendations!fdp', 66)
-    mapper.set_value(vote, '!t!meta!link_bk_results_de', 'http://a.b')
+    mapper.set_value(vote, '!t!content!link_bk_results_de', 'http://a.b')
 
     assert vote.bfs_number == Decimal('100.1')
     assert vote.date == date(2019, 1, 1)
@@ -983,7 +983,9 @@ def test_model_column_mapper():
     assert mapper.get_value(vote, 'keyword') == 'keyword'
     assert mapper.get_value(vote, '_legal_form') == 4
     assert mapper.get_value(vote, '!i!recommendations!fdp') == 66
-    assert mapper.get_value(vote, '!t!meta!link_bk_results_de') == 'http://a.b'
+    assert mapper.get_value(vote, '!t!content!link_bk_results_de') == (
+        'http://a.b'
+    )
 
     assert list(mapper.get_values(vote))[:21] == [
         Decimal('100.1'),
@@ -1018,8 +1020,8 @@ def test_model_column_mapper():
         ('keyword', 'keyword'),
         ('_legal_form', 4),
         ('anneepolitique', None),
-        ('!t!meta!link_bk_chrono_de', None),
-        ('!t!meta!link_bk_chrono_fr', None),
+        ('!t!content!link_bk_chrono_de', None),
+        ('!t!content!link_bk_chrono_fr', None),
         ('descriptor_1_level_1', None),
         ('descriptor_1_level_2', None),
         ('descriptor_1_level_3', None),
@@ -1041,8 +1043,14 @@ def test_model_column_mapper():
         ('keyword', 'stichwort', 'TEXT', True, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None),
         ('anneepolitique', 'anneepolitique', 'TEXT', True, None, None),
-        ('!t!meta!link_bk_chrono_de', 'bkchrono-de', 'TEXT', True, None, None),
-        ('!t!meta!link_bk_chrono_fr', 'bkchrono-fr', 'TEXT', True, None, None),
+        (
+            '!t!content!link_bk_chrono_de', 'bkchrono-de', 'TEXT', True, None,
+            None
+        ),
+        (
+            '!t!content!link_bk_chrono_fr', 'bkchrono-fr', 'TEXT', True, None,
+            None
+        ),
         ('descriptor_1_level_1', 'd1e1', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_1_level_2', 'd1e2', 'NUMERIC(8, 4)', True, 8, 4),
         ('descriptor_1_level_3', 'd1e3', 'NUMERIC(8, 4)', True, 8, 4),

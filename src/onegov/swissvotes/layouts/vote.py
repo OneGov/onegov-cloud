@@ -23,7 +23,16 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Campaign material for a Yes"),
+                    text=_("Campaign material"),
+                    url=self.request.link(
+                        self.model, name='manage-campaign-material'
+                    ),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
+            result.append(
+                Link(
+                    text=_("Graphical campaign material for a Yes"),
                     url=self.request.link(
                         self.model, name='manage-campaign-material-yea'
                     ),
@@ -32,7 +41,7 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Campaign material for a No"),
+                    text=_("Graphical campaign material for a No"),
                     url=self.request.link(
                         self.model, name='manage-campaign-material-nay'
                     ),
@@ -99,6 +108,13 @@ class VoteStrengthsLayout(VoteDetailLayout):
         return _("Voter strengths")
 
 
+class VoteCampaignMaterialLayout(VoteDetailLayout):
+
+    @cached_property
+    def title(self):
+        return _("Documents from the campaign")
+
+
 class UploadVoteAttachemtsLayout(VoteDetailLayout):
 
     @cached_property
@@ -106,18 +122,25 @@ class UploadVoteAttachemtsLayout(VoteDetailLayout):
         return _("Manage attachments")
 
 
+class ManageCampaingMaterialLayout(VoteDetailLayout):
+
+    @cached_property
+    def title(self):
+        return _("Campaign material")
+
+
 class ManageCampaingMaterialYeaLayout(VoteDetailLayout):
 
     @cached_property
     def title(self):
-        return _("Campaign material for a Yes")
+        return _("Graphical campaign material for a Yes")
 
 
 class ManageCampaingMaterialNayLayout(VoteDetailLayout):
 
     @cached_property
     def title(self):
-        return _("Campaign material for a No")
+        return _("Graphical campaign material for a No")
 
 
 class DeleteVoteLayout(VoteDetailLayout):

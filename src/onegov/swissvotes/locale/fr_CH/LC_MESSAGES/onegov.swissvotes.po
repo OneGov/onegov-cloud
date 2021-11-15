@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-11 09:45+0100\n"
+"POT-Creation-Date: 2021-11-15 10:27+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -229,17 +229,23 @@ msgstr "Nouvelle page"
 msgid "Delete attachment"
 msgstr "Supprimer la pièce jointe"
 
-msgid "Campaign material for a Yes"
-msgstr "Matériel de campagne pour le oui"
+msgid "Campaign material"
+msgstr "Matériel de la campagne"
 
-msgid "Campaign material for a No"
-msgstr "Matériel de campagne pour le non"
+msgid "Graphical campaign material for a Yes"
+msgstr "Matériel visuel de la campagne pour le oui"
+
+msgid "Graphical campaign material for a No"
+msgstr "Matériel visuel de la campagne pour le non"
 
 msgid "Delete vote"
 msgstr "Supprimer cette votation"
 
 msgid "Voter strengths"
 msgstr "Poids électoraux"
+
+msgid "Documents from the campaign"
+msgstr "Documents de la campagne de votation"
 
 msgid "Update dataset"
 msgstr "Actualiser la base de données"
@@ -1468,6 +1474,27 @@ msgstr "Veuillez glisser les fichiers à importer ici"
 msgid "Upload"
 msgstr "Charger"
 
+msgid "Document title"
+msgstr "Titre du document"
+
+msgid "Position towards the vote"
+msgstr "Position vis-à-vis de la votation"
+
+msgid "Author"
+msgstr "Auteur:e"
+
+msgid "Edited by"
+msgstr "Mandant:e / éditeur:trice"
+
+msgid "Date of publication"
+msgstr "Date du document"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Type of document"
+msgstr "Type de document"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
@@ -1735,6 +1762,9 @@ msgstr "(majoritairement en faveur)"
 
 msgid "(predominantly negative)"
 msgstr "(majoritairement en défaveur)"
+
+msgid "Display the list of documents"
+msgstr "Afficher la liste des documents"
 
 msgid "People"
 msgstr "Peuple"

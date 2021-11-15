@@ -12,9 +12,11 @@ from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.forms import AttachmentsForm
 from onegov.swissvotes.layouts import DeleteVoteAttachmentLayout
 from onegov.swissvotes.layouts import DeleteVoteLayout
+from onegov.swissvotes.layouts import ManageCampaingMaterialLayout
 from onegov.swissvotes.layouts import ManageCampaingMaterialNayLayout
 from onegov.swissvotes.layouts import ManageCampaingMaterialYeaLayout
 from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
+from onegov.swissvotes.layouts import VoteCampaignMaterialLayout
 from onegov.swissvotes.layouts import VoteLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import Actor
@@ -226,6 +228,18 @@ def view_vote_strengths(self, request):
     }
 
 
+@SwissvotesApp.html(
+    model=SwissVote,
+    permission=Public,
+    template='campaign_material.pt',
+    name='campaign-material'
+)
+def view_vote_campaign_material(self, request):
+    return {
+        'layout': VoteCampaignMaterialLayout(self, request),
+    }
+
+
 @SwissvotesApp.form(
     model=SwissVote,
     permission=Private,
@@ -318,6 +332,50 @@ for attribute_name, attribute in SwissVote.localized_files().items():
             permission=Public,
             name=view_name
         )(create_static_file_view(attribute_name, locale))
+
+
+@SwissvotesApp.html(
+    model=SwissVote,
+    template='attachments.pt',
+    name='manage-campaign-material',
+    permission=Private
+)
+def view_manage_campaign_material(self, request):
+    layout = ManageCampaingMaterialLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload-campaign-material')
+        ),
+        'files': self.campaign_material_other,
+        'notice': self,
+    }
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    name='upload-campaign-material',
+    permission=Private,
+    request_method='POST'
+)
+def upload_manage_campaign_material(self, request):
+    request.assert_valid_csrf_token()
+
+    attachment = SwissVoteFile(id=random_token())
+    attachment.name = 'campaign_material_other-{}'.format(
+        request.params['file'].filename
+    )
+    attachment.reference = as_fileintent(
+        request.params['file'].file,
+        request.params['file'].filename
+    )
+
+    if attachment.reference.content_type != 'application/pdf':
+        raise HTTPUnsupportedMediaType()
+
+    self.files.append(attachment)
 
 
 @SwissvotesApp.html(
@@ -417,12 +475,12 @@ def upload_manage_campaign_material_nay(self, request):
 )
 def delete_vote_attachment(self, request, form):
     layout = DeleteVoteAttachmentLayout(self, request)
-    url = request.link(
-        layout.parent,
-        'manage-campaign-material-{}'.format(
-            'nay' if 'nay' in self.name else 'yea'
-        )
-    )
+    name = 'manage-campaign-material'
+    if 'yea' in self.name:
+        name += '-yea'
+    if 'nay' in self.name:
+        name += '-nay'
+    url = request.link(layout.parent, name)
 
     if form.submitted(request):
         request.session.delete(self)

@@ -655,6 +655,7 @@ def test_layout_vote(swissvotes_app):
     layout = VoteLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVote/100.00/upload',
+        'SwissVote/100.00/manage-campaign-material',
         'SwissVote/100.00/manage-campaign-material-yea',
         'SwissVote/100.00/manage-campaign-material-nay',
         'SwissVote/100.00/delete'
@@ -665,6 +666,7 @@ def test_layout_vote(swissvotes_app):
     layout = VoteLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVote/100.00/upload',
+        'SwissVote/100.00/manage-campaign-material',
         'SwissVote/100.00/manage-campaign-material-yea',
         'SwissVote/100.00/manage-campaign-material-nay',
         'SwissVote/100.00/delete'
@@ -903,7 +905,7 @@ def test_layout_manage_campaign_material_yea(swissvotes_app):
     )
 
     layout = ManageCampaingMaterialYeaLayout(model, request)
-    assert layout.title == _("Campaign material for a Yes")
+    assert layout.title == _("Graphical campaign material for a Yes")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'Principal/SwissVoteCollection/SwissVote/100/#'
@@ -932,7 +934,7 @@ def test_layout_manage_campaign_material_nay(swissvotes_app):
     )
 
     layout = ManageCampaingMaterialNayLayout(model, request)
-    assert layout.title == _("Campaign material for a No")
+    assert layout.title == _("Graphical campaign material for a No")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'Principal/SwissVoteCollection/SwissVote/100/#'
