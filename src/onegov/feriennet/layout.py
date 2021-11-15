@@ -142,6 +142,9 @@ class BookingCollectionLayout(DefaultLayout):
         if self.request.app.org.meta['locales'] == 'de_CH':
             return 'https://www.rega.ch/partner/' \
                    'das-pro-juventute-engagement-der-rega'
+        if self.request.app.org.meta['locales'] == 'it_CH':
+            return 'https://www.rega.ch/it/partner/' \
+                   'limpegno-pro-juventute-della-rega'
         return 'https://www.rega.ch/fr/partenariats/' \
                'lengagement-de-la-rega-en-faveur-de-pro-juventute'
 

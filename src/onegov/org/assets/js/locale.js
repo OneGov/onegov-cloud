@@ -50,6 +50,32 @@ var locales = {
         "The server could not be reached. Please try again.": "Le serveur n'a pas pu être joint. Veuillez réessayer.",
         "The site could not be found.": "Impossible de trouver le site.",
         "Access denied. Please log in before continuing.": "Accès refusé. Veuillez vous connecter avant de continuer."
+    },
+    it: {
+        "Allocation": "Allocazione",
+        "Add": "Aggiungi",
+        "Count": "Conta",
+        "Dates": "Date",
+        "From": "A partire dal",
+        "No": "No",
+        "Remove": "Rimuovi",
+        "Reserve": "Prenota",
+        "Select allocations in the calendar to reserve them": "Seleziona le allocazioni nel calendario per prenotarle",
+        "Until": "Fino a quando",
+        "Whole day": "Giorno intero",
+        "Yes": "Sì",
+        "Add Suggestion": "Aggiungi suggerimento",
+        "Goto date": "Vai alla data",
+        "Image": "Immagine",
+        "File": "File",
+        "Internal Link": "Collegamento interno",
+        "Upload": "Carica",
+        "Select": "Seleziona",
+        "This site is currently undergoing scheduled maintenance, please try again later.": "Questo sito è attualmente in fase di manutenzione programmata, riprova più tardi.",
+        "The server responded with an error. We have been informed and will investigate the problem.": "Il server ha risposto con un errore. Siamo stati informati e indagheremo sul problema.",
+        "The server could not be reached. Please try again.": "Impossibile raggiungere il server. Per favore riprova.",
+        "The site could not be found.": "Impossibile trovare il sito.",
+        "Access denied. Please log in before continuing.": "Accesso negato. Effettua il login prima di continuare."
     }
 };
 
