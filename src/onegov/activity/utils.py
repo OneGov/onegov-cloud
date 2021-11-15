@@ -149,6 +149,12 @@ def generate_xml(payments):
             <BkToCstmrStmt>
                 <Stmt>
                     <Ntry>
+                        <BookgDt>
+                            <Dt>2016-04-30</Dt>
+                        </BookgDt>
+                        <ValDt>
+                            <Dt>2016-04-30</Dt>
+                        </ValDt>
                         <NtryDtls>
                             {}
                         </NtryDtls>

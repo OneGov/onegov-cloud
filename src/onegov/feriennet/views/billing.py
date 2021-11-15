@@ -381,6 +381,7 @@ def view_execute_import(self, request):
                 item.tid = payments[invoice.user_id].tid
                 item.source = 'xml'
                 item.paid = True
+                item.payment_date = payments[invoice.user_id].valuta_date
 
         request.success(_("Imported ${count} payments", mapping={
             'count': len(payments)

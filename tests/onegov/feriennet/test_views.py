@@ -1352,6 +1352,8 @@ def test_import_account_statement(client, scenario):
     scenario.add_occasion(cost=100)
     scenario.add_attendee(name="Dustin")
     scenario.add_booking(state='accepted', cost=100)
+    scenario.add_attendee(name="Austin")
+    scenario.add_booking(state='accepted', cost=100)
     scenario.commit()
 
     admin = client.spawn()
@@ -1377,7 +1379,8 @@ def test_import_account_statement(client, scenario):
     assert "kein Bankkonto" not in page
 
     xml = generate_xml([
-        dict(amount='100.00 CHF', note=code)
+        dict(amount='200.00 CHF', note=code),
+        dict(amount='100.00 CHF', note='will not get matched')
     ])
 
     page.form['xml'] = Upload(
