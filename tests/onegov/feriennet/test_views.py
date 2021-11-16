@@ -1379,7 +1379,7 @@ def test_import_account_statement(client, scenario):
     assert "kein Bankkonto" not in page
 
     xml = generate_xml([
-        dict(amount='200.00 CHF', note=code),
+        dict(amount='200.00 CHF', note=code, valdat='2020-03-22'),
         dict(amount='100.00 CHF', note='will not get matched')
     ])
 

@@ -106,7 +106,8 @@ def generate_xml(payments):
 
     default = {
         'reference': '',
-        'note': ''
+        'note': '',
+        'valdat': '2016-04-12'
     }
 
     for ix, payment in enumerate(payments):
@@ -127,38 +128,35 @@ def generate_xml(payments):
                 payment[key] = default[key]
 
         transactions.append("""
-        <TxDtls>
-            <Refs>
-                <AcctSvcrRef>{tid}</AcctSvcrRef>
-            </Refs>
-            <Amt Ccy="{currency}">{amount}</Amt>
-            <CdtDbtInd>{credit}</CdtDbtInd>
-            <RmtInf>
-                <Strd>
-                    <CdtrRefInf>
-                        <Ref>{reference}</Ref>
-                    </CdtrRefInf>
-                </Strd>
-                <Ustrd>{note}</Ustrd>
-            </RmtInf>
-        </TxDtls>
+        <Ntry>
+            <ValDt>
+                <Dt>{valdat}</Dt>
+            </ValDt>
+            <NtryDtls>
+                <TxDtls>
+                    <Refs>
+                        <AcctSvcrRef>{tid}</AcctSvcrRef>
+                    </Refs>
+                    <Amt Ccy="{currency}">{amount}</Amt>
+                    <CdtDbtInd>{credit}</CdtDbtInd>
+                    <RmtInf>
+                        <Strd>
+                            <CdtrRefInf>
+                                <Ref>{reference}</Ref>
+                            </CdtrRefInf>
+                        </Strd>
+                        <Ustrd>{note}</Ustrd>
+                    </RmtInf>
+                </TxDtls>
+        </NtryDtls>
+        </Ntry>
         """.format(**payment))
 
     return """<?xml version="1.0" encoding="UTF-8"?>
         <Document>
             <BkToCstmrStmt>
                 <Stmt>
-                    <Ntry>
-                        <BookgDt>
-                            <Dt>2016-04-30</Dt>
-                        </BookgDt>
-                        <ValDt>
-                            <Dt>2016-04-30</Dt>
-                        </ValDt>
-                        <NtryDtls>
-                            {}
-                        </NtryDtls>
-                    </Ntry>
+                    {}
                 </Stmt>
             </BkToCstmrStmt>
         </Document>
