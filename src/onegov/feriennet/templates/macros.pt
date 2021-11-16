@@ -125,19 +125,19 @@
                         <tal:b condition="request.locale.startswith('it')">
                             <div>
                                 <a href="https://www.projuventute.ch/it">
-                                    Feriennet ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
+                                    Feriennet è la piattaforma di prenotazione di Pro Juventute per campi e colonie di vacanza.
                                 </a>
                                 <span>
-                                    Weitere Angebote der Stiftung finden Sie <a href="https://www.projuventute.ch/it/servizi">hier</a>.
+                                    Potete trovare altri progetti della fondazione <a href="https://www.projuventute.ch/it/servizi">qui</a>.
                                 </span>
                             </div>
 
                             <div>
-                                Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie hier <a href="https://www.projuventute.ch/it/supporto/donare?utm_source=spendenLink&utm_medium=spendenLinkFooter&utm_campaign=feriennet" class="donate-link">spenden</a>. Herzlichen Dank.
+                                Volete sostenere il nostro lavoro per i bambini e i giovani in Svizzera? Allora potete effettuare una donazione <a href="https://www.projuventute.ch/it/supporto/donare?utm_source=spendenLink&utm_medium=spendenLinkFooter&utm_campaign=feriennet" class="donate-link">qui</a>. Grazie mille..
                             </div>
 
                             <div>
-                                Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/it">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
+                                Questa piattaforma è stata realizzata grazie al generoso sostegno dei nostri <a href="https://www.projuventute.ch/it">partner</a> e sviluppata da <a href="https://www.seantis.ch">Seantis GmbH</a> con <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, supportata da <a href="https://www.netcetera.com">Netcetera AG</a>.
                             </div>
                         </tal:b>
                     </div>
