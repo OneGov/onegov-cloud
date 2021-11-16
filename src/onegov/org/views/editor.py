@@ -5,7 +5,6 @@ from webob.exc import HTTPForbidden
 
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
-from onegov.core.elements import Link
 from onegov.org.forms.page import PageUrlForm
 from onegov.org.layout import EditorLayout
 from onegov.org.management import PageNameChange
