@@ -1391,6 +1391,8 @@ def test_import_account_statement(client, scenario):
 
     page = page.form.submit()
 
+    assert "22.03.2020" in page
+
     assert "1 Zahlungen importieren" in page
     page.click("1 Zahlungen importieren")
 
