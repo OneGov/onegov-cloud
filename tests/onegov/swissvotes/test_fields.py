@@ -6,7 +6,7 @@ from io import BytesIO
 from onegov.form import Form
 from onegov.swissvotes.fields import PolicyAreaField
 from onegov.swissvotes.fields import SwissvoteDatasetField
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from xlsxwriter.workbook import Workbook
 
 
@@ -111,7 +111,7 @@ def test_swissvotes_dataset_field_missing_columns():
     form = Form()
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
     columns = [
         column for column in mapper.columns.values()
         if column != 'anr'
@@ -143,7 +143,7 @@ def test_swissvotes_dataset_field_types_and_missing_values():
     form = Form()
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
@@ -210,7 +210,7 @@ def test_swissvotes_dataset_field_all_okay():
     form = Form()
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
@@ -298,7 +298,7 @@ def test_swissvotes_dataset_skip_empty_columns():
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
 
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
 
     file = BytesIO()
     workbook = Workbook(file)

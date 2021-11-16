@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-15 10:27+0100\n"
+"POT-Creation-Date: 2021-11-16 15:55+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -32,6 +32,9 @@ msgstr "Il manque certaines colonnes: ${columns}."
 #, python-format
 msgid "Some cells contain invalid values: ${errors}."
 msgstr "Les valeurs de certaines cellules sont non valides: ${errors}"
+
+msgid "Sheet 'Metadaten zu Scans' is missing."
+msgstr "Tableau 'Metadaten zu Scans' manque."
 
 msgid "Select Some Options"
 msgstr "Sélectionner les options"
@@ -199,6 +202,12 @@ msgstr "La mise à jour de l’ensemble de données peut prendre un certain temp
 msgid "Dataset"
 msgstr "Base de données"
 
+msgid "Updating the metadata may take some time."
+msgstr "La mise à jour des métadonnées peut prendre un certain temps."
+
+msgid "Metadata"
+msgstr "Métadonnées"
+
 msgid "Votes"
 msgstr "Votations"
 
@@ -249,6 +258,9 @@ msgstr "Documents de la campagne de votation"
 
 msgid "Update dataset"
 msgstr "Actualiser la base de données"
+
+msgid "Update metadata"
+msgstr "Actualiser les métadonnées"
 
 msgid "Update external resources"
 msgstr "Actualiser des resources externes"
@@ -1435,6 +1447,48 @@ msgstr "Cette formation n'existe plus"
 msgid "unknown"
 msgstr "inconnu"
 
+msgid "Mixed"
+msgstr ""
+
+msgid "German"
+msgstr ""
+
+msgid "French"
+msgstr ""
+
+msgid "Italian"
+msgstr ""
+
+msgid "Rhaeto-Romanic"
+msgstr ""
+
+msgid "Argumentarium"
+msgstr ""
+
+msgid "Press article"
+msgstr ""
+
+msgid "Media release"
+msgstr ""
+
+msgid "Lecture"
+msgstr ""
+
+msgid "Leaflet"
+msgstr ""
+
+msgid "Essay"
+msgstr ""
+
+msgid "Letter"
+msgstr ""
+
+msgid "Legal text"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
 
@@ -1974,6 +2028,10 @@ msgstr ""
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "La base de données contient des codes inconnus."
+
+#, python-format
+msgid "Metadata updated (${added} added, ${updated} updated)"
+msgstr "Métadonnées mises à jour (${added} ajouté, ${updated} modifié)"
 
 #, python-format
 msgid ""

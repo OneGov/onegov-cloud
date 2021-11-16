@@ -698,10 +698,10 @@ def add_more_recommendation_columns(context):
             )
 
 
-@upgrade_task('Add campaign material meta column')
+@upgrade_task('Add campaign material meta column', always_run=True)
 def add_campaign_material_meta_column(context):
-    if not context.has_column('swissvotes', 'campaign_meterial_metadata'):
+    if not context.has_column('swissvotes', 'campaign_material_metadata'):
         context.operations.add_column(
             'swissvotes',
-            Column('campaign_meterial_metadata', JSON())
+            Column('campaign_material_metadata', JSON())
         )

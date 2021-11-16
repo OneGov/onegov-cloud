@@ -23,6 +23,15 @@ class VotesLayout(DefaultLayout):
             )
             result.append(
                 Link(
+                    text=_("Update metadata"),
+                    url=self.request.link(
+                        self.model.default(), name='update-metadata'
+                    ),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
+            result.append(
+                Link(
                     text=_("Update external resources"),
                     url=self.request.link(
                         self.model.default(),
@@ -63,46 +72,44 @@ class VotesLayout(DefaultLayout):
         ]
 
 
-class UpdateVotesLayout(DefaultLayout):
+class VotesActionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        raise NotImplementedError()
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.title, '#'),
+        ]
+
+
+class UpdateVotesLayout(VotesActionLayout):
 
     @cached_property
     def title(self):
         return _("Update dataset")
 
+
+class UpdateMetadataLayout(VotesActionLayout):
+
     @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
-            Link(self.title, '#'),
-        ]
+    def title(self):
+        return _("Update metadata")
 
 
-class UpdateExternalResourcesLayout(DefaultLayout):
+class UpdateExternalResourcesLayout(VotesActionLayout):
 
     @cached_property
     def title(self):
         return _("Update external resources")
 
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
-            Link(self.title, '#'),
-        ]
 
-
-class DeleteVotesLayout(DefaultLayout):
+class DeleteVotesLayout(VotesActionLayout):
 
     @cached_property
     def title(self):
         return _("Delete all votes")
-
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
-            Link(self.title, '#'),
-        ]

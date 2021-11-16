@@ -162,6 +162,36 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (None, _("unknown"))
             ))
 
+        if attribute == 'campaign_material_metadata_position':
+            return OrderedDict((
+                ('yes', _("Yes")),
+                ('no', _("No")),
+                ('neutral', _("Neutral")),
+                ('mixed', _("Mixed")),
+            ))
+
+        if attribute == 'campaign_material_metadata_language':
+            return OrderedDict((
+                ('de', _('German')),
+                ('fr', _('French')),
+                ('it', _('Italian')),
+                ('rm', _('Rhaeto-Romanic')),
+                ('mixed', _('Mixed')),
+            ))
+
+        if attribute == 'campaign_material_metadata_doctype':
+            return OrderedDict((
+                ('argument', _('Argumentarium')),
+                ('article', _('Press article')),
+                ('release', _('Media release')),
+                ('lecture', _('Lecture')),
+                ('leaflet', _('Leaflet')),
+                ('essay', _('Essay')),
+                ('letter', _('Letter')),
+                ('legal', _('Legal text')),
+                ('other', _('Other')),
+            ))
+
         raise RuntimeError(f"No codes available for '{attribute}'")
 
     id = Column(Integer, nullable=False, primary_key=True)
@@ -686,29 +716,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     campaign_material_yea = FileSubCollection()
     campaign_material_nay = FileSubCollection()
     campaign_material_other = FileSubCollection()
-    campaign_meterial_metadata = Column(JSON, nullable=False, default=dict)
-
-    # todo:
-    # language = meta_property(default=frozenset())
-    # Deutsch / Französisch / Italienisch / Rätoromanisch/ Gemischt
-    # Allemand / Français / Italien / Romanche / Divers
-    # German / French / Italian / Rhaeto-Romanic / Mixed
-    # document_type = meta_property(default=frozenset())
-
-    # title = meta_property(default='')
-    # position = meta_property(default=frozenset())
-    # Ja  / Nein  / Gemischt  / Neutral
-    # Oui / Non / Mixte / Neutre
-    # Yes  / No  / Mixed  / Neutral
-
-    # author = meta_property(default='')
-    # editor = meta_property(default='')
-    # date_year = meta_property()
-    # date_month = meta_property()
-    # date_day = meta_property()
-
-
-
+    campaign_material_metadata = Column(JSON, nullable=False, default=dict)
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))

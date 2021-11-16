@@ -834,6 +834,7 @@ def test_layout_votes(swissvotes_app):
     layout = VotesLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVoteCollection/update',
+        'SwissVoteCollection/update-metadata',
         'SwissVoteCollection/update-external-resources',
         'SwissVoteCollection/csv',
         'SwissVoteCollection/xlsx',
@@ -844,6 +845,7 @@ def test_layout_votes(swissvotes_app):
     layout = VotesLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'SwissVoteCollection/update',
+        'SwissVoteCollection/update-metadata',
         'SwissVoteCollection/update-external-resources',
         'SwissVoteCollection/csv',
         'SwissVoteCollection/xlsx',

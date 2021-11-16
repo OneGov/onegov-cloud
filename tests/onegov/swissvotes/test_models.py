@@ -5,7 +5,7 @@ from onegov.core.crypto import random_token
 from onegov.core.utils import Bunch
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes.models import Actor
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.models import Region
@@ -950,7 +950,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
 
 
 def test_model_column_mapper():
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
     vote = SwissVote()
 
     mapper.set_value(vote, 'bfs_number', Decimal('100.1'))

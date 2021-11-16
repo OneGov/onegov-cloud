@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-15 10:27+0100\n"
+"POT-Creation-Date: 2021-11-16 15:55+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -32,6 +32,9 @@ msgstr "Some columns are missing: ${columns}."
 #, python-format
 msgid "Some cells contain invalid values: ${errors}."
 msgstr "Some cells contain invalid values: ${errors}."
+
+msgid "Sheet 'Metadaten zu Scans' is missing."
+msgstr "Sheet 'Metadaten zu Scans' is missing."
 
 msgid "Select Some Options"
 msgstr "Select options"
@@ -196,6 +199,12 @@ msgstr "Updating the dataset may take some time."
 msgid "Dataset"
 msgstr "Dataset"
 
+msgid "Updating the metadata may take some time."
+msgstr "Updating the metadata may take some time."
+
+msgid "Metadata"
+msgstr "Metadata"
+
 msgid "Votes"
 msgstr "Votes"
 
@@ -246,6 +255,9 @@ msgstr "Documents from the campaign"
 
 msgid "Update dataset"
 msgstr "Update dataset"
+
+msgid "Update metadata"
+msgstr "Update metadata"
 
 msgid "Update external resources"
 msgstr "Update external resources"
@@ -1428,6 +1440,48 @@ msgstr "Organization no longer exists"
 msgid "unknown"
 msgstr "unknown"
 
+msgid "Mixed"
+msgstr "Mixed"
+
+msgid "German"
+msgstr "German"
+
+msgid "French"
+msgstr "French"
+
+msgid "Italian"
+msgstr "Italian"
+
+msgid "Rhaeto-Romanic"
+msgstr "Rhaeto-Romanic"
+
+msgid "Argumentarium"
+msgstr "Argumentarium"
+
+msgid "Press article"
+msgstr "Press article"
+
+msgid "Media release"
+msgstr "Media release"
+
+msgid "Lecture"
+msgstr "Lecture"
+
+msgid "Leaflet"
+msgstr "Leaflet"
+
+msgid "Essay"
+msgstr "Essay"
+
+msgid "Letter"
+msgstr "Letter"
+
+msgid "Legal text"
+msgstr "Legal text"
+
+msgid "Other"
+msgstr "Other"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 
@@ -1964,6 +2018,10 @@ msgstr "Dataset has been updated (${added} added, ${updated} updated)"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "The dataset contains unknown descriptors: ${items}."
+
+#, python-format
+msgid "Metadata updated (${added} added, ${updated} updated)"
+msgstr "Metadata updated (${added} added, ${updated} updated)"
 
 #, python-format
 msgid ""

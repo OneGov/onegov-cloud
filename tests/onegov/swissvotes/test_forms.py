@@ -10,7 +10,7 @@ from onegov.swissvotes.forms import PageForm
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
 from onegov.swissvotes.forms import UpdateExternalResourcesForm
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import TranslatablePage
 from xlsxwriter.workbook import Workbook
 
@@ -440,7 +440,7 @@ def test_update_dataset_form(session):
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
     workbook.add_worksheet('CITATION')
-    worksheet.write_row(0, 0, ColumnMapper().columns.values())
+    worksheet.write_row(0, 0, ColumnMapperDataset().columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr / NUMERIC
         '1.2.2008',  # datum / DATE

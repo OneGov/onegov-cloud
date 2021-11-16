@@ -3,7 +3,7 @@ from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
 
 
-class ColumnMapper(object):
+class ColumnMapperDataset(object):
     """ Defines the columns used in the dataset and provides helper functions.
 
     Typically, you want to iterate over all attributes of a vote (``columns``,
@@ -691,4 +691,87 @@ class ColumnMapper(object):
                 nullable = table_column.nullable
                 precision = getattr(table_column.type, 'precision', None)
                 scale = getattr(table_column.type, 'scale', None)
+            yield attribute, column, type_, nullable, precision, scale
+
+
+class ColumnMapperMetadata(object):
+    """ Defines the columns used for the metadata and provides helper functions.
+
+    Typically, you want to iterate over all attributes of a vote (``columns``,
+    ``items``, ``get_values``, ``get_items``) and set/get them (``set_value``,
+    ``get_value``).
+
+    """
+
+    @cached_property
+    def columns(self):
+        """ The SwissVote attribute name and its column in the metadata file.
+
+        Each line contains a type hint, a nullable hint, an attribute and
+        optionally a key for list items.
+
+        """
+
+        return OrderedDict((
+            ('n:f:bfs_number', 'Abst-Nummer'),
+            ('t:f:filename', 'Dateiname'),
+            ('t:t:title', 'Titel des Dokuments'),
+            ('t:t:position', 'Position zur Vorlage'),
+            ('t:t:author', 'AutorIn (Nachname Vorname) des Dokuments'),
+            ('t:t:editor', 'AuftraggeberIn/HerausgeberIn des Dokuments '
+                           '(typischerweise Komitee/Verband/Partei)'),
+            ('i:t:date_year', 'Datum Jahr'),
+            ('i:t:date_month', 'Datum Monat'),
+            ('i:t:date_day', 'Datum Tag'),
+            ('t:t:language!de', 'Sprache D'),
+            ('t:t:language!en', 'Sprache E'),
+            ('t:t:language!fr', 'Sprache F'),
+            ('t:t:language!it', 'Sprache IT'),
+            ('t:t:language!rm', 'Sprache RR'),
+            ('t:t:language!mixed', 'Sprache Gemischt'),
+            ('t:t:doctype!argument', 'Doktyp Argumentarium'),
+            ('t:t:doctype!article', 'Doktyp Presseartikel'),
+            ('t:t:doctype!release', 'Doktyp Medienmitteilung'),
+            ('t:t:doctype!lecture', 'Doktyp Referatstext'),
+            ('t:t:doctype!leaflet', 'Doktyp Flugblatt'),
+            ('t:t:doctype!essay', 'Doktyp Abhandlung'),
+            ('t:t:doctype!letter', 'Doktyp Brief'),
+            ('t:t:doctype!legal', 'Doktyp Rechtstext'),
+            ('t:t:doctype!other', 'Doktyp Anderes'),
+        ))
+
+    def set_value(self, data, attribute, value):
+        """ Set the given value to the metadata dict of a single line. """
+
+        attribute = attribute.split(':')[2]
+        if '!' in attribute:
+            attribute, code = attribute.split('!')
+
+            data.setdefault(attribute, [])
+            if value:
+                data[attribute].append(code)
+        elif attribute == 'position':
+            value = {
+                'Ja': 'yes',
+                'Nein': 'no',
+                'Gemischt': 'mixed',
+                'Neutral': 'neutral',
+            }.get(value, value)
+            data[attribute] = value
+        else:
+            data[attribute] = value
+
+    def items(self):
+        """ Returns the attributes and column names together with additional
+        information (type, nullable, precision, scale).
+
+        """
+
+        for attribute, column in self.columns.items():
+            type_, nullable, name = attribute.split(':')
+            nullable = {'t': True, 'f': False}.get(nullable, True)
+            precision = {'n': 8}.get(type_, None)
+            scale = {'n': 2}.get(type_, None)
+            type_ = {'n': 'NUMERIC', 'i': 'INTEGER', 't': 'TEXT'}.get(type_)
+
             yield attribute, column, type_, nullable, precision, scale

@@ -4,7 +4,7 @@ from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
 from pytest import mark
 from tests.shared import Client
@@ -108,7 +108,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
     workbook.add_worksheet('CITATION')
-    worksheet.write_row(0, 0, ColumnMapper().columns.values())
+    worksheet.write_row(0, 0, ColumnMapperDataset().columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr
         '1.2.2008',  # datum
