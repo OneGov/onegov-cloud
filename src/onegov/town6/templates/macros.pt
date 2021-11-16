@@ -250,7 +250,7 @@
 
 <metal:partners define-macro="partner-cards" i18n:domain="onegov.town6">
     <div class="partners grid-x grid-padding-x">
-        <div class="cell small-12" tal:condition="show_title|True">
+        <div class="cell small-12" tal:condition="show_title">
             <h3 tal:condition="not: title" i18n:translate>Partner</h3>
             <h3 tal:condition="title">${title}</h3>
         </div>

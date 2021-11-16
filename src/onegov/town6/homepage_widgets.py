@@ -177,9 +177,8 @@ class PartnerWidget(object):
             <xsl:variable name="apos">'</xsl:variable>
             <xsl:variable name="show_title">
                 <xsl:choose>
-                     <xsl:when test="@hide-title">
-                        <xsl:value-of
-                        select="'False'" />
+                     <xsl:when test="@show-title">
+                        <xsl:value-of select="'False'" />
                     </xsl:when>
                      <xsl:otherwise>
                         <xsl:value-of select="'True'" />
