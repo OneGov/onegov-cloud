@@ -22,12 +22,6 @@
     background: $light-gray;
 }
 
-article.content .grid-container:last-of-type {
-    @include breakpoint(medium up) {
-        padding-bottom: 1.4rem;
-    }
-}
-
 article.content .side-panel {
     @include breakpoint(small only) {
         padding-top: 4rem;
@@ -73,18 +67,8 @@ article.content .side-panel {
     }
 
     &> .grid-container {
-
-        @include breakpoint(small only) {
-            padding-bottom: .625rem;
-            padding-top: .625rem;
-        }
-
-        padding-bottom: 1.4rem;
-        padding-top: 1.4rem;
-
-        &:last-of-type {
-            padding-bottom: 0;
-        }
+        padding-bottom: 2rem;
+        padding-top: 2rem;
     }
 
     .grid-container.full {
