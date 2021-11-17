@@ -126,6 +126,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
         }
 
     def format_code(self, metadata, key):
+        metadata = metadata or {}
         values = metadata.get(key)
         if not values:
             return ''
@@ -133,10 +134,12 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
             values = [values]
         codes = self.codes.get(key, {})
         return ', '.join((
-            self.request.translate(codes.get(value, '')) for value in values
+            self.request.translate(codes[value]) for value in values
+            if value in codes
         ))
 
     def format_partial_date(self, metadata):
+        metadata = metadata or {}
         year = metadata.get('date_year')
         month = metadata.get('date_month')
         day = metadata.get('date_day')
@@ -149,14 +152,16 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
         return ''
 
     def format_sortable_date(self, metadata):
+        metadata = metadata or {}
         year = metadata.get('date_year')
         month = metadata.get('date_month') or 1
         day = metadata.get('date_day') or 1
         return date(year, month, day).strftime('%Y%m%d') if year else ''
 
     def metadata(self, filename):
-        filename = filename.replace('.pdf', '')
-        metadata = self.model.campaign_material_metadata.get(filename, {})
+        filename = (filename or '').replace('.pdf', '')
+        metadata = self.model.campaign_material_metadata or {}
+        metadata = metadata.get(filename, {})
         if not metadata:
             return {}
 
