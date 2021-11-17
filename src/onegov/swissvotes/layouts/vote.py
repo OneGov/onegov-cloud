@@ -148,6 +148,12 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
             return self.format_date(date(year, 1, 1), 'date_year')
         return ''
 
+    def format_sortable_date(self, metadata):
+        year = metadata.get('date_year')
+        month = metadata.get('date_month') or 1
+        day = metadata.get('date_day') or 1
+        return date(year, month, day).strftime('%Y%m%d') if year else ''
+
     def metadata(self, filename):
         filename = filename.replace('.pdf', '')
         metadata = self.model.campaign_material_metadata.get(filename, {})
@@ -159,6 +165,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
             'author': metadata.get('author', ''),
             'editor': metadata.get('editor', ''),
             'date': self.format_partial_date(metadata),
+            'date_sortable': self.format_sortable_date(metadata),
             'position': self.format_code(metadata, 'position'),
             'language': self.format_code(metadata, 'language'),
             'doctype': self.format_code(metadata, 'doctype'),

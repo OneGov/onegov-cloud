@@ -25,7 +25,7 @@
                             <td>${metadata['position']}</td>
                             <td>${metadata['author']}</td>
                             <td>${metadata['editor']}</td>
-                            <td>${metadata['date']}</td>
+                            <td data-text="${metadata['date_sortable']}">${metadata['date']}</td>
                             <td>${metadata['language']}</td>
                             <td>${metadata['doctype']}</td>
                         </tal:block>
