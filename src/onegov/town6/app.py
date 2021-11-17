@@ -201,6 +201,7 @@ def get_editor_asset():
     yield 'imagemanager.js'
     yield 'redactor.de.js'
     yield 'redactor.fr.js'
+    yield 'redactor.it.js'
     yield 'input_with_button.js'
     yield 'editor.js'
 
