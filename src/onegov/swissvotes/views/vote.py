@@ -235,14 +235,8 @@ def view_vote_strengths(self, request):
     name='campaign-material'
 )
 def view_vote_campaign_material(self, request):
-    codes = {
-        key: self.codes(f'campaign_material_metadata_{key}')
-        for key in ('position', 'language', 'doctype')
-    }
-
     return {
         'layout': VoteCampaignMaterialLayout(self, request),
-        'codes': codes
     }
 
 

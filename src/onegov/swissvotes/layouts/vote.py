@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from datetime import date
 from onegov.core.elements import Link
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
@@ -110,9 +111,58 @@ class VoteStrengthsLayout(VoteDetailLayout):
 
 class VoteCampaignMaterialLayout(VoteDetailLayout):
 
+    date_month_format = 'MM.yyyy'
+    date_year_format = 'yyyy'
+
     @cached_property
     def title(self):
         return _("Documents from the campaign")
+
+    @cached_property
+    def codes(self):
+        return {
+            key: self.model.codes(f'campaign_material_metadata_{key}')
+            for key in ('position', 'language', 'doctype')
+        }
+
+    def format_code(self, metadata, key):
+        values = metadata.get(key)
+        if not values:
+            return ''
+        if isinstance(values, str):
+            values = [values]
+        codes = self.codes.get(key, {})
+        return ', '.join((
+            self.request.translate(codes.get(value, '')) for value in values
+        ))
+
+    def format_partial_date(self, metadata):
+        year = metadata.get('date_year')
+        month = metadata.get('date_month')
+        day = metadata.get('date_day')
+        if year and month and day:
+            return self.format_date(date(year, month, day), 'date')
+        if year and month:
+            return self.format_date(date(year, month, 1), 'date_month')
+        if year:
+            return self.format_date(date(year, 1, 1), 'date_year')
+        return ''
+
+    def metadata(self, filename):
+        filename = filename.replace('.pdf', '')
+        metadata = self.model.campaign_material_metadata.get(filename, {})
+        if not metadata:
+            return {}
+
+        return {
+            'title': metadata.get('title', '') or filename,
+            'author': metadata.get('author', ''),
+            'editor': metadata.get('editor', ''),
+            'date': self.format_partial_date(metadata),
+            'position': self.format_code(metadata, 'position'),
+            'language': self.format_code(metadata, 'language'),
+            'doctype': self.format_code(metadata, 'doctype'),
+        }
 
 
 class UploadVoteAttachemtsLayout(VoteDetailLayout):

@@ -19,21 +19,15 @@
             </thead>
             <tbody>
                 <tr tal:repeat="file vote.campaign_material_other">
-                    <tal:block tal:define="metadata vote.campaign_material_metadata.get(file.filename.replace('.pdf', ''), {})">
+                    <tal:block tal:define="metadata layout.metadata(file.filename)">
                         <tal:block tal:condition="metadata">
-                            <td>
-                                <a href="${request.link(file)}" target="_blank" >${metadata.get('title') or file.filename}</a>
-                            </td>
-                            <td tal:define="value metadata.get('position')" i18n:translate>${codes['position'].get(value, value)}</td>
-                            <td>${metadata.get('author')}</td>
-                            <td>${metadata.get('editor')}</td>
-                            <td>${metadata.get('')}</td>
-                            <td>
-                                <span tal:repeat="value metadata.get('language')" i18n:translate>${codes['language'].get(value, value)}</span>
-                            </td>
-                            <td>
-                                <span tal:repeat="value metadata.get('doctype')" i18n:translate>${codes['doctype'].get(value, value)}</span>
-                            </td>
+                            <td><a href="${request.link(file)}" target="_blank" >${metadata['title']}</a></td>
+                            <td>${metadata['position']}</td>
+                            <td>${metadata['author']}</td>
+                            <td>${metadata['editor']}</td>
+                            <td>${metadata['date']}</td>
+                            <td>${metadata['language']}</td>
+                            <td>${metadata['doctype']}</td>
                         </tal:block>
                         <tal:block tal:condition="not: metadata">
                             <td colspan="7">

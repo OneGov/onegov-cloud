@@ -217,12 +217,6 @@ h2 small {
     }
 }
 
-.campaign-material {
-    td span:not(:first-child)::before {
-        content: ", ";
-    }
-}
-
 /*
     Content pages
 */
