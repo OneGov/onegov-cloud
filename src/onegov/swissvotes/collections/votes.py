@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 from decimal import InvalidOperation
 from onegov.core.collection import Pagination
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import func
@@ -463,7 +463,7 @@ class SwissVoteCollection(Pagination):
         updated = 0
         query = self.session.query(SwissVote)
         existing = {vote.bfs_number: vote for vote in query}
-        mapper = ColumnMapper()
+        mapper = ColumnMapperDataset()
         for vote in votes:
             old = existing.get(vote.bfs_number)
             if old:
@@ -481,6 +481,24 @@ class SwissVoteCollection(Pagination):
 
         return added, updated
 
+    def update_metadata(self, metadata):
+        added = 0
+        updated = 0
+        for bfs_number, files in metadata.items():
+            vote = self.session.query(SwissVote)
+            vote = vote.filter_by(bfs_number=bfs_number).first()
+            if vote:
+                for filename, data in files.items():
+                    old = vote.campaign_material_metadata.get(filename)
+                    if not old:
+                        added += 1
+                        vote.campaign_material_metadata[filename] = data
+                    elif old != data:
+                        updated += 1
+                        vote.campaign_material_metadata[filename] = data
+
+        return added, updated
+
     @property
     def last_modified(self):
         """ Returns the last change of any votes. """
@@ -488,7 +506,7 @@ class SwissVoteCollection(Pagination):
 
     def export_csv(self, file):
         """ Exports all votes according to the code book. """
-        mapper = ColumnMapper()
+        mapper = ColumnMapperDataset()
 
         csv = writer(file)
         csv.writerow(mapper.columns.values())
@@ -515,7 +533,7 @@ class SwissVoteCollection(Pagination):
 
     def export_xlsx(self, file):
         """ Exports all votes according to the code book. """
-        mapper = ColumnMapper()
+        mapper = ColumnMapperDataset()
 
         workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
         workbook.add_worksheet('CITATION')

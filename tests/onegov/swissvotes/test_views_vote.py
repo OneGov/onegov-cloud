@@ -77,7 +77,7 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert "(40.01% Ja-Stimmen)" in page
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
-    assert "Kampagnenmaterial Ja" in page
+    assert "Bildmaterial der Ja-Kampagne" in page
     assert "Offizielle Chronologie" in page
     assert "Ergebnisübersicht Bundeskanzlei" in page
     assert "(mehrheitlich befürwortend)" in page
@@ -585,8 +585,35 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     page = client.get('/').maybe_follow().click('Abstimmungen')
     page = page.click('Details')
 
+    # Other
+    manage = page.click('Kampagnenmaterial')
+    assert 'Keine Anhänge.' in manage
+
+    # ... upload
+    file = campaign_material['campaign_material_other-leaflet.pdf']
+    manage.form['file'] = Upload(
+        'leaflet.pdf',
+        file.reference.file.read(),
+        'application/pdf'
+    )
+    manage = manage.form.submit().maybe_follow()
+    assert manage.status_code == 200
+
+    manage = page.click('Kampagnenmaterial')
+    assert 'leaflet.pdf' in manage
+    assert manage.click('leaflet.pdf').content_type == 'application/pdf'
+
+    # ... view
+    details = client.get('/').maybe_follow().click('Abstimmungen')
+    details = details.click('Details').click('Liste der Dokumente anzeigen')
+    assert 'leaflet.pdf' in details
+
+    # ... delete
+    manage = manage.click('Löschen').form.submit().maybe_follow()
+    assert 'Keine Anhänge.' in manage
+
     # Yea
-    manage = page.click('Kampagnenmaterial Ja')
+    manage = page.click('Bildmaterial der Ja-Kampagne')
     assert 'Keine Anhänge.' in manage
 
     # ... upload
@@ -598,7 +625,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
-    manage = page.click('Kampagnenmaterial Ja')
+    manage = page.click('Bildmaterial der Ja-Kampagne')
     assert '1.png' in manage
     assert manage.click('1.png').content_type == 'image/png'
 
@@ -607,7 +634,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     assert 'Keine Anhänge.' in manage
 
     # Nay
-    manage = page.click('Kampagnenmaterial Nein')
+    manage = page.click('Bildmaterial der Nein-Kampagne')
     assert 'Keine Anhänge.' in manage
 
     # ... upload
@@ -619,7 +646,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
-    manage = page.click('Kampagnenmaterial Nein')
+    manage = page.click('Bildmaterial der Nein-Kampagne')
     assert '1.png' in manage
     assert manage.click('1.png').content_type == 'image/png'
 

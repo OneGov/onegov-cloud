@@ -357,14 +357,20 @@
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
+                    <tr tal:condition="vote.campaign_material_other">
+                        <th class="column-30" i18n:translate="">Documents from the campaign</th>
+                        <td>
+                            <a href="${request.link(vote, name='campaign-material')}" i18n:translate="">Display the list of documents</a>
+                        </td>
+                    </tr>
                     <tr tal:condition="posters['yea']">
-                        <th class="column-30" i18n:translate="">Campaign material for a Yes</th>
+                        <th class="column-30" i18n:translate="">Graphical campaign material for a Yes</th>
                         <td>
                             <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['yea']; id_suffix 'yea'" />
                         </td>
                     </tr>
                     <tr tal:condition="posters['nay']">
-                        <th class="column-30" i18n:translate="">Campaign material for a No</th>
+                        <th class="column-30" i18n:translate="">Graphical campaign material for a No</th>
                         <td>
                             <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items posters['nay']; id_suffix 'nay'" />
                         </td>

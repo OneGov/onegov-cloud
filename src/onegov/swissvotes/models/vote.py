@@ -2,7 +2,7 @@ from cached_property import cached_property
 from collections import OrderedDict
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
-from onegov.core.orm.mixins import meta_property
+from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.core.utils import Bunch
@@ -162,6 +162,38 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (None, _("unknown"))
             ))
 
+    @staticmethod
+    def metadata_codes(attribute):
+        if attribute == 'position':
+            return OrderedDict((
+                ('yes', _("Yes")),
+                ('no', _("No")),
+                ('neutral', _("Neutral")),
+                ('mixed', _("Mixed")),
+            ))
+
+        if attribute == 'language':
+            return OrderedDict((
+                ('de', _('German')),
+                ('fr', _('French')),
+                ('it', _('Italian')),
+                ('rm', _('Rhaeto-Romanic')),
+                ('mixed', _('Mixed')),
+            ))
+
+        if attribute == 'doctype':
+            return OrderedDict((
+                ('argument', _('Argumentarium')),
+                ('article', _('Press article')),
+                ('release', _('Media release')),
+                ('lecture', _('Lecture')),
+                ('leaflet', _('Leaflet')),
+                ('essay', _('Essay')),
+                ('letter', _('Letter')),
+                ('legal', _('Legal text')),
+                ('other', _('Other')),
+            ))
+
         raise RuntimeError(f"No codes available for '{attribute}'")
 
     id = Column(Integer, nullable=False, primary_key=True)
@@ -194,30 +226,30 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             pass
 
     # Additional links
-    link_curia_vista_de = meta_property()
-    link_curia_vista_fr = meta_property()
+    link_curia_vista_de = content_property()
+    link_curia_vista_fr = content_property()
     link_curia_vista = localized_property()
-    link_bk_results_de = meta_property()
-    link_bk_results_fr = meta_property()
+    link_bk_results_de = content_property()
+    link_bk_results_fr = content_property()
     link_bk_results = localized_property()
-    link_bk_chrono_de = meta_property()
-    link_bk_chrono_fr = meta_property()
+    link_bk_chrono_de = content_property()
+    link_bk_chrono_fr = content_property()
     link_bk_chrono = localized_property()
-    link_federal_council_de = meta_property()
-    link_federal_council_fr = meta_property()
-    link_federal_council_en = meta_property()
+    link_federal_council_de = content_property()
+    link_federal_council_fr = content_property()
+    link_federal_council_en = content_property()
     link_federal_council = localized_property()
-    link_federal_departement_de = meta_property()
-    link_federal_departement_fr = meta_property()
-    link_federal_departement_en = meta_property()
+    link_federal_departement_de = content_property()
+    link_federal_departement_fr = content_property()
+    link_federal_departement_en = content_property()
     link_federal_departement = localized_property()
-    link_federal_office_de = meta_property()
-    link_federal_office_fr = meta_property()
-    link_federal_office_en = meta_property()
+    link_federal_office_de = content_property()
+    link_federal_office_fr = content_property()
+    link_federal_office_en = content_property()
     link_federal_office = localized_property()
-    link_post_vote_poll_de = meta_property()
-    link_post_vote_poll_fr = meta_property()
-    link_post_vote_poll_en = meta_property()
+    link_post_vote_poll_de = content_property()
+    link_post_vote_poll_fr = content_property()
+    link_post_vote_poll_en = content_property()
     link_post_vote_poll = localized_property()
 
     # space-separated poster URLs coming from the dataset
@@ -227,12 +259,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     posters_sa_nay = Column(Text)
 
     # Fetched list of image urls using MfG API
-    posters_mfg_yea_imgs = meta_property(default=dict)
-    posters_mfg_nay_imgs = meta_property(default=dict)
+    posters_mfg_yea_imgs = content_property(default=dict)
+    posters_mfg_nay_imgs = content_property(default=dict)
 
     # Fetched list of image urls using SA API
-    posters_sa_yea_imgs = meta_property(default=dict)
-    posters_sa_nay_imgs = meta_property(default=dict)
+    posters_sa_yea_imgs = content_property(default=dict)
+    posters_sa_nay_imgs = content_property(default=dict)
 
     def posters(self, request):
         result = {'yea': [], 'nay': []}
@@ -685,6 +717,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     campaign_material_yea = FileSubCollection()
     campaign_material_nay = FileSubCollection()
+    campaign_material_other = FileSubCollection()
+    campaign_material_metadata = Column(JSON, nullable=False, default=dict)
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))

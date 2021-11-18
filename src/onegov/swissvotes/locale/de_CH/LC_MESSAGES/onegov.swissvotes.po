@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-11 09:45+0100\n"
+"POT-Creation-Date: 2021-11-18 09:28+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -22,9 +22,6 @@ msgstr "Keine Daten."
 msgid "Sheet DATA is missing."
 msgstr "Tabellenblatt DATA fehlt."
 
-msgid "Sheet CITATION is missing."
-msgstr "Tabellenblatt CITATION fehlt."
-
 #, python-format
 msgid "Some columns are missing: ${columns}."
 msgstr "Einige Spalten fehlen: ${columns}."
@@ -32,6 +29,9 @@ msgstr "Einige Spalten fehlen: ${columns}."
 #, python-format
 msgid "Some cells contain invalid values: ${errors}."
 msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
+
+msgid "Sheet 'Metadaten zu Scans' is missing."
+msgstr "Tabellenblatt 'Metadaten zu Scans' fehlt."
 
 msgid "Select Some Options"
 msgstr "Optionen auswählen"
@@ -200,6 +200,12 @@ msgstr ""
 msgid "Dataset"
 msgstr "Datensatz"
 
+msgid "Updating the metadata may take some time."
+msgstr "Die Aktualisierung der Metadaten kann einige Zeit in Anspruch nehmen."
+
+msgid "Metadata"
+msgstr "Metadaten"
+
 msgid "Votes"
 msgstr "Abstimmungen"
 
@@ -230,11 +236,14 @@ msgstr "Seite hinzufügen"
 msgid "Delete attachment"
 msgstr "Anhang löschen"
 
-msgid "Campaign material for a Yes"
-msgstr "Kampagnenmaterial Ja"
+msgid "Campaign material"
+msgstr "Kampagnenmaterial"
 
-msgid "Campaign material for a No"
-msgstr "Kampagnenmaterial Nein"
+msgid "Graphical campaign material for a Yes"
+msgstr "Bildmaterial der Ja-Kampagne"
+
+msgid "Graphical campaign material for a No"
+msgstr "Bildmaterial der Nein-Kampagne"
 
 msgid "Delete vote"
 msgstr "Abstimmung löschen"
@@ -242,8 +251,14 @@ msgstr "Abstimmung löschen"
 msgid "Voter strengths"
 msgstr "Wählerstärken"
 
+msgid "Documents from the campaign"
+msgstr "Dokumente aus der Abstimmungskampagne"
+
 msgid "Update dataset"
 msgstr "Datensatz aktualisieren"
+
+msgid "Update metadata"
+msgstr "Metadaten aktualisieren"
 
 msgid "Update external resources"
 msgstr "Externe Quellen aktualisieren"
@@ -1424,6 +1439,48 @@ msgstr "Organisation existiert nicht mehr"
 msgid "unknown"
 msgstr "unbekannt"
 
+msgid "Mixed"
+msgstr "Gemischt"
+
+msgid "German"
+msgstr "Deutsch"
+
+msgid "French"
+msgstr "Französisch"
+
+msgid "Italian"
+msgstr "Italienisch"
+
+msgid "Rhaeto-Romanic"
+msgstr "Rätoromanisch"
+
+msgid "Argumentarium"
+msgstr "Argumentarium"
+
+msgid "Press article"
+msgstr "Presseartikel"
+
+msgid "Media release"
+msgstr "Medienmitteilung"
+
+msgid "Lecture"
+msgstr "Referatstext"
+
+msgid "Leaflet"
+msgstr "Flugblatt"
+
+msgid "Essay"
+msgstr "Abhandlung"
+
+msgid "Letter"
+msgstr "Brief"
+
+msgid "Legal text"
+msgstr "Rechtstext"
+
+msgid "Other"
+msgstr "Anderes"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 
@@ -1462,6 +1519,27 @@ msgstr "Dateien hierhin ziehen, um sie hochzuladen"
 
 msgid "Upload"
 msgstr "Hochladen"
+
+msgid "Document title"
+msgstr "Titel des Dokuments"
+
+msgid "Position towards the vote"
+msgstr "Position zur Vorlage"
+
+msgid "Author"
+msgstr "Autor:in"
+
+msgid "Edited by"
+msgstr "Auftraggeber:in / Herausgeber:in"
+
+msgid "Date of publication"
+msgstr "Datum des Dokuments"
+
+msgid "Language"
+msgstr "Sprache"
+
+msgid "Type of document"
+msgstr "Dokumententyp"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -1732,6 +1810,9 @@ msgstr "(mehrheitlich befürwortend)"
 msgid "(predominantly negative)"
 msgstr "(mehrheitlich ablehnend)"
 
+msgid "Display the list of documents"
+msgstr "Liste der Dokumente anzeigen"
+
 msgid "People"
 msgstr "Volk"
 
@@ -1943,6 +2024,10 @@ msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
+
+#, python-format
+msgid "Metadata updated (${added} added, ${updated} updated)"
+msgstr "Metadaten aktualisiert (${added} hinzugefügt, ${updated} geändert)"
 
 #, python-format
 msgid ""

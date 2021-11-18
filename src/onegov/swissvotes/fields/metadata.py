@@ -1,17 +1,14 @@
-from dateutil.parser import parse
 from decimal import Decimal
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
-from onegov.swissvotes.models import ColumnMapperDataset
-from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import ColumnMapperMetadata
 from openpyxl import load_workbook
-from openpyxl.utils.datetime import from_excel
 
 
-class SwissvoteDatasetField(UploadField):
-    """ An upload field expecting a Swissvotes dataset (XLSX). """
+class SwissvoteMetadataField(UploadField):
+    """ An upload field expecting Swissvotes metadata (XLSX). """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('validators', [])
@@ -39,8 +36,8 @@ class SwissvoteDatasetField(UploadField):
         """ Make sure the given XLSX is valid (all expected columns are
         present all cells contain reasonable values).
 
-        Converts the XLSX to a list of SwissVote objects, available as
-        ``data``.
+        Converts the XLSX to a list of metadata dictionaries objects,
+        available as ``data``.
 
         """
 
@@ -49,8 +46,8 @@ class SwissvoteDatasetField(UploadField):
             return
 
         errors = []
-        data = []
-        mapper = ColumnMapperDataset()
+        data = {}
+        mapper = ColumnMapperMetadata()
 
         try:
             workbook = load_workbook(self.raw_data[0].file, data_only=True)
@@ -60,10 +57,10 @@ class SwissvoteDatasetField(UploadField):
         if len(workbook.worksheets) < 1:
             raise ValueError(_("No data."))
 
-        if 'DATA' not in workbook.sheetnames:
-            raise ValueError(_('Sheet DATA is missing.'))
+        if 'Metadaten zu Scans' not in workbook.sheetnames:
+            raise ValueError(_("Sheet 'Metadaten zu Scans' is missing."))
 
-        sheet = workbook['DATA']
+        sheet = workbook['Metadaten zu Scans']
 
         if sheet.max_row <= 1:
             raise ValueError(_("No data."))
@@ -77,7 +74,7 @@ class SwissvoteDatasetField(UploadField):
             ))
 
         for index in range(2, sheet.max_row + 1):
-            vote = SwissVote()
+            metadata = {}
             all_columns_empty = True
             column_errors = []
             for (
@@ -96,15 +93,6 @@ class SwissvoteDatasetField(UploadField):
                         else:
                             value = str(cell.value)
                         value = '' if value == '.' else value
-                    elif type_ == 'DATE':
-                        if cell.data_type == 's':
-                            value = parse(cell.value, dayfirst=True).date()
-                        elif cell.data_type == 'n':
-                            value = from_excel(cell.value).date()
-                        elif cell.data_type == 'd':
-                            value = cell.value.date()
-                        else:
-                            raise ValueError('Not a valid date format')
                     elif type_ == 'INTEGER':
                         if cell.data_type == 's':
                             value = cell.value
@@ -127,18 +115,22 @@ class SwissvoteDatasetField(UploadField):
                     all_columns_empty = all_columns_empty and value is None
 
                 except Exception:
-                    errors.append((
+                    column_errors.append((
                         index, column, f"'{value}' ≠ {type_.lower()}"
                     ))
 
                 else:
                     if not nullable and value is None:
                         column_errors.append((index, column, "∅"))
-                    mapper.set_value(vote, attribute, value)
+                    mapper.set_value(metadata, attribute, value)
 
             if not all_columns_empty:
                 errors.extend(column_errors)
-                data.append(vote)
+                if not column_errors:
+                    bfs_number = metadata['bfs_number']
+                    filename = metadata['filename']
+                    data.setdefault(bfs_number, {})
+                    data[bfs_number][filename] = metadata
 
         if errors:
             raise ValueError(_(

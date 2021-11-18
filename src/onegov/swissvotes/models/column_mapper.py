@@ -3,7 +3,7 @@ from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
 
 
-class ColumnMapper(object):
+class ColumnMapperDataset(object):
     """ Defines the columns used in the dataset and provides helper functions.
 
     Typically, you want to iterate over all attributes of a vote (``columns``,
@@ -30,8 +30,8 @@ class ColumnMapper(object):
             ('keyword', 'stichwort'),
             ('_legal_form', 'rechtsform'),
             ('anneepolitique', 'anneepolitique'),
-            ('!t!meta!link_bk_chrono_de', 'bkchrono-de'),
-            ('!t!meta!link_bk_chrono_fr', 'bkchrono-fr'),
+            ('!t!content!link_bk_chrono_de', 'bkchrono-de'),
+            ('!t!content!link_bk_chrono_fr', 'bkchrono-fr'),
             ('descriptor_1_level_1', 'd1e1'),
             ('descriptor_1_level_2', 'd1e2'),
             ('descriptor_1_level_3', 'd1e3'),
@@ -42,8 +42,8 @@ class ColumnMapper(object):
             ('descriptor_3_level_2', 'd3e2'),
             ('descriptor_3_level_3', 'd3e3'),
             ('_position_federal_council', 'br-pos'),
-            ('!t!meta!link_curia_vista_de', 'curiavista-de'),
-            ('!t!meta!link_curia_vista_fr', 'curiavista-fr'),
+            ('!t!content!link_curia_vista_de', 'curiavista-de'),
+            ('!t!content!link_curia_vista_fr', 'curiavista-fr'),
             ('_position_parliament', 'bv-pos'),
             ('_position_national_council', 'nr-pos'),
             ('position_national_council_yeas', 'nrja'),
@@ -615,26 +615,26 @@ class ColumnMapper(object):
             ('_result_ne_accepted', 'ne-annahme'),
             ('_result_ge_accepted', 'ge-annahme'),
             ('_result_ju_accepted', 'ju-annahme'),
-            ('!t!meta!link_bk_results_de', 'bkresults-de'),
-            ('!t!meta!link_bk_results_fr', 'bkresults-fr'),
-            ('!t!meta!link_federal_council_de', 'info_br-de'),
-            ('!t!meta!link_federal_council_fr', 'info_br-fr'),
-            ('!t!meta!link_federal_council_en', 'info_br-en'),
-            ('!t!meta!link_federal_departement_de', 'info_dep-de'),
-            ('!t!meta!link_federal_departement_fr', 'info_dep-fr'),
-            ('!t!meta!link_federal_departement_en', 'info_dep-en'),
-            ('!t!meta!link_federal_office_de', 'info_amt-de'),
-            ('!t!meta!link_federal_office_fr', 'info_amt-fr'),
-            ('!t!meta!link_federal_office_en', 'info_amt-en'),
+            ('!t!content!link_bk_results_de', 'bkresults-de'),
+            ('!t!content!link_bk_results_fr', 'bkresults-fr'),
+            ('!t!content!link_federal_council_de', 'info_br-de'),
+            ('!t!content!link_federal_council_fr', 'info_br-fr'),
+            ('!t!content!link_federal_council_en', 'info_br-en'),
+            ('!t!content!link_federal_departement_de', 'info_dep-de'),
+            ('!t!content!link_federal_departement_fr', 'info_dep-fr'),
+            ('!t!content!link_federal_departement_en', 'info_dep-en'),
+            ('!t!content!link_federal_office_de', 'info_amt-de'),
+            ('!t!content!link_federal_office_fr', 'info_amt-fr'),
+            ('!t!content!link_federal_office_en', 'info_amt-en'),
             ('bfs_map_de', 'bfsmap-de'),
             ('bfs_map_fr', 'bfsmap-fr'),
             ('media_ads_total', 'inserate-total'),
             ('media_ads_yea_p', 'inserate-jaanteil'),
             ('media_coverage_articles_total', 'mediares-tot'),
             ('media_coverage_tonality_total', 'mediaton-tot'),
-            ('!t!meta!link_post_vote_poll_de', 'nach_cockpit_d'),
-            ('!t!meta!link_post_vote_poll_fr', 'nach_cockpit_f'),
-            ('!t!meta!link_post_vote_poll_en', 'nach_cockpit_e'),
+            ('!t!content!link_post_vote_poll_de', 'nach_cockpit_d'),
+            ('!t!content!link_post_vote_poll_fr', 'nach_cockpit_f'),
+            ('!t!content!link_post_vote_poll_en', 'nach_cockpit_e'),
             ('procedure_number', 'gesch_nr'),
             ('brief_description_title', 'kurzbetitel'),
         ))
@@ -691,4 +691,87 @@ class ColumnMapper(object):
                 nullable = table_column.nullable
                 precision = getattr(table_column.type, 'precision', None)
                 scale = getattr(table_column.type, 'scale', None)
+            yield attribute, column, type_, nullable, precision, scale
+
+
+class ColumnMapperMetadata(object):
+    """ Defines the columns used for the metadata and provides helper functions.
+
+    Typically, you want to iterate over all attributes of a vote (``columns``,
+    ``items``, ``get_values``, ``get_items``) and set/get them (``set_value``,
+    ``get_value``).
+
+    """
+
+    @cached_property
+    def columns(self):
+        """ The SwissVote attribute name and its column in the metadata file.
+
+        Each line contains a type hint, a nullable hint, an attribute and
+        optionally a key for list items.
+
+        """
+
+        return OrderedDict((
+            ('n:f:bfs_number', 'Abst-Nummer'),
+            ('t:f:filename', 'Dateiname'),
+            ('t:t:title', 'Titel des Dokuments'),
+            ('t:t:position', 'Position zur Vorlage'),
+            ('t:t:author', 'AutorIn (Nachname Vorname) des Dokuments'),
+            ('t:t:editor', 'AuftraggeberIn/HerausgeberIn des Dokuments '
+                           '(typischerweise Komitee/Verband/Partei)'),
+            ('i:t:date_year', 'Datum Jahr'),
+            ('i:t:date_month', 'Datum Monat'),
+            ('i:t:date_day', 'Datum Tag'),
+            ('t:t:language!de', 'Sprache D'),
+            ('t:t:language!en', 'Sprache E'),
+            ('t:t:language!fr', 'Sprache F'),
+            ('t:t:language!it', 'Sprache IT'),
+            ('t:t:language!rm', 'Sprache RR'),
+            ('t:t:language!mixed', 'Sprache Gemischt'),
+            ('t:t:doctype!argument', 'Doktyp Argumentarium'),
+            ('t:t:doctype!article', 'Doktyp Presseartikel'),
+            ('t:t:doctype!release', 'Doktyp Medienmitteilung'),
+            ('t:t:doctype!lecture', 'Doktyp Referatstext'),
+            ('t:t:doctype!leaflet', 'Doktyp Flugblatt'),
+            ('t:t:doctype!essay', 'Doktyp Abhandlung'),
+            ('t:t:doctype!letter', 'Doktyp Brief'),
+            ('t:t:doctype!legal', 'Doktyp Rechtstext'),
+            ('t:t:doctype!other', 'Doktyp Anderes'),
+        ))
+
+    def set_value(self, data, attribute, value):
+        """ Set the given value to the metadata dict of a single line. """
+
+        attribute = attribute.split(':')[2]
+        if '!' in attribute:
+            attribute, code = attribute.split('!')
+
+            data.setdefault(attribute, [])
+            if value:
+                data[attribute].append(code)
+        elif attribute == 'position':
+            value = {
+                'Ja': 'yes',
+                'Nein': 'no',
+                'Gemischt': 'mixed',
+                'Neutral': 'neutral',
+            }.get(value, value)
+            data[attribute] = value
+        else:
+            data[attribute] = value
+
+    def items(self):
+        """ Returns the attributes and column names together with additional
+        information (type, nullable, precision, scale).
+
+        """
+
+        for attribute, column in self.columns.items():
+            type_, nullable, name = attribute.split(':')
+            nullable = {'t': True, 'f': False}.get(nullable, True)
+            precision = {'n': 8}.get(type_, None)
+            scale = {'n': 2}.get(type_, None)
+            type_ = {'n': 'NUMERIC', 'i': 'INTEGER', 't': 'TEXT'}.get(type_)
+
             yield attribute, column, type_, nullable, precision, scale

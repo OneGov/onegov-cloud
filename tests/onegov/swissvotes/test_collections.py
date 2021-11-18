@@ -342,7 +342,7 @@ def test_votes_query(swissvotes_app):
         _position_national_council=2,
         _result=1,
     )
-    vote_2 = votes.add(
+    votes.add(
         id=2,
         bfs_number=Decimal('200.1'),
         date=date(1990, 9, 2),
@@ -364,7 +364,7 @@ def test_votes_query(swissvotes_app):
         _position_national_council=1,
         _result=1
     )
-    vote_3 = votes.add(
+    votes.add(
         id=3,
         bfs_number=Decimal('200.2'),
         date=date(1990, 9, 2),
@@ -801,6 +801,64 @@ def test_votes_update(swissvotes_app):
     assert added == 0
     assert updated == 1
     assert votes.by_bfs_number(Decimal('1')).title == 'First vote'
+
+
+def test_votes_update_metadata(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
+    vote_1 = votes.add(
+        bfs_number=Decimal('1'),
+        date=date(1990, 6, 1),
+        title_de="First",
+        title_fr="First",
+        short_title_de="First",
+        short_title_fr="First",
+        _legal_form=1,
+    )
+    vote_2 = votes.add(
+        bfs_number=Decimal('2'),
+        date=date(1990, 6, 1),
+        title_de="Second",
+        title_fr="Second",
+        short_title_de="Second",
+        short_title_fr="Second",
+        _legal_form=1,
+    )
+
+    added, updated = votes.update_metadata({
+        Decimal('1'): {
+            'essay.pdf': {'a': 10, 'b': 11},
+            'leafet.pdf': {'a': 20, 'c': 21},
+        },
+        Decimal('3'): {
+            'article.pdf': {'a': 30, 'b': 31},
+        },
+    })
+    assert added == 2
+    assert updated == 0
+
+    added, updated = votes.update_metadata({
+        Decimal('1'): {
+            'essay.pdf': {'a': 10, 'b': 12},
+            'letter.pdf': {'a': 40},
+        },
+        Decimal('2'): {
+            'legal.pdf': {'a': 40},
+        },
+        Decimal('3'): {
+            'article.pdf': {'a': 30, 'b': 31},
+        },
+    })
+    assert added == 2
+    assert updated == 1
+
+    assert vote_1.campaign_material_metadata == {
+        'essay.pdf': {'a': 10, 'b': 12},
+        'leafet.pdf': {'a': 20, 'c': 21},
+        'letter.pdf': {'a': 40}
+    }
+    assert vote_2.campaign_material_metadata == {
+        'legal.pdf': {'a': 40}
+    }
 
 
 def test_votes_export(swissvotes_app):

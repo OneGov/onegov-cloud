@@ -1,13 +1,13 @@
 from decimal import Decimal
 from io import BytesIO
-
 from onegov.core.utils import module_path
 from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
 from pytest import mark
 from tests.shared import Client
+from transaction import commit
 from unittest.mock import patch
 from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
@@ -108,7 +108,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
     workbook.add_worksheet('CITATION')
-    worksheet.write_row(0, 0, ColumnMapper().columns.values())
+    worksheet.write_row(0, 0, ColumnMapperDataset().columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr
         '1.2.2008',  # datum
@@ -145,6 +145,54 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     manage = manage.form.submit().follow()
     assert "Datensatz aktualisiert (1 hinzugefügt, 0 geändert)" in manage
     assert "unbekannte Deskriptoren: 12.55, 12.6, 13" in manage
+
+
+@mark.parametrize('file', [
+    module_path('tests.onegov.swissvotes', 'fixtures/metadata.xlsx'),
+])
+def test_view_update_metdata(swissvotes_app, file, sample_vote):
+    session = swissvotes_app.session()
+    sample_vote.bfs_number = Decimal('236')
+    session.add(sample_vote)
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    with open(file, 'rb') as f:
+        content = f.read()
+
+    # Upload
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Metadaten aktualisieren")
+    manage.form['metadata'] = Upload(
+        'metadata.xlsx',
+        content,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    manage = manage.form.submit().follow()
+
+    assert "Metadaten aktualisiert (30 hinzugefügt, 0 geändert)" in manage
+
+    session = swissvotes_app.session()
+    vote = session.query(SwissVote).filter_by(bfs_number=236).one()
+    assert len(vote.campaign_material_metadata) == 32
+
+    # Upload (unchanged)
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Metadaten aktualisieren")
+    manage.form['metadata'] = Upload(
+        'metadata.xlsx',
+        content,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    manage = manage.form.submit().follow()
+    assert "Metadaten aktualisiert (0 hinzugefügt, 0 geändert)" in manage
 
 
 @patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, {Decimal('4')}))

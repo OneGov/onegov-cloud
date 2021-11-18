@@ -11,8 +11,10 @@ from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
 from onegov.swissvotes.forms import UpdateExternalResourcesForm
+from onegov.swissvotes.forms import UpdateMetadataForm
 from onegov.swissvotes.layouts import DeleteVotesLayout
 from onegov.swissvotes.layouts import UpdateExternalResourcesLayout
+from onegov.swissvotes.layouts import UpdateMetadataLayout
 from onegov.swissvotes.layouts import UpdateVotesLayout
 from onegov.swissvotes.layouts import VotesLayout
 from translationstring import TranslationString
@@ -72,6 +74,38 @@ def update_votes(self, request, form):
                 ),
                 'warning'
             )
+
+        return request.redirect(layout.votes_url)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'cancel': request.link(self),
+        'button_text': _("Update"),
+    }
+
+
+@SwissvotesApp.form(
+    model=SwissVoteCollection,
+    permission=Private,
+    form=UpdateMetadataForm,
+    template='form.pt',
+    name='update-metadata'
+)
+def update_metadata(self, request, form):
+    self = self.default()
+
+    layout = UpdateMetadataLayout(self, request)
+
+    if form.submitted(request):
+        added, updated = self.update_metadata(form.metadata.data)
+        request.message(
+            _(
+                "Metadata updated (${added} added, ${updated} updated)",
+                mapping={'added': added, 'updated': updated}
+            ),
+            'success'
+        )
 
         return request.redirect(layout.votes_url)
 

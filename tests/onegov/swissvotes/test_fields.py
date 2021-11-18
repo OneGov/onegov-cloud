@@ -2,11 +2,12 @@ from cgi import FieldStorage
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
-
 from onegov.form import Form
 from onegov.swissvotes.fields import PolicyAreaField
 from onegov.swissvotes.fields import SwissvoteDatasetField
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.fields import SwissvoteMetadataField
+from onegov.swissvotes.models import ColumnMapperDataset
+from onegov.swissvotes.models import ColumnMapperMetadata
 from xlsxwriter.workbook import Workbook
 
 
@@ -16,14 +17,6 @@ class DummyPostData(dict):
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
-
-
-def test_swissvotes_dataset_field_validators():
-    form = Form()
-    field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
-    assert field()
-    assert len(field.validators) == 2
 
 
 def test_swissvotes_dataset_field_corrupt():
@@ -41,14 +34,13 @@ def test_swissvotes_dataset_field_corrupt():
     assert "Not a valid XLSX file." in field.errors
 
 
-def test_swissvotes_dataset_field_missing_sheet_data():
+def test_swissvotes_dataset_field_missing_sheet():
     form = Form()
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
 
     file = BytesIO()
     workbook = Workbook(file)
-    workbook.add_worksheet('CITATION')
     workbook.close()
     file.seek(0)
 
@@ -63,28 +55,6 @@ def test_swissvotes_dataset_field_missing_sheet_data():
     assert "Sheet DATA is missing." in field.errors
 
 
-def test_swissvotes_dataset_field_missing_sheet_citations():
-    form = Form()
-    field = SwissvoteDatasetField()
-    field = field.bind(form, 'dataset')
-
-    file = BytesIO()
-    workbook = Workbook(file)
-    workbook.add_worksheet('DATA')
-    workbook.close()
-    file.seek(0)
-
-    field_storage = FieldStorage()
-    field_storage.type = 'application/excel'
-    field_storage.filename = 'test.xlsx'
-    field_storage.file = file
-    field.process(DummyPostData({'dataset': field_storage}))
-
-    # It raises for the first sheet it cant find
-    assert not field.validate(form)
-    assert "Sheet CITATION is missing." in field.errors
-
-
 def test_swissvotes_dataset_field_empty():
     form = Form()
     field = SwissvoteDatasetField()
@@ -93,7 +63,6 @@ def test_swissvotes_dataset_field_empty():
     file = BytesIO()
     workbook = Workbook(file)
     workbook.add_worksheet('DATA')
-    workbook.add_worksheet('CITATION')
     workbook.close()
     file.seek(0)
 
@@ -111,7 +80,7 @@ def test_swissvotes_dataset_field_missing_columns():
     form = Form()
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
     columns = [
         column for column in mapper.columns.values()
         if column != 'anr'
@@ -120,7 +89,6 @@ def test_swissvotes_dataset_field_missing_columns():
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
-    workbook.add_worksheet('CITATION')
 
     worksheet.write_row(0, 0, columns)
     worksheet.write_row(1, 0, columns)
@@ -143,11 +111,10 @@ def test_swissvotes_dataset_field_types_and_missing_values():
     form = Form()
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
-    workbook.add_worksheet('CITATION')
     worksheet.write_row(0, 0, mapper.columns.values())
     for row, content in enumerate(('', None, 'x', 1, 1.1, date(2018, 12, 12))):
         worksheet.write_row(row + 1, 0, [
@@ -210,11 +177,10 @@ def test_swissvotes_dataset_field_all_okay():
     form = Form()
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
-    workbook.add_worksheet('CITATION')
     worksheet.write_row(0, 0, mapper.columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr / NUMERIC
@@ -298,11 +264,10 @@ def test_swissvotes_dataset_skip_empty_columns():
     field = SwissvoteDatasetField()
     field = field.bind(form, 'dataset')
 
-    mapper = ColumnMapper()
+    mapper = ColumnMapperDataset()
 
     file = BytesIO()
     workbook = Workbook(file)
-    workbook.add_worksheet('CITATION')
     worksheet = workbook.add_worksheet('DATA')
     worksheet.write_row(0, 0, mapper.columns.values())
     worksheet.write_row(8, 0, [
@@ -348,6 +313,383 @@ def test_swissvotes_dataset_skip_empty_columns():
     assert field.data[0].short_title_fr == 'titel_kurz_f'
     assert field.data[0].keyword == 'stichwort'
     assert field.data[0]._legal_form == 3
+
+
+def test_swissvotes_metadata_field_corrupt():
+    form = Form()
+    field = SwissvoteMetadataField()
+    field = field.bind(form, 'metadata')
+
+    field_storage = FieldStorage()
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+    field_storage.file = BytesIO(b'Test')
+    field.process(DummyPostData({'metadata': field_storage}))
+
+    assert not field.validate(form)
+    assert "Not a valid XLSX file." in field.errors
+
+
+def test_swissvotes_metadata_field_missing_sheet():
+    form = Form()
+    field = SwissvoteMetadataField()
+    field = field.bind(form, 'metadata')
+
+    file = BytesIO()
+    workbook = Workbook(file)
+    workbook.close()
+    file.seek(0)
+
+    field_storage = FieldStorage()
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+    field_storage.file = file
+    field.process(DummyPostData({'metadata': field_storage}))
+
+    # It raises for the first sheet it cant find
+    assert not field.validate(form)
+    assert "Sheet 'Metadaten zu Scans' is missing." in field.errors
+
+
+def test_swissvotes_metadata_field_empty():
+    form = Form()
+    field = SwissvoteMetadataField()
+    field = field.bind(form, 'metadata')
+
+    file = BytesIO()
+    workbook = Workbook(file)
+    workbook.add_worksheet('Metadaten zu Scans')
+    workbook.close()
+    file.seek(0)
+
+    field_storage = FieldStorage()
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+    field_storage.file = file
+    field.process(DummyPostData({'metadata': field_storage}))
+
+    assert not field.validate(form)
+    assert "No data." in field.errors
+
+
+def test_swissvotes_metadata_field_missing_columns():
+    form = Form()
+    field = SwissvoteMetadataField()
+    field = field.bind(form, 'metadata')
+    mapper = ColumnMapperMetadata()
+    columns = [
+        column for column in mapper.columns.values()
+        if column != 'Dateiname'
+    ]
+
+    file = BytesIO()
+    workbook = Workbook(file)
+    worksheet = workbook.add_worksheet('Metadaten zu Scans')
+
+    worksheet.write_row(0, 0, columns)
+    worksheet.write_row(1, 0, columns)
+    workbook.close()
+    file.seek(0)
+
+    field_storage = FieldStorage()
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+    field_storage.file = file
+    field.process(DummyPostData({'metadata': field_storage}))
+
+    assert not field.validate(form)
+    errors = [error.interpolate() for error in field.errors]
+
+    assert 'Some columns are missing: Dateiname.' in errors
+
+
+def test_swissvotes_metadata_field_types_and_missing_values():
+    form = Form()
+    field = SwissvoteMetadataField()
+    field = field.bind(form, 'metadata')
+    mapper = ColumnMapperMetadata()
+    file = BytesIO()
+    workbook = Workbook(file)
+    worksheet = workbook.add_worksheet('Metadaten zu Scans')
+    worksheet.write_row(0, 0, mapper.columns.values())
+    for row, content in enumerate(('', None, 'x', 1, 1.1)):
+        worksheet.write_row(row + 1, 0, [
+            content,  # Abst-Nummer
+            content,  # Dateiname
+            content,  # Titel des Dokuments
+            content,  # Position zur Vorlage
+            content,  # AutorIn (Nachname Vorname) des Dokuments
+            content,  # AuftraggeberIn/HerausgeberIn des Dokuments
+            content,  # Datum Jahr
+            content,  # Datum Monat
+            content,  # Datum Tag
+            content,  # Sprache D
+            content,  # Sprache E
+            content,  # Sprache F
+            content,  # Sprache IT
+            content,  # Sprache RR
+            content,  # Sprache Gemischt
+            content,  # Doktyp Argumentarium
+            content,  # Doktyp Presseartikel
+            content,  # Doktyp Medienmitteilung
+            content,  # Doktyp Referatstext
+            content,  # Doktyp Flugblatt
+            content,  # Doktyp Abhandlung
+            content,  # Doktyp Brief
+            content,  # Doktyp Rechtstext
+            'xxx'     # avoid being ignore because all cells are empty
+        ])
+    workbook.close()
+    file.seek(0)
+
+    field_storage = FieldStorage()
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+    field_storage.file = file
+    field.process(DummyPostData({'metadata': field_storage}))
+
+    assert not field.validate(form)
+    error = [error.interpolate() for error in field.errors][0]
+
+    assert "2:Abst-Nummer ∅" in error
+    assert "2:Dateiname ∅" in error
+
+    assert "3:Abst-Nummer ∅" in error
+    assert "3:Dateiname ∅" in error
+
+    assert "4:Abst-Nummer 'x' ≠ numeric" in error
+    assert "4:Datum Jahr 'x' ≠ integer" in error
+    assert "4:Datum Monat 'x' ≠ integer" in error
+    assert "4:Datum Tag 'x' ≠ integer" in error
+
+
+def test_swissvotes_metadata_field_all_okay():
+    form = Form()
+    field = SwissvoteMetadataField()
+    field = field.bind(form, 'metadata')
+    mapper = ColumnMapperMetadata()
+    file = BytesIO()
+    workbook = Workbook(file)
+    worksheet = workbook.add_worksheet('Metadaten zu Scans')
+    worksheet.write_row(0, 0, mapper.columns.values())
+    worksheet.write_row(1, 0, [
+        '100.1',  # Abst-Nummer
+        'letter.pdf',  # Dateiname
+        'Brief',  # Titel des Dokuments
+        'Ja',  # Position zur Vorlage
+        'Autor',  # AutorIn (Nachname Vorname) des Dokuments
+        'Herausgeber',  # AuftraggeberIn/HerausgeberIn des Dokuments
+        '1970',  # Datum Jahr
+        '12',  # Datum Monat
+        '31',  # Datum Tag
+        'x',  # Sprache D
+        'x',  # Sprache E
+        'x',  # Sprache F
+        'x',  # Sprache IT
+        'x',  # Sprache RR
+        'x',  # Sprache Gemischt
+        'x',  # Doktyp Argumentarium
+        'x',  # Doktyp Presseartikel
+        'x',  # Doktyp Medienmitteilung
+        'x',  # Doktyp Referatstext
+        'x',  # Doktyp Flugblatt
+        'x',  # Doktyp Abhandlung
+        'x',  # Doktyp Brief
+        'x',  # Doktyp Rechtstext
+        'x',  # Doktyp Anderes
+    ])
+    worksheet.write_row(2, 0, [
+        '100.1',  # Abst-Nummer
+        'article.pdf',  # Dateiname
+        'Presseartikel',  # Titel des Dokuments
+        'Gemischt',  # Position zur Vorlage
+        'A.',  # AutorIn (Nachname Vorname) des Dokuments
+        'H.',  # AuftraggeberIn/HerausgeberIn des Dokuments
+        '1980',  # Datum Jahr
+        '',  # Datum Monat
+        '',  # Datum Tag
+        'x',  # Sprache D
+        '',  # Sprache E
+        '',  # Sprache F
+        '',  # Sprache IT
+        '',  # Sprache RR
+        '',  # Sprache Gemischt
+        '',  # Doktyp Argumentarium
+        'x',  # Doktyp Presseartikel
+        '',  # Doktyp Medienmitteilung
+        '',  # Doktyp Referatstext
+        '',  # Doktyp Flugblatt
+        '',  # Doktyp Abhandlung
+        '',  # Doktyp Brief
+        '',  # Doktyp Rechtstext
+        '',  # Doktyp Anderes
+    ])
+    worksheet.write_row(3, 0, [
+        '100.2',  # Abst-Nummer
+        'other.pdf',  # Dateiname
+        '',  # Titel des Dokuments
+        '',  # Position zur Vorlage
+        '',  # AutorIn (Nachname Vorname) des Dokuments
+        '',  # AuftraggeberIn/HerausgeberIn des Dokuments
+        '',  # Datum Jahr
+        '',  # Datum Monat
+        '',  # Datum Tag
+        '',  # Sprache D
+        '',  # Sprache E
+        '',  # Sprache F
+        '',  # Sprache IT
+        '',  # Sprache RR
+        '',  # Sprache Gemischt
+        '',  # Doktyp Argumentarium
+        '',  # Doktyp Presseartikel
+        '',  # Doktyp Medienmitteilung
+        '',  # Doktyp Referatstext
+        '',  # Doktyp Flugblatt
+        '',  # Doktyp Abhandlung
+        '',  # Doktyp Brief
+        '',  # Doktyp Rechtstext
+        '',  # Doktyp Anderes
+    ])
+    workbook.close()
+    file.seek(0)
+
+    field_storage = FieldStorage()
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+    field_storage.file = file
+    field.process(DummyPostData({'metadata': field_storage}))
+
+    assert field.validate(form)
+    assert not field.errors
+    assert field.data == {
+        Decimal('100.10'): {
+            'letter.pdf': {
+                'author': 'Autor',
+                'bfs_number': Decimal('100.10'),
+                'date_day': 31,
+                'date_month': 12,
+                'date_year': 1970,
+                'doctype': [
+                    'argument',
+                    'article',
+                    'release',
+                    'lecture',
+                    'leaflet',
+                    'essay',
+                    'letter',
+                    'legal',
+                    'other'
+                ],
+                'editor': 'Herausgeber',
+                'filename': 'letter.pdf',
+                'language': [
+                    'de',
+                    'en',
+                    'fr',
+                    'it',
+                    'rm',
+                    'mixed'
+                ],
+                'position': 'yes',
+                'title': 'Brief'
+            },
+            'article.pdf': {
+                'author': 'A.',
+                'bfs_number': Decimal('100.10'),
+                'date_day': None,
+                'date_month': None,
+                'date_year': 1980,
+                'doctype': ['article'],
+                'editor': 'H.',
+                'filename': 'article.pdf',
+                'language': ['de'],
+                'position': 'mixed',
+                'title': 'Presseartikel'
+            }
+        },
+        Decimal('100.20'): {
+            'other.pdf': {
+                'author': None,
+                'bfs_number': Decimal('100.20'),
+                'date_day': None,
+                'date_month': None,
+                'date_year': None,
+                'doctype': [],
+                'editor': None,
+                'filename': 'other.pdf',
+                'language': [],
+                'position': None,
+                'title': None
+            },
+        }
+    }
+
+
+def test_swissvotes_metadata_skip_empty_columns():
+    form = Form()
+    field = SwissvoteMetadataField()
+    field = field.bind(form, 'metadata')
+
+    mapper = ColumnMapperMetadata()
+
+    file = BytesIO()
+    workbook = Workbook(file)
+    worksheet = workbook.add_worksheet('Metadaten zu Scans')
+    worksheet.write_row(0, 0, mapper.columns.values())
+    worksheet.write_row(8, 0, [
+        '100.2',  # Abst-Nummer
+        'other.pdf',  # Dateiname
+        '',  # Titel des Dokuments
+        '',  # Position zur Vorlage
+        '',  # AutorIn (Nachname Vorname) des Dokuments
+        '',  # AuftraggeberIn/HerausgeberIn des Dokuments
+        '',  # Datum Jahr
+        '',  # Datum Monat
+        '',  # Datum Tag
+        '',  # Sprache D
+        '',  # Sprache E
+        '',  # Sprache F
+        '',  # Sprache IT
+        '',  # Sprache RR
+        '',  # Sprache Gemischt
+        '',  # Doktyp Argumentarium
+        '',  # Doktyp Presseartikel
+        '',  # Doktyp Medienmitteilung
+        '',  # Doktyp Referatstext
+        '',  # Doktyp Flugblatt
+        '',  # Doktyp Abhandlung
+        '',  # Doktyp Brief
+        '',  # Doktyp Rechtstext
+        '',  # Doktyp Anderes
+    ])
+    workbook.close()
+    file.seek(0)
+
+    field_storage = FieldStorage()
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+    field_storage.file = file
+    field.process(DummyPostData({'metadata': field_storage}))
+
+    assert field.validate(form)
+    assert not field.errors
+    assert field.data == {
+        Decimal('100.20'): {
+            'other.pdf': {
+                'author': None,
+                'bfs_number': Decimal('100.20'),
+                'date_day': None,
+                'date_month': None,
+                'date_year': None,
+                'doctype': [],
+                'editor': None,
+                'filename': 'other.pdf',
+                'language': [],
+                'position': None,
+                'title': None
+            }
+        }
+    }
 
 
 def test_policy_area_field():

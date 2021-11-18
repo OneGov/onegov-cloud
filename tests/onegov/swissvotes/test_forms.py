@@ -2,7 +2,6 @@ from cgi import FieldStorage
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
-
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.forms import AttachmentsForm
@@ -10,7 +9,9 @@ from onegov.swissvotes.forms import PageForm
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
 from onegov.swissvotes.forms import UpdateExternalResourcesForm
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.forms import UpdateMetadataForm
+from onegov.swissvotes.models import ColumnMapperDataset
+from onegov.swissvotes.models import ColumnMapperMetadata
 from onegov.swissvotes.models import TranslatablePage
 from xlsxwriter.workbook import Workbook
 
@@ -439,8 +440,7 @@ def test_update_dataset_form(session):
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
-    workbook.add_worksheet('CITATION')
-    worksheet.write_row(0, 0, ColumnMapper().columns.values())
+    worksheet.write_row(0, 0, ColumnMapperDataset().columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr / NUMERIC
         '1.2.2008',  # datum / DATE
@@ -473,6 +473,57 @@ def test_update_dataset_form(session):
     field_storage.filename = 'test.xlsx'
 
     form.dataset.process(DummyPostData({'dataset': field_storage}))
+
+    assert form.validate()
+
+
+def test_update_metadata_form(session):
+    request = DummyRequest(session, DummyPrincipal())
+
+    # Validate
+    form = UpdateMetadataForm()
+    form.request = request
+    assert not form.validate()
+
+    file = BytesIO()
+    workbook = Workbook(file)
+    worksheet = workbook.add_worksheet('Metadaten zu Scans')
+    worksheet.write_row(0, 0, ColumnMapperMetadata().columns.values())
+    worksheet.write_row(1, 0, [
+        '100.1',  # Abst-Nummer
+        'letter.pdf',  # Dateiname
+        'Brief',  # Titel des Dokuments
+        'Ja',  # Position zur Vorlage
+        'Autor',  # AutorIn (Nachname Vorname) des Dokuments
+        'Herausgeber',  # AuftraggeberIn/HerausgeberIn des Dokuments
+        '1970',  # Datum Jahr
+        '12',  # Datum Monat
+        '31',  # Datum Tag
+        'x',  # Sprache D
+        'x',  # Sprache E
+        'x',  # Sprache F
+        'x',  # Sprache IT
+        'x',  # Sprache RR
+        'x',  # Sprache Gemischt
+        'x',  # Doktyp Argumentarium
+        'x',  # Doktyp Presseartikel
+        'x',  # Doktyp Medienmitteilung
+        'x',  # Doktyp Referatstext
+        'x',  # Doktyp Flugblatt
+        'x',  # Doktyp Abhandlung
+        'x',  # Doktyp Brief
+        'x',  # Doktyp Rechtstext
+        'x',  # Doktyp Anderes
+    ])
+    workbook.close()
+    file.seek(0)
+
+    field_storage = FieldStorage()
+    field_storage.file = file
+    field_storage.type = 'application/excel'
+    field_storage.filename = 'test.xlsx'
+
+    form.metadata.process(DummyPostData({'metadata': field_storage}))
 
     assert form.validate()
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-11 09:45+0100\n"
+"POT-Creation-Date: 2021-11-18 09:28+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -22,9 +22,6 @@ msgstr "Aucune donnée"
 msgid "Sheet DATA is missing."
 msgstr "Tableau DATA manque."
 
-msgid "Sheet CITATION is missing."
-msgstr "Tableau CITATION manque."
-
 #, python-format
 msgid "Some columns are missing: ${columns}."
 msgstr "Il manque certaines colonnes: ${columns}."
@@ -32,6 +29,9 @@ msgstr "Il manque certaines colonnes: ${columns}."
 #, python-format
 msgid "Some cells contain invalid values: ${errors}."
 msgstr "Les valeurs de certaines cellules sont non valides: ${errors}"
+
+msgid "Sheet 'Metadaten zu Scans' is missing."
+msgstr "Tableau 'Metadaten zu Scans' manque."
 
 msgid "Select Some Options"
 msgstr "Sélectionner les options"
@@ -199,6 +199,12 @@ msgstr "La mise à jour de l’ensemble de données peut prendre un certain temp
 msgid "Dataset"
 msgstr "Base de données"
 
+msgid "Updating the metadata may take some time."
+msgstr "La mise à jour des métadonnées peut prendre un certain temps."
+
+msgid "Metadata"
+msgstr "Métadonnées"
+
 msgid "Votes"
 msgstr "Votations"
 
@@ -229,11 +235,14 @@ msgstr "Nouvelle page"
 msgid "Delete attachment"
 msgstr "Supprimer la pièce jointe"
 
-msgid "Campaign material for a Yes"
-msgstr "Matériel de campagne pour le oui"
+msgid "Campaign material"
+msgstr "Matériel de la campagne"
 
-msgid "Campaign material for a No"
-msgstr "Matériel de campagne pour le non"
+msgid "Graphical campaign material for a Yes"
+msgstr "Matériel visuel de la campagne pour le oui"
+
+msgid "Graphical campaign material for a No"
+msgstr "Matériel visuel de la campagne pour le non"
 
 msgid "Delete vote"
 msgstr "Supprimer cette votation"
@@ -241,8 +250,14 @@ msgstr "Supprimer cette votation"
 msgid "Voter strengths"
 msgstr "Poids électoraux"
 
+msgid "Documents from the campaign"
+msgstr "Documents de la campagne de votation"
+
 msgid "Update dataset"
 msgstr "Actualiser la base de données"
+
+msgid "Update metadata"
+msgstr "Actualiser les métadonnées"
 
 msgid "Update external resources"
 msgstr "Actualiser des resources externes"
@@ -1429,6 +1444,48 @@ msgstr "Cette formation n'existe plus"
 msgid "unknown"
 msgstr "inconnu"
 
+msgid "Mixed"
+msgstr ""
+
+msgid "German"
+msgstr ""
+
+msgid "French"
+msgstr ""
+
+msgid "Italian"
+msgstr ""
+
+msgid "Rhaeto-Romanic"
+msgstr ""
+
+msgid "Argumentarium"
+msgstr ""
+
+msgid "Press article"
+msgstr ""
+
+msgid "Media release"
+msgstr ""
+
+msgid "Lecture"
+msgstr ""
+
+msgid "Leaflet"
+msgstr ""
+
+msgid "Essay"
+msgstr ""
+
+msgid "Letter"
+msgstr ""
+
+msgid "Legal text"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
 
@@ -1467,6 +1524,27 @@ msgstr "Veuillez glisser les fichiers à importer ici"
 
 msgid "Upload"
 msgstr "Charger"
+
+msgid "Document title"
+msgstr "Titre du document"
+
+msgid "Position towards the vote"
+msgstr "Position vis-à-vis de la votation"
+
+msgid "Author"
+msgstr "Auteur:e"
+
+msgid "Edited by"
+msgstr "Mandant:e / éditeur:trice"
+
+msgid "Date of publication"
+msgstr "Date du document"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Type of document"
+msgstr "Type de document"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -1736,6 +1814,9 @@ msgstr "(majoritairement en faveur)"
 msgid "(predominantly negative)"
 msgstr "(majoritairement en défaveur)"
 
+msgid "Display the list of documents"
+msgstr "Afficher la liste des documents"
+
 msgid "People"
 msgstr "Peuple"
 
@@ -1944,6 +2025,10 @@ msgstr ""
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "La base de données contient des codes inconnus."
+
+#, python-format
+msgid "Metadata updated (${added} added, ${updated} updated)"
+msgstr "Métadonnées mises à jour (${added} ajouté, ${updated} modifié)"
 
 #, python-format
 msgid ""
