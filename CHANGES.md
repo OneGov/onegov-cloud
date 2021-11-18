@@ -1,8 +1,30 @@
 # Changes
 
+## 2021.91
+
+`2021-11-18` | [cfd18ef3a0...e64ae929a8](https://github.com/OneGov/onegov-cloud/compare/cfd18ef3a0^...e64ae929a8)
+
+### Org
+
+##### Fix typo
+
+`Other` | [OGC-126](https://linear.app/onegovcloud/issue/OGC-126) | [a5f96aa73b](https://github.com/onegov/onegov-cloud/commit/a5f96aa73b2c1cb6830c159b54dfc781b75fef0a)
+
+### Swissvotes
+
+##### Add additional campaign material.
+
+`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [e64ae929a8](https://github.com/onegov/onegov-cloud/commit/e64ae929a80fbcead446273a2443b04b9ab75f75)
+
+### Town6
+
+##### Improve footer logo spacing.
+
+`Other` | [OGC-124](https://linear.app/onegovcloud/issue/OGC-124) | [34e115b8ed](https://github.com/onegov/onegov-cloud/commit/34e115b8ed4ab11a0a30c4c285503ecd43c18c6f)
+
 ## 2021.90
 
-`2021-11-16` | [f9d62e2108...a765b1f79e](https://github.com/OneGov/onegov-cloud/compare/f9d62e2108^...a765b1f79e)
+`2021-11-16` | [f9d62e2108...0960f2c7a5](https://github.com/OneGov/onegov-cloud/compare/f9d62e2108^...0960f2c7a5)
 
 ### Core
 
@@ -1396,8 +1418,4 @@ Fixes IconField in DirectoryForm town6.
 ## 2021.42
 
 `2021-04-15` | [4d9fa2f5ff...e5d040398b](https://github.com/OneGov/onegov-cloud/compare/4d9fa2f5ff^...e5d040398b)
-
-## 2021.41
-
-`2021-04-15` | [28790c3ee9...dba3ab2168](https://github.com/OneGov/onegov-cloud/compare/28790c3ee9^...dba3ab2168)
 
