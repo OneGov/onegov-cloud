@@ -5,7 +5,6 @@ from click.testing import CliRunner
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
-from onegov.core.cli.commands import cli as core_cli
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
@@ -73,27 +72,6 @@ def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
     result = run_command(cfg_path, 'govikon', ['add'])
     assert result.exit_code == 1
     assert "This selector may not reference an existing path" in result.output
-
-
-def test_cli_delete_instance(postgres_dsn, temporary_directory, redis_url):
-
-    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
-
-    result = run_command(cfg_path, 'govikon', ['add'])
-    assert result.exit_code == 0
-    assert "Instance was created successfully" in result.output
-
-    result = CliRunner().invoke(
-        core_cli, [
-            '--config', cfg_path, '--select', '/onegov_swissvotes/govikon',
-            'delete'
-        ],
-        input='y\n'
-    )
-
-    assert result.exit_code == 0
-    assert "Instance was deleted successfully" in result.output
 
 
 def test_cli_import_attachments(session_manager, temporary_directory,
