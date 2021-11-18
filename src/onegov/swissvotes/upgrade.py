@@ -2,37 +2,18 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from onegov.core.orm import as_selectable
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
-from onegov.swissvotes.collections import TranslatablePageCollection
-from onegov.swissvotes.models import SwissVote
-from onegov.swissvotes.models import TranslatablePage
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
 @upgrade_task('Rename recommendation columns')
 def rename_recommendation_columns(context):
-    for old, new in (
-        ('ucsp', 'csp'),
-        ('sbv', 'sbv_usp'),
-        ('cng_travs', 'travs'),
-        ('zsa', 'sav')
-    ):
-        old = f'recommendation_{old}'
-        new = f'recommendation_{new}'
-        if (
-            context.has_column('swissvotes', old)
-            and not context.has_column('swissvotes', new)
-        ):
-            context.operations.alter_column(
-                'swissvotes', old, new_column_name=new
-            )
+    pass  # deleted later
 
 
 @upgrade_task('Add tsvector columns')
@@ -43,9 +24,6 @@ def add_tsvector_columns(context):
                 'swissvotes', Column(column, TSVECTOR())
             )
 
-    for vote in context.app.session().query(SwissVote):
-        vote.vectorize_files()
-
 
 @upgrade_task('Add parliament position columns')
 def add_parliament_position_columns(context):
@@ -55,16 +33,6 @@ def add_parliament_position_columns(context):
         if not context.has_column('swissvotes', col):
             context.operations.add_column('swissvotes', Column(col, Integer))
 
-    for vote in context.app.session().query(SwissVote):
-        for col in columns:
-            yeas = getattr(vote, f'{col}_yeas')
-            nays = getattr(vote, f'{col}_nays')
-            if yeas is not None and nays is not None:
-                if yeas > nays:
-                    setattr(vote, f'_{col}', 1)
-                elif yeas < nays:
-                    setattr(vote, f'_{col}', 2)
-
 
 @upgrade_task('Add cantonal result columns')
 def add_cantonal_result_columns(context):
@@ -73,27 +41,11 @@ def add_cantonal_result_columns(context):
         'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur', 'vd', 'vs',
         'zg', 'zh'
     ):
-        for column in (
-            f'result_{canton}_eligible_voters',
-            f'result_{canton}_votes_valid',
-            f'result_{canton}_votes_total',
-            f'result_{canton}_yeas',
-            f'result_{canton}_nays',
-            f'result_{canton}_accepted'
-        ):
-            if not context.has_column('swissvotes', column):
-                context.operations.add_column(
-                    'swissvotes', Column(column, Integer)
-                )
-
-        for column in (
-            f'result_{canton}_turnout',
-            f'result_{canton}_yeas_p'
-        ):
-            if not context.has_column('swissvotes', column):
-                context.operations.add_column(
-                    'swissvotes', Column(column, Numeric(13, 10))
-                )
+        column = f'result_{canton}_accepted'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes', Column(column, Integer)
+            )
 
 
 @upgrade_task('Add order column to pages')
@@ -108,19 +60,6 @@ def add_order_column_to_pagess(context):
             Column('order', Integer, default=2 ** 16)
         )
 
-        default = (
-            'home', 'disclaimer', 'imprint', 'data-protection', 'dataset',
-            'about', 'contact'
-        )
-        pages = TranslatablePageCollection(context.app.session())
-        for id in default:
-            pages.setdefault(id)
-        for order, id in enumerate(default):
-            pages.by_id(id).order = order
-        for page in pages.query().filter(TranslatablePage.id.notin_(default)):
-            order += 1
-            page.order = order
-
 
 @upgrade_task('Add recommendations column')
 def add_recommendations_column(context):
@@ -130,72 +69,6 @@ def add_recommendations_column(context):
             Column('recommendations', JSON())
         )
 
-        query = as_selectable("""
-            SELECT
-                id,  -- Integer
-                recommendation_fdp,  -- Integer
-                recommendation_cvp,  -- Integer
-                recommendation_sps,  -- Integer
-                recommendation_svp,  -- Integer
-                recommendation_lps,  -- Integer
-                recommendation_ldu,  -- Integer
-                recommendation_evp,  -- Integer
-                recommendation_csp,  -- Integer
-                recommendation_pda,  -- Integer
-                recommendation_poch,  -- Integer
-                recommendation_gps,  -- Integer
-                recommendation_sd,  -- Integer
-                recommendation_rep,  -- Integer
-                recommendation_edu,  -- Integer
-                recommendation_fps,  -- Integer
-                recommendation_lega,  -- Integer
-                recommendation_kvp,  -- Integer
-                recommendation_glp,  -- Integer
-                recommendation_bdp,  -- Integer
-                recommendation_mcg,  -- Integer
-                recommendation_sav,  -- Integer
-                recommendation_eco,  -- Integer
-                recommendation_sgv,  -- Integer
-                recommendation_sbv_usp,  -- Integer
-                recommendation_sgb,  -- Integer
-                recommendation_travs,  -- Integer
-                recommendation_vsa  -- Integer
-            FROM
-                swissvotes
-        """)
-        session = context.app.session_manager.session()
-        for result in session.execute(select(query.c)):
-            vote = session.query(SwissVote).filter_by(id=result.id).one()
-            vote.recommendations = {
-                'fdp': result.recommendation_fdp,
-                'cvp': result.recommendation_cvp,
-                'sps': result.recommendation_sps,
-                'svp': result.recommendation_svp,
-                'lps': result.recommendation_lps,
-                'ldu': result.recommendation_ldu,
-                'evp': result.recommendation_evp,
-                'csp': result.recommendation_csp,
-                'pda': result.recommendation_pda,
-                'poch': result.recommendation_poch,
-                'gps': result.recommendation_gps,
-                'sd': result.recommendation_sd,
-                'rep': result.recommendation_rep,
-                'edu': result.recommendation_edu,
-                'fps': result.recommendation_fps,
-                'lega': result.recommendation_lega,
-                'kvp': result.recommendation_kvp,
-                'glp': result.recommendation_glp,
-                'bdp': result.recommendation_bdp,
-                'mcg': result.recommendation_mcg,
-                'sav': result.recommendation_sav,
-                'eco': result.recommendation_eco,
-                'sgv': result.recommendation_sgv,
-                'sbv_usp': result.recommendation_sbv_usp,
-                'sgb': result.recommendation_sgb,
-                'travs': result.recommendation_travs,
-                'vsa': result.recommendation_vsa,
-            }
-
     for column in (
         'recommendation_fdp',
         'recommendation_cvp',
@@ -204,6 +77,7 @@ def add_recommendations_column(context):
         'recommendation_lps',
         'recommendation_ldu',
         'recommendation_evp',
+        'recommendation_ucsp',
         'recommendation_csp',
         'recommendation_pda',
         'recommendation_poch',
@@ -217,11 +91,14 @@ def add_recommendations_column(context):
         'recommendation_glp',
         'recommendation_bdp',
         'recommendation_mcg',
+        'recommendation_zsa',
         'recommendation_sav',
         'recommendation_eco',
         'recommendation_sgv',
+        'recommendation_sbv',
         'recommendation_sbv_usp',
         'recommendation_sgb',
+        'recommendation_cng_travs',
         'recommendation_travs',
         'recommendation_vsa'
     ):
@@ -256,10 +133,7 @@ def add_divergent_recommendations_column(context):
 
 @upgrade_task('Rename sbv-usp column')
 def rename_sbv_usp_column(context):
-    for vote in context.app.session().query(SwissVote):
-        if 'sbv_usp' in vote.recommendations:
-            vote.recommendations['sbv-usp'] = vote.recommendations['sbv_usp']
-            del vote.recommendations['sbv_usp']
+    pass
 
 
 @upgrade_task('Adds french and short titles')
@@ -298,19 +172,7 @@ def remove_decade_column(context):
 
 @upgrade_task('Adds links for extensions 2019')
 def add_curiavista_and_additional_links(context):
-
-    new_cols = (
-        'curia_vista_de',
-        'curia_vista_fr',
-        'bkresults_de',
-        'bkresults_fr',
-        'bkchrono_de',
-        'bkchrono_fr'
-    )
-
-    for col in new_cols:
-        if not context.has_column('swissvotes', col):
-            context.operations.add_column('swissvotes', Column(col, Text()))
+    pass  # deleted
 
 
 @upgrade_task('Adds poster_yes and poster_no')
@@ -340,10 +202,7 @@ def add_meta_content(context):
 
 @upgrade_task('Adds swissvoteslink')
 def add_swissvoteslink(context):
-    if not context.has_column('swissvotes', 'swissvoteslink'):
-        context.operations.add_column(
-            'swissvotes', Column('swissvoteslink', Text())
-        )
+    pass  # deleted later
 
 
 @upgrade_task('Changes procedure number type to text')
@@ -355,31 +214,16 @@ def change_procedure_number_type(context):
 
 @upgrade_task('Adds post-vote poll links')
 def add_post_vote_poll_links(context):
-    columns = (
-        'post_vote_poll_link_de',
-        'post_vote_poll_link_fr',
-        'post_vote_poll_link_en'
-    )
-    for column in columns:
-        if not context.has_column('swissvotes', column):
-            context.operations.add_column('swissvotes', Column(column, Text()))
+    pass  # deleted later
 
 
 @upgrade_task('Adds media fields')
 def add_media_fields(context):
     columns = (
         ('media_ads_total', Integer()),
-        ('media_ads_per_issue', Numeric(13, 10)),
-        ('media_ads_yea', Integer()),
-        ('media_ads_nay', Integer()),
-        ('media_ads_neutral', Integer()),
         ('media_ads_yea_p', Numeric(13, 10)),
         ('media_coverage_articles_total', Integer()),
-        ('media_coverage_articles_d', Integer()),
-        ('media_coverage_articles_f', Integer()),
         ('media_coverage_tonality_total', Integer()),
-        ('media_coverage_tonality_d', Integer()),
-        ('media_coverage_tonality_f', Integer()),
     )
     for column, type_ in columns:
         if not context.has_column('swissvotes', column):
@@ -407,19 +251,14 @@ def add_additional_poster_links(context):
             context.operations.add_column('swissvotes', Column(column, Text()))
 
 
-@upgrade_task('Change media tonality types to numeric')
+@upgrade_task(
+    'Change media tonality types to numeric',
+    requires='onegov.swissvotes:Adds media fields'
+)
 def change_media_tonality_types(context):
     context.operations.execute(
         'ALTER TABLE swissvotes '
         'ALTER COLUMN media_coverage_tonality_total TYPE NUMERIC(13, 10)'
-    )
-    context.operations.execute(
-        'ALTER TABLE swissvotes '
-        'ALTER COLUMN media_coverage_tonality_d TYPE NUMERIC(13, 10)'
-    )
-    context.operations.execute(
-        'ALTER TABLE swissvotes '
-        'ALTER COLUMN media_coverage_tonality_f TYPE NUMERIC(13, 10)'
     )
 
 
