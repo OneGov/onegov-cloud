@@ -6,6 +6,7 @@ from onegov.core.utils import Bunch
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes.models import Actor
 from onegov.swissvotes.models import ColumnMapperDataset
+from onegov.swissvotes.models import ColumnMapperMetadata
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.models import Region
@@ -383,6 +384,17 @@ def test_model_vote(session, sample_vote):
     assert vote.media_ads_yea_p == Decimal('30.06')
     assert vote.media_coverage_articles_total == 3007
     assert vote.media_coverage_tonality_total == Decimal('30.10')
+    assert vote.campaign_material_metadata == {
+        'essay.pdf': {
+            'title': 'Essay',
+            'position': 'no'
+        },
+        'leaflet.pdf': {
+            'title': 'Leaflet',
+            'date_year': 1970,
+            'language': ['de']
+        }
+    }
 
     # localized properties
     vote.session_manager.current_locale = 'fr_CH'
@@ -779,6 +791,9 @@ def test_model_vote_codes():
     assert SwissVote.codes('position_national_council')[2] == "Rejecting"
     assert SwissVote.codes('position_council_of_states')[2] == "Rejecting"
     assert SwissVote.codes('recommendation')[5] == "Free vote"
+    assert SwissVote.metadata_codes('position')['no'] == "No"
+    assert SwissVote.metadata_codes('language')['mixed'] == "Mixed"
+    assert SwissVote.metadata_codes('doctype')['essay'] == "Essay"
 
 
 def test_model_vote_attachments(swissvotes_app, attachments,
@@ -915,11 +930,14 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     # Additional campaing material
     assert vote.campaign_material_yea == []
     assert vote.campaign_material_nay == []
+    assert vote.campaign_material_other == []
 
     vote.files.append(campaign_material['campaign_material_yea-1.png'])
     vote.files.append(campaign_material['campaign_material_yea-2.png'])
     vote.files.append(campaign_material['campaign_material_nay-1.png'])
     vote.files.append(campaign_material['campaign_material_nay-2.png'])
+    vote.files.append(campaign_material['campaign_material_other-essay.pdf'])
+    vote.files.append(campaign_material['campaign_material_other-leaflet.pdf'])
     session.flush()
 
     assert [file.filename for file in vote.campaign_material_yea] == [
@@ -927,6 +945,10 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     ]
     assert [file.filename for file in vote.campaign_material_nay] == [
         'campaign_material_nay-1.png', 'campaign_material_nay-2.png'
+    ]
+    assert [file.filename for file in vote.campaign_material_other] == [
+        'campaign_material_other-essay.pdf',
+        'campaign_material_other-leaflet.pdf'
     ]
 
     assert vote.posters(DummyRequest())['yea'] == [
@@ -949,7 +971,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     ]
 
 
-def test_model_column_mapper():
+def test_model_column_mapper_dataset():
     mapper = ColumnMapperDataset()
     vote = SwissVote()
 
@@ -1066,6 +1088,76 @@ def test_model_column_mapper():
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )
+
+
+def test_model_column_mapper_metadata():
+    mapper = ColumnMapperMetadata()
+    data = {}
+
+    mapper.set_value(data, 'n:f:bfs_number', Decimal('100.1'))
+    mapper.set_value(data, 't:f:filename', 'Dateiname')
+    mapper.set_value(data, 't:t:title', 'Titel'),
+    mapper.set_value(data, 't:t:position', 'Ja'),
+    mapper.set_value(data, 't:t:author', 'Autor'),
+    mapper.set_value(data, 't:t:editor', 'Herausgeber'),
+    mapper.set_value(data, 'i:t:date_year', 1970),
+    mapper.set_value(data, 'i:t:date_month', None),
+    mapper.set_value(data, 'i:t:date_day', 31),
+    mapper.set_value(data, 't:t:language!de', 'x'),
+    mapper.set_value(data, 't:t:language!en', True),
+    mapper.set_value(data, 't:t:language!fr', ''),
+    mapper.set_value(data, 't:t:language!it', None),
+    mapper.set_value(data, 't:t:doctype!argument', 'x'),
+    mapper.set_value(data, 't:t:doctype!article', True),
+    mapper.set_value(data, 't:t:doctype!release', ''),
+    mapper.set_value(data, 't:t:doctype!lecture', None),
+
+    assert data == {
+        'author': 'Autor',
+        'bfs_number': Decimal('100.1'),
+        'date_day': 31,
+        'date_month': None,
+        'date_year': 1970,
+        'doctype': ['argument', 'article'],
+        'editor': 'Herausgeber',
+        'filename': 'Dateiname',
+        'language': ['de', 'en'],
+        'position': 'yes',
+        'title': 'Titel'
+    }
+
+    assert list(mapper.items()) == [
+        ('n:f:bfs_number', 'Abst-Nummer', 'NUMERIC', False, 8, 2),
+        ('t:f:filename', 'Dateiname', 'TEXT', False, None, None),
+        ('t:t:title', 'Titel des Dokuments', 'TEXT', True, None, None),
+        ('t:t:position', 'Position zur Vorlage', 'TEXT', True, None, None),
+        ('t:t:author', 'AutorIn (Nachname Vorname) des Dokuments', 'TEXT',
+         True, None, None),
+        ('t:t:editor', 'AuftraggeberIn/HerausgeberIn des Dokuments '
+         '(typischerweise Komitee/Verband/Partei)', 'TEXT', True, None, None),
+        ('i:t:date_year', 'Datum Jahr', 'INTEGER', True, None, None),
+        ('i:t:date_month', 'Datum Monat', 'INTEGER', True, None, None),
+        ('i:t:date_day', 'Datum Tag', 'INTEGER', True, None, None),
+        ('t:t:language!de', 'Sprache D', 'TEXT', True, None, None),
+        ('t:t:language!en', 'Sprache E', 'TEXT', True, None, None),
+        ('t:t:language!fr', 'Sprache F', 'TEXT', True, None, None),
+        ('t:t:language!it', 'Sprache IT', 'TEXT', True, None, None),
+        ('t:t:language!rm', 'Sprache RR', 'TEXT', True, None, None),
+        ('t:t:language!mixed', 'Sprache Gemischt', 'TEXT', True, None, None),
+        ('t:t:doctype!argument', 'Doktyp Argumentarium', 'TEXT', True, None,
+         None),
+        ('t:t:doctype!article', 'Doktyp Presseartikel', 'TEXT', True, None,
+         None),
+        ('t:t:doctype!release', 'Doktyp Medienmitteilung', 'TEXT', True, None,
+         None),
+        ('t:t:doctype!lecture', 'Doktyp Referatstext', 'TEXT', True, None,
+         None),
+        ('t:t:doctype!leaflet', 'Doktyp Flugblatt', 'TEXT', True, None, None),
+        ('t:t:doctype!essay', 'Doktyp Abhandlung', 'TEXT', True, None, None),
+        ('t:t:doctype!letter', 'Doktyp Brief', 'TEXT', True, None, None),
+        ('t:t:doctype!legal', 'Doktyp Rechtstext', 'TEXT', True, None, None),
+        ('t:t:doctype!other', 'Doktyp Anderes', 'TEXT', True, None, None),
+    ]
 
 
 def test_model_recommendation_order():

@@ -98,7 +98,7 @@ def update_metadata(self, request, form):
     layout = UpdateMetadataLayout(self, request)
 
     if form.submitted(request):
-        added, updated = self.update_metadata(form.dataset.data)
+        added, updated = self.update_metadata(form.metadata.data)
         request.message(
             _(
                 "Metadata updated (${added} added, ${updated} updated)",

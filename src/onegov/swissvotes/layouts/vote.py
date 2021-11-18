@@ -121,7 +121,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
     @cached_property
     def codes(self):
         return {
-            key: self.model.codes(f'campaign_material_metadata_{key}')
+            key: self.model.metadata_codes(key)
             for key in ('position', 'language', 'doctype')
         }
 

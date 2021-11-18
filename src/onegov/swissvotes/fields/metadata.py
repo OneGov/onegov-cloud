@@ -115,7 +115,7 @@ class SwissvoteMetadataField(UploadField):
                     all_columns_empty = all_columns_empty and value is None
 
                 except Exception:
-                    errors.append((
+                    column_errors.append((
                         index, column, f"'{value}' ≠ {type_.lower()}"
                     ))
 

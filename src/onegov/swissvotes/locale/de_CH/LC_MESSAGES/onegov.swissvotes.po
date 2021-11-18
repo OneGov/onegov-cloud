@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-16 15:55+0100\n"
+"POT-Creation-Date: 2021-11-18 09:28+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -21,9 +21,6 @@ msgstr "Keine Daten."
 
 msgid "Sheet DATA is missing."
 msgstr "Tabellenblatt DATA fehlt."
-
-msgid "Sheet CITATION is missing."
-msgstr "Tabellenblatt CITATION fehlt."
 
 #, python-format
 msgid "Some columns are missing: ${columns}."

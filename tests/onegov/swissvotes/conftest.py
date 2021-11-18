@@ -51,6 +51,16 @@ def create_swissvotes_app(request, temporary_path):
     return app
 
 
+def create_pdf(content):
+    result = BytesIO()
+    pdf = Pdf(result)
+    pdf.init_report()
+    pdf.p(content)
+    pdf.generate()
+    result.seek(0)
+    return result
+
+
 @fixture(scope='session')
 def swissvotes_password():
     return hash_password('hunter2')
@@ -87,13 +97,7 @@ def attachments(swissvotes_app):
         ('voting_text', "Abstimmungstext"),
         ('post_vote_poll_report', "Technischer Bericht"),
     ):
-        file = BytesIO()
-        pdf = Pdf(file)
-        pdf.init_report()
-        pdf.p(content)
-        pdf.generate()
-        file.seek(0)
-
+        file = create_pdf(content)
         attachment = SwissVoteFile(id=random_token())
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
@@ -155,6 +159,13 @@ def campaign_material(swissvotes_app):
         name = f'campaign_material_{name}'
         file = create_image()
 
+        attachment = SwissVoteFile(id=random_token(), name=name)
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    for name in ('essay', 'leaflet'):
+        name = f'campaign_material_other-{name}.pdf'
+        file = create_pdf(name)
         attachment = SwissVoteFile(id=random_token(), name=name)
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
@@ -249,13 +260,7 @@ def page_attachments(swissvotes_app, page_attachments_filenames):
             ('REFERENCES', 'Quellen'),
             ('CODEBOOK', 'Codebuch'),
         ):
-            file = BytesIO()
-            pdf = Pdf(file)
-            pdf.init_report()
-            pdf.p(content)
-            pdf.generate()
-            file.seek(0)
-
+            file = create_pdf(content)
             filename = page_attachments_filenames[locale][name]
             attachment = TranslatablePageFile(
                 id=random_token(),
@@ -527,4 +532,15 @@ def sample_vote():
     vote.national_council_share_free_vote = Decimal('27.20')
     vote.national_council_share_unknown = Decimal('28.20')
     vote.national_council_share_vague = Decimal('28.20')
+    vote.campaign_material_metadata = {
+        'essay.pdf': {
+            'title': 'Essay',
+            'position': 'no'
+        },
+        'leaflet.pdf': {
+            'title': 'Leaflet',
+            'date_year': 1970,
+            'language': ['de']
+        }
+    }
     return vote

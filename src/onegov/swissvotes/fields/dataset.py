@@ -63,9 +63,6 @@ class SwissvoteDatasetField(UploadField):
         if 'DATA' not in workbook.sheetnames:
             raise ValueError(_('Sheet DATA is missing.'))
 
-        if 'CITATION' not in workbook.sheetnames:
-            raise ValueError(_('Sheet CITATION is missing.'))
-
         sheet = workbook['DATA']
 
         if sheet.max_row <= 1:

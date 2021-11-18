@@ -21,7 +21,7 @@
                 <tr tal:repeat="file vote.campaign_material_other">
                     <tal:block tal:define="metadata layout.metadata(file.filename)">
                         <tal:block tal:condition="metadata">
-                            <td><a href="${request.link(file)}" target="_blank" >${metadata['title']}</a></td>
+                            <td><a href="${request.link(file)}" target="_blank">${metadata['title']}</a></td>
                             <td>${metadata['position']}</td>
                             <td>${metadata['author']}</td>
                             <td>${metadata['editor']}</td>
@@ -31,7 +31,7 @@
                         </tal:block>
                         <tal:block tal:condition="not: metadata">
                             <td colspan="7">
-                                <a href="${request.link(file)}" target="_blank" >${file.filename}</a>
+                                <a href="${request.link(file)}" target="_blank">${file.filename}</a>
                             </td>
                         </tal:block>
                     </tal:block>

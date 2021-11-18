@@ -585,6 +585,33 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     page = client.get('/').maybe_follow().click('Abstimmungen')
     page = page.click('Details')
 
+    # Other
+    manage = page.click('Kampagnenmaterial')
+    assert 'Keine Anhänge.' in manage
+
+    # ... upload
+    file = campaign_material['campaign_material_other-leaflet.pdf']
+    manage.form['file'] = Upload(
+        'leaflet.pdf',
+        file.reference.file.read(),
+        'application/pdf'
+    )
+    manage = manage.form.submit().maybe_follow()
+    assert manage.status_code == 200
+
+    manage = page.click('Kampagnenmaterial')
+    assert 'leaflet.pdf' in manage
+    assert manage.click('leaflet.pdf').content_type == 'application/pdf'
+
+    # ... view
+    details = client.get('/').maybe_follow().click('Abstimmungen')
+    details = details.click('Details').click('Liste der Dokumente anzeigen')
+    assert 'leaflet.pdf' in details
+
+    # ... delete
+    manage = manage.click('Löschen').form.submit().maybe_follow()
+    assert 'Keine Anhänge.' in manage
+
     # Yea
     manage = page.click('Bildmaterial der Ja-Kampagne')
     assert 'Keine Anhänge.' in manage

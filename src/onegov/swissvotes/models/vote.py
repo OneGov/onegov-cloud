@@ -162,7 +162,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (None, _("unknown"))
             ))
 
-        if attribute == 'campaign_material_metadata_position':
+    @staticmethod
+    def metadata_codes(attribute):
+        if attribute == 'position':
             return OrderedDict((
                 ('yes', _("Yes")),
                 ('no', _("No")),
@@ -170,7 +172,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('mixed', _("Mixed")),
             ))
 
-        if attribute == 'campaign_material_metadata_language':
+        if attribute == 'language':
             return OrderedDict((
                 ('de', _('German')),
                 ('fr', _('French')),
@@ -179,7 +181,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('mixed', _('Mixed')),
             ))
 
-        if attribute == 'campaign_material_metadata_doctype':
+        if attribute == 'doctype':
             return OrderedDict((
                 ('argument', _('Argumentarium')),
                 ('article', _('Press article')),

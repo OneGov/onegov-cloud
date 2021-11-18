@@ -21,7 +21,7 @@ class UpdateMetadataForm(Form):
 
     callout = _("Updating the metadata may take some time.")
 
-    dataset = SwissvoteMetadataField(
+    metadata = SwissvoteMetadataField(
         label=_("Metadata"),
         validators=[
             DataRequired()
