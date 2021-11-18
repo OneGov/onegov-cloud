@@ -60,6 +60,15 @@ def run_command(cfg_path, principal, commands, input=None):
     )
 
 
+def create_file(path, content='content'):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, 'wb') as file:
+        pdf = Pdf(file)
+        pdf.init_report()
+        pdf.p(content)
+        pdf.generate()
+
+
 def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
@@ -76,14 +85,6 @@ def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
 
 def test_cli_import_attachments(session_manager, temporary_directory,
                                 redis_url):
-
-    def create_file(path, content='content'):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, 'wb') as file:
-            pdf = Pdf(file)
-            pdf.init_report()
-            pdf.p(content)
-            pdf.generate()
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
@@ -207,6 +208,73 @@ def test_cli_import_attachments(session_manager, temporary_directory,
                 'voting_text',
             ):
                 assert f'{number}{name}{lang}' in getattr(vote, name).extract
+
+
+def test_cli_import_campaign_material(session_manager, temporary_directory,
+                                      redis_url):
+
+    # Create instance
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
+
+    result = run_command(cfg_path, 'govikon', ['add'])
+    assert result.exit_code == 0
+    assert "Instance was created successfully" in result.output
+
+    # Create votes
+    session_manager.ensure_schema_exists('onegov_swissvotes-govikon')
+    session_manager.set_current_schema('onegov_swissvotes-govikon')
+    session = session_manager.session()
+    for index, number in enumerate(('229', '232.1', '232.2')):
+        session.add(
+            SwissVote(
+                id=index,
+                bfs_number=Decimal(number),
+                date=date(1990, 6, 2),
+                title_de=f"Vote {number}",
+                title_fr=f"Vote {number}",
+                short_title_de=f"Vote {number}",
+                short_title_fr=f"Vote {number}",
+                _legal_form=1,
+            )
+        )
+        session.flush()
+    commit()
+
+    folder = Path(temporary_directory) / 'data-1'
+    create_file(folder / '229_Ja-PB_Argumentarium-Gründe-der-Trennung.pdf')
+    create_file(folder / '229_Mix_PB_Presseschau-Zusatz-Presseschau-126.2-2')
+    create_file(folder / '232-1_Nein_PB_Referentenführer.pdf')
+    create_file(folder / '232-2_Ja_PB_Referentenführer.pdf')
+    create_file(folder / '236_Mix_PB_Presseartikel.pdf')
+
+    result = run_command(
+        cfg_path, 'govikon', ['import-campaign-material', str(folder)]
+    )
+    assert result.exit_code == 0
+    assert 'Ignoring 229_Mix' in result.output
+    assert 'Added 229' in result.output
+    assert 'Added 232-1' in result.output
+    assert 'Added 232-2' in result.output
+    assert 'No matching vote for 236' in result.output
+
+    for number in (0, 1, 2):
+        vote = session.query(SwissVote).filter_by(id=number).one()
+        assert len(vote.campaign_material_other) == 1
+        assert vote.campaign_material_other[0].extract
+
+    create_file(folder / '229_Mix_PB_Bulletin-Amtliches-Bulletin.pdf')
+
+    result = run_command(
+        cfg_path, 'govikon', ['import-campaign-material', str(folder)]
+    )
+    assert result.exit_code == 0
+    assert 'Gründe-der-Trennung.pdf already exists' in result.output
+    assert 'Ignoring 229_Mix' in result.output
+    assert 'Added 229_Mix_PB_Bulletin-Amtliches-Bulletin.pdf' in result.output
+    assert '232-1_Nein_PB_Referentenführer.pdf already exists' in result.output
+    assert '232-2_Ja_PB_Referentenführer.pdf already exists' in result.output
+    assert 'No matching vote for 236_Mix_PB_Presseartikel.pdf' in result.output
 
 
 def test_cli_reindex(session_manager, temporary_directory, redis_url):
