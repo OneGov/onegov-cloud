@@ -1347,9 +1347,18 @@ def test_create_duplicate_notification(client):
 
 
 def test_import_account_statement(client, scenario):
+    scenario.add_user(username='member@example.org', role='member')
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Julian")
+    scenario.add_booking(
+        username='editor@example.org',
+        state='accepted', cost=100)
+    scenario.add_attendee(name="Yannick")
+    scenario.add_booking(
+        username='member@example.org',
+        state='accepted', cost=100)
     scenario.add_attendee(name="Dustin")
     scenario.add_booking(
         username='admin@example.org',
@@ -1377,16 +1386,24 @@ def test_import_account_statement(client, scenario):
     settings.form.submit()
 
     page = page.click('Rechnungen')
-    code = page.pyquery('.invoice-items-payment li:last').text()
+
+    bookings = list()
+    for item in scenario.session.query(InvoiceItem):
+        bookings.append(item)
+
+    code1 = 'Zahlungszweck {}'.format(
+        bookings[1].invoice.references[0].readable)
+    code2 = 'Zahlungszweck {}'.format(
+        bookings[3].invoice.references[0].readable)
 
     page = page.click('Fakturierung').click('Kontoauszug importieren')
     assert "kein Bankkonto" not in page
 
     xml = generate_xml([
-        dict(amount='150.00 CHF', note="code", valdat='2020-03-05'),
-        dict(amount='200.00 CHF', note=code, valdat='2020-03-22'),
-        dict(amount='200.00 CHF', note='will not get matched'),
-        dict(amount='100.00 CHF', note='will not get matched')
+        dict(amount='100.00 CHF', note=code1, valdat='2020-03-22'),
+        dict(amount='200.00 CHF', note=code2, valdat='2020-03-05'),
+        dict(amount='200.00 CHF', note='no match', valdat='2020-05-23'),
+        dict(amount='100.00 CHF', note='no match', valdat='2020-05-12')
     ])
 
     page.form['xml'] = Upload(
@@ -1398,12 +1415,13 @@ def test_import_account_statement(client, scenario):
     page = page.form.submit()
 
     assert "22.03.2020" in page
+    assert "05.03.2020" in page
 
-    assert "1 Zahlungen importieren" in page
-    page.click("1 Zahlungen importieren")
+    assert "2 Zahlungen importieren" in page
+    page.click("2 Zahlungen importieren")
 
     page = admin.get('/my-bills')
-    assert "1 Zahlungen wurden importiert" in page
+    assert "2 Zahlungen wurden importiert" in page
     assert "unpaid" not in page
 
     page = page.click('Fakturierung').click('Kontoauszug importieren')
