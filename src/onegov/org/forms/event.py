@@ -516,7 +516,10 @@ class EventImportForm(Form):
                 session.delete(event)
 
         csvfile = convert_excel_to_csv(self.file.file)
-        csv = CSVFile(csvfile, expected_headers=headers.values())
+        try:
+            csv = CSVFile(csvfile, expected_headers=headers.values())
+        except Exception:
+            return 0, ['0']
         lines = list(csv.lines)
         columns = {
             key: csv.as_valid_identifier(value)
