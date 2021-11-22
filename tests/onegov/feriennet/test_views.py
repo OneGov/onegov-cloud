@@ -1351,9 +1351,13 @@ def test_import_account_statement(client, scenario):
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_occasion(cost=100)
     scenario.add_attendee(name="Dustin")
-    scenario.add_booking(state='accepted', cost=100)
+    scenario.add_booking(
+        username='admin@example.org',
+        state='accepted', cost=100)
     scenario.add_attendee(name="Austin")
-    scenario.add_booking(state='accepted', cost=100)
+    scenario.add_booking(
+        username='admin@example.org',
+        state='accepted', cost=100)
     scenario.commit()
 
     admin = client.spawn()
@@ -1379,7 +1383,9 @@ def test_import_account_statement(client, scenario):
     assert "kein Bankkonto" not in page
 
     xml = generate_xml([
+        dict(amount='150.00 CHF', note="code", valdat='2020-03-05'),
         dict(amount='200.00 CHF', note=code, valdat='2020-03-22'),
+        dict(amount='200.00 CHF', note='will not get matched'),
         dict(amount='100.00 CHF', note='will not get matched')
     ])
 
