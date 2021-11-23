@@ -60,6 +60,9 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     # Quellensteuer
     withholding_tax = Column(Boolean, default=False)
 
+    # Selbständig
+    self_employed = Column(Boolean, default=False)
+
     gender = Column(Enum(*GENDERS, name='gender'))
     date_of_birth = Column(Date)
     nationality = Column(Text)

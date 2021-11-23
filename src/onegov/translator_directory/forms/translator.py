@@ -113,6 +113,11 @@ class TranslatorForm(Form, FormChoicesMixin):
         default=False
     )
 
+    self_employed = BooleanField(
+        label=_('Self-employed'),
+        default=False
+    )
+
     last_name = StringField(
         label=_('Last name'),
         validators=[InputRequired()],
@@ -391,6 +396,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         model.pers_id = self.pers_id.data or None
         model.admission = self.admission.data
         model.withholding_tax = self.withholding_tax.data
+        model.self_employed = self.self_employed.data
         model.gender = self.gender.data
         model.date_of_birth = self.date_of_birth.data or None
         model.nationality = self.nationality.data or None

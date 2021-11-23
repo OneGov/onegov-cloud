@@ -7,6 +7,7 @@ member_can_see = (
     'pers_id',
     'admission',
     'withholding_tax',
+    'self_employed',
     'gender',
     'date_of_birth',
     'nationality',
