@@ -249,7 +249,7 @@ def test_view_languages(client):
     assert 'Arabic' in page
 
 
-def test_create_new_language(client):
+def test_manage_language(client):
     client.login_editor()
     client.get('/languages/new', status=403)
     client.login_admin()
@@ -273,6 +273,11 @@ def test_create_new_language(client):
     page.form['name'] = 'English (British)'
     page = page.form.submit().follow()
     assert 'English (British)' in page
+
+    page = client.get('/languages').click('English').click('Löschen')
+    page = client.get('/languages')
+    assert 'English' not in page
+    assert 'English (British)' not in page
 
 
 def test_view_search_translator(client):
