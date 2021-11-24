@@ -375,6 +375,14 @@ $editbar-fg-color-active: $white;
 
 
 .side-navigation {
+    li span:hover {
+        color: $editbar-bg-color;
+    }
+
+    li:hover {
+        background: $offcanvas-background;
+        filter: brightness(.95);
+    }
 
     @include breakpoint(small only) {
         background: $offcanvas-background;
