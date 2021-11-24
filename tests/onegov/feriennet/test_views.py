@@ -1350,11 +1350,11 @@ def test_import_account_statement(client, scenario):
     scenario.add_user(username='member@example.org', role='member')
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
-    scenario.add_occasion(cost=100)
+    scenario.add_occasion(cost=150)
     scenario.add_attendee(name="Julian")
     scenario.add_booking(
         username='editor@example.org',
-        state='accepted', cost=100)
+        state='accepted', cost=150)
     scenario.add_attendee(name="Yannick")
     scenario.add_booking(
         username='member@example.org',
@@ -1400,6 +1400,7 @@ def test_import_account_statement(client, scenario):
     assert "kein Bankkonto" not in page
 
     xml = generate_xml([
+        dict(amount='200.00 CHF', note='no match', valdat='2020-04-23'),
         dict(amount='100.00 CHF', note=code1, valdat='2020-03-22'),
         dict(amount='200.00 CHF', note=code2, valdat='2020-03-05'),
         dict(amount='200.00 CHF', note='no match', valdat='2020-05-23'),
@@ -1414,13 +1415,23 @@ def test_import_account_statement(client, scenario):
 
     page = page.form.submit()
 
-    assert "22.03.2020" in page
-    assert "05.03.2020" in page
-
     assert "2 Zahlungen importieren" in page
     page.click("2 Zahlungen importieren")
 
     page = admin.get('/my-bills')
+
+    booking1 = scenario.session.query(InvoiceItem).filter(
+        InvoiceItem.payment_date == date(2020, 3, 22)
+    ).one()
+    booking2 = scenario.session.query(InvoiceItem).filter(
+        InvoiceItem.payment_date == date(2020, 3, 5)
+    ).first()
+
+    assert booking1.invoice.references[0].readable == bookings[
+        1].invoice.references[0].readable
+    assert booking2.invoice.references[0].readable == bookings[
+        3].invoice.references[0].readable
+
     assert "2 Zahlungen wurden importiert" in page
     assert "unpaid" not in page
 
