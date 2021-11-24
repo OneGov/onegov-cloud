@@ -14,8 +14,6 @@ from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models.file import LocalizedFile
-from sqlalchemy import create_engine
-from sqlalchemy.orm.session import close_all_sessions
 
 
 cli = command_group()
@@ -37,40 +35,7 @@ def add(group_context):
     return add_instance
 
 
-@cli.command()
-@pass_group_context
-def delete(group_context):
-    """ Deletes an instance from the database. For example:
-
-        onegov-swissvotes --select '/onegov_swissvotes/swissvotes' delete
-
-    """
-
-    def delete_instance(request, app):
-
-        confirmation = 'Do you really want to DELETE {}?'.format(app.schema)
-
-        if not click.confirm(confirmation):
-            abort('Deletion process aborted')
-
-        assert app.has_database_connection
-        assert app.session_manager.is_valid_schema(app.schema)
-
-        close_all_sessions()
-        dsn = app.session_manager.dsn
-        app.session_manager.dispose()
-
-        engine = create_engine(dsn)
-        engine.execute('DROP SCHEMA "{}" CASCADE'.format(app.schema))
-        engine.raw_connection().invalidate()
-        engine.dispose()
-
-        click.echo('Instance was deleted successfully')
-
-    return delete_instance
-
-
-@cli.command('import')
+@cli.command('import-attachments')
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
 def import_attachments(group_context, folder):
@@ -78,7 +43,7 @@ def import_attachments(group_context, folder):
 
         onegov-swissvotes \
             --select '/onegov_swissvotes/swissvotes' \
-            import data_folder
+            import-attachments data_folder
 
     Expects a data folder structure with the first level representing an
     attachment and the second level a locale. The PDFs have to be name by
@@ -155,6 +120,67 @@ def import_attachments(group_context, folder):
                         f'Added {attachment}/{locale}/{name}',
                         fg='green'
                     )
+
+    return _import
+
+
+@cli.command('import-campaign-material')
+@click.argument('folder', type=click.Path(exists=True))
+@pass_group_context
+def import_campaign_material(group_context, folder):
+    """ Import a campaign material from the given folder. For example:
+
+        onegov-swissvotes \
+            --select '/onegov_swissvotes/swissvotes' \
+            import-campaign-material data_folder
+
+    Expects all files within this folder and filenames starting with the BFS
+    number. For example:
+
+        229_Ja-PB_Argumentarium-Gründe-der-Trennung.pdf
+        232-1_Nein_PB_Referentenführer.pdf
+
+    """
+
+    def _import(request, app):
+        votes = SwissVoteCollection(app)
+        bfs_numbers = votes.query().with_entities(SwissVote.bfs_number)
+        bfs_numbers = [r.bfs_number for r in bfs_numbers]
+
+        attachments = {}
+        for name in os.listdir(folder):
+            if not name.endswith('.pdf'):
+                click.secho(f'Ignoring {name}', fg='yellow')
+                continue
+
+            try:
+                bfs_number = (name.split('_')[0] or '').replace('-', '.')
+                bfs_number = Decimal(bfs_number)
+            except InvalidOperation:
+                click.secho(f'Invalid name {name}', fg='red')
+                continue
+
+            if bfs_number in bfs_numbers:
+                attachments.setdefault(bfs_number, [])
+                attachments[bfs_number].append(name)
+            else:
+                click.secho(f'No matching vote for {name}', fg='red')
+
+        for bfs_number in sorted(attachments):
+            names = sorted(attachments[bfs_number])
+            vote = votes.by_bfs_number(bfs_number)
+            existing = [file.filename for file in vote.campaign_material_other]
+            for name in names:
+                if name in existing:
+                    click.secho(f'{name} already exists', fg='yellow')
+                    continue
+
+                file = SwissVoteFile(id=random_token())
+                file.name = f'campaign_material_other-{name}'
+                with open(os.path.join(folder, name), 'rb') as content:
+                    file.reference = as_fileintent(content, name)
+                vote.files.append(file)
+                click.secho(f'Added {name}', fg='green')
 
     return _import
 

@@ -51,7 +51,6 @@ from sedate import replace_timezone, utcnow
 from sqlalchemy import create_engine, event, text, or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import Session
-from sqlalchemy.orm.session import close_all_sessions
 from tqdm import tqdm
 from uuid import UUID, uuid4
 
@@ -84,55 +83,6 @@ def add(group_context, name, locale):
         click.echo("{} was created successfully".format(name))
 
     return add_org
-
-
-@cli.command()
-@pass_group_context
-def delete(group_context):
-    """ Deletes a single organisation matching the selector.
-
-    Selectors matching multiple organisations are disabled for saftey reasons.
-
-    """
-
-    def delete_org(request, app):
-
-        org = getattr(app.org, 'title', 'this organisation')
-        confirmation = "Do you really want to DELETE {}?".format(org)
-
-        if not click.confirm(confirmation):
-            abort("Deletion process aborted")
-
-        if app.has_filestorage:
-            click.echo("Removing File Storage")
-
-            for item in app.filestorage.listdir('.'):
-                if app.filestorage.isdir(item):
-                    app.filestorage.removedir(item, recursive=True, force=True)
-                else:
-                    app.filestorage.remove(item)
-
-        if app.depot_storage_path and app.bound_storage_path:
-            click.echo("Removing Depot Storage")
-            shutil.rmtree(str(app.bound_storage_path.absolute()))
-
-        if app.has_database_connection:
-            click.echo("Dropping Database Schema")
-
-            assert app.session_manager.is_valid_schema(app.schema)
-
-            close_all_sessions()
-            dsn = app.session_manager.dsn
-            app.session_manager.dispose()
-
-            engine = create_engine(dsn)
-            engine.execute('DROP SCHEMA "{}" CASCADE'.format(app.schema))
-            engine.raw_connection().invalidate()
-            engine.dispose()
-
-        click.echo("{} was deleted successfully".format(org))
-
-    return delete_org
 
 
 @cli.command(name='import-digirez', context_settings={'singular': True})

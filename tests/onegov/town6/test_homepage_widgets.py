@@ -19,36 +19,21 @@ def test_focus_widget():
     assert 'hide_text True;' in result
 
     result = transform_structure(widgets, """
-            <focus title="My Fokus"/>
-        """)
+        <focus title="My Fokus"/>
+    """)
 
     assert '<h3>My Fokus</h3>' in result
 
     result = transform_structure(widgets, """
-                <focus title="My Fokus" hide-title="any value" />
-            """)
+        <focus title="My Fokus" hide-title="any value" />
+    """)
     assert 'My Fokus' not in result
 
     result = transform_structure(widgets, """
-                    <focus image-src="#" image-url="###"/>
-                """)
+        <focus image-src="#" image-url="###"/>
+    """)
     assert "image_src '#';" in result
     assert "image_url '###';" in result
-
-    result = transform_structure(widgets, """
-                       <focus page-path="kontakt/gemeinde" hide-title="yes" />
-                   """)
-
-    defined = " ".join((
-        'page_path',
-        "'kontakt/gemeinde';",
-        'hide_title', 'True;',
-        'hide_lead', 'False;',
-        'hide_text', 'False;',
-        'image_src', 'None;',
-        'image_url', 'None;',
-    ))
-    assert f'tal:define="{defined}"' in result
 
 
 def test_partner_widget():

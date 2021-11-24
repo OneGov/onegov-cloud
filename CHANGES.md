@@ -1,8 +1,114 @@
 # Changes
 
+## 2021.91
+
+`2021-11-18` | [cfd18ef3a0...e64ae929a8](https://github.com/OneGov/onegov-cloud/compare/cfd18ef3a0^...e64ae929a8)
+
+### Org
+
+##### Fix typo
+
+`Other` | [OGC-126](https://linear.app/onegovcloud/issue/OGC-126) | [a5f96aa73b](https://github.com/onegov/onegov-cloud/commit/a5f96aa73b2c1cb6830c159b54dfc781b75fef0a)
+
+### Swissvotes
+
+##### Add additional campaign material.
+
+`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [e64ae929a8](https://github.com/onegov/onegov-cloud/commit/e64ae929a80fbcead446273a2443b04b9ab75f75)
+
+### Town6
+
+##### Improve footer logo spacing.
+
+`Other` | [OGC-124](https://linear.app/onegovcloud/issue/OGC-124) | [34e115b8ed](https://github.com/onegov/onegov-cloud/commit/34e115b8ed4ab11a0a30c4c285503ecd43c18c6f)
+
+## 2021.90
+
+`2021-11-16` | [f9d62e2108...0960f2c7a5](https://github.com/OneGov/onegov-cloud/compare/f9d62e2108^...0960f2c7a5)
+
+### Core
+
+##### Add generic CLI command for deleting an instance.
+
+`Feature` | [SEA-524](https://linear.app/seantis/issue/SEA-524) | [f9d62e2108](https://github.com/onegov/onegov-cloud/commit/f9d62e2108855e2889b346a1f953304558d1532b)
+
+##### Adds compatibility with latest fs version.
+
+`Bugfix` | [SEA-524](https://linear.app/seantis/issue/SEA-524) | [59848b31d0](https://github.com/onegov/onegov-cloud/commit/59848b31d0a9501eff56e72ceb6d7e16f7607425)
+
+### Feriennet
+
+##### Update Italian Translations.
+
+`Other` | [PRO-970](https://linear.app/projuventute/issue/PRO-970) | [1a96ac56d2](https://github.com/onegov/onegov-cloud/commit/1a96ac56d27038b5f82c4d9da5bc04e443330349)
+
+##### Update Italian translations.
+
+`Other` | [PRO-970](https://linear.app/projuventute/issue/PRO-970) | [afc4d45e2a](https://github.com/onegov/onegov-cloud/commit/afc4d45e2acc4c374e4e0f08567a6d72131e26ca)
+
+### Swissvotes
+
+##### Use separate encoding for tie-breakers.
+
+`Feature` | [SWI-25](https://linear.app/swissvotes/issue/SWI-25) | [ac53ef0b3d](https://github.com/onegov/onegov-cloud/commit/ac53ef0b3d65a7ce1971968df83122a34bdfa197)
+
+##### Adjust brief description link.
+
+`Other` | [SWI-17](https://linear.app/swissvotes/issue/SWI-17) | [8e53278631](https://github.com/onegov/onegov-cloud/commit/8e5327863182748bb85ddb0750ed5fd7b79738b5)
+
+## 2021.89
+
+`2021-11-11` | [927e7222f1...b4ee607625](https://github.com/OneGov/onegov-cloud/compare/927e7222f1^...b4ee607625)
+
+### Feriennet
+
+##### Fix translation.
+
+`Bugfix` | [PRO-945](https://linear.app/projuventute/issue/PRO-945) | [09c8777fbe](https://github.com/onegov/onegov-cloud/commit/09c8777fbe1f86a63c200ef75bae695e8d584fc1)
+
+##### Fix Italian translations.
+
+`Bugfix` | [PRO-970](https://linear.app/projuventute/issue/PRO-970) | [4591feb5e3](https://github.com/onegov/onegov-cloud/commit/4591feb5e3de3db567199f4991bdef587ed5ba1c)
+
+### Ferriennet
+
+##### Add translations for QR bills.
+
+`Other` | [PRO-667](https://linear.app/projuventute/issue/PRO-667) | [ea9f02fccf](https://github.com/onegov/onegov-cloud/commit/ea9f02fccf4026d386daad32ab3bcbb1d6de1182)
+
+### Org
+
+##### Fix typo.
+
+`Bugfix` | [OGC-126](https://linear.app/onegovcloud/issue/OGC-126) | [98b76b76bf](https://github.com/onegov/onegov-cloud/commit/98b76b76bf2328cbe952e47c1171400de499f7e4)
+
+### Swissvotes
+
+##### Add title column for brief description.
+
+`Feature` | [SWI-17](https://linear.app/swissvotes/issue/SWI-17) | [4e9f0efd53](https://github.com/onegov/onegov-cloud/commit/4e9f0efd533f8943231783394b94c7ed95f16e7f)
+
+##### Add additional links.
+
+`Feature` | [0125ce4521](https://github.com/onegov/onegov-cloud/commit/0125ce4521461a44782def2c7cef723f1a830a8b)
+
+##### Drop unused columns.
+
+`Other` | [SWI-29](https://linear.app/swissvotes/issue/SWI-29) | [f9846c8cf0](https://github.com/onegov/onegov-cloud/commit/f9846c8cf0bfee70c6f499a0748f85697265d6a8)
+
+### Town6
+
+##### Remove slider controls for less than 2 images.
+
+`Feature` | [OGC-118](https://linear.app/onegovcloud/issue/OGC-118) | [d455670454](https://github.com/onegov/onegov-cloud/commit/d45567045442bbdca53febb1756bfd78fd7f8452)
+
+##### Add link on whole focus widget.
+
+`Other` | [OGC-122](https://linear.app/onegovcloud/issue/OGC-122) | [896ee5bdf0](https://github.com/onegov/onegov-cloud/commit/896ee5bdf0d73e80ab4c731d0057d3321a3aab94)
+
 ## 2021.88
 
-`2021-11-01` | [2cb5fe49f8...4f7e6264c4](https://github.com/OneGov/onegov-cloud/compare/2cb5fe49f8^...4f7e6264c4)
+`2021-11-01` | [2cb5fe49f8...246345e7b7](https://github.com/OneGov/onegov-cloud/compare/2cb5fe49f8^...246345e7b7)
 
 ### Org
 
@@ -1312,103 +1418,4 @@ Fixes IconField in DirectoryForm town6.
 ## 2021.42
 
 `2021-04-15` | [4d9fa2f5ff...e5d040398b](https://github.com/OneGov/onegov-cloud/compare/4d9fa2f5ff^...e5d040398b)
-
-## 2021.41
-
-`2021-04-15` | [28790c3ee9...dba3ab2168](https://github.com/OneGov/onegov-cloud/compare/28790c3ee9^...dba3ab2168)
-
-## 2021.40
-
-`2021-04-14` | [f59ab70a55...f442d02925](https://github.com/OneGov/onegov-cloud/compare/f59ab70a55^...f442d02925)
-
-### Agencies
-
-##### Drop support for import from plone / seantis.agencies.
-
-`Other` | [SEA-101](https://linear.app/seantis/issue/SEA-101) | [eb7c3cf5ad](https://github.com/onegov/onegov-cloud/commit/eb7c3cf5adb0d03022a86f8262ead7943d268ebf)
-
-### Election Day
-
-##### Fixes translations.
-
-`Bugfix` | [f59ab70a55](https://github.com/onegov/onegov-cloud/commit/f59ab70a5520f82eabc95217a4fc3f226c1708a0)
-
-##### Removes possibility to create majorz election compounds.
-
-Currently, one can define election compounds with majorz elections but 
-these don't contain lists results, which we display. Since such 
-compounds are historically possible, but are not really a use case at 
-the moment, we drop this feature.
-
-`Bugfix` | [fb9c2824a7](https://github.com/onegov/onegov-cloud/commit/fb9c2824a7ef1871e3f29444408ee8f9838dae67)
-
-### Feriennet
-
-##### Enables favicon from /favicon-settings
-
-`Feature` | [FER-949](https://issues.seantis.ch/browse/FER-949) | [7092439672](https://github.com/onegov/onegov-cloud/commit/7092439672f367d88c27b3579b66f8390b9ca617)
-
-### Org
-
-##### Opens files in news/topics in new tab based on user setting
-
-Enables settings org.open_files_target_blank for news and topics.
-
-`Feature` | [FER-873](https://issues.seantis.ch/browse/FER-873) | [60e29148d6](https://github.com/onegov/onegov-cloud/commit/60e29148d69ab4790e5b6ec35f1ddf5c48e71346)
-
-##### Make people side panel expandible
-
-`Feature` | [SEA-7](https://linear.app/seantis/issue/SEA-7) | [33a6146f0b](https://github.com/onegov/onegov-cloud/commit/33a6146f0b14af32a6c456cf2b090bf900db95b6)
-
-### Swissvotes
-
-##### Use openpyxl instead of xlrd.
-
-`Other` | [SEA-101](https://linear.app/seantis/issue/SEA-101) | [b1721cd1e2](https://github.com/onegov/onegov-cloud/commit/b1721cd1e2703adc181329bf768777e04de748dd)
-
-### Town6
-
-##### Adds chatbot integration
-
-Adds a first integration for a chatbot with settings available on url /chatbot-settings.
-
-`Feature` | [SEA-163](https://linear.app/seantis/issue/SEA-163) | [e295303bd4](https://github.com/onegov/onegov-cloud/commit/e295303bd4f245dc79bac11949e5d6c322b956eb)
-
-##### Adds progress indicator
-
-Adds step sequence registry. Defines 3 steps for forms, event suggestions, and new directories and directory change-requests.
-
-`Feature` | [SEA-105](https://linear.app/seantis/issue/SEA-105) | [24c69a0e37](https://github.com/onegov/onegov-cloud/commit/24c69a0e37c17eff18b68f3922a0df4b7bea5263)
-
-## 2021.39
-
-`2021-04-06` | [575884a9a5...c05630558a](https://github.com/OneGov/onegov-cloud/compare/575884a9a5^...c05630558a)
-
-### Election Day
-
-##### Adds converters to paths.
-
-`Bugfix` | [575884a9a5](https://github.com/onegov/onegov-cloud/commit/575884a9a5726de1670b2a3a3cf053a951f31f09)
-
-### Org
-
-##### Enables logo in email newsletter
-
-Adds new setting at /newsletter-settings to include homepage logo.
-
-`Feature` | [SEA-251](https://linear.app/seantis/issue/SEA-251) | [94db9f73d1](https://github.com/onegov/onegov-cloud/commit/94db9f73d132e802752324ff0b97fe838d062ade)
-
-##### Enables ticket notifications for all external messages
-
-Adds option to /ticket-settings to disable sending notifications for external messages. Outvotes setting in form message-to-submitter.
-
-`Feature` | [SEA-245](https://linear.app/seantis/issue/SEA-245) | [e0162b5636](https://github.com/onegov/onegov-cloud/commit/e0162b563690ae4b7043eff4624a7cbf4cab0c14)
-
-### Town6
-
-##### Adds page setting to display page lead
-
-On topic A with child B, show the B's lead on /topics/a if enabled in the settings of B.
-
-`Feature` | [SEA-249](https://linear.app/seantis/issue/SEA-249) | [468544435f](https://github.com/onegov/onegov-cloud/commit/468544435f5165cbd2b6bad408a314a515951028)
 

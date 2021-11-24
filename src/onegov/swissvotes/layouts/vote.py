@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from datetime import date
 from onegov.core.elements import Link
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
@@ -23,7 +24,16 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Campaign material for a Yes"),
+                    text=_("Campaign material"),
+                    url=self.request.link(
+                        self.model, name='manage-campaign-material'
+                    ),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
+            result.append(
+                Link(
+                    text=_("Graphical campaign material for a Yes"),
                     url=self.request.link(
                         self.model, name='manage-campaign-material-yea'
                     ),
@@ -32,7 +42,7 @@ class VoteLayout(DefaultLayout):
             )
             result.append(
                 Link(
-                    text=_("Campaign material for a No"),
+                    text=_("Graphical campaign material for a No"),
                     url=self.request.link(
                         self.model, name='manage-campaign-material-nay'
                     ),
@@ -99,6 +109,74 @@ class VoteStrengthsLayout(VoteDetailLayout):
         return _("Voter strengths")
 
 
+class VoteCampaignMaterialLayout(VoteDetailLayout):
+
+    date_month_format = 'MM.yyyy'
+    date_year_format = 'yyyy'
+
+    @cached_property
+    def title(self):
+        return _("Documents from the campaign")
+
+    @cached_property
+    def codes(self):
+        return {
+            key: self.model.metadata_codes(key)
+            for key in ('position', 'language', 'doctype')
+        }
+
+    def format_code(self, metadata, key):
+        metadata = metadata or {}
+        values = metadata.get(key)
+        if not values:
+            return ''
+        if isinstance(values, str):
+            values = [values]
+        codes = self.codes.get(key, {})
+        return ', '.join((
+            self.request.translate(codes[value]) for value in values
+            if value in codes
+        ))
+
+    def format_partial_date(self, metadata):
+        metadata = metadata or {}
+        year = metadata.get('date_year')
+        month = metadata.get('date_month')
+        day = metadata.get('date_day')
+        if year and month and day:
+            return self.format_date(date(year, month, day), 'date')
+        if year and month:
+            return self.format_date(date(year, month, 1), 'date_month')
+        if year:
+            return self.format_date(date(year, 1, 1), 'date_year')
+        return ''
+
+    def format_sortable_date(self, metadata):
+        metadata = metadata or {}
+        year = metadata.get('date_year')
+        month = metadata.get('date_month') or 1
+        day = metadata.get('date_day') or 1
+        return date(year, month, day).strftime('%Y%m%d') if year else ''
+
+    def metadata(self, filename):
+        filename = (filename or '').replace('.pdf', '')
+        metadata = self.model.campaign_material_metadata or {}
+        metadata = metadata.get(filename, {})
+        if not metadata:
+            return {}
+
+        return {
+            'title': metadata.get('title', '') or filename,
+            'author': metadata.get('author', ''),
+            'editor': metadata.get('editor', ''),
+            'date': self.format_partial_date(metadata),
+            'date_sortable': self.format_sortable_date(metadata),
+            'position': self.format_code(metadata, 'position'),
+            'language': self.format_code(metadata, 'language'),
+            'doctype': self.format_code(metadata, 'doctype'),
+        }
+
+
 class UploadVoteAttachemtsLayout(VoteDetailLayout):
 
     @cached_property
@@ -106,18 +184,25 @@ class UploadVoteAttachemtsLayout(VoteDetailLayout):
         return _("Manage attachments")
 
 
+class ManageCampaingMaterialLayout(VoteDetailLayout):
+
+    @cached_property
+    def title(self):
+        return _("Campaign material")
+
+
 class ManageCampaingMaterialYeaLayout(VoteDetailLayout):
 
     @cached_property
     def title(self):
-        return _("Campaign material for a Yes")
+        return _("Graphical campaign material for a Yes")
 
 
 class ManageCampaingMaterialNayLayout(VoteDetailLayout):
 
     @cached_property
     def title(self):
-        return _("Campaign material for a No")
+        return _("Graphical campaign material for a No")
 
 
 class DeleteVoteLayout(VoteDetailLayout):

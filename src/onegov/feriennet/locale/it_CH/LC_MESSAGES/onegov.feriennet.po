@@ -1,18 +1,23 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-10-25 10:27+0200\n"
-"PO-Revision-Date: 2021-09-27 13:23+0200\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-11-11 09:08+0100\n"
+"PO-Revision-Date: 2021-11-11 09:07+0100\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
+"Language-Team: \n"
 "Language: it_CH\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "Partner of Pro Juventute"
-msgstr ""
+msgstr "Partner di Pro Juventute"
 
 msgid "No active period"
-msgstr ""
+msgstr "Nessun periodo attivo"
 
 #, python-format
 msgid "Prebooking: ${dates}"
@@ -430,7 +435,7 @@ msgid "Needs"
 msgstr "Necessità"
 
 msgid "Exports occasion needs."
-msgstr "Esportare le necessità per gli eventi"
+msgstr "Esportare le necessità per gli eventi."
 
 msgid "Attendees without Bookings"
 msgstr "Partecipanti senza prenotazioni"
@@ -637,7 +642,7 @@ msgstr "${name} si è già registrato per questo evento"
 msgid "This occasion is outside the currently active period"
 msgstr "Questo evento è al di fuori del periodo attivo"
 
-msgid "This period has already been finalized"
+msgid "This period has already been finalized."
 msgstr "Questo periodo è già terminato."
 
 msgid "Cannot create a booking outside the prebooking period"
@@ -672,7 +677,7 @@ msgstr "Il partecipante è troppo vecchio"
 msgid "The attendee is too young"
 msgstr "Il partecipante è troppo giovane"
 
-msgid "The deadline has passed"
+msgid "The deadline has passed."
 msgstr "La data termine di registrazione è passata."
 
 msgid "Maximum number of bookings per period"
@@ -744,7 +749,7 @@ msgid "Confirm matching:"
 msgstr "Terminare l'assegnazione:"
 
 msgid "Yes, confirm matching"
-msgstr "Si, terminare l'assegnazione:"
+msgstr "Si, terminare l'assegnazione"
 
 msgid "I know the wishlist-phase ends as a result."
 msgstr "Sono consapevole che la fase dei desideri finisce."
@@ -790,7 +795,7 @@ msgid "Administrators"
 msgstr "Amministratori"
 
 msgid "Organisers"
-msgstr "Organizzatori  "
+msgstr "Organizzatori"
 
 msgid "Members"
 msgstr "Membri"
@@ -834,7 +839,7 @@ msgid "Participants"
 msgstr "Partecipante"
 
 msgid "Maximum Number of Participants"
-msgstr "Numero di posti "
+msgstr "Numero di posti"
 
 msgid "Minimum Age"
 msgstr "Età minima"
@@ -889,13 +894,13 @@ msgstr "La data di fine deve essere successiva alla data di inizio"
 msgid "The date is outside the selected period"
 msgstr "La data è al di fuori del periodo selezionato"
 
-msgid "The date overlaps with another in this occasion"
+msgid "The date overlaps with another in this occasion."
 msgstr "La data si sovrappone a un'altra data di questo evento."
 
 msgid "Date validation failed"
-msgstr "Errore, data non valida "
+msgstr "Errore, data non valida"
 
-msgid "Minimum Age must be lower than maximum age"
+msgid "Minimum age must be lower than maximum age."
 msgstr "L'età minima deve essere superiore all'età massima."
 
 msgid ""
@@ -972,7 +977,7 @@ msgstr "Con fatturazione"
 msgid ""
 "A period without billing will hide all bills from regular users, so if you "
 "have used billing before and have open bills, your users won't find them. If "
-"in doubt, use billing without creating any bills. "
+"in doubt, use billing without creating any bills."
 msgstr ""
 "Un periodo senza fatturazione nasconde tutte le fatture al semplice utente. "
 "Se hai delle fatture aperte, i tuoi utenti non le troveranno. In caso di "
@@ -1000,7 +1005,7 @@ msgid "How are the activities conducted?"
 msgstr "Come viene realizzato il lasciapassare vacanze?"
 
 msgid "Execution"
-msgstr "Realizzazione  "
+msgstr "Realizzazione"
 
 msgid ""
 "Each attendee may book as many activites as he likes. Each activity is "
@@ -1020,7 +1025,7 @@ msgid ""
 "billed separately."
 msgstr ""
 "Ogni partecipante può frequentare un numero fisso di attività. Ogni attività "
-"viene addebitata separatamente"
+"viene addebitata separatamente."
 
 msgid "Maximum Number of Activities per Attendee"
 msgstr "Numero massimo di attività per partecipante"
@@ -1155,14 +1160,14 @@ msgstr "La fase dell'evento non può finire prima della fase di prenotazione"
 
 msgid ""
 "It is no longer possible to change the execution settings since the period "
-"has already been confirmed"
+"has already been confirmed."
 msgstr ""
 "Non è più possibile cambiare le impostazioni  dell'evento perché il periodo "
 "è già stato confermato."
 
 msgid ""
 "It is not possible to have required minutes between bookings when limiting "
-"attendees to one activity per day"
+"attendees to one activity per day."
 msgstr ""
 "Non è possibile registrare un tempo di blocco se i partecipanti sono "
 "limitati a un'offerta al giorno."
@@ -1174,7 +1179,7 @@ msgid "General"
 msgstr "Generale"
 
 msgid "Salutation"
-msgstr "Appellativo   "
+msgstr "Appellativo"
 
 msgid "Personal"
 msgstr "Personale"
@@ -1192,10 +1197,10 @@ msgid "Place"
 msgstr "Località utente"
 
 msgid "Political Municipality"
-msgstr "Comune politico "
+msgstr "Comune politico"
 
 msgid "Public E-Mail Address"
-msgstr "Indirizzo e-mail "
+msgstr "Indirizzo e-mail"
 
 msgid "If different than username"
 msgstr "Se diverso dal nome utente"
@@ -1293,7 +1298,7 @@ msgstr ""
 "Si prega di aggiungere almeno un evento prima di richiedere la pubblicazione."
 
 msgid "Discard"
-msgstr "Annullare "
+msgstr "Annullare"
 
 #, python-format
 msgid "Do you really want to discard \"${title}\"?"
@@ -1313,7 +1318,7 @@ msgstr "Gli eventi non possono ancora essere creati"
 
 msgid ""
 "There are no periods defined yet. At least one period needs to be defined "
-"before occasions can be created"
+"before occasions can be created."
 msgstr ""
 "Attualmente non ci sono periodi di tempo. Deve esistere almeno un periodo "
 "prima che gli eventi possano essere registrati."
@@ -1331,7 +1336,7 @@ msgid "New Period"
 msgstr "Nuovo periodo"
 
 msgid "Matches"
-msgstr "Assegnazioni  "
+msgstr "Assegnazioni"
 
 #, python-format
 msgid "Delete \"${text}\""
@@ -1370,10 +1375,10 @@ msgstr "Contabilità"
 msgid "Manual Booking"
 msgstr "Prenotazione manuale"
 
-msgid "Manual bookings can only be added once the billing has been confirmed"
+msgid "Manual bookings can only be added once the billing has been confirmed."
 msgstr ""
 "Le prenotazioni manuali possono essere create solo dopo la conferma della "
-"fatturazione"
+"fatturazione."
 
 msgid "Donation"
 msgstr "Donazione"
@@ -1493,7 +1498,7 @@ msgid "Duration"
 msgstr "Durata"
 
 msgid "Municipalities"
-msgstr "Comuni  "
+msgstr "Comuni"
 
 msgid "Age"
 msgstr "Età"
@@ -1546,7 +1551,7 @@ msgid "This activity has been archived."
 msgstr "Questa attività è stata archiviata."
 
 msgid "There are currently no occasions planned."
-msgstr "Attualmente non ci sono eventi pianificati"
+msgstr "Attualmente non ci sono eventi pianificati."
 
 msgid "The total amount is ${amount} CHF."
 msgstr "L'importo totale è di ${amount} CHF."
@@ -1705,7 +1710,7 @@ msgid "Change in Userprofile"
 msgstr "Modificare il profilo utente"
 
 msgid "No bookings yet."
-msgstr "Ancora nessuna prenotazione"
+msgstr "Ancora nessuna prenotazione."
 
 msgid "Mark up to three occasions per child as favorites."
 msgstr "E' possibile segnare fino a tre attività per bambino come preferite."
@@ -1766,10 +1771,10 @@ msgid "Call ${name}"
 msgstr "Chiamare ${name}"
 
 msgid "Passport"
-msgstr "Lasciapassare vacanze  "
+msgstr "Lasciapassare vacanze"
 
 msgid "Free sponsorship by Rega"
-msgstr "Tesseramento Rega gratuito "
+msgstr "Tesseramento Rega gratuito"
 
 msgid ""
 "Register your child for a Rega patronage free of charge during holiday "
@@ -1788,8 +1793,8 @@ msgid ""
 "Your donation will be added to your invoice and can be removed or adjusted "
 "at any time, until the payment has been made."
 msgstr ""
-"La vostra donazione sarà aggiunta alla  fattura e può essere modificata o "
-"rimossa in qualsiasi momento fino a quando la fattura non sarà pagata"
+"La vostra donazione sarà aggiunta alla fattura e può essere modificata o "
+"rimossa in qualsiasi momento fino a quando la fattura non sarà pagata."
 
 msgid ""
 "The bills for this period have already been created. Signing up may add "
@@ -1813,7 +1818,7 @@ msgstr ""
 "messi insieme, ma non c'è alcuna garanzia."
 
 msgid "This group is from an inactive period."
-msgstr "Questo è un gruppo di un periodo inattivo"
+msgstr "Questo è un gruppo di un periodo inattivo."
 
 msgid "Own Children"
 msgstr "Figli propri"
@@ -1840,10 +1845,10 @@ msgid "No bills created yet."
 msgstr "Nessuna fattura è stata ancora emessa."
 
 msgid "Your donation"
-msgstr "La sua donazione  "
+msgstr "La sua donazione"
 
 msgid "Adjust"
-msgstr "Modificare  "
+msgstr "Modificare"
 
 msgid "Do you really want to remove your donation?"
 msgstr "Vuole davvero rimuovere la tua donazione?"
@@ -1876,7 +1881,7 @@ msgid "Feriennet Partner"
 msgstr "Partner Feriennet"
 
 msgid "Privacy Protection"
-msgstr ""
+msgstr "Tutela della privacy"
 
 msgid "Best of Swiss Web Award 2019"
 msgstr "Premio Best of Swiss Web 2019"
@@ -1924,10 +1929,10 @@ msgid "${count} attendees"
 msgstr "${count} Partecipante"
 
 msgid "${min_spots} - ${max_spots} participants"
-msgstr "${min_spot} - ${max_spot} Partecipanti"
+msgstr "${min_spots} - ${max_spots} Partecipanti"
 
 msgid "up to ${max_spots} participants"
-msgstr "fino a ${max_spot} partecipanti"
+msgstr "fino a ${max_spots} partecipanti"
 
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
@@ -1957,7 +1962,7 @@ msgid "Delete"
 msgstr "Cancellare"
 
 msgid "Enroll your child now."
-msgstr "Iscriva ora suo figlio/a"
+msgstr "Iscriva ora suo figlio/a."
 
 msgid "Enroll"
 msgstr "Iscrizione"
@@ -1975,19 +1980,19 @@ msgid "Decrease the bookings priority"
 msgstr "Abbassare la priorità della prenotazione"
 
 msgid "Prebooking begins on ${date}."
-msgstr "La fase dei desideri inizia il ${data}."
+msgstr "La fase dei desideri inizia il ${date}."
 
 msgid "Prebooking is now active until ${date}."
-msgstr "La fase dei desideri è ora attiva fino a ${data}."
+msgstr "La fase dei desideri è ora attiva fino a ${date}."
 
 msgid "Prebooking has ended."
 msgstr "La fase dei desideri è finita."
 
 msgid "Booking begins on ${date}."
-msgstr "La fase di prenotazione inizia il ${data}."
+msgstr "La fase di prenotazione inizia il ${date}."
 
 msgid "Booking is now active until ${date}."
-msgstr "La fase di prenotazione è ora attiva fino a ${data}."
+msgstr "La fase di prenotazione è ora attiva fino a ${date}."
 
 msgid "Booking has ended."
 msgstr "La fase di prenotazione è finita."
@@ -2002,7 +2007,7 @@ msgstr ""
 "evento."
 
 msgid "The deadline for last-minute cancellations is the ${date}."
-msgstr "Le cancellazioni sono possibili fino a ${data}."
+msgstr "Le cancellazioni sono possibili fino a ${date}."
 
 msgid ""
 "Last-minute cancellations are possible up to ${days} days before each "
@@ -2128,7 +2133,7 @@ msgid "Activity published."
 msgstr "Attività pubblicata."
 
 msgid "Activity archived."
-msgstr "attività archiviata."
+msgstr "Attività archiviata."
 
 msgid "Activity reassigned from ${old_username} to ${new_username}."
 msgstr "Assegnazione dell'attività a ${new_username} (da ${old_username})."
@@ -2167,7 +2172,7 @@ msgid "Target Group"
 msgstr "Gruppo target"
 
 msgid "There are no available recipients for your user account."
-msgstr "Non ci sono destinatari disponibili per il suo utente"
+msgstr "Non ci sono destinatari disponibili per il suo utente."
 
 msgid "Notification templates can only be used with an active period."
 msgstr ""
@@ -2227,7 +2232,7 @@ msgid ""
 "given execution phase:"
 msgstr ""
 "Le seguenti attività contengono eventi che sono in conflitto con le date di "
-"altri eventi"
+"altri eventi:"
 
 msgid "No periods defined."
 msgstr "Nessun periodo di tempo definito."
@@ -2528,15 +2533,15 @@ msgstr "Creare fatture"
 msgid "The period must be active in order to reset billing"
 msgstr "Il periodo deve essere attivo per resettare la fatturazione"
 
-msgid "The billing was successfully reset"
-msgstr "La fatturazione è stata resettata con successo"
+msgid "The billing was successfully reset."
+msgstr "La fatturazione è stata resettata con successo."
 
 #, python-format
 msgid "Online Payments by ${name}"
 msgstr "Pagamenti online da ${name}"
 
 msgid "Refund Payment"
-msgstr "Rimborsare "
+msgstr "Rimborsare"
 
 #, python-format
 msgid "Do you really want to refund ${amount}?"
@@ -2569,7 +2574,7 @@ msgstr ""
 msgid "No transactions were found in the given file"
 msgstr "Nessuna transazione è stata trovata nel file specificato"
 
-msgid "No manual bookings were created"
+msgid "No manual bookings were created."
 msgstr "Non sono state create prenotazioni manualmente."
 
 #, python-format
@@ -2608,10 +2613,10 @@ msgstr ""
 "Solo le prenotazioni aperte, cancellate, rifiutate e bloccate possono essere "
 "cancellate"
 
-msgid "Only admins may cancel bookings at this point"
+msgid "Only admins may cancel bookings at this point."
 msgstr ""
 "Solo gli amministratori possono ancora cancellare le prenotazioni in questo "
-"momento"
+"momento."
 
 msgid "The booking was cancelled successfully"
 msgstr "La prenotazione è stata cancellata con successo"
@@ -2695,7 +2700,7 @@ msgid "Thank you for your donation"
 msgstr "Grazie per la vostra donazione"
 
 msgid "Donate"
-msgstr "Donare   "
+msgstr "Donare"
 
 msgid "Your donation was removed"
 msgstr "La sua donazione è stata rimossa"
@@ -2793,7 +2798,7 @@ msgstr "Dublicare evento"
 
 msgid ""
 "The period of this occasion has already been confirmed. It is not "
-"recommended to change the period associated with this occasion. "
+"recommended to change the period associated with this occasion."
 msgstr ""
 "Il periodo di questo evento è già stato confermato. Non si raccomanda di "
 "selezionare un altro periodo."
@@ -2925,7 +2930,7 @@ msgid "ESR identification number"
 msgstr "Numero di identificazione PVR"
 
 msgid "QR-Bill (experimental)"
-msgstr ""
+msgstr "Fattura QR (sperimentale)"
 
 msgid "Full age required for registration"
 msgstr "Età completa richiesta per la registrazione"
@@ -2984,27 +2989,29 @@ msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Il numero di identificazione PVR deve essere di 3-6 caratteri"
 
 msgid "QR-Bills require an IBAN"
-msgstr ""
+msgstr "Le fatture QR richiedono un IBAN"
 
 msgid "Not a valid IBAN"
-msgstr ""
+msgstr "IBAN non valido"
 
 msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
-msgstr ""
+msgstr "Le fatture QR richiedono un IBAN svizzero o del Lichteinstein"
 
 msgid "This IBAN cannot be used for QR-Bills without ESR"
-msgstr ""
+msgstr "Questo IBAN non può essere utilizzato per le fatture QR senza PVR"
 
 msgid "This IBAN cannot be used for QR-Bills with ESR"
-msgstr ""
+msgstr "Questo IBAN non può essere utilizzato per le fatture QR con PVR"
 
 msgid "QR-Bills require a beneficiary"
-msgstr ""
+msgstr "Le fatture QR richiedono un beneficiario"
 
 msgid ""
 "QR-Bills require the beneficiary to be in the form: name, street number, "
 "code city"
 msgstr ""
+"Le fatture QR richiedono che il beneficiario sia specificato nel modulo: "
+"Nome, Via, Codice postale, Città"
 
 msgid "Feriennet"
 msgstr "Feriennet"

@@ -142,6 +142,9 @@ class BookingCollectionLayout(DefaultLayout):
         if self.request.app.org.meta['locales'] == 'de_CH':
             return 'https://www.rega.ch/partner/' \
                    'das-pro-juventute-engagement-der-rega'
+        if self.request.app.org.meta['locales'] == 'it_CH':
+            return 'https://www.rega.ch/it/partner/' \
+                   'limpegno-pro-juventute-della-rega'
         return 'https://www.rega.ch/fr/partenariats/' \
                'lengagement-de-la-rega-en-faveur-de-pro-juventute'
 
@@ -374,7 +377,7 @@ class VacationActivityLayout(DefaultLayout):
                             _(
                                 "There are no periods defined yet. At least "
                                 "one period needs to be defined before "
-                                "occasions can be created"
+                                "occasions can be created."
                             ),
                             _("Cancel")
                         )
@@ -585,7 +588,7 @@ class BillingCollectionLayout(DefaultLayout):
                         traits=(
                             Block(_(
                                 "Manual bookings can only be added "
-                                "once the billing has been confirmed"
+                                "once the billing has been confirmed."
                             ), no=_("Cancel")),
                         ) if not self.model.period.finalized else tuple()
                     ),

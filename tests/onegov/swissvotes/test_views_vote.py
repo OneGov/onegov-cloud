@@ -2,7 +2,6 @@ from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.views.vote import view_vote_percentages
-from psycopg2.extras import NumericRange
 from pytest import mark
 from re import findall
 from transaction import commit
@@ -78,7 +77,7 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert "(40.01% Ja-Stimmen)" in page
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
-    assert "Kampagnenmaterial Ja" in page
+    assert "Bildmaterial der Ja-Kampagne" in page
     assert "Offizielle Chronologie" in page
     assert "Ergebnisübersicht Bundeskanzlei" in page
     assert "(mehrheitlich befürwortend)" in page
@@ -201,7 +200,7 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_vote_deciding_question(swissvotes_app, sample_vote):
+def test_view_vote_tie_breaker(swissvotes_app, sample_vote):
     sample_vote._legal_form = 5
 
     swissvotes_app.session().add(sample_vote)
@@ -213,11 +212,13 @@ def test_view_vote_deciding_question(swissvotes_app, sample_vote):
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
 
-    assert "Wähleranteil des Lagers für Bevorzugung der Initiative" in page
-    assert "(40.01% für die Initiative)" in page
-    assert "(1.5 für die Initiative, 24.5 für den Gegenentwurf)" in page
-    assert "(10 für die Initiative, 20 für den Gegenentwurf)" in page
-    assert "(30 für die Initiative, 40 für den Gegenentwurf)" in page
+    assert (
+        "Wähleranteil des Lagers für Bevorzugung der Volksinitiative"
+    ) in page
+    assert "(40.01% für die Volksinitiative)" in page
+    assert "(1.5 für die Volksinitiative, 24.5 für den Gegenentwurf)" in page
+    assert "(10 für die Volksinitiative, 20 für den Gegenentwurf)" in page
+    assert "(30 für die Volksinitiative, 40 für den Gegenentwurf)" in page
 
 
 def test_vote_upload(swissvotes_app, attachments):
@@ -227,14 +228,11 @@ def test_vote_upload(swissvotes_app, attachments):
         SwissVote(
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
             title_fr="Vote FR",
             short_title_de="V D",
             short_title_fr="V F",
             keyword="Keyword",
-            votes_on_same_day=2,
             _legal_form=3,
             initiator="Initiator",
         )
@@ -306,14 +304,11 @@ def test_view_vote_pagination(swissvotes_app):
             SwissVote(
                 bfs_number=Decimal(number),
                 date=date(1990, 6, day),
-                legislation_number=4,
-                legislation_decade=NumericRange(1990, 1994),
                 title_de="Vote DE",
                 title_fr="Vote FR",
                 short_title_de="V D",
                 short_title_fr="V F",
                 keyword="Keyword",
-                votes_on_same_day=2,
                 _legal_form=3,
                 initiator="Initiator",
             )
@@ -485,21 +480,21 @@ def test_view_vote_chart(session):
         )
     }
 
-    # Test deciding question
+    # Test tie-breaker
     model._legal_form = 5
     results = view_vote_percentages(model, request)['results']
 
     assert results[0] == {
         'empty': False,
         'text': 'People', 'text_label': '',
-        'yea': 10.2, 'yea_label': '10.2% for the initiative',
+        'yea': 10.2, 'yea_label': '10.2% for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 89.8, 'nay_label': '89.8% for the counter-proposal',
     }
     assert results[1] == {
         'empty': False,
         'text': 'Cantons', 'text_label': '',
-        'yea': 90.4, 'yea_label': '23.5 for the initiative',
+        'yea': 90.4, 'yea_label': '23.5 for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 9.6, 'nay_label': '2.5 for the counter-proposal',
     }
@@ -509,14 +504,14 @@ def test_view_vote_chart(session):
     assert results[3] == {
         'empty': False,
         'text': 'National Council', 'text_label': '',
-        'yea': 74.5, 'yea_label': '149 for the initiative',
+        'yea': 74.5, 'yea_label': '149 for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 25.5, 'nay_label': '51 for the counter-proposal',
     }
     assert results[4] == {
         'empty': False,
         'text': 'Council of States', 'text_label': '',
-        'yea': 93.5, 'yea_label': '43 for the initiative',
+        'yea': 93.5, 'yea_label': '43 for the popular initiative',
         'none': 0.0, 'none_label': '',
         'nay': 6.5, 'nay_label': '3 for the counter-proposal',
     }
@@ -590,8 +585,35 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     page = client.get('/').maybe_follow().click('Abstimmungen')
     page = page.click('Details')
 
+    # Other
+    manage = page.click('Kampagnenmaterial')
+    assert 'Keine Anhänge.' in manage
+
+    # ... upload
+    file = campaign_material['campaign_material_other-leaflet.pdf']
+    manage.form['file'] = Upload(
+        'leaflet.pdf',
+        file.reference.file.read(),
+        'application/pdf'
+    )
+    manage = manage.form.submit().maybe_follow()
+    assert manage.status_code == 200
+
+    manage = page.click('Kampagnenmaterial')
+    assert 'leaflet.pdf' in manage
+    assert manage.click('leaflet.pdf').content_type == 'application/pdf'
+
+    # ... view
+    details = client.get('/').maybe_follow().click('Abstimmungen')
+    details = details.click('Details').click('Liste der Dokumente anzeigen')
+    assert 'leaflet.pdf' in details
+
+    # ... delete
+    manage = manage.click('Löschen').form.submit().maybe_follow()
+    assert 'Keine Anhänge.' in manage
+
     # Yea
-    manage = page.click('Kampagnenmaterial Ja')
+    manage = page.click('Bildmaterial der Ja-Kampagne')
     assert 'Keine Anhänge.' in manage
 
     # ... upload
@@ -603,7 +625,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
-    manage = page.click('Kampagnenmaterial Ja')
+    manage = page.click('Bildmaterial der Ja-Kampagne')
     assert '1.png' in manage
     assert manage.click('1.png').content_type == 'image/png'
 
@@ -612,7 +634,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     assert 'Keine Anhänge.' in manage
 
     # Nay
-    manage = page.click('Kampagnenmaterial Nein')
+    manage = page.click('Bildmaterial der Nein-Kampagne')
     assert 'Keine Anhänge.' in manage
 
     # ... upload
@@ -624,7 +646,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
-    manage = page.click('Kampagnenmaterial Nein')
+    manage = page.click('Bildmaterial der Nein-Kampagne')
     assert '1.png' in manage
     assert manage.click('1.png').content_type == 'image/png'
 

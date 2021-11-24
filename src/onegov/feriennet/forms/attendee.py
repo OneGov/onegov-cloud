@@ -274,7 +274,7 @@ class AttendeeSignupForm(AttendeeBase):
             return
 
         self.attendee.errors.append(
-            _("This period has already been finalized"))
+            _("This period has already been finalized."))
 
         return False
 
@@ -395,7 +395,7 @@ class AttendeeSignupForm(AttendeeBase):
             return True
 
         if self.model.is_past_deadline(utcnow()):
-            self.attendee.errors.append(_("The deadline has passed"))
+            self.attendee.errors.append(_("The deadline has passed."))
             return False
 
 
