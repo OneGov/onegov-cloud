@@ -139,6 +139,7 @@ def test_view_new_translator(client):
     page.form['pers_id'] = 123456
     page.form['admission'] = 'in_progress'
     page.form['withholding_tax'] = True
+    page.form['self_employed'] = True
     page.form['gender'] = 'F'
     page.form['date_of_birth'] = '2019-01-01'
     page.form['nationality'] = 'PERU'

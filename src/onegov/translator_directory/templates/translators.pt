@@ -19,6 +19,7 @@
                                 <thead>
                                     <th i18n:translate="" tal:condition="layout.show('pers_id')">Personal ID</th>
                                     <th i18n:translate="" tal:condition="layout.show('withholding_tax')">Withholding tax</th>
+                                    <th i18n:translate="" tal:condition="layout.show('self_employed')">Self-employed</th>
                                     <th i18n:translate="">Name</th>
                                     <th i18n:translate="">Written languages</th>
                                     <th i18n:translate="">Spoken languages</th>
@@ -34,8 +35,13 @@
                                                 <span tal:case="True" class="check-icon"></span>
                                                 <span tal:case="False">-</span>
                                             </tal:b>
-
-                                            </td>
+                                        </td>
+                                        <td tal:condition="layout.show('self_employed')" class="text-center">
+                                            <tal:b tal:switch="translator.self_employed">
+                                                <span tal:case="True" class="check-icon"></span>
+                                                <span tal:case="False">-</span>
+                                            </tal:b>
+                                        </td>
                                         <td><a href="${request.link(translator)}">${translator.full_name}</a></td>
                                         <td>
                                             <tal:b tal:repeat="language translator.written_languages">

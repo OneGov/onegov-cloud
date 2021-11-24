@@ -43,4 +43,17 @@ def add_imported_column(context):
         context.add_column_with_defaults(
             table='translators',
             column=Column('imported', Boolean, nullable=False),
-            default=lambda x: False)
+            default=lambda x: False
+        )
+
+
+@upgrade_task('Add self-employed column')
+def add_self_employed_column(context):
+    if not context.has_table('translators'):
+        return
+    if not context.has_column('translators', 'self_employed'):
+        context.add_column_with_defaults(
+            table='translators',
+            column=Column('self_employed', Boolean),
+            default=lambda x: False
+        )

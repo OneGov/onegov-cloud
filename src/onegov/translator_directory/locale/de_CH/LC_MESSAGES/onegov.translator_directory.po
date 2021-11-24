@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-11-23 16:40+0100\n"
+"POT-Creation-Date: 2021-11-23 17:55+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -130,6 +130,9 @@ msgstr "Zulassung"
 
 msgid "Withholding tax"
 msgstr "Quellensteuer"
+
+msgid "Self-employed"
+msgstr "Selbständig"
 
 msgid "Last name"
 msgstr "Nachname"

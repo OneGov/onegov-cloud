@@ -220,7 +220,10 @@ class TranslatorCollectionLayout(DefaultLayout):
                 Link(
                     _('Export Excel'),
                     url=self.request.class_link(
-                        TranslatorCollection, name='export')),
+                        TranslatorCollection, name='export'
+                    ),
+                    attrs={'class': 'export-link'}
+                ),
                 Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
