@@ -95,7 +95,8 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
         if self.model.course_event_id:
             attendees = self.event.possible_subscribers(
-                external_only=self.model.external_only
+                external_only=self.model.external_only,
+                auth_attendee=self.model.auth_attendee
             )
         else:
             attendees = self.attendee_collection.query()
