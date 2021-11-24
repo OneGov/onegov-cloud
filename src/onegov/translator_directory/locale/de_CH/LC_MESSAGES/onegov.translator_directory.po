@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-13 14:36+0100\n"
+"POT-Creation-Date: 2021-11-23 16:40+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -353,6 +353,15 @@ msgstr "Sprache hinzufügen"
 msgid "Export Excel"
 msgstr "Export Excel"
 
+msgid "This language is used and can't be deleted."
+msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden."
+
+msgid "Do you really want to delete this language?"
+msgstr "Wollen Sie diese Sprache wirklich löschen?"
+
+msgid "Delete language"
+msgstr "Sprache löschen"
+
 msgid "Upload"
 msgstr "Hochladen"
 
@@ -411,9 +420,6 @@ msgstr "Sprache ${name} aktualisiert"
 
 msgid "Edit language"
 msgstr "Sprache bearbeiten"
-
-msgid "This language is used and can't be deleted"
-msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden"
 
 msgid "Language successfully deleted"
 msgstr "Sprache erfolgreich gelöscht"

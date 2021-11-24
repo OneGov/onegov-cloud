@@ -2,7 +2,7 @@ from cached_property import cached_property
 from purl import URL
 
 from onegov.translator_directory import _
-from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
+from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.translator_directory.collections.documents import \
@@ -328,8 +328,50 @@ class EditLanguageLayout(LanguageLayout):
         links.append(Link(_('Edit')))
         return links
 
-    @property
+    @cached_property
     def editbar_links(self):
+        if self.request.is_admin:
+            if not self.model.deletable:
+                return [
+                    Link(
+                        _('Delete'),
+                        self.csrf_protected_url(
+                            self.request.link(self.model)
+                        ),
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Block(
+                                _("This language is used and can't be "
+                                  "deleted."),
+                                no=_("Cancel")
+                            ),
+                        )
+                    ),
+                ]
+            return [
+                Link(
+                    _('Delete'),
+                    self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete "
+                              "this language?"),
+                            _("This cannot be undone."),
+                            _("Delete language"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                TranslatorCollection
+                            )
+                        )
+                    )
+                ),
+            ]
         return []
 
 
