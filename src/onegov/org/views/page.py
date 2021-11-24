@@ -112,25 +112,3 @@ def view_news(self, request, layout=None):
         'tag_links': tag_links,
         'get_lead': get_lead
     }
-
-
-# @OrgApp.html(
-#     model=Topic,
-#     template='sort.pt',
-#     name='sort',
-#     permission=Private
-# )
-# def view_topics_sort(self, request):
-#     layout = PageLayout(self, request)
-
-#     return {
-#         'title': _("Sort"),
-#         'layout': layout,
-#         'items': (
-#             (
-#                 _('Topics'),
-#                 layout.move_agency_url_template,
-#                 ((agency.id, agency.title) for agency in self.roots)
-#             ),
-#         )
-#     }

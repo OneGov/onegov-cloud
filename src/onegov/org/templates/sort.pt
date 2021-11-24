@@ -9,11 +9,11 @@
                     <p i18n:translate="">Sort the items using drag and drop. The new positions are automatically saved directly after moving.</p>
                 </div>
                 <ul class="sort-items" data-sortable data-sortable-url="${layout.sortable_url_template}">
-                    <li tal:repeat="child page.children" data-sortable-id="${child.id}">
+                    <li tal:repeat="child pages" data-sortable-id="${child.id}">
                         ${child.title}
                     </li>
                 </ul>
-                <a class="button" i18n:translate="">Back to page</a>
+                <a href="${request.link(page)}" class="button" i18n:translate="">Back to page</a>
             </div>
         </div>
     </tal:block>

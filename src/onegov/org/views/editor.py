@@ -163,5 +163,6 @@ def view_topics_sort(self, request, layout=None):
     return {
         'title': _("Sort"),
         'layout': layout,
-        'page': self.page
+        'page': self.page,
+        'pages': self.page.children
     }
