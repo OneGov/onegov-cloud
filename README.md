@@ -19,7 +19,7 @@ looking for, you might appreciate these links:
 - **[Changelog](CHANGES.md)**
 <br>Where you get a list of releases with relevant changes
 
-- **[Onboarding](https//start.onegovcloud.ch)**
+- **[Onboarding](https://start.onegovcloud.ch)**
 <br>Where you can start your own free instance of our solution for muncipalities
 
 ---
