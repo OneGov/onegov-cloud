@@ -56,7 +56,8 @@ PROFESSIONAL_GUILDS = {
     'engineering': _('Engineering'),
     'internation_relations': _('International relations and organisations'),
     'law_insurance': _('Law and insurance industry'),
-    'military': _('Military')
+    'military': _('Military'),
+    'medicine': _('Medicine')
 }
 
 INTERPRETING_TYPES = {

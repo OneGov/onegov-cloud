@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-11-23 17:55+0100\n"
+"POT-Creation-Date: 2021-11-25 06:00+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -63,6 +63,9 @@ msgstr "Recht und Versicherungswesen"
 
 msgid "Military"
 msgstr "Militär"
+
+msgid "Medicine"
+msgstr "Medizin"
 
 msgid "Simultaneous interpreting"
 msgstr "Simultandolmetschen"
