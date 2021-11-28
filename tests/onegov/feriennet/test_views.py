@@ -1372,11 +1372,13 @@ def test_import_account_statement(client, scenario):
     admin = client.spawn()
     admin.login_admin()
 
+    # Fakturierung
     page = admin.get('/').click('Fakturierung')
     page.form['confirm'] = 'yes'
     page.form['sure'] = 'yes'
     page = page.form.submit()
 
+    # No IBAN yet
     page = page.click('Kontoauszug importieren')
     assert "kein Bankkonto" in page
 
@@ -1385,56 +1387,50 @@ def test_import_account_statement(client, scenario):
     settings.form['bank_beneficiary'] = 'Initech'
     settings.form.submit()
 
-    page = page.click('Rechnungen')
+    # Prepare two payments
+    bookings = scenario.session.query(InvoiceItem).all()
+    assert not all([booking.payment_date for booking in bookings])
+    assert not all([booking.tid for booking in bookings])
 
-    bookings = list()
-    for item in scenario.session.query(InvoiceItem):
-        bookings.append(item)
-
-    code1 = 'Zahlungszweck {}'.format(
+    code_1 = 'Zahlungszweck {}'.format(
         bookings[1].invoice.references[0].readable)
-    code2 = 'Zahlungszweck {}'.format(
+    code_2 = 'Zahlungszweck {}'.format(
         bookings[3].invoice.references[0].readable)
-
-    page = page.click('Fakturierung').click('Kontoauszug importieren')
-    assert "kein Bankkonto" not in page
-
     xml = generate_xml([
         dict(amount='200.00 CHF', note='no match', valdat='2020-04-23'),
-        dict(amount='100.00 CHF', note=code1, valdat='2020-03-22'),
-        dict(amount='200.00 CHF', note=code2, valdat='2020-03-05'),
+        dict(amount='100.00 CHF', note=code_1, valdat='2020-03-22', tid='TX1'),
+        dict(amount='200.00 CHF', note=code_2, valdat='2020-03-05', tid='TX2'),
         dict(amount='200.00 CHF', note='no match', valdat='2020-05-23'),
         dict(amount='100.00 CHF', note='no match', valdat='2020-05-12')
     ])
 
+    # Import payments
+    page = page.click('Rechnungen')
+    page = page.click('Fakturierung').click('Kontoauszug importieren')
     page.form['xml'] = Upload(
         'account.xml',
         xml.encode('utf-8'),
         'application/xml'
     )
-
     page = page.form.submit()
 
     assert "2 Zahlungen importieren" in page
-    page.click("2 Zahlungen importieren")
-
+    page = page.click("2 Zahlungen importieren")
     page = admin.get('/my-bills')
+    assert "2 Zahlungen wurden importiert" in page
 
+    # Check dates and transaction IDs
     booking1 = scenario.session.query(InvoiceItem).filter(
         InvoiceItem.payment_date == date(2020, 3, 22)
     ).one()
+    assert booking1.tid == 'TX1'
+
     booking2 = scenario.session.query(InvoiceItem).filter(
         InvoiceItem.payment_date == date(2020, 3, 5)
     ).first()
+    assert booking2.tid == 'TX2'
 
-    assert booking1.invoice.references[0].readable == bookings[
-        1].invoice.references[0].readable
-    assert booking2.invoice.references[0].readable == bookings[
-        3].invoice.references[0].readable
-
-    assert "2 Zahlungen wurden importiert" in page
-    assert "unpaid" not in page
-
+    # Re-run import
     page = page.click('Fakturierung').click('Kontoauszug importieren')
     page.form['xml'] = Upload(
         'account.xml',
