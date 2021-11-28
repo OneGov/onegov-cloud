@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-18 09:28+0100\n"
+"POT-Creation-Date: 2021-11-28 09:53+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -255,13 +255,13 @@ msgid "Documents from the campaign"
 msgstr "Dokumente aus der Abstimmungskampagne"
 
 msgid "Update dataset"
-msgstr "Datensatz aktualisieren"
+msgstr "Abstimmungsdatensatz aktualisieren"
 
 msgid "Update metadata"
-msgstr "Metadaten aktualisieren"
+msgstr "Daten Kampagnenmaterial aktualisieren"
 
 msgid "Update external resources"
-msgstr "Externe Quellen aktualisieren"
+msgstr "Bildquellen aktualisieren"
 
 msgid "Download dataset (CSV)"
 msgstr "Datensatz herunterladen (CSV)"
@@ -1457,26 +1457,32 @@ msgstr "Rätoromanisch"
 msgid "Argumentarium"
 msgstr "Argumentarium"
 
-msgid "Press article"
-msgstr "Presseartikel"
+msgid "Letter"
+msgstr "Brief"
 
-msgid "Media release"
-msgstr "Medienmitteilung"
-
-msgid "Lecture"
-msgstr "Referatstext"
+msgid "Documentation"
+msgstr "Dokumentation"
 
 msgid "Leaflet"
 msgstr "Flugblatt"
 
-msgid "Essay"
-msgstr "Abhandlung"
+msgid "Media release"
+msgstr "Medienmitteilung"
 
-msgid "Letter"
-msgstr "Brief"
+msgid "Member directory"
+msgstr "Mitgliederverzeichnis"
+
+msgid "Press article"
+msgstr "Presseartikel"
 
 msgid "Legal text"
 msgstr "Rechtstext"
+
+msgid "Lecture"
+msgstr "Referatstext"
+
+msgid "Statistics"
+msgstr "Statistik"
 
 msgid "Other"
 msgstr "Anderes"

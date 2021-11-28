@@ -793,7 +793,7 @@ def test_model_vote_codes():
     assert SwissVote.codes('recommendation')[5] == "Free vote"
     assert SwissVote.metadata_codes('position')['no'] == "No"
     assert SwissVote.metadata_codes('language')['mixed'] == "Mixed"
-    assert SwissVote.metadata_codes('doctype')['essay'] == "Essay"
+    assert SwissVote.metadata_codes('doctype')['statistics'] == "Statistics"
 
 
 def test_model_vote_attachments(swissvotes_app, attachments,
@@ -1138,25 +1138,28 @@ def test_model_column_mapper_metadata():
         ('i:t:date_year', 'Datum Jahr', 'INTEGER', True, None, None),
         ('i:t:date_month', 'Datum Monat', 'INTEGER', True, None, None),
         ('i:t:date_day', 'Datum Tag', 'INTEGER', True, None, None),
-        ('t:t:language!de', 'Sprache D', 'TEXT', True, None, None),
-        ('t:t:language!en', 'Sprache E', 'TEXT', True, None, None),
-        ('t:t:language!fr', 'Sprache F', 'TEXT', True, None, None),
+        ('t:t:language!de', 'Sprache DE', 'TEXT', True, None, None),
+        ('t:t:language!en', 'Sprache EN', 'TEXT', True, None, None),
+        ('t:t:language!fr', 'Sprache FR', 'TEXT', True, None, None),
         ('t:t:language!it', 'Sprache IT', 'TEXT', True, None, None),
         ('t:t:language!rm', 'Sprache RR', 'TEXT', True, None, None),
         ('t:t:language!mixed', 'Sprache Gemischt', 'TEXT', True, None, None),
-        ('t:t:doctype!argument', 'Doktyp Argumentarium', 'TEXT', True, None,
+        ('t:t:language!other', 'Sprache Anderes', 'TEXT', True, None, None),
+        ('t:t:doctype!argument', 'Typ ARGUMENTARIUM', 'TEXT', True, None,
          None),
-        ('t:t:doctype!article', 'Doktyp Presseartikel', 'TEXT', True, None,
+        ('t:t:doctype!letter', 'Typ BRIEF', 'TEXT', True, None, None),
+        ('t:t:doctype!documentation', 'Typ DOKUMENTATION', 'TEXT', True, None,
          None),
-        ('t:t:doctype!release', 'Doktyp Medienmitteilung', 'TEXT', True, None,
+        ('t:t:doctype!leaflet', 'Typ FLUGBLATT', 'TEXT', True, None, None),
+        ('t:t:doctype!release', 'Typ MEDIENMITTEILUNG', 'TEXT', True, None,
          None),
-        ('t:t:doctype!lecture', 'Doktyp Referatstext', 'TEXT', True, None,
-         None),
-        ('t:t:doctype!leaflet', 'Doktyp Flugblatt', 'TEXT', True, None, None),
-        ('t:t:doctype!essay', 'Doktyp Abhandlung', 'TEXT', True, None, None),
-        ('t:t:doctype!letter', 'Doktyp Brief', 'TEXT', True, None, None),
-        ('t:t:doctype!legal', 'Doktyp Rechtstext', 'TEXT', True, None, None),
-        ('t:t:doctype!other', 'Doktyp Anderes', 'TEXT', True, None, None),
+        ('t:t:doctype!memberships', 'Typ MITGLIEDERVERZEICHNIS', 'TEXT', True,
+         None, None),
+        ('t:t:doctype!article', 'Typ PRESSEARTIKEL', 'TEXT', True, None, None),
+        ('t:t:doctype!legal', 'Typ RECHTSTEXT', 'TEXT', True, None, None),
+        ('t:t:doctype!lecture', 'Typ REFERATSTEXT', 'TEXT', True, None, None),
+        ('t:t:doctype!statistics', 'Typ STATISTIK', 'TEXT', True, None, None),
+        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None)
     ]
 
 

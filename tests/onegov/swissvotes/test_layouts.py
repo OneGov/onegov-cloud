@@ -866,13 +866,15 @@ def test_layout_vote_campaign_material(swissvotes_app):
     assert layout.codes == {
         'doctype': {
             'argument': 'Argumentarium',
-            'article': 'Press article',
-            'release': 'Media release',
-            'lecture': 'Lecture',
-            'leaflet': 'Leaflet',
-            'essay': 'Essay',
             'letter': 'Letter',
+            'documentation': 'Documentation',
+            'leaflet': 'Leaflet',
+            'release': 'Media release',
+            'memberships': 'Member directory',
+            'article': 'Press article',
             'legal': 'Legal text',
+            'lecture': 'Lecture',
+            'statistics': 'Statistics',
             'other': 'Other'
         },
         'language': {
@@ -880,7 +882,8 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'fr': 'French',
             'it': 'Italian',
             'rm': 'Rhaeto-Romanic',
-            'mixed': 'Mixed'
+            'mixed': 'Mixed',
+            'other': 'Other'
         },
         'position': {
             'yes': 'Yes',

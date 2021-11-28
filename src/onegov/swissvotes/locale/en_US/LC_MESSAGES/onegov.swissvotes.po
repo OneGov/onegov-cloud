@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-18 09:28+0100\n"
+"POT-Creation-Date: 2021-11-28 09:53+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1455,26 +1455,32 @@ msgstr "Rhaeto-Romanic"
 msgid "Argumentarium"
 msgstr "Argumentarium"
 
-msgid "Press article"
-msgstr "Press article"
+msgid "Letter"
+msgstr "Letter"
 
-msgid "Media release"
-msgstr "Media release"
-
-msgid "Lecture"
-msgstr "Lecture"
+msgid "Documentation"
+msgstr "Documentation"
 
 msgid "Leaflet"
 msgstr "Leaflet"
 
-msgid "Essay"
-msgstr "Essay"
+msgid "Media release"
+msgstr "Media release"
 
-msgid "Letter"
-msgstr "Letter"
+msgid "Member directory"
+msgstr "Member directory"
+
+msgid "Press article"
+msgstr "Press article"
 
 msgid "Legal text"
 msgstr "Legal text"
+
+msgid "Lecture"
+msgstr "Lecture"
+
+msgid "Statistics"
+msgstr "Statistics"
 
 msgid "Other"
 msgstr "Other"

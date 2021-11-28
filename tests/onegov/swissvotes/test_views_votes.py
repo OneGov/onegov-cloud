@@ -30,7 +30,7 @@ def test_view_update_votes(swissvotes_app, file):
 
     # Upload
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         content,
@@ -56,7 +56,7 @@ def test_view_update_votes(swissvotes_app, file):
 
     # Upload (unchanged)
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         content,
@@ -72,7 +72,7 @@ def test_view_update_votes(swissvotes_app, file):
 
     # Upload (roundtrip)
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
 
     # Changed from xlsx to content to upload since
     # generated file lacks the CITATION sheet
@@ -136,7 +136,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     file.seek(0)
 
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         file.read(),
@@ -169,7 +169,7 @@ def test_view_update_metdata(swissvotes_app, file, sample_vote):
 
     # Upload
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Metadaten aktualisieren")
+    manage = manage.click("Daten Kampagnenmaterial aktualisieren")
     manage.form['metadata'] = Upload(
         'metadata.xlsx',
         content,
@@ -185,7 +185,7 @@ def test_view_update_metdata(swissvotes_app, file, sample_vote):
 
     # Upload (unchanged)
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Metadaten aktualisieren")
+    manage = manage.click("Daten Kampagnenmaterial aktualisieren")
     manage.form['metadata'] = Upload(
         'metadata.xlsx',
         content,
@@ -209,7 +209,7 @@ def test_view_update_external_resources(mfg, sa, swissvotes_app):
     login.form.submit()
 
     manage = client.get('/').maybe_follow().click('Abstimmungen')
-    manage = manage.click('Externe Quellen aktualisieren')
+    manage = manage.click('Bildquellen aktualisieren')
     manage.form['resources'] = ['mfg', 'sa']
     manage = manage.form.submit().follow()
 
