@@ -1,8 +1,38 @@
 # Changes
 
+## 2021.92
+
+`2021-11-28` | [a1f9257561...621927d18a](https://github.com/OneGov/onegov-cloud/compare/a1f9257561^...621927d18a)
+
+### Fsi
+
+##### Filters course attendedees for editors when adding subscriptions for existing courses too.
+
+`Bugfix` | [OGC-125](https://linear.app/onegovcloud/issue/OGC-125) | [cc228b7ca6](https://github.com/onegov/onegov-cloud/commit/cc228b7ca6b8bdcbdc4b5b3131978a70812f856f)
+
+### Org
+
+##### Allow to filter local users.
+
+`Feature` | [2af8f8bad3](https://github.com/onegov/onegov-cloud/commit/2af8f8bad3e349b46f1fe921f8096eb90b50d0a9)
+
+### Swissvotes
+
+##### Fix upgrade step being executed on every upgrade.
+
+`Bugifx` | [5d3ec47dbf](https://github.com/onegov/onegov-cloud/commit/5d3ec47dbf7db7070c3ca525be703f192d143fc0)
+
+##### Update metadata file format.
+
+`Other` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [e33cfa95cf](https://github.com/onegov/onegov-cloud/commit/e33cfa95cf100db19d65cdabe3b7e0fa24c80be1)
+
+##### Update display format of brief description title.
+
+`Other` | [SWI-17](https://linear.app/swissvotes/issue/SWI-17) | [621927d18a](https://github.com/onegov/onegov-cloud/commit/621927d18a500d316094994b23411addc2fc0704)
+
 ## 2021.91
 
-`2021-11-18` | [cfd18ef3a0...e64ae929a8](https://github.com/OneGov/onegov-cloud/compare/cfd18ef3a0^...e64ae929a8)
+`2021-11-18` | [cfd18ef3a0...b346914d99](https://github.com/OneGov/onegov-cloud/compare/cfd18ef3a0^...b346914d99)
 
 ### Org
 
@@ -1414,8 +1444,4 @@ Fixes IconField in DirectoryForm town6.
 ##### Adds version link to Changes.md link to footer
 
 `Feature` | [SEA-273](https://linear.app/seantis/issue/SEA-273) | [66462f9756](https://github.com/onegov/onegov-cloud/commit/66462f9756633b4499a2f80a96f797ea057ee349)
-
-## 2021.42
-
-`2021-04-15` | [4d9fa2f5ff...e5d040398b](https://github.com/OneGov/onegov-cloud/compare/4d9fa2f5ff^...e5d040398b)
 
