@@ -10,7 +10,8 @@ from wtforms.validators import (
 )
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField, MultiCheckboxField
+from onegov.form.fields import ChosenSelectMultipleField, MultiCheckboxField, \
+    TagsField
 
 from onegov.form.validators import ValidPhoneNumber, \
     ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
@@ -20,7 +21,8 @@ from onegov.translator_directory import _, log
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import order_cols
+from onegov.translator_directory.collections.translator import order_cols, \
+    TranslatorCollection
 from onegov.translator_directory.constants import (
     full_text_max_chars, GENDERS, ADMISSIONS,
     INTERPRETING_TYPES, PROFESSIONAL_GUILDS
@@ -41,6 +43,11 @@ class FormChoicesMixin:
     @property
     def available_certificates(self):
         return LanguageCertificateCollection(self.request.session).query()
+
+    @property
+    def available_additional_guilds(self):
+        translators = TranslatorCollection(self.request.session)
+        return translators.available_additional_professional_guilds
 
     @cached_property
     def language_choices(self):
@@ -76,10 +83,12 @@ class FormChoicesMixin:
 
     @cached_property
     def guilds_choices(self):
-        return tuple(
+        result = [
             (k, self.request.translate(v))
             for k, v in PROFESSIONAL_GUILDS.items()
-        )
+        ]
+        result.extend([(k, k) for k in self.available_additional_guilds])
+        return sorted(result, key=lambda x: x[0].upper())
 
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
@@ -277,6 +286,10 @@ class TranslatorForm(Form, FormChoicesMixin):
         ]
     )
 
+    expertise_professional_guilds_other = TagsField(
+        label=_('Expertise by professional guild: other')
+    )
+
     expertise_interpreting_types = MultiCheckboxField(
         label=_('Expertise by interpreting type'),
         choices=[
@@ -348,6 +361,7 @@ class TranslatorForm(Form, FormChoicesMixin):
     # Here come the actual file fields to upload stuff
 
     def on_request(self):
+        self.request.include('tags-input')
         self.gender.choices = self.gender_choices
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
@@ -431,6 +445,8 @@ class TranslatorForm(Form, FormChoicesMixin):
 
         model.expertise_professional_guilds = \
             self.expertise_professional_guilds.data
+        model.expertise_professional_guilds_other = \
+            self.expertise_professional_guilds_other.data
         model.expertise_interpreting_types = \
             self.expertise_interpreting_types.data
 

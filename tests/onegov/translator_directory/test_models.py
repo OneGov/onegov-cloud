@@ -38,6 +38,24 @@ def test_translator(session):
     translator.drive_distance = 60.5
     session.flush()
 
+    # professional expertises
+    assert translator.expertise_professional_guilds == tuple()
+    assert translator.expertise_professional_guilds_other == tuple()
+    assert translator.expertise_professional_guilds_all == tuple()
+
+    translator.expertise_professional_guilds = ['economy', 'art_leisure']
+    assert translator.expertise_professional_guilds_all == (
+        'economy', 'art_leisure'
+    )
+
+    translator.expertise_professional_guilds_other = ['Psychologie']
+    assert translator.expertise_professional_guilds_all == (
+        'economy', 'art_leisure', 'Psychologie'
+    )
+
+    translator.expertise_professional_guilds = []
+    assert translator.expertise_professional_guilds_all == ('Psychologie', )
+
 
 def test_translator_collection(session):
     translators = TranslatorCollection(session)

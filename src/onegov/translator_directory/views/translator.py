@@ -92,7 +92,11 @@ def export_translator_directory(self, request):
 
     def format_guilds(guilds):
         return format_iterable(
-            (request.translate(PROFESSIONAL_GUILDS[s]) for s in guilds)
+            (
+                request.translate(PROFESSIONAL_GUILDS[s])
+                if s in PROFESSIONAL_GUILDS else s
+                for s in guilds
+            )
         )
 
     def format_interpreting_types(types):
@@ -187,7 +191,7 @@ def export_translator_directory(self, request):
             format_languages(trs.mother_tongues),
             format_languages(trs.spoken_languages),
             format_languages(trs.written_languages),
-            format_guilds(trs.expertise_professional_guilds),
+            format_guilds(trs.expertise_professional_guilds_all),
             format_interpreting_types(trs.expertise_interpreting_types),
             trs.proof_of_preconditions or '',
             trs.agency_references or '',

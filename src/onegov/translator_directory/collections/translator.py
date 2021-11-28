@@ -111,8 +111,12 @@ class TranslatorCollection(GenericCollection, Pagination):
 
     @property
     def by_professional_guilds_expression(self):
+        keys = (
+            'expertise_professional_guilds',
+            'expertise_professional_guilds_other'
+        )
         return tuple(
-            Translator.meta['expertise_professional_guilds'].contains((v, ))
+            or_(*(Translator.meta[key].contains((v, )) for key in keys))
             for v in self.guilds
         )
 
@@ -173,3 +177,10 @@ class TranslatorCollection(GenericCollection, Pagination):
             spoken_langs=form.spoken_langs.data,
             order_by=form.order_by.data
         )
+
+    @property
+    def available_additional_professional_guilds(self):
+        query = self.session.query(
+            Translator.meta['expertise_professional_guilds_other']
+        )
+        return sorted([tag for result in query for tag in result[0]])

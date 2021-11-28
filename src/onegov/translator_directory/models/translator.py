@@ -143,6 +143,14 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # List of types of professional guilds
     expertise_professional_guilds = meta_property(default=tuple)
+    expertise_professional_guilds_other = meta_property(default=tuple)
+
+    @property
+    def expertise_professional_guilds_all(self):
+        return (
+            tuple(self.expertise_professional_guilds or tuple())
+            + tuple(self.expertise_professional_guilds_other or tuple())
+        )
 
     # If entry was imported, for the form and the expertise fields
     imported = Column(Boolean, default=False, nullable=False)

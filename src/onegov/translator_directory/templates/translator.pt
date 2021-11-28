@@ -98,10 +98,10 @@
                                     <tal:b tal:repeat="expertise model.expertise_interpreting_types">${layout.format_interpreting_type(expertise)}<br></tal:b>
                                 </dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.expertise_professional_guilds and layout.show('expertise_professional_guilds')">
+                            <dl class="field-display" tal:condition="model.expertise_professional_guilds_all and layout.show('expertise_professional_guilds_all')">
                                 <dt i18n:translate>Expertise by professional guild</dt>
                                 <dd>
-                                    <tal:b tal:repeat="expertise model.expertise_professional_guilds">${layout.format_prof_guild(expertise)}<br></tal:b>
+                                    <tal:b tal:repeat="expertise model.expertise_professional_guilds_all">${layout.format_prof_guild(expertise)}<br></tal:b>
                                 </dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.operation_comments and layout.show('operation_comments')">

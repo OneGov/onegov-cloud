@@ -58,7 +58,9 @@ class DefaultLayout(BaseLayout):
             return 'text-orange'
 
     def format_prof_guild(self, key):
-        return self.request.translate(PROFESSIONAL_GUILDS[key])
+        if key in PROFESSIONAL_GUILDS:
+            return self.request.translate(PROFESSIONAL_GUILDS[key])
+        return key
 
     def format_interpreting_type(self, key):
         return self.request.translate(INTERPRETING_TYPES[key])

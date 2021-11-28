@@ -24,7 +24,9 @@ member_can_see = (
     'languages_written',
     'languages_spoken',
     'expertise_interpreting_types',
-    'expertise_professional_guilds'
+    'expertise_professional_guilds',
+    'expertise_professional_guilds_other',
+    'expertise_professional_guilds_all'
 )
 
 editor_can_see = member_can_see + (

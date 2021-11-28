@@ -39,6 +39,7 @@ translator_data = dict(
     education_as_interpreter=False,
     comments=None,
     expertise_professional_guilds=tuple(),
+    expertise_professional_guilds_other=tuple(),
     expertise_interpreting_types=tuple()
 )
 
