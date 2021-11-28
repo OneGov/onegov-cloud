@@ -58,7 +58,8 @@
                     <tr tal:condition="layout.attachments['brief_description']">
                         <th class="column-30" i18n:translate>Brief description Swissvotes</th>
                         <td>
-                            <a href="${layout.attachments['brief_description']}" target="_blank" class="brief-description" tal:define="text vote.brief_description_title + ' (PDF)' if (request.html_lang == 'de-CH' and vote.brief_description_title) else 'PDF'">${text}</a>
+                            <a href="${layout.attachments['brief_description']}" target="_blank" class="brief-description">PDF</a>
+                            <span tal:condition="request.html_lang == 'de-CH' and vote.brief_description_title">&laquo;${vote.brief_description_title}&raquo;</span>
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
