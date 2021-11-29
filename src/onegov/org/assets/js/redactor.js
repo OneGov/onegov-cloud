@@ -180,7 +180,7 @@
 
 		source: true,
 		buttons: ['html', 'formatting', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist',
-				  'outdent', 'indent', 'image', 'file', 'link', 'alignment', 'horizontalrule'], // + 'underline'
+				  'outdent', 'indent', 'image', 'file', 'link', 'alignment', 'horizontalrule', 'table'], // + 'underline'
 
 		buttonsHide: [],
 		buttonsHideOnMobile: [],
@@ -331,7 +331,8 @@
 				alignment: 'Alignment',
 				filename: 'Name (optional)',
 				edit: 'Edit',
-				upload_label: 'Drop file here or '
+				upload_label: 'Drop file here or ',
+				table: 'Table'
 			}
 		},
 

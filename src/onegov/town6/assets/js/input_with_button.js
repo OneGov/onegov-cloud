@@ -136,7 +136,7 @@ var on_internal_link_button_click = function(input, type) {
     var form = $(input).closest('form');
 
     var virtual = $('<textarea><p></p></textarea>').redactor({
-        plugins: ['imagemanager', 'filemanager', 'definedlinks'],
+        plugins: ['imagemanager', 'filemanager', 'definedlinks', 'table'],
         fileUpload: form.data('file-upload-url'),
         fileManagerJson: form.data('file-list-url'),
         imageUpload: form.data('image-upload-url'),
