@@ -1427,8 +1427,8 @@ def test_import_account_statement(client, scenario):
 
     booking2 = scenario.session.query(InvoiceItem).filter(
         InvoiceItem.payment_date == date(2020, 3, 5)
-    ).first()
-    assert booking2.tid == 'TX2'
+    ).all()
+    assert [b.tid for b in booking2] == ['TX2', 'TX2']
 
     # Re-run import
     page = page.click('Fakturierung').click('Kontoauszug importieren')
