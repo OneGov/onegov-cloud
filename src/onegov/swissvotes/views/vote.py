@@ -235,8 +235,18 @@ def view_vote_strengths(self, request):
     name='campaign-material'
 )
 def view_vote_campaign_material(self, request):
+    layout = VoteCampaignMaterialLayout(self, request)
+    files = [
+        (file, layout.metadata(file.filename))
+        for file in self.campaign_material_other
+    ]
+
+    def sort_func(item):
+        return item[1].get('order', 999), item[1].get('title', '')
+
     return {
-        'layout': VoteCampaignMaterialLayout(self, request),
+        'layout': layout,
+        'files': sorted(files, key=sort_func)
     }
 
 

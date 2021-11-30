@@ -165,6 +165,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
         if not metadata:
             return {}
 
+        order = {v: i for i, v in enumerate(self.codes['position'])}
         return {
             'title': metadata.get('title', '') or filename,
             'author': metadata.get('author', ''),
@@ -172,6 +173,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
             'date': self.format_partial_date(metadata),
             'date_sortable': self.format_sortable_date(metadata),
             'position': self.format_code(metadata, 'position'),
+            'order': order.get(metadata.get('position'), 999),
             'language': self.format_code(metadata, 'language'),
             'doctype': self.format_code(metadata, 'doctype'),
         }

@@ -167,9 +167,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         if attribute == 'position':
             return OrderedDict((
                 ('yes', _("Yes")),
+                ('mixed', _("Mixed")),
                 ('no', _("No")),
                 ('neutral', _("Neutral")),
-                ('mixed', _("Mixed")),
             ))
 
         if attribute == 'language':

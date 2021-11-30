@@ -953,11 +953,13 @@ def test_layout_vote_campaign_material(swissvotes_app):
     assert layout.metadata('yyy.pdf') == {}
     assert layout.metadata('zzz') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
-        'date_sortable': '', 'position': '', 'language': '', 'doctype': ''
+        'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
+        'order': 999
     }
     assert layout.metadata('zzz.pdf') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
-        'date_sortable': '', 'position': '', 'language': '', 'doctype': ''
+        'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
+        'order': 999
     }
 
     model.campaign_material_metadata = {
@@ -979,6 +981,7 @@ def test_layout_vote_campaign_material(swissvotes_app):
         'doctype': 'Pamphlet, Other',
         'editor': 'BBB',
         'language': 'German, French',
+        'order': 0,
         'position': 'Yes',
         'title': 'xxx'
     }
