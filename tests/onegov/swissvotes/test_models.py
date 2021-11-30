@@ -390,7 +390,7 @@ def test_model_vote(session, sample_vote):
             'position': 'no'
         },
         'leaflet.pdf': {
-            'title': 'Leaflet',
+            'title': 'Pamphlet',
             'date_year': 1970,
             'language': ['de']
         }
@@ -793,7 +793,7 @@ def test_model_vote_codes():
     assert SwissVote.codes('recommendation')[5] == "Free vote"
     assert SwissVote.metadata_codes('position')['no'] == "No"
     assert SwissVote.metadata_codes('language')['mixed'] == "Mixed"
-    assert SwissVote.metadata_codes('doctype')['statistics'] == "Statistics"
+    assert SwissVote.metadata_codes('doctype')['leaflet'] == "Pamphlet"
 
 
 def test_model_vote_attachments(swissvotes_app, attachments,

@@ -538,7 +538,7 @@ def sample_vote():
             'position': 'no'
         },
         'leaflet.pdf': {
-            'title': 'Leaflet',
+            'title': 'Pamphlet',
             'date_year': 1970,
             'language': ['de']
         }

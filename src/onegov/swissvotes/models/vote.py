@@ -184,16 +184,16 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         if attribute == 'doctype':
             return OrderedDict((
-                ('argument', _('Argumentarium')),
+                ('argument', _('Collection of arguments')),
                 ('letter', _('Letter')),
                 ('documentation', _('Documentation')),
-                ('leaflet', _('Leaflet')),
+                ('leaflet', _('Pamphlet')),
                 ('release', _('Media release')),
-                ('memberships', _('Member directory')),
+                ('memberships', _('List of members')),
                 ('article', _('Press article')),
                 ('legal', _('Legal text')),
-                ('lecture', _('Lecture')),
-                ('statistics', _('Statistics')),
+                ('lecture', _('Text of a presentation')),
+                ('statistics', _('Statistical data')),
                 ('other', _('Other')),
             ))
 

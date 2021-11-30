@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-28 09:53+0100\n"
+"POT-Creation-Date: 2021-11-30 16:28+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -254,13 +254,13 @@ msgstr "Wählerstärken"
 msgid "Documents from the campaign"
 msgstr "Dokumente aus der Abstimmungskampagne"
 
-msgid "Update dataset"
+msgid "Update dataset on the votes"
 msgstr "Abstimmungsdatensatz aktualisieren"
 
-msgid "Update metadata"
+msgid "Update metadata on the campaign material"
 msgstr "Daten Kampagnenmaterial aktualisieren"
 
-msgid "Update external resources"
+msgid "Update external sources for images"
 msgstr "Bildquellen aktualisieren"
 
 msgid "Download dataset (CSV)"
@@ -1454,7 +1454,10 @@ msgstr "Italienisch"
 msgid "Rhaeto-Romanic"
 msgstr "Rätoromanisch"
 
-msgid "Argumentarium"
+msgid "Other"
+msgstr "Anderes"
+
+msgid "Collection of arguments"
 msgstr "Argumentarium"
 
 msgid "Letter"
@@ -1463,13 +1466,13 @@ msgstr "Brief"
 msgid "Documentation"
 msgstr "Dokumentation"
 
-msgid "Leaflet"
+msgid "Pamphlet"
 msgstr "Flugblatt"
 
 msgid "Media release"
 msgstr "Medienmitteilung"
 
-msgid "Member directory"
+msgid "List of members"
 msgstr "Mitgliederverzeichnis"
 
 msgid "Press article"
@@ -1478,14 +1481,11 @@ msgstr "Presseartikel"
 msgid "Legal text"
 msgstr "Rechtstext"
 
-msgid "Lecture"
+msgid "Text of a presentation"
 msgstr "Referatstext"
 
-msgid "Statistics"
+msgid "Statistical data"
 msgstr "Statistik"
-
-msgid "Other"
-msgstr "Anderes"
 
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"

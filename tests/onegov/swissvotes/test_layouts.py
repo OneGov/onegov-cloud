@@ -865,16 +865,16 @@ def test_layout_vote_campaign_material(swissvotes_app):
     )
     assert layout.codes == {
         'doctype': {
-            'argument': 'Argumentarium',
+            'argument': 'Collection of arguments',
             'letter': 'Letter',
             'documentation': 'Documentation',
-            'leaflet': 'Leaflet',
+            'leaflet': 'Pamphlet',
             'release': 'Media release',
-            'memberships': 'Member directory',
+            'memberships': 'List of members',
             'article': 'Press article',
             'legal': 'Legal text',
-            'lecture': 'Lecture',
-            'statistics': 'Statistics',
+            'lecture': 'Text of a presentation',
+            'statistics': 'Statistical data',
             'other': 'Other'
         },
         'language': {
@@ -1025,7 +1025,7 @@ def test_layout_votes_details(swissvotes_app):
     model = SwissVoteCollection(swissvotes_app)
 
     layout = UpdateVotesLayout(model, request)
-    assert layout.title == _("Update dataset")
+    assert layout.title == _("Update dataset on the votes")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
@@ -1041,7 +1041,7 @@ def test_layout_votes_details(swissvotes_app):
 
     # UpdateMetadataLayout
     layout = UpdateMetadataLayout(model, request)
-    assert layout.title == _('Update metadata')
+    assert layout.title == _('Update metadata on the campaign material')
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
@@ -1057,7 +1057,7 @@ def test_layout_votes_details(swissvotes_app):
 
     # UpdateExternalResourcesLayout
     layout = UpdateExternalResourcesLayout(model, request)
-    assert layout.title == _('Update external resources')
+    assert layout.title == _('Update external sources for images')
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
