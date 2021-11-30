@@ -738,18 +738,48 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         'preliminary_examination'
     }
 
-    def vectorize_files(self):
-        """ Extract the text from the indexed files and store it. """
+    def reindex_files(self):
+        """ Extract the text from all files and save it.
+
+        Save the indexed files in the search columns as well but only if the
+        locale matches!.
+        """
 
         for locale, language in (('de_CH', 'german'), ('fr_CH', 'french')):
-            files = [
-                SwissVote.__dict__[file].__get_by_locale__(self, locale)
-                for file in self.indexed_files
-            ]
-            text = ' '.join([
-                extract_pdf_info(file.reference.file)[1] or ''
-                for file in files if file
-            ]).strip()
+            text = ''
+
+            # Localized files
+            files = []
+            for name, attribute in self.localized_files().items():
+                if attribute.extension == 'pdf':
+                    file = SwissVote.__dict__[name].__get_by_locale__(
+                        self, locale
+                    )
+                    if file:
+                        index = name in self.indexed_files
+                        files.append((file, index))
+
+            # Campaign material
+            for file in self.campaign_material_other:
+                name = file.filename.replace('.pdf', '')
+                metadata = (self.campaign_material_metadata or {}).get(name)
+                index = False
+                if metadata:
+                    languages = metadata.get('language', [])
+                    if len(languages) == 1:
+                        if languages[0] == locale.split('_')[0]:
+                            index = True
+                files.append((file, index))
+
+            # Extract content
+            for file, index in files:
+                file.extract = (
+                    extract_pdf_info(file.reference.file)[1] or ''
+                ).strip()
+
+                if file.extract and index:
+                    text += '\n\n' + file.extract
+
             setattr(
                 self,
                 f'searchable_text_{locale}',
@@ -758,7 +788,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @observes('files')
     def files_observer(self, files):
-        self.vectorize_files()
+        self.reindex_files()
 
     def get_file(self, name, locale=None, fallback=True):
         """ Returns the requested localized file.
