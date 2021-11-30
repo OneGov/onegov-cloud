@@ -818,3 +818,12 @@ def add_occasion_need_public_toggle(context):
 
     for occasion in context.session.query(Occasion):
         occasion.seeking_volunteers = False
+
+
+@upgrade_task('Add invoice item payment date')
+def add_invoice_item_payment_date(context):
+    if not context.has_column('invoice_items', 'payment_date'):
+        context.operations.add_column(
+            'invoice_items',
+            column=Column('payment_date', Date, nullable=True)
+        )

@@ -1347,21 +1347,38 @@ def test_create_duplicate_notification(client):
 
 
 def test_import_account_statement(client, scenario):
+    scenario.add_user(username='member@example.org', role='member')
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
-    scenario.add_occasion(cost=100)
+    scenario.add_occasion(cost=150)
+    scenario.add_attendee(name="Julian")
+    scenario.add_booking(
+        username='editor@example.org',
+        state='accepted', cost=150)
+    scenario.add_attendee(name="Yannick")
+    scenario.add_booking(
+        username='member@example.org',
+        state='accepted', cost=100)
     scenario.add_attendee(name="Dustin")
-    scenario.add_booking(state='accepted', cost=100)
+    scenario.add_booking(
+        username='admin@example.org',
+        state='accepted', cost=100)
+    scenario.add_attendee(name="Austin")
+    scenario.add_booking(
+        username='admin@example.org',
+        state='accepted', cost=100)
     scenario.commit()
 
     admin = client.spawn()
     admin.login_admin()
 
+    # Fakturierung
     page = admin.get('/').click('Fakturierung')
     page.form['confirm'] = 'yes'
     page.form['sure'] = 'yes'
     page = page.form.submit()
 
+    # No IBAN yet
     page = page.click('Kontoauszug importieren')
     assert "kein Bankkonto" in page
 
@@ -1370,31 +1387,50 @@ def test_import_account_statement(client, scenario):
     settings.form['bank_beneficiary'] = 'Initech'
     settings.form.submit()
 
-    page = page.click('Rechnungen')
-    code = page.pyquery('.invoice-items-payment li:last').text()
+    # Prepare two payments
+    bookings = scenario.session.query(InvoiceItem).all()
+    assert not all([booking.payment_date for booking in bookings])
+    assert not all([booking.tid for booking in bookings])
 
-    page = page.click('Fakturierung').click('Kontoauszug importieren')
-    assert "kein Bankkonto" not in page
-
+    code_1 = 'Zahlungszweck {}'.format(
+        bookings[1].invoice.references[0].readable)
+    code_2 = 'Zahlungszweck {}'.format(
+        bookings[3].invoice.references[0].readable)
     xml = generate_xml([
-        dict(amount='100.00 CHF', note=code)
+        dict(amount='200.00 CHF', note='no match', valdat='2020-04-23'),
+        dict(amount='100.00 CHF', note=code_1, valdat='2020-03-22', tid='TX1'),
+        dict(amount='200.00 CHF', note=code_2, valdat='2020-03-05', tid='TX2'),
+        dict(amount='200.00 CHF', note='no match', valdat='2020-05-23'),
+        dict(amount='100.00 CHF', note='no match', valdat='2020-05-12')
     ])
 
+    # Import payments
+    page = page.click('Rechnungen')
+    page = page.click('Fakturierung').click('Kontoauszug importieren')
     page.form['xml'] = Upload(
         'account.xml',
         xml.encode('utf-8'),
         'application/xml'
     )
-
     page = page.form.submit()
 
-    assert "1 Zahlungen importieren" in page
-    page.click("1 Zahlungen importieren")
-
+    assert "2 Zahlungen importieren" in page
+    page = page.click("2 Zahlungen importieren")
     page = admin.get('/my-bills')
-    assert "1 Zahlungen wurden importiert" in page
-    assert "unpaid" not in page
+    assert "2 Zahlungen wurden importiert" in page
 
+    # Check dates and transaction IDs
+    booking1 = scenario.session.query(InvoiceItem).filter(
+        InvoiceItem.payment_date == date(2020, 3, 22)
+    ).one()
+    assert booking1.tid == 'TX1'
+
+    booking2 = scenario.session.query(InvoiceItem).filter(
+        InvoiceItem.payment_date == date(2020, 3, 5)
+    ).all()
+    assert [b.tid for b in booking2] == ['TX2', 'TX2']
+
+    # Re-run import
     page = page.click('Fakturierung').click('Kontoauszug importieren')
     page.form['xml'] = Upload(
         'account.xml',
@@ -1670,8 +1706,16 @@ def test_online_payment(client, scenario):
     assert 'checkout-button' in page
     assert "Jetzt online bezahlen" in page
 
-    # it should be possible to change the payment state again
-    client.get('/billing?state=all').click("Rechnung als bezahlt markieren")
+    with freeze_time('2018-01-01'):
+        # it should be possible to change the payment state again
+        client.get('/billing?state=all').click(
+            "Rechnung als bezahlt markieren")
+
+        # check if paid and payment date is set
+        assert scenario.session.query(
+            InvoiceItem
+        ).all()[0].payment_date == date(2018, 1, 1)
+
     client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
     # pay again (leading to a refunded and an open charge)
