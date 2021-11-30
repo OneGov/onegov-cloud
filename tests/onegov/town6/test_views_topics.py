@@ -11,7 +11,9 @@ def test_sort_topics(client):
     page.form['title'] = "Topic 2"
     page = page.form.submit().follow()
 
-    page = client.get('/editor/sort/page/2/sort/')
+    page = page.click('Sortieren')
+    page = page.follow()
 
     assert "Topic 1" in page
     assert "Topic 2" in page
+
