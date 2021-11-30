@@ -15,4 +15,3 @@ def test_sort_topics(client):
 
     assert "Topic 1" in page
     assert "Topic 2" in page
-    
