@@ -1706,8 +1706,16 @@ def test_online_payment(client, scenario):
     assert 'checkout-button' in page
     assert "Jetzt online bezahlen" in page
 
-    # it should be possible to change the payment state again
-    client.get('/billing?state=all').click("Rechnung als bezahlt markieren")
+    with freeze_time('2018-01-01'):
+        # it should be possible to change the payment state again
+        client.get('/billing?state=all').click(
+            "Rechnung als bezahlt markieren")
+
+        # check if paid and payment date is set
+        assert scenario.session.query(
+            InvoiceItem
+        ).all()[0].payment_date == date(2018, 1, 1)
+
     client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
     # pay again (leading to a refunded and an open charge)
