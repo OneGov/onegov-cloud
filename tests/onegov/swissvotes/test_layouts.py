@@ -976,7 +976,7 @@ def test_layout_vote_campaign_material(swissvotes_app):
         'author': 'AAA',
         'date': '31.12.1988',
         'date_sortable': '19881231',
-        'doctype': 'Leaflet, Other',
+        'doctype': 'Pamphlet, Other',
         'editor': 'BBB',
         'language': 'German, French',
         'position': 'Yes',
