@@ -9,7 +9,7 @@ $(function() {
             buttons: [
                 'formatting', 'bold', 'italic', 'deleted',
                 'unorderedlist', 'orderedlist', 'image', 'file', 'link',
-                'horizontalrule', 'html', 'table'
+                'horizontalrule', 'html'
             ],
             formatting: ['p', 'blockquote', 'pre'],
             fileUpload: form.data('file-upload-url'),
