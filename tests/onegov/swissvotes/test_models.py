@@ -877,9 +877,13 @@ def test_model_vote_attachments(swissvotes_app, attachments,
 
     assert len(vote.files) == 4
     assert vote.ad_analysis.name == 'ad_analysis-de_CH'
+    assert vote.ad_analysis.extract == 'Inserateanalyse'
     assert vote.brief_description.name == 'brief_description-de_CH'
+    assert vote.brief_description.extract == 'Kurschbeschreibung'
     assert vote.parliamentary_debate.name == 'parliamentary_debate-de_CH'
+    assert vote.parliamentary_debate.extract == 'Parlamentdebatte'
     assert vote.voting_text.name == 'voting_text-de_CH'
+    assert vote.voting_text.extract == 'Abstimmungstext'
     assert "abstimmungstex" in vote.searchable_text_de_CH
     assert "kurschbeschreib" in vote.searchable_text_de_CH
     assert "parlamentdebatt" in vote.searchable_text_de_CH
@@ -928,6 +932,10 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.get_file('resolution', 'de_CH') is None
 
     # Additional campaing material
+    vote.campaign_material_metadata = {
+        'campaign_material_other-essay': {'language': ['de']},
+        'campaign_material_other-leaflet': {'language': ['fr']},
+    }
     assert vote.campaign_material_yea == []
     assert vote.campaign_material_nay == []
     assert vote.campaign_material_other == []
@@ -950,6 +958,12 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'campaign_material_other-essay.pdf',
         'campaign_material_other-leaflet.pdf'
     ]
+    assert [file.extract for file in vote.campaign_material_other] == [
+        'Abhandlung',
+        'Flyer'
+    ]
+    assert 'abhandl' in vote.searchable_text_de_CH
+    assert 'flyer' in vote.searchable_text_fr_CH
 
     assert vote.posters(DummyRequest())['yea'] == [
         Bunch(
