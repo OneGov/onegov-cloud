@@ -544,3 +544,11 @@ def add_campaign_material_meta_column(context):
             'swissvotes',
             Column('campaign_material_metadata', JSON())
         )
+
+
+@upgrade_task('Add tsvector column for italian')
+def add_tsvector_column_it(context):
+    if not context.has_column('swissvotes', 'searchable_text_it_CH'):
+        context.operations.add_column(
+            'swissvotes', Column('searchable_text_it_CH', TSVECTOR())
+        )

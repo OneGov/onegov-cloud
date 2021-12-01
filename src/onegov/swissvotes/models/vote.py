@@ -726,6 +726,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))
     searchable_text_fr_CH = deferred(Column(TSVECTOR))
+    searchable_text_it_CH = deferred(Column(TSVECTOR))
 
     indexed_files = {
         'voting_text',
@@ -745,7 +746,11 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         locale matches!.
         """
 
-        for locale, language in (('de_CH', 'german'), ('fr_CH', 'french')):
+        for locale, lang, language, in (
+            ('de_CH', 'de', 'german'),
+            ('fr_CH', 'fr', 'french'),
+            ('it_CH', 'it', 'french')
+        ):
             text = ''
 
             # Localized files
@@ -764,11 +769,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 name = file.filename.replace('.pdf', '')
                 metadata = (self.campaign_material_metadata or {}).get(name)
                 index = False
-                if metadata:
-                    languages = metadata.get('language', [])
-                    if len(languages) == 1:
-                        if languages[0] == locale.split('_')[0]:
-                            index = True
+                if (metadata or {}).get('language', []) == [lang]:
+                    index = True
                 files.append((file, index))
 
             # Extract content
