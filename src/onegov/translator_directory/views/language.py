@@ -97,9 +97,8 @@ def edit_language(self, request, form):
 )
 def delete_language(self, request):
     request.assert_valid_csrf_token()
-    if self.speaker.first() or self.writers.first():
-        request.warning(_(
-            "This language is used and can't be deleted"))
+    if not self.deletable:
+        request.warning(_("This language is used and can't be deleted."))
     else:
         LanguageCollection(request.session).delete(self)
         request.success(_('Language successfully deleted'))

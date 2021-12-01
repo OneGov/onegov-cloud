@@ -305,6 +305,7 @@ class TilesWidget(object):
                         for c in children
                     )
                 )
+
             elif page.type == 'news':
                 links = [
                     Link(str(year), link(page.for_year(year)), classes=classes)

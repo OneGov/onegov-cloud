@@ -264,7 +264,7 @@ class OccasionForm(Form):
                 if index != subindex:
                     if overlaps(d.start, d.end, subd.start, subd.end):
                         self.date_errors[index] = self.request.translate(_(
-                            "The date overlaps with another in this occasion"
+                            "The date overlaps with another in this occasion."
                         ))
                         valid = False
 
@@ -277,7 +277,7 @@ class OccasionForm(Form):
         if self.min_age.data is not None and self.max_age.data:
             if self.min_age.data > self.max_age.data:
                 self.min_age.errors = [
-                    _("Minimum Age must be lower than maximum age")]
+                    _("Minimum age must be lower than maximum age.")]
                 return False
 
     def ensure_max_spots_after_min_spots(self):

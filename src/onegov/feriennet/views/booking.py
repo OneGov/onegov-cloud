@@ -412,7 +412,7 @@ def cancel_booking(self, request):
         if not request.is_admin:
             if self.occasion.is_past_cancellation(date.today()):
                 request.alert(_(
-                    "Only admins may cancel bookings at this point"
+                    "Only admins may cancel bookings at this point."
                 ))
 
                 return

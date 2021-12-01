@@ -70,3 +70,11 @@ class Language(Base):
         session = object_session(self)
         return session.query(
             mother_tongue_association_table).filter_by(lang_id=self.id).count()
+
+    @property
+    def deletable(self):
+        return (
+            self.speakers_count
+            + self.writers_count
+            + self.native_speakers_count
+        ) == 0

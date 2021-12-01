@@ -1,14 +1,14 @@
 from decimal import Decimal
 from io import BytesIO
-
 from onegov.core.utils import module_path
 from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
 from pytest import mark
+from tests.shared import Client
+from transaction import commit
 from unittest.mock import patch
-from webtest import TestApp as Client
 from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
 
@@ -30,7 +30,7 @@ def test_view_update_votes(swissvotes_app, file):
 
     # Upload
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         content,
@@ -38,13 +38,12 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert "Datensatz aktualisiert (659 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (673 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
     assert str(vote.bfs_number) == '82.20'
     assert vote.date.isoformat() == '1920-03-21'
-    assert vote.legislation_number == 25
     assert vote.title == (
         "Gegenentwurf zur Volksinitiative "
         "«für ein Verbot der Errichtung von Spielbanken»"
@@ -57,7 +56,7 @@ def test_view_update_votes(swissvotes_app, file):
 
     # Upload (unchanged)
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         content,
@@ -73,7 +72,7 @@ def test_view_update_votes(swissvotes_app, file):
 
     # Upload (roundtrip)
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
 
     # Changed from xlsx to content to upload since
     # generated file lacks the CITATION sheet
@@ -109,7 +108,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet('DATA')
     workbook.add_worksheet('CITATION')
-    worksheet.write_row(0, 0, ColumnMapper().columns.values())
+    worksheet.write_row(0, 0, ColumnMapperDataset().columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr
         '1.2.2008',  # datum
@@ -118,8 +117,6 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
-        'link',  # swissvoteslink
-        '2',  # anzahl
         '3',  # rechtsform
         '',  # anneepolitique
         '',  # bkchrono-de
@@ -133,16 +130,13 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         '12',  # d3e1
         '12.5',  # d3e2
         '12.55',  # d3e3
-        '',  # dep
         '',  # br-pos
-        '1',  # legislatur
-        '2004-2008',  # legisjahr
     ])
     workbook.close()
     file.seek(0)
 
     manage = client.get('/').maybe_follow().click("Abstimmungen")
-    manage = manage.click("Datensatz aktualisieren")
+    manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         file.read(),
@@ -151,6 +145,54 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     manage = manage.form.submit().follow()
     assert "Datensatz aktualisiert (1 hinzugefügt, 0 geändert)" in manage
     assert "unbekannte Deskriptoren: 12.55, 12.6, 13" in manage
+
+
+@mark.parametrize('file', [
+    module_path('tests.onegov.swissvotes', 'fixtures/metadata.xlsx'),
+])
+def test_view_update_metdata(swissvotes_app, file, sample_vote):
+    session = swissvotes_app.session()
+    sample_vote.bfs_number = Decimal('236')
+    session.add(sample_vote)
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    with open(file, 'rb') as f:
+        content = f.read()
+
+    # Upload
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Daten Kampagnenmaterial aktualisieren")
+    manage.form['metadata'] = Upload(
+        'metadata.xlsx',
+        content,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    manage = manage.form.submit().follow()
+
+    assert "Metadaten aktualisiert (30 hinzugefügt, 0 geändert)" in manage
+
+    session = swissvotes_app.session()
+    vote = session.query(SwissVote).filter_by(bfs_number=236).one()
+    assert len(vote.campaign_material_metadata) == 32
+
+    # Upload (unchanged)
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Daten Kampagnenmaterial aktualisieren")
+    manage.form['metadata'] = Upload(
+        'metadata.xlsx',
+        content,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    manage = manage.form.submit().follow()
+    assert "Metadaten aktualisiert (0 hinzugefügt, 0 geändert)" in manage
 
 
 @patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, {Decimal('4')}))
@@ -167,7 +209,7 @@ def test_view_update_external_resources(mfg, sa, swissvotes_app):
     login.form.submit()
 
     manage = client.get('/').maybe_follow().click('Abstimmungen')
-    manage = manage.click('Externe Quellen aktualisieren')
+    manage = manage.click('Bildquellen aktualisieren')
     manage.form['resources'] = ['mfg', 'sa']
     manage = manage.form.submit().follow()
 

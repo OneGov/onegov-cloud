@@ -16,14 +16,23 @@ class VotesLayout(DefaultLayout):
         if self.request.has_role('admin', 'editor'):
             result.append(
                 Link(
-                    text=_("Update dataset"),
+                    text=_("Update dataset on the votes"),
                     url=self.request.link(self.model.default(), name='update'),
                     attrs={'class': 'upload-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Update external resources"),
+                    text=_("Update metadata on the campaign material"),
+                    url=self.request.link(
+                        self.model.default(), name='update-metadata'
+                    ),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
+            result.append(
+                Link(
+                    text=_("Update external sources for images"),
                     url=self.request.link(
                         self.model.default(),
                         name='update-external-resources'
@@ -63,11 +72,11 @@ class VotesLayout(DefaultLayout):
         ]
 
 
-class UpdateVotesLayout(DefaultLayout):
+class VotesActionLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Update dataset")
+        raise NotImplementedError()
 
     @cached_property
     def breadcrumbs(self):
@@ -78,31 +87,29 @@ class UpdateVotesLayout(DefaultLayout):
         ]
 
 
-class UpdateExternalResourcesLayout(DefaultLayout):
+class UpdateVotesLayout(VotesActionLayout):
 
     @cached_property
     def title(self):
-        return _("Update external resources")
+        return _("Update dataset on the votes")
+
+
+class UpdateMetadataLayout(VotesActionLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
-            Link(self.title, '#'),
-        ]
+    def title(self):
+        return _("Update metadata on the campaign material")
 
 
-class DeleteVotesLayout(DefaultLayout):
+class UpdateExternalResourcesLayout(VotesActionLayout):
+
+    @cached_property
+    def title(self):
+        return _("Update external sources for images")
+
+
+class DeleteVotesLayout(VotesActionLayout):
 
     @cached_property
     def title(self):
         return _("Delete all votes")
-
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Votes"), self.votes_url),
-            Link(self.title, '#'),
-        ]

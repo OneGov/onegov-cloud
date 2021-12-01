@@ -4,11 +4,10 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
 from openpyxl.utils.datetime import from_excel
-from psycopg2.extras import NumericRange
 
 
 class SwissvoteDatasetField(UploadField):
@@ -45,16 +44,13 @@ class SwissvoteDatasetField(UploadField):
 
         """
 
-        super(SwissvoteDatasetField, self).post_validate(
-            form,
-            validation_stopped
-        )
+        super().post_validate(form, validation_stopped)
         if validation_stopped:
             return
 
         errors = []
         data = []
-        mapper = ColumnMapper()
+        mapper = ColumnMapperDataset()
 
         try:
             workbook = load_workbook(self.raw_data[0].file, data_only=True)
@@ -67,15 +63,12 @@ class SwissvoteDatasetField(UploadField):
         if 'DATA' not in workbook.sheetnames:
             raise ValueError(_('Sheet DATA is missing.'))
 
-        if 'CITATION' not in workbook.sheetnames:
-            raise ValueError(_('Sheet CITATION is missing.'))
-
         sheet = workbook['DATA']
 
         if sheet.max_row <= 1:
             raise ValueError(_("No data."))
 
-        headers = [column.value for column in tuple(sheet.rows)[0]]
+        headers = [column.value for column in next(sheet.rows)]
         missing = set(mapper.columns.values()) - set(headers)
         if missing:
             raise ValueError(_(
@@ -86,7 +79,7 @@ class SwissvoteDatasetField(UploadField):
         for index in range(2, sheet.max_row + 1):
             vote = SwissVote()
             all_columns_empty = True
-            errors_of_empty_columns = []
+            column_errors = []
             for (
                 attribute, column, type_, nullable, precision, scale
             ) in mapper.items():
@@ -119,10 +112,6 @@ class SwissvoteDatasetField(UploadField):
                             value = int(value) if value else None
                         else:
                             value = int(cell.value)
-                    elif type_ == 'INT4RANGE':
-                        value = NumericRange(*[
-                            int(bound) for bound in cell.value.split('-')
-                        ])
                     elif type_.startswith('NUMERIC'):
                         if isinstance(cell.value, str):
                             value = cell.value
@@ -144,11 +133,11 @@ class SwissvoteDatasetField(UploadField):
 
                 else:
                     if not nullable and value is None:
-                        errors_of_empty_columns.append((index, column, "∅"))
+                        column_errors.append((index, column, "∅"))
                     mapper.set_value(vote, attribute, value)
 
             if not all_columns_empty:
-                errors.extend(errors_of_empty_columns)
+                errors.extend(column_errors)
                 data.append(vote)
 
         if errors:

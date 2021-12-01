@@ -251,7 +251,7 @@ def reset_billing(self, request):
     for invoice in self.invoices.query():
         session.delete(invoice)
 
-    request.success(_("The billing was successfully reset"))
+    request.success(_("The billing was successfully reset."))
 
 
 @FeriennetApp.html(
@@ -381,6 +381,7 @@ def view_execute_import(self, request):
                 item.tid = payments[invoice.user_id].tid
                 item.source = 'xml'
                 item.paid = True
+                item.payment_date = payments[invoice.user_id].valuta_date
 
         request.success(_("Imported ${count} payments", mapping={
             'count': len(payments)
@@ -486,7 +487,7 @@ def view_manual_booking_form(self, request, form):
         count = self.add_manual_position(form.users, form.text, form.amount)
 
         if not count:
-            request.alert(_("No manual bookings were created"))
+            request.alert(_("No manual bookings were created."))
         else:
             request.success(_("Created ${count} manual bookings", mapping={
                 'count': count

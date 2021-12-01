@@ -1,5 +1,6 @@
 from onegov.swissvotes.models.actor import Actor
-from onegov.swissvotes.models.column_mapper import ColumnMapper
+from onegov.swissvotes.models.column_mapper import ColumnMapperDataset
+from onegov.swissvotes.models.column_mapper import ColumnMapperMetadata
 from onegov.swissvotes.models.file import SwissVoteFile
 from onegov.swissvotes.models.file import TranslatablePageFile
 from onegov.swissvotes.models.page import TranslatablePage
@@ -13,7 +14,8 @@ from onegov.swissvotes.models.vote import SwissVote
 
 __all__ = (
     'Actor',
-    'ColumnMapper',
+    'ColumnMapperDataset',
+    'ColumnMapperMetadata',
     'PolicyArea',
     'PolicyAreaDefinition',
     'Principal',

@@ -436,9 +436,11 @@
     <div tal:define="show_title show_title|nothing">
         <h3 i18n:translate class="${'' if show_title else 'show-for-sr'}">Selected Topics</h3>
         <div class="grid-x grid-padding-x" data-equalizer data-equalize-on="medium">
-            <div class="cell small-12 medium-6 large-4 homepage-tile" tal:repeat="item tiles">
-                <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
-            </div>
+            <tal:block tal:repeat="item tiles">
+                <div class="cell small-12 medium-6 large-4 homepage-tile" tal:condition="item.links">
+                    <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
+                </div>
+            </tal:block>    
         </div>
     </div>
 </metal:homepage-tiles>
@@ -1296,7 +1298,7 @@
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
         <div class="orbit-wrapper">
-            <div class="orbit-controls">
+            <div  tal:condition="images and len(images) > 1" class="orbit-controls">
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span>&#9664;&#xFE0E;</button>
                 <button class="orbit-next"><span class="show-for-sr">Next Slide</span>&#9654;&#xFE0E;</button>
             </div>
@@ -1309,7 +1311,7 @@
                 </li>
             </ul>
         </div>
-        <metal:b use-macro="layout.macros['orbit-bullets']" />
+        <metal:b tal:condition="images and len(images) > 1" use-macro="layout.macros['orbit-bullets']" />
     </div>
     <div class="slider no-images" tal:condition="not images and request.is_manager">
         <tal:b i18n:translate>
@@ -2132,24 +2134,14 @@
 </metal:focus>
 
 <metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
-    <tal:b tal:define="page layout.page_by_path(page_path); page_url request.link(page) if page else None">
         <div class="focus-image" tal:condition="image_src">
-            <a href="${image_url or page_url}" tal:condition="image_url or page_url">
-                <img src="${image_src}" alt="Focus Image">
-            </a>
-            <img tal:condition="python: not image_url and not page_url" src="${image_src}" alt="Focus Image">
+            <img src="${image_src}" alt="Focus Image">
         </div>
-        <tal:b  tal:condition="page">
-            <h5 class="focus-title">${page.title}</h5>
-            <div class="focus-lead">${page.lead}</div>
-            <div class="focus-text" tal:content="structure page.text" />
-        </tal:b>
-        <div class="panel" tal:condition="python: not page and not image_src">
+        <div class="panel" tal:condition="python: not image_src">
             <p i18n:translate="">Available options for the focus widget:</p>
             <code>&lt;focus<br>
                 image-src="https://..."<br>
-                image-url="https://on-image-click.com"<br>
-                page-path="kontakte"<br>
+                focus-url="https://on-image-click.com"<br>
                 title="..."<br>
                 hide-title=""<br>
                 hide-lead=""<br>
@@ -2158,7 +2150,6 @@
                 &lt;/focus&gt;
             </code>
         </div>
-    </tal:b>
 </metal:focus>
 
 <metal:chat define-macro="chat">

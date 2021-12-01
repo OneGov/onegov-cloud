@@ -61,6 +61,15 @@ $footer-hover-color: $primary-fg-color;
 }
 
 .partners {
+    @include breakpoint(small only) {
+        margin-bottom: -1rem;
+
+
+        &>div {
+            margin-bottom: 1rem;
+        }
+    }
+
     .card {
         align-items: center;
         height: 100%;

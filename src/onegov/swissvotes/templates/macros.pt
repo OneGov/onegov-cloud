@@ -187,7 +187,7 @@
 
     <metal:image_gallery_item define-macro="image_gallery_item" i18n:domain="onegov.swissvotes">
         <div class="image-container ${additional|nothing}">
-            <img src="${item.thumbnail}" data-src="${item.image}" alt="{item.label}" id="${'img-' + index + id_suffix}">
+            <img src="${item.thumbnail}" data-src="${item.image}" id="${'img-' + index + id_suffix}">
             <a tal:condition="item.url" href="${item.url}" target="_blank" i18n:translate="">${item.label}</a>
             <span tal:condition="not: item.url" i18n:translate="">${item.label}</span>
             <div class="modal" id="${'modal-' + index + id_suffix}">

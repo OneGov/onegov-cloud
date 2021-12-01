@@ -16,7 +16,8 @@ def test_translator_search(session):
         first_name='Sebastian Hans',
         last_name='Meier Hugentobler',
         expertise_interpreting_types=[],
-        expertise_professional_guilds=guild_types[0:3]
+        expertise_professional_guilds=guild_types[0:3],
+        expertise_professional_guilds_other=['Psychologie', 'Religion']
     )
 
     mary = create_translator(
@@ -25,10 +26,13 @@ def test_translator_search(session):
         first_name='Mary Astiana',
         last_name='Sitkova Lavrova',
         expertise_interpreting_types=interpreting_types[0:1],
-        expertise_professional_guilds=[]
+        expertise_professional_guilds=[],
+        expertise_professional_guilds_other=['Geologie']
     )
 
     translators = TranslatorCollection(session)
+
+    # term
     translators.search = 'Lavrov'
     assert translators.query().one().last_name == 'Sitkova Lavrova'
 
@@ -41,14 +45,28 @@ def test_translator_search(session):
     translators.search = 'astian'
     assert translators.query().all() == [seba, mary]
 
+    # interpreting types
     translators.interpret_types = [interpreting_types[0]]
     assert translators.query().all() == [mary]
     translators.interpret_types.append(interpreting_types[1])
     assert translators.query().all() == []
 
+    # professional expertise
+    assert translators.available_additional_professional_guilds == [
+        'Geologie', 'Psychologie', 'Religion'
+    ]
+
     translators.interpret_types = []
     translators.guilds = guild_types[0:2]
     assert translators.query().all() == [seba]
+
+    translators.search = ''
+    translators.guilds = [guild_types[0], 'Psychologie', 'Religion']
+    assert translators.query().all() == [seba]
+
+    translators.search = ''
+    translators.guilds = ['Geologie']
+    assert translators.query().all() == [mary]
 
 
 def test_translator_collection(session):

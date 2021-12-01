@@ -105,9 +105,12 @@ class SearchForm(Form):
 
         self.policy_area.tree = serialize(PolicyAreaDefinition.all())
 
-    def populate_choice(self, name, add_none=False):
+    def populate_choice(self, name, remove=[], add_none=False):
         field = getattr(self, name)
-        field.choices = list(SwissVote.codes(name).items())
+        field.choices = [
+            (code, text) for code, text in SwissVote.codes(name).items()
+            if code not in remove
+        ]
         if add_none:
             field.choices.append((-1, _("Missing")))
 
@@ -115,10 +118,10 @@ class SearchForm(Form):
         if hasattr(self, 'csrf_token'):
             self.delete_field('csrf_token')
         self.populate_choice('legal_form')
-        self.populate_choice('result')
-        self.populate_choice('position_federal_council', True)
-        self.populate_choice('position_national_council')
-        self.populate_choice('position_council_of_states')
+        self.populate_choice('result', [3, 8, 9])
+        self.populate_choice('position_federal_council', [8, 9], True)
+        self.populate_choice('position_national_council', [8, 9])
+        self.populate_choice('position_council_of_states', [8, 9])
         self.populate_policy_area()
 
     def select_all(self, name):

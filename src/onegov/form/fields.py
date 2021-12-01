@@ -224,7 +224,9 @@ class TagsField(StringField):
     widget = TagsWidget()
 
     def process_formdata(self, valuelist):
-        if valuelist:
+        if valuelist == ['[]']:
+            self.data = []
+        elif valuelist:
             values = (v.strip() for v in valuelist[0].split(','))
             values = (v for v in values if v)
 

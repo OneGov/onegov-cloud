@@ -196,6 +196,9 @@ def test_user_sources(session):
 
     assert users.sources == ('ldap', 'msal')
 
+    assert UserCollection(session, source={'ldap'}).query().count() == 2
+    assert UserCollection(session, source={'ldap', ''}).query().count() == 3
+
 
 def test_user_group(session):
     groups = UserGroupCollection(session)

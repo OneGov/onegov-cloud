@@ -1,9 +1,12 @@
 from onegov.activity import InvoiceCollection, PeriodCollection, \
     InvoiceReference
+from datetime import date
 from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.exports.booking import BookingExport
 from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
+import transaction
+
 
 
 def test_exports(client, scenario):
@@ -75,11 +78,12 @@ def test_exports(client, scenario):
             translate=lambda text, *args, **kwargs: text,
             locale='de_CH',
             current_username=(
-                    admin and 'admin@example.org' or 'organiser@example.org'
+                admin and 'admin@example.org'
+                or 'organiser@example.org'
             )
         )
 
-    # Export buchungen
+    # Export bookings
     rows = BookingExport().run(
         form=Bunch(selected_period=scenario.latest_period),
         session=session
@@ -111,6 +115,16 @@ def test_exports(client, scenario):
         bucket='esr-v1'
     ))
 
+    invoices = invoices.query_items()
+
+    # Mark items as paid
+    for item in invoices:
+        item.paid = True
+        item.payment_date = date(2020, 3, 5)
+
+    transaction.commit()
+    scenario.refresh()
+
     # Export invoice items with tags
     items = list(InvoiceItemExport().run(
         form=Bunch(selected_period=scenario.latest_period),
@@ -123,4 +137,4 @@ def test_exports(client, scenario):
     assert len(items) == 1
     data = dict(items[0])
     assert len(data['Invoice Item References'].splitlines()) == 2
-
+    assert data['Invoice Item Payment Date'] == date(2020, 3, 5)

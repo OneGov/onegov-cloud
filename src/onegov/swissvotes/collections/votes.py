@@ -4,13 +4,11 @@ from datetime import date
 from decimal import Decimal
 from decimal import InvalidOperation
 from onegov.core.collection import Pagination
-from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
-from psycopg2.extras import NumericRange
 from sqlalchemy import func
 from sqlalchemy import or_
-from sqlalchemy.orm import undefer_group
 from xlsxwriter.workbook import Workbook
 
 
@@ -336,7 +334,8 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query(SwissVote)
 
-        def in_or_none(column, values):
+        def in_or_none(column, values, extra={}):
+            values = values + [x for y, x in extra.items() if y in values]
             statement = column.in_(values)
             if -1 in values:
                 statement = or_(statement, column.is_(None))
@@ -349,9 +348,6 @@ class SwissVoteCollection(Pagination):
         if self.legal_form:
             query = query.filter(SwissVote._legal_form.in_(self.legal_form))
         if self.result:
-            # XXX votes with deciding questions have not been properly added
-            # to the query view (no way to select for their results), so we
-            # always include them here
             query = query.filter(or_(
                 SwissVote._result.in_(self.result),
                 SwissVote._result == None,
@@ -396,21 +392,24 @@ class SwissVoteCollection(Pagination):
             query = query.filter(
                 in_or_none(
                     SwissVote._position_federal_council,
-                    self.position_federal_council
+                    self.position_federal_council,
+                    {1: 9, 2: 8}
                 )
             )
         if self.position_national_council:
             query = query.filter(
                 in_or_none(
                     SwissVote._position_national_council,
-                    self.position_national_council
+                    self.position_national_council,
+                    {1: 9, 2: 8}
                 )
             )
         if self.position_council_of_states:
             query = query.filter(
                 in_or_none(
                     SwissVote._position_council_of_states,
-                    self.position_council_of_states
+                    self.position_council_of_states,
+                    {1: 9, 2: 8}
                 )
             )
 
@@ -462,9 +461,9 @@ class SwissVoteCollection(Pagination):
 
         added = 0
         updated = 0
-        query = self.session.query(SwissVote).options(undefer_group("dataset"))
+        query = self.session.query(SwissVote)
         existing = {vote.bfs_number: vote for vote in query}
-        mapper = ColumnMapper()
+        mapper = ColumnMapperDataset()
         for vote in votes:
             old = existing.get(vote.bfs_number)
             if old:
@@ -482,6 +481,24 @@ class SwissVoteCollection(Pagination):
 
         return added, updated
 
+    def update_metadata(self, metadata):
+        added = 0
+        updated = 0
+        for bfs_number, files in metadata.items():
+            vote = self.session.query(SwissVote)
+            vote = vote.filter_by(bfs_number=bfs_number).first()
+            if vote:
+                for filename, data in files.items():
+                    old = vote.campaign_material_metadata.get(filename)
+                    if not old:
+                        added += 1
+                        vote.campaign_material_metadata[filename] = data
+                    elif old != data:
+                        updated += 1
+                        vote.campaign_material_metadata[filename] = data
+
+        return added, updated
+
     @property
     def last_modified(self):
         """ Returns the last change of any votes. """
@@ -489,12 +506,12 @@ class SwissVoteCollection(Pagination):
 
     def export_csv(self, file):
         """ Exports all votes according to the code book. """
-        mapper = ColumnMapper()
+        mapper = ColumnMapperDataset()
 
         csv = writer(file)
         csv.writerow(mapper.columns.values())
 
-        query = self.query().options(undefer_group("dataset"))
+        query = self.query()
         query = query.order_by(None).order_by(SwissVote.bfs_number)
 
         for vote in query:
@@ -508,8 +525,6 @@ class SwissVoteCollection(Pagination):
                     row.append(f'{value:%d.%m.%Y}')
                 elif isinstance(value, int):
                     row.append(str(value))
-                elif isinstance(value, NumericRange):
-                    row.append(f'{value.lower}-{value.upper}')
                 elif isinstance(value, Decimal):
                     row.append(
                         f'{value:f}'.replace('.', ',').rstrip('0').rstrip(',')
@@ -518,14 +533,14 @@ class SwissVoteCollection(Pagination):
 
     def export_xlsx(self, file):
         """ Exports all votes according to the code book. """
-        mapper = ColumnMapper()
+        mapper = ColumnMapperDataset()
 
         workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
         workbook.add_worksheet('CITATION')
         worksheet = workbook.add_worksheet('DATA')
         worksheet.write_row(0, 0, mapper.columns.values())
 
-        query = self.query().options(undefer_group("dataset"))
+        query = self.query()
         query = query.order_by(None).order_by(SwissVote.bfs_number)
 
         row = 0
@@ -540,9 +555,5 @@ class SwissVoteCollection(Pagination):
                     worksheet.write_datetime(row, column_, value)
                 elif isinstance(value, int) or isinstance(value, Decimal):
                     worksheet.write_number(row, column_, value)
-                elif isinstance(value, NumericRange):
-                    worksheet.write_string(
-                        row, column_, f'{value.lower}-{value.upper}'
-                    )
 
         workbook.close()

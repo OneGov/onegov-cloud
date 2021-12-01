@@ -12,9 +12,11 @@ from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.forms import AttachmentsForm
 from onegov.swissvotes.layouts import DeleteVoteAttachmentLayout
 from onegov.swissvotes.layouts import DeleteVoteLayout
+from onegov.swissvotes.layouts import ManageCampaingMaterialLayout
 from onegov.swissvotes.layouts import ManageCampaingMaterialNayLayout
 from onegov.swissvotes.layouts import ManageCampaingMaterialYeaLayout
 from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
+from onegov.swissvotes.layouts import VoteCampaignMaterialLayout
 from onegov.swissvotes.layouts import VoteLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import Actor
@@ -37,14 +39,12 @@ def view_vote(self, request):
     next = query.order_by(SwissVote.bfs_number.asc())
     next = next.filter(SwissVote.bfs_number > self.bfs_number).first()
 
-    bfs_map = self.bfs_map(request.locale)
-    bfs_map_host = self.bfs_map_host(request.locale)
-    if bfs_map_host:
-        request.content_security_policy.default_src |= {bfs_map_host}
+    if self.bfs_map_host:
+        request.content_security_policy.default_src |= {self.bfs_map_host}
 
     return {
         'layout': layout,
-        'bfs_map': bfs_map,
+        'bfs_map': self.bfs_map,
         'prev': prev,
         'next': next,
         'map_preview': request.link(StaticFile('images/map-preview.png')),
@@ -58,6 +58,7 @@ def view_vote(self, request):
     name='percentages'
 )
 def view_vote_percentages(self, request):
+
     def create(text, text_label=None, percentage=None,
                yeas_p=None, nays_p=None, yeas=None, nays=None, code=None,
                yea_label=None, nay_label=None, none_label=None,
@@ -76,17 +77,15 @@ def view_vote_percentages(self, request):
             'empty': empty
         }
 
-        default_yea_label = _("${x}% yea") if not self.deciding_question \
-            else _("${x}% for the initiative")
-
-        default_nay_label = _("${x}% nay") if not self.deciding_question \
-            else _("${x}% for the counter-proposal")
-
-        yea_label_no_perc = _("${x} yea") if not self.deciding_question \
-            else _("${x} for the initiative")
-
-        nay_label_no_per = _("${x} nay") if not self.deciding_question \
-            else _("${x} for the counter-proposal")
+        default_yea_label = _("${x}% yea")
+        default_nay_label = _("${x}% nay")
+        yea_label_no_perc = _("${x} yea")
+        nay_label_no_per = _("${x} nay")
+        if self._legal_form == 5:
+            default_yea_label = _("${x}% for the popular initiative")
+            default_nay_label = _("${x}% for the counter-proposal")
+            yea_label_no_perc = _("${x} for the popular initiative")
+            nay_label_no_per = _("${x} for the counter-proposal")
 
         if percentage is not None:
             yea = round(float(percentage), 1)
@@ -188,14 +187,14 @@ def view_vote_percentages(self, request):
             yea_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending Yes ${x}%"
-            ) if not self.deciding_question else _(
+            ) if self._legal_form != 5 else _(
                 "Electoral shares of parties: "
                 "Parties preferring the initiative ${x}%"
             ),
             nay_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending No ${x}%"
-            ) if not self.deciding_question else _(
+            ) if self._legal_form != 5 else _(
                 "Electoral shares of parties: "
                 "Parties preferring the counter-proposal ${x}%"
             ),
@@ -226,6 +225,28 @@ def view_vote_strengths(self, request):
     return {
         'layout': VoteStrengthsLayout(self, request),
         'Actor': Actor
+    }
+
+
+@SwissvotesApp.html(
+    model=SwissVote,
+    permission=Public,
+    template='campaign_material.pt',
+    name='campaign-material'
+)
+def view_vote_campaign_material(self, request):
+    layout = VoteCampaignMaterialLayout(self, request)
+    files = [
+        (file, layout.metadata(file.filename))
+        for file in self.campaign_material_other
+    ]
+
+    def sort_func(item):
+        return item[1].get('order', 999), item[1].get('title', '')
+
+    return {
+        'layout': layout,
+        'files': sorted(files, key=sort_func)
     }
 
 
@@ -326,6 +347,50 @@ for attribute_name, attribute in SwissVote.localized_files().items():
 @SwissvotesApp.html(
     model=SwissVote,
     template='attachments.pt',
+    name='manage-campaign-material',
+    permission=Private
+)
+def view_manage_campaign_material(self, request):
+    layout = ManageCampaingMaterialLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload-campaign-material')
+        ),
+        'files': self.campaign_material_other,
+        'notice': self,
+    }
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    name='upload-campaign-material',
+    permission=Private,
+    request_method='POST'
+)
+def upload_manage_campaign_material(self, request):
+    request.assert_valid_csrf_token()
+
+    attachment = SwissVoteFile(id=random_token())
+    attachment.name = 'campaign_material_other-{}'.format(
+        request.params['file'].filename
+    )
+    attachment.reference = as_fileintent(
+        request.params['file'].file,
+        request.params['file'].filename
+    )
+
+    if attachment.reference.content_type != 'application/pdf':
+        raise HTTPUnsupportedMediaType()
+
+    self.files.append(attachment)
+
+
+@SwissvotesApp.html(
+    model=SwissVote,
+    template='attachments.pt',
     name='manage-campaign-material-yea',
     permission=Private
 )
@@ -420,12 +485,12 @@ def upload_manage_campaign_material_nay(self, request):
 )
 def delete_vote_attachment(self, request, form):
     layout = DeleteVoteAttachmentLayout(self, request)
-    url = request.link(
-        layout.parent,
-        'manage-campaign-material-{}'.format(
-            'nay' if 'nay' in self.name else 'yea'
-        )
-    )
+    name = 'manage-campaign-material'
+    if 'yea' in self.name:
+        name += '-yea'
+    if 'nay' in self.name:
+        name += '-nay'
+    url = request.link(layout.parent, name)
 
     if form.submitted(request):
         request.session.delete(self)

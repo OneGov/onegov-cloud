@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-09-06 10:07+0200\n"
+"POT-Creation-Date: 2021-11-30 16:28+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -22,9 +22,6 @@ msgstr "Aucune donnée"
 msgid "Sheet DATA is missing."
 msgstr "Tableau DATA manque."
 
-msgid "Sheet CITATION is missing."
-msgstr "Tableau CITATION manque."
-
 #, python-format
 msgid "Some columns are missing: ${columns}."
 msgstr "Il manque certaines colonnes: ${columns}."
@@ -32,6 +29,9 @@ msgstr "Il manque certaines colonnes: ${columns}."
 #, python-format
 msgid "Some cells contain invalid values: ${errors}."
 msgstr "Les valeurs de certaines cellules sont non valides: ${errors}"
+
+msgid "Sheet 'Metadaten zu Scans' is missing."
+msgstr "Tableau 'Metadaten zu Scans' manque."
 
 msgid "Select Some Options"
 msgstr "Sélectionner les options"
@@ -143,21 +143,6 @@ msgstr "Titre"
 msgid "Content"
 msgstr "Contenu"
 
-msgid "From date"
-msgstr "De"
-
-msgid "To date"
-msgstr "A"
-
-msgid "Legal form"
-msgstr "Type de processus"
-
-msgid "Voting result"
-msgstr "Résultat de la votation"
-
-msgid "Policy area"
-msgstr "Domaine politique"
-
 msgid "Text Search"
 msgstr "Texte"
 
@@ -177,6 +162,21 @@ msgstr ""
 "Recherche dans l'intégralité du texte, pièces jointes comprises. "
 "Sélectionnez \"non\" si vous souhaitez limiter la recherche au titre, mot-"
 "clé, numéro de vote et numéro de procédure."
+
+msgid "Policy area"
+msgstr "Domaine politique"
+
+msgid "Legal form"
+msgstr "Type de processus"
+
+msgid "Voting result"
+msgstr "Résultat de la votation"
+
+msgid "From date"
+msgstr "De"
+
+msgid "To date"
+msgstr "A"
 
 msgid "Position of the Federal Council"
 msgstr "Position du Conseil fédéral"
@@ -198,6 +198,12 @@ msgstr "La mise à jour de l’ensemble de données peut prendre un certain temp
 
 msgid "Dataset"
 msgstr "Base de données"
+
+msgid "Updating the metadata may take some time."
+msgstr "La mise à jour des métadonnées peut prendre un certain temps."
+
+msgid "Metadata"
+msgstr "Métadonnées"
 
 msgid "Votes"
 msgstr "Votations"
@@ -229,11 +235,14 @@ msgstr "Nouvelle page"
 msgid "Delete attachment"
 msgstr "Supprimer la pièce jointe"
 
-msgid "Campaign material for a Yes"
-msgstr "Matériel de campagne pour le oui"
+msgid "Campaign material"
+msgstr "Matériel de la campagne"
 
-msgid "Campaign material for a No"
-msgstr "Matériel de campagne pour le non"
+msgid "Graphical campaign material for a Yes"
+msgstr "Matériel visuel de la campagne pour le oui"
+
+msgid "Graphical campaign material for a No"
+msgstr "Matériel visuel de la campagne pour le non"
 
 msgid "Delete vote"
 msgstr "Supprimer cette votation"
@@ -241,11 +250,17 @@ msgstr "Supprimer cette votation"
 msgid "Voter strengths"
 msgstr "Poids électoraux"
 
-msgid "Update dataset"
-msgstr "Actualiser la base de données"
+msgid "Documents from the campaign"
+msgstr "Documents de la campagne de votation"
 
-msgid "Update external resources"
-msgstr "Actualiser des resources externes"
+msgid "Update dataset on the votes"
+msgstr "Actualisier la base de données sur les votations"
+
+msgid "Update metadata on the campaign material"
+msgstr "Actualiser les métadonnées sur les matériaux de campagne"
+
+msgid "Update external sources for images"
+msgstr "Actualiser les sources externes pour les images"
 
 msgid "Download dataset (CSV)"
 msgstr "Télécharger le fichier de données (CSV)"
@@ -1375,75 +1390,38 @@ msgstr "Initiative populaire"
 msgid "Direct counter-proposal"
 msgstr "Contre-projet direct"
 
-msgid "Deciding question"
+msgid "Tie-breaker"
 msgstr "Question subsidiaire"
 
 msgid "Rejected"
 msgstr "Rejeté"
 
-msgid "Preferred the counter-proposal"
-msgstr "Contre-projet préféré"
-
 msgid "Accepted"
 msgstr "Accepté"
-
-msgid "Preferred the popular initiative"
-msgstr "Initiative préférée"
 
 msgid "Majority of the cantons not necessary"
 msgstr "Majorité des cantons non nécessaire"
 
-msgid "For the counter-proposal"
-msgstr "Pour le contre-projet"
+msgid "Counter-proposal preferred"
+msgstr "Contre-projet préféré"
 
-msgid "For the initiative"
-msgstr "Pour l'initiative"
-
-msgid "Federal Department of Foreign Affairs (FDFA)"
-msgstr "Département fédéral des affaires étrangères (DFAE)"
-
-msgid "Federal Department of Home Affairs (FDHA)"
-msgstr "Département fédéral de l'intérieur (DFI)"
-
-msgid "Federal Department of Justice and Police (FDJP)"
-msgstr "Département fédéral de justice et police (DFJP)"
-
-msgid "Federal Department of Defence, Civil Protection and Sport (DDPS)"
-msgstr ""
-"Département fédéral de la défense, de la protection de la population et des "
-"sports (DDPS)"
-
-msgid "Federal Department of Finance (FDF)"
-msgstr "Département fédéral des finances (DFF)"
-
-msgid "Federal Department of Economic Affairs, Education and Research (EAER)"
-msgstr ""
-"Département fédéral de l'économie, de la formation et de la recherche (DEFR)"
-
-msgid ""
-"Federal Department of the Environment, Transport, Energy and Communications "
-"(DETEC)"
-msgstr ""
-"Département fédéral de l'environnement, des transports, de l'énergie et de "
-"la communication (DETEC)"
-
-msgid "Federal Chancellery (FCh)"
-msgstr "Chancellerie fédérale (ChF)"
+msgid "Popular initiative preferred"
+msgstr "Initiative préférée"
 
 msgid "Accepting"
 msgstr "Accepter"
 
-msgid "Preference for the popular initiative"
-msgstr "Préférence pour l'initiative populaire"
-
 msgid "Rejecting"
 msgstr "Rejeter"
+
+msgid "None"
+msgstr "Aucune"
 
 msgid "Preference for the counter-proposal"
 msgstr "Préférence pour le contre-projet"
 
-msgid "None"
-msgstr "Aucune"
+msgid "Preference for the popular initiative"
+msgstr "Préférence pour l'initiative populaire"
 
 msgid "Yea"
 msgstr "Oui"
@@ -1465,6 +1443,54 @@ msgstr "Cette formation n'existe plus"
 
 msgid "unknown"
 msgstr "inconnu"
+
+msgid "Mixed"
+msgstr "Mixte"
+
+msgid "German"
+msgstr "Allemand"
+
+msgid "French"
+msgstr "Français"
+
+msgid "Italian"
+msgstr "Italien"
+
+msgid "Rhaeto-Romanic"
+msgstr "Réto-roman"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Collection of arguments"
+msgstr "Argumentaire"
+
+msgid "Letter"
+msgstr "Lettre"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "Pamphlet"
+msgstr "Prospectus"
+
+msgid "Media release"
+msgstr "Communiqué de presse"
+
+msgid "List of members"
+msgstr "Liste des membres"
+
+msgid "Press article"
+msgstr "Article de presse"
+
+msgid "Legal text"
+msgstr "Texte juridique"
+
+msgid "Text of a presentation"
+msgstr "Texte d’exposé"
+
+msgid "Statistical data"
+msgstr "Données statistiques"
 
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
@@ -1504,6 +1530,27 @@ msgstr "Veuillez glisser les fichiers à importer ici"
 
 msgid "Upload"
 msgstr "Charger"
+
+msgid "Document title"
+msgstr "Titre du document"
+
+msgid "Position towards the vote"
+msgstr "Position vis-à-vis de la votation"
+
+msgid "Author"
+msgstr "Auteur:e"
+
+msgid "Edited by"
+msgstr "Mandant:e / éditeur:trice"
+
+msgid "Date of publication"
+msgstr "Date du document"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Type of document"
+msgstr "Type de document"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -1656,7 +1703,7 @@ msgstr "Durée entre le message du Conseil Fédéral et l’arrêté du Parlemen
 msgid "Parliament's position"
 msgstr "Position du Parlement"
 
-msgid "for the initiative"
+msgid "for the popular initiative"
 msgstr "pour l'initiative"
 
 msgid "for the counter-proposal"
@@ -1668,6 +1715,18 @@ msgid ""
 msgstr ""
 "Durée entre l’arrêté du Parlement et l’arrêté constatant l’aboutissement du "
 "référendum"
+
+msgid "Online information by the federal authorities"
+msgstr "Informations en ligne des autorités"
+
+msgid "Link Federal Council"
+msgstr "Lien Conseil fédéral"
+
+msgid "Link department"
+msgstr "Lien département"
+
+msgid "Link federal office"
+msgstr "Lien office fédéral"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"
@@ -1761,6 +1820,9 @@ msgstr "(majoritairement en faveur)"
 msgid "(predominantly negative)"
 msgstr "(majoritairement en défaveur)"
 
+msgid "Display the list of documents"
+msgstr "Afficher la liste des documents"
+
 msgid "People"
 msgstr "Peuple"
 
@@ -1787,6 +1849,18 @@ msgstr "Rapport technique"
 
 msgid "Cockpit with selected results"
 msgstr "Cockpit avec des résultats d'analyse"
+
+msgid ""
+"Due to data protection requirements, Swissvotes publishes a slightly reduced "
+"version of this dataset. Access to the full version might be possible for "
+"research purposes; see the Swissvotes codebook for more details on this "
+"(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
+msgstr ""
+"Pour des raisons de protection des données, une version réduite de cet "
+"ensemble de données est publiée sur Swissvotes. L’accès à l’ensemble des "
+"données est éventuellement possible à des fins de recherche; vous trouverez "
+"davantage d’informations à ce propos dans le codebook de Swissvotes (www."
+"swissvotes.ch/page/dataset/codebook-de.pdf)."
 
 msgid "Filter"
 msgstr "Filtre de recherche"
@@ -1876,28 +1950,28 @@ msgid "${x}% yea"
 msgstr "${x}% Oui"
 
 #, python-format
-msgid "${x}% for the initiative"
-msgstr "${x}% pour l'initiative"
-
-#, python-format
 msgid "${x}% nay"
 msgstr "${x}% Non"
-
-#, python-format
-msgid "${x}% for the counter-proposal"
-msgstr "${x}% pour le contre-projet"
 
 #, python-format
 msgid "${x} yea"
 msgstr "${x} Oui"
 
 #, python-format
-msgid "${x} for the initiative"
-msgstr "${x} pour l'initiative"
-
-#, python-format
 msgid "${x} nay"
 msgstr "${x} Non"
+
+#, python-format
+msgid "${x}% for the popular initiative"
+msgstr "${x}% pour l'initiative"
+
+#, python-format
+msgid "${x}% for the counter-proposal"
+msgstr "${x}% pour le contre-projet"
+
+#, python-format
+msgid "${x} for the popular initiative"
+msgstr "${x} pour l'initiative"
 
 #, python-format
 msgid "${x} for the counter-proposal"
@@ -1957,6 +2031,10 @@ msgstr ""
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "La base de données contient des codes inconnus."
+
+#, python-format
+msgid "Metadata updated (${added} added, ${updated} updated)"
+msgstr "Métadonnées mises à jour (${added} ajouté, ${updated} modifié)"
 
 #, python-format
 msgid ""

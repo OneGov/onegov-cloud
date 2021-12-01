@@ -99,7 +99,7 @@ def edit_occasion(self, request, form):
         warning = _(
             "The period of this occasion has already been confirmed. "
             "It is not recommended to change the period associated with "
-            "this occasion. "
+            "this occasion."
         )
     else:
         warning = None

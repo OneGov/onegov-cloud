@@ -133,6 +133,13 @@ class GenericResponseExtension(object):
         """
         return pq(self.body)
 
+    def __or__(self, text):
+        """ Grep style searching the response, e.g.
+        `print(client.get('/') | 'Text')`
+
+        """
+        return '\n'.join([l for l in str(self).split('\n') if text in l])
+
 
 class SkipFirstFormExtension(object):
 

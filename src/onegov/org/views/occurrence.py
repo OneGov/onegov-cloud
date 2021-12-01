@@ -1,18 +1,17 @@
 """ The onegov org collection of images uploaded to the site. """
 
-from collections import OrderedDict
 from datetime import date
+from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
-from onegov.org.forms import ExportForm
+from onegov.org.forms import ExportForm, EventImportForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
-from sqlalchemy.orm import joinedload
 
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
@@ -133,7 +132,7 @@ def ical_export_occurences(self, request):
     )
 
 
-@OrgApp.form(model=OccurrenceCollection, name='export', permission=Private,
+@OrgApp.form(model=OccurrenceCollection, name='export', permission=Public,
              form=ExportForm, template='export.pt')
 def export_occurrences(self, request, form, layout=None):
     """ Export the occurrences in various formats. """
@@ -143,10 +142,9 @@ def export_occurrences(self, request, form, layout=None):
     layout.editbar_links = None
 
     if form.submitted(request):
-        results = run_export(
-            request,
-            layout.export_formatter(form.format)
-        )
+        import_form = EventImportForm()
+        import_form.request = request
+        results = import_form.run_export()
 
         return form.as_export_response(results, title=request.translate(_(
             "Events"
@@ -158,35 +156,6 @@ def export_occurrences(self, request, form, layout=None):
         'form': form,
         'explanation': _("Exports all future events.")
     }
-
-
-def run_export(request, formatter):
-    occasions = OccurrenceCollection(request.session, outdated=False)
-
-    query = occasions.query()
-    query = query.options(joinedload(Occurrence.event))
-    query = query.order_by(Occurrence.start)
-
-    attributes = (
-        'title', 'location', 'event.organizer', 'tags',
-        'start', 'end', 'event.description'
-    )
-
-    def get(obj, attr):
-
-        if attr == 'tags':
-            return [request.translate(_(tag)) for tag in obj.tags]
-
-        for a in attr.split('.'):
-            obj = value = getattr(obj, a)
-
-        return value
-
-    return [
-        OrderedDict(
-            (attr, formatter(get(occasion, attr))) for attr in attributes)
-        for occasion in query.all()
-    ]
 
 
 @OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
@@ -217,3 +186,45 @@ def json_export_occurences(self, request):
             'url': request.link(occurrence),
         } for occurrence in query
     ]
+
+
+@OrgApp.form(
+    model=OccurrenceCollection,
+    name='import',
+    template='form.pt',
+    form=EventImportForm,
+    permission=Private
+)
+def import_occurrences(self, request, form, layout=None):
+
+    if form.submitted(request):
+        count, errors = form.run_import()
+        if errors:
+            request.alert(_(
+                'The following line(s) contain invalid data: ${lines}',
+                mapping={'lines': ', '.join(errors)}
+            ))
+        elif form.dry_run.data:
+            request.success(_(
+                '${count} events will be imported',
+                mapping={'count': count}
+            ))
+        else:
+            request.success(_(
+                '${count} events imported',
+                mapping={'count': count}
+            ))
+            return redirect(request.link(self))
+
+    layout = layout or OccurrencesLayout(self, request)
+
+    return {
+        'layout': layout,
+        'callout': _(
+            'The same format as the export (XLSX) can be used for the '
+            'import.'
+        ),
+        'title': _('Import'),
+        'form': form,
+        'form_width': 'large',
+    }

@@ -1,16 +1,15 @@
 import os
-from datetime import datetime
-
 import yaml
 
 from click.testing import CliRunner
-from transaction import commit
-
+from datetime import datetime
 from onegov.chat import MessageCollection
+from onegov.core.cli.commands import cli as core_cli
 from onegov.event import Event, EventCollection
 from onegov.org.cli import cli
 from onegov.ticket import TicketCollection
 from onegov.user import User
+from transaction import commit
 
 
 def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
@@ -52,12 +51,12 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
     assert result.exit_code == 1
     assert "may not reference an existing path" in result.output
 
-    result = runner.invoke(cli, [
+    result = runner.invoke(core_cli, [
         '--config', cfg_path, '--select', '/onegov_org/newyork', 'delete'
     ], input='y\n')
 
     assert result.exit_code == 0
-    assert "New York was deleted successfully" in result.output
+    assert "Instance was deleted successfully" in result.output
 
 
 def test_fetch_with_state_and_tickets(
@@ -299,7 +298,6 @@ def test_fetch(cfg_path, session_manager, test_password):
     assert result.exit_code == 0
     assert "5 added, 0 updated, 0 deleted" in result.output
     assert get_session('qux').query(Event).first().state == 'published'
-
 
     # Bar[B, C] -> Qux
     result = runner.invoke(cli, [

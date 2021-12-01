@@ -1,19 +1,19 @@
 import copy
+import transaction
+
 from datetime import datetime
 from io import BytesIO
-from unittest import mock
-
-import transaction
-from webtest import Upload
-from xlsxwriter import Workbook
-
 from onegov.gis import Coordinates
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
+from openpyxl import load_workbook
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
+from unittest import mock
+from webtest import Upload
+from xlsxwriter import Workbook
 
 
 class FakeResponse:
@@ -70,6 +70,9 @@ def test_view_new_translator(client):
     page.form['spoken_languages_ids'] = [language_ids[0], language_ids[1]]
     page.form['written_languages_ids'] = [language_ids[2]]
     page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
+    page.form.get('expertise_professional_guilds', index=0).checked = True
+    page.form['expertise_professional_guilds_other'] = ['Psychologie']
+    page.form.get('expertise_interpreting_types', index=0).checked = True
     page.form['coordinates'] = encode_map_value({
         'lat': 46, 'lon': 7, 'zoom': 12
     })
@@ -92,14 +95,14 @@ def test_view_new_translator(client):
     assert '978654' in page
     assert 'Uncle' in page
     assert 'Bob' in page
-    # test lower-casing the user input
-    mail = 'test@test.com'
-    assert f'<a href="mailto:{mail}">{mail}</a>' in page
-
+    assert '<a href="mailto:test@test.com">test@test.com</a>' in page
     assert '756.1234.5678.97' in page
     assert 'All okay' in page
     assert '7890' in page
     assert 'DE07 1234 1234 1234 1234 12' in page
+    assert 'Ernährung und Landwirtschaft' in page
+    assert 'Psychologie' in page
+    assert 'Simultandolmetschen' in page
     assert str(round(drive_distance, 1)) in page
 
     # Test mother tongue set to the first ordered option
@@ -139,6 +142,7 @@ def test_view_new_translator(client):
     page.form['pers_id'] = 123456
     page.form['admission'] = 'in_progress'
     page.form['withholding_tax'] = True
+    page.form['self_employed'] = True
     page.form['gender'] = 'F'
     page.form['date_of_birth'] = '2019-01-01'
     page.form['nationality'] = 'PERU'
@@ -163,6 +167,11 @@ def test_view_new_translator(client):
     page.form['comments'] = 'My Comments'
     page.form['operation_comments'] = 'operational'
     page.form['for_admins_only'] = True
+    page.form.get('expertise_professional_guilds', index=0).checked = False
+    page.form.get('expertise_professional_guilds', index=1).checked = True
+    page.form['expertise_professional_guilds_other'] = ['Religion']
+    page.form.get('expertise_interpreting_types', index=0).checked = False
+    page.form.get('expertise_interpreting_types', index=1).checked = True
 
     # test removing all languages
     page.form['spoken_languages_ids'] = []
@@ -211,13 +220,19 @@ def test_view_new_translator(client):
     assert 'Kt. ZG' in page
     assert 'My Comments' in page
     assert 'operational' in page
+    assert 'Ernährung und Landwirtschaft' not in page
+    assert 'Wirtschaft' in page
+    assert 'Psychologie' not in page
+    assert 'Religion' in page
+    assert 'Simultandolmetschen' not in page
+    assert 'Konsektutivdolmetschen' in page
 
     assert language_names[3] in page
     assert language_names[0] not in page
     assert language_names[1] not in page
     assert language_names[2] not in page
 
-    # # try adding another with same email
+    # try adding another with same email
     page = client.get('/translators/new')
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
@@ -249,7 +264,7 @@ def test_view_languages(client):
     assert 'Arabic' in page
 
 
-def test_create_new_language(client):
+def test_manage_language(client):
     client.login_editor()
     client.get('/languages/new', status=403)
     client.login_admin()
@@ -273,6 +288,11 @@ def test_create_new_language(client):
     page.form['name'] = 'English (British)'
     page = page.form.submit().follow()
     assert 'English (British)' in page
+
+    page = client.get('/languages').click('English').click('Löschen')
+    page = client.get('/languages')
+    assert 'English' not in page
+    assert 'English (British)' not in page
 
 
 def test_view_search_translator(client):
@@ -336,6 +356,66 @@ def test_view_search_translator(client):
     page = page.form.submit().follow()
     assert 'Sitkova Lavrova' in page
     assert 'Hugentobler' not in page
+
+
+def test_view_export_translators(client):
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(session)
+
+    data = copy.deepcopy(translator_data)
+    data['spoken_languages'] = [languages[0]]
+    data['written_languages'] = [languages[1]]
+    data['expertise_professional_guilds'] = ['economy']
+    data['expertise_professional_guilds_other'] = ['Psychologie', 'Religion']
+    data['expertise_interpreting_types'] = ['simultaneous', 'whisper']
+
+    translators.add(**data)
+    transaction.commit()
+
+    client.login_admin()
+    response = client.get('/translators').click('Export')
+    sheet = load_workbook(BytesIO(response.body)).worksheets[0]
+    assert sheet.cell(2, 1).value == 1234
+    assert sheet.cell(2, 2).value == (
+        'nicht zertifiziert / Einsatz Dringlichkeit'
+    )
+    assert sheet.cell(2, 3).value == 0
+    assert sheet.cell(2, 4).value == 0
+    assert sheet.cell(2, 5).value == 'Benito'
+    assert sheet.cell(2, 6).value == 'Hugo'
+    assert sheet.cell(2, 7).value == 'Männlich'
+    assert sheet.cell(2, 8).value == data['date_of_birth'].isoformat()
+    assert sheet.cell(2, 9).value == 'CH'
+    # assert sheet.cell(2, 10).value == '{"lon":null,"zoom":null,"lat":null}'
+    assert sheet.cell(2, 11).value == 'Downing Street 5'
+    assert sheet.cell(2, 12).value == '4000'
+    assert sheet.cell(2, 13).value == 'Luzern'
+    assert sheet.cell(2, 14).value == None
+    assert sheet.cell(2, 15).value == '756.1234.4568.90'
+    assert sheet.cell(2, 16).value == 'R-BS'
+    assert sheet.cell(2, 17).value == 'Bullstreet 5'
+    assert sheet.cell(2, 18).value == 'Hugo Benito'
+    assert sheet.cell(2, 19).value == None
+    assert sheet.cell(2, 20).value == 'hugo@benito.com'
+    assert sheet.cell(2, 21).value == None
+    assert sheet.cell(2, 22).value == '079 000 00 00'
+    assert sheet.cell(2, 23).value == '041 444 44 44'
+    assert sheet.cell(2, 24).value == 'always'
+    assert sheet.cell(2, 25).value == None
+    assert sheet.cell(2, 26).value == 0
+    assert sheet.cell(2, 27).value == data['date_of_application'].isoformat()
+    assert sheet.cell(2, 28).value == data['date_of_decision'].isoformat()
+    assert sheet.cell(2, 29).value == None
+    assert sheet.cell(2, 30).value == 'German'
+    assert sheet.cell(2, 31).value == 'French'
+    assert sheet.cell(2, 32).value == 'Wirtschaft|Psychologie|Religion'
+    assert sheet.cell(2, 33).value == 'Simultandolmetschen|Flüsterdolmetschen'
+    assert sheet.cell(2, 34).value == 'all okay'
+    assert sheet.cell(2, 35).value == 'Some ref'
+    assert sheet.cell(2, 36).value == 0
+    assert sheet.cell(2, 37).value == None
+    assert sheet.cell(2, 38).value == None
 
 
 def test_file_security(client):

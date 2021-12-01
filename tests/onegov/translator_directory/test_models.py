@@ -9,9 +9,10 @@ from tests.onegov.translator_directory.shared import create_languages, \
 
 def test_translator(session):
     langs = create_languages(session)
+    assert all((lang.deletable for lang in langs))
+
     translators = TranslatorCollection(session)
-    translator = translators.add(
-        **translator_data, mother_tongues=[langs[0]])
+    translator = translators.add(**translator_data, mother_tongues=[langs[0]])
 
     assert translator.mother_tongues
     assert not translator.spoken_languages
@@ -20,6 +21,7 @@ def test_translator(session):
     assert translator.spoken_languages
     assert spoken.speakers == [translator]
     assert spoken.speakers_count == 1
+    assert not spoken.deletable
 
     written = langs[1]
     translator.written_languages.append(written)
@@ -27,6 +29,7 @@ def test_translator(session):
     assert written.writers_count == 1
     assert translator.written_languages == [written]
     assert not translator.files
+    assert not written.deletable
 
     cert = LanguageCertificateCollection(session).add(name='TestCert')
     translator.certificates.append(cert)
@@ -34,6 +37,24 @@ def test_translator(session):
     assert translator.certificates
     translator.drive_distance = 60.5
     session.flush()
+
+    # professional expertises
+    assert translator.expertise_professional_guilds == tuple()
+    assert translator.expertise_professional_guilds_other == tuple()
+    assert translator.expertise_professional_guilds_all == tuple()
+
+    translator.expertise_professional_guilds = ['economy', 'art_leisure']
+    assert translator.expertise_professional_guilds_all == (
+        'economy', 'art_leisure'
+    )
+
+    translator.expertise_professional_guilds_other = ['Psychologie']
+    assert translator.expertise_professional_guilds_all == (
+        'economy', 'art_leisure', 'Psychologie'
+    )
+
+    translator.expertise_professional_guilds = []
+    assert translator.expertise_professional_guilds_all == ('Psychologie', )
 
 
 def test_translator_collection(session):

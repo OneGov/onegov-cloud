@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-09 09:10+0200\n"
+"POT-Creation-Date: 2021-10-27 15:28+0200\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -22,6 +22,9 @@ msgstr "En attente"
 
 msgid "Closed"
 msgstr "Fermé"
+
+msgid "Archived"
+msgstr "Archivé"
 
 msgid "All"
 msgstr "Tout"
@@ -651,6 +654,22 @@ msgstr "Ajouter"
 msgid "Remove"
 msgstr "Supprimer"
 
+msgid "Clear"
+msgstr "Supprimer"
+
+msgid ""
+"Delete imported events before importing. This does not delete otherwise "
+"imported events and submitted events."
+msgstr ""
+"Supprime les événements importés avant de les importer. Les événements "
+"importés ailleurs et les événements signalés ne sont pas supprimés par cela."
+
+msgid "Dry Run"
+msgstr "Test"
+
+msgid "Do not actually import the events."
+msgstr "Les événements ne sont pas sauvegardés."
+
 msgid "Map"
 msgstr "Carte"
 
@@ -1232,6 +1251,15 @@ msgstr "Couleur de la police"
 
 msgid "Relative font size"
 msgstr "Taille de police relative"
+
+msgid "Announcement"
+msgstr "Annonce"
+
+msgid "Announcement bg color"
+msgstr "Couleur de fond de l'annonce"
+
+msgid "Announcement font color"
+msgstr "Couleur de la police de l'annonce"
 
 msgid "Homepage Image #1"
 msgstr "Image n°1 de page d'accueil"
@@ -2547,9 +2575,6 @@ msgstr "Demande de modification"
 
 msgid "New Entry"
 msgstr "Nouvelle entrée"
-
-msgid "Archived"
-msgstr "Archivé"
 
 msgid "Previous Page"
 msgstr "Page précédente"
@@ -4197,6 +4222,23 @@ msgstr "Exporter un événement"
 
 msgid "Exports all future events."
 msgstr "Exporte tous les événements futurs."
+
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr ""
+"La ou les lignes suivantes contiennent des données invalides : ${lines}"
+
+#, python-format
+msgid "${count} events will be imported"
+msgstr "${count} événements seront importés"
+
+#, python-format
+msgid "${count} events imported"
+msgstr "${count} événements ont été importés"
+
+msgid "The same format as the export (XLSX) can be used for the import."
+msgstr ""
+"Le même format que l'exportation (XLSX) peut être utilisé pour l'importation."
 
 msgid "Your payment has been received"
 msgstr "Votre paiement a été reçu"

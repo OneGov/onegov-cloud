@@ -61,11 +61,7 @@ class Transaction(object):
         state = self.state
 
         if self.valuta_date:
-            date = self.valuta_date and (
-                self.valuta_date.year * 10000
-                + self.valuta_date.month * 100
-                + self.valuta_date.day
-            ) * - 1
+            date = -int(self.valuta_date.strftime('%Y%M%d'))
         else:
             date = -1
 
