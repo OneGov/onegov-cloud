@@ -1,7 +1,7 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-10-27 15:28+0200\n"
+"POT-Creation-Date: 2021-12-01 08:37+0100\n"
 "PO-Revision-Date: 2021-09-27 13:23+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -712,6 +712,16 @@ msgstr "Testo"
 msgid "Used to group the form in the overview"
 msgstr "Utilizzato per raggruppare il modulo nella panoramica"
 
+msgid "Pick-Up"
+msgstr "Prelievo"
+
+msgid ""
+"Describes how this resource can be picked up. This text is used on the "
+"ticket status page to inform the user"
+msgstr ""
+"Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
+"viene utilizzato nella pagina di stato del biglietto per informare l'utente"
+
 msgid "Url path"
 msgstr "Percorso URL"
 
@@ -959,16 +969,6 @@ msgstr "Descrive il contenuto di questa risorsa di prenotazione"
 
 msgid "Used to group the resource in the overview"
 msgstr "Utilizzato per raggruppare la risorsa nella panoramica"
-
-msgid "Pick-Up"
-msgstr "Prelievo"
-
-msgid ""
-"Describes how this resource can be picked up. This text is used on the "
-"ticket status page to inform the user"
-msgstr ""
-"Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
-"viene utilizzato nella pagina di stato del biglietto per informare l'utente"
 
 msgid "Extra Fields Definition"
 msgstr "Definizione dei campi aggiuntivi"
@@ -2470,6 +2470,9 @@ msgstr "Segui questo collegamento per accedere."
 
 msgid "No forms defined yet."
 msgstr "Nessun modulo ancora definito."
+
+msgid "Categories"
+msgstr "Categorie"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "

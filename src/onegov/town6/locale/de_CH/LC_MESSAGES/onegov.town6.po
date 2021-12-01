@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-10-09 08:59+0200\n"
+"POT-Creation-Date: 2021-12-01 09:09+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -307,6 +307,9 @@ msgstr "So"
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
 
+msgid "Import"
+msgstr "Import"
+
 msgid "This event can't be editet."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
 
@@ -422,9 +425,6 @@ msgstr "Verzeichnis"
 
 msgid "Configure"
 msgstr "Konfigurieren"
-
-msgid "Import"
-msgstr "Import"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -612,6 +612,9 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
+
+msgid "Categories"
+msgstr "Kategorien"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "

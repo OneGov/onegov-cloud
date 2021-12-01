@@ -6,8 +6,20 @@
         <p tal:condition="not:resources" i18n:translate="">No reservation resources defined yet.</p>
 
         <div class="grid-x" tal:condition="resources">
+
             <div class="cell small-12 medium-7">
                 <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped resources; add_pagerefs request.is_logged_in" />
+            </div>
+
+            <div class="cell small-12 medium-4 medium-offset-1">
+                <div class="borderless-side-panel">
+                    <h3 i18n:translate="">Categories</h3>
+                    <ul>
+                        <li tal:repeat="resource resources">
+                            <a href="#${resource}">${resource}</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </tal:b>
