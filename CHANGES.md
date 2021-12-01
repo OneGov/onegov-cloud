@@ -1,8 +1,40 @@
 # Changes
 
+## 2021.93
+
+`2021-12-01` | [2388f01b4a...ba2a63d909](https://github.com/OneGov/onegov-cloud/compare/2388f01b4a^...ba2a63d909)
+
+### Feriennet
+
+##### Add payment date to export.
+
+`Feature` | [PRO-946](https://linear.app/projuventute/issue/PRO-946) | [42631665c2](https://github.com/onegov/onegov-cloud/commit/42631665c2cf82de94268a3d42f31f85507ad1df)
+
+### Org
+
+##### Add tables to editor.
+
+`Feature` | [OGC-131](https://linear.app/onegovcloud/issue/OGC-131) | [6338d15748](https://github.com/onegov/onegov-cloud/commit/6338d1574860f2257435a314e243b1df45122315)
+
+##### Add categories to forms and resources.
+
+`Feature` | [OGC-140](https://linear.app/onegovcloud/issue/OGC-140) | [ba2a63d909](https://github.com/onegov/onegov-cloud/commit/ba2a63d9092eec669c6b1488ffc3b39c18050c19)
+
+### Swissvotes
+
+##### Index campaign material for full text search.
+
+Addionally, store text extracts per file.
+
+`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [2388f01b4a](https://github.com/onegov/onegov-cloud/commit/2388f01b4a9c5eb951ca35c0cde5b6ee998c7c32)
+
+##### Add ordering to campaign material.
+
+`Other` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [29eb157d85](https://github.com/onegov/onegov-cloud/commit/29eb157d858af9ca746e9a0601a5ad309c65dd85)
+
 ## 2021.92
 
-`2021-11-28` | [a1f9257561...621927d18a](https://github.com/OneGov/onegov-cloud/compare/a1f9257561^...621927d18a)
+`2021-11-28` | [a1f9257561...67e7a90ec8](https://github.com/OneGov/onegov-cloud/compare/a1f9257561^...67e7a90ec8)
 
 ### Fsi
 
@@ -1426,22 +1458,4 @@ For news and topics, adds option to change the url path independant from the pag
 - Add link health checker fetching links in async way
 
 `Feature` | [SEA-255](https://linear.app/seantis/issue/SEA-255) | [133e3f16c2](https://github.com/onegov/onegov-cloud/commit/133e3f16c2444047444a152b019a272ac0c302af)
-
-## 2021.43
-
-`2021-04-21` | [47e62bf74e...2effac2bd6](https://github.com/OneGov/onegov-cloud/compare/47e62bf74e^...2effac2bd6)
-
-### Form
-
-##### Adds support for FontAwesome5 in IconWidget
-
-Fixes IconField in DirectoryForm town6.
-
-`Bugfix` | [SEA-248](https://linear.app/seantis/issue/SEA-248) | [879ded77fd](https://github.com/onegov/onegov-cloud/commit/879ded77fd01e60ae2669064e1fa4f47ab3d235a)
-
-### Town6
-
-##### Adds version link to Changes.md link to footer
-
-`Feature` | [SEA-273](https://linear.app/seantis/issue/SEA-273) | [66462f9756](https://github.com/onegov/onegov-cloud/commit/66462f9756633b4499a2f80a96f797ea057ee349)
 
