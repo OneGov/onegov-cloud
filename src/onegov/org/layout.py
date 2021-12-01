@@ -2605,18 +2605,19 @@ class HomepageLayout(DefaultLayout):
 
     @property
     def editbar_links(self):
-        return[
-            Link(
-                _("Edit"),
-                self.request.link(self.model, 'homepage-settings'),
-                attrs={'class': ('edit-link')}
-            ),
-            Link(
-                _("Sort"),
-                self.request.link(self.model, 'sort'),
-                attrs={'class': ('sort-link')}
-            )
-        ]
+        if self.request.is_manager:
+            return[
+                Link(
+                    _("Edit"),
+                    self.request.link(self.model, 'homepage-settings'),
+                    attrs={'class': ('edit-link')}
+                ),
+                Link(
+                    _("Sort"),
+                    self.request.link(self.model, 'sort'),
+                    attrs={'class': ('sort-link')}
+                )
+            ]
 
     @cached_property
     def sortable_url_template(self):
