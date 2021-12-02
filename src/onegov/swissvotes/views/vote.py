@@ -131,12 +131,12 @@ def view_vote_percentages(self, request):
         elif code is not None:
             value = getattr(self, f'_{code}')
             label = getattr(self, code)
-            if value == 1:
+            if value in (1, 9):
                 result.update({
                     'yea': True,
                     'yea_label': translate(label)
                 })
-            if value == 0 or value == 2:
+            if value in (0, 2, 8):
                 result.update({
                     'nay': True,
                     'nay_label': translate(label)
