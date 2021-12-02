@@ -295,29 +295,30 @@ class SwissVoteCollection(Pagination):
         if not term:
             return []
 
-        def match(column, language='german'):
+        def match(column, language):
             return column.op('@@')(func.to_tsquery(language, term))
 
-        def match_convert(column, language='german'):
+        def match_convert(column, language):
             return match(func.to_tsvector(language, column), language)
 
         if not self.full_text:
             return [
-                match_convert(SwissVote.title_de),
+                match_convert(SwissVote.title_de, 'german'),
                 match_convert(SwissVote.title_fr, 'french'),
-                match_convert(SwissVote.short_title_de),
+                match_convert(SwissVote.short_title_de, 'german'),
                 match_convert(SwissVote.short_title_fr, 'french'),
-                match_convert(SwissVote.keyword),
+                match_convert(SwissVote.keyword, 'german'),
             ]
         return [
-            match_convert(SwissVote.title_de),
+            match_convert(SwissVote.title_de, 'german'),
             match_convert(SwissVote.title_fr, 'french'),
-            match_convert(SwissVote.short_title_de),
+            match_convert(SwissVote.short_title_de, 'german'),
             match_convert(SwissVote.short_title_fr, 'french'),
-            match_convert(SwissVote.keyword),
-            match_convert(SwissVote.initiator),
-            match(SwissVote.searchable_text_de_CH),
+            match_convert(SwissVote.keyword, 'german'),
+            match_convert(SwissVote.initiator, 'german'),
+            match(SwissVote.searchable_text_de_CH, 'german'),
             match(SwissVote.searchable_text_fr_CH, 'french'),
+            match(SwissVote.searchable_text_it_CH, 'italian'),
         ]
 
     @property

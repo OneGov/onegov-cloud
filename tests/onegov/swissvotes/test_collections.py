@@ -204,6 +204,7 @@ def test_votes_term_filter(swissvotes_app):
     c_initiator = "to_tsvector('german', swissvotes.initiator)"
     c_text_de = 'swissvotes."searchable_text_de_CH"'
     c_text_fr = 'swissvotes."searchable_text_fr_CH"'
+    c_text_it = 'swissvotes."searchable_text_it_CH"'
 
     assert compiled(term='987') == [
         'swissvotes.bfs_number = 987',
@@ -258,6 +259,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_initiator} @@ to_tsquery('german', 'abc')",
         f"{c_text_de} @@ to_tsquery('german', 'abc')",
         f"{c_text_fr} @@ to_tsquery('french', 'abc')",
+        f"{c_text_it} @@ to_tsquery('italian', 'abc')",
     ]
 
     assert compiled(term='Müller') == [
@@ -490,7 +492,7 @@ def test_votes_query(swissvotes_app):
 
 
 def test_votes_query_attachments(swissvotes_app, attachments,
-                                 postgres_version):
+                                 postgres_version, campaign_material):
     if int(postgres_version.split('.')[0]) < 10:
         skip("PostgreSQL 10+")
 
@@ -527,6 +529,12 @@ def test_votes_query_attachments(swissvotes_app, attachments,
     )
     for name, attachment in attachments.items():
         setattr(vote, name, attachment)
+    vote.campaign_material_metadata = {
+        'campaign_material_other-essay': {'language': ['de']},
+        'campaign_material_other-leaflet': {'language': ['it']},
+    }
+    vote.files.append(campaign_material['campaign_material_other-essay.pdf'])
+    vote.files.append(campaign_material['campaign_material_other-leaflet.pdf'])
     votes.session.flush()
 
     def count(**kwargs):
@@ -541,6 +549,10 @@ def test_votes_query_attachments(swissvotes_app, attachments,
     assert count(term='Parlamentdebatte', full_text=True) == 1
     assert count(term='Réalisation', full_text=True) == 1
     assert count(term='booklet', full_text=True) == 0
+    assert count(term='Abhandlung', full_text=True) == 1
+    assert count(term='Volantino', full_text=True) == 1
+    assert count(term='volantinare', full_text=True) == 1
+    assert count(term='Volantini', full_text=True) == 1
 
 
 def test_votes_order(swissvotes_app):

@@ -256,3 +256,12 @@ def add_publication_column(context):
                 server_default='FALSE'
             )
         )
+
+
+@upgrade_task('Add language column')
+def add_language_column(context):
+    if not context.has_column('files', 'language'):
+        context.operations.add_column(
+            'files',
+            Column('language', Text, nullable=True)
+        )

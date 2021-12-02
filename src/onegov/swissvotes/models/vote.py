@@ -1,11 +1,12 @@
 from cached_property import cached_property
 from collections import OrderedDict
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.core.utils import Bunch
+from onegov.file.utils import word_count
 from onegov.pdf.utils import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
@@ -745,11 +746,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         Save the indexed files in the search columns as well but only if the
         locale matches!.
         """
-
         for locale, lang, language, in (
             ('de_CH', 'de', 'german'),
             ('fr_CH', 'fr', 'french'),
-            ('it_CH', 'it', 'french')
+            ('it_CH', 'it', 'italian')
         ):
             text = ''
 
@@ -768,16 +768,18 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             for file in self.campaign_material_other:
                 name = file.filename.replace('.pdf', '')
                 metadata = (self.campaign_material_metadata or {}).get(name)
-                index = False
                 if (metadata or {}).get('language', []) == [lang]:
-                    index = True
-                files.append((file, index))
+                    files.append((file, True))
 
             # Extract content
             for file, index in files:
-                file.extract = (
-                    extract_pdf_info(file.reference.file)[1] or ''
-                ).strip()
+                pages, extract = extract_pdf_info(file.reference.file)
+                file.extract = (extract or '').strip()
+                file.stats = {
+                    'pages': pages,
+                    'words': word_count(file.extract)
+                }
+                file.language = language
 
                 if file.extract and index:
                     text += '\n\n' + file.extract

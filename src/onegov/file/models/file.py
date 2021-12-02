@@ -169,6 +169,9 @@ class File(Base, Associable, TimestampMixin):
     #: we load massive amounts of text on simple queries)
     extract = deferred(Column(Text, nullable=True))
 
+    #: the languge of the file
+    language = Column(Text, nullable=True)
+
     #: statistics around the extract (number of pages, words, etc.)
     #: those are usually set during file upload (as some information is
     #: lost afterwards)
