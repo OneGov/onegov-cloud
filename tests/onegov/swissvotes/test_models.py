@@ -796,6 +796,12 @@ def test_model_vote_codes():
     assert SwissVote.metadata_codes('doctype')['leaflet'] == "Pamphlet"
 
 
+def test_model_vote_search_term_expression(swissvotes_app):
+    assert SwissVote.search_term_expression(None) == ''
+    assert SwissVote.search_term_expression('') == ''
+    assert SwissVote.search_term_expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
+
+
 def test_model_vote_attachments(swissvotes_app, attachments,
                                 campaign_material):
     session = swissvotes_app.session()
@@ -882,7 +888,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.ad_analysis.stats == {'pages': 1, 'words': 1}
     assert vote.ad_analysis.language == 'german'
     assert vote.brief_description.name == 'brief_description-de_CH'
-    assert vote.brief_description.extract == 'Kurschbeschreibung'
+    assert vote.brief_description.extract == 'Kurzbeschreibung'
     assert vote.brief_description.stats == {'pages': 1, 'words': 1}
     assert vote.brief_description.language == 'german'
     assert vote.parliamentary_debate.name == 'parliamentary_debate-de_CH'
@@ -894,9 +900,13 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.voting_text.stats == {'pages': 1, 'words': 1}
     assert vote.voting_text.language == 'german'
     assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "kurzbeschreib" in vote.searchable_text_de_CH
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert vote.searchable_text_fr_CH == ''
+    assert vote.search('Inserateanalysen') == [vote.ad_analysis]
+    assert vote.search('Kurzbeschreibung') == [vote.brief_description]
+    assert vote.search('Parlamentdebatte') == [vote.parliamentary_debate]
+    assert vote.search('Abstimmungstext') == [vote.voting_text]
 
     # Upload fr_CH
     swissvotes_app.session_manager.current_locale = 'fr_CH'
@@ -910,9 +920,10 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.realization.stats == {'pages': 1, 'words': 1}
     assert vote.realization.language == 'french'
     assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "kurzbeschreib" in vote.searchable_text_de_CH
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert "réalis" in vote.searchable_text_fr_CH
+    assert vote.search('Réalisation') == [vote.realization]
 
     del vote.realization
     vote.federal_council_message = attachments['federal_council_message']
@@ -932,11 +943,15 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.voting_booklet.stats == {'pages': 1, 'words': 2}
     assert vote.voting_booklet.language == 'french'
     assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "kurzbeschreib" in vote.searchable_text_de_CH
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert "réalis" not in vote.searchable_text_fr_CH
     assert "conseil" in vote.searchable_text_fr_CH
     assert "fédéral" in vote.searchable_text_fr_CH
+    assert vote.search('Conseil fédéral') == [vote.federal_council_message]
+    assert vote.search('Messages') == [vote.federal_council_message]
+    assert vote.search('constatant') == [vote.resolution]
+    assert vote.search('brochure') == [vote.voting_booklet]
 
     assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
     assert vote.get_file('ad_analysis', 'fr_CH').name == 'ad_analysis-de_CH'
@@ -985,6 +1000,8 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert files['leaflet'].language == 'italian'
     assert 'abhandl' in vote.searchable_text_de_CH
     assert 'volantin' in vote.searchable_text_it_CH
+    assert vote.search('Abhandlung') == [files['essay']]
+    assert vote.search('Volantino') == [files['leaflet']]
 
     assert vote.posters(DummyRequest())['yea'] == [
         Bunch(

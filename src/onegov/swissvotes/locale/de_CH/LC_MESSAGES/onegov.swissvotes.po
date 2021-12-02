@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-30 16:28+0100\n"
+"POT-Creation-Date: 2021-12-02 10:26+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1877,6 +1877,9 @@ msgstr "Ja-Anteil Volk"
 #. Default: Turnout
 msgid "turnout_hyphenated"
 msgstr "Stimm&shy;beteiligung"
+
+msgid "Full text search in the files for this vote"
+msgstr "Volltextsuche in den Dateien zu dieser Vorlage"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

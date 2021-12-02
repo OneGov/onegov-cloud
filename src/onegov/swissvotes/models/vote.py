@@ -808,3 +808,48 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         fallback = get(self, default_locale) if fallback else None
         result = get(self, locale) if locale else getattr(self, name, None)
         return result or fallback
+
+    @staticmethod
+    def search_term_expression(term):
+        """ Returns the given search term transformed to use within Postgres
+        ``to_tsquery`` function.
+
+        Removes all unwanted characters, replaces prefix matching, joins
+        word together using FOLLOWED BY.
+        """
+
+        def cleanup(text):
+            result = ''.join((c for c in text if c.isalnum() or c in ',.'))
+            return f'{result}:*' if text.endswith('*') else result
+
+        parts = [cleanup(part) for part in (term or '').strip().split()]
+        return ' <-> '.join([part for part in parts if part])
+
+    def search(self, term):
+        """ Searches for the given term in the indexed attachments.
+
+        Returns a tuple of attribute name and locale which can be used with
+        ``get_file``.
+        """
+        term = self.search_term_expression(term)
+        if not term:
+            return []
+
+        from onegov.swissvotes.models.file import SwissVoteFile
+        from sqlalchemy.orm import object_session
+        from sqlalchemy import func, and_, or_
+
+        query = object_session(self).query(SwissVoteFile)
+        query = query.filter(
+            or_(*[
+                and_(
+                    SwissVoteFile.id.in_([file.id for file in self.files]),
+                    SwissVoteFile.language == language,
+                    func.to_tsvector(language, SwissVoteFile.extract).op('@@')(
+                        func.to_tsquery(language, term)
+                    )
+                )
+                for language in ['german', 'french', 'italian']
+            ])
+        )
+        return query.all()
