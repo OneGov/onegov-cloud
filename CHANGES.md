@@ -1,8 +1,24 @@
 # Changes
 
+## 2021.94
+
+`2021-12-02` | [1f20e02e1b...60a6a1a495](https://github.com/OneGov/onegov-cloud/compare/1f20e02e1b^...60a6a1a495)
+
+### Core
+
+##### Allow table elements in HTML sanitation.
+
+`Bugfix` | [OGC-131](https://linear.app/onegovcloud/issue/OGC-131) | [ac95559cc6](https://github.com/onegov/onegov-cloud/commit/ac95559cc6e2b235baedb40869b9616980c734a8)
+
+### Swissvotes
+
+##### Show tie-breaker positions in the bar chart.
+
+`Bugfix` | [SWI-25](https://linear.app/swissvotes/issue/SWI-25) | [ff973db631](https://github.com/onegov/onegov-cloud/commit/ff973db631d6022cdb0b7c45a4b7231ffa9a33b0)
+
 ## 2021.93
 
-`2021-12-01` | [2388f01b4a...ba2a63d909](https://github.com/OneGov/onegov-cloud/compare/2388f01b4a^...ba2a63d909)
+`2021-12-01` | [2388f01b4a...f3cfb23787](https://github.com/OneGov/onegov-cloud/compare/2388f01b4a^...f3cfb23787)
 
 ### Feriennet
 
@@ -1423,39 +1439,4 @@ for a whole day with multiple quantities possible per allocation.
 ##### Add CLI commands for clearing, exporting and importing people.
 
 `Feature` | [SEA-252](https://linear.app/seantis/issue/SEA-252) | [39e6a28deb](https://github.com/onegov/onegov-cloud/commit/39e6a28debaced0038eaf4f4a027eb1f2af9e127)
-
-## 2021.44
-
-`2021-04-21` | [374e89a420...1fc3b1a099](https://github.com/OneGov/onegov-cloud/compare/374e89a420^...1fc3b1a099)
-
-### Core
-
-##### Use openpyxl for XLSX, xlrd for XLS conversion to CSV.
-
-`Other` | [SEA-101](https://linear.app/seantis/issue/SEA-101) | [f8a2f4fcf1](https://github.com/onegov/onegov-cloud/commit/f8a2f4fcf10e921e30a4465bbce44fd91f0dca14)
-
-### Feriennet
-
-##### Fixes end of day for period phases
-
-Ends phases at the end of day for prebooking, booking and wishlist phase.
-
-`Bugfix` | [FER-947](https://issues.seantis.ch/browse/FER-947) | [7f06c9ca39](https://github.com/onegov/onegov-cloud/commit/7f06c9ca3991c8fb7ca4db6a3ffccca783ac0f04)
-
-### Org
-
-##### Adds option to change page urls path for admins
-
-For news and topics, adds option to change the url path independant from the page title. Works for trait link and page, but prevents changing name of the parent news item under /news.
-
-`Feature` | [SEA-255](https://linear.app/seantis/issue/SEA-255) | [ea0e3a610f](https://github.com/onegov/onegov-cloud/commit/ea0e3a610f306c48d30fce4a160e764f0a19008a)
-
-##### Adds admin tools for link adjustments and link checking
-
-- Adds change-url views for Pages.
-  Migrates all subpages and links to itself and subpages.
-- Adds migration tool to replace a chosen old domain to the current domain
-- Add link health checker fetching links in async way
-
-`Feature` | [SEA-255](https://linear.app/seantis/issue/SEA-255) | [133e3f16c2](https://github.com/onegov/onegov-cloud/commit/133e3f16c2444047444a152b019a272ac0c302af)
 
