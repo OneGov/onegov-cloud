@@ -109,6 +109,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     ORGANIZATION_NO_LONGER_EXISTS = 9999
 
+    term = None
+
     @staticmethod
     def codes(attribute):
         """ Returns the codes for the given attribute as defined in the code
@@ -825,12 +827,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         parts = [cleanup(part) for part in (term or '').strip().split()]
         return ' <-> '.join([part for part in parts if part])
 
-    def search(self, term):
+    def search(self, term=None):
         """ Searches for the given term in the indexed attachments.
 
         Returns a tuple of attribute name and locale which can be used with
         ``get_file``.
         """
+        term = self.term if term is None else term
         term = self.search_term_expression(term)
         if not term:
             return []

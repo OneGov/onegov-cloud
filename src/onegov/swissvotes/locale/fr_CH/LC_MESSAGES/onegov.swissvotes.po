@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-12-02 10:26+0100\n"
+"POT-Creation-Date: 2021-12-04 12:39+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -146,7 +146,7 @@ msgstr "Contenu"
 msgid "Text Search"
 msgstr "Texte"
 
-msgid "Full Text"
+msgid "Full-text"
 msgstr "Texte intégral"
 
 msgid "Yes"
@@ -1861,6 +1861,18 @@ msgstr ""
 "données est éventuellement possible à des fins de recherche; vous trouverez "
 "davantage d’informations à ce propos dans le codebook de Swissvotes (www."
 "swissvotes.ch/page/dataset/codebook-de.pdf)."
+
+msgid "Full-text search"
+msgstr "Recherche en texte intégral"
+
+msgid "Search results"
+msgstr "Résultats de la recherche"
+
+msgid "No documents found."
+msgstr "Aucun document trouvé."
+
+msgid "Document"
+msgstr "Documents"
 
 msgid "Filter"
 msgstr "Filtre de recherche"

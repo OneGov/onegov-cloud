@@ -92,10 +92,14 @@ def get_votes(
 
 @SwissvotesApp.path(
     model=SwissVote,
-    path='/vote/{bfs_number}'
+    path='/vote/{bfs_number}',
+    converters=dict(term=str)
 )
-def get_vote(app, bfs_number):
-    return SwissVoteCollection(app).by_bfs_number(bfs_number)
+def get_vote(app, bfs_number, term=None):
+    vote = SwissVoteCollection(app).by_bfs_number(bfs_number)
+    if vote:
+        vote.term = term
+    return vote
 
 
 @SwissvotesApp.path(
