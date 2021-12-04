@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.utils import module_path
@@ -11,6 +12,64 @@ from transaction import commit
 from unittest.mock import patch
 from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
+
+
+def test_view_votes_pagination(swissvotes_app):
+    for day, number in ((1, '100'), (2, '101.1'), (2, '101.2'), (3, '102')):
+        swissvotes_app.session().add(
+            SwissVote(
+                bfs_number=Decimal(number),
+                date=date(1990, 6, day),
+                title_de="Vote DE",
+                title_fr="Vote FR",
+                short_title_de="V D",
+                short_title_fr="V F",
+                keyword="Keyword",
+                _legal_form=3,
+                initiator="Initiator",
+            )
+        )
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    # 102
+    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = page.click("Details", index=0)
+    assert "<td>102</td>" in page
+    assert "Vorherige Abstimmung" in page
+    assert "Nächste Abstimmung" not in page
+
+    # 101.2
+    page = page.click("Vorherige Abstimmung")
+    assert "<td>101.2</td>" in page
+    assert "Vorherige Abstimmung" in page
+    assert "Nächste Abstimmung" in page
+
+    # 101.1
+    page = page.click("Vorherige Abstimmung")
+    assert "<td>101.1</td>" in page
+    assert "Vorherige Abstimmung" in page
+    assert "Nächste Abstimmung" in page
+
+    # 100
+    page = page.click("Vorherige Abstimmung")
+    assert "<td>100</td>" in page
+    assert "Vorherige Abstimmung" not in page
+    assert "Nächste Abstimmung" in page
+
+    # 101.1
+    page = page.click("Nächste Abstimmung")
+    assert "<td>101.1</td>" in page
+
+    # 101.2
+    page = page.click("Nächste Abstimmung")
+    assert "<td>101.2</td>" in page
+
+    # 102
+    page = page.click("Nächste Abstimmung")
+    assert "<td>102</td>" in page
 
 
 @mark.parametrize('file', [

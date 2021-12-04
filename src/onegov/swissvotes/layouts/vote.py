@@ -89,6 +89,30 @@ class VoteLayout(DefaultLayout):
 
         return result
 
+    @cached_property
+    def search_results(self):
+        result = []
+        metadata = self.model.campaign_material_metadata or {}
+        labels = {
+            name: file.label
+            for name, file in self.model.localized_files().items()
+        }
+        for file in self.model.search():
+            name = file.name.split('-')[0]
+            if name in labels:
+                order = 0
+                title = self.request.translate(labels[name])
+            elif name == 'campaign_material_other':
+                order = 1
+                title = metadata.get(
+                    file.filename.replace('.pdf', ''), {}
+                ).get('title', file.filename)
+            else:
+                order = 3
+                title = file.filename
+            result.append((title, file, order))
+        return sorted(result, key=lambda x: (x[2], x[0].lower()))
+
 
 class VoteDetailLayout(DefaultLayout):
 

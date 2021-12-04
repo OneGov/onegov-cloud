@@ -20,7 +20,7 @@ class SearchForm(Form):
     )
 
     full_text = RadioField(
-        label=_("Full Text"),
+        label=_("Full-text"),
         choices=(
             (1, _("Yes")),
             (0, _("No")),
@@ -149,3 +149,19 @@ class SearchForm(Form):
         self.select_all('position_federal_council')
         self.select_all('position_national_council')
         self.select_all('position_council_of_states')
+
+
+class AttachmentsSearchForm(Form):
+
+    term = StringField(
+        label=_("Text Search"),
+        render_kw={'size': 12, 'clear': True},
+        description="...",
+    )
+
+    def on_request(self):
+        if hasattr(self, 'csrf_token'):
+            self.delete_field('csrf_token')
+
+    def apply_model(self, model):
+        self.term.data = model.term

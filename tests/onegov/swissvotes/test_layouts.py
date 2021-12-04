@@ -33,6 +33,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from pytest import mark
+from unittest.mock import patch
 
 
 class DummyPrincipal(object):
@@ -732,6 +733,60 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
     assert layout.attachments['post_vote_poll'] == (
         'SwissVote/100/nachbefragung-de.pdf'
     )
+
+
+def test_layout_vote_search_results(swissvotes_app, attachments,
+                                    campaign_material):
+    model = SwissVote(
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="Vote D",
+        short_title_fr="Vote F",
+        bfs_number=Decimal('100'),
+        date=date(1990, 6, 2),
+        _legal_form=1,
+        campaign_material_metadata={
+            'campaign_material_other-essay': {
+                'title': 'Perché è una pessima idea.',
+                'language': ['it']
+            },
+        }
+    )
+    for name, locale in (
+        ('post_vote_poll', 'de_CH'),
+        ('brief_description', 'fr_CH')
+    ):
+        model.session_manager.current_locale = locale
+        setattr(model, name, attachments[name])
+
+    for name in (
+        'campaign_material_yea-1.png',
+        'campaign_material_other-essay.pdf',
+        'campaign_material_other-leaflet.pdf'
+    ):
+        model.files.append(campaign_material[name])
+
+    session = swissvotes_app.session()
+    session.add(model)
+    session.flush()
+
+    request = DummyRequest()
+    request.app = swissvotes_app
+    request.locale = 'de_CH'
+
+    layout = VoteLayout(model, request)
+    with patch.object(model, 'search', return_value=model.files):
+        results = [
+            (title, file.language, order)
+            for (title, file, order) in layout.search_results
+        ]
+        assert results == [
+            ('Brief description Swissvotes', 'french', 0),
+            ('Full analysis of post-vote poll results', 'german', 0),
+            ('campaign_material_other-leaflet.pdf', None, 1),
+            ('Perché è una pessima idea.', 'italian', 1),
+            ('campaign_material_yea-1.png', None, 3)
+        ]
 
 
 def test_layout_vote_details(swissvotes_app):

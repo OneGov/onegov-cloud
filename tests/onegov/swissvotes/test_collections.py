@@ -174,15 +174,6 @@ def test_votes_pagination(swissvotes_app):
     assert votes.next.previous == votes
 
 
-def test_votes_term_expression(swissvotes_app):
-    def term_expression(term):
-        return SwissVoteCollection(swissvotes_app, term=term).term_expression
-
-    assert term_expression(None) == ''
-    assert term_expression('') == ''
-    assert term_expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
-
-
 def test_votes_term_filter(swissvotes_app):
     assert SwissVoteCollection(swissvotes_app).term_filter == []
     assert SwissVoteCollection(swissvotes_app, term='').term_filter == []

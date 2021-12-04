@@ -298,64 +298,6 @@ def test_vote_upload(swissvotes_app, attachments):
         assert page.content_disposition.startswith('inline; filename=100.1')
 
 
-def test_view_vote_pagination(swissvotes_app):
-    for day, number in ((1, '100'), (2, '101.1'), (2, '101.2'), (3, '102')):
-        swissvotes_app.session().add(
-            SwissVote(
-                bfs_number=Decimal(number),
-                date=date(1990, 6, day),
-                title_de="Vote DE",
-                title_fr="Vote FR",
-                short_title_de="V D",
-                short_title_fr="V F",
-                keyword="Keyword",
-                _legal_form=3,
-                initiator="Initiator",
-            )
-        )
-    commit()
-
-    client = Client(swissvotes_app)
-    client.get('/locale/de_CH').follow()
-
-    # 102
-    page = client.get('/').maybe_follow().click("Abstimmungen")
-    page = page.click("Details", index=0)
-    assert "<td>102</td>" in page
-    assert "Vorherige Abstimmung" in page
-    assert "Nächste Abstimmung" not in page
-
-    # 101.2
-    page = page.click("Vorherige Abstimmung")
-    assert "<td>101.2</td>" in page
-    assert "Vorherige Abstimmung" in page
-    assert "Nächste Abstimmung" in page
-
-    # 101.1
-    page = page.click("Vorherige Abstimmung")
-    assert "<td>101.1</td>" in page
-    assert "Vorherige Abstimmung" in page
-    assert "Nächste Abstimmung" in page
-
-    # 100
-    page = page.click("Vorherige Abstimmung")
-    assert "<td>100</td>" in page
-    assert "Vorherige Abstimmung" not in page
-    assert "Nächste Abstimmung" in page
-
-    # 101.1
-    page = page.click("Nächste Abstimmung")
-    assert "<td>101.1</td>" in page
-
-    # 101.2
-    page = page.click("Nächste Abstimmung")
-    assert "<td>101.2</td>" in page
-
-    # 102
-    page = page.click("Nächste Abstimmung")
-    assert "<td>102</td>" in page
-
-
 def test_view_vote_chart(session):
     class Request(object):
         def translate(self, text):
@@ -653,3 +595,24 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     # ... delete
     manage = manage.click('Löschen').form.submit().maybe_follow()
     assert 'Keine Anhänge.' in manage
+
+
+def test_view_vote_search(swissvotes_app, sample_vote, campaign_material):
+    session = swissvotes_app.session()
+    session.add(sample_vote)
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    page = client.get('/').maybe_follow().click('Abstimmungen')
+    page.form['term'] = 'keyword'
+    page = page.form.submit()
+    page = page.click('Volltextsuche in den Dateien zu dieser Vorlag')
+    assert page.form['term'].value == 'keyword'
+    assert '#search' in page.form.action
