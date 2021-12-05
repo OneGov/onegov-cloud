@@ -1,3 +1,5 @@
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
@@ -132,3 +134,16 @@ def summarized_property(name):
         return cls.aggregate_results_expression(cls, name)
 
     return hybrid_property(getter, expr=expression)
+
+
+class LastModifiedMixin(TimestampMixin):
+
+    @declared_attr
+    def last_result_change(cls):
+        return Column(UTCDateTime)
+
+    @property
+    def last_modified(self):
+        changes = [self.last_change, self.last_result_change]
+        changes = [change for change in changes if change]
+        return max(changes) if changes else None

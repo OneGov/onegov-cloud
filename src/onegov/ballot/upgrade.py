@@ -2,12 +2,9 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from onegov.ballot import Election
-from onegov.ballot import Vote
-from onegov.ballot.models.election.election_compound import \
-    ElectionCompoundAssociation, ElectionCompound
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -19,41 +16,26 @@ from sqlalchemy.engine.reflection import Inspector
 
 @upgrade_task('Rename yays to yeas')
 def rename_yays_to_yeas(context):
-
-    if context.has_column('ballot_results', 'yeas'):
-        return False
-    else:
+    if not context.has_column('ballot_results', 'yeas'):
         context.operations.alter_column(
-            'ballot_results', 'yays', new_column_name='yeas')
+            'ballot_results', 'yays', new_column_name='yeas'
+        )
 
 
 @upgrade_task('Add shortcode column')
 def add_shortcode_column(context):
-    context.operations.add_column('votes', Column('shortcode', Text()))
+    if not context.has_column('votes', 'shortcode'):
+        context.operations.add_column('votes', Column('shortcode', Text()))
 
 
 @upgrade_task('Enable translation of vote title')
 def enable_translation_of_vote_title(context):
-
-    # get the existing votes before removing the old column
-    query = context.session.execute('SELECT id, title FROM votes')
-    votes = dict(query.fetchall())
-
-    context.operations.drop_column('votes', 'title')
-    context.operations.add_column('votes', Column(
-        'title_translations', HSTORE, nullable=True
-    ))
-
-    for vote in context.session.query(Vote).all():
-        vote.title_translations = {
-            locale: votes[vote.id].strip()
-            for locale in context.app.locales
-        }
-    context.session.flush()
-
-    context.operations.alter_column(
-        'votes', 'title_translations', nullable=False
-    )
+    if context.has_column('votes', 'title'):
+        context.operations.drop_column('votes', 'title')
+    if not context.has_column('votes', 'title_translations'):
+        context.operations.add_column('votes', Column(
+            'title_translations', HSTORE, nullable=False
+        ))
 
 
 @upgrade_task('Add absolute majority column')
@@ -210,9 +192,10 @@ def rename_candidates_tables(context):
 
 @upgrade_task('Adds ballot title')
 def add_ballot_title(context):
-    context.operations.add_column('ballots', Column(
-        'title_translations', HSTORE, nullable=True
-    ))
+    if not context.has_column('ballots', 'title_translations'):
+        context.operations.add_column('ballots', Column(
+            'title_translations', HSTORE, nullable=True
+        ))
 
 
 @upgrade_task('Add content columns')
@@ -228,12 +211,6 @@ def add_content_columns(context):
 def add_vote_type_column(context):
     if not context.has_column('votes', 'type'):
         context.operations.add_column('votes', Column('type', Text))
-
-        for vote in context.session.query(Vote).all():
-            meta = vote.meta or {}
-            vote.type = meta.get('vote_type', 'simple')
-            if 'vote_type' in meta:
-                del vote.meta['vote_type']
 
 
 @upgrade_task('Change election type column')
@@ -414,37 +391,14 @@ def add_update_contraints(context):
     )
 
 
-@upgrade_task('Migrate election compounds', always_run=True)
+@upgrade_task('Migrate election compounds')
 def migrate_election_compounds(context):
-    if (
-        context.has_table('election_compounds')
-        and context.has_table('election_compound_associations')
-        and context.has_column('election_compounds', 'elections')
-    ):
-        session = context.session
-        query = session.execute(
-            'SELECT id, akeys(elections) FROM election_compounds'
-        )
-        for election_compound_id, elections in query.fetchall():
-            for election_id in (elections or []):
-                if session.query(Election).filter_by(id=election_id).first():
-                    session.add(
-                        ElectionCompoundAssociation(
-                            election_compound_id=election_compound_id,
-                            election_id=election_id
-                        )
-                    )
-
-        context.operations.drop_column('election_compounds', 'elections')
-    else:
-        return False
+    pass
 
 
 @upgrade_task('Adds a default majority type')
 def add_default_majority_type(context):
-    for election in context.session.query(Election).all():
-        if not election.majority_type:
-            election.majority_type = 'absolute'
+    pass
 
 
 @upgrade_task('Add delete contraints')
@@ -513,12 +467,7 @@ def add_delete_contraints(context):
 
 @upgrade_task('Adds migration for related link and related link label')
 def add_related_link_and_label(context):
-    for model in (Vote, Election, ElectionCompound):
-        for item in context.session.query(model):
-            if not item.related_link:
-                item.related_link = None
-            if not item.related_link_label:
-                item.related_link_label = {}
+    pass
 
 
 @upgrade_task('Adds Doppelter Pukelsheim to CompoundElection/Election')
@@ -541,3 +490,12 @@ def add_after_pukelsheim(context):
                 nullable=False,
                 default=False
             ), default=lambda x: False)
+
+
+@upgrade_task('Adds last result change columns')
+def add_last_result_change(context):
+    for table in ('elections', 'election_compounds', 'votes'):
+        if not context.has_column(table, 'last_result_change'):
+            context.operations.add_column(
+                table, Column('last_result_change', UTCDateTime)
+            )

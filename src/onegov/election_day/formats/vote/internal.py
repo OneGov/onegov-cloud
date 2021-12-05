@@ -170,6 +170,7 @@ def import_vote_internal(vote, principal, file, mimetype):
 
     # Add the results to the DB
     vote.clear_results()
+    vote.last_result_change = vote.timestamp()
     vote.status = status
 
     ballot_ids = {b: vote.ballot(b, create=True).id for b in ballot_types}

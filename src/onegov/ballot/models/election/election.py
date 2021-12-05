@@ -1,11 +1,11 @@
 from collections import OrderedDict
-
 from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
 from onegov.ballot.models.mixins import TitleTranslationsMixin
@@ -13,7 +13,6 @@ from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
-from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
@@ -28,7 +27,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class Election(Base, ContentMixin, TimestampMixin,
+class Election(Base, ContentMixin, LastModifiedMixin,
                DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
                DerivedAttributesMixin):
 
@@ -210,31 +209,6 @@ class Election(Base, ContentMixin, TimestampMixin,
         return expr
 
     @property
-    def last_modified(self):
-        """ Returns last change of the election and any of its results.
-
-        We assume that all candidates, election and candidate results have been
-        updated at the same time.
-
-        """
-        changes = [self.last_change, self.last_result_change]
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
-
-    @property
-    def last_result_change(self):
-        """ Returns the last change of the results.
-
-        We assume that all election and candidate results have been updated
-        at the same time.
-
-        """
-
-        results = object_session(self).query(ElectionResult.last_change)
-        results = results.filter(ElectionResult.election_id == self.id)
-        return results.first()[0] if results.first() else None
-
-    @property
     def elected_candidates(self):
         """ Returns the first and last names of the elected candidates. """
 
@@ -306,6 +280,7 @@ class Election(Base, ContentMixin, TimestampMixin,
 
         self.absolute_majority = None
         self.status = None
+        self.last_result_change = None
 
         session = object_session(self)
         session.query(Candidate).filter(

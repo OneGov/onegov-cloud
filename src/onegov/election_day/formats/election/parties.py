@@ -138,6 +138,8 @@ def import_party_results(election, file, mimetype):
     for result in election.panachage_results:
         session.delete(result)
 
+    election.last_result_change = election.timestamp()
+
     for result in party_results.values():
         election.party_results.append(result)
 

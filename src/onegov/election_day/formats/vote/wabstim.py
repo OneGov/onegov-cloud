@@ -157,6 +157,7 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         return [FileImportError(_("No data found"))]
 
     vote.clear_results()
+    vote.last_result_change = vote.timestamp()
 
     for ballot_type in used_ballot_types:
         remaining = set(entities.keys())

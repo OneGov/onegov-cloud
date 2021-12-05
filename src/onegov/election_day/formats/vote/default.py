@@ -188,6 +188,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
         return errors
 
     if ballot_results:
+        vote.last_result_change = vote.timestamp()
         vote.status = None
         ballot.clear_results()
 

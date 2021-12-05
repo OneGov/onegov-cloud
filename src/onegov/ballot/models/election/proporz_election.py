@@ -164,29 +164,6 @@ class ProporzElection(Election, PartyResultExportMixin):
         return Election
 
     @property
-    def last_result_change(self):
-        """ Returns the last change of the results of the election and the
-        panachage results.
-
-        We assume that
-        - all election, list and candidate results have been updated at the
-          same time.
-        - all party and panachage results have been updated at the same time.
-
-        """
-        session = object_session(self)
-
-        changed = super(ProporzElection, self).last_result_change
-
-        parties = session.query(PartyResult.last_change)
-        parties = parties.filter(PartyResult.owner == self.id)
-        parties = parties.first()[0] if parties.first() else None
-
-        changes = [changed, parties]
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
-
-    @property
     def has_lists_panachage_data(self):
         """ Checks if there are lists panachage data available. """
 

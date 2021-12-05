@@ -3,9 +3,13 @@
 import click
 import os
 
+from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.election_day.models import ArchivedResult, DataSource
+from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import DataSource
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
@@ -165,3 +169,29 @@ def delete_associated(wabsti_token, delete_compound):
             session.delete(compound)
 
     return delete
+
+
+@cli.command('update-last-result-change')
+def update_last_result_change():
+
+    def update(request, app):
+        session = request.app.session()
+        for item in session.query(Election):
+            result = item.results.first()
+            if result:
+                item.last_result_change = result.last_change
+
+        for item in session.query(ElectionCompound):
+            result = [x.last_result_change for x in item.elections]
+            result = [x for x in result if x]
+            if result:
+                item.last_result_change = max(result)
+
+        for item in session.query(Vote):
+            result = [x.results.first() for x in item.ballots]
+            result = [x.last_change if x else None for x in result]
+            result = [x for x in result if x]
+            if result:
+                item.last_result_change = max(result)
+
+    return update
