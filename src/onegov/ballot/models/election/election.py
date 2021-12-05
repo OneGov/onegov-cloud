@@ -17,7 +17,6 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
-from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
@@ -212,45 +211,28 @@ class Election(Base, ContentMixin, TimestampMixin,
 
     @property
     def last_modified(self):
-        """ Returns last change of the election, its candidates and any of its
-        results.
+        """ Returns last change of the election and any of its results.
+
+        We assume that all candidates, election and candidate results have been
+        updated at the same time.
 
         """
-        candidates = object_session(self).query(Candidate.last_change)
-        candidates = candidates.order_by(desc(Candidate.last_change))
-        candidates = candidates.filter(Candidate.election_id == self.id)
-        candidates = candidates.first()[0] if candidates.first() else None
-
-        changes = [candidates, self.last_change, self.last_result_change]
+        changes = [self.last_change, self.last_result_change]
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
     @property
     def last_result_change(self):
-        """ Returns the last change of the results of the election and the
-        candidates.
+        """ Returns the last change of the results.
+
+        We assume that all election and candidate results have been updated
+        at the same time.
 
         """
 
-        session = object_session(self)
-
-        results = session.query(ElectionResult.last_change)
-        results = results.order_by(desc(ElectionResult.last_change))
+        results = object_session(self).query(ElectionResult.last_change)
         results = results.filter(ElectionResult.election_id == self.id)
-        results = results.first()[0] if results.first() else None
-
-        ids = session.query(Candidate.id)
-        ids = ids.filter(Candidate.election_id == self.id).all()
-        if not ids:
-            return results
-
-        candidates = session.query(CandidateResult.last_change)
-        candidates = candidates.order_by(desc(CandidateResult.last_change))
-        candidates = candidates.filter(CandidateResult.candidate_id.in_(ids))
-        candidates = candidates.first()[0] if candidates.first() else None
-
-        changes = [change for change in (results, candidates) if change]
-        return max(changes) if changes else None
+        return results.first()[0] if results.first() else None
 
     @property
     def elected_candidates(self):

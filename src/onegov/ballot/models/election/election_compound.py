@@ -5,7 +5,6 @@ from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
-from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.election.panachage_result import PanachageResult
@@ -234,31 +233,12 @@ class ElectionCompound(
         """ Returns last change of the elections. """
 
         changes = [self.last_change, self.last_result_change]
-        session = object_session(self)
         election_ids = [election.id for election in self.elections]
 
         # Get the last election change
         result = object_session(self).query(Election.last_change)
         result = result.order_by(desc(Election.last_change))
         result = result.filter(Election.id.in_(election_ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last candidate change
-        result = object_session(self).query(Candidate.last_change)
-        result = result.order_by(desc(Candidate.last_change))
-        result = result.filter(Candidate.election_id.in_(election_ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last list connection change
-        result = session.query(ListConnection.last_change)
-        result = result.order_by(desc(ListConnection.last_change))
-        result = result.filter(ListConnection.election_id.in_(election_ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last list change
-        result = session.query(List.last_change)
-        result = result.order_by(desc(List.last_change))
-        result = result.filter(List.election_id == self.id)
         changes.append(result.first()[0] if result.first() else None)
 
         changes = [change for change in changes if change]

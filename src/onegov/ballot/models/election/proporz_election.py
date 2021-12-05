@@ -11,7 +11,6 @@ from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from sqlalchemy import cast, func
-from sqlalchemy import desc
 from sqlalchemy import String
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
@@ -165,66 +164,25 @@ class ProporzElection(Election, PartyResultExportMixin):
         return Election
 
     @property
-    def last_modified(self):
-        """ Returns last change of the election, its candidates, lists, list
-        connections and any of its results.
-
-        """
-        session = object_session(self)
-
-        changed = super(ProporzElection, self).last_modified
-
-        connections = session.query(ListConnection.last_change)
-        connections = connections.order_by(desc(ListConnection.last_change))
-        connections = connections.filter(ListConnection.election_id == self.id)
-        connections = connections.first()[0] if connections.first() else None
-
-        lists = session.query(List.last_change)
-        lists = lists.order_by(desc(List.last_change))
-        lists = lists.filter(List.election_id == self.id)
-        lists = lists.first()[0] if lists.first() else None
-
-        changes = [changed, connections, lists]
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
-
-    @property
     def last_result_change(self):
         """ Returns the last change of the results of the election and the
-        candidates.
+        panachage results.
+
+        We assume that
+        - all election, list and candidate results have been updated at the
+          same time.
+        - all party and panachage results have been updated at the same time.
 
         """
         session = object_session(self)
 
         changed = super(ProporzElection, self).last_result_change
 
-        lists = None
-        pan = None
-        ids = session.query(List.id)
-        ids = ids.filter(List.election_id == self.id).all()
-        if ids:
-            lists = session.query(ListResult.last_change)
-            lists = lists.order_by(desc(ListResult.last_change))
-            lists = lists.filter(ListResult.list_id.in_(ids))
-            lists = lists.first()[0] if lists.first() else None
-
-            ids = [str(id_[0]) for id_ in ids]
-            pan = session.query(PanachageResult.last_change)
-            pan = pan.order_by(desc(PanachageResult.last_change))
-            pan = pan.filter(PanachageResult.target.in_(ids))
-            pan = pan.first()[0] if pan.first() else None
-
         parties = session.query(PartyResult.last_change)
-        parties = parties.order_by(desc(PartyResult.last_change))
         parties = parties.filter(PartyResult.owner == self.id)
         parties = parties.first()[0] if parties.first() else None
 
-        panachage = session.query(PanachageResult.last_change)
-        panachage = panachage.order_by(desc(PanachageResult.last_change))
-        panachage = panachage.filter(PanachageResult.owner == self.id)
-        panachage = panachage.first()[0] if panachage.first() else None
-
-        changes = [changed, lists, pan, parties, panachage]
+        changes = [changed, parties]
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
