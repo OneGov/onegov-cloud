@@ -1,8 +1,18 @@
 # Changes
 
+## 2021.95
+
+`2021-12-05` | [93aa02d789...93aa02d789](https://github.com/OneGov/onegov-cloud/compare/93aa02d789^...93aa02d789)
+
+### Swissvotes
+
+##### Add document full-text search to votes.
+
+`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [93aa02d789](https://github.com/onegov/onegov-cloud/commit/93aa02d7892396bb2975eccab9e78005ad92cb7a)
+
 ## 2021.94
 
-`2021-12-02` | [1f20e02e1b...60a6a1a495](https://github.com/OneGov/onegov-cloud/compare/1f20e02e1b^...60a6a1a495)
+`2021-12-02` | [1f20e02e1b...fc7802f4dd](https://github.com/OneGov/onegov-cloud/compare/1f20e02e1b^...fc7802f4dd)
 
 ### Core
 
@@ -1423,20 +1433,4 @@ for a whole day with multiple quantities possible per allocation.
 - Adds the same to town6 app
 
 `Other` | [53fe4cde0a](https://github.com/onegov/onegov-cloud/commit/53fe4cde0ad41c6be84bda2af2beae33b392ae2c)
-
-## 2021.45
-
-`2021-04-23` | [db4286be42...a05fa442cd](https://github.com/OneGov/onegov-cloud/compare/db4286be42^...a05fa442cd)
-
-### Election Day
-
-##### Adds missing newline in color suggestions.
-
-`Bugfix` | [8bc504a68c](https://github.com/onegov/onegov-cloud/commit/8bc504a68cc6c04f84a10f76e2318c0019afc38a)
-
-### People
-
-##### Add CLI commands for clearing, exporting and importing people.
-
-`Feature` | [SEA-252](https://linear.app/seantis/issue/SEA-252) | [39e6a28deb](https://github.com/onegov/onegov-cloud/commit/39e6a28debaced0038eaf4f4a027eb1f2af9e127)
 
