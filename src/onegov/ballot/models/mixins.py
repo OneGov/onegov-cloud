@@ -4,6 +4,7 @@ from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -142,8 +143,12 @@ class LastModifiedMixin(TimestampMixin):
     def last_result_change(cls):
         return Column(UTCDateTime)
 
-    @property
+    @hybrid_property
     def last_modified(self):
         changes = [self.last_change, self.last_result_change]
         changes = [change for change in changes if change]
         return max(changes) if changes else None
+
+    @last_modified.expression
+    def last_modified(cls):
+        return func.greatest(cls.last_change, cls.last_result_change)

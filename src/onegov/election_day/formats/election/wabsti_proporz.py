@@ -458,6 +458,10 @@ def import_election_wabsti_proporz(
 
     election.clear_results()
     election.last_result_change = election.timestamp()
+    for association in election.associations:
+        association.election_compound.last_result_change = (
+            election.last_result_change
+        )
 
     for connection in connections.values():
         election.list_connections.append(connection)

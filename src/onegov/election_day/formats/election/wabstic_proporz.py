@@ -688,6 +688,10 @@ def import_election_wabstic_proporz(
     election.status = 'unknown'
     if remaining_entities == 0:
         election.status = 'final'
+    for association in election.associations:
+        association.election_compound.last_result_change = (
+            election.last_result_change
+        )
 
     result_uids = {entity_id: uuid4() for entity_id in added_results}
 

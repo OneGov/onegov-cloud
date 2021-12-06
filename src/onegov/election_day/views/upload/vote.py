@@ -95,7 +95,6 @@ def view_upload(self, request, form):
                     )
             else:
                 raise NotImplementedError("Unsupported import format")
-
             archive = ArchivedResultCollection(session)
             archive.update(self, request)
 
