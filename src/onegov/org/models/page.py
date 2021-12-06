@@ -5,7 +5,8 @@ from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    ContactExtension, NewsletterExtension, PublicationExtension
+    ContactExtension, ContactHiddenOnPageExtension,
+    NewsletterExtension, PublicationExtension
 )
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
@@ -23,7 +24,8 @@ from sqlalchemy_utils import observes
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
-            ContactExtension, PersonLinkExtension, CoordinatesExtension):
+            ContactExtension, ContactHiddenOnPageExtension,
+            PersonLinkExtension, CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     es_type_name = 'topics'
