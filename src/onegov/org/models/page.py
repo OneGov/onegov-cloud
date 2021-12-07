@@ -93,7 +93,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           ContactExtension, PersonLinkExtension, CoordinatesExtension):
+           ContactExtension, ContactHiddenOnPageExtension, PersonLinkExtension,
+           CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     es_type_name = 'news'
@@ -149,7 +150,9 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def get_root_page_form_class(self, request):
         return self.with_content_extensions(
             Form, request, extensions=(
-                ContactExtension, PersonLinkExtension, AccessExtension)
+                ContactExtension, ContactHiddenOnPageExtension,
+                PersonLinkExtension, AccessExtension
+            )
         )
 
     def get_form_class(self, trait, action, request):
