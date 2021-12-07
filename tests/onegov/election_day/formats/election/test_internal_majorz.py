@@ -26,6 +26,7 @@ def test_import_internal_majorz_cantonal_zg(
         expats=False
     )
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority == 18191
@@ -48,6 +49,7 @@ def test_import_internal_majorz_cantonal_zg(
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority == 18191
@@ -81,6 +83,7 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
         expats=False
     )
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority == 3237
@@ -98,6 +101,7 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority == 3237
@@ -129,6 +133,7 @@ def test_import_internal_majorz_municipality_bern(
         municipality=municipality
     )
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority == 3294
@@ -150,6 +155,7 @@ def test_import_internal_majorz_municipality_bern(
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority == 3294
@@ -183,6 +189,7 @@ def test_import_internal_majorz_municipality_kriens(
         municipality=municipality
     )
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (6, 6)
     assert election.absolute_majority == 12606
@@ -204,6 +211,7 @@ def test_import_internal_majorz_municipality_kriens(
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (6, 6)
     assert election.absolute_majority == 12606

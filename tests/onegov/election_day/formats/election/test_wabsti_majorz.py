@@ -22,6 +22,7 @@ def test_import_wabsti_majorz_cantonal_simple(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -55,6 +56,7 @@ def test_import_wabsti_majorz_cantonal_complete(
         dataset_name='staenderatswahlen-2011-complete',
     )
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -88,6 +90,7 @@ def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (9, 9)
     assert round(election.turnout, 2) == 42.0
@@ -119,6 +122,7 @@ def test_import_wabsti_majorz_municipal(session, import_test_datasets):
         municipality='3231'
     )
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (1, 1)
     assert round(election.turnout, 2) == 27.03

@@ -41,6 +41,7 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (78, 78)
     assert election.absolute_majority is None
@@ -112,6 +113,7 @@ def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
         )
 
         assert not errors
+        assert election.last_result_change
         assert election.completed
         assert election.progress == (entities, entities)
         assert election.accounted_votes == votes

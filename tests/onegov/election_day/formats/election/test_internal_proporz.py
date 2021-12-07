@@ -23,6 +23,7 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
         expats=False
     )
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority is None
@@ -54,6 +55,7 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority is None
@@ -93,6 +95,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority is None
@@ -136,6 +139,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority is None
