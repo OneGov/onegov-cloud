@@ -15,7 +15,6 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
-from pathlib import Path
 
 
 cli = command_group()
@@ -123,21 +122,9 @@ def generate_media():
         if not app.principal or not app.configuration.get('d3_renderer'):
             return
 
-        lockfile = Path(os.path.join(
-            app.configuration.get('lockfile_path', ''),
-            '.lock-{}'.format(app.schema)
-        ))
-
-        try:
-            lockfile.touch(exist_ok=False)
-        except FileExistsError:
-            return
-        else:
-            renderer = D3Renderer(app)
-            SvgGenerator(app, renderer).create_svgs()
-            PdfGenerator(app, renderer).create_pdfs()
-        finally:
-            lockfile.unlink()
+        renderer = D3Renderer(app)
+        SvgGenerator(app, renderer).create_svgs()
+        PdfGenerator(app, renderer).create_pdfs()
 
     return generate
 
