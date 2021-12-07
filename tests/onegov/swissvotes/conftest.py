@@ -83,7 +83,7 @@ def attachments(swissvotes_app):
     result = {}
     for name, content in (
         ('ad_analysis', "Inserateanalyse"),
-        ('brief_description', "Kurschbeschreibung"),
+        ('brief_description', "Kurzbeschreibung"),
         ('federal_council_message', "Message du Conseil fédéral"),
         ('foeg_analysis', "Medienanalyse fög"),
         ('parliamentary_debate', "Parlamentdebatte"),
@@ -163,7 +163,7 @@ def campaign_material(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
-    for name, content in (('essay', 'Abhandlung'), ('leaflet', 'Flyer')):
+    for name, content in (('essay', 'Abhandlung'), ('leaflet', 'Volantino')):
         name = f'campaign_material_other-{name}.pdf'
         file = create_pdf(content)
         attachment = SwissVoteFile(id=random_token(), name=name)

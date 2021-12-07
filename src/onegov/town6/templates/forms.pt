@@ -9,6 +9,16 @@
                 <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
                 <metal:b use-macro="layout.macros['group_by_column']" tal:condition="forms" tal:define="grouped forms; add_pagerefs request.is_logged_in" />
             </tal:b>
+            <tal:b metal:fill-slot="before-panels">
+                <div class="borderless-side-panel" tal:condition="forms">
+                    <h3 i18n:translate="">Categories</h3>
+                    <ul>
+                        <li tal:repeat="form forms">
+                            <a href="#${form}">${form}</a>
+                        </li>
+                    </ul>
+                </div>
+            </tal:b>
         </tal:b>
     </tal:b>
 </div>

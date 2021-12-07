@@ -10,6 +10,7 @@ from onegov.form import Form
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.forms import AttachmentsForm
+from onegov.swissvotes.forms import AttachmentsSearchForm
 from onegov.swissvotes.layouts import DeleteVoteAttachmentLayout
 from onegov.swissvotes.layouts import DeleteVoteLayout
 from onegov.swissvotes.layouts import ManageCampaingMaterialLayout
@@ -26,12 +27,13 @@ from webob.exc import HTTPNotFound
 from webob.exc import HTTPUnsupportedMediaType
 
 
-@SwissvotesApp.html(
+@SwissvotesApp.form(
     model=SwissVote,
     permission=Public,
-    template='vote.pt'
+    template='vote.pt',
+    form=AttachmentsSearchForm
 )
-def view_vote(self, request):
+def view_vote(self, request, form):
     layout = VoteLayout(self, request)
     query = request.session.query(SwissVote)
     prev = query.order_by(SwissVote.bfs_number.desc())
@@ -42,13 +44,19 @@ def view_vote(self, request):
     if self.bfs_map_host:
         request.content_security_policy.default_src |= {self.bfs_map_host}
 
+    form.action += '#search'
+    if not form.errors:
+        form.apply_model(self)
+
     return {
         'layout': layout,
         'bfs_map': self.bfs_map,
         'prev': prev,
         'next': next,
         'map_preview': request.link(StaticFile('images/map-preview.png')),
-        'posters': self.posters(request)
+        'posters': self.posters(request),
+        'form': form,
+        'search_results': layout.search_results
     }
 
 
@@ -131,12 +139,12 @@ def view_vote_percentages(self, request):
         elif code is not None:
             value = getattr(self, f'_{code}')
             label = getattr(self, code)
-            if value == 1:
+            if value in (1, 9):
                 result.update({
                     'yea': True,
                     'yea_label': translate(label)
                 })
-            if value == 0 or value == 2:
+            if value in (0, 2, 8):
                 result.update({
                     'nay': True,
                     'nay_label': translate(label)

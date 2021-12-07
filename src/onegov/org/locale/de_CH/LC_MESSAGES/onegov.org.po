@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-10-27 15:26+0200\n"
+"POT-Creation-Date: 2021-12-01 08:37+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -713,6 +713,17 @@ msgstr "Text"
 msgid "Used to group the form in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
 
+msgid "Pick-Up"
+msgstr "Abholung"
+
+msgid ""
+"Describes how this resource can be picked up. This text is used on the "
+"ticket status page to inform the user"
+msgstr ""
+"Beschreibt, wie die Reservations-Resource abgeholt oder bezogen werden kann. "
+"Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
+"informieren"
+
 msgid "Url path"
 msgstr "Url Pfad"
 
@@ -960,17 +971,6 @@ msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
 msgid "Used to group the resource in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
-
-msgid "Pick-Up"
-msgstr "Abholung"
-
-msgid ""
-"Describes how this resource can be picked up. This text is used on the "
-"ticket status page to inform the user"
-msgstr ""
-"Beschreibt, wie die Reservations-Resource abgeholt oder bezogen werden kann. "
-"Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
-"informieren"
 
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
@@ -2472,6 +2472,9 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
+
+msgid "Categories"
+msgstr "Kategorien"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
