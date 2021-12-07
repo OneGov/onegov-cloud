@@ -194,11 +194,11 @@ def reindex_attachments(group_context):
     def _reindex(request, app):
         bfs_numbers = sorted(app.session().query(SwissVote.bfs_number))
         for bfs_number in bfs_numbers:
+            click.secho(f'Reindexing vote {bfs_number.bfs_number}', fg='green')
             app.session().query(SwissVote).filter_by(
                 bfs_number=bfs_number.bfs_number
             ).one().reindex_files()
             transaction.commit()
-            click.secho(f'Reindexed vote {bfs_number.bfs_number}', fg='green')
 
     return _reindex
 

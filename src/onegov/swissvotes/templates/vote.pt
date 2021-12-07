@@ -526,7 +526,7 @@
             </table>
 
             <div class="search">
-                <h3 i18n:translate id="search">Full-text search</h3>
+                <h3 i18n:translate id="search">Full-text search in all documents on this vote</h3>
 
                 <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET'"/>
 

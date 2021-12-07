@@ -60,7 +60,7 @@
                             <td class="left-aligned sort-${votes.sort_order_by_key('result')}">${layout.format_number(vote.result_turnout)}%</td>
                             <td class="left-aligned" tal:define="term layout.model.term; full_text layout.model.full_text">
                                 <a tal:condition="not: term and full_text" href="${request.link(vote)}" i18n:translate>Details</a>
-                                <a tal:condition="term and full_text" href="${request.link(vote, query_params={'term': term})}#search" i18n:translate>Full text search in the files for this vote</a>
+                                <a tal:condition="term and full_text" href="${request.link(vote, query_params={'term': term})}#search" target="_blank" i18n:translate>Search results in the documents on this vote</a>
                             </td>
                         </tr>
                     </tbody>

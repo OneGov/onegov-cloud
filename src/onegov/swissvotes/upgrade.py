@@ -552,3 +552,11 @@ def add_tsvector_column_it(context):
         context.operations.add_column(
             'swissvotes', Column('searchable_text_it_CH', TSVECTOR())
         )
+
+
+@upgrade_task('Add tsvector column for english')
+def add_tsvector_column_en(context):
+    if not context.has_column('swissvotes', 'searchable_text_en_US'):
+        context.operations.add_column(
+            'swissvotes', Column('searchable_text_en_US', TSVECTOR())
+        )

@@ -28,8 +28,16 @@ class SearchForm(Form):
         coerce=bool,
         render_kw={'size': 6},
         description=_(
-            "Searches all text fields and attachments. Select «No» to limit "
-            "the search to title, keyword, vote number, and procedure number."
+            "The full-text search searches the following documents, in their "
+            "available language versions: brief description by Swissvotes, "
+            "text subject to vote, preliminary examination, decree on "
+            "success, Federal Council dispatch, parliamentary debate, "
+            "documents from the voting campaign. In contrast, the following "
+            "documents are not included in the search because they invariably "
+            "contain information on all the subjects that were put to the "
+            "vote on that day : explanatory brochure, analysis of the "
+            "advertising campaign, analysis of the media coverage, decree "
+            "on voting result, reports on the post-vote poll."
         ),
     )
 
@@ -156,7 +164,6 @@ class AttachmentsSearchForm(Form):
     term = StringField(
         label=_("Text Search"),
         render_kw={'size': 12, 'clear': True},
-        description="...",
     )
 
     def on_request(self):

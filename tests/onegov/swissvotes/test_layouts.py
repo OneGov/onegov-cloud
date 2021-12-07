@@ -783,7 +783,7 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         assert results == [
             ('Brief description Swissvotes', 'french', 0),
             ('Full analysis of post-vote poll results', 'german', 0),
-            ('campaign_material_other-leaflet.pdf', None, 1),
+            ('campaign_material_other-leaflet.pdf', 'english', 1),
             ('Perché è una pessima idea.', 'italian', 1),
             ('campaign_material_yea-1.png', None, 3)
         ]
