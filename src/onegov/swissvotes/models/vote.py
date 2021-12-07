@@ -730,6 +730,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     searchable_text_de_CH = deferred(Column(TSVECTOR))
     searchable_text_fr_CH = deferred(Column(TSVECTOR))
     searchable_text_it_CH = deferred(Column(TSVECTOR))
+    searchable_text_en_US = deferred(Column(TSVECTOR))
 
     indexed_files = {
         'voting_text',
@@ -743,20 +744,31 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     }
 
     def reindex_files(self):
-        """ Extract the text from all files and save it.
+        """ Extract the text from the localized files and the campaign
+        material and save it together with the language. Store the text of the
+        **indexed only** localized files and **all** campaign material
+        in the search indexes.
 
-        Save the indexed files in the search columns as well but only if the
-        locale matches!.
+        The language is determined as follows:
+        - For the localized files, the language is determined by the locale,
+          e.g. `de_CH` -> `german`.
+        - For the campaign material, the campaign metadata is used. If a
+          document is (amongst others) `de` --> `german`. If (amongst others,)
+          `fr` but not `de` --> `french`. If (amongst others) `it` but not `de`
+          or `fr` --> `italian`. In all other cases `english`.
+
         """
-        for locale, lang, language, in (
-            ('de_CH', 'de', 'german'),
-            ('fr_CH', 'fr', 'french'),
-            ('it_CH', 'it', 'italian')
-        ):
-            text = ''
 
-            # Localized files
-            files = []
+        locales = {
+            'de_CH': 'german',
+            'fr_CH': 'french',
+            'it_CH': 'italian',
+            'en_US': 'english'
+        }
+        files = {locale: [] for locale in locales}
+
+        # Localized files
+        for locale in locales:
             for name, attribute in self.localized_files().items():
                 if attribute.extension == 'pdf':
                     file = SwissVote.__dict__[name].__get_by_locale__(
@@ -764,24 +776,33 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                     )
                     if file:
                         index = name in self.indexed_files
-                        files.append((file, index))
+                        files[locale].append((file, index))
 
-            # Campaign material
-            for file in self.campaign_material_other:
-                name = file.filename.replace('.pdf', '')
-                metadata = (self.campaign_material_metadata or {}).get(name)
-                if (metadata or {}).get('language', []) == [lang]:
-                    files.append((file, True))
+        # Campaign material
+        for file in self.campaign_material_other:
+            name = file.filename.replace('.pdf', '')
+            metadata = (self.campaign_material_metadata or {}).get(name)
+            languages = set((metadata or {}).get('language', []))
+            if 'de' in languages:
+                files['de_CH'].append((file, True))
+            elif 'fr' in languages:
+                files['fr_CH'].append((file, True))
+            elif 'it' in languages:
+                files['it_CH'].append((file, True))
+            else:
+                files['en_US'].append((file, True))
 
-            # Extract content
-            for file, index in files:
+        # Extract content and index
+        for locale in files:
+            text = ''
+            for file, index in files[locale]:
                 pages, extract = extract_pdf_info(file.reference.file)
                 file.extract = (extract or '').strip()
                 file.stats = {
                     'pages': pages,
                     'words': word_count(file.extract)
                 }
-                file.language = language
+                file.language = locales[locale]
 
                 if file.extract and index:
                     text += '\n\n' + file.extract
@@ -789,7 +810,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             setattr(
                 self,
                 f'searchable_text_{locale}',
-                func.to_tsvector(language, text)
+                func.to_tsvector(locales[locale], text)
             )
 
     @observes('files')
@@ -852,7 +873,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                         func.to_tsquery(language, term)
                     )
                 )
-                for language in ['german', 'french', 'italian']
+                for language in ['german', 'french', 'italian', 'english']
             ])
         )
         return query.all()

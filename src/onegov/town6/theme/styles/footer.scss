@@ -79,5 +79,9 @@ $footer-hover-color: $primary-fg-color;
         @include breakpoint(small only) {
             padding: 10px;
         }
+
+        a {
+            width: 100%;
+        }
     }
 }
