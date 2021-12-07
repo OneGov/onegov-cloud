@@ -153,11 +153,11 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
     """
 
-    contact_hide = meta_property(default=False)
+    hide_contact = meta_property(default=False)
 
     def extend_form(self, form_class, request):
         class ContactHiddenOnPageForm(form_class):
-            contact_hide = BooleanField(
+            hide_contact = BooleanField(
                 label=_("Hide contact info in sidebar"),
                 fieldset=_("Contact"))
 
