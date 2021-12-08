@@ -1,8 +1,32 @@
 # Changes
 
+## 2021.97
+
+`2021-12-08` | [b14a8d105b...ea8856d556](https://github.com/OneGov/onegov-cloud/compare/b14a8d105b^...ea8856d556)
+
+### Election Day
+
+##### Make party panachage view on compounds configurable.
+
+`Feature` | [OGC-165](https://linear.app/onegovcloud/issue/OGC-165) | [09b7462f11](https://github.com/onegov/onegov-cloud/commit/09b7462f1186e49c775b7c4581c49731016a3cd9)
+
+##### Don't show districts for regional elections.
+
+`Other` | [OGC-30](https://linear.app/onegovcloud/issue/OGC-30) | [b14a8d105b](https://github.com/onegov/onegov-cloud/commit/b14a8d105b01e7a5c8845cba31cae26a92d0dbbf)
+
+##### Make aggretaed lists view of election compounds optional. Also add a warning because this view is not meaningful.
+
+`Bugfix` | [OGC-40](https://linear.app/onegovcloud/issue/OGC-40) | [65ec908289](https://github.com/onegov/onegov-cloud/commit/65ec9082899f67bb127063f0f35db67b03ec699f)
+
+### Swissvotes
+
+##### Update full-text search.
+
+`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [ea8856d556](https://github.com/onegov/onegov-cloud/commit/ea8856d556336482a50499cd8ee45067a4514c04)
+
 ## 2021.96
 
-`2021-12-08` | [01e1b2652d...0c19358eb8](https://github.com/OneGov/onegov-cloud/compare/01e1b2652d^...0c19358eb8)
+`2021-12-08` | [01e1b2652d...1a0a0c1d30](https://github.com/OneGov/onegov-cloud/compare/01e1b2652d^...1a0a0c1d30)
 
 ### Election Day
 
@@ -1413,21 +1437,4 @@ setting has access to the tickets in that category.
 ##### Styles albums and contacts widget
 
 `Other` | [SEA-303](https://linear.app/seantis/issue/SEA-303) | [7d5879145d](https://github.com/onegov/onegov-cloud/commit/7d5879145d1b29e477ea205b37374c858d88a569)
-
-## 2021.47
-
-`2021-04-29` | [4f4f381207...184621e882](https://github.com/OneGov/onegov-cloud/compare/4f4f381207^...184621e882)
-
-### Election Day
-
-##### Add screens.
-
-Screens allow to show tables, charts and other widgets for a given vote 
-or election in a flexible way.
-
-`Feature` | [SEA-147](https://linear.app/seantis/issue/SEA-147) | [d3be6d7077](https://github.com/onegov/onegov-cloud/commit/d3be6d70771e0615b3373096eb2a714d2fd66055)
-
-##### Fixes candidates chart not being displayed for intermediate results.
-
-`Bugfix` | [4f4f381207](https://github.com/onegov/onegov-cloud/commit/4f4f381207e85e9c82b3c6be0baf21e8f4d8b009)
 
