@@ -104,14 +104,32 @@ class ElectionCompoundForm(Form):
         render_kw={'lang': 'rm'}
     )
 
-    show_party_strengths = BooleanField(
-        label=_("Party strengths"),
+    show_lists = BooleanField(
+        label=_("Lists"),
+        description=_(
+            "Shows a tab with aggregated list results over all elections. "
+            "Requires that all elections share the same lists. Note that the number of votes is not really meaningful."
+        ),
         fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
 
     show_mandate_allocation = BooleanField(
         label=_("Mandate allocation"),
+        description=_(
+            "Shows a tab with the comparison of party strengths as a table. "
+            "Requires party results."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
+    show_party_strengths = BooleanField(
+        label=_("Party strengths"),
+        description=_(
+            "Shows a tab with the comparison of party strengths as a bar "
+            "chart. Requires party results."
+        ),
         fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
@@ -213,6 +231,7 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_mandate_allocation = self.show_mandate_allocation.data
         model.after_pukelsheim = self.after_pukelsheim.data
@@ -266,6 +285,7 @@ class ElectionCompoundForm(Form):
         self.related_link.data = model.related_link
         self.after_pukelsheim.data = model.after_pukelsheim
         self.pukelsheim_completed.data = model.pukelsheim_completed
+        self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_mandate_allocation.data = model.show_mandate_allocation
         self.elections.data = [election.id for election in model.elections]

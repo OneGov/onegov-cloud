@@ -143,7 +143,7 @@ class DummyPrincipal(object):
         2: {'name': 'Entity2', 'district': 'District'}
     } for year in all_years}
 
-    hidden_tabs = {'elections': ['lists']}
+    hidden_tabs = {}
 
     def __init__(self):
         self.name = 'name'
@@ -464,8 +464,9 @@ def create_election_compound(client):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'canton'
     new.form['elections'] = ['regional-election-a', 'regional-election-b']
-    new.form['show_party_strengths'] = True
+    new.form['show_lists'] = True
     new.form['show_mandate_allocation'] = True
+    new.form['show_party_strengths'] = True
     new.form.submit()
 
 

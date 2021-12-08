@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-08 06:24+0100\n"
+"POT-Creation-Date: 2021-12-08 07:38+0100\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -342,14 +342,33 @@ msgstr ""
 msgid "Elections"
 msgstr "Elecziuns"
 
-msgid "Party strengths"
-msgstr "Forza da las partidas"
+msgid "Lists"
+msgstr "Glistas"
+
+msgid ""
+"Shows a tab with aggregated list results over all elections. Requires that "
+"all elections share the same lists. Note that the number of votes is not "
+"really meaningful."
+msgstr ""
 
 msgid "Views"
 msgstr "Vistas"
 
 msgid "Mandate allocation"
 msgstr "Repartiziun dals sezs"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a table. Requires "
+"party results."
+msgstr ""
+
+msgid "Party strengths"
+msgstr "Forza da las partidas"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
 
 msgid "After Doppelter Pukelsheim"
 msgstr ""
@@ -451,9 +470,6 @@ msgstr "Titel da la cuntraproposta"
 
 msgid "Title of the tie breaker"
 msgstr "Titel da la dumonda decisiva"
-
-msgid "Lists"
-msgstr "Glistas"
 
 msgid "Candidates"
 msgstr "Candidatas e candidats"

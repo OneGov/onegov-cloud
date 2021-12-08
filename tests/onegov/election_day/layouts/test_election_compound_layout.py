@@ -12,7 +12,7 @@ from unittest.mock import Mock
 import pytest
 
 
-def test_election_compound_layout_1(session):
+def test_election_compound_layout_general(session):
     date_ = date(2011, 1, 1)
     majorz = Election(title="majorz", domain='region', date=date_)
     proporz = ProporzElection(title="proporz", domain='region', date=date_)
@@ -47,14 +47,8 @@ def test_election_compound_layout_1(session):
     assert layout.proporz is False
     assert layout.has_party_results is False
     assert layout.tab_visible('statistics') is False
-    assert request.app.principal.hidden_tabs == {'elections': ['lists']}
-    assert layout.hide_tab('lists') is True
 
-    request.app.principal.hidden_tabs = {}
-    reloaded_layout = ElectionCompoundLayout(compound, request)
-    assert reloaded_layout.hide_tab('lists') is False
-    assert reloaded_layout.main_view == 'ElectionCompound/lists'
-
+    # test majorz/proporz
     compound.elections = [majorz]
     layout = ElectionCompoundLayout(compound, DummyRequest())
     assert layout.majorz is True
@@ -65,6 +59,19 @@ def test_election_compound_layout_1(session):
     assert layout.majorz is False
     assert layout.proporz is True
 
+    # test results
+    proporz.results.append(
+        ElectionResult(
+            name='1',
+            entity_id=1,
+            counted=True,
+            eligible_voters=500,
+        )
+    )
+    layout = ElectionCompoundLayout(compound, DummyRequest())
+    assert layout.has_results
+
+    # test party results
     compound.party_results.append(
         PartyResult(
             year=2017,
@@ -76,6 +83,17 @@ def test_election_compound_layout_1(session):
     )
     assert layout.has_party_results is True
 
+    # test main menu
+    compound.show_lists = True
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.main_view == 'ElectionCompound/lists'
+
+    request.app.principal.hidden_tabs = {'elections': ['lists']}
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.hide_tab('lists') is True
+    assert layout.main_view == 'ElectionCompound/districts'
+
+    # test file paths
     with freeze_time("2014-01-01 12:00"):
         compound = ElectionCompound(
             title="ElectionCompound",
@@ -217,27 +235,19 @@ def test_election_compound_layout_menu_proporz(session):
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
+    compound.show_lists = True
+    compound.show_mandate_allocation = True
     compound.show_party_strengths = True
 
     assert ElectionCompoundLayout(compound, request).menu == [
-        ('__districts', 'ElectionCompound/districts', False, []),
-        ('Elected candidates', 'ElectionCompound/candidates', False, []),
-        ('Party strengths', 'ElectionCompound/party-strengths', False, []),
-        ('Panachage', 'ElectionCompound/parties-panachage', False, []),
-        ('Election statistics', 'ElectionCompound/statistics', False, []),
-        ('Downloads', 'ElectionCompound/data', False, [])
-    ]
-
-    compound.show_party_strengths = False
-    compound.show_mandate_allocation = True
-
-    assert ElectionCompoundLayout(compound, request).menu == [
+        ('Lists', 'ElectionCompound/lists', False, []),
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
         (
             'Mandate allocation', 'ElectionCompound/mandate-allocation', False,
             []
         ),
+        ('Party strengths', 'ElectionCompound/party-strengths', False, []),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
         ('Election statistics', 'ElectionCompound/statistics', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
