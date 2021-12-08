@@ -1,8 +1,36 @@
 # Changes
 
+## 2021.96
+
+`2021-12-08` | [01e1b2652d...0c19358eb8](https://github.com/OneGov/onegov-cloud/compare/01e1b2652d^...0c19358eb8)
+
+### Election Day
+
+##### Add links to votes, elections, election compounds to breadcrumbs.
+
+`Feature` | [OGC_30](#OGC_30) | [0c19358eb8](https://github.com/onegov/onegov-cloud/commit/0c19358eb87b0abb85d8194bcc22eea1eda08c1d)
+
+### Org
+
+##### Fix setting bold problem with Chrome.
+
+`Feature` | [OGC-138](https://linear.app/onegovcloud/issue/OGC-138) | [81a267b69d](https://github.com/onegov/onegov-cloud/commit/81a267b69d0a3a57b784891e925d1e380a24da90)
+
+### Swissvotes
+
+##### Adds english fall back for full-text search and use less strict language handling.
+
+`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [d43b010753](https://github.com/onegov/onegov-cloud/commit/d43b0107539e7aaec7b6cff2df86c060a81c22bc)
+
+### Town6
+
+##### Fix problem with SVG without width not showing.
+
+`Bugfix` | [OGC-156](https://linear.app/onegovcloud/issue/OGC-156) | [01e1b2652d](https://github.com/onegov/onegov-cloud/commit/01e1b2652d6ba2ced1e8da4674de54a0a7665501)
+
 ## 2021.95
 
-`2021-12-05` | [93aa02d789...93aa02d789](https://github.com/OneGov/onegov-cloud/compare/93aa02d789^...93aa02d789)
+`2021-12-05` | [93aa02d789...0723514278](https://github.com/OneGov/onegov-cloud/compare/93aa02d789^...0723514278)
 
 ### Swissvotes
 
@@ -1402,35 +1430,4 @@ or election in a flexible way.
 ##### Fixes candidates chart not being displayed for intermediate results.
 
 `Bugfix` | [4f4f381207](https://github.com/onegov/onegov-cloud/commit/4f4f381207e85e9c82b3c6be0baf21e8f4d8b009)
-
-## 2021.46
-
-`2021-04-27` | [5dd6c63404...f6b9143271](https://github.com/OneGov/onegov-cloud/compare/5dd6c63404^...f6b9143271)
-
-### Org
-
-##### Adds open graph meta tags with defaults
-
-Meta tags can be overwritten by using layouts using the corresponding attribute: og:title -> og_title.
-Applies for town6 as well.
-
-`Feature` | [SEA-271](https://linear.app/seantis/issue/SEA-271) | [b829b72cca](https://github.com/onegov/onegov-cloud/commit/b829b72cca7ac6fea423756748ac33ea52399c75)
-
-##### Adds open graph meta tags with defaults
-
-Meta tags can be overwritten using the corresponding attribute in the layout: og:title -> og_title.
-Applies for town6 as well.
-
-`Feature` | [SEA-271](https://linear.app/seantis/issue/SEA-271) | [35aeaf118d](https://github.com/onegov/onegov-cloud/commit/35aeaf118da6d117a4aab21f00995f0656d784b8)
-
-##### Adds daily-item Resource type
-
-Adds news resource type for general purpose items that are reserved
-for a whole day with multiple quantities possible per allocation.
-
-- Adapts cli for importing legacy db
-- Adds translations
-- Adds the same to town6 app
-
-`Other` | [53fe4cde0a](https://github.com/onegov/onegov-cloud/commit/53fe4cde0ad41c6be84bda2af2beae33b392ae2c)
 
