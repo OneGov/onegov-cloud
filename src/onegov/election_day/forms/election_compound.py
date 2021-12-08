@@ -108,7 +108,8 @@ class ElectionCompoundForm(Form):
         label=_("Lists"),
         description=_(
             "Shows a tab with aggregated list results over all elections. "
-            "Requires that all elections share the same lists. Note that the number of votes is not really meaningful."
+            "Requires that all elections share the same lists. Note that the "
+            "number of votes is not really meaningful."
         ),
         fieldset=_("Views"),
         render_kw=dict(force_simple=True)
