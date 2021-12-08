@@ -135,6 +135,15 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    show_party_panachage = BooleanField(
+        label=_("Panachage"),
+        description=_(
+            "Shows a tab with the panachage. Requires party results."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
     after_pukelsheim = BooleanField(
         label=_("After Doppelter Pukelsheim"),
         fieldset=_("Views"),
@@ -234,6 +243,7 @@ class ElectionCompoundForm(Form):
         model.related_link = self.related_link.data
         model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
+        model.show_party_panachage = self.show_party_panachage.data
         model.show_mandate_allocation = self.show_mandate_allocation.data
         model.after_pukelsheim = self.after_pukelsheim.data
         model.pukelsheim_completed = self.pukelsheim_completed.data
@@ -288,6 +298,7 @@ class ElectionCompoundForm(Form):
         self.pukelsheim_completed.data = model.pukelsheim_completed
         self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
+        self.show_party_panachage.data = model.show_party_panachage
         self.show_mandate_allocation.data = model.show_mandate_allocation
         self.elections.data = [election.id for election in model.elections]
 

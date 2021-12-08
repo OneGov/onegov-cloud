@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-08 07:38+0100\n"
+"POT-Creation-Date: 2021-12-08 13:01+0100\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -370,6 +370,12 @@ msgid ""
 "party results."
 msgstr ""
 
+msgid "Panachage"
+msgstr "Statistica da panaschar"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
+
 msgid "After Doppelter Pukelsheim"
 msgstr ""
 
@@ -479,9 +485,6 @@ msgstr "Partidas"
 
 msgid "Downloads"
 msgstr "Downloads"
-
-msgid "Panachage"
-msgstr "Statistica da panaschar"
 
 msgid "Elected candidates"
 msgstr "Candidat(a)s elegid(a)s"

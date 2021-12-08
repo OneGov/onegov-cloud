@@ -658,7 +658,7 @@ class PdfGenerator():
 
         # Parties Panachage
         chart = self.renderer.get_parties_panachage_chart(compound, 'pdf')
-        if chart:
+        if compound.show_party_panachage and chart:
             pdf.h2(_('Panachage (parties)'))
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_panachage'))

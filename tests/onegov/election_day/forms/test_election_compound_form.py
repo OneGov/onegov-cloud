@@ -131,6 +131,7 @@ def test_election_compound_form_model(session, related_link_labels):
     model.show_lists = True
     model.show_mandate_allocation = True
     model.show_party_strengths = True
+    model.show_party_panachage = True
     model.elections = [e1, e2]
     model.after_pukelsheim = True
     model.pukelsheim_completed = True
@@ -159,6 +160,7 @@ def test_election_compound_form_model(session, related_link_labels):
     assert form.show_lists.data is True
     assert form.show_mandate_allocation.data is True
     assert form.show_party_strengths.data is True
+    assert form.show_party_panachage.data is True
     assert form.elections.data == ['e-1', 'e-2']
     assert form.after_pukelsheim.data is True
     assert form.pukelsheim_completed.data is True
@@ -179,6 +181,7 @@ def test_election_compound_form_model(session, related_link_labels):
     form.show_lists.data = False
     form.show_mandate_allocation.data = False
     form.show_party_strengths.data = False
+    form.show_party_panachage.data = False
     form.elections.data = ['e-1', 'e-3', 'e-4']
     form.after_pukelsheim.data = False
     form.pukelsheim_completed.data = False
@@ -207,6 +210,7 @@ def test_election_compound_form_model(session, related_link_labels):
     assert form.show_lists.data is False
     assert form.show_mandate_allocation.data is False
     assert form.show_party_strengths.data is False
+    assert form.show_party_panachage.data is False
     assert sorted([e.id for e in model.elections]) == ['e-1', 'e-3']
     assert model.colors == {
         'CVP': '#ff9100',

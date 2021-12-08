@@ -92,7 +92,10 @@ class ElectionCompoundLayout(DetailLayout):
                 and self.has_party_results
             )
         if tab == 'parties-panachage':
-            return self.model.panachage_results.first() is not None
+            return (
+                self.model.show_party_panachage is True
+                and self.model.panachage_results.first() is not None
+            )
 
         return True
 

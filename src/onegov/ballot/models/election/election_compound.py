@@ -387,6 +387,9 @@ class ElectionCompound(
     #: may be used to enable/disable the visibility of party strengths
     show_party_strengths = meta_property('show_party_strengths')
 
+    #: may be used to enable/disable the visibility of party panachage
+    show_party_panachage = meta_property('show_party_panachage')
+
     #: may be used to enable/disable the visibility of mandate allocation
     show_mandate_allocation = meta_property('show_mandate_allocation')
 

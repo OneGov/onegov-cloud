@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-08 07:38+0100\n"
+"POT-Creation-Date: 2021-12-08 13:01+0100\n"
 "PO-Revision-Date: 2021-04-01 10:22+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -381,6 +381,12 @@ msgstr ""
 "Zeigt eine Registerkarte mit dem Vergleich der Parteistärken in Form eines "
 "Balkendiagramms an. Erfordert Parteiergebnisse."
 
+msgid "Panachage"
+msgstr "Panaschierstatistik"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
+
 msgid "After Doppelter Pukelsheim"
 msgstr "Nach Doppeltem Pukelsheim"
 
@@ -494,9 +500,6 @@ msgstr "Parteien"
 
 msgid "Downloads"
 msgstr "Downloads"
-
-msgid "Panachage"
-msgstr "Panaschierstatistik"
 
 msgid "Elected candidates"
 msgstr "Gewählte Kandidierende"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-08 07:38+0100\n"
+"POT-Creation-Date: 2021-12-08 13:01+0100\n"
 "PO-Revision-Date: 2021-04-01 10:24+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -380,6 +380,12 @@ msgstr ""
 "Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
 "grafico a barre. Richiede i risultati dei partiti."
 
+msgid "Panachage"
+msgstr "Panachage"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
+
 msgid "After Doppelter Pukelsheim"
 msgstr ""
 
@@ -491,9 +497,6 @@ msgstr "Parti"
 
 msgid "Downloads"
 msgstr "Download"
-
-msgid "Panachage"
-msgstr "Panachage"
 
 msgid "Elected candidates"
 msgstr "Candidati eletti"
