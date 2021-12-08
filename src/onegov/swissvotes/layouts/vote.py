@@ -104,7 +104,7 @@ class VoteLayout(DefaultLayout):
                 order = 0
                 title = self.request.translate(labels[name])
                 language = self.request.translate(
-                    (file.language or '').capitalize()
+                    _((file.language or '').capitalize())
                 )
             elif name == 'campaign_material_other':
                 data = metadata.get(file.filename.replace('.pdf', ''), {})
