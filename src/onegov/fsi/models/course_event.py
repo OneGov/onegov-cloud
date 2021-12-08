@@ -284,7 +284,8 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
             external_only=False,
             year=None,
             as_uids=False,
-            exclude_inactive=True
+            exclude_inactive=True,
+            auth_attendee=None
     ):
         """Returns the list of possible bookers. Attendees that already have
         a subscription for the parent course in the same year are excluded."""
@@ -298,6 +299,15 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
+
+        if auth_attendee and auth_attendee.role == 'editor':
+            attendee_permissions = auth_attendee.permissions or []
+            query = query.filter(
+                or_(
+                    CourseAttendee.organisation.in_(attendee_permissions),
+                    CourseAttendee.id == auth_attendee.id
+                )
+            )
 
         query = query.filter(CourseAttendee.id.notin_(excl))
 

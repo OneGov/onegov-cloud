@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-18 09:28+0100\n"
+"POT-Creation-Date: 2021-12-08 13:21+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -147,7 +147,7 @@ msgstr "Inhalt"
 msgid "Text Search"
 msgstr "Textsuche"
 
-msgid "Full Text"
+msgid "Full-text"
 msgstr "Volltext"
 
 msgid "Yes"
@@ -157,11 +157,27 @@ msgid "No"
 msgstr "Nein"
 
 msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to "
-"title, keyword, vote number, and procedure number."
+"Select «No» if you want to limit the search to title, keyword, vote number, "
+"and procedure number only. If you select «Yes», the full-text search also "
+"includes the following documents, in their available language versions: "
+"brief description by Swissvotes, text subject to vote, preliminary "
+"examination, decree on success, Federal Council dispatch, parliamentary "
+"debate, documents from the voting campaign. In contrast, the following "
+"documents are not included in the search because they invariably contain "
+"information on all the subjects that were put to the vote on that day : "
+"explanatory brochure, analysis of the advertising campaign, analysis of the "
+"media coverage, decree on voting result, reports on the post-vote poll."
 msgstr ""
-"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
-"Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
+"Wenn Sie «Nein» wählen, wird die Suche auf Titel, Kurzbezeichnung, "
+"Abstimmungs- und Geschäftsnummer beschränkt. Wenn Sie «Ja» wählen, werden "
+"alle Textfelder sowie die folgenden Dokumente in allen verfügbaren Sprachen "
+"durchsucht: Kurzbeschreibung Swissvotes, Abstimmungstext, Vorprüfung, "
+"Zustandekommen, Botschaft des Bundesrats, Parlamentsberatung, Dokumente aus "
+"der Abstimmungskampagne. Nicht durchsucht werden hingegen die folgenden "
+"Dokumente, weil diese immer Ausführungen zu allen Vorlagen enthalten, die am "
+"selben Tag zur Abstimmung kamen: Abstimmungsbüchlein, Inserateanalyse, "
+"Medienberichterstattungs-Analyse, Erwahrungsbeschluss, Berichte zur "
+"Nachbefragung."
 
 msgid "Policy area"
 msgstr "Politikbereich"
@@ -254,14 +270,14 @@ msgstr "Wählerstärken"
 msgid "Documents from the campaign"
 msgstr "Dokumente aus der Abstimmungskampagne"
 
-msgid "Update dataset"
-msgstr "Datensatz aktualisieren"
+msgid "Update dataset on the votes"
+msgstr "Abstimmungsdatensatz aktualisieren"
 
-msgid "Update metadata"
-msgstr "Metadaten aktualisieren"
+msgid "Update metadata on the campaign material"
+msgstr "Daten Kampagnenmaterial aktualisieren"
 
-msgid "Update external resources"
-msgstr "Externe Quellen aktualisieren"
+msgid "Update external sources for images"
+msgstr "Bildquellen aktualisieren"
 
 msgid "Download dataset (CSV)"
 msgstr "Datensatz herunterladen (CSV)"
@@ -1454,32 +1470,38 @@ msgstr "Italienisch"
 msgid "Rhaeto-Romanic"
 msgstr "Rätoromanisch"
 
-msgid "Argumentarium"
+msgid "Other"
+msgstr "Anderes"
+
+msgid "Collection of arguments"
 msgstr "Argumentarium"
-
-msgid "Press article"
-msgstr "Presseartikel"
-
-msgid "Media release"
-msgstr "Medienmitteilung"
-
-msgid "Lecture"
-msgstr "Referatstext"
-
-msgid "Leaflet"
-msgstr "Flugblatt"
-
-msgid "Essay"
-msgstr "Abhandlung"
 
 msgid "Letter"
 msgstr "Brief"
 
+msgid "Documentation"
+msgstr "Dokumentation"
+
+msgid "Pamphlet"
+msgstr "Flugblatt"
+
+msgid "Media release"
+msgstr "Medienmitteilung"
+
+msgid "List of members"
+msgstr "Mitgliederverzeichnis"
+
+msgid "Press article"
+msgstr "Presseartikel"
+
 msgid "Legal text"
 msgstr "Rechtstext"
 
-msgid "Other"
-msgstr "Anderes"
+msgid "Text of a presentation"
+msgstr "Referatstext"
+
+msgid "Statistical data"
+msgstr "Statistik"
 
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
@@ -1852,6 +1874,18 @@ msgstr ""
 "näheren Angaben dazu im Swissvotes-Codebuch (www.swissvotes.ch/page/dataset/"
 "codebook-de.pdf)."
 
+msgid "Full-text search in all documents on this vote"
+msgstr "Volltextsuche in allen Dokumenten zu dieser Vorlage"
+
+msgid "Search results"
+msgstr "Suchresultate"
+
+msgid "No documents found."
+msgstr "Keine Dokumente gefunden."
+
+msgid "Document"
+msgstr "Dokument"
+
 msgid "Filter"
 msgstr "Filtern"
 
@@ -1871,6 +1905,9 @@ msgstr "Ja-Anteil Volk"
 #. Default: Turnout
 msgid "turnout_hyphenated"
 msgstr "Stimm&shy;beteiligung"
+
+msgid "Search results in the documents on this vote"
+msgstr "Suchresultate in den Dokumenten zu dieser Vorlage"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

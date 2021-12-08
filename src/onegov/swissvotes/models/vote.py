@@ -1,11 +1,12 @@
 from cached_property import cached_property
 from collections import OrderedDict
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.core.utils import Bunch
+from onegov.file.utils import word_count
 from onegov.pdf.utils import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
@@ -108,6 +109,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     ORGANIZATION_NO_LONGER_EXISTS = 9999
 
+    term = None
+
     @staticmethod
     def codes(attribute):
         """ Returns the codes for the given attribute as defined in the code
@@ -167,9 +170,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         if attribute == 'position':
             return OrderedDict((
                 ('yes', _("Yes")),
+                ('mixed', _("Mixed")),
                 ('no', _("No")),
                 ('neutral', _("Neutral")),
-                ('mixed', _("Mixed")),
             ))
 
         if attribute == 'language':
@@ -179,18 +182,21 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('it', _('Italian')),
                 ('rm', _('Rhaeto-Romanic')),
                 ('mixed', _('Mixed')),
+                ('other', _('Other')),
             ))
 
         if attribute == 'doctype':
             return OrderedDict((
-                ('argument', _('Argumentarium')),
-                ('article', _('Press article')),
-                ('release', _('Media release')),
-                ('lecture', _('Lecture')),
-                ('leaflet', _('Leaflet')),
-                ('essay', _('Essay')),
+                ('argument', _('Collection of arguments')),
                 ('letter', _('Letter')),
+                ('documentation', _('Documentation')),
+                ('leaflet', _('Pamphlet')),
+                ('release', _('Media release')),
+                ('memberships', _('List of members')),
+                ('article', _('Press article')),
                 ('legal', _('Legal text')),
+                ('lecture', _('Text of a presentation')),
+                ('statistics', _('Statistical data')),
                 ('other', _('Other')),
             ))
 
@@ -723,6 +729,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))
     searchable_text_fr_CH = deferred(Column(TSVECTOR))
+    searchable_text_it_CH = deferred(Column(TSVECTOR))
+    searchable_text_en_US = deferred(Column(TSVECTOR))
 
     indexed_files = {
         'voting_text',
@@ -735,27 +743,79 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         'preliminary_examination'
     }
 
-    def vectorize_files(self):
-        """ Extract the text from the indexed files and store it. """
+    def reindex_files(self):
+        """ Extract the text from the localized files and the campaign
+        material and save it together with the language. Store the text of the
+        **indexed only** localized files and **all** campaign material
+        in the search indexes.
 
-        for locale, language in (('de_CH', 'german'), ('fr_CH', 'french')):
-            files = [
-                SwissVote.__dict__[file].__get_by_locale__(self, locale)
-                for file in self.indexed_files
-            ]
-            text = ' '.join([
-                extract_pdf_info(file.reference.file)[1] or ''
-                for file in files if file
-            ]).strip()
+        The language is determined as follows:
+        - For the localized files, the language is determined by the locale,
+          e.g. `de_CH` -> `german`.
+        - For the campaign material, the campaign metadata is used. If a
+          document is (amongst others) `de` --> `german`. If (amongst others,)
+          `fr` but not `de` --> `french`. If (amongst others) `it` but not `de`
+          or `fr` --> `italian`. In all other cases `english`.
+
+        """
+
+        locales = {
+            'de_CH': 'german',
+            'fr_CH': 'french',
+            'it_CH': 'italian',
+            'en_US': 'english'
+        }
+        files = {locale: [] for locale in locales}
+
+        # Localized files
+        for locale in locales:
+            for name, attribute in self.localized_files().items():
+                if attribute.extension == 'pdf':
+                    file = SwissVote.__dict__[name].__get_by_locale__(
+                        self, locale
+                    )
+                    if file:
+                        index = name in self.indexed_files
+                        files[locale].append((file, index))
+
+        # Campaign material
+        for file in self.campaign_material_other:
+            name = file.filename.replace('.pdf', '')
+            metadata = (self.campaign_material_metadata or {}).get(name)
+            languages = set((metadata or {}).get('language', []))
+            if 'de' in languages:
+                files['de_CH'].append((file, True))
+            elif 'fr' in languages:
+                files['fr_CH'].append((file, True))
+            elif 'it' in languages:
+                files['it_CH'].append((file, True))
+            else:
+                files['en_US'].append((file, True))
+
+        # Extract content and index
+        for locale in files:
+            text = ''
+            for file, index in files[locale]:
+                pages, extract = extract_pdf_info(file.reference.file)
+                file.extract = (extract or '').strip()
+                file.stats = {
+                    'pages': pages,
+                    'words': word_count(file.extract)
+                }
+                file.language = locales[locale]
+
+                if file.extract and index:
+                    text += '\n\n' + file.extract
+
             setattr(
                 self,
                 f'searchable_text_{locale}',
-                func.to_tsvector(language, text)
+                func.to_tsvector(locales[locale], text)
             )
 
     @observes('files')
     def files_observer(self, files):
-        self.vectorize_files()
+        self.reindex_files()
 
     def get_file(self, name, locale=None, fallback=True):
         """ Returns the requested localized file.
@@ -771,3 +831,49 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         fallback = get(self, default_locale) if fallback else None
         result = get(self, locale) if locale else getattr(self, name, None)
         return result or fallback
+
+    @staticmethod
+    def search_term_expression(term):
+        """ Returns the given search term transformed to use within Postgres
+        ``to_tsquery`` function.
+
+        Removes all unwanted characters, replaces prefix matching, joins
+        word together using FOLLOWED BY.
+        """
+
+        def cleanup(text):
+            result = ''.join((c for c in text if c.isalnum() or c in ',.'))
+            return f'{result}:*' if text.endswith('*') else result
+
+        parts = [cleanup(part) for part in (term or '').strip().split()]
+        return ' <-> '.join([part for part in parts if part])
+
+    def search(self, term=None):
+        """ Searches for the given term in the indexed attachments.
+
+        Returns a tuple of attribute name and locale which can be used with
+        ``get_file``.
+        """
+        term = self.term if term is None else term
+        term = self.search_term_expression(term)
+        if not term:
+            return []
+
+        from onegov.swissvotes.models.file import SwissVoteFile
+        from sqlalchemy.orm import object_session
+        from sqlalchemy import func, and_, or_
+
+        query = object_session(self).query(SwissVoteFile)
+        query = query.filter(
+            or_(*[
+                and_(
+                    SwissVoteFile.id.in_([file.id for file in self.files]),
+                    SwissVoteFile.language == language,
+                    func.to_tsvector(language, SwissVoteFile.extract).op('@@')(
+                        func.to_tsquery(language, term)
+                    )
+                )
+                for language in ['german', 'french', 'italian', 'english']
+            ])
+        )
+        return query.all()

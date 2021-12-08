@@ -423,20 +423,23 @@ def test_swissvotes_metadata_field_types_and_missing_values():
             content,  # Datum Jahr
             content,  # Datum Monat
             content,  # Datum Tag
-            content,  # Sprache D
-            content,  # Sprache E
-            content,  # Sprache F
+            content,  # Sprache DE
+            content,  # Sprache EN
+            content,  # Sprache FR
             content,  # Sprache IT
             content,  # Sprache RR
             content,  # Sprache Gemischt
-            content,  # Doktyp Argumentarium
-            content,  # Doktyp Presseartikel
-            content,  # Doktyp Medienmitteilung
-            content,  # Doktyp Referatstext
-            content,  # Doktyp Flugblatt
-            content,  # Doktyp Abhandlung
-            content,  # Doktyp Brief
-            content,  # Doktyp Rechtstext
+            content,  # Sprache Anderes
+            content,  # Typ ARGUMENTARIUM
+            content,  # Typ BRIEF
+            content,  # Typ DOKUMENTATION
+            content,  # Typ FLUGBLATT
+            content,  # Typ MEDIENMITTEILUNG
+            content,  # Typ MITGLIEDERVERZEICHNIS
+            content,  # Typ PRESSEARTIKEL
+            content,  # Typ RECHTSTEXT
+            content,  # Typ REFERATSTEXT
+            content,  # Typ STATISTIK
             'xxx'     # avoid being ignore because all cells are empty
         ])
     workbook.close()
@@ -482,21 +485,24 @@ def test_swissvotes_metadata_field_all_okay():
         '1970',  # Datum Jahr
         '12',  # Datum Monat
         '31',  # Datum Tag
-        'x',  # Sprache D
-        'x',  # Sprache E
-        'x',  # Sprache F
+        'x',  # Sprache DE
+        'x',  # Sprache EN
+        'x',  # Sprache FR
         'x',  # Sprache IT
         'x',  # Sprache RR
         'x',  # Sprache Gemischt
-        'x',  # Doktyp Argumentarium
-        'x',  # Doktyp Presseartikel
-        'x',  # Doktyp Medienmitteilung
-        'x',  # Doktyp Referatstext
-        'x',  # Doktyp Flugblatt
-        'x',  # Doktyp Abhandlung
-        'x',  # Doktyp Brief
-        'x',  # Doktyp Rechtstext
-        'x',  # Doktyp Anderes
+        'x',  # Sprache Anderes
+        'x',  # Typ ARGUMENTARIUM
+        'x',  # Typ BRIEF
+        'x',  # Typ DOKUMENTATION
+        'x',  # Typ FLUGBLATT
+        'x',  # Typ MEDIENMITTEILUNG
+        'x',  # Typ MITGLIEDERVERZEICHNIS
+        'x',  # Typ PRESSEARTIKEL
+        'x',  # Typ RECHTSTEXT
+        'x',  # Typ REFERATSTEXT
+        'x',  # Typ STATISTIK
+        'x',  # Typ ANDERES
     ])
     worksheet.write_row(2, 0, [
         '100.1',  # Abst-Nummer
@@ -508,21 +514,24 @@ def test_swissvotes_metadata_field_all_okay():
         '1980',  # Datum Jahr
         '',  # Datum Monat
         '',  # Datum Tag
-        'x',  # Sprache D
-        '',  # Sprache E
-        '',  # Sprache F
+        'x',  # Sprache DE
+        '',  # Sprache EN
+        '',  # Sprache FR
         '',  # Sprache IT
         '',  # Sprache RR
         '',  # Sprache Gemischt
-        '',  # Doktyp Argumentarium
-        'x',  # Doktyp Presseartikel
-        '',  # Doktyp Medienmitteilung
-        '',  # Doktyp Referatstext
-        '',  # Doktyp Flugblatt
-        '',  # Doktyp Abhandlung
-        '',  # Doktyp Brief
-        '',  # Doktyp Rechtstext
-        '',  # Doktyp Anderes
+        '',  # Sprache Anderes
+        '',  # Typ ARGUMENTARIUM
+        '',  # Typ BRIEF
+        '',  # Typ DOKUMENTATION
+        '',  # Typ FLUGBLATT
+        '',  # Typ MEDIENMITTEILUNG
+        '',  # Typ MITGLIEDERVERZEICHNIS
+        'x',  # Typ PRESSEARTIKEL
+        '',  # Typ RECHTSTEXT
+        '',  # Typ REFERATSTEXT
+        '',  # Typ STATISTIK
+        '',  # Typ ANDERES
     ])
     worksheet.write_row(3, 0, [
         '100.2',  # Abst-Nummer
@@ -534,21 +543,24 @@ def test_swissvotes_metadata_field_all_okay():
         '',  # Datum Jahr
         '',  # Datum Monat
         '',  # Datum Tag
-        '',  # Sprache D
-        '',  # Sprache E
-        '',  # Sprache F
+        '',  # Sprache DE
+        '',  # Sprache EN
+        '',  # Sprache FR
         '',  # Sprache IT
         '',  # Sprache RR
         '',  # Sprache Gemischt
-        '',  # Doktyp Argumentarium
-        '',  # Doktyp Presseartikel
-        '',  # Doktyp Medienmitteilung
-        '',  # Doktyp Referatstext
-        '',  # Doktyp Flugblatt
-        '',  # Doktyp Abhandlung
-        '',  # Doktyp Brief
-        '',  # Doktyp Rechtstext
-        '',  # Doktyp Anderes
+        '',  # Sprache Anderes
+        '',  # Typ ARGUMENTARIUM
+        '',  # Typ BRIEF
+        '',  # Typ DOKUMENTATION
+        '',  # Typ FLUGBLATT
+        '',  # Typ MEDIENMITTEILUNG
+        '',  # Typ MITGLIEDERVERZEICHNIS
+        '',  # Typ PRESSEARTIKEL
+        '',  # Typ RECHTSTEXT
+        '',  # Typ REFERATSTEXT
+        '',  # Typ STATISTIK
+        '',  # Typ ANDERES
     ])
     workbook.close()
     file.seek(0)
@@ -571,13 +583,15 @@ def test_swissvotes_metadata_field_all_okay():
                 'date_year': 1970,
                 'doctype': [
                     'argument',
-                    'article',
-                    'release',
-                    'lecture',
-                    'leaflet',
-                    'essay',
                     'letter',
+                    'documentation',
+                    'leaflet',
+                    'release',
+                    'memberships',
+                    'article',
                     'legal',
+                    'lecture',
+                    'statistics',
                     'other'
                 ],
                 'editor': 'Herausgeber',
@@ -588,7 +602,8 @@ def test_swissvotes_metadata_field_all_okay():
                     'fr',
                     'it',
                     'rm',
-                    'mixed'
+                    'mixed',
+                    'other'
                 ],
                 'position': 'yes',
                 'title': 'Brief'
@@ -646,21 +661,24 @@ def test_swissvotes_metadata_skip_empty_columns():
         '',  # Datum Jahr
         '',  # Datum Monat
         '',  # Datum Tag
-        '',  # Sprache D
-        '',  # Sprache E
-        '',  # Sprache F
+        '',  # Sprache DE
+        '',  # Sprache EN
+        '',  # Sprache FR
         '',  # Sprache IT
         '',  # Sprache RR
         '',  # Sprache Gemischt
-        '',  # Doktyp Argumentarium
-        '',  # Doktyp Presseartikel
-        '',  # Doktyp Medienmitteilung
-        '',  # Doktyp Referatstext
-        '',  # Doktyp Flugblatt
-        '',  # Doktyp Abhandlung
-        '',  # Doktyp Brief
-        '',  # Doktyp Rechtstext
-        '',  # Doktyp Anderes
+        '',  # Sprache Anderes
+        '',  # Typ ARGUMENTARIUM
+        '',  # Typ BRIEF
+        '',  # Typ DOKUMENTATION
+        '',  # Typ FLUGBLATT
+        '',  # Typ MEDIENMITTEILUNG
+        '',  # Typ MITGLIEDERVERZEICHNIS
+        '',  # Typ PRESSEARTIKEL
+        '',  # Typ RECHTSTEXT
+        '',  # Typ REFERATSTEXT
+        '',  # Typ STATISTIK
+        '',  # Typ ANDERES
     ])
     workbook.close()
     file.seek(0)

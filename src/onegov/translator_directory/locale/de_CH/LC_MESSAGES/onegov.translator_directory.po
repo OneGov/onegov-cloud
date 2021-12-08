@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-13 14:36+0100\n"
+"POT-Creation-Date: 2021-11-25 06:16+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -63,6 +63,9 @@ msgstr "Recht und Versicherungswesen"
 
 msgid "Military"
 msgstr "Militär"
+
+msgid "Medicine"
+msgstr "Medizin"
 
 msgid "Simultaneous interpreting"
 msgstr "Simultandolmetschen"
@@ -130,6 +133,9 @@ msgstr "Zulassung"
 
 msgid "Withholding tax"
 msgstr "Quellensteuer"
+
+msgid "Self-employed"
+msgstr "Selbständig"
 
 msgid "Last name"
 msgstr "Nachname"
@@ -246,6 +252,9 @@ msgstr "Sprachen Schrift"
 msgid "Expertise by professional guild"
 msgstr "Fachkenntnisse nach Berufssparte"
 
+msgid "Expertise by professional guild: other"
+msgstr "Fachkenntnisse nach Berufssparte: andere"
+
 msgid "Expertise by interpreting type"
 msgstr "Fachkenntnisse nach Dolmetscherart"
 
@@ -353,6 +362,15 @@ msgstr "Sprache hinzufügen"
 msgid "Export Excel"
 msgstr "Export Excel"
 
+msgid "This language is used and can't be deleted."
+msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden."
+
+msgid "Do you really want to delete this language?"
+msgstr "Wollen Sie diese Sprache wirklich löschen?"
+
+msgid "Delete language"
+msgstr "Sprache löschen"
+
 msgid "Upload"
 msgstr "Hochladen"
 
@@ -411,9 +429,6 @@ msgstr "Sprache ${name} aktualisiert"
 
 msgid "Edit language"
 msgstr "Sprache bearbeiten"
-
-msgid "This language is used and can't be deleted"
-msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden"
 
 msgid "Language successfully deleted"
 msgstr "Sprache erfolgreich gelöscht"

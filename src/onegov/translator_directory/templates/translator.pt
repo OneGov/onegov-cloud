@@ -16,9 +16,13 @@
                                 <dt i18n:translate>Admission</dt>
                                 <dd>${layout.format_admission(model.admission)}</dd>
                             </dl>
-                             <dl class="field-display" tal:condition="layout.show('withholding_tax')">
+                            <dl class="field-display" tal:condition="layout.show('withholding_tax')">
                                 <dt i18n:translate>Withholding tax</dt>
                                 <dd>${layout.format_boolean(model.withholding_tax)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="layout.show('self_employed')">
+                                <dt i18n:translate>Self-employed</dt>
+                                <dd>${layout.format_boolean(model.self_employed)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.gender and layout.show('gender')">
                                 <dt i18n:translate>Gender</dt>
@@ -94,10 +98,10 @@
                                     <tal:b tal:repeat="expertise model.expertise_interpreting_types">${layout.format_interpreting_type(expertise)}<br></tal:b>
                                 </dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.expertise_professional_guilds and layout.show('expertise_professional_guilds')">
+                            <dl class="field-display" tal:condition="model.expertise_professional_guilds_all and layout.show('expertise_professional_guilds_all')">
                                 <dt i18n:translate>Expertise by professional guild</dt>
                                 <dd>
-                                    <tal:b tal:repeat="expertise model.expertise_professional_guilds">${layout.format_prof_guild(expertise)}<br></tal:b>
+                                    <tal:b tal:repeat="expertise model.expertise_professional_guilds_all">${layout.format_prof_guild(expertise)}<br></tal:b>
                                 </dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.operation_comments and layout.show('operation_comments')">

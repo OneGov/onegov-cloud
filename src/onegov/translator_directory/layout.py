@@ -2,7 +2,7 @@ from cached_property import cached_property
 from purl import URL
 
 from onegov.translator_directory import _
-from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
+from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.translator_directory.collections.documents import \
@@ -58,7 +58,9 @@ class DefaultLayout(BaseLayout):
             return 'text-orange'
 
     def format_prof_guild(self, key):
-        return self.request.translate(PROFESSIONAL_GUILDS[key])
+        if key in PROFESSIONAL_GUILDS:
+            return self.request.translate(PROFESSIONAL_GUILDS[key])
+        return key
 
     def format_interpreting_type(self, key):
         return self.request.translate(INTERPRETING_TYPES[key])
@@ -220,7 +222,10 @@ class TranslatorCollectionLayout(DefaultLayout):
                 Link(
                     _('Export Excel'),
                     url=self.request.class_link(
-                        TranslatorCollection, name='export')),
+                        TranslatorCollection, name='export'
+                    ),
+                    attrs={'class': 'export-link'}
+                ),
                 Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
@@ -328,8 +333,50 @@ class EditLanguageLayout(LanguageLayout):
         links.append(Link(_('Edit')))
         return links
 
-    @property
+    @cached_property
     def editbar_links(self):
+        if self.request.is_admin:
+            if not self.model.deletable:
+                return [
+                    Link(
+                        _('Delete'),
+                        self.csrf_protected_url(
+                            self.request.link(self.model)
+                        ),
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Block(
+                                _("This language is used and can't be "
+                                  "deleted."),
+                                no=_("Cancel")
+                            ),
+                        )
+                    ),
+                ]
+            return [
+                Link(
+                    _('Delete'),
+                    self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete "
+                              "this language?"),
+                            _("This cannot be undone."),
+                            _("Delete language"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                TranslatorCollection
+                            )
+                        )
+                    )
+                ),
+            ]
         return []
 
 

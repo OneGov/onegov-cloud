@@ -30,7 +30,13 @@ SANE_HTML_TAGS = [
     'h3',
     'h4',
     'h5',
-    'h6'
+    'h6',
+    'table',
+    'tbody',
+    'thead',
+    'tr',
+    'th',
+    'td',
 ]
 
 # html attributes allowed by bleach

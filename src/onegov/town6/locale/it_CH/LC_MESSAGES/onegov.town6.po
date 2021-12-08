@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-10-09 08:59+0200\n"
+"POT-Creation-Date: 2021-12-01 09:09+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -301,6 +301,9 @@ msgstr "Do"
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
 
+msgid "Import"
+msgstr "Importa"
+
 msgid "This event can't be editet."
 msgstr "Questo evento non può essere modificato."
 
@@ -415,9 +418,6 @@ msgstr "Cartella"
 
 msgid "Configure"
 msgstr "Configura"
-
-msgid "Import"
-msgstr "Importa"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -605,6 +605,9 @@ msgstr "Segui questo collegamento per accedere."
 
 msgid "No forms defined yet."
 msgstr "Nessun modulo ancora definito."
+
+msgid "Categories"
+msgstr "Categorie"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "

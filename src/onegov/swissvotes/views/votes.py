@@ -175,7 +175,7 @@ def update_external_resources(self, request, form):
         'layout': layout,
         'form': form,
         'cancel': request.link(self),
-        'button_text': _("Update external resources"),
+        'button_text': _("Update external sources for images"),
     }
 
 

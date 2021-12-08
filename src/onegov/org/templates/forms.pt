@@ -5,6 +5,24 @@
     <tal:b metal:fill-slot="content">
         <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
 
-        <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped forms; add_pagerefs request.is_logged_in" />
+        <div class="row" tal:condition="forms">
+
+            <div class="columns small-12 medium-8">
+                <metal:b use-macro="layout.macros['group_by_column']" tal:define="grouped forms; add_pagerefs request.is_logged_in" />
+            </div>
+
+            <div class="large-4 medium-4 columns">
+                <div class="borderless-side-panel">
+                    <h2 i18n:translate="">Categories</h2>
+                    <ul>
+                        <li tal:repeat="form forms">
+                            <a href="#${form}">${form}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
     </tal:b>
 </div>

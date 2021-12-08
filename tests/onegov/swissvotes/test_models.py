@@ -390,7 +390,7 @@ def test_model_vote(session, sample_vote):
             'position': 'no'
         },
         'leaflet.pdf': {
-            'title': 'Leaflet',
+            'title': 'Pamphlet',
             'date_year': 1970,
             'language': ['de']
         }
@@ -793,7 +793,13 @@ def test_model_vote_codes():
     assert SwissVote.codes('recommendation')[5] == "Free vote"
     assert SwissVote.metadata_codes('position')['no'] == "No"
     assert SwissVote.metadata_codes('language')['mixed'] == "Mixed"
-    assert SwissVote.metadata_codes('doctype')['essay'] == "Essay"
+    assert SwissVote.metadata_codes('doctype')['leaflet'] == "Pamphlet"
+
+
+def test_model_vote_search_term_expression(swissvotes_app):
+    assert SwissVote.search_term_expression(None) == ''
+    assert SwissVote.search_term_expression('') == ''
+    assert SwissVote.search_term_expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
 
 
 def test_model_vote_attachments(swissvotes_app, attachments,
@@ -874,16 +880,33 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     vote.parliamentary_debate = attachments['parliamentary_debate']
     vote.voting_text = attachments['voting_text']
     session.flush()
+    session.refresh(vote)
 
     assert len(vote.files) == 4
     assert vote.ad_analysis.name == 'ad_analysis-de_CH'
+    assert vote.ad_analysis.extract == 'Inserateanalyse'
+    assert vote.ad_analysis.stats == {'pages': 1, 'words': 1}
+    assert vote.ad_analysis.language == 'german'
     assert vote.brief_description.name == 'brief_description-de_CH'
+    assert vote.brief_description.extract == 'Kurzbeschreibung'
+    assert vote.brief_description.stats == {'pages': 1, 'words': 1}
+    assert vote.brief_description.language == 'german'
     assert vote.parliamentary_debate.name == 'parliamentary_debate-de_CH'
+    assert vote.parliamentary_debate.extract == 'Parlamentdebatte'
+    assert vote.parliamentary_debate.stats == {'pages': 1, 'words': 1}
+    assert vote.parliamentary_debate.language == 'german'
     assert vote.voting_text.name == 'voting_text-de_CH'
+    assert vote.voting_text.extract == 'Abstimmungstext'
+    assert vote.voting_text.stats == {'pages': 1, 'words': 1}
+    assert vote.voting_text.language == 'german'
     assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "kurzbeschreib" in vote.searchable_text_de_CH
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert vote.searchable_text_fr_CH == ''
+    assert vote.search('Inserateanalysen') == [vote.ad_analysis]
+    assert vote.search('Kurzbeschreibung') == [vote.brief_description]
+    assert vote.search('Parlamentdebatte') == [vote.parliamentary_debate]
+    assert vote.search('Abstimmungstext') == [vote.voting_text]
 
     # Upload fr_CH
     swissvotes_app.session_manager.current_locale = 'fr_CH'
@@ -894,10 +917,13 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert len(vote.files) == 5
     assert vote.voting_text is None
     assert vote.realization.name == 'realization-fr_CH'
+    assert vote.realization.stats == {'pages': 1, 'words': 1}
+    assert vote.realization.language == 'french'
     assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "kurzbeschreib" in vote.searchable_text_de_CH
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert "réalis" in vote.searchable_text_fr_CH
+    assert vote.search('Réalisation') == [vote.realization]
 
     del vote.realization
     vote.federal_council_message = attachments['federal_council_message']
@@ -908,14 +934,24 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert len(vote.files) == 7
     assert vote.voting_text is None
     assert vote.federal_council_message.name == 'federal_council_message-fr_CH'
+    assert vote.federal_council_message.stats == {'pages': 1, 'words': 4}
+    assert vote.federal_council_message.language == 'french'
     assert vote.resolution.name == 'resolution-fr_CH'
+    assert vote.resolution.stats == {'pages': 1, 'words': 4}
+    assert vote.resolution.language == 'french'
     assert vote.voting_booklet.name == 'voting_booklet-fr_CH'
+    assert vote.voting_booklet.stats == {'pages': 1, 'words': 2}
+    assert vote.voting_booklet.language == 'french'
     assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "kurzbeschreib" in vote.searchable_text_de_CH
     assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert "réalis" not in vote.searchable_text_fr_CH
     assert "conseil" in vote.searchable_text_fr_CH
     assert "fédéral" in vote.searchable_text_fr_CH
+    assert vote.search('Conseil fédéral') == [vote.federal_council_message]
+    assert vote.search('Messages') == [vote.federal_council_message]
+    assert vote.search('constatant') == [vote.resolution]
+    assert vote.search('brochure') == [vote.voting_booklet]
 
     assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
     assert vote.get_file('ad_analysis', 'fr_CH').name == 'ad_analysis-de_CH'
@@ -928,6 +964,11 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.get_file('resolution', 'de_CH') is None
 
     # Additional campaing material
+    vote.campaign_material_metadata = {
+        'campaign_material_other-essay': {'language': ['de', 'it']},
+        'campaign_material_other-leaflet': {'language': ['it', 'en']},
+        'campaign_material_other-legal': {'language': ['fr', 'it']},
+    }
     assert vote.campaign_material_yea == []
     assert vote.campaign_material_nay == []
     assert vote.campaign_material_other == []
@@ -938,6 +979,8 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     vote.files.append(campaign_material['campaign_material_nay-2.png'])
     vote.files.append(campaign_material['campaign_material_other-essay.pdf'])
     vote.files.append(campaign_material['campaign_material_other-leaflet.pdf'])
+    vote.files.append(campaign_material['campaign_material_other-article.pdf'])
+    vote.files.append(campaign_material['campaign_material_other-legal.pdf'])
     session.flush()
 
     assert [file.filename for file in vote.campaign_material_yea] == [
@@ -946,10 +989,37 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert [file.filename for file in vote.campaign_material_nay] == [
         'campaign_material_nay-1.png', 'campaign_material_nay-2.png'
     ]
-    assert [file.filename for file in vote.campaign_material_other] == [
-        'campaign_material_other-essay.pdf',
-        'campaign_material_other-leaflet.pdf'
-    ]
+    files = {
+        file.name.split('-')[1].split('.')[0]: file
+        for file in vote.campaign_material_other
+    }
+    assert files['essay'].filename == 'campaign_material_other-essay.pdf'
+    assert files['essay'].extract == 'Abhandlung'
+    assert files['essay'].stats == {'pages': 1, 'words': 1}
+    assert files['essay'].language == 'german'
+    assert files['leaflet'].filename == 'campaign_material_other-leaflet.pdf'
+    assert files['leaflet'].extract == 'Volantino'
+    assert files['leaflet'].stats == {'pages': 1, 'words': 1}
+    assert files['leaflet'].language == 'italian'
+    assert files['article'].filename == 'campaign_material_other-article.pdf'
+    assert files['article'].language == 'english'
+    assert files['article'].extract == 'Article'
+    assert files['legal'].stats == {'pages': 1, 'words': 1}
+    assert files['legal'].filename == 'campaign_material_other-legal.pdf'
+    assert files['legal'].language == 'french'
+    assert files['legal'].extract == 'Juridique'
+    assert files['legal'].stats == {'pages': 1, 'words': 1}
+    assert 'abhandl' in vote.searchable_text_de_CH
+    assert 'volantin' in vote.searchable_text_it_CH
+    assert 'articl' in vote.searchable_text_en_US
+    assert vote.search('Abhandlung') == [files['essay']]
+    assert vote.search('Abhandlungen') == [files['essay']]
+    assert vote.search('Volantino') == [files['leaflet']]
+    assert vote.search('Volantini') == [files['leaflet']]
+    assert vote.search('Article') == [files['article']]
+    assert vote.search('Articles') == [files['article']]
+    assert vote.search('Juridique') == [files['legal']]
+    assert vote.search('Juridiques') == [files['legal']]
 
     assert vote.posters(DummyRequest())['yea'] == [
         Bunch(
@@ -1138,25 +1208,28 @@ def test_model_column_mapper_metadata():
         ('i:t:date_year', 'Datum Jahr', 'INTEGER', True, None, None),
         ('i:t:date_month', 'Datum Monat', 'INTEGER', True, None, None),
         ('i:t:date_day', 'Datum Tag', 'INTEGER', True, None, None),
-        ('t:t:language!de', 'Sprache D', 'TEXT', True, None, None),
-        ('t:t:language!en', 'Sprache E', 'TEXT', True, None, None),
-        ('t:t:language!fr', 'Sprache F', 'TEXT', True, None, None),
+        ('t:t:language!de', 'Sprache DE', 'TEXT', True, None, None),
+        ('t:t:language!en', 'Sprache EN', 'TEXT', True, None, None),
+        ('t:t:language!fr', 'Sprache FR', 'TEXT', True, None, None),
         ('t:t:language!it', 'Sprache IT', 'TEXT', True, None, None),
         ('t:t:language!rm', 'Sprache RR', 'TEXT', True, None, None),
         ('t:t:language!mixed', 'Sprache Gemischt', 'TEXT', True, None, None),
-        ('t:t:doctype!argument', 'Doktyp Argumentarium', 'TEXT', True, None,
+        ('t:t:language!other', 'Sprache Anderes', 'TEXT', True, None, None),
+        ('t:t:doctype!argument', 'Typ ARGUMENTARIUM', 'TEXT', True, None,
          None),
-        ('t:t:doctype!article', 'Doktyp Presseartikel', 'TEXT', True, None,
+        ('t:t:doctype!letter', 'Typ BRIEF', 'TEXT', True, None, None),
+        ('t:t:doctype!documentation', 'Typ DOKUMENTATION', 'TEXT', True, None,
          None),
-        ('t:t:doctype!release', 'Doktyp Medienmitteilung', 'TEXT', True, None,
+        ('t:t:doctype!leaflet', 'Typ FLUGBLATT', 'TEXT', True, None, None),
+        ('t:t:doctype!release', 'Typ MEDIENMITTEILUNG', 'TEXT', True, None,
          None),
-        ('t:t:doctype!lecture', 'Doktyp Referatstext', 'TEXT', True, None,
-         None),
-        ('t:t:doctype!leaflet', 'Doktyp Flugblatt', 'TEXT', True, None, None),
-        ('t:t:doctype!essay', 'Doktyp Abhandlung', 'TEXT', True, None, None),
-        ('t:t:doctype!letter', 'Doktyp Brief', 'TEXT', True, None, None),
-        ('t:t:doctype!legal', 'Doktyp Rechtstext', 'TEXT', True, None, None),
-        ('t:t:doctype!other', 'Doktyp Anderes', 'TEXT', True, None, None),
+        ('t:t:doctype!memberships', 'Typ MITGLIEDERVERZEICHNIS', 'TEXT', True,
+         None, None),
+        ('t:t:doctype!article', 'Typ PRESSEARTIKEL', 'TEXT', True, None, None),
+        ('t:t:doctype!legal', 'Typ RECHTSTEXT', 'TEXT', True, None, None),
+        ('t:t:doctype!lecture', 'Typ REFERATSTEXT', 'TEXT', True, None, None),
+        ('t:t:doctype!statistics', 'Typ STATISTIK', 'TEXT', True, None, None),
+        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None)
     ]
 
 

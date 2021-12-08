@@ -1,5 +1,6 @@
 import click
 import os
+import transaction
 
 from decimal import Decimal
 from decimal import InvalidOperation
@@ -191,10 +192,13 @@ def reindex_attachments(group_context):
     """ Reindexes the attachments. """
 
     def _reindex(request, app):
-        votes = SwissVoteCollection(app)
-        for vote in votes.query():
-            vote.vectorize_files()
-            click.secho(f'Reindexed vote {vote.bfs_number}', fg='green')
+        bfs_numbers = sorted(app.session().query(SwissVote.bfs_number))
+        for bfs_number in bfs_numbers:
+            click.secho(f'Reindexing vote {bfs_number.bfs_number}', fg='green')
+            app.session().query(SwissVote).filter_by(
+                bfs_number=bfs_number.bfs_number
+            ).one().reindex_files()
+            transaction.commit()
 
     return _reindex
 

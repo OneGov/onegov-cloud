@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-18 09:28+0100\n"
+"POT-Creation-Date: 2021-12-08 13:21+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -146,7 +146,7 @@ msgstr "Contenu"
 msgid "Text Search"
 msgstr "Texte"
 
-msgid "Full Text"
+msgid "Full-text"
 msgstr "Texte intégral"
 
 msgid "Yes"
@@ -156,12 +156,28 @@ msgid "No"
 msgstr "Non"
 
 msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to "
-"title, keyword, vote number, and procedure number."
+"Select «No» if you want to limit the search to title, keyword, vote number, "
+"and procedure number only. If you select «Yes», the full-text search also "
+"includes the following documents, in their available language versions: "
+"brief description by Swissvotes, text subject to vote, preliminary "
+"examination, decree on success, Federal Council dispatch, parliamentary "
+"debate, documents from the voting campaign. In contrast, the following "
+"documents are not included in the search because they invariably contain "
+"information on all the subjects that were put to the vote on that day : "
+"explanatory brochure, analysis of the advertising campaign, analysis of the "
+"media coverage, decree on voting result, reports on the post-vote poll."
 msgstr ""
-"Recherche dans l'intégralité du texte, pièces jointes comprises. "
-"Sélectionnez \"non\" si vous souhaitez limiter la recherche au titre, mot-"
-"clé, numéro de vote et numéro de procédure."
+"Sélectionnez «Non» si vous souhaitez limiter la recherche au titre, mot-clé, "
+"numéro de vote et numéro de procédure. Si vous sélectionnez «Oui», la "
+"recherche plein texte porte aussi sur les documents suivants dans toutes les "
+"langues disponibles: résumé Swissvotes, texte soumis en votation, examen "
+"préliminaire, arrêté constatant l’aboutissement, message du Conseil fédéral, "
+"débat parlementaire, documents de la campagne de votation. En revanche, les "
+"documents suivants ne seront pas inclus dans la recherche, car ils "
+"contiennent toujours des explications sur tous les objets qui ont été soumis "
+"à votation le même jour: brochure explicative, analyse des annonces de "
+"campagne, analyse de la couverture médiatique, arrêté constatant le "
+"résultat, rapports sur l’enquête post-votation."
 
 msgid "Policy area"
 msgstr "Domaine politique"
@@ -253,14 +269,14 @@ msgstr "Poids électoraux"
 msgid "Documents from the campaign"
 msgstr "Documents de la campagne de votation"
 
-msgid "Update dataset"
-msgstr "Actualiser la base de données"
+msgid "Update dataset on the votes"
+msgstr "Actualisier la base de données sur les votations"
 
-msgid "Update metadata"
-msgstr "Actualiser les métadonnées"
+msgid "Update metadata on the campaign material"
+msgstr "Actualiser les métadonnées sur les matériaux de campagne"
 
-msgid "Update external resources"
-msgstr "Actualiser des resources externes"
+msgid "Update external sources for images"
+msgstr "Actualiser les sources externes pour les images"
 
 msgid "Download dataset (CSV)"
 msgstr "Télécharger le fichier de données (CSV)"
@@ -1445,46 +1461,52 @@ msgid "unknown"
 msgstr "inconnu"
 
 msgid "Mixed"
-msgstr ""
+msgstr "Mixte"
 
 msgid "German"
-msgstr ""
+msgstr "Allemand"
 
 msgid "French"
-msgstr ""
+msgstr "Français"
 
 msgid "Italian"
-msgstr ""
+msgstr "Italien"
 
 msgid "Rhaeto-Romanic"
-msgstr ""
-
-msgid "Argumentarium"
-msgstr ""
-
-msgid "Press article"
-msgstr ""
-
-msgid "Media release"
-msgstr ""
-
-msgid "Lecture"
-msgstr ""
-
-msgid "Leaflet"
-msgstr ""
-
-msgid "Essay"
-msgstr ""
-
-msgid "Letter"
-msgstr ""
-
-msgid "Legal text"
-msgstr ""
+msgstr "Réto-roman"
 
 msgid "Other"
-msgstr ""
+msgstr "Autre"
+
+msgid "Collection of arguments"
+msgstr "Argumentaire"
+
+msgid "Letter"
+msgstr "Lettre"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "Pamphlet"
+msgstr "Prospectus"
+
+msgid "Media release"
+msgstr "Communiqué de presse"
+
+msgid "List of members"
+msgstr "Liste des membres"
+
+msgid "Press article"
+msgstr "Article de presse"
+
+msgid "Legal text"
+msgstr "Texte juridique"
+
+msgid "Text of a presentation"
+msgstr "Texte d’exposé"
+
+msgid "Statistical data"
+msgstr "Données statistiques"
 
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
@@ -1856,6 +1878,18 @@ msgstr ""
 "davantage d’informations à ce propos dans le codebook de Swissvotes (www."
 "swissvotes.ch/page/dataset/codebook-de.pdf)."
 
+msgid "Full-text search in all documents on this vote"
+msgstr "Recherche plein texte dans tous les documents de cette votation"
+
+msgid "Search results"
+msgstr "Résultats de la recherche"
+
+msgid "No documents found."
+msgstr "Aucun document trouvé."
+
+msgid "Document"
+msgstr "Documents"
+
 msgid "Filter"
 msgstr "Filtre de recherche"
 
@@ -1875,6 +1909,9 @@ msgstr "Pourcentage de \"oui\""
 #. Default: Turnout
 msgid "turnout_hyphenated"
 msgstr "Partici&shy;pation"
+
+msgid "Search results in the documents on this vote"
+msgstr "Résultats de recherche dans les documents de cette votation"
 
 msgid "Wrong username or password"
 msgstr "Nom d'utilisateur ou mot de passe incorrect"

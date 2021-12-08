@@ -7,6 +7,7 @@ member_can_see = (
     'pers_id',
     'admission',
     'withholding_tax',
+    'self_employed',
     'gender',
     'date_of_birth',
     'nationality',
@@ -23,7 +24,9 @@ member_can_see = (
     'languages_written',
     'languages_spoken',
     'expertise_interpreting_types',
-    'expertise_professional_guilds'
+    'expertise_professional_guilds',
+    'expertise_professional_guilds_other',
+    'expertise_professional_guilds_all'
 )
 
 editor_can_see = member_can_see + (
@@ -55,7 +58,8 @@ PROFESSIONAL_GUILDS = {
     'engineering': _('Engineering'),
     'internation_relations': _('International relations and organisations'),
     'law_insurance': _('Law and insurance industry'),
-    'military': _('Military')
+    'military': _('Military'),
+    'medicine': _('Medicine')
 }
 
 INTERPRETING_TYPES = {

@@ -74,7 +74,9 @@ def test_course_event(scenario):
 
     # event = scenario.latest_event
     assert event.course
-    assert event.possible_subscribers(year=event.end.year).all() == [attendee_2]
+    assert event.possible_subscribers(year=event.end.year).all() == [
+        attendee_2
+    ]
 
     scenario.add_course_event(
         scenario.latest_course,

@@ -81,6 +81,14 @@ class UserCollection(object):
         return query
 
     def apply_filter(self, query, key, values):
+        if '' in values:
+            return query.filter(
+                or_(
+                    getattr(User, key).in_(values),
+                    getattr(User, key).is_(None)
+                )
+            )
+
         return query.filter(getattr(User, key).in_(values))
 
     def apply_tag_filter(self, query, key, values):

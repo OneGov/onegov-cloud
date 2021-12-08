@@ -58,7 +58,8 @@
                     <tr tal:condition="layout.attachments['brief_description']">
                         <th class="column-30" i18n:translate>Brief description Swissvotes</th>
                         <td>
-                            <a href="${layout.attachments['brief_description']}" target="_blank" class="brief-description" tal:define="text vote.brief_description_title + ' (PDF)' if (request.html_lang == 'de-CH' and vote.brief_description_title) else 'PDF'">${text}</a>
+                            <a href="${layout.attachments['brief_description']}" target="_blank" class="brief-description">PDF</a>
+                            <span tal:condition="request.html_lang == 'de-CH' and vote.brief_description_title">&laquo;${vote.brief_description_title}&raquo;</span>
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
@@ -524,6 +525,30 @@
                 </tbody>
             </table>
 
+            <div class="search">
+                <h3 i18n:translate id="search">Full-text search in all documents on this vote</h3>
+
+                <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET'"/>
+
+                <tal:block tal:condition="vote.term">
+                    <h4 i18n:translate>Search results</h4>
+
+                    <p tal:condition="not: search_results" i18n:translate>No documents found.</p>
+                    <table tal:condition="search_results">
+                        <thead>
+                            <th i18n:translate>Document</th>
+                            <th i18n:translate>Language</th>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="(order, title, language, file) search_results">
+                                <td><a href="${request.link(file)}">${title}</a></td>
+                                <td>${language}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </tal:block>
+
+            </div>
         </div>
     </tal:block>
 </div>

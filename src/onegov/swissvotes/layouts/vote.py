@@ -89,6 +89,38 @@ class VoteLayout(DefaultLayout):
 
         return result
 
+    @cached_property
+    def search_results(self):
+        result = []
+        metadata = self.model.campaign_material_metadata or {}
+        labels = {
+            name: file.label
+            for name, file in self.model.localized_files().items()
+        }
+        codes = self.model.metadata_codes('language')
+        for file in self.model.search():
+            name = file.name.split('-')[0]
+            if name in labels:
+                order = 0
+                title = self.request.translate(labels[name])
+                language = self.request.translate(
+                    (file.language or '').capitalize()
+                )
+            elif name == 'campaign_material_other':
+                data = metadata.get(file.filename.replace('.pdf', ''), {})
+                order = 1
+                title = data.get('title', file.filename)
+                language = ', '.join([
+                    self.request.translate(codes[lang])
+                    for lang in data.get('language', [])
+                ])
+            else:
+                order = 3
+                title = file.filename
+                language = ''
+            result.append((order, title, language, file))
+        return sorted(result, key=lambda x: (x[0], x[1].lower()))
+
 
 class VoteDetailLayout(DefaultLayout):
 
@@ -165,6 +197,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
         if not metadata:
             return {}
 
+        order = {v: i for i, v in enumerate(self.codes['position'])}
         return {
             'title': metadata.get('title', '') or filename,
             'author': metadata.get('author', ''),
@@ -172,6 +205,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
             'date': self.format_partial_date(metadata),
             'date_sortable': self.format_sortable_date(metadata),
             'position': self.format_code(metadata, 'position'),
+            'order': order.get(metadata.get('position'), 999),
             'language': self.format_code(metadata, 'language'),
             'doctype': self.format_code(metadata, 'doctype'),
         }

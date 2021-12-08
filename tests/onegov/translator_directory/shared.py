@@ -14,6 +14,7 @@ translator_data = dict(
     last_name='Benito',
     admission=None,
     withholding_tax=False,
+    self_employed=False,
     gender=list(GENDERS.keys())[0],
     date_of_birth=date.today(),
     nationality='CH',
@@ -38,6 +39,7 @@ translator_data = dict(
     education_as_interpreter=False,
     comments=None,
     expertise_professional_guilds=tuple(),
+    expertise_professional_guilds_other=tuple(),
     expertise_interpreting_types=tuple()
 )
 
@@ -81,4 +83,3 @@ def create_translators(session, count=1):
         results.append(translators.add(**data))
 
     return results
-

@@ -250,23 +250,6 @@ class SwissVoteCollection(Pagination):
             return self.page_by_index((self.page or 0) + 1)
 
     @property
-    def term_expression(self):
-        """ Returns the current search term transformed to use within
-        Postgres ``to_tsquery`` function.
-
-
-        Removes all unwanted characters, replaces prefix matching, joins
-        word together using FOLLOWED BY.
-        """
-
-        def cleanup(text):
-            result = ''.join((c for c in text if c.isalnum() or c in ',.'))
-            return f'{result}:*' if text.endswith('*') else result
-
-        parts = [cleanup(part) for part in (self.term or '').split()]
-        return ' <-> '.join([part for part in parts if part])
-
-    @property
     def term_filter_numeric(self):
         """ Returns a list of SqlAlchemy filter statements matching possible
         numeric attributes based on the term.
@@ -290,34 +273,36 @@ class SwissVoteCollection(Pagination):
         fulltext attributes based on the term.
 
         """
-        term = self.term_expression
+        term = SwissVote.search_term_expression(self.term)
 
         if not term:
             return []
 
-        def match(column, language='german'):
+        def match(column, language):
             return column.op('@@')(func.to_tsquery(language, term))
 
-        def match_convert(column, language='german'):
+        def match_convert(column, language):
             return match(func.to_tsvector(language, column), language)
 
         if not self.full_text:
             return [
-                match_convert(SwissVote.title_de),
+                match_convert(SwissVote.title_de, 'german'),
                 match_convert(SwissVote.title_fr, 'french'),
-                match_convert(SwissVote.short_title_de),
+                match_convert(SwissVote.short_title_de, 'german'),
                 match_convert(SwissVote.short_title_fr, 'french'),
-                match_convert(SwissVote.keyword),
+                match_convert(SwissVote.keyword, 'german'),
             ]
         return [
-            match_convert(SwissVote.title_de),
+            match_convert(SwissVote.title_de, 'german'),
             match_convert(SwissVote.title_fr, 'french'),
-            match_convert(SwissVote.short_title_de),
+            match_convert(SwissVote.short_title_de, 'german'),
             match_convert(SwissVote.short_title_fr, 'french'),
-            match_convert(SwissVote.keyword),
-            match_convert(SwissVote.initiator),
-            match(SwissVote.searchable_text_de_CH),
+            match_convert(SwissVote.keyword, 'german'),
+            match_convert(SwissVote.initiator, 'german'),
+            match(SwissVote.searchable_text_de_CH, 'german'),
             match(SwissVote.searchable_text_fr_CH, 'french'),
+            match(SwissVote.searchable_text_it_CH, 'italian'),
+            match(SwissVote.searchable_text_en_US, 'english'),
         ]
 
     @property

@@ -407,6 +407,7 @@ def get_editor_asset():
     yield 'definedlinks.js'
     yield 'filemanager.js'
     yield 'imagemanager.js'
+    yield 'table.js'
     yield 'redactor.de.js'
     yield 'redactor.fr.js'
     yield 'redactor.it.js'

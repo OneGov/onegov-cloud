@@ -1,6 +1,4 @@
 import os
-from uuid import uuid4
-
 import transaction
 
 from onegov.file import FileCollection
@@ -16,7 +14,7 @@ def test_translator_voucher(client):
     files = FileCollection(app.session())
     file_id = files.add('logo.png', create_image()).id
     transaction.commit()
-    file = files.by_id(file_id)
+    files.by_id(file_id)
 
     class FakeRequest:
 
@@ -41,4 +39,4 @@ def test_translator_voucher(client):
         law_excerpt_path=excerpt_path
     )
 
-    xlsx = voucher.create_document()
+    voucher.create_document()

@@ -33,6 +33,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from pytest import mark
+from unittest.mock import patch
 
 
 class DummyPrincipal(object):
@@ -734,6 +735,57 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
     )
 
 
+def test_layout_vote_search_results(swissvotes_app, attachments,
+                                    campaign_material):
+    model = SwissVote(
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="Vote D",
+        short_title_fr="Vote F",
+        bfs_number=Decimal('100'),
+        date=date(1990, 6, 2),
+        _legal_form=1,
+        campaign_material_metadata={
+            'campaign_material_other-essay': {
+                'title': 'Perché è una pessima idea.',
+                'language': ['it', 'rm']
+            },
+        }
+    )
+    for name, locale in (
+        ('post_vote_poll', 'de_CH'),
+        ('brief_description', 'fr_CH')
+    ):
+        model.session_manager.current_locale = locale
+        setattr(model, name, attachments[name])
+
+    for name in (
+        'campaign_material_yea-1.png',
+        'campaign_material_other-essay.pdf',
+        'campaign_material_other-leaflet.pdf'
+    ):
+        model.files.append(campaign_material[name])
+
+    session = swissvotes_app.session()
+    session.add(model)
+    session.flush()
+
+    request = DummyRequest()
+    request.app = swissvotes_app
+    request.locale = 'de_CH'
+
+    layout = VoteLayout(model, request)
+    with patch.object(model, 'search', return_value=model.files):
+        results = [r[:3] for r in layout.search_results]
+        assert results == [
+            (0, 'Brief description Swissvotes', 'French'),
+            (0, 'Full analysis of post-vote poll results', 'German'),
+            (1, 'campaign_material_other-leaflet.pdf', ''),
+            (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic'),
+            (3, 'campaign_material_yea-1.png', '')
+        ]
+
+
 def test_layout_vote_details(swissvotes_app):
     request = DummyRequest()
     request.app = swissvotes_app
@@ -865,14 +917,16 @@ def test_layout_vote_campaign_material(swissvotes_app):
     )
     assert layout.codes == {
         'doctype': {
-            'argument': 'Argumentarium',
-            'article': 'Press article',
-            'release': 'Media release',
-            'lecture': 'Lecture',
-            'leaflet': 'Leaflet',
-            'essay': 'Essay',
+            'argument': 'Collection of arguments',
             'letter': 'Letter',
+            'documentation': 'Documentation',
+            'leaflet': 'Pamphlet',
+            'release': 'Media release',
+            'memberships': 'List of members',
+            'article': 'Press article',
             'legal': 'Legal text',
+            'lecture': 'Text of a presentation',
+            'statistics': 'Statistical data',
             'other': 'Other'
         },
         'language': {
@@ -880,7 +934,8 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'fr': 'French',
             'it': 'Italian',
             'rm': 'Rhaeto-Romanic',
-            'mixed': 'Mixed'
+            'mixed': 'Mixed',
+            'other': 'Other'
         },
         'position': {
             'yes': 'Yes',
@@ -950,11 +1005,13 @@ def test_layout_vote_campaign_material(swissvotes_app):
     assert layout.metadata('yyy.pdf') == {}
     assert layout.metadata('zzz') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
-        'date_sortable': '', 'position': '', 'language': '', 'doctype': ''
+        'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
+        'order': 999
     }
     assert layout.metadata('zzz.pdf') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
-        'date_sortable': '', 'position': '', 'language': '', 'doctype': ''
+        'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
+        'order': 999
     }
 
     model.campaign_material_metadata = {
@@ -973,9 +1030,10 @@ def test_layout_vote_campaign_material(swissvotes_app):
         'author': 'AAA',
         'date': '31.12.1988',
         'date_sortable': '19881231',
-        'doctype': 'Leaflet, Other',
+        'doctype': 'Pamphlet, Other',
         'editor': 'BBB',
         'language': 'German, French',
+        'order': 0,
         'position': 'Yes',
         'title': 'xxx'
     }
@@ -1022,7 +1080,7 @@ def test_layout_votes_details(swissvotes_app):
     model = SwissVoteCollection(swissvotes_app)
 
     layout = UpdateVotesLayout(model, request)
-    assert layout.title == _("Update dataset")
+    assert layout.title == _("Update dataset on the votes")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
@@ -1038,7 +1096,7 @@ def test_layout_votes_details(swissvotes_app):
 
     # UpdateMetadataLayout
     layout = UpdateMetadataLayout(model, request)
-    assert layout.title == _('Update metadata')
+    assert layout.title == _('Update metadata on the campaign material')
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
@@ -1054,7 +1112,7 @@ def test_layout_votes_details(swissvotes_app):
 
     # UpdateExternalResourcesLayout
     layout = UpdateExternalResourcesLayout(model, request)
-    assert layout.title == _('Update external resources')
+    assert layout.title == _('Update external sources for images')
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
