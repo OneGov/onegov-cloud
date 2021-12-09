@@ -15,6 +15,7 @@
                     <div class="small-12 medium-6 columns">
                         <ul class="top-actions text-right">
                             <li><a class="action-new" href="${new_screen}" i18n:translate>New screen</a></li>
+                            <li><a class="action-export" href="${export}" i18n:translate>Export</a></li>
                         </ul>
                     </div>
                 </div>
