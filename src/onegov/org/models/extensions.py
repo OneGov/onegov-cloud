@@ -321,17 +321,19 @@ class PersonLinkExtension(ContentExtension):
                     # existing list and add the new people at the end
                     existing = set()
                     selected = {
-                        key for key, function
+                        key: function for key, function
                         in self.get_people_and_function()
                     }
 
-                    old_people = list()
+                    old_people = dict()
                     new_people = list()
 
                     for id, function in previous_people:
-                        if id in selected:
-                            old_people.append((id, function))
+                        if id in selected.keys():
                             existing.add(id)
+                            old_people[id] = selected[id]
+
+                    old_people = list(old_people.items())
 
                     for id, function in self.get_people_and_function():
                         if id not in existing:
