@@ -692,7 +692,7 @@ def group_by_column(request, query, group_column, sort_column,
 
 
 def keywords_first(keywords):
-    """ Returns a sort key which preferrs values matching the given keywords
+    """ Returns a sort key which prefers values matching the given keywords
     before other values which are sorted alphabetically.
 
     """

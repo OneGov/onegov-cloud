@@ -1,5 +1,6 @@
 """ Lists the custom forms. """
 
+import collections
 from onegov.core.security import Public
 from onegov.form import FormCollection, FormDefinition
 from onegov.org import _, OrgApp
@@ -14,11 +15,8 @@ def combine_grouped(items, external_links, sort=None):
         if key not in items:
             items[key] = values
         else:
-            if sort:
-                items[key] = sorted(items[key] + values, key=sort)
-            else:
-                items[key] += values
-    return items
+            items[key] += values
+    return collections.OrderedDict(sorted(items.items()))
 
 
 @OrgApp.html(model=FormCollection, template='forms.pt', permission=Public)
