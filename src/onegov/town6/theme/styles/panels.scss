@@ -265,6 +265,11 @@ $checklist-icon: "\f0ae";
     ul {
         border-top: $morelist-border;
         padding-top: .5rem;
+
+        div {
+            color: #444;
+            margin-top: -10px !important;
+        }
     }
 
     .person-link {
