@@ -121,6 +121,10 @@ $publications-icon: '\f1ea';
             padding-right: $panel-icon-padding-right;
         }
 
+        .callout {
+            border: none;
+        }
+
         @include more-link-after;
 
         a {
@@ -134,6 +138,10 @@ $publications-icon: '\f1ea';
             .h5 {
                 margin-bottom: 0;
             }
+
+            a {
+                line-height: 1.2;
+            }
         }
 
         li {
@@ -145,6 +153,10 @@ $publications-icon: '\f1ea';
             border: 0;
         }
     }
+}
+
+.primary .card {
+    border: none
 }
 
 .borderless-side-panel {

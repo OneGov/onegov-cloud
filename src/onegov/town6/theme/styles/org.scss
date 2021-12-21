@@ -138,7 +138,8 @@ footer {
 
 .main-title {
     margin-bottom: 1rem;
-    margin-top: -.5rem;
+    max-width: 30ex;
+    line-height: 1.2;
 }
 
 /*
@@ -480,4 +481,16 @@ $pageref-color-hover: $iron;
     right: 0;
     text-align: center;
     white-space: nowrap;
+}
+
+.page-lead.h5,
+.news-lead.h5,
+.newsletter-lead.h5 {
+    margin-bottom: 30px;
+    display: block;
+    font-weight: bold !important;
+}
+
+.subheader {
+    margin-bottom: 1rem !important;
 }
