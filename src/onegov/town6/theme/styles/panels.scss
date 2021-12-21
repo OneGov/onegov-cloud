@@ -221,6 +221,7 @@ $checklist-icon: "\f0ae";
 .contact-panel-content {
     @include callout-style($gray-dark-medium);
     padding: 1rem;
+    color: #444;
 }
 
 
