@@ -4,11 +4,12 @@ import morepath
 
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
-from onegov.org import OrgApp
+from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
+from onegov.org.models.editor import Editor
 from onegov.page import Page, PageCollection
 from webob import exc
 from webob.exc import HTTPNotFound
@@ -42,6 +43,14 @@ def view_topic(self, request, layout=None):
 
     if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
+        layout.editbar_links.insert(
+            len(layout.editbar_links) - 1,
+            Link(
+                _("Sort"),
+                request.link(Editor('sort', self)),
+                classes=('sort-link', )
+            )
+        )
         children = self.children
     else:
         children = request.exclude_invisible(

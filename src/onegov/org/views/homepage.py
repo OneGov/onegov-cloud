@@ -1,13 +1,14 @@
 """ The onegov organisation homepage. """
 
 from morepath import redirect
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.core.widgets import inject_variables
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
+from onegov.org import _
 from onegov.org import OrgApp
-from onegov.org.layout import DefaultLayout
+from onegov.org.layout import HomepageLayout
 from onegov.org.models import Organisation
 from onegov.org.models import PublicationCollection
 from onegov.reservation import ResourceCollection
@@ -48,7 +49,7 @@ def view_org(self, request, layout=None):
     if redirect:
         return redirect
 
-    layout = layout or DefaultLayout(self, request)
+    layout = layout or HomepageLayout(self, request)
 
     default = {
         'layout': layout,
@@ -58,3 +59,20 @@ def view_org(self, request, layout=None):
     structure = self.meta.get('homepage_structure')
     widgets = request.app.config.homepage_widget_registry.values()
     return inject_variables(widgets, layout, structure, default)
+
+
+@OrgApp.html(
+    model=Organisation,
+    template='sort.pt',
+    name='sort',
+    permission=Private
+)
+def view_pages_sort(self, request, layout=None):
+    layout = layout or HomepageLayout(self, request)
+
+    return {
+        'title': _("Sort"),
+        'layout': layout,
+        'page': self,
+        'pages': layout.root_pages
+    }

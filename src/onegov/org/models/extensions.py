@@ -134,7 +134,6 @@ class ContactExtension(ContentExtension):
         return self.content.get('contact_html')
 
     def extend_form(self, form_class, request):
-
         class ContactPageForm(form_class):
             contact = TextAreaField(
                 label=_("Address"),
@@ -146,6 +145,23 @@ class ContactExtension(ContentExtension):
             )
 
         return ContactPageForm
+
+
+class ContactHiddenOnPageExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field.
+
+    """
+
+    hide_contact = meta_property(default=False)
+
+    def extend_form(self, form_class, request):
+        class ContactHiddenOnPageForm(form_class):
+            hide_contact = BooleanField(
+                label=_("Hide contact info in sidebar"),
+                fieldset=_("Contact"))
+
+        return ContactHiddenOnPageForm
 
 
 class NewsletterExtension(ContentExtension):

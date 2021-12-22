@@ -31,6 +31,27 @@
       </div>
 </metal:b>
 
+<metal:navigation define-macro="sort-items-nested">
+    <a tal:condition="children">
+        <span data-click-target="${link.attrs['href']}">${link.text}</span>
+        <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
+        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+    </a>
+    <tal:b tal:condition="not: children">
+        <a href="${link.attrs['href']}">
+            <span>${link.text}</span>
+            <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
+            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+        </a>
+    </tal:b>
+    <ul class="vertical menu nested" tal:condition="children">
+        <tal:b tal:repeat="(page, sublink, c) children">
+            <li data-sortable-id="${page.id}">
+                <metal:b use-macro="layout.macros['sort-items-nested']" tal:define="link sublink; children c" />
+            </li>
+        </tal:b>
+    </ul>
+</metal:navigation>
 
 <metal:navigation define-macro="side-navigation-nested">
     <a tal:condition="children">
@@ -45,7 +66,7 @@
             <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
         </a>
     </tal:b>
-    <ul class="vertical menu nested" data-sortable data-sortable-url="${layout.sortable_url_template}" tal:condition="children">
+    <ul class="vertical menu nested"  tal:condition="children">
         <tal:b tal:repeat="(page, sublink, c) children">
             <li data-sortable-id="${page.id}">
                 <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
@@ -56,7 +77,7 @@
 
 
 <metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu side-navigation" data-sortable data-sortable-url="${layout.sortable_url_template}" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+    <ul class="vertical menu side-navigation"  data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(page, link, children) links" data-sortable-id="${page.id}">
             <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>
@@ -605,11 +626,13 @@
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
     <div class="small-12 medium-4 cell page-content-sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
         <div metal:define-slot="before-panels"></div>
-        <div class="side-panel contact-panel" tal:condition="contact or coordinates or location">
-            <h3 i18n:translate tal:condition="contact">Contact</h3>
-            <div class="contact-panel-content" tal:condition="contact">
-                <tal:b content="structure contact" />
-            </div>
+        <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="contact or coordinates or location">
+            <div tal:condition="contact and not hide">
+                <h3 i18n:translate>Contact</h3>
+                <div class="contact-panel-content">
+                    <tal:b content="structure contact" />
+                </div>
+            </div>   
             <br tal:condition="coordinates and contact" />
             <h3 i18n:translate tal:condition="not contact">Map</h3>
             <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
