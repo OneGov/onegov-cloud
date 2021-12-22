@@ -526,7 +526,7 @@
             </table>
 
             <div class="search">
-                <h3 i18n:translate id="search">Full-text search</h3>
+                <h3 i18n:translate id="search">Full-text search in all documents on this vote</h3>
 
                 <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET'"/>
 
@@ -540,9 +540,9 @@
                             <th i18n:translate>Language</th>
                         </thead>
                         <tbody>
-                            <tr tal:repeat="(title, file, order) search_results">
+                            <tr tal:repeat="(order, title, language, file) search_results">
                                 <td><a href="${request.link(file)}">${title}</a></td>
-                                <td i18n:translate>${(file.language or '').capitalize()}</td>
+                                <td>${language}</td>
                             </tr>
                         </tbody>
                     </table>

@@ -302,7 +302,6 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url,
         _legal_form=1,
         campaign_material_metadata={
             'campaign_material_other-essay': {'language': ['de']},
-            'campaign_material_other-leaflet': {'language': ['fr']},
         }
     )
     vote.voting_text = attachments['voting_text']
@@ -316,16 +315,16 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url,
     commit()
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "abstimmungstext" in vote.searchable_text_de_CH
     assert "abhandl" in vote.searchable_text_de_CH
 
     # Reindex
     result = run_command(cfg_path, 'govikon', ['reindex'])
     assert result.exit_code == 0
-    assert "Reindexed vote 1.00" in result.output
+    assert "Reindexing vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "abstimmungstext" in vote.searchable_text_de_CH
     assert "abhandl" in vote.searchable_text_de_CH
 
     # Change file contents
@@ -341,16 +340,16 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url,
             pdf.generate()
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "abstimmungstext" in vote.searchable_text_de_CH
     assert "abhandl" in vote.searchable_text_de_CH
 
     # Reindex
     result = run_command(cfg_path, 'govikon', ['reindex'])
     assert result.exit_code == 0
-    assert "Reindexed vote 1.00" in result.output
+    assert "Reindexing vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
-    assert "realisa" in vote.searchable_text_de_CH
+    assert "realisation" in vote.searchable_text_de_CH
     assert "kampagnenmaterial" in vote.searchable_text_de_CH
 
 

@@ -748,7 +748,7 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         campaign_material_metadata={
             'campaign_material_other-essay': {
                 'title': 'Perché è una pessima idea.',
-                'language': ['it']
+                'language': ['it', 'rm']
             },
         }
     )
@@ -776,16 +776,13 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
 
     layout = VoteLayout(model, request)
     with patch.object(model, 'search', return_value=model.files):
-        results = [
-            (title, file.language, order)
-            for (title, file, order) in layout.search_results
-        ]
+        results = [r[:3] for r in layout.search_results]
         assert results == [
-            ('Brief description Swissvotes', 'french', 0),
-            ('Full analysis of post-vote poll results', 'german', 0),
-            ('campaign_material_other-leaflet.pdf', None, 1),
-            ('Perché è una pessima idea.', 'italian', 1),
-            ('campaign_material_yea-1.png', None, 3)
+            (0, 'Brief description Swissvotes', 'French'),
+            (0, 'Full analysis of post-vote poll results', 'German'),
+            (1, 'campaign_material_other-leaflet.pdf', ''),
+            (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic'),
+            (3, 'campaign_material_yea-1.png', '')
         ]
 
 

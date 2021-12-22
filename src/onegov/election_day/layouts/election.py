@@ -43,7 +43,7 @@ class ElectionLayout(DetailLayout):
         if not self.principal.has_districts:
             return False
         if self.model.domain == 'region':
-            return self.model.distinct
+            return False
         return True
 
     def title(self, tab=None):

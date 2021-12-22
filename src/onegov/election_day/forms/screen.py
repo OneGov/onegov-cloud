@@ -242,33 +242,38 @@ class ScreenForm(Form):
 
         query = session.query(Vote).filter_by(type='simple')
         self.simple_vote.choices = [
-            (vote.id, vote.title)
-            for vote in query.order_by(Vote.shortcode)
+            (vote.id, f'{vote.title} [{vote.date}]')
+            for vote in query.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
         query = session.query(Vote).filter_by(type='complex')
         self.complex_vote.choices = [
-            (vote.id, vote.title)
-            for vote in query.order_by(Vote.shortcode)
+            (vote.id, f'{vote.title} [{vote.date}]')
+            for vote in query.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
         query = session.query(Election).filter_by(type='majorz')
         self.majorz_election.choices = [
-            (election.id, election.title)
-            for election in query.order_by(Election.shortcode)
+            (election.id, f'{election.title} [{election.date}]')
+            for election in query.order_by(
+                Election.date.desc(), Election.shortcode
+            )
         ]
 
         query = session.query(Election).filter_by(type='proporz')
         self.proporz_election.choices = [
-            (election.id, election.title)
-            for election in query.order_by(Election.shortcode)
+            (election.id, f'{election.title} [{election.date}]')
+            for election in query.order_by(
+                Election.date.desc(), Election.shortcode
+            )
         ]
 
         query = session.query(ElectionCompound)
-        query = query.order_by(ElectionCompound.shortcode)
         self.election_compound.choices = [
-            (election_compound.id, election_compound.title)
-            for election_compound in query
+            (compound.id, f'{compound.title} [{compound.date}]')
+            for compound in query.order_by(
+                ElectionCompound.date.desc(), ElectionCompound.shortcode
+            )
         ]
 
         self.tags_simple_vote.text = '\n'.join(sorted([

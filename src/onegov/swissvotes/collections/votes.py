@@ -302,6 +302,7 @@ class SwissVoteCollection(Pagination):
             match(SwissVote.searchable_text_de_CH, 'german'),
             match(SwissVote.searchable_text_fr_CH, 'french'),
             match(SwissVote.searchable_text_it_CH, 'italian'),
+            match(SwissVote.searchable_text_en_US, 'english'),
         ]
 
     @property

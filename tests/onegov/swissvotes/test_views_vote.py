@@ -613,6 +613,6 @@ def test_view_vote_search(swissvotes_app, sample_vote, campaign_material):
     page = client.get('/').maybe_follow().click('Abstimmungen')
     page.form['term'] = 'keyword'
     page = page.form.submit()
-    page = page.click('Volltextsuche in den Dateien zu dieser Vorlag')
+    page = page.click('Suchresultate in den Dokumenten zu dieser Vorlage')
     assert page.form['term'].value == 'keyword'
     assert '#search' in page.form.action
