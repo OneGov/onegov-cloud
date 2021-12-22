@@ -211,3 +211,13 @@ def get_editor_asset():
 def get_scoutss_chatbot_assets():
     yield 'jqueryui.min.js'
     yield 'scoutss-dialog.js'
+
+
+@TownApp.webasset('fullcalendar')
+def get_fullcalendar_asset():
+    yield 'fullcalendar.css'
+    yield 'fullcalendar.js'
+    yield 'fullcalendar.de.js'
+    yield 'fullcalendar.fr.js'
+    yield 'reservationcalendar.jsx'
+    yield 'reservationcalendar_custom.js'
