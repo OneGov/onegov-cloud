@@ -1619,6 +1619,9 @@ msgstr "Esporta"
 msgid "Change Url"
 msgstr "Modifica URL"
 
+msgid "Sort"
+msgstr "Ordinare"
+
 msgid "Registration Windows"
 msgstr "Finestre di registrazione"
 
@@ -4498,6 +4501,12 @@ msgstr ""
 
 msgid "Topics"
 msgstr "Argomenti"
+
+msgid "Sort the items using drag and drop.  The new positions are automatically saved directly after moving."
+msgstr "Ordina gli elementi usando il drag and drop. Le nuove posizioni vengono automaticamente salvate direttamente dopo lo spostamento"
+
+msgid "Back to page"
+msgstr "Torna alla pagina"
 
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"

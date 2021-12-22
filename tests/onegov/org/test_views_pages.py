@@ -1,8 +1,9 @@
 from freezegun import freeze_time
 
 from tests.onegov.org.common import edit_bar_links
-from tests.shared.utils import get_meta, create_image, open_in_browser
+from tests.shared.utils import get_meta, create_image
 from webtest import Upload
+
 
 def check_breadcrumbs(page, excluded):
     # check the breadcrumbs
@@ -30,7 +31,7 @@ def test_pages_cache(client):
     root_page = client.get(root_url)
     links = edit_bar_links(root_page, 'text')
     assert 'Url ändern' in links
-    assert len(links) == 5
+    assert len(links) == 6
 
     # Test changing the url of the root page organisation
     assert 'Url ändern' not in editor.get(root_page.request.url)
