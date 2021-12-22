@@ -134,7 +134,6 @@ class ContactExtension(ContentExtension):
         return self.content.get('contact_html')
 
     def extend_form(self, form_class, request):
-
         class ContactPageForm(form_class):
             contact = TextAreaField(
                 label=_("Address"),
@@ -146,6 +145,23 @@ class ContactExtension(ContentExtension):
             )
 
         return ContactPageForm
+
+
+class ContactHiddenOnPageExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field.
+
+    """
+
+    hide_contact = meta_property(default=False)
+
+    def extend_form(self, form_class, request):
+        class ContactHiddenOnPageForm(form_class):
+            hide_contact = BooleanField(
+                label=_("Hide contact info in sidebar"),
+                fieldset=_("Contact"))
+
+        return ContactHiddenOnPageForm
 
 
 class NewsletterExtension(ContentExtension):
@@ -321,17 +337,19 @@ class PersonLinkExtension(ContentExtension):
                     # existing list and add the new people at the end
                     existing = set()
                     selected = {
-                        key for key, function
+                        key: function for key, function
                         in self.get_people_and_function()
                     }
 
-                    old_people = list()
+                    old_people = dict()
                     new_people = list()
 
                     for id, function in previous_people:
-                        if id in selected:
-                            old_people.append((id, function))
+                        if id in selected.keys():
                             existing.add(id)
+                            old_people[id] = selected[id]
+
+                    old_people = list(old_people.items())
 
                     for id, function in self.get_people_and_function():
                         if id not in existing:

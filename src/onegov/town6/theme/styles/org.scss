@@ -511,3 +511,29 @@ $pageref-color-hover: $iron;
 .contact-panel-content>ul li+li {
     margin-top: 0 !important;
 }
+
+/*
+    Sort topics
+*/
+.sort-items {
+    list-style: none;
+    margin-left: 0;
+
+    li {
+        background: #f5f5f5;
+        border: 1px dashed #ddd;
+        cursor: grab;
+        margin-bottom: 1em;
+        padding: .25rem .5rem;
+
+        &::before {
+            color: #999;
+            content: '\f0dc';
+            display: inline-block;
+            font-family: 'Font Awesome 5 Free';
+            font-weight: bold;
+            width: 1.5ex;
+        }
+    }
+}
+

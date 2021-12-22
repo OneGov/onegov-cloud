@@ -1,7 +1,7 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-12-01 08:37+0100\n"
+"POT-Creation-Date: 2021-12-06 15:35+0100\n"
 "PO-Revision-Date: 2021-09-27 13:23+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1619,6 +1619,9 @@ msgstr "Esporta"
 msgid "Change Url"
 msgstr "Modifica URL"
 
+msgid "Sort"
+msgstr "Ordinare"
+
 msgid "Registration Windows"
 msgstr "Finestre di registrazione"
 
@@ -1910,6 +1913,9 @@ msgstr ""
 "- \"-\" verrà convertito in un elenco puntato\n"
 " - Le URL verranno trasformate in collegamenti\n"
 " - Anche e-mail e numeri di telefono"
+
+msgid "Hide contact info in sidebar"
+msgstr "Nascondi le informazioni di contatto nella sidebar"
 
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
@@ -4495,6 +4501,12 @@ msgstr ""
 
 msgid "Topics"
 msgstr "Argomenti"
+
+msgid "Sort the items using drag and drop.  The new positions are automatically saved directly after moving."
+msgstr "Ordina gli elementi usando il drag and drop. Le nuove posizioni vengono automaticamente salvate direttamente dopo lo spostamento"
+
+msgid "Back to page"
+msgstr "Torna alla pagina"
 
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-12-01 08:37+0100\n"
+"POT-Creation-Date: 2021-12-06 15:35+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1613,6 +1613,9 @@ msgstr "Export"
 msgid "Change Url"
 msgstr "Url ändern"
 
+msgid "Sort"
+msgstr "Sortieren"
+
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
 
@@ -1906,6 +1909,9 @@ msgstr ""
 "- '-' wird in eine Aufzählung umgewandelt\n"
 "- Urls werden zu Hyperlinks konvertiert\n"
 "- E-Mails und Telefon-Nummern ebenfalls"
+
+msgid "Hide contact info in sidebar"
+msgstr "Kontaktinformationen in Sidebar ausblenden"
 
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
@@ -4484,6 +4490,12 @@ msgstr ""
 
 msgid "Topics"
 msgstr "Themen"
+
+msgid "Sort the items using drag and drop. The new positions are automatically saved directly after moving."
+msgstr "Sortieren Sie die Elemente mittels Drag & Drop. Die neuen Positionen werden direkt nach dem Verschieben automatisch gespeichert."
+
+msgid "Back to page"
+msgstr "Zurück zur Seite"
 
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"
