@@ -500,8 +500,12 @@ $pageref-color-hover: $iron;
 }
 
 .more-list li .list-lead {
-    color: #444;
+    color: #707070;
     line-height: 1.3;
+}
+
+.more-list a {
+    font-size: 1.1875rem !important;
 }
 
 .contact-panel-content>ul li+li {
