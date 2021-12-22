@@ -121,6 +121,10 @@ $publications-icon: '\f1ea';
             padding-right: $panel-icon-padding-right;
         }
 
+        .callout {
+            border: none;
+        }
+
         @include more-link-after;
 
         a {
@@ -134,6 +138,10 @@ $publications-icon: '\f1ea';
             .h5 {
                 margin-bottom: 0;
             }
+
+            a {
+                line-height: 1.2;
+            }
         }
 
         li {
@@ -145,6 +153,10 @@ $publications-icon: '\f1ea';
             border: 0;
         }
     }
+}
+
+.primary .card {
+    border: none
 }
 
 .borderless-side-panel {
@@ -209,6 +221,7 @@ $checklist-icon: "\f0ae";
 .contact-panel-content {
     @include callout-style($gray-dark-medium);
     padding: 1rem;
+    color: #444;
 }
 
 
@@ -252,6 +265,11 @@ $checklist-icon: "\f0ae";
     ul {
         border-top: $morelist-border;
         padding-top: .5rem;
+
+        div {
+            color: #444;
+            margin-top: -10px !important;
+        }
     }
 
     .person-link {

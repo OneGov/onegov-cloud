@@ -49,6 +49,7 @@ $payments-icon: $payment-provider-icon;
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d8';
+$sort-link-icon: '\f074';
 $sync-icon: '\f2f1';
 $subscribe-link-icon: '\f0f3';
 $test-link-icon: '\f4da';
@@ -292,10 +293,15 @@ $editbar-fg-color-active: $white;
     margin-bottom: 2px;
     margin-top: -2px;
 
-    li a::before {
-        margin-right: 2 * $default-icon-margin;
-    }
+    li {
+        a::before {
+            margin-right: 2 * $default-icon-margin;
+        }
 
+        &:hover {
+            background: $editbar-bg-color-active;
+        }
+    }
 
     > li > a {
         color: $editbar-fg-color;
@@ -359,6 +365,7 @@ $editbar-fg-color-active: $white;
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
+    .sort-link::before { @include icon($sort-link-icon); font-weight: bold; }
     .subscribe-link::before { @include icon-bold($subscribe-link-icon); }
     .test-link::before { @include icon($test-link-icon); }
     .rule-link::before { @include icon-bold($rule-link-icon); }
@@ -373,6 +380,14 @@ $editbar-fg-color-active: $white;
 
 
 .side-navigation {
+    li span:hover {
+        color: $editbar-bg-color;
+    }
+
+    li:hover {
+        background: $offcanvas-background;
+        filter: brightness(.95);
+    }
 
     @include breakpoint(small only) {
         background: $offcanvas-background;

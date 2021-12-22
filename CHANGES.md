@@ -1,8 +1,34 @@
 # Changes
 
+## 2021.98
+
+`2021-12-22` | [35e78c3645...a68caad81d](https://github.com/OneGov/onegov-cloud/compare/35e78c3645^...a68caad81d)
+
+### Election Day
+
+##### Add date to screen dropdown menus.
+
+`Feature` | [OGC-173](https://linear.app/onegovcloud/issue/OGC-173) | [663f2c1adc](https://github.com/onegov/onegov-cloud/commit/663f2c1adc83ab30fd6ff6a8666fa7d6c541f4aa)
+
+##### Add screens export.
+
+`Feature` | [OGC-181](https://linear.app/onegovcloud/issue/OGC-181) | [a14f57fb02](https://github.com/onegov/onegov-cloud/commit/a14f57fb021f5dfc66d5235dc3c5a1e2bb786f06)
+
+### Feriennet
+
+##### Update translations.
+
+`Other` | [PRO-946](https://linear.app/projuventute/issue/PRO-946) | [e6efa3e617](https://github.com/onegov/onegov-cloud/commit/e6efa3e61772f1ffea75651d3e8f1e2899f05232)
+
+### Swissvotes
+
+##### Fixes language of attachments not being translate in the search.
+
+`Bugfix` | [92f96dc9bd](https://github.com/onegov/onegov-cloud/commit/92f96dc9bdb112b76caacec81d353cf2a4bda18b)
+
 ## 2021.97
 
-`2021-12-08` | [b14a8d105b...ea8856d556](https://github.com/OneGov/onegov-cloud/compare/b14a8d105b^...ea8856d556)
+`2021-12-08` | [b14a8d105b...182ae78670](https://github.com/OneGov/onegov-cloud/compare/b14a8d105b^...182ae78670)
 
 ### Election Day
 
@@ -1419,22 +1445,4 @@ setting has access to the tickets in that category.
 - Adds contacts panel to initial content
 
 `Other` | [SEA-320](https://linear.app/seantis/issue/SEA-320) | [7ed00fc816](https://github.com/onegov/onegov-cloud/commit/7ed00fc816f6b0cc0b8f04343057d40e52353877)
-
-## 2021.48
-
-`2021-05-03` | [bf9ae82dfd...336d7dc053](https://github.com/OneGov/onegov-cloud/compare/bf9ae82dfd^...336d7dc053)
-
-### Town6
-
-##### Adds header link to template
-
-`Other` | [SEA-300](https://linear.app/seantis/issue/SEA-300) | [677352be3e](https://github.com/onegov/onegov-cloud/commit/677352be3efaf764645df5263874a52c696e68d0)
-
-##### Display Directory Cards in flex grid
-
-`Other` | [SEA-302](https://linear.app/seantis/issue/SEA-302) | [2e7c00779c](https://github.com/onegov/onegov-cloud/commit/2e7c00779c9fb99a358de3931359498a091dc9c5)
-
-##### Styles albums and contacts widget
-
-`Other` | [SEA-303](https://linear.app/seantis/issue/SEA-303) | [7d5879145d](https://github.com/onegov/onegov-cloud/commit/7d5879145d1b29e477ea205b37374c858d88a569)
 
