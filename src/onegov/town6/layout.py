@@ -2010,9 +2010,6 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
                     ]
                 )
 
-            if not self.request.is_logged_in:
-                yield export_link
-
         return list(links())
 
     def get_pub_link(self, text, filter=None, toggle_active=True):
