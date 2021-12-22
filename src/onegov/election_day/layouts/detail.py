@@ -4,7 +4,7 @@ from onegov.election_day.layouts.default import DefaultLayout
 
 class HiddenTabsMixin:
     """
-    Mixing for a generic handling of hiding any kind of menu or submenu
+    Mixin for a generic handling of hiding any kind of menu or submenu
     tab on election, election_compound and vote detail layouts in
     combination with the yaml file config.
     """

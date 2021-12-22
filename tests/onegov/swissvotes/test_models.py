@@ -965,8 +965,9 @@ def test_model_vote_attachments(swissvotes_app, attachments,
 
     # Additional campaing material
     vote.campaign_material_metadata = {
-        'campaign_material_other-essay': {'language': ['de']},
-        'campaign_material_other-leaflet': {'language': ['it']},
+        'campaign_material_other-essay': {'language': ['de', 'it']},
+        'campaign_material_other-leaflet': {'language': ['it', 'en']},
+        'campaign_material_other-legal': {'language': ['fr', 'it']},
     }
     assert vote.campaign_material_yea == []
     assert vote.campaign_material_nay == []
@@ -978,6 +979,8 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     vote.files.append(campaign_material['campaign_material_nay-2.png'])
     vote.files.append(campaign_material['campaign_material_other-essay.pdf'])
     vote.files.append(campaign_material['campaign_material_other-leaflet.pdf'])
+    vote.files.append(campaign_material['campaign_material_other-article.pdf'])
+    vote.files.append(campaign_material['campaign_material_other-legal.pdf'])
     session.flush()
 
     assert [file.filename for file in vote.campaign_material_yea] == [
@@ -998,10 +1001,25 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert files['leaflet'].extract == 'Volantino'
     assert files['leaflet'].stats == {'pages': 1, 'words': 1}
     assert files['leaflet'].language == 'italian'
+    assert files['article'].filename == 'campaign_material_other-article.pdf'
+    assert files['article'].language == 'english'
+    assert files['article'].extract == 'Article'
+    assert files['legal'].stats == {'pages': 1, 'words': 1}
+    assert files['legal'].filename == 'campaign_material_other-legal.pdf'
+    assert files['legal'].language == 'french'
+    assert files['legal'].extract == 'Juridique'
+    assert files['legal'].stats == {'pages': 1, 'words': 1}
     assert 'abhandl' in vote.searchable_text_de_CH
     assert 'volantin' in vote.searchable_text_it_CH
+    assert 'articl' in vote.searchable_text_en_US
     assert vote.search('Abhandlung') == [files['essay']]
+    assert vote.search('Abhandlungen') == [files['essay']]
     assert vote.search('Volantino') == [files['leaflet']]
+    assert vote.search('Volantini') == [files['leaflet']]
+    assert vote.search('Article') == [files['article']]
+    assert vote.search('Articles') == [files['article']]
+    assert vote.search('Juridique') == [files['legal']]
+    assert vote.search('Juridiques') == [files['legal']]
 
     assert vote.posters(DummyRequest())['yea'] == [
         Bunch(

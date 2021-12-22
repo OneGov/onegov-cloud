@@ -196,6 +196,7 @@ def test_votes_term_filter(swissvotes_app):
     c_text_de = 'swissvotes."searchable_text_de_CH"'
     c_text_fr = 'swissvotes."searchable_text_fr_CH"'
     c_text_it = 'swissvotes."searchable_text_it_CH"'
+    c_text_en = 'swissvotes."searchable_text_en_US"'
 
     assert compiled(term='987') == [
         'swissvotes.bfs_number = 987',
@@ -251,6 +252,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_text_de} @@ to_tsquery('german', 'abc')",
         f"{c_text_fr} @@ to_tsquery('french', 'abc')",
         f"{c_text_it} @@ to_tsquery('italian', 'abc')",
+        f"{c_text_en} @@ to_tsquery('english', 'abc')",
     ]
 
     assert compiled(term='Müller') == [

@@ -77,7 +77,11 @@ class ElectionForm(Form):
 
     distinct = BooleanField(
         label=_("Distinct district"),
-        description=_("The election contains results of a whole district."),
+        description=_(
+            "The election contains results for an entire district. "
+            "When uploading intermediate results, the missing municipalities "
+            "of the districts are added accordingly."
+        ),
         render_kw=dict(force_simple=True),
         depends_on=('domain', 'region'),
     )

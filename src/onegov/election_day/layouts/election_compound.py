@@ -13,7 +13,8 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'lists', 'districts', 'candidates', 'statistics')
+        'lists', 'districts', 'candidates', 'statistics'
+    )
 
     @cached_property
     def table_link(self):
@@ -74,11 +75,12 @@ class ElectionCompoundLayout(DetailLayout):
 
     def tab_visible(self, tab):
 
-        if self.hide_tab(tab):
-            return False
-
         if not self.has_results:
             return False
+        if self.hide_tab(tab):
+            return False
+        if tab == 'lists':
+            return self.model.show_lists is True
         if tab == 'mandate-allocation':
             return (
                 self.model.show_mandate_allocation is True
@@ -90,7 +92,10 @@ class ElectionCompoundLayout(DetailLayout):
                 and self.has_party_results
             )
         if tab == 'parties-panachage':
-            return self.model.panachage_results.first() is not None
+            return (
+                self.model.show_party_panachage is True
+                and self.model.panachage_results.first() is not None
+            )
 
         return True
 
@@ -114,9 +119,9 @@ class ElectionCompoundLayout(DetailLayout):
     @cached_property
     def main_view(self):
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
+            if self.tab_visible(tab):
                 return self.request.link(self.model, tab)
-        return 'districts'
+        return self.request.link(self.model, 'districts')
 
     @cached_property
     def menu(self):
