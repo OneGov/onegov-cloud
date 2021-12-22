@@ -1,8 +1,12 @@
 # Changes
 
+## 2021.99
+
+`2021-12-22` | [6cebe417d2...30877daaca](https://github.com/OneGov/onegov-cloud/compare/6cebe417d2^...30877daaca)
+
 ## 2021.98
 
-`2021-12-22` | [35e78c3645...a68caad81d](https://github.com/OneGov/onegov-cloud/compare/35e78c3645^...a68caad81d)
+`2021-12-22` | [35e78c3645...34dc2ac0a5](https://github.com/OneGov/onegov-cloud/compare/35e78c3645^...34dc2ac0a5)
 
 ### Election Day
 
@@ -1403,46 +1407,4 @@ optionally ban the IP.
 Invalidating a dogpile cache region only works for the current process.
 
 `Feature` | [SEA-314](https://linear.app/seantis/issue/SEA-314) | [d40011e571](https://github.com/onegov/onegov-cloud/commit/d40011e5713f91c74cc61818f39ec5d4bf7b30e5)
-
-## 2021.49
-
-`2021-05-11` | [7cd3771161...c707683eae](https://github.com/OneGov/onegov-cloud/compare/7cd3771161^...c707683eae)
-
-### Core
-
-##### Updates dogpile.cache
-
-Serialization and deserialization now take place within the CacheRegion so that backends may now assume string values in all cases.
-
-`Other` | [SEA-306](https://linear.app/seantis/issue/SEA-306) | [16d92ed361](https://github.com/onegov/onegov-cloud/commit/16d92ed361f72130ff42453536ef1b0bf712692a)
-
-##### Fixes race condition in sendmail command.
-
-`Bugfix` | [SEA-321](https://linear.app/seantis/issue/SEA-321) | [866ed27ecb](https://github.com/onegov/onegov-cloud/commit/866ed27ecb9ac016c028d31046dd1f47e2aa2d17)
-
-### Org
-
-##### Add user group management.
-
-`Feature` | [7cd3771161](https://github.com/onegov/onegov-cloud/commit/7cd37711619238c3e5092f38b04ca2ed1b6d36b7)
-
-##### Adds permissions for tickets.
-
-User groups have now a setting to restrain access to specific ticket 
-categories. If one is defined, only users within groups with that 
-setting has access to the tickets in that category.
-
-`Feature` | [SEA-254](https://linear.app/seantis/issue/SEA-254) | [b901fc94c5](https://github.com/onegov/onegov-cloud/commit/b901fc94c516c4539d0127214059d8785176a6c0)
-
-##### Adds start_date to import_reservations cli command
-
-`Other` | [SEA-257](https://linear.app/seantis/issue/SEA-257) | [f7bb46ffde](https://github.com/onegov/onegov-cloud/commit/f7bb46ffde30bd962aafdec32821d906c3ae9d7a)
-
-### Town6
-
-##### Changes ContactsAndAlbumsWidget to ContactsWidget
-
-- Adds contacts panel to initial content
-
-`Other` | [SEA-320](https://linear.app/seantis/issue/SEA-320) | [7ed00fc816](https://github.com/onegov/onegov-cloud/commit/7ed00fc816f6b0cc0b8f04343057d40e52353877)
 
