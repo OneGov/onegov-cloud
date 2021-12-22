@@ -41,6 +41,10 @@ $footer-hover-color: $primary-fg-color;
             margin-bottom: .5rem;
         }
 
+        p, span {
+            opacity: 0.75;
+        }
+
         a:hover {
             color: $footer-hover-color;
         }
