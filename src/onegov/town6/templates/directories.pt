@@ -7,9 +7,9 @@
                  tal:define="lead None; text None; people None; coordinates None; contact layout.org.meta.get('contact_html')">
             <tal:b metal:fill-slot="after-text">
                 <p tal:condition="not:directories" i18n:translate="">No directories defined yet.</p>
-                <ul tal:condition="directories" class="forms-list">
+                <ul tal:condition="directories" class="more-list">
                     <li tal:repeat="directory directories">
-                        <a class="list-title h5" tal:attributes="href link(directory)">${directory.title}</a>
+                        <a class="" tal:attributes="href link(directory)">${directory.title}</a>
                         <metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
                         <div class="list-lead" tal:content="structure layout.linkify(directory.lead)" />
                     </li>
