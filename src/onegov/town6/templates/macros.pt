@@ -1686,9 +1686,9 @@
             <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
         </h2>
 
-        <ul class="forms-list">
+        <ul class="forms-list more-list">
             <li tal:repeat="record grouped[group]">
-                <a class="list-title h5" tal:attributes="href link_func(record)">
+                <a class="" tal:attributes="href link_func(record)">
                         ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
                 <tal:b tal:define="link edit_link(record)|nothing">
