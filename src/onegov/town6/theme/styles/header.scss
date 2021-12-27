@@ -303,6 +303,10 @@ $editbar-fg-color-active: $white;
         }
     }
 
+    ul > li:hover {
+        background: #f3f3f3;
+    }
+
     > li > a {
         color: $editbar-fg-color;
 
