@@ -18,11 +18,11 @@
 
         <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
 
-        <div class="grid-x reverse-on-mobile">
+        <div class="grid-x grid-padding-x reverse-on-mobile">
             <div class="cell medium-8">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 
-                <ul class="with-lead ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
+                <ul class="more-list directory-list ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
                     <li tal:repeat="entry entries">
                         <div class="thumbnail" tal:condition="show_thumbnails">
                             <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
@@ -31,7 +31,7 @@
                         </div>
 
                         <div>
-                            <a class="list-title h5" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
+                            <a class="" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
                             <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
                                 <div class="list-lead">
