@@ -542,15 +542,17 @@ $pageref-color-hover: $iron;
 
 /* Improves accessability and avoids zoom in input form fields
    for iOS devices but not in the editor mode.
-*/ 
+*/
+
 body:not(.editor-layout) {
     select, textarea, input[type="text"], input[type="password"],
     input[type="datetime"], input[type="datetime-local"],
     input[type="date"], input[type="month"], input[type="time"],
     input[type="week"], input[type="number"], input[type="email"],
     input[type="tel"], input[type="url"] {
-		font-size: 16px !important;
-	}
+        font-size: 16px !important;
+    }
+}
 
 @media #{$small-only} {
     .orbit.slider {
