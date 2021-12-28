@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-26 09:33+0200\n"
+"POT-Creation-Date: 2021-12-28 16:37+0100\n"
 "PO-Revision-Date: 2020-03-24 11:39+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -20,17 +20,17 @@ msgstr "Comptoir en ligne"
 msgid "Forms and applications"
 msgstr "Formulaires et candidatures"
 
-msgid "Publications"
-msgstr "Publications"
-
-msgid "Official Documents"
-msgstr "Documents officiels"
-
 msgid "Reservations"
 msgstr "Réservations"
 
 msgid "Daypasses and rooms"
 msgstr "Cartes journalières et pièces"
+
+msgid "Publications"
+msgstr "Publications"
+
+msgid "Official Documents"
+msgstr "Documents officiels"
 
 msgid "E-Move"
 msgstr "e-Déménagement"
@@ -65,14 +65,26 @@ msgstr "Impressions"
 msgid "Online Counter Label"
 msgstr "Étiquette de comptoir en ligne"
 
+msgid "Hide Online Counter on Homepage"
+msgstr "Masquer le comptoir en ligne sur la page d'accueil"
+
 msgid "Reservations Label"
 msgstr "Étiquette de réservations"
+
+msgid "Hide Reservations on Homepage"
+msgstr "Masquer les réservations sur la page d'accueil"
 
 msgid "SBB Daypass Label"
 msgstr "Étiquette de carte journalière CFF"
 
+msgid "Publication"
+msgstr "Publications"
+
 msgid "Publications Label"
 msgstr "Étiquette de publications"
+
+msgid "Hide Publications on Homepage"
+msgstr "Masquer les publications sur la page d'accueil"
 
 msgid "E-Move Label"
 msgstr "Étiquette de eDéménagement"
@@ -80,14 +92,20 @@ msgstr "Étiquette de eDéménagement"
 msgid "E-Move Url"
 msgstr "Url de eDéménagement"
 
-msgid "Hide Publications on Homepage"
-msgstr "Masquer les publications sur la page d'accueil"
+msgid "News and Events"
+msgstr ""
 
-msgid "Maximum number of events displayed on homepage"
-msgstr "Nombre maximal d'événements affichés sur la page d'accueil"
+msgid "Number of news entries on homepage"
+msgstr ""
 
-msgid "Maximum number of news entries on homepage"
-msgstr "Nombre maximal des nouvelles sur la page d'accueil"
+msgid "Number of events displayed on homepage"
+msgstr ""
 
 msgid "Homepage"
 msgstr "Page d'accueil"
+
+#~ msgid "Maximum number of events displayed on homepage"
+#~ msgstr "Nombre maximal d'événements affichés sur la page d'accueil"
+
+#~ msgid "Maximum number of news entries on homepage"
+#~ msgstr "Nombre maximal des nouvelles sur la page d'accueil"
