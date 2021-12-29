@@ -1,8 +1,12 @@
 # Changes
 
+## 2021.100
+
+`2021-12-29` | [14d227380f...a5c0d1b32a](https://github.com/OneGov/onegov-cloud/compare/14d227380f^...a5c0d1b32a)
+
 ## 2021.99
 
-`2021-12-22` | [6cebe417d2...30877daaca](https://github.com/OneGov/onegov-cloud/compare/6cebe417d2^...30877daaca)
+`2021-12-22` | [6cebe417d2...579dbd0974](https://github.com/OneGov/onegov-cloud/compare/6cebe417d2^...579dbd0974)
 
 ## 2021.98
 
@@ -1395,16 +1399,4 @@ optionally ban the IP.
 ##### Don't correct language input.
 
 `Bugfix` | [ZW-314](https://kanton-zug.atlassian.net/browse/ZW-314) | [f380853e13](https://github.com/onegov/onegov-cloud/commit/f380853e13dac0b726541509ba06e8cc587c9291)
-
-## 2021.50
-
-`2021-05-13` | [f767eccb86...ab32040507](https://github.com/OneGov/onegov-cloud/compare/f767eccb86^...ab32040507)
-
-### Org
-
-##### Adds a flush method to caches.
-
-Invalidating a dogpile cache region only works for the current process.
-
-`Feature` | [SEA-314](https://linear.app/seantis/issue/SEA-314) | [d40011e571](https://github.com/onegov/onegov-cloud/commit/d40011e5713f91c74cc61818f39ec5d4bf7b30e5)
 
