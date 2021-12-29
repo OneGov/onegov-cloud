@@ -113,7 +113,7 @@ def test_phone_regex_groups_valid(number):
 def test_phone_linkify_valid(number):
     r = linkify_phone(number)
     number = utils.remove_duplicate_whitespace(number)
-    wanted = f'<a href="tel:{number}">{number}</a>'
+    wanted = f'<a href="tel:{number}">{number}</a> '
     assert r == wanted
     # Important !
     assert linkify_phone(wanted) == wanted
@@ -144,15 +144,14 @@ def test_linkify():
     tel_nr = valid_test_phone_numbers[0]
     text = f'2016/2019<br>{tel_nr}'
     assert utils.linkify(text, escape=False) ==\
-           f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a>'
+           f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a> '
 
 
 @pytest.mark.parametrize("tel", [
     ('Tel. +41 41 728 33 11',
-     'Tel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a>'),
+     'Tel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a> '),
     ('\nTel. +41 41 728 33 11\n',
-     '\nTel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a>\n'),
-
+     '\nTel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a> \n'),
 ])
 def test_linkify_with_phone(tel):
     assert utils.linkify(tel[0], escape=False) == tel[1]
@@ -161,7 +160,7 @@ def test_linkify_with_phone(tel):
 
 def test_linkify_with_phone_newline():
     assert utils.linkify('Foo\n041 123 45 67') == (
-        'Foo\n<a href="tel:041 123 45 67">041 123 45 67</a>'
+        'Foo\n<a href="tel:041 123 45 67">041 123 45 67</a> '
     )
 
 
