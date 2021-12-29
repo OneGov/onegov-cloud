@@ -1,8 +1,12 @@
 # Changes
 
+## 2021.101
+
+No changes since last release
+
 ## 2021.100
 
-`2021-12-29` | [14d227380f...a5c0d1b32a](https://github.com/OneGov/onegov-cloud/compare/14d227380f^...a5c0d1b32a)
+`2021-12-29` | [14d227380f...212583fb9d](https://github.com/OneGov/onegov-cloud/compare/14d227380f^...212583fb9d)
 
 ## 2021.99
 
@@ -1357,46 +1361,4 @@ Shows german banner version for all languages.
 ##### Hide news in top navigation.
 
 `Other` | [SEA-343](https://linear.app/seantis/issue/SEA-343) | [9c6b2cd771](https://github.com/onegov/onegov-cloud/commit/9c6b2cd77132b322850b0771dc19aacc5d53dfc0)
-
-## 2021.51
-
-`2021-05-19` | [8eaa83aa1c...e9cd52c898](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...e9cd52c898)
-
-### Agency
-
-##### Use honeypots in mutuation form.
-
-`Feature` | [SEA-288](https://linear.app/seantis/issue/SEA-288) | [4c1553ec7e](https://github.com/onegov/onegov-cloud/commit/4c1553ec7ed2dace76307f384a6d2bc914191943)
-
-### Form
-
-##### Add honeypot fields.
-
-A honey pot field is hidden using CSS and therefore not visible for 
-users
-but bots (probably). We expect this field to be empty at any
-time and throw an error if provided as well as adding a log message to
-optionally ban the IP.
-
-`Feature` | [SEA-288](https://linear.app/seantis/issue/SEA-288) | [8eaa83aa1c](https://github.com/onegov/onegov-cloud/commit/8eaa83aa1cd87eb20e7f0e4eca857194b5f6508a)
-
-### Org
-
-##### Add honeypot extensions for form definitions.
-
-`Feature` | [4a076451f7](https://github.com/onegov/onegov-cloud/commit/4a076451f7d96473e03d164091df3c5396c8f9e6)
-
-##### Adds a generic text homepage widget.
-
-`Feature` | [SEA-334](https://linear.app/seantis/issue/SEA-334) | [2ba1ee6428](https://github.com/onegov/onegov-cloud/commit/2ba1ee642858c21b3979dc575906c1920e7a5635)
-
-##### Check for overlapping form registration windows.
-
-`Bugfix` | [f838b92cbc](https://github.com/onegov/onegov-cloud/commit/f838b92cbcda7d07c382bcdca1fda1b9c638b3b6)
-
-### Translatordirectory
-
-##### Don't correct language input.
-
-`Bugfix` | [ZW-314](https://kanton-zug.atlassian.net/browse/ZW-314) | [f380853e13](https://github.com/onegov/onegov-cloud/commit/f380853e13dac0b726541509ba06e8cc587c9291)
 
