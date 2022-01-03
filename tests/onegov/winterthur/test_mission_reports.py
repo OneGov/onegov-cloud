@@ -1,9 +1,7 @@
-from onegov.winterthur.collections import MissionReportCollection
-from tests.shared import Client as BaseClient
-from sedate import replace_timezone
 from datetime import datetime as dt
-
-from tests.shared.utils import open_in_browser
+from onegov.winterthur.collections import MissionReportCollection
+from sedate import replace_timezone
+from tests.shared import Client as BaseClient
 
 
 class Client(BaseClient):
@@ -41,7 +39,7 @@ def test_view_mission_reports(winterthur_app):
     page = client.get(new_url)
 
     # leave time unfilled
-    page.form['day'] = '2021-05-05'
+    page.form['day'] = f'{dt.now().year}-05-05'
     page.form['duration'] = 5
     page.form['nature'] = 'Fire with a lot of smoke'
     page.form['location'] = 'Montreux'
@@ -70,5 +68,3 @@ def test_view_mission_reports(winterthur_app):
 
     page = client.get(f'/mission-reports?year={date.year}')
     assert page.pyquery('.total-missions b')[0].text == '5'
-
-
