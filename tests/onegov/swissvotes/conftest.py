@@ -538,11 +538,15 @@ def sample_vote():
     vote.national_council_share_unknown = Decimal('28.20')
     vote.national_council_share_vague = Decimal('28.20')
     vote.campaign_material_metadata = {
-        'essay.pdf': {
+        'article': {
+            'title': 'Article',
+            'doctype': ['article']
+        },
+        'essay': {
             'title': 'Essay',
             'position': 'no'
         },
-        'leaflet.pdf': {
+        'leaflet': {
             'title': 'Pamphlet',
             'date_year': 1970,
             'language': ['de']

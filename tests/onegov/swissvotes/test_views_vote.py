@@ -3,6 +3,7 @@ from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.views.vote import view_vote_percentages
 from pytest import mark
+from pytest import raises
 from re import findall
 from transaction import commit
 from translationstring import TranslationString
@@ -532,9 +533,9 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     assert 'Keine Anhänge.' in manage
 
     # ... upload
-    file = campaign_material['campaign_material_other-leaflet.pdf']
+    file = campaign_material['campaign_material_other-article.pdf']
     manage.form['file'] = Upload(
-        'leaflet.pdf',
+        'article.pdf',
         file.reference.file.read(),
         'application/pdf'
     )
@@ -542,13 +543,21 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     assert manage.status_code == 200
 
     manage = page.click('Kampagnenmaterial')
-    assert 'leaflet.pdf' in manage
-    assert manage.click('leaflet.pdf').content_type == 'application/pdf'
+    assert 'article.pdf' in manage
+    assert manage.click('article.pdf').content_type == 'application/pdf'
 
     # ... view
     details = client.get('/').maybe_follow().click('Abstimmungen')
     details = details.click('Details').click('Liste der Dokumente anzeigen')
-    assert 'leaflet.pdf' in details
+    assert details.click('Article').content_type == 'application/pdf'
+
+    # ... view (anon)
+    details = Client(swissvotes_app).get('/').maybe_follow()
+    details = details.click('Abstimmungen').click('Details')
+    details = details.click('Liste der Dokumente anzeigen')
+    assert 'Urheberrechtsschutz' in details
+    with raises(Exception):
+        details.click('Article').content_type == 'application/pdf'
 
     # ... delete
     manage = manage.click('Löschen').form.submit().maybe_follow()

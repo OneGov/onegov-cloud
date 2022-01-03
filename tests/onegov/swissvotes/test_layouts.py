@@ -1006,12 +1006,12 @@ def test_layout_vote_campaign_material(swissvotes_app):
     assert layout.metadata('zzz') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
         'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
-        'order': 999
+        'order': 999, 'protected': False
     }
     assert layout.metadata('zzz.pdf') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
         'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
-        'order': 999
+        'order': 999, 'protected': False
     }
 
     model.campaign_material_metadata = {
@@ -1023,19 +1023,20 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'date_day': 31,
             'position': 'yes',
             'language': ['de', 'fr'],
-            'doctype': ['leaflet', 'other'],
+            'doctype': ['leaflet', 'article'],
         }
     }
     assert layout.metadata('xxx') == {
         'author': 'AAA',
         'date': '31.12.1988',
         'date_sortable': '19881231',
-        'doctype': 'Pamphlet, Other',
+        'doctype': 'Pamphlet, Press article',
         'editor': 'BBB',
         'language': 'German, French',
         'order': 0,
         'position': 'Yes',
-        'title': 'xxx'
+        'title': 'xxx',
+        'protected': True
     }
 
 
