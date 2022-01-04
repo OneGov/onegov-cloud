@@ -1,35 +1,46 @@
 {
     "1701": {
-        "name": "Baar"
+        "name": "Baar",
+        "region": "Baar"
     },
     "1702": {
-        "name": "Cham"
+        "name": "Cham",
+        "region": "Cham"
     },
     "1703": {
-        "name": "H\u00fcnenberg"
+        "name": "H\u00fcnenberg",
+        "region": "H\u00fcnenberg"
     },
     "1704": {
-        "name": "Menzingen"
+        "name": "Menzingen",
+        "region": "Menzingen"
     },
     "1705": {
-        "name": "Neuheim"
+        "name": "Neuheim",
+        "region": "Neuheim"
     },
     "1706": {
-        "name": "Ober\u00e4geri"
+        "name": "Ober\u00e4geri",
+        "region": "Ober\u00e4geri"
     },
     "1707": {
-        "name": "Risch"
+        "name": "Risch",
+        "region": "Risch"
     },
     "1708": {
-        "name": "Steinhausen"
+        "name": "Steinhausen",
+        "region": "Steinhausen"
     },
     "1709": {
-        "name": "Unter\u00e4geri"
+        "name": "Unter\u00e4geri",
+        "region": "Unter\u00e4geri"
     },
     "1710": {
-        "name": "Walchwil"
+        "name": "Walchwil",
+        "region": "Walchwil"
     },
     "1711": {
-        "name": "Zug"
+        "name": "Zug",
+        "region": "Zug"
     }
 }

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-08 13:01+0100\n"
+"POT-Creation-Date: 2022-01-04 08:19+0100\n"
 "PO-Revision-Date: 2021-04-01 10:22+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -605,6 +605,12 @@ msgstr "Bezirke"
 msgid "Districts"
 msgstr "Wahlkreise"
 
+msgid "superregion_label_bl"
+msgstr "Region"
+
+msgid "superregions_label_bl"
+msgstr "Regionen"
+
 msgid "Communal"
 msgstr "Kommunal"
 
@@ -1072,11 +1078,11 @@ msgstr "Resultate hochladen"
 msgid "New screen"
 msgstr "Neuer Screen"
 
-msgid "No screens yet."
-msgstr "Noch keine Screens."
-
 msgid "Export"
 msgstr "Export"
+
+msgid "No screens yet."
+msgstr "Noch keine Screens."
 
 msgid "No subscribers yet."
 msgstr "Noch keine Abonnenten."

@@ -1075,18 +1075,6 @@
         "district": "Bern-Mittelland",
         "name": "Kirchdorf (BE)"
     },
-    "873": {
-        "district": "Bern-Mittelland",
-        "name": "Kirchenthurnen"
-    },
-    "874": {
-        "district": "Bern-Mittelland",
-        "name": "Lohnstorf"
-    },
-    "876": {
-        "district": "Bern-Mittelland",
-        "name": "M\u00fchlethurnen"
-    },
     "877": {
         "district": "Bern-Mittelland",
         "name": "Niedermuhlern"
@@ -1122,6 +1110,10 @@
     "888": {
         "district": "Bern-Mittelland",
         "name": "Wald (BE)"
+    },
+    "889": {
+        "district": "Bern-Mittelland",
+        "name": "Thurnen"
     },
     "901": {
         "district": "Emmental",
@@ -1210,10 +1202,6 @@
     "936": {
         "district": "Thun",
         "name": "Pohlern"
-    },
-    "937": {
-        "district": "Thun",
-        "name": "Schwendibach"
     },
     "938": {
         "district": "Thun",
@@ -1378,9 +1366,5 @@
     "995": {
         "district": "Oberaargau",
         "name": "Wiedlisbach"
-    },
-    "996": {
-        "district": "Oberaargau",
-        "name": "Wolfisberg"
     }
 }
