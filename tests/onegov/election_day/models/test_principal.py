@@ -5,12 +5,12 @@ from onegov.election_day.models import Principal
 from textwrap import dedent
 
 
-SUPPORTED_YEARS = list(range(2002, 2021 + 1))
+SUPPORTED_YEARS = list(range(2002, 2022 + 1))
 
-SUPPORTED_YEARS_MAP = list(range(2013, 2021 + 1))
+SUPPORTED_YEARS_MAP = list(range(2013, 2022 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 
-SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2021 + 1))
+SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2022 + 1))
 SUPPORTED_YEARS_NO_MAP_ADDITIONAL = list(
     set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ADDITIONAL)
 )
