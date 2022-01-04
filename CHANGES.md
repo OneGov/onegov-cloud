@@ -1,8 +1,36 @@
 # Changes
 
+## 2022.1
+
+`2022-01-04` | [62416c3a0f...2653647d0e](https://github.com/OneGov/onegov-cloud/compare/62416c3a0f^...2653647d0e)
+
+### Election Day
+
+##### Add year 2022.
+
+`Feature` | [OGC-225](https://linear.app/onegovcloud/issue/OGC-225) | [4bd51d99dd](https://github.com/onegov/onegov-cloud/commit/4bd51d99dd037b5be07c17bf019393fd0810d8dd)
+
+##### Add static data for regions and superregions.
+
+`Feature` | [OGC-164](https://linear.app/onegovcloud/issue/OGC-164) | [c0be59074d](https://github.com/onegov/onegov-cloud/commit/c0be59074d3c0a43f39503c37bac9b98d9ea84fc)
+
+##### Remove Bodensee from mapdata.
+
+`Bugfix` | [OGC-148](https://linear.app/onegovcloud/issue/OGC-148) | [ed069923c3](https://github.com/onegov/onegov-cloud/commit/ed069923c31fa0e8ba5cb201a928919130aa53eb)
+
+### Swissvotes
+
+##### Don't allow to download press article for copyright reasons.
+
+`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [6fbab571af](https://github.com/onegov/onegov-cloud/commit/6fbab571afff266fc83732780bb4b1922eb4ea9d)
+
+##### Update translations.
+
+`Bugfix` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [62416c3a0f](https://github.com/onegov/onegov-cloud/commit/62416c3a0f631d0eed77e392598a99b6fa67b14f)
+
 ## 2021.101
 
-No changes since last release
+`2021-12-29` | [d7e8950d11...d7e8950d11](https://github.com/OneGov/onegov-cloud/compare/d7e8950d11^...d7e8950d11)
 
 ## 2021.100
 
@@ -1325,40 +1353,4 @@ Shows german banner version for all languages.
 ##### Extends mission reports with type and mission count
 
 `Feature` | [001072616e](https://github.com/onegov/onegov-cloud/commit/001072616e4036cbdb353608009e0fa9c5955e77)
-
-## 2021.52
-
-`2021-05-21` | [173c481049...2eb3f14319](https://github.com/OneGov/onegov-cloud/compare/173c481049^...2eb3f14319)
-
-### Ballot
-
-##### Add limit parameter to election compound list results.
-
-`Feature` | [1e2d51d9a1](https://github.com/onegov/onegov-cloud/commit/1e2d51d9a16e3bee1e460c9b00c142f754906388)
-
-### Core
-
-##### Allow linking with additional query parameters.
-
-`Feature` | [c801b0ed2b](https://github.com/onegov/onegov-cloud/commit/c801b0ed2b7d782e207ac87e0c305d1b69f33c06)
-
-### Form
-
-##### Allow MultiCheckboxFieldRenderer to render unkown or outdated data.
-
-`Bugfix` | [173c481049](https://github.com/onegov/onegov-cloud/commit/173c481049c4a80fc2c4c6fa42cb9a10da870a16)
-
-### Town6
-
-##### Move login from header to footer.
-
-`Other` | [SEA-345](https://linear.app/seantis/issue/SEA-345) | [3c5dd81156](https://github.com/onegov/onegov-cloud/commit/3c5dd81156313245ce7767ce36c3905370d6b13f)
-
-##### Show full date in news.
-
-`Other` | [SEA-344](https://linear.app/seantis/issue/SEA-344) | [4c84a0fdf7](https://github.com/onegov/onegov-cloud/commit/4c84a0fdf7d9ebb57891e7696df9e68895b0602d)
-
-##### Hide news in top navigation.
-
-`Other` | [SEA-343](https://linear.app/seantis/issue/SEA-343) | [9c6b2cd771](https://github.com/onegov/onegov-cloud/commit/9c6b2cd77132b322850b0771dc19aacc5d53dfc0)
 
