@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-12-06 15:35+0100\n"
+"POT-Creation-Date: 2022-01-06 09:26+0100\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1282,6 +1282,9 @@ msgstr "Image n°6 de page d'accueil"
 msgid "Homepage Cover"
 msgstr "Couverture de la page d'accueil"
 
+msgid "Structure"
+msgstr "Structure"
+
 msgid "Homepage Structure (for advanced users only)"
 msgstr ""
 "Structure de la page d'accueil (seulement pour les utilisateurs avancés)"
@@ -1615,9 +1618,6 @@ msgstr "Exporter"
 msgid "Change Url"
 msgstr "Changer Url"
 
-msgid "Sort"
-msgstr "Trier"
-
 msgid "Registration Windows"
 msgstr "Fenêtres d'inscription"
 
@@ -1853,6 +1853,9 @@ msgstr "Voulez-vous vraiment supprimer ce lien externe?"
 
 msgid "Delete external link"
 msgstr "Supprimer lien externe"
+
+msgid "Sort"
+msgstr "Trier"
 
 msgid "The submission was adopted"
 msgstr "La proposition a été adoptée"
@@ -3441,6 +3444,14 @@ msgstr ""
 "Votre lien d'inscription a été créé comme suit. Copiez-le avant de "
 "continuer, il ne vous sera pas montré à nouveau :"
 
+msgid ""
+"Sort the items using drag and drop. The new positions are automatically "
+"saved directly after moving."
+msgstr ""
+
+msgid "Back to page"
+msgstr "Retour à la page"
+
 msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
 
@@ -4505,12 +4516,6 @@ msgstr ""
 msgid "Topics"
 msgstr "Sujets"
 
-msgid "Sort the items using drag and drop."
-msgstr "Triez les éléments par glisser-déposer."
-
-msgid "Back to page"
-msgstr "Retour à la page"
-
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"
 msgstr "l'abonnement pour ${address} a bien été confirmé"
@@ -4702,3 +4707,6 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Sort the items using drag and drop."
+#~ msgstr "Triez les éléments par glisser-déposer."

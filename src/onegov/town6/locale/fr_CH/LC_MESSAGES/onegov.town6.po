@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-12-01 09:09+0100\n"
+"POT-Creation-Date: 2021-12-28 16:58+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -461,6 +461,9 @@ msgstr "Voulez-vous vraiment supprimer ce lien externe?"
 
 msgid "Delete external link"
 msgstr "Supprimer lien externe"
+
+msgid "Sort"
+msgstr ""
 
 msgid "No rules defined."
 msgstr "Aucune règle définie."
@@ -1888,8 +1891,14 @@ msgstr "Éditer le destinataire"
 msgid "Online Counter Label"
 msgstr "Étiquette de comptoir en ligne"
 
+msgid "Hide Online Counter on Homepage"
+msgstr "Masquer le comptoir en ligne sur la page d'accueil"
+
 msgid "Reservations Label"
 msgstr "Étiquette de réservations"
+
+msgid "Hide Reservations on Homepage"
+msgstr "Masquer les réservations sur la page d'accueil"
 
 msgid "SBB Daypass Label"
 msgstr "Étiquette de carte journalière CFF"
@@ -1897,20 +1906,23 @@ msgstr "Étiquette de carte journalière CFF"
 msgid "Publications Label"
 msgstr "Étiquette de publications"
 
+msgid "Hide Publications on Homepage"
+msgstr "Masquer les publications sur la page d'accueil"
+
 msgid "E-Move Label"
 msgstr "Étiquette de eDéménagement"
 
 msgid "E-Move Url"
 msgstr "Url de eDéménagement"
 
-msgid "Hide Publications on Homepage"
-msgstr "Masquer les publications sur la page d'accueil"
-
-msgid "Number of events displayed on homepage"
-msgstr "Nombre d'événements affichés sur la page d'accueil"
+msgid "News and Events"
+msgstr "Nouvelles et événements"
 
 msgid "Number of news entries on homepage"
 msgstr "Nombre des nouvelles sur la page d'accueil"
+
+msgid "Number of events displayed on homepage"
+msgstr "Nombre d'événements affichés sur la page d'accueil"
 
 msgid "Show partners on all pages"
 msgstr "Afficher les partenaires sur toutes les pages"

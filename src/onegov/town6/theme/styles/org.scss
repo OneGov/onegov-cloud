@@ -137,9 +137,9 @@ footer {
 */
 
 .main-title {
+    line-height: 1.2;
     margin-bottom: 1rem;
     max-width: 30ex;
-    line-height: 1.2;
 }
 
 /*
@@ -485,9 +485,9 @@ $pageref-color-hover: $iron;
 .page-lead.h5,
 .news-lead.h5,
 .newsletter-lead.h5 {
-    margin-bottom: 30px;
     display: block;
     font-weight: bold !important;
+    margin-bottom: 30px;
 }
 
 .subheader {
