@@ -199,6 +199,7 @@ setup(
             'pyyaml',
             'requests',
             'requests-mock',
+            'selenium',
             'splinter',
             'sqlalchemy',
             'testing.postgresql',

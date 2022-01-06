@@ -1688,7 +1688,7 @@
 
         <ul class="forms-list more-list">
             <li tal:repeat="record grouped[group]">
-                <a class="" tal:attributes="href link_func(record)">
+                <a class="list-title" tal:attributes="href link_func(record)">
                         ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
                 <tal:b tal:define="link edit_link(record)|nothing">

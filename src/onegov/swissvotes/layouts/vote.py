@@ -208,6 +208,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
             'order': order.get(metadata.get('position'), 999),
             'language': self.format_code(metadata, 'language'),
             'doctype': self.format_code(metadata, 'doctype'),
+            'protected': 'article' in metadata.get('doctype', [])
         }
 
 

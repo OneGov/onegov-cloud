@@ -385,11 +385,15 @@ def test_model_vote(session, sample_vote):
     assert vote.media_coverage_articles_total == 3007
     assert vote.media_coverage_tonality_total == Decimal('30.10')
     assert vote.campaign_material_metadata == {
-        'essay.pdf': {
+        'article': {
+            'title': 'Article',
+            'doctype': ['article']
+        },
+        'essay': {
             'title': 'Essay',
             'position': 'no'
         },
-        'leaflet.pdf': {
+        'leaflet': {
             'title': 'Pamphlet',
             'date_year': 1970,
             'language': ['de']

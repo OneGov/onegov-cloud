@@ -21,8 +21,12 @@ class Principal(object):
     canton code).
 
     A principal may consist of different entitites (municipalitites: quarters,
-    cantons: municipalities) grouped by districts. The label of the entity and
-    districts may vary and can be queried with `label`.
+    cantons: municipalities) grouped by districts. Some cantons have regions
+    for certain years, an additional type of district only used for regional
+    elections (Kantonsratswahl, Grossratswahl, Landratswahl). Some of them have
+    superregions which further aggregate these regions. The label of the
+    entity, the districts, regions and superregions may vary and can be queried
+    with `label`.
 
     A principal is part of a domain (municipalitites: municipality, canton:
     canton) and supports different types of domains (typically all higher
@@ -69,6 +73,8 @@ class Principal(object):
         base=None,
         analytics=None,
         has_districts=True,
+        has_regions=False,
+        has_superregions=False,
         use_maps=False,
         fetch=None,
         webhooks=None,
@@ -99,6 +105,8 @@ class Principal(object):
         self.base = base
         self.analytics = analytics
         self.has_districts = has_districts
+        self.has_regions = has_regions
+        self.has_superregions = has_superregions
         self.use_maps = use_maps
         self.fetch = fetch or {}
         self.webhooks = webhooks or {}
@@ -205,6 +213,22 @@ class Canton(Principal):
         ])
         has_districts = None not in districts
 
+        # Test if some of the entities have regions
+        regions = set([
+            entity.get('region', None)
+            for year in entities.values()
+            for entity in year.values()
+        ])
+        has_regions = regions != {None}
+
+        # Test if some of the entities have superregions
+        superregions = set([
+            entity.get('superregion', None)
+            for year in entities.values()
+            for entity in year.values()
+        ])
+        has_superregions = superregions != {None}
+
         super(Canton, self).__init__(
             id_=canton,
             domain='canton',
@@ -212,6 +236,8 @@ class Canton(Principal):
             domains_vote=domains_vote,
             entities=entities,
             has_districts=has_districts,
+            has_regions=has_regions,
+            has_superregions=has_superregions,
             use_maps=True,
             **kwargs
         )
@@ -236,6 +262,24 @@ class Canton(Principal):
                 return _("districts_label_gr")
             if self.id == 'sz':
                 return _("districts_label_sz")
+            return _("Districts")
+        if value == 'region':
+            if self.id in ('sz', 'zg'):
+                return _("Municipality")
+            return _("District")
+        if value == 'regions':
+            if self.id in ('sz', 'zg'):
+                return _("Municipalities")
+            return _("Districts")
+        if value == 'superregion':
+            if self.id == 'bl':
+                # Region
+                return _("superregion_label_bl")
+            return _("District")
+        if value == 'superregions':
+            if self.id == 'bl':
+                # Regionen
+                return _("superregions_label_bl")
             return _("Districts")
         return ''
 

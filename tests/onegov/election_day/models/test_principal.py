@@ -5,12 +5,12 @@ from onegov.election_day.models import Principal
 from textwrap import dedent
 
 
-SUPPORTED_YEARS = list(range(2002, 2021 + 1))
+SUPPORTED_YEARS = list(range(2002, 2022 + 1))
 
-SUPPORTED_YEARS_MAP = list(range(2013, 2021 + 1))
+SUPPORTED_YEARS_MAP = list(range(2013, 2022 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 
-SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2021 + 1))
+SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2022 + 1))
 SUPPORTED_YEARS_NO_MAP_ADDITIONAL = list(
     set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ADDITIONAL)
 )
@@ -213,20 +213,20 @@ def test_principal_load_options():
     }
 
 
-def test_canton_entities():
+def test_canton():
     principal = Canton(name='Zug', canton='zg')
     entities = {
-        1701: {'name': 'Baar'},
-        1702: {'name': 'Cham'},
-        1703: {'name': 'Hünenberg'},
-        1704: {'name': 'Menzingen'},
-        1705: {'name': 'Neuheim'},
-        1706: {'name': 'Oberägeri'},
-        1707: {'name': 'Risch'},
-        1708: {'name': 'Steinhausen'},
-        1709: {'name': 'Unterägeri'},
-        1710: {'name': 'Walchwil'},
-        1711: {'name': 'Zug'},
+        1701: {'name': 'Baar', 'region': 'Baar'},
+        1702: {'name': 'Cham', 'region': 'Cham'},
+        1703: {'name': 'Hünenberg', 'region': 'Hünenberg'},
+        1704: {'name': 'Menzingen', 'region': 'Menzingen'},
+        1705: {'name': 'Neuheim', 'region': 'Neuheim'},
+        1706: {'name': 'Oberägeri', 'region': 'Oberägeri'},
+        1707: {'name': 'Risch', 'region': 'Risch'},
+        1708: {'name': 'Steinhausen', 'region': 'Steinhausen'},
+        1709: {'name': 'Unterägeri', 'region': 'Unterägeri'},
+        1710: {'name': 'Walchwil', 'region': 'Walchwil'},
+        1711: {'name': 'Zug', 'region': 'Zug'},
     }
     assert principal.entities == {
         year: entities for year in SUPPORTED_YEARS
@@ -238,12 +238,26 @@ def test_canton_entities():
         for year in SUPPORTED_YEARS:
             assert principal.entities[year]
 
-
-def test_canton_has_districts():
+    # has_districts
+    assert Canton(name='bl', canton='bl').has_districts is True
     assert Canton(name='gr', canton='gr').has_districts is True
     assert Canton(name='sg', canton='sg').has_districts is True
     assert Canton(name='sz', canton='sz').has_districts is True
     assert Canton(name='zg', canton='zg').has_districts is False
+
+    # has_regions
+    assert Canton(name='bl', canton='bl').has_regions is True
+    assert Canton(name='gr', canton='gr').has_regions is True
+    assert Canton(name='sg', canton='sg').has_regions is False
+    assert Canton(name='sz', canton='sz').has_regions is True
+    assert Canton(name='zg', canton='zg').has_regions is True
+
+    # has_superregions
+    assert Canton(name='bl', canton='bl').has_superregions is True
+    assert Canton(name='gr', canton='gr').has_superregions is False
+    assert Canton(name='sg', canton='sg').has_superregions is False
+    assert Canton(name='sz', canton='sz').has_superregions is False
+    assert Canton(name='zg', canton='zg').has_superregions is False
 
 
 def test_municipality_entities():
@@ -363,6 +377,22 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Circonscriptions électorales'),
         ('districts', 'it_CH', 'Distretti elettorali'),
         ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -385,6 +415,22 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Districts électorales'),
         ('districts', 'it_CH', 'Distretti elettorali'),
         ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Region'),
+        ('superregion', 'fr_CH', 'Région'),
+        ('superregion', 'it_CH', 'Regione'),
+        ('superregion', 'rm_CH', 'Regiun'),
+        ('superregions', 'de_CH', 'Regionen'),
+        ('superregions', 'fr_CH', 'Régions'),
+        ('superregions', 'it_CH', 'Regioni'),
+        ('superregions', 'rm_CH', 'Regiuns'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -407,6 +453,22 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Régions'),
         ('districts', 'it_CH', 'Regioni'),
         ('districts', 'rm_CH', 'Regiuns'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -429,6 +491,60 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Districts électorales'),
         ('districts', 'it_CH', 'Distretti elettorali'),
         ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Gemeinde'),
+        ('region', 'fr_CH', 'Commune'),
+        ('region', 'it_CH', 'Comune'),
+        ('region', 'rm_CH', 'Vischnanca'),
+        ('regions', 'de_CH', 'Gemeinden'),
+        ('regions', 'fr_CH', 'Communes'),
+        ('regions', 'it_CH', 'Comuni'),
+        ('regions', 'rm_CH', 'Vischnancas'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
+    ):
+        assert translate(principal.label(label), locale) == result
+
+    # ZG
+    principal = Canton(name='sz', canton='sz')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entity', 'fr_CH', 'Commune'),
+        ('entity', 'it_CH', 'Comune'),
+        ('entity', 'rm_CH', 'Vischnanca'),
+        ('entities', 'de_CH', 'Gemeinden'),
+        ('entities', 'fr_CH', 'Communes'),
+        ('entities', 'it_CH', 'Comuni'),
+        ('entities', 'rm_CH', 'Vischnancas'),
+        ('district', 'de_CH', 'Bezirk'),
+        ('district', 'fr_CH', 'District électoral'),
+        ('district', 'it_CH', 'Distretto elettorale'),
+        ('district', 'rm_CH', 'Circul electoral'),
+        ('districts', 'de_CH', 'Bezirke'),
+        ('districts', 'fr_CH', 'Districts électorales'),
+        ('districts', 'it_CH', 'Distretti elettorali'),
+        ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Gemeinde'),
+        ('region', 'fr_CH', 'Commune'),
+        ('region', 'it_CH', 'Comune'),
+        ('region', 'rm_CH', 'Vischnanca'),
+        ('regions', 'de_CH', 'Gemeinden'),
+        ('regions', 'fr_CH', 'Communes'),
+        ('regions', 'it_CH', 'Comuni'),
+        ('regions', 'rm_CH', 'Vischnancas'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
     ):
         assert translate(principal.label(label), locale) == result
 

@@ -240,7 +240,7 @@ def test_view_update_metdata(swissvotes_app, file, sample_vote):
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=236).one()
-    assert len(vote.campaign_material_metadata) == 32
+    assert len(vote.campaign_material_metadata) == 33
 
     # Upload (unchanged)
     manage = client.get('/').maybe_follow().click("Abstimmungen")

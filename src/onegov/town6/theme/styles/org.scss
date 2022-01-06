@@ -431,6 +431,7 @@ ul.pagination li {
 $formlist-padding: .75rem 0;
 
 .forms-list {
+    margin-top: 0 !important;
     li:last-of-type {
         border: 0;
         padding-bottom: 1.5rem;

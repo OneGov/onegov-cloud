@@ -15,7 +15,10 @@ def combine_grouped(items, external_links, sort=None):
         if key not in items:
             items[key] = values
         else:
-            items[key] += values
+            if sort:
+                items[key] = sorted(items[key] + values, key=sort)
+            else:
+                items[key] += values
     return collections.OrderedDict(sorted(items.items()))
 
 
