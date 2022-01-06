@@ -183,18 +183,9 @@ class Canton(Principal):
 
     def __init__(self, canton=None, **kwargs):
         assert canton in self.CANTONS
+        self.id = canton
 
         kwargs.pop('use_maps', None)
-
-        domains_election = OrderedDict((
-            ('federation', _("Federal")),
-            ('region', _("Regional")),
-            ('canton', _("Cantonal"))
-        ))
-        domains_vote = OrderedDict((
-            ('federation', _("Federal")),
-            ('canton', _("Cantonal"))
-        ))
 
         # Read the municipalties for each year from our static data
         entities = {}
@@ -228,6 +219,25 @@ class Canton(Principal):
             for entity in year.values()
         ])
         has_superregions = superregions != {None}
+
+        domains_election = OrderedDict()
+        domains_election['federation'] = _("Federal")
+        domains_election['canton'] = _("Cantonal")
+        if has_regions:
+            domains_election['region'] = _(
+                "Regional (${on})",
+                mapping={'on': self.label('region')}
+            )
+        if has_districts:
+            domains_election['district'] = _(
+                "Regional (${on})",
+                mapping={'on': self.label('district')}
+            )
+        domains_election['none'] = _("Other")
+
+        domains_vote = OrderedDict()
+        domains_vote['federation'] = _("Federal")
+        domains_vote['canton'] = _("Cantonal")
 
         super(Canton, self).__init__(
             id_=canton,

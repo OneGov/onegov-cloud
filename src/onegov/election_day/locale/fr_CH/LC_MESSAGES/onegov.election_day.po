@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-04 08:19+0100\n"
+"POT-Creation-Date: 2022-01-06 09:20+0100\n"
 "PO-Revision-Date: 2021-04-01 10:23+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -254,6 +254,9 @@ msgstr "Relative"
 msgid "Absolute majority"
 msgstr "Majorité absolue"
 
+msgid "District"
+msgstr "Circonscription électorale"
+
 msgid "Tacit election"
 msgstr "Élection tacite"
 
@@ -262,18 +265,6 @@ msgstr "Suisses de l'étranger"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'élection contient des résultats distincts pour les expatriés."
-
-msgid "Distinct district"
-msgstr "District unique"
-
-msgid ""
-"The election contains results for an entire district. When uploading "
-"intermediate results, the missing municipalities of the districts are added "
-"accordingly."
-msgstr ""
-"L'élection contient des résultats pour une circonscription électorale "
-"entière. Lors du téléchargement des résultats intermédiaires, les communes "
-"manquantes de la circonscription électorale sont complétées en conséquence."
 
 msgid "Doppelter Pukelsheim"
 msgstr ""
@@ -335,12 +326,8 @@ msgstr "Définitions de couleurs non valides"
 msgid "Cantonal"
 msgstr "Cantonal"
 
-msgid ""
-"Elections contain results for single municipalities rather than (partial) "
-"districts"
-msgstr ""
-"Les élections contiennent des résultats pour des municipalités individuelles "
-"plutôt que pour des districts (partiels)."
+msgid "Domain of the elections"
+msgstr "Echelon des élections"
 
 msgid "Elections"
 msgstr "Elections"
@@ -577,6 +564,13 @@ msgstr "Les résultats finaux sont disponibles sur ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Les nouveaux résultats intermédiaires sont disponibles sur ${url}"
 
+#, python-format
+msgid "Regional (${on})"
+msgstr "Régional (${on})"
+
+msgid "Other"
+msgstr "Autre"
+
 msgid "Municipalities"
 msgstr "Communes"
 
@@ -588,9 +582,6 @@ msgstr "Région"
 
 msgid "district_label_sz"
 msgstr "District électoral"
-
-msgid "District"
-msgstr "Circonscription électorale"
 
 msgid "districts_label_bl"
 msgstr "Districts électorales"

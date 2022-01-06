@@ -68,9 +68,11 @@ class ArchivedResultCollection(object):
         }
 
         dates = groupbydict(items, lambda i: i.date)
-        order = ('federation', 'canton', 'region', 'municipality')
+        order = ('federation', 'canton', 'region', 'district', 'municipality')
         if request.app.principal.domain == 'municipality':
-            order = ('municipality', 'federation', 'canton', 'region')
+            order = (
+                'municipality', 'federation', 'canton', 'region', 'district'
+            )
 
         for date_, items_by_date in dates.items():
             domains = groupbydict(
@@ -431,9 +433,11 @@ class SearchableArchivedResultCollection(
             query = query.filter(or_(*self.term_filter))
 
         # order by date and type
-        order = ('federation', 'canton', 'region', 'municipality')
+        order = ('federation', 'canton', 'region', 'district', 'municipality')
         if self.app_principal_domain == 'municipality':
-            order = ('municipality', 'federation', 'canton', 'region')
+            order = (
+                'municipality', 'federation', 'canton', 'region', 'district'
+            )
         query = query.order_by(
             ArchivedResult.date.desc(),
             case(

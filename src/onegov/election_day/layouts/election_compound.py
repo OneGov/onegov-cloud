@@ -45,9 +45,9 @@ class ElectionCompoundLayout(DetailLayout):
                 yield result
 
     def label(self, value):
-        if self.model.aggregated_by_entity and value == 'district':
-            return self.principal.label('entity')
-        if self.model.aggregated_by_entity and value == 'districts':
+        if value == 'district' and self.model.domain_elections == 'region':
+            return self.principal.label('region')
+        if value == 'districts' and self.model.domain_elections == 'region':
             return self.principal.label('entities')
         return self.principal.label(value)
 
@@ -100,13 +100,9 @@ class ElectionCompoundLayout(DetailLayout):
         return True
 
     def election_title(self, election):
-        result = election.results.first()
-        if result:
-            if self.model.aggregated_by_entity:
-                return result.name
-            else:
-                return election.district
-        return election.title
+        if self.model.domain_elections == 'region':
+            return election.region or election.title
+        return election.district or election.title
 
     @cached_property
     def has_party_results(self):

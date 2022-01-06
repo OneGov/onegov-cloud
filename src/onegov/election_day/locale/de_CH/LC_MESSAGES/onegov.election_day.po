@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-04 08:19+0100\n"
+"POT-Creation-Date: 2022-01-06 09:20+0100\n"
 "PO-Revision-Date: 2021-04-01 10:22+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -255,6 +255,9 @@ msgstr "Relativ"
 msgid "Absolute majority"
 msgstr "Absolutes Mehr"
 
+msgid "District"
+msgstr "Wahlkreis"
+
 msgid "Tacit election"
 msgstr "Stille Wahl"
 
@@ -263,18 +266,6 @@ msgstr "Auslandschweizer"
 
 msgid "The election contains seperate results for expats."
 msgstr "Die Wahl enthält gesonderte Ergebnisse für Auslandsschweizer."
-
-msgid "Distinct district"
-msgstr "Eindeutiger Wahlkreis"
-
-msgid ""
-"The election contains results for an entire district. When uploading "
-"intermediate results, the missing municipalities of the districts are added "
-"accordingly."
-msgstr ""
-"Die Wahl enthält Ergebnisse für einen ganzen Wahlkreis. Beim  Hochladen von "
-"Zwischenergebnissen werden die fehlenden Gemeinden des Wahlkreises "
-"entsprechend ergänzt."
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
@@ -336,12 +327,8 @@ msgstr "Ungültige Farbdefinitionen"
 msgid "Cantonal"
 msgstr "Kantonal"
 
-msgid ""
-"Elections contain results for single municipalities rather than (partial) "
-"districts"
-msgstr ""
-"Wahlen enthalten Ergebnisse einzelner Gemeinden und nicht (Teilen von) "
-"Wahlkreisen"
+msgid "Domain of the elections"
+msgstr "Ebene der Wahlen"
 
 msgid "Elections"
 msgstr "Wahlen"
@@ -578,6 +565,13 @@ msgstr "Schlussresultate verfügbar auf ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Neue Zwischenresultate verfügbar auf ${url}"
 
+#, python-format
+msgid "Regional (${on})"
+msgstr "Regional (${on})"
+
+msgid "Other"
+msgstr "Andere"
+
 msgid "Municipalities"
 msgstr "Gemeinden"
 
@@ -589,9 +583,6 @@ msgstr "Region"
 
 msgid "district_label_sz"
 msgstr "Bezirk"
-
-msgid "District"
-msgstr "Wahlkreis"
 
 msgid "districts_label_bl"
 msgstr "Bezirke"

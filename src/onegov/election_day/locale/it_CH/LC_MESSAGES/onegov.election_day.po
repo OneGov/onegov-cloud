@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-04 08:19+0100\n"
+"POT-Creation-Date: 2022-01-06 09:20+0100\n"
 "PO-Revision-Date: 2021-04-01 10:24+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -254,6 +254,9 @@ msgstr "Relativo"
 msgid "Absolute majority"
 msgstr "Maggioranza assoluta"
 
+msgid "District"
+msgstr "Distretto elettorale"
+
 msgid "Tacit election"
 msgstr "Elezione tacita"
 
@@ -262,18 +265,6 @@ msgstr "Svizzeri all'estero"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'elezione contiene risultati separati per gli espatriati."
-
-msgid "Distinct district"
-msgstr "Distretto Unico"
-
-msgid ""
-"The election contains results for an entire district. When uploading "
-"intermediate results, the missing municipalities of the districts are added "
-"accordingly."
-msgstr ""
-"L'elezione contiene risultati per un'intera circoscrizione. Quando si "
-"caricano i risultati intermedi, i comuni mancanti della circoscrizione "
-"vengono aggiunti di conseguenza."
 
 msgid "Doppelter Pukelsheim"
 msgstr ""
@@ -335,12 +326,8 @@ msgstr "Definizioni di colore non valide"
 msgid "Cantonal"
 msgstr "Cantonale"
 
-msgid ""
-"Elections contain results for single municipalities rather than (partial) "
-"districts"
-msgstr ""
-"Le elezioni contengono risultati per singoli comuni piuttosto che per "
-"distretti (parziali)"
+msgid "Domain of the elections"
+msgstr "Livello di elezione"
 
 msgid "Elections"
 msgstr "Elezioni"
@@ -575,6 +562,13 @@ msgstr "Risultati finali sono disponibili su ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Nuovi risultati provvisori sono disponibili su ${url}"
 
+#, python-format
+msgid "Regional (${on})"
+msgstr "Regionale (${on})"
+
+msgid "Other"
+msgstr "Altro"
+
 msgid "Municipalities"
 msgstr "Comuni"
 
@@ -585,9 +579,6 @@ msgid "district_label_gr"
 msgstr "Regione"
 
 msgid "district_label_sz"
-msgstr "Distretto elettorale"
-
-msgid "District"
 msgstr "Distretto elettorale"
 
 msgid "districts_label_bl"

@@ -19,7 +19,7 @@ from wtforms.validators import InputRequired
 class ElectionCompoundForm(Form):
 
     domain = RadioField(
-        label=_("Type"),
+        label=_("Domain"),
         choices=[
             ('canton', _("Cantonal"))
         ],
@@ -29,12 +29,11 @@ class ElectionCompoundForm(Form):
         ]
     )
 
-    aggregated_by_entity = BooleanField(
-        label=_(
-            "Elections contain results for single municipalities rather than "
-            "(partial) districts"
-        ),
-        render_kw=dict(force_simple=True),
+    domain_elections = RadioField(
+        label=_("Domain of the elections"),
+        validators=[
+            InputRequired()
+        ]
     )
 
     date = DateField(
@@ -70,12 +69,22 @@ class ElectionCompoundForm(Form):
         render_kw={'lang': 'rm'}
     )
 
-    elections = ChosenSelectMultipleField(
+    region_elections = ChosenSelectMultipleField(
         label=_("Elections"),
         choices=[],
         validators=[
             InputRequired()
         ],
+        depends_on=('domain_elections', 'region'),
+    )
+
+    district_elections = ChosenSelectMultipleField(
+        label=_("Elections"),
+        choices=[],
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain_elections', 'district'),
     )
 
     related_link = URLField(
@@ -201,11 +210,22 @@ class ElectionCompoundForm(Form):
             raise ValidationError(_('Invalid color definitions'))
 
     def on_request(self):
+        principal = self.request.app.principal
+
+        self.domain_elections.choices = []
+        if principal.has_regions:
+            self.domain_elections.choices.append(
+                ('region', principal.label('region'))
+            )
+        if principal.has_districts:
+            self.domain_elections.choices.append(
+                ('district', principal.label('district'))
+            )
+
         self.election_de.validators = []
         self.election_fr.validators = []
         self.election_it.validators = []
         self.election_rm.validators = []
-
         default_locale = self.request.default_locale
         if default_locale.startswith('de'):
             self.election_de.validators.append(InputRequired())
@@ -220,11 +240,8 @@ class ElectionCompoundForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        query = query.filter(
-            Election.domain == 'region',
-            Election.type == 'proporz'
-        )
-        self.elections.choices = [
+        query = query.filter(Election.type == 'proporz')
+        self.region_elections.choices = [
             (
                 item.id,
                 '{} {} {}'.format(
@@ -232,12 +249,22 @@ class ElectionCompoundForm(Form):
                     item.shortcode or '',
                     item.title,
                 ).replace("  ", " ")
-            ) for item in query
+            ) for item in query.filter(Election.domain == 'region')
+        ]
+        self.district_elections.choices = [
+            (
+                item.id,
+                '{} {} {}'.format(
+                    layout.format_date(item.date, 'date'),
+                    item.shortcode or '',
+                    item.title,
+                ).replace("  ", " ")
+            ) for item in query.filter(Election.domain == 'district')
         ]
 
     def update_model(self, model):
         model.domain = self.domain.data
-        model.aggregated_by_entity = self.aggregated_by_entity.data
+        model.domain_elections = self.domain_elections.data
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
@@ -249,8 +276,14 @@ class ElectionCompoundForm(Form):
         model.pukelsheim_completed = self.pukelsheim_completed.data
 
         elections = self.request.session.query(Election)
-        elections = elections.filter(Election.id.in_(self.elections.data))
-        model.elections = elections
+        if self.domain.data == 'region':
+            model.elections = elections.filter(
+                Election.id.in_(self.region_elections.data)
+            )
+        if self.domain.data == 'district':
+            model.elections = elections.filter(
+                Election.id.in_(self.district_elections.data)
+            )
 
         titles = {}
         if self.election_de.data:
@@ -290,7 +323,7 @@ class ElectionCompoundForm(Form):
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
         self.domain.data = model.domain
-        self.aggregated_by_entity.data = model.aggregated_by_entity
+        self.domain_elections.data = model.domain_elections
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
@@ -300,7 +333,10 @@ class ElectionCompoundForm(Form):
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
         self.show_mandate_allocation.data = model.show_mandate_allocation
-        self.elections.data = [election.id for election in model.elections]
+        if model.domain_elections == 'region':
+            self.region_elections.data = [e.id for e in model.elections]
+        if model.domain_elections == 'district':
+            self.district_elections.data = [e.id for e in model.elections]
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)

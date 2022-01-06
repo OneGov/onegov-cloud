@@ -336,10 +336,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return form
 
     def translate(self, text):
-        """ Transalates the given text, if it's a translatable text. """
+        """ Translates the given text, if it's a translatable text. Also
+        translates mappings. """
 
         if not hasattr(text, 'domain'):
             return text
+
+        if getattr(text, 'mapping', None):
+            for key, value in text.mapping.items():
+                if hasattr(text, 'domain'):
+                    text.mapping[key] = self.translator(value)
 
         return self.translator(text)
 

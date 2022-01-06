@@ -7,9 +7,16 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class DomainOfInfluenceMixin(object):
-    """ Defines the scope of the election or vote - eCH-0155 calls this the
-    domain of influence. Unlike eCH-0155 we refrain from putting this in a
-    separate model. We also only include domains we currently support.
+    """ Defines the scope of a principal, an election, an election compound
+    or a vote.
+
+    The following domains of influence are supported:
+    - federation: The vote or election is nation wide.
+    - canton: The vote or election takes place in one canton only.
+    - region: The election takes place in one region of a canton only.
+    - district: The election takes place in one district of a canton only.
+    - municipality: The vote or election takes place in one municipality only.
+    - none: The election takes place in certain municipalities only.
 
     """
 
@@ -19,9 +26,11 @@ class DomainOfInfluenceMixin(object):
         return Column(
             Enum(
                 'federation',
-                'region',
                 'canton',
+                'region',
+                'district',
                 'municipality',
+                'none',
                 name='domain_of_influence'
             ),
             nullable=False

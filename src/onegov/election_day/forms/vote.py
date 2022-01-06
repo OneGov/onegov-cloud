@@ -24,7 +24,7 @@ class VoteForm(Form):
     )
 
     domain = RadioField(
-        label=_("Type"),
+        label=_("Domain"),
         validators=[
             InputRequired()
         ]
@@ -143,6 +143,12 @@ class VoteForm(Form):
     )
 
     def on_request(self):
+        principal = self.request.app.principal
+
+        self.domain.choices = [
+            (key, text) for key, text in principal.domains_vote.items()
+        ]
+
         self.vote_de.validators = []
         self.vote_fr.validators = []
         self.vote_it.validators = []
@@ -157,11 +163,6 @@ class VoteForm(Form):
             self.vote_de.validators.append(InputRequired())
         if default_locale.startswith('rm'):
             self.vote_de.validators.append(InputRequired())
-
-    def set_domain(self, principal):
-        self.domain.choices = [
-            (key, text) for key, text in principal.domains_vote.items()
-        ]
 
     def update_model(self, model):
         model.date = self.date.data

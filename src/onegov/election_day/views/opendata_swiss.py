@@ -183,7 +183,7 @@ def view_rdf(self, request):
                             'principal': principal_name
                         }
                     )
-                elif item.domain == 'region':
+                elif item.domain in ('region', 'district'):
                     des = _(
                         "Final results of the regional election \"${title}\", "
                         "${date}, ${principal}, "
