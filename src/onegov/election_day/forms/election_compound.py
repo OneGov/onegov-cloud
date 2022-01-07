@@ -213,14 +213,12 @@ class ElectionCompoundForm(Form):
         principal = self.request.app.principal
 
         self.domain_elections.choices = []
-        if principal.has_regions:
-            self.domain_elections.choices.append(
-                ('region', principal.label('region'))
-            )
-        if principal.has_districts:
-            self.domain_elections.choices.append(
-                ('district', principal.label('district'))
-            )
+        for domain in ('region', 'district'):
+            if domain in principal.domains_election:
+                self.domain_elections.choices.append((
+                    domain,
+                    self.request.translate(principal.domains_election[domain])
+                ))
 
         self.election_de.validators = []
         self.election_fr.validators = []

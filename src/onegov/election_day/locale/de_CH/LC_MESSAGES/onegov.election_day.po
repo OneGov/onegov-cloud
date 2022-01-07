@@ -217,7 +217,7 @@ msgid "To date"
 msgstr "Bis Datum"
 
 msgid "Voting result"
-msgstr "Wahlresultat"
+msgstr "Abstimmungsergebnis"
 
 msgid "Domain"
 msgstr "Ebene"
