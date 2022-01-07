@@ -407,8 +407,12 @@ class SearchableArchivedResultCollection(
                 query = query.filter(ArchivedResult.type == self.item_type)
 
         if self.domains:
-            if len(self.domains) != len(ArchivedResult.types_of_domains):
-                query = query.filter(ArchivedResult.domain.in_(self.domains))
+            domains = set(self.domains)
+            if 'district' in domains:
+                domains.add('region')
+            if 'region' in domains:
+                domains.add('district')
+            query = query.filter(ArchivedResult.domain.in_(domains))
 
         if self.to_date:
             if self.to_date > date.today():
@@ -421,13 +425,11 @@ class SearchableArchivedResultCollection(
                 self.from_date = self.to_date
             query = query.filter(ArchivedResult.date >= self.from_date)
 
-        if self.answers:
-            if self.item_type == 'vote':
-                if len(self.answers) != len(ArchivedResult.types_of_answers):
-                    query = query.filter(
-                        ArchivedResult.type == 'vote',
-                        ArchivedResult.meta['answer'].astext.in_(self.answers)
-                    )
+        if self.answers and self.item_type == 'vote':
+            query = query.filter(
+                ArchivedResult.type == 'vote',
+                ArchivedResult.meta['answer'].astext.in_(self.answers)
+            )
 
         if self.term:
             query = query.filter(or_(*self.term_filter))
@@ -460,7 +462,6 @@ class SearchableArchivedResultCollection(
 
     @classmethod
     def for_item_type(cls, session, item_type, **kwargs):
-        allowed_item_types = [a[0] for a in ArchivedResult.types_of_results]
-        if item_type in allowed_item_types:
+        if item_type in ['vote', 'election']:
             kwargs['item_type'] = item_type
             return cls(session, **kwargs)

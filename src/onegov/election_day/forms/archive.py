@@ -1,4 +1,3 @@
-from onegov.election_day.models import ArchivedResult
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from wtforms.fields.html5 import DateField
@@ -9,8 +8,8 @@ from onegov.election_day import _
 class ArchiveSearchForm(Form):
 
     term = StringField(
-        label=_("Text Retrieval"),
-        render_kw={'size': 4, 'clear': True},
+        label=_("Term"),
+        render_kw={'size': 4, 'clear': False},
         description=_(
             "Searches the title of the election/vote. "
             "Use Wilcards (*) to find more results, e.g Nationalrat*."
@@ -19,28 +18,22 @@ class ArchiveSearchForm(Form):
 
     from_date = DateField(
         label=_("From date"),
-        render_kw={'size': 4}
+        render_kw={'size': 4, 'clear': False}
     )
 
     to_date = DateField(
         label=_("To date"),
-        render_kw={'size': 4, 'clear': False}
-    )
-
-    answers = MultiCheckboxField(
-        label=_("Voting result"),
-        choices=ArchivedResult.types_of_answers,
-        render_kw={'size': 4}
+        render_kw={'size': 4, 'clear': True}
     )
 
     domains = MultiCheckboxField(
         label=_("Domain"),
-        render_kw={'size': 8, 'clear': False},
-        choices=ArchivedResult.types_of_domains
+        render_kw={'size': 4, 'clear': False},
+        choices=[]
     )
 
     def on_request(self):
-        # Roves crf token from query params
+        # Removes csrf token from query params, it's public page
         if hasattr(self, 'csrf_token'):
             self.delete_field('csrf_token')
 
@@ -49,24 +42,48 @@ class ArchiveSearchForm(Form):
         if not field.data:
             field.data = list(next(zip(*field.choices)))
 
-    def toggle_hidden_fields(self, model):
-        """ Hides answers field for election view and move the field to
-        the right side with render_kw. """
-        if model.item_type in ('election', 'election_compound'):
-            self.answers.render_kw['hidden'] = True
-            self.domains.render_kw['size'] = 12
-        else:
-            self.domains.render_kw['size'] = 8
-            self.answers.render_kw['hidden'] = False
-
     def apply_model(self, model):
-
         self.term.data = model.term
         self.from_date.data = model.from_date
         self.to_date.data = model.to_date
-        self.answers.data = model.answers
         self.domains.data = model.domains
 
         self.select_all('domains')
+
+
+class ArchiveSearchFormVote(ArchiveSearchForm):
+
+    answers = MultiCheckboxField(
+        label=_("Voting result"),
+        choices=(
+            ('accepted', _("Accepted")),
+            ('rejected', _("Rejected")),
+            ('counter_proposal', _("Counter Proposal"))
+        ),
+        render_kw={'size': 4, 'clear': True}
+    )
+
+    def on_request(self):
+        super().on_request()
+        principal = self.request.app.principal
+        self.domains.choices = principal.domains_vote.items()
+
+    def apply_model(self, model):
+        super().apply_model(model)
+        self.answers.data = model.answers
         self.select_all('answers')
-        self.toggle_hidden_fields(model)
+
+
+class ArchiveSearchFormElection(ArchiveSearchForm):
+
+    def on_request(self):
+        super().on_request()
+        principal = self.request.app.principal
+        domains = principal.domains_election.copy()
+        if 'region' in domains:
+            domains['region'] = _('Regional')
+        if 'district' in domains:
+            domains['district'] = _('Regional')
+        if 'region' in domains and 'district' in domains:
+            del domains['district']
+        self.domains.choices = domains.items()

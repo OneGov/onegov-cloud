@@ -199,7 +199,7 @@ msgstr "Impossibile leggere 'Schede bianche'"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Termine di ricerca"
 
 msgid ""

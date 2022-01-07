@@ -200,7 +200,7 @@ msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Suchbegriff"
 
 msgid ""

@@ -199,7 +199,7 @@ msgstr "Impossible de connaître les votes blancs"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Terme de recherche"
 
 msgid ""

@@ -697,7 +697,7 @@
                         ${field()}
                         <small class="error" tal:repeat="error field.errors">${error}</small>
                     </tal:block>
-                     <tal:block condition="input_type != 'hidden'">
+                    <tal:block condition="input_type != 'hidden'">
                         <label tal:attributes="class field.errors and 'error' or None">
                             <tal:block condition="field.type == 'BooleanField'">
                                 ${field(placeholder=request.translate(field.description))}
@@ -713,9 +713,10 @@
                             </tal:block>
                         </label>
                         <small class="error" tal:repeat="error field.errors">${error}</small>
-                     </tal:block>
+                    </tal:block>
                </tal:block>
             </div>
+            <div class="clearfix" tal:condition="field.render_kw['clear']|True"></div>
         </tal:block>
   </div>
 </metal:fields>

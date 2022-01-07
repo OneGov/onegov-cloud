@@ -201,7 +201,7 @@ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Noziun tschertgada"
 
 msgid ""

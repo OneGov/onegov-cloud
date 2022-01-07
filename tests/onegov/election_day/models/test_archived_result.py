@@ -221,11 +221,3 @@ def test_domain_types():
     domain_entries = [d[0] for d in ArchivedResult.types_of_domains]
     assert sorted(domain_entries) == \
         ['canton', 'federation', 'municipality', 'region']
-
-
-def test_type_of_results_order():
-    # Order is explicitly used in code, so test it
-    results = ArchivedResult.types_of_results
-    assert results[0][0] == 'vote'
-    assert results[1][0] == 'election'
-    assert results[2][0] == 'election_compound'
