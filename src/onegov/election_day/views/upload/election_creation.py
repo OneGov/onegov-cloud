@@ -1,5 +1,4 @@
 """
-Canton SZ has over 100 districts.
 
 For compound elections, the election creation view creates:
 
@@ -36,6 +35,9 @@ def view_create_wabsti_proporz(self, request):
     # Get Additional params, if None then False
     create_compound = bool(request.params.get('create_compound'))
     after_pukelsheim = bool(request.params.get('after_pukelsheim'))
+    domain = (
+        'district' if request.params.get('domain') == 'district' else 'region'
+    )
 
     if data_source.items.first():
         return {
@@ -65,6 +67,7 @@ def view_create_wabsti_proporz(self, request):
         form.wp_wahl.data['mimetype'],
         create_compound=create_compound,
         after_pukelsheim=after_pukelsheim,
+        domain=domain
     )
     translate_errors(errors, request)
 

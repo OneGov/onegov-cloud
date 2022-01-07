@@ -151,7 +151,32 @@ def load_csv(
     return csv, error
 
 
-# Verification utils
+def get_entity_and_district(entity_id, entities, election, errors):
+    """ Returns the entity name and district or region (from our static data,
+    depending on the domain of the election). Adds an error, if the district
+    or region is not part of this election.
+
+    """
+
+    entity = entities.get(entity_id, {})
+    name = entity.get('name', '')
+    district = entity.get('district', '')
+    if election.domain == 'region':
+        district = entity.get('region', '')
+
+    if election.domain in ('region', 'district'):
+        if election.region_or_district != district:
+            errors.append(_(
+                "${name} is not part of the district ${district}",
+                mapping={
+                    'name': entity_id,
+                    'district': election.region_or_district
+                }
+            ))
+
+    return name, district
+
+
 def line_is_relevant(line, number, district=None):
     if district:
         return line.sortwahlkreis == district and line.sortgeschaeft == number

@@ -1,15 +1,14 @@
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import FileImportError, \
-    validate_integer, validate_list_id
+from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.common import validate_list_id
+from onegov.election_day.formats.mappings import ELECTION_PARTY_HEADERS
 from re import match
 from sqlalchemy.orm import object_session
 from uuid import uuid4
-
-from onegov.election_day.import_export.mappings import \
-    ELECTION_PARTY_HEADERS
 
 
 def parse_party_result(

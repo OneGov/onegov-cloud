@@ -289,6 +289,14 @@ class Election(Base, ContentMixin, TimestampMixin,
     region = meta_property('region', default='')
 
     @property
+    def region_or_district(self):
+        if self.domain == 'region':
+            return self.region
+        if self.domain == 'district':
+            return self.district
+        return ''
+
+    @property
     def votes_by_district(self):
         results = self.results.order_by(None)
         results = results.with_entities(
