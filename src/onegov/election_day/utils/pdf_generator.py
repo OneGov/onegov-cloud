@@ -520,20 +520,16 @@ class PdfGenerator():
             return item.name if item.entity_id else pdf.translate(_("Expats"))
 
         def label(value):
-            if compound.aggregated_by_entity and value == 'district':
-                return principal.label('entity')
-            if compound.aggregated_by_entity and value == 'districts':
-                return principal.label('entities')
+            if value == 'district' and compound.domain_elections == 'region':
+                return principal.label('region')
+            if value == 'districts' and compound.domain_elections == 'region':
+                return principal.label('regions')
             return principal.label(value)
 
         def election_title(election):
-            result = election.results.first()
-            if result:
-                if compound.aggregated_by_entity:
-                    return result.name
-                else:
-                    return election.district
-            return _("Results")
+            if compound.domain_elections == 'region':
+                return election.region or election.title
+            return election.district or election.title
 
         majorz = False
         if compound.elections and compound.elections[0].type == 'majorz':
@@ -617,43 +613,44 @@ class PdfGenerator():
             deltas, results = get_party_results_deltas(
                 compound, years, parties
             )
-            results = results[sorted(results.keys())[-1]]
-            if deltas:
-                pdf.results(
-                    [
-                        _('Party'),
-                        _('Mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                        'Δ {}'.format(years[0]),
-                    ],
-                    [[
-                        r[0],
-                        r[1],
-                        r[3],
-                        r[2],
-                        r[4],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
-            else:
-                pdf.results(
-                    [
-                        _('Party'),
-                        _('Mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                    ],
-                    [[
-                        r[0],
-                        r[1],
-                        r[3],
-                        r[2],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
+            if results:
+                results = results[sorted(results.keys())[-1]]
+                if deltas:
+                    pdf.results(
+                        [
+                            _('Party'),
+                            _('Mandates'),
+                            _('single_votes'),
+                            _('single_votes'),
+                            'Δ {}'.format(years[0]),
+                        ],
+                        [[
+                            r[0],
+                            r[1],
+                            r[3],
+                            r[2],
+                            r[4],
+                        ] for r in results],
+                        [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
+                        pdf.style.table_results_1
+                    )
+                else:
+                    pdf.results(
+                        [
+                            _('Party'),
+                            _('Mandates'),
+                            _('single_votes'),
+                            _('single_votes'),
+                        ],
+                        [[
+                            r[0],
+                            r[1],
+                            r[3],
+                            r[2],
+                        ] for r in results],
+                        [None, 2 * cm, 2 * cm, 2 * cm],
+                        pdf.style.table_results_1
+                    )
             pdf.pagebreak()
 
         # Parties Panachage

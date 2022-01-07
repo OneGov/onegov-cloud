@@ -48,7 +48,7 @@ class ElectionCompoundLayout(DetailLayout):
         if value == 'district' and self.model.domain_elections == 'region':
             return self.principal.label('region')
         if value == 'districts' and self.model.domain_elections == 'region':
-            return self.principal.label('entities')
+            return self.principal.label('regions')
         return self.principal.label(value)
 
     def title(self, tab=None):

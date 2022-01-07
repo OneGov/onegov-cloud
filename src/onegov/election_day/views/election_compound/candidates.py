@@ -11,7 +11,7 @@ def get_districts(model, layout):
             layout.election_title(election),
             layout.request.link(election)
         )
-        for election in layout.model.elections if election.results.first()
+        for election in layout.model.elections
     }
 
 
