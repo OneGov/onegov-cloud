@@ -1,8 +1,18 @@
 # Changes
 
+## 2022.2
+
+`2022-01-07` | [f7e892211d...f7e892211d](https://github.com/OneGov/onegov-cloud/compare/f7e892211d^...f7e892211d)
+
+### Org
+
+##### Add options to hide the online counter and reserverations link on the homepage.
+
+`Feature` | [OGC-212](https://linear.app/onegovcloud/issue/OGC-212) | [f7e892211d](https://github.com/onegov/onegov-cloud/commit/f7e892211dda171317462ddc2545d5f6ed8dad1b)
+
 ## 2022.1
 
-`2022-01-04` | [62416c3a0f...2653647d0e](https://github.com/OneGov/onegov-cloud/compare/62416c3a0f^...2653647d0e)
+`2022-01-04` | [62416c3a0f...9fabebc6ee](https://github.com/OneGov/onegov-cloud/compare/62416c3a0f^...9fabebc6ee)
 
 ### Election Day
 
@@ -1313,44 +1323,4 @@ Render a better translation for each handler code if it is used by the app and t
 ##### Fixes user group form throwing an error for forms with hyphens.
 
 `Bugfix` | [fd4637a07d](https://github.com/onegov/onegov-cloud/commit/fd4637a07de486aeae4d9ab6c517c8510e3caebc)
-
-## 2021.53
-
-`2021-05-26` | [30d9fb132b...be09de2c39](https://github.com/OneGov/onegov-cloud/compare/30d9fb132b^...be09de2c39)
-
-### Feriennet
-
-##### Adds WUP App banner DE only
-
-Shows german banner version for all languages.
-
-`Feature` | [FER-958](https://issues.seantis.ch/browse/FER-958) | [c05ea64481](https://github.com/onegov/onegov-cloud/commit/c05ea6448111adea2142c85817f0562bcea324a0)
-
-### Fsi
-
-##### Handle inactive users
-
-- adds inactive field to attendee
-- set users missing in ldap to inactive
-- filter inactive attendees from some views
-
-`Feature` | [FSI-45](https://kanton-zug.atlassian.net/browse/FSI-45) | [33788f532b](https://github.com/onegov/onegov-cloud/commit/33788f532ba35537644f1c928a0ddf189b100b60)
-
-### Org
-
-##### Add hashtag filter to news.
-
-`Feature` | [SEA-250](https://linear.app/seantis/issue/SEA-250) | [d6813417d7](https://github.com/onegov/onegov-cloud/commit/d6813417d77d9c9f810ce0be7244445c0867dd0e)
-
-### Town6
-
-##### Fixes access hint in UI on path /forms
-
-`Bugfix` | [SEA-335](https://linear.app/seantis/issue/SEA-335) | [617e32254e](https://github.com/onegov/onegov-cloud/commit/617e32254e53291eff664eb12555a509b45cc11a)
-
-### Winterthur
-
-##### Extends mission reports with type and mission count
-
-`Feature` | [001072616e](https://github.com/onegov/onegov-cloud/commit/001072616e4036cbdb353608009e0fa9c5955e77)
 

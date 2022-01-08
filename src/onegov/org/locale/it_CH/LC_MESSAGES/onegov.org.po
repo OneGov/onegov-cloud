@@ -1,7 +1,7 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-12-06 15:35+0100\n"
+"POT-Creation-Date: 2022-01-06 09:26+0100\n"
 "PO-Revision-Date: 2021-09-27 13:23+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1279,6 +1279,9 @@ msgstr "Immagine n. 6 della pagina principale"
 msgid "Homepage Cover"
 msgstr "Copertina della pagina principale"
 
+msgid "Structure"
+msgstr "Struttura"
+
 msgid "Homepage Structure (for advanced users only)"
 msgstr "Struttura della pagina principale (solo per utenti avanzati)"
 
@@ -1619,9 +1622,6 @@ msgstr "Esporta"
 msgid "Change Url"
 msgstr "Modifica URL"
 
-msgid "Sort"
-msgstr "Ordinare"
-
 msgid "Registration Windows"
 msgstr "Finestre di registrazione"
 
@@ -1859,6 +1859,9 @@ msgstr "Vuoi davvero eliminare questo collegamento esterno?"
 
 msgid "Delete external link"
 msgstr "Elimina collegamento esterno"
+
+msgid "Sort"
+msgstr "Ordinare"
 
 msgid "The submission was adopted"
 msgstr "L'iscrizione è stata adottata"
@@ -3437,6 +3440,14 @@ msgstr ""
 "Il tuo collegamento di registrazione è stato creato come segue. Copialo "
 "prima di proseguire, non ti verrà più mostrato:"
 
+msgid ""
+"Sort the items using drag and drop. The new positions are automatically "
+"saved directly after moving."
+msgstr ""
+
+msgid "Back to page"
+msgstr "Torna alla pagina"
+
 msgid "No activities yet."
 msgstr "Ancora nessuna attività."
 
@@ -4502,12 +4513,6 @@ msgstr ""
 msgid "Topics"
 msgstr "Argomenti"
 
-msgid "Sort the items using drag and drop.  The new positions are automatically saved directly after moving."
-msgstr "Ordina gli elementi usando il drag and drop. Le nuove posizioni vengono automaticamente salvate direttamente dopo lo spostamento"
-
-msgid "Back to page"
-msgstr "Torna alla pagina"
-
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"
 msgstr "l'abbonamento di ${address} è stato correttamente confermato"
@@ -4700,3 +4705,10 @@ msgstr "Utente creato correttamente"
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr ""
 "L'iscrizione da tutte le e-mail periodiche è stata annullata correttamente."
+
+#~ msgid ""
+#~ "Sort the items using drag and drop.  The new positions are automatically "
+#~ "saved directly after moving."
+#~ msgstr ""
+#~ "Ordina gli elementi usando il drag and drop. Le nuove posizioni vengono "
+#~ "automaticamente salvate direttamente dopo lo spostamento"

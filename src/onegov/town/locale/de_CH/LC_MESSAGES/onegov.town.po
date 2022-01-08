@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-26 09:33+0200\n"
+"POT-Creation-Date: 2021-12-28 16:37+0100\n"
 "PO-Revision-Date: 2020-03-24 11:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -19,17 +19,17 @@ msgstr "Online-Schalter"
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
 
-msgid "Publications"
-msgstr "Publikationen"
-
-msgid "Official Documents"
-msgstr "Amtliche Dokumente"
-
 msgid "Reservations"
 msgstr "Reservationen"
 
 msgid "Daypasses and rooms"
 msgstr "Tageskarten und Räume"
+
+msgid "Publications"
+msgstr "Publikationen"
+
+msgid "Official Documents"
+msgstr "Amtliche Dokumente"
 
 msgid "E-Move"
 msgstr "e-Umzug"
@@ -64,14 +64,26 @@ msgstr "Impressionen"
 msgid "Online Counter Label"
 msgstr "Onlineschalter Label"
 
+msgid "Hide Online Counter on Homepage"
+msgstr "Onlineschalter auf der Homepage ausblenden"
+
 msgid "Reservations Label"
 msgstr "Reservationen Label"
+
+msgid "Hide Reservations on Homepage"
+msgstr "Reservationen auf der Homepage ausblenden"
 
 msgid "SBB Daypass Label"
 msgstr "SBB Tageskarte Label"
 
+msgid "Publication"
+msgstr "Publikation"
+
 msgid "Publications Label"
 msgstr "Publikationen Label"
+
+msgid "Hide Publications on Homepage"
+msgstr "Publikationen auf der Homepage ausblenden"
 
 msgid "E-Move Label"
 msgstr "E-Umzug Label"
@@ -79,14 +91,20 @@ msgstr "E-Umzug Label"
 msgid "E-Move Url"
 msgstr "E-Umzug Url"
 
-msgid "Hide Publications on Homepage"
-msgstr "Publikationen auf der Homepage ausblenden"
+msgid "News and Events"
+msgstr "News und Events"
 
-msgid "Maximum number of events displayed on homepage"
-msgstr "Maximale Anzahl von Veranstaltungen auf der Startseite"
+msgid "Number of news entries on homepage"
+msgstr "Anzahl angezeigte News/ Einträge für Aktuelles"
 
-msgid "Maximum number of news entries on homepage"
-msgstr "Maximale Anzahl von News auf der Startseite"
+msgid "Number of events displayed on homepage"
+msgstr "Anzahl angezeigte Veranstaltungen"
 
 msgid "Homepage"
 msgstr "Startseite"
+
+#~ msgid "Maximum number of events displayed on homepage"
+#~ msgstr "Maximale Anzahl von Veranstaltungen auf der Startseite"
+
+#~ msgid "Maximum number of news entries on homepage"
+#~ msgstr "Maximale Anzahl von News auf der Startseite"
