@@ -233,6 +233,7 @@ class Canton(Principal):
                 "Regional (${on})",
                 mapping={'on': self.label('district')}
             )
+        domains_election['municipality'] = _("Communal")
         domains_election['none'] = _("Other")
 
         domains_vote = OrderedDict()
@@ -274,21 +275,15 @@ class Canton(Principal):
                 return _("districts_label_sz")
             return _("Districts")
         if value == 'region':
-            if self.id in ('sz', 'zg'):
-                return _("Municipality")
             return _("District")
         if value == 'regions':
-            if self.id in ('sz', 'zg'):
-                return _("Municipalities")
             return _("Districts")
         if value == 'superregion':
             if self.id == 'bl':
-                # Region
                 return _("superregion_label_bl")
             return _("District")
         if value == 'superregions':
             if self.id == 'bl':
-                # Regionen
                 return _("superregions_label_bl")
             return _("Districts")
         return ''

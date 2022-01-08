@@ -164,13 +164,23 @@ def get_entity_and_district(entity_id, entities, election, errors):
     if election.domain == 'region':
         district = entity.get('region', '')
 
+    if election.domain == 'municipality':
+        if election.domain_segment != name:
+            errors.append(_(
+                "${name} is not part of this election",
+                mapping={
+                    'name': entity_id,
+                    'district': election.domain_segment
+                }
+            ))
+
     if election.domain in ('region', 'district'):
-        if election.region_or_district != district:
+        if election.domain_segment != district:
             errors.append(_(
                 "${name} is not part of the district ${district}",
                 mapping={
                     'name': entity_id,
-                    'district': election.region_or_district
+                    'district': election.domain_segment
                 }
             ))
 

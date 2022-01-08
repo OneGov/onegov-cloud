@@ -282,19 +282,10 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: results (typically with entity_id = 0)
     expats = meta_property('expats', default=False)
 
-    #: the district, if this is a regional (district) election
-    district = meta_property('district', default='')
-
-    #: the region, if this is a regional (region) election
-    region = meta_property('region', default='')
-
-    @property
-    def region_or_district(self):
-        if self.domain == 'region':
-            return self.region
-        if self.domain == 'district':
-            return self.district
-        return ''
+    #: The segment of the domain. This might be the district, if this is a
+    #: regional (district) election; the region, if it's a regional (region)
+    #: election or the municipality, if this is a communal election.
+    domain_segment = meta_property('domain_segment', default='')
 
     @property
     def votes_by_district(self):

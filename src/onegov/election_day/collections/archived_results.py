@@ -68,17 +68,31 @@ class ArchivedResultCollection(object):
         }
 
         dates = groupbydict(items, lambda i: i.date)
-        order = ('federation', 'canton', 'region', 'district', 'municipality')
+
+        order = {
+            'federation': 1,
+            'canton': 2,
+            'region': 3,
+            'district': 3,
+            'municipality': 4,
+            'none': 3
+        }
+        mapping = {
+            'federation': 'federation',
+            'canton': 'canton',
+            'region': 'region',
+            'district': 'region',
+            'municipality': 'municipality',
+            'none': 'region',
+        }
         if request.app.principal.domain == 'municipality':
-            order = (
-                'municipality', 'federation', 'canton', 'region', 'district'
-            )
+            order['municipality'] = 0
 
         for date_, items_by_date in dates.items():
             domains = groupbydict(
                 items_by_date,
-                lambda i: i.domain,
-                lambda i: order.index(i.domain) if i.domain in order else 99
+                lambda i: mapping.get(i.domain),
+                lambda i: order.get(i.domain, 99)
             )
             for domain, items_by_domain in domains.items():
                 types = groupbydict(

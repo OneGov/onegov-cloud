@@ -44,6 +44,9 @@ class ElectionLayout(DetailLayout):
             return False
         if self.model.domain in ('region', 'district'):
             return False
+        if self.model.domain == 'municipality':
+            if self.principal.domain != 'municipality':
+                return False
         return True
 
     def title(self, tab=None):

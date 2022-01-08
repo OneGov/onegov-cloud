@@ -87,6 +87,15 @@ class ElectionCompoundForm(Form):
         depends_on=('domain_elections', 'district'),
     )
 
+    municipality_elections = ChosenSelectMultipleField(
+        label=_("Elections"),
+        choices=[],
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain_elections', 'municipality'),
+    )
+
     related_link = URLField(
         label=_("Link"),
         fieldset=_("Related link")
@@ -213,7 +222,7 @@ class ElectionCompoundForm(Form):
         principal = self.request.app.principal
 
         self.domain_elections.choices = []
-        for domain in ('region', 'district'):
+        for domain in ('region', 'district', 'municipality'):
             if domain in principal.domains_election:
                 self.domain_elections.choices.append((
                     domain,
@@ -259,6 +268,16 @@ class ElectionCompoundForm(Form):
                 ).replace("  ", " ")
             ) for item in query.filter(Election.domain == 'district')
         ]
+        self.municipality_elections.choices = [
+            (
+                item.id,
+                '{} {} {}'.format(
+                    layout.format_date(item.date, 'date'),
+                    item.shortcode or '',
+                    item.title,
+                ).replace("  ", " ")
+            ) for item in query.filter(Election.domain == 'municipality')
+        ]
 
     def update_model(self, model):
         model.domain = self.domain.data
@@ -281,6 +300,10 @@ class ElectionCompoundForm(Form):
         if self.domain.data == 'district':
             model.elections = elections.filter(
                 Election.id.in_(self.district_elections.data)
+            )
+        if self.domain.data == 'municipality':
+            model.elections = elections.filter(
+                Election.id.in_(self.municipality_elections.data)
             )
 
         titles = {}
@@ -335,6 +358,8 @@ class ElectionCompoundForm(Form):
             self.region_elections.data = [e.id for e in model.elections]
         if model.domain_elections == 'district':
             self.district_elections.data = [e.id for e in model.elections]
+        if model.domain_elections == 'municipality':
+            self.municipality_elections.data = [e.id for e in model.elections]
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)

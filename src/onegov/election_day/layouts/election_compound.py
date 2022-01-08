@@ -100,7 +100,7 @@ class ElectionCompoundLayout(DetailLayout):
         return True
 
     def election_title(self, election):
-        return election.region_or_district or election.title
+        return election.domain_segment or election.title
 
     @cached_property
     def has_party_results(self):

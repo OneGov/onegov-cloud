@@ -81,6 +81,14 @@ class ElectionForm(Form):
         depends_on=('domain', 'district'),
     )
 
+    municipality = ChosenSelectField(
+        label=_("Municipality"),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain', 'municipality'),
+    )
+
     tacit = BooleanField(
         label=_("Tacit election"),
         render_kw=dict(force_simple=True)
@@ -239,6 +247,16 @@ class ElectionForm(Form):
         ])
         self.district.choices = [(item, item) for item in sorted(districts)]
 
+        municipalities = set([
+            entity.get('name', None)
+            for year in principal.entities.values()
+            for entity in year.values()
+            if entity.get('name', None)
+        ])
+        self.municipality.choices = [
+            (item, item) for item in sorted(municipalities)
+        ]
+
         self.election_de.validators = []
         self.election_fr.validators = []
         self.election_it.validators = []
@@ -271,8 +289,15 @@ class ElectionForm(Form):
     def update_model(self, model):
         model.date = self.date.data
         model.domain = self.domain.data
+        if model.domain == 'region':
+            model.domain_segment = self.region.data
+        if model.domain == 'district':
+            model.domain_segment = self.district.data
+        if model.domain == 'municipality':
+            model.domain_segment = self.municipality.data
         model.region = self.region.data
         model.district = self.district.data
+        model.municipality = self.municipality.data
         model.type = self.election_type.data
         model.shortcode = self.shortcode.data
         model.number_of_mandates = self.mandates.data
@@ -340,8 +365,12 @@ class ElectionForm(Form):
 
         self.date.data = model.date
         self.domain.data = model.domain
-        self.region.data = model.region
-        self.district.data = model.district
+        if model.domain == 'region':
+            self.region.data = model.domain_segment
+        if model.domain == 'district':
+            self.district.data = model.domain_segment
+        if model.domain == 'municipality':
+            self.municipality.data = model.domain_segment
         self.shortcode.data = model.shortcode
         self.election_type.data = model.type
         self.mandates.data = model.number_of_mandates

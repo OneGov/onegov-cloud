@@ -32,12 +32,14 @@ def view_create_wabsti_proporz(self, request):
     set_locale(request)
     data_source = authenticated_source(request)
 
-    # Get Additional params, if None then False
+    # Get Additional params, if None then False/district
     create_compound = bool(request.params.get('create_compound'))
     after_pukelsheim = bool(request.params.get('after_pukelsheim'))
-    domain = (
-        'district' if request.params.get('domain') == 'district' else 'region'
-    )
+    domain = {
+        'district': 'district',
+        'region': 'region',
+        'municipality': 'municipality'
+    }.get(request.params.get('domain'), 'district')
 
     if data_source.items.first():
         return {

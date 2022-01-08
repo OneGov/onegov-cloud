@@ -399,8 +399,11 @@ def import_election_wabstic_majorz(
         district = entity.get('district', '')
         if election.domain == 'none':
             continue
+        if election.domain == 'municipality':
+            if entity != election.domain_segment:
+                continue
         if election.domain in ('region', 'district'):
-            if district != election.region_or_district:
+            if district != election.domain_segment:
                 continue
         result_inserts.append(
             dict(

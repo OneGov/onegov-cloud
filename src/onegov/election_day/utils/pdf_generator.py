@@ -527,7 +527,7 @@ class PdfGenerator():
             return principal.label(value)
 
         def election_title(election):
-            return election.region_or_district or election.title
+            return election.domain_segment or election.title
 
         majorz = False
         if compound.elections and compound.elections[0].type == 'majorz':
