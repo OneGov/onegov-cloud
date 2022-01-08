@@ -57,7 +57,8 @@ class ArchivedResultCollection(object):
         """ Groups a list of archived results.
 
         Groups election compounds and elections to the same group. Removes
-        elections already covered by an election compound.
+        elections already covered by an election compound. Merges region,
+        district and none domains.
         """
 
         if not items:
@@ -74,16 +75,16 @@ class ArchivedResultCollection(object):
             'canton': 2,
             'region': 3,
             'district': 3,
+            'none': 3,
             'municipality': 4,
-            'none': 3
         }
         mapping = {
             'federation': 'federation',
             'canton': 'canton',
             'region': 'region',
             'district': 'region',
-            'municipality': 'municipality',
             'none': 'region',
+            'municipality': 'municipality',
         }
         if request.app.principal.domain == 'municipality':
             order['municipality'] = 0
@@ -422,10 +423,9 @@ class SearchableArchivedResultCollection(
 
         if self.domains:
             domains = set(self.domains)
-            if 'district' in domains:
-                domains.add('region')
             if 'region' in domains:
                 domains.add('district')
+                domains.add('none')
             query = query.filter(ArchivedResult.domain.in_(domains))
 
         if self.to_date:
@@ -449,8 +449,9 @@ class SearchableArchivedResultCollection(
             query = query.filter(or_(*self.term_filter))
 
         # order by date and type
+        # todo:
         order = ('federation', 'canton', 'region', 'district', 'municipality')
-        if self.app_principal_domain == 'municipality':
+        if self.app_principal_domain == 'municipality':  # todo:
             order = (
                 'municipality', 'federation', 'canton', 'region', 'district'
             )

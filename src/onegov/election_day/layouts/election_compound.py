@@ -44,11 +44,25 @@ class ElectionCompoundLayout(DetailLayout):
             for result in e.results:
                 yield result
 
+    @cached_property
+    def has_districts(self):
+        if not self.principal.has_districts:
+            return False
+        if self.model.domain_elections == 'municipality':
+            return False
+        return True
+
     def label(self, value):
-        if value == 'district' and self.model.domain_elections == 'region':
-            return self.principal.label('region')
-        if value == 'districts' and self.model.domain_elections == 'region':
-            return self.principal.label('regions')
+        if value == 'district':
+            if self.model.domain_elections == 'region':
+                return self.principal.label('region')
+            if self.model.domain_elections == 'municipality':
+                return _("Municipality")
+        if value == 'districts':
+            if self.model.domain_elections == 'region':
+                return self.principal.label('regions')
+            if self.model.domain_elections == 'municipality':
+                return _("Municipalities")
         return self.principal.label(value)
 
     def title(self, tab=None):

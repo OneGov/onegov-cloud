@@ -293,15 +293,15 @@ class ElectionCompoundForm(Form):
         model.pukelsheim_completed = self.pukelsheim_completed.data
 
         elections = self.request.session.query(Election)
-        if self.domain.data == 'region':
+        if self.domain_elections.data == 'region':
             model.elections = elections.filter(
                 Election.id.in_(self.region_elections.data)
             )
-        if self.domain.data == 'district':
+        if self.domain_elections.data == 'district':
             model.elections = elections.filter(
                 Election.id.in_(self.district_elections.data)
             )
-        if self.domain.data == 'municipality':
+        if self.domain_elections.data == 'municipality':
             model.elections = elections.filter(
                 Election.id.in_(self.municipality_elections.data)
             )

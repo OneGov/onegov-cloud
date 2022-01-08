@@ -78,12 +78,13 @@ class ArchiveSearchFormElection(ArchiveSearchForm):
 
     def on_request(self):
         super().on_request()
-        principal = self.request.app.principal
-        domains = principal.domains_election.copy()
-        if 'region' in domains:
-            domains['region'] = _('Regional')
-        if 'district' in domains:
-            domains['district'] = _('Regional')
-        if 'region' in domains and 'district' in domains:
-            del domains['district']
-        self.domains.choices = domains.items()
+        domains = self.request.app.principal.domains_election
+
+        self.domains.choices = [
+            ('federation', _("Federal")),
+            ('canton', _("Cantonal")),
+        ]
+        if 'region' in domains or 'region' in domains or 'none' in domains:
+            self.domains.choices.append(('region', _("Regional")))
+        if 'municipality' in domains:
+            self.domains.choices.append(('municipality', _("Communal")))

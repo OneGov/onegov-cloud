@@ -272,7 +272,7 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.label('district')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>

@@ -520,10 +520,16 @@ class PdfGenerator():
             return item.name if item.entity_id else pdf.translate(_("Expats"))
 
         def label(value):
-            if value == 'district' and compound.domain_elections == 'region':
-                return principal.label('region')
-            if value == 'districts' and compound.domain_elections == 'region':
-                return principal.label('regions')
+            if value == 'district':
+                if compound.domain_elections == 'region':
+                    return principal.label('region')
+                if compound.domain_elections == 'municipality':
+                    return _("Municipality")
+            if value == 'districts':
+                if compound.domain_elections == 'region':
+                    return principal.label('regions')
+                if compound.domain_elections == 'municipality':
+                    return _("Municipalities")
             return principal.label(value)
 
         def election_title(election):

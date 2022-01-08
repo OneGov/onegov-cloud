@@ -233,8 +233,11 @@ class Canton(Principal):
                 "Regional (${on})",
                 mapping={'on': self.label('district')}
             )
+        domains_election['none'] = _(
+            "Regional (${on})",
+            mapping={'on': _("Other")}
+        )
         domains_election['municipality'] = _("Communal")
-        domains_election['none'] = _("Other")
 
         domains_vote = OrderedDict()
         domains_vote['federation'] = _("Federal")
