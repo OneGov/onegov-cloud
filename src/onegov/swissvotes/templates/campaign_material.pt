@@ -26,7 +26,7 @@
                             </tal:block>
                             <tal:block tal:condition="not downloadable">
                                 ${metadata['title']}
-                                <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="This document contains press articles that are protected by copyright. Therefore, we are not allowed to offer it for free download. However, you can view the document at our premises in Bern if you use it for private personal use only. To do so, please send us an e-mail to info@swissvotes.ch."><i class="fa fa-info" aria-hidden="true"></i></span>
+                                <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="This document contains press articles which are protected by copyright. Therefore, we are not allowed to provide it for free download. However, you are welcome to access the document on our premises in Bern for private use. Please contact us by email at info@swissvotes.ch to make an appointment."><i class="fa fa-info" aria-hidden="true"></i></span>
                             </tal:block>
                         </td>
                         <td>${metadata['position']}</td>
