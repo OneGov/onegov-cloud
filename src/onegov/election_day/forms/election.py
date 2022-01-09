@@ -256,6 +256,8 @@ class ElectionForm(Form):
         self.municipality.choices = [
             (item, item) for item in sorted(municipalities)
         ]
+        if principal.domain == 'municipality':
+            self.municipality.choices = [(principal.name, principal.name)]
 
         self.election_de.validators = []
         self.election_fr.validators = []

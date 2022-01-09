@@ -21,7 +21,7 @@ from onegov.election_day.formats.mappings import (
 from uuid import uuid4
 
 
-def parse_election_result(line, errors, entities, election):
+def parse_election_result(line, errors, entities, election, principal):
     try:
         entity_id = validate_integer(line, 'einheit_bfs')
     except ValueError as e:
@@ -37,7 +37,7 @@ def parse_election_result(line, errors, entities, election):
 
         else:
             name = entientity, district = get_entity_and_district(
-                entity_id, entities, election, errors
+                entity_id, entities, election, principal, errors
             )
 
             if not errors:
@@ -227,7 +227,7 @@ def import_election_wabsti_proporz(
 
             # Parse the line
             result = parse_election_result(
-                line, line_errors, entities, election
+                line, line_errors, entities, election, principal
             )
             candidate = parse_candidate(line, line_errors)
             candidate_result = parse_candidate_result(line, line_errors)
@@ -445,8 +445,9 @@ def import_election_wabsti_proporz(
         if election.domain == 'none':
             continue
         if election.domain == 'municipality':
-            if entity != election.domain_segment:
-                continue
+            if principal.domain != 'municipality':
+                if entity != election.domain_segment:
+                    continue
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
                 continue

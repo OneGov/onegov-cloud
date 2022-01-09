@@ -151,7 +151,7 @@ def load_csv(
     return csv, error
 
 
-def get_entity_and_district(entity_id, entities, election, errors):
+def get_entity_and_district(entity_id, entities, election, principal, errors):
     """ Returns the entity name and district or region (from our static data,
     depending on the domain of the election). Adds an error, if the district
     or region is not part of this election.
@@ -166,18 +166,19 @@ def get_entity_and_district(entity_id, entities, election, errors):
 
     if election.domain == 'municipality':
         if election.domain_segment != name:
-            errors.append(_(
-                "${name} is not part of this election",
-                mapping={
-                    'name': entity_id,
-                    'district': election.domain_segment
-                }
-            ))
+            if principal.domain != 'municipality':
+                errors.append(_(
+                    "${name} is not part of this election",
+                    mapping={
+                        'name': entity_id,
+                        'district': election.domain_segment
+                    }
+                ))
 
     if election.domain in ('region', 'district'):
         if election.domain_segment != district:
             errors.append(_(
-                "${name} is not part of the district ${district}",
+                "${name} is not part of ${district}",
                 mapping={
                     'name': entity_id,
                     'district': election.domain_segment

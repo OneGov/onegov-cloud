@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-06 09:20+0100\n"
+"POT-Creation-Date: 2022-01-09 08:04+0100\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -65,6 +65,14 @@ msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
 #, python-format
+msgid "${name} is not part of this election"
+msgstr ""
+
+#, python-format
+msgid "${name} is not part of ${district}"
+msgstr ""
+
+#, python-format
 msgid "Empty value: ${col}"
 msgstr "Valur vida: ${col}"
 
@@ -101,9 +109,6 @@ msgstr "Resultats"
 
 msgid "No data found"
 msgstr "Chattà naginas datas"
-
-msgid "No clear district"
-msgstr "Nagina clera regiun"
 
 msgid "Invalid list results"
 msgstr "Resultats da glistas nunvalaivels"
@@ -217,11 +222,29 @@ msgstr "Dals"
 msgid "To date"
 msgstr "Fin ils"
 
+msgid "Domain"
+msgstr "Plaun"
+
 msgid "Voting result"
 msgstr "Resultat da l'elecziun"
 
-msgid "Domain"
-msgstr "Plaun"
+msgid "Accepted"
+msgstr "Acceptà"
+
+msgid "Rejected"
+msgstr "Refusà"
+
+msgid "Federal"
+msgstr "Plaun naziunal"
+
+msgid "Cantonal"
+msgstr "Plaun chantunal"
+
+msgid "Regional"
+msgstr "Plaun regiunal"
+
+msgid "Communal"
+msgstr "Plaun communal"
 
 msgid "Name"
 msgstr "Denominaziun"
@@ -258,6 +281,9 @@ msgstr "Maioritad absoluta"
 
 msgid "District"
 msgstr "Circul electoral"
+
+msgid "Municipality"
+msgstr "Vischnanca"
 
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
@@ -324,9 +350,6 @@ msgstr ""
 
 msgid "Invalid color definitions"
 msgstr ""
-
-msgid "Cantonal"
-msgstr "Plaun chantunal"
 
 msgid "Domain of the elections"
 msgstr ""
@@ -478,6 +501,9 @@ msgstr "Partidas"
 msgid "Downloads"
 msgstr "Downloads"
 
+msgid "Municipalities"
+msgstr "Vischnancas"
+
 msgid "Elected candidates"
 msgstr "Candidat(a)s elegid(a)s"
 
@@ -486,12 +512,6 @@ msgstr "Novs resultats intermediars"
 
 msgid "Final results"
 msgstr "Resultats finals"
-
-msgid "Accepted"
-msgstr "Acceptà"
-
-msgid "Rejected"
-msgstr "Refusà"
 
 msgid "Counter proposal accepted"
 msgstr "Acceptà la cuntraproposta"
@@ -538,15 +558,6 @@ msgstr "Administrar"
 msgid "Mappings"
 msgstr "Attribuziuns"
 
-msgid "Federal"
-msgstr "Plaun naziunal"
-
-msgid "Regional"
-msgstr "Plaun regiunal"
-
-msgid "Municipality"
-msgstr "Vischnanca"
-
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Resultats finals disponibels sin ${url}"
@@ -561,9 +572,6 @@ msgstr "Plaun regiunal (${on})"
 
 msgid "Other"
 msgstr "Auter"
-
-msgid "Municipalities"
-msgstr "Vischnancas"
 
 msgid "district_label_bl"
 msgstr "Circul electoral"
@@ -591,9 +599,6 @@ msgstr "Regiun"
 
 msgid "superregions_label_bl"
 msgstr "Regiuns"
-
-msgid "Communal"
-msgstr "Plaun communal"
 
 msgid "Quarter"
 msgstr "Quartier"

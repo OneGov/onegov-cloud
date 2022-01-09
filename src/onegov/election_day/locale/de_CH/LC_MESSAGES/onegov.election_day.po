@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-06 09:20+0100\n"
+"POT-Creation-Date: 2022-01-09 08:04+0100\n"
 "PO-Revision-Date: 2021-04-01 10:22+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -65,6 +65,14 @@ msgid "The file contains an empty line."
 msgstr "Die Datei enthält eine leere Zeile."
 
 #, python-format
+msgid "${name} is not part of this election"
+msgstr "${name} ist nicht Teil dieser Wahl"
+
+#, python-format
+msgid "${name} is not part of ${district}"
+msgstr "${name} ist nicht Teil von ${district}"
+
+#, python-format
 msgid "Empty value: ${col}"
 msgstr "Leerer Wert: ${col}"
 
@@ -101,9 +109,6 @@ msgstr "Resultate"
 
 msgid "No data found"
 msgstr "Keine Daten gefunden"
-
-msgid "No clear district"
-msgstr "Kein eindeutiger Wahlkreis"
 
 msgid "Invalid list results"
 msgstr "Ungültige Listenresultate"
@@ -216,11 +221,29 @@ msgstr "Von Datum"
 msgid "To date"
 msgstr "Bis Datum"
 
+msgid "Domain"
+msgstr "Ebene"
+
 msgid "Voting result"
 msgstr "Abstimmungsergebnis"
 
-msgid "Domain"
-msgstr "Ebene"
+msgid "Accepted"
+msgstr "angenommen"
+
+msgid "Rejected"
+msgstr "abgelehnt"
+
+msgid "Federal"
+msgstr "National"
+
+msgid "Cantonal"
+msgstr "Kantonal"
+
+msgid "Regional"
+msgstr "Regional"
+
+msgid "Communal"
+msgstr "Kommunal"
 
 msgid "Name"
 msgstr "Name"
@@ -257,6 +280,9 @@ msgstr "Absolutes Mehr"
 
 msgid "District"
 msgstr "Wahlkreis"
+
+msgid "Municipality"
+msgstr "Gemeinde"
 
 msgid "Tacit election"
 msgstr "Stille Wahl"
@@ -323,9 +349,6 @@ msgstr "Farben"
 
 msgid "Invalid color definitions"
 msgstr "Ungültige Farbdefinitionen"
-
-msgid "Cantonal"
-msgstr "Kantonal"
 
 msgid "Domain of the elections"
 msgstr "Ebene der Wahlen"
@@ -488,6 +511,9 @@ msgstr "Parteien"
 msgid "Downloads"
 msgstr "Downloads"
 
+msgid "Municipalities"
+msgstr "Gemeinden"
+
 msgid "Elected candidates"
 msgstr "Gewählte Kandidierende"
 
@@ -496,12 +522,6 @@ msgstr "Neue Zwischenresultate"
 
 msgid "Final results"
 msgstr "Schlussresultate"
-
-msgid "Accepted"
-msgstr "angenommen"
-
-msgid "Rejected"
-msgstr "abgelehnt"
 
 msgid "Counter proposal accepted"
 msgstr "Gegenentwurf angenommen"
@@ -548,15 +568,6 @@ msgstr "Verwalten"
 msgid "Mappings"
 msgstr "Zuordnungen"
 
-msgid "Federal"
-msgstr "National"
-
-msgid "Regional"
-msgstr "Regional"
-
-msgid "Municipality"
-msgstr "Gemeinde"
-
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Schlussresultate verfügbar auf ${url}"
@@ -571,9 +582,6 @@ msgstr "Regional (${on})"
 
 msgid "Other"
 msgstr "Andere"
-
-msgid "Municipalities"
-msgstr "Gemeinden"
 
 msgid "district_label_bl"
 msgstr "Bezirk"
@@ -601,9 +609,6 @@ msgstr "Region"
 
 msgid "superregions_label_bl"
 msgstr "Regionen"
-
-msgid "Communal"
-msgstr "Kommunal"
 
 msgid "Quarter"
 msgstr "Stadtteil"

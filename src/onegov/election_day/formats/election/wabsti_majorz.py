@@ -31,7 +31,8 @@ def parse_election(line, errors):
     return mandates, majority
 
 
-def parse_election_result(line, errors, entities, added_entities, election):
+def parse_election_result(line, errors, entities, added_entities, election,
+                          principal):
     try:
         entity_id = validate_integer(line, 'bfs')
         eligible_voters = validate_integer(line, 'stimmber')
@@ -84,7 +85,7 @@ def parse_election_result(line, errors, entities, added_entities, election):
                 }))
         else:
             name, district = get_entity_and_district(
-                entity_id, entities, election, errors
+                entity_id, entities, election, principal, errors
             )
 
             if not errors:
@@ -188,7 +189,8 @@ def import_election_wabsti_majorz(
             # Parse the line
             mandates, majority = parse_election(line, line_errors)
             result = parse_election_result(
-                line, line_errors, entities, added_entities, election
+                line, line_errors, entities, added_entities, election,
+                principal
             )
             if result:
                 for candidate, c_result in parse_candidates(line, line_errors):
@@ -274,8 +276,9 @@ def import_election_wabsti_majorz(
         if election.domain == 'none':
             continue
         if election.domain == 'municipality':
-            if entity != election.domain_segment:
-                continue
+            if principal.domain != 'municipality':
+                if entity != election.domain_segment:
+                    continue
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
                 continue

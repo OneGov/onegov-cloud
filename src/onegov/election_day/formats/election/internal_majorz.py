@@ -32,7 +32,7 @@ def parse_election(line, errors):
     return majority, status
 
 
-def parse_election_result(line, errors, entities, election):
+def parse_election_result(line, errors, entities, election, principal):
     try:
         entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
@@ -61,7 +61,7 @@ def parse_election_result(line, errors, entities, election):
 
         else:
             name, district = get_entity_and_district(
-                entity_id, entities, election, errors
+                entity_id, entities, election, principal, errors
             )
 
             if not errors:
@@ -154,7 +154,9 @@ def import_election_internal_majorz(election, principal, file, mimetype):
 
         # Parse the line
         absolute_majority, status = parse_election(line, line_errors)
-        result = parse_election_result(line, line_errors, entities, election)
+        result = parse_election_result(
+            line, line_errors, entities, election, principal
+        )
         candidate = parse_candidate(line, line_errors, election_id)
         candidate_result = parse_candidate_result(line, line_errors)
 
@@ -197,8 +199,9 @@ def import_election_internal_majorz(election, principal, file, mimetype):
         if election.domain == 'none':
             continue
         if election.domain == 'municipality':
-            if entity != election.domain_segment:
-                continue
+            if principal.domain != 'municipality':
+                if entity != election.domain_segment:
+                    continue
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
                 continue

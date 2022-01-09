@@ -351,7 +351,7 @@ def import_election_wabstic_proporz(
 
         # Get and check the district/region
         name, district = get_entity_and_district(
-            entity_id, entities, election, line_errors
+            entity_id, entities, election, principal, line_errors
         )
 
         # Pass the errors and continue to next line
@@ -764,8 +764,9 @@ def import_election_wabstic_proporz(
         if election.domain == 'none':
             continue
         if election.domain == 'municipality':
-            if entity != election.domain_segment:
-                continue
+            if principal.domain != 'municipality':
+                if entity != election.domain_segment:
+                    continue
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
                 continue
