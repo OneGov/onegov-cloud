@@ -1,11 +1,12 @@
+from datetime import date
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.forms import ArchiveSearchFormElection
 from onegov.election_day.forms import ArchiveSearchFormVote
-from datetime import date
+from tests.onegov.election_day.common import DummyApp
 
 
 def test_apply_model_archive_search_form(session):
-    archive = SearchableArchivedResultCollection(session)
+    archive = SearchableArchivedResultCollection(DummyApp(session))
     archive.term = 'xxx'
     archive.from_date = date(2222, 1, 1)
     archive.to_date = date(2222, 1, 1)

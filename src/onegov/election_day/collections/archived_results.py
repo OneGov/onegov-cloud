@@ -283,12 +283,11 @@ class ArchivedResultCollection(object):
         self.session.flush()
 
 
-class SearchableArchivedResultCollection(
-        ArchivedResultCollection, Pagination):
+class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
 
     def __init__(
             self,
-            session,
+            app,
             date_=None,
             from_date=None,
             to_date=None,
@@ -299,7 +298,8 @@ class SearchableArchivedResultCollection(
             locale='de_CH',
             page=0
     ):
-        super().__init__(session, date_=date_)
+        super().__init__(app.session(), date_=date_)
+        self.app = app
         self.from_date = from_date
         self.to_date = to_date or date.today()
         self.item_type = item_type
@@ -307,7 +307,6 @@ class SearchableArchivedResultCollection(
         self.term = term
         self.answers = answers
         self.locale = locale
-        self.app_principal_domain = None
         self.page = page
 
     def __eq__(self, other):
@@ -322,7 +321,7 @@ class SearchableArchivedResultCollection(
 
     def page_by_index(self, index):
         return self.__class__(
-            session=self.session,
+            app=self.app,
             date_=self.date,
             from_date=self.from_date,
             to_date=self.to_date,
@@ -449,18 +448,21 @@ class SearchableArchivedResultCollection(
             query = query.filter(or_(*self.term_filter))
 
         # order by date and type
-        # todo:
-        order = ('federation', 'canton', 'region', 'district', 'municipality')
-        if self.app_principal_domain == 'municipality':  # todo:
+        order = (
+            'federation', 'canton', 'region', 'district', 'none',
+            'municipality'
+        )
+        if self.app.principal.domain == 'municipality':
             order = (
-                'municipality', 'federation', 'canton', 'region', 'district'
+                'municipality', 'federation', 'canton', 'region', 'district',
+                'none'
             )
         query = query.order_by(
             ArchivedResult.date.desc(),
             case(
                 tuple(
-                    (ArchivedResult.domain == opt, ind) for
-                    ind, opt in enumerate(order, 1)
+                    (ArchivedResult.domain == domain, index) for
+                    index, domain in enumerate(order, 1)
                 )
             )
         )

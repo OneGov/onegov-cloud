@@ -7,30 +7,18 @@ from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
 
-def test_election_form_domains():
-    form = ElectionForm()
-    assert ElectionForm().domain.choices is None
-
-    form.set_domain(Canton(name='be', canton='be'))
-    assert sorted(form.domain.choices) == [
-        ('canton', 'Cantonal'),
-        ('federation', 'Federal'),
-        ('region', 'Regional'),
-    ]
-
-    form.set_domain(Municipality(name='bern', municipality='351'))
-    assert sorted(form.domain.choices) == [
-        ('canton', 'Cantonal'),
-        ('federation', 'Federal'),
-        ('municipality', 'Communal')
-    ]
-
-
-def test_election_form_translations(session):
+def test_election_form_on_request(session):
     form = ElectionForm()
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='zg', canton='zg')
     form.on_request()
+    assert [x[0] for x in form.domain.choices] == [
+        'federation', 'canton', 'none', 'municipality'
+    ]
+    assert form.region.choices == []
+    assert form.district.choices == []
+    assert len(form.municipality.choices) == 11
     assert isinstance(form.election_de.validators[0], InputRequired)
     assert form.election_fr.validators == []
     assert form.election_it.validators == []
@@ -39,11 +27,50 @@ def test_election_form_translations(session):
     form = ElectionForm()
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'fr_CH'
+    form.request.app.principal = Canton(name='sg', canton='sg')
     form.on_request()
+    assert [x[0] for x in form.domain.choices] == [
+        'federation', 'canton', 'district', 'none', 'municipality'
+    ]
+    assert form.region.choices == []
+    assert len(form.district.choices) == 18
+    assert len(form.municipality.choices) == 95
     assert form.election_de.validators == []
     assert isinstance(form.election_fr.validators[0], InputRequired)
     assert form.election_it.validators == []
     assert form.election_rm.validators == []
+
+    form = ElectionForm()
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'it_CH'
+    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.on_request()
+    assert [x[0] for x in form.domain.choices] == [
+        'federation', 'canton', 'region', 'district', 'none', 'municipality'
+    ]
+    assert len(form.region.choices) == 39
+    assert len(form.district.choices) == 15
+    assert len(form.municipality.choices) == 232
+    assert form.election_de.validators == []
+    assert form.election_fr.validators == []
+    assert isinstance(form.election_it.validators[0], InputRequired)
+    assert form.election_rm.validators == []
+
+    form = ElectionForm()
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'rm_CH'
+    form.request.app.principal = Municipality(name='bern', municipality='351')
+    form.on_request()
+    assert [x[0] for x in form.domain.choices] == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert form.region.choices == []
+    assert form.district.choices == []
+    assert form.municipality.choices == [('bern', 'bern')]
+    assert form.election_de.validators == []
+    assert form.election_fr.validators == []
+    assert form.election_it.validators == []
+    assert isinstance(form.election_rm.validators[0], InputRequired)
 
 
 def test_election_form_model(session, related_link_labels):

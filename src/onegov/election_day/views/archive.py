@@ -156,9 +156,6 @@ def view_archive_search(self, request, form):
     if not form.errors:
         form.apply_model(self)
 
-    # set principal for query function
-    self.app_principal_domain = request.app.principal.domain
-
     return {
         'item_type': self.item_type,
         'layout': layout,

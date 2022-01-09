@@ -114,7 +114,9 @@ def test_archived_result_collection(session):
 
 def test_archived_result_collection_grouping(session):
     # Add a vote and election for each domain on two dates
-    for domain in ('federation', 'canton', 'region', 'municipality'):
+    for domain in (
+        'federation', 'canton', 'region', 'district', 'none', 'municipality'
+    ):
         session.add(
             Election(
                 title="{} election 1".format(domain),
@@ -154,6 +156,8 @@ def test_archived_result_collection_grouping(session):
         'federation-election-1',
         'canton-election-1',
         'region-election-1',
+        'district-election-1',
+        'none-election-1',
         'municipality-election-1'
     ]))
     session.add(compound)
@@ -171,6 +175,8 @@ def test_archived_result_collection_grouping(session):
     grouped = archive.group_items(items, request)
     assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
     assert all([list(group) == expected for group in grouped.values()])
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
+    assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
 
     # Test grouping of a communal instance
     request.app.principal.domain = 'municipality'
@@ -178,6 +184,8 @@ def test_archived_result_collection_grouping(session):
     grouped = archive.group_items(items, request)
     assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
     assert all([list(group) == expected for group in grouped.values()])
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
+    assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
 
     # Test grouping with compounds
     assert 'election' not in grouped[date(2017, 2, 12)]['municipality']

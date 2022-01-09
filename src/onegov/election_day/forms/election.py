@@ -269,9 +269,9 @@ class ElectionForm(Form):
         if default_locale.startswith('fr'):
             self.election_fr.validators.append(InputRequired())
         if default_locale.startswith('it'):
-            self.election_de.validators.append(InputRequired())
+            self.election_it.validators.append(InputRequired())
         if default_locale.startswith('rm'):
-            self.election_de.validators.append(InputRequired())
+            self.election_rm.validators.append(InputRequired())
 
         layout = DefaultLayout(None, self.request)
 

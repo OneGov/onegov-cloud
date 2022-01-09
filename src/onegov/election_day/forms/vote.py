@@ -160,9 +160,9 @@ class VoteForm(Form):
         if default_locale.startswith('fr'):
             self.vote_fr.validators.append(InputRequired())
         if default_locale.startswith('it'):
-            self.vote_de.validators.append(InputRequired())
+            self.vote_it.validators.append(InputRequired())
         if default_locale.startswith('rm'):
-            self.vote_de.validators.append(InputRequired())
+            self.vote_rm.validators.append(InputRequired())
 
     def update_model(self, model):
         model.date = self.date.data

@@ -110,5 +110,6 @@ def get_honeypot_asset():
 def get_chosen_asset():
     # Make sure your app includes jQuery!
     yield 'chosen.css'
+    yield 'chosen.fixes.css'
     yield 'chosen.jquery.js'
     yield 'chosen-init.js'
