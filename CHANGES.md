@@ -1,8 +1,22 @@
 # Changes
 
+## 2022.3
+
+`2022-01-09` | [642818ca15...c1e5f4ef0e](https://github.com/OneGov/onegov-cloud/compare/642818ca15^...c1e5f4ef0e)
+
+### Swissvotes
+
+##### Split importing campaign material in multiple transactions.
+
+`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [c1e5f4ef0e](https://github.com/onegov/onegov-cloud/commit/c1e5f4ef0ee43bb50a1969c12c1ff6a3d61363d0)
+
+##### Update translations.
+
+`Other` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [642818ca15](https://github.com/onegov/onegov-cloud/commit/642818ca15ca76f4534b916d6cf6271ab436907c)
+
 ## 2022.2
 
-`2022-01-07` | [f7e892211d...f7e892211d](https://github.com/OneGov/onegov-cloud/compare/f7e892211d^...f7e892211d)
+`2022-01-07` | [f7e892211d...22a8a3665a](https://github.com/OneGov/onegov-cloud/compare/f7e892211d^...22a8a3665a)
 
 ### Org
 
@@ -1302,25 +1316,4 @@ Render a better translation for each handler code if it is used by the app and t
 ## 2021.55
 
 `2021-05-31` | [e42dc76114...a7b04bb8e2](https://github.com/OneGov/onegov-cloud/compare/e42dc76114^...a7b04bb8e2)
-
-## 2021.54
-
-`2021-05-27` | [0f1e7e0776...a714dceda7](https://github.com/OneGov/onegov-cloud/compare/0f1e7e0776^...a714dceda7)
-
-### Election Day
-
-##### Improves screen widgets.
-
-- Adds a generic text and logo widget
-- Adds map widgets for votes
-- Allows to set classes to widgets
-- Allows to limit candidates and list charts
-
-`Other` | [0a90662330](https://github.com/onegov/onegov-cloud/commit/0a90662330308eaafe0e9e39553b42929c361cd3)
-
-### Org
-
-##### Fixes user group form throwing an error for forms with hyphens.
-
-`Bugfix` | [fd4637a07d](https://github.com/onegov/onegov-cloud/commit/fd4637a07de486aeae4d9ab6c517c8510e3caebc)
 
