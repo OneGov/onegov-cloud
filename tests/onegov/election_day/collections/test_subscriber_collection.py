@@ -63,11 +63,11 @@ def test_subscriber_collection(session):
     assert collection.query().count() == 0
 
 
-def test_subscriber_collection_confirm_email(election_day_app, session):
+def test_subscriber_collection_confirm_email(election_day_app_zg, session):
     mock = Mock()
-    election_day_app.send_email = mock
+    election_day_app_zg.send_email = mock
     request = DummyRequest(
-        app=election_day_app, session=session, locale='de_CH'
+        app=election_day_app_zg, session=session, locale='de_CH'
     )
     collection = EmailSubscriberCollection(session)
 
@@ -91,11 +91,11 @@ def test_subscriber_collection_confirm_email(election_day_app, session):
     assert mock.call_count == 2
 
 
-def test_subscriber_collection_confirm_sms(election_day_app, session):
+def test_subscriber_collection_confirm_sms(election_day_app_zg, session):
     mock = Mock()
-    election_day_app.send_sms = mock
+    election_day_app_zg.send_sms = mock
     request = DummyRequest(
-        app=election_day_app, session=session, locale='de_CH'
+        app=election_day_app_zg, session=session, locale='de_CH'
     )
     collection = SmsSubscriberCollection(session)
 

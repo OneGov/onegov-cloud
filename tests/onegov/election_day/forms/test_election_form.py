@@ -81,7 +81,8 @@ def test_election_form_model(session, related_link_labels):
     model.title_translations['it_CH'] = 'Election (IT)'
     model.title_translations['rm_CH'] = 'Election (RM)'
     model.date = date.today()
-    model.domain = 'federation'
+    model.domain = 'region'
+    model.domain_segment = 'r1'
     model.shortcode = 'xy'
     model.type = 'proporz'
     model.majority_type = 'relative'
@@ -89,7 +90,6 @@ def test_election_form_model(session, related_link_labels):
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
     model.tacit = False
-    model.distinct = False
     model.expats = False
     model.after_pukelsheim = True
     model.colors = {
@@ -106,7 +106,8 @@ def test_election_form_model(session, related_link_labels):
     assert form.election_it.data == 'Election (IT)'
     assert form.election_rm.data == 'Election (RM)'
     assert form.date.data == date.today()
-    assert form.domain.data == 'federation'
+    assert form.domain.data == 'region'
+    assert form.region.data == 'r1'
     assert form.shortcode.data == 'xy'
     assert form.election_type.data == 'proporz'
     assert form.mandates.data == 5
@@ -116,7 +117,6 @@ def test_election_form_model(session, related_link_labels):
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
     assert form.tacit.data is False
-    assert form.distinct.data is False
     assert form.expats.data is False
     assert form.after_pukelsheim.data is True
     assert form.colors.data == (
@@ -129,7 +129,8 @@ def test_election_form_model(session, related_link_labels):
     form.election_it.data = 'An Election (IT)'
     form.election_rm.data = 'An Election (RM)'
     form.date.data = date(2016, 1, 1)
-    form.domain.data = 'canton'
+    form.domain.data = 'district'
+    form.district.data = 'd1'
     form.shortcode.data = 'yz'
     form.election_type.data = 'majorz'
     form.mandates.data = 2
@@ -137,7 +138,6 @@ def test_election_form_model(session, related_link_labels):
     form.absolute_majority.data = 10000
     form.related_link.data = 'http://ur.l'
     form.tacit.data = True
-    form.distinct.data = True
     form.expats.data = True
     form.after_pukelsheim.data = False
     form.colors.data = (
@@ -154,7 +154,8 @@ def test_election_form_model(session, related_link_labels):
     assert model.title_translations['it_CH'] == 'An Election (IT)'
     assert model.title_translations['rm_CH'] == 'An Election (RM)'
     assert model.date == date(2016, 1, 1)
-    assert model.domain == 'canton'
+    assert model.domain == 'district'
+    assert model.domain_segment == 'd1'
     assert model.shortcode == 'yz'
     assert model.type == 'majorz'
     assert model.number_of_mandates == 2
@@ -162,7 +163,6 @@ def test_election_form_model(session, related_link_labels):
     assert model.absolute_majority == 10000
     assert model.related_link == 'http://ur.l'
     assert model.tacit is True
-    assert model.distinct is True
     assert model.expats is True
     assert model.after_pukelsheim is False
     assert model.colors == {
@@ -171,6 +171,11 @@ def test_election_form_model(session, related_link_labels):
         'GLP': '#aeca00',
         'SP Juso': '#dd0e0e',
     }
+
+    form.domain.data = 'municipality'
+    form.municipality.data = 'm1'
+    form.update_model(model)
+    assert model.domain_segment == 'm1'
 
 
 def test_election_form_relations(session):
@@ -194,6 +199,7 @@ def test_election_form_relations(session):
 
     form = ElectionForm()
     form.request = DummyRequest(session=session)
+    form.request.app.principal = Canton(name='gr', canton='gr')
     form.on_request()
     assert form.related_elections.choices == [
         ('second-election', '02.01.2011 Second Election'),
@@ -215,6 +221,7 @@ def test_election_form_relations(session):
 
     form = ElectionForm()
     form.request = DummyRequest(session=session)
+    form.request.app.principal = Canton(name='gr', canton='gr')
     form.on_request()
     assert form.related_elections.choices == [
         ('third-election', '03.01.2011 SC Third Election'),

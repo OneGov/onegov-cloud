@@ -116,9 +116,10 @@ def test_import_wabsti_proporz_regional_sg(session, import_test_datasets):
         'wabsti',
         'election',
         principal,
-        'region',
+        'district',
         election_type='proporz',
         date_=date(2015, 10, 18),
+        domain_segment='Rheintal',
         number_of_mandates=17,
         dataset_name='kantonsratswahlen-2016',
     )

@@ -254,7 +254,7 @@
         </thead>
         <tbody>
             <tr tal:repeat="election election_compound.elections">
-                <td class="column-district left-aligned"><a href="${request.link(election)}">${layout.election_title(election)}</a></td>
+                <td class="column-district left-aligned"><a href="${request.link(election)}">${election.domain_segment}</a></td>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates(consider_completed=True), election.number_of_mandates)" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress; enable_y_n True" /></td>
             </tr>

@@ -197,7 +197,7 @@ class ElectionCompound(
     @property
     def counted_entities(self):
         return [
-            election.title for election in self.elections
+            election.domain_segment for election in self.elections
             if election.completed
         ]
 

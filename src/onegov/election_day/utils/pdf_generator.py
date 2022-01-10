@@ -532,15 +532,12 @@ class PdfGenerator():
                     return _("Municipalities")
             return principal.label(value)
 
-        def election_title(election):
-            return election.domain_segment or election.title
-
         majorz = False
         if compound.elections and compound.elections[0].type == 'majorz':
             majorz = True
 
         districts = {
-            election.id: election_title(election)
+            election.id: election.domain_segment
             for election in compound.elections if election.results.first()
         }
 
@@ -558,7 +555,7 @@ class PdfGenerator():
             [label('district'), _('Mandates')],
             [
                 [
-                    election_title(e),
+                    e.domain_segment,
                     e.allocated_mandates(consider_completed=True)
                 ]
                 for e in compound.elections

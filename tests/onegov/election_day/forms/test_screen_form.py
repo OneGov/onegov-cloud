@@ -10,8 +10,8 @@ from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_screen_form_validate(election_day_app):
-    session = election_day_app.session()
+def test_screen_form_validate(election_day_app_zg):
+    session = election_day_app_zg.session()
 
     assert not ScreenForm().validate()
 
@@ -27,7 +27,7 @@ def test_screen_form_validate(election_day_app):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.majorz_election.choices = [('election', 'Election')]
     assert form.validate()
 
@@ -43,7 +43,7 @@ def test_screen_form_validate(election_day_app):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ['error parsing attribute name']}
@@ -60,7 +60,7 @@ def test_screen_form_validate(election_day_app):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ["Invalid element '<fancy-stuff>'"]}
@@ -232,8 +232,8 @@ def test_screen_form_update_apply(session):
     assert form.election_compound.data == ''
 
 
-def test_screen_form_populate(election_day_app):
-    session = election_day_app.session()
+def test_screen_form_populate(election_day_app_zg):
+    session = election_day_app_zg.session()
     session.add(
         Vote(
             title='Simple 1',
@@ -299,7 +299,7 @@ def test_screen_form_populate(election_day_app):
     session.flush()
 
     form = ScreenForm()
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.on_request()
     assert form.simple_vote.choices == [
         ('simple-2', 'Simple 2 [2001-01-01]'),

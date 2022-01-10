@@ -6,8 +6,8 @@ from tests.onegov.election_day.common import login
 from webtest import TestApp as Client
 
 
-def test_view_latest(election_day_app):
-    client = Client(election_day_app)
+def test_view_latest(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -31,8 +31,8 @@ def test_view_latest(election_day_app):
     assert "Wahl 1. Januar 2013" in latest
 
 
-def test_view_latest_json(election_day_app):
-    client = Client(election_day_app)
+def test_view_latest_json(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     assert client.get('/json').json['archive'] == {}
@@ -61,8 +61,8 @@ def test_view_latest_json(election_day_app):
     assert latest.headers['Access-Control-Allow-Origin'] == '*'
 
 
-def test_view_archive(election_day_app):
-    client = Client(election_day_app)
+def test_view_archive(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -95,8 +95,8 @@ def test_view_archive(election_day_app):
     assert "noch keine Wahlen oder Abstimmungen" in archive
 
 
-def test_view_archive_json(election_day_app):
-    client = Client(election_day_app)
+def test_view_archive_json(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -133,8 +133,8 @@ def test_view_archive_json(election_day_app):
     assert archive.headers['Access-Control-Allow-Origin'] == '*'
 
 
-def test_view_update_results(election_day_app):
-    client = Client(election_day_app)
+def test_view_update_results(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -155,7 +155,7 @@ def test_view_update_results(election_day_app):
 
     assert len(client.get('/json').json['results']) == 2
 
-    session = election_day_app.session()
+    session = election_day_app_zg.session()
     archive = ArchivedResultCollection(session)
 
     results = archive.query().all()
@@ -176,8 +176,8 @@ def test_view_update_results(election_day_app):
 
 
 @pytest.mark.parametrize("url", ['vote', 'election', 'election_compound'])
-def test_view_filter_archive(url, election_day_app):
-    client = Client(election_day_app)
+def test_view_filter_archive(url, election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     new = client.get(f'/archive-search/{url}')
     assert new.form

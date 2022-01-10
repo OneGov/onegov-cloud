@@ -351,10 +351,10 @@ def test_principal_notifications_enabled():
     ).notifications is True
 
 
-def test_principal_label(election_day_app):
+def test_principal_label(election_day_app_zg):
 
     def translate(text, locale):
-        translator = election_day_app.translations.get(locale)
+        translator = election_day_app_zg.translations.get(locale)
         return text.interpolate(translator.gettext(text))
 
     # Default (Canton)

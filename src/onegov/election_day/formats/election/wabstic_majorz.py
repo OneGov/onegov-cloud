@@ -166,7 +166,7 @@ def import_election_wabstic_majorz(
             line_errors.append(e.args[0])
 
         # Get and check the district/region
-        name, district = get_entity_and_district(
+        entity_name, entity_district = get_entity_and_district(
             entity_id, entities, election, principal, line_errors
         )
 
@@ -182,8 +182,8 @@ def import_election_wabstic_majorz(
             continue
 
         added_entities[entity_id] = {
-            'name': name,
-            'district': district,
+            'name': entity_name,
+            'district': entity_district,
             'eligible_voters': eligible_voters
         }
 

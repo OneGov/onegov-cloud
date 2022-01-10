@@ -81,9 +81,9 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
     assert ">58<" in anonymous.get('/election/proporz-election').follow()
 
 
-def test_upload_election_temporary_results_majorz(election_day_app):
-    archive = ArchivedResultCollection(election_day_app.session())
-    client = Client(election_day_app)
+def test_upload_election_temporary_results_majorz(election_day_app_zg):
+    archive = ArchivedResultCollection(election_day_app_zg.session())
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -144,7 +144,8 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    assert election_day_app.session().query(Election).one().status == 'interim'
+    assert election_day_app_zg.session().query(Election).one().status == \
+        'interim'
     assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
@@ -154,7 +155,8 @@ def test_upload_election_temporary_results_majorz(election_day_app):
 
     upload.form['complete'] = True
     assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert election_day_app.session().query(Election).one().status == 'final'
+    assert election_day_app_zg.session().query(Election).one().status == \
+        'final'
     assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
@@ -197,9 +199,9 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     assert result_wabsti.replace('final', 'unknown') in result_onegov
 
 
-def test_upload_election_temporary_results_proporz(election_day_app):
-    archive = ArchivedResultCollection(election_day_app.session())
-    client = Client(election_day_app)
+def test_upload_election_temporary_results_proporz(election_day_app_zg):
+    archive = ArchivedResultCollection(election_day_app_zg.session())
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -249,7 +251,8 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['statistics'] = Upload('data.csv', csv_stat, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert election_day_app.session().query(Election).one().status == 'interim'
+    assert election_day_app_zg.session().query(Election).one().status == \
+        'interim'
     assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
@@ -259,7 +262,8 @@ def test_upload_election_temporary_results_proporz(election_day_app):
 
     upload.form['complete'] = True
     assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert election_day_app.session().query(Election).one().status == 'final'
+    assert election_day_app_zg.session().query(Election).one().status == \
+        'final'
     assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
@@ -325,8 +329,8 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     assert result_wabsti.replace('final', 'unknown') in result_onegov
 
 
-def test_upload_election_available_formats_canton(election_day_app):
-    client = Client(election_day_app)
+def test_upload_election_available_formats_canton(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -453,9 +457,9 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
 
-def test_upload_election_notify_zulip(election_day_app):
+def test_upload_election_notify_zulip(election_day_app_zg):
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -466,18 +470,18 @@ def test_upload_election_notify_zulip(election_day_app):
         sleep(5)
         assert not urlopen.called
 
-        election_day_app.zulip_url = 'https://xx.zulipchat.com/api/v1/messages'
-        election_day_app.zulip_stream = 'WAB'
-        election_day_app.zulip_user = 'wab-bot@seantis.zulipchat.com'
-        election_day_app.zulip_key = 'aabbcc'
+        election_day_app_zg.zulip_url = 'https://zulipchat.com/api/v1/messages'
+        election_day_app_zg.zulip_stream = 'WAB'
+        election_day_app_zg.zulip_user = 'wab-bot@seantis.zulipchat.com'
+        election_day_app_zg.zulip_key = 'aabbcc'
         upload_majorz_election(client, canton='zg')
         sleep(5)
         assert urlopen.called
-        assert 'xx.zulipchat.com' in urlopen.call_args[0][0].get_full_url()
+        assert 'zulipchat.com' in urlopen.call_args[0][0].get_full_url()
 
 
-def test_upload_election_submit(election_day_app):
-    client = Client(election_day_app)
+def test_upload_election_submit(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -564,10 +568,10 @@ def test_upload_election_submit(election_day_app):
         assert import_.called
 
     # Wabsti Municipality Majorz
-    principal = election_day_app.principal
+    principal = election_day_app_zg.principal
     principal.domain = 'municipality'
     principal.municipality = '351'
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
     with patch(
         'onegov.election_day.views.upload.election.'

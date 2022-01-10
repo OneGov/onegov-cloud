@@ -39,7 +39,7 @@ def test_vote_form_on_request():
     assert form.vote_rm.validators == []
 
 
-def test_vote_form_model(election_day_app, related_link_labels):
+def test_vote_form_model(election_day_app_zg, related_link_labels):
     model = Vote()
     model.title_translations = {
         'de_CH': 'Vote (DE)',

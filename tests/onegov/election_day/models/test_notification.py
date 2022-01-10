@@ -175,14 +175,14 @@ def test_webhook_notification(session):
             }
 
 
-def test_email_notification_vote(election_day_app, session):
+def test_email_notification_vote(election_day_app_zg, session):
     with freeze_time("2008-01-01 00:00"):
         mock = Mock()
-        election_day_app.send_email = mock
+        election_day_app_zg.send_email = mock
 
-        principal = election_day_app.principal
+        principal = election_day_app_zg.principal
         principal.email_notification = True
-        election_day_app.cache.set('principal', principal)
+        election_day_app_zg.cache.set('principal', principal)
 
         session.add(
             Vote(
@@ -212,7 +212,7 @@ def test_email_notification_vote(election_day_app, session):
         )
         complex_vote = session.query(ComplexVote).one()
 
-        request = DummyRequest(app=election_day_app, session=session)
+        request = DummyRequest(app=election_day_app_zg, session=session)
         freezed = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
 
         session.add(EmailSubscriber(address='de@examp.le', locale='de_CH'))
@@ -386,15 +386,15 @@ def test_email_notification_vote(election_day_app, session):
         assert "61.34 %" in contents
 
 
-def test_email_notification_election(election_day_app, session):
+def test_email_notification_election(election_day_app_zg, session):
     with freeze_time("2008-01-01 00:00"):
         mock = Mock()
-        election_day_app.send_email = mock
+        election_day_app_zg.send_email = mock
 
-        principal = election_day_app.principal
+        principal = election_day_app_zg.principal
         principal.email_notification = True
         principal.reply_to = 'reply-to@example.org'
-        election_day_app.cache.set('principal', principal)
+        election_day_app_zg.cache.set('principal', principal)
 
         session.add(
             Election(
@@ -426,7 +426,7 @@ def test_email_notification_election(election_day_app, session):
         )
         proporz = session.query(ProporzElection).one()
 
-        request = DummyRequest(app=election_day_app, session=session)
+        request = DummyRequest(app=election_day_app_zg, session=session)
         freezed = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
 
         session.add(EmailSubscriber(address='de@examp.le', locale='de_CH'))
@@ -673,14 +673,14 @@ def test_email_notification_election(election_day_app, session):
         assert "49.83 %" in contents
 
 
-def test_sms_notification(request, election_day_app, session):
+def test_sms_notification(request, election_day_app_zg, session):
     with freeze_time("2008-01-01 00:00"):
-        election_day_app.send_sms = Mock()
+        election_day_app_zg.send_sms = Mock()
 
-        principal = election_day_app.principal
+        principal = election_day_app_zg.principal
         principal.sms_notification = 'https://wab.ch.ch'
         # use the default reply_to
-        election_day_app.cache.set('principal', principal)
+        election_day_app_zg.cache.set('principal', principal)
 
         session.add(
             Election(
@@ -700,7 +700,7 @@ def test_sms_notification(request, election_day_app, session):
         )
         vote = session.query(Vote).one()
 
-        request = DummyRequest(app=election_day_app, session=session)
+        request = DummyRequest(app=election_day_app_zg, session=session)
         freezed = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
 
         notification = SmsNotification()
@@ -708,14 +708,14 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.type == 'sms'
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
-        assert election_day_app.send_sms.call_count == 0
+        assert election_day_app_zg.send_sms.call_count == 0
 
         notification = SmsNotification()
         notification.trigger(request, vote)
         assert notification.type == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
-        assert election_day_app.send_sms.call_count == 0
+        assert election_day_app_zg.send_sms.call_count == 0
 
         session.add(SmsSubscriber(address='+41791112233', locale='en'))
         session.add(SmsSubscriber(address='+41791112233', locale='de_CH'))
@@ -728,12 +728,12 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.type == 'sms'
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
-        assert election_day_app.send_sms.call_count == 2
-        assert election_day_app.send_sms.call_args_list[0][0] == (
+        assert election_day_app_zg.send_sms.call_count == 2
+        assert election_day_app_zg.send_sms.call_args_list[0][0] == (
             '+41791112233',
             'New intermediate results are available on https://wab.ch.ch'
         )
-        assert election_day_app.send_sms.call_args_list[1][0] == (
+        assert election_day_app_zg.send_sms.call_args_list[1][0] == (
             '+41791112233',
             'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
         )
@@ -745,12 +745,12 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.type == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
-        assert election_day_app.send_sms.call_count == 4
-        assert election_day_app.send_sms.call_args_list[2][0] == (
+        assert election_day_app_zg.send_sms.call_count == 4
+        assert election_day_app_zg.send_sms.call_args_list[2][0] == (
             '+41791112233',
             'New intermediate results are available on https://wab.ch.ch'
         )
-        assert election_day_app.send_sms.call_args_list[3][0] == (
+        assert election_day_app_zg.send_sms.call_args_list[3][0] == (
             '+41791112233',
             'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
         )
@@ -763,12 +763,12 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.type == 'sms'
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
-        assert election_day_app.send_sms.call_count == 6
-        assert election_day_app.send_sms.call_args_list[4][0] == (
+        assert election_day_app_zg.send_sms.call_count == 6
+        assert election_day_app_zg.send_sms.call_args_list[4][0] == (
             '+41791112233',
             'Final results are available on https://wab.ch.ch'
         )
-        assert election_day_app.send_sms.call_args_list[5][0] == (
+        assert election_day_app_zg.send_sms.call_args_list[5][0] == (
             '+41791112233',
             'Schlussresultate verfügbar auf https://wab.ch.ch'
         )
@@ -781,12 +781,12 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.type == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
-        assert election_day_app.send_sms.call_count == 8
-        assert election_day_app.send_sms.call_args_list[6][0] == (
+        assert election_day_app_zg.send_sms.call_count == 8
+        assert election_day_app_zg.send_sms.call_args_list[6][0] == (
             '+41791112233',
             'Final results are available on https://wab.ch.ch'
         )
-        assert election_day_app.send_sms.call_args_list[7][0] == (
+        assert election_day_app_zg.send_sms.call_args_list[7][0] == (
             '+41791112233',
             'Schlussresultate verfügbar auf https://wab.ch.ch'
         )

@@ -113,9 +113,6 @@ class ElectionCompoundLayout(DetailLayout):
 
         return True
 
-    def election_title(self, election):
-        return election.domain_segment or election.title
-
     @cached_property
     def has_party_results(self):
         return self.model.party_results.first() is not None

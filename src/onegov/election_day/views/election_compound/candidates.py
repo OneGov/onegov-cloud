@@ -8,7 +8,7 @@ from onegov.election_day.utils.election import get_elected_candidates
 def get_districts(model, layout):
     return {
         election.id: (
-            layout.election_title(election),
+            election.domain_segment,
             layout.request.link(election)
         )
         for election in layout.model.elections

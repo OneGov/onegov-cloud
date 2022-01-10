@@ -73,17 +73,18 @@ def test_import_wabsti_majorz_cantonal_complete(
 
 
 def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
-    # - regional results from Rohrschach the 25.09.2016
+    # - regional results from Rorschach the 25.09.2016
     principal = 'sg'
     # Test regional election
     election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
-        'region',
+        'district',
         election_type='majorz',
         number_of_mandates=1,
         date_=date(2016, 9, 25),
+        domain_segment='Rorschach',
         dataset_name='RO-Kreisgericht-Rohrschach',
     )
 

@@ -55,7 +55,7 @@ class ElectionCompoundCandidatesTableWidget(ModelBoundWidget):
         request = layout.request
         session = request.session
         districts = {
-            election.id: (election.district, request.link(election))
+            election.id: (election.domain_segment, request.link(election))
             for election in model.elections
         }
         elected_candidates = get_elected_candidates(model, session).all()

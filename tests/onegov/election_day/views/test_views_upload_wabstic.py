@@ -55,8 +55,8 @@ def regenerate_token(client, id_):
     return token
 
 
-def test_view_wabstic_authenticate(election_day_app):
-    client = Client(election_day_app)
+def test_view_wabstic_authenticate(election_day_app_zg):
+    client = Client(election_day_app_zg)
     urls = ('vote', 'majorz', 'proporz')
 
     def post(url):
@@ -68,7 +68,7 @@ def test_view_wabstic_authenticate(election_day_app):
 
     assert all((post(url).status_code == 403 for url in urls))
 
-    id_, token = add_data_source(Client(election_day_app))
+    id_, token = add_data_source(Client(election_day_app_zg))
 
     assert all((post(url).status_code == 403 for url in urls))
 
@@ -76,15 +76,15 @@ def test_view_wabstic_authenticate(election_day_app):
 
     assert all((post(url).status_code == 200 for url in urls))
 
-    regenerate_token(Client(election_day_app), id_)
+    regenerate_token(Client(election_day_app_zg), id_)
 
     assert all((post(url).status_code == 403 for url in urls))
 
 
-def test_view_wabstic_translations(election_day_app):
-    id_, token = add_data_source(Client(election_day_app), fill=True)
+def test_view_wabstic_translations(election_day_app_zg):
+    id_, token = add_data_source(Client(election_day_app_zg), fill=True)
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
     params = (
@@ -156,10 +156,10 @@ def test_view_wabstic_translations(election_day_app):
     )
 
 
-def test_view_wabstic_vote(election_day_app):
-    id_, token = add_data_source(Client(election_day_app), fill=True)
+def test_view_wabstic_vote(election_day_app_zg):
+    id_, token = add_data_source(Client(election_day_app_zg), fill=True)
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
     params = [
@@ -177,14 +177,14 @@ def test_view_wabstic_vote(election_day_app):
         assert result.json['status'] == 'success'
 
 
-def test_view_wabstic_majorz(election_day_app):
+def test_view_wabstic_majorz(election_day_app_zg):
     id_, token = add_data_source(
-        Client(election_day_app),
+        Client(election_day_app_zg),
         upload_type='majorz',
         fill=True
     )
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
     params = [
@@ -209,14 +209,14 @@ def test_view_wabstic_majorz(election_day_app):
         assert result.json['status'] == 'success'
 
 
-def test_view_wabstic_proporz(election_day_app):
+def test_view_wabstic_proporz(election_day_app_zg):
     id_, token = add_data_source(
-        Client(election_day_app),
+        Client(election_day_app_zg),
         upload_type='proporz',
         fill=True
     )
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
     params = [

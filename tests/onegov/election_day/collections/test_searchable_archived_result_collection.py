@@ -200,9 +200,9 @@ def test_searchable_archive_exclude_elections(searchable_archive):
     assert searchable_archive.query().count() == 3
 
 
-def test_searchable_archive_query_term_only_on_locale(election_day_app):
+def test_searchable_archive_query_term_only_on_locale(election_day_app_zg):
 
-    session = election_day_app.session_manager.session()
+    session = election_day_app_zg.session_manager.session()
     vote = Vote(title="Vote {}".format(2012), domain='federation',
                 date=date(2012, 1, 1))
     vote.title_translations['de_CH'] = 'Election (de)'
@@ -215,7 +215,7 @@ def test_searchable_archive_query_term_only_on_locale(election_day_app):
     archive = SearchableArchivedResultCollection(DummyApp(session))
     request = DummyRequest(
         locale='de_CH',
-        app=election_day_app,
+        app=election_day_app_zg,
         session=session)
 
     archive.update_all(request)

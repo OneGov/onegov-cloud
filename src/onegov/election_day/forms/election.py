@@ -297,9 +297,6 @@ class ElectionForm(Form):
             model.domain_segment = self.district.data
         if model.domain == 'municipality':
             model.domain_segment = self.municipality.data
-        model.region = self.region.data
-        model.district = self.district.data
-        model.municipality = self.municipality.data
         model.type = self.election_type.data
         model.shortcode = self.shortcode.data
         model.number_of_mandates = self.mandates.data

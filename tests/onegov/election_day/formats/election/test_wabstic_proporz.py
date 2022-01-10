@@ -74,38 +74,24 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
 
 
 def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
-    election, errors = import_test_datasets(
-        'wabstic',
-        'election',
-        'sg',
-        domain='region',
-        election_type='proporz',
-        dataset_name='kantonsratswahl-2016',
-        number_of_mandates=12,
-        date_=date(2016, 2, 28),
-        expats=False,
-    )
-
-    assert not errors
-
-    for number, district, mandates, entities, votes, turnout in (
-        ('1', '1', 29, 9, 949454, 44.45),  # SG
-        ('2', '2', 10, 9, 105959, 43.07),  # RO
-        ('3', '3', 17, 13, 318662, 46.86),  # RH
-        ('4', '5', 9, 6, 83098, 43.94),  # WE
-        ('5', '6', 10, 8, 119157, 48.10),  # SA
-        ('6', '7', 16, 10, 301843, 44.65),  # SE
-        ('7', '8', 11, 12, 159038, 49.15),  # TO
-        ('8', '13', 18, 10, 352595, 43.94),  # WI
+    for number, district, segment, mandates, entities, votes, turnout in (
+        ('1', '1', 'St. Gallen', 29, 9, 949454, 44.45),
+        ('2', '2', 'Rorschach', 10, 9, 105959, 43.07),
+        ('3', '3', 'Rheintal', 17, 13, 318662, 46.86),
+        ('4', '5', 'Werdenberg', 9, 6, 83098, 43.94),
+        ('5', '6', 'Sarganserland', 10, 8, 119157, 48.10),
+        ('6', '7', 'See-Gaster', 16, 10, 301843, 44.65),
+        ('7', '8', 'Toggenburg', 11, 12, 159038, 49.15),
+        ('8', '13', 'Wil', 18, 10, 352595, 43.94),
     ):
-        election.number_of_mandates = mandates
         election, errors = import_test_datasets(
             'wabstic',
             'election',
             'sg',
-            domain='region',
-            election=election,
+            domain='district',
+            domain_segment=segment,
             election_type='proporz',
+            number_of_mandates=mandates,
             dataset_name='kantonsratswahl-2016',
             election_number=number,
             election_district=district

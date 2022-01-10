@@ -73,9 +73,10 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
         'internal',
         'election',
         principal,
-        'region',
+        'municipality',
         'majorz',
         date_=date(2015, 10, 18),
+        domain_segment='Baar',
         number_of_mandates=1,
         dataset_name='friedensrichter-2012-06-24',
         expats=False

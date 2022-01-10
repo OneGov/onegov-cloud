@@ -267,9 +267,46 @@ def test_view_election_compound_json(election_day_app_gr):
 
     response = client.get('/elections/elections/json')
     assert response.headers['Access-Control-Allow-Origin'] == '*'
-    assert all((expected in str(response.json) for expected in (
-        "Carol", "Winner", "Hans", "Sieger"
-    )))
+    data = response.json
+    assert data['completed'] == True
+    assert data['data']['csv']
+    assert data['data']['json']
+    assert data['date'] == '2022-01-01'
+    assert data['districts'] == [
+        {
+            'mandates': {'allocated': 1, 'total': 10},
+            'name': 'Alvaschein',
+            'progress': {'counted': 1, 'total': 1}
+        },
+        {
+            'mandates': {'allocated': 1, 'total': 5},
+            'name': 'Belfort',
+            'progress': {'counted': 1, 'total': 1}
+        }
+    ]
+    assert data['elected_candidates'] == [
+        {
+            'district': 'Belfort',
+            'family_name': 'Hans',
+            'first_name': 'Sieger',
+            'list': 'FDP',
+            'party': ''
+        },
+        {
+            'district': 'Alvaschein',
+            'family_name': 'Carol',
+            'first_name': 'Winner',
+            'list': 'CVP',
+            'party': ''
+        }
+    ]
+    assert data['elections']
+    assert data['last_modified']
+    assert data['mandates'] == {'allocated': 2, 'total': 15}
+    assert data['progress'] == {'counted': 2, 'total': 2}
+    assert data['title'] == {'de_CH': 'Elections'}
+    assert data['type'] == 'election_compound'
+    assert data['url']
 
 
 def test_view_election_compound_summary(election_day_app_gr):

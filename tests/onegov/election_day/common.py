@@ -21,12 +21,12 @@ def print_errors(errors):
             return error.interpolate()
         return error
 
-    error_list = sorted([
+    error_list = [
         (
             e.filename,
             e.line,
             message(e.error)) for e in errors
-    ])
+    ]
     for fn, l, err in error_list:
         print(f'{fn}:{l} {err}')
 
@@ -153,6 +153,8 @@ class DummyPrincipal(object):
         self.domain = 'canton'
         self.wabsti_import = False
         self.has_districts = False
+        self.has_regions = False
+        self.has_superregions = False
         self._is_year_available = True
         self.reply_to = None
 
@@ -438,78 +440,80 @@ def upload_party_results(client, create=True,
     upload = upload.form.submit()
 
 
-def create_election_compound(client):
+def create_election_compound(client, canton='gr'):
+    domain = {
+        'bl': 'region',
+        'gr': 'region',
+        'sg': 'district',
+        'sz': 'municipality',
+        'zg': 'municipality',
+    }
+    elections_field = {
+        'bl': 'region_elections',
+        'gr': 'region_elections',
+        'sg': 'district_elections',
+        'sz': 'municipality_elections',
+        'zg': 'municipality_elections',
+    }
+    segment = {
+        'bl': ['Reinach', 'Allschwil'],
+        'gr': ['Alvaschein', 'Belfort'],
+        'sg': ['Muolen', 'St. Gallen'],
+        'sz': ['Einsiedeln', 'Gersau'],
+        'zg': ['Baar', 'Cham'],
+    }
+
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election A'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = date(2022, 1, 1)
     new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'region'
-    new.form['distinct'] = True
+    new.form['domain'] = domain[canton]
+    new.form[domain[canton]] = segment[canton][0]
     new.form['mandates'] = 10
     new.form.submit()
 
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election B'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = date(2022, 1, 1)
     new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'region'
-    new.form['distinct'] = True
+    new.form['domain'] = domain[canton]
+    new.form[domain[canton]] = segment[canton][1]
     new.form['mandates'] = 5
     new.form.submit()
 
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
     new.form['election_de'] = 'Elections'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = date(2022, 1, 1)
     new.form['domain'] = 'canton'
-    new.form['elections'] = ['regional-election-a', 'regional-election-b']
-    new.form['show_lists'] = True
-    new.form['show_mandate_allocation'] = True
+    new.form['domain_elections'] = domain[canton]
+    new.form[elections_field[canton]] = [
+        'regional-election-a', 'regional-election-b'
+    ]
     new.form['show_party_strengths'] = True
     new.form['show_party_panachage'] = True
     new.form.submit()
 
 
 def upload_election_compound(client, create=True, canton='gr'):
+    entities = {
+        'bl': [2761, 2762],
+        'gr': [3506, 3513],
+        'sg': [3202, 3203],
+        'sz': [1301, 1311],
+        'zg': [1701, 1702],
+    }
     if create:
-        # Add two elections
-        new = client.get('/manage/elections').click('Neue Wahl')
-        new.form['election_de'] = 'Regional Election A'
-        new.form['date'] = date(2015, 1, 1)
-        new.form['election_type'] = 'proporz'
-        new.form['domain'] = 'region'
-        new.form['distinct'] = True
-        new.form['mandates'] = 10
-        new.form.submit()
-
-        new = client.get('/manage/elections').click('Neue Wahl')
-        new.form['election_de'] = 'Regional Election B'
-        new.form['date'] = date(2015, 1, 1)
-        new.form['election_type'] = 'proporz'
-        new.form['domain'] = 'region'
-        new.form['distinct'] = True
-        new.form['mandates'] = 5
-        new.form.submit()
-
-        # Add a compound
-        new = client.get('/manage/election-compounds').click('Neue Verbindung')
-        new.form['election_de'] = 'Elections'
-        new.form['date'] = date(2015, 1, 1)
-        new.form['domain'] = 'canton'
-        new.form['elections'] = ['regional-election-a', 'regional-election-b']
-        new.form['elections'] = ['regional-election-a', 'regional-election-b']
-        new.form['show_party_strengths'] = True
-        new.form['show_party_panachage'] = True
-        new.form.submit()
+        create_election_compound(client, canton=canton)
 
     for index, slug in enumerate((
         'regional-election-a', 'regional-election-b'
     )):
         csv = PROPORZ_HEADER
 
+        entity = entities[canton][index]
         if index:
-            entity = 3503 if canton == 'gr' else 1711
             csv += (
                 f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
                 f'101,True,Hans,Sieger,0,,0,1\n'
@@ -517,7 +521,6 @@ def upload_election_compound(client, create=True, canton='gr'):
                 f'201,False,Peter,Verlierer,2,,2,0\n'
             )
         else:
-            entity = 3633 if canton == 'gr' else 1711
             csv += (
                 f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
                 f'101,False,Anna,Looser,0,,0,1\n'

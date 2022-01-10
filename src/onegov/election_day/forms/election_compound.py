@@ -292,19 +292,23 @@ class ElectionCompoundForm(Form):
         model.after_pukelsheim = self.after_pukelsheim.data
         model.pukelsheim_completed = self.pukelsheim_completed.data
 
-        elections = self.request.session.query(Election)
+        model.elections = []
+        query = self.request.session.query(Election)
         if self.domain_elections.data == 'region':
-            model.elections = elections.filter(
-                Election.id.in_(self.region_elections.data)
-            )
+            if self.region_elections.data:
+                model.elections = query.filter(
+                    Election.id.in_(self.region_elections.data)
+                )
         if self.domain_elections.data == 'district':
-            model.elections = elections.filter(
-                Election.id.in_(self.district_elections.data)
-            )
+            if self.district_elections.data:
+                model.elections = query.filter(
+                    Election.id.in_(self.district_elections.data)
+                )
         if self.domain_elections.data == 'municipality':
-            model.elections = elections.filter(
-                Election.id.in_(self.municipality_elections.data)
-            )
+            if self.municipality_elections.data:
+                model.elections = query.filter(
+                    Election.id.in_(self.municipality_elections.data)
+                )
 
         titles = {}
         if self.election_de.data:
@@ -354,10 +358,13 @@ class ElectionCompoundForm(Form):
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
         self.show_mandate_allocation.data = model.show_mandate_allocation
+        self.region_elections.data = []
         if model.domain_elections == 'region':
             self.region_elections.data = [e.id for e in model.elections]
+        self.district_elections.data = []
         if model.domain_elections == 'district':
             self.district_elections.data = [e.id for e in model.elections]
+        self.municipality_elections.data = []
         if model.domain_elections == 'municipality':
             self.municipality_elections.data = [e.id for e in model.elections]
 
