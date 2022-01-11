@@ -121,10 +121,11 @@ class SmsQueueProcessor(object):
 
         The file names in the directory usually look like this:
 
-            * +41764033314.1571822840.745629
-            * +41764033314.1571822743.595377
+            * 0.1571822840.745629
+            * 1.1571822743.595377
 
-        The part before the first dot is the number, the rest is the suffix.
+        The part before the first dot is the batch number the rest is
+        the timestamp at time of calling app.send_sms.
 
         The messages are sorted by suffix, so by default the sorting
         happens from oldest to newest message.
@@ -137,8 +138,8 @@ class SmsQueueProcessor(object):
             if not f.is_file:
                 continue
 
-            # we expect to messages to in E.164 format, eg. '+41780000000'
-            if not f.name.startswith('+'):
+            # ignore .sending- .rejected-  files
+            if f.name.startswith('.'):
                 continue
 
             files.append(f)
@@ -147,12 +148,12 @@ class SmsQueueProcessor(object):
 
         return tuple(os.path.join(self.path, f.name) for f in files)
 
-    def send(self, number, content):
+    def send(self, numbers, content):
         code, body = self.send_request({
             "UserName": self.username,
             "Password": self.password,
             "Originator": self.originator,
-            "Recipients": (number, ),
+            "Recipients": numbers,
             "MessageText": content,
         })
 
@@ -181,13 +182,31 @@ class SmsQueueProcessor(object):
         return code, body
 
     def parse(self, filename):
-        number = self.split(filename)[1].lstrip('+')
+        with open(filename) as f:
+            try:
+                data = json.loads(f.read())
+            except json.JSONDecodeError:
+                return None, None
 
-        if not number.isdigit():
+        if not isinstance(data, dict):
             return None, None
 
-        with open(filename) as f:
-            return number, f.read()
+        receivers = data.get('receivers')
+        content = data.get('content')
+        if not isinstance(receivers, list):
+            return None, content
+
+        # NOTE: For now we silently drop invalid numbers in a batch
+        #       maybe we want to fail instead in this case.
+        #       This should only really come into play if someone
+        #       messes with the file contents in an editor.
+        #       Numbers stored in the system are pre-validated.
+        receivers = tuple(
+            r for r in receivers
+            if isinstance(r, str) and r.lstrip('+').isdigit()
+        )
+
+        return receivers, content
 
     def send_messages(self):
         for filename in self.message_files():
@@ -276,14 +295,14 @@ class SmsQueueProcessor(object):
                 raise
 
         # read message file and send contents
-        number, message = self.parse(filename)
-        if number and message:
-            self.send(number, message)
+        numbers, message = self.parse(filename)
+        if numbers and message:
+            self.send(numbers, message)
+            log.info("SMS to {} sent.".format(', '.join(numbers)))
         else:
             log.error(
-                "Discarding SMS {} due to invalid content/number".format(
-                    filename
-                )
+                f"Discarding SMS batch {filename} due to invalid "
+                "content/numbers"
             )
             os.link(filename, rejected_filename)
 
@@ -308,5 +327,3 @@ class SmsQueueProcessor(object):
             else:
                 # something bad happened, log it
                 raise
-
-        log.info("SMS to {} sent.".format(number))
