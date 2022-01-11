@@ -100,10 +100,10 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Engler']['3503']['counted'] is True
-        assert data['Engler']['3503']['percentage'] == round_(20, 21)
-        assert data['Schmid']['3503']['counted'] is True
-        assert data['Schmid']['3503']['percentage'] == round_(18, 21)
+        assert data['Engler']['3506']['counted'] is True
+        assert data['Engler']['3506']['percentage'] == round_(20, 21)
+        assert data['Schmid']['3506']['counted'] is True
+        assert data['Schmid']['3506']['percentage'] == round_(18, 21)
 
     for url in (
         '/election/proporz-election/candidate-by-entity',
@@ -117,10 +117,10 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Caluori']['3503']['counted'] is True
-        assert data['Caluori']['3503']['percentage'] == round_(2, 14)
-        assert data['Casanova']['3503']['counted'] is True
-        assert data['Casanova']['3503']['percentage'] == 0.0
+        assert data['Caluori']['3506']['counted'] is True
+        assert data['Caluori']['3506']['percentage'] == round_(2, 14)
+        assert data['Casanova']['3506']['counted'] is True
+        assert data['Casanova']['3506']['percentage'] == 0.0
 
     # test for incomplete majorz
     upload_majorz_election(client, status='unknown')
@@ -156,10 +156,10 @@ def test_view_election_candidate_by_district(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Engler']['Bernina']['entities'] == [3551, 3561]
+        assert data['Engler']['Bernina']['entities'] == [3561, 3551]
         assert data['Engler']['Bernina']['counted'] is False
         assert data['Engler']['Bernina']['percentage'] == 0.0
-        assert data['Schmid']['Bernina']['entities'] == [3551, 3561]
+        assert data['Schmid']['Bernina']['entities'] == [3561, 3551]
         assert data['Schmid']['Bernina']['counted'] is False
         assert data['Schmid']['Bernina']['percentage'] == 0.0
 
@@ -175,10 +175,10 @@ def test_view_election_candidate_by_district(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Caluori']['Bernina']['entities'] == [3551, 3561]
+        assert data['Caluori']['Bernina']['entities'] == [3561, 3551]
         assert data['Caluori']['Bernina']['counted'] is False
         assert data['Caluori']['Bernina']['percentage'] == 0.0
-        assert data['Casanova']['Bernina']['entities'] == [3551, 3561]
+        assert data['Casanova']['Bernina']['entities'] == [3561, 3551]
         assert data['Casanova']['Bernina']['counted'] is False
         assert data['Casanova']['Bernina']['percentage'] == 0.0
 
@@ -193,12 +193,12 @@ def test_view_election_statistics(election_day_app_gr):
 
     statistics = client.get('/election/majorz-election/statistics')
     assert all((expected in statistics for expected in (
-        "1 von 125", "Grüsch", "56", "25", "21", "41", "Noch nicht ausgezählt"
+        "1 von 101", "Grüsch", "56", "25", "21", "41", "Noch nicht ausgezählt"
     )))
 
     statistics = client.get('/election/proporz-election/statistics')
     assert all((expected in statistics for expected in (
-        "1 von 125", "Grüsch", "56", "32", "31", "153", "Noch nicht ausgezählt"
+        "1 von 101", "Grüsch", "56", "32", "31", "153", "Noch nicht ausgezählt"
     )))
 
 
@@ -265,10 +265,10 @@ def test_view_election_list_by_entity(election_day_app_gr):
             option.text: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['CVP']['3503']['counted'] is True
-        assert data['CVP']['3503']['percentage'] == round_(6, 14)
-        assert data['FDP']['3503']['counted'] is True
-        assert data['FDP']['3503']['percentage'] == round_(8, 14)
+        assert data['CVP']['3506']['counted'] is True
+        assert data['CVP']['3506']['percentage'] == round_(6, 14)
+        assert data['FDP']['3506']['counted'] is True
+        assert data['FDP']['3506']['percentage'] == round_(8, 14)
 
 
 def test_view_election_list_by_district(election_day_app_gr):
@@ -295,10 +295,10 @@ def test_view_election_list_by_district(election_day_app_gr):
             option.text: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['CVP']['Bernina']['entities'] == [3551, 3561]
+        assert data['CVP']['Bernina']['entities'] == [3561, 3551]
         assert data['CVP']['Bernina']['counted'] is False
         assert data['CVP']['Bernina']['percentage'] == 0.0
-        assert data['FDP']['Bernina']['entities'] == [3551, 3561]
+        assert data['FDP']['Bernina']['entities'] == [3561, 3551]
         assert data['FDP']['Bernina']['counted'] is False
         assert data['FDP']['Bernina']['percentage'] == 0.0
 
@@ -331,7 +331,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     parties = client.get('/election/proporz-election/party-strengths-data')
     parties = parties.json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
-    assert parties['labels'] == ['2015']
+    assert parties['labels'] == ['2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 5
     assert parties['results']
@@ -343,16 +343,16 @@ def test_view_election_party_strengths(election_day_app_gr):
     export = client.get('/election/proporz-election/data-parties').text
     lines = export.split('\r\n')
     assert lines[0].startswith('year,name,id,total_votes,color,mandates,votes')
-    assert lines[1].startswith('2015,BDP,0,11270,#efb52c,1,60387')
-    assert lines[2].startswith('2015,CVP,1,11270,#ff6300,1,49117')
-    assert lines[3].startswith('2015,FDP,2,11270,#0571b0,0,35134')
+    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387')
+    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117')
+    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134')
 
     # Historical data
     csv_parties = (
         'year,name,id,total_votes,color,mandates,votes\r\n'
-        '2015,BDP,0,60000,#efb52c,1,10000\r\n'
-        '2015,CVP,1,60000,#ff6300,1,30000\r\n'
-        '2015,FDP,2,60000,#4068c8,0,20000\r\n'
+        '2022,BDP,0,60000,#efb52c,1,10000\r\n'
+        '2022,CVP,1,60000,#ff6300,1,30000\r\n'
+        '2022,FDP,2,60000,#4068c8,0,20000\r\n'
         '2011,BDP,0,40000,#efb52c,1,1000\r\n'
         '2011,CVP,1,40000,#ff6300,1,15000\r\n'
         '2011,FDP,2,40000,#4068c8,1,10000\r\n'
@@ -366,7 +366,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     parties = client.get('/election/proporz-election/party-strengths-data')
     parties = parties.json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
-    assert parties['labels'] == ['2011', '2015']
+    assert parties['labels'] == ['2011', '2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 5
     assert parties['results']
@@ -376,32 +376,32 @@ def test_view_election_party_strengths(election_day_app_gr):
         for party in parties['results']
     }
     assert parties['2011-BDP']['color'] == '#efb52c'
-    assert parties['2015-BDP']['color'] == '#efb52c'
+    assert parties['2022-BDP']['color'] == '#efb52c'
     assert parties['2011-CVP']['color'] == '#ff6300'
-    assert parties['2015-CVP']['color'] == '#ff6300'
+    assert parties['2022-CVP']['color'] == '#ff6300'
     assert parties['2011-FDP']['color'] == '#4068c8'
-    assert parties['2015-FDP']['color'] == '#4068c8'
+    assert parties['2022-FDP']['color'] == '#4068c8'
 
     assert parties['2011-BDP']['active'] is False
     assert parties['2011-CVP']['active'] is False
     assert parties['2011-FDP']['active'] is False
-    assert parties['2015-BDP']['active'] is True
-    assert parties['2015-CVP']['active'] is True
-    assert parties['2015-FDP']['active'] is True
+    assert parties['2022-BDP']['active'] is True
+    assert parties['2022-CVP']['active'] is True
+    assert parties['2022-FDP']['active'] is True
 
     assert parties['2011-BDP']['value']['front'] == 1
     assert parties['2011-CVP']['value']['front'] == 1
     assert parties['2011-FDP']['value']['front'] == 1
-    assert parties['2015-BDP']['value']['front'] == 1
-    assert parties['2015-CVP']['value']['front'] == 1
-    assert parties['2015-FDP']['value']['front'] == 0
+    assert parties['2022-BDP']['value']['front'] == 1
+    assert parties['2022-CVP']['value']['front'] == 1
+    assert parties['2022-FDP']['value']['front'] == 0
 
     assert parties['2011-BDP']['value']['back'] == 2.5
     assert parties['2011-CVP']['value']['back'] == 37.5
     assert parties['2011-FDP']['value']['back'] == 25
-    assert parties['2015-BDP']['value']['back'] == 16.7
-    assert parties['2015-CVP']['value']['back'] == 50
-    assert parties['2015-FDP']['value']['back'] == 33.3
+    assert parties['2022-BDP']['value']['back'] == 16.7
+    assert parties['2022-CVP']['value']['back'] == 50
+    assert parties['2022-FDP']['value']['back'] == 33.3
 
     results = client.get('/election/proporz-election/party-strengths').text
     assert '2.5%' in results
@@ -589,11 +589,11 @@ def test_view_election_summary(election_day_app_gr):
         assert response.headers['Access-Control-Allow-Origin'] == '*'
         assert response.json == {
             'completed': False,
-            'date': '2015-01-01',
+            'date': '2022-01-01',
             'domain': 'federation',
             'elected': [['Stefan', 'Engler'], ['Martin', 'Schmid']],
             'last_modified': '2014-01-01T12:00:00+00:00',
-            'progress': {'counted': 1, 'total': 125},
+            'progress': {'counted': 1, 'total': 101},
             'title': {'de_CH': 'Majorz Election'},
             'type': 'election',
             'url': 'http://localhost/election/majorz-election',
@@ -604,11 +604,11 @@ def test_view_election_summary(election_day_app_gr):
         assert response.headers['Access-Control-Allow-Origin'] == '*'
         assert response.json == {
             'completed': False,
-            'date': '2015-01-01',
+            'date': '2022-01-01',
             'domain': 'federation',
             'elected': [],
             'last_modified': '2014-01-01T12:00:00+00:00',
-            'progress': {'counted': 1, 'total': 125},
+            'progress': {'counted': 1, 'total': 101},
             'title': {'de_CH': 'Proporz Election'},
             'type': 'election',
             'url': 'http://localhost/election/proporz-election',
@@ -625,10 +625,10 @@ def test_view_election_data(election_day_app_gr):
     upload_proporz_election(client)
 
     export = client.get('/election/majorz-election/data-json')
-    assert all((expected in export for expected in ("3503", "Engler", "20")))
+    assert all((expected in export for expected in ("3506", "Engler", "20")))
 
     export = client.get('/election/majorz-election/data-csv')
-    assert all((expected in export for expected in ("3503", "Engler", "20")))
+    assert all((expected in export for expected in ("3506", "Engler", "20")))
 
     export = client.get('/election/proporz-election/data-json')
     assert all((expected in export for expected in ("FDP", "Caluori", "56")))
@@ -645,7 +645,7 @@ def test_view_election_tacit(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Tacit Election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = date(2022, 1, 1)
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -654,8 +654,8 @@ def test_view_election_tacit(election_day_app_gr):
 
     csv = MAJORZ_HEADER
     csv += (
-        "final,,3503,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
-        "final,,3503,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
+        "final,,3506,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
+        "final,,3506,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
     )
     csv = csv.encode('utf-8')
 
@@ -680,7 +680,7 @@ def test_view_election_relations(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'First Election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = date(2022, 1, 1)
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -688,7 +688,7 @@ def test_view_election_relations(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Second Election'
-    new.form['date'] = date(2015, 1, 2)
+    new.form['date'] = date(2022, 1, 2)
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -697,8 +697,8 @@ def test_view_election_relations(election_day_app_gr):
 
     csv = MAJORZ_HEADER
     csv += (
-        "final,,3503,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
-        "final,,3503,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
+        "final,,3506,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
+        "final,,3506,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
     )
     csv = csv.encode('utf-8')
 

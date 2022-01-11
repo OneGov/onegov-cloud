@@ -353,10 +353,15 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def translator(self):
         """ Returns the translate function for basic string translations. """
         translator = self.get_translate()
-        if translator:
-            return lambda text: text.interpolate(translator.gettext(text))
 
-        return lambda text: text.interpolate(text)
+        def translate(text):
+            if not hasattr(text, 'interpolate'):
+                return text
+            if translator:
+                return text.interpolate(translator.gettext(text))
+            return text.interpolate(text)
+
+        return translate
 
     @cached_property
     def default_locale(self):

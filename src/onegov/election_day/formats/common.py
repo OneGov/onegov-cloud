@@ -151,10 +151,12 @@ def load_csv(
     return csv, error
 
 
-def get_entity_and_district(entity_id, entities, election, principal, errors):
+def get_entity_and_district(
+    entity_id, entities, election, principal, errors=None
+):
     """ Returns the entity name and district or region (from our static data,
-    depending on the domain of the election). Adds an error, if the district
-    or region is not part of this election.
+    depending on the domain of the election). Adds optionally an error, if the
+    district or region is not part of this election.
 
     """
 
@@ -164,26 +166,26 @@ def get_entity_and_district(entity_id, entities, election, principal, errors):
     if election.domain == 'region':
         district = entity.get('region', '')
 
-    if election.domain == 'municipality':
-        if election.domain_segment != name:
-            if principal.domain != 'municipality':
+    if errors is not None:
+        if election.domain == 'municipality':
+            if election.domain_segment != name:
+                if principal.domain != 'municipality':
+                    errors.append(_(
+                        "${name} is not part of this election",
+                        mapping={
+                            'name': entity_id,
+                            'district': election.domain_segment
+                        }
+                    ))
+        if election.domain in ('region', 'district'):
+            if election.domain_segment != district:
                 errors.append(_(
-                    "${name} is not part of this election",
+                    "${name} is not part of ${district}",
                     mapping={
                         'name': entity_id,
                         'district': election.domain_segment
                     }
                 ))
-
-    if election.domain in ('region', 'district'):
-        if election.domain_segment != district:
-            errors.append(_(
-                "${name} is not part of ${district}",
-                mapping={
-                    'name': entity_id,
-                    'district': election.domain_segment
-                }
-            ))
 
     return name, district
 

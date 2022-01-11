@@ -175,7 +175,7 @@ def test_view_update_results(election_day_app_zg):
     assert len(client.get('/json').json['results']) == 2
 
 
-@pytest.mark.parametrize("url", ['vote', 'election', 'election_compound'])
+@pytest.mark.parametrize("url", ['vote', 'election'])
 def test_view_filter_archive(url, election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()

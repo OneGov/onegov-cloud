@@ -194,13 +194,14 @@ def import_election_internal_majorz(election, principal, file, mimetype):
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:
-        entity = entities.get(entity_id, {})
-        district = entity.get('district', '')
+        name, district = get_entity_and_district(
+            entity_id, entities, election, principal
+        )
         if election.domain == 'none':
             continue
         if election.domain == 'municipality':
             if principal.domain != 'municipality':
-                if entity != election.domain_segment:
+                if name != election.domain_segment:
                     continue
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
@@ -208,7 +209,7 @@ def import_election_internal_majorz(election, principal, file, mimetype):
         results[entity_id] = dict(
             id=uuid4(),
             election_id=election_id,
-            name=entity.get('name', ''),
+            name=name,
             district=district,
             entity_id=entity_id,
             counted=False

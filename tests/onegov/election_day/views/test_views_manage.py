@@ -80,9 +80,9 @@ def test_view_manage_elections(election_day_app_zg):
     assert archive.query().count() == 0
 
 
-def test_view_manage_election_compounds(election_day_app_zg):
-    archive = ArchivedResultCollection(election_day_app_zg.session())
-    client = Client(election_day_app_zg)
+def test_view_manage_election_compounds(election_day_app_gr):
+    archive = ArchivedResultCollection(election_day_app_gr.session())
+    client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     assert client.get('/manage/election-compounds',
@@ -116,13 +116,14 @@ def test_view_manage_election_compounds(election_day_app_zg):
     new.form['election_de'] = 'Elect a new parliament'
     new.form['date'] = date(2016, 1, 1)
     new.form['domain'] = 'canton'
-    new.form['elections'] = ['elect-a-new-parliament-region-a']
+    new.form['domain_elections'] = 'region'
+    new.form['region_elections'] = ['elect-a-new-parliament-region-a']
     manage = new.form.submit().follow()
 
     assert "Elect a new parliament" in manage
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new cantonal parliament'
-    edit.form['elections'] = [
+    edit.form['region_elections'] = [
         'elect-a-new-parliament-region-a',
         'elect-a-new-parliament-region-b'
     ]
@@ -210,10 +211,7 @@ def test_view_clear_results(election_day_app_zg):
     upload_election_compound(client, canton='zg')
     upload_party_results(client)
     upload_party_results(client, slug='elections/elections')
-    upload_vote(client)
-
-    # Test currently fails for lists / panachage because
-    # layout.visible is False because' self.proporz is False!?!
+    upload_vote(client, canton='zg')
 
     marker = "<h2>Resultate</h2>"
     i_marker = "<h2>Zwischenergebnisse</h2>"
@@ -225,8 +223,11 @@ def test_view_clear_results(election_day_app_zg):
         '/election/proporz-election/connections',
         '/election/proporz-election/party-strengths',
         '/election/proporz-election/parties-panachage',
-        # '/election/proporz-election/lists-panachage',
+        '/election/proporz-election/lists-panachage',
         '/election/proporz-election/statistics',
+        '/elections/elections/districts',
+        '/elections/elections/candidates',
+        '/elections/elections/statistics',
         '/elections/elections/parties-panachage',
         '/elections/elections/party-strengths',
         '/vote/vote/entities'
@@ -235,7 +236,6 @@ def test_view_clear_results(election_day_app_zg):
     for url in urls:
         page = client.get(url)
         if marker not in page and i_marker not in page:
-            print(url)
             assert False
 
     client.get('/election/majorz-election/clear').form.submit()
@@ -479,7 +479,7 @@ def test_view_manage_screens(election_day_app_zg):
     new.form['election_de'] = 'Majorz Wahl'
     new.form['date'] = date(2016, 1, 1)
     new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'region'
+    new.form['domain'] = 'municipality'
     new.form['mandates'] = 10
     new.form.submit().follow()
 
@@ -487,7 +487,7 @@ def test_view_manage_screens(election_day_app_zg):
     new.form['election_de'] = 'Proporz Wahl'
     new.form['date'] = date(2016, 1, 1)
     new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'region'
+    new.form['domain'] = 'municipality'
     new.form['mandates'] = 5
     new.form.submit().follow()
 
@@ -496,7 +496,8 @@ def test_view_manage_screens(election_day_app_zg):
     new.form['election_de'] = 'Verbund von Wahlen'
     new.form['date'] = date(2016, 1, 1)
     new.form['domain'] = 'canton'
-    new.form['elections'] = ['proporz-wahl']
+    new.form['domain_elections'] = 'municipality'
+    new.form['municipality_elections'] = ['proporz-wahl']
     new.form.submit().follow()
 
     # Add a screen

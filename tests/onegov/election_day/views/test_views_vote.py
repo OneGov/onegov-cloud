@@ -107,7 +107,7 @@ def test_view_vote_summary(election_day_app_zg):
         assert response.json == {
             'answer': 'rejected',
             'completed': True,
-            'date': '2015-01-01',
+            'date': '2022-01-01',
             'domain': 'federation',
             'last_modified': '2014-01-01T12:00:00+00:00',
             'nays_percentage': 62.78808066258552,

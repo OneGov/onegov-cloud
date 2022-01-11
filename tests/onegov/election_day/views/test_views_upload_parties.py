@@ -17,8 +17,8 @@ def test_upload_parties_invalidate_cache(election_day_app_gr):
     client.get('/locale/de_CH').follow()
     login(client)
 
-    upload_proporz_election(client)
-    upload_election_compound(client)
+    upload_proporz_election(client, canton='gr')
+    upload_election_compound(client, canton='gr')
     urls = (
         '/election/proporz-election/party-strengths',
         '/elections/elections/party-strengths'
@@ -49,7 +49,7 @@ def test_upload_parties_submit(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    create_election_compound(client)
+    create_election_compound(client, canton='zg')
 
     for slug in ('election/election', 'elections/elections'):
         with patch(

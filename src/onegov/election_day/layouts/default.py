@@ -39,6 +39,9 @@ class DefaultLayout(ChameleonLayout):
     def principal(self):
         return self.request.app.principal
 
+    def label(self, value):
+        return self.principal.label(value)
+
     @cached_property
     def has_districts(self):
         return self.principal.has_districts
