@@ -997,7 +997,7 @@ def safe_move(src, dst):
 
 def batched(iterable, batch_size, container_factory=tuple):
     """ Splits an iterable into container batches of batch_size.
-    
+
     The container_factory is necessary in order to consume the iterator
     returned by islice. Otherwise this function would never return.
 
