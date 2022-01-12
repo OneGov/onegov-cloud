@@ -155,6 +155,7 @@ def import_election_wabstic_majorz(
             if entity_id in added_entities:
                 line_errors.append(
                     _("${name} was found twice", mapping={'name': entity_id}))
+
             # Skip expats if not enabled
             if entity_id == 0 and not election.expats:
                 continue

@@ -9,7 +9,7 @@ from unittest.mock import Mock
 import pytest
 
 
-def test_vote_layout_1(session):
+def test_vote_layout(session):
 
     layout = VoteLayout(Vote(date=date(2021, 1, 1)), DummyRequest())
 

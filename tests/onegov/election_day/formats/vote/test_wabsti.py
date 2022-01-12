@@ -9,7 +9,7 @@ from tests.onegov.election_day.common import get_tar_file_path, \
     create_principal
 
 
-def test_import_wabsti_vote_1(session):
+def test_import_wabsti_vote(session):
     principal = 'sg'
     domain = 'federation'
 

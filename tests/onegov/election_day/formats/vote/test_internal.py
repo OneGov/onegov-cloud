@@ -8,7 +8,7 @@ from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import create_principal
 
 
-def test_import_internal_vote_1(session, import_test_datasets):
+def test_import_internal_vote(session, import_test_datasets):
 
     principal = 'sg'
 
