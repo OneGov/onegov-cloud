@@ -137,9 +137,10 @@ def test_view_sms_subscription(election_day_app):
     assert len(os.listdir(sms_path)) == 1
 
     filename = os.listdir(sms_path)[0]
-    assert '+41791112233' in filename
     with open(os.path.join(sms_path, filename)) as f:
-        assert 'Die SMS-Benachrichtigung wurde abonniert' in f.read()
+        content = f.read()
+        assert '+41791112233' in content
+        assert 'Die SMS-Benachrichtigung wurde abonniert' in content
 
     client.get('/locale/fr_CH').follow()
 
