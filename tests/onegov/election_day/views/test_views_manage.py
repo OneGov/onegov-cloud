@@ -213,8 +213,6 @@ def test_view_clear_results(election_day_app_zg):
     upload_party_results(client, slug='elections/elections')
     upload_vote(client, canton='zg')
 
-    marker = "<h2>Resultate</h2>"
-    i_marker = "<h2>Zwischenergebnisse</h2>"
     urls = (
         '/election/majorz-election/candidates',
         '/election/majorz-election/statistics',
@@ -233,17 +231,16 @@ def test_view_clear_results(election_day_app_zg):
         '/vote/vote/entities'
     )
 
-    for url in urls:
-        page = client.get(url)
-        if marker not in page and i_marker not in page:
-            assert False
+    assert all(['Noch keine Resultate' not in client.get(url) for url in urls])
 
-    client.get('/election/majorz-election/clear').form.submit()
-    client.get('/election/proporz-election/clear').form.submit()
-    client.get('/elections/elections/clear').form.submit()
-    client.get('/vote/vote/clear').form.submit()
+    client.get('/election/majorz-election/clear').form.submit().follow()
+    client.get('/election/proporz-election/clear').form.submit().follow()
+    client.get('/elections/elections/clear').form.submit().follow()
+    client.get('/election/regional-election-a/clear').form.submit().follow()
+    client.get('/election/regional-election-b/clear').form.submit().follow()
+    client.get('/vote/vote/clear').form.submit().follow()
 
-    assert all((marker not in client.get(url) for url in urls))
+    assert all(['Noch keine Resultate' in client.get(url) for url in urls])
 
 
 def test_view_manage_upload_tokens(election_day_app_zg):
