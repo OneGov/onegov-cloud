@@ -115,7 +115,7 @@ class VoteLayout(DefaultLayout):
                     self.request.translate(codes[lang])
                     for lang in data.get('language', [])
                 ])
-                protected = 'article' in data.get('doctype', [])
+                protected = 'article' in data.get('doctype', ['article'])
             else:
                 order = 3
                 title = file.filename

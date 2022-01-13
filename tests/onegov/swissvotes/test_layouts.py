@@ -748,7 +748,8 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         campaign_material_metadata={
             'campaign_material_other-essay': {
                 'title': 'Perché è una pessima idea.',
-                'language': ['it', 'rm']
+                'language': ['it', 'rm'],
+                'doctype': ['argument']
             },
             'campaign_material_other-article': {
                 'title': 'Presseschau',
@@ -786,7 +787,7 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         assert results == [
             (0, 'Brief description Swissvotes', 'French', False),
             (0, 'Full analysis of post-vote poll results', 'German', False),
-            (1, 'campaign_material_other-leaflet.pdf', '', False),
+            (1, 'campaign_material_other-leaflet.pdf', '', True),
             (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic',
              False),
             (1, 'Presseschau', 'German', True),
