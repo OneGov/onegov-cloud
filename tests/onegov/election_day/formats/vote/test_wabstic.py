@@ -10,7 +10,7 @@ from onegov.election_day.models import Municipality
 from tests.onegov.election_day.common import get_tar_file_path, print_errors
 
 
-def test_import_wabstic_vote_1(session):
+def test_import_wabstic_vote(session):
     # The tar file contains (modified) vote results from SG from the 12.02.2017
     # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
     # complex communal vote

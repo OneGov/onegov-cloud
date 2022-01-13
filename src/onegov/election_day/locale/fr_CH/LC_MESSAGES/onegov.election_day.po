@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-04 08:19+0100\n"
+"POT-Creation-Date: 2022-01-09 08:04+0100\n"
 "PO-Revision-Date: 2021-04-01 10:23+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -64,6 +64,14 @@ msgid "The file contains an empty line."
 msgstr "Le fichier contient une ligne vide."
 
 #, python-format
+msgid "${name} is not part of this election"
+msgstr "${name} ne fait pas partie de cette élection"
+
+#, python-format
+msgid "${name} is not part of ${district}"
+msgstr "${name} ne fait pas partie de ${district}"
+
+#, python-format
 msgid "Empty value: ${col}"
 msgstr "Valeur vide: ${col}"
 
@@ -100,9 +108,6 @@ msgstr "Résultats"
 
 msgid "No data found"
 msgstr "Pas de données trouvées"
-
-msgid "No clear district"
-msgstr "Aucun district clair"
 
 msgid "Invalid list results"
 msgstr "Résultats de la liste non valides"
@@ -199,7 +204,7 @@ msgstr "Impossible de connaître les votes blancs"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Terme de recherche"
 
 msgid ""
@@ -215,11 +220,29 @@ msgstr "De"
 msgid "To date"
 msgstr "A"
 
+msgid "Domain"
+msgstr "Echelon"
+
 msgid "Voting result"
 msgstr "Résultat de la votation"
 
-msgid "Domain"
-msgstr "Echelon"
+msgid "Accepted"
+msgstr "Accepté"
+
+msgid "Rejected"
+msgstr "Refusé"
+
+msgid "Federal"
+msgstr "Fédéral"
+
+msgid "Cantonal"
+msgstr "Cantonal"
+
+msgid "Regional"
+msgstr "Régional"
+
+msgid "Communal"
+msgstr "Municipal"
 
 msgid "Name"
 msgstr "Nom"
@@ -254,6 +277,12 @@ msgstr "Relative"
 msgid "Absolute majority"
 msgstr "Majorité absolue"
 
+msgid "District"
+msgstr "Circonscription électorale"
+
+msgid "Municipality"
+msgstr "Commune"
+
 msgid "Tacit election"
 msgstr "Élection tacite"
 
@@ -262,18 +291,6 @@ msgstr "Suisses de l'étranger"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'élection contient des résultats distincts pour les expatriés."
-
-msgid "Distinct district"
-msgstr "District unique"
-
-msgid ""
-"The election contains results for an entire district. When uploading "
-"intermediate results, the missing municipalities of the districts are added "
-"accordingly."
-msgstr ""
-"L'élection contient des résultats pour une circonscription électorale "
-"entière. Lors du téléchargement des résultats intermédiaires, les communes "
-"manquantes de la circonscription électorale sont complétées en conséquence."
 
 msgid "Doppelter Pukelsheim"
 msgstr ""
@@ -332,15 +349,8 @@ msgstr "Couleurs"
 msgid "Invalid color definitions"
 msgstr "Définitions de couleurs non valides"
 
-msgid "Cantonal"
-msgstr "Cantonal"
-
-msgid ""
-"Elections contain results for single municipalities rather than (partial) "
-"districts"
-msgstr ""
-"Les élections contiennent des résultats pour des municipalités individuelles "
-"plutôt que pour des districts (partiels)."
+msgid "Domain of the elections"
+msgstr "Echelon des élections"
 
 msgid "Elections"
 msgstr "Elections"
@@ -500,6 +510,9 @@ msgstr "Partis"
 msgid "Downloads"
 msgstr "Téléchargements"
 
+msgid "Municipalities"
+msgstr "Communes"
+
 msgid "Elected candidates"
 msgstr "Candidats élus"
 
@@ -508,12 +521,6 @@ msgstr "Nouveaux résultats intermédiaires"
 
 msgid "Final results"
 msgstr "Résultats finaux"
-
-msgid "Accepted"
-msgstr "Accepté"
-
-msgid "Rejected"
-msgstr "Refusé"
 
 msgid "Counter proposal accepted"
 msgstr "Contre-projet accepté"
@@ -560,15 +567,6 @@ msgstr "Gérer"
 msgid "Mappings"
 msgstr "Cartographie"
 
-msgid "Federal"
-msgstr "Fédéral"
-
-msgid "Regional"
-msgstr "Régional"
-
-msgid "Municipality"
-msgstr "Commune"
-
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Les résultats finaux sont disponibles sur ${url}"
@@ -577,8 +575,12 @@ msgstr "Les résultats finaux sont disponibles sur ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Les nouveaux résultats intermédiaires sont disponibles sur ${url}"
 
-msgid "Municipalities"
-msgstr "Communes"
+#, python-format
+msgid "Regional (${on})"
+msgstr "Régional (${on})"
+
+msgid "Other"
+msgstr "Autre"
 
 msgid "district_label_bl"
 msgstr "District électoral"
@@ -588,9 +590,6 @@ msgstr "Région"
 
 msgid "district_label_sz"
 msgstr "District électoral"
-
-msgid "District"
-msgstr "Circonscription électorale"
 
 msgid "districts_label_bl"
 msgstr "Districts électorales"
@@ -609,9 +608,6 @@ msgstr "Région"
 
 msgid "superregions_label_bl"
 msgstr "Régions"
-
-msgid "Communal"
-msgstr "Municipal"
 
 msgid "Quarter"
 msgstr "Quartier"

@@ -1,0 +1,4 @@
+/* Fixes depends_on rendering the select visible */
+.field-type-chosenselectmultiplefield select {
+    display: none !important;
+}

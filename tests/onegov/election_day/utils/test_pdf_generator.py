@@ -19,47 +19,47 @@ class PatchedPdfGenerator(PdfGenerator):
         self.renderer = PatchedD3Renderer(app)
 
 
-def test_generate_pdf_election(session, election_day_app):
-    generator = PatchedPdfGenerator(election_day_app)
+def test_generate_pdf_election(session, election_day_app_zg):
+    generator = PatchedPdfGenerator(election_day_app_zg)
 
     # Majorz election
     majorz = add_majorz_election(session)
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(majorz, 'election.pdf', locale)
-        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 3
 
     # Proporz election
     proporz = add_proporz_election(session)
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
-        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 8
 
     # Proporz election with deltas
     add_proporz_election(session, year=2011)
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
-        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 8
 
     # Proporz election with more than one entitiy
     proporz.status = 'final'
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
-        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 8
 
     # Tacit election
     majorz.tacit = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(majorz, 'election.pdf', locale)
-        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 1
 
 
-def test_generate_pdf_election_compound(session, election_day_app):
-    generator = PatchedPdfGenerator(election_day_app)
+def test_generate_pdf_election_compound(session, election_day_app_zg):
+    generator = PatchedPdfGenerator(election_day_app_zg)
 
     compound = add_election_compound(session)
     compound.show_party_strengths = True
@@ -67,12 +67,12 @@ def test_generate_pdf_election_compound(session, election_day_app):
     compound.show_mandate_allocation = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
-        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 4
 
 
-def test_generate_pdf_vote(session, election_day_app):
-    generator = PatchedPdfGenerator(election_day_app)
+def test_generate_pdf_vote(session, election_day_app_zg):
+    generator = PatchedPdfGenerator(election_day_app_zg)
 
     # Simple vote
     vote = add_vote(session, 'simple')
@@ -81,7 +81,7 @@ def test_generate_pdf_vote(session, election_day_app):
     ))
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(vote, 'vote.pdf', locale)
-        with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 3
 
     # Complex vote
@@ -97,7 +97,7 @@ def test_generate_pdf_vote(session, election_day_app):
     ))
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(vote, 'vote.pdf', locale)
-        with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 9
 
 
@@ -131,25 +131,25 @@ def test_generate_pdf_vote_districts(session, election_day_app_gr):
             assert len(PdfReader(f, decompress=False).pages) == 15
 
 
-def test_generate_pdf_vote_single(session, election_day_app):
-    generator = PatchedPdfGenerator(election_day_app)
+def test_generate_pdf_vote_single(session, election_day_app_zg):
+    generator = PatchedPdfGenerator(election_day_app_zg)
 
     # Simple vote, only one entity
     vote = add_vote(session, 'simple')
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(vote, 'vote.pdf', locale)
-        with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 1
 
     # Complex vote, only one entity
     vote = add_vote(session, 'complex')
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(vote, 'vote.pdf', locale)
-        with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+        with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 3
 
 
-def test_generate_pdf_long_title(session, election_day_app):
+def test_generate_pdf_long_title(session, election_day_app_zg):
     title = """This is a very long title so that it breaks the header line to
     a second line which must also be ellipsed.
 
@@ -170,32 +170,32 @@ def test_generate_pdf_long_title(session, election_day_app):
     )
     session.flush()
 
-    generator = PatchedPdfGenerator(election_day_app)
+    generator = PatchedPdfGenerator(election_day_app_zg)
     generator.generate_pdf(vote, 'vote.pdf', 'de_CH')
-    with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+    with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
         assert len(PdfReader(f, decompress=False).pages) == 1
 
 
-def test_sign_pdf(session, election_day_app):
+def test_sign_pdf(session, election_day_app_zg):
     # No signing
-    generator = PdfGenerator(election_day_app)
+    generator = PdfGenerator(election_day_app_zg)
 
     with patch('onegov.pdf.signature.post') as post:
         generator.sign_pdf('vote.pdf')
         assert not post.called
 
     # signing
-    principal = election_day_app.principal
+    principal = election_day_app_zg.principal
     principal.pdf_signing = {
         'host': 'http://abcd.ef',
         'login': 'abcd',
         'password': '1234',
         'reason': 'why'
     }
-    election_day_app.cache.set('principal', principal)
-    generator = PdfGenerator(election_day_app)
+    election_day_app_zg.cache.set('principal', principal)
+    generator = PdfGenerator(election_day_app_zg)
 
-    with election_day_app.filestorage.open('vote.pdf', 'w') as f:
+    with election_day_app_zg.filestorage.open('vote.pdf', 'w') as f:
         f.write('PDF')
 
     args = {
@@ -219,17 +219,17 @@ def test_sign_pdf(session, election_day_app):
                 'reason_for_signature': 'why'
             }
         }
-    with election_day_app.filestorage.open('vote.pdf', 'r') as f:
+    with election_day_app_zg.filestorage.open('vote.pdf', 'r') as f:
         assert f.read() == 'SIGNED'
 
 
-def test_create_pdfs(election_day_app):
-    generator = PatchedPdfGenerator(election_day_app)
-    session = election_day_app.session()
-    fs = election_day_app.filestorage
+def test_create_pdfs(election_day_app_zg):
+    generator = PatchedPdfGenerator(election_day_app_zg)
+    session = election_day_app_zg.session()
+    fs = election_day_app_zg.filestorage
 
     generator.create_pdfs()
-    assert election_day_app.filestorage.listdir('pdf') == []
+    assert election_day_app_zg.filestorage.listdir('pdf') == []
 
     majorz_election = add_majorz_election(session)
     proporz_election = add_proporz_election(session)

@@ -2,10 +2,6 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from onegov.ballot import Election
-from onegov.ballot import Vote
-from onegov.ballot.models.election.election_compound import \
-    ElectionCompoundAssociation, ElectionCompound
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
@@ -17,6 +13,41 @@ from sqlalchemy import Text
 from sqlalchemy.engine.reflection import Inspector
 
 
+def alter_domain_of_influence(context, old, new):
+    # see http://stackoverflow.com/a/14845740
+
+    # Todo: Check if old exists
+    old_type = Enum(*old, name='domain_of_influence')
+
+    # Change current types to a temporary one
+    tmp_type = Enum(*new, name='_domain_of_influence')
+    tmp_type.create(context.operations.get_bind(), checkfirst=False)
+    inspector = Inspector(context.operations_connection)
+    tables = ['elections', 'election_compounds', 'votes', 'archived_results']
+    for table in tables:
+        if table in inspector.get_table_names(context.schema):
+            context.operations.execute(
+                f'ALTER TABLE {table} '
+                f'ALTER COLUMN domain TYPE _domain_of_influence '
+                f'USING domain::text::_domain_of_influence'
+            )
+
+    # Drop old one
+    old_type.drop(context.operations.get_bind(), checkfirst=False)
+
+    # Change temporary to new one with the right name
+    new_type = Enum(*new, name='domain_of_influence')
+    new_type.create(context.operations.get_bind(), checkfirst=False)
+    for table in tables:
+        context.operations.execute(
+            f'ALTER TABLE {table} '
+            f'ALTER COLUMN domain TYPE domain_of_influence '
+            f'USING domain::text::domain_of_influence'
+        )
+    # Drop temporary
+    tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
 @upgrade_task('Rename yays to yeas')
 def rename_yays_to_yeas(context):
 
@@ -24,7 +55,8 @@ def rename_yays_to_yeas(context):
         return False
     else:
         context.operations.alter_column(
-            'ballot_results', 'yays', new_column_name='yeas')
+            'ballot_results', 'yays', new_column_name='yeas'
+        )
 
 
 @upgrade_task('Add shortcode column')
@@ -34,23 +66,10 @@ def add_shortcode_column(context):
 
 @upgrade_task('Enable translation of vote title')
 def enable_translation_of_vote_title(context):
-
-    # get the existing votes before removing the old column
-    query = context.session.execute('SELECT id, title FROM votes')
-    votes = dict(query.fetchall())
-
     context.operations.drop_column('votes', 'title')
     context.operations.add_column('votes', Column(
         'title_translations', HSTORE, nullable=True
     ))
-
-    for vote in context.session.query(Vote).all():
-        vote.title_translations = {
-            locale: votes[vote.id].strip()
-            for locale in context.app.locales
-        }
-    context.session.flush()
-
     context.operations.alter_column(
         'votes', 'title_translations', nullable=False
     )
@@ -88,47 +107,12 @@ def add_municipality_domain(context):
         if context.has_column(table, old):
             context.operations.alter_column(table, old, new_column_name=new)
 
-    # Add the new domain, see http://stackoverflow.com/a/14845740
-    table_names = []
-    inspector = Inspector(context.operations_connection)
-    if 'elections' in inspector.get_table_names(context.schema):
-        table_names.append('elections')
-    if 'election_compounds' in inspector.get_table_names(context.schema):
-        table_names.append('election_compounds')
-    if 'votes' in inspector.get_table_names(context.schema):
-        table_names.append('votes')
-    if 'archived_results' in inspector.get_table_names(context.schema):
-        table_names.append('archived_results')
-
-    old_type = Enum('federation', 'canton', name='domain_of_influence')
-    new_type = Enum('federation', 'canton', 'municipality',
-                    name='domain_of_influence')
-    tmp_type = Enum('federation', 'canton', 'municipality',
-                    name='_domain_of_influence')
-
-    tmp_type.create(context.operations.get_bind(), checkfirst=False)
-
-    for table_name in table_names:
-        context.operations.execute(
-            (
-                'ALTER TABLE {} ALTER COLUMN domain TYPE _domain_of_influence '
-                'USING domain::text::_domain_of_influence'
-            ).format(table_name)
-        )
-
-    old_type.drop(context.operations.get_bind(), checkfirst=False)
-
-    new_type.create(context.operations.get_bind(), checkfirst=False)
-
-    for table_name in table_names:
-        context.operations.execute(
-            (
-                'ALTER TABLE {} ALTER COLUMN domain TYPE domain_of_influence '
-                'USING domain::text::domain_of_influence'
-            ).format(table_name)
-        )
-
-    tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+    # Add the new domain,
+    alter_domain_of_influence(
+        context,
+        ['federation', 'canton'],
+        ['federation', 'canton', 'municipality']
+    )
 
 
 @upgrade_task('Add party resuts columns')
@@ -229,12 +213,6 @@ def add_vote_type_column(context):
     if not context.has_column('votes', 'type'):
         context.operations.add_column('votes', Column('type', Text))
 
-        for vote in context.session.query(Vote).all():
-            meta = vote.meta or {}
-            vote.type = meta.get('vote_type', 'simple')
-            if 'vote_type' in meta:
-                del vote.meta['vote_type']
-
 
 @upgrade_task('Change election type column')
 def change_election_type_column(context):
@@ -277,50 +255,16 @@ def change_counted_columns_of_elections(context):
         context.operations.drop_column('elections', 'counted_entities')
 
 
-@upgrade_task('Add region domain of influence')
+@upgrade_task(
+    'Add region domain of influence',
+    requires='onegov.ballot:Add municipality domain of influence',
+)
 def add_region_domain(context):
-    # Add the new domain, see http://stackoverflow.com/a/14845740
-    table_names = []
-    inspector = Inspector(context.operations_connection)
-    if 'elections' in inspector.get_table_names(context.schema):
-        table_names.append('elections')
-    if 'election_compounds' in inspector.get_table_names(context.schema):
-        table_names.append('election_compounds')
-    if 'votes' in inspector.get_table_names(context.schema):
-        table_names.append('votes')
-    if 'archived_results' in inspector.get_table_names(context.schema):
-        table_names.append('archived_results')
-
-    old_type = Enum('federation', 'canton', 'municipality',
-                    name='domain_of_influence')
-    new_type = Enum('federation', 'region', 'canton', 'municipality',
-                    name='domain_of_influence')
-    tmp_type = Enum('federation', 'region', 'canton', 'municipality',
-                    name='_domain_of_influence')
-
-    tmp_type.create(context.operations.get_bind(), checkfirst=False)
-
-    for table_name in table_names:
-        context.operations.execute(
-            (
-                'ALTER TABLE {} ALTER COLUMN domain TYPE _domain_of_influence '
-                'USING domain::text::_domain_of_influence'
-            ).format(table_name)
-        )
-
-    old_type.drop(context.operations.get_bind(), checkfirst=False)
-
-    new_type.create(context.operations.get_bind(), checkfirst=False)
-
-    for table_name in table_names:
-        context.operations.execute(
-            (
-                'ALTER TABLE {} ALTER COLUMN domain TYPE domain_of_influence '
-                'USING domain::text::domain_of_influence'
-            ).format(table_name)
-        )
-
-    tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+    alter_domain_of_influence(
+        context,
+        ['federation', 'canton', 'municipality'],
+        ['federation', 'region', 'canton', 'municipality'],
+    )
 
 
 @upgrade_task('Rename eligible voters columns')
@@ -414,37 +358,16 @@ def add_update_contraints(context):
     )
 
 
-@upgrade_task('Migrate election compounds', always_run=True)
+@upgrade_task('Migrate election compounds')
 def migrate_election_compounds(context):
-    if (
-        context.has_table('election_compounds')
-        and context.has_table('election_compound_associations')
-        and context.has_column('election_compounds', 'elections')
-    ):
-        session = context.session
-        query = session.execute(
-            'SELECT id, akeys(elections) FROM election_compounds'
-        )
-        for election_compound_id, elections in query.fetchall():
-            for election_id in (elections or []):
-                if session.query(Election).filter_by(id=election_id).first():
-                    session.add(
-                        ElectionCompoundAssociation(
-                            election_compound_id=election_compound_id,
-                            election_id=election_id
-                        )
-                    )
-
+    if context.has_column('election_compounds', 'elections'):
         context.operations.drop_column('election_compounds', 'elections')
-    else:
-        return False
 
 
 @upgrade_task('Adds a default majority type')
 def add_default_majority_type(context):
-    for election in context.session.query(Election).all():
-        if not election.majority_type:
-            election.majority_type = 'absolute'
+    # Removed data migrations
+    pass
 
 
 @upgrade_task('Add delete contraints')
@@ -513,12 +436,8 @@ def add_delete_contraints(context):
 
 @upgrade_task('Adds migration for related link and related link label')
 def add_related_link_and_label(context):
-    for model in (Vote, Election, ElectionCompound):
-        for item in context.session.query(model):
-            if not item.related_link:
-                item.related_link = None
-            if not item.related_link_label:
-                item.related_link_label = {}
+    # Removed data migrations
+    pass
 
 
 @upgrade_task('Adds Doppelter Pukelsheim to CompoundElection/Election')
@@ -541,3 +460,15 @@ def add_after_pukelsheim(context):
                 nullable=False,
                 default=False
             ), default=lambda x: False)
+
+
+@upgrade_task(
+    'Add district and none domains of influence',
+    requires='onegov.ballot:Add region domain of influence',
+)
+def add_district_and_none_domain(context):
+    alter_domain_of_influence(
+        context,
+        ['federation', 'region', 'canton', 'municipality'],
+        ['federation', 'canton', 'region', 'district', 'municipality', 'none']
+    )

@@ -7,8 +7,8 @@ from tests.onegov.election_day.common import upload_vote
 from webtest import TestApp as Client
 
 
-def test_view_notifications_votes(election_day_app):
-    client = Client(election_day_app)
+def test_view_notifications_votes(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -23,9 +23,9 @@ def test_view_notifications_votes(election_day_app):
     assert "Benachrichtigungen auslösen" not in client.get('/manage/votes')
     assert "Benachrichtigungen auszulösen" not in upload_vote(client, False)
 
-    principal = election_day_app.principal
+    principal = election_day_app_zg.principal
     principal.webhooks = {'http://example.com/1': None}
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
     assert "Benachrichtigungen auszulösen" in upload_vote(client, False)
@@ -43,11 +43,11 @@ def test_view_notifications_votes(election_day_app):
     assert "erneut auslösen" not in client.get('/vote/vote/trigger')
 
     # Test email
-    principal = election_day_app.principal
+    principal = election_day_app_zg.principal
     principal.email_notification = True
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
-    anom = Client(election_day_app)
+    anom = Client(election_day_app_zg)
     anom.get('/locale/fr_CH').follow()
     subscribe = anom.get('/subscribe-email')
     subscribe.form['email'] = 'hans@example.org'
@@ -57,7 +57,7 @@ def test_view_notifications_votes(election_day_app):
     trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
-    message = election_day_app.smtp.outbox.pop()
+    message = election_day_app_zg.smtp.outbox.pop()
     assert message['To'] == 'hans@example.org'
     assert message['Subject'] == '=?utf-8?q?Vote_-_Refus=C3=A9?='
     unsubscribe = message['List-Unsubscribe'].strip('<>')
@@ -152,13 +152,13 @@ def test_view_notifications_elections(election_day_app_gr):
     assert 'hans@example.org' not in client.get('/manage/subscribers/email')
 
 
-def test_view_notifications_summarized(election_day_app):
+def test_view_notifications_summarized(election_day_app_zg):
     sms_path = os.path.join(
-        election_day_app.configuration['sms_directory'],
-        election_day_app.schema
+        election_day_app_zg.configuration['sms_directory'],
+        election_day_app_zg.schema
     )
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -185,11 +185,11 @@ def test_view_notifications_summarized(election_day_app):
     assert "E-Mail" not in manage
 
     # Add configuration
-    principal = election_day_app.principal
+    principal = election_day_app_zg.principal
     principal.webhooks = {'http://example.com/1': None}
     principal.email_notification = True
     principal.sms_notification = 'http://example.com'
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
     # Trigger all notification (no subscribers yet)
     manage = client.get('/trigger-notifications')
@@ -206,17 +206,17 @@ def test_view_notifications_summarized(election_day_app):
     manage = manage.form.submit().maybe_follow()
     assert "Benachrichtigungen ausgelöst" in manage
 
-    assert len(election_day_app.smtp.outbox) == 0
+    assert len(election_day_app_zg.smtp.outbox) == 0
     assert not os.path.exists(sms_path)
 
     # Add subscriber
-    anom = Client(election_day_app)
+    anom = Client(election_day_app_zg)
     anom.get('/locale/fr_CH').follow()
     subscribe = anom.get('/subscribe-email')
     subscribe.form['email'] = 'hans@example.org'
     subscribe.form.submit()
-    assert len(election_day_app.smtp.outbox) == 1
-    election_day_app.smtp.outbox.pop()
+    assert len(election_day_app_zg.smtp.outbox) == 1
+    election_day_app_zg.smtp.outbox.pop()
 
     subscribe = anom.get('/subscribe-sms')
     subscribe.form['phone_number'] = '+41792223344'
@@ -232,8 +232,8 @@ def test_view_notifications_summarized(election_day_app):
     manage = manage.form.submit().maybe_follow()
     assert "Benachrichtigungen ausgelöst" in manage
 
-    assert len(election_day_app.smtp.outbox) == 1
-    message = election_day_app.smtp.outbox.pop()
+    assert len(election_day_app_zg.smtp.outbox) == 1
+    message = election_day_app_zg.smtp.outbox.pop()
     assert message['To'] == 'hans@example.org'
     assert message['Subject'] == (
         '=?utf-8?q?Les_nouveaux_r=C3=A9sultats_sont_disponibles?='

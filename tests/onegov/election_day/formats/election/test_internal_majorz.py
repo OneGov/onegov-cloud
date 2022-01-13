@@ -73,9 +73,10 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
         'internal',
         'election',
         principal,
-        'region',
+        'municipality',
         'majorz',
         date_=date(2015, 10, 18),
+        domain_segment='Baar',
         number_of_mandates=1,
         dataset_name='friedensrichter-2012-06-24',
         expats=False
@@ -493,244 +494,156 @@ def test_import_internal_majorz_temporary_results(session):
 
 
 def test_import_internal_majorz_regional(session):
+
+    def create_csv(results):
+        lines = []
+        lines.append((
+            'election_absolute_majority',
+            'election_status',
+            'entity_id',
+            'entity_counted',
+            'entity_eligible_voters',
+            'entity_received_ballots',
+            'entity_blank_ballots',
+            'entity_invalid_ballots',
+            'entity_blank_votes',
+            'entity_invalid_votes',
+            'candidate_family_name',
+            'candidate_first_name',
+            'candidate_id',
+            'candidate_elected',
+            'candidate_votes',
+            'candidate_party',
+        ))
+        for entity_id, counted in results:
+            lines.append((
+                '',  # election_absolute_majority
+                'unknown',  # election_status
+                str(entity_id),  # entity_id
+                str(counted),  # entity_counted
+                '111',  # entity_eligible_voters
+                '11',  # entity_received_ballots
+                '1',  # entity_blank_ballots
+                '1',  # entity_invalid_ballots
+                '1',  # entity_blank_votes
+                '1',  # entity_invalid_votes
+                'xxx',  # candidate_family_name
+                'xxx',  # candidate_first_name
+                '1',  # candidate_id
+                'false',  # candidate_elected
+                '1',  # candidate_votes
+                '',  # candidate_party
+            ))
+
+        return BytesIO(
+            '\n'.join(
+                (','.join(column for column in line)) for line in lines
+            ).encode('utf-8')
+        ), 'text/plain'
+
     session.add(
         Election(
             title='election',
             domain='region',
-            date=date(2018, 2, 19),
+            date=date(2022, 2, 19),
             number_of_mandates=1
         )
     )
     session.flush()
     election = session.query(Election).one()
-    principal_zg = Canton(canton='zg')
-    principal_sg = Canton(canton='sg')
 
-    # Too many districts
-    for distinct in (False, True):
-        election.distinct = distinct
-        expected = ['No clear district'] if distinct else []
-
-        errors = import_election_internal_majorz(
-            election, principal_zg,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'election_absolute_majority',
-                        'election_status',
-                        'entity_id',
-                        'entity_counted',
-                        'entity_eligible_voters',
-                        'entity_received_ballots',
-                        'entity_blank_ballots',
-                        'entity_invalid_ballots',
-                        'entity_blank_votes',
-                        'entity_invalid_votes',
-                        'candidate_family_name',
-                        'candidate_first_name',
-                        'candidate_id',
-                        'candidate_elected',
-                        'candidate_votes',
-                        'candidate_party',
-                    )),
-                    ','.join((
-                        '',  # election_absolute_majority
-                        'unknown',  # election_status
-                        '1701',  # entity_id
-                        'True',  # entity_counted
-                        '111',  # entity_eligible_voters
-                        '11',  # entity_received_ballots
-                        '1',  # entity_blank_ballots
-                        '1',  # entity_invalid_ballots
-                        '1',  # entity_blank_votes
-                        '1',  # entity_invalid_votes
-                        'xxx',  # candidate_family_name
-                        'xxx',  # candidate_first_name
-                        '1',  # candidate_id
-                        'false',  # candidate_elected
-                        '1',  # candidate_votes
-                        '',  # candidate_party
-                    )),
-                    ','.join((
-                        '',  # election_absolute_majority
-                        'unknown',  # election_status
-                        '1702',  # entity_id
-                        'False',  # entity_counted
-                        '111',  # entity_eligible_voters
-                        '11',  # entity_received_ballots
-                        '1',  # entity_blank_ballots
-                        '1',  # entity_invalid_ballots
-                        '1',  # entity_blank_votes
-                        '1',  # entity_invalid_votes
-                        'xxx',  # candidate_family_name
-                        'xxx',  # candidate_first_name
-                        '1',  # candidate_id
-                        'false',  # candidate_elected
-                        '1',  # candidate_votes
-                        '',  # candidate_party
-                    ))
-                ))
-            ).encode('utf-8')), 'text/plain',
-        )
-        assert [error.error for error in errors] == expected
-
-        errors = import_election_internal_majorz(
-            election, principal_sg,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'election_absolute_majority',
-                        'election_status',
-                        'entity_id',
-                        'entity_counted',
-                        'entity_eligible_voters',
-                        'entity_received_ballots',
-                        'entity_blank_ballots',
-                        'entity_invalid_ballots',
-                        'entity_blank_votes',
-                        'entity_invalid_votes',
-                        'candidate_family_name',
-                        'candidate_first_name',
-                        'candidate_id',
-                        'candidate_elected',
-                        'candidate_votes',
-                        'candidate_party',
-                    )),
-                    ','.join((
-                        '',  # election_absolute_majority
-                        'unknown',  # election_status
-                        '3231',  # entity_id
-                        'True',  # entity_counted
-                        '111',  # entity_eligible_voters
-                        '11',  # entity_received_ballots
-                        '1',  # entity_blank_ballots
-                        '1',  # entity_invalid_ballots
-                        '1',  # entity_blank_votes
-                        '1',  # entity_invalid_votes
-                        'xxx',  # candidate_family_name
-                        'xxx',  # candidate_first_name
-                        '1',  # candidate_id
-                        'false',  # candidate_elected
-                        '1',  # candidate_votes
-                        '',  # candidate_party
-                    )),
-                    ','.join((
-                        '',  # election_absolute_majority
-                        'unknown',  # election_status
-                        '3276',  # entity_id
-                        'True',  # entity_counted
-                        '111',  # entity_eligible_voters
-                        '11',  # entity_received_ballots
-                        '1',  # entity_blank_ballots
-                        '1',  # entity_invalid_ballots
-                        '1',  # entity_blank_votes
-                        '1',  # entity_invalid_votes
-                        'xxx',  # candidate_family_name
-                        'xxx',  # candidate_first_name
-                        '1',  # candidate_id
-                        'false',  # candidate_elected
-                        '1',  # candidate_votes
-                        '',  # candidate_party
-                    ))
-                ))
-            ).encode('utf-8')), 'text/plain',
-        )
-        assert [error.error for error in errors] == expected
-
-    # OK
-    election.distinct = True
+    # ZG, municipality, too many municipalitites
+    principal = Canton(canton='zg')
+    election.domain = 'municipality'
+    election.domain_segment = 'Baar'
     errors = import_election_internal_majorz(
-        election, principal_zg,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'election_absolute_majority',
-                    'election_status',
-                    'entity_id',
-                    'entity_counted',
-                    'entity_eligible_voters',
-                    'entity_received_ballots',
-                    'entity_blank_ballots',
-                    'entity_invalid_ballots',
-                    'entity_blank_votes',
-                    'entity_invalid_votes',
-                    'candidate_family_name',
-                    'candidate_first_name',
-                    'candidate_id',
-                    'candidate_elected',
-                    'candidate_votes',
-                    'candidate_party',
-                )),
-                ','.join((
-                    '',  # election_absolute_majority
-                    'unknown',  # election_status
-                    '1701',  # entity_id
-                    'True',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
-                ))
-            ))
-        ).encode('utf-8')), 'text/plain',
+        election, principal,
+        *create_csv(((1701, False), (1702, False)))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '1702 is not part of this election'
+    ]
+
+    # ZG, municipality, ok
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv(((1701, False),))
     )
     assert not errors
-    assert election.progress == (1, 1)
+    assert election.progress == (0, 1)
 
-    # Temporary
-    for distinct, total in ((False, 1), (True, 13)):
-        election.distinct = distinct
+    # ZG, none, ok
+    election.domain = 'none'
+    election.domain_segment = ''
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv(((1701, True), (1702, False)))
+    )
+    assert not errors
+    assert election.progress == (1, 2)
 
-        errors = import_election_internal_majorz(
-            election, principal_sg,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'election_absolute_majority',
-                        'election_status',
-                        'entity_id',
-                        'entity_counted',
-                        'entity_eligible_voters',
-                        'entity_received_ballots',
-                        'entity_blank_ballots',
-                        'entity_invalid_ballots',
-                        'entity_blank_votes',
-                        'entity_invalid_votes',
-                        'candidate_family_name',
-                        'candidate_first_name',
-                        'candidate_id',
-                        'candidate_elected',
-                        'candidate_votes',
-                        'candidate_party',
-                    )),
-                    ','.join((
-                        '',  # election_absolute_majority
-                        'unknown',  # election_status
-                        '3231',  # entity_id
-                        'True',  # entity_counted
-                        '111',  # entity_eligible_voters
-                        '11',  # entity_received_ballots
-                        '1',  # entity_blank_ballots
-                        '1',  # entity_invalid_ballots
-                        '1',  # entity_blank_votes
-                        '1',  # entity_invalid_votes
-                        'xxx',  # candidate_family_name
-                        'xxx',  # candidate_first_name
-                        '1',  # candidate_id
-                        'false',  # candidate_elected
-                        '1',  # candidate_votes
-                        '',  # candidate_party
-                    ))
-                ))
-            ).encode('utf-8')), 'text/plain',
-        )
-        assert not errors
-        assert election.progress == (1, total)
+    # SG, district, too many districts
+    principal = Canton(canton='sg')
+    election.domain = 'district'
+    election.domain_segment = 'Werdenberg'
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv(((3271, False), (3201, False)))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '3201 is not part of Werdenberg'
+    ]
+
+    # SG, district, ok
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv((
+            (3271, True), (3272, False), (3273, False), (3274, False),
+            # (3275, False), (3276, False)
+        ))
+    )
+    assert not errors
+    assert election.progress == (1, 6)
+
+    # SG, none, ok
+    election.domain = 'none'
+    election.domain_segment = ''
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv(((3271, True), (3201, False)))
+    )
+    assert not errors
+    assert election.progress == (1, 2)
+
+    # GR, region, too many regions
+    principal = Canton(canton='gr')
+    election.domain = 'region'
+    election.domain_segment = 'Ilanz'
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv(((3572, True), (3513, False)))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '3513 is not part of Ilanz'
+    ]
+
+    # GR, region, ok
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv((
+            (3572, True), (3575, False), (3581, False), (3582, False)
+            # (3619, False), (3988, False)
+        ))
+    )
+    assert not errors
+    assert election.progress == (1, 6)
+
+    # GR, none, ok
+    election.domain = 'none'
+    election.domain_segment = ''
+    errors = import_election_internal_majorz(
+        election, principal,
+        *create_csv(((3572, True), (3513, False)))
+    )
+    assert not errors
+    assert election.progress == (1, 2)

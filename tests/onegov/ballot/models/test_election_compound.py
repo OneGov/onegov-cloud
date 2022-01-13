@@ -215,6 +215,7 @@ def test_election_compound(session):
         Election(
             title="First election",
             domain='region',
+            domain_segment='First district',
             date=date(2015, 6, 14),
             number_of_mandates=1,
         )
@@ -223,6 +224,7 @@ def test_election_compound(session):
         Election(
             title="Second election",
             domain='region',
+            domain_segment='Second district',
             date=date(2015, 6, 14),
             number_of_mandates=2,
         )
@@ -303,7 +305,7 @@ def test_election_compound(session):
     assert election_compound.counted is True
     assert election_compound.progress == (2, 2)
     assert election_compound.counted_entities == [
-        'First election', 'Second election'
+        'First district', 'Second district'
     ]
     assert election_compound.allocated_mandates() == 0
     assert election_compound.completed == True

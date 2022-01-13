@@ -7,7 +7,7 @@ from onegov.election_day.models import Municipality
 from tests.onegov.election_day.common import get_tar_file_path
 
 
-def test_import_wabstim_vote_1(session):
+def test_import_wabstim_vote(session):
     domain = 'municipality'
 
     session.add(

@@ -9,13 +9,13 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from unittest.mock import patch, MagicMock
 
 
-def test_d3_renderer_scripts(election_day_app):
-    generator = D3Renderer(election_day_app)
+def test_d3_renderer_scripts(election_day_app_zg):
+    generator = D3Renderer(election_day_app_zg)
     assert len(generator.scripts)
 
 
-def test_d3_renderer_translatation(election_day_app):
-    generator = D3Renderer(election_day_app)
+def test_d3_renderer_translatation(election_day_app_zg):
+    generator = D3Renderer(election_day_app_zg)
 
     assert generator.translate(_('Election'), 'de_CH') == 'Wahl'
     assert generator.translate(_('Election'), 'fr_CH') == 'Election'
@@ -23,8 +23,8 @@ def test_d3_renderer_translatation(election_day_app):
     assert generator.translate(_('Election'), 'rm_CH') == 'Elecziun'
 
 
-def test_d3_renderer_get_chart(election_day_app):
-    d3 = D3Renderer(election_day_app)
+def test_d3_renderer_get_chart(election_day_app_zg):
+    d3 = D3Renderer(election_day_app_zg)
 
     with patch('onegov.election_day.utils.d3_renderer.post',
                return_value=MagicMock(text='<svg></svg>')) as post:
@@ -129,7 +129,7 @@ def test_d3_renderer_get_chart(election_day_app):
         assert post.call_args[0] == ('http://localhost:1337/d3/pdf',)
 
 
-def test_d3_renderer_get_charts(election_day_app):
+def test_d3_renderer_get_charts(election_day_app_zg):
     election = Election(
         title="Election",
         domain='federation',
@@ -147,12 +147,12 @@ def test_d3_renderer_get_charts(election_day_app):
     )
     vote.ballots.append(Ballot(type='proposal'))
 
-    session = election_day_app.session()
+    session = election_day_app_zg.session()
     session.add(election)
     session.add(compound)
     session.add(vote)
 
-    d3 = D3Renderer(election_day_app)
+    d3 = D3Renderer(election_day_app_zg)
 
     assert d3.get_lists_chart(election, 'svg') is None
     assert d3.get_lists_chart(compound, 'svg') is None

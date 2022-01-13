@@ -37,8 +37,6 @@ def create_vote(self, request, form):
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.session)
 
-    form.set_domain(request.app.principal)
-
     if form.submitted(request):
         vote = Vote.get_polymorphic_class(form.vote_type.data, Vote)()
         form.update_model(vote)
@@ -64,8 +62,6 @@ def edit_vote(self, request, form):
 
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.session)
-
-    form.set_domain(request.app.principal)
 
     if form.submitted(request):
         form.update_model(self)

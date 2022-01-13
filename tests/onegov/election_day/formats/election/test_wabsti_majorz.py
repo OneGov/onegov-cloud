@@ -73,17 +73,18 @@ def test_import_wabsti_majorz_cantonal_complete(
 
 
 def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
-    # - regional results from Rohrschach the 25.09.2016
+    # - regional results from Rorschach the 25.09.2016
     principal = 'sg'
     # Test regional election
     election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
-        'region',
+        'district',
         election_type='majorz',
         number_of_mandates=1,
         date_=date(2016, 9, 25),
+        domain_segment='Rorschach',
         dataset_name='RO-Kreisgericht-Rohrschach',
     )
 
@@ -418,184 +419,142 @@ def test_import_wabsti_majorz_temporary_results(session):
 
 
 def test_import_wabsti_majorz_regional(session):
+
+    def create_csv(results):
+        lines = []
+        lines.append((
+            'AnzMandate',
+            'BFS',
+            'StimmBer',
+            'StimmAbgegeben',
+            'StimmLeer',
+            'StimmUngueltig',
+            'KandName_1',
+            'Stimmen_1',
+            'KandName_2',
+            'Stimmen_2',
+        ))
+        for entity_id in results:
+            lines.append((
+                '',  # AnzMandate
+                str(entity_id),  # BFS
+                '100',  # StimmBer
+                '90',  # StimmAbgegeben
+                '1',  # StimmLeer
+                '1',  # StimmUngueltig
+                'Leere Zeilen',  # KandName_1
+                '0',  # Stimmen_1
+                'Ungültige Stimmen',  # KandName_2
+                '1'  # Stimmen_2
+            ))
+
+        return BytesIO(
+            '\n'.join(
+                (','.join(column for column in line)) for line in lines
+            ).encode('utf-8')
+        ), 'text/plain'
+
     session.add(
         Election(
             title='election',
             domain='region',
-            date=date(2018, 2, 19),
+            date=date(2022, 2, 19),
             number_of_mandates=1
         )
     )
     session.flush()
     election = session.query(Election).one()
-    principal_zg = Canton(canton='zg')
-    principal_sg = Canton(canton='sg')
 
-    # Too many districts
-    for distinct in (False, True):
-        election.distinct = distinct
-        expected = ['No clear district'] if distinct else []
-
-        errors = import_election_wabsti_majorz(
-            election, principal_zg,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'AnzMandate',
-                        'BFS',
-                        'StimmBer',
-                        'StimmAbgegeben',
-                        'StimmLeer',
-                        'StimmUngueltig',
-                        'KandName_1',
-                        'Stimmen_1',
-                        'KandName_2',
-                        'Stimmen_2',
-                    )),
-                    ','.join((
-                        '',
-                        '1701',
-                        '100',
-                        '90',
-                        '1',
-                        '1',
-                        'Leere Zeilen',
-                        '0',
-                        'Ungültige Stimmen',
-                        '1'
-                    )),
-                    ','.join((
-                        '',
-                        '1702',
-                        '100',
-                        '90',
-                        '1',
-                        '1',
-                        'Leere Zeilen',
-                        '0',
-                        'Ungültige Stimmen',
-                        '1'
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain'
-        )
-        assert [error.error for error in errors] == expected
-
-        errors = import_election_wabsti_majorz(
-            election, principal_sg,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'AnzMandate',
-                        'BFS',
-                        'StimmBer',
-                        'StimmAbgegeben',
-                        'StimmLeer',
-                        'StimmUngueltig',
-                        'KandName_1',
-                        'Stimmen_1',
-                        'KandName_2',
-                        'Stimmen_2',
-                    )),
-                    ','.join((
-                        '',
-                        '3231',
-                        '100',
-                        '90',
-                        '1',
-                        '1',
-                        'Leere Zeilen',
-                        '0',
-                        'Ungültige Stimmen',
-                        '1'
-                    )),
-                    ','.join((
-                        '',
-                        '3276',
-                        '100',
-                        '90',
-                        '1',
-                        '1',
-                        'Leere Zeilen',
-                        '0',
-                        'Ungültige Stimmen',
-                        '1'
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain'
-        )
-        assert [error.error for error in errors] == expected
-
-    # OK
-    election.distinct = True
+    # ZG, municipality, too many municipalitites
+    principal = Canton(canton='zg')
+    election.domain = 'municipality'
+    election.domain_segment = 'Baar'
     errors = import_election_wabsti_majorz(
-        election, principal_zg,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'AnzMandate',
-                    'BFS',
-                    'StimmBer',
-                    'StimmAbgegeben',
-                    'StimmLeer',
-                    'StimmUngueltig',
-                    'KandName_1',
-                    'Stimmen_1',
-                    'KandName_2',
-                    'Stimmen_2',
-                )),
-                ','.join((
-                    '',
-                    '1701',
-                    '100',
-                    '90',
-                    '1',
-                    '1',
-                    'Leere Zeilen',
-                    '0',
-                    'Ungültige Stimmen',
-                    '1'
-                )),
-            ))
-        ).encode('utf-8')), 'text/plain'
+        election, principal,
+        *create_csv((1701, 1702))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '1702 is not part of this election'
+    ]
+
+    # ZG, municipality, ok
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((1701,))
     )
     assert not errors
     assert election.progress == (1, 1)
 
-    # Temporary
-    for distinct, total in ((False, 1), (True, 13)):
-        election.distinct = distinct
+    # ZG, none, ok
+    election.domain = 'none'
+    election.domain_segment = ''
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((1701, 1702))
+    )
+    assert not errors
+    assert election.progress == (2, 2)
 
-        errors = import_election_wabsti_majorz(
-            election, principal_sg,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'AnzMandate',
-                        'BFS',
-                        'StimmBer',
-                        'StimmAbgegeben',
-                        'StimmLeer',
-                        'StimmUngueltig',
-                        'KandName_1',
-                        'Stimmen_1',
-                        'KandName_2',
-                        'Stimmen_2',
-                    )),
-                    ','.join((
-                        '',
-                        '3231',
-                        '100',
-                        '90',
-                        '1',
-                        '1',
-                        'Leere Zeilen',
-                        '0',
-                        'Ungültige Stimmen',
-                        '1'
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain'
-        )
-        assert not errors
-        assert election.progress == (1, total)
+    # SG, district, too many districts
+    principal = Canton(canton='sg')
+    election.domain = 'district'
+    election.domain_segment = 'Werdenberg'
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((3271, 3201))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '3201 is not part of Werdenberg'
+    ]
+
+    # SG, district, ok
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((
+            3271, 3272, 3273, 3274,  # 3275, 3276
+        ))
+    )
+    assert not errors
+    assert election.progress == (4, 6)
+
+    # SG, none, ok
+    election.domain = 'none'
+    election.domain_segment = ''
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((3271, 3201))
+    )
+    assert not errors
+    assert election.progress == (2, 2)
+
+    # GR, region, too many regions
+    principal = Canton(canton='gr')
+    election.domain = 'region'
+    election.domain_segment = 'Ilanz'
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((3572, 3513))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '3513 is not part of Ilanz'
+    ]
+
+    # GR, region, ok
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((
+            (3572, 3575, 3581, 3582)   # 3619, 3988
+        ))
+    )
+    assert not errors
+    assert election.progress == (4, 6)
+
+    # GR, none, ok
+    election.domain = 'none'
+    election.domain_segment = ''
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        *create_csv((3572, 3513))
+    )
+    assert not errors
+    assert election.progress == (2, 2)

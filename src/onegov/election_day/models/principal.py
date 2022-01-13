@@ -183,18 +183,9 @@ class Canton(Principal):
 
     def __init__(self, canton=None, **kwargs):
         assert canton in self.CANTONS
+        self.id = canton
 
         kwargs.pop('use_maps', None)
-
-        domains_election = OrderedDict((
-            ('federation', _("Federal")),
-            ('region', _("Regional")),
-            ('canton', _("Cantonal"))
-        ))
-        domains_vote = OrderedDict((
-            ('federation', _("Federal")),
-            ('canton', _("Cantonal"))
-        ))
 
         # Read the municipalties for each year from our static data
         entities = {}
@@ -228,6 +219,29 @@ class Canton(Principal):
             for entity in year.values()
         ])
         has_superregions = superregions != {None}
+
+        domains_election = OrderedDict()
+        domains_election['federation'] = _("Federal")
+        domains_election['canton'] = _("Cantonal")
+        if has_regions:
+            domains_election['region'] = _(
+                "Regional (${on})",
+                mapping={'on': self.label('region')}
+            )
+        if has_districts:
+            domains_election['district'] = _(
+                "Regional (${on})",
+                mapping={'on': self.label('district')}
+            )
+        domains_election['none'] = _(
+            "Regional (${on})",
+            mapping={'on': _("Other")}
+        )
+        domains_election['municipality'] = _("Communal")
+
+        domains_vote = OrderedDict()
+        domains_vote['federation'] = _("Federal")
+        domains_vote['canton'] = _("Cantonal")
 
         super(Canton, self).__init__(
             id_=canton,
@@ -264,21 +278,15 @@ class Canton(Principal):
                 return _("districts_label_sz")
             return _("Districts")
         if value == 'region':
-            if self.id in ('sz', 'zg'):
-                return _("Municipality")
             return _("District")
         if value == 'regions':
-            if self.id in ('sz', 'zg'):
-                return _("Municipalities")
             return _("Districts")
         if value == 'superregion':
             if self.id == 'bl':
-                # Region
                 return _("superregion_label_bl")
             return _("District")
         if value == 'superregions':
             if self.id == 'bl':
-                # Regionen
                 return _("superregions_label_bl")
             return _("Districts")
         return ''

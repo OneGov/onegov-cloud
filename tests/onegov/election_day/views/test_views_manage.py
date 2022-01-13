@@ -15,8 +15,8 @@ from webtest import TestApp as Client
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_view_login_logout(election_day_app):
-    client = Client(election_day_app)
+def test_view_login_logout(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login = client.get('/').click('Anmelden')
@@ -37,9 +37,9 @@ def test_view_login_logout(election_day_app):
     assert 'Anmelden' in client.get('/').click('Abmelden').follow()
 
 
-def test_view_manage_elections(election_day_app):
-    archive = ArchivedResultCollection(election_day_app.session())
-    client = Client(election_day_app)
+def test_view_manage_elections(election_day_app_zg):
+    archive = ArchivedResultCollection(election_day_app_zg.session())
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     assert client.get('/manage/elections',
@@ -80,9 +80,9 @@ def test_view_manage_elections(election_day_app):
     assert archive.query().count() == 0
 
 
-def test_view_manage_election_compounds(election_day_app):
-    archive = ArchivedResultCollection(election_day_app.session())
-    client = Client(election_day_app)
+def test_view_manage_election_compounds(election_day_app_gr):
+    archive = ArchivedResultCollection(election_day_app_gr.session())
+    client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     assert client.get('/manage/election-compounds',
@@ -116,13 +116,14 @@ def test_view_manage_election_compounds(election_day_app):
     new.form['election_de'] = 'Elect a new parliament'
     new.form['date'] = date(2016, 1, 1)
     new.form['domain'] = 'canton'
-    new.form['elections'] = ['elect-a-new-parliament-region-a']
+    new.form['domain_elections'] = 'region'
+    new.form['region_elections'] = ['elect-a-new-parliament-region-a']
     manage = new.form.submit().follow()
 
     assert "Elect a new parliament" in manage
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new cantonal parliament'
-    edit.form['elections'] = [
+    edit.form['region_elections'] = [
         'elect-a-new-parliament-region-a',
         'elect-a-new-parliament-region-b'
     ]
@@ -144,9 +145,9 @@ def test_view_manage_election_compounds(election_day_app):
     assert archive.query().count() == 2
 
 
-def test_view_manage_votes(election_day_app):
-    archive = ArchivedResultCollection(election_day_app.session())
-    client = Client(election_day_app)
+def test_view_manage_votes(election_day_app_zg):
+    archive = ArchivedResultCollection(election_day_app_zg.session())
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     assert client.get('/manage/votes', expect_errors=True).status_code == 403
@@ -183,25 +184,25 @@ def test_view_manage_votes(election_day_app):
     assert archive.query().count() == 0
 
 
-def test_upload_proporz_election(election_day_app):
-    client = Client(election_day_app)
+def test_upload_proporz_election(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
     upload_proporz_election(client, canton='zg')
 
-    session = election_day_app.session_manager.session()
+    session = election_day_app_zg.session_manager.session()
     election = session.query(ProporzElection).one()
     assert election.type == 'proporz'
 
-    request = DummyRequest(session, election_day_app)
+    request = DummyRequest(session, election_day_app_zg)
 
     layout = ElectionLayout(election, request, 'lists-panachage')
     assert layout.visible
 
 
-def test_view_clear_results(election_day_app):
-    client = Client(election_day_app)
+def test_view_clear_results(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -210,13 +211,8 @@ def test_view_clear_results(election_day_app):
     upload_election_compound(client, canton='zg')
     upload_party_results(client)
     upload_party_results(client, slug='elections/elections')
-    upload_vote(client)
+    upload_vote(client, canton='zg')
 
-    # Test currently fails for lists / panachage because
-    # layout.visible is False because' self.proporz is False!?!
-
-    marker = "<h2>Resultate</h2>"
-    i_marker = "<h2>Zwischenergebnisse</h2>"
     urls = (
         '/election/majorz-election/candidates',
         '/election/majorz-election/statistics',
@@ -225,29 +221,30 @@ def test_view_clear_results(election_day_app):
         '/election/proporz-election/connections',
         '/election/proporz-election/party-strengths',
         '/election/proporz-election/parties-panachage',
-        # '/election/proporz-election/lists-panachage',
+        '/election/proporz-election/lists-panachage',
         '/election/proporz-election/statistics',
+        '/elections/elections/districts',
+        '/elections/elections/candidates',
+        '/elections/elections/statistics',
         '/elections/elections/parties-panachage',
         '/elections/elections/party-strengths',
         '/vote/vote/entities'
     )
 
-    for url in urls:
-        page = client.get(url)
-        if marker not in page and i_marker not in page:
-            print(url)
-            assert False
+    assert all(['Noch keine Resultate' not in client.get(url) for url in urls])
 
-    client.get('/election/majorz-election/clear').form.submit()
-    client.get('/election/proporz-election/clear').form.submit()
-    client.get('/elections/elections/clear').form.submit()
-    client.get('/vote/vote/clear').form.submit()
+    client.get('/election/majorz-election/clear').form.submit().follow()
+    client.get('/election/proporz-election/clear').form.submit().follow()
+    client.get('/elections/elections/clear').form.submit().follow()
+    client.get('/election/regional-election-a/clear').form.submit().follow()
+    client.get('/election/regional-election-b/clear').form.submit().follow()
+    client.get('/vote/vote/clear').form.submit().follow()
 
-    assert all((marker not in client.get(url) for url in urls))
+    assert all(['Noch keine Resultate' in client.get(url) for url in urls])
 
 
-def test_view_manage_upload_tokens(election_day_app):
-    client = Client(election_day_app)
+def test_view_manage_upload_tokens(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     login(client)
 
@@ -261,8 +258,8 @@ def test_view_manage_upload_tokens(election_day_app):
     assert "Noch keine Token." in client.get('/manage/upload-tokens')
 
 
-def test_view_manage_data_sources(election_day_app):
-    client = Client(election_day_app)
+def test_view_manage_data_sources(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     login(client)
 
@@ -390,8 +387,8 @@ def test_view_manage_data_sources(election_day_app):
     assert 'Noch keine Datenquellen' in client.get('/manage/sources')
 
 
-def test_reset_password(election_day_app):
-    client = Client(election_day_app)
+def test_reset_password(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     request_page = client.get('/auth/login').click('Passwort zurücksetzen')
@@ -399,13 +396,13 @@ def test_reset_password(election_day_app):
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit()
-    assert len(election_day_app.smtp.outbox) == 0
+    assert len(election_day_app_zg.smtp.outbox) == 0
 
     request_page.form['email'] = 'admin@example.org'
     assert 'admin@example.org' in request_page.form.submit()
-    assert len(election_day_app.smtp.outbox) == 1
+    assert len(election_day_app_zg.smtp.outbox) == 1
 
-    message = election_day_app.smtp.outbox[0]
+    message = election_day_app_zg.smtp.outbox[0]
     message = message.get_payload(1).get_payload(decode=True)
     message = message.decode('iso-8859-1')
     link = list(document_fromstring(message).iterlinks())[0][2]
@@ -447,8 +444,8 @@ def test_reset_password(election_day_app):
     assert "Sie sind angemeldet" in login_page
 
 
-def test_view_manage_screens(election_day_app):
-    client = Client(election_day_app)
+def test_view_manage_screens(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     assert client.get('/manage/screens', expect_errors=True).status_code == 403
@@ -479,7 +476,7 @@ def test_view_manage_screens(election_day_app):
     new.form['election_de'] = 'Majorz Wahl'
     new.form['date'] = date(2016, 1, 1)
     new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'region'
+    new.form['domain'] = 'municipality'
     new.form['mandates'] = 10
     new.form.submit().follow()
 
@@ -487,7 +484,7 @@ def test_view_manage_screens(election_day_app):
     new.form['election_de'] = 'Proporz Wahl'
     new.form['date'] = date(2016, 1, 1)
     new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'region'
+    new.form['domain'] = 'municipality'
     new.form['mandates'] = 5
     new.form.submit().follow()
 
@@ -496,7 +493,8 @@ def test_view_manage_screens(election_day_app):
     new.form['election_de'] = 'Verbund von Wahlen'
     new.form['date'] = date(2016, 1, 1)
     new.form['domain'] = 'canton'
-    new.form['elections'] = ['proporz-wahl']
+    new.form['domain_elections'] = 'municipality'
+    new.form['municipality_elections'] = ['proporz-wahl']
     new.form.submit().follow()
 
     # Add a screen

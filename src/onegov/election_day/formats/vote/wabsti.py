@@ -1,10 +1,11 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, validate_integer, \
-    validate_float
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.import_export.mappings import WABSTI_VOTE_HEADERS
+from onegov.election_day.formats.common import validate_float
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.mappings import WABSTI_VOTE_HEADERS
 
 
 def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
