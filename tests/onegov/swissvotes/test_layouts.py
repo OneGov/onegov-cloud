@@ -750,6 +750,11 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
                 'title': 'Perché è una pessima idea.',
                 'language': ['it', 'rm']
             },
+            'campaign_material_other-article': {
+                'title': 'Presseschau',
+                'language': ['de'],
+                'doctype': 'article'
+            },
         }
     )
     for name, locale in (
@@ -760,9 +765,10 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         setattr(model, name, attachments[name])
 
     for name in (
-        'campaign_material_yea-1.png',
+        'campaign_material_other-article.pdf',
         'campaign_material_other-essay.pdf',
-        'campaign_material_other-leaflet.pdf'
+        'campaign_material_other-leaflet.pdf',
+        'campaign_material_yea-1.png',
     ):
         model.files.append(campaign_material[name])
 
@@ -776,13 +782,15 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
 
     layout = VoteLayout(model, request)
     with patch.object(model, 'search', return_value=model.files):
-        results = [r[:3] for r in layout.search_results]
+        results = [r[:4] for r in layout.search_results]
         assert results == [
-            (0, 'Brief description Swissvotes', 'French'),
-            (0, 'Full analysis of post-vote poll results', 'German'),
-            (1, 'campaign_material_other-leaflet.pdf', ''),
-            (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic'),
-            (3, 'campaign_material_yea-1.png', '')
+            (0, 'Brief description Swissvotes', 'French', False),
+            (0, 'Full analysis of post-vote poll results', 'German', False),
+            (1, 'campaign_material_other-leaflet.pdf', '', False),
+            (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic',
+             False),
+            (1, 'Presseschau', 'German', True),
+            (3, 'campaign_material_yea-1.png', '', False)
         ]
 
 
