@@ -18,10 +18,10 @@ COLUMNS = [
 ]
 
 
-def test_upload_vote_unknown_result(election_day_app):
-    archive = ArchivedResultCollection(election_day_app.session())
+def test_upload_vote_unknown_result(election_day_app_zg):
+    archive = ArchivedResultCollection(election_day_app_zg.session())
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -62,8 +62,8 @@ def test_upload_vote_unknown_result(election_day_app):
     assert archive.query().one().progress == (0, 11)
 
 
-def test_upload_vote_year_unavailable(election_day_app):
-    client = Client(election_day_app)
+def test_upload_vote_year_unavailable(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -85,8 +85,8 @@ def test_upload_vote_year_unavailable(election_day_app):
     assert "Das Jahr 2000 wird noch nicht unterstützt" in results
 
 
-def test_upload_vote_submit(election_day_app):
-    client = Client(election_day_app)
+def test_upload_vote_submit(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     login(client)
 
@@ -170,10 +170,10 @@ def test_upload_vote_submit(election_day_app):
         assert import_.call_args[0][2] == 1
 
     # Wabsti municipalities
-    principal = election_day_app.principal
+    principal = election_day_app_zg.principal
     principal.domain = 'municipality'
     principal.municipality = '351'
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_wabstim'
@@ -189,15 +189,15 @@ def test_upload_vote_submit(election_day_app):
         assert import_.called
 
 
-def test_upload_vote_invalidate_cache(election_day_app):
-    client = Client(election_day_app)
+def test_upload_vote_invalidate_cache(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     upload_vote(client)
 
-    anonymous = Client(election_day_app)
+    anonymous = Client(election_day_app_zg)
     anonymous.get('/locale/de_CH').follow()
 
     assert ">522<" in anonymous.get('/vote/vote/entities')
@@ -215,8 +215,8 @@ def test_upload_vote_invalidate_cache(election_day_app):
     assert ">533<" in anonymous.get('/vote/vote/entities')
 
 
-def test_upload_vote_available_formats_canton(election_day_app):
-    client = Client(election_day_app)
+def test_upload_vote_available_formats_canton(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -284,8 +284,8 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
     ]
 
 
-def test_upload_vote_notify_zulip(election_day_app):
-    client = Client(election_day_app)
+def test_upload_vote_notify_zulip(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -296,20 +296,20 @@ def test_upload_vote_notify_zulip(election_day_app):
         sleep(5)
         assert not urlopen.called
 
-        election_day_app.zulip_url = 'https://xx.zulipchat.com/api/v1/messages'
-        election_day_app.zulip_stream = 'WAB'
-        election_day_app.zulip_user = 'wab-bot@seantis.zulipchat.com'
-        election_day_app.zulip_key = 'aabbcc'
+        election_day_app_zg.zulip_url = 'https://zulipchat.com/api/v1/messages'
+        election_day_app_zg.zulip_stream = 'WAB'
+        election_day_app_zg.zulip_user = 'wab-bot@seantis.zulipchat.com'
+        election_day_app_zg.zulip_key = 'aabbcc'
         upload_vote(client)
         sleep(5)
         assert urlopen.called
-        assert 'xx.zulipchat.com' in urlopen.call_args[0][0].get_full_url()
+        assert 'zulipchat.com' in urlopen.call_args[0][0].get_full_url()
 
 
-def test_upload_vote_all_or_nothing(election_day_app):
-    archive = ArchivedResultCollection(election_day_app.session())
+def test_upload_vote_all_or_nothing(election_day_app_zg):
+    archive = ArchivedResultCollection(election_day_app_zg.session())
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -356,5 +356,7 @@ def test_upload_vote_all_or_nothing(election_day_app):
     assert '<span class="error-line"><span>Zeile</span>2</span>' in upload
     assert archive.query().one().progress == (0, 0)
 
-    vote = VoteCollection(election_day_app.session()).by_id('bacon-yea-or-nay')
+    vote = VoteCollection(election_day_app_zg.session()).by_id(
+        'bacon-yea-or-nay'
+    )
     assert [ballot.results.count() for ballot in vote.ballots] == [0, 0, 0]

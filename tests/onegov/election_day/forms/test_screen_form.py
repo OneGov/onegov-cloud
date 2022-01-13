@@ -10,8 +10,8 @@ from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_screen_form_validate(election_day_app):
-    session = election_day_app.session()
+def test_screen_form_validate(election_day_app_zg):
+    session = election_day_app_zg.session()
 
     assert not ScreenForm().validate()
 
@@ -27,7 +27,7 @@ def test_screen_form_validate(election_day_app):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.majorz_election.choices = [('election', 'Election')]
     assert form.validate()
 
@@ -43,7 +43,7 @@ def test_screen_form_validate(election_day_app):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ['error parsing attribute name']}
@@ -60,7 +60,7 @@ def test_screen_form_validate(election_day_app):
             'css': ''
         })
     )
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.majorz_election.choices = [('election', 'Election')]
     assert not form.validate()
     assert form.errors == {'structure': ["Invalid element '<fancy-stuff>'"]}
@@ -232,14 +232,14 @@ def test_screen_form_update_apply(session):
     assert form.election_compound.data == ''
 
 
-def test_screen_form_populate(election_day_app):
-    session = election_day_app.session()
+def test_screen_form_populate(election_day_app_zg):
+    session = election_day_app_zg.session()
     session.add(
         Vote(
             title='Simple 1',
             shortcode='m2',
             domain='federation',
-            date=date(2015, 6, 14)
+            date=date(2001, 1, 1)
         )
     )
     session.add(
@@ -247,14 +247,14 @@ def test_screen_form_populate(election_day_app):
             title='Simple 2',
             shortcode='m1',
             domain='federation',
-            date=date(2015, 6, 14)
+            date=date(2001, 1, 1)
         )
     )
     session.add(
         ComplexVote(
             title='Complex 1',
             domain='federation',
-            date=date(2015, 6, 14)
+            date=date(2001, 1, 1)
         )
     )
     session.add(
@@ -262,7 +262,7 @@ def test_screen_form_populate(election_day_app):
             title='Majorz 1',
             shortcode='m2',
             domain='federation',
-            date=date(2015, 6, 14)
+            date=date(2001, 1, 1)
         )
     )
     session.add(
@@ -270,14 +270,14 @@ def test_screen_form_populate(election_day_app):
             title='Majorz 2',
             shortcode='m1',
             domain='federation',
-            date=date(2015, 6, 14)
+            date=date(2001, 1, 1)
         )
     )
     session.add(
         ProporzElection(
             title='Proporz 1',
             domain='federation',
-            date=date(2015, 6, 14)
+            date=date(2001, 1, 1)
         )
     )
     session.add(
@@ -285,7 +285,7 @@ def test_screen_form_populate(election_day_app):
             title='Elections 1',
             shortcode='e1',
             domain='canton',
-            date=date(2015, 6, 14),
+            date=date(2001, 1, 1),
         )
     )
     session.add(
@@ -293,28 +293,31 @@ def test_screen_form_populate(election_day_app):
             title='Elections 2',
             shortcode='e2',
             domain='canton',
-            date=date(2015, 6, 14),
+            date=date(2001, 1, 1),
         )
     )
     session.flush()
 
     form = ScreenForm()
-    form.request = DummyRequest(app=election_day_app, session=session)
+    form.request = DummyRequest(app=election_day_app_zg, session=session)
     form.on_request()
     assert form.simple_vote.choices == [
-        ('simple-2', 'Simple 2'), ('simple-1', 'Simple 1')
+        ('simple-2', 'Simple 2 [2001-01-01]'),
+        ('simple-1', 'Simple 1 [2001-01-01]')
     ]
     assert form.complex_vote.choices == [
-        ('complex-1', 'Complex 1')
+        ('complex-1', 'Complex 1 [2001-01-01]')
     ]
     assert form.majorz_election.choices == [
-        ('majorz-2', 'Majorz 2'), ('majorz-1', 'Majorz 1')
+        ('majorz-2', 'Majorz 2 [2001-01-01]'),
+        ('majorz-1', 'Majorz 1 [2001-01-01]')
     ]
     assert form.proporz_election.choices == [
-        ('proporz-1', 'Proporz 1')
+        ('proporz-1', 'Proporz 1 [2001-01-01]')
     ]
     assert form.election_compound.choices == [
-        ('elections-1', 'Elections 1'), ('elections-2', 'Elections 2')
+        ('elections-1', 'Elections 1 [2001-01-01]'),
+        ('elections-2', 'Elections 2 [2001-01-01]')
     ]
 
     assert form.tags_simple_vote.text == (

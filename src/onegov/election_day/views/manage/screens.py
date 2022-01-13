@@ -1,6 +1,7 @@
 """ The manage screen views. """
 
 from morepath import redirect
+from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ScreenCollection
@@ -22,6 +23,22 @@ def view_screens(self, request):
         'title': _('Screens'),
         'screens': self.batch,
         'new_screen': request.link(self, 'new-screen'),
+        'export': request.link(self, 'export'),
+    }
+
+
+@ElectionDayApp.csv_file(
+    model=ScreenCollection,
+    name='export',
+    permission=Private
+)
+def export_screens(self, request):
+
+    """ Export all screens as a CSV file. """
+
+    return {
+        'data': self.export(),
+        'name': 'screens'
     }
 
 

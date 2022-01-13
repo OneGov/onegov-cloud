@@ -34,15 +34,15 @@ def create_election(app, type):
     new.form.submit()
 
 
-def test_view_rest_authenticate(election_day_app):
-    client = Client(election_day_app)
+def test_view_rest_authenticate(election_day_app_zg):
+    client = Client(election_day_app_zg)
 
     client.post('/upload', status=401)
 
     client.authorization = ('Basic', ('', 'password'))
     client.post('/upload', status=401)
 
-    collection = UploadTokenCollection(election_day_app.session())
+    collection = UploadTokenCollection(election_day_app_zg.session())
     token = str(collection.create().token)
     transaction.commit()
     client.post('/upload', status=401)
@@ -56,12 +56,12 @@ def test_view_rest_authenticate(election_day_app):
     client.post('/upload', status=401)
 
 
-def test_view_rest_validation(election_day_app):
-    token = UploadTokenCollection(election_day_app.session()).create()
+def test_view_rest_validation(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
     # No parameters
@@ -96,7 +96,7 @@ def test_view_rest_validation(election_day_app):
     assert result['errors']['id'] == [{'message': 'Invalid id'}]
 
     # Wrong election type
-    create_election(election_day_app, 'majorz')
+    create_election(election_day_app_zg, 'majorz')
     params = (
         ('id', 'election'),
         ('type', 'parties'),
@@ -108,12 +108,12 @@ def test_view_rest_validation(election_day_app):
     }]
 
 
-def test_view_rest_translations(election_day_app):
-    token = UploadTokenCollection(election_day_app.session()).create()
+def test_view_rest_translations(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
     params = (
@@ -148,15 +148,15 @@ def test_view_rest_translations(election_day_app):
     assert result['errors']['id'][0]['message'] == 'Ungültige ID'
 
 
-def test_view_rest_vote(election_day_app):
-    token = UploadTokenCollection(election_day_app.session()).create()
+def test_view_rest_vote(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
-    create_vote(election_day_app)
+    create_vote(election_day_app_zg)
 
     params = (
         ('id', 'vote'),
@@ -178,15 +178,15 @@ def test_view_rest_vote(election_day_app):
         assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_majorz(election_day_app):
-    token = UploadTokenCollection(election_day_app.session()).create()
+def test_view_rest_majorz(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
-    create_election(election_day_app, 'majorz')
+    create_election(election_day_app_zg, 'majorz')
 
     params = (
         ('id', 'election'),
@@ -211,15 +211,15 @@ def test_view_rest_majorz(election_day_app):
         assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_proporz(election_day_app):
-    token = UploadTokenCollection(election_day_app.session()).create()
+def test_view_rest_proporz(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
-    create_election(election_day_app, 'proporz')
+    create_election(election_day_app_zg, 'proporz')
 
     params = (
         ('id', 'election'),
@@ -244,15 +244,15 @@ def test_view_rest_proporz(election_day_app):
         assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_parties(election_day_app):
-    token = UploadTokenCollection(election_day_app.session()).create()
+def test_view_rest_parties(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
-    create_election(election_day_app, 'proporz')
+    create_election(election_day_app_zg, 'proporz')
 
     params = (
         ('id', 'election'),

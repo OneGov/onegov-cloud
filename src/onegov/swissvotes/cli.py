@@ -144,11 +144,11 @@ def import_campaign_material(group_context, folder):
     """
 
     def _import(request, app):
+        attachments = {}
+
         votes = SwissVoteCollection(app)
         bfs_numbers = votes.query().with_entities(SwissVote.bfs_number)
         bfs_numbers = [r.bfs_number for r in bfs_numbers]
-
-        attachments = {}
         for name in os.listdir(folder):
             if not name.endswith('.pdf'):
                 click.secho(f'Ignoring {name}', fg='yellow')
@@ -168,9 +168,11 @@ def import_campaign_material(group_context, folder):
                 click.secho(f'No matching vote for {name}', fg='red')
 
         for bfs_number in sorted(attachments):
-            names = sorted(attachments[bfs_number])
-            vote = votes.by_bfs_number(bfs_number)
+            vote = app.session().query(SwissVote).filter_by(
+                bfs_number=bfs_number
+            ).one()
             existing = [file.filename for file in vote.campaign_material_other]
+            names = sorted(attachments[bfs_number])
             for name in names:
                 if name in existing:
                     click.secho(f'{name} already exists', fg='yellow')
@@ -182,6 +184,7 @@ def import_campaign_material(group_context, folder):
                     file.reference = as_fileintent(content, name)
                 vote.files.append(file)
                 click.secho(f'Added {name}', fg='green')
+            transaction.commit()
 
     return _import
 

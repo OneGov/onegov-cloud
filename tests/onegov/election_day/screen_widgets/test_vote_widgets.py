@@ -30,7 +30,7 @@ from onegov.election_day.screen_widgets import (
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_vote_widgets(election_day_app, import_test_datasets):
+def test_vote_widgets(election_day_app_zg, import_test_datasets):
     structure = """
         <row>
             <column span="1">
@@ -69,13 +69,13 @@ def test_vote_widgets(election_day_app, import_test_datasets):
     ]
 
     # Empty
-    session = election_day_app.session()
+    session = election_day_app_zg.session()
     session.add(
         Vote(title='Vote', domain='canton', date=date(2015, 6, 18))
     )
     session.flush()
     model = session.query(Vote).one()
-    request = DummyRequest(app=election_day_app, session=session)
+    request = DummyRequest(app=election_day_app_zg, session=session)
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -212,7 +212,7 @@ def test_vote_widgets(election_day_app, import_test_datasets):
     assert 'my-class-7' in result
 
 
-def test_complex_vote_widgets(election_day_app, import_test_datasets):
+def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     structure = """
         <row>
             <column span="1">
@@ -291,14 +291,14 @@ def test_complex_vote_widgets(election_day_app, import_test_datasets):
     ]
 
     # Empty
-    session = election_day_app.session()
+    session = election_day_app_zg.session()
     session.add(
         ComplexVote(title='Proposal', domain='canton', date=date(2015, 6, 18))
     )
     model = session.query(ComplexVote).one()
     model.counter_proposal.title = 'Counter Proposal'
     model.tie_breaker.title = 'Tie Breaker'
-    request = DummyRequest(app=election_day_app, session=session)
+    request = DummyRequest(app=election_day_app_zg, session=session)
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)

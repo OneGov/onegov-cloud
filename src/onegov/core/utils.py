@@ -344,7 +344,7 @@ def linkify_phone(text):
             return match.group(0)
         if is_valid_length(strip_whitespace(number)):
             number = remove_duplicate_whitespace(number).strip()
-            return f'<a href="tel:{number}">{number}</a>'
+            return f'<a href="tel:{number}">{number}</a> '
 
         return match.group(0)
 

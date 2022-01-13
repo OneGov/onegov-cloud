@@ -131,10 +131,6 @@
         "district": "La Gl\u00e2ne",
         "name": "Ursy"
     },
-    "2111": {
-        "district": "La Gl\u00e2ne",
-        "name": "Villaz-Saint-Pierre"
-    },
     "2113": {
         "district": "La Gl\u00e2ne",
         "name": "Vuisternens-devant-Romont"
@@ -147,9 +143,9 @@
         "district": "La Gl\u00e2ne",
         "name": "Torny"
     },
-    "2116": {
+    "2117": {
         "district": "La Gl\u00e2ne",
-        "name": "La Folliaz"
+        "name": "Villaz"
     },
     "2121": {
         "district": "La Gruy\u00e8re",
@@ -275,10 +271,6 @@
         "district": "La Sarine",
         "name": "Corminboeuf"
     },
-    "2185": {
-        "district": "La Sarine",
-        "name": "Corserey"
-    },
     "2186": {
         "district": "La Sarine",
         "name": "Cottens (FR)"
@@ -319,10 +311,6 @@
         "district": "La Sarine",
         "name": "Neyruz (FR)"
     },
-    "2213": {
-        "district": "La Sarine",
-        "name": "Nor\u00e9az"
-    },
     "2216": {
         "district": "La Sarine",
         "name": "Pierrafortscha"
@@ -334,10 +322,6 @@
     "2220": {
         "district": "La Sarine",
         "name": "Le Mouret"
-    },
-    "2221": {
-        "district": "La Sarine",
-        "name": "Prez-vers-Nor\u00e9az"
     },
     "2225": {
         "district": "La Sarine",
@@ -370,6 +354,10 @@
     "2236": {
         "district": "La Sarine",
         "name": "Gibloux"
+    },
+    "2237": {
+        "district": "La Sarine",
+        "name": "Prez"
     },
     "2250": {
         "district": "See / Lac",

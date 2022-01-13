@@ -20,7 +20,15 @@
             <tbody>
                 <tr tal:repeat="(file, metadata) files">
                     <tal:block tal:condition="metadata">
-                        <td><a href="${request.link(file)}" target="_blank">${metadata['title']}</a></td>
+                        <td tal:define="downloadable not metadata['protected'] or request.is_logged_in">
+                            <tal:block tal:condition="downloadable">
+                                <a href="${request.link(file)}" target="_blank">${metadata['title']}</a>
+                            </tal:block>
+                            <tal:block tal:condition="not downloadable">
+                                ${metadata['title']}
+                                <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="This document contains press articles which are protected by copyright. Therefore, we are not allowed to provide it for free download. However, you are welcome to access the document on our premises in Bern for private use. Please contact us by email at info@swissvotes.ch to make an appointment."><i class="fa fa-info" aria-hidden="true"></i></span>
+                            </tal:block>
+                        </td>
                         <td>${metadata['position']}</td>
                         <td>${metadata['author']}</td>
                         <td>${metadata['editor']}</td>
@@ -29,9 +37,7 @@
                         <td>${metadata['doctype']}</td>
                     </tal:block>
                     <tal:block tal:condition="not: metadata">
-                        <td colspan="7">
-                            <a href="${request.link(file)}" target="_blank">${file.filename}</a>
-                        </td>
+                        <td colspan="7">${file.filename}</td>
                     </tal:block>
                 </tr>
             </tbody>

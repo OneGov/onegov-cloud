@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-27 09:03+0200\n"
+"POT-Creation-Date: 2022-01-09 08:04+0100\n"
 "PO-Revision-Date: 2021-04-01 10:24+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -64,6 +64,14 @@ msgid "The file contains an empty line."
 msgstr "Il file contiene una riga vuota."
 
 #, python-format
+msgid "${name} is not part of this election"
+msgstr "non fa parte di questa elezione"
+
+#, python-format
+msgid "${name} is not part of ${district}"
+msgstr "${name} non fa parte di ${district}"
+
+#, python-format
 msgid "Empty value: ${col}"
 msgstr "Valore vuoto: ${col}"
 
@@ -100,9 +108,6 @@ msgstr "Risultati"
 
 msgid "No data found"
 msgstr "Nessun dato trovato"
-
-msgid "No clear district"
-msgstr "Nessun distretto ben definito"
 
 msgid "Invalid list results"
 msgstr "Risultati della lista non validi"
@@ -199,7 +204,7 @@ msgstr "Impossibile leggere 'Schede bianche'"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Termine di ricerca"
 
 msgid ""
@@ -215,11 +220,29 @@ msgstr "Da"
 msgid "To date"
 msgstr "A"
 
+msgid "Domain"
+msgstr "Livello"
+
 msgid "Voting result"
 msgstr "Risultato elettorale"
 
-msgid "Domain"
-msgstr "Livello"
+msgid "Accepted"
+msgstr "Accolto"
+
+msgid "Rejected"
+msgstr "Respinto"
+
+msgid "Federal"
+msgstr "Nazionale"
+
+msgid "Cantonal"
+msgstr "Cantonale"
+
+msgid "Regional"
+msgstr "Regionale"
+
+msgid "Communal"
+msgstr "Comunale"
 
 msgid "Name"
 msgstr "Nome"
@@ -254,6 +277,12 @@ msgstr "Relativo"
 msgid "Absolute majority"
 msgstr "Maggioranza assoluta"
 
+msgid "District"
+msgstr "Distretto elettorale"
+
+msgid "Municipality"
+msgstr "Comune"
+
 msgid "Tacit election"
 msgstr "Elezione tacita"
 
@@ -262,12 +291,6 @@ msgstr "Svizzeri all'estero"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'elezione contiene risultati separati per gli espatriati."
-
-msgid "Distinct district"
-msgstr "Distretto Unico"
-
-msgid "The election contains results of a whole district."
-msgstr "L'elezione contiene i risultati di un intero distretto."
 
 msgid "Doppelter Pukelsheim"
 msgstr ""
@@ -326,27 +349,52 @@ msgstr "Colori"
 msgid "Invalid color definitions"
 msgstr "Definizioni di colore non valide"
 
-msgid "Cantonal"
-msgstr "Cantonale"
-
-msgid ""
-"Elections contain results for single municipalities rather than (partial) "
-"districts"
-msgstr ""
-"Le elezioni contengono risultati per singoli comuni piuttosto che per "
-"distretti (parziali)"
+msgid "Domain of the elections"
+msgstr "Livello di elezione"
 
 msgid "Elections"
 msgstr "Elezioni"
 
-msgid "Party strengths"
-msgstr "Forza delle parti"
+msgid "Lists"
+msgstr "Liste"
+
+msgid ""
+"Shows a tab with aggregated list results over all elections. Requires that "
+"all elections share the same lists. Note that the number of votes is not "
+"really meaningful."
+msgstr ""
+"Mostra una scheda con i risultati delle liste aggregate su tutte le "
+"elezioni. Richiede che tutte le elezioni condividano le stesse liste. Si "
+"noti che il numero di voti non è veramente significativo."
 
 msgid "Views"
 msgstr "Visualizzazioni"
 
 msgid "Mandate allocation"
 msgstr "Ripartizione dei seggi"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a table. Requires "
+"party results."
+msgstr ""
+"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
+"tabella. Richiede i risultati dei partiti."
+
+msgid "Party strengths"
+msgstr "Forza delle parti"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
+"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
+"grafico a barre. Richiede i risultati dei partiti."
+
+msgid "Panachage"
+msgstr "Panachage"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
 
 msgid "After Doppelter Pukelsheim"
 msgstr ""
@@ -451,9 +499,6 @@ msgstr "Titolo dello controprogetto"
 msgid "Title of the tie breaker"
 msgstr "Titolo dello spareggio"
 
-msgid "Lists"
-msgstr "Liste"
-
 msgid "Candidates"
 msgstr "Candidati"
 
@@ -463,8 +508,8 @@ msgstr "Parti"
 msgid "Downloads"
 msgstr "Download"
 
-msgid "Panachage"
-msgstr "Panachage"
+msgid "Municipalities"
+msgstr "Comuni"
 
 msgid "Elected candidates"
 msgstr "Candidati eletti"
@@ -474,12 +519,6 @@ msgstr "Nuovi risultati provvisori"
 
 msgid "Final results"
 msgstr "Risultati finali"
-
-msgid "Accepted"
-msgstr "Accolto"
-
-msgid "Rejected"
-msgstr "Respinto"
 
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
@@ -526,15 +565,6 @@ msgstr "Amministrare"
 msgid "Mappings"
 msgstr "Mapping"
 
-msgid "Federal"
-msgstr "Nazionale"
-
-msgid "Regional"
-msgstr "Regionale"
-
-msgid "Municipality"
-msgstr "Comune"
-
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Risultati finali sono disponibili su ${url}"
@@ -543,8 +573,12 @@ msgstr "Risultati finali sono disponibili su ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Nuovi risultati provvisori sono disponibili su ${url}"
 
-msgid "Municipalities"
-msgstr "Comuni"
+#, python-format
+msgid "Regional (${on})"
+msgstr "Regionale (${on})"
+
+msgid "Other"
+msgstr "Altro"
 
 msgid "district_label_bl"
 msgstr "Distretto elettorale"
@@ -553,9 +587,6 @@ msgid "district_label_gr"
 msgstr "Regione"
 
 msgid "district_label_sz"
-msgstr "Distretto elettorale"
-
-msgid "District"
 msgstr "Distretto elettorale"
 
 msgid "districts_label_bl"
@@ -570,8 +601,11 @@ msgstr "Distretti elettorali"
 msgid "Districts"
 msgstr "Distretti elettorali"
 
-msgid "Communal"
-msgstr "Comunale"
+msgid "superregion_label_bl"
+msgstr "Regione"
+
+msgid "superregions_label_bl"
+msgstr "Regioni"
 
 msgid "Quarter"
 msgstr "Quartiere"
@@ -1036,11 +1070,11 @@ msgstr "Caricare risultati"
 msgid "New screen"
 msgstr "Nuova schermata"
 
-msgid "No screens yet."
-msgstr "Ancora niente schermi."
-
 msgid "Export"
 msgstr "Export"
+
+msgid "No screens yet."
+msgstr "Ancora niente schermi."
 
 msgid "No subscribers yet."
 msgstr "Non ci sono ancora degli iscritti."

@@ -493,6 +493,7 @@ class HomepageSettingsForm(Form):
         render_kw={'rows': 10})
 
     homepage_structure = TextAreaField(
+        fieldset=_("Structure"),
         label=_("Homepage Structure (for advanced users only)"),
         description=_("The structure of the homepage"),
         render_kw={'rows': 32, 'data-editor': 'xml'})

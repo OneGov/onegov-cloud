@@ -2,13 +2,15 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, validate_integer
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.mappings import WABSTI_MAJORZ_HEADERS
+from onegov.election_day.formats.mappings import \
+    WABSTI_MAJORZ_HEADERS_CANDIDATES
 from uuid import uuid4
-
-from onegov.election_day.import_export.mappings import \
-    WABSTI_MAJORZ_HEADERS, WABSTI_MAJORZ_HEADERS_CANDIDATES
 
 
 def parse_election(line, errors):
@@ -29,7 +31,8 @@ def parse_election(line, errors):
     return mandates, majority
 
 
-def parse_election_result(line, errors, entities, added_entities):
+def parse_election_result(line, errors, entities, added_entities, election,
+                          principal):
     try:
         entity_id = validate_integer(line, 'bfs')
         eligible_voters = validate_integer(line, 'stimmber')
@@ -74,27 +77,32 @@ def parse_election_result(line, errors, entities, added_entities):
             errors.append(_(
                 _("${name} is unknown", mapping={'name': entity_id})
             ))
+
         elif entity_id in added_entities:
             errors.append(
                 _("${name} was found twice", mapping={
                     'name': entity_id
                 }))
         else:
-            added_entities.add(entity_id)
-            entity = entities.get(entity_id, {})
-            return ElectionResult(
-                id=uuid4(),
-                name=entity.get('name', ''),
-                district=entity.get('district', ''),
-                counted=True,
-                entity_id=entity_id,
-                eligible_voters=eligible_voters,
-                received_ballots=received_ballots,
-                blank_ballots=blank_ballots,
-                invalid_ballots=invalid_ballots,
-                blank_votes=blank_votes,
-                invalid_votes=invalid_votes,
+            name, district = get_entity_and_district(
+                entity_id, entities, election, principal, errors
             )
+
+            if not errors:
+                added_entities.add(entity_id)
+                return ElectionResult(
+                    id=uuid4(),
+                    name=name,
+                    district=district,
+                    counted=True,
+                    entity_id=entity_id,
+                    eligible_voters=eligible_voters,
+                    received_ballots=received_ballots,
+                    blank_ballots=blank_ballots,
+                    invalid_ballots=invalid_ballots,
+                    blank_votes=blank_votes,
+                    invalid_votes=invalid_votes,
+                )
 
 
 def parse_candidates(line, errors):
@@ -181,7 +189,8 @@ def import_election_wabsti_majorz(
             # Parse the line
             mandates, majority = parse_election(line, line_errors)
             result = parse_election_result(
-                line, line_errors, entities, added_entities
+                line, line_errors, entities, added_entities, election,
+                principal
             )
             if result:
                 for candidate, c_result in parse_candidates(line, line_errors):
@@ -253,16 +262,6 @@ def import_election_wabsti_majorz(
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
-    # Check if all results are from the same district if regional election
-    districts = set([result.district for result in results.values()])
-    if election.domain == 'region' and election.distinct:
-        if principal.has_districts:
-            if len(districts) != 1:
-                errors.append(FileImportError(_("No clear district")))
-        else:
-            if len(results) != 1:
-                errors.append(FileImportError(_("No clear district")))
-
     if errors:
         return errors
 
@@ -272,18 +271,21 @@ def import_election_wabsti_majorz(
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:
-        entity = entities.get(entity_id, {})
-        district = entity.get('district', '')
-        if election.domain == 'region':
-            if not election.distinct:
-                continue
-            if not principal.has_districts:
-                continue
-            if district not in districts:
+        name, district = get_entity_and_district(
+            entity_id, entities, election, principal
+        )
+        if election.domain == 'none':
+            continue
+        if election.domain == 'municipality':
+            if principal.domain != 'municipality':
+                if name != election.domain_segment:
+                    continue
+        if election.domain in ('region', 'district'):
+            if district != election.domain_segment:
                 continue
         results[entity_id] = ElectionResult(
             id=uuid4(),
-            name=entity.get('name', ''),
+            name=name,
             district=district,
             entity_id=entity_id,
             counted=False

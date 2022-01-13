@@ -748,7 +748,13 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         campaign_material_metadata={
             'campaign_material_other-essay': {
                 'title': 'Perché è una pessima idea.',
-                'language': ['it']
+                'language': ['it', 'rm'],
+                'doctype': ['argument']
+            },
+            'campaign_material_other-article': {
+                'title': 'Presseschau',
+                'language': ['de'],
+                'doctype': 'article'
             },
         }
     )
@@ -760,9 +766,10 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         setattr(model, name, attachments[name])
 
     for name in (
-        'campaign_material_yea-1.png',
+        'campaign_material_other-article.pdf',
         'campaign_material_other-essay.pdf',
-        'campaign_material_other-leaflet.pdf'
+        'campaign_material_other-leaflet.pdf',
+        'campaign_material_yea-1.png',
     ):
         model.files.append(campaign_material[name])
 
@@ -776,16 +783,15 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
 
     layout = VoteLayout(model, request)
     with patch.object(model, 'search', return_value=model.files):
-        results = [
-            (title, file.language, order)
-            for (title, file, order) in layout.search_results
-        ]
+        results = [r[:4] for r in layout.search_results]
         assert results == [
-            ('Brief description Swissvotes', 'french', 0),
-            ('Full analysis of post-vote poll results', 'german', 0),
-            ('campaign_material_other-leaflet.pdf', 'english', 1),
-            ('Perché è una pessima idea.', 'italian', 1),
-            ('campaign_material_yea-1.png', None, 3)
+            (0, 'Brief description Swissvotes', 'French', False),
+            (0, 'Full analysis of post-vote poll results', 'German', False),
+            (1, 'campaign_material_other-leaflet.pdf', '', True),
+            (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic',
+             False),
+            (1, 'Presseschau', 'German', True),
+            (3, 'campaign_material_yea-1.png', '', False)
         ]
 
 
@@ -1009,12 +1015,12 @@ def test_layout_vote_campaign_material(swissvotes_app):
     assert layout.metadata('zzz') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
         'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
-        'order': 999
+        'order': 999, 'protected': False
     }
     assert layout.metadata('zzz.pdf') == {
         'title': 'zzz', 'author': 'AAA', 'editor': '', 'date': '',
         'date_sortable': '', 'position': '', 'language': '', 'doctype': '',
-        'order': 999
+        'order': 999, 'protected': False
     }
 
     model.campaign_material_metadata = {
@@ -1026,19 +1032,20 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'date_day': 31,
             'position': 'yes',
             'language': ['de', 'fr'],
-            'doctype': ['leaflet', 'other'],
+            'doctype': ['leaflet', 'article'],
         }
     }
     assert layout.metadata('xxx') == {
         'author': 'AAA',
         'date': '31.12.1988',
         'date_sortable': '19881231',
-        'doctype': 'Pamphlet, Other',
+        'doctype': 'Pamphlet, Press article',
         'editor': 'BBB',
         'language': 'German, French',
         'order': 0,
         'position': 'Yes',
-        'title': 'xxx'
+        'title': 'xxx',
+        'protected': True
     }
 
 

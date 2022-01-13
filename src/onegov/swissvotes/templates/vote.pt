@@ -540,9 +540,15 @@
                             <th i18n:translate>Language</th>
                         </thead>
                         <tbody>
-                            <tr tal:repeat="(title, file, order) search_results">
-                                <td><a href="${request.link(file)}">${title}</a></td>
-                                <td i18n:translate>${(file.language or '').capitalize()}</td>
+                            <tr tal:repeat="(order, title, language, protected, file) search_results">
+                                <tal:block tal:define="downloadable not protected or request.is_logged_in">
+                                    <td tal:condition="not downloadable">
+                                        ${title}
+                                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="This document contains press articles which are protected by copyright. Therefore, we are not allowed to provide it for free download. However, you are welcome to access the document on our premises in Bern for private use. Please contact us by email at info@swissvotes.ch to make an appointment."><i class="fa fa-info" aria-hidden="true"></i></span>
+                                    </td>
+                                    <td tal:condition="downloadable"><a href="${request.link(file)}">${title}</a></td>
+                                    <td>${language}</td>
+                                </tal:block>
                             </tr>
                         </tbody>
                     </table>

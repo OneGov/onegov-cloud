@@ -5,18 +5,19 @@ from onegov.election_day.models import Principal
 from textwrap import dedent
 
 
-SUPPORTED_YEARS = list(range(2002, 2021 + 1))
+SUPPORTED_YEARS = list(range(2002, 2022 + 1))
 
-SUPPORTED_YEARS_MAP = list(range(2013, 2021 + 1))
+SUPPORTED_YEARS_MAP = list(range(2013, 2022 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 
-SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2021 + 1))
+SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2022 + 1))
 SUPPORTED_YEARS_NO_MAP_ADDITIONAL = list(
     set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ADDITIONAL)
 )
 
 
-def test_principal_load_canton():
+def test_principal_load():
+    # Canton with minimal options
     principal = Principal.from_yaml(dedent("""
         name: Kanton Zug
         canton: zg
@@ -27,7 +28,7 @@ def test_principal_load_canton():
     assert principal.id == 'zg'
     assert principal.domain == 'canton'
     assert list(principal.domains_election.keys()) == [
-        'federation', 'region', 'canton'
+        'federation', 'canton', 'none', 'municipality'
     ]
     assert list(principal.domains_vote.keys()) == ['federation', 'canton']
     assert len(principal.entities)
@@ -52,76 +53,7 @@ def test_principal_load_canton():
         'vote': False, 'election': False, 'election_compound': False
     }
 
-
-def test_principal_load_municipality_with_static_data():
-    principal = Principal.from_yaml(dedent("""
-        name: Stadt Bern
-        municipality: '351'
-    """))
-    assert isinstance(principal, Municipality)
-    assert principal.name == 'Stadt Bern'
-    assert principal.id == '351'
-    assert principal.domain == 'municipality'
-    assert list(principal.domains_election.keys()) == [
-        'federation', 'canton', 'municipality'
-    ]
-    assert list(principal.domains_vote.keys()) == [
-        'federation', 'canton', 'municipality'
-    ]
-    assert principal.has_quarters is True
-    assert len(principal.entities)
-    assert len(list(principal.entities.values())[0])
-
-    assert principal.logo is None
-    assert principal.color == '#000'
-    assert principal.base is None
-    assert principal.base_domain is None
-    assert principal.analytics is None
-    assert principal.use_maps is False
-    assert principal.has_districts is False
-    assert principal.fetch == {}
-    assert principal.webhooks == {}
-    assert principal.sms_notification is None
-    assert principal.email_notification is None
-    assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
-
-
-def test_principal_load_municipality_wo_static_data():
-    principal = Principal.from_yaml(dedent("""
-        name: Kriens
-        municipality: '1059'
-    """))
-    assert isinstance(principal, Municipality)
-    assert principal.name == 'Kriens'
-    assert principal.id == '1059'
-    assert principal.domain == 'municipality'
-    assert list(principal.domains_election.keys()) == [
-        'federation', 'canton', 'municipality'
-    ]
-    assert list(principal.domains_vote.keys()) == [
-        'federation', 'canton', 'municipality'
-    ]
-    assert principal.has_quarters is False
-    assert len(principal.entities)
-    assert len(list(principal.entities.values())[0]) == 1
-
-    assert principal.logo is None
-    assert principal.color == '#000'
-    assert principal.base is None
-    assert principal.base_domain is None
-    assert principal.analytics is None
-    assert principal.use_maps is False
-    assert principal.has_districts is False
-    assert principal.fetch == {}
-    assert principal.webhooks == {}
-    assert principal.sms_notification is None
-    assert principal.email_notification is None
-    assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
-
-
-def test_principal_load_options():
+    # Canton with all options
     principal = Principal.from_yaml(dedent("""
         name: Kanton Zug
         canton: zg
@@ -163,11 +95,6 @@ def test_principal_load_options():
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
     assert principal.domain == 'canton'
-    assert list(principal.domains_election.keys()) == [
-        'federation', 'region', 'canton'
-    ]
-    assert list(principal.domains_vote.keys()) == ['federation', 'canton']
-
     assert principal.name == 'Kanton Zug'
     assert principal.logo is None
     assert principal.color == '#000'
@@ -212,38 +139,124 @@ def test_principal_load_options():
         'tabs': {'elections': ['lists']}
     }
 
+    # Municipality with static data
+    principal = Principal.from_yaml(dedent("""
+        name: Stadt Bern
+        municipality: '351'
+    """))
+    assert isinstance(principal, Municipality)
+    assert principal.name == 'Stadt Bern'
+    assert principal.id == '351'
+    assert principal.domain == 'municipality'
+    assert list(principal.domains_election.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert list(principal.domains_vote.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert principal.has_quarters is True
+    assert len(principal.entities)
+    assert len(list(principal.entities.values())[0])
 
-def test_canton_entities():
-    principal = Canton(name='Zug', canton='zg')
-    entities = {
-        1701: {'name': 'Baar'},
-        1702: {'name': 'Cham'},
-        1703: {'name': 'Hünenberg'},
-        1704: {'name': 'Menzingen'},
-        1705: {'name': 'Neuheim'},
-        1706: {'name': 'Oberägeri'},
-        1707: {'name': 'Risch'},
-        1708: {'name': 'Steinhausen'},
-        1709: {'name': 'Unterägeri'},
-        1710: {'name': 'Walchwil'},
-        1711: {'name': 'Zug'},
-    }
-    assert principal.entities == {
-        year: entities for year in SUPPORTED_YEARS
-    }
+    assert principal.logo is None
+    assert principal.color == '#000'
+    assert principal.base is None
+    assert principal.base_domain is None
+    assert principal.analytics is None
+    assert principal.use_maps is False
+    assert principal.has_districts is False
+    assert principal.fetch == {}
+    assert principal.webhooks == {}
+    assert principal.sms_notification is None
+    assert principal.email_notification is None
+    assert principal.wabsti_import is False
+    assert principal.pdf_signing == {}
 
+    # Municipality without static data
+    principal = Principal.from_yaml(dedent("""
+        name: Kriens
+        municipality: '1059'
+    """))
+    assert isinstance(principal, Municipality)
+    assert principal.name == 'Kriens'
+    assert principal.id == '1059'
+    assert principal.domain == 'municipality'
+    assert list(principal.domains_election.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert list(principal.domains_vote.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert principal.has_quarters is False
+    assert len(principal.entities)
+    assert len(list(principal.entities.values())[0]) == 1
+
+    assert principal.logo is None
+    assert principal.color == '#000'
+    assert principal.base is None
+    assert principal.base_domain is None
+    assert principal.analytics is None
+    assert principal.use_maps is False
+    assert principal.has_districts is False
+    assert principal.fetch == {}
+    assert principal.webhooks == {}
+    assert principal.sms_notification is None
+    assert principal.email_notification is None
+    assert principal.wabsti_import is False
+    assert principal.pdf_signing == {}
+
+
+def test_canton():
     # All cantons
-    for canton in principal.CANTONS:
+    for canton in Canton.CANTONS:
         principal = Canton(name=canton, canton=canton)
         for year in SUPPORTED_YEARS:
             assert principal.entities[year]
 
+    # BL
+    canton = Canton(name='bl', canton='bl')
+    assert canton.has_districts is True
+    assert canton.has_regions is True
+    assert canton.has_superregions is True
+    assert list(canton.domains_election.keys()) == [
+        'federation', 'canton', 'region', 'district', 'none', 'municipality'
+    ]
 
-def test_canton_has_districts():
-    assert Canton(name='gr', canton='gr').has_districts is True
-    assert Canton(name='sg', canton='sg').has_districts is True
-    assert Canton(name='sz', canton='sz').has_districts is True
-    assert Canton(name='zg', canton='zg').has_districts is False
+    # GR
+    canton = Canton(name='gr', canton='gr')
+    assert canton.has_districts is True
+    assert canton.has_regions is True
+    assert canton.has_superregions is False
+    assert list(canton.domains_election.keys()) == [
+        'federation', 'canton', 'region', 'district', 'none', 'municipality'
+    ]
+
+    # SG
+    canton = Canton(name='sg', canton='sg')
+    assert canton.has_districts is True
+    assert canton.has_regions is False
+    assert canton.has_superregions is False
+    assert list(canton.domains_election.keys()) == [
+        'federation', 'canton', 'district', 'none', 'municipality'
+    ]
+
+    # SZ
+    canton = Canton(name='sz', canton='sz')
+    assert canton.has_districts is True
+    assert canton.has_regions is False
+    assert canton.has_superregions is False
+    assert list(canton.domains_election.keys()) == [
+        'federation', 'canton', 'district', 'none', 'municipality'
+    ]
+
+    # ZG
+    canton = Canton(name='zg', canton='zg')
+    assert canton.has_districts is False
+    assert canton.has_regions is False
+    assert canton.has_superregions is False
+    assert list(canton.domains_election.keys()) == [
+        'federation', 'canton', 'none', 'municipality'
+    ]
 
 
 def test_municipality_entities():
@@ -338,10 +351,10 @@ def test_principal_notifications_enabled():
     ).notifications is True
 
 
-def test_principal_label(election_day_app):
+def test_principal_label(election_day_app_zg):
 
     def translate(text, locale):
-        translator = election_day_app.translations.get(locale)
+        translator = election_day_app_zg.translations.get(locale)
         return text.interpolate(translator.gettext(text))
 
     # Default (Canton)
@@ -363,6 +376,22 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Circonscriptions électorales'),
         ('districts', 'it_CH', 'Distretti elettorali'),
         ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -385,6 +414,22 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Districts électorales'),
         ('districts', 'it_CH', 'Distretti elettorali'),
         ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Region'),
+        ('superregion', 'fr_CH', 'Région'),
+        ('superregion', 'it_CH', 'Regione'),
+        ('superregion', 'rm_CH', 'Regiun'),
+        ('superregions', 'de_CH', 'Regionen'),
+        ('superregions', 'fr_CH', 'Régions'),
+        ('superregions', 'it_CH', 'Regioni'),
+        ('superregions', 'rm_CH', 'Regiuns'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -407,6 +452,22 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Régions'),
         ('districts', 'it_CH', 'Regioni'),
         ('districts', 'rm_CH', 'Regiuns'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -429,6 +490,60 @@ def test_principal_label(election_day_app):
         ('districts', 'fr_CH', 'Districts électorales'),
         ('districts', 'it_CH', 'Distretti elettorali'),
         ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
+    ):
+        assert translate(principal.label(label), locale) == result
+
+    # ZG
+    principal = Canton(name='sz', canton='sz')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entity', 'fr_CH', 'Commune'),
+        ('entity', 'it_CH', 'Comune'),
+        ('entity', 'rm_CH', 'Vischnanca'),
+        ('entities', 'de_CH', 'Gemeinden'),
+        ('entities', 'fr_CH', 'Communes'),
+        ('entities', 'it_CH', 'Comuni'),
+        ('entities', 'rm_CH', 'Vischnancas'),
+        ('district', 'de_CH', 'Bezirk'),
+        ('district', 'fr_CH', 'District électoral'),
+        ('district', 'it_CH', 'Distretto elettorale'),
+        ('district', 'rm_CH', 'Circul electoral'),
+        ('districts', 'de_CH', 'Bezirke'),
+        ('districts', 'fr_CH', 'Districts électorales'),
+        ('districts', 'it_CH', 'Distretti elettorali'),
+        ('districts', 'rm_CH', 'Circuls electorals'),
+        ('region', 'de_CH', 'Wahlkreis'),
+        ('region', 'fr_CH', 'Circonscription électorale'),
+        ('region', 'it_CH', 'Distretto elettorale'),
+        ('region', 'rm_CH', 'Circul electoral'),
+        ('regions', 'de_CH', 'Wahlkreise'),
+        ('regions', 'fr_CH', 'Circonscriptions électorales'),
+        ('regions', 'it_CH', 'Distretti elettorali'),
+        ('regions', 'rm_CH', 'Circuls electorals'),
+        ('superregion', 'de_CH', 'Wahlkreis'),
+        ('superregion', 'fr_CH', 'Circonscription électorale'),
+        ('superregion', 'it_CH', 'Distretto elettorale'),
+        ('superregion', 'rm_CH', 'Circul electoral'),
+        ('superregions', 'de_CH', 'Wahlkreise'),
+        ('superregions', 'fr_CH', 'Circonscriptions électorales'),
+        ('superregions', 'it_CH', 'Distretti elettorali'),
+        ('superregions', 'rm_CH', 'Circuls electorals'),
     ):
         assert translate(principal.label(label), locale) == result
 

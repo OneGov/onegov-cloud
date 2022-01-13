@@ -4,6 +4,7 @@ from onegov.ballot import ElectionAssociation
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
 from re import findall
@@ -58,10 +59,34 @@ class ElectionForm(Form):
     )
 
     domain = RadioField(
-        label=_("Type"),
+        label=_("Domain"),
         validators=[
             InputRequired()
         ]
+    )
+
+    region = ChosenSelectField(
+        label=_("District"),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain', 'region'),
+    )
+
+    district = ChosenSelectField(
+        label=_("District"),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain', 'district'),
+    )
+
+    municipality = ChosenSelectField(
+        label=_("Municipality"),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain', 'municipality'),
     )
 
     tacit = BooleanField(
@@ -73,13 +98,6 @@ class ElectionForm(Form):
         label=_("Expats"),
         description=_("The election contains seperate results for expats."),
         render_kw=dict(force_simple=True)
-    )
-
-    distinct = BooleanField(
-        label=_("Distinct district"),
-        description=_("The election contains results of a whole district."),
-        render_kw=dict(force_simple=True),
-        depends_on=('domain', 'region'),
     )
 
     after_pukelsheim = BooleanField(
@@ -204,20 +222,56 @@ class ElectionForm(Form):
             raise ValidationError(_('Invalid color definitions'))
 
     def on_request(self):
+        principal = self.request.app.principal
+
+        self.domain.choices = [
+            (key, self.request.translate(text))
+            for key, text in principal.domains_election.items()
+        ]
+
+        self.region.label.text = principal.label('region')
+        regions = set([
+            entity.get('region', None)
+            for year in principal.entities.values()
+            for entity in year.values()
+            if entity.get('region', None)
+        ])
+        self.region.choices = [(item, item) for item in sorted(regions)]
+
+        self.district.label.text = principal.label('district')
+        districts = set([
+            entity.get('district', None)
+            for year in principal.entities.values()
+            for entity in year.values()
+            if entity.get('district', None)
+        ])
+        self.district.choices = [(item, item) for item in sorted(districts)]
+
+        municipalities = set([
+            entity.get('name', None)
+            for year in principal.entities.values()
+            for entity in year.values()
+            if entity.get('name', None)
+        ])
+        self.municipality.choices = [
+            (item, item) for item in sorted(municipalities)
+        ]
+        if principal.domain == 'municipality':
+            self.municipality.choices = [(principal.name, principal.name)]
+
         self.election_de.validators = []
         self.election_fr.validators = []
         self.election_it.validators = []
         self.election_rm.validators = []
-
         default_locale = self.request.default_locale
         if default_locale.startswith('de'):
             self.election_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
             self.election_fr.validators.append(InputRequired())
         if default_locale.startswith('it'):
-            self.election_de.validators.append(InputRequired())
+            self.election_it.validators.append(InputRequired())
         if default_locale.startswith('rm'):
-            self.election_de.validators.append(InputRequired())
+            self.election_rm.validators.append(InputRequired())
 
         layout = DefaultLayout(None, self.request)
 
@@ -234,14 +288,15 @@ class ElectionForm(Form):
             ) for election in query
         ]
 
-    def set_domain(self, principal):
-        self.domain.choices = [
-            (key, text) for key, text in principal.domains_election.items()
-        ]
-
     def update_model(self, model):
         model.date = self.date.data
         model.domain = self.domain.data
+        if model.domain == 'region':
+            model.domain_segment = self.region.data
+        if model.domain == 'district':
+            model.domain_segment = self.district.data
+        if model.domain == 'municipality':
+            model.domain_segment = self.municipality.data
         model.type = self.election_type.data
         model.shortcode = self.shortcode.data
         model.number_of_mandates = self.mandates.data
@@ -250,7 +305,6 @@ class ElectionForm(Form):
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
         model.expats = self.expats.data
-        model.distinct = self.distinct.data
         model.after_pukelsheim = self.after_pukelsheim.data
 
         titles = {}
@@ -310,6 +364,12 @@ class ElectionForm(Form):
 
         self.date.data = model.date
         self.domain.data = model.domain
+        if model.domain == 'region':
+            self.region.data = model.domain_segment
+        if model.domain == 'district':
+            self.district.data = model.domain_segment
+        if model.domain == 'municipality':
+            self.municipality.data = model.domain_segment
         self.shortcode.data = model.shortcode
         self.election_type.data = model.type
         self.mandates.data = model.number_of_mandates
@@ -318,7 +378,6 @@ class ElectionForm(Form):
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit
         self.expats.data = model.expats
-        self.distinct.data = model.distinct
         self.after_pukelsheim.data = model.after_pukelsheim
 
         self.colors.data = '\n'.join((

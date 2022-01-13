@@ -37,8 +37,6 @@ def create_election(self, request, form):
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.session)
 
-    form.set_domain(request.app.principal)
-
     if form.submitted(request):
         election = Election()
         form.update_model(election)
@@ -64,8 +62,6 @@ def edit_election(self, request, form):
 
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.session)
-
-    form.set_domain(request.app.principal)
 
     if form.submitted(request):
         form.update_model(self)

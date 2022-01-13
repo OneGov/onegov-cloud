@@ -336,10 +336,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return form
 
     def translate(self, text):
-        """ Transalates the given text, if it's a translatable text. """
+        """ Translates the given text, if it's a translatable text. Also
+        translates mappings. """
 
         if not hasattr(text, 'domain'):
             return text
+
+        if getattr(text, 'mapping', None):
+            for key, value in text.mapping.items():
+                if hasattr(text, 'domain'):
+                    text.mapping[key] = self.translator(value)
 
         return self.translator(text)
 
@@ -347,10 +353,15 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def translator(self):
         """ Returns the translate function for basic string translations. """
         translator = self.get_translate()
-        if translator:
-            return lambda text: text.interpolate(translator.gettext(text))
 
-        return lambda text: text.interpolate(text)
+        def translate(text):
+            if not hasattr(text, 'interpolate'):
+                return text
+            if translator:
+                return text.interpolate(translator.gettext(text))
+            return text.interpolate(text)
+
+        return translate
 
     @cached_property
     def default_locale(self):

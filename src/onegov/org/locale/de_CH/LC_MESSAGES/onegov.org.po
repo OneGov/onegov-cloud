@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-12-01 08:37+0100\n"
+"POT-Creation-Date: 2022-01-06 09:26+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1281,6 +1281,9 @@ msgstr "Startseiten Bild #6"
 msgid "Homepage Cover"
 msgstr "Startseiten Cover"
 
+msgid "Structure"
+msgstr "Struktur"
+
 msgid "Homepage Structure (for advanced users only)"
 msgstr "Startseiten Struktur (nur für fortgeschrittene Benutzer)"
 
@@ -1853,6 +1856,9 @@ msgstr "Wollen sie die externe Verknüpfung wirklich löschen?"
 msgid "Delete external link"
 msgstr "Verknüpfung löschen"
 
+msgid "Sort"
+msgstr "Sortieren"
+
 msgid "The submission was adopted"
 msgstr "Der Eintrag wurde übernommen"
 
@@ -1906,6 +1912,9 @@ msgstr ""
 "- '-' wird in eine Aufzählung umgewandelt\n"
 "- Urls werden zu Hyperlinks konvertiert\n"
 "- E-Mails und Telefon-Nummern ebenfalls"
+
+msgid "Hide contact info in sidebar"
+msgstr "Kontaktinformationen in Sidebar ausblenden"
 
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
@@ -3431,6 +3440,16 @@ msgid ""
 msgstr ""
 "Ihr Registrationslink wurde wie folgt erstellt. Bitte kopieren Sie diesen "
 "bevor Sie weiterfahren, der Link wird Ihnen nicht wieder angezeigt:"
+
+msgid ""
+"Sort the items using drag and drop. The new positions are automatically "
+"saved directly after moving."
+msgstr ""
+"Sortieren Sie die Elemente mittels Drag & Drop. Die neuen Positionen werden "
+"direkt nach dem Verschieben automatisch gespeichert."
+
+msgid "Back to page"
+msgstr "Zurück zur Seite"
 
 msgid "No activities yet."
 msgstr "Noch keine Aktivitäten."

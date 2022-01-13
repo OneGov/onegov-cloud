@@ -1580,6 +1580,7 @@ $payments-icon: '\f09d';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
+$sort-link-icon: '\f074';
 $sync-icon: '\f021';
 $subscribe-link-icon: '\f0c1';
 $test-link-icon: '\f0e9';
@@ -1704,6 +1705,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
+    .sort-link::before { @include icon($sort-link-icon); }
     .subscribe-link::before { @include icon($subscribe-link-icon); }
     .test-link::before { @include icon($test-link-icon); }
     .rule-link::before { @include icon($rule-link-icon); }
@@ -6306,4 +6308,29 @@ $pageref-color-hover: $iron;
     right: 0;
     text-align: center;
     white-space: nowrap;
+}
+
+/*
+    Sort topics
+*/
+.sort-items {
+    list-style: none;
+    margin-left: 0;
+
+    li {
+        background: #f5f5f5;
+        border: 1px dashed #ddd;
+        cursor: grab;
+        margin-bottom: 1em;
+        padding: .25rem .5rem;
+
+        &::before {
+            color: #999;
+            content: '\f0dc';
+            display: inline-block;
+            font-family: 'FontAwesome';
+            font-weight: bold;
+            width: 1.5ex;
+        }
+    }
 }

@@ -3,51 +3,76 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.election_day.forms import ElectionCompoundForm
+from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
 
-def test_election_compound_form_populate(session):
-    form = ElectionCompoundForm()
-    form.request = DummyRequest(session=session)
-
-    form.on_request()
-    assert form.elections.choices == []
-
+def test_election_compound_form_on_request(session):
     session.add(
         ProporzElection(
-            title='election-1',
+            title='r1',
             domain='region',
             shortcode='2',
             date=date(2001, 1, 1))
     )
     session.add(
-        Election(
-            title='election-2',
-            domain='region',
+        ProporzElection(
+            title='d1',
+            domain='district',
             shortcode='1',
             date=date(2001, 1, 1))
     )
     session.add(
         ProporzElection(
-            title='election-3',
-            domain='region',
+            title='m1',
+            domain='municipality',
             date=date(2000, 1, 1))
     )
     session.add(
         Election(
-            title='election-4',
+            title='m2',
+            domain='municipality',
+            date=date(2000, 1, 1))
+    )
+    session.add(
+        ProporzElection(
+            title='f1',
             domain='federation',
             date=date(2001, 1, 1))
     )
     session.flush()
 
+    form = ElectionCompoundForm()
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='zg', canton='zg')
     form.on_request()
-    assert form.elections.choices == [
-        ('election-1', '01.01.2001 2 election-1'),
-        ('election-3', '01.01.2000 election-3'),
+    assert [x[0] for x in form.domain_elections.choices] == ['municipality']
+    assert [x[0] for x in form.region_elections.choices] == ['r1']
+    assert [x[0] for x in form.district_elections.choices] == ['d1']
+    assert [x[0] for x in form.municipality_elections.choices] == ['m1']
+    assert isinstance(form.election_de.validators[0], InputRequired)
+    assert form.election_fr.validators == []
+    assert form.election_it.validators == []
+    assert form.election_rm.validators == []
+
+    form = ElectionCompoundForm()
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'fr_CH'
+    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.on_request()
+    assert [x[0] for x in form.domain_elections.choices] == [
+        'region', 'district', 'municipality'
     ]
+    assert [x[0] for x in form.region_elections.choices] == ['r1']
+    assert [x[0] for x in form.district_elections.choices] == ['d1']
+    assert [x[0] for x in form.municipality_elections.choices] == ['m1']
+    assert form.election_de.validators == []
+    assert isinstance(form.election_fr.validators[0], InputRequired)
+    assert form.election_it.validators == []
+    assert form.election_rm.validators == []
 
 
 def test_election_compound_form_validate(session):
@@ -67,53 +92,36 @@ def test_election_compound_form_validate(session):
 
     form = ElectionCompoundForm()
     form.request = DummyRequest(session=session)
+    form.request.app.principal = Canton(name='gr', canton='gr')
     form.on_request()
 
     form.process(DummyPostData({
         'election_de': 'Elections',
         'domain': 'canton',
+        'domain_elections': 'region',
         'date': '2012-01-01',
-        'elections': ['election-1'],
+        'region_elections': ['election-1'],
     }))
     assert form.validate()
 
     form.process(DummyPostData({
         'election_de': 'Elections',
         'domain': 'canton',
+        'domain_elections': 'region',
         'date': '2012-01-01',
-        'elections': ['election-1', 'election-2'],
+        'region_elections': ['election-1', 'election-2'],
     }))
     assert form.validate()
-
-
-def test_election_compound_form_translations(session):
-    form = ElectionCompoundForm()
-    form.request = DummyRequest(session=session)
-    form.request.default_locale = 'de_CH'
-    form.on_request()
-    assert isinstance(form.election_de.validators[0], InputRequired)
-    assert form.election_fr.validators == []
-    assert form.election_it.validators == []
-    assert form.election_rm.validators == []
-
-    form = ElectionCompoundForm()
-    form.request = DummyRequest(session=session)
-    form.request.default_locale = 'fr_CH'
-    form.on_request()
-    assert form.election_de.validators == []
-    assert isinstance(form.election_fr.validators[0], InputRequired)
-    assert form.election_it.validators == []
-    assert form.election_rm.validators == []
 
 
 def test_election_compound_form_model(session, related_link_labels):
     date_ = date(2001, 1, 1)
-    e1 = Election(domain='region', title='e', id='e-1', date=date_)
-    e2 = Election(domain='region', title='e', id='e-2', date=date_)
-    e3 = Election(domain='region', title='e', id='e-3', date=date_)
-    session.add(e1)
-    session.add(e2)
-    session.add(e3)
+    e_r = Election(domain='region', title='e', id='e-r', date=date_)
+    e_d = Election(domain='district', title='e', id='e-d', date=date_)
+    e_m = Election(domain='municipality', title='e', id='e-m', date=date_)
+    session.add(e_r)
+    session.add(e_d)
+    session.add(e_m)
     session.flush()
 
     model = ElectionCompound()
@@ -124,13 +132,15 @@ def test_election_compound_form_model(session, related_link_labels):
     model.title_translations['rm_CH'] = 'Elections (RM)'
     model.date = date(2012, 1, 1)
     model.domain = 'canton'
-    model.aggregated_by_entity = True
+    model.domain_elections = 'region'
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
-    model.show_party_strengths = True
+    model.show_lists = True
     model.show_mandate_allocation = True
-    model.elections = [e1, e2]
+    model.show_party_strengths = True
+    model.show_party_panachage = True
+    model.elections = [e_r]
     model.after_pukelsheim = True
     model.pukelsheim_completed = True
     model.colors = {
@@ -141,23 +151,26 @@ def test_election_compound_form_model(session, related_link_labels):
 
     form = ElectionCompoundForm()
     form.apply_model(model)
-
     assert form.election_de.data == 'Elections (DE)'
     assert form.election_fr.data == 'Elections (FR)'
     assert form.election_it.data == 'Elections (IT)'
     assert form.election_rm.data == 'Elections (RM)'
     assert form.date.data == date(2012, 1, 1)
     assert form.domain.data == 'canton'
-    assert form.aggregated_by_entity.data == True
+    assert form.domain_elections.data == 'region'
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
     assert form.related_link_label_de.data == 'DE'
     assert form.related_link_label_fr.data == 'FR'
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
-    assert form.show_party_strengths.data is True
+    assert form.show_lists.data is True
     assert form.show_mandate_allocation.data is True
-    assert form.elections.data == ['e-1', 'e-2']
+    assert form.show_party_strengths.data is True
+    assert form.show_party_panachage.data is True
+    assert form.region_elections.data == ['e-r']
+    assert form.district_elections.data == []
+    assert form.municipality_elections.data == []
     assert form.after_pukelsheim.data is True
     assert form.pukelsheim_completed.data is True
     assert form.colors.data == (
@@ -171,12 +184,16 @@ def test_election_compound_form_model(session, related_link_labels):
     form.election_rm.data = 'Some Elections (RM)'
     form.date.data = date(2016, 1, 1)
     form.domain.data = 'canton'
-    form.aggregated_by_entity.data = False
+    form.domain_elections.data = 'district'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
-    form.show_party_strengths.data = False
+    form.show_lists.data = False
     form.show_mandate_allocation.data = False
-    form.elections.data = ['e-1', 'e-3', 'e-4']
+    form.show_party_strengths.data = False
+    form.show_party_panachage.data = False
+    form.region_elections.data = ['e-r']
+    form.district_elections.data = ['e-d']
+    form.municipality_elections.data = ['e-m']
     form.after_pukelsheim.data = False
     form.pukelsheim_completed.data = False
     form.colors.data = (
@@ -187,9 +204,9 @@ def test_election_compound_form_model(session, related_link_labels):
     )
 
     form.request = DummyRequest(session=session)
+    form.request.app.principal = Canton(name='gr', canton='gr')
     form.on_request()
     form.update_model(model)
-
     assert model.title == 'Some Elections (DE)'
     assert model.title_translations['de_CH'] == 'Some Elections (DE)'
     assert model.title_translations['fr_CH'] == 'Some Elections (FR)'
@@ -197,16 +214,22 @@ def test_election_compound_form_model(session, related_link_labels):
     assert model.title_translations['rm_CH'] == 'Some Elections (RM)'
     assert model.date == date(2016, 1, 1)
     assert model.domain == 'canton'
-    assert model.aggregated_by_entity == False
+    assert model.domain_elections == 'district'
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
     assert model.pukelsheim_completed is False
-    assert form.show_party_strengths.data is False
+    assert form.show_lists.data is False
     assert form.show_mandate_allocation.data is False
-    assert sorted([e.id for e in model.elections]) == ['e-1', 'e-3']
+    assert form.show_party_strengths.data is False
+    assert form.show_party_panachage.data is False
+    assert sorted([e.id for e in model.elections]) == ['e-d']
     assert model.colors == {
         'CVP': '#ff9100',
         'FDP': '#3a8bc1',
         'GLP': '#aeca00',
         'SP Juso': '#dd0e0e',
     }
+
+    form.domain_elections.data = 'municipality'
+    form.update_model(model)
+    assert sorted([e.id for e in model.elections]) == ['e-m']

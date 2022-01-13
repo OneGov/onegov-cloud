@@ -33,7 +33,7 @@ def test_load_csv():
     module_path('tests.onegov.election_day', 'fixtures/wb_v2.xlsx'),
     module_path('tests.onegov.election_day', 'fixtures/wb_v3.xlsx'),
 ])
-def test_load_csv_excel(election_day_app, excel_file):
+def test_load_csv_excel(election_day_app_zg, excel_file):
     with open(excel_file, 'rb') as f:
         csv, error = load_csv(f, 'application/excel', ['A'])
     assert not error
@@ -46,13 +46,13 @@ def test_load_csv_excel(election_day_app, excel_file):
     module_path('tests.onegov.election_day', 'fixtures/wb_error_v2.xls'),
     module_path('tests.onegov.election_day', 'fixtures/wb_error_v2.xlsx'),
 ])
-def test_load_csv_excel_invalid(election_day_app, excel_file):
+def test_load_csv_excel_invalid(election_day_app_zg, excel_file):
     with open(excel_file, 'rb') as f:
         csv, error = load_csv(f, 'application/excel', ['A'])
     assert error.error == 'The xls/xlsx file contains unsupported cells.'
 
 
-def test_load_csv_errors(election_day_app):
+def test_load_csv_errors(election_day_app_zg):
     csv, error = load_csv(
         BytesIO('A,B\n1,2\n'.encode('utf-8')), 'text/plain', ['A']
     )

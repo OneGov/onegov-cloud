@@ -34,28 +34,37 @@ class ManageLayout(DefaultLayout):
             []
         ))
 
-        submenu = []
-        submenu.append((
-            _("Elections"),
-            self.request.link(ElectionCollection(session)),
-            isinstance(self.model, ElectionCollection),
-            []
-        ))
-        submenu.append((
-            _("Compounds of elections"),
-            self.request.link(ElectionCompoundCollection(session)),
-            isinstance(self.model, ElectionCompoundCollection),
-            []
-        ))
-        result.append((
-            _("Elections"),
-            '',
-            (
-                isinstance(self.model, ElectionCollection)
-                or isinstance(self.model, ElectionCompoundCollection)
-            ),
-            submenu
-        ))
+        if principal.domain == 'municipality':
+            result.append((
+                _("Elections"),
+                self.request.link(ElectionCollection(session)),
+                isinstance(self.model, ElectionCollection),
+                []
+            ))
+        else:
+            submenu = []
+            submenu.append((
+                _("Elections"),
+                self.request.link(ElectionCollection(session)),
+                isinstance(self.model, ElectionCollection),
+                []
+            ))
+
+            submenu.append((
+                _("Compounds of elections"),
+                self.request.link(ElectionCompoundCollection(session)),
+                isinstance(self.model, ElectionCompoundCollection),
+                []
+            ))
+            result.append((
+                _("Elections"),
+                '',
+                (
+                    isinstance(self.model, ElectionCollection)
+                    or isinstance(self.model, ElectionCompoundCollection)
+                ),
+                submenu
+            ))
 
         submenu = []
         submenu.append((

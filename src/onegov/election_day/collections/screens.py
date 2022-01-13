@@ -40,3 +40,17 @@ class ScreenCollection(ScreenCollectionPagination):
     def delete(self, source):
         self.session.delete(source)
         self.session.flush()
+
+    def export(self):
+        return [
+            {
+                'number': screen.number,
+                'description': screen.description,
+                'type': screen.type,
+                'structure': screen.structure,
+                'css': screen.css,
+                'group': screen.group,
+                'duration': screen.duration,
+            }
+            for screen in self.query()
+        ]

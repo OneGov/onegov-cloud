@@ -28,16 +28,19 @@ class SearchForm(Form):
         coerce=bool,
         render_kw={'size': 6},
         description=_(
-            "The full-text search searches the following documents, in their "
+            "Select «No» if you want to limit the search to title, keyword, "
+            "vote number, and procedure number only. If you select «Yes», the "
+            "full-text search also includes the following documents, in their "
             "available language versions: brief description by Swissvotes, "
             "text subject to vote, preliminary examination, decree on "
             "success, Federal Council dispatch, parliamentary debate, "
-            "documents from the voting campaign. In contrast, the following "
-            "documents are not included in the search because they invariably "
-            "contain information on all the subjects that were put to the "
-            "vote on that day : explanatory brochure, analysis of the "
-            "advertising campaign, analysis of the media coverage, decree "
-            "on voting result, reports on the post-vote poll."
+            "documents from the voting campaign. In contrast to the "
+            "abovementioned documents, the following documents are not "
+            "included in the search because they invariably contain "
+            "information on all the subjects that were put to the vote on "
+            "that day : explanatory brochure, analysis of the advertising "
+            "campaign, analysis of the media coverage, decree on voting "
+            "result, reports on the post-vote poll."
         ),
     )
 

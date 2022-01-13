@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2021-09-21 08:37+0200\n"
+"POT-Creation-Date: 2021-12-28 16:37+0100\n"
 "PO-Revision-Date: 2021-09-21 08:37+0200\n"
 "Last-Translator: Marc <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -23,17 +23,17 @@ msgstr "Banco online"
 msgid "Forms and applications"
 msgstr "Moduli e richieste"
 
-msgid "Publications"
-msgstr "Pubblicazioni"
-
-msgid "Official Documents"
-msgstr "Documenti ufficiali"
-
 msgid "Reservations"
 msgstr "Prenotazioni"
 
 msgid "Daypasses and rooms"
 msgstr "Pass giornalieri e camere"
+
+msgid "Publications"
+msgstr "Pubblicazioni"
+
+msgid "Official Documents"
+msgstr "Documenti ufficiali"
 
 msgid "E-Move"
 msgstr "E-Trasloco"
@@ -68,14 +68,26 @@ msgstr "Impressioni"
 msgid "Online Counter Label"
 msgstr "Etichetta Banco online"
 
+msgid "Hide Online Counter on Homepage"
+msgstr "Nascondi Banco online nella pagina iniziale"
+
 msgid "Reservations Label"
 msgstr "Etichetta Prenotazioni"
+
+msgid "Hide Reservations on Homepage"
+msgstr "Nascondi Prenotazioni nella pagina iniziale"
 
 msgid "SBB Daypass Label"
 msgstr "Etichetta Pass giornaliero SBB"
 
+msgid "Publication"
+msgstr "Pubblicazioni"
+
 msgid "Publications Label"
 msgstr "Etichetta Pubblicazioni"
+
+msgid "Hide Publications on Homepage"
+msgstr "Nascondi Pubblicazioni nella pagina iniziale"
 
 msgid "E-Move Label"
 msgstr "Etichetta E-Trasloco"
@@ -83,14 +95,20 @@ msgstr "Etichetta E-Trasloco"
 msgid "E-Move Url"
 msgstr "URL E-Trasloco"
 
-msgid "Hide Publications on Homepage"
-msgstr "Nascondi Pubblicazioni nella pagina iniziale"
+msgid "News and Events"
+msgstr ""
 
-msgid "Maximum number of events displayed on homepage"
-msgstr "Numero massimo di eventi mostrati nella pagina iniziale"
+msgid "Number of news entries on homepage"
+msgstr ""
 
-msgid "Maximum number of news entries on homepage"
-msgstr "Numero massimo di notizie nella pagina iniziale"
+msgid "Number of events displayed on homepage"
+msgstr ""
 
 msgid "Homepage"
 msgstr "Pagina iniziale"
+
+#~ msgid "Maximum number of events displayed on homepage"
+#~ msgstr "Numero massimo di eventi mostrati nella pagina iniziale"
+
+#~ msgid "Maximum number of news entries on homepage"
+#~ msgstr "Numero massimo di notizie nella pagina iniziale"

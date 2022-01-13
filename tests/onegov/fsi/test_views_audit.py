@@ -6,7 +6,8 @@ from uuid import uuid4
 def test_audit_for_course(client, scenario):
     """
     Story:
-    For a course with refresh interval, an admin checks the list of attendees.
+    For a course with refresh interval,
+    an admin checks the list of attendees.
     This list contains when the attendee last visited this course during an
     event.
 
@@ -70,7 +71,9 @@ def test_audit_for_course(client, scenario):
     assert page.form['organisations'].value is None
 
     # test next subscription
-    scenario.add_subscription(scenario.course_events[1], scenario.attendees[0])
+    scenario.add_subscription(
+        scenario.course_events[1], scenario.attendees[0]
+    )
     scenario.commit()
     scenario.refresh()
     page = client.get(url)

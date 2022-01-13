@@ -97,21 +97,31 @@ class VoteLayout(DefaultLayout):
             name: file.label
             for name, file in self.model.localized_files().items()
         }
+        codes = self.model.metadata_codes('language')
         for file in self.model.search():
             name = file.name.split('-')[0]
+            protected = False
             if name in labels:
                 order = 0
                 title = self.request.translate(labels[name])
+                language = self.request.translate(
+                    _((file.language or '').capitalize())
+                )
             elif name == 'campaign_material_other':
+                data = metadata.get(file.filename.replace('.pdf', ''), {})
                 order = 1
-                title = metadata.get(
-                    file.filename.replace('.pdf', ''), {}
-                ).get('title', file.filename)
+                title = data.get('title', file.filename)
+                language = ', '.join([
+                    self.request.translate(codes[lang])
+                    for lang in data.get('language', [])
+                ])
+                protected = 'article' in data.get('doctype', ['article'])
             else:
                 order = 3
                 title = file.filename
-            result.append((title, file, order))
-        return sorted(result, key=lambda x: (x[2], x[0].lower()))
+                language = ''
+            result.append((order, title, language, protected, file))
+        return sorted(result, key=lambda x: (x[0], x[1].lower()))
 
 
 class VoteDetailLayout(DefaultLayout):
@@ -200,6 +210,7 @@ class VoteCampaignMaterialLayout(VoteDetailLayout):
             'order': order.get(metadata.get('position'), 999),
             'language': self.format_code(metadata, 'language'),
             'doctype': self.format_code(metadata, 'doctype'),
+            'protected': 'article' in metadata.get('doctype', [])
         }
 
 

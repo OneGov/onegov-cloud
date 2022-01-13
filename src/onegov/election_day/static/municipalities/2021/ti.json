@@ -343,6 +343,10 @@
         "district": "Lugano",
         "name": "Monteceneri"
     },
+    "5239": {
+        "district": "Lugano",
+        "name": "Tresa"
+    },
     "5242": {
         "district": "Mendrisio",
         "name": "Balerna"
@@ -426,14 +430,6 @@
     "5324": {
         "district": "Vallemaggia",
         "name": "Avegno Gordevio"
-    },
-    "5391": {
-        "district": "Bellinzona",
-        "name": "Comunanza Cadenazzo/Monteceneri"
-    },
-    "5394": {
-        "district": "Lugano",
-        "name": "Comunanza Capriasca/Lugano"
     },
     "5396": {
         "district": "Locarno",

@@ -13,7 +13,8 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'lists', 'districts', 'candidates', 'statistics')
+        'lists', 'districts', 'candidates', 'statistics'
+    )
 
     @cached_property
     def table_link(self):
@@ -43,11 +44,25 @@ class ElectionCompoundLayout(DetailLayout):
             for result in e.results:
                 yield result
 
+    @cached_property
+    def has_districts(self):
+        if not self.principal.has_districts:
+            return False
+        if self.model.domain_elections == 'municipality':
+            return False
+        return True
+
     def label(self, value):
-        if self.model.aggregated_by_entity and value == 'district':
-            return self.principal.label('entity')
-        if self.model.aggregated_by_entity and value == 'districts':
-            return self.principal.label('entities')
+        if value == 'district':
+            if self.model.domain_elections == 'region':
+                return self.principal.label('region')
+            if self.model.domain_elections == 'municipality':
+                return _("Municipality")
+        if value == 'districts':
+            if self.model.domain_elections == 'region':
+                return self.principal.label('regions')
+            if self.model.domain_elections == 'municipality':
+                return _("Municipalities")
         return self.principal.label(value)
 
     def title(self, tab=None):
@@ -74,11 +89,12 @@ class ElectionCompoundLayout(DetailLayout):
 
     def tab_visible(self, tab):
 
-        if self.hide_tab(tab):
-            return False
-
         if not self.has_results:
             return False
+        if self.hide_tab(tab):
+            return False
+        if tab == 'lists':
+            return self.model.show_lists is True
         if tab == 'mandate-allocation':
             return (
                 self.model.show_mandate_allocation is True
@@ -90,18 +106,12 @@ class ElectionCompoundLayout(DetailLayout):
                 and self.has_party_results
             )
         if tab == 'parties-panachage':
-            return self.model.panachage_results.first() is not None
+            return (
+                self.model.show_party_panachage is True
+                and self.model.panachage_results.first() is not None
+            )
 
         return True
-
-    def election_title(self, election):
-        result = election.results.first()
-        if result:
-            if self.model.aggregated_by_entity:
-                return result.name
-            else:
-                return election.district
-        return election.title
 
     @cached_property
     def has_party_results(self):
@@ -114,9 +124,9 @@ class ElectionCompoundLayout(DetailLayout):
     @cached_property
     def main_view(self):
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
+            if self.tab_visible(tab):
                 return self.request.link(self.model, tab)
-        return 'districts'
+        return self.request.link(self.model, 'districts')
 
     @cached_property
     def menu(self):

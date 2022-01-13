@@ -236,15 +236,16 @@ class ServicesWidget(object):
     """
 
     def get_service_links(self, layout):
-        yield Link(
-            text=_("Online Counter"),
-            url=layout.request.class_link(FormCollection),
-            subtitle=(
-                layout.org.meta.get('online_counter_label')
-                or _("Forms and applications")
-            ),
-            classes=('online-counter', 'h5')
-        )
+        if not layout.org.hide_online_counter:
+            yield Link(
+                text=_("Online Counter"),
+                url=layout.request.class_link(FormCollection),
+                subtitle=(
+                    layout.org.meta.get('online_counter_label')
+                    or _("Forms and applications")
+                ),
+                classes=('online-counter', 'h5')
+            )
 
         # only if there are publications, will we enable the link to them
         if not layout.org.hide_publications and layout.app.publications_count:
@@ -258,15 +259,16 @@ class ServicesWidget(object):
                 classes=('publications', 'h5')
             )
 
-        yield Link(
-            text=_("Reservations"),
-            url=layout.request.class_link(ResourceCollection),
-            subtitle=(
-                layout.org.meta.get('reservations_label')
-                or _("Daypasses and rooms")
-            ),
-            classes=('reservations', 'h5')
-        )
+        if not layout.org.hide_reservations:
+            yield Link(
+                text=_("Reservations"),
+                url=layout.request.class_link(ResourceCollection),
+                subtitle=(
+                    layout.org.meta.get('reservations_label')
+                    or _("Daypasses and rooms")
+                ),
+                classes=('reservations', 'h5')
+            )
 
         if layout.org.meta.get('e_move_url'):
             yield Link(

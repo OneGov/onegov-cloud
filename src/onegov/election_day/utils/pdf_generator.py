@@ -520,27 +520,24 @@ class PdfGenerator():
             return item.name if item.entity_id else pdf.translate(_("Expats"))
 
         def label(value):
-            if compound.aggregated_by_entity and value == 'district':
-                return principal.label('entity')
-            if compound.aggregated_by_entity and value == 'districts':
-                return principal.label('entities')
+            if value == 'district':
+                if compound.domain_elections == 'region':
+                    return principal.label('region')
+                if compound.domain_elections == 'municipality':
+                    return _("Municipality")
+            if value == 'districts':
+                if compound.domain_elections == 'region':
+                    return principal.label('regions')
+                if compound.domain_elections == 'municipality':
+                    return _("Municipalities")
             return principal.label(value)
-
-        def election_title(election):
-            result = election.results.first()
-            if result:
-                if compound.aggregated_by_entity:
-                    return result.name
-                else:
-                    return election.district
-            return _("Results")
 
         majorz = False
         if compound.elections and compound.elections[0].type == 'majorz':
             majorz = True
 
         districts = {
-            election.id: election_title(election)
+            election.id: election.domain_segment
             for election in compound.elections if election.results.first()
         }
 
@@ -558,7 +555,7 @@ class PdfGenerator():
             [label('district'), _('Mandates')],
             [
                 [
-                    election_title(e),
+                    e.domain_segment,
                     e.allocated_mandates(consider_completed=True)
                 ]
                 for e in compound.elections
@@ -617,48 +614,49 @@ class PdfGenerator():
             deltas, results = get_party_results_deltas(
                 compound, years, parties
             )
-            results = results[sorted(results.keys())[-1]]
-            if deltas:
-                pdf.results(
-                    [
-                        _('Party'),
-                        _('Mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                        'Δ {}'.format(years[0]),
-                    ],
-                    [[
-                        r[0],
-                        r[1],
-                        r[3],
-                        r[2],
-                        r[4],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
-            else:
-                pdf.results(
-                    [
-                        _('Party'),
-                        _('Mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                    ],
-                    [[
-                        r[0],
-                        r[1],
-                        r[3],
-                        r[2],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
+            if results:
+                results = results[sorted(results.keys())[-1]]
+                if deltas:
+                    pdf.results(
+                        [
+                            _('Party'),
+                            _('Mandates'),
+                            _('single_votes'),
+                            _('single_votes'),
+                            'Δ {}'.format(years[0]),
+                        ],
+                        [[
+                            r[0],
+                            r[1],
+                            r[3],
+                            r[2],
+                            r[4],
+                        ] for r in results],
+                        [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
+                        pdf.style.table_results_1
+                    )
+                else:
+                    pdf.results(
+                        [
+                            _('Party'),
+                            _('Mandates'),
+                            _('single_votes'),
+                            _('single_votes'),
+                        ],
+                        [[
+                            r[0],
+                            r[1],
+                            r[3],
+                            r[2],
+                        ] for r in results],
+                        [None, 2 * cm, 2 * cm, 2 * cm],
+                        pdf.style.table_results_1
+                    )
             pdf.pagebreak()
 
         # Parties Panachage
         chart = self.renderer.get_parties_panachage_chart(compound, 'pdf')
-        if chart:
+        if compound.show_party_panachage and chart:
             pdf.h2(_('Panachage (parties)'))
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_panachage'))

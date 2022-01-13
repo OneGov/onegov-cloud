@@ -1,8 +1,168 @@
 # Changes
 
+## 2022.4
+
+`2022-01-13` | [e3c0bff5a8...2fbeb92b02](https://github.com/OneGov/onegov-cloud/compare/e3c0bff5a8^...2fbeb92b02)
+
+### Swissvotes
+
+##### Hide press articles in full-text search results.
+
+`Bugfix` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [e3c0bff5a8](https://github.com/onegov/onegov-cloud/commit/e3c0bff5a8df3056cd47800c531ef7caba89c361)
+
+##### Updates translations.
+
+`Other` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [770ad7e3c8](https://github.com/onegov/onegov-cloud/commit/770ad7e3c81fcb0b78f1d0ae26a4a63941d0e630)
+
+##### Hide campaign material with no metadata in full-text search results. Always show them when logged-in.
+
+`Bugfix` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [2fbeb92b02](https://github.com/onegov/onegov-cloud/commit/2fbeb92b020e0cc9689966c06f0eee67edb937ec)
+
+## 2022.3
+
+`2022-01-09` | [642818ca15...82ad29c86f](https://github.com/OneGov/onegov-cloud/compare/642818ca15^...82ad29c86f)
+
+### Swissvotes
+
+##### Split importing campaign material in multiple transactions.
+
+`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [c1e5f4ef0e](https://github.com/onegov/onegov-cloud/commit/c1e5f4ef0ee43bb50a1969c12c1ff6a3d61363d0)
+
+##### Update translations.
+
+`Other` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [642818ca15](https://github.com/onegov/onegov-cloud/commit/642818ca15ca76f4534b916d6cf6271ab436907c)
+
+## 2022.2
+
+`2022-01-07` | [f7e892211d...22a8a3665a](https://github.com/OneGov/onegov-cloud/compare/f7e892211d^...22a8a3665a)
+
+### Org
+
+##### Add options to hide the online counter and reserverations link on the homepage.
+
+`Feature` | [OGC-212](https://linear.app/onegovcloud/issue/OGC-212) | [f7e892211d](https://github.com/onegov/onegov-cloud/commit/f7e892211dda171317462ddc2545d5f6ed8dad1b)
+
+## 2022.1
+
+`2022-01-04` | [62416c3a0f...9fabebc6ee](https://github.com/OneGov/onegov-cloud/compare/62416c3a0f^...9fabebc6ee)
+
+### Election Day
+
+##### Add year 2022.
+
+`Feature` | [OGC-225](https://linear.app/onegovcloud/issue/OGC-225) | [4bd51d99dd](https://github.com/onegov/onegov-cloud/commit/4bd51d99dd037b5be07c17bf019393fd0810d8dd)
+
+##### Add static data for regions and superregions.
+
+`Feature` | [OGC-164](https://linear.app/onegovcloud/issue/OGC-164) | [c0be59074d](https://github.com/onegov/onegov-cloud/commit/c0be59074d3c0a43f39503c37bac9b98d9ea84fc)
+
+##### Remove Bodensee from mapdata.
+
+`Bugfix` | [OGC-148](https://linear.app/onegovcloud/issue/OGC-148) | [ed069923c3](https://github.com/onegov/onegov-cloud/commit/ed069923c31fa0e8ba5cb201a928919130aa53eb)
+
+### Swissvotes
+
+##### Don't allow to download press article for copyright reasons.
+
+`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [6fbab571af](https://github.com/onegov/onegov-cloud/commit/6fbab571afff266fc83732780bb4b1922eb4ea9d)
+
+##### Update translations.
+
+`Bugfix` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [62416c3a0f](https://github.com/onegov/onegov-cloud/commit/62416c3a0f631d0eed77e392598a99b6fa67b14f)
+
+## 2021.101
+
+`2021-12-29` | [d7e8950d11...d7e8950d11](https://github.com/OneGov/onegov-cloud/compare/d7e8950d11^...d7e8950d11)
+
+## 2021.100
+
+`2021-12-29` | [14d227380f...212583fb9d](https://github.com/OneGov/onegov-cloud/compare/14d227380f^...212583fb9d)
+
+## 2021.99
+
+`2021-12-22` | [6cebe417d2...579dbd0974](https://github.com/OneGov/onegov-cloud/compare/6cebe417d2^...579dbd0974)
+
+## 2021.98
+
+`2021-12-22` | [35e78c3645...34dc2ac0a5](https://github.com/OneGov/onegov-cloud/compare/35e78c3645^...34dc2ac0a5)
+
+### Election Day
+
+##### Add date to screen dropdown menus.
+
+`Feature` | [OGC-173](https://linear.app/onegovcloud/issue/OGC-173) | [663f2c1adc](https://github.com/onegov/onegov-cloud/commit/663f2c1adc83ab30fd6ff6a8666fa7d6c541f4aa)
+
+##### Add screens export.
+
+`Feature` | [OGC-181](https://linear.app/onegovcloud/issue/OGC-181) | [a14f57fb02](https://github.com/onegov/onegov-cloud/commit/a14f57fb021f5dfc66d5235dc3c5a1e2bb786f06)
+
+### Feriennet
+
+##### Update translations.
+
+`Other` | [PRO-946](https://linear.app/projuventute/issue/PRO-946) | [e6efa3e617](https://github.com/onegov/onegov-cloud/commit/e6efa3e61772f1ffea75651d3e8f1e2899f05232)
+
+### Swissvotes
+
+##### Fixes language of attachments not being translate in the search.
+
+`Bugfix` | [92f96dc9bd](https://github.com/onegov/onegov-cloud/commit/92f96dc9bdb112b76caacec81d353cf2a4bda18b)
+
+## 2021.97
+
+`2021-12-08` | [b14a8d105b...182ae78670](https://github.com/OneGov/onegov-cloud/compare/b14a8d105b^...182ae78670)
+
+### Election Day
+
+##### Make party panachage view on compounds configurable.
+
+`Feature` | [OGC-165](https://linear.app/onegovcloud/issue/OGC-165) | [09b7462f11](https://github.com/onegov/onegov-cloud/commit/09b7462f1186e49c775b7c4581c49731016a3cd9)
+
+##### Don't show districts for regional elections.
+
+`Other` | [OGC-30](https://linear.app/onegovcloud/issue/OGC-30) | [b14a8d105b](https://github.com/onegov/onegov-cloud/commit/b14a8d105b01e7a5c8845cba31cae26a92d0dbbf)
+
+##### Make aggretaed lists view of election compounds optional. Also add a warning because this view is not meaningful.
+
+`Bugfix` | [OGC-40](https://linear.app/onegovcloud/issue/OGC-40) | [65ec908289](https://github.com/onegov/onegov-cloud/commit/65ec9082899f67bb127063f0f35db67b03ec699f)
+
+### Swissvotes
+
+##### Update full-text search.
+
+`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [ea8856d556](https://github.com/onegov/onegov-cloud/commit/ea8856d556336482a50499cd8ee45067a4514c04)
+
+## 2021.96
+
+`2021-12-08` | [01e1b2652d...1a0a0c1d30](https://github.com/OneGov/onegov-cloud/compare/01e1b2652d^...1a0a0c1d30)
+
+### Election Day
+
+##### Add links to votes, elections, election compounds to breadcrumbs.
+
+`Feature` | [OGC_30](#OGC_30) | [0c19358eb8](https://github.com/onegov/onegov-cloud/commit/0c19358eb87b0abb85d8194bcc22eea1eda08c1d)
+
+### Org
+
+##### Fix setting bold problem with Chrome.
+
+`Feature` | [OGC-138](https://linear.app/onegovcloud/issue/OGC-138) | [81a267b69d](https://github.com/onegov/onegov-cloud/commit/81a267b69d0a3a57b784891e925d1e380a24da90)
+
+### Swissvotes
+
+##### Adds english fall back for full-text search and use less strict language handling.
+
+`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [d43b010753](https://github.com/onegov/onegov-cloud/commit/d43b0107539e7aaec7b6cff2df86c060a81c22bc)
+
+### Town6
+
+##### Fix problem with SVG without width not showing.
+
+`Bugfix` | [OGC-156](https://linear.app/onegovcloud/issue/OGC-156) | [01e1b2652d](https://github.com/onegov/onegov-cloud/commit/01e1b2652d6ba2ced1e8da4674de54a0a7665501)
+
 ## 2021.95
 
-`2021-12-05` | [93aa02d789...93aa02d789](https://github.com/OneGov/onegov-cloud/compare/93aa02d789^...93aa02d789)
+`2021-12-05` | [93aa02d789...0723514278](https://github.com/OneGov/onegov-cloud/compare/93aa02d789^...0723514278)
 
 ### Swissvotes
 
@@ -1170,267 +1330,4 @@ Render a better translation for each handler code if it is used by the app and t
 ##### Adds title and hide-title to partners widget
 
 `Feature` | [SEA-373](https://linear.app/seantis/issue/SEA-373) | [a1bcdb09db](https://github.com/onegov/onegov-cloud/commit/a1bcdb09dbb4a1b6729e9cb50e8fa9dd0c3661b4)
-
-## 2021.55
-
-`2021-05-31` | [e42dc76114...a7b04bb8e2](https://github.com/OneGov/onegov-cloud/compare/e42dc76114^...a7b04bb8e2)
-
-## 2021.54
-
-`2021-05-27` | [0f1e7e0776...a714dceda7](https://github.com/OneGov/onegov-cloud/compare/0f1e7e0776^...a714dceda7)
-
-### Election Day
-
-##### Improves screen widgets.
-
-- Adds a generic text and logo widget
-- Adds map widgets for votes
-- Allows to set classes to widgets
-- Allows to limit candidates and list charts
-
-`Other` | [0a90662330](https://github.com/onegov/onegov-cloud/commit/0a90662330308eaafe0e9e39553b42929c361cd3)
-
-### Org
-
-##### Fixes user group form throwing an error for forms with hyphens.
-
-`Bugfix` | [fd4637a07d](https://github.com/onegov/onegov-cloud/commit/fd4637a07de486aeae4d9ab6c517c8510e3caebc)
-
-## 2021.53
-
-`2021-05-26` | [30d9fb132b...be09de2c39](https://github.com/OneGov/onegov-cloud/compare/30d9fb132b^...be09de2c39)
-
-### Feriennet
-
-##### Adds WUP App banner DE only
-
-Shows german banner version for all languages.
-
-`Feature` | [FER-958](https://issues.seantis.ch/browse/FER-958) | [c05ea64481](https://github.com/onegov/onegov-cloud/commit/c05ea6448111adea2142c85817f0562bcea324a0)
-
-### Fsi
-
-##### Handle inactive users
-
-- adds inactive field to attendee
-- set users missing in ldap to inactive
-- filter inactive attendees from some views
-
-`Feature` | [FSI-45](https://kanton-zug.atlassian.net/browse/FSI-45) | [33788f532b](https://github.com/onegov/onegov-cloud/commit/33788f532ba35537644f1c928a0ddf189b100b60)
-
-### Org
-
-##### Add hashtag filter to news.
-
-`Feature` | [SEA-250](https://linear.app/seantis/issue/SEA-250) | [d6813417d7](https://github.com/onegov/onegov-cloud/commit/d6813417d77d9c9f810ce0be7244445c0867dd0e)
-
-### Town6
-
-##### Fixes access hint in UI on path /forms
-
-`Bugfix` | [SEA-335](https://linear.app/seantis/issue/SEA-335) | [617e32254e](https://github.com/onegov/onegov-cloud/commit/617e32254e53291eff664eb12555a509b45cc11a)
-
-### Winterthur
-
-##### Extends mission reports with type and mission count
-
-`Feature` | [001072616e](https://github.com/onegov/onegov-cloud/commit/001072616e4036cbdb353608009e0fa9c5955e77)
-
-## 2021.52
-
-`2021-05-21` | [173c481049...2eb3f14319](https://github.com/OneGov/onegov-cloud/compare/173c481049^...2eb3f14319)
-
-### Ballot
-
-##### Add limit parameter to election compound list results.
-
-`Feature` | [1e2d51d9a1](https://github.com/onegov/onegov-cloud/commit/1e2d51d9a16e3bee1e460c9b00c142f754906388)
-
-### Core
-
-##### Allow linking with additional query parameters.
-
-`Feature` | [c801b0ed2b](https://github.com/onegov/onegov-cloud/commit/c801b0ed2b7d782e207ac87e0c305d1b69f33c06)
-
-### Form
-
-##### Allow MultiCheckboxFieldRenderer to render unkown or outdated data.
-
-`Bugfix` | [173c481049](https://github.com/onegov/onegov-cloud/commit/173c481049c4a80fc2c4c6fa42cb9a10da870a16)
-
-### Town6
-
-##### Move login from header to footer.
-
-`Other` | [SEA-345](https://linear.app/seantis/issue/SEA-345) | [3c5dd81156](https://github.com/onegov/onegov-cloud/commit/3c5dd81156313245ce7767ce36c3905370d6b13f)
-
-##### Show full date in news.
-
-`Other` | [SEA-344](https://linear.app/seantis/issue/SEA-344) | [4c84a0fdf7](https://github.com/onegov/onegov-cloud/commit/4c84a0fdf7d9ebb57891e7696df9e68895b0602d)
-
-##### Hide news in top navigation.
-
-`Other` | [SEA-343](https://linear.app/seantis/issue/SEA-343) | [9c6b2cd771](https://github.com/onegov/onegov-cloud/commit/9c6b2cd77132b322850b0771dc19aacc5d53dfc0)
-
-## 2021.51
-
-`2021-05-19` | [8eaa83aa1c...e9cd52c898](https://github.com/OneGov/onegov-cloud/compare/8eaa83aa1c^...e9cd52c898)
-
-### Agency
-
-##### Use honeypots in mutuation form.
-
-`Feature` | [SEA-288](https://linear.app/seantis/issue/SEA-288) | [4c1553ec7e](https://github.com/onegov/onegov-cloud/commit/4c1553ec7ed2dace76307f384a6d2bc914191943)
-
-### Form
-
-##### Add honeypot fields.
-
-A honey pot field is hidden using CSS and therefore not visible for 
-users
-but bots (probably). We expect this field to be empty at any
-time and throw an error if provided as well as adding a log message to
-optionally ban the IP.
-
-`Feature` | [SEA-288](https://linear.app/seantis/issue/SEA-288) | [8eaa83aa1c](https://github.com/onegov/onegov-cloud/commit/8eaa83aa1cd87eb20e7f0e4eca857194b5f6508a)
-
-### Org
-
-##### Add honeypot extensions for form definitions.
-
-`Feature` | [4a076451f7](https://github.com/onegov/onegov-cloud/commit/4a076451f7d96473e03d164091df3c5396c8f9e6)
-
-##### Adds a generic text homepage widget.
-
-`Feature` | [SEA-334](https://linear.app/seantis/issue/SEA-334) | [2ba1ee6428](https://github.com/onegov/onegov-cloud/commit/2ba1ee642858c21b3979dc575906c1920e7a5635)
-
-##### Check for overlapping form registration windows.
-
-`Bugfix` | [f838b92cbc](https://github.com/onegov/onegov-cloud/commit/f838b92cbcda7d07c382bcdca1fda1b9c638b3b6)
-
-### Translatordirectory
-
-##### Don't correct language input.
-
-`Bugfix` | [ZW-314](https://kanton-zug.atlassian.net/browse/ZW-314) | [f380853e13](https://github.com/onegov/onegov-cloud/commit/f380853e13dac0b726541509ba06e8cc587c9291)
-
-## 2021.50
-
-`2021-05-13` | [f767eccb86...ab32040507](https://github.com/OneGov/onegov-cloud/compare/f767eccb86^...ab32040507)
-
-### Org
-
-##### Adds a flush method to caches.
-
-Invalidating a dogpile cache region only works for the current process.
-
-`Feature` | [SEA-314](https://linear.app/seantis/issue/SEA-314) | [d40011e571](https://github.com/onegov/onegov-cloud/commit/d40011e5713f91c74cc61818f39ec5d4bf7b30e5)
-
-## 2021.49
-
-`2021-05-11` | [7cd3771161...c707683eae](https://github.com/OneGov/onegov-cloud/compare/7cd3771161^...c707683eae)
-
-### Core
-
-##### Updates dogpile.cache
-
-Serialization and deserialization now take place within the CacheRegion so that backends may now assume string values in all cases.
-
-`Other` | [SEA-306](https://linear.app/seantis/issue/SEA-306) | [16d92ed361](https://github.com/onegov/onegov-cloud/commit/16d92ed361f72130ff42453536ef1b0bf712692a)
-
-##### Fixes race condition in sendmail command.
-
-`Bugfix` | [SEA-321](https://linear.app/seantis/issue/SEA-321) | [866ed27ecb](https://github.com/onegov/onegov-cloud/commit/866ed27ecb9ac016c028d31046dd1f47e2aa2d17)
-
-### Org
-
-##### Add user group management.
-
-`Feature` | [7cd3771161](https://github.com/onegov/onegov-cloud/commit/7cd37711619238c3e5092f38b04ca2ed1b6d36b7)
-
-##### Adds permissions for tickets.
-
-User groups have now a setting to restrain access to specific ticket 
-categories. If one is defined, only users within groups with that 
-setting has access to the tickets in that category.
-
-`Feature` | [SEA-254](https://linear.app/seantis/issue/SEA-254) | [b901fc94c5](https://github.com/onegov/onegov-cloud/commit/b901fc94c516c4539d0127214059d8785176a6c0)
-
-##### Adds start_date to import_reservations cli command
-
-`Other` | [SEA-257](https://linear.app/seantis/issue/SEA-257) | [f7bb46ffde](https://github.com/onegov/onegov-cloud/commit/f7bb46ffde30bd962aafdec32821d906c3ae9d7a)
-
-### Town6
-
-##### Changes ContactsAndAlbumsWidget to ContactsWidget
-
-- Adds contacts panel to initial content
-
-`Other` | [SEA-320](https://linear.app/seantis/issue/SEA-320) | [7ed00fc816](https://github.com/onegov/onegov-cloud/commit/7ed00fc816f6b0cc0b8f04343057d40e52353877)
-
-## 2021.48
-
-`2021-05-03` | [bf9ae82dfd...336d7dc053](https://github.com/OneGov/onegov-cloud/compare/bf9ae82dfd^...336d7dc053)
-
-### Town6
-
-##### Adds header link to template
-
-`Other` | [SEA-300](https://linear.app/seantis/issue/SEA-300) | [677352be3e](https://github.com/onegov/onegov-cloud/commit/677352be3efaf764645df5263874a52c696e68d0)
-
-##### Display Directory Cards in flex grid
-
-`Other` | [SEA-302](https://linear.app/seantis/issue/SEA-302) | [2e7c00779c](https://github.com/onegov/onegov-cloud/commit/2e7c00779c9fb99a358de3931359498a091dc9c5)
-
-##### Styles albums and contacts widget
-
-`Other` | [SEA-303](https://linear.app/seantis/issue/SEA-303) | [7d5879145d](https://github.com/onegov/onegov-cloud/commit/7d5879145d1b29e477ea205b37374c858d88a569)
-
-## 2021.47
-
-`2021-04-29` | [4f4f381207...184621e882](https://github.com/OneGov/onegov-cloud/compare/4f4f381207^...184621e882)
-
-### Election Day
-
-##### Add screens.
-
-Screens allow to show tables, charts and other widgets for a given vote 
-or election in a flexible way.
-
-`Feature` | [SEA-147](https://linear.app/seantis/issue/SEA-147) | [d3be6d7077](https://github.com/onegov/onegov-cloud/commit/d3be6d70771e0615b3373096eb2a714d2fd66055)
-
-##### Fixes candidates chart not being displayed for intermediate results.
-
-`Bugfix` | [4f4f381207](https://github.com/onegov/onegov-cloud/commit/4f4f381207e85e9c82b3c6be0baf21e8f4d8b009)
-
-## 2021.46
-
-`2021-04-27` | [5dd6c63404...f6b9143271](https://github.com/OneGov/onegov-cloud/compare/5dd6c63404^...f6b9143271)
-
-### Org
-
-##### Adds open graph meta tags with defaults
-
-Meta tags can be overwritten by using layouts using the corresponding attribute: og:title -> og_title.
-Applies for town6 as well.
-
-`Feature` | [SEA-271](https://linear.app/seantis/issue/SEA-271) | [b829b72cca](https://github.com/onegov/onegov-cloud/commit/b829b72cca7ac6fea423756748ac33ea52399c75)
-
-##### Adds open graph meta tags with defaults
-
-Meta tags can be overwritten using the corresponding attribute in the layout: og:title -> og_title.
-Applies for town6 as well.
-
-`Feature` | [SEA-271](https://linear.app/seantis/issue/SEA-271) | [35aeaf118d](https://github.com/onegov/onegov-cloud/commit/35aeaf118da6d117a4aab21f00995f0656d784b8)
-
-##### Adds daily-item Resource type
-
-Adds news resource type for general purpose items that are reserved
-for a whole day with multiple quantities possible per allocation.
-
-- Adapts cli for importing legacy db
-- Adds translations
-- Adds the same to town6 app
-
-`Other` | [53fe4cde0a](https://github.com/onegov/onegov-cloud/commit/53fe4cde0ad41c6be84bda2af2beae33b392ae2c)
 

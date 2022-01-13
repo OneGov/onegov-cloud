@@ -27,7 +27,7 @@ from onegov.election_day.screen_widgets import (
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_majorz_election_widgets(election_day_app, import_test_datasets):
+def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     structure = """
         <row>
             <column span="1">
@@ -68,13 +68,13 @@ def test_majorz_election_widgets(election_day_app, import_test_datasets):
     ]
 
     # Empty
-    session = election_day_app.session()
+    session = election_day_app_zg.session()
     session.add(
         Election(title='Election', domain='canton', date=date(2015, 6, 18))
     )
     session.flush()
     model = session.query(Election).one()
-    request = DummyRequest(app=election_day_app, session=session)
+    request = DummyRequest(app=election_day_app_zg, session=session)
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -386,7 +386,7 @@ def test_majorz_election_widgets(election_day_app, import_test_datasets):
     assert 'my-class-7' in result
 
 
-def test_proporz_election_widgets(election_day_app, import_test_datasets):
+def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     structure = """
         <row>
             <column span="1">
@@ -435,14 +435,14 @@ def test_proporz_election_widgets(election_day_app, import_test_datasets):
     ]
 
     # Empty
-    session = election_day_app.session()
+    session = election_day_app_zg.session()
     session.add(
         ProporzElection(
             title='Election', domain='canton', date=date(2015, 6, 18)
         )
     )
     model = session.query(ProporzElection).one()
-    request = DummyRequest(app=election_day_app, session=session)
+    request = DummyRequest(app=election_day_app_zg, session=session)
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -854,10 +854,11 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'internal',
         'election',
         'sg',
-        'region',
+        'district',
         'proporz',
         date_=date(2020, 3, 8),
         number_of_mandates=17,
+        domain_segment='Rheintal',
         dataset_name='kantonsratswahl-2020-wahlkreis-rheintal-intermediate',
         app_session=session
     )
@@ -866,10 +867,11 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'internal',
         'election',
         'sg',
-        'region',
+        'district',
         'proporz',
         date_=date(2020, 3, 8),
         number_of_mandates=10,
+        domain_segment='Rorschach',
         dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
         app_session=session
     )
@@ -922,7 +924,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'election': model,
         'election_compound': model,
         'embed': False,
-        'entities': e_2,
+        'entities': 'Rorschach',
         'layout': layout,
         'lists': [
             ('SVP', 9, 31515),
@@ -977,9 +979,10 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'internal',
         'election',
         'sg',
-        'region',
+        'district',
         'proporz',
         date_=date(2020, 3, 8),
+        domain_segment='Rheintal',
         number_of_mandates=17,
         dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
         app_session=session
@@ -1032,7 +1035,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'election': model,
         'election_compound': model,
         'embed': False,
-        'entities': f'{e_1}, {e_2}',
+        'entities': 'Rheintal, Rorschach',
         'layout': layout,
         'lists': [
             ('SVP', 9, 87135),

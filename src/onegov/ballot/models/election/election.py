@@ -235,22 +235,13 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     tacit = meta_property('tacit', default=False)
 
     #: may be used to indicate that the vote contains expats as seperate
-    #: resultas (typically with entity_id = 0)
+    #: results (typically with entity_id = 0)
     expats = meta_property('expats', default=False)
 
-    #: may be used to mark an election as distinct, e.g. a regional election
-    #: containing only the municipalities of one district of a canton.
-    distinct = meta_property('distinct', default=True)
-
-    @property
-    def district(self):
-        """ Returns the district name, if this is a `distinct` election.
-        Requires results to be present.
-
-        """
-        result = self.results.first()
-        if result:
-            return result.district or result.name
+    #: The segment of the domain. This might be the district, if this is a
+    #: regional (district) election; the region, if it's a regional (region)
+    #: election or the municipality, if this is a communal election.
+    domain_segment = meta_property('domain_segment', default='')
 
     @property
     def votes_by_district(self):

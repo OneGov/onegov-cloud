@@ -39,9 +39,20 @@ class DefaultLayout(ChameleonLayout):
     def principal(self):
         return self.request.app.principal
 
+    def label(self, value):
+        return self.principal.label(value)
+
     @cached_property
     def has_districts(self):
         return self.principal.has_districts
+
+    @cached_property
+    def has_regions(self):
+        return self.principal.has_regions
+
+    @cached_property
+    def has_superregions(self):
+        return self.principal.has_superregions
 
     @cached_property
     def homepage_link(self):

@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-12-01 09:09+0100\n"
+"POT-Creation-Date: 2021-12-28 16:58+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -458,6 +458,9 @@ msgstr "Vuoi davvero eliminare questo collegamento esterno?"
 
 msgid "Delete external link"
 msgstr "Elimina collegamento esterno"
+
+msgid "Sort"
+msgstr ""
 
 msgid "No rules defined."
 msgstr "Nessuna regola definita."
@@ -1883,8 +1886,14 @@ msgstr "Modifica il destinatario"
 msgid "Online Counter Label"
 msgstr "Etichetta Banco online"
 
+msgid "Hide Online Counter on Homepage"
+msgstr "Nascondi Banco online nella pagina iniziale"
+
 msgid "Reservations Label"
 msgstr "Etichetta Prenotazioni"
+
+msgid "Hide Reservations on Homepage"
+msgstr "Nascondi Prenotazioni nella pagina iniziale"
 
 msgid "SBB Daypass Label"
 msgstr "Etichetta Pass giornaliero SBB"
@@ -1892,20 +1901,23 @@ msgstr "Etichetta Pass giornaliero SBB"
 msgid "Publications Label"
 msgstr "Etichetta Pubblicazioni"
 
+msgid "Hide Publications on Homepage"
+msgstr "Nascondi Pubblicazioni nella pagina iniziale"
+
 msgid "E-Move Label"
 msgstr "Etichetta E-Trasloco"
 
 msgid "E-Move Url"
 msgstr "URL E-Trasloco"
 
-msgid "Hide Publications on Homepage"
-msgstr "Nascondi Pubblicazioni nella pagina iniziale"
-
-msgid "Number of events displayed on homepage"
-msgstr "Numero di eventi visualizzati sulla homepage"
+msgid "News and Events"
+msgstr "Voci e eventi"
 
 msgid "Number of news entries on homepage"
 msgstr "Numero di voci di notizie sulla homepage"
+
+msgid "Number of events displayed on homepage"
+msgstr "Numero di eventi visualizzati sulla homepage"
 
 msgid "Show partners on all pages"
 msgstr "Mostra i partner su tutte le pagine"
