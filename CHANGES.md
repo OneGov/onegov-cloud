@@ -1,8 +1,26 @@
 # Changes
 
+## 2022.4
+
+`2022-01-13` | [e3c0bff5a8...2fbeb92b02](https://github.com/OneGov/onegov-cloud/compare/e3c0bff5a8^...2fbeb92b02)
+
+### Swissvotes
+
+##### Hide press articles in full-text search results.
+
+`Bugfix` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [e3c0bff5a8](https://github.com/onegov/onegov-cloud/commit/e3c0bff5a8df3056cd47800c531ef7caba89c361)
+
+##### Updates translations.
+
+`Other` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [770ad7e3c8](https://github.com/onegov/onegov-cloud/commit/770ad7e3c81fcb0b78f1d0ae26a4a63941d0e630)
+
+##### Hide campaign material with no metadata in full-text search results. Always show them when logged-in.
+
+`Bugfix` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [2fbeb92b02](https://github.com/onegov/onegov-cloud/commit/2fbeb92b020e0cc9689966c06f0eee67edb937ec)
+
 ## 2022.3
 
-`2022-01-09` | [642818ca15...c1e5f4ef0e](https://github.com/OneGov/onegov-cloud/compare/642818ca15^...c1e5f4ef0e)
+`2022-01-09` | [642818ca15...82ad29c86f](https://github.com/OneGov/onegov-cloud/compare/642818ca15^...82ad29c86f)
 
 ### Swissvotes
 
@@ -1312,8 +1330,4 @@ Render a better translation for each handler code if it is used by the app and t
 ##### Adds title and hide-title to partners widget
 
 `Feature` | [SEA-373](https://linear.app/seantis/issue/SEA-373) | [a1bcdb09db](https://github.com/onegov/onegov-cloud/commit/a1bcdb09dbb4a1b6729e9cb50e8fa9dd0c3661b4)
-
-## 2021.55
-
-`2021-05-31` | [e42dc76114...a7b04bb8e2](https://github.com/OneGov/onegov-cloud/compare/e42dc76114^...a7b04bb8e2)
 
