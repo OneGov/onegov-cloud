@@ -83,7 +83,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_1px.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_1px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(1);
   });
@@ -98,7 +98,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_200px.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_200px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(200);
   });
@@ -113,7 +113,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_500px.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_500px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(500);
   });
@@ -128,7 +128,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_700px.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_700px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -143,7 +143,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_2000px.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_2000px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(2000);
   });
@@ -159,7 +159,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_700px_red.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_700px_red.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -175,7 +175,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_700px_blue.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_700px_blue.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -207,7 +207,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_700px_partial.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_700px_partial.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -223,7 +223,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("district_map_700px_no_legend.svg", document.svg(), function(err, result) {});
+    // require('fs').writeFile("district_map_700px_no_legend.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
