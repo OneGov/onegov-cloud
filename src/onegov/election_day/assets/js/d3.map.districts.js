@@ -28,6 +28,7 @@
             fontFamily: 'sans-serif'
         };
         var hidePercentages = false;
+        var hideLegend = false;
 
         if (params) {
             if ('data' in params) data = params.data;
@@ -42,6 +43,7 @@
             if ('labelExpats' in params) labelExpats = params.labelExpats;
             if ('options' in params) options = params.options;
             if ('hidePercentages' in params) hidePercentages = params.hidePercentages || false;
+            if ('hideLegend' in params) hideLegend = params.hideLegend || false;
         }
 
         var isUndefined = function(obj) {
@@ -58,7 +60,6 @@
             scale.domain([30, 49.9999999, 50.000001, 70])
                 .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
         }
-
 
         var districts;
         var expats;
@@ -258,34 +259,37 @@
                 // Add the the legend (we need to up/downscale the elements)
                 var unitScale = d3.scale.linear()
                     .rangeRound([0, (bboxMap.width - bboxMap.x) / (width - margin.left - margin.right)]);
-                var legendValues = [0, 20, 40, 49.999, 50.001, 60, 80, 100];
-                var legendScale = d3.scale.ordinal()
-                    .domain(legendValues)
-                    .rangeRoundBands([0.2 * (bboxMap.width - bboxMap.x), 0.8 * (bboxMap.width - bboxMap.x)]);
-                var legend = svg.append('g')
-                    .attr('transform', function(d) {
-                        return 'translate(0,' + Math.round(bboxMap.y + bboxMap.height + unitScale(options.legendMargin)) + ')';
-                    });
-                var legendItems = legend.selectAll('.legend_item')
-                    .data(legendValues).enter()
-                    .append('rect')
-                    .attr('x', function(d) {return legendScale(d);})
-                    .attr('width', legendScale.rangeBand())
-                    .attr('height', unitScale(options.legendHeight))
-                    .style('fill', function(d) {return scale(d);});
-                var textLeftHand = legend.append('text')
-                    .attr('x', legendScale(0))
-                    .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
-                    .style('font-size', unitScale(options.fontSizePx) + 'px')
-                    .style('font-family', options.fontFamily)
-                    .text(labelLeftHand);
-                var textRightHand = legend.append('text')
-                    .attr('x', legendScale(100) + legendScale.rangeBand())
-                    .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
-                    .style('text-anchor', 'end')
-                    .style('font-size', unitScale(options.fontSizePx) + 'px')
-                    .style('font-family', options.fontFamily)
-                    .text(labelRightHand);
+
+                if (!hideLegend) {
+                    var legendValues = [0, 20, 40, 49.999, 50.001, 60, 80, 100];
+                    var legendScale = d3.scale.ordinal()
+                        .domain(legendValues)
+                        .rangeRoundBands([0.2 * (bboxMap.width - bboxMap.x), 0.8 * (bboxMap.width - bboxMap.x)]);
+                    var legend = svg.append('g')
+                        .attr('transform', function(d) {
+                            return 'translate(0,' + Math.round(bboxMap.y + bboxMap.height + unitScale(options.legendMargin)) + ')';
+                        });
+                    var legendItems = legend.selectAll('.legend_item')
+                        .data(legendValues).enter()
+                        .append('rect')
+                        .attr('x', function(d) {return legendScale(d);})
+                        .attr('width', legendScale.rangeBand())
+                        .attr('height', unitScale(options.legendHeight))
+                        .style('fill', function(d) {return scale(d);});
+                    var textLeftHand = legend.append('text')
+                        .attr('x', legendScale(0))
+                        .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                        .style('font-size', unitScale(options.fontSizePx) + 'px')
+                        .style('font-family', options.fontFamily)
+                        .text(labelLeftHand);
+                    var textRightHand = legend.append('text')
+                        .attr('x', legendScale(100) + legendScale.rangeBand())
+                        .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                        .style('text-anchor', 'end')
+                        .style('font-size', unitScale(options.fontSizePx) + 'px')
+                        .style('font-family', options.fontFamily)
+                        .text(labelRightHand);
+                }
 
                 // Set size
                 bbox = svg[0][0].getBBox();
@@ -309,20 +313,22 @@
                     d3.select(window).on('resize.ballotmap', function() {
                         width = $(container).width();
                         unitScale.rangeRound([bboxMap.x, (bboxMap.width - bboxMap.x) / (width - margin.left - margin.right)]);
-                        legendScale.rangeRoundBands([0.2 * (bboxMap.width - bboxMap.x), 0.8 * (bboxMap.width - bboxMap.x)]);
-                        legend.attr('transform', function(d) {
-                                return 'translate(0,' + Math.round(bboxMap.y + bboxMap.height + unitScale(options.legendMargin)) + ')';
-                            });
-                        legendItems.attr('x', function(d) {return legendScale(d);})
-                            .attr('width', legendScale.rangeBand())
-                            .attr('height', unitScale(options.legendHeight))
-                            .style('fill', function(d) {return scale(d);});
-                        textLeftHand.attr('x', legendScale(0))
-                            .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
-                            .style('font-size', unitScale(options.fontSizePx) + 'px');
-                        textRightHand.attr('x', legendScale(100) + legendScale.rangeBand())
-                            .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
-                            .style('font-size', unitScale(options.fontSizePx) + 'px');
+                        if (!hideLegend) {
+                            legendScale.rangeRoundBands([0.2 * (bboxMap.width - bboxMap.x), 0.8 * (bboxMap.width - bboxMap.x)]);
+                            legend.attr('transform', function(d) {
+                                    return 'translate(0,' + Math.round(bboxMap.y + bboxMap.height + unitScale(options.legendMargin)) + ')';
+                                });
+                            legendItems.attr('x', function(d) {return legendScale(d);})
+                                .attr('width', legendScale.rangeBand())
+                                .attr('height', unitScale(options.legendHeight))
+                                .style('fill', function(d) {return scale(d);});
+                            textLeftHand.attr('x', legendScale(0))
+                                .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                                .style('font-size', unitScale(options.fontSizePx) + 'px');
+                            textRightHand.attr('x', legendScale(100) + legendScale.rangeBand())
+                                .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                                .style('font-size', unitScale(options.fontSizePx) + 'px');
+                        }
 
                         bbox = svg[0][0].getBBox();
 

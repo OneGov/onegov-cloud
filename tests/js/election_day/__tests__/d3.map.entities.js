@@ -29,7 +29,7 @@ describe('Map', () => {
     expect(document.svg(d3)).toMatchSnapshot();
   });
 
-  it('renders a svg @1', () => {
+  it('renders an svg of width 1px', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 1,
@@ -39,12 +39,12 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@1.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_1px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(1);
   });
 
-  it('renders a svg @200', () => {
+  it('renders an svg of width 200px', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 200,
@@ -54,12 +54,12 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@200.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_200px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(200);
   });
 
-  it('renders a svg @500', () => {
+  it('renders an svg of width 500px', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 500,
@@ -69,12 +69,12 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@500.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_500px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(500);
   });
 
-  it('renders a svg @700', () => {
+  it('renders an svg of width 700px', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 700,
@@ -84,12 +84,12 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@700.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_700px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
 
-  it('renders a svg @2000', () => {
+  it('renders an svg of width 2000px', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 2000,
@@ -99,12 +99,12 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@2000.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_2000px.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(2000);
   });
 
-  it('renders a svg @700 with the red colorscale', () => {
+  it('renders an svg of width 700px with the red colorscale', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 700,
@@ -115,12 +115,12 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@r.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_700px_red.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
 
-  it('renders a svg @700 with the blue colorscale', () => {
+  it('renders an svg of width 700px with the blue colorscale', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 700,
@@ -131,12 +131,12 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@b.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_700px_blue.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
 
-  it('renders a partial svg @700', () => {
+  it('renders a partial svg of width 700px', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({
       width: 700,
@@ -152,7 +152,23 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map@partial.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_700px_partial.svg", document.svg(), function(err, result) {});
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.width()).toBe(700);
+  });
+
+  it('renders an svg of width 700px with no legend', () => {
+    var document = jsdom.jsdom();
+    var chart = mapChart({
+      width: 700,
+      mapdata: mapdata,
+      data: data,
+      canton: 'zg',
+      hideLegend: true
+    });
+
+    chart(document.body);
+    require('fs').writeFile("entities_map_700px_no_legend.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(700);
   });
@@ -194,7 +210,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    // require('fs').writeFile("map_c@500.svg", document.svg(), function(err, result) {});
+    require('fs').writeFile("entities_map_500px_communal.svg", document.svg(), function(err, result) {});
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(500);
   });
