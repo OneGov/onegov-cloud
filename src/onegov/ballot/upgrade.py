@@ -472,6 +472,7 @@ def add_district_and_none_domain(context):
         ['federation', 'canton', 'region', 'district', 'municipality', 'none']
     )
 
+
 @upgrade_task('Adds last result change columns')
 def add_last_result_change(context):
     for table in ('elections', 'election_compounds', 'votes'):
