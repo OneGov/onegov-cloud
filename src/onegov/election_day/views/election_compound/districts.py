@@ -3,6 +3,7 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils.election import get_districts_data
+from onegov.election_day.utils import add_last_modified_header
 
 
 @ElectionDayApp.html(
@@ -50,6 +51,10 @@ def view_election_list_by_district_chart(self, request):
 
     """" Embed the heatmap. """
 
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
     scope = 'districts'
     if self.domain_elections == 'municipality':
         scope = 'entities'
@@ -79,6 +84,10 @@ def view_election_list_by_district_chart(self, request):
 def view_election_compound_districts_table(self, request):
 
     """" Displays the districts as standalone table. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
 
     return {
         'election_compound': self,
