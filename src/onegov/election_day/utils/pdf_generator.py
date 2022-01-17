@@ -411,7 +411,9 @@ class PdfGenerator():
                 'even'
             )
 
-        elif not principal.has_districts:
+        elif not principal.has_districts or election.domain in (
+            'region', 'district', 'municipality', 'none'
+        ):
             pdf.results(
                 [
                     principal.label('entity'),

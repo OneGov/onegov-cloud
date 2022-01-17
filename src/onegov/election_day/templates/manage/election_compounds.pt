@@ -53,6 +53,9 @@
                                                 <a i18n:translate="" class="action-clear" href="${request.link(compound, 'clear')}">Clear results</a>
                                             </li>
                                             <li>
+                                                <a i18n:translate="" class="action-clear" href="${request.link(compound, 'clear-media')}">Clear media</a>
+                                            </li>
+                                            <li>
                                                 <a i18n:translate="" class="action-delete" href="${request.link(compound, 'delete')}">Delete</a>
                                             </li>
                                         </ul>

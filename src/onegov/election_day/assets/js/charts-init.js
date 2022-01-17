@@ -74,6 +74,7 @@ var initEntitiesMap = function(el) {
     var mapurl = $(el).data('mapurl');
     var dataurl = $(el).data('dataurl');
     var hidePercentages = python_to_bool($(el).data('hide-percentages'));
+    var hideLegend = python_to_bool($(el).data('hide-legend'));
     $.ajax({ url: mapurl }).done(function(mapdata) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton = $(el).data('canton');
@@ -92,7 +93,8 @@ var initEntitiesMap = function(el) {
                 labelLeftHand: labelLeftHand,
                 labelRightHand: labelRightHand,
                 labelExpats: labelExpats,
-                hidePercentages: hidePercentages
+                hidePercentages: hidePercentages,
+                hideLegend: hideLegend
             })(el);
             $(el).data('map', map);
 
@@ -111,6 +113,7 @@ var initDistrictsMap = function(el) {
     var mapurl = $(el).data('mapurl');
     var dataurl = $(el).data('dataurl');
     var hidePercentages = python_to_bool($(el).data('hide-percentages'));
+    var hideLegend = python_to_bool($(el).data('hide-legend'));
     $.ajax({ url: mapurl }).done(function(mapdata) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton = $(el).data('canton');
@@ -129,7 +132,8 @@ var initDistrictsMap = function(el) {
                 labelLeftHand: labelLeftHand,
                 labelRightHand: labelRightHand,
                 labelExpats: labelExpats,
-                hidePercentages: hidePercentages
+                hidePercentages: hidePercentages,
+                hideLegend: hideLegend
             })(el);
             $(el).data('map', map);
 

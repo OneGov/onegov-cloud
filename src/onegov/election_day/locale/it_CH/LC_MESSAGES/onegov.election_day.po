@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-09 08:04+0100\n"
-"PO-Revision-Date: 2021-04-01 10:24+0200\n"
+"POT-Creation-Date: 2022-01-17 10:08+0100\n"
+"PO-Revision-Date: 2022-01-17 10:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "The final results are available"
 msgstr "Risultati finali sono disponibili"
@@ -1061,6 +1061,9 @@ msgstr "Carica risultati partito"
 msgid "Clear results"
 msgstr "Ripristina risultati"
 
+msgid "Clear media"
+msgstr "Cancellare i media"
+
 msgid "New election"
 msgstr "Nuova elezione"
 
@@ -1260,6 +1263,21 @@ msgstr "Risultati eliminata."
 msgid "Do you really want to clear all party results of \"${item}\"?"
 msgstr "Sicuro di voler eliminare tutti i risultati partito di \"${item}\"?"
 
+#, python-format
+msgid "${count} files deleted."
+msgstr "$ {count} file eliminati."
+
+msgid ""
+"Deletes all SVGs and PDFs. They are regenerated in the background and are "
+"available again in a few minutes."
+msgstr ""
+"Cancella tutti gli SVG e i PDF. Vengono rigenerati in background e sono di "
+"nuovo disponibili in pochi minuti."
+
+#, python-format
+msgid "Do you really want to clear all media of \"${item}\"?"
+msgstr "Volete davvero cancellare tutti i media di \"${item}\"?"
+
 msgid "Compound deleted."
 msgstr "Componente eliminato."
 
@@ -1427,7 +1445,7 @@ msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
 
 msgid "This source has already elections assigned to it"
-msgstr ""
+msgstr "Questa fonte ha già delle elezioni assegnate"
 
 msgid "Invalid id"
 msgstr "ID non valido"

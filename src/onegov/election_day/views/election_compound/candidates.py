@@ -2,6 +2,7 @@ from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_elected_candidates
 
 
@@ -45,6 +46,10 @@ def view_election_compound_candidates(self, request):
 def view_election_statistics_table(self, request):
 
     """" View for the standalone statistics table.  """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
 
     session = request.app.session()
     layout = ElectionCompoundLayout(self, request, 'candidates')

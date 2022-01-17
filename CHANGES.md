@@ -1,8 +1,18 @@
 # Changes
 
+## 2022.5
+
+`2022-01-16` | [a545c14565...a545c14565](https://github.com/OneGov/onegov-cloud/compare/a545c14565^...a545c14565)
+
+### Election Day
+
+##### Add new domains for regional Elections.
+
+`Feature` | [OGC-166](https://linear.app/onegovcloud/issue/OGC-166) | [a545c14565](https://github.com/onegov/onegov-cloud/commit/a545c14565e99c78bb0fce63e0c31ed00733db99)
+
 ## 2022.4
 
-`2022-01-13` | [e3c0bff5a8...2fbeb92b02](https://github.com/OneGov/onegov-cloud/compare/e3c0bff5a8^...2fbeb92b02)
+`2022-01-13` | [e3c0bff5a8...4752b36a5d](https://github.com/OneGov/onegov-cloud/compare/e3c0bff5a8^...4752b36a5d)
 
 ### Swissvotes
 
@@ -1277,57 +1287,4 @@ Adds Qr link to editbar on /form/{name} for managers.
 ##### Adds edit button for payment amount in ticket view
 
 `Feature` | [SEA-360](https://linear.app/seantis/issue/SEA-360) | [df815ed43b](https://github.com/onegov/onegov-cloud/commit/df815ed43b47ffdd51cb04462b56fc5b9f7093b2)
-
-## 2021.56
-
-`2021-06-07` | [d8fadefb86...e2836955ce](https://github.com/OneGov/onegov-cloud/compare/d8fadefb86^...e2836955ce)
-
-### Core
-
-##### Adds a shell command.
-
-`Feature` | [eb9048e73c](https://github.com/onegov/onegov-cloud/commit/eb9048e73c8ac3b00b3bebfd7a8d64bc027d8112)
-
-### Form
-
-##### Make radio field renderer more robust
-
-`Feature` | [c263089438](https://github.com/onegov/onegov-cloud/commit/c2630894386b3e0ea3a9d6b3ee4c0f99fb59eff1)
-
-##### Adds https to empty url input fields
-
-`Other` | [SEA-313](https://linear.app/seantis/issue/SEA-313) | [f034646fdb](https://github.com/onegov/onegov-cloud/commit/f034646fdb5a16be04998c94ad8694b783822710)
-
-### Org
-
-##### Changes newsletter confirm mail end text (incl. Town6)
-
-- Remove best regards
-- removes sender
-
-`Other` | [SEA-359](https://linear.app/seantis/issue/SEA-359) | [69fcb45fe9](https://github.com/onegov/onegov-cloud/commit/69fcb45fe9e399b7efb7ec248e949ec4d6f61441)
-
-##### Adds working link check for internal links
-
-Requests internal urls with ajax calls.
-
-`Improvement` | [SEA-331](https://linear.app/seantis/issue/SEA-331) | [67b24f7526](https://github.com/onegov/onegov-cloud/commit/67b24f75269916d5793a51d213d8e7a8bb63c20c)
-
-### Ticket
-
-##### Adds translations for handler codes
-
-Render a better translation for each handler code if it is used by the app and translations exist.
-
-`Feature` | [SEA-364](https://linear.app/seantis/issue/SEA-364) | [085924de20](https://github.com/onegov/onegov-cloud/commit/085924de20b2cf30e27cd5577f48df966c26bc95)
-
-### Town6
-
-##### Reduce height of form field people
-
-`Feature` | [SEA-361](https://linear.app/seantis/issue/SEA-361) | [644a67e676](https://github.com/onegov/onegov-cloud/commit/644a67e67636349691efc17950480a980eecfc4b)
-
-##### Adds title and hide-title to partners widget
-
-`Feature` | [SEA-373](https://linear.app/seantis/issue/SEA-373) | [a1bcdb09db](https://github.com/onegov/onegov-cloud/commit/a1bcdb09dbb4a1b6729e9cb50e8fa9dd0c3661b4)
 
