@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-09 08:04+0100\n"
-"PO-Revision-Date: 2021-04-01 10:22+0200\n"
+"POT-Creation-Date: 2022-01-17 10:08+0100\n"
+"PO-Revision-Date: 2022-01-17 10:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "The final results are available"
 msgstr "Die Schlussresultate sind verfügbar"
@@ -396,6 +396,7 @@ msgstr "Panaschierstatistik"
 
 msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
+"Zeigt eine Registerkarte mit Panaschierdaten an. Erfordert Parteiergebnisse."
 
 msgid "After Doppelter Pukelsheim"
 msgstr "Nach Doppeltem Pukelsheim"
@@ -1065,6 +1066,9 @@ msgstr "Parteiresultate hochladen"
 msgid "Clear results"
 msgstr "Resultate löschen"
 
+msgid "Clear media"
+msgstr "Medien löschen"
+
 msgid "New election"
 msgstr "Neue Wahl"
 
@@ -1262,6 +1266,21 @@ msgstr "Ergebnisse gelöscht."
 #, python-format
 msgid "Do you really want to clear all party results of \"${item}\"?"
 msgstr "Möchten Sie wirklich alle Parteiresultate von \"${item}\" löschen?"
+
+#, python-format
+msgid "${count} files deleted."
+msgstr "${count} Dateien gelöscht."
+
+msgid ""
+"Deletes all SVGs and PDFs. They are regenerated in the background and are "
+"available again in a few minutes."
+msgstr ""
+"Löscht alle SVGs und PDFs. Sie werden im Hintergrund regeneriert und stehen "
+"in wenigen Minuten wieder zur Verfügung."
+
+#, python-format
+msgid "Do you really want to clear all media of \"${item}\"?"
+msgstr "Möchten Sie wirklich alle Medien von \"${item}\" löschen?"
 
 msgid "Compound deleted."
 msgstr "Verbindung gelöscht."
