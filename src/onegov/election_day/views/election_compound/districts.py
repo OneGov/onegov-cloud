@@ -1,44 +1,8 @@
 from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
-from onegov.core.utils import groupbylist
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
-
-
-def districts_data(principal, compound):
-    entities = principal.entities.get(compound.date.year, {})
-    if compound.domain_elections in ('region', 'district'):
-        lookup = sorted([
-            (value.get(compound.domain_elections), key)
-            for key, value in entities.items()
-        ])
-        lookup = groupbylist(lookup, lambda x: x[0])
-        lookup = {
-            key: {
-                'id': key,
-                'entities': [v[1] for v in value]
-            } for key, value in lookup
-        }
-    if compound.domain_elections == 'municipality':
-        lookup = {
-            value['name']: {
-                'id': key,
-                'entities': []
-            } for key, value in entities.items()
-        }
-    if not lookup:
-        return {}
-
-    return {
-        lookup[election.domain_segment]['id']: {
-            'entities': lookup[election.domain_segment]['entities'],
-            'votes': 0,
-            'percentage': 100.0,
-            'counted': election.counted
-        }
-        for election in compound.elections
-        if election.domain_segment in lookup
-    }
+from onegov.election_day.utils.election import get_districts_data
 
 
 @ElectionDayApp.html(
@@ -73,7 +37,7 @@ def view_election_compound_by_district(self, request):
 
     """" View the districts/regions/municipalities as JSON for the map. """
 
-    return districts_data(request.app.principal, self)
+    return get_districts_data(self, request.app.principal)
 
 
 @ElectionDayApp.html(

@@ -5,6 +5,7 @@ from onegov.election_day.utils.election.candidates import \
     get_candidates_results_by_entity
 from onegov.election_day.utils.election.candidates import \
     get_elected_candidates
+from onegov.election_day.utils.election.compound import get_districts_data
 from onegov.election_day.utils.election.connections import \
     get_connection_results, get_connection_results_api
 from onegov.election_day.utils.election.connections import get_connections_data
@@ -28,6 +29,7 @@ __all__ = [
     'get_connection_results_api',
     'get_connection_results',
     'get_connections_data',
+    'get_districts_data',
     'get_elected_candidates',
     'get_list_results',
     'get_lists_data',
