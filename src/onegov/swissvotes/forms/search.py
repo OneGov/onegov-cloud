@@ -34,13 +34,13 @@ class SearchForm(Form):
             "available language versions: brief description by Swissvotes, "
             "text subject to vote, preliminary examination, decree on "
             "success, Federal Council dispatch, parliamentary debate, "
-            "documents from the voting campaign. In contrast to the above "
-            "mentioned documents, the following documents are not included "
-            "in the search because they invariably contain information on "
-            "all the subjects that were put to the vote on that day : "
-            "explanatory brochure, analysis of the advertising campaign, "
-            "analysis of the media coverage, decree on voting result, "
-            "reports on the post-vote poll."
+            "documents from the voting campaign. In contrast to the "
+            "abovementioned documents, the following documents are not "
+            "included in the search because they invariably contain "
+            "information on all the subjects that were put to the vote on "
+            "that day : explanatory brochure, analysis of the advertising "
+            "campaign, analysis of the media coverage, decree on voting "
+            "result, reports on the post-vote poll."
         ),
     )
 

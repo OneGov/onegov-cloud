@@ -15,6 +15,8 @@ def test_default_layout():
     layout = DefaultLayout(model, request)
     assert layout.principal == request.app.principal
     assert layout.has_districts is False
+    assert layout.has_regions is False
+    assert layout.has_superregions is False
 
     assert layout_de.homepage_link == 'DummyPrincipal/archive'
     assert layout_en.homepage_link == 'DummyPrincipal/archive'

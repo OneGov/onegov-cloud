@@ -4,6 +4,7 @@ from onegov.ballot.models import BallotResult
 from onegov.ballot.models import Election
 from onegov.ballot.models import ElectionCompound
 from onegov.ballot.models import ElectionResult
+from onegov.ballot.models import ProporzElection
 from onegov.ballot.models import Vote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
@@ -114,7 +115,9 @@ def test_archived_result_collection(session):
 
 def test_archived_result_collection_grouping(session):
     # Add a vote and election for each domain on two dates
-    for domain in ('federation', 'canton', 'region', 'municipality'):
+    for domain in (
+        'federation', 'canton', 'region', 'district', 'none', 'municipality'
+    ):
         session.add(
             Election(
                 title="{} election 1".format(domain),
@@ -154,6 +157,8 @@ def test_archived_result_collection_grouping(session):
         'federation-election-1',
         'canton-election-1',
         'region-election-1',
+        'district-election-1',
+        'none-election-1',
         'municipality-election-1'
     ]))
     session.add(compound)
@@ -171,6 +176,8 @@ def test_archived_result_collection_grouping(session):
     grouped = archive.group_items(items, request)
     assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
     assert all([list(group) == expected for group in grouped.values()])
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
+    assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
 
     # Test grouping of a communal instance
     request.app.principal.domain = 'municipality'
@@ -178,6 +185,8 @@ def test_archived_result_collection_grouping(session):
     grouped = archive.group_items(items, request)
     assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
     assert all([list(group) == expected for group in grouped.values()])
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
+    assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
 
     # Test grouping with compounds
     assert 'election' not in grouped[date(2017, 2, 12)]['municipality']
@@ -197,7 +206,7 @@ def test_archived_result_collection_updates(session):
 
     # Add elections and votes
     elections = {
-        year: Election(
+        year: ProporzElection(
             title="Election {}".format(year),
             domain='federation',
             date=date(year, 1, 1),
@@ -296,7 +305,7 @@ def test_archived_result_collection_updates(session):
     assert result.total_entities == 1
     assert result.progress == (0, 1)
     assert result.external_id == 'elections-2001'
-    assert result.elections == ['Election/election-2001']
+    assert result.elections == ['ProporzElection/election-2001']
 
     election_compounds[2001].title = 'Elections'
     election_compounds[2001].shortcode = 'shortcode'
@@ -310,7 +319,7 @@ def test_archived_result_collection_updates(session):
 
     # Test update election
     result = archive.update(elections[2001], request)
-    assert result.url == 'Election/election-2001'
+    assert result.url == 'ProporzElection/election-2001'
     assert result.schema
     assert result.domain == 'federation'
     assert result.date == date(2001, 1, 1)
@@ -349,6 +358,10 @@ def test_archived_result_collection_updates(session):
             invalid_votes=3
         )
     )
+    elections[2001].last_result_change = elections[2001].timestamp()
+    for association in elections[2001].associations:
+        association.election_compound.last_result_change = \
+            elections[2001].last_result_change
     result = archive.update(elections[2001], request)
     assert result.last_result_change is not None
 
@@ -370,7 +383,7 @@ def test_archived_result_collection_updates(session):
     assert result.total_entities == 1
     assert result.progress == (1, 1)
     assert result.external_id == 'elections-2001'
-    assert result.elections == ['Election/election-2001']
+    assert result.elections == ['ProporzElection/election-2001']
 
     # Test update vote
     result = archive.update(votes[2001], request)
@@ -401,5 +414,6 @@ def test_archived_result_collection_updates(session):
             name='x', yeas=100, nays=0, counted=True, entity_id=1
         )
     )
+    votes[2001].last_result_change = votes[2001].timestamp()
     result = archive.update(votes[2001], request)
     assert result.last_result_change is not None

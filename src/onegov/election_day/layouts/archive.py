@@ -1,7 +1,7 @@
+from onegov.election_day import _
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.layouts import DefaultLayout
 from cached_property import cached_property
-from onegov.election_day.models import ArchivedResult
 
 
 class ArchiveLayout(DefaultLayout):
@@ -11,21 +11,20 @@ class ArchiveLayout(DefaultLayout):
 
     @cached_property
     def menu(self):
-
+        current = self.model.item_type
         return [
-            (label, self.link_for(abbrev), self.model.item_type == abbrev)
-            for abbrev, label in ArchivedResult.types_of_results[0:2]
+            (_('Votes'), self.link_for('vote'), current == 'vote'),
+            (_('Elections'), self.link_for('election'), current == 'election')
         ]
 
     @cached_property
     def tab_menu_title(self):
-        mapping = {k: v for k, v in ArchivedResult.types_of_results}
-        return mapping[self.model.item_type]
+        return _('Votes') if self.model.item_type == 'vote' else _('Elections')
 
     def link_for(self, item_type):
         return self.request.link(
             SearchableArchivedResultCollection(
-                self.request.session,
+                self.request.app,
                 item_type=item_type))
 
     def instance_link(self):

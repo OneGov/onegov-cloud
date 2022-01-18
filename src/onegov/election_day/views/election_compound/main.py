@@ -54,7 +54,7 @@ def view_election_compound_json(self, request):
     elected_candidates = get_elected_candidates(self, request.app.session())
     districts = {
         election.id: {
-            'name': election.district,
+            'name': election.domain_segment,
             'mandates': {
                 'allocated': election.allocated_mandates(
                     consider_completed=True) or 0,

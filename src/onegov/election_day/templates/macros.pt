@@ -254,7 +254,7 @@
         </thead>
         <tbody>
             <tr tal:repeat="election election_compound.elections">
-                <td class="column-district left-aligned"><a href="${request.link(election)}">${layout.election_title(election)}</a></td>
+                <td class="column-district left-aligned"><a href="${request.link(election)}">${election.domain_segment}</a></td>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates(consider_completed=True), election.number_of_mandates)" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress; enable_y_n True" /></td>
             </tr>
@@ -272,7 +272,7 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.label('district')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
@@ -697,7 +697,7 @@
                         ${field()}
                         <small class="error" tal:repeat="error field.errors">${error}</small>
                     </tal:block>
-                     <tal:block condition="input_type != 'hidden'">
+                    <tal:block condition="input_type != 'hidden'">
                         <label tal:attributes="class field.errors and 'error' or None">
                             <tal:block condition="field.type == 'BooleanField'">
                                 ${field(placeholder=request.translate(field.description))}
@@ -713,9 +713,10 @@
                             </tal:block>
                         </label>
                         <small class="error" tal:repeat="error field.errors">${error}</small>
-                     </tal:block>
+                    </tal:block>
                </tal:block>
             </div>
+            <div class="clearfix" tal:condition="field.render_kw['clear']|True"></div>
         </tal:block>
   </div>
 </metal:fields>

@@ -10,7 +10,7 @@ from onegov.election_day.models import Municipality
 from tests.onegov.election_day.common import get_tar_file_path, print_errors
 
 
-def test_import_wabstic_vote_1(session):
+def test_import_wabstic_vote(session):
     # The tar file contains (modified) vote results from SG from the 12.02.2017
     # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
     # complex communal vote
@@ -50,6 +50,7 @@ def test_import_wabstic_vote_1(session):
         )
         print_errors(errors)
         assert not errors
+        assert vote.last_result_change
         assert vote.status == status
         assert vote.progress == (78, 78)
         assert vote.completed == completed
@@ -64,6 +65,7 @@ def test_import_wabstic_vote_1(session):
         BytesIO(sg_gemeinden), 'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.one().results.count() == 78
     assert vote.yeas == 57653
@@ -86,6 +88,7 @@ def test_import_wabstic_vote_1(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
+        assert vote.last_result_change
         assert vote.counted
         assert vote.status == 'unknown'
         assert vote.completed
@@ -105,6 +108,7 @@ def test_import_wabstic_vote_1(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
+        assert vote.last_result_change
         assert not vote.completed
         assert not vote.ballots.one().results.one().counted
 
@@ -123,6 +127,7 @@ def test_import_wabstic_vote_1(session):
         BytesIO(sg_gemeinden), 'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 3
     assert vote.proposal.yeas == 1596

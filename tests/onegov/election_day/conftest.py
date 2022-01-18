@@ -100,7 +100,7 @@ def create_election_day(
 
 
 @pytest.fixture(scope="function")
-def election_day_app(request):
+def election_day_app_zg(request):
 
     app = create_election_day(
         request,
@@ -172,6 +172,7 @@ def import_elections_internal(
         session,
         number_of_mandates,
         date_,
+        domain_segment,
         dataset_name,
         expats,
         election,
@@ -226,6 +227,7 @@ def import_elections_internal(
                     date=election_date,
                     number_of_mandates=number_of_mandates,
                     domain=domain,
+                    domain_segment=domain_segment,
                     type=election_type,
                     expats=expats,
                 )
@@ -248,6 +250,7 @@ def import_elections_wabstic(
         session,
         number_of_mandates,
         date_,
+        domain_segment,
         number,
         district,
         dataset_name,
@@ -295,6 +298,7 @@ def import_elections_wabstic(
                     date=election_date,
                     number_of_mandates=number_of_mandates,
                     domain=domain,
+                    domain_segment=domain_segment,
                     # type=election_type,
                     expats=expats
                 )
@@ -344,6 +348,7 @@ def import_elections_wabsti(
         session,
         number_of_mandates,
         date_,
+        domain_segment,
         number,
         district,
         dataset_name,
@@ -386,6 +391,7 @@ def import_elections_wabsti(
                     date=election_date,
                     number_of_mandates=number_of_mandates,
                     domain=domain,
+                    domain_segment=domain_segment,
                     # type=election_type,
                     expats=expats
                 )
@@ -589,7 +595,9 @@ def import_test_datasets(session):
     models = ('election', 'vote')
     election_types = ('majorz', 'proporz')
     apis = ('internal', 'wabstic', 'wabsti')
-    domains = ('federation', 'canton', 'region', 'municipality')
+    domains = (
+        'federation', 'canton', 'region', 'district', 'municipality', 'none'
+    )
     vote_types = ('simple', 'complex')
 
     def _import_test_datasets(
@@ -600,6 +608,7 @@ def import_test_datasets(session):
             election_type=None,
             number_of_mandates=None,
             date_=None,
+            domain_segment='',
             dataset_name=None,
             expats=False,
             election=None,
@@ -639,6 +648,7 @@ def import_test_datasets(session):
                     app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
+                    domain_segment=domain_segment,
                     dataset_name=dataset_name,
                     expats=expats,
                     election=election,
@@ -653,6 +663,7 @@ def import_test_datasets(session):
                     app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
+                    domain_segment=domain_segment,
                     dataset_name=dataset_name,
                     expats=expats,
                     election=election,
@@ -669,6 +680,7 @@ def import_test_datasets(session):
                     app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
+                    domain_segment=domain_segment,
                     dataset_name=dataset_name,
                     expats=expats,
                     election=election,

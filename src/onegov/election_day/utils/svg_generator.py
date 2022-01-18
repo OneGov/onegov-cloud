@@ -1,7 +1,6 @@
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
-from onegov.core.utils import groupbylist
 from onegov.election_day import log
 from onegov.election_day.utils import svg_filename
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -30,19 +29,12 @@ class SvgGenerator():
             if fs.exists(path) and not file.is_dir:
                 fs.remove(path)
 
-    def generate_svg(self, item, type_, last_modified, locale=None):
-        """ Creates the requested SVG. """
+    def generate_svg(self, item, type_, filename, locale=None):
+        """ Creates the requested SVG.
 
-        if not self.app.filestorage.exists(self.svg_dir):
-            self.app.filestorage.makedir(self.svg_dir)
+        Returns the number of created files.
 
-        existing = self.app.filestorage.listdir(self.svg_dir)
-        filename = svg_filename(
-            item, type_, locale, last_modified=last_modified
-        )
-
-        if filename in existing:
-            return None
+        """
 
         path = '{}/{}'.format(self.svg_dir, filename)
         if self.app.filestorage.exists(path):
@@ -69,83 +61,79 @@ class SvgGenerator():
             with self.app.filestorage.open(path, 'w') as f:
                 copyfileobj(chart, f)
             log.info("{} created".format(filename))
+            return 1
+
+        return 0
 
     def create_svgs(self):
         """ Generates all SVGs for the given application.
 
         Only generates SVGs if not already generated since the last change of
-        the election or vote.
+        the election, election compound or vote.
 
-        Optionally cleans up unused SVGs.
+        Cleans up unused SVGs.
 
         """
+
+        principal = self.app.principal
+        types = {
+            'majorz': (
+                'candidates',
+            ),
+            'proporz': (
+                'candidates', 'lists', 'connections', 'lists-panachage',
+                'party-strengths', 'parties-panachage',
+            ),
+            'compound': (
+                'party-strengths', 'parties-panachage',
+            ),
+            'ballot': (
+                'entities-map', 'districts-map'
+            ) if principal.has_districts else ('entities-map')
+        }
 
         # Read existing SVGs
         fs = self.app.filestorage
         if not fs.exists(self.svg_dir):
             fs.makedir(self.svg_dir)
+        existing = fs.listdir(self.svg_dir)
 
         # Generate the SVGs
-        created = []
-        principal = self.app.principal
+        created = 0
+        filenames = []
         for election in self.session.query(Election):
             last_modified = election.last_modified
-            created.append(
-                svg_filename(election, '', '', last_modified=last_modified)
-            )
-            self.generate_svg(election, 'candidates', last_modified)
-            if election.type == 'proporz':
-                self.generate_svg(election, 'lists', last_modified)
-                self.generate_svg(election, 'connections', last_modified)
-                self.generate_svg(election, 'party-strengths', last_modified)
-                self.generate_svg(election, 'parties-panachage', last_modified)
-                self.generate_svg(election, 'lists-panachage', last_modified)
+            for type_ in types[election.type]:
+                filename = svg_filename(election, type_, None, last_modified)
+                filenames.append(filename)
+                if filename not in existing:
+                    created += self.generate_svg(election, type_, filename)
+
         for compound in self.session.query(ElectionCompound):
             last_modified = compound.last_modified
-            created.append(
-                svg_filename(compound, '', '', last_modified=last_modified)
-            )
-            self.generate_svg(compound, 'party-strengths', last_modified)
-            self.generate_svg(compound, 'parties-panachage', last_modified)
+            for type_ in types['compound']:
+                filename = svg_filename(compound, type_, None, last_modified)
+                filenames.append(filename)
+                if filename not in existing:
+                    created += self.generate_svg(compound, type_, filename)
+
         if principal.use_maps:
             for ballot in self.session.query(Ballot):
-                last_modified = ballot.vote.last_modified
-                created.append(
-                    svg_filename(ballot, '', '', last_modified=last_modified)
-                )
                 if principal.is_year_available(ballot.vote.date.year):
                     for locale in self.app.locales:
-                        self.generate_svg(
-                            ballot, 'entities-map', last_modified, locale
-                        )
-                        if principal.has_districts:
-                            self.generate_svg(
-                                ballot, 'districts-map', last_modified, locale
+                        last_modified = ballot.vote.last_modified
+                        for type_ in types['ballot']:
+                            filename = svg_filename(
+                                ballot, type_, locale, last_modified
                             )
+                            filenames.append(filename)
+                            if filename not in existing:
+                                created += self.generate_svg(
+                                    ballot, type_, filename, locale
+                                )
 
-        # Delete old SVGs
-        existing = fs.listdir(self.svg_dir)
-        existing = dict(groupbylist(
-            sorted(existing),
-            key=lambda a: a.split('.')[0]
-        ))
+        # Delete obsolete SVGs
+        obsolete = set(existing) - set(filenames)
+        self.remove(self.svg_dir, obsolete)
 
-        # ... orphaned files
-        created = [name.split('.')[0] for name in created]
-        diff = set(existing.keys()) - set(created)
-        files = ['{}*'.format(file) for file in diff if file]
-        self.remove(self.svg_dir, files)
-        if '' in existing:
-            self.remove(self.svg_dir, existing[''])
-
-        # ... old files
-        for files in existing.values():
-            if len(files):
-                files = sorted(files, reverse=True)
-                try:
-                    ts = str(int(files[0].split('.')[1]))
-                except (IndexError, ValueError):
-                    pass
-                else:
-                    files = [f for f in files if ts not in f]
-                    self.remove(self.svg_dir, files)
+        return created, len(obsolete)

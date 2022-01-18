@@ -1,12 +1,14 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, validate_integer
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.mappings import (
+    WABSTIC_VOTE_HEADERS_SG_GEMEINDEN,
+    WABSTIC_VOTE_HEADERS_SG_GESCHAEFTE
+)
 from sqlalchemy.orm import object_session
-
-from onegov.election_day.import_export.mappings import \
-    WABSTIC_VOTE_HEADERS_SG_GESCHAEFTE, WABSTIC_VOTE_HEADERS_SG_GEMEINDEN
 
 
 def parse_domain(domain):
@@ -227,6 +229,7 @@ def import_vote_wabstic(vote, principal, number, district,
 
     # Add the results to the DB
     vote.clear_results()
+    vote.last_result_change = vote.timestamp()
     vote.status = 'unknown'
 
     if remaining_entities == 0:

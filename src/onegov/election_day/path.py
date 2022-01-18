@@ -265,7 +265,7 @@ def get_archive_search(
         page=0
 ):
     return SearchableArchivedResultCollection.for_item_type(
-        app.session(),
+        app,
         item_type,
         to_date=to_date,
         from_date=from_date,

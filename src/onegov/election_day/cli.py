@@ -3,15 +3,18 @@
 import click
 import os
 
+from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.election_day.models import ArchivedResult, DataSource
+from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import DataSource
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
-from pathlib import Path
 
 
 cli = command_group()
@@ -119,21 +122,17 @@ def generate_media():
         if not app.principal or not app.configuration.get('d3_renderer'):
             return
 
-        lockfile = Path(os.path.join(
-            app.configuration.get('lockfile_path', ''),
-            '.lock-{}'.format(app.schema)
-        ))
+        click.secho(f'Generating media for {app.schema}', fg='yellow')
+        renderer = D3Renderer(app)
 
-        try:
-            lockfile.touch(exist_ok=False)
-        except FileExistsError:
-            return
-        else:
-            renderer = D3Renderer(app)
-            SvgGenerator(app, renderer).create_svgs()
-            PdfGenerator(app, renderer).create_pdfs()
-        finally:
-            lockfile.unlink()
+        created_svgs, removed_svgs = SvgGenerator(app, renderer).create_svgs()
+        created_pdfs, removed_pdfs = PdfGenerator(app, renderer).create_pdfs()
+        click.secho(
+            f'Generated {created_svgs} SVGs / {created_pdfs} PDFs, '
+            f'removed {removed_svgs} SVGs / {removed_pdfs} PDFs '
+            f'for {app.schema}',
+            fg='green'
+        )
 
     return generate
 
@@ -165,3 +164,38 @@ def delete_associated(wabsti_token, delete_compound):
             session.delete(compound)
 
     return delete
+
+
+@cli.command('update-last-result-change')
+def update_last_result_change():
+
+    def update(request, app):
+        click.secho(f'Updating {app.schema}', fg='yellow')
+
+        count = 0
+
+        session = request.app.session()
+        for item in session.query(Election):
+            result = item.results.first()
+            if result:
+                item.last_result_change = result.last_change
+                count += 1
+
+        for item in session.query(ElectionCompound):
+            result = [x.last_result_change for x in item.elections]
+            result = [x for x in result if x]
+            if result:
+                item.last_result_change = max(result)
+                count += 1
+
+        for item in session.query(Vote):
+            result = [x.results.first() for x in item.ballots]
+            result = [x.last_change if x else None for x in result]
+            result = [x for x in result if x]
+            if result:
+                item.last_result_change = max(result)
+                count += 1
+
+        click.secho(f'Updated {count} items', fg='green')
+
+    return update

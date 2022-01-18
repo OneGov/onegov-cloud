@@ -161,7 +161,7 @@ def test_list_percentages(session):
         1: {'counted': True, 'votes': 52, 'percentage': round_(52, tot[1])},
         2: {'counted': True, 'votes': 20, 'percentage': round_(20, tot[2])},
         3: {'counted': False, 'votes': 0, 'percentage': 0.0},
-        4: {'counted': True,  'votes': 10, 'percentage': round_(10, tot[4])}
+        4: {'counted': True, 'votes': 10, 'percentage': round_(10, tot[4])}
     }
     assert list_2.percentage_by_entity == {
         1: {'counted': True, 'votes': 11, 'percentage': round_(11, tot[1])},
@@ -176,16 +176,16 @@ def test_list_percentages(session):
         4: {'counted': True, 'votes': 0, 'percentage': 0.0}
     }
     assert list_4.percentage_by_entity == {
-        1: {'counted': True,  'votes': 1, 'percentage': round_(1, tot[1])},
-        2: {'counted': True,  'votes': 0, 'percentage': 0.0},
+        1: {'counted': True, 'votes': 1, 'percentage': round_(1, tot[1])},
+        2: {'counted': True, 'votes': 0, 'percentage': 0.0},
         3: {'counted': False, 'votes': 0, 'percentage': 0.0},
-        4: {'counted': True,  'votes': 0, 'percentage': 0.0}
+        4: {'counted': True, 'votes': 0, 'percentage': 0.0}
     }
     assert list_5.percentage_by_entity == {
-        1: {'counted': True,  'votes': 0, 'percentage': 0.0},
-        2: {'counted': True,  'votes': 5, 'percentage': round_(5, tot[2])},
+        1: {'counted': True, 'votes': 0, 'percentage': 0.0},
+        2: {'counted': True, 'votes': 5, 'percentage': round_(5, tot[2])},
         3: {'counted': False, 'votes': 0, 'percentage': 0.0},
-        4: {'counted': True,  'votes': 0, 'percentage': 0.0}
+        4: {'counted': True, 'votes': 0, 'percentage': 0.0}
     }
 
     assert list_1.percentage_by_district == {

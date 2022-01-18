@@ -1,9 +1,10 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, validate_integer
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.import_export.mappings import WABSTIM_VOTE_HEADERS
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.mappings import WABSTIM_VOTE_HEADERS
 
 
 def import_vote_wabstim(vote, principal, file, mimetype):
@@ -157,6 +158,7 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         return [FileImportError(_("No data found"))]
 
     vote.clear_results()
+    vote.last_result_change = vote.timestamp()
 
     for ballot_type in used_ballot_types:
         remaining = set(entities.keys())

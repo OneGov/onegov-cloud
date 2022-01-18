@@ -117,6 +117,46 @@ def clear_election_compound(self, request, form):
 
 @ElectionDayApp.manage_form(
     model=ElectionCompound,
+    name='clear-media'
+)
+def clear_election_compound_media(self, request, form):
+    """ Deletes alls SVGs and PDFs of this election compound. """
+
+    layout = ManageElectionCompoundsLayout(self, request)
+
+    if form.submitted(request):
+        count = layout.clear_media()
+        request.message(
+            _('${count} files deleted.', mapping={'count': count}),
+            'success'
+        )
+        request.app.pages_cache.flush()
+        return redirect(layout.manage_model_link)
+
+    return {
+        'callout': _(
+            'Deletes all SVGs and PDFs. They are regenerated in the '
+            'background and are available again in a few minutes.'
+        ),
+        'message': _(
+            'Do you really want to clear all media of "${item}"?',
+            mapping={
+                'item': self.title
+            }
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': _("Clear media"),
+        'button_text': _("Clear media"),
+        'button_class': 'alert',
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=ElectionCompound,
     name='delete'
 )
 def delete_election_compound(self, request, form):

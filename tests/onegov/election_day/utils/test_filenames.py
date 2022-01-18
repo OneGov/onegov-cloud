@@ -36,8 +36,8 @@ def test_pdf_filename(session):
         assert pdf_filename(election, 'rm') == f'election-{he}.{ts}.rm.pdf'
 
         hc = '2ef359817c8f8a7354e201f891cd7c11a13f4e025aa25239c3ad0cabe58bc49b'
-        assert pdf_filename(compound, 'de') == f'election-{hc}.{ts}.de.pdf'
-        assert pdf_filename(compound, 'rm') == f'election-{hc}.{ts}.rm.pdf'
+        assert pdf_filename(compound, 'de') == f'elections-{hc}.{ts}.de.pdf'
+        assert pdf_filename(compound, 'rm') == f'elections-{hc}.{ts}.rm.pdf'
 
         hv = 'ab274474a6aa82c100dddca63977facb556f66f489fb558c044a456f9ba919ce'
         assert pdf_filename(vote, 'de') == f'vote-{hv}.{ts}.de.pdf'
@@ -79,11 +79,11 @@ def test_svg_filename(session):
 
         hc = '2ef359817c8f8a7354e201f891cd7c11a13f4e025aa25239c3ad0cabe58bc49b'
         assert svg_filename(compound, 'chart') == \
-            f'election-{hc}.{ts}.chart.any.svg'
+            f'elections-{hc}.{ts}.chart.any.svg'
         assert svg_filename(compound, 'chart', 'de') == \
-            f'election-{hc}.{ts}.chart.de.svg'
+            f'elections-{hc}.{ts}.chart.de.svg'
         assert svg_filename(compound, 'chart', 'rm') == \
-            f'election-{hc}.{ts}.chart.rm.svg'
+            f'elections-{hc}.{ts}.chart.rm.svg'
 
         hv = 'ab274474a6aa82c100dddca63977facb556f66f489fb558c044a456f9ba919ce'
         assert svg_filename(vote, 'chart') == \

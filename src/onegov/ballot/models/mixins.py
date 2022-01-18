@@ -1,15 +1,25 @@
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class DomainOfInfluenceMixin(object):
-    """ Defines the scope of the election or vote - eCH-0155 calls this the
-    domain of influence. Unlike eCH-0155 we refrain from putting this in a
-    separate model. We also only include domains we currently support.
+    """ Defines the scope of a principal, an election, an election compound
+    or a vote.
+
+    The following domains of influence are supported:
+    - federation: The vote or election is nation wide.
+    - canton: The vote or election takes place in one canton only.
+    - region: The election takes place in one region of a canton only.
+    - district: The election takes place in one district of a canton only.
+    - municipality: The vote or election takes place in one municipality only.
+    - none: The election takes place in certain municipalities only.
 
     """
 
@@ -19,9 +29,11 @@ class DomainOfInfluenceMixin(object):
         return Column(
             Enum(
                 'federation',
-                'region',
                 'canton',
+                'region',
+                'district',
                 'municipality',
+                'none',
                 name='domain_of_influence'
             ),
             nullable=False
@@ -132,3 +144,20 @@ def summarized_property(name):
         return cls.aggregate_results_expression(cls, name)
 
     return hybrid_property(getter, expr=expression)
+
+
+class LastModifiedMixin(TimestampMixin):
+
+    @declared_attr
+    def last_result_change(cls):
+        return Column(UTCDateTime)
+
+    @hybrid_property
+    def last_modified(self):
+        changes = [self.last_change, self.last_result_change]
+        changes = [change for change in changes if change]
+        return max(changes) if changes else None
+
+    @last_modified.expression
+    def last_modified(cls):
+        return func.greatest(cls.last_change, cls.last_result_change)

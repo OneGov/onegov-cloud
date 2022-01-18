@@ -37,6 +37,7 @@
                         data-label-right-hand="100%"
                         data-label-expats="Expats"
                         data-hide-percentages="${hide_percentages|False}"
+                        data-hide-label="false"
                         i18n:attributes="data-embed-link; data-label-expats"
                         >
                     </div>

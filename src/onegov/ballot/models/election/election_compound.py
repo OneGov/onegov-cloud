@@ -1,22 +1,17 @@
 from collections import OrderedDict
 from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
-from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
-from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.mixins import PartyResultExportMixin
-from onegov.ballot.models.election.panachage_result import PanachageResult
-from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
-from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
 from sqlalchemy import cast
@@ -26,7 +21,6 @@ from sqlalchemy import desc
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
-from sqlalchemy import or_
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
@@ -74,7 +68,7 @@ class ElectionCompoundAssociation(Base):
 
 
 class ElectionCompound(
-    Base, ContentMixin, TimestampMixin,
+    Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
     PartyResultExportMixin
 ):
@@ -131,9 +125,8 @@ class ElectionCompound(
     #: Defines optional colors for parties
     colors = meta_property('colors', default=dict)
 
-    #: If true, an election represents a single entity rather than a (partial)
-    #: district
-    aggregated_by_entity = meta_property('aggregated_by_entity', default=False)
+    #: Defines the domain of the elections
+    domain_elections = meta_property('domain_elections', default='district')
 
     @property
     def elections(self):
@@ -198,7 +191,7 @@ class ElectionCompound(
     @property
     def counted_entities(self):
         return [
-            election.title for election in self.elections
+            election.domain_segment for election in self.elections
             if election.completed
         ]
 
@@ -228,94 +221,6 @@ class ElectionCompound(
                 return False
 
         return True
-
-    @property
-    def last_modified(self):
-        """ Returns last change of the elections. """
-
-        changes = [self.last_change, self.last_result_change]
-        session = object_session(self)
-        election_ids = [election.id for election in self.elections]
-
-        # Get the last election change
-        result = object_session(self).query(Election.last_change)
-        result = result.order_by(desc(Election.last_change))
-        result = result.filter(Election.id.in_(election_ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last candidate change
-        result = object_session(self).query(Candidate.last_change)
-        result = result.order_by(desc(Candidate.last_change))
-        result = result.filter(Candidate.election_id.in_(election_ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last list connection change
-        result = session.query(ListConnection.last_change)
-        result = result.order_by(desc(ListConnection.last_change))
-        result = result.filter(ListConnection.election_id.in_(election_ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last list change
-        result = session.query(List.last_change)
-        result = result.order_by(desc(List.last_change))
-        result = result.filter(List.election_id == self.id)
-        changes.append(result.first()[0] if result.first() else None)
-
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
-
-    @property
-    def last_result_change(self):
-        """ Returns the last change of the results of the elections. """
-
-        changes = []
-        session = object_session(self)
-        election_ids = [election.id for election in self.elections]
-
-        # Get the last election result change
-        result = session.query(ElectionResult.last_change)
-        result = result.order_by(desc(ElectionResult.last_change))
-        result = result.filter(ElectionResult.election_id.in_(election_ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last candidate result change
-        ids = session.query(Candidate.id)
-        ids = ids.filter(Candidate.election_id.in_(election_ids)).all()
-        result = session.query(CandidateResult.last_change)
-        result = result.order_by(desc(CandidateResult.last_change))
-        result = result.filter(CandidateResult.candidate_id.in_(ids))
-        changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last list result changes
-        ids = session.query(List.id)
-        ids = ids.filter(List.election_id.in_(election_ids)).all()
-        if ids:
-            result = session.query(ListResult.last_change)
-            result = result.order_by(desc(ListResult.last_change))
-            result = result.filter(ListResult.list_id.in_(ids))
-            changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last panachage result changes
-        if ids:
-            ids = [str(id_[0]) for id_ in ids]
-            result = session.query(PanachageResult.last_change)
-            result = result.order_by(desc(PanachageResult.last_change))
-            result = result.filter(
-                or_(
-                    PanachageResult.target.in_(ids),
-                    PanachageResult.owner == self.id,
-                )
-            )
-            changes.append(result.first()[0] if result.first() else None)
-
-        # Get the last party result changes
-        result = session.query(PartyResult.last_change)
-        result = result.order_by(desc(PartyResult.last_change))
-        result = result.filter(PartyResult.owner.in_(election_ids + [self.id]))
-        changes.append(result.first()[0] if result.first() else None)
-
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
 
     @property
     def elected_candidates(self):
@@ -395,6 +300,12 @@ class ElectionCompound(
 
     def clear_results(self):
         """ Clears all own results. """
+
+        self.last_result_change = None
+        result = [x.last_result_change for x in self.elections]
+        result = [x for x in result if x]
+        if result:
+            self.last_result_change = max(result)
 
         session = object_session(self)
         for result in self.party_results:

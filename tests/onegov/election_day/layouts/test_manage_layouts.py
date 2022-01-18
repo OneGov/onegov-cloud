@@ -1,5 +1,10 @@
+from datetime import date
+from freezegun import freeze_time
+from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundCollection
+from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
@@ -358,3 +363,47 @@ def test_manage_layouts(session):
             )
         ]
     )
+
+
+def test_manage_layouts_clear_media(election_day_app_zg):
+    session = election_day_app_zg.session()
+    request = DummyRequest(app=election_day_app_zg, session=session)
+    filestorage = election_day_app_zg.filestorage
+    filestorage.makedir('svg')
+    filestorage.makedir('pdf')
+
+    with freeze_time('2016-08-31'):
+        date_ = date(2010, 1, 1)
+        domain = 'canton'
+        session.add(Election(title='item', domain=domain, date=date_))
+        session.add(ElectionCompound(title='item', domain=domain, date=date_))
+        session.add(Vote(title='item', domain=domain, date=date_))
+        session.flush()
+
+    hash = '4a33eacd5fa65f2b2e2871cd131286b53c415b131666d71173bb6e3fe59361b3'
+    timestamp = 1472601600
+    for path in (
+        f'pdf/election-{hash}.{timestamp}.de_CH.pdf',
+        f'svg/election-{hash}.{timestamp}.lists.any.svg',
+        f'svg/election-{hash}.{timestamp}.parties-panachage.any.svg',
+        f'svg/election-{hash}.{timestamp-5}.parties-panachage.any.svg',
+        f'pdf/elections-{hash}.{timestamp}.de_CH.pdf',
+        f'svg/elections-{hash}.{timestamp}.mandate-allocation.any.svg',
+        f'svg/elections-{hash}.{timestamp-5}.mandate-allocation.any.svg',
+        f'pdf/vote-{hash}.{timestamp}.rm_CH.pdf',
+        f'svg/vote-{hash}.{timestamp}.proposal-entities.any.svg',
+        f'svg/vote-{hash}.{timestamp-5}.proposal-entities.any.svg',
+    ):
+        filestorage.touch(path)
+
+    model = session.query(Election).one()
+    layout = ManageElectionsLayout(model, request)
+    assert layout.clear_media() == 3
+
+    model = session.query(ElectionCompound).one()
+    layout = ManageElectionCompoundsLayout(model, request)
+    assert layout.clear_media() == 2
+
+    model = session.query(Vote).one()
+    layout = ManageVotesLayout(model, request)
+    assert layout.clear_media() == 2

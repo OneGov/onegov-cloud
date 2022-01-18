@@ -8,27 +8,16 @@ from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
 
-def test_vote_form_domains():
-    form = VoteForm()
-    assert form.domain.choices is None
-
-    form.set_domain(Canton(name='be', canton='be'))
-    assert sorted(form.domain.choices) == [
-        ('canton', 'Cantonal'), ('federation', 'Federal')
-    ]
-
-    form.set_domain(Municipality(name='bern', municipality='351'))
-    assert sorted(form.domain.choices) == [
-        ('canton', 'Cantonal'), ('federation', 'Federal'),
-        ('municipality', 'Communal')
-    ]
-
-
-def test_vote_form_translations():
+def test_vote_form_on_request():
     form = VoteForm()
     form.request = DummyRequest()
     form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
     form.on_request()
+    assert form.domain.choices == [
+        ('federation', 'Federal'),
+        ('canton', 'Cantonal'),
+    ]
     assert isinstance(form.vote_de.validators[0], InputRequired)
     assert form.vote_fr.validators == []
     assert form.vote_it.validators == []
@@ -37,14 +26,20 @@ def test_vote_form_translations():
     form = VoteForm()
     form.request = DummyRequest()
     form.request.default_locale = 'fr_CH'
+    form.request.app.principal = Municipality(name='bern', municipality='351')
     form.on_request()
+    assert form.domain.choices == [
+        ('federation', 'Federal'),
+        ('canton', 'Cantonal'),
+        ('municipality', 'Communal'),
+    ]
     assert form.vote_de.validators == []
     assert isinstance(form.vote_fr.validators[0], InputRequired)
     assert form.vote_it.validators == []
     assert form.vote_rm.validators == []
 
 
-def test_vote_form_model(election_day_app, related_link_labels):
+def test_vote_form_model(election_day_app_zg, related_link_labels):
     model = Vote()
     model.title_translations = {
         'de_CH': 'Vote (DE)',

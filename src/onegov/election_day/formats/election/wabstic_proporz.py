@@ -1,32 +1,36 @@
 from datetime import datetime
-
-from onegov.ballot import Candidate, ProporzElection, ElectionCompound
+from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
+from onegov.ballot import ProporzElection
 from onegov.ballot.models.election.election_compound import \
     ElectionCompoundAssociation
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, line_is_relevant, \
-    validate_integer
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import get_entity_and_district
+from onegov.election_day.formats.common import line_is_relevant
 from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.mappings import (
+    WABSTIC_PROPORZ_HEADERS_WP_GEMEINDEN, WABSTIC_PROPORZ_HEADERS_WP_LISTEN,
+    WABSTIC_PROPORZ_HEADERS_WP_KANDIDATEN,
+    WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE,
+    WABSTIC_PROPORZ_HEADERS_WP_LISTENGDE,
+    WABSTIC_PROPORZ_HEADERS_WP_WAHL,
+    WABSTIC_PROPORZ_HEADERS_WPSTATIC_GEMEINDEN,
+    WABSTIC_PROPORZ_HEADERS_WPSTATIC_KANDIDATEN
+)
+from onegov.election_day.models import DataSource
+from onegov.election_day.models import DataSourceItem
+from onegov.election_day.views.upload import unsupported_year_error
 from sqlalchemy.orm import object_session
 from uuid import uuid4
-
-from onegov.election_day.import_export.mappings import \
-    WABSTIC_PROPORZ_HEADERS_WP_WAHL, \
-    WABSTIC_PROPORZ_HEADERS_WPSTATIC_GEMEINDEN, \
-    WABSTIC_PROPORZ_HEADERS_WP_GEMEINDEN, WABSTIC_PROPORZ_HEADERS_WP_LISTEN, \
-    WABSTIC_PROPORZ_HEADERS_WP_LISTENGDE, \
-    WABSTIC_PROPORZ_HEADERS_WPSTATIC_KANDIDATEN, \
-    WABSTIC_PROPORZ_HEADERS_WP_KANDIDATEN, \
-    WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE
-from onegov.election_day.models import DataSource, DataSourceItem
-from onegov.election_day.views.upload import unsupported_year_error
 
 
 def get_entity_id(line, expats):
@@ -57,7 +61,7 @@ def parse_date(line):
     return datetime.strptime(line.sonntag, '%d.%m.%Y')
 
 
-def construct_copound_title(line, year):
+def construct_compound_title(line, year):
     compound_title = line.gebezoffiziell
     wahlkreis_words = line.wahlkreisbez.split(' ')
     for word in wahlkreis_words:
@@ -74,7 +78,8 @@ def create_election_wabstic_proporz(
         file_wp_wahl,
         mimetype_wp_wahl,
         create_compound=False,
-        after_pukelsheim=False
+        after_pukelsheim=False,
+        domain='region'
 ):
     assert isinstance(data_source, DataSource)
     session = request.session
@@ -100,7 +105,8 @@ def create_election_wabstic_proporz(
         try:
             date_ = parse_date(line)
             mandates = validate_integer(
-                line, 'mandate', treat_none_as_default=False)
+                line, 'mandate', treat_none_as_default=False
+            )
 
             election = dict(
                 id=normalize_for_url(line.gebezoffiziell),
@@ -109,9 +115,8 @@ def create_election_wabstic_proporz(
                 shortcode=line.gebezkurz,
                 date=date_,
                 number_of_mandates=mandates,
-                domain='region',
+                domain=domain,
                 status='unknown',
-                distinct=True,
                 after_pukelsheim=after_pukelsheim
             )
 
@@ -142,7 +147,7 @@ def create_election_wabstic_proporz(
             line_errors.append(unsupported_year_error(date_.year))
 
         if not compound_title:
-            compound_title = construct_copound_title(line, date_.year)
+            compound_title = construct_compound_title(line, date_.year)
 
         if not compound_shortcode:
             compound_shortcode = f'{line.gebezkurz.split(" ")[0]}_{date_.year}'
@@ -170,6 +175,7 @@ def create_election_wabstic_proporz(
         shortcode=compound_shortcode,
         date=elections[0]['date'],
         domain='canton',
+        domain_elections=domain,
         after_pukelsheim=after_pukelsheim
     )
 
@@ -343,6 +349,11 @@ def import_election_wabstic_proporz(
         if entity_id == 0 and not election.expats:
             continue
 
+        # Get and check the district/region
+        entity_name, entity_district = get_entity_and_district(
+            entity_id, entities, election, principal, line_errors
+        )
+
         # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
@@ -354,10 +365,9 @@ def import_election_wabstic_proporz(
             )
             continue
 
-        entity = entities.get(entity_id, {})
         added_entities[entity_id] = {
-            'name': entity.get('name', ''),
-            'district': entity.get('district', ''),
+            'name': entity_name,
+            'district': entity_district,
             'eligible_voters': eligible_voters
         }
 
@@ -668,25 +678,19 @@ def import_election_wabstic_proporz(
             added_results[entity_id] = {}
         added_results[entity_id][candidate_id] = votes
 
-    # Check if all results are from the same district if regional election
-    districts = set([result['district'] for result in added_entities.values()])
-    if election.domain == 'region' and districts and election.distinct:
-        if principal.has_districts:
-            if len(districts) != 1:
-                # FIXME: Distinguish between the two errors
-                errors.append(FileImportError(_("No clear district")))
-        else:
-            if len(added_results) != 1:
-                errors.append(FileImportError(_("No clear district")))
-
     if errors:
         return errors
 
     # Add the results to the DB
     election.clear_results()
+    election.last_result_change = election.timestamp()
     election.status = 'unknown'
     if remaining_entities == 0:
         election.status = 'final'
+    for association in election.associations:
+        association.election_compound.last_result_change = (
+            election.last_result_change
+        )
 
     result_uids = {entity_id: uuid4() for entity_id in added_results}
 
@@ -760,20 +764,23 @@ def import_election_wabstic_proporz(
         remaining.add(0)
     remaining -= set(added_results.keys())
     for entity_id in remaining:
-        entity = entities.get(entity_id, {})
-        district = entity.get('district', '')
-        if election.domain == 'region':
-            if not election.distinct:
-                continue
-            if not principal.has_districts:
-                continue
-            if district not in districts:
+        name, district = get_entity_and_district(
+            entity_id, entities, election, principal
+        )
+        if election.domain == 'none':
+            continue
+        if election.domain == 'municipality':
+            if principal.domain != 'municipality':
+                if name != election.domain_segment:
+                    continue
+        if election.domain in ('region', 'district'):
+            if district != election.domain_segment:
                 continue
         result_inserts.append(
             dict(
                 id=uuid4(),
                 election_id=election_id,
-                name=entity.get('name', ''),
+                name=name,
                 district=district,
                 entity_id=entity_id,
                 counted=False

@@ -2,18 +2,21 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, \
-    validate_integer, line_is_relevant
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import get_entity_and_district
+from onegov.election_day.formats.common import line_is_relevant
 from onegov.election_day.formats.common import load_csv
-from sqlalchemy.orm import object_session
-from uuid import uuid4
-
-from onegov.election_day.import_export.mappings import (
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.mappings import (
+    WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN,
+    WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN,
+    WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE,
     WABSTIC_MAJORZ_HEADERS_WM_WAHL,
     WABSTIC_MAJORZ_HEADERS_WMSTATIC_GEMEINDEN,
-    WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN, WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN,
-    WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE)
+)
+from sqlalchemy.orm import object_session
+from uuid import uuid4
 
 
 def get_entity_id(line):
@@ -152,6 +155,7 @@ def import_election_wabstic_majorz(
             if entity_id in added_entities:
                 line_errors.append(
                     _("${name} was found twice", mapping={'name': entity_id}))
+
             # Skip expats if not enabled
             if entity_id == 0 and not election.expats:
                 continue
@@ -161,6 +165,11 @@ def import_election_wabstic_majorz(
             eligible_voters = validate_integer(line, 'stimmberechtigte')
         except ValueError as e:
             line_errors.append(e.args[0])
+
+        # Get and check the district/region
+        entity_name, entity_district = get_entity_and_district(
+            entity_id, entities, election, principal, line_errors
+        )
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -173,10 +182,9 @@ def import_election_wabstic_majorz(
             )
             continue
 
-        entity = entities.get(entity_id, {})
         added_entities[entity_id] = {
-            'name': entity.get('name', ''),
-            'district': entity.get('district', ''),
+            'name': entity_name,
+            'district': entity_district,
             'eligible_voters': eligible_voters
         }
 
@@ -325,16 +333,6 @@ def import_election_wabstic_majorz(
             added_results[entity_id] = {}
         added_results[entity_id][candidate_id] = votes
 
-    # Check if all results are from the same district if regional election
-    districts = set([result['district'] for result in added_entities.values()])
-    if election.domain == 'region' and districts and election.distinct:
-        if principal.has_districts:
-            if len(districts) != 1:
-                errors.append(FileImportError(_("No clear district")))
-        else:
-            if len(added_results) != 1:
-                errors.append(FileImportError(_("No clear district")))
-
     if complete and complete == 2 and remaining_entities != 0:
         errors.append(FileImportError(
             _('Ausmittlungsstand set to final but AnzPendentGde is not 0'))
@@ -344,6 +342,7 @@ def import_election_wabstic_majorz(
 
     # Add the results to the DB
     election.clear_results()
+    election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = 'unknown'
 
@@ -398,21 +397,24 @@ def import_election_wabstic_majorz(
         remaining.add(0)
     remaining -= set(added_results.keys())
     for entity_id in remaining:
-        entity = entities.get(entity_id, {})
-        district = entity.get('district', '')
-        if election.domain == 'region':
-            if not election.distinct:
-                continue
-            if not principal.has_districts:
-                continue
-            if district not in districts:
+        name, district = get_entity_and_district(
+            entity_id, entities, election, principal
+        )
+        if election.domain == 'none':
+            continue
+        if election.domain == 'municipality':
+            if principal.domain != 'municipality':
+                if name != election.domain_segment:
+                    continue
+        if election.domain in ('region', 'district'):
+            if district != election.domain_segment:
                 continue
         result_inserts.append(
             dict(
                 id=uuid4(),
                 election_id=election_id,
-                name=entity.get('name', ''),
-                district=entity.get('district', ''),
+                name=name,
+                district=district,
                 entity_id=entity_id,
                 counted=False
             )

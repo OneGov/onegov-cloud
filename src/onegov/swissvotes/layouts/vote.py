@@ -100,6 +100,7 @@ class VoteLayout(DefaultLayout):
         codes = self.model.metadata_codes('language')
         for file in self.model.search():
             name = file.name.split('-')[0]
+            protected = False
             if name in labels:
                 order = 0
                 title = self.request.translate(labels[name])
@@ -114,11 +115,12 @@ class VoteLayout(DefaultLayout):
                     self.request.translate(codes[lang])
                     for lang in data.get('language', [])
                 ])
+                protected = 'article' in data.get('doctype', ['article'])
             else:
                 order = 3
                 title = file.filename
                 language = ''
-            result.append((order, title, language, file))
+            result.append((order, title, language, protected, file))
         return sorted(result, key=lambda x: (x[0], x[1].lower()))
 
 

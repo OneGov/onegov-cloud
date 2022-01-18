@@ -11,8 +11,14 @@ from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts.default import DefaultLayout
+from onegov.election_day.layouts.election import ElectionLayout
+from onegov.election_day.layouts.election_compound import \
+    ElectionCompoundLayout
+from onegov.election_day.layouts.vote import VoteLayout
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
+from onegov.election_day.utils import pdf_filename
+from onegov.election_day.utils import svg_filename
 
 
 class ManageLayout(DefaultLayout):
@@ -34,28 +40,37 @@ class ManageLayout(DefaultLayout):
             []
         ))
 
-        submenu = []
-        submenu.append((
-            _("Elections"),
-            self.request.link(ElectionCollection(session)),
-            isinstance(self.model, ElectionCollection),
-            []
-        ))
-        submenu.append((
-            _("Compounds of elections"),
-            self.request.link(ElectionCompoundCollection(session)),
-            isinstance(self.model, ElectionCompoundCollection),
-            []
-        ))
-        result.append((
-            _("Elections"),
-            '',
-            (
-                isinstance(self.model, ElectionCollection)
-                or isinstance(self.model, ElectionCompoundCollection)
-            ),
-            submenu
-        ))
+        if principal.domain == 'municipality':
+            result.append((
+                _("Elections"),
+                self.request.link(ElectionCollection(session)),
+                isinstance(self.model, ElectionCollection),
+                []
+            ))
+        else:
+            submenu = []
+            submenu.append((
+                _("Elections"),
+                self.request.link(ElectionCollection(session)),
+                isinstance(self.model, ElectionCollection),
+                []
+            ))
+
+            submenu.append((
+                _("Compounds of elections"),
+                self.request.link(ElectionCompoundCollection(session)),
+                isinstance(self.model, ElectionCompoundCollection),
+                []
+            ))
+            result.append((
+                _("Elections"),
+                '',
+                (
+                    isinstance(self.model, ElectionCollection)
+                    or isinstance(self.model, ElectionCompoundCollection)
+                ),
+                submenu
+            ))
 
         submenu = []
         submenu.append((
@@ -165,6 +180,25 @@ class ManageLayout(DefaultLayout):
             (_("Manage"), super().manage_link, 'unavailable'),
         ]
 
+    def clear_media(self, tabs=[], additional=[]):
+        app = self.request.app
+        filestorage = app.filestorage
+        paths = additional.copy()
+        paths.extend([
+            'pdf/{}'.format(pdf_filename(self.model, locale))
+            for locale in app.locales
+        ])
+        paths.extend([
+            'svg/{}'.format(svg_filename(self.model, tab))
+            for tab in tabs
+        ])
+        count = 0
+        for path in paths:
+            if filestorage.exists(path):
+                filestorage.remove(path)
+                count += 1
+        return count
+
 
 class ManageElectionsLayout(ManageLayout):
 
@@ -179,6 +213,10 @@ class ManageElectionsLayout(ManageLayout):
         self.breadcrumbs.append(
             (_("Elections"), request.link(self.model), '')
         )
+
+    def clear_media(self):
+        layout = ElectionLayout(self.model, self.request)
+        return super().clear_media(tabs=layout.all_tabs)
 
 
 class ManageElectionCompoundsLayout(ManageLayout):
@@ -195,6 +233,10 @@ class ManageElectionCompoundsLayout(ManageLayout):
             (_("Compounds of elections"), request.link(self.model), '')
         )
 
+    def clear_media(self):
+        layout = ElectionCompoundLayout(self.model, self.request)
+        return super().clear_media(tabs=layout.all_tabs)
+
 
 class ManageVotesLayout(ManageLayout):
 
@@ -209,6 +251,16 @@ class ManageVotesLayout(ManageLayout):
         self.breadcrumbs.append(
             (_("Votes"), request.link(self.model), ''),
         )
+
+    def clear_media(self):
+        layout = VoteLayout(self.model, self.request)
+        additional = [
+            'svg/{}'.format(svg_filename(ballot, prefix, locale))
+            for ballot in self.model.ballots
+            for prefix in ('entities-map', 'districts-map')
+            for locale in self.request.app.locales
+        ]
+        return super().clear_media(tabs=layout.all_tabs, additional=additional)
 
 
 class ManageSubscribersLayout(ManageLayout):

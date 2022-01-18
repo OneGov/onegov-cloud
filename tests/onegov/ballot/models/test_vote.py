@@ -649,73 +649,73 @@ def test_ballot_results_aggregation(session):
     round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
 
 
-def test_vote_last_change(session):
+def test_vote_last_modified(session):
     # Add vote
-    with freeze_time("2014-01-01"):
+    with freeze_time("2001-01-01"):
         vote = Vote(
             title="Abstimmung",
             domain='federation',
             date=date(2015, 6, 18)
         )
-        vote.ballots.append(Ballot(type='proposal'))
+        assert vote.last_ballot_change is None
+        assert vote.last_modified is None
+
         session.add(vote)
         session.flush()
+        assert vote.last_ballot_change is None
+        assert session.query(Vote.last_ballot_change).scalar() is None
+        assert vote.last_modified.isoformat().startswith('2001')
+        assert session.query(Vote.last_modified).scalar()\
+            .isoformat().startswith('2001')
 
-    assert vote.last_modified.isoformat().startswith('2014-01-01')
-    assert vote.last_result_change is None
-
-    # Add results
-    with freeze_time("2014-01-02"):
-        vote.proposal.results.append(
-            BallotResult(
-                name='x', yeas=100, nays=0, counted=True, entity_id=1
-            )
-        )
-        vote.proposal.results.append(
-            BallotResult(
-                name='y', yeas=0, nays=100, counted=True, entity_id=1
-            )
-        )
+    with freeze_time("2002-01-01"):
+        vote.last_result_change = vote.timestamp()
         session.flush()
+        assert vote.last_ballot_change is None
+        assert session.query(Vote.last_ballot_change).scalar() is None
+        assert vote.last_modified.isoformat().startswith('2002')
+        assert session.query(Vote.last_modified).scalar()\
+            .isoformat().startswith('2002')
 
-    assert vote.last_modified.isoformat().startswith('2014-01-02')
-    assert vote.last_result_change.isoformat().startswith('2014-01-02')
-
-    # Add another result
-    with freeze_time("2014-01-03"):
-        vote.proposal.results.append(
-            BallotResult(
-                name='z', yeas=100, nays=0, counted=True, entity_id=1
-            )
-        )
-        session.flush()
-
-    assert vote.last_modified.isoformat().startswith('2014-01-03')
-    assert vote.last_result_change.isoformat().startswith('2014-01-03')
-
-    # Change a result
-    with freeze_time("2014-01-04"):
-        vote.proposal.results[0].name = 'q'
-        session.flush()
-
-    assert vote.last_modified.isoformat().startswith('2014-01-04')
-    assert vote.last_result_change.isoformat().startswith('2014-01-04')
-
-    # Change a ballot
-    with freeze_time("2014-01-05"):
-        vote.proposal.title_translations = {'en': 'Proposal', 'de': 'Vorlage'}
-        session.flush()
-
-    assert vote.last_modified.isoformat().startswith('2014-01-05')
-    assert vote.last_result_change.isoformat().startswith('2014-01-04')
-
-    # Change the vote
-    with freeze_time("2014-01-06"):
+    with freeze_time("2003-01-01"):
         vote.domain = 'canton'
         session.flush()
+        assert vote.last_ballot_change is None
+        assert session.query(Vote.last_ballot_change).scalar() is None
+        assert vote.last_modified.isoformat().startswith('2003')
+        assert session.query(Vote.last_modified).scalar()\
+            .isoformat().startswith('2003')
 
-    assert vote.last_modified.isoformat().startswith('2014-01-06')
-    assert vote.last_result_change.isoformat().startswith('2014-01-04')
+    with freeze_time("2004-01-01"):
+        vote.ballots.append(Ballot(type='proposal'))
+        session.flush()
+        assert vote.last_ballot_change.isoformat().startswith('2004')
+        assert session.query(Vote.last_ballot_change).scalar()\
+            .isoformat().startswith('2004')
+        assert vote.last_modified.isoformat().startswith('2004')
+        assert session.query(Vote.last_modified).scalar()\
+            .isoformat().startswith('2004')
+
+    with freeze_time("2005-01-01"):
+        vote.ballots.one().title = 'Proposal'
+        session.flush()
+        assert vote.last_ballot_change.isoformat().startswith('2005')
+        assert session.query(Vote.last_ballot_change).scalar()\
+            .isoformat().startswith('2005')
+        assert vote.last_modified.isoformat().startswith('2005')
+        assert session.query(Vote.last_modified).scalar()\
+            .isoformat().startswith('2005')
+
+    with freeze_time("2006-01-01"):
+        vote.ballots.append(Ballot(type='counter-proposal'))
+        session.flush()
+        assert vote.last_ballot_change.isoformat().startswith('2006')
+        assert session.query(Vote.last_ballot_change).scalar()\
+            .isoformat().startswith('2006')
+        assert vote.last_modified.isoformat().startswith('2006')
+        assert session.query(Vote.last_modified).scalar()\
+            .isoformat().startswith('2006')
+    return
 
 
 def test_vote_export(session):
@@ -1054,9 +1054,11 @@ def test_clear_vote(session):
             invalid=4,
         )
     )
+    vote.last_result_change = vote.timestamp()
 
     vote.clear_results()
 
+    assert vote.last_result_change is None
     assert vote.status is None
     assert vote.proposal.results.first() is None
 

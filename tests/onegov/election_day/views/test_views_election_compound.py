@@ -29,17 +29,16 @@ def test_view_election_compound_districts(election_day_app_gr):
     upload_election_compound(client)
 
     districts = client.get('/elections/elections/districts')
-    assert "Hinterrhein" in districts
-    assert "Albula" in districts
+    assert "Alvaschein" in districts
+    assert "Belfort" in districts
     # intermediate results status_callout etc.
     assert '0 von 2' in districts        # Ausgezählt 0 von 2
     assert '0 von 15' in districts      # Mandate 0 von 15
 
     # Will render 0 if election is not completed
-    assert "0 von 10" in districts  # Table Mandates Hinterrhein
-    assert "0 von 5" in districts  # Table Mandates Albula
-    assert "1 von 24" in districts  # Ausgezählt Hinterrhein
-    assert "1 von 16" in districts  # Ausgezählt Albula
+    assert "0 von 10" in districts  # Table Mandates Belfort
+    assert "0 von 5" in districts  # Table Mandates Alvaschein
+    assert "1 von 2" in districts  # Ausgezählt Belfort, Alvaschein
 
 
 def test_view_election_compound_elected_candidates(election_day_app_gr):
@@ -56,8 +55,8 @@ def test_view_election_compound_elected_candidates(election_day_app_gr):
     assert "Peter Verlierer" not in candidates
     assert "regional-election-b" in candidates
     assert "regional-election-a" in candidates
-    assert "Albula" in candidates
-    assert "Hinterrhein" in candidates
+    assert "Alvaschein" in candidates
+    assert "Belfort" in candidates
 
 
 def test_view_election_compound_lists(election_day_app_gr):
@@ -93,7 +92,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     parties = client.get('/elections/elections/party-strengths-data')
     parties = parties.json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
-    assert parties['labels'] == ['2015']
+    assert parties['labels'] == ['2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 15
     assert parties['results']
@@ -105,19 +104,19 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     export = client.get('/elections/elections/data-parties').text
     lines = export.split('\r\n')
     assert lines[0].startswith('year,name,id,total_votes,color,mandates,votes')
-    assert lines[1].startswith('2015,BDP,0,11270,#efb52c,1,60387')
-    assert lines[2].startswith('2015,CVP,1,11270,#ff6300,1,49117')
-    assert lines[3].startswith('2015,FDP,2,11270,#0571b0,0,35134')
+    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387')
+    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117')
+    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134')
 
     # Historical data
     csv_parties = (
         'year,name,id,total_votes,color,mandates,votes\r\n'
-        '2015,BDP,0,60000,#efb52c,1,10000\r\n'
-        '2015,CVP,1,60000,#ff6300,1,30000\r\n'
-        '2015,FDP,2,60000,#4068c8,0,20000\r\n'
-        '2011,BDP,0,40000,#efb52c,1,1000\r\n'
-        '2011,CVP,1,40000,#ff6300,1,15000\r\n'
-        '2011,FDP,2,40000,#4068c8,1,10000\r\n'
+        '2022,BDP,0,60000,#efb52c,1,10000\r\n'
+        '2022,CVP,1,60000,#ff6300,1,30000\r\n'
+        '2022,FDP,2,60000,#4068c8,0,20000\r\n'
+        '2018,BDP,0,40000,#efb52c,1,1000\r\n'
+        '2018,CVP,1,40000,#ff6300,1,15000\r\n'
+        '2018,FDP,2,40000,#4068c8,1,10000\r\n'
     ).encode('utf-8')
 
     upload = client.get('/elections/elections/upload-party-results')
@@ -128,7 +127,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     parties = client.get('/elections/elections/party-strengths-data')
     parties = parties.json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
-    assert parties['labels'] == ['2011', '2015']
+    assert parties['labels'] == ['2018', '2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 15
     assert parties['results']
@@ -137,33 +136,33 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
         '{}-{}'.format(party['item'], party['group']): party
         for party in parties['results']
     }
-    assert parties['2011-BDP']['color'] == '#efb52c'
-    assert parties['2015-BDP']['color'] == '#efb52c'
-    assert parties['2011-CVP']['color'] == '#ff6300'
-    assert parties['2015-CVP']['color'] == '#ff6300'
-    assert parties['2011-FDP']['color'] == '#4068c8'
-    assert parties['2015-FDP']['color'] == '#4068c8'
+    assert parties['2018-BDP']['color'] == '#efb52c'
+    assert parties['2022-BDP']['color'] == '#efb52c'
+    assert parties['2018-CVP']['color'] == '#ff6300'
+    assert parties['2022-CVP']['color'] == '#ff6300'
+    assert parties['2018-FDP']['color'] == '#4068c8'
+    assert parties['2022-FDP']['color'] == '#4068c8'
 
-    assert parties['2011-BDP']['active'] is False
-    assert parties['2011-CVP']['active'] is False
-    assert parties['2011-FDP']['active'] is False
-    assert parties['2015-BDP']['active'] is True
-    assert parties['2015-CVP']['active'] is True
-    assert parties['2015-FDP']['active'] is True
+    assert parties['2018-BDP']['active'] is False
+    assert parties['2018-CVP']['active'] is False
+    assert parties['2018-FDP']['active'] is False
+    assert parties['2022-BDP']['active'] is True
+    assert parties['2022-CVP']['active'] is True
+    assert parties['2022-FDP']['active'] is True
 
-    assert parties['2011-BDP']['value']['front'] == 1
-    assert parties['2011-CVP']['value']['front'] == 1
-    assert parties['2011-FDP']['value']['front'] == 1
-    assert parties['2015-BDP']['value']['front'] == 1
-    assert parties['2015-CVP']['value']['front'] == 1
-    assert parties['2015-FDP']['value']['front'] == 0
+    assert parties['2018-BDP']['value']['front'] == 1
+    assert parties['2018-CVP']['value']['front'] == 1
+    assert parties['2018-FDP']['value']['front'] == 1
+    assert parties['2022-BDP']['value']['front'] == 1
+    assert parties['2022-CVP']['value']['front'] == 1
+    assert parties['2022-FDP']['value']['front'] == 0
 
-    assert parties['2011-BDP']['value']['back'] == 2.5
-    assert parties['2011-CVP']['value']['back'] == 37.5
-    assert parties['2011-FDP']['value']['back'] == 25
-    assert parties['2015-BDP']['value']['back'] == 16.7
-    assert parties['2015-CVP']['value']['back'] == 50
-    assert parties['2015-FDP']['value']['back'] == 33.3
+    assert parties['2018-BDP']['value']['back'] == 2.5
+    assert parties['2018-CVP']['value']['back'] == 37.5
+    assert parties['2018-FDP']['value']['back'] == 25
+    assert parties['2022-BDP']['value']['back'] == 16.7
+    assert parties['2022-CVP']['value']['back'] == 50
+    assert parties['2022-FDP']['value']['back'] == 33.3
 
     results = client.get('/elections/elections/party-strengths').text
     assert '2.5%' in results
@@ -191,7 +190,7 @@ def test_view_election_compound_mandate_allocation(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    create_election_compound(client)
+    create_election_compound(client, canton='gr')
     upload_party_results(client, slug='elections/elections')
 
     main = client.get('/elections/elections/mandate-allocation')
@@ -200,12 +199,12 @@ def test_view_election_compound_mandate_allocation(election_day_app_gr):
     # Historical data
     csv_parties = (
         'year,name,id,total_votes,color,mandates,votes\r\n'
-        '2015,BDP,0,60000,#efb52c,1,10000\r\n'
-        '2015,CVP,1,60000,#ff6300,1,30000\r\n'
-        '2015,FDP,2,60000,#4068c8,0,20000\r\n'
-        '2011,BDP,0,40000,#efb52c,1,1000\r\n'
-        '2011,CVP,1,40000,#ff6300,1,15000\r\n'
-        '2011,FDP,2,40000,#4068c8,1,10000\r\n'
+        '2022,BDP,0,60000,#efb52c,1,10000\r\n'
+        '2022,CVP,1,60000,#ff6300,1,30000\r\n'
+        '2022,FDP,2,60000,#4068c8,0,20000\r\n'
+        '2018,BDP,0,40000,#efb52c,1,1000\r\n'
+        '2018,CVP,1,40000,#ff6300,1,15000\r\n'
+        '2018,FDP,2,40000,#4068c8,1,10000\r\n'
     ).encode('utf-8')
 
     upload = client.get('/elections/elections/upload-party-results')
@@ -267,9 +266,46 @@ def test_view_election_compound_json(election_day_app_gr):
 
     response = client.get('/elections/elections/json')
     assert response.headers['Access-Control-Allow-Origin'] == '*'
-    assert all((expected in str(response.json) for expected in (
-        "Carol", "Winner", "Hans", "Sieger"
-    )))
+    data = response.json
+    assert data['completed'] == False
+    assert data['data']['csv']
+    assert data['data']['json']
+    assert data['date'] == '2022-01-01'
+    assert data['districts'] == [
+        {
+            'mandates': {'allocated': 0, 'total': 10},
+            'name': 'Alvaschein',
+            'progress': {'counted': 1, 'total': 2}
+        },
+        {
+            'mandates': {'allocated': 0, 'total': 5},
+            'name': 'Belfort',
+            'progress': {'counted': 1, 'total': 2}
+        }
+    ]
+    assert data['elected_candidates'] == [
+        {
+            'district': 'Belfort',
+            'family_name': 'Hans',
+            'first_name': 'Sieger',
+            'list': 'FDP',
+            'party': ''
+        },
+        {
+            'district': 'Alvaschein',
+            'family_name': 'Carol',
+            'first_name': 'Winner',
+            'list': 'CVP',
+            'party': ''
+        }
+    ]
+    assert data['elections']
+    assert data['last_modified']
+    assert data['mandates'] == {'allocated': 0, 'total': 15}
+    assert data['progress'] == {'counted': 0, 'total': 2}
+    assert data['title'] == {'de_CH': 'Elections'}
+    assert data['type'] == 'election_compound'
+    assert data['url']
 
 
 def test_view_election_compound_summary(election_day_app_gr):
@@ -278,20 +314,20 @@ def test_view_election_compound_summary(election_day_app_gr):
 
     login(client)
 
-    with freeze_time("2014-01-01 12:00"):
+    with freeze_time("2022-01-01 12:00"):
         upload_election_compound(client)
 
         response = client.get('/elections/elections/summary')
         assert response.headers['Access-Control-Allow-Origin'] == '*'
         assert response.json == {
             'completed': False,
-            'date': '2015-01-01',
+            'date': '2022-01-01',
             'domain': 'canton',
             'elections': [
                 'http://localhost/election/regional-election-a',
                 'http://localhost/election/regional-election-b'
             ],
-            'last_modified': '2014-01-01T12:00:00+00:00',
+            'last_modified': '2022-01-01T12:00:00+00:00',
             'progress': {'counted': 0, 'total': 2},
             'title': {'de_CH': 'Elections'},
             'type': 'election_compound',
@@ -307,10 +343,10 @@ def test_view_election_compound_data(election_day_app_gr):
     upload_election_compound(client)
 
     export = client.get('/elections/elections/data-json')
-    assert all((expected in export for expected in ("3503", "Sieger", "153")))
+    assert all((expected in export for expected in ("3506", "Sieger", "153")))
 
     export = client.get('/elections/elections/data-csv')
-    assert all((expected in export for expected in ("3503", "Sieger", "153")))
+    assert all((expected in export for expected in ("3506", "Sieger", "153")))
 
 
 def test_views_election_compound_embedded_tables(election_day_app_gr):

@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import datetime
 from freezegun import freeze_time
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
@@ -13,6 +14,7 @@ from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.ballot.models.election.election_compound import \
     ElectionCompoundAssociation
+from pytz import UTC
 from uuid import uuid4
 
 
@@ -215,14 +217,17 @@ def test_election_compound(session):
         Election(
             title="First election",
             domain='region',
+            domain_segment='First district',
             date=date(2015, 6, 14),
             number_of_mandates=1,
+            last_result_change=datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
         )
     )
     session.add(
         Election(
             title="Second election",
             domain='region',
+            domain_segment='Second district',
             date=date(2015, 6, 14),
             number_of_mandates=2,
         )
@@ -303,7 +308,7 @@ def test_election_compound(session):
     assert election_compound.counted is True
     assert election_compound.progress == (2, 2)
     assert election_compound.counted_entities == [
-        'First election', 'Second election'
+        'First district', 'Second district'
     ]
     assert election_compound.allocated_mandates() == 0
     assert election_compound.completed == True
@@ -342,10 +347,18 @@ def test_election_compound(session):
     session.flush()
     assert election_compound.panachage_results.one() == panachage_result
 
+    election_compound.last_result_change = election_compound.timestamp()
+
     # Clear results
     election_compound.clear_results()
-    assert election_compound.party_results.first() == None
-    assert election_compound.panachage_results.first() == None
+    assert election_compound.last_result_change.date() == date(2015, 6, 14)
+    assert election_compound.party_results.first() is None
+    assert election_compound.panachage_results.first() is None
+
+    election = session.query(Election).filter_by(title="First election").one()
+    election.clear_results()
+    election_compound.clear_results()
+    assert election_compound.last_result_change is None
 
 
 def test_election_compound_id_generation(session):
@@ -371,73 +384,34 @@ def test_election_compound_id_generation(session):
     assert election.id == 'legislative-elections-1'
 
 
-def test_election_compound_changes(session):
-    with freeze_time("2014-01-01"):
-        session.add(
-            ElectionCompound(
-                title='Elections',
-                domain='canton',
-                date=date(2015, 6, 14),
-            )
+def test_election_compound_last_modified(session):
+    with freeze_time("2001-01-01"):
+        compound = ElectionCompound(
+            title='Elections',
+            domain='canton',
+            date=date(2015, 6, 14),
         )
-        session.flush()
+        assert compound.last_modified is None
 
-    election_compound = session.query(ElectionCompound).one()
-    assert election_compound.last_modified.isoformat().startswith('2014')
-    assert election_compound.last_result_change is None
+        session.add(compound)
+        session.flush()
+        assert compound.last_modified.isoformat().startswith('2001')
+        assert session.query(ElectionCompound.last_modified).scalar()\
+            .isoformat().startswith('2001')
 
-    with freeze_time("2015-01-01"):
-        session.add(majorz_election())
+    with freeze_time("2002-01-01"):
+        compound.last_result_change = compound.timestamp()
         session.flush()
-    with freeze_time("2016-01-01"):
-        session.add(proporz_election())
-        session.flush()
-    assert election_compound.last_modified.isoformat().startswith('2014')
-    assert election_compound.last_result_change is None
+        assert compound.last_modified.isoformat().startswith('2002')
+        assert session.query(ElectionCompound.last_modified).scalar()\
+            .isoformat().startswith('2002')
 
-    with freeze_time("2011-01-01"):
-        election_compound.elections = session.query(Election).all()
+    with freeze_time("2003-01-01"):
+        compound.domain = 'federation'
         session.flush()
-    assert election_compound.last_modified.isoformat().startswith('2016')
-    assert election_compound.last_result_change.isoformat().startswith('2016')
-
-    with freeze_time("2017-01-01"):
-        election_compound.title = 'elections'
-        session.flush()
-    assert election_compound.last_modified.isoformat().startswith('2017')
-    assert election_compound.last_result_change.isoformat().startswith('2016')
-
-    with freeze_time("2018-01-01"):
-        election_compound.party_results.append(
-            PartyResult(
-                number_of_mandates=0,
-                votes=0,
-                total_votes=100,
-                name='Libertarian',
-                color='black'
-            )
-        )
-        session.flush()
-    assert election_compound.last_modified.isoformat().startswith('2018')
-    assert election_compound.last_result_change.isoformat().startswith('2018')
-
-    with freeze_time("2019-01-01"):
-        election_compound.panachage_results.append(
-            PanachageResult(
-                source='A',
-                target='B',
-                votes=0
-            )
-        )
-        session.flush()
-    assert election_compound.last_modified.isoformat().startswith('2019')
-    assert election_compound.last_result_change.isoformat().startswith('2019')
-
-    with freeze_time("2020-01-01"):
-        election_compound.elections[0].shortcode = '8'
-        session.flush()
-    assert election_compound.last_modified.isoformat().startswith('2020')
-    assert election_compound.last_result_change.isoformat().startswith('2019')
+        assert compound.last_modified.isoformat().startswith('2003')
+        assert session.query(ElectionCompound.last_modified).scalar()\
+            .isoformat().startswith('2003')
 
 
 def test_election_compound_export(session):

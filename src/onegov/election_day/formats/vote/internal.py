@@ -1,13 +1,13 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import BALLOT_TYPES, validate_integer
+from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.mappings import INTERNAL_VOTE_HEADERS
 from sqlalchemy.orm import object_session
-
-from onegov.election_day.import_export.mappings import INTERNAL_VOTE_HEADERS
 
 
 def import_vote_internal(vote, principal, file, mimetype):
@@ -170,6 +170,7 @@ def import_vote_internal(vote, principal, file, mimetype):
 
     # Add the results to the DB
     vote.clear_results()
+    vote.last_result_change = vote.timestamp()
     vote.status = status
 
     ballot_ids = {b: vote.ballot(b, create=True).id for b in ballot_types}

@@ -6,18 +6,22 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, validate_integer, \
-    validate_list_id
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.common import validate_integer
+from onegov.election_day.formats.common import validate_list_id
+from onegov.election_day.formats.mappings import (
+    WABSTI_PROPORZ_HEADERS,
+    WABSTI_PROPORZ_HEADERS_CANDIDATES,
+    WABSTI_PROPORZ_HEADERS_CONNECTIONS,
+    WABSTI_PROPORZ_HEADERS_STATS
+)
 from uuid import uuid4
 
-from onegov.election_day.import_export.mappings import \
-    WABSTI_PROPORZ_HEADERS, WABSTI_PROPORZ_HEADERS_CONNECTIONS, \
-    WABSTI_PROPORZ_HEADERS_CANDIDATES, WABSTI_PROPORZ_HEADERS_STATS
 
-
-def parse_election_result(line, errors, entities):
+def parse_election_result(line, errors, entities, election, principal):
     try:
         entity_id = validate_integer(line, 'einheit_bfs')
     except ValueError as e:
@@ -30,15 +34,20 @@ def parse_election_result(line, errors, entities):
             errors.append(_(
                 _("${name} is unknown", mapping={'name': entity_id})
             ))
+
         else:
-            entity = entities.get(entity_id, {})
-            return ElectionResult(
-                id=uuid4(),
-                name=entity.get('name', ''),
-                district=entity.get('district', ''),
-                entity_id=entity_id,
-                counted=True
+            name, district = get_entity_and_district(
+                entity_id, entities, election, principal, errors
             )
+
+            if not errors:
+                return ElectionResult(
+                    id=uuid4(),
+                    name=name,
+                    district=district,
+                    entity_id=entity_id,
+                    counted=True
+                )
 
 
 def parse_list(line, errors):
@@ -217,7 +226,9 @@ def import_election_wabsti_proporz(
             line_errors = []
 
             # Parse the line
-            result = parse_election_result(line, line_errors, entities)
+            result = parse_election_result(
+                line, line_errors, entities, election, principal
+            )
             candidate = parse_candidate(line, line_errors)
             candidate_result = parse_candidate_result(line, line_errors)
             list = parse_list(line, line_errors)
@@ -412,16 +423,6 @@ def import_election_wabsti_proporz(
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
-    # Check if all results are from the same district if regional election
-    districts = set([result.district for result in results.values()])
-    if election.domain == 'region' and election.distinct:
-        if principal.has_districts:
-            if len(districts) != 1:
-                errors.append(FileImportError(_("No clear district")))
-        else:
-            if len(results) != 1:
-                errors.append(FileImportError(_("No clear district")))
-
     if panachage_headers:
         for list_id in panachage_headers.values():
             if not list_id == '999' and list_id not in lists.keys():
@@ -439,24 +440,32 @@ def import_election_wabsti_proporz(
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:
-        entity = entities.get(entity_id, {})
-        district = entity.get('district', '')
-        if election.domain == 'region':
-            if not election.distinct:
-                continue
-            if not principal.has_districts:
-                continue
-            if district not in districts:
+        name, district = get_entity_and_district(
+            entity_id, entities, election, principal
+        )
+        if election.domain == 'none':
+            continue
+        if election.domain == 'municipality':
+            if principal.domain != 'municipality':
+                if name != election.domain_segment:
+                    continue
+        if election.domain in ('region', 'district'):
+            if district != election.domain_segment:
                 continue
         results[entity_id] = ElectionResult(
             id=uuid4(),
-            name=entity.get('name', ''),
+            name=name,
             district=district,
             entity_id=entity_id,
             counted=False
         )
 
     election.clear_results()
+    election.last_result_change = election.timestamp()
+    for association in election.associations:
+        association.election_compound.last_result_change = (
+            election.last_result_change
+        )
 
     for connection in connections.values():
         election.list_connections.append(connection)

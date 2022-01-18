@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-04 08:19+0100\n"
+"POT-Creation-Date: 2022-01-17 10:08+0100\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -65,6 +65,14 @@ msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
 #, python-format
+msgid "${name} is not part of this election"
+msgstr ""
+
+#, python-format
+msgid "${name} is not part of ${district}"
+msgstr ""
+
+#, python-format
 msgid "Empty value: ${col}"
 msgstr "Valur vida: ${col}"
 
@@ -101,9 +109,6 @@ msgstr "Resultats"
 
 msgid "No data found"
 msgstr "Chattà naginas datas"
-
-msgid "No clear district"
-msgstr "Nagina clera regiun"
 
 msgid "Invalid list results"
 msgstr "Resultats da glistas nunvalaivels"
@@ -201,7 +206,7 @@ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Noziun tschertgada"
 
 msgid ""
@@ -217,11 +222,29 @@ msgstr "Dals"
 msgid "To date"
 msgstr "Fin ils"
 
+msgid "Domain"
+msgstr "Plaun"
+
 msgid "Voting result"
 msgstr "Resultat da l'elecziun"
 
-msgid "Domain"
-msgstr "Plaun"
+msgid "Accepted"
+msgstr "Acceptà"
+
+msgid "Rejected"
+msgstr "Refusà"
+
+msgid "Federal"
+msgstr "Plaun naziunal"
+
+msgid "Cantonal"
+msgstr "Plaun chantunal"
+
+msgid "Regional"
+msgstr "Plaun regiunal"
+
+msgid "Communal"
+msgstr "Plaun communal"
 
 msgid "Name"
 msgstr "Denominaziun"
@@ -256,6 +279,12 @@ msgstr "Relativ"
 msgid "Absolute majority"
 msgstr "Maioritad absoluta"
 
+msgid "District"
+msgstr "Circul electoral"
+
+msgid "Municipality"
+msgstr "Vischnanca"
+
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
 
@@ -263,15 +292,6 @@ msgid "Expats"
 msgstr "Svizzers a l'exteriur"
 
 msgid "The election contains seperate results for expats."
-msgstr ""
-
-msgid "Distinct district"
-msgstr "Clera regiun"
-
-msgid ""
-"The election contains results for an entire district. When uploading "
-"intermediate results, the missing municipalities of the districts are added "
-"accordingly."
 msgstr ""
 
 msgid "Doppelter Pukelsheim"
@@ -331,12 +351,7 @@ msgstr ""
 msgid "Invalid color definitions"
 msgstr ""
 
-msgid "Cantonal"
-msgstr "Plaun chantunal"
-
-msgid ""
-"Elections contain results for single municipalities rather than (partial) "
-"districts"
+msgid "Domain of the elections"
 msgstr ""
 
 msgid "Elections"
@@ -486,6 +501,9 @@ msgstr "Partidas"
 msgid "Downloads"
 msgstr "Downloads"
 
+msgid "Municipalities"
+msgstr "Vischnancas"
+
 msgid "Elected candidates"
 msgstr "Candidat(a)s elegid(a)s"
 
@@ -494,12 +512,6 @@ msgstr "Novs resultats intermediars"
 
 msgid "Final results"
 msgstr "Resultats finals"
-
-msgid "Accepted"
-msgstr "Acceptà"
-
-msgid "Rejected"
-msgstr "Refusà"
 
 msgid "Counter proposal accepted"
 msgstr "Acceptà la cuntraproposta"
@@ -546,15 +558,6 @@ msgstr "Administrar"
 msgid "Mappings"
 msgstr "Attribuziuns"
 
-msgid "Federal"
-msgstr "Plaun naziunal"
-
-msgid "Regional"
-msgstr "Plaun regiunal"
-
-msgid "Municipality"
-msgstr "Vischnanca"
-
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Resultats finals disponibels sin ${url}"
@@ -563,8 +566,12 @@ msgstr "Resultats finals disponibels sin ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Novs resultats intermediars disponibels sin ${url}"
 
-msgid "Municipalities"
-msgstr "Vischnancas"
+#, python-format
+msgid "Regional (${on})"
+msgstr "Plaun regiunal (${on})"
+
+msgid "Other"
+msgstr "Auter"
 
 msgid "district_label_bl"
 msgstr "Circul electoral"
@@ -573,9 +580,6 @@ msgid "district_label_gr"
 msgstr "Regiun"
 
 msgid "district_label_sz"
-msgstr "Circul electoral"
-
-msgid "District"
 msgstr "Circul electoral"
 
 msgid "districts_label_bl"
@@ -595,9 +599,6 @@ msgstr "Regiun"
 
 msgid "superregions_label_bl"
 msgstr "Regiuns"
-
-msgid "Communal"
-msgstr "Plaun communal"
 
 msgid "Quarter"
 msgstr "Quartier"
@@ -1058,6 +1059,9 @@ msgstr "Chargiar si ils resultats da las partidas"
 msgid "Clear results"
 msgstr "Stizzar ils resultats"
 
+msgid "Clear media"
+msgstr ""
+
 msgid "New election"
 msgstr "Nova elecziun"
 
@@ -1249,6 +1253,19 @@ msgstr "Stizzà ils resultats."
 #, python-format
 msgid "Do you really want to clear all party results of \"${item}\"?"
 msgstr "Vulais Vus propi stizzar tut ils resultats da partida da \"${item}\"?"
+
+#, python-format
+msgid "${count} files deleted."
+msgstr ""
+
+msgid ""
+"Deletes all SVGs and PDFs. They are regenerated in the background and are "
+"available again in a few minutes."
+msgstr ""
+
+#, python-format
+msgid "Do you really want to clear all media of \"${item}\"?"
+msgstr ""
 
 msgid "Compound deleted."
 msgstr "Stizzà la colliaziun."

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-04 08:19+0100\n"
-"PO-Revision-Date: 2021-04-01 10:23+0200\n"
+"POT-Creation-Date: 2022-01-17 10:08+0100\n"
+"PO-Revision-Date: 2022-01-17 10:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "The final results are available"
 msgstr "Les résultats finaux sont disponibles"
@@ -64,6 +64,14 @@ msgid "The file contains an empty line."
 msgstr "Le fichier contient une ligne vide."
 
 #, python-format
+msgid "${name} is not part of this election"
+msgstr "${name} ne fait pas partie de cette élection"
+
+#, python-format
+msgid "${name} is not part of ${district}"
+msgstr "${name} ne fait pas partie de ${district}"
+
+#, python-format
 msgid "Empty value: ${col}"
 msgstr "Valeur vide: ${col}"
 
@@ -100,9 +108,6 @@ msgstr "Résultats"
 
 msgid "No data found"
 msgstr "Pas de données trouvées"
-
-msgid "No clear district"
-msgstr "Aucun district clair"
 
 msgid "Invalid list results"
 msgstr "Résultats de la liste non valides"
@@ -199,7 +204,7 @@ msgstr "Impossible de connaître les votes blancs"
 msgid "Error in anzgdependent: ${msg}"
 msgstr ""
 
-msgid "Text Retrieval"
+msgid "Term"
 msgstr "Terme de recherche"
 
 msgid ""
@@ -215,11 +220,29 @@ msgstr "De"
 msgid "To date"
 msgstr "A"
 
+msgid "Domain"
+msgstr "Echelon"
+
 msgid "Voting result"
 msgstr "Résultat de la votation"
 
-msgid "Domain"
-msgstr "Echelon"
+msgid "Accepted"
+msgstr "Accepté"
+
+msgid "Rejected"
+msgstr "Refusé"
+
+msgid "Federal"
+msgstr "Fédéral"
+
+msgid "Cantonal"
+msgstr "Cantonal"
+
+msgid "Regional"
+msgstr "Régional"
+
+msgid "Communal"
+msgstr "Municipal"
 
 msgid "Name"
 msgstr "Nom"
@@ -254,6 +277,12 @@ msgstr "Relative"
 msgid "Absolute majority"
 msgstr "Majorité absolue"
 
+msgid "District"
+msgstr "Circonscription électorale"
+
+msgid "Municipality"
+msgstr "Commune"
+
 msgid "Tacit election"
 msgstr "Élection tacite"
 
@@ -262,18 +291,6 @@ msgstr "Suisses de l'étranger"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'élection contient des résultats distincts pour les expatriés."
-
-msgid "Distinct district"
-msgstr "District unique"
-
-msgid ""
-"The election contains results for an entire district. When uploading "
-"intermediate results, the missing municipalities of the districts are added "
-"accordingly."
-msgstr ""
-"L'élection contient des résultats pour une circonscription électorale "
-"entière. Lors du téléchargement des résultats intermédiaires, les communes "
-"manquantes de la circonscription électorale sont complétées en conséquence."
 
 msgid "Doppelter Pukelsheim"
 msgstr ""
@@ -332,15 +349,8 @@ msgstr "Couleurs"
 msgid "Invalid color definitions"
 msgstr "Définitions de couleurs non valides"
 
-msgid "Cantonal"
-msgstr "Cantonal"
-
-msgid ""
-"Elections contain results for single municipalities rather than (partial) "
-"districts"
-msgstr ""
-"Les élections contiennent des résultats pour des municipalités individuelles "
-"plutôt que pour des districts (partiels)."
+msgid "Domain of the elections"
+msgstr "Echelon des élections"
 
 msgid "Elections"
 msgstr "Elections"
@@ -500,6 +510,9 @@ msgstr "Partis"
 msgid "Downloads"
 msgstr "Téléchargements"
 
+msgid "Municipalities"
+msgstr "Communes"
+
 msgid "Elected candidates"
 msgstr "Candidats élus"
 
@@ -508,12 +521,6 @@ msgstr "Nouveaux résultats intermédiaires"
 
 msgid "Final results"
 msgstr "Résultats finaux"
-
-msgid "Accepted"
-msgstr "Accepté"
-
-msgid "Rejected"
-msgstr "Refusé"
 
 msgid "Counter proposal accepted"
 msgstr "Contre-projet accepté"
@@ -560,15 +567,6 @@ msgstr "Gérer"
 msgid "Mappings"
 msgstr "Cartographie"
 
-msgid "Federal"
-msgstr "Fédéral"
-
-msgid "Regional"
-msgstr "Régional"
-
-msgid "Municipality"
-msgstr "Commune"
-
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Les résultats finaux sont disponibles sur ${url}"
@@ -577,8 +575,12 @@ msgstr "Les résultats finaux sont disponibles sur ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Les nouveaux résultats intermédiaires sont disponibles sur ${url}"
 
-msgid "Municipalities"
-msgstr "Communes"
+#, python-format
+msgid "Regional (${on})"
+msgstr "Régional (${on})"
+
+msgid "Other"
+msgstr "Autre"
 
 msgid "district_label_bl"
 msgstr "District électoral"
@@ -588,9 +590,6 @@ msgstr "Région"
 
 msgid "district_label_sz"
 msgstr "District électoral"
-
-msgid "District"
-msgstr "Circonscription électorale"
 
 msgid "districts_label_bl"
 msgstr "Districts électorales"
@@ -609,9 +608,6 @@ msgstr "Région"
 
 msgid "superregions_label_bl"
 msgstr "Régions"
-
-msgid "Communal"
-msgstr "Municipal"
 
 msgid "Quarter"
 msgstr "Quartier"
@@ -1070,6 +1066,9 @@ msgstr "Uploader les résultats par parti"
 msgid "Clear results"
 msgstr "Effacer les résultats"
 
+msgid "Clear media"
+msgstr "Supprimer le média"
+
 msgid "New election"
 msgstr "Nouveau election"
 
@@ -1271,6 +1270,21 @@ msgid "Do you really want to clear all party results of \"${item}\"?"
 msgstr ""
 "Voulez-vous vraiment effacer tous les résultats par parti de \"${item}\" ?"
 
+#, python-format
+msgid "${count} files deleted."
+msgstr "${count} fichiers supprimés."
+
+msgid ""
+"Deletes all SVGs and PDFs. They are regenerated in the background and are "
+"available again in a few minutes."
+msgstr ""
+"Supprime tous les SVGs et PDFs. Ils sont régénérés en arrière-plan et sont à "
+"nouveau disponibles en quelques minutes."
+
+#, python-format
+msgid "Do you really want to clear all media of \"${item}\"?"
+msgstr "Voulez-vous vraiment supprimer tous les médias de \"${item}\" ?"
+
 msgid "Compound deleted."
 msgstr "Composante supprimée."
 
@@ -1437,7 +1451,7 @@ msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
 
 msgid "This source has already elections assigned to it"
-msgstr ""
+msgstr "Cette source a déjà des élections qui lui ont été attribuées"
 
 msgid "Invalid id"
 msgstr "Mauvaise référence"

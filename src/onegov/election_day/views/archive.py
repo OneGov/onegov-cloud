@@ -1,10 +1,9 @@
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.collections.archived_results import (
-    SearchableArchivedResultCollection
-)
-from onegov.election_day.forms.archive import ArchiveSearchForm
+from onegov.election_day.collections import SearchableArchivedResultCollection
+from onegov.election_day.forms import ArchiveSearchFormElection
+from onegov.election_day.forms import ArchiveSearchFormVote
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts.archive import ArchiveLayout
 from onegov.election_day.models import Principal
@@ -133,10 +132,16 @@ def view_principal_json(self, request):
     }
 
 
+def search_form(model, request, form=None):
+    if model.item_type == 'vote':
+        return ArchiveSearchFormVote
+    return ArchiveSearchFormElection
+
+
 @ElectionDayApp.form(
     model=SearchableArchivedResultCollection,
     template='archive_search.pt',
-    form=ArchiveSearchForm,
+    form=search_form,
     permission=Public,
 )
 def view_archive_search(self, request, form):
@@ -150,9 +155,6 @@ def view_archive_search(self, request, form):
 
     if not form.errors:
         form.apply_model(self)
-
-    # set principal for query function
-    self.app_principal_domain = request.app.principal.domain
 
     return {
         'item_type': self.item_type,

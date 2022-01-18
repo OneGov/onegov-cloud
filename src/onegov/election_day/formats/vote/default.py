@@ -1,10 +1,10 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
+from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.formats.common import BALLOT_TYPES
-from onegov.election_day.import_export.mappings import DEFAULT_VOTE_HEADER
+from onegov.election_day.formats.mappings import DEFAULT_VOTE_HEADER
 
 
 def import_vote_default(vote, principal, ballot_type, file, mimetype):
@@ -188,6 +188,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
         return errors
 
     if ballot_results:
+        vote.last_result_change = vote.timestamp()
         vote.status = None
         ballot.clear_results()
 

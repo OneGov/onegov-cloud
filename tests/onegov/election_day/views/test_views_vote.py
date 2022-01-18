@@ -6,8 +6,8 @@ from tests.onegov.election_day.common import upload_vote
 from webtest import TestApp as Client
 
 
-def test_view_vote_redirect(election_day_app):
-    client = Client(election_day_app)
+def test_view_vote_redirect(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -24,8 +24,8 @@ def test_view_vote_redirect(election_day_app):
     assert 'complex-vote/proposal-entities' in response.headers['Location']
 
 
-def test_view_vote_entities(election_day_app):
-    client = Client(election_day_app)
+def test_view_vote_entities(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -79,8 +79,8 @@ def test_view_vote_districts(election_day_app_gr):
         assert data_url in client.get(url).follow()
 
 
-def test_view_vote_json(election_day_app):
-    client = Client(election_day_app)
+def test_view_vote_json(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -93,8 +93,8 @@ def test_view_vote_json(election_day_app):
     )))
 
 
-def test_view_vote_summary(election_day_app):
-    client = Client(election_day_app)
+def test_view_vote_summary(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -107,7 +107,7 @@ def test_view_vote_summary(election_day_app):
         assert response.json == {
             'answer': 'rejected',
             'completed': True,
-            'date': '2015-01-01',
+            'date': '2022-01-01',
             'domain': 'federation',
             'last_modified': '2014-01-01T12:00:00+00:00',
             'nays_percentage': 62.78808066258552,
@@ -120,8 +120,8 @@ def test_view_vote_summary(election_day_app):
         }
 
 
-def test_view_vote_data(election_day_app):
-    client = Client(election_day_app)
+def test_view_vote_data(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -143,8 +143,8 @@ def test_view_vote_data(election_day_app):
     'tie-breaker-by-districts-table',
     'vote-header-widget'
 ])
-def test_views_vote_embedded_widgets(election_day_app, url):
-    client = Client(election_day_app)
+def test_views_vote_embedded_widgets(election_day_app_zg, url):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)

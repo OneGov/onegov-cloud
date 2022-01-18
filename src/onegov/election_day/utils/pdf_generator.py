@@ -1,7 +1,6 @@
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
-from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import log
 from onegov.election_day.pdf import Pdf
@@ -411,7 +410,9 @@ class PdfGenerator():
                 'even'
             )
 
-        elif not principal.has_districts:
+        elif not principal.has_districts or election.domain in (
+            'region', 'district', 'municipality', 'none'
+        ):
             pdf.results(
                 [
                     principal.label('entity'),
@@ -520,27 +521,24 @@ class PdfGenerator():
             return item.name if item.entity_id else pdf.translate(_("Expats"))
 
         def label(value):
-            if compound.aggregated_by_entity and value == 'district':
-                return principal.label('entity')
-            if compound.aggregated_by_entity and value == 'districts':
-                return principal.label('entities')
+            if value == 'district':
+                if compound.domain_elections == 'region':
+                    return principal.label('region')
+                if compound.domain_elections == 'municipality':
+                    return _("Municipality")
+            if value == 'districts':
+                if compound.domain_elections == 'region':
+                    return principal.label('regions')
+                if compound.domain_elections == 'municipality':
+                    return _("Municipalities")
             return principal.label(value)
-
-        def election_title(election):
-            result = election.results.first()
-            if result:
-                if compound.aggregated_by_entity:
-                    return result.name
-                else:
-                    return election.district
-            return _("Results")
 
         majorz = False
         if compound.elections and compound.elections[0].type == 'majorz':
             majorz = True
 
         districts = {
-            election.id: election_title(election)
+            election.id: election.domain_segment
             for election in compound.elections if election.results.first()
         }
 
@@ -558,7 +556,7 @@ class PdfGenerator():
             [label('district'), _('Mandates')],
             [
                 [
-                    election_title(e),
+                    e.domain_segment,
                     e.allocated_mandates(consider_completed=True)
                 ]
                 for e in compound.elections
@@ -617,43 +615,44 @@ class PdfGenerator():
             deltas, results = get_party_results_deltas(
                 compound, years, parties
             )
-            results = results[sorted(results.keys())[-1]]
-            if deltas:
-                pdf.results(
-                    [
-                        _('Party'),
-                        _('Mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                        'Δ {}'.format(years[0]),
-                    ],
-                    [[
-                        r[0],
-                        r[1],
-                        r[3],
-                        r[2],
-                        r[4],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
-            else:
-                pdf.results(
-                    [
-                        _('Party'),
-                        _('Mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                    ],
-                    [[
-                        r[0],
-                        r[1],
-                        r[3],
-                        r[2],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
+            if results:
+                results = results[sorted(results.keys())[-1]]
+                if deltas:
+                    pdf.results(
+                        [
+                            _('Party'),
+                            _('Mandates'),
+                            _('single_votes'),
+                            _('single_votes'),
+                            'Δ {}'.format(years[0]),
+                        ],
+                        [[
+                            r[0],
+                            r[1],
+                            r[3],
+                            r[2],
+                            r[4],
+                        ] for r in results],
+                        [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
+                        pdf.style.table_results_1
+                    )
+                else:
+                    pdf.results(
+                        [
+                            _('Party'),
+                            _('Mandates'),
+                            _('single_votes'),
+                            _('single_votes'),
+                        ],
+                        [[
+                            r[0],
+                            r[1],
+                            r[3],
+                            r[2],
+                        ] for r in results],
+                        [None, 2 * cm, 2 * cm, 2 * cm],
+                        pdf.style.table_results_1
+                    )
             pdf.pagebreak()
 
         # Parties Panachage
@@ -984,11 +983,25 @@ class PdfGenerator():
         """ Generates all PDFs for the given application.
 
         Only generates PDFs if not already generated since the last change of
-        the election or vote.
+        the election, election compound or vote.
 
-        Optionally cleans up unused PDFs.
+        Cleans up unused files.
 
         """
+
+        publish = self.app.principal.publish_intermediate_results
+
+        def render_item(item):
+            if item.completed:
+                return True
+            counted, total = item.progress
+            if counted == 0:
+                return False
+            if not publish:
+                return False
+            if isinstance(item, Vote) and publish.get('vote'):
+                return True
+            return False
 
         # Get all elections and votes
         items = self.session.query(Election).all()
@@ -1001,35 +1014,15 @@ class PdfGenerator():
             fs.makedir(self.pdf_dir)
         existing = fs.listdir(self.pdf_dir)
 
-        def render_item(item):
-            completed = item.completed
-            if completed:
-                return True
-            counted, total = item.progress
-            if counted == 0:
-                return False
-            publish = self.app.principal.publish_intermediate_results
-            if not publish:
-                return False
-            if isinstance(item, Vote) and publish.get('vote'):
-                return True
-            if isinstance(item, Election) and publish.get('election'):
-                raise NotImplementedError
-            if isinstance(item, ElectionCompound):
-                if publish.get('election_compound'):
-                    raise NotImplementedError
-            return False
-
         # Generate the PDFs
-        created = []
+        created = 0
+        filenames = []
         for locale in self.app.locales:
             for item in items:
-                last_modified = item.last_modified
-                filename = pdf_filename(
-                    item, locale, last_modified=last_modified
-                )
-                created.append(filename.split('.')[0])
+                filename = pdf_filename(item, locale)
+                filenames.append(filename)
                 if filename not in existing and render_item(item):
+                    created += 1
                     path = '{}/{}'.format(self.pdf_dir, filename)
                     if fs.exists(path):
                         fs.remove(path)
@@ -1045,18 +1038,8 @@ class PdfGenerator():
                         if fs.exists(path):
                             fs.remove(path)
 
-        # Delete old PDFs
-        existing = fs.listdir(self.pdf_dir)
-        existing = dict(groupbylist(
-            sorted(existing),
-            key=lambda a: a.split('.')[0]
-        ))
+        # Delete obsolete PDFs
+        obsolete = set(existing) - set(filenames)
+        self.remove(self.pdf_dir, obsolete)
 
-        # ... orphaned files
-        for id in set(existing.keys()) - set(created):
-            self.remove(self.pdf_dir, existing[id])
-
-        # ... old files
-        for files in existing.values():
-            files = sorted(files, reverse=True)
-            self.remove(self.pdf_dir, files[len(self.app.locales):])
+        return created, len(obsolete)

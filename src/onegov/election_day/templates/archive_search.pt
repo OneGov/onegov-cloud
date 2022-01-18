@@ -45,48 +45,38 @@
                             <thead>
                                 <tr>
                                     <th i18n:translate>Vote</th>
+                                    <th i18n:translate>Result</th>
                                     <th i18n:translate>Date</th>
                                     <th i18n:translate>Domain</th>
-                                    <th i18n:translate>Result</th>
-                                    <th class="no-wrap" i18n:translate class="right-aligned">Yes %</th>
-                                    <th class="no-wrap" i18n:translate class="right-aligned">No %</th>
                                     <th i18n:translate class="right-aligned" tal:condition="not: communal_instance">Counted</th>
                                     <th i18n:translate class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tal:b tal:repeat="vote results">
-                                        <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
-                                            <td class="top-aligned" tal:define="prefix vote.title_prefix(request)">
-                                                <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
-                                            </td>
-                                            <td class="top-aligned" >${layout.format_date(vote.date, 'date')}</td>
-                                            <td class="top-aligned" tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
-                                            <td class="top-aligned" tal:condition="vote.domain == 'region'" i18n:translate>Regional</td>
-                                            <td class="top-aligned" tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
-                                            <td class="top-aligned" tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
-                                            <td class="top-aligned">
-                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
-                                            </td>
-                                            <td class="right-aligned top-aligned">
-                                                <tal:b tal:condition="vote.progress[0]">
-                                                    ${layout.format_number(vote.display_yeas_percentage(request))}
-                                                </tal:b>
-                                            </td>
-                                            <td class="right-aligned top-aligned">
-                                                <tal:b tal:condition="vote.progress[0]">
-                                                    ${layout.format_number(vote.display_nays_percentage(request))}
-                                                </tal:b>
-                                            </td>
-                                            <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
-                                                <tal:b tal:condition="vote.progress[0]">
-                                                    <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
-                                                </tal:b>
-                                            </td>
-                                            <td class="right-aligned top-aligned">
-                                                ${layout.format_date(vote.last_result_change, 'datetime')}
-                                            </td>
-                                        </tr>
+                                    <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
+                                        <td class="top-aligned" tal:define="prefix vote.title_prefix(request)">
+                                            <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
+                                        </td>
+                                        <td class="top-aligned">
+                                            <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
+                                        </td>
+                                        <td class="top-aligned" >${layout.format_date(vote.date, 'date')}</td>
+                                        <td class="top-aligned" tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
+                                        <td class="top-aligned" tal:condition="vote.domain == 'district'" i18n:translate>Regional</td>
+                                        <td class="top-aligned" tal:condition="vote.domain == 'region'" i18n:translate>Regional</td>
+                                        <td class="top-aligned" tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
+                                        <td class="top-aligned" tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
+                                        <td class="top-aligned" tal:condition="vote.domain == 'none'" i18n:translate>Regional</td>
+                                        <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
+                                            <tal:b tal:condition="vote.progress[0]">
+                                                <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
+                                            </tal:b>
+                                        </td>
+                                        <td class="right-aligned top-aligned">
+                                            ${layout.format_date(vote.last_result_change, 'datetime')}
+                                        </td>
+                                    </tr>
                                 </tal:b>
                             </tbody>
                         </table>
@@ -100,6 +90,7 @@
                             <thead>
                                 <tr>
                                     <th i18n:translate="">Election</th>
+                                    <th i18n:translate="">Date</th>
                                     <th i18n:translate="">Domain</th>
                                     <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Counted</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
@@ -110,10 +101,13 @@
                                     <td class="top-aligned" tal:define="prefix election.title_prefix(request)">
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
                                     </td>
+                                    <td class="top-aligned" >${layout.format_date(election.date, 'date')}</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
+                                    <td class="top-aligned" tal:condition="election.domain == 'district'" i18n:translate>Regional</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'region'" i18n:translate>Regional</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'municipality'" i18n:translate>Communal</td>
+                                    <td class="top-aligned" tal:condition="election.domain == 'none'" i18n:translate>Regional</td>
                                     <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>

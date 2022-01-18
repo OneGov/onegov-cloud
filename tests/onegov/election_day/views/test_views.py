@@ -20,8 +20,8 @@ def test_view_permissions():
     utils.assert_explicit_permissions(election_day, ElectionDayApp)
 
 
-def test_i18n(election_day_app):
-    client = Client(election_day_app)
+def test_i18n(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -71,20 +71,20 @@ def test_i18n(election_day_app):
     assert "Tick" in homepage
 
 
-def test_pages_cache(election_day_app):
-    principal = election_day_app.principal
+def test_pages_cache(election_day_app_zg):
+    principal = election_day_app_zg.principal
     principal.open_data = {
         'id': 'kanton-govikon',
         'mail': 'info@govikon',
         'name': 'Staatskanzlei Kanton Govikon'
     }
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH')
 
     # make sure codes != 200 are not cached
-    anonymous = Client(election_day_app)
+    anonymous = Client(election_day_app_zg)
     anonymous.get('/vote/0xdeadbeef/entities', status=404)
 
     login(client)
@@ -103,7 +103,7 @@ def test_pages_cache(election_day_app):
         assert '0xdeadbeef' in anonymous.get(url)
 
     # Modify without invalidating the cache
-    election_day_app.session().query(Vote).one().title = '0xdeadc0de'
+    election_day_app_zg.session().query(Vote).one().title = '0xdeadc0de'
     commit()
 
     for url in urls:
@@ -122,9 +122,9 @@ def test_pages_cache(election_day_app):
         assert '0xd3adc0d3' in client.get(url)
 
 
-def test_view_last_modified(election_day_app):
+def test_view_last_modified(election_day_app_zg):
     with freeze_time("2014-01-01 12:00"):
-        client = Client(election_day_app)
+        client = Client(election_day_app_zg)
         client.get('/locale/de_CH').follow()
 
         login(client)
@@ -141,17 +141,18 @@ def test_view_last_modified(election_day_app):
         new.form['date'] = date(2013, 1, 1)
         new.form['mandates'] = 1
         new.form['election_type'] = 'proporz'
-        new.form['domain'] = 'region'
+        new.form['domain'] = 'municipality'
         new.form.submit()
 
         new = client.get('/manage/election-compounds/new-election-compound')
         new.form['election_de'] = "Elections"
         new.form['date'] = date(2013, 1, 1)
-        new.form['elections'] = ['election']
+        new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
+        new.form['domain_elections'] = 'municipality'
         new.form.submit()
 
-        client = Client(election_day_app)
+        client = Client(election_day_app_zg)
         client.get('/locale/de_CH').follow()
 
         for path in (
@@ -192,8 +193,8 @@ def test_view_last_modified(election_day_app):
             assert 'Last-Modified' not in client.get(path).headers
 
 
-def test_view_headerless(election_day_app):
-    client = Client(election_day_app)
+def test_view_headerless(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -216,8 +217,8 @@ def test_view_headerless(election_day_app):
         assert 'manage-links' in client.get(path)
 
 
-def test_view_pdf(election_day_app):
-    client = Client(election_day_app)
+def test_view_pdf(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -235,8 +236,8 @@ def test_view_pdf(election_day_app):
         assert client.get(path, expect_errors=True).status_code == 202
 
     pdf = '%PDF-1.6'.encode('utf-8')
-    election_day_app.filestorage.makedir('pdf')
-    with election_day_app.filestorage.open('pdf/test.pdf', 'wb') as f:
+    election_day_app_zg.filestorage.makedir('pdf')
+    with election_day_app_zg.filestorage.open('pdf/test.pdf', 'wb') as f:
         f.write(pdf)
 
     filenames = []
@@ -283,8 +284,8 @@ def test_view_pdf(election_day_app):
     ]
 
 
-def test_view_svg(election_day_app):
-    client = Client(election_day_app)
+def test_view_svg(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
@@ -293,7 +294,7 @@ def test_view_svg(election_day_app):
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
 
-    ballot_id = election_day_app.session().query(Ballot).one().id
+    ballot_id = election_day_app_zg.session().query(Ballot).one().id
     paths = (
         f'/ballot/{ballot_id}/entities-map-svg',
         f'/ballot/{ballot_id}/districts-map-svg',
@@ -311,8 +312,8 @@ def test_view_svg(election_day_app):
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" ></svg>'
     ).encode('utf-8')
-    election_day_app.filestorage.makedir('svg')
-    with election_day_app.filestorage.open('svg/test.svg', 'wb') as f:
+    election_day_app_zg.filestorage.makedir('svg')
+    with election_day_app_zg.filestorage.open('svg/test.svg', 'wb') as f:
         f.write(svg)
 
     filenames = []
@@ -358,21 +359,21 @@ def test_view_svg(election_day_app):
     ]
 
 
-def test_view_opendata_catalog(election_day_app):
-    client = Client(election_day_app)
+def test_view_opendata_catalog(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     # Not configured
     response = client.get('/catalog.rdf', expect_errors=True)
     assert response.status_code == 501
 
-    principal = election_day_app.principal
+    principal = election_day_app_zg.principal
     principal.open_data = {
         'id': 'kanton-govikon',
         'mail': 'info@govikon',
         'name': 'Staatskanzlei Kanton Govikon'
     }
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
     # Empty
     root = fromstring(client.get('/catalog.rdf').text)
@@ -384,7 +385,7 @@ def test_view_opendata_catalog(election_day_app):
     upload_vote(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
-    create_election_compound(client)
+    create_election_compound(client, canton='zg')
 
     root = fromstring(client.get('/catalog.rdf').text)
     assert set([
@@ -427,8 +428,8 @@ def test_view_opendata_catalog(election_day_app):
     }
 
 
-def test_view_screen(election_day_app):
-    client = Client(election_day_app)
+def test_view_screen(election_day_app_zg):
+    client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     client.get('/screen/10', status=404)
@@ -459,10 +460,10 @@ def test_view_screen(election_day_app):
     assert 'Einfache Vorlage' in view
 
 
-def test_view_custom_css(election_day_app):
-    principal = election_day_app.principal
+def test_view_custom_css(election_day_app_zg):
+    principal = election_day_app_zg.principal
     principal.custom_css = 'tr { display: none }'
-    election_day_app.cache.set('principal', principal)
+    election_day_app_zg.cache.set('principal', principal)
 
-    client = Client(election_day_app)
+    client = Client(election_day_app_zg)
     assert '<style>tr { display: none }</style>' in client.get('/')
