@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -50,10 +51,7 @@ def alter_domain_of_influence(context, old, new):
 
 @upgrade_task('Rename yays to yeas')
 def rename_yays_to_yeas(context):
-
-    if context.has_column('ballot_results', 'yeas'):
-        return False
-    else:
+    if not context.has_column('ballot_results', 'yeas'):
         context.operations.alter_column(
             'ballot_results', 'yays', new_column_name='yeas'
         )
@@ -61,18 +59,18 @@ def rename_yays_to_yeas(context):
 
 @upgrade_task('Add shortcode column')
 def add_shortcode_column(context):
-    context.operations.add_column('votes', Column('shortcode', Text()))
+    if not context.has_column('votes', 'shortcode'):
+        context.operations.add_column('votes', Column('shortcode', Text()))
 
 
 @upgrade_task('Enable translation of vote title')
 def enable_translation_of_vote_title(context):
-    context.operations.drop_column('votes', 'title')
-    context.operations.add_column('votes', Column(
-        'title_translations', HSTORE, nullable=True
-    ))
-    context.operations.alter_column(
-        'votes', 'title_translations', nullable=False
-    )
+    if context.has_column('votes', 'title'):
+        context.operations.drop_column('votes', 'title')
+    if not context.has_column('votes', 'title_translations'):
+        context.operations.add_column('votes', Column(
+            'title_translations', HSTORE, nullable=False
+        ))
 
 
 @upgrade_task('Add absolute majority column')
@@ -194,9 +192,10 @@ def rename_candidates_tables(context):
 
 @upgrade_task('Adds ballot title')
 def add_ballot_title(context):
-    context.operations.add_column('ballots', Column(
-        'title_translations', HSTORE, nullable=True
-    ))
+    if not context.has_column('ballots', 'title_translations'):
+        context.operations.add_column('ballots', Column(
+            'title_translations', HSTORE, nullable=True
+        ))
 
 
 @upgrade_task('Add content columns')
@@ -472,3 +471,12 @@ def add_district_and_none_domain(context):
         ['federation', 'region', 'canton', 'municipality'],
         ['federation', 'canton', 'region', 'district', 'municipality', 'none']
     )
+
+
+@upgrade_task('Adds last result change columns')
+def add_last_result_change(context):
+    for table in ('elections', 'election_compounds', 'votes'):
+        if not context.has_column(table, 'last_result_change'):
+            context.operations.add_column(
+                table, Column('last_result_change', UTCDateTime)
+            )

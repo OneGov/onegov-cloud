@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
 from onegov.ballot.models.mixins import TitleTranslationsMixin
@@ -10,22 +11,21 @@ from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
-from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
 from sqlalchemy import Date
-from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class Vote(Base, ContentMixin, TimestampMixin,
+class Vote(Base, ContentMixin, LastModifiedMixin,
            DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
            DerivedBallotsCountMixin):
     """ A vote describes the issue being voted on. For example,
@@ -219,35 +219,39 @@ class Vote(Base, ContentMixin, TimestampMixin,
 
         return expr
 
-    @property
+    @hybrid_property
+    def last_ballot_change(self):
+        """ Returns last change of the vote, its ballots and any of its
+        results.
+
+        """
+        changes = [ballot.last_change for ballot in self.ballots]
+        changes = [change for change in changes if change]
+        return max(changes) if changes else None
+
+    @last_ballot_change.expression
+    def last_ballot_change(cls):
+        expr = select([func.max(Ballot.last_change)])
+        expr = expr.where(Ballot.vote_id == cls.id)
+        expr = expr.label('last_ballot_change')
+        return expr
+
+    @hybrid_property
     def last_modified(self):
         """ Returns last change of the vote, its ballots and any of its
         results.
 
         """
-        ballots = object_session(self).query(Ballot.last_change)
-        ballots = ballots.order_by(desc(Ballot.last_change))
-        ballots = ballots.filter(Ballot.vote_id == self.id)
-        ballots = ballots.first()[0] if ballots.first() else None
-
-        changes = [ballots, self.last_change, self.last_result_change]
+        changes = [ballot.last_change for ballot in self.ballots]
+        changes.extend([self.last_change, self.last_result_change])
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
-    @property
-    def last_result_change(self):
-        """ Returns the last change of the results of the vote. """
-
-        session = object_session(self)
-        ballot_ids = session.query(Ballot.id)
-        ballot_ids = ballot_ids.filter(Ballot.vote_id == self.id).all()
-        if not ballot_ids:
-            return None
-
-        results = session.query(BallotResult.last_change)
-        results = results.order_by(desc(BallotResult.last_change))
-        results = results.filter(BallotResult.ballot_id.in_(ballot_ids))
-        return results.first()[0] if results.first() else None
+    @last_modified.expression
+    def last_modified(cls):
+        return func.greatest(
+            cls.last_change, cls.last_result_change, cls.last_ballot_change
+        )
 
     #: may be used to store a link related to this vote
     related_link = meta_property('related_link')
@@ -262,6 +266,7 @@ class Vote(Base, ContentMixin, TimestampMixin,
         """ Clear all the results. """
 
         self.status = None
+        self.last_result_change = None
 
         for ballot in self.ballots:
             ballot.clear_results()

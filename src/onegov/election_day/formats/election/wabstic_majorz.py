@@ -342,6 +342,7 @@ def import_election_wabstic_majorz(
 
     # Add the results to the DB
     election.clear_results()
+    election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = 'unknown'
 

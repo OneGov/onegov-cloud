@@ -348,7 +348,13 @@ def import_election_internal_proporz(election, principal, file, mimetype):
 
     # Add the results to the DB
     election.clear_results()
+    election.last_result_change = election.timestamp()
     election.status = status
+    for association in election.associations:
+        association.election_compound.last_result_change = (
+            election.last_result_change
+        )
+
     result_uids = {r['entity_id']: r['id'] for r in results.values()}
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
     session = object_session(election)

@@ -229,6 +229,7 @@ def import_vote_wabstic(vote, principal, number, district,
 
     # Add the results to the DB
     vote.clear_results()
+    vote.last_result_change = vote.timestamp()
     vote.status = 'unknown'
 
     if remaining_entities == 0:

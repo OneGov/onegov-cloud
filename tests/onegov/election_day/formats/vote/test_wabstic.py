@@ -50,6 +50,7 @@ def test_import_wabstic_vote(session):
         )
         print_errors(errors)
         assert not errors
+        assert vote.last_result_change
         assert vote.status == status
         assert vote.progress == (78, 78)
         assert vote.completed == completed
@@ -64,6 +65,7 @@ def test_import_wabstic_vote(session):
         BytesIO(sg_gemeinden), 'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.one().results.count() == 78
     assert vote.yeas == 57653
@@ -86,6 +88,7 @@ def test_import_wabstic_vote(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
+        assert vote.last_result_change
         assert vote.counted
         assert vote.status == 'unknown'
         assert vote.completed
@@ -105,6 +108,7 @@ def test_import_wabstic_vote(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
+        assert vote.last_result_change
         assert not vote.completed
         assert not vote.ballots.one().results.one().counted
 
@@ -123,6 +127,7 @@ def test_import_wabstic_vote(session):
         BytesIO(sg_gemeinden), 'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 3
     assert vote.proposal.yeas == 1596

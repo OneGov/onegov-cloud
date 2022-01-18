@@ -24,6 +24,7 @@ def test_import_wabstic_majorz(session, import_test_datasets):
     )
 
     assert not errors
+    assert election.last_result_change
     assert election.completed
     assert election.progress == (78, 78)
     assert election.results.count() == 78

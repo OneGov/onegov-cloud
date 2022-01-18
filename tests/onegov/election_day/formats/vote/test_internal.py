@@ -24,6 +24,7 @@ def test_import_internal_vote(session, import_test_datasets):
     )
     assert not errors
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 40.91
@@ -45,6 +46,7 @@ def test_import_internal_vote(session, import_test_datasets):
         'text/plain')
 
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 40.91

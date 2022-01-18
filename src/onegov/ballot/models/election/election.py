@@ -1,11 +1,11 @@
 from collections import OrderedDict
-
 from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
 from onegov.ballot.models.mixins import TitleTranslationsMixin
@@ -13,11 +13,9 @@ from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
-from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
-from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
@@ -29,7 +27,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class Election(Base, ContentMixin, TimestampMixin,
+class Election(Base, ContentMixin, LastModifiedMixin,
                DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
                DerivedAttributesMixin):
 
@@ -211,48 +209,6 @@ class Election(Base, ContentMixin, TimestampMixin,
         return expr
 
     @property
-    def last_modified(self):
-        """ Returns last change of the election, its candidates and any of its
-        results.
-
-        """
-        candidates = object_session(self).query(Candidate.last_change)
-        candidates = candidates.order_by(desc(Candidate.last_change))
-        candidates = candidates.filter(Candidate.election_id == self.id)
-        candidates = candidates.first()[0] if candidates.first() else None
-
-        changes = [candidates, self.last_change, self.last_result_change]
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
-
-    @property
-    def last_result_change(self):
-        """ Returns the last change of the results of the election and the
-        candidates.
-
-        """
-
-        session = object_session(self)
-
-        results = session.query(ElectionResult.last_change)
-        results = results.order_by(desc(ElectionResult.last_change))
-        results = results.filter(ElectionResult.election_id == self.id)
-        results = results.first()[0] if results.first() else None
-
-        ids = session.query(Candidate.id)
-        ids = ids.filter(Candidate.election_id == self.id).all()
-        if not ids:
-            return results
-
-        candidates = session.query(CandidateResult.last_change)
-        candidates = candidates.order_by(desc(CandidateResult.last_change))
-        candidates = candidates.filter(CandidateResult.candidate_id.in_(ids))
-        candidates = candidates.first()[0] if candidates.first() else None
-
-        changes = [change for change in (results, candidates) if change]
-        return max(changes) if changes else None
-
-    @property
     def elected_candidates(self):
         """ Returns the first and last names of the elected candidates. """
 
@@ -315,6 +271,7 @@ class Election(Base, ContentMixin, TimestampMixin,
 
         self.absolute_majority = None
         self.status = None
+        self.last_result_change = None
 
         session = object_session(self)
         session.query(Candidate).filter(

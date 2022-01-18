@@ -37,6 +37,7 @@ def test_import_wabsti_vote(session):
             vote, principal, number, BytesIO(csv), 'text/plain'
         )
         assert not errors
+        assert vote.last_result_change
         assert vote.completed
         assert vote.ballots.one().results.count() == 78
         assert vote.yeas == yeas
@@ -56,6 +57,7 @@ def test_import_wabsti_vote(session):
         vote, principal, 5, BytesIO(csv), 'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 3
     assert round(vote.turnout, 1) == 43.3

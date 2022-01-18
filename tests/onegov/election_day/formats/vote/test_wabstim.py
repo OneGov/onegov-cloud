@@ -27,6 +27,7 @@ def test_import_wabstim_vote(session):
         vote, principal, BytesIO(xlsx), 'application/excel'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 47.44

@@ -44,6 +44,7 @@ def test_import_default_vote(session):
         'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 61.34
@@ -77,6 +78,7 @@ def test_import_default_vote(session):
         'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 38.41
@@ -113,6 +115,7 @@ def test_import_default_vote(session):
         'text/plain'
     )
     assert not errors
+    assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 37.99

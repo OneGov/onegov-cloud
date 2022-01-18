@@ -292,6 +292,7 @@ def import_election_wabsti_majorz(
         )
 
     election.clear_results()
+    election.last_result_change = election.timestamp()
     election.number_of_mandates = mandates
     election.absolute_majority = majority
 
