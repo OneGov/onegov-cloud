@@ -70,9 +70,9 @@ def test_sms_queue_processor(election_day_app_zg, temporary_directory):
     ]
 
 
-def test_sms_queue_processor_failed(election_day_app, temporary_directory):
+def test_sms_queue_processor_failed(election_day_app_zg, temporary_directory):
     sms_path = os.path.join(
-        temporary_directory, 'sms', election_day_app.schema
+        temporary_directory, 'sms', election_day_app_zg.schema
     )
     os.makedirs(sms_path)
 
