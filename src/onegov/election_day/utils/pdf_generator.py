@@ -1002,8 +1002,7 @@ class PdfGenerator():
         existing = fs.listdir(self.pdf_dir)
 
         def render_item(item):
-            completed = item.completed
-            if completed:
+            if item.completed:
                 return True
             counted, total = item.progress
             if counted == 0:
@@ -1013,11 +1012,6 @@ class PdfGenerator():
                 return False
             if isinstance(item, Vote) and publish.get('vote'):
                 return True
-            if isinstance(item, Election) and publish.get('election'):
-                raise NotImplementedError
-            if isinstance(item, ElectionCompound):
-                if publish.get('election_compound'):
-                    raise NotImplementedError
             return False
 
         # Generate the PDFs
