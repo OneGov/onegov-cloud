@@ -95,8 +95,8 @@ def test_generate_svg(election_day_app_gr, session):
             f'election-{hp}.{ts}.party-strengths.de_CH.svg',
             f'election-{hp}.{ts}.parties-panachage.de_CH.svg',
             f'election-{hp}.{ts}.lists-panachage.de_CH.svg',
-            f'election-{hc}.{ts}.party-strengths.de_CH.svg',
-            f'election-{hc}.{ts}.parties-panachage.de_CH.svg',
+            f'elections-{hc}.{ts}.party-strengths.de_CH.svg',
+            f'elections-{hc}.{ts}.parties-panachage.de_CH.svg',
             f'ballot-{hb}.{ts}.entities-map.de_CH.svg',
             f'ballot-{hb}.{ts}.districts-map.de_CH.svg',
             f'ballot-{hb}.{ts}.entities-map.it_CH.svg'

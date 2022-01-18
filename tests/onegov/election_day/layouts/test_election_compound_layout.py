@@ -111,21 +111,21 @@ def test_election_compound_layout_general(session):
         request.app.filestorage = Mock()
 
         layout = ElectionCompoundLayout(compound, request)
-        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
-        assert layout.svg_path == f'svg/election-{ts}.None.any.svg'
+        assert layout.pdf_path == f'pdf/elections-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/elections-{ts}.None.any.svg'
         assert layout.svg_link == 'ElectionCompound/None-svg'
         assert layout.svg_name == 'electioncompound.svg'
 
         layout = ElectionCompoundLayout(compound, request, 'party-strengths')
-        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
-        assert layout.svg_path == f'svg/election-{ts}.party-strengths.any.svg'
+        assert layout.pdf_path == f'pdf/elections-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/elections-{ts}.party-strengths.any.svg'
         assert layout.svg_link == 'ElectionCompound/party-strengths-svg'
         assert layout.svg_name == 'electioncompound-party-strengths.svg'
 
         layout = ElectionCompoundLayout(compound, request, 'parties-panachage')
-        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
+        assert layout.pdf_path == f'pdf/elections-{ts}.de.pdf'
         assert (
-            layout.svg_path == f'svg/election-{ts}.parties-panachage.any.svg'
+            layout.svg_path == f'svg/elections-{ts}.parties-panachage.any.svg'
         )
         assert layout.svg_link == 'ElectionCompound/parties-panachage-svg'
         assert layout.svg_name == 'electioncompound-panachage.svg'

@@ -387,8 +387,9 @@ def test_manage_layouts_clear_media(election_day_app_zg):
         f'svg/election-{hash}.{timestamp}.lists.any.svg',
         f'svg/election-{hash}.{timestamp}.parties-panachage.any.svg',
         f'svg/election-{hash}.{timestamp-5}.parties-panachage.any.svg',
-        f'svg/election-{hash}.{timestamp}.mandate-allocation.any.svg',
-        f'svg/election-{hash}.{timestamp-5}.mandate-allocation.any.svg',
+        f'pdf/elections-{hash}.{timestamp}.de_CH.pdf',
+        f'svg/elections-{hash}.{timestamp}.mandate-allocation.any.svg',
+        f'svg/elections-{hash}.{timestamp-5}.mandate-allocation.any.svg',
         f'pdf/vote-{hash}.{timestamp}.rm_CH.pdf',
         f'svg/vote-{hash}.{timestamp}.proposal-entities.any.svg',
         f'svg/vote-{hash}.{timestamp-5}.proposal-entities.any.svg',
@@ -401,7 +402,7 @@ def test_manage_layouts_clear_media(election_day_app_zg):
 
     model = session.query(ElectionCompound).one()
     layout = ManageElectionCompoundsLayout(model, request)
-    assert layout.clear_media() == 1
+    assert layout.clear_media() == 2
 
     model = session.query(Vote).one()
     layout = ManageVotesLayout(model, request)
