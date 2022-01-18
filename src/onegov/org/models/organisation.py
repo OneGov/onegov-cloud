@@ -151,6 +151,7 @@ class Organisation(Base, TimestampMixin):
     footer_right_width = meta_property(default=4)
 
     # Newsletter settings
+    show_newsletter = meta_property()
     logo_in_newsletter = meta_property(default=False)
 
     # Chat Settings

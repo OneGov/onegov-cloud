@@ -523,8 +523,10 @@
                 <small tal:condition="show_all_news_link|nothing">
                     <a href="${layout.news_url}">
                         <i class="fas fa-chevron-right" aria-hidden="true"></i><span i18n:translate>All articles</span></a>
-                    <span> / </span>
-                    <a href="${layout.newsletter_url}"><span i18n:translate>Newsletter</span></a>
+                    <tal:b condition="layout.org.show_newsletter">
+                        <span> / </span>
+                        <a href="${layout.newsletter_url}"><span i18n:translate>Newsletter</span></a>
+                    </tal:b>    
                 </small>
             </h3>
         </div>
