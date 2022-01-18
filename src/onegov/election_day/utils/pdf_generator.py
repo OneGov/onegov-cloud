@@ -1,7 +1,6 @@
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
-from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import log
 from onegov.election_day.pdf import Pdf
@@ -984,11 +983,25 @@ class PdfGenerator():
         """ Generates all PDFs for the given application.
 
         Only generates PDFs if not already generated since the last change of
-        the election or vote.
+        the election, election compound or vote.
 
-        Optionally cleans up unused PDFs.
+        Cleans up unused files.
 
         """
+
+        publish = self.app.principal.publish_intermediate_results
+
+        def render_item(item):
+            if item.completed:
+                return True
+            counted, total = item.progress
+            if counted == 0:
+                return False
+            if not publish:
+                return False
+            if isinstance(item, Vote) and publish.get('vote'):
+                return True
+            return False
 
         # Get all elections and votes
         items = self.session.query(Election).all()
@@ -1001,29 +1014,15 @@ class PdfGenerator():
             fs.makedir(self.pdf_dir)
         existing = fs.listdir(self.pdf_dir)
 
-        def render_item(item):
-            if item.completed:
-                return True
-            counted, total = item.progress
-            if counted == 0:
-                return False
-            publish = self.app.principal.publish_intermediate_results
-            if not publish:
-                return False
-            if isinstance(item, Vote) and publish.get('vote'):
-                return True
-            return False
-
         # Generate the PDFs
-        created = []
+        created = 0
+        filenames = []
         for locale in self.app.locales:
             for item in items:
-                last_modified = item.last_modified
-                filename = pdf_filename(
-                    item, locale, last_modified=last_modified
-                )
-                created.append(filename.split('.')[0])
+                filename = pdf_filename(item, locale)
+                filenames.append(filename)
                 if filename not in existing and render_item(item):
+                    created += 1
                     path = '{}/{}'.format(self.pdf_dir, filename)
                     if fs.exists(path):
                         fs.remove(path)
@@ -1039,18 +1038,8 @@ class PdfGenerator():
                         if fs.exists(path):
                             fs.remove(path)
 
-        # Delete old PDFs
-        existing = fs.listdir(self.pdf_dir)
-        existing = dict(groupbylist(
-            sorted(existing),
-            key=lambda a: a.split('.')[0]
-        ))
+        # Delete obsolete PDFs
+        obsolete = set(existing) - set(filenames)
+        self.remove(self.pdf_dir, obsolete)
 
-        # ... orphaned files
-        for id in set(existing.keys()) - set(created):
-            self.remove(self.pdf_dir, existing[id])
-
-        # ... old files
-        for files in existing.values():
-            files = sorted(files, reverse=True)
-            self.remove(self.pdf_dir, files[len(self.app.locales):])
+        return created, len(obsolete)
