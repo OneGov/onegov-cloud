@@ -60,7 +60,10 @@ def test_registration_ticket_workflow(client):
 
     count = 0
 
-    def register(client, data_in_email, accept_ticket=True, url='/form/meetup'):
+    def register(
+        client, data_in_email,
+        accept_ticket=True, url='/form/meetup'
+    ):
         nonlocal count
         count += 1
         with freeze_time('2018-01-01'):
@@ -189,3 +192,44 @@ def test_registration_ticket_workflow(client):
         '.delete-link.confirm').attr('ic-delete-from')
 
     client.delete(form_delete_link, status=200)
+
+
+def test_form_group_sort(client):
+    client.login_editor()
+
+    groups = ['Aaaantelope', 'Allgemein', 'Apple', 'Zzzebra']
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = "There are many like it, but this one's mine"
+    form_page.form['group'] = "Zzzebra"
+    form_page.form['definition'] = "E-Mail * = @@@"
+    form_page = form_page.form.submit()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Formiorm"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = "There are many like it, but this one's mine"
+    form_page.form['group'] = "Apple"
+    form_page.form['definition'] = "E-Mail * = @@@"
+    form_page = form_page.form.submit()
+
+    form_page = client.get('/external-links/new')
+    form_page.form['title'] = "My Formius"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['url'] = "https://example.ch"
+    form_page.form['group'] = "Apple"
+    form_page = form_page.form.submit()
+
+    form_page = client.get('/external-links/new')
+    form_page.form['title'] = "My Formeros"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['url'] = "https://example.ch"
+    form_page.form['group'] = "Aaaantelope"
+    form_page = form_page.form.submit()
+
+    page = client.get('/forms')
+
+    assert groups == page.pyquery(
+        '.page-content-main h2').text().strip().split(' ')
