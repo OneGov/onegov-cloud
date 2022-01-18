@@ -110,7 +110,7 @@ class ElectionDayApp(Framework, FormApp, UserApp):
             }).encode('utf-8')
 
             dest_path = os.path.join(
-                path, '{}.{}'.format(index, timestamp)
+                path, '{}.{}.{}'.format(index, len(receiver_batch), timestamp)
             )
 
             FileDataManager.write_file(payload, dest_path)

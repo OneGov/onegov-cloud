@@ -24,6 +24,7 @@ def test_send_sms(election_day_app, temporary_directory):
     )
     sms = os.listdir(path)
     assert len(sms) == 1
+    assert sms[0].startswith('0.1.')
 
     with open(os.path.join(path, sms[0])) as file:
         data = json.loads(file.read())
@@ -44,6 +45,9 @@ def test_send_sms_batch(election_day_app, temporary_directory):
     )
     sms = sorted(os.listdir(path))
     assert len(sms) == 3
+    assert sms[0].startswith('0.1000.')
+    assert sms[1].startswith('1.1000.')
+    assert sms[2].startswith('2.700.')
 
     with open(os.path.join(path, sms[0])) as file:
         data = json.loads(file.read())

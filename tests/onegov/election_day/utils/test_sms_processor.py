@@ -13,7 +13,7 @@ def test_sms_queue_processor(election_day_app, temporary_directory):
     os.makedirs(sms_path)
 
     qp = SmsQueueProcessor(sms_path, 'username', 'password')
-    qp.send = Mock()
+    qp.send = Mock(return_value=None)
 
     def create(name, receivers, content='Fancy new results!'):
         with open(os.path.join(sms_path, name), 'w') as f:
@@ -25,8 +25,8 @@ def test_sms_queue_processor(election_day_app, temporary_directory):
         ['one', ['+41791112233'], 'Fancy new results'],
         ['batch', ['+41794445566', '+41794445577'], 'Fancy new results'],
         ['0.000000', ['+41791112233'], 'Fancy new results'],
-        ['0.054981', ['+41794445566'], 'Fancy new results'],
-        ['0.aeerwe', ['+41797778899'], 'Fancy new results'],
+        ['0.1.054981', ['+41794445566'], 'Fancy new results'],
+        ['0.1.aeerwe', ['+41797778899'], 'Fancy new results'],
         ['0.89791.98766', ['+41791112233'], 'Fancy new results'],
         ['0.1.2.3.4.-.334', ['+41794445566'], 'Fancy new results'],
         ['wo03.03002.', ['+41797778899'], 'Fancy new results'],
@@ -70,18 +70,41 @@ def test_sms_queue_processor(election_day_app, temporary_directory):
     ]
 
 
+def test_sms_queue_processor_failed(election_day_app, temporary_directory):
+    sms_path = os.path.join(
+        temporary_directory, 'sms', election_day_app.schema
+    )
+    os.makedirs(sms_path)
+
+    qp = SmsQueueProcessor(sms_path, 'username', 'password')
+    qp.send = Mock(return_value={'StatusCode': '0'})
+
+    filename = '0.1.0.0'
+    with open(os.path.join(sms_path, filename), 'w') as f:
+        f.write(json.dumps({
+            'receivers': ['+41791112233'],
+            'content': 'Fancy new results'
+        }))
+
+    qp.send_messages()
+    assert qp.send.called
+    assert not os.path.exists(os.path.join(sms_path, filename))
+    assert os.path.exists(os.path.join(sms_path, '.failed-' + filename))
+
+
 def test_sms_queue_processor_send():
     processor = SmsQueueProcessor('path', 'username', 'password')
     processor.send_request = Mock()
 
     processor.send_request.return_value = (200, '{}')
-    with raises(RuntimeError):
-        processor.send(['1234'], 'content')
+    assert processor.send(['1234'], 'content') == {}
 
     processor.send_request.return_value = (
         200, '{"StatusInfo": "ERROR", "StatusCode": "0"}')
-    with raises(RuntimeError):
-        processor.send(['1234'], 'content')
+    assert processor.send(['1234'], 'content') == {
+        'StatusInfo': 'ERROR',
+        'StatusCode': '0'
+    }
 
     processor.send_request.return_value = (500, 'Error')
     with raises(RuntimeError):
@@ -89,4 +112,4 @@ def test_sms_queue_processor_send():
 
     processor.send_request.return_value = (
         200, '{"StatusInfo": "OK", "StatusCode": "1"}')
-    processor.send(['1234'], 'content')
+    assert processor.send(['1234'], 'content') == None

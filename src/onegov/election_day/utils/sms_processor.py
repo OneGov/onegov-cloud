@@ -149,6 +149,10 @@ class SmsQueueProcessor(object):
         return tuple(os.path.join(self.path, f.name) for f in files)
 
     def send(self, numbers, content):
+        """ Sends the SMS and returns the API response on error.
+
+            On success this returns None.
+        """
         code, body = self.send_request({
             "UserName": self.username,
             "Password": self.password,
@@ -163,7 +167,8 @@ class SmsQueueProcessor(object):
         result = json.loads(body)
 
         if result.get('StatusInfo') != 'OK' or result.get('StatusCode') != '1':
-            raise RuntimeError(f'Sending SMS failed, got: "{result}"')
+            return result
+        return None
 
     def send_request(self, parameters):
         """ Performes the API request using the given parameters. """
@@ -216,6 +221,7 @@ class SmsQueueProcessor(object):
         head, tail = os.path.split(filename)
         tmp_filename = os.path.join(head, f'.sending-{tail}')
         rejected_filename = os.path.join(head, f'.rejected-{tail}')
+        failed_filename = os.path.join(head, f'.failed-{tail}')
 
         # perform a series of operations in an attempt to ensure
         # that no two threads/processes send this message
@@ -297,9 +303,20 @@ class SmsQueueProcessor(object):
         # read message file and send contents
         numbers, message = self.parse(filename)
         if numbers and message:
-            self.send(numbers, message)
-            log.info("SMS to {} sent.".format(', '.join(numbers)))
+            status = self.send(numbers, message)
+            if status is None:
+                log.info("SMS to {} sent.".format(', '.join(numbers)))
+            else:
+                # this should cause stderr output, which
+                # will write the cronjob output to chat
+                log.error(
+                    f"Failed sending SMS batch {filename} with "
+                    f"API response {status}"
+                )
+                os.link(filename, failed_filename)
         else:
+            # this should cause stderr output, which
+            # will write the cronjob output to chat
             log.error(
                 f"Discarding SMS batch {filename} due to invalid "
                 "content/numbers"
