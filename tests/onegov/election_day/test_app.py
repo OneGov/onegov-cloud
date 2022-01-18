@@ -32,16 +32,16 @@ def test_send_sms(election_day_app_zg, temporary_directory):
         assert data['content'] == 'text'
 
 
-def test_send_sms_batch(election_day_app, temporary_directory):
-    election_day_app.send_sms(
+def test_send_sms_batch(election_day_app_zg, temporary_directory):
+    election_day_app_zg.send_sms(
         [f'+4179111{digits}' for digits in range(1000, 3700)],
         'text'
     )
     transaction.commit()
 
     path = os.path.join(
-        election_day_app.configuration['sms_directory'],
-        election_day_app.schema
+        election_day_app_zg.configuration['sms_directory'],
+        election_day_app_zg.schema
     )
     sms = sorted(os.listdir(path))
     assert len(sms) == 3
