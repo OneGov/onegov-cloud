@@ -1,8 +1,32 @@
 # Changes
 
+## 2022.7
+
+`2022-01-19` | [1ab8ecb547...936c6fc4f7](https://github.com/OneGov/onegov-cloud/compare/1ab8ecb547^...936c6fc4f7)
+
+### Election Day
+
+##### Allows SMS to be sent to multiple recipients at once.
+
+`Feature` | [155](https://github.com/onegov/onegov-cloud/issues/155) | [936c6fc4f7](https://github.com/onegov/onegov-cloud/commit/936c6fc4f713cdb1519b2e06efb6c2d4e17eed18)
+
+##### Fixes purging old SVGs and PDFs for large numbers not possible.
+
+`Bugfix` | [35b5389362](https://github.com/onegov/onegov-cloud/commit/35b5389362335bb50641365f139aaffe98d8aca1)
+
+### Town6
+
+##### Remove margin of alert-box on homepage.
+
+`Bugfix` | [OGC-202](https://linear.app/onegovcloud/issue/OGC-202) | [1ab8ecb547](https://github.com/onegov/onegov-cloud/commit/1ab8ecb547c6ac61d80af9af4caab47a47e88ed4)
+
+##### Link images from events on the home page.
+
+`Bugfix` | [OGC-203](https://linear.app/onegovcloud/issue/OGC-203) | [a8daa373a8](https://github.com/onegov/onegov-cloud/commit/a8daa373a82b4a7272191ae4c787b2af19980dfc)
+
 ## 2022.6
 
-`2022-01-18` | [0c38fb0d05...2c589dc418](https://github.com/OneGov/onegov-cloud/compare/0c38fb0d05^...2c589dc418)
+`2022-01-18` | [0c38fb0d05...98e29a2470](https://github.com/OneGov/onegov-cloud/compare/0c38fb0d05^...98e29a2470)
 
 ### Election Day
 
@@ -1255,18 +1279,4 @@ Prevents double entries by joining on activity and invoice references.
 - Remove mission count from /mission-reports table
 
 `Other` | [673cf13b7b](https://github.com/onegov/onegov-cloud/commit/673cf13b7b55738536554cedf022e7f4d1576561)
-
-## 2021.58
-
-`2021-06-15` | [5efda0b90f...d8ebec8a12](https://github.com/OneGov/onegov-cloud/compare/5efda0b90f^...d8ebec8a12)
-
-### Election Day
-
-##### Show when the last update date on the upload forms.
-
-`Feature` | [ZW-320](https://kanton-zug.atlassian.net/browse/ZW-320) | [e43a5de27b](https://github.com/onegov/onegov-cloud/commit/e43a5de27b2ea0b230776abfe547ec1d7ca8c211)
-
-##### Show the last notifications on the notification screens.
-
-`Feature` | [ZW-320](https://kanton-zug.atlassian.net/browse/ZW-320) | [b2abe8b3de](https://github.com/onegov/onegov-cloud/commit/b2abe8b3de39eb84dbd32be83986e47042ae6f3b)
 
