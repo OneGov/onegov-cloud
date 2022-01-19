@@ -11,6 +11,7 @@ from onegov.election_day import _
 from onegov.election_day.models.subscriber import EmailSubscriber
 from onegov.election_day.models.subscriber import SmsSubscriber
 from onegov.election_day.utils import get_summary
+from sqlalchemy import func
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
@@ -207,13 +208,17 @@ class SmsNotification(Notification):
     def send_sms(self, request, content):
         """ Sends the given text to all subscribers. """
 
-        subscribers = request.session.query(SmsSubscriber).all()
-        for subscriber in subscribers:
-            translator = request.app.translations.get(subscriber.locale)
+        subscribers = request.session.query(
+            SmsSubscriber.locale,
+            func.array_agg(SmsSubscriber.address),
+        ).group_by(SmsSubscriber.locale).order_by(SmsSubscriber.locale)
+
+        for locale, addresses in subscribers:
+            translator = request.app.translations.get(locale)
             translated = translator.gettext(content) if translator else content
             translated = content.interpolate(translated)
 
-            request.app.send_sms(subscriber.address, translated)
+            request.app.send_sms(addresses, translated)
 
     def trigger(self, request, model):
         """ Posts a link to the vote or election to all subscribers.
