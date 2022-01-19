@@ -480,3 +480,11 @@ def add_last_result_change(context):
             context.operations.add_column(
                 table, Column('last_result_change', UTCDateTime)
             )
+
+
+@upgrade_task('Adds voters count to party results')
+def add_voters_count(context):
+    if not context.has_column('party_results', 'voters_count'):
+        context.operations.add_column(
+            'party_results', Column('voters_count', Integer)
+        )

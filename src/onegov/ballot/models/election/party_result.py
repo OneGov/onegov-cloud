@@ -18,20 +18,23 @@ class PartyResult(Base, TimestampMixin):
     #: the election or election  compound this result belongs to
     owner = Column(Text, nullable=False)
 
-    # number of mandates
+    #: the number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
-    # votes
+    #: the number of votes
     votes = Column(Integer, nullable=False, default=lambda: 0)
 
-    # total votes
+    #: the number of total votes
     total_votes = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: name of the party
+    #: the voters count (the proportionals number of votes)
+    voters_count = Column(Integer, nullable=True, default=lambda: 0)
+
+    #: the name of the party
     name = Column(Text, nullable=False)
 
-    #: year
+    #: the year
     year = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: color code
+    #: the color code
     color = Column(Text, nullable=True)

@@ -65,7 +65,8 @@ class PartyResultExportMixin(object):
                 'total_votes': result.total_votes,
                 'color': result.color,
                 'mandates': result.number_of_mandates,
-                'votes': result.votes
+                'votes': result.votes,
+                'voters_count': result.voters_count
             }
             parties |= set([result.name])
 
@@ -92,6 +93,7 @@ class PartyResultExportMixin(object):
                 row['color'] = result.get('color', '')
                 row['mandates'] = result.get('mandates', '')
                 row['votes'] = result.get('votes', '')
+                row['voters_count'] = result.get('voters_count', '')
 
                 # add the panachage results
                 if self.panachage_results.count():
