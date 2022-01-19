@@ -16,17 +16,14 @@ class SvgGenerator():
         self.renderer = renderer or D3Renderer(app)
 
     def remove(self, directory, files):
-        """ Safely removes the given files from the directory. Allows to use
-        wildcards.
-
-        """
+        """ Safely removes the given files from the directory. """
         if not files:
             return
 
         fs = self.app.filestorage
-        for file in fs.filterdir(directory, files=files):
-            path = '{}/{}'.format(directory, file.name)
-            if fs.exists(path) and not file.is_dir:
+        for file in files:
+            path = '{}/{}'.format(directory, file)
+            if fs.exists(path) and not fs.isdir(path):
                 fs.remove(path)
 
     def generate_svg(self, item, type_, filename, locale=None):
@@ -35,10 +32,6 @@ class SvgGenerator():
         Returns the number of created files.
 
         """
-
-        path = '{}/{}'.format(self.svg_dir, filename)
-        if self.app.filestorage.exists(path):
-            self.app.filestorage.remove(path)
 
         chart = None
         if type_ == 'candidates':
@@ -58,6 +51,7 @@ class SvgGenerator():
         if type_ == 'districts-map':
             chart = self.renderer.get_districts_map(item, 'svg', locale)
         if chart:
+            path = '{}/{}'.format(self.svg_dir, filename)
             with self.app.filestorage.open(path, 'w') as f:
                 copyfileobj(chart, f)
             log.info("{} created".format(filename))

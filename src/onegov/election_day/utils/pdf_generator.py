@@ -32,17 +32,14 @@ class PdfGenerator():
         self.renderer = renderer or D3Renderer(app)
 
     def remove(self, directory, files):
-        """ Safely removes the given files from the directory. Allows to use
-        wildcards.
-
-        """
+        """ Safely removes the given files from the directory. """
         if not files:
             return
 
         fs = self.app.filestorage
-        for file in fs.filterdir(directory, files=files):
-            path = '{}/{}'.format(directory, file.name)
-            if fs.exists(path) and not file.is_dir:
+        for file in files:
+            path = '{}/{}'.format(directory, file)
+            if fs.exists(path) and not fs.isdir(path):
                 fs.remove(path)
 
     def sign_pdf(self, path):

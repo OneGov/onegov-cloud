@@ -125,14 +125,11 @@ def generate_media():
         click.secho(f'Generating media for {app.schema}', fg='yellow')
         renderer = D3Renderer(app)
 
-        created_svgs, removed_svgs = SvgGenerator(app, renderer).create_svgs()
-        created_pdfs, removed_pdfs = PdfGenerator(app, renderer).create_pdfs()
-        click.secho(
-            f'Generated {created_svgs} SVGs / {created_pdfs} PDFs, '
-            f'removed {removed_svgs} SVGs / {removed_pdfs} PDFs '
-            f'for {app.schema}',
-            fg='green'
-        )
+        created, purged = SvgGenerator(app, renderer).create_svgs()
+        click.secho(f'Generated {created} SVGs, purged {purged}', fg='green')
+
+        created, purged = PdfGenerator(app, renderer).create_pdfs()
+        click.secho(f'Generated {created} PDFs, purged {purged}', fg='green')
 
     return generate
 
