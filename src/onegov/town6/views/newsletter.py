@@ -12,15 +12,19 @@ from onegov.org.forms import NewsletterTestForm
 from onegov.org.forms import SignupForm
 from onegov.town6.layout import NewsletterLayout, RecipientLayout, \
     DefaultMailLayout
+from webob.exc import HTTPNotFound
 
 
 @TownApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
               permission=Public, form=SignupForm)
 def town_handle_newsletters(self, request, form):
-    return handle_newsletters(
-        self, request, form, NewsletterLayout(self, request),
-        DefaultMailLayout(self, request)
-    )
+    if request.app.org.show_newsletter:
+        return handle_newsletters(
+            self, request, form, NewsletterLayout(self, request),
+            DefaultMailLayout(self, request)
+        )
+    else:
+        raise HTTPNotFound()
 
 
 @TownApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
