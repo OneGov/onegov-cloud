@@ -7,14 +7,15 @@ from onegov.ballot import ElectionCompound
 from onegov.core.custom import json
 from onegov.core.utils import module_path
 from onegov.election_day import _
-from onegov.election_day.utils.ballot import get_ballot_data_by_district
-from onegov.election_day.utils.ballot import get_ballot_data_by_entity
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_connections_data
 from onegov.election_day.utils.election import get_lists_data
 from onegov.election_day.utils.election import get_lists_panachage_data
 from onegov.election_day.utils.election import get_parties_panachage_data
 from onegov.election_day.utils.election import get_party_results_data
+from onegov.election_day.utils.election_compound import get_list_groups_data
+from onegov.election_day.utils.vote import get_ballot_data_by_district
+from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from requests import post
 from rjsmin import jsmin
 
@@ -120,6 +121,15 @@ class D3Renderer():
         })
 
         return self.get_chart('{}-map'.format(map), fmt, data, width, params)
+
+    def get_list_groups_chart(self, item, fmt, return_data=False):
+        chart = None
+        data = None
+        if isinstance(item, Election) or isinstance(item, ElectionCompound):
+            data = get_list_groups_data(item)
+            if data and data.get('results'):
+                chart = self.get_chart('bar', fmt, data)
+        return (chart, data) if return_data else chart
 
     def get_lists_chart(self, item, fmt, return_data=False):
         chart = None

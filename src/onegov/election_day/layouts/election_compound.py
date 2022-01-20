@@ -13,7 +13,7 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'lists', 'districts', 'candidates', 'statistics'
+        'list-groups', 'lists', 'districts', 'candidates', 'statistics'
     )
 
     @cached_property
@@ -28,6 +28,7 @@ class ElectionCompoundLayout(DetailLayout):
     def all_tabs(self):
         """ Return the tabs in order of their appearance. """
         return (
+            'list-groups',
             'lists',
             'districts',
             'candidates',
@@ -68,6 +69,8 @@ class ElectionCompoundLayout(DetailLayout):
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
 
+        if tab == 'list-groups':
+            return _("List groups")
         if tab == 'lists':
             return _("Lists")
         if tab == 'districts':
@@ -93,12 +96,17 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         if self.hide_tab(tab):
             return False
+        if tab == 'list-groups':
+            return (
+                self.model.show_list_groups is True
+                and self.has_party_results
+            )
         if tab == 'lists':
             return self.model.show_lists is True
         if tab == 'mandate-allocation':
             return (
                 self.model.show_mandate_allocation is True
-                and self.model.party_results.first() is not None
+                and self.has_party_results
             )
         if tab == 'party-strengths':
             return (
@@ -108,7 +116,7 @@ class ElectionCompoundLayout(DetailLayout):
         if tab == 'parties-panachage':
             return (
                 self.model.show_party_panachage is True
-                and self.model.panachage_results.first() is not None
+                and self.has_party_results
             )
 
         return True

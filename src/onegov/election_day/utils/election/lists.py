@@ -1,14 +1,14 @@
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
+from collections import OrderedDict
 from itertools import groupby
-
-from onegov.ballot import List, ElectionCompound
+from onegov.ballot import List
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path
 from onegov.election_day import _
-from sqlalchemy import desc, select
-from sqlalchemy.orm import object_session
-
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
+from sqlalchemy import desc
+from sqlalchemy import select
+from sqlalchemy.orm import object_session
 
 
 def get_aggregated_list_results(election, session, use_checks=False):
@@ -95,11 +95,6 @@ def get_aggregated_list_results(election, session, use_checks=False):
 def get_list_results(election, limit=None, names=None):
     """ Returns the aggregated list results as list. """
 
-    if isinstance(election, ElectionCompound):
-        if election.after_pukelsheim:
-            return election.get_list_results(order_by='number_of_mandates')
-        return election.get_list_results()
-
     session = object_session(election)
     result = session.query(
         List.name, List.votes.label('votes'),
@@ -121,40 +116,6 @@ def get_lists_data(election, limit=None, names=None, mandates_only=False):
     completed = election.completed
     colors = election.colors
     default_color = '#999' if election.colors else ''
-
-    if isinstance(election, ElectionCompound):
-        if not mandates_only:
-            return {
-                'results': [
-                    {
-                        'text': list_.name,
-                        'value': list_.votes,
-                        'value2': list_.number_of_mandates,
-                        'class': 'active' if completed else 'inactive',
-                        'color': colors.get(list_.name) or default_color
-                    }
-                    for list_ in election.get_list_results(
-                        limit=limit, names=names
-                    )
-                ]
-            }
-        else:
-            return {
-                'results': [
-                    {
-                        'text': list_.name,
-                        'value': list_.number_of_mandates,
-                        'value2': None,
-                        'class': 'active' if completed else 'inactive',
-                        'color': colors.get(list_.name) or default_color
-                    }
-                    for list_ in election.get_list_results(
-                        limit=limit,
-                        names=names,
-                        order_by='number_of_mandates'
-                    )
-                ]
-            }
 
     if election.type == 'majorz':
         return {
@@ -187,7 +148,6 @@ def get_lists_panachage_data(election, request):
     chart.
 
     """
-    # Fixme: Rewrite this function, it is very confusing what is does and why
     if election.type == 'majorz':
         return {}
 

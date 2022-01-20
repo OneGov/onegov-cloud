@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 08:10+0100\n"
-"PO-Revision-Date: 2022-01-17 10:08+0100\n"
+"POT-Creation-Date: 2022-01-20 10:43+0100\n"
+"PO-Revision-Date: 2022-01-20 08:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -356,6 +356,17 @@ msgstr "Ebene der Wahlen"
 msgid "Elections"
 msgstr "Wahlen"
 
+msgid "List groups"
+msgstr "Listengruppen"
+
+msgid "Shows a tab with list group results. Requires party results."
+msgstr ""
+"Zeigt eine Registerkarte mit Listengruppenergebnissen an. Erfordert "
+"Parteiergebnisse."
+
+msgid "Views"
+msgstr "Ansichten"
+
 msgid "Lists"
 msgstr "Listen"
 
@@ -367,9 +378,6 @@ msgstr ""
 "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle Wahlen. "
 "Erfordert, dass alle Wahlen dieselben Listen verwenden. Achtung, die Anzahl "
 "der Stimmen ist nicht wirklich aussagekräftig."
-
-msgid "Views"
-msgstr "Ansichten"
 
 msgid "Mandate allocation"
 msgstr "Sitzzuteilung"
@@ -848,6 +856,12 @@ msgstr "Alle Kandidierenden"
 msgid "Elected candidates only"
 msgstr "Nur gewählte Kandidierende"
 
+msgid "List group"
+msgstr "Listengruppe"
+
+msgid "Voters count"
+msgstr "Wählerzahl"
+
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
 
@@ -984,9 +998,6 @@ msgstr ""
 
 msgid "Year"
 msgstr "Jahr"
-
-msgid "Voters count"
-msgstr "Wählerzahl"
 
 msgid "Difference"
 msgstr "Differenz"

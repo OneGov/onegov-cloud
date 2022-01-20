@@ -122,6 +122,15 @@ class ElectionCompoundForm(Form):
         render_kw={'lang': 'rm'}
     )
 
+    show_list_groups = BooleanField(
+        label=_("List groups"),
+        description=_(
+            "Shows a tab with list group results. Requires party results."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
     show_lists = BooleanField(
         label=_("Lists"),
         description=_(
@@ -285,6 +294,7 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        model.show_list_groups = self.show_list_groups.data
         model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
@@ -354,6 +364,7 @@ class ElectionCompoundForm(Form):
         self.related_link.data = model.related_link
         self.after_pukelsheim.data = model.after_pukelsheim
         self.pukelsheim_completed.data = model.pukelsheim_completed
+        self.show_list_groups.data = model.show_list_groups
         self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage

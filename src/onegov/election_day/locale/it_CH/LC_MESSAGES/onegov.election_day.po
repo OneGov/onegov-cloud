@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 08:10+0100\n"
-"PO-Revision-Date: 2022-01-17 10:08+0100\n"
+"POT-Creation-Date: 2022-01-20 10:43+0100\n"
+"PO-Revision-Date: 2022-01-20 08:42+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -355,6 +355,17 @@ msgstr "Livello di elezione"
 msgid "Elections"
 msgstr "Elezioni"
 
+msgid "List groups"
+msgstr "Gruppi di liste"
+
+msgid "Shows a tab with list group results. Requires party results."
+msgstr ""
+"Mostra una scheda con i risultati del gruppo di liste. Richiede i risultati "
+"del partito."
+
+msgid "Views"
+msgstr "Visualizzazioni"
+
 msgid "Lists"
 msgstr "Liste"
 
@@ -366,9 +377,6 @@ msgstr ""
 "Mostra una scheda con i risultati delle liste aggregate su tutte le "
 "elezioni. Richiede che tutte le elezioni condividano le stesse liste. Si "
 "noti che il numero di voti non è veramente significativo."
-
-msgid "Views"
-msgstr "Visualizzazioni"
 
 msgid "Mandate allocation"
 msgstr "Ripartizione dei seggi"
@@ -394,7 +402,7 @@ msgid "Panachage"
 msgstr "Panachage"
 
 msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
+msgstr "Mostra una scheda con il panachage. Richiede i risultati del partito."
 
 msgid "After Doppelter Pukelsheim"
 msgstr ""
@@ -843,6 +851,12 @@ msgstr "Tutti i candidati"
 msgid "Elected candidates only"
 msgstr "Solo i candidati eletti"
 
+msgid "List group"
+msgstr "Gruppo di liste"
+
+msgid "Voters count"
+msgstr "Numero di elettori"
+
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"
 
@@ -980,9 +994,6 @@ msgstr ""
 
 msgid "Year"
 msgstr "Anno"
-
-msgid "Voters count"
-msgstr "Numero di elettori"
 
 msgid "Difference"
 msgstr "Differenza"

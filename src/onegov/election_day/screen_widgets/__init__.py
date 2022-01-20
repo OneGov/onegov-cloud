@@ -1,11 +1,13 @@
-from onegov.election_day.screen_widgets.election import (
-    ElectionCandidatesByEntityTableWidget,
-    ElectionCandidatesChartWidget,
-    ElectionCandidatesTableWidget,
+from onegov.election_day.screen_widgets.election_compound import (
     ElectionCompoundCandidatesTableWidget,
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListsChartWidget,
     ElectionCompoundListsTableWidget,
+)
+from onegov.election_day.screen_widgets.election import (
+    ElectionCandidatesByEntityTableWidget,
+    ElectionCandidatesChartWidget,
+    ElectionCandidatesTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
 )

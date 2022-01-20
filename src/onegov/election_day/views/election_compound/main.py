@@ -7,7 +7,7 @@ from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
-from onegov.election_day.utils.election import get_elected_candidates
+from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election import get_party_results
 
 
@@ -37,7 +37,7 @@ def view_election_compound_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
-    embed = {}
+    embed = {'districts-map': request.link(self, 'districts-map')}
     media = {'charts': {}}
     layout = ElectionCompoundLayout(self, request)
     layout.last_modified = last_modified

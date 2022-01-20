@@ -458,6 +458,30 @@
     </table>
 </metal:election-lists-table>
 
+<metal:election-compound-list-groups-table define-macro="election-compound-list-groups-table" i18n:domain="onegov.election_day">
+    <table
+        class="election-compound-list-groups-table results tablesaw sortable"
+        data-tablesaw-mode="columntoggle"
+        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+        data-tablesaw-minimap=""
+        >
+        <thead>
+            <tr>
+                <th data-tablesaw-priority="persist" i18n:translate="" class="column-list-group">List group</th>
+                <th data-tablesaw-priority="1" i18n:translate="" class="column-voters-count right-aligned">Voters count</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-mandates right-aligned">Mandates</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="group groups">
+                <td class="column-list-group">${group.name}</td>
+                <td class="column-voters-count right-aligned" data-text="${group.voters_count or 0}">${layout.format_number(group.voters_count or 0)}</td>
+                <td class="column-mandates right-aligned">${group.number_of_mandates}</td>
+            </tr>
+        </tbody>
+    </table>
+</metal:election-compound-list-groups-table>
+
 <metal:election-compound-lists-table define-macro="election-compound-lists-table" i18n:domain="onegov.election_day">
     <table
         class="election-compound-lists-table results tablesaw sortable"
@@ -546,6 +570,22 @@
         </tal:block>
     </tal:block>
 </metal:lists-chart i18n:domain="onegov.election_day">
+
+<metal:list-groups-chart define-macro="list-groups-chart" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="embed">
+        <div class="bar-chart"
+            i18n:attributes="data-embed-link"
+            data-dataurl="${request.link(model, name='list-groups-data')}"
+            data-embed-link="Embed"
+            data-embed-source="${request.link(model, name='list-groups-chart')}">
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not: embed">
+        <div class="bar-chart"
+            data-dataurl="${request.link(model, name='list-groups-data')}">
+        </div>
+    </tal:block>
+</metal:list-groups-chart i18n:domain="onegov.election_day">
 
 <metal:party-strengths-chart define-macro="party-strengths-chart" i18n:domain="onegov.election_day">
     <tal:block tal:condition="embed">
@@ -1085,7 +1125,7 @@
                         <tr>
                             <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
                             <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Mandates</th>
-                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Voters count</th>
+                            <th data-tablesaw-priority="${1 if show_voters_count else 0}" class="right-aligned" i18n:translate="">Voters count</th>
                             <th data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
                             <th data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
                             <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
