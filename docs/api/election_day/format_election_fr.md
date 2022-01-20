@@ -225,7 +225,7 @@ La version `>= 2.2` est prise en charge, veuillez vous référer à la documenta
 
 ### Résultats du parti
 
-Chaque élection (proporz) est susceptible de contenir les résultats de partis. Ces résultats sont indépendants des autres résultats et contiennent généralement les résultats déjà agrégés des différentes listes d'un parti.
+Chaque élection (proporz) et chaque composition électoral est susceptible de contenir les résultats de partis. Ces résultats sont indépendants des autres résultats et contiennent généralement les résultats déjà agrégés des différentes listes d'un parti.
 
 Les colonnes suivantes seront évaluées et devraient avoir été créées :
 
@@ -238,6 +238,7 @@ Nom|Description
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
+`voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 
 Les résultats peuvent inclure des résultats avec panachage en ajoutant une colonne par parti :
 
@@ -255,14 +256,14 @@ Les résultats avec panachage sont uniquement ajoutés si :
 
 ### Création automatique des composantes des élections
 
-Avec WabstiC Export version 2.4.3, les composantes des élections peuvent être créées en utilisant le fichier 'WP_Wahl.csv'. 
+Avec WabstiC Export version 2.4.3, les composantes des élections peuvent être créées en utilisant le fichier 'WP_Wahl.csv'.
 Le token est créé sous **Source de données Wabsti**.
 
     curl https://[base_url]/create-wabsti-proporz \
       --user :[token] \
       --header "Accept-Language: de_CH" \
       --form "wp_wahl=@WP_Wahl.csv"
-      
+
 La demande précedant effectue ensuite les étapes suivantes:
 
 1. Tous les élections présent dans le fichier `WP_Wahl.csv`.

@@ -131,12 +131,13 @@ Die Rohdaten sind als CSV verfügbar. Die folgenden Felder sind enthalten:
 Name|Description
 ---|---
 `year`|Das Jahr der Wahl.
-`total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
+The number of votes per total number of mandates.
 `name`|Der Name der Partei.
 `id`|ID der Partei.
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
+`voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
 
 3 Abstimmungsresultate

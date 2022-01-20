@@ -55,6 +55,7 @@ ELECTION_PARTY_HEADERS = (
     'color',
     'mandates',
     'votes',
+    # 'voters_count'  optional
 )
 
 WABSTI_MAJORZ_HEADERS = (

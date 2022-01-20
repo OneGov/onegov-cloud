@@ -23,6 +23,9 @@ def parse_party_result(
         )
         mandates = validate_integer(line, 'mandates')
         votes = validate_integer(line, 'votes')
+        voters_count = validate_integer(
+            line, 'voters_count', optional=True, default=None
+        )
         assert all((year, total_votes, name, color))
         assert match(r'^#[0-9A-Fa-f]{6}$', color)
         assert totals.get(year, total_votes) == total_votes
@@ -46,7 +49,8 @@ def parse_party_result(
                 name=name,
                 color=color,
                 number_of_mandates=mandates,
-                votes=votes
+                votes=votes,
+                voters_count=voters_count
             )
 
 

@@ -27,7 +27,8 @@ class PartyResult(Base, TimestampMixin):
     #: the number of total votes
     total_votes = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: the voters count (the proportionals number of votes)
+    #: the number of total votes divided by the total number of mandates,
+    #: used instead of total_votes by election compounds
     voters_count = Column(Integer, nullable=True, default=lambda: 0)
 
     #: the name of the party
