@@ -1085,6 +1085,7 @@
                         <tr>
                             <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
                             <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Mandates</th>
+                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Voters count</th>
                             <th data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
                             <th data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
                             <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>

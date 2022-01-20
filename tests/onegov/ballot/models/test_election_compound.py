@@ -703,6 +703,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=0,
             votes=0,
+            voters_count=1,
             total_votes=100,
             name='Libertarian',
             color='black',
@@ -713,6 +714,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=2,
             votes=2,
+            voters_count=3,
             total_votes=50,
             name='Libertarian',
             color='black',
@@ -723,6 +725,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=1,
             votes=1,
+            voters_count=2,
             total_votes=100,
             name='Conservative',
             color='red',
@@ -733,6 +736,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=3,
             votes=3,
+            voters_count=4,
             total_votes=50,
             name='Conservative',
             color='red',
@@ -749,6 +753,7 @@ def test_election_compound_export_parties(session):
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
+            'voters_count': 4,
         }, {
             'year': 2016,
             'name': 'Libertarian',
@@ -757,6 +762,7 @@ def test_election_compound_export_parties(session):
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
+            'voters_count': 3,
         }, {
             'year': 2012,
             'name': 'Conservative',
@@ -765,6 +771,7 @@ def test_election_compound_export_parties(session):
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
+            'voters_count': 2,
         }, {
             'year': 2012,
             'name': 'Libertarian',
@@ -773,6 +780,7 @@ def test_election_compound_export_parties(session):
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
+            'voters_count': 1,
         }
     ]
 
@@ -801,6 +809,7 @@ def test_election_compound_export_parties(session):
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
+            'voters_count': 4,
             'panachage_votes_from_0': 1,
             'panachage_votes_from_1': 2,
             'panachage_votes_from_2': 3,
@@ -813,6 +822,7 @@ def test_election_compound_export_parties(session):
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
+            'voters_count': 3,
             'panachage_votes_from_0': 5,
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -824,6 +834,7 @@ def test_election_compound_export_parties(session):
             'id': 2,
             'total_votes': '',
             'votes': '',
+            'voters_count': '',
             'year': 2016,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
@@ -837,6 +848,7 @@ def test_election_compound_export_parties(session):
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
+            'voters_count': 2,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -849,6 +861,7 @@ def test_election_compound_export_parties(session):
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
+            'voters_count': 1,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -860,6 +873,7 @@ def test_election_compound_export_parties(session):
             'id': 2,
             'total_votes': '',
             'votes': '',
+            'voters_count': '',
             'year': 2012,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',

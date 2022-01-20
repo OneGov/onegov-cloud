@@ -39,6 +39,7 @@ def get_party_results(item):
                 round(1000 * (result.votes / (totals.get(result.year) or 1)))
             )
         }
+        year['voters_count'] = result.voters_count
 
     return years, parties
 
@@ -60,10 +61,12 @@ def get_party_results_deltas(election, years, parties):
             values = party.get(year)
             if values:
                 result.append(values.get('mandates', ''))
+                result.append(values.get('voters_count', ''))
                 result.append(values.get('votes', {}).get('total', ''))
                 permille = values.get('votes', {}).get('permille')
-                result.append('{}%'.format(permille / 10 if permille else ''))
+                result.append(f'{permille/10}%' if permille else '')
             else:
+                result.append('')
                 result.append('')
                 result.append('')
                 result.append('')
