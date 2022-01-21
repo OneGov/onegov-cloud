@@ -16,6 +16,9 @@ class ElectionCompoundLayout(DetailLayout):
         'list-groups', 'lists', 'districts', 'candidates', 'statistics'
     )
 
+    majorz = False
+    proporz = True
+
     @cached_property
     def table_link(self):
         if self.tab not in self.tabs_with_embedded_tables:
@@ -146,18 +149,6 @@ class ElectionCompoundLayout(DetailLayout):
                 []
             ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
-
-    @cached_property
-    def majorz(self):
-        if not self.model.elections:
-            return False
-        return self.model.elections[0].type == 'majorz'
-
-    @cached_property
-    def proporz(self):
-        if not self.model.elections:
-            return False
-        return self.model.elections[0].type == 'proporz'
 
     @cached_property
     def pdf_path(self):

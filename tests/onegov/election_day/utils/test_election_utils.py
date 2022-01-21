@@ -6,6 +6,10 @@ from onegov.election_day.utils.election import get_candidates_results_by_entity
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
+from onegov.election_day.utils.election import get_parties_panachage_data
+from onegov.election_day.utils.election import get_party_results
+from onegov.election_day.utils.election import get_party_results_data
+from onegov.election_day.utils.election import get_party_results_deltas
 from tests.onegov.election_day.common import print_errors
 
 
@@ -604,6 +608,297 @@ def test_election_utils_proporz(import_test_datasets, session):
     }
 
 
+def test_election_utils_parties(import_test_datasets, session):
+    election, errors = import_test_datasets(
+        'internal',
+        'election',
+        'zg',
+        'canton',
+        'proporz',
+        date_=date(2015, 10, 18),
+        number_of_mandates=3,
+        dataset_name='nationalratswahlen-2015',
+        expats=False
+    )
+    assert not errors
+    errors = import_test_datasets(
+        'internal',
+        'parties',
+        'zg',
+        'canton',
+        'proporz',
+        election=election,
+        dataset_name='nationalratswahlen-2015-parteien',
+    )
+    assert not errors
+
+    years, parties = get_party_results(election)
+    assert years == ['2011', '2015']
+    assert parties == {
+        'AL': {
+            '2011': {
+                'color': '#a74c97',
+                'mandates': 0,
+                'voters_count': 0,
+                'votes': {'permille': 154, 'total': 17972}
+            },
+            '2015': {
+                'color': '#a74c97',
+                'mandates': 0,
+                'voters_count': 0,
+                'votes': {'permille': 72, 'total': 8352}
+            }
+        },
+        'CVP': {
+            '2011': {
+                'color': '#ff6300',
+                'mandates': 1,
+                'voters_count': 0,
+                'votes': {'permille': 243, 'total': 28413}
+            },
+            '2015': {
+                'color': '#ff6300',
+                'mandates': 1,
+                'voters_count': 0,
+                'votes': {'permille': 264, 'total': 30856}
+            }
+        },
+        'FDP': {
+            '2011': {
+                'color': '#4068c8',
+                'mandates': 1,
+                'voters_count': 0,
+                'votes': {'permille': 192, 'total': 22494}
+            },
+            '2015': {
+                'color': '#4068c8',
+                'mandates': 1,
+                'voters_count': 0,
+                'votes': {'permille': 176, 'total': 20584}
+            }
+        },
+        'GLP': {
+            '2011': {
+                'color': '#aeca00',
+                'mandates': 0,
+                'voters_count': 0,
+                'votes': {'permille': 68, 'total': 7943}
+            },
+            '2015': {
+                'color': '#aeca00',
+                'mandates': 0,
+                'voters_count': 0,
+                'votes': {'permille': 36, 'total': 4178}
+            }
+        },
+        'SP': {
+            '2011': {
+                'color': '#db3c27',
+                'mandates': 0,
+                'voters_count': 0,
+                'votes': {'permille': 53, 'total': 6167}
+            },
+            '2015': {
+                'color': '#db3c27',
+                'mandates': 0,
+                'voters_count': 0,
+                'votes': {'permille': 138, 'total': 16048}
+            }
+        },
+        'SVP': {
+            '2011': {
+                'color': '#3f841a',
+                'mandates': 1,
+                'voters_count': 0,
+                'votes': {'permille': 283, 'total': 33116}
+            },
+            '2015': {
+                'color': '#3f841a',
+                'mandates': 1,
+                'voters_count': 0,
+                'votes': {'permille': 305, 'total': 35543}
+            }
+        }
+    }
+
+    deltas, results = get_party_results_deltas(election, years, parties)
+    assert deltas
+    assert results == {
+        '2011': [
+            ['AL', 0, 0, 17972, '15.4%', ''],
+            ['CVP', 1, 0, 28413, '24.3%', ''],
+            ['FDP', 1, 0, 22494, '19.2%', ''],
+            ['GLP', 0, 0, 7943, '6.8%', ''],
+            ['SP', 0, 0, 6167, '5.3%', ''],
+            ['SVP', 1, 0, 33116, '28.3%', '']
+        ],
+        '2015': [
+            ['AL', 0, 0, 8352, '7.2%', '-8.2%'],
+            ['CVP', 1, 0, 30856, '26.4%', '2.1%'],
+            ['FDP', 1, 0, 20584, '17.6%', '-1.6%'],
+            ['GLP', 0, 0, 4178, '3.6%', '-3.2%'],
+            ['SP', 0, 0, 16048, '13.8%', '8.5%'],
+            ['SVP', 1, 0, 35543, '30.5%', '2.2%']
+        ]
+    }
+
+    assert get_party_results_data(election) == {
+        'axis_units': {'back': '%', 'front': ''},
+        'groups': ['AL', 'CVP', 'FDP', 'GLP', 'SP', 'SVP'],
+        'labels': ['2011', '2015'],
+        'maximum': {'back': 100, 'front': 3},
+        'results': [
+            {
+                'active': True,
+                'color': '#a74c97',
+                'group': 'AL',
+                'item': '2015',
+                'value': {'back': 7.2, 'front': 0}
+            },
+            {
+                'active': False,
+                'color': '#a74c97',
+                'group': 'AL',
+                'item': '2011',
+                'value': {'back': 15.4, 'front': 0}
+            },
+            {
+                'active': True,
+                'color': '#ff6300',
+                'group': 'CVP',
+                'item': '2015',
+                'value': {'back': 26.4, 'front': 1}
+            },
+            {
+                'active': False,
+                'color': '#ff6300',
+                'group': 'CVP',
+                'item': '2011',
+                'value': {'back': 24.3, 'front': 1}
+            },
+            {
+                'active': True,
+                'color': '#4068c8',
+                'group': 'FDP',
+                'item': '2015',
+                'value': {'back': 17.6, 'front': 1}
+            },
+            {
+                'active': False,
+                'color': '#4068c8',
+                'group': 'FDP',
+                'item': '2011',
+                'value': {'back': 19.2, 'front': 1}
+            },
+            {
+                'active': True,
+                'color': '#aeca00',
+                'group': 'GLP',
+                'item': '2015',
+                'value': {'back': 3.6, 'front': 0}
+            },
+            {
+                'active': False,
+                'color': '#aeca00',
+                'group': 'GLP',
+                'item': '2011',
+                'value': {'back': 6.8, 'front': 0}
+            },
+            {
+                'active': True,
+                'color': '#db3c27',
+                'group': 'SP',
+                'item': '2015',
+                'value': {'back': 13.8, 'front': 0}
+            },
+            {
+                'active': False,
+                'color': '#db3c27',
+                'group': 'SP',
+                'item': '2011',
+                'value': {'back': 5.3, 'front': 0}
+            },
+            {
+                'active': True,
+                'color': '#3f841a',
+                'group': 'SVP',
+                'item': '2015',
+                'value': {'back': 30.5, 'front': 1}
+            },
+            {
+                'active': False,
+                'color': '#3f841a',
+                'group': 'SVP',
+                'item': '2011',
+                'value': {'back': 28.3, 'front': 1}
+            }
+        ],
+        'title': 'proporz_internal_nationalratswahlen-2015'
+    }
+
+    data = get_parties_panachage_data(election)
+    assert data['title'] == 'proporz_internal_nationalratswahlen-2015'
+    l = data['links']
+    assert {'color': '#ff6300', 'source': 2, 'target': 8, 'value': 20} in l
+    assert {'color': '#4068c8', 'source': 3, 'target': 8, 'value': 30} in l
+    assert {'color': '#aeca00', 'source': 4, 'target': 8, 'value': 40} in l
+    assert {'color': '#db3c27', 'source': 5, 'target': 8, 'value': 50} in l
+    assert {'color': '#3f841a', 'source': 6, 'target': 8, 'value': 60} in l
+    assert {'color': '#999', 'source': 0, 'target': 8, 'value': 70} in l
+    assert {'color': '#a74c97', 'source': 1, 'target': 9, 'value': 10} in l
+    assert {'color': '#4068c8', 'source': 3, 'target': 9, 'value': 31} in l
+    assert {'color': '#aeca00', 'source': 4, 'target': 9, 'value': 41} in l
+    assert {'color': '#db3c27', 'source': 5, 'target': 9, 'value': 51} in l
+    assert {'color': '#3f841a', 'source': 6, 'target': 9, 'value': 61} in l
+    assert {'color': '#999', 'source': 0, 'target': 9, 'value': 71} in l
+    assert {'color': '#a74c97', 'source': 1, 'target': 10, 'value': 11} in l
+    assert {'color': '#ff6300', 'source': 2, 'target': 10, 'value': 21} in l
+    assert {'color': '#aeca00', 'source': 4, 'target': 10, 'value': 42} in l
+    assert {'color': '#db3c27', 'source': 5, 'target': 10, 'value': 52} in l
+    assert {'color': '#3f841a', 'source': 6, 'target': 10, 'value': 62} in l
+    assert {'color': '#999', 'source': 0, 'target': 10, 'value': 72} in l
+    assert {'color': '#a74c97', 'source': 1, 'target': 11, 'value': 12} in l
+    assert {'color': '#ff6300', 'source': 2, 'target': 11, 'value': 22} in l
+    assert {'color': '#4068c8', 'source': 3, 'target': 11, 'value': 32} in l
+    assert {'color': '#db3c27', 'source': 5, 'target': 11, 'value': 53} in l
+    assert {'color': '#3f841a', 'source': 6, 'target': 11, 'value': 63} in l
+    assert {'color': '#999', 'source': 0, 'target': 11, 'value': 73} in l
+    assert {'color': '#a74c97', 'source': 1, 'target': 12, 'value': 13} in l
+    assert {'color': '#ff6300', 'source': 2, 'target': 12, 'value': 23} in l
+    assert {'color': '#4068c8', 'source': 3, 'target': 12, 'value': 33} in l
+    assert {'color': '#aeca00', 'source': 4, 'target': 12, 'value': 43} in l
+    assert {'color': '#3f841a', 'source': 6, 'target': 12, 'value': 64} in l
+    assert {'color': '#999', 'source': 0, 'target': 12, 'value': 74} in l
+    assert {'color': '#a74c97', 'source': 1, 'target': 13, 'value': 14} in l
+    assert {'color': '#ff6300', 'source': 2, 'target': 13, 'value': 24} in l
+    assert {'color': '#4068c8', 'source': 3, 'target': 13, 'value': 34} in l
+    assert {'color': '#aeca00', 'source': 4, 'target': 13, 'value': 44} in l
+    assert {'color': '#db3c27', 'source': 5, 'target': 13, 'value': 54} in l
+    assert {'color': '#999', 'source': 0, 'target': 13, 'value': 75} in l
+    assert {'color': '#3f841a', 'source': 6, 'target': 13, 'value': 35298} in l
+    assert {'color': '#ff6300', 'source': 2, 'target': 9, 'value': 30591} in l
+    assert {'color': '#a74c97', 'source': 1, 'target': 8, 'value': 8082} in l
+    assert {'color': '#aeca00', 'source': 4, 'target': 11, 'value': 3923} in l
+    assert {'color': '#db3c27', 'source': 5, 'target': 12, 'value': 15798} in l
+    assert {'color': '#4068c8', 'source': 3, 'target': 10, 'value': 20324} in l
+
+    n = data['nodes']
+    assert {'color': '#999', 'id': 1, 'name': '-'} in n
+    assert {'color': '#a74c97', 'id': 2, 'name': 'AL'} in n
+    assert {'color': '#ff6300', 'id': 3, 'name': 'CVP'} in n
+    assert {'color': '#4068c8', 'id': 4, 'name': 'FDP'} in n
+    assert {'color': '#aeca00', 'id': 5, 'name': 'GLP'} in n
+    assert {'color': '#db3c27', 'id': 6, 'name': 'SP'} in n
+    assert {'color': '#3f841a', 'id': 7, 'name': 'SVP'} in n
+    assert {'color': '#999', 'id': 8, 'name': '-'} in n
+    assert {'color': '#a74c97', 'id': 9, 'name': 'AL'} in n
+    assert {'color': '#ff6300', 'id': 10, 'name': 'CVP'} in n
+    assert {'color': '#4068c8', 'id': 11, 'name': 'FDP'} in n
+    assert {'color': '#aeca00', 'id': 12, 'name': 'GLP'} in n
+    assert {'color': '#db3c27', 'id': 13, 'name': 'SP'} in n
+    assert {'color': '#3f841a', 'id': 14, 'name': 'SVP'} in n
+
+
 def test_get_connection_results_interal(import_test_datasets, session):
     election, errors = import_test_datasets(
         'internal',
@@ -681,4 +976,3 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
 
 
 # todo: test on incompleted election
-# todo: test party results

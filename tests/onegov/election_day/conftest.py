@@ -19,7 +19,8 @@ from onegov.election_day.hidden_by_principal import \
 from onegov.election_day.formats import import_election_internal_majorz, \
     import_election_internal_proporz, import_election_wabstic_proporz, \
     import_election_wabstic_majorz, import_election_wabsti_proporz, \
-    import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti
+    import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti, \
+    import_party_results
 from tests.onegov.election_day.common import print_errors, \
     get_tar_file_path, create_principal
 from onegov.user import User
@@ -241,6 +242,42 @@ def import_elections_internal(
     print(tar_fp)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
+
+
+def import_parties_internal(
+        principal,
+        domain,
+        dataset_name,
+        election,
+):
+    """
+    Import test datasets with party results in internal formats. For one
+    election, there is a single file to load, so subfolders are not necessary.
+
+    :param dataset_name: use the filename without ending
+    :return:
+    """
+    assert isinstance(principal, str)
+    if dataset_name:
+        assert '.' not in dataset_name, 'Remove the file ending' \
+                                        ' from dataset_name'
+
+    tar_fp = get_tar_file_path(
+        domain, principal, 'internal', 'election', 'proporz'
+    )
+    with tarfile.open(tar_fp, 'r:gz') as f:
+        members = f.getmembers()
+        names = [fn.split('.')[0] for fn in f.getnames()]
+        for name, member in zip(names, members):
+            if name == dataset_name:
+                file = f.extractfile(member).read()
+                errors = import_party_results(
+                    election, BytesIO(file), 'text/plain'
+                )
+                break
+            errors = ['Dataset not found']
+
+    return errors
 
 
 def import_elections_wabstic(
@@ -592,7 +629,7 @@ def import_votes_wabsti(
 @pytest.fixture(scope="function")
 def import_test_datasets(session):
 
-    models = ('election', 'vote')
+    models = ('election', 'vote', 'parties')
     election_types = ('majorz', 'proporz')
     apis = ('internal', 'wabstic', 'wabsti')
     domains = (
@@ -637,7 +674,6 @@ def import_test_datasets(session):
             assert vote_type in vote_types
 
         all_loaded = OrderedDict()
-
         if model == 'election':
             assert election_type, 'Election Type is needed to load fixture'
             if api_format == 'internal':
@@ -689,6 +725,14 @@ def import_test_datasets(session):
                     municipality=municipality
                 )
                 all_loaded.update(elections)
+
+        elif model == 'parties':
+            import_parties_internal(
+                principal,
+                domain,
+                dataset_name,
+                election,
+            )
 
         elif model == 'vote' and api_format == 'internal':
             votes = import_votes_internal(

@@ -1,13 +1,15 @@
 from onegov.ballot import PartyResult
 
 
-def get_list_groups(item):
+def get_list_groups(election_compound):
     """" Get list groups data. """
 
-    if getattr(item, 'type', 'proporz') == 'majorz':
+    if getattr(election_compound, 'type', 'proporz') == 'majorz':
         return {}
 
-    results = item.party_results.filter(PartyResult.year == item.date.year)
+    results = election_compound.party_results.filter(
+        PartyResult.year == election_compound.date.year
+    )
     results = results.order_by(
         PartyResult.voters_count.desc(),
         PartyResult.number_of_mandates.desc(),
@@ -15,10 +17,10 @@ def get_list_groups(item):
     return results.all()
 
 
-def get_list_groups_data(item):
+def get_list_groups_data(election_compound):
     """" Get the list groups bar chart data as JSON. """
 
-    results = get_list_groups(item)
+    results = get_list_groups(election_compound)
     if not results:
         return {}
 
@@ -29,8 +31,10 @@ def get_list_groups_data(item):
                 'value': result.voters_count,
                 'value2': result.number_of_mandates,
                 'class': (
-                    'active' if result.number_of_mandates and item.completed
-                    else 'inactive'
+                    'active' if (
+                        result.number_of_mandates
+                        and election_compound.completed
+                    ) else 'inactive'
                 ),
                 'color': result.color
             } for result in results

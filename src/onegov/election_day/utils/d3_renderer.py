@@ -125,7 +125,7 @@ class D3Renderer():
     def get_list_groups_chart(self, item, fmt, return_data=False):
         chart = None
         data = None
-        if isinstance(item, Election) or isinstance(item, ElectionCompound):
+        if isinstance(item, ElectionCompound):
             data = get_list_groups_data(item)
             if data and data.get('results'):
                 chart = self.get_chart('bar', fmt, data)
