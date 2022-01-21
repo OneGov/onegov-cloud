@@ -358,7 +358,7 @@ msgid "Elections"
 msgstr "Elecziuns"
 
 msgid "List groups"
-msgstr ""
+msgstr "Gruppas da glistas"
 
 msgid "Shows a tab with list group results. Requires party results."
 msgstr ""
@@ -845,7 +845,7 @@ msgid "Elected candidates only"
 msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
-msgstr ""
+msgstr "Gruppa da glista"
 
 msgid "Voters count"
 msgstr "Cifra electorala"
