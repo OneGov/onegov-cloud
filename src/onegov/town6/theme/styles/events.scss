@@ -6,16 +6,21 @@ $placeholder-icon-size: 6rem;
 $event-image-max-height: 150px;
 
 .events {
-    .card img {
 
+
+    .card {
+        border: 0;
+
+        &:hover img {
+            transform: scale(1.05);
+        }
+    }
+
+    .card img {
         max-height: $event-image-max-height;
         object-fit: cover;
         transition: transform .5s ease;
         width: auto;
-
-        &:hover {
-            transform: scale(1.05);
-        }
     }
 
     .contained {
@@ -24,6 +29,7 @@ $event-image-max-height: 150px;
     }
 
     .date-place {
+        color:  $primary-color;
         flex: none;
         font-size: 97%;
         font-weight: bold;

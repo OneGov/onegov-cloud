@@ -1,3 +1,4 @@
+import json
 import os
 
 from datetime import date
@@ -254,7 +255,7 @@ def test_view_notifications_summarized(election_day_app_zg):
     contents = []
     for sms in os.listdir(sms_path):
         with open(os.path.join(sms_path, sms)) as file:
-            contents.append(file.read())
+            contents.append(json.loads(file.read())['content'])
 
     assert (
         'Les nouveaux résultats sont disponibles sur http://example.com'
