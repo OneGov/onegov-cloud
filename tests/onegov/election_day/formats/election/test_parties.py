@@ -207,7 +207,8 @@ def test_import_party_results_missing_headers(session):
         ).encode('utf-8')), 'text/plain'
     )
     assert [(e.filename, e.error.interpolate()) for e in errors] == [
-        (None, "Missing columns: 'color'")
+        (None, "Missing columns: 'color'"),
+        (None, 'No party results for year 2015')
     ]
 
 

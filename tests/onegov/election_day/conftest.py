@@ -275,6 +275,7 @@ def import_parties_internal(
                     election, BytesIO(file), 'text/plain'
                 )
                 break
+        else:
             errors = ['Dataset not found']
 
     return errors
@@ -727,7 +728,7 @@ def import_test_datasets(session):
                 all_loaded.update(elections)
 
         elif model == 'parties':
-            import_parties_internal(
+            all_loaded['parties'] = import_parties_internal(
                 principal,
                 domain,
                 dataset_name,
@@ -764,9 +765,8 @@ def import_test_datasets(session):
             all_loaded.update(votes)
         else:
             raise NotImplementedError
-        if len(all_loaded.keys()) == 1:
-            return all_loaded.get(
-                f'{election_type or vote_type}_{api_format}_{dataset_name}')
+        if len(all_loaded) == 1:
+            return list(all_loaded.values())[0]
         return all_loaded
 
     return _import_test_datasets

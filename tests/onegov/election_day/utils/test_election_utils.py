@@ -899,7 +899,7 @@ def test_election_utils_parties(import_test_datasets, session):
     assert {'color': '#3f841a', 'id': 14, 'name': 'SVP'} in n
 
 
-def test_get_connection_results_interal(import_test_datasets, session):
+def test_get_connection_results_internal(import_test_datasets, session):
     election, errors = import_test_datasets(
         'internal',
         'election',

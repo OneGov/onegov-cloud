@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 10:43+0100\n"
+"POT-Creation-Date: 2022-01-21 09:03+0100\n"
 "PO-Revision-Date: 2021-03-18 10:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -126,6 +126,10 @@ msgstr "Valurs nunvalaivlas"
 #, python-format
 msgid "${name} was found twice"
 msgstr "${name} è avant maun duas giadas"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr ""
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"

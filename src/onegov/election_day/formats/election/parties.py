@@ -125,11 +125,20 @@ def import_party_results(election, file, mimetype):
                         for err in line_errors
                     )
 
-    if panachage_headers:
+    if not parties:
+        errors.append(FileImportError(
+            _(
+                "No party results for year ${year}",
+                mapping={'year': election.date.year}
+            )
+        ))
+
+    if panachage_headers and parties:
         for list_id in panachage_headers.values():
             if not list_id == '999' and list_id not in parties.keys():
                 errors.append(FileImportError(
-                    _("Panachage results ids and id not consistent")))
+                    _("Panachage results ids and id not consistent"))
+                )
                 break
 
     if errors:

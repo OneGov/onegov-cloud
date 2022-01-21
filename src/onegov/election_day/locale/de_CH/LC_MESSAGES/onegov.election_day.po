@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 10:43+0100\n"
+"POT-Creation-Date: 2022-01-21 09:03+0100\n"
 "PO-Revision-Date: 2022-01-20 08:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -126,6 +126,10 @@ msgstr "Ungültige Werte"
 #, python-format
 msgid "${name} was found twice"
 msgstr "${name} kommt zweimal vor"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr "Keine Parteiresultate für das Jahr ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids und id nicht konsistent"

@@ -185,6 +185,52 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     ])
 
 
+def test_view_election_compound_list_groups(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    create_election_compound(client)
+    upload_party_results(client, slug='elections/elections')
+
+    main = client.get('/elections/elections/list-groups')
+    assert '<h3>Listengruppen</h3>' in main
+    assert 'BDP' in main
+    assert 'data-text="603"' in main  # todo:
+
+    groups = client.get('/elections/elections/list-groups-data')
+    groups = groups.json
+    assert groups == {
+        'results': [
+            {
+                'class': 'inactive',
+                'color': '#efb52c',
+                'text': 'BDP',
+                'value': 603,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#ff6300',
+                'text': 'CVP',
+                'value': 491,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#0571b0',
+                'text': 'FDP',
+                'value': 351,
+                'value2': 0
+            }
+        ]
+    }
+
+    chart = client.get('/elections/elections/list-groups-chart')
+    assert chart.status_code == 200
+    assert '/elections/elections/list-groups-data' in chart
+
+
 def test_view_election_compound_mandate_allocation(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
