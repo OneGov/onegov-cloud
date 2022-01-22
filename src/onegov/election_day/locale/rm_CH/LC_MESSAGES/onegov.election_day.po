@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-21 09:03+0100\n"
-"PO-Revision-Date: 2021-03-18 10:25+0100\n"
+"POT-Creation-Date: 2022-01-22 07:42+0100\n"
+"PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "The final results are available"
 msgstr "Ils resultats finals èn disponibels"
@@ -721,6 +721,18 @@ msgstr "Descripziun dal format"
 
 msgid "Embed"
 msgstr "Incorporar"
+
+#. Default: The number of votes of a party is divided by the number of seats to
+#. be allocated in the district concerned. The result is called the voters
+#. count. The voters count determines the allocation to the list groups. The
+#. election is finished as soon as the number of mandates appears.
+#.
+msgid "figcaption_list_groups"
+msgstr ""
+"Il dumber da vuschs da partida d'ina glista vegn dividì tras il dumber da "
+"sezs ch'èn d'occupar en il circul electoral correspundent. Il resultat vegn "
+"numnà cifra electorala da la glista. Il Cifra electorala attribuziun "
+"superiura a las gruppas da glistas."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""

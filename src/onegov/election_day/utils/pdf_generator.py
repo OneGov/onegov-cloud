@@ -12,6 +12,7 @@ from onegov.election_day.utils.election import get_connection_results
 from onegov.election_day.utils.election import get_party_results
 from onegov.election_day.utils.election import get_party_results_deltas
 from onegov.election_day.utils.election_compound import get_elected_candidates
+from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -597,6 +598,29 @@ class PdfGenerator():
                 pdf.style.table_results_3
             )
         pdf.pagebreak()
+
+        # List groups
+        chart = self.renderer.get_list_groups_chart(compound, 'pdf')
+        if compound.show_list_groups and chart:
+            pdf.h2(_('List groups'))
+            pdf.pdf(chart)
+            pdf.figcaption(_('figcaption_list_groups'))
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('List group'),
+                    _('Voters count'),
+                    _('Mandates'),
+                ],
+                [[
+                    r.name,
+                    r.voters_count,
+                    r.number_of_mandates
+                ] for r in get_list_groups(compound)],
+                [None, 2 * cm, 2 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.pagebreak()
 
         # Parties
         chart = self.renderer.get_party_strengths_chart(compound, 'pdf')

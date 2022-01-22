@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-21 09:03+0100\n"
-"PO-Revision-Date: 2022-01-20 08:40+0100\n"
+"POT-Creation-Date: 2022-01-22 07:42+0100\n"
+"PO-Revision-Date: 2022-01-22 07:44+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -732,6 +732,18 @@ msgstr "Description du format"
 
 msgid "Embed"
 msgstr "Intégration"
+
+#. Default: The number of votes of a party is divided by the number of seats to
+#. be allocated in the district concerned. The result is called the voters
+#. count. The voters count determines the allocation to the list groups. The
+#. election is finished as soon as the number of mandates appears.
+#.
+msgid "figcaption_list_groups"
+msgstr ""
+"Le nombre de voix des partis pour une liste est divisé par le nombre de "
+"sièges à attribuer dans la circonscription électorale en question. Le "
+"résultat est appelé le nombre d'électeurs sur la liste. Le nombre de votants "
+"est réparti entre les groupes de listes."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
