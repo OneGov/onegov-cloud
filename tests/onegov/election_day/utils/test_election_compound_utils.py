@@ -225,14 +225,29 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
 
 
 def test_election_compound_utils_parties(import_test_datasets, session):
-    session.add(
-        ElectionCompound(
-            title='Compound', domain='canton', date=date(2014, 1, 1)
-        )
+    election, errors = import_test_datasets(
+        'internal',
+        'election',
+        'sg',
+        'district',
+        'proporz',
+        date_=date(2020, 3, 8),
+        domain_segment='Rheintal',
+        number_of_mandates=17,
+        dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
+        app_session=session
     )
-    election_compound = session.query(ElectionCompound).one()
+    assert not errors
+    session.add(election)
 
-    # assert not errors
+    election_compound = ElectionCompound(
+        title='Compound',
+        domain='canton',
+        date=date(2014, 1, 1)
+    )
+    election_compound.elections = [election]
+    session.add(election_compound)
+
     errors = import_test_datasets(
         'internal',
         'parties',
@@ -456,7 +471,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         'axis_units': {'back': '%', 'front': ''},
         'groups': ['AL', 'CVP', 'FDP', 'GLP', 'Piraten', 'SP', 'SVP'],
         'labels': ['2014'],
-        'maximum': {'back': 100, 'front': 0},
+        'maximum': {'back': 100, 'front': 17},
         'results': [
             {
                 'active': True,

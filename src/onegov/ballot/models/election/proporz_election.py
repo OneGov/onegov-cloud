@@ -110,16 +110,14 @@ class ProporzElection(Election, PartyResultExportMixin):
     @property
     def completed(self):
         """ Overwrites StatusMixin's 'completed' for Doppelter Pukelsheim """
-        if self.after_pukelsheim:
-            cmp = self.compound
-            if cmp:
-                if not cmp.after_pukelsheim:
-                    return super(ProporzElection, self).completed
-                return cmp.pukelsheim_completed
-            else:
-                # case before the associations are created
-                pass
-        return super(ProporzElection, self).completed
+
+        result = super(ProporzElection, self).completed
+
+        compound = self.compound
+        if compound and compound.after_pukelsheim:
+            return compound.pukelsheim_completed and result
+
+        return result
 
     @property
     def votes_by_entity(self):

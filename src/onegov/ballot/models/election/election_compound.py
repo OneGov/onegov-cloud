@@ -211,14 +211,18 @@ class ElectionCompound(
 
     @property
     def completed(self):
-        """ Returns True, if the all elections are completed. """
+        """ Returns True, if all elections are completed. """
 
-        if self.after_pukelsheim:
-            return self.pukelsheim_completed
+        elections = self.elections
+        if not elections:
+            return False
 
-        for election in self.elections:
+        for election in elections:
             if not election.completed:
                 return False
+
+        if self.after_pukelsheim and not self.pukelsheim_completed:
+            return False
 
         return True
 

@@ -85,8 +85,7 @@ def proporz_election(
         date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=144,
-        status=None,
-        after_pukelsheim=False
+        status=None
 ):
 
     # election
@@ -98,8 +97,7 @@ def proporz_election(
         date=date,
         number_of_mandates=number_of_mandates,
         absolute_majority=absolute_majority,
-        status=status,
-        after_pukelsheim=after_pukelsheim
+        status=status
     )
     election.title_translations['it_CH'] = 'Elezione'
 
@@ -207,8 +205,8 @@ def test_election_compound(session):
     assert election_compound.counted is True
     assert election_compound.progress == (0, 0)
     assert election_compound.counted_entities == []
-    assert election_compound.has_results == False
-    assert election_compound.completed == True
+    assert election_compound.has_results is False
+    assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
 
@@ -916,13 +914,12 @@ def test_election_compound_doppelter_pukelsheim(session):
 
     election_compound = ElectionCompound(
         title='Elections',
-        id='elerctions',
+        id='elections',
         domain='canton',
         date=date(2020, 3, 22),
     )
-
-    proporz_1 = proporz_election(
-        title='Proporz 1',
+    election_1 = proporz_election(
+        title='Election 1',
         id='1',
         shortcode='P1',
         domain='region',
@@ -930,9 +927,8 @@ def test_election_compound_doppelter_pukelsheim(session):
         number_of_mandates=1,
         status='interim'
     )
-
-    proporz_2 = proporz_election(
-        title='Proporz 2',
+    election_2 = proporz_election(
+        title='Election 2',
         id='2',
         shortcode='P2',
         domain='region',
@@ -940,44 +936,50 @@ def test_election_compound_doppelter_pukelsheim(session):
         number_of_mandates=1,
         status='final'
     )
-
-    session.add_all((proporz_1, proporz_2))
+    session.add_all((election_compound, election_1, election_2))
     session.flush()
 
-    # normal situation
-    assert proporz_1.completed is False
-    assert proporz_2.completed is True
-
-    # test when no associations are set for the election or
-    # compound election and election dates mismatch (fallback)
-    proporz_2.after_pukelsheim = True
-    assert proporz_2.completed is True
-
-    # Create compound
-    election_compound.elections = (proporz_1, proporz_2)
-    session.add(election_compound)
-    session.flush()
-    assert proporz_2.compound == election_compound
-
-    # Iterates over all election.competed that query compound itself
-    # test to prevent maximum recursion depth
+    # Normal situation
     assert election_compound.completed is False
-    # Since his compound is not flagged to use Pukelsheim, use default
-    assert proporz_2.completed is True
+    assert election_compound.progress == (0, 0)
+    assert election_1.completed is False
+    assert election_2.completed is True
 
-    proporz_1.status = 'final'
-    assert proporz_1.completed is True
+    election_compound.elections = (election_1, election_2)
+    assert election_1.compound == election_compound
+    assert election_2.compound == election_compound
+    assert election_compound.completed is False
+    assert election_compound.progress == (1, 2)
+    assert election_1.completed is False
+    assert election_2.completed is True
 
-    proporz_1.after_pukelsheim = True
-    assert proporz_1.completed is True
-
+    # Doppelter Pukelsheim, not completed
     election_compound.after_pukelsheim = True
-    assert proporz_1.completed is False
-    assert proporz_2.completed is False
+    assert election_compound.pukelsheim_completed is False
+    assert election_compound.completed is False
+    assert election_compound.progress == (0, 2)
+    assert election_1.completed is False
+    assert election_2.completed is False
 
+    election_1.status = 'final'
+    assert election_compound.completed is False
+    assert election_compound.progress == (0, 2)
+    assert election_1.completed is False
+    assert election_2.completed is False
+
+    # Doppelter Pukelsheim, completed
     election_compound.pukelsheim_completed = True
-    assert proporz_1.completed is True
-    assert proporz_2.completed is True
+    election_1.status = 'interim'
+    assert election_compound.completed is False
+    assert election_compound.progress == (1, 2)
+    assert election_1.completed is False
+    assert election_2.completed is True
+
+    election_1.status = 'final'
+    assert election_compound.completed is True
+    assert election_compound.progress == (2, 2)
+    assert election_1.completed is True
+    assert election_2.completed is True
 
 
 def test_list_results(session):

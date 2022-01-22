@@ -100,12 +100,6 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    after_pukelsheim = BooleanField(
-        label=_("Doppelter Pukelsheim"),
-        depends_on=('election_type', 'proporz'),
-        render_kw=dict(force_simple=True)
-    )
-
     date = DateField(
         label=_("Date"),
         validators=[
@@ -305,7 +299,6 @@ class ElectionForm(Form):
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
         model.expats = self.expats.data
-        model.after_pukelsheim = self.after_pukelsheim.data
 
         titles = {}
         if self.election_de.data:
@@ -378,7 +371,6 @@ class ElectionForm(Form):
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit
         self.expats.data = model.expats
-        self.after_pukelsheim.data = model.after_pukelsheim
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)

@@ -117,7 +117,6 @@ def create_election_wabstic_proporz(
                 number_of_mandates=mandates,
                 domain=domain,
                 status='unknown',
-                after_pukelsheim=after_pukelsheim
             )
 
             data_source_item = dict(

@@ -91,7 +91,6 @@ def test_election_form_model(session, related_link_labels):
     model.related_link_label = related_link_labels
     model.tacit = False
     model.expats = False
-    model.after_pukelsheim = True
     model.colors = {
         'FDP': '#3a8bc1',
         'CVP': '#ff9100',
@@ -118,7 +117,6 @@ def test_election_form_model(session, related_link_labels):
     assert form.related_link_label_rm.data == 'RM'
     assert form.tacit.data is False
     assert form.expats.data is False
-    assert form.after_pukelsheim.data is True
     assert form.colors.data == (
         'CVP #ff9100\n'
         'FDP #3a8bc1'
@@ -139,7 +137,6 @@ def test_election_form_model(session, related_link_labels):
     form.related_link.data = 'http://ur.l'
     form.tacit.data = True
     form.expats.data = True
-    form.after_pukelsheim.data = False
     form.colors.data = (
         'CVP #ff9100\r\n'
         'SP Juso #dd0e0e\n'
@@ -164,7 +161,6 @@ def test_election_form_model(session, related_link_labels):
     assert model.related_link == 'http://ur.l'
     assert model.tacit is True
     assert model.expats is True
-    assert model.after_pukelsheim is False
     assert model.colors == {
         'CVP': '#ff9100',
         'FDP': '#3a8bc1',

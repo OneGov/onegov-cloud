@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-22 07:42+0100\n"
+"POT-Creation-Date: 2022-01-22 08:27+0100\n"
 "PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -299,7 +299,7 @@ msgid "The election contains seperate results for expats."
 msgstr ""
 
 msgid "Doppelter Pukelsheim"
-msgstr ""
+msgstr "Doppelter Pukelsheim"
 
 msgid "Date"
 msgstr "Data"
@@ -358,13 +358,23 @@ msgstr ""
 msgid "Domain of the elections"
 msgstr ""
 
+msgid ""
+"Enables manual completion of the election compound. No indidvidual election "
+"results are displayed until the election compound is manually completed."
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
 msgid "Elections"
 msgstr "Elecziuns"
 
 msgid "List groups"
 msgstr "Gruppas da glistas"
 
-msgid "Shows a tab with list group results. Requires party results."
+msgid ""
+"Shows a tab with list group results. Requires party results with voters "
+"counts. Only if Doppelter Pukelsheim."
 msgstr ""
 
 msgid "Views"
@@ -399,12 +409,6 @@ msgid "Panachage"
 msgstr "Statistica da panaschar"
 
 msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
-
-msgid "After Doppelter Pukelsheim"
-msgstr ""
-
-msgid "Mark Pukelsheim Completed"
 msgstr ""
 
 msgid "Notifications"

@@ -14,7 +14,7 @@ from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
-from sqlalchemy import Column, Boolean
+from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import func
 from sqlalchemy import Integer
@@ -67,9 +67,6 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     #: Number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
-
-    #: Enable Doppelter Pukelsheim for election.completed
-    after_pukelsheim = Column(Boolean, default=False, nullable=False)
 
     def allocated_mandates(self, consider_completed=False):
         """ Number of already allocated mandates/elected candidates. """

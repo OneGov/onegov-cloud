@@ -488,3 +488,14 @@ def add_voters_count(context):
         context.operations.add_column(
             'party_results', Column('voters_count', Integer)
         )
+
+
+@upgrade_task(
+    'Removes Doppelter Pukelsheim to Election',
+    requires=(
+        'onegov.ballot:Adds Doppelter Pukelsheim to CompoundElection/Election'
+    )
+)
+def remove_after_pukelsheim(context):
+    if context.has_column('elections', 'after_pukelsheim'):
+        context.operations.drop_column('elections', 'after_pukelsheim')
