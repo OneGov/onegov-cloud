@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-22 08:27+0100\n"
+"POT-Creation-Date: 2022-01-22 10:20+0100\n"
 "PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -298,9 +298,6 @@ msgstr "Svizzers a l'exteriur"
 msgid "The election contains seperate results for expats."
 msgstr ""
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
-
 msgid "Date"
 msgstr "Data"
 
@@ -357,6 +354,9 @@ msgstr ""
 
 msgid "Domain of the elections"
 msgstr ""
+
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
 
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
@@ -854,9 +854,6 @@ msgstr "Gea"
 
 msgid "No"
 msgstr "Na"
-
-msgid "n.a."
-msgstr "n.i."
 
 msgid "All candidates"
 msgstr "Tut las candidatas e candidats"

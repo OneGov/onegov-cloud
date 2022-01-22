@@ -150,14 +150,11 @@ class ElectionCompound(
             election.number_of_mandates for election in self.elections
         ])
 
-    def allocated_mandates(self, consider_completed=False):
+    @property
+    def allocated_mandates(self):
         """ Number of already allocated mandates/elected candidates. """
 
-        if consider_completed:
-            election_ids = [e.id for e in self.elections if e.completed]
-        else:
-            election_ids = [e.id for e in self.elections]
-
+        election_ids = [e.id for e in self.elections if e.completed]
         if not election_ids:
             return 0
         session = object_session(self)
@@ -320,7 +317,7 @@ class ElectionCompound(
         for result in self.panachage_results:
             session.delete(result)
 
-    def export(self, consider_completed=False):
+    def export(self):
         """ Returns all data connected to this election compound as list with
         dicts.
 
@@ -347,7 +344,7 @@ class ElectionCompound(
 
         rows = []
         for election in self.elections:
-            for row in election.export(consider_completed):
+            for row in election.export():
                 rows.append(
                     OrderedDict(list(common.items()) + list(row.items()))
                 )

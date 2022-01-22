@@ -201,7 +201,7 @@ def test_election_compound(session):
 
     assert election_compound.elections == []
     assert election_compound.number_of_mandates == 0
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.counted is True
     assert election_compound.progress == (0, 0)
     assert election_compound.counted_entities == []
@@ -242,7 +242,7 @@ def test_election_compound(session):
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == False
     assert election_compound.completed == False
     assert election_compound.elected_candidates == []
@@ -288,7 +288,7 @@ def test_election_compound(session):
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == False
     assert election_compound.completed == False
 
@@ -297,7 +297,7 @@ def test_election_compound(session):
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == True
     assert election_compound.completed == False
 
@@ -308,7 +308,7 @@ def test_election_compound(session):
     assert election_compound.counted_entities == [
         'First district', 'Second district'
     ]
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.completed == True
 
     # Set candidates as elected

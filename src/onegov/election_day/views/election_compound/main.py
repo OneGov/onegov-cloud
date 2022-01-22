@@ -56,8 +56,7 @@ def view_election_compound_json(self, request):
         election.id: {
             'name': election.domain_segment,
             'mandates': {
-                'allocated': election.allocated_mandates(
-                    consider_completed=True) or 0,
+                'allocated': election.allocated_mandates or 0,
                 'total': election.number_of_mandates or 0,
             },
             'progress': {
@@ -75,7 +74,7 @@ def view_election_compound_json(self, request):
         'date': self.date.isoformat(),
         'last_modified': last_modified.isoformat(),
         'mandates': {
-            'allocated': self.allocated_mandates(consider_completed=True) or 0,
+            'allocated': self.allocated_mandates or 0,
             'total': self.number_of_mandates or 0,
         },
         'progress': {

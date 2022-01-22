@@ -77,7 +77,7 @@ def view_election_json(self, request):
         'domain': self.domain,
         'last_modified': last_modified.isoformat(),
         'mandates': {
-            'allocated': self.allocated_mandates(consider_completed=True) or 0,
+            'allocated': self.allocated_mandates or 0,
             'total': self.number_of_mandates or 0,
         },
         'progress': {

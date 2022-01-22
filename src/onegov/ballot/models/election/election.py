@@ -68,11 +68,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     #: Number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
-    def allocated_mandates(self, consider_completed=False):
+    @property
+    def allocated_mandates(self):
         """ Number of already allocated mandates/elected candidates. """
 
         # Unless an election is finished, allocated mandates are 0
-        if consider_completed and not self.completed:
+        if not self.completed:
             return 0
 
         results = object_session(self).query(
@@ -278,7 +279,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             ElectionResult.election_id == self.id
         ).delete()
 
-    def export(self, consider_completed=False):
+    def export(self):
         """ Returns all data connected to this election as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -288,18 +289,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         included in the export (since they are not really connected with the
         lists).
 
-        If consider completed, status for candidate_elected and
-        absolute_majority will be set to None if election is not completed.
-
         """
 
         session = object_session(self)
 
         ids = session.query(ElectionResult.id)
         ids = ids.filter(ElectionResult.election_id == self.id)
-
-        if consider_completed:
-            completed = self.completed
 
         results = session.query(
             CandidateResult.votes,
@@ -347,19 +342,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
                 title = result[1] and result[1].get(locale) or ''
                 row[f'election_title_{locale}'] = title.strip()
 
-            if consider_completed:
-                elected = result[24] if completed else None
-                absolute_majority = result[6] if completed else None
-            else:
-                elected = result[24]
-                absolute_majority = result[6]
-
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
             row['election_type'] = result[4]
             row['election_mandates'] = result[5]
 
-            row['election_absolute_majority'] = absolute_majority
+            row['election_absolute_majority'] = result[6]
             row['election_status'] = result[7] or 'unknown'
             row['entity_district'] = result[8] or ''
             row['entity_name'] = result[9]
@@ -378,7 +366,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             row['candidate_family_name'] = result[21]
             row['candidate_first_name'] = result[22]
             row['candidate_id'] = result[23]
-            row['candidate_elected'] = elected
+            row['candidate_elected'] = result[24]
 
             row['candidate_party'] = result[25]
             row['candidate_votes'] = result[0]

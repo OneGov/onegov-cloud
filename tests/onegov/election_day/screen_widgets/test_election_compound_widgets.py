@@ -224,7 +224,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'data-text="31515"' not in result
     assert 'data-text="10027"' in result
     assert 'data-text="1379"' in result
-    assert '>n.a.</td>' in result
     assert (
         'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
     ) in result
@@ -359,7 +358,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'data-text="24722"' in result
     assert 'data-text="1379"' in result
     assert 'data-text="3487"' in result
-    assert '>n.a.</td>' not in result
     assert (
         'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
     ) in result

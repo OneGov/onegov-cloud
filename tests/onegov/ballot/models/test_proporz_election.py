@@ -571,7 +571,7 @@ def test_proporz_election_results(session):
 
     assert sorted((c.votes for c in election.list_connections)) == []
 
-    assert election.number_of_mandates == election.allocated_mandates()
+    assert election.number_of_mandates == election.allocated_mandates
     assert election.elected_candidates == [('Joe', 'Quimby')]
 
     assert sum(

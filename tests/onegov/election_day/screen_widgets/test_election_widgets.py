@@ -189,7 +189,6 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="10693"' not in result
     assert 'data-text="2890"' in result
     assert 'data-text="2541"' in result
-    assert '>n.a.</td>' in result
     assert (
         'data-dataurl="Election/candidates-data'
         '?limit=0&amp;lists=&amp;elected="'
@@ -361,7 +360,6 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="24132"' not in result
     assert 'data-text="6612"' in result
     assert 'data-text="5691"' in result
-    assert '>n.a.</td>' not in result
     assert (
         'data-dataurl="Election/candidates-data'
         '?limit=0&amp;lists=&amp;elected="'
@@ -580,7 +578,6 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="50"' in result
     assert 'data-text="105"' in result
     assert 'data-text="69"' in result
-    assert '>n.a.</td>' in result
     assert (
         'data-dataurl="ProporzElection/candidates-data'
         '?limit=0&amp;lists=&amp;elected="'
@@ -729,7 +726,6 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="117"' in result
     assert 'data-text="269"' in result
     assert 'data-text="168"' in result
-    assert '>n.a.</td>' not in result
     assert (
         'data-dataurl="ProporzElection/candidates-data'
         '?limit=0&amp;lists=&amp;elected="'
