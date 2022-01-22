@@ -3,7 +3,6 @@ from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
-from onegov.election_day.utils.election_compound import get_list_groups_data
 from onegov.election_day.utils.election_compound import get_list_results
 
 
