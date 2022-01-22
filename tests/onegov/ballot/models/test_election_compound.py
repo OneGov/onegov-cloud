@@ -954,7 +954,7 @@ def test_election_compound_doppelter_pukelsheim(session):
     assert election_2.completed is True
 
     # Doppelter Pukelsheim, not completed
-    election_compound.after_pukelsheim = True
+    election_compound.pukelsheim = True
     assert election_compound.pukelsheim_completed is False
     assert election_compound.completed is False
     assert election_compound.progress == (0, 2)

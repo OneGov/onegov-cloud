@@ -2,7 +2,7 @@
 def get_list_results(election_compound, limit=None, names=None):
     """ Returns the aggregated list results as list. """
 
-    if election_compound.after_pukelsheim:
+    if election_compound.pukelsheim:
         return election_compound.get_list_results(
             order_by='number_of_mandates'
         )

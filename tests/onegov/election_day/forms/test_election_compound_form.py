@@ -142,7 +142,7 @@ def test_election_compound_form_model(session, related_link_labels):
     model.show_party_strengths = True
     model.show_party_panachage = True
     model.elections = [e_r]
-    model.after_pukelsheim = True
+    model.pukelsheim = True
     model.pukelsheim_completed = True
     model.colors = {
         'FDP': '#3a8bc1',
@@ -173,7 +173,7 @@ def test_election_compound_form_model(session, related_link_labels):
     assert form.region_elections.data == ['e-r']
     assert form.district_elections.data == []
     assert form.municipality_elections.data == []
-    assert form.after_pukelsheim.data is True
+    assert form.pukelsheim.data is True
     assert form.pukelsheim_completed.data is True
     assert form.colors.data == (
         'CVP #ff9100\n'
@@ -197,7 +197,7 @@ def test_election_compound_form_model(session, related_link_labels):
     form.region_elections.data = ['e-r']
     form.district_elections.data = ['e-d']
     form.municipality_elections.data = ['e-m']
-    form.after_pukelsheim.data = False
+    form.pukelsheim.data = False
     form.pukelsheim_completed.data = False
     form.colors.data = (
         'CVP #ff9100\r\n'

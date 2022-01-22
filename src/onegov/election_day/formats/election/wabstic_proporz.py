@@ -78,7 +78,7 @@ def create_election_wabstic_proporz(
         file_wp_wahl,
         mimetype_wp_wahl,
         create_compound=False,
-        after_pukelsheim=False,
+        pukelsheim=False,
         domain='region'
 ):
     assert isinstance(data_source, DataSource)
@@ -175,7 +175,7 @@ def create_election_wabstic_proporz(
         date=elections[0]['date'],
         domain='canton',
         domain_elections=domain,
-        after_pukelsheim=after_pukelsheim
+        pukelsheim=pukelsheim
     )
 
     session.add(ElectionCompound(**compound))

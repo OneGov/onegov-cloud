@@ -97,7 +97,7 @@ class ElectionCompound(
     date = Column(Date, nullable=False)
 
     #: Enable Doppelter Pukelsheim for setting status of child elections
-    after_pukelsheim = Column(Boolean, nullable=False, default=False)
+    pukelsheim = Column(Boolean, nullable=False, default=False)
 
     #: Status for Doppelter Pukelsheim to set via Website
     pukelsheim_completed = Column(Boolean, nullable=False, default=False)
@@ -218,7 +218,7 @@ class ElectionCompound(
             if not election.completed:
                 return False
 
-        if self.after_pukelsheim and not self.pukelsheim_completed:
+        if self.pukelsheim and not self.pukelsheim_completed:
             return False
 
         return True

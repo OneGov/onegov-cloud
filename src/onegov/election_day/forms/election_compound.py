@@ -36,7 +36,7 @@ class ElectionCompoundForm(Form):
         ]
     )
 
-    after_pukelsheim = BooleanField(
+    pukelsheim = BooleanField(
         label=_("Doppelter Pukelsheim"),
         description=_(
             "Enables manual completion of the election compound. "
@@ -48,7 +48,7 @@ class ElectionCompoundForm(Form):
 
     pukelsheim_completed = BooleanField(
         label=_("Completed"),
-        depends_on=('after_pukelsheim', 'y'),
+        depends_on=('pukelsheim', 'y'),
         render_kw=dict(force_simple=True)
     )
 
@@ -146,7 +146,7 @@ class ElectionCompoundForm(Form):
         ),
         fieldset=_("Views"),
         render_kw=dict(force_simple=True),
-        depends_on=('after_pukelsheim', 'y'),
+        depends_on=('pukelsheim', 'y'),
     )
 
     show_lists = BooleanField(
@@ -304,7 +304,7 @@ class ElectionCompoundForm(Form):
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
         model.show_mandate_allocation = self.show_mandate_allocation.data
-        model.after_pukelsheim = self.after_pukelsheim.data
+        model.pukelsheim = self.pukelsheim.data
         model.pukelsheim_completed = self.pukelsheim_completed.data
 
         model.elections = []
@@ -367,7 +367,7 @@ class ElectionCompoundForm(Form):
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
-        self.after_pukelsheim.data = model.after_pukelsheim
+        self.pukelsheim.data = model.pukelsheim
         self.pukelsheim_completed.data = model.pukelsheim_completed
         self.show_list_groups.data = model.show_list_groups
         self.show_lists.data = model.show_lists

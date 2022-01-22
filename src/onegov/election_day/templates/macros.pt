@@ -485,7 +485,7 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-list">List</th>
-                <th data-tablesaw-priority="${'0' if election.after_pukelsheim else '1'}" i18n:translate="single_votes" class="column-votes right-aligned">Votes</th>
+                <th data-tablesaw-priority="${'0' if election.pukelsheim else '1'}" i18n:translate="single_votes" class="column-votes right-aligned">Votes</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-mandates right-aligned">Mandates</th>
             </tr>
         </thead>

@@ -22,7 +22,7 @@ def view_election_compound_lists_data(self, request):
 
     return get_lists_data(
         self, limit=limit, names=names,
-        mandates_only=self.after_pukelsheim
+        mandates_only=self.pukelsheim
     )
 
 

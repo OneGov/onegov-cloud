@@ -114,7 +114,7 @@ class ProporzElection(Election, PartyResultExportMixin):
         result = super(ProporzElection, self).completed
 
         compound = self.compound
-        if compound and compound.after_pukelsheim:
+        if compound and compound.pukelsheim:
             return compound.pukelsheim_completed and result
 
         return result
