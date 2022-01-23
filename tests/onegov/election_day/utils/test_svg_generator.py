@@ -52,9 +52,12 @@ def test_generate_svg(election_day_app_gr, session):
             assert generate(item, 'entities-map', 'de_CH') == 0
             assert generate(item, 'districts-map', 'de_CH') == 0
 
-            item = add_election_compound(session)
+            item = add_election_compound(
+                session, elections=[item],
+                pukelsheim=True, pukelsheim_completed=True
+            )
             assert generate(item, 'list-groups', 'de_CH') == 1
-            assert generate(item, 'lists', 'de_CH') == 0
+            assert generate(item, 'lists', 'de_CH') == 1
             assert generate(item, 'candidates', 'de_CH') == 0
             assert generate(item, 'connections', 'de_CH') == 0
             assert generate(item, 'party-strengths', 'de_CH') == 1
@@ -78,7 +81,7 @@ def test_generate_svg(election_day_app_gr, session):
         with freeze_time("2015-05-05 15:00"):
             assert generate(item, 'map', 'it_CH') == 0
 
-        assert gc.call_count == 15
+        assert gc.call_count == 16
 
         ts = '1396620000'
         hm = '41c18975bf916862ed817b7c569b6f242ca7ad9f86ca73bbabd8d9cb26858440'
@@ -96,6 +99,7 @@ def test_generate_svg(election_day_app_gr, session):
             f'election-{hp}.{ts}.parties-panachage.de_CH.svg',
             f'election-{hp}.{ts}.lists-panachage.de_CH.svg',
             f'elections-{hc}.{ts}.list-groups.de_CH.svg',
+            f'elections-{hc}.{ts}.lists.de_CH.svg',
             f'elections-{hc}.{ts}.party-strengths.de_CH.svg',
             f'elections-{hc}.{ts}.parties-panachage.de_CH.svg',
             f'ballot-{hb}.{ts}.entities-map.de_CH.svg',

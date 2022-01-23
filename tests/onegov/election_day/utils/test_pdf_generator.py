@@ -62,15 +62,19 @@ def test_generate_pdf_election(session, election_day_app_zg):
 def test_generate_pdf_election_compound(session, election_day_app_zg):
     generator = PatchedPdfGenerator(election_day_app_zg)
 
-    compound = add_election_compound(session)
+    election = add_proporz_election(session)
+    compound = add_election_compound(session, elections=[election])
+    compound.pukelsheim = True
+    compound.pukelsheim_completed = True
     compound.show_list_groups = True
+    compound.show_lists = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
     compound.show_mandate_allocation = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 5
+            assert len(PdfReader(f, decompress=False).pages) == 6
 
 
 def test_generate_pdf_vote(session, election_day_app_zg):

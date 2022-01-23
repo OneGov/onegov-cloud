@@ -604,17 +604,34 @@ class PdfGenerator():
         if compound.show_list_groups and chart:
             pdf.h2(_('List groups'))
             pdf.pdf(chart)
-            pdf.figcaption(_('figcaption_list_groups'))
             pdf.spacer()
             pdf.results(
                 [
                     _('List group'),
-                    _('Voters count'),
                     _('Mandates'),
                 ],
                 [[
                     r.name,
-                    r.voters_count,
+                    r.number_of_mandates
+                ] for r in get_list_groups(compound)],
+                [None, 2 * cm, 2 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.pagebreak()
+
+        # Lists
+        chart = self.renderer.get_lists_chart(compound, 'pdf')
+        if compound.show_lists and chart:
+            pdf.h2(_('Lists'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('List'),
+                    _('Mandates'),
+                ],
+                [[
+                    r.name,
                     r.number_of_mandates
                 ] for r in get_list_groups(compound)],
                 [None, 2 * cm, 2 * cm],

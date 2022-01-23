@@ -81,7 +81,7 @@ class SvgGenerator():
                 'party-strengths', 'parties-panachage',
             ),
             'compound': (
-                'list-groups', 'party-strengths', 'parties-panachage',
+                'list-groups', 'lists', 'party-strengths', 'parties-panachage',
             ),
             'ballot': (
                 'entities-map', 'districts-map'

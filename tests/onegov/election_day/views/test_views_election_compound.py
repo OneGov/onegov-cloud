@@ -191,7 +191,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    create_election_compound(client)
+    create_election_compound(client, pukelsheim=True)
     upload_party_results(client, slug='elections/elections')
 
     main = client.get('/elections/elections/list-groups')

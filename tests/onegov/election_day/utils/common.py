@@ -225,12 +225,13 @@ def add_vote(session, type_):
     return vote
 
 
-def add_election_compound(session, year=2015, elections=None):
+def add_election_compound(session, year=2015, elections=None, **kwargs):
     compound = ElectionCompound(
         title='Election Compound',
         domain='canton',
         date=date(year, 6, 14),
-        elections=elections or []
+        elections=elections or [],
+        **kwargs
     )
     session.add(compound)
     session.flush()
