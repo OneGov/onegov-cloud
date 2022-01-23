@@ -4,17 +4,23 @@ from onegov.ballot import PartyResult
 def get_list_groups(election_compound):
     """" Get list groups data. """
 
-    if getattr(election_compound, 'type', 'proporz') == 'majorz':
+    if not election_compound.pukelsheim:
         return {}
 
-    results = election_compound.party_results.filter(
+    query = election_compound.party_results.filter(
         PartyResult.year == election_compound.date.year
     )
-    results = results.order_by(
-        PartyResult.voters_count.desc(),
-        PartyResult.number_of_mandates.desc(),
-    )
-    return results.all()
+    if election_compound.completed:
+        query = query.order_by(
+            PartyResult.number_of_mandates.desc(),
+            PartyResult.name,
+        )
+    else:
+        query = query.order_by(
+            PartyResult.voters_count.desc(),
+            PartyResult.name,
+        )
+    return query.all()
 
 
 def get_list_groups_data(election_compound):
@@ -22,19 +28,21 @@ def get_list_groups_data(election_compound):
 
     results = get_list_groups(election_compound)
     if not results:
-        return {}
+        return {'results': []}
 
+    completed = election_compound.completed
     return {
         'results': [
             {
                 'text': result.name,
-                'value': result.voters_count,
-                'value2': result.number_of_mandates,
+                'value': (
+                    result.number_of_mandates if completed
+                    else result.voters_count
+                ),
+                'value2': None,
                 'class': (
-                    'active' if (
-                        result.number_of_mandates
-                        and election_compound.completed
-                    ) else 'inactive'
+                    'active' if completed and result.number_of_mandates
+                    else 'inactive'
                 ),
                 'color': result.color
             } for result in results

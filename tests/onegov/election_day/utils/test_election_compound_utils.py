@@ -321,62 +321,124 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     )
     assert not errors
 
-    assert len(get_list_groups(election_compound)) == 7
+    # Not pukelsheim
+    assert len(get_list_groups(election_compound)) == 0
+    assert get_list_groups_data(election_compound) == {'results': []}
 
+    # Pukelsheim, intermediate
+    election_compound.pukelsheim = True
+    assert len(get_list_groups(election_compound)) == 7
+    assert get_list_groups_data(election_compound) == {
+        'results': [
+            {
+                'class': 'inactive',
+                'color': '#EE7F00',
+                'text': 'CVP',
+                'value': 931,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#019040',
+                'text': 'SVP',
+                'value': 899,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#0E52A0',
+                'text': 'FDP',
+                'value': 863,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#99C040',
+                'text': 'AL',
+                'value': 538,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#E53136',
+                'text': 'SP',
+                'value': 418,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#acc700',
+                'text': 'GLP',
+                'value': 236,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#F9B200',
+                'text': 'Piraten',
+                'value': 19,
+                'value2': None
+            }
+        ]
+    }
+
+    # Pukelsheim, final
+    election_compound.pukelsheim_completed = True
     assert get_list_groups_data(election_compound) == {
         'results': [
             {
                 'class': 'active',
                 'color': '#EE7F00',
                 'text': 'CVP',
-                'value': 0,
-                'value2': 22
+                'value': 22,
+                'value2': None
             },
             {
                 'class': 'active',
                 'color': '#019040',
                 'text': 'SVP',
-                'value': 0,
-                'value2': 19
+                'value': 19,
+                'value2': None
             },
             {
                 'class': 'active',
                 'color': '#0E52A0',
                 'text': 'FDP',
-                'value': 0,
-                'value2': 18
+                'value': 18,
+                'value2': None
             },
             {
                 'class': 'active',
                 'color': '#99C040',
                 'text': 'AL',
-                'value': 0,
-                'value2': 10
+                'value': 10,
+                'value2': None
             },
             {
                 'class': 'active',
                 'color': '#E53136',
                 'text': 'SP',
-                'value': 0,
-                'value2': 7
+                'value': 7,
+                'value2': None
             },
             {
                 'class': 'active',
                 'color': '#acc700',
                 'text': 'GLP',
-                'value': 0,
-                'value2': 4
+                'value': 4,
+                'value2': None
             },
             {
                 'class': 'inactive',
                 'color': '#F9B200',
                 'text': 'Piraten',
                 'value': 0,
-                'value2': 0
+                'value2': None
             }
         ]
     }
 
+    # Party results
     data = get_parties_panachage_data(election_compound)
     assert data['title'] == 'Compound'
     l = data['links']
@@ -461,7 +523,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#99C040',
                 'mandates': 10,
-                'voters_count': 0,
+                'voters_count': 538,
                 'votes': {'permille': 138, 'total': 43062}
             }
         },
@@ -469,7 +531,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#EE7F00',
                 'mandates': 22,
-                'voters_count': 0,
+                'voters_count': 931,
                 'votes': {'permille': 238, 'total': 74448}
             }
         },
@@ -477,7 +539,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#0E52A0',
                 'mandates': 18,
-                'voters_count': 0,
+                'voters_count': 863,
                 'votes': {'permille': 221, 'total': 69028}
             }
         },
@@ -485,7 +547,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#acc700',
                 'mandates': 4,
-                'voters_count': 0,
+                'voters_count': 236,
                 'votes': {'permille': 60, 'total': 18864}
             }
         },
@@ -493,7 +555,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#F9B200',
                 'mandates': 0,
-                'voters_count': 0,
+                'voters_count': 19,
                 'votes': {'permille': 5, 'total': 1487}
             }
         },
@@ -501,7 +563,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#E53136',
                 'mandates': 7,
-                'voters_count': 0,
+                'voters_count': 418,
                 'votes': {'permille': 107, 'total': 33459}
             }
         },
@@ -509,7 +571,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#019040',
                 'mandates': 19,
-                'voters_count': 0,
+                'voters_count': 899,
                 'votes': {'permille': 230, 'total': 71930}
             }
         }}
@@ -518,13 +580,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         False,
         {
             '2014': [
-                ['AL', 10, 0, 43062, '13.8%'],
-                ['CVP', 22, 0, 74448, '23.8%'],
-                ['FDP', 18, 0, 69028, '22.1%'],
-                ['GLP', 4, 0, 18864, '6.0%'],
-                ['Piraten', 0, 0, 1487, '0.5%'],
-                ['SP', 7, 0, 33459, '10.7%'],
-                ['SVP', 19, 0, 71930, '23.0%']
+                ['AL', 10, 538, 43062, '13.8%'],
+                ['CVP', 22, 931, 74448, '23.8%'],
+                ['FDP', 18, 863, 69028, '22.1%'],
+                ['GLP', 4, 236, 18864, '6.0%'],
+                ['Piraten', 0, 19, 1487, '0.5%'],
+                ['SP', 7, 418, 33459, '10.7%'],
+                ['SVP', 19, 899, 71930, '23.0%']
             ]
         }
     )

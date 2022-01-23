@@ -502,7 +502,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False):
 
 
 def upload_election_compound(client, create=True, canton='gr',
-                             pukelsheim=False):
+                             status='unknown', pukelsheim=False):
     entities = {
         'bl': [2761, 2762],
         'gr': [3506, 3513],
@@ -521,16 +521,16 @@ def upload_election_compound(client, create=True, canton='gr',
         entity = entities[canton][index]
         if index:
             csv += (
-                f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
                 f'101,True,Hans,Sieger,0,,0,1\n'
-                f'unknown,{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
                 f'201,False,Peter,Verlierer,2,,2,0\n'
             )
         else:
             csv += (
-                f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
                 f'101,False,Anna,Looser,0,,0,1\n'
-                f'unknown,{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
                 f'201,True,Carol,Winner,2,,2,0\n'
             )
         csv = csv.encode('utf-8')

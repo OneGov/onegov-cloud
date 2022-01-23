@@ -191,13 +191,14 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    create_election_compound(client, pukelsheim=True)
+    upload_election_compound(client, pukelsheim=True, status='final')
     upload_party_results(client, slug='elections/elections')
 
+    # intermediate results
     main = client.get('/elections/elections/list-groups')
     assert '<h3>Listengruppen</h3>' in main
     assert 'BDP' in main
-    assert 'data-text="603"' in main  # todo:
+    assert 'data-text="603"' in main
 
     groups = client.get('/elections/elections/list-groups-data')
     groups = groups.json
@@ -208,21 +209,21 @@ def test_view_election_compound_list_groups(election_day_app_gr):
                 'color': '#efb52c',
                 'text': 'BDP',
                 'value': 603,
-                'value2': 1
+                'value2': None
             },
             {
                 'class': 'inactive',
                 'color': '#ff6300',
                 'text': 'CVP',
                 'value': 491,
-                'value2': 1
+                'value2': None
             },
             {
                 'class': 'inactive',
                 'color': '#0571b0',
                 'text': 'FDP',
                 'value': 351,
-                'value2': 0
+                'value2': None
             }
         ]
     }
@@ -230,6 +231,44 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     chart = client.get('/elections/elections/list-groups-chart')
     assert chart.status_code == 200
     assert '/elections/elections/list-groups-data' in chart
+
+    # final results
+    edit = client.get('/elections/elections/edit')
+    edit.form['pukelsheim_completed'] = True
+    edit.form.submit()
+
+    main = client.get('/elections/elections/list-groups')
+    assert '<h3>Listengruppen</h3>' in main
+    assert 'BDP' in main
+    # assert 'data-text="603"' not in main
+
+    groups = client.get('/elections/elections/list-groups-data')
+    groups = groups.json
+    assert groups == {
+        'results': [
+            {
+                'class': 'active',
+                'color': '#efb52c',
+                'text': 'BDP',
+                'value': 1,
+                'value2': None
+            },
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'text': 'CVP',
+                'value': 1,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#0571b0',
+                'text': 'FDP',
+                'value': 0,
+                'value2': None
+            }
+        ]
+    }
 
 
 def test_view_election_compound_mandate_allocation(election_day_app_gr):

@@ -123,17 +123,20 @@ def test_create_svgs(election_day_app_gr):
         with freeze_time("2014-04-04 14:00"):
             majorz = add_majorz_election(session)
             proporz = add_proporz_election(session)
-            compound = add_election_compound(session)
+            compound = add_election_compound(
+                session, elections=[proporz],
+                pukelsheim=True, pukelsheim_completed=True,
+            )
             vote = add_vote(session, 'complex')
             assert majorz.last_result_change is None  # used later
 
         # generate
-        assert generator.create_svgs() == (34, 0)
-        assert len(fs.listdir('svg')) == 34
+        assert generator.create_svgs() == (35, 0)
+        assert len(fs.listdir('svg')) == 35
 
         # don't recreate
         assert generator.create_svgs() == (0, 0)
-        assert len(fs.listdir('svg')) == 34
+        assert len(fs.listdir('svg')) == 35
 
         # remove foreign files
         fs.touch('svg/somefile')
@@ -141,7 +144,7 @@ def test_create_svgs(election_day_app_gr):
         fs.touch('svg/.somefile')
 
         assert generator.create_svgs() == (0, 3)
-        assert len(fs.listdir('svg')) == 34
+        assert len(fs.listdir('svg')) == 35
 
         # remove obsolete
         session.delete(vote)
@@ -149,7 +152,7 @@ def test_create_svgs(election_day_app_gr):
         session.delete(compound)
         session.flush()
 
-        assert generator.create_svgs() == (0, 33)
+        assert generator.create_svgs() == (0, 34)
         assert len(fs.listdir('svg')) == 1
 
         # recreate after changes

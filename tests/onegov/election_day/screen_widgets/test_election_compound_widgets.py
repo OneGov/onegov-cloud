@@ -325,9 +325,9 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             ('SVP', 4128, 35),
             ('CVP', 3487, 27),
             ('FDP', 2894, 22),
-            ('SP', 2481, 6),
             ('GRÜ', 1424, 9),
             ('GLP', 1165, 6),
+            ('SP', 2481, 6),
             ('EVP', 369, 2)
         ],
         'layout': layout,
@@ -359,7 +359,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'data-text="87135"' not in result
     assert 'data-text="1705"' not in result  # voters_count hidden
     assert 'data-text="140"' not in result  # voters_count hidden
-    assert 'data-text="3487"' in result
+    assert 'data-text="3487"' not in result  # voters_count hidden
     assert (
         'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
     ) in result
