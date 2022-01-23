@@ -164,3 +164,15 @@ class CountedEntitiesWidget(ModelBoundWidget):
             'model': model,
             'entities': ', '.join(model.counted_entities)
         }
+
+
+class ChartWidget(ModelBoundWidget):
+
+    def __init__(self, model=None):
+        self.model = model
+
+    def get_variables(self, layout):
+        return {
+            'embed': False,
+            'model': self.model or layout.model
+        }

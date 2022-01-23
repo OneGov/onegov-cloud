@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-17 10:08+0100\n"
-"PO-Revision-Date: 2022-01-17 10:08+0100\n"
+"POT-Creation-Date: 2022-01-23 08:17+0100\n"
+"PO-Revision-Date: 2022-01-22 08:26+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -125,6 +125,10 @@ msgstr "Valori non validi"
 #, python-format
 msgid "${name} was found twice"
 msgstr "${name} figura due volte"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr "Nessun risultato di partito per l'anno ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids e id non coerente"
@@ -292,9 +296,6 @@ msgstr "Svizzeri all'estero"
 msgid "The election contains seperate results for expats."
 msgstr "L'elezione contiene risultati separati per gli espatriati."
 
-msgid "Doppelter Pukelsheim"
-msgstr ""
-
 msgid "Date"
 msgstr "Data"
 
@@ -352,23 +353,46 @@ msgstr "Definizioni di colore non valide"
 msgid "Domain of the elections"
 msgstr "Livello di elezione"
 
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid ""
+"Enables manual completion of the election compound. No indidvidual election "
+"results are displayed until the election compound is manually completed."
+msgstr ""
+"Permette di completare manualmente il componente delle elezioni. Nessun "
+"risultato elettorale individuale viene visualizzato fino a quando il "
+"componente elettorale non viene completato manualmente."
+
+msgid "Completed"
+msgstr "Completato"
+
 msgid "Elections"
 msgstr "Elezioni"
+
+msgid "List groups"
+msgstr "Gruppi di liste"
+
+msgid ""
+"Shows a tab with list group results. Requires party results with voters "
+"counts. Only if Doppelter Pukelsheim."
+msgstr ""
+"Mostra una scheda con i risultati del gruppo di liste. Richiede i risultati "
+"del partito con il conteggio dei votanti. Solo per Doppelter Pukelsheim."
+
+msgid "Views"
+msgstr "Visualizzazioni"
 
 msgid "Lists"
 msgstr "Liste"
 
 msgid ""
-"Shows a tab with aggregated list results over all elections. Requires that "
-"all elections share the same lists. Note that the number of votes is not "
-"really meaningful."
+"Shows a tab with aggregated list results over all elections. Only useful if "
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
 msgstr ""
 "Mostra una scheda con i risultati delle liste aggregate su tutte le "
-"elezioni. Richiede che tutte le elezioni condividano le stesse liste. Si "
-"noti che il numero di voti non è veramente significativo."
-
-msgid "Views"
-msgstr "Visualizzazioni"
+"elezioni. Utile solo se le liste corrispondono ai gruppi di liste. Solo per "
+"Doppelter Pukelsheim."
 
 msgid "Mandate allocation"
 msgstr "Ripartizione dei seggi"
@@ -394,13 +418,7 @@ msgid "Panachage"
 msgstr "Panachage"
 
 msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
-
-msgid "After Doppelter Pukelsheim"
-msgstr ""
-
-msgid "Mark Pukelsheim Completed"
-msgstr ""
+msgstr "Mostra una scheda con il panachage. Richiede i risultati del partito."
 
 msgid "Notifications"
 msgstr "Notifiche"
@@ -601,6 +619,12 @@ msgstr "Distretti elettorali"
 msgid "Districts"
 msgstr "Distretti elettorali"
 
+msgid "region_label_gr"
+msgstr "Circondario elettorale"
+
+msgid "regions_label_gr"
+msgstr "Circondari elettorali"
+
 msgid "superregion_label_bl"
 msgstr "Regione"
 
@@ -711,6 +735,18 @@ msgstr "Descrizione del formato"
 
 msgid "Embed"
 msgstr "Incorporare"
+
+#. Default: The number of votes of a party is divided by the number of seats to
+#. be allocated in the district concerned. The result is called the voters
+#. count. The voters count determines the allocation to the list groups. The
+#. election is finished as soon as the number of mandates appears.
+#.
+msgid "figcaption_list_groups"
+msgstr ""
+"Il numero di voti di partito di una lista è diviso per il numero dei seggi "
+"da assegnare nel circondario elettorale in questione. Il risultato è detto "
+"numero di elettori della lista. Il numero di elettori sovraripartizione tra "
+"i gruppi di liste."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -828,14 +864,17 @@ msgstr "Si"
 msgid "No"
 msgstr "No"
 
-msgid "n.a."
-msgstr "n.d."
-
 msgid "All candidates"
 msgstr "Tutti i candidati"
 
 msgid "Elected candidates only"
 msgstr "Solo i candidati eletti"
+
+msgid "List group"
+msgstr "Gruppo di liste"
+
+msgid "Voters count"
+msgstr "Numero di elettori"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"

@@ -3,7 +3,6 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import \
     hide_connections_chart
-from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
@@ -50,7 +49,7 @@ def view_election_connections_chart(self, request):
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionLayout(self, request),
         'type': 'connections-chart',
         'skip_rendering': skip_rendering,
         'help_text': election_incomplete_text
@@ -73,7 +72,7 @@ def view_election_connections_table(self, request):
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionLayout(self, request),
         'connections': get_connection_results_api(self, object_session(self)),
         'type': 'election-table',
         'scope': 'connections'

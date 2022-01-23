@@ -7,8 +7,8 @@ from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
-from onegov.election_day.utils.election import get_elected_candidates
-from onegov.election_day.utils.election import get_party_results
+from onegov.election_day.utils.election_compound import get_elected_candidates
+from onegov.election_day.utils.parties import get_party_results
 
 
 @ElectionDayApp.html(
@@ -37,7 +37,7 @@ def view_election_compound_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
-    embed = {}
+    embed = {'districts-map': request.link(self, 'districts-map')}
     media = {'charts': {}}
     layout = ElectionCompoundLayout(self, request)
     layout.last_modified = last_modified
@@ -56,8 +56,7 @@ def view_election_compound_json(self, request):
         election.id: {
             'name': election.domain_segment,
             'mandates': {
-                'allocated': election.allocated_mandates(
-                    consider_completed=True) or 0,
+                'allocated': election.allocated_mandates or 0,
                 'total': election.number_of_mandates or 0,
             },
             'progress': {
@@ -75,7 +74,7 @@ def view_election_compound_json(self, request):
         'date': self.date.isoformat(),
         'last_modified': last_modified.isoformat(),
         'mandates': {
-            'allocated': self.allocated_mandates(consider_completed=True) or 0,
+            'allocated': self.allocated_mandates or 0,
             'total': self.number_of_mandates or 0,
         },
         'progress': {

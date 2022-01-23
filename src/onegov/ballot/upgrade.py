@@ -480,3 +480,32 @@ def add_last_result_change(context):
             context.operations.add_column(
                 table, Column('last_result_change', UTCDateTime)
             )
+
+
+@upgrade_task('Adds voters count to party results')
+def add_voters_count(context):
+    if not context.has_column('party_results', 'voters_count'):
+        context.operations.add_column(
+            'party_results', Column('voters_count', Integer)
+        )
+
+
+@upgrade_task(
+    'Cleans up pukelsheim fields',
+    requires=(
+        'onegov.ballot:Adds Doppelter Pukelsheim to CompoundElection/Election'
+    )
+)
+def cleanup_pukelsheim_fields(context):
+    if context.has_column('elections', 'after_pukelsheim'):
+        context.operations.drop_column(
+            'elections',
+            'after_pukelsheim'
+        )
+
+    if context.has_column('election_compounds', 'after_pukelsheim'):
+        context.operations.alter_column(
+            'election_compounds',
+            'after_pukelsheim',
+            new_column_name='pukelsheim'
+        )

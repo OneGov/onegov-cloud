@@ -228,7 +228,7 @@ Version `>= 2.2` is supported, please refer to the documentation provided by the
 
 ### Party results
 
-Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
+Each (proporz) election and each election compound may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
 
 The following columns will be evaluated and should exist:
 
@@ -241,6 +241,7 @@ Name|Description
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
+`voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 
 The results may contain panachage results by adding one column per party:
 

@@ -85,8 +85,7 @@ def proporz_election(
         date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=144,
-        status=None,
-        after_pukelsheim=False
+        status=None
 ):
 
     # election
@@ -98,8 +97,7 @@ def proporz_election(
         date=date,
         number_of_mandates=number_of_mandates,
         absolute_majority=absolute_majority,
-        status=status,
-        after_pukelsheim=after_pukelsheim
+        status=status
     )
     election.title_translations['it_CH'] = 'Elezione'
 
@@ -203,12 +201,12 @@ def test_election_compound(session):
 
     assert election_compound.elections == []
     assert election_compound.number_of_mandates == 0
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.counted is True
     assert election_compound.progress == (0, 0)
     assert election_compound.counted_entities == []
-    assert election_compound.has_results == False
-    assert election_compound.completed == True
+    assert election_compound.has_results is False
+    assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
 
@@ -244,7 +242,7 @@ def test_election_compound(session):
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == False
     assert election_compound.completed == False
     assert election_compound.elected_candidates == []
@@ -290,7 +288,7 @@ def test_election_compound(session):
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == False
     assert election_compound.completed == False
 
@@ -299,7 +297,7 @@ def test_election_compound(session):
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == True
     assert election_compound.completed == False
 
@@ -310,7 +308,7 @@ def test_election_compound(session):
     assert election_compound.counted_entities == [
         'First district', 'Second district'
     ]
-    assert election_compound.allocated_mandates() == 0
+    assert election_compound.allocated_mandates == 0
     assert election_compound.completed == True
 
     # Set candidates as elected
@@ -703,6 +701,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=0,
             votes=0,
+            voters_count=1,
             total_votes=100,
             name='Libertarian',
             color='black',
@@ -713,6 +712,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=2,
             votes=2,
+            voters_count=3,
             total_votes=50,
             name='Libertarian',
             color='black',
@@ -723,6 +723,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=1,
             votes=1,
+            voters_count=2,
             total_votes=100,
             name='Conservative',
             color='red',
@@ -733,6 +734,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=3,
             votes=3,
+            voters_count=4,
             total_votes=50,
             name='Conservative',
             color='red',
@@ -749,6 +751,7 @@ def test_election_compound_export_parties(session):
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
+            'voters_count': 4,
         }, {
             'year': 2016,
             'name': 'Libertarian',
@@ -757,6 +760,7 @@ def test_election_compound_export_parties(session):
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
+            'voters_count': 3,
         }, {
             'year': 2012,
             'name': 'Conservative',
@@ -765,6 +769,7 @@ def test_election_compound_export_parties(session):
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
+            'voters_count': 2,
         }, {
             'year': 2012,
             'name': 'Libertarian',
@@ -773,6 +778,7 @@ def test_election_compound_export_parties(session):
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
+            'voters_count': 1,
         }
     ]
 
@@ -801,6 +807,7 @@ def test_election_compound_export_parties(session):
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
+            'voters_count': 4,
             'panachage_votes_from_0': 1,
             'panachage_votes_from_1': 2,
             'panachage_votes_from_2': 3,
@@ -813,6 +820,7 @@ def test_election_compound_export_parties(session):
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
+            'voters_count': 3,
             'panachage_votes_from_0': 5,
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -824,6 +832,7 @@ def test_election_compound_export_parties(session):
             'id': 2,
             'total_votes': '',
             'votes': '',
+            'voters_count': '',
             'year': 2016,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
@@ -837,6 +846,7 @@ def test_election_compound_export_parties(session):
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
+            'voters_count': 2,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -849,6 +859,7 @@ def test_election_compound_export_parties(session):
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
+            'voters_count': 1,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -860,6 +871,7 @@ def test_election_compound_export_parties(session):
             'id': 2,
             'total_votes': '',
             'votes': '',
+            'voters_count': '',
             'year': 2012,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
@@ -902,13 +914,12 @@ def test_election_compound_doppelter_pukelsheim(session):
 
     election_compound = ElectionCompound(
         title='Elections',
-        id='elerctions',
+        id='elections',
         domain='canton',
         date=date(2020, 3, 22),
     )
-
-    proporz_1 = proporz_election(
-        title='Proporz 1',
+    election_1 = proporz_election(
+        title='Election 1',
         id='1',
         shortcode='P1',
         domain='region',
@@ -916,9 +927,8 @@ def test_election_compound_doppelter_pukelsheim(session):
         number_of_mandates=1,
         status='interim'
     )
-
-    proporz_2 = proporz_election(
-        title='Proporz 2',
+    election_2 = proporz_election(
+        title='Election 2',
         id='2',
         shortcode='P2',
         domain='region',
@@ -926,44 +936,50 @@ def test_election_compound_doppelter_pukelsheim(session):
         number_of_mandates=1,
         status='final'
     )
-
-    session.add_all((proporz_1, proporz_2))
+    session.add_all((election_compound, election_1, election_2))
     session.flush()
 
-    # normal situation
-    assert proporz_1.completed is False
-    assert proporz_2.completed is True
-
-    # test when no associations are set for the election or
-    # compound election and election dates mismatch (fallback)
-    proporz_2.after_pukelsheim = True
-    assert proporz_2.completed is True
-
-    # Create compound
-    election_compound.elections = (proporz_1, proporz_2)
-    session.add(election_compound)
-    session.flush()
-    assert proporz_2.compound == election_compound
-
-    # Iterates over all election.competed that query compound itself
-    # test to prevent maximum recursion depth
+    # Normal situation
     assert election_compound.completed is False
-    # Since his compound is not flagged to use Pukelsheim, use default
-    assert proporz_2.completed is True
+    assert election_compound.progress == (0, 0)
+    assert election_1.completed is False
+    assert election_2.completed is True
 
-    proporz_1.status = 'final'
-    assert proporz_1.completed is True
+    election_compound.elections = (election_1, election_2)
+    assert election_1.compound == election_compound
+    assert election_2.compound == election_compound
+    assert election_compound.completed is False
+    assert election_compound.progress == (1, 2)
+    assert election_1.completed is False
+    assert election_2.completed is True
 
-    proporz_1.after_pukelsheim = True
-    assert proporz_1.completed is True
+    # Doppelter Pukelsheim, not completed
+    election_compound.pukelsheim = True
+    assert election_compound.pukelsheim_completed is False
+    assert election_compound.completed is False
+    assert election_compound.progress == (0, 2)
+    assert election_1.completed is False
+    assert election_2.completed is False
 
-    election_compound.after_pukelsheim = True
-    assert proporz_1.completed is False
-    assert proporz_2.completed is False
+    election_1.status = 'final'
+    assert election_compound.completed is False
+    assert election_compound.progress == (0, 2)
+    assert election_1.completed is False
+    assert election_2.completed is False
 
+    # Doppelter Pukelsheim, completed
     election_compound.pukelsheim_completed = True
-    assert proporz_1.completed is True
-    assert proporz_2.completed is True
+    election_1.status = 'interim'
+    assert election_compound.completed is False
+    assert election_compound.progress == (1, 2)
+    assert election_1.completed is False
+    assert election_2.completed is True
+
+    election_1.status = 'final'
+    assert election_compound.completed is True
+    assert election_compound.progress == (2, 2)
+    assert election_1.completed is True
+    assert election_2.completed is True
 
 
 def test_list_results(session):
@@ -975,20 +991,25 @@ def test_list_results(session):
     session.add(election_compound)
     session.flush()
 
-    assert election_compound.get_list_results().all() == []
+    assert election_compound.get_list_results() == []
     elections = [
-        proporz_election(id='1'),
-        proporz_election(id='2'),
-        proporz_election(id='3')
+        proporz_election(id='1', number_of_mandates=1),
+        proporz_election(id='2', number_of_mandates=2),
+        proporz_election(id='3', number_of_mandates=3)
     ]
     for election in elections:
         session.add(election)
     election_compound.elections = elections
     session.flush()
 
-    assert election_compound.get_list_results().all() == [
-        ('Quimby Again!', 3, 3 * 520),
-        ('Kwik-E-Major', 0, 3 * 111)
+    # Not Doppelter Pukelsheim
+    assert election_compound.get_list_results() == []
+
+    # Not Doppelter Pukelsheim
+    election_compound.pukelsheim = True
+    assert election_compound.get_list_results() == [
+        ('Quimby Again!', 3, 953),  # 520 / 1 + 520 / 2 + 520 / 3
+        ('Kwik-E-Major', 0, 204)  # 111 / 1 + 111/2 + 111/3
     ]
 
     # Add another list
@@ -1013,66 +1034,64 @@ def test_list_results(session):
     elections[0].results.append(election_result)
     session.flush()
 
-    assert election_compound.get_list_results().all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
-        ('Burns burns!', 5, 200)
+    assert election_compound.get_list_results() == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
+        ('Burns burns!', 5, 200)  # 200 + 0 / 2 + 0 / 3
     ]
 
     # Test optional parameters
     # ... limit
-    assert election_compound.get_list_results(limit=0).all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
+    assert election_compound.get_list_results(limit=0) == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
         ('Burns burns!', 5, 200)
     ]
-    assert election_compound.get_list_results(limit=None).all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
+    assert election_compound.get_list_results(limit=None) == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
         ('Burns burns!', 5, 200)
     ]
-    assert election_compound.get_list_results(limit=-5).all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
+    assert election_compound.get_list_results(limit=-5) == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
         ('Burns burns!', 5, 200)
     ]
-    assert election_compound.get_list_results(limit=2).all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
+    assert election_compound.get_list_results(limit=2) == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
     ]
 
     # ... names
-    assert election_compound.get_list_results(names=[]).all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
+    assert election_compound.get_list_results(names=[]) == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
         ('Burns burns!', 5, 200)
     ]
-    assert election_compound.get_list_results(names=None).all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
+    assert election_compound.get_list_results(names=None) == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
         ('Burns burns!', 5, 200)
     ]
     assert election_compound.get_list_results(
         names=['Quimby Again!', 'Kwik-E-Major', 'All others']
-    ).all() == [
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333),
+    ) == [
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204),
     ]
 
-    # ... order_by
-    assert election_compound.get_list_results(
-        order_by='number_of_mandates'
-    ).all() == [
+    # ... completed
+    election_compound.pukelsheim_completed = True
+    assert election_compound.get_list_results() == [
         ('Burns burns!', 5, 200),
-        ('Quimby Again!', 3, 1560),
-        ('Kwik-E-Major', 0, 333)
+        ('Quimby Again!', 3, 953),
+        ('Kwik-E-Major', 0, 204)
     ]
 
     # ... limit & names & order_by
     assert election_compound.get_list_results(
         limit=1,
         names=['Quimby Again!'],
-        order_by='number_of_mandates'
-    ).all() == [
-        ('Quimby Again!', 3, 1560),
+    ) == [
+        ('Quimby Again!', 3, 953),
     ]

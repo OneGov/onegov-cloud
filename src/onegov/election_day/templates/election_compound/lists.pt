@@ -26,6 +26,11 @@
                         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
                             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
                         </a>
+                        <figcaption tal:condition="not: layout.completed" i18n:translate="figcaption_list_groups">
+                            The number of votes of a party is divided by the number of seats to be allocated in the district concerned.
+                            The result is called the voters count. The voters count determines the allocation to the list groups.
+                            The election is finished as soon as the number of mandates appears.
+                        </figcaption>
                     </figure>
                 </div>
             </div>

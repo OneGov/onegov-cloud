@@ -9,9 +9,10 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
-from onegov.election_day.utils.election import get_elected_candidates
-from onegov.election_day.utils.election import get_party_results
-from onegov.election_day.utils.election import get_party_results_deltas
+from onegov.election_day.utils.election_compound import get_elected_candidates
+from onegov.election_day.utils.election_compound import get_list_groups
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -180,7 +181,7 @@ class PdfGenerator():
                 ''
             ],
             [
-                election.allocated_mandates(consider_completed=True),
+                election.allocated_mandates,
                 election.absolute_majority if show_majority else '',
                 ''
             ],
@@ -542,7 +543,7 @@ class PdfGenerator():
         # Factoids
         pdf.factoids(
             [_('Seats') if majorz else _('Mandates'), '', ''],
-            [compound.allocated_mandates(consider_completed=True), '', '']
+            [compound.allocated_mandates, '', '']
         )
         pdf.spacer()
         pdf.spacer()
@@ -554,7 +555,7 @@ class PdfGenerator():
             [
                 [
                     e.domain_segment,
-                    e.allocated_mandates(consider_completed=True)
+                    e.allocated_mandates
                 ]
                 for e in compound.elections
             ],
@@ -597,6 +598,46 @@ class PdfGenerator():
                 pdf.style.table_results_3
             )
         pdf.pagebreak()
+
+        # List groups
+        chart = self.renderer.get_list_groups_chart(compound, 'pdf')
+        if compound.show_list_groups and chart:
+            pdf.h2(_('List groups'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('List group'),
+                    _('Mandates'),
+                ],
+                [[
+                    r.name,
+                    r.number_of_mandates
+                ] for r in get_list_groups(compound)],
+                [None, 2 * cm, 2 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.pagebreak()
+
+        # Lists
+        chart = self.renderer.get_lists_chart(compound, 'pdf')
+        if compound.show_lists and chart:
+            pdf.h2(_('Lists'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('List'),
+                    _('Mandates'),
+                ],
+                [[
+                    r.name,
+                    r.number_of_mandates
+                ] for r in get_list_groups(compound)],
+                [None, 2 * cm, 2 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.pagebreak()
 
         # Parties
         chart = self.renderer.get_party_strengths_chart(compound, 'pdf')

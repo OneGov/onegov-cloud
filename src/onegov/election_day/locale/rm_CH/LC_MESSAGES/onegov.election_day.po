@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-17 10:08+0100\n"
-"PO-Revision-Date: 2021-03-18 10:25+0100\n"
+"POT-Creation-Date: 2022-01-23 08:17+0100\n"
+"PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "The final results are available"
 msgstr "Ils resultats finals èn disponibels"
@@ -126,6 +126,10 @@ msgstr "Valurs nunvalaivlas"
 #, python-format
 msgid "${name} was found twice"
 msgstr "${name} è avant maun duas giadas"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr ""
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
@@ -294,9 +298,6 @@ msgstr "Svizzers a l'exteriur"
 msgid "The election contains seperate results for expats."
 msgstr ""
 
-msgid "Doppelter Pukelsheim"
-msgstr ""
-
 msgid "Date"
 msgstr "Data"
 
@@ -354,20 +355,38 @@ msgstr ""
 msgid "Domain of the elections"
 msgstr ""
 
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid ""
+"Enables manual completion of the election compound. No indidvidual election "
+"results are displayed until the election compound is manually completed."
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
 msgid "Elections"
 msgstr "Elecziuns"
+
+msgid "List groups"
+msgstr "Gruppas da glistas"
+
+msgid ""
+"Shows a tab with list group results. Requires party results with voters "
+"counts. Only if Doppelter Pukelsheim."
+msgstr ""
+
+msgid "Views"
+msgstr "Vistas"
 
 msgid "Lists"
 msgstr "Glistas"
 
 msgid ""
-"Shows a tab with aggregated list results over all elections. Requires that "
-"all elections share the same lists. Note that the number of votes is not "
-"really meaningful."
+"Shows a tab with aggregated list results over all elections. Only useful if "
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
 msgstr ""
-
-msgid "Views"
-msgstr "Vistas"
 
 msgid "Mandate allocation"
 msgstr "Repartiziun dals sezs"
@@ -389,12 +408,6 @@ msgid "Panachage"
 msgstr "Statistica da panaschar"
 
 msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
-
-msgid "After Doppelter Pukelsheim"
-msgstr ""
-
-msgid "Mark Pukelsheim Completed"
 msgstr ""
 
 msgid "Notifications"
@@ -594,6 +607,12 @@ msgstr "Circuls electorals"
 msgid "Districts"
 msgstr "Circuls electorals"
 
+msgid "region_label_gr"
+msgstr "Circul electoral"
+
+msgid "regions_label_gr"
+msgstr "Circuls electorals"
+
 msgid "superregion_label_bl"
 msgstr "Regiun"
 
@@ -705,6 +724,18 @@ msgstr "Descripziun dal format"
 
 msgid "Embed"
 msgstr "Incorporar"
+
+#. Default: The number of votes of a party is divided by the number of seats to
+#. be allocated in the district concerned. The result is called the voters
+#. count. The voters count determines the allocation to the list groups. The
+#. election is finished as soon as the number of mandates appears.
+#.
+msgid "figcaption_list_groups"
+msgstr ""
+"Il dumber da vuschs da partida d'ina glista vegn dividì tras il dumber da "
+"sezs ch'èn d'occupar en il circul electoral correspundent. Il resultat vegn "
+"numnà cifra electorala da la glista. Il Cifra electorala attribuziun "
+"superiura a las gruppas da glistas."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -823,14 +854,17 @@ msgstr "Gea"
 msgid "No"
 msgstr "Na"
 
-msgid "n.a."
-msgstr "n.i."
-
 msgid "All candidates"
 msgstr "Tut las candidatas e candidats"
 
 msgid "Elected candidates only"
 msgstr "Mo candidat(a)s elegid(a)s"
+
+msgid "List group"
+msgstr "Gruppa da glista"
+
+msgid "Voters count"
+msgstr "Cifra electorala"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
