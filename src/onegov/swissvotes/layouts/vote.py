@@ -110,7 +110,7 @@ class VoteLayout(DefaultLayout):
             elif name == 'campaign_material_other':
                 data = metadata.get(file.filename.replace('.pdf', ''), {})
                 order = 1
-                title = data.get('title', file.filename)
+                title = data.get('title') or file.filename
                 language = ', '.join([
                     self.request.translate(codes[lang])
                     for lang in data.get('language', [])
@@ -121,7 +121,7 @@ class VoteLayout(DefaultLayout):
                 title = file.filename
                 language = ''
             result.append((order, title, language, protected, file))
-        return sorted(result, key=lambda x: (x[0], x[1].lower()))
+        return sorted(result, key=lambda x: (x[0], (x[1] or '').lower()))
 
 
 class VoteDetailLayout(DefaultLayout):
