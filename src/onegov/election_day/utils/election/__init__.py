@@ -11,10 +11,10 @@ from onegov.election_day.utils.election.lists import \
 from onegov.election_day.utils.election.lists import get_list_results
 from onegov.election_day.utils.election.lists import get_lists_data
 from onegov.election_day.utils.election.lists import get_lists_panachage_data
-from onegov.election_day.utils.election.parties import get_party_results
-from onegov.election_day.utils.election.parties import get_party_results_data
-from onegov.election_day.utils.election.parties import get_party_results_deltas
-from onegov.election_day.utils.election.parties import \
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_data
+from onegov.election_day.utils.parties import get_party_results_deltas
+from onegov.election_day.utils.parties import \
     get_parties_panachage_data
 
 

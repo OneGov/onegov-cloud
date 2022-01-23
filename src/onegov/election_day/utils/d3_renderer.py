@@ -11,11 +11,11 @@ from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_connections_data
 from onegov.election_day.utils.election import get_lists_data
 from onegov.election_day.utils.election import get_lists_panachage_data
-from onegov.election_day.utils.election import get_parties_panachage_data
-from onegov.election_day.utils.election import get_party_results_data
 from onegov.election_day.utils.election_compound import get_list_groups_data
 from onegov.election_day.utils.election_compound import get_lists_data as \
     get_compound_lists_data
+from onegov.election_day.utils.parties import get_parties_panachage_data
+from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from requests import post

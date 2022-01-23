@@ -6,10 +6,10 @@ from onegov.election_day.utils.election import get_candidates_results_by_entity
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
-from onegov.election_day.utils.election import get_parties_panachage_data
-from onegov.election_day.utils.election import get_party_results
-from onegov.election_day.utils.election import get_party_results_data
-from onegov.election_day.utils.election import get_party_results_deltas
+from onegov.election_day.utils.parties import get_parties_panachage_data
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_data
+from onegov.election_day.utils.parties import get_party_results_deltas
 from tests.onegov.election_day.common import print_errors
 
 
@@ -639,13 +639,11 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#a74c97',
                 'mandates': 0,
-                'voters_count': 0,
                 'votes': {'permille': 154, 'total': 17972}
             },
             '2015': {
                 'color': '#a74c97',
                 'mandates': 0,
-                'voters_count': 0,
                 'votes': {'permille': 72, 'total': 8352}
             }
         },
@@ -653,13 +651,11 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#ff6300',
                 'mandates': 1,
-                'voters_count': 0,
                 'votes': {'permille': 243, 'total': 28413}
             },
             '2015': {
                 'color': '#ff6300',
                 'mandates': 1,
-                'voters_count': 0,
                 'votes': {'permille': 264, 'total': 30856}
             }
         },
@@ -667,13 +663,11 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#4068c8',
                 'mandates': 1,
-                'voters_count': 0,
                 'votes': {'permille': 192, 'total': 22494}
             },
             '2015': {
                 'color': '#4068c8',
                 'mandates': 1,
-                'voters_count': 0,
                 'votes': {'permille': 176, 'total': 20584}
             }
         },
@@ -681,13 +675,11 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#aeca00',
                 'mandates': 0,
-                'voters_count': 0,
                 'votes': {'permille': 68, 'total': 7943}
             },
             '2015': {
                 'color': '#aeca00',
                 'mandates': 0,
-                'voters_count': 0,
                 'votes': {'permille': 36, 'total': 4178}
             }
         },
@@ -695,13 +687,11 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#db3c27',
                 'mandates': 0,
-                'voters_count': 0,
                 'votes': {'permille': 53, 'total': 6167}
             },
             '2015': {
                 'color': '#db3c27',
                 'mandates': 0,
-                'voters_count': 0,
                 'votes': {'permille': 138, 'total': 16048}
             }
         },
@@ -709,13 +699,11 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#3f841a',
                 'mandates': 1,
-                'voters_count': 0,
                 'votes': {'permille': 283, 'total': 33116}
             },
             '2015': {
                 'color': '#3f841a',
                 'mandates': 1,
-                'voters_count': 0,
                 'votes': {'permille': 305, 'total': 35543}
             }
         }
@@ -725,20 +713,20 @@ def test_election_utils_parties(import_test_datasets, session):
     assert deltas
     assert results == {
         '2011': [
-            ['AL', 0, 0, 17972, '15.4%', ''],
-            ['CVP', 1, 0, 28413, '24.3%', ''],
-            ['FDP', 1, 0, 22494, '19.2%', ''],
-            ['GLP', 0, 0, 7943, '6.8%', ''],
-            ['SP', 0, 0, 6167, '5.3%', ''],
-            ['SVP', 1, 0, 33116, '28.3%', '']
+            ['AL', 0, 17972, '15.4%', ''],
+            ['CVP', 1, 28413, '24.3%', ''],
+            ['FDP', 1, 22494, '19.2%', ''],
+            ['GLP', 0, 7943, '6.8%', ''],
+            ['SP', 0, 6167, '5.3%', ''],
+            ['SVP', 1, 33116, '28.3%', '']
         ],
         '2015': [
-            ['AL', 0, 0, 8352, '7.2%', '-8.2%'],
-            ['CVP', 1, 0, 30856, '26.4%', '2.1%'],
-            ['FDP', 1, 0, 20584, '17.6%', '-1.6%'],
-            ['GLP', 0, 0, 4178, '3.6%', '-3.2%'],
-            ['SP', 0, 0, 16048, '13.8%', '8.5%'],
-            ['SVP', 1, 0, 35543, '30.5%', '2.2%']
+            ['AL', 0, 8352, '7.2%', '-8.2%'],
+            ['CVP', 1, 30856, '26.4%', '2.1%'],
+            ['FDP', 1, 20584, '17.6%', '-1.6%'],
+            ['GLP', 0, 4178, '3.6%', '-3.2%'],
+            ['SP', 0, 16048, '13.8%', '8.5%'],
+            ['SVP', 1, 35543, '30.5%', '2.2%']
         ]
     }
 

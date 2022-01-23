@@ -1,5 +1,6 @@
 from onegov.ballot import PartyResult
 from onegov.election_day import _
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
 
@@ -14,16 +15,30 @@ def has_party_results(item):
 
 def get_party_results(item):
 
-    """ Returns the aggregated party results as list. """
+    """ Returns the aggregated party results as list.
+
+    Adds `voters_count` for election compounds with Doppelter Pukelsheim, else
+    `votes`.
+
+    """
 
     if not has_party_results(item):
         return [], {}
 
     session = object_session(item)
+    pukelsheim = getattr(item, 'pukelsheim', False) == True
 
     # Get the totals votes per year
-    query = session.query(PartyResult.year, PartyResult.total_votes)
-    query = query.filter(PartyResult.owner == item.id).distinct()
+    if pukelsheim:
+        query = session.query(
+            PartyResult.year,
+            func.sum(PartyResult.voters_count)
+        )
+        query = query.filter(PartyResult.owner == item.id)
+        query = query.group_by(PartyResult.year)
+    else:
+        query = session.query(PartyResult.year, PartyResult.total_votes)
+        query = query.filter(PartyResult.owner == item.id).distinct()
     totals = dict(query)
     years = sorted((str(key) for key in totals.keys()))
 
@@ -33,24 +48,26 @@ def get_party_results(item):
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
-        year['votes'] = {
-            'total': result.votes,
+        total = result.voters_count if pukelsheim else result.votes
+        year['voters_count' if pukelsheim else 'votes'] = {
+            'total': total,
             'permille': int(
-                round(1000 * (result.votes / (totals.get(result.year) or 1)))
+                round(1000 * (total / (totals.get(result.year) or 1)))
             )
         }
-        year['voters_count'] = result.voters_count
 
     return years, parties
 
 
-def get_party_results_deltas(election, years, parties):
+def get_party_results_deltas(item, years, parties):
 
     """ Returns the aggregated party results with the differences to the
     last elections.
 
     """
 
+    pukelsheim = getattr(item, 'pukelsheim', False) == True
+    attribute = 'voters_count' if pukelsheim else 'votes'
     deltas = len(years) > 1
     results = {}
     for index, year in enumerate(years):
@@ -61,12 +78,10 @@ def get_party_results_deltas(election, years, parties):
             values = party.get(year)
             if values:
                 result.append(values.get('mandates', ''))
-                result.append(values.get('voters_count', ''))
-                result.append(values.get('votes', {}).get('total', ''))
-                permille = values.get('votes', {}).get('permille')
+                result.append(values.get(attribute, {}).get('total', ''))
+                permille = values.get(attribute, {}).get('permille')
                 result.append(f'{permille/10}%' if permille else '')
             else:
-                result.append('')
                 result.append('')
                 result.append('')
                 result.append('')
@@ -77,8 +92,8 @@ def get_party_results_deltas(election, years, parties):
                     last = party.get(years[index - 1])
                     if values and last:
                         diff = (
-                            (values.get('votes', {}).get('permille', 0) or 0)
-                            - (last.get('votes', {}).get('permille', 0) or 0)
+                            (values.get(attribute, {}).get('permille', 0) or 0)
+                            - (last.get(attribute, {}).get('permille', 0) or 0)
                         ) / 10
                         delta = '{}%'.format(diff)
                 result.append(delta)
@@ -101,6 +116,8 @@ def get_party_results_data(item):
             'title': item.title
         }
 
+    pukelsheim = getattr(item, 'pukelsheim', False) == True
+    attribute = 'voters_count' if pukelsheim else 'votes'
     years, parties = get_party_results(item)
     names = sorted(parties.keys())
 
@@ -108,7 +125,7 @@ def get_party_results_data(item):
     for party in names:
         for year in parties[party]:
             front = parties[party].get(year, {}).get('mandates', 0)
-            back = parties[party].get(year, {}).get('votes', {})
+            back = parties[party].get(year, {}).get(attribute, {})
             back = back.get('permille', 0) / 10.0
             color = parties[party].get(year, {}).get('color', '#999999')
             results.append({

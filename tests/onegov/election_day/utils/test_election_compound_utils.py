@@ -1,15 +1,15 @@
 from datetime import date
 from onegov.ballot import ElectionCompound
-from onegov.election_day.utils.election import get_parties_panachage_data
-from onegov.election_day.utils.election import get_party_results
-from onegov.election_day.utils.election import get_party_results_data
-from onegov.election_day.utils.election import get_party_results_deltas
 from onegov.election_day.utils.election_compound import get_districts_data
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_list_groups_data
 from onegov.election_day.utils.election_compound import get_list_results
 from onegov.election_day.utils.election_compound import get_lists_data
+from onegov.election_day.utils.parties import get_parties_panachage_data
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_data
+from onegov.election_day.utils.parties import get_party_results_deltas
 
 
 def test_election_utils_compound(import_test_datasets, election_day_app_sg):
@@ -523,56 +523,49 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#99C040',
                 'mandates': 10,
-                'voters_count': 538,
-                'votes': {'permille': 138, 'total': 43062}
+                'voters_count': {'permille': 138, 'total': 538}
             }
         },
         'CVP': {
             '2014': {
                 'color': '#EE7F00',
                 'mandates': 22,
-                'voters_count': 931,
-                'votes': {'permille': 238, 'total': 74448}
+                'voters_count': {'permille': 238, 'total': 931}
             }
         },
         'FDP': {
             '2014': {
                 'color': '#0E52A0',
                 'mandates': 18,
-                'voters_count': 863,
-                'votes': {'permille': 221, 'total': 69028}
+                'voters_count': {'permille': 221, 'total': 863}
             }
         },
         'GLP': {
             '2014': {
                 'color': '#acc700',
                 'mandates': 4,
-                'voters_count': 236,
-                'votes': {'permille': 60, 'total': 18864}
+                'voters_count': {'permille': 60, 'total': 236}
             }
         },
         'Piraten': {
             '2014': {
                 'color': '#F9B200',
                 'mandates': 0,
-                'voters_count': 19,
-                'votes': {'permille': 5, 'total': 1487}
+                'voters_count': {'permille': 5, 'total': 19}
             }
         },
         'SP': {
             '2014': {
                 'color': '#E53136',
                 'mandates': 7,
-                'voters_count': 418,
-                'votes': {'permille': 107, 'total': 33459}
+                'voters_count': {'permille': 107, 'total': 418}
             }
         },
         'SVP': {
             '2014': {
                 'color': '#019040',
                 'mandates': 19,
-                'voters_count': 899,
-                'votes': {'permille': 230, 'total': 71930}
+                'voters_count': {'permille': 230, 'total': 899}
             }
         }}
 
@@ -580,13 +573,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         False,
         {
             '2014': [
-                ['AL', 10, 538, 43062, '13.8%'],
-                ['CVP', 22, 931, 74448, '23.8%'],
-                ['FDP', 18, 863, 69028, '22.1%'],
-                ['GLP', 4, 236, 18864, '6.0%'],
-                ['Piraten', 0, 19, 1487, '0.5%'],
-                ['SP', 7, 418, 33459, '10.7%'],
-                ['SVP', 19, 899, 71930, '23.0%']
+                ['AL', 10, 538, '13.8%'],
+                ['CVP', 22, 931, '23.8%'],
+                ['FDP', 18, 863, '22.1%'],
+                ['GLP', 4, 236, '6.0%'],
+                ['Piraten', 0, 19, '0.5%'],
+                ['SP', 7, 418, '10.7%'],
+                ['SVP', 19, 899, '23.0%']
             ]
         }
     )

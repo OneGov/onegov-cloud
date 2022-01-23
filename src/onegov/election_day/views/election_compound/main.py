@@ -8,7 +8,7 @@ from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
 from onegov.election_day.utils.election_compound import get_elected_candidates
-from onegov.election_day.utils.election import get_party_results
+from onegov.election_day.utils.parties import get_party_results
 
 
 @ElectionDayApp.html(

@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            <div metal:use-macro="layout.macros['party_strengths']" tal:define="show_voters_count True"/>
+            <div metal:use-macro="layout.macros['party_strengths']" tal:define="pukelsheim election_compound.pukelsheim"/>
 
         </tal:block>
 
