@@ -1,7 +1,6 @@
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_parameter
@@ -40,7 +39,7 @@ def view_election_lists_chart(self, request):
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionLayout(self, request),
         'type': 'lists-chart',
     }
 
@@ -62,7 +61,7 @@ def view_election_lists_table(self, request):
     return {
         'election': self,
         'lists': get_list_results(self),
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionLayout(self, request),
         'type': 'election-table',
         'scope': 'lists',
     }

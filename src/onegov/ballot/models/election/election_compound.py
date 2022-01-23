@@ -22,6 +22,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy import Numeric
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
@@ -233,12 +234,24 @@ class ElectionCompound(
 
         return result
 
-    def get_list_results(self, limit=None, names=None, order_by='votes'):
-        """ Returns the aggregated number of mandates and votes of all the
-        lists.
+    def get_list_results(self, limit=None, names=None):
+        """ Returns the aggregated number of mandates and voters count of all
+        the lists.
+
+        These results are only comparable for elections using the Doppelter
+        Pukelsheim system and are therefore only provided in this case.
+
+        Sorts the results by number of mandates if the election is completed,
+        by voters count else.
 
         """
-        assert order_by in ('votes', 'number_of_mandates')
+
+        if not self.pukelsheim:
+            return []
+
+        order_by = 'voters_count'
+        if self.completed:
+            order_by = 'number_of_mandates'
 
         session = object_session(self)
 
@@ -246,7 +259,7 @@ class ElectionCompound(
         mandates = session.query(
             List.name.label('name'),
             func.sum(List.number_of_mandates).label('number_of_mandates'),
-            literal_column('0').label('votes')
+            literal_column('0').label('voters_count')
         )
         mandates = mandates.join(ElectionCompound.associations)
         mandates = mandates.filter(ElectionCompound.id == self.id)
@@ -255,33 +268,41 @@ class ElectionCompound(
         mandates = mandates.join(Election, List)
         mandates = mandates.group_by(List.name)
 
-        # Query votes
-        votes = session.query(
+        # Query voters counts
+        voters_counts = session.query(
             List.name.label('name'),
             literal_column('0').label('number_of_mandates'),
-            func.sum(ListResult.votes).label('votes')
+            func.sum(
+                func.round(
+                    cast(ListResult.votes, Numeric).op('/')(
+                        cast(Election.number_of_mandates, Numeric)
+                    )
+                )
+            ).label('voters_count'),
         )
-        votes = votes.join(ElectionCompound.associations)
-        votes = votes.filter(ElectionCompound.id == self.id)
+        voters_counts = voters_counts.join(ElectionCompound.associations)
+        voters_counts = voters_counts.filter(ElectionCompound.id == self.id)
         if names:
-            votes = votes.filter(List.name.in_(names))
-        votes = votes.join(Election, List, ListResult)
-        votes = votes.group_by(List.name)
+            voters_counts = voters_counts.filter(List.name.in_(names))
+        voters_counts = voters_counts.join(Election, List, ListResult)
+        voters_counts = voters_counts.group_by(List.name)
 
         # Combine
-        union = mandates.union_all(votes).subquery('union')
+        union = mandates.union_all(voters_counts).subquery('union')
         query = session.query(
             union.c.name.label('name'),
             cast(func.sum(union.c.number_of_mandates), Integer).label(
                 'number_of_mandates'
             ),
-            cast(func.sum(union.c.votes), Integer).label('votes')
+            cast(func.sum(union.c.voters_count), Integer).label(
+                'voters_count'
+            )
         )
         query = query.group_by(union.c.name)
-        query = query.order_by(desc(order_by))
+        query = query.order_by(desc(order_by), union.c.name)
         if limit and limit > 0:
             query = query.limit(limit)
-        return query
+        return query.all()
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')

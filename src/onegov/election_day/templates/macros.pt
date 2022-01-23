@@ -461,7 +461,7 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-list-group">List group</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-voters-count right-aligned">Voters count</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-mandates right-aligned">Mandates</th>
+                <th data-tablesaw-priority="2"  i18n:translate="" class="column-mandates right-aligned">Mandates</th>
             </tr>
         </thead>
         <tbody>
@@ -485,16 +485,16 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-list">List</th>
-                <th data-tablesaw-priority="${'0' if election.pukelsheim else '1'}" i18n:translate="single_votes" class="column-votes right-aligned">Votes</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-mandates right-aligned">Mandates</th>
+                <th tal:condition="not layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-votes right-aligned">Voters count</th>
+                <th tal:condition="layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-mandates right-aligned">Mandates</th>
             </tr>
         </thead>
         <tbody>
             <tr tal:repeat="list lists">
                 <tal:block tal:condition="not names or list.name in [n.strip() for n in names.split(',')]">
                     <td class="column-list">${list.name}</td>
-                    <td class="column-votes right-aligned" data-text="${list.votes or 0}">${layout.format_number(list.votes or 0)}</td>
-                    <td class="column-mandates right-aligned">${list.number_of_mandates}</td>
+                    <td tal:condition="not layout.completed" class="column-votes right-aligned" data-text="${list.voters_count or 0}">${layout.format_number(list.voters_count or 0)}</td>
+                    <td tal:condition="layout.completed" class="column-mandates right-aligned">${list.number_of_mandates}</td>
                 </tal:block>
             </tr>
         </tbody>

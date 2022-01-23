@@ -84,7 +84,7 @@ class ElectionCompoundListsTableWidget(ModelBoundWidget):
 
     def get_variables(self, layout):
         model = self.model or layout.model
-        lists = get_list_results(model).all()
+        lists = get_list_results(model)
         return {
             'election': model,
             'lists': lists

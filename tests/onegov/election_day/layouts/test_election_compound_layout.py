@@ -1,6 +1,5 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionResult
 from onegov.ballot import PanachageResult
@@ -76,6 +75,7 @@ def test_election_compound_layout_general(session):
     assert layout.has_party_results is True
 
     # test main view
+    compound.pukelsheim = True
     compound.show_lists = True
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/lists'
@@ -84,6 +84,10 @@ def test_election_compound_layout_general(session):
     layout = ElectionCompoundLayout(compound, request)
     assert layout.hide_tab('lists') is True
     assert layout.main_view == 'ElectionCompound/districts'
+
+    compound.show_list_groups = True
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.main_view == 'ElectionCompound/list-groups'
 
     # test file paths
     with freeze_time("2014-01-01 12:00"):
@@ -190,6 +194,7 @@ def test_election_compound_layout_menu(session):
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
+    compound.pukelsheim = True
     compound.show_list_groups = True
     compound.show_lists = True
     compound.show_mandate_allocation = True

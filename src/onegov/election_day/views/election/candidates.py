@@ -3,7 +3,6 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import \
     hide_candidates_chart
-from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_parameter
@@ -56,7 +55,7 @@ def view_election_candidates_chart(self, request):
         'skip_rendering': hide_candidates_chart(self, request),
         'help_text': election_incomplete_text,
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionLayout(self, request),
         'type': 'candidates-chart',
     }
 

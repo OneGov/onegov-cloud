@@ -18,14 +18,15 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     session = election_day_app_sg.session()
     session.add(
         ElectionCompound(
-            title='Compound', domain='canton', date=date(2020, 3, 8)
+            title='Compound', domain='canton', date=date(2020, 3, 8),
+            pukelsheim=True
         )
     )
     election_compound = session.query(ElectionCompound).one()
 
     assert get_districts_data(election_compound, principal) == {}
     assert get_elected_candidates(election_compound, session).all() == []
-    assert get_list_results(election_compound, session).all() == []
+    assert get_list_results(election_compound) == []
     assert get_lists_data(election_compound) == {'results': []}
 
     # Add intermediate results
@@ -104,74 +105,72 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
         ('Losa', 'Jeannette', '', 'GRÜ', '06', election_2.id),
         ('Mattle', 'Ruedi', '', 'GLP', '06', election_1.id)
     ]
-    assert get_list_results(election_compound, session).all() == [
-        ('SVP', 9, 31515),
-        ('CVP', 6, 28509),
-        ('FDP', 5, 19546),
-        ('SP', 4, 17381),
-        ('GRÜ', 2, 10027),
-        ('GLP', 1, 7725),
-        ('EVP', 0, 2834),
-        ('FDP_J', 0, 1379)
+    assert get_list_results(election_compound) == [
+        ('SVP', 9, 2702),
+        ('CVP', 6, 2399),
+        ('FDP', 5, 1780),
+        ('SP', 4, 1567),
+        ('GRÜ', 2, 841),
+        ('GLP', 1, 652),
+        ('EVP', 0, 283),
+        ('FDP_J', 0, 140)
     ]
-
     assert get_lists_data(election_compound) == {
         'results': [{
             'class': 'inactive',
             'color': '',
             'text': 'SVP',
-            'value': 31515,
-            'value2': 9
+            'value': 2702,
+            'value2': None
         }, {
             'class': 'inactive',
             'color': '',
             'text': 'CVP',
-            'value': 28509,
-            'value2': 6
+            'value': 2399,
+            'value2': None
         }, {
             'class': 'inactive',
             'color': '',
             'text': 'FDP',
-            'value': 19546,
-            'value2': 5
+            'value': 1780,
+            'value2': None
         }, {
             'class': 'inactive',
             'color': '',
             'text': 'SP',
-            'value': 17381,
-            'value2': 4
+            'value': 1567,
+            'value2': None
         }, {
             'class': 'inactive',
             'color': '',
             'text': 'GRÜ',
-            'value': 10027,
-            'value2': 2
+            'value': 841,
+            'value2': None
         }, {
             'class': 'inactive',
             'color': '',
             'text': 'GLP',
-            'value': 7725,
-            'value2': 1
+            'value': 652,
+            'value2': None
         }, {
             'class': 'inactive',
             'color': '',
             'text': 'EVP',
-            'value': 2834,
-            'value2': 0
+            'value': 283,
+            'value2': None
         }, {
             'class': 'inactive',
             'color': '',
             'text': 'FDP_J',
-            'value': 1379,
-            'value2': 0
+            'value': 140,
+            'value2': None
         }]
     }
-    assert get_lists_data(election_compound, mandates_only=True, limit=1,
-                          names=['SP', 'Grü']) == {
+    assert get_lists_data(election_compound, limit=1, names=['SP', 'Grü']) == {
         'results': [
             {
                 'text': 'SP',
-                'value': 4,
+                'value': 1567,
                 'value2': None,
                 'class': 'inactive',
                 'color': ''
@@ -195,6 +194,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     assert not errors
     session.add(election_1)
     election_compound.elections = [election_1, election_2]
+    election_compound.pukelsheim_completed = True
     session.flush()
 
     assert get_districts_data(election_compound, principal) == {
@@ -212,16 +212,78 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
             'votes': 0
         }
     }
-    assert get_list_results(election_compound, session).all() == [
-        ('SVP', 9, 87135),
-        ('CVP', 6, 71209),
-        ('FDP', 5, 55152),
-        ('SP', 4, 37291),
-        ('GRÜ', 2, 24722),
-        ('GLP', 1, 20644),
-        ('EVP', 0, 2834),
-        ('FDP_J', 0, 1379)
+    assert get_list_results(election_compound) == [
+        ('SVP', 9, 5973),
+        ('CVP', 6, 4911),
+        ('FDP', 5, 3874),
+        ('SP', 4, 2737),
+        ('GRÜ', 2, 1705),
+        ('GLP', 1, 1412),
+        ('EVP', 0, 283),
+        ('FDP_J', 0, 140)
     ]
+    assert get_lists_data(election_compound) == {
+        'results': [{
+            'class': 'active',
+            'color': '',
+            'text': 'SVP',
+            'value': 9,
+            'value2': None
+        }, {
+            'class': 'active',
+            'color': '',
+            'text': 'CVP',
+            'value': 6,
+            'value2': None
+        }, {
+            'class': 'active',
+            'color': '',
+            'text': 'FDP',
+            'value': 5,
+            'value2': None
+        }, {
+            'class': 'active',
+            'color': '',
+            'text': 'SP',
+            'value': 4,
+            'value2': None
+        }, {
+            'class': 'active',
+            'color': '',
+            'text': 'GRÜ',
+            'value': 2,
+            'value2': None
+        }, {
+            'class': 'active',
+            'color': '',
+            'text': 'GLP',
+            'value': 1,
+            'value2': None
+        }, {
+            'class': 'inactive',
+            'color': '',
+            'text': 'EVP',
+            'value': 0,
+            'value2': None
+        }, {
+            'class': 'inactive',
+            'color': '',
+            'text': 'FDP_J',
+            'value': 0,
+            'value2': None
+        }]
+    }
+    assert get_lists_data(election_compound, limit=1, names=['SP', 'Grü']) == {
+        'results': [
+            {
+                'text': 'SP',
+                'value': 4,
+                'value2': None,
+                'class': 'active',
+                'color': ''
+            }
+        ]
+    }
 
 
 def test_election_compound_utils_parties(import_test_datasets, session):

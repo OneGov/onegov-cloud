@@ -76,7 +76,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     session = election_day_app_sg.session()
     session.add(
         ElectionCompound(
-            title='Compound', domain='canton', date=date(2020, 3, 8)
+            title='Compound', domain='canton', date=date(2020, 3, 8),
+            pukelsheim=True,
         )
     )
     model = session.query(ElectionCompound).one()
@@ -189,18 +190,18 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'election': model,
         'election_compound': model,
         'embed': False,
-        'entities': 'Rorschach',
+        'entities': '',
         'groups': [],
         'layout': layout,
         'lists': [
-            ('SVP', 9, 31515),
-            ('CVP', 6, 28509),
-            ('FDP', 5, 19546),
-            ('SP', 4, 17381),
-            ('GRÜ', 2, 10027),
-            ('GLP', 1, 7725),
-            ('EVP', 0, 2834),
-            ('FDP_J', 0, 1379)
+            ('SVP', 9, 2702),
+            ('CVP', 6, 2399),
+            ('FDP', 5, 1780),
+            ('SP', 4, 1567),
+            ('GRÜ', 2, 841),
+            ('GLP', 1, 652),
+            ('EVP', 0, 283),
+            ('FDP_J', 0, 140)
         ],
         'model': model,
         'request': request
@@ -211,19 +212,19 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     etree.fromstring(result.encode('utf-8'))
 
     assert '>Compound</span>' in result
-    assert '1 of 2' in result
+    assert '0 of 2' in result
     assert f'<div>{e_2}</div>'
     assert 'election-compound-candidates-table' in result
     assert 'Bruss-Schmidheiny Carmen' in result
     assert 'election-compound-districts-table' in result
-    assert '10 of 10' in result
+    assert '0 of 10' in result
     assert '9 of 9' in result
     assert '0 of 17' in result
     assert '1 of 13' in result
     assert 'election-compound-lists-table' in result
     assert 'data-text="31515"' not in result
-    assert 'data-text="10027"' in result
-    assert 'data-text="1379"' in result
+    assert 'data-text="841"' in result
+    assert 'data-text="140"' in result
     assert (
         'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
     ) in result
@@ -267,6 +268,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert not errors
     session.add(election_1)
     model.elections = [election_1, election_2]
+    model.pukelsheim_completed = True
     session.flush()
 
     layout = ElectionCompoundLayout(model, request)
@@ -330,14 +332,14 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ],
         'layout': layout,
         'lists': [
-            ('SVP', 9, 87135),
-            ('CVP', 6, 71209),
-            ('FDP', 5, 55152),
-            ('SP', 4, 37291),
-            ('GRÜ', 2, 24722),
-            ('GLP', 1, 20644),
-            ('EVP', 0, 2834),
-            ('FDP_J', 0, 1379)
+            ('SVP', 9, 5973),
+            ('CVP', 6, 4911),
+            ('FDP', 5, 3874),
+            ('SP', 4, 2737),
+            ('GRÜ', 2, 1705),
+            ('GLP', 1, 1412),
+            ('EVP', 0, 283),
+            ('FDP_J', 0, 140)
         ],
         'model': model,
         'request': request
@@ -355,8 +357,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '13 of 13' in result
     assert 'election-compound-lists-table' in result
     assert 'data-text="87135"' not in result
-    assert 'data-text="24722"' in result
-    assert 'data-text="1379"' in result
+    assert 'data-text="1705"' not in result  # voters_count hidden
+    assert 'data-text="140"' not in result  # voters_count hidden
     assert 'data-text="3487"' in result
     assert (
         'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'

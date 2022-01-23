@@ -102,10 +102,14 @@ class ElectionCompoundLayout(DetailLayout):
         if tab == 'list-groups':
             return (
                 self.model.show_list_groups is True
+                and self.model.pukelsheim is True
                 and self.has_party_results
             )
         if tab == 'lists':
-            return self.model.show_lists is True
+            return (
+                self.model.show_lists is True
+                and self.model.pukelsheim is True
+            )
         if tab == 'mandate-allocation':
             return (
                 self.model.show_mandate_allocation is True

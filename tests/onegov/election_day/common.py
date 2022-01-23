@@ -442,7 +442,7 @@ def upload_party_results(client, slug='election/proporz-election'):
     return upload
 
 
-def create_election_compound(client, canton='gr'):
+def create_election_compound(client, canton='gr', pukelsheim=False):
     domain = {
         'bl': 'region',
         'gr': 'region',
@@ -493,6 +493,7 @@ def create_election_compound(client, canton='gr'):
     new.form[elections_field[canton]] = [
         'regional-election-a', 'regional-election-b'
     ]
+    new.form['pukelsheim'] = pukelsheim
     new.form['show_list_groups'] = True
     new.form['show_party_strengths'] = True
     new.form['show_party_panachage'] = True
@@ -500,7 +501,8 @@ def create_election_compound(client, canton='gr'):
     new.form.submit()
 
 
-def upload_election_compound(client, create=True, canton='gr'):
+def upload_election_compound(client, create=True, canton='gr',
+                             pukelsheim=False):
     entities = {
         'bl': [2761, 2762],
         'gr': [3506, 3513],
@@ -509,7 +511,7 @@ def upload_election_compound(client, create=True, canton='gr'):
         'zg': [1701, 1702],
     }
     if create:
-        create_election_compound(client, canton=canton)
+        create_election_compound(client, canton=canton, pukelsheim=pukelsheim)
 
     for index, slug in enumerate((
         'regional-election-a', 'regional-election-b'

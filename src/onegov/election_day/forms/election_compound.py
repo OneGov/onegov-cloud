@@ -153,10 +153,11 @@ class ElectionCompoundForm(Form):
         label=_("Lists"),
         description=_(
             "Shows a tab with aggregated list results over all elections. "
-            "Requires that all elections share the same lists. Note that the "
-            "number of votes is not really meaningful."
+            "Only useful if the lists correspond to the list groups. Only if "
+            "Doppelter Pukelsheim."
         ),
         fieldset=_("Views"),
+        depends_on=('pukelsheim', 'y'),
         render_kw=dict(force_simple=True)
     )
 
