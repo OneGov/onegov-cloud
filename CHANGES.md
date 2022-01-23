@@ -1,8 +1,26 @@
 # Changes
 
+## 2022.8
+
+`2022-01-23` | [73b49c2696...d30032b59e](https://github.com/OneGov/onegov-cloud/compare/73b49c2696^...d30032b59e)
+
+### Election Day
+
+##### Add voters count to election compound party results.
+
+For election compounds with Doppelter Pukelsheim only. Also adds a new view and widgets based on the party results to display list groups and changes the existing list view to display voters counts instead of votes. Adds these views to the PDFs and SVGs. Futerhmore removes inconsistencies with displaying intermediate results, cleans up Doppelter Pukelsheim namings and descriptions and a lot of other things.
+
+`Feature` | [OGC-162](https://linear.app/onegovcloud/issue/OGC-162) | [d30032b59e](https://github.com/onegov/onegov-cloud/commit/d30032b59ebddd6255ce9f01b9c5d3770bd2067e)
+
+### Swissvotes
+
+##### Fixes sorting search results with empty titles throwing an error.
+
+`Bugfix` | [73b49c2696](https://github.com/onegov/onegov-cloud/commit/73b49c2696528fdf657d27b351dbff4cb1732ab9)
+
 ## 2022.7
 
-`2022-01-19` | [1ab8ecb547...936c6fc4f7](https://github.com/OneGov/onegov-cloud/compare/1ab8ecb547^...936c6fc4f7)
+`2022-01-19` | [1ab8ecb547...c1a735c644](https://github.com/OneGov/onegov-cloud/compare/1ab8ecb547^...c1a735c644)
 
 ### Election Day
 
@@ -1251,32 +1269,4 @@ Exports manual and stripe payments with ticket information.
 ##### Fixes SOGC importer.
 
 `Bugfix` | [842352cd19](https://github.com/onegov/onegov-cloud/commit/842352cd19dae4a5912408e40084a9ce12cbcfc4)
-
-## 2021.59
-
-`2021-06-16` | [90f7a384b6...47f659af71](https://github.com/OneGov/onegov-cloud/compare/90f7a384b6^...47f659af71)
-
-### Agency
-
-##### Improve styling of memberships.
-
-`Other` | [STAKABS-27](https://kt-bs.atlassian.net/browse/STAKABS-27) | [82f59fdfce](https://github.com/onegov/onegov-cloud/commit/82f59fdfce82d7ff3be518454d589ea9ca53557f)
-
-### Feriennet
-
-##### Fixes export of invoice items
-
-Prevents double entries by joining on activity and invoice references.
-
-`Bugfix` | [f3caf5e2f7](https://github.com/onegov/onegov-cloud/commit/f3caf5e2f7cff8734054f0705966fb303f2c4e3f)
-
-### Winterthur
-
-##### Adapts UI for multi missions
-
-- Make time field required
-- Always display correct time
-- Remove mission count from /mission-reports table
-
-`Other` | [673cf13b7b](https://github.com/onegov/onegov-cloud/commit/673cf13b7b55738536554cedf022e7f4d1576561)
 
