@@ -35,10 +35,12 @@
                     </a>
                 </div>
             </div>
+
             <tal:b metal:use-macro="layout.macros['ballot-entities-table']"/>
+            <tal:block metal:use-macro="layout.macros['embedded-widget']" tal:define="embed_link layout.table_link"/>
+
         </tal:block>
 
-        <tal:block metal:use-macro="layout.macros['embedded-widget']" tal:define="embed_link layout.table_link"/>
         <div metal:use-macro="layout.macros['related_link']" />
 
     </tal:block>
