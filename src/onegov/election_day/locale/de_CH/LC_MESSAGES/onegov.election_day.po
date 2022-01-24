@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-23 08:17+0100\n"
-"PO-Revision-Date: 2022-01-22 08:22+0100\n"
+"POT-Creation-Date: 2022-01-24 10:35+0100\n"
+"PO-Revision-Date: 2022-01-24 10:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -248,6 +248,20 @@ msgstr "Regional"
 
 msgid "Communal"
 msgstr "Kommunal"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing theID might "
+"break links on external sites!"
+msgstr ""
+"Die ID wird in der URL verwendet und wird möglicherweise an anderer Stelle "
+"verwendet. Das Ändern der ID kann Links auf externen Seiten unbrauchbar "
+"machen!"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "ID already exists"
+msgstr "ID ist bereits vorhanden"
 
 msgid "Name"
 msgstr "Name"
@@ -745,7 +759,6 @@ msgstr "Einbetten"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "Die Parteistimmenzahl einer Liste wird durch die Zahl der im betreffenden "
@@ -779,6 +792,33 @@ msgstr "Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "View"
+msgstr "Anzeigen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Change ID"
+msgstr "ID ändern"
+
+msgid "Upload results"
+msgstr "Resultate hochladen"
+
+msgid "Clear results"
+msgstr "Resultate löschen"
+
+msgid "Clear media"
+msgstr "Medien löschen"
+
+msgid "Upload party results"
+msgstr "Parteiresultate hochladen"
+
+msgid "Delete"
+msgstr "Löschen"
 
 msgid "Yeas"
 msgstr "Ja-Stimmen"
@@ -1063,15 +1103,6 @@ msgstr "Neue Zuordnung"
 msgid "No mappings yet."
 msgstr "Noch keine Zuordnungen."
 
-msgid "Actions"
-msgstr "Aktionen"
-
-msgid "Delete"
-msgstr "Löschen"
-
-msgid "Edit"
-msgstr "Bearbeiten"
-
 msgid "New data source"
 msgstr "Neue Datenquelle"
 
@@ -1096,23 +1127,8 @@ msgstr "Noch keine Verbindungen."
 msgid "Title"
 msgstr "Titel"
 
-msgid "View"
-msgstr "Anzeigen"
-
-msgid "Upload party results"
-msgstr "Parteiresultate hochladen"
-
-msgid "Clear results"
-msgstr "Resultate löschen"
-
-msgid "Clear media"
-msgstr "Medien löschen"
-
 msgid "New election"
 msgstr "Neue Wahl"
-
-msgid "Upload results"
-msgstr "Resultate hochladen"
 
 msgid "New screen"
 msgstr "Neuer Screen"

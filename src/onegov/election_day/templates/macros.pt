@@ -31,6 +31,9 @@
                     <a i18n:translate="" class="action-edit" href="${request.link(election, 'edit')}">Edit</a>
                 </li>
                 <li>
+                    <a i18n:translate="" class="action-change-id" href="${request.link(election, 'change-id')}">Change ID</a>
+                </li>
+                <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload results</a>
                 </li>
                 <li>
@@ -64,6 +67,9 @@
                     <a i18n:translate="" class="action-edit" href="${request.link(compound, 'edit')}">Edit</a>
                 </li>
                 <li>
+                    <a i18n:translate="" class="action-change-id" href="${request.link(compound, 'change-id')}">Change ID</a>
+                </li>
+                <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(compound, 'upload-party-results')}">Upload party results</a>
                 </li>
                 <li>
@@ -89,6 +95,9 @@
                 </li>
                 <li>
                     <a i18n:translate="" class="action-edit" href="${request.link(vote, 'edit')}">Edit</a>
+                </li>
+                <li>
+                    <a i18n:translate="" class="action-change-id" href="${request.link(vote, 'change-id')}">Change ID</a>
                 </li>
                 <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(vote, 'upload')}">Upload results</a>

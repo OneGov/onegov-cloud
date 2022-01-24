@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-23 08:17+0100\n"
-"PO-Revision-Date: 2022-01-22 08:26+0100\n"
+"POT-Creation-Date: 2022-01-24 10:35+0100\n"
+"PO-Revision-Date: 2022-01-24 10:37+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -247,6 +247,19 @@ msgstr "Regionale"
 
 msgid "Communal"
 msgstr "Comunale"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing theID might "
+"break links on external sites!"
+msgstr ""
+"L'ID è usato nell'URL e potrebbe essere usato da qualche parte. Cambiare "
+"l'ID potrebbe rompere i link su siti esterni!"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "ID already exists"
+msgstr "L'ID esiste già"
 
 msgid "Name"
 msgstr "Nome"
@@ -740,7 +753,6 @@ msgstr "Incorporare"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "Il numero di voti di partito di una lista è diviso per il numero dei seggi "
@@ -774,6 +786,33 @@ msgstr "Hai dimenticato la password?"
 
 msgid "Reset password"
 msgstr "Ripristina password"
+
+msgid "Actions"
+msgstr "Azioni"
+
+msgid "View"
+msgstr "Mostrare"
+
+msgid "Edit"
+msgstr "Elabora"
+
+msgid "Change ID"
+msgstr "Cambiare l'ID"
+
+msgid "Upload results"
+msgstr "Caricare risultati"
+
+msgid "Clear results"
+msgstr "Ripristina risultati"
+
+msgid "Clear media"
+msgstr "Cancellare i media"
+
+msgid "Upload party results"
+msgstr "Carica risultati partito"
+
+msgid "Delete"
+msgstr "Elimina"
 
 msgid "Yeas"
 msgstr "Voti favorevoli"
@@ -1057,15 +1096,6 @@ msgstr "Nuovo mapping"
 msgid "No mappings yet."
 msgstr "Nessun mapping per il momento."
 
-msgid "Actions"
-msgstr "Azioni"
-
-msgid "Delete"
-msgstr "Elimina"
-
-msgid "Edit"
-msgstr "Elabora"
-
 msgid "New data source"
 msgstr "Nuova origine dati"
 
@@ -1091,23 +1121,8 @@ msgstr "Ancora nessun componente."
 msgid "Title"
 msgstr "Titolo"
 
-msgid "View"
-msgstr "Mostrare"
-
-msgid "Upload party results"
-msgstr "Carica risultati partito"
-
-msgid "Clear results"
-msgstr "Ripristina risultati"
-
-msgid "Clear media"
-msgstr "Cancellare i media"
-
 msgid "New election"
 msgstr "Nuova elezione"
-
-msgid "Upload results"
-msgstr "Caricare risultati"
 
 msgid "New screen"
 msgstr "Nuova schermata"
