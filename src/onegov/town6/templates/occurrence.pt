@@ -69,20 +69,22 @@
                     tal:condition="request.is_manager and ticket"
                 />
 
-                <div class="borderless-side-panel">
-                    <h2 i18n:translate="">Exports</h2>
-                    <ul class="calendar-export-list">
-                        <li>
-                            <a href="${request.link(occurrence, name='ical')}" i18n:translate>Export this event</a>
-                        </li>
-                        <li tal:condition="len(occurrences) > 1">
-                            <a href="${request.link(occurrence.event, name='ical')}" i18n:translate>Export all occurrences of this event</a>
-                        </li>
-                    </ul>
+                <div>
+                    <h3 i18n:translate="">Exports</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="calendar-export-list">
+                            <li>
+                                <a href="${request.link(occurrence, name='ical')}" i18n:translate>Export this event</a>
+                            </li>
+                            <li tal:condition="len(occurrences) > 1">
+                                <a href="${request.link(occurrence.event, name='ical')}" i18n:translate>Export all occurrences of this event</a>
+                            </li>
+                        </ul>
+                    </div>    
                 </div>
 
                 <div class="borderless-side-panel occurrence-dates">
-                    <h2 i18n:translate="">All occurrences of this event</h2>
+                    <h3 i18n:translate="">All occurrences of this event</h3>
                     <div class="monthly-view" data-dates="${';'.join(layout.format_date(o, 'isodate') for o in occurrences)}"></div>
                 </div>
 
