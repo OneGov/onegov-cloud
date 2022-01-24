@@ -9,6 +9,8 @@
 
         <div metal:use-macro="layout.macros['status_callout']" />
 
+        <div metal:use-macro="layout.macros['vote-actions']" />
+
         <tal:block tal:condition="layout.visible">
 
             <h2 i18n:translate tal:condition="vote.completed">Results</h2>

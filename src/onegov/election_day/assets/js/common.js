@@ -19,7 +19,7 @@ $('ul.actions').each(function(index, element) {
     $(element).before(
         $('<a></a>')
             .attr('href', '#')
-            .attr('class', 'button split small action-button secondary')
+            .attr('class', 'button split small action-button pull-right secondary')
             .on('click', function() { $(element).toggle(); return false; })
             .html($(this).data('title') + ' <span></span>')
     ).hide();
