@@ -69,7 +69,7 @@ def get_manage_elections(app, page=0, year=None):
     )
 )
 def get_manage_election_compsites(app, page=0, year=None):
-    return ElectionCompoundCollection(app.session(), page=page,year=year)
+    return ElectionCompoundCollection(app.session(), page=page, year=year)
 
 
 @ElectionDayApp.path(
