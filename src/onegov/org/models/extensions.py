@@ -39,8 +39,10 @@ class ContentExtension(object):
 
         """
 
+        disabled_extensions = request.app.settings.org.disabled_extensions
         for extension in extensions or self.content_extensions:
-            form_class = extension.extend_form(self, form_class, request)
+            if extension.__name__ not in disabled_extensions:
+                form_class = extension.extend_form(self, form_class, request)
 
         return form_class
 
