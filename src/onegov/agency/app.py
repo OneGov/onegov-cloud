@@ -122,6 +122,11 @@ def get_ticket_manager_roles():
     return ('admin', 'editor', 'member')
 
 
+@AgencyApp.setting(section='org', name='disabled_extensions')
+def get_disabled_extensions():
+    return ('PersonLinkExtension', )
+
+
 @AgencyApp.webasset_output()
 def get_webasset_output():
     return 'assets/bundles'
