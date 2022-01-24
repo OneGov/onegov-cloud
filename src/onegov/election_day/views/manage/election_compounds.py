@@ -16,11 +16,17 @@ from onegov.election_day.layouts import ManageElectionCompoundsLayout
 def view_election_compounds(self, request):
     """ View a list of all election compoundss. """
 
+    years = [
+        (year, year == self.year, request.link(self.for_year(year)))
+        for year in [None] + self.get_years()
+    ]
+
     return {
         'layout': ManageElectionCompoundsLayout(self, request),
         'title': _("Compounds of elections"),
         'groups': groupbylist(self.batch, key=lambda items: items.date),
-        'new_election_compound': request.link(self, 'new-election-compound')
+        'new_election_compound': request.link(self, 'new-election-compound'),
+        'years': years,
     }
 
 

@@ -19,6 +19,8 @@
                     </div>
                 </div>
 
+                <div metal:use-macro="layout.macros['years-dropdown']" />
+
                 <p tal:condition="not:groups" i18n:translate>
                     No votes yet.
                 </p>

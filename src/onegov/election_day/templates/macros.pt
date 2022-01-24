@@ -5,6 +5,21 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal">
 <body>
 
+<metal:years-dropdown define-macro="years-dropdown" i18n:domain="onegov.election_day">
+    <div class="row">
+        <div class="small-12 columns">
+            <form>
+                <select onchange="this.options[this.selectedIndex].onclick()">
+                    <tal:block tal:repeat="(name, active, link) years">
+                        <option tal:condition="active" selected>${name}</option>
+                        <option tal:condition="not active" onclick="location.href='${link}'">${name}</option>
+                    </tal:block>
+                </select>
+            </form>
+        </div>
+    </div>
+</metal:years-dropdown>
+
 <metal:intermediate-results-popup define-macro="intermediate-results-popup" i18n:domain="onegov.election_day">
     <tal:b tal:condition="skip_rendering|nothing">
         <div class="panel">

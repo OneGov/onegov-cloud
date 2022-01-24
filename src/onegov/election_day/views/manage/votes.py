@@ -18,11 +18,17 @@ from onegov.election_day.layouts import ManageVotesLayout
 def view_votes(self, request):
     """ View a list of all votes. """
 
+    years = [
+        (year, year == self.year, request.link(self.for_year(year)))
+        for year in [None] + self.get_years()
+    ]
+
     return {
         'layout': ManageVotesLayout(self, request),
         'title': _("Votes"),
         'groups': groupbylist(self.batch, key=lambda vote: vote.date),
-        'new_vote': request.link(self, 'new-vote')
+        'new_vote': request.link(self, 'new-vote'),
+        'years': years
     }
 
 
