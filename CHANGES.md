@@ -1,8 +1,50 @@
 # Changes
 
+## 2022.9
+
+`2022-01-25` | [e2b7e13929...ba24957bb8](https://github.com/OneGov/onegov-cloud/compare/e2b7e13929^...ba24957bb8)
+
+### Agency
+
+##### Disable person link extensions.
+
+`Bugfix` | [OGC-228](https://linear.app/onegovcloud/issue/OGC-228) | [e2b7e13929](https://github.com/onegov/onegov-cloud/commit/e2b7e13929be041df236ded402217244c6c7165f)
+
+### Election Day
+
+##### Add year filters to backend views.
+
+`Feature` | [OGC-68](https://linear.app/onegovcloud/issue/OGC-68) | [599ddb9fbf](https://github.com/onegov/onegov-cloud/commit/599ddb9fbfbcb8c2d9a025b31f8888bc16bc2169)
+
+##### Add actions menus to election, election compound and votes views if logged in.
+
+`Feature` | [OGC-69](https://linear.app/onegovcloud/issue/OGC-69) | [aac4de597d](https://github.com/onegov/onegov-cloud/commit/aac4de597de764bc455cdb15b1d7bf48c09d8085)
+
+##### Allow to change the IDs of elections, election compounds and votes.
+
+`Feature` | [OGC-60](https://linear.app/onegovcloud/issue/OGC-60) | [92b1acb4b0](https://github.com/onegov/onegov-cloud/commit/92b1acb4b0c1a698b4434a13d6bd0d8deb7f862b)
+
+##### Add honepot fields to subscription forms.
+
+`Feature` | [OGC-114](https://linear.app/onegovcloud/issue/OGC-114) | [40e9bd0cb5](https://github.com/onegov/onegov-cloud/commit/40e9bd0cb5c8fce272ec7a28eaa512c62553eff2)
+
+##### Removes inconsistencies in the display of embedded links for items without results.
+
+`Bugfix` | [43a7957afd](https://github.com/onegov/onegov-cloud/commit/43a7957afd1b6258c6b6c0da7ab4debe58aebc21)
+
+### Town6
+
+##### Style occurences side panel.
+
+`Bugfix` | [OGC-200](https://linear.app/onegovcloud/issue/OGC-200) | [5037c85660](https://github.com/onegov/onegov-cloud/commit/5037c85660cbfd3a9747c775ab409042a24ad0e1)
+
+##### Style more side panels.
+
+`Bugfix` | [OGC-200](https://linear.app/onegovcloud/issue/OGC-200) | [ba24957bb8](https://github.com/onegov/onegov-cloud/commit/ba24957bb8eadc1cb48155c6f2855b4d6676f1a9)
+
 ## 2022.8
 
-`2022-01-23` | [73b49c2696...d30032b59e](https://github.com/OneGov/onegov-cloud/compare/73b49c2696^...d30032b59e)
+`2022-01-23` | [73b49c2696...28fc743aba](https://github.com/OneGov/onegov-cloud/compare/73b49c2696^...28fc743aba)
 
 ### Election Day
 
@@ -1243,30 +1285,4 @@ Exports manual and stripe payments with ticket information.
 ##### Add a CLI argument to fail on reindexing errors.
 
 `Feature` | [455a4c6463](https://github.com/onegov/onegov-cloud/commit/455a4c6463a853649763bcf90dc3b04302a86057)
-
-## 2021.60
-
-`2021-06-21` | [5ca599442b...ff0ec616f5](https://github.com/OneGov/onegov-cloud/compare/5ca599442b^...ff0ec616f5)
-
-### Agency
-
-##### Add dedicated views for sorting.
-
-`Feature` | [5239cb98f6](https://github.com/onegov/onegov-cloud/commit/5239cb98f6529141f1016cef05da17e25658f352)
-
-### Fsi
-
-##### Adapts ldap sync for teachers
-
-- maps organisation by ldap base and filters
-- adapts login for teachers
-- adds helper class to query from config (json) for ldap sync
-
-`Other` | [FSI-2](https://kanton-zug.atlassian.net/browse/FSI-2) | [3769935af9](https://github.com/onegov/onegov-cloud/commit/3769935af921df1639daa21a96a324695ec813d0)
-
-### Gazette
-
-##### Fixes SOGC importer.
-
-`Bugfix` | [842352cd19](https://github.com/onegov/onegov-cloud/commit/842352cd19dae4a5912408e40084a9ce12cbcfc4)
 
