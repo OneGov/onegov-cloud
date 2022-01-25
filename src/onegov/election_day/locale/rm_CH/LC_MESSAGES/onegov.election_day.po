@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-24 10:35+0100\n"
+"POT-Creation-Date: 2022-01-25 07:27+0100\n"
 "PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -256,6 +256,9 @@ msgid ""
 msgstr ""
 
 msgid "ID"
+msgstr ""
+
+msgid "Invalid ID"
 msgstr ""
 
 msgid "ID already exists"

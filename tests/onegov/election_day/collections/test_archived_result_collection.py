@@ -417,3 +417,27 @@ def test_archived_result_collection_updates(session):
     votes[2001].last_result_change = votes[2001].timestamp()
     result = archive.update(votes[2001], request)
     assert result.last_result_change is not None
+
+    # Test update when changing IDs
+    election_compounds[2001].id += '-1'
+    session.flush()
+    old = 'ElectionCompound/elections-2001'
+    result = archive.update(election_compounds[2001], request, old=old)
+    assert result.url == 'ElectionCompound/elections-2001-1'
+    assert old not in [r.url for r in archive.query()]
+
+    elections[2001].id += '-1'
+    session.flush()
+    old = 'ProporzElection/election-2001'
+    result = archive.update(elections[2001], request, old=old)
+    assert result.url == 'ProporzElection/election-2001-1'
+    assert old not in [r.url for r in archive.query()]
+
+    votes[2001].id += '-1'
+    session.flush()
+    old = 'Vote/vote-2001'
+    result = archive.update(votes[2001], request, old=old)
+    assert result.url == 'Vote/vote-2001-1'
+    assert old not in [r.url for r in archive.query()]
+
+    assert archive.query().count() == 6

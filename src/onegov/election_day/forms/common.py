@@ -1,3 +1,4 @@
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.form import Form
 from wtforms import StringField
@@ -24,6 +25,8 @@ class ChangeIdForm(Form):
     )
 
     def validate_id(self, field):
+        if normalize_for_url(field.data) != field.data:
+            raise ValidationError(_('Invalid ID'))
         if self.model.id != field.data:
             query = self.request.session.query(self.model.__class__.id)
             query = query.filter_by(id=field.data)
