@@ -358,6 +358,11 @@ def get_public_ticket_messages():
     )
 
 
+@OrgApp.setting(section='org', name='disabled_extensions')
+def get_disabled_extensions():
+    return tuple()
+
+
 @OrgApp.webasset_path()
 def get_js_path():
     return 'assets/js'

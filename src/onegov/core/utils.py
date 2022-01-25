@@ -253,9 +253,22 @@ class Bunch(object):
         point.z = 3
         assert point.z == 3
 
+    Allows the creation of simple nested bunches, for example::
+
+        request = Bunch(**{'app.settings.org.my_setting': True})
+        assert request.app.settings.org.my_setting is True
+
     """
     def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+        self.__dict__.update({
+            key: value for key, value in kwargs.items()
+            if '.' not in key
+        })
+        for key, value in kwargs.items():
+            if '.' in key:
+                name = key.split('.')[0]
+                key = '.'.join(key.split('.')[1:])
+                setattr(self, name, Bunch(**{key: value}))
 
     def __eq__(self, other):
         if type(other) is type(self):

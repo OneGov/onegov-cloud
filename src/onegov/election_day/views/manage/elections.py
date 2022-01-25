@@ -6,6 +6,7 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.forms import ChangeIdForm
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layouts import ManageElectionsLayout
@@ -18,11 +19,17 @@ from onegov.election_day.layouts import ManageElectionsLayout
 def view_elections(self, request):
     """ View a list of all elections. """
 
+    years = [
+        (year, year == self.year, request.link(self.for_year(year)))
+        for year in [None] + self.get_years()
+    ]
+
     return {
         'layout': ManageElectionsLayout(self, request),
         'title': _("Elections"),
         'groups': groupbylist(self.batch, key=lambda election: election.date),
-        'new_election': request.link(self, 'new-election')
+        'new_election': request.link(self, 'new-election'),
+        'years': years
     }
 
 
@@ -79,6 +86,36 @@ def edit_election(self, request, form):
         'title': self.title,
         'shortcode': self.shortcode,
         'subtitle': _("Edit election"),
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=Election,
+    name='change-id',
+    form=ChangeIdForm
+)
+def change_vote_id(self, request, form):
+    layout = ManageElectionsLayout(self, request)
+    archive = ArchivedResultCollection(request.session)
+
+    if form.submitted(request):
+        old = request.link(self)
+        form.update_model(self)
+        archive.update(self, request, old=old)
+        request.message(_("Election modified."), 'success')
+        request.app.pages_cache.flush()
+        return redirect(layout.manage_model_link)
+
+    if not form.errors:
+        form.apply_model(self)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': _("Change ID"),
         'cancel': layout.manage_model_link
     }
 
