@@ -1,5 +1,6 @@
 from onegov.election_day import _
 from onegov.form import Form
+from onegov.form.fields import HoneyPotField
 from onegov.form.fields import PhoneNumberField
 from wtforms import StringField
 from wtforms.validators import Email
@@ -16,6 +17,8 @@ class EmailSubscriptionForm(Form):
         ]
     )
 
+    name = HoneyPotField()
+
 
 class SmsSubscriptionForm(Form):
 
@@ -26,3 +29,5 @@ class SmsSubscriptionForm(Form):
             InputRequired(),
         ],
     )
+
+    name = HoneyPotField()
