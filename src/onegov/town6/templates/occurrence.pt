@@ -60,8 +60,8 @@
             </div>
 
             <div class="large-4 medium-4 cell">
-                <div class="occurrence-map borderless-side-panel" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
-                    <h2 i18n:translate>Map</h2>
+                <div class="occurrence-map" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
+                    <h3 i18n:translate>Map</h3>
                     <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
                 </div>
 
