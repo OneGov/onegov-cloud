@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-23 08:17+0100\n"
+"POT-Creation-Date: 2022-01-25 07:27+0100\n"
 "PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -249,6 +249,20 @@ msgstr "Plaun regiunal"
 
 msgid "Communal"
 msgstr "Plaun communal"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing theID might "
+"break links on external sites!"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Invalid ID"
+msgstr ""
+
+msgid "ID already exists"
+msgstr ""
 
 msgid "Name"
 msgstr "Denominaziun"
@@ -729,7 +743,6 @@ msgstr "Incorporar"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "Il dumber da vuschs da partida d'ina glista vegn dividì tras il dumber da "
@@ -764,6 +777,33 @@ msgstr "Emblidà il pled-clav?"
 
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
+
+msgid "Actions"
+msgstr "Acziuns"
+
+msgid "View"
+msgstr "Mussar"
+
+msgid "Edit"
+msgstr "Modifitgar"
+
+msgid "Change ID"
+msgstr ""
+
+msgid "Upload results"
+msgstr "Chargiar si resultats"
+
+msgid "Clear results"
+msgstr "Stizzar ils resultats"
+
+msgid "Clear media"
+msgstr ""
+
+msgid "Upload party results"
+msgstr "Chargiar si ils resultats da las partidas"
+
+msgid "Delete"
+msgstr "Stizzar"
 
 msgid "Yeas"
 msgstr "Vuschs affirmativas"
@@ -1051,15 +1091,6 @@ msgstr "Nova attribuziun"
 msgid "No mappings yet."
 msgstr "Anc naginas attribuziuns"
 
-msgid "Actions"
-msgstr "Acziuns"
-
-msgid "Delete"
-msgstr "Stizzar"
-
-msgid "Edit"
-msgstr "Modifitgar"
-
 msgid "New data source"
 msgstr "Nova funtauna da datas"
 
@@ -1084,23 +1115,8 @@ msgstr "Anc nagina colliaziun."
 msgid "Title"
 msgstr "Titel"
 
-msgid "View"
-msgstr "Mussar"
-
-msgid "Upload party results"
-msgstr "Chargiar si ils resultats da las partidas"
-
-msgid "Clear results"
-msgstr "Stizzar ils resultats"
-
-msgid "Clear media"
-msgstr ""
-
 msgid "New election"
 msgstr "Nova elecziun"
-
-msgid "Upload results"
-msgstr "Chargiar si resultats"
 
 msgid "New screen"
 msgstr ""
