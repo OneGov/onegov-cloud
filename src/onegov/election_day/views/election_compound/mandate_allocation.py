@@ -2,8 +2,8 @@ from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
-from onegov.election_day.utils.election import get_party_results
-from onegov.election_day.utils.election import get_party_results_deltas
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_deltas
 
 
 @ElectionDayApp.html(

@@ -23,6 +23,9 @@ def parse_party_result(
         )
         mandates = validate_integer(line, 'mandates')
         votes = validate_integer(line, 'votes')
+        voters_count = validate_integer(
+            line, 'voters_count', optional=True, default=None
+        )
         assert all((year, total_votes, name, color))
         assert match(r'^#[0-9A-Fa-f]{6}$', color)
         assert totals.get(year, total_votes) == total_votes
@@ -46,7 +49,8 @@ def parse_party_result(
                 name=name,
                 color=color,
                 number_of_mandates=mandates,
-                votes=votes
+                votes=votes,
+                voters_count=voters_count
             )
 
 
@@ -121,11 +125,20 @@ def import_party_results(election, file, mimetype):
                         for err in line_errors
                     )
 
-    if panachage_headers:
+    if not parties:
+        errors.append(FileImportError(
+            _(
+                "No party results for year ${year}",
+                mapping={'year': election.date.year}
+            )
+        ))
+
+    if panachage_headers and parties:
         for list_id in panachage_headers.values():
             if not list_id == '999' and list_id not in parties.keys():
                 errors.append(FileImportError(
-                    _("Panachage results ids and id not consistent")))
+                    _("Panachage results ids and id not consistent"))
+                )
                 break
 
     if errors:

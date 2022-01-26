@@ -401,6 +401,9 @@ def test_bunch():
     assert bunch.a == 1
     assert bunch.b == 2
 
+    bunch = Bunch(**{'x.y.z': 3})
+    assert bunch.x.y.z == 3
+
     assert (Bunch() == Bunch()) is True
     assert (Bunch(x=1) == Bunch()) is False
     assert (Bunch(x=1) == Bunch(x=1)) is True

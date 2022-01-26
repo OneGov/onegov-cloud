@@ -225,7 +225,7 @@ La versione `>= 2.2` è supportata. Consulta la documentazione del programma di 
 
 ### Risultati dei partiti
 
-Ciascuna elezione ("proporz") può contenere i risultati di partito. Questi risultati sono indipendenti dagli altri risultati e di solito contengono i valori già aggregati delle varie liste di un partito.
+Ciascuna elezione ("proporz") e ogni composto elettorale può contenere i risultati di partito. Questi risultati sono indipendenti dagli altri risultati e di solito contengono i valori già aggregati delle varie liste di un partito.
 
 Le seguenti colonne verranno valutate e devono esistere:
 
@@ -238,6 +238,7 @@ Nome|Descrizione
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
+`voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 
 I risultati potrebbero contenere risultati misti aggiungendo una colonna per partito:
 

@@ -38,6 +38,8 @@ class SvgGenerator():
             chart = self.renderer.get_candidates_chart(item, 'svg')
         if type_ == 'connections':
             chart = self.renderer.get_connections_chart(item, 'svg')
+        if type_ == 'list-groups':
+            chart = self.renderer.get_list_groups_chart(item, 'svg')
         if type_ == 'lists':
             chart = self.renderer.get_lists_chart(item, 'svg')
         if type_ == 'lists-panachage':
@@ -79,7 +81,7 @@ class SvgGenerator():
                 'party-strengths', 'parties-panachage',
             ),
             'compound': (
-                'party-strengths', 'parties-panachage',
+                'list-groups', 'lists', 'party-strengths', 'parties-panachage',
             ),
             'ballot': (
                 'entities-map', 'districts-map'

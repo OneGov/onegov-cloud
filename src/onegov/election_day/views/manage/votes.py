@@ -6,6 +6,7 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.forms import ChangeIdForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.layouts import ManageVotesLayout
@@ -18,11 +19,17 @@ from onegov.election_day.layouts import ManageVotesLayout
 def view_votes(self, request):
     """ View a list of all votes. """
 
+    years = [
+        (year, year == self.year, request.link(self.for_year(year)))
+        for year in [None] + self.get_years()
+    ]
+
     return {
         'layout': ManageVotesLayout(self, request),
         'title': _("Votes"),
         'groups': groupbylist(self.batch, key=lambda vote: vote.date),
-        'new_vote': request.link(self, 'new-vote')
+        'new_vote': request.link(self, 'new-vote'),
+        'years': years
     }
 
 
@@ -79,6 +86,36 @@ def edit_vote(self, request, form):
         'title': self.title,
         'shortcode': self.shortcode,
         'subtitle': _("Edit vote"),
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=Vote,
+    name='change-id',
+    form=ChangeIdForm
+)
+def change_vote_id(self, request, form):
+    layout = ManageVotesLayout(self, request)
+    archive = ArchivedResultCollection(request.session)
+
+    if form.submitted(request):
+        old = request.link(self)
+        form.update_model(self)
+        archive.update(self, request, old=old)
+        request.message(_("Vote modified."), 'success')
+        request.app.pages_cache.flush()
+        return redirect(layout.manage_model_link)
+
+    if not form.errors:
+        form.apply_model(self)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': _("Change ID"),
         'cancel': layout.manage_model_link
     }
 

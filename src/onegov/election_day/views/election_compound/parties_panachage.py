@@ -1,10 +1,9 @@
 from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.election import get_parties_panachage_data
+from onegov.election_day.utils.parties import get_parties_panachage_data
 
 
 @ElectionDayApp.json(
@@ -38,7 +37,7 @@ def view_election_compound_parties_panachage_chart(self, request):
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionCompoundLayout(self, request),
         'type': 'parties-panachage-chart',
     }
 

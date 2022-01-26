@@ -65,7 +65,6 @@ def test_candidate_percentages(session):
     election.results.append(election_result_4)
     session.flush()
 
-
     # Add 5 lists
     list_1 = List(
         number_of_mandates=1,
@@ -310,7 +309,7 @@ def test_candidate_percentages(session):
     }
     assert candidate_5.percentage_by_district == {
         '1': {'votes': 5, 'counted': True,
-              'entities': [1, 2], 'percentage': round_(5,  tot_d['1'])},
+              'entities': [1, 2], 'percentage': round_(5, tot_d['1'])},
         '2': {'votes': 0, 'counted': False,
               'entities': [3, 4], 'percentage': 0.0}
     }

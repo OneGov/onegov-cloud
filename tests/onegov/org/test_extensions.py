@@ -7,6 +7,29 @@ from onegov.org.models import (
 from uuid import UUID
 
 
+def test_disable_extension():
+
+    class Topic(AccessExtension):
+        meta = {}
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class()
+    assert 'access' in form._fields
+
+    topic = Topic()
+    request = Bunch(**{
+        'app.settings.org.disabled_extensions': ['AccessExtension']
+    })
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class()
+    assert 'access' not in form._fields
+
+
 def test_access_extension():
 
     class Topic(AccessExtension):
@@ -18,7 +41,8 @@ def test_access_extension():
     topic = Topic()
     assert topic.access == 'public'
 
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     assert 'access' in form._fields
@@ -29,7 +53,7 @@ def test_access_extension():
 
     assert topic.access == 'private'
 
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     form.process(obj=topic)
@@ -57,15 +81,14 @@ def test_person_link_extension():
     class TopicForm(Form):
         pass
 
-    class Request(object):
-
-        def translate(self, text):
-            return text
-
     topic = Topic()
     assert topic.people is None
 
-    form_class = topic.with_content_extensions(TopicForm, request=Request())
+    request = Bunch(**{
+        'translate': lambda text: text,
+        'app.settings.org.disabled_extensions': []
+    })
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     assert 'people_6d120102d90344868eb32614cf3acb1a' in form._fields
@@ -89,7 +112,7 @@ def test_person_link_extension():
         ('6d120102d90344868eb32614cf3acb1a', 'The Truest Repairman')
     ]
 
-    form_class = topic.with_content_extensions(TopicForm, request=Request())
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
     form.apply_model(topic)
 
@@ -120,15 +143,14 @@ def test_person_link_extension_duplicate_name():
     class TopicForm(Form):
         pass
 
-    class Request(object):
-
-        def translate(self, text):
-            return text
-
     topic = Topic()
     assert topic.people is None
 
-    form_class = topic.with_content_extensions(TopicForm, request=Request())
+    request = Bunch(**{
+        'translate': lambda text: text,
+        'app.settings.org.disabled_extensions': []
+    })
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     assert 'people_6d120102d90344868eb32614cf3acb1a' in form._fields
@@ -162,16 +184,15 @@ def test_person_link_extension_order():
                 )
             ]
 
-    class Request(object):
-
-        def translate(self, text):
-            return text
-
     class TopicForm(Form):
         pass
 
+    request = Bunch(**{
+        'translate': lambda text: text,
+        'app.settings.org.disabled_extensions': []
+    })
     topic = Topic()
-    form_class = topic.with_content_extensions(TopicForm, request=Request())
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     form.people_6d120102d90344868eb32614cf3acb1a.data = True
@@ -246,15 +267,15 @@ def test_person_link_move_function():
                 ),
             ]
 
-    class Request(object):
-        def translate(self, text):
-            return text
-
     class TopicForm(Form):
         pass
 
     topic = Topic()
-    form_class = topic.with_content_extensions(TopicForm, request=Request())
+    request = Bunch(**{
+        'translate': lambda text: text,
+        'app.settings.org.disabled_extensions': []
+    })
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     form.people_6d120102d90344868eb32614cf3acb1a.data = True
@@ -295,7 +316,8 @@ def test_contact_extension():
     assert topic.contact is None
     assert topic.contact_html is None
 
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     assert 'contact' in form._fields
@@ -323,7 +345,7 @@ def test_contact_extension():
         '</ul>'
     )
 
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     form.process(obj=topic)
@@ -351,8 +373,9 @@ def test_honeypot_extension():
     submission = Submission()
     assert submission.honeypot is True
 
+    request = Bunch(**{'app.settings.org.disabled_extensions': []})
     form_class = submission.with_content_extensions(
-        EditSubmissionForm, request=object()
+        EditSubmissionForm, request=request
     )
     form = form_class()
     assert 'honeypot' in form._fields
@@ -365,7 +388,7 @@ def test_honeypot_extension():
 
     # ... apply
     form_class = submission.with_content_extensions(
-        EditSubmissionForm, request=object()
+        EditSubmissionForm, request=request
     )
     form = form_class()
     form.process(obj=submission)

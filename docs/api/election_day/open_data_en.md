@@ -136,6 +136,7 @@ Name|Description
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
+`voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 `panachage_votes_from_{XX}`|The number of votes the party got from the party with `id = XX`. An `id` with the value `999` marks the votes from the blank list.
 
 3 Vote results

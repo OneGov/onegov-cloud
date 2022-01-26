@@ -170,11 +170,12 @@ class ArchivedResultCollection(object):
 
             return query.all(), (last_modified.first() or [None])[0]
 
-    def update(self, item, request):
+    def update(self, item, request, old=None):
         """ Updates a result. """
-        url = request.link(item)
 
-        result = self.query().filter_by(url=url).first()
+        url = request.link(item)
+        old = url if not old else old
+        result = self.query().filter_by(url=old).first()
 
         add_result = False
         if not result:

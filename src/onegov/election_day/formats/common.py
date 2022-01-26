@@ -196,7 +196,8 @@ def line_is_relevant(line, number, district=None):
     return line.sortgeschaeft == number
 
 
-def validate_integer(line, col, treat_none_as_default=True, default=0):
+def validate_integer(line, col, treat_none_as_default=True, default=0,
+                     optional=False):
     """
     Checks line of a csv file for a valid integer.
     Raises an error if the attribute is not there.
@@ -205,8 +206,13 @@ def validate_integer(line, col, treat_none_as_default=True, default=0):
     :param col: attribute of line object
     :param default: default to return if line.col is None
     :param treat_none_as_default: raises ValueError if line.col is None
+    :param optional: return the default, if the col does not exist.
     :return: integer value of line.col
     """
+
+    if not hasattr(line, col) and optional:
+        return default
+
     result = getattr(line, col)
     if not result:
         if treat_none_as_default:

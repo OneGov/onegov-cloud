@@ -1,11 +1,15 @@
+from onegov.election_day.screen_widgets.election_compound import (
+    ElectionCompoundCandidatesTableWidget,
+    ElectionCompoundDistrictsTableWidget,
+    ElectionCompoundListGroupsChartWidget,
+    ElectionCompoundListGroupsTableWidget,
+    ElectionCompoundListsChartWidget,
+    ElectionCompoundListsTableWidget,
+)
 from onegov.election_day.screen_widgets.election import (
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
-    ElectionCompoundCandidatesTableWidget,
-    ElectionCompoundDistrictsTableWidget,
-    ElectionCompoundListsChartWidget,
-    ElectionCompoundListsTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
 )
@@ -48,6 +52,8 @@ __all__ = (
     'ElectionCandidatesTableWidget',
     'ElectionCompoundCandidatesTableWidget',
     'ElectionCompoundDistrictsTableWidget',
+    'ElectionCompoundListGroupsChartWidget',
+    'ElectionCompoundListGroupsTableWidget',
     'ElectionCompoundListsChartWidget',
     'ElectionCompoundListsTableWidget',
     'ElectionListsChartWidget',

@@ -910,9 +910,9 @@
 </metal:payment_status>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town6">
-    <div class="borderless-side-panel" tal:condition="ticket">
-        <h2 i18n:translate>Ticket</h2>
-        <div class="ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
+    <div tal:condition="ticket">
+        <h3 i18n:translate>Ticket</h3>
+            <div class="ticket-number side-panel-with-bg"><a href="${request.link(ticket)}">${ticket.number}</a></div>    
     </div>
 </metal:ticket_callout>
 

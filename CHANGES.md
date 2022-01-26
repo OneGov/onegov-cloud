@@ -1,8 +1,92 @@
 # Changes
 
+## 2022.9
+
+`2022-01-25` | [e2b7e13929...ba24957bb8](https://github.com/OneGov/onegov-cloud/compare/e2b7e13929^...ba24957bb8)
+
+### Agency
+
+##### Disable person link extensions.
+
+`Bugfix` | [OGC-228](https://linear.app/onegovcloud/issue/OGC-228) | [e2b7e13929](https://github.com/onegov/onegov-cloud/commit/e2b7e13929be041df236ded402217244c6c7165f)
+
+### Election Day
+
+##### Add year filters to backend views.
+
+`Feature` | [OGC-68](https://linear.app/onegovcloud/issue/OGC-68) | [599ddb9fbf](https://github.com/onegov/onegov-cloud/commit/599ddb9fbfbcb8c2d9a025b31f8888bc16bc2169)
+
+##### Add actions menus to election, election compound and votes views if logged in.
+
+`Feature` | [OGC-69](https://linear.app/onegovcloud/issue/OGC-69) | [aac4de597d](https://github.com/onegov/onegov-cloud/commit/aac4de597de764bc455cdb15b1d7bf48c09d8085)
+
+##### Allow to change the IDs of elections, election compounds and votes.
+
+`Feature` | [OGC-60](https://linear.app/onegovcloud/issue/OGC-60) | [92b1acb4b0](https://github.com/onegov/onegov-cloud/commit/92b1acb4b0c1a698b4434a13d6bd0d8deb7f862b)
+
+##### Add honepot fields to subscription forms.
+
+`Feature` | [OGC-114](https://linear.app/onegovcloud/issue/OGC-114) | [40e9bd0cb5](https://github.com/onegov/onegov-cloud/commit/40e9bd0cb5c8fce272ec7a28eaa512c62553eff2)
+
+##### Removes inconsistencies in the display of embedded links for items without results.
+
+`Bugfix` | [43a7957afd](https://github.com/onegov/onegov-cloud/commit/43a7957afd1b6258c6b6c0da7ab4debe58aebc21)
+
+### Town6
+
+##### Style occurences side panel.
+
+`Bugfix` | [OGC-200](https://linear.app/onegovcloud/issue/OGC-200) | [5037c85660](https://github.com/onegov/onegov-cloud/commit/5037c85660cbfd3a9747c775ab409042a24ad0e1)
+
+##### Style more side panels.
+
+`Bugfix` | [OGC-200](https://linear.app/onegovcloud/issue/OGC-200) | [ba24957bb8](https://github.com/onegov/onegov-cloud/commit/ba24957bb8eadc1cb48155c6f2855b4d6676f1a9)
+
+## 2022.8
+
+`2022-01-23` | [73b49c2696...28fc743aba](https://github.com/OneGov/onegov-cloud/compare/73b49c2696^...28fc743aba)
+
+### Election Day
+
+##### Add voters count to election compound party results.
+
+For election compounds with Doppelter Pukelsheim only. Also adds a new view and widgets based on the party results to display list groups and changes the existing list view to display voters counts instead of votes. Adds these views to the PDFs and SVGs. Futerhmore removes inconsistencies with displaying intermediate results, cleans up Doppelter Pukelsheim namings and descriptions and a lot of other things.
+
+`Feature` | [OGC-162](https://linear.app/onegovcloud/issue/OGC-162) | [d30032b59e](https://github.com/onegov/onegov-cloud/commit/d30032b59ebddd6255ce9f01b9c5d3770bd2067e)
+
+### Swissvotes
+
+##### Fixes sorting search results with empty titles throwing an error.
+
+`Bugfix` | [73b49c2696](https://github.com/onegov/onegov-cloud/commit/73b49c2696528fdf657d27b351dbff4cb1732ab9)
+
+## 2022.7
+
+`2022-01-19` | [1ab8ecb547...c1a735c644](https://github.com/OneGov/onegov-cloud/compare/1ab8ecb547^...c1a735c644)
+
+### Election Day
+
+##### Allows SMS to be sent to multiple recipients at once.
+
+`Feature` | [155](https://github.com/onegov/onegov-cloud/issues/155) | [936c6fc4f7](https://github.com/onegov/onegov-cloud/commit/936c6fc4f713cdb1519b2e06efb6c2d4e17eed18)
+
+##### Fixes purging old SVGs and PDFs for large numbers not possible.
+
+`Bugfix` | [35b5389362](https://github.com/onegov/onegov-cloud/commit/35b5389362335bb50641365f139aaffe98d8aca1)
+
+### Town6
+
+##### Remove margin of alert-box on homepage.
+
+`Bugfix` | [OGC-202](https://linear.app/onegovcloud/issue/OGC-202) | [1ab8ecb547](https://github.com/onegov/onegov-cloud/commit/1ab8ecb547c6ac61d80af9af4caab47a47e88ed4)
+
+##### Link images from events on the home page.
+
+`Bugfix` | [OGC-203](https://linear.app/onegovcloud/issue/OGC-203) | [a8daa373a8](https://github.com/onegov/onegov-cloud/commit/a8daa373a82b4a7272191ae4c787b2af19980dfc)
+
 ## 2022.6
 
-`2022-01-18` | [0c38fb0d05...2c589dc418](https://github.com/OneGov/onegov-cloud/compare/0c38fb0d05^...2c589dc418)
+`2022-01-18` | [0c38fb0d05...98e29a2470](https://github.com/OneGov/onegov-cloud/compare/0c38fb0d05^...98e29a2470)
 
 ### Election Day
 
@@ -1201,72 +1285,4 @@ Exports manual and stripe payments with ticket information.
 ##### Add a CLI argument to fail on reindexing errors.
 
 `Feature` | [455a4c6463](https://github.com/onegov/onegov-cloud/commit/455a4c6463a853649763bcf90dc3b04302a86057)
-
-## 2021.60
-
-`2021-06-21` | [5ca599442b...ff0ec616f5](https://github.com/OneGov/onegov-cloud/compare/5ca599442b^...ff0ec616f5)
-
-### Agency
-
-##### Add dedicated views for sorting.
-
-`Feature` | [5239cb98f6](https://github.com/onegov/onegov-cloud/commit/5239cb98f6529141f1016cef05da17e25658f352)
-
-### Fsi
-
-##### Adapts ldap sync for teachers
-
-- maps organisation by ldap base and filters
-- adapts login for teachers
-- adds helper class to query from config (json) for ldap sync
-
-`Other` | [FSI-2](https://kanton-zug.atlassian.net/browse/FSI-2) | [3769935af9](https://github.com/onegov/onegov-cloud/commit/3769935af921df1639daa21a96a324695ec813d0)
-
-### Gazette
-
-##### Fixes SOGC importer.
-
-`Bugfix` | [842352cd19](https://github.com/onegov/onegov-cloud/commit/842352cd19dae4a5912408e40084a9ce12cbcfc4)
-
-## 2021.59
-
-`2021-06-16` | [90f7a384b6...47f659af71](https://github.com/OneGov/onegov-cloud/compare/90f7a384b6^...47f659af71)
-
-### Agency
-
-##### Improve styling of memberships.
-
-`Other` | [STAKABS-27](https://kt-bs.atlassian.net/browse/STAKABS-27) | [82f59fdfce](https://github.com/onegov/onegov-cloud/commit/82f59fdfce82d7ff3be518454d589ea9ca53557f)
-
-### Feriennet
-
-##### Fixes export of invoice items
-
-Prevents double entries by joining on activity and invoice references.
-
-`Bugfix` | [f3caf5e2f7](https://github.com/onegov/onegov-cloud/commit/f3caf5e2f7cff8734054f0705966fb303f2c4e3f)
-
-### Winterthur
-
-##### Adapts UI for multi missions
-
-- Make time field required
-- Always display correct time
-- Remove mission count from /mission-reports table
-
-`Other` | [673cf13b7b](https://github.com/onegov/onegov-cloud/commit/673cf13b7b55738536554cedf022e7f4d1576561)
-
-## 2021.58
-
-`2021-06-15` | [5efda0b90f...d8ebec8a12](https://github.com/OneGov/onegov-cloud/compare/5efda0b90f^...d8ebec8a12)
-
-### Election Day
-
-##### Show when the last update date on the upload forms.
-
-`Feature` | [ZW-320](https://kanton-zug.atlassian.net/browse/ZW-320) | [e43a5de27b](https://github.com/onegov/onegov-cloud/commit/e43a5de27b2ea0b230776abfe547ec1d7ca8c211)
-
-##### Show the last notifications on the notification screens.
-
-`Feature` | [ZW-320](https://kanton-zug.atlassian.net/browse/ZW-320) | [b2abe8b3de](https://github.com/onegov/onegov-cloud/commit/b2abe8b3de39eb84dbd32be83986e47042ae6f3b)
 

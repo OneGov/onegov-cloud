@@ -278,8 +278,12 @@ class Canton(Principal):
                 return _("districts_label_sz")
             return _("Districts")
         if value == 'region':
+            if self.id == 'gr':
+                return _("region_label_gr")
             return _("District")
         if value == 'regions':
+            if self.id == 'gr':
+                return _("regions_label_gr")
             return _("Districts")
         if value == 'superregion':
             if self.id == 'bl':

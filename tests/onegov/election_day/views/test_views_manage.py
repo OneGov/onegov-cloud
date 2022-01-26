@@ -48,9 +48,9 @@ def test_view_manage_elections(election_day_app_zg):
     login(client)
 
     manage = client.get('/manage/elections')
-
     assert "Noch keine Wahlen erfasst" in manage
 
+    # Add
     new = manage.click('Neue Wahl')
     new.form['election_de'] = 'Elect a new president'
     new.form['date'] = date(2016, 1, 1)
@@ -58,25 +58,29 @@ def test_view_manage_elections(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form['mandates'] = 1
     manage = new.form.submit().follow()
-
     assert "Elect a new president" in manage
 
+    # Edit
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new federal councillor'
     edit.form['absolute_majority'] = None
     manage = edit.form.submit().follow()
-
     assert "Elect a new federal councillor" in manage
     assert "Elect a new federal councillor" == archive.query().one().title
 
+    # Change ID
+    change = manage.click('ID ändern')
+    change.form['id'] = 'presidential-election'
+    manage = change.form.submit().follow()
+    assert '/election/presidential-election' in manage
+
+    # Delete
     delete = manage.click("Löschen")
     assert "Wahl löschen" in delete
     assert "Elect a new federal councillor" in delete
     assert "Bearbeiten" in delete.click("Abbrechen")
-
     manage = delete.form.submit().follow()
     assert "Noch keine Wahlen erfasst" in manage
-
     assert archive.query().count() == 0
 
 
@@ -91,7 +95,6 @@ def test_view_manage_election_compounds(election_day_app_gr):
     login(client)
 
     manage = client.get('/manage/election-compounds')
-
     assert "Noch keine Verbindungen" in manage
 
     # Add two elections
@@ -119,8 +122,9 @@ def test_view_manage_election_compounds(election_day_app_gr):
     new.form['domain_elections'] = 'region'
     new.form['region_elections'] = ['elect-a-new-parliament-region-a']
     manage = new.form.submit().follow()
-
     assert "Elect a new parliament" in manage
+
+    # Edit
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new cantonal parliament'
     edit.form['region_elections'] = [
@@ -128,20 +132,24 @@ def test_view_manage_election_compounds(election_day_app_gr):
         'elect-a-new-parliament-region-b'
     ]
     manage = edit.form.submit().follow()
-
     assert "Elect a new cantonal parliament" in manage
     assert "Elect a new cantonal parliament" in [
         a.title for a in archive.query()
     ]
 
+    # Change ID
+    change = manage.click('ID ändern')
+    change.form['id'] = 'parliamentary-election'
+    manage = change.form.submit().follow()
+    assert '/elections/parliamentary-election' in manage
+
+    # Delete
     delete = manage.click("Löschen")
     assert "Verbindung löschen" in delete
     assert "Elect a new cantonal parliament" in delete
     assert "Bearbeiten" in delete.click("Abbrechen")
-
     manage = delete.form.submit().follow()
     assert "Noch keine Verbindungen" in manage
-
     assert archive.query().count() == 2
 
 
@@ -155,32 +163,36 @@ def test_view_manage_votes(election_day_app_zg):
     login(client)
 
     manage = client.get('/manage/votes')
-
     assert "Noch keine Abstimmungen erfasst" in manage
 
+    # Add
     new = manage.click('Neue Abstimmung')
     new.form['vote_de'] = 'Vote for a better yesterday'
     new.form['date'] = date(2016, 1, 1)
     new.form['domain'] = 'federation'
     manage = new.form.submit().follow()
-
     assert "Vote for a better yesterday" in manage
 
+    # Edit
     edit = manage.click('Bearbeiten')
     edit.form['vote_de'] = 'Vote for a better tomorrow'
     manage = edit.form.submit().follow()
-
     assert "Vote for a better tomorrow" in manage
     assert "Vote for a better tomorrow" == archive.query().one().title
 
+    # Change ID
+    change = manage.click('ID ändern')
+    change.form['id'] = 'future-vote'
+    manage = change.form.submit().follow()
+    assert '/vote/future-vote' in manage
+
+    # Delete
     delete = manage.click("Löschen")
     assert "Abstimmung löschen" in delete
     assert "Vote for a better tomorrow" in delete
     assert "Bearbeiten" in delete.click("Abbrechen")
-
     manage = delete.form.submit().follow()
     assert "Noch keine Abstimmungen erfasst" in manage
-
     assert archive.query().count() == 0
 
 

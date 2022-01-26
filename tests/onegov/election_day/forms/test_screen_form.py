@@ -402,6 +402,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<counted-entities class=""/>\n'
         '<election-compound-candidates-table class=""/>\n'
         '<election-compound-districts-table class=""/>\n'
+        '<election-compound-list-groups-chart class=""/>\n'
+        '<election-compound-list-groups-table class="" />\n'
         '<election-compound-lists-chart limit="" names="," class=""/>\n'
         '<election-compound-lists-table class="" names=","/>\n'
         '<h1 class=""></h1>\n'
