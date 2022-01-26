@@ -613,10 +613,8 @@ class Framework(
 
         """
 
-        sender = self.mail['marketing']['sender']
         directory = self.mail['marketing']['directory']
         assert directory
-        assert sender
 
         BATCH_LIMIT = 500
         # NOTE: The API specifies MB, so let's not chance it
@@ -638,28 +636,31 @@ class Framework(
             nonlocal batch_num
 
             buffer.write(b']')
-            dest_path = os.path.join(
-                directory, '{}.{}.{}'.format(
-                    batch_num, num_included, timestamp
+
+            # if the batch is empty we just skip it
+            if num_included > 0:
+                assert num_included <= BATCH_LIMIT
+                assert buffer.tell() <= SIZE_LIMIT
+                dest_path = os.path.join(
+                    directory, '{}.{}.{}'.format(
+                        batch_num, num_included, timestamp
+                    )
                 )
-            )
 
-            assert num_included > 0
-            assert num_included <= BATCH_LIMIT
-            assert buffer.tell() <= SIZE_LIMIT
-
-            # send e-mails through the transaction machinery
-            FileDataManager.write_file(buffer.getvalue(), dest_path)
+                # send e-mails through the transaction machinery
+                FileDataManager.write_file(buffer.getvalue(), dest_path)
+                batch_num += 1
 
             # prepare vars for next batch
             buffer.close()
             buffer = io.BytesIO()
             buffer.write(b'[')
             num_included = 0
-            batch_num += 1
 
         for email in prepared_emails:
             assert email['MessageStream'] == 'marketing'
+            # TODO: we could verify that From is the correct
+            #       sender for the marketing configuration...
 
             payload = json.dumps(email).encode('utf-8')
             if buffer.tell() + len(payload) >= SIZE_LIMIT:
