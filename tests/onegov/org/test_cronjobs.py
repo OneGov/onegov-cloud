@@ -1,3 +1,4 @@
+import os
 import transaction
 
 from datetime import datetime
@@ -8,12 +9,11 @@ from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.reservation import ResourceCollection
-from webtest import TestApp as Client
 from sedate import ensure_timezone, utcnow
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import ResourceRecipientCollection
-from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url, \
-    get_mail
+from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+from tests.shared import Client
 
 
 def register_echo_handler(handlers):
@@ -54,7 +54,7 @@ def register_echo_handler(handlers):
             return self.data.get('links')
 
 
-def test_ticket_statistics(org_app, smtp, handlers):
+def test_ticket_statistics(org_app, handlers):
     register_echo_handler(handlers)
 
     client = Client(org_app)
@@ -66,7 +66,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
 
     tz = ensure_timezone('Europe/Zurich')
 
-    assert len(smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     # do not run on the weekends
     with freeze_time(datetime(2016, 1, 2, tzinfo=tz)):
@@ -75,7 +75,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
     with freeze_time(datetime(2016, 1, 3, tzinfo=tz)):
         client.get(url)
 
-    assert len(smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     transaction.begin()
 
@@ -159,11 +159,11 @@ def test_ticket_statistics(org_app, smtp, handlers):
     with freeze_time(datetime(2016, 1, 4, tzinfo=tz)):
         client.get(url)
 
-    assert len(smtp.outbox) == 1
-    message = get_mail(smtp.outbox, 0)
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
 
-    assert message['subject'] == 'Govikon OneGov Cloud Status'
-    txt = message['text']
+    assert message['Subject'] == 'Govikon OneGov Cloud Status'
+    txt = message['TextBody']
     assert "Folgendes ist während des Wochenendes auf der Govikon" in txt
     assert "6 Tickets wurden eröffnet." in txt
     assert "2 Tickets wurden angenommen." in txt
@@ -176,7 +176,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
     assert "abmelden" in txt
 
 
-def test_daily_reservation_overview(org_app, smtp):
+def test_daily_reservation_overview(org_app):
     resources = ResourceCollection(org_app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
@@ -259,44 +259,45 @@ def test_daily_reservation_overview(org_app, smtp):
 
     # do not send an e-mail outside the selected days
     for day in [2, 3, 4, 5, 8]:
-        with freeze_time(datetime(2017, 1, day, tzinfo=tz)):
+        with freeze_time(datetime(2017, 1, day, tzinfo=tz), tick=True):
             client.get(url)
 
-            assert len(smtp.outbox) == 0
+            assert len(os.listdir(client.app.maildir)) == 0
 
     # only send e-mails to the users with the right selection
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz)):
+    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
         client.get(url)
 
-    assert len(smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
 
-    with freeze_time(datetime(2017, 1, 7, tzinfo=tz)):
+    with freeze_time(datetime(2017, 1, 7, tzinfo=tz), tick=True):
         client.get(url)
 
-    assert len(smtp.outbox) == 3
+    assert len(os.listdir(client.app.maildir)) == 3
 
     # there are no really confirmed reservations at this point, so the
     # e-mail will not contain any information info
-    del smtp.outbox[:]
+    client.flush_email_queue()
 
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz)):
+    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
         client.get(url)
 
-    for i in (0, 1):
-        message = get_mail(smtp.outbox, i)
-        assert "Heute keine Reservationen" in message['text']
-        assert "-reservation" not in message['text']
+    mails = [client.get_email(i) for i in range(2)]
+    for mail in mails:
+        assert "Heute keine Reservationen" in mail['TextBody']
+        assert "-reservation" not in mail['TextBody']
 
-    assert get_mail(smtp.outbox, 0)['to'] == 'day@example.org'
-    assert "Allgemein - Dailypass" in get_mail(smtp.outbox, 0)['text']
-    assert "Allgemein - Gymnasium" not in get_mail(smtp.outbox, 0)['text']
+    # NOTE: these are now in opposite order due to ticking time
+    assert mails[0]['To'] == 'gym@example.org'
+    assert "Allgemein - Gymnasium" in mails[0]['TextBody']
+    assert "Allgemein - Dailypass" not in mails[0]['TextBody']
 
-    assert get_mail(smtp.outbox, 1)['to'] == 'gym@example.org'
-    assert "Allgemein - Gymnasium" in get_mail(smtp.outbox, 1)['text']
-    assert "Allgemein - Dailypass" not in get_mail(smtp.outbox, 1)['text']
+    assert mails[1]['To'] == 'day@example.org'
+    assert "Allgemein - Dailypass" in mails[1]['TextBody']
+    assert "Allgemein - Gymnasium" not in mails[1]['TextBody']
 
     # once we confirm the reservation it shows up in the e-mail
-    del smtp.outbox[:]
+    client.flush_email_queue()
 
     gymnasium = resources.by_name('gymnasium')
     r = gymnasium.scheduler.reservations_by_token(gym_reservation_token)[0]
@@ -304,22 +305,24 @@ def test_daily_reservation_overview(org_app, smtp):
 
     transaction.commit()
 
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz)):
+    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
         client.get(url)
 
-    with freeze_time(datetime(2017, 1, 7, tzinfo=tz)):
+    with freeze_time(datetime(2017, 1, 7, tzinfo=tz), tick=True):
         client.get(url)
 
-    assert '0xdeadbeef' not in get_mail(smtp.outbox, 0)['text']
-    assert '0xdeadbeef' in get_mail(smtp.outbox, 1)['text']
+    # NOTE: these are now in opposite order due to ticking time
+    assert '0xdeadbeef' in client.get_email(0)['TextBody']
+    assert '0xdeadbeef' not in client.get_email(1)['TextBody']
 
-    assert get_mail(smtp.outbox, 2)['to'] == 'both@example.org'
-    assert 'Gymnasium' in get_mail(smtp.outbox, 2)['text']
-    assert 'Dailypass' in get_mail(smtp.outbox, 2)['text']
-    assert '0xdeadbeef' not in get_mail(smtp.outbox, 2)['text']  # diff. day
+    mail = client.get_email(2)
+    assert mail['To'] == 'both@example.org'
+    assert 'Gymnasium' in mail['TextBody']
+    assert 'Dailypass' in mail['TextBody']
+    assert '0xdeadbeef' not in mail['TextBody']  # diff. day
 
     # this also works for the other reservation which has no data
-    del smtp.outbox[:]
+    client.flush_email_queue()
 
     dailypass = resources.by_name('dailypass')
     r = dailypass.scheduler.reservations_by_token(day_reservation_token)[0]
@@ -327,17 +330,20 @@ def test_daily_reservation_overview(org_app, smtp):
 
     transaction.commit()
 
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz)):
+    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
         client.get(url)
 
-    assert 'gym-reservation' not in get_mail(smtp.outbox, 0)['text']
-    assert 'day-reservation' in get_mail(smtp.outbox, 0)['text']
+    # NOTE: these are now in opposite order due to ticking time
+    text = client.get_email(0)['TextBody']
+    assert 'day-reservation' not in text
+    assert 'gym-reservation' in text
 
-    assert 'day-reservation' not in get_mail(smtp.outbox, 1)['text']
-    assert 'gym-reservation' in get_mail(smtp.outbox, 1)['text']
+    text = client.get_email(1)['TextBody']
+    assert 'gym-reservation' not in text
+    assert 'day-reservation' in text
 
 
-def test_send_scheduled_newsletters(org_app, smtp):
+def test_send_scheduled_newsletters(org_app):
     newsletters = NewsletterCollection(org_app.session())
     recipients = RecipientCollection(org_app.session())
 
@@ -361,7 +367,7 @@ def test_send_scheduled_newsletters(org_app, smtp):
 
         newsletter = newsletters.query().one()
         assert newsletter.scheduled
-        assert len(smtp.outbox) == 0
+        assert len(os.listdir(client.app.maildir)) == 0
 
     with freeze_time('2018-05-31 12:00'):
         client = Client(org_app)
@@ -369,4 +375,4 @@ def test_send_scheduled_newsletters(org_app, smtp):
 
         newsletter = newsletters.query().one()
         assert not newsletter.scheduled
-        assert len(smtp.outbox) == 1
+        assert len(os.listdir(client.app.maildir)) == 1

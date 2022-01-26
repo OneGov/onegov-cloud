@@ -9,7 +9,8 @@ from uuid import uuid4
 
 
 @pytest.fixture(scope="function")
-def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url, redis_url):
+def onboarding_app(postgres_dsn, temporary_directory, maildir, es_url,
+                   redis_url):
 
     scan_morepath_modules(onegov.onboarding.OnboardingApp)
     morepath.commit(onegov.onboarding.OnboardingApp)
@@ -41,23 +42,14 @@ def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url, redis_url):
 
     app.mail = {
         'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': maildir,
             'sender': 'mails@govikon.ch'
         },
         'transactional': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': maildir,
             'sender': 'mails@govikon.ch'
         }
     }
+    app.maildir = maildir
 
     yield app

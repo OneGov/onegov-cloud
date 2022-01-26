@@ -1,3 +1,4 @@
+import os
 import re
 from lxml.html import document_fromstring
 
@@ -75,15 +76,13 @@ def test_reset_password(client):
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit().follow()
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     request_page.form['email'] = 'admin@example.org'
     assert 'admin@example.org' in request_page.form.submit().follow()
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = client.app.smtp.outbox[0]
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
+    message = client.get_email(0)['HtmlBody']
     link = list(document_fromstring(message).iterlinks())[0][2]
     token = link.split('token=')[1]
 
@@ -171,7 +170,7 @@ def test_registration(client):
 
     assert "Vielen Dank" in register.form.submit().follow()
 
-    message = client.get_email(0, 1)
+    message = client.get_email(0)['HtmlBody']
     assert "Anmeldung bestätigen" in message
 
     expr = r'href="[^"]+">Anmeldung bestätigen</a>'

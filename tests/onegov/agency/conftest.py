@@ -45,7 +45,7 @@ def create_agency_app(request, use_elasticsearch=False):
     app = create_app(
         AgencyApp,
         request,
-        use_smtp=True,
+        use_maildir=True,
         use_elasticsearch=use_elasticsearch
     )
     org = create_new_organisation(app, name="Govikon")

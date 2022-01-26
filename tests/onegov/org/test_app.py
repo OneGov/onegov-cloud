@@ -1,7 +1,9 @@
+import os
 import transaction
 
 from onegov.core.utils import Bunch
 from onegov.org import OrgApp
+from tests.shared import Client
 
 
 def test_allowed_application_id(org_app):
@@ -14,7 +16,7 @@ def test_allowed_application_id(org_app):
     assert org_app.is_allowed_application_id('foo')
 
 
-def test_send_email(smtp):
+def test_send_email(maildir):
 
     class App(OrgApp):
 
@@ -29,37 +31,32 @@ def test_send_email(smtp):
     app = App()
     app.mail = {
         'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': maildir,
             'sender': 'mails@govikon.ch'
         },
         'transactional': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': maildir,
             'sender': 'mails@govikon.ch'
         }
     }
+    app.maildir = maildir
+    client = Client(app)
 
-    app.send_email(receivers=['civilian@example.org'], subject='Test')
-    assert len(smtp.outbox) == 0
+    app.send_email(
+        receivers=['civilian@example.org'], subject='Test', content='Test'
+    )
+    assert len(os.listdir(maildir)) == 0
     transaction.abort()
 
-    app.send_email(receivers=['civilian@example.org'], subject='Test')
-    assert len(smtp.outbox) == 0
+    app.send_email(
+        receivers=['civilian@example.org'], subject='Test', content='Test'
+    )
+    assert len(os.listdir(maildir)) == 0
     transaction.commit()
 
-    assert len(smtp.outbox) == 1
-    mail = smtp.outbox[0]
+    assert len(os.listdir(maildir)) == 1
+    mail = client.get_email(0)
 
-    assert mail['Reply-To'] == 'Gemeinde Govikon <info@govikon.ch>'
+    assert mail['ReplyTo'] == 'Gemeinde Govikon <info@govikon.ch>'
     assert mail['Subject'] == 'Test'
-    assert mail['Sender'] == 'Gemeinde Govikon <mails@govikon.ch>'
     assert mail['From'] == 'Gemeinde Govikon <mails@govikon.ch>'

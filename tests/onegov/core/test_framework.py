@@ -3,20 +3,17 @@ import os
 import transaction
 import pytest
 
-from base64 import b64decode
 from base64 import b64encode
 from cached_property import cached_property
 from datetime import datetime, timedelta
-from email.header import decode_header
-from email.utils import parseaddr
 from freezegun import freeze_time
 from gettext import NullTranslations
 from itsdangerous import BadSignature, Signer
-from mailthon.enclosure import Attachment
 from onegov.core.custom import json
 from onegov.core.framework import Framework
 from onegov.core.html import html_to_text
 from onegov.core.i18n import translation_chain
+from onegov.core.mail import Attachment, prepare_email
 from onegov.core.redirect import Redirect
 from onegov.core.upgrade import UpgradeState
 from onegov.server import Config, Server
@@ -571,18 +568,14 @@ def test_fixed_translation_chain_length(redis_url):
     assert app.translation_chain_length == initial_length
 
 
-def test_send_email(smtp):
+def test_send_email(tmpdir):
 
+    maildir = tmpdir.mkdir('mail')
     app = Framework()
 
     app.mail = {
         'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
@@ -597,39 +590,27 @@ def test_send_email(smtp):
 
     transaction.commit()
 
-    assert len(smtp.outbox) == 1
-    message = smtp.outbox[0]
+    files = maildir.listdir()
+    assert len(files) == 1
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 1
+    message = messages[0]
 
-    assert message['Sender'] == 'noreply@example.org'
     assert message['From'] == 'noreply@example.org'
-    assert message['Reply-To'] == 'info@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
     assert message['Subject'] == 'Test E-Mail'
-    assert message['List-Unsubscribe'] == '<mailto:unsubscribe@example.org>'
-    assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/plain; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
-    )
-    assert message.get_payload()[1].as_string() == (
-        'Content-Type: text/html; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
-    )
+    assert message['MessageStream'] == 'marketing'
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert headers['List-Unsubscribe'] == '<mailto:unsubscribe@example.org>'
 
 
-def test_send_email_with_name(smtp):
+def test_send_email_with_name(tmpdir):
 
+    maildir = tmpdir.mkdir('mail')
     app = Framework()
     app.mail = {
         'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
@@ -643,186 +624,24 @@ def test_send_email_with_name(smtp):
 
     transaction.commit()
 
-    assert len(smtp.outbox) == 1
-    message = smtp.outbox[0]
+    files = maildir.listdir()
+    assert len(files) == 1
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 1
+    message = messages[0]
 
-    assert message['Sender'] == 'Govikon <noreply@example.org>'
     assert message['From'] == 'Govikon <noreply@example.org>'
-    assert message['Reply-To'] == 'Govikon <info@example.org>'
+    assert message['ReplyTo'] == 'Govikon <info@example.org>'
     assert message['Subject'] == 'Test E-Mail'
-    assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/plain; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
-    )
-    assert message.get_payload()[1].as_string() == (
-        'Content-Type: text/html; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
-    )
 
 
-def test_send_email_to_maildir(temporary_directory):
+def test_email_attachments(tmpdir):
 
+    maildir = tmpdir.mkdir('mail')
     app = Framework()
     app.mail = {
         'marketing': {
-            'use_directory': True,
-            'directory': temporary_directory,
-            'sender': 'noreply@example.org'
-        }
-    }
-
-    app.send_email(
-        reply_to='Govikon <info@example.org>',
-        receivers=['recipient@example.org'],
-        subject="Test E-Mail",
-        content="This e-mail is just a test"
-    )
-
-    assert not os.listdir(temporary_directory)
-
-    transaction.commit()
-
-    assert set(os.listdir(temporary_directory)) == {'cur', 'new', 'tmp'}
-
-    new_emails = os.path.join(temporary_directory, 'new')
-    assert len(os.listdir(new_emails)) == 1
-
-    new_email = os.path.join(new_emails, os.listdir(new_emails)[0])
-    with open(new_email, 'r') as f:
-        email = f.read()
-
-    assert 'Subject: Test E-Mail' in email
-    assert 'Reply-To: Govikon <info@example.org>' in email
-    assert 'From: Govikon <noreply@example.org>' in email
-    assert 'Sender: Govikon <noreply@example.org>' in email
-    assert 'To: recipient@example.org' in email
-
-
-def test_send_email_iso_8859_1(smtp):
-    app = Framework()
-    app.mail = {
-        'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
-            'sender': 'noreply@example.org'
-        }
-    }
-
-    app.send_email(
-        reply_to='Gövikon <info@example.org>',
-        receivers=['recipient@example.org'],
-        subject="Nüws",
-        content="This e-mäil is just a test"
-    )
-
-    assert len(smtp.outbox) == 0
-    transaction.commit()
-
-    assert len(smtp.outbox) == 1
-    message = smtp.outbox[0]
-
-    def decode(header):
-        name, addr = parseaddr(header)
-
-        try:
-            name = decode_header(name)[0][0].decode('utf-8')
-        except AttributeError:
-            pass
-
-        return name, addr
-
-    assert decode(message['Sender']) == ("Gövikon", 'noreply@example.org')
-    assert decode(message['From']) == ("Gövikon", 'noreply@example.org')
-    assert decode(message['Reply-To']) == ("Gövikon", 'info@example.org')
-
-    assert decode_header(message['Subject'])[0][0].decode('utf-8') \
-        == "Nüws"
-
-    assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/plain; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW3DpGlsIGlzIGp1c3QgYSB0ZXN0\n'
-    )
-    assert message.get_payload()[1].as_string() == (
-        'Content-Type: text/html; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW3DpGlsIGlzIGp1c3QgYSB0ZXN0\n'
-    )
-
-
-def test_send_email_unicode(smtp):
-    app = Framework()
-    app.mail = {
-        'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
-            'sender': 'noreply@example.org'
-        }
-    }
-
-    app.send_email(
-        reply_to='👴 <info@example.org>',
-        receivers=['recipient@example.org'],
-        subject="👍",
-        content="👍"
-    )
-
-    assert len(smtp.outbox) == 0
-    transaction.commit()
-
-    assert len(smtp.outbox) == 1
-    message = smtp.outbox[0]
-
-    def decode(header):
-        name, addr = parseaddr(header)
-
-        try:
-            name = decode_header(name)[0][0].decode('utf-8')
-        except AttributeError:
-            pass
-
-        return name, addr
-
-    assert decode(message['Sender']) == ("👴", 'noreply@example.org')
-    assert decode(message['From']) == ("👴", 'noreply@example.org')
-    assert decode(message['Reply-To']) == ("👴", 'info@example.org')
-    assert decode_header(message['Subject'])[0][0].decode('utf-8') == "👍"
-
-    assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/plain; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        '8J+RjQ==\n'
-    )
-
-    assert message.get_payload()[1].as_string() == (
-        'Content-Type: text/html; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        '8J+RjQ==\n'
-    )
-
-
-def test_email_attachments(temporary_directory):
-    app = Framework()
-    app.mail = {
-        'marketing': {
-            'use_directory': True,
-            'directory': temporary_directory,
+            'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
@@ -832,11 +651,9 @@ def test_email_attachments(temporary_directory):
     tempfile.close()
     attachments = [tempfile.name]
 
-    tempfile = NamedTemporaryFile(mode='w', delete=False)
-    tempfile.write('Second')
-    tempfile.close()
-    attachment = Attachment(tempfile.name)
-    attachment.headers['Content-Disposition'] = 'attachment; filename="at.txt"'
+    attachment = Attachment(
+        'at.txt', content='Second', content_type='text/custom'
+    )
     attachments.append(attachment)
 
     app.send_email(
@@ -847,14 +664,23 @@ def test_email_attachments(temporary_directory):
         attachments=attachments
     )
     transaction.commit()
-    new_emails = os.path.join(temporary_directory, 'new')
-    new_email = os.path.join(new_emails, os.listdir(new_emails)[0])
-    with open(new_email, 'r') as f:
-        email = f.read()
+    files = maildir.listdir()
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 1
+    message = messages[0]
 
-    assert b64encode('First'.encode('utf-8')).decode('utf-8') in email
-    assert b64encode('Second'.encode('utf-8')).decode('utf-8') in email
-    assert 'Content-Disposition: attachment; filename="at.txt"' in email
+    attachments = message['Attachments']
+    assert len(attachments) == 2
+    assert attachments[0]['Name'] == os.path.basename(tempfile.name)
+    assert attachments[0]['Content'] == b64encode(
+        'First'.encode('utf-8')
+    ).decode('utf-8')
+    assert attachments[0]['ContentType'] == 'text/plain'
+    assert attachments[1]['Name'] == 'at.txt'
+    assert attachments[1]['Content'] == b64encode(
+        'Second'.encode('utf-8')
+    ).decode('utf-8')
+    assert attachments[1]['ContentType'] == 'text/custom'
 
 
 def test_html_to_text():
@@ -898,7 +724,7 @@ def test_object_by_path():
     assert app.object_by_path('/asdf/asdf') is None
 
 
-def test_send_email_transaction(smtp, redis_url):
+def test_send_email_transaction(tmpdir, redis_url):
 
     import more.transaction
     import more.webassets
@@ -934,17 +760,13 @@ def test_send_email_transaction(smtp, redis_url):
             content="This e-mäil is just a test"
         )
 
+    maildir = tmpdir.mkdir('mail')
     app = App()
     app.application_id = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
     app.mail = {
         'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
@@ -957,22 +779,19 @@ def test_send_email_transaction(smtp, redis_url):
     with pytest.raises(AssertionError):
         client.get('/send-fail')
 
-    assert len(smtp.outbox) == 0
+    assert len(maildir.listdir()) == 0
 
     client.get('/send-ok')
-    assert len(smtp.outbox) == 1
+    assert len(maildir.listdir()) == 1
 
 
-def test_send_email_plaintext_alternative(smtp):
+def test_send_email_plaintext_alternative(tmpdir):
+
+    maildir = tmpdir.mkdir('mail')
     app = Framework()
     app.mail = {
         'marketing': {
-            'host': smtp.address[0],
-            'port': smtp.address[1],
-            'force_tls': False,
-            'username': None,
-            'password': None,
-            'use_directory': False,
+            'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
@@ -981,43 +800,165 @@ def test_send_email_plaintext_alternative(smtp):
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="<a href='http://example.org'>This e-mail is just a test</a>"
+        content='<a href="http://example.org">This e-mail is just a test</a>'
     )
 
     transaction.commit()
 
-    assert len(smtp.outbox) == 1
-    message = smtp.outbox[0]
+    files = maildir.listdir()
+    assert len(files) == 1
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 1
+    message = messages[0]
 
-    assert message['Sender'] == 'Govikon <noreply@example.org>'
     assert message['From'] == 'Govikon <noreply@example.org>'
-    assert message['Reply-To'] == 'Govikon <info@example.org>'
+    assert message['ReplyTo'] == 'Govikon <info@example.org>'
     assert message['Subject'] == 'Test E-Mail'
-
-    assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/plain; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'W1RoaXMgZS1tYWlsIGlzIGp1c3QgYSB0ZXN0XShodHRwOi8vZXhhbXBsZS5vcmcp\n'
+    assert message['HtmlBody'] == (
+        '<a href="http://example.org">This e-mail is just a test</a>'
+    )
+    assert message['TextBody'] == (
+        '[This e-mail is just a test](http://example.org)'
     )
 
-    content = message.get_payload()[0].as_string().splitlines()[-1]
-    assert b64decode(content) == (
-        b"[This e-mail is just a test](http://example.org)"
-    )
 
-    assert message.get_payload()[1].as_string() == (
-        'Content-Type: text/html; charset="utf-8"\n'
-        'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'PGEgaHJlZj0naHR0cDovL2V4YW1wbGUub3JnJz5UaGlzI'
-        'GUtbWFpbCBpcyBqdXN0IGEgdGVzdDwv\nYT4=\n'
-    )
+def test_send_marketing_email_batch(tmpdir):
 
-    content = ''.join(message.get_payload()[1].as_string().splitlines()[-2:])
-    assert b64decode(content) == (
-        b"<a href='http://example.org'>This e-mail is just a test</a>"
-    )
+    maildir = tmpdir.mkdir('mail')
+    app = Framework()
+
+    app.mail = {
+        'marketing': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org'
+        }
+    }
+
+    # NOTE: We use plaintext only to speed up the test
+    mails = [
+        app.prepare_email(
+            reply_to='info@example.org',
+            subject=f'Subject {index}',
+            plaintext=f'Content {index}'
+        )
+        for index in range(1, 1251)
+    ]
+    app.send_marketing_email_batch(mails)
+
+    transaction.commit()
+
+    files = sorted(maildir.listdir())
+    assert len(files) == 3
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 500
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 1'
+    assert message['TextBody'] == 'Content 1'
+    assert message['MessageStream'] == 'marketing'
+
+    messages = json.loads(files[1].read_text('utf-8'))
+    assert len(messages) == 500
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 501'
+    assert message['TextBody'] == 'Content 501'
+    assert message['MessageStream'] == 'marketing'
+
+    messages = json.loads(files[2].read_text('utf-8'))
+    assert len(messages) == 250
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 1001'
+    assert message['TextBody'] == 'Content 1001'
+    assert message['MessageStream'] == 'marketing'
+
+
+def test_send_marketing_email_batch_size_limit(tmpdir):
+
+    maildir = tmpdir.mkdir('mail')
+    app = Framework()
+
+    app.mail = {
+        'marketing': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org'
+        }
+    }
+
+    content = 'a' * 1_000_000  # 1 MB
+    # NOTE: We use plaintext only to speed up the test
+    mails = [
+        app.prepare_email(
+            reply_to='info@example.org',
+            subject=f'Subject {index}',
+            plaintext=content
+        )
+        for index in range(1, 75)
+    ]
+    app.send_marketing_email_batch(mails)
+
+    transaction.commit()
+
+    files = sorted(maildir.listdir())
+    assert len(files) == 2
+    payload = files[0].read_binary()
+    assert len(payload) < 50_000_000
+    messages = json.loads(payload.decode('utf-8'))
+    assert len(messages) == 49
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 1'
+    assert message['MessageStream'] == 'marketing'
+
+    payload = files[1].read_binary()
+    assert len(payload) < 50_000_000
+    messages = json.loads(payload.decode('utf-8'))
+    assert len(messages) == 25
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 50'
+    assert message['MessageStream'] == 'marketing'
+
+
+def test_send_marketing_email_batch_illegal_category(tmpdir):
+
+    maildir = tmpdir.mkdir('mail')
+    app = Framework()
+
+    app.mail = {
+        'marketing': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org'
+        },
+        'transactional': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org'
+        },
+    }
+
+    # NOTE: We use plaintext only to speed up the test
+    mails = [
+        app.prepare_email(
+            reply_to='info@example.org',
+            subject=f'Subject {index}',
+            plaintext=f'Content {index}',
+            category='transactional',
+        )
+        for index in range(1, 10)
+    ]
+    with pytest.raises(AssertionError):
+        app.send_marketing_email_batch(mails)
 
 
 def test_send_zulip(session):

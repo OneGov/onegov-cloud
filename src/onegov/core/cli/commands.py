@@ -1,25 +1,20 @@
 import click
-import email
-import mailbox
 import os
 import platform
 import shutil
 import subprocess
 import sys
 
-from cached_property import cached_property
 from fnmatch import fnmatch
-from mailthon.middleware import TLS, Auth
 from onegov.core.cache import lru_cache
 from onegov.core.cli.core import command_group, pass_group_context, abort
-from onegov.core.mail import Postman
+from onegov.core.mail_processor import MailQueueProcessor
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
 from onegov.core.upgrade import get_upgrade_modules
 from onegov.core.upgrade import RawUpgradeRunner
 from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
-from smtplib import SMTPRecipientsRefused
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
 
@@ -81,109 +76,26 @@ def delete(group_context):
     'matches_required': False,
     'default_selector': '*'
 })
-@click.option('--hostname', help="The smtp host")
-@click.option('--port', help="The smtp port")
-@click.option('--force-tls', default=False, is_flag=True,
-              help="Force a TLS connection")
-@click.option('--username', help="The username to authenticate", default=None)
-@click.option('--password', help="The password to authenticate", default=None)
+@click.option('--token', default=None,
+              help="The postmark server token to authenticate")
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
-@click.option('--category', help="Only send e-mails of the given category",
-              default=None)
 @pass_group_context
-def sendmail(group_context,
-             hostname, port, force_tls, username, password, limit, category):
+def sendmail(group_context, token, limit):
     """ Iterates over all applications and processes the maildir for each
     application that uses maildir e-mail delivery.
 
     """
-    exit_code = 0
-
-    class Mail(object):
-
-        def __init__(self, maildir, filename):
-            self.maildir = maildir
-            self.filename = filename
-
-        @cached_property
-        def message(self):
-            return email.message_from_string(self.text)
-
-        @cached_property
-        def text(self):
-            return self.maildir.get_file(self.filename).read().decode('utf-8')
-
-        @property
-        def category(self):
-            return self.message.get('X-Category')
-
-        @property
-        def exists(self):
-            return self.filename in self.maildir
-
-        def remove(self):
-            self.maildir.remove(self.filename)
-
-        def send(self, connection):
-            connection.sendmail(
-                self.message['From'],
-                self.message['To'],
-                self.text)
-
-            return connection.noop()[0]
 
     # applications with a maildir configuration
     cfgs = (c for c in group_context.appcfgs if 'mail' in c.configuration)
     cfgs = (v for c in cfgs for v in c.configuration['mail'].values())
-    cfgs = (c for c in cfgs if c.get('use_directory'))
+    cfgs = (c for c in cfgs if c.get('directory'))
 
     # non-empty maildirs
     dirs = set(c['directory'] for c in cfgs)
-    dirs = (mailbox.Maildir(d, create=False) for d in dirs)
-    dirs = (d for d in dirs if len(d))
-
-    # emails
-    mails = (Mail(d, f) for d in dirs for f in d.keys())
-    mails = tuple(mails)
-    mails = (
-        m for m in mails
-        if m.exists and (category is None or m.category == category)
-    )
-
-    # load all the mails we're going to process
-    if limit:
-        mails = tuple(x for _, x in zip(range(limit), mails))
-    else:
-        mails = tuple(mails)
-
-    if not mails:
-        sys.exit(exit_code)
-
-    # create the connection handler
-    postman = Postman(hostname, port)
-
-    if force_tls:
-        postman.middlewares.append(TLS(force=True))
-
-    if username:
-        postman.middlewares.append(Auth(username, password))
-
-    # send the messages
-    with postman.connection() as connection:
-
-        for mail in mails:
-            try:
-                status = mail.send(connection)
-            except SMTPRecipientsRefused as e:
-                exit_code = 1
-                print(f"Could not send e-mail: {e.recipients}")
-                mail.remove()
-            else:
-                if status == 250:
-                    mail.remove()
-
-    sys.exit(exit_code)
+    qp = MailQueueProcessor(token, *dirs, limit=limit)
+    qp.send_messages()
 
 
 @cli.command(context_settings={

@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 import babel
+import os
 
 from tests.onegov.town6.common import step_class
 
@@ -81,12 +82,10 @@ def test_event_steps(client):
     assert step_class(confirmation_page, 2) == 'is-complete'
     assert step_class(confirmation_page, 3) == 'is-current'
 
-    assert len(client.app.smtp.outbox) == 1
-    message = client.app.smtp.outbox[0]
-    assert message.get('to') == "test@example.org"
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
-    assert ticket_nr in message
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message['To'] == "test@example.org"
+    assert ticket_nr in message['TextBody']
 
     assert "Zugriff verweigert" in preview_page.form.submit(expect_errors=True)
 
@@ -126,11 +125,10 @@ def test_event_steps(client):
 
     assert "My Event" in client.get('/events')
 
-    assert len(client.app.smtp.outbox) == 2
-    message = client.app.smtp.outbox[1]
-    assert message.get('to') == "test@example.org"
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
+    assert message['To'] == "test@example.org"
+    message = message['TextBody']
     assert "My Event" in message
     assert "My event is an event." in message
     assert "Location" in message
@@ -147,10 +145,7 @@ def test_event_steps(client):
     # Close ticket
     ticket_page.click("Ticket abschliessen").follow()
 
-    assert len(client.app.smtp.outbox) == 3
-    message = client.app.smtp.outbox[2]
-    assert message.get('to') == "test@example.org"
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
-
-    assert "Ihre Anfrage wurde abgeschlossen" in message
+    assert len(os.listdir(client.app.maildir)) == 3
+    message = client.get_email(2)
+    assert message['To'] == "test@example.org"
+    assert "Ihre Anfrage wurde abgeschlossen" in message['TextBody']

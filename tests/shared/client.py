@@ -1,3 +1,5 @@
+import json
+import os
 import re
 
 from cached_property import cached_property
@@ -41,14 +43,35 @@ class Client(TestApp):
     def logout(self):
         return self.get('/auth/logout')
 
-    def get_email(self, index, payload=0):
-        """ Get the email at the given index, returning the nth payload (0 is
-        usually text-only).
+    def get_email(self, batch_index, index=0, flush_queue=False):
+        """ Get the nth email from the batch at the given batch index.
+        This will be dictionary formatted to suit the Postmark API
 
+        :param flush_queue: Should the email queue be emptied after
+            retrieving the email?
+
+        See: https://postmarkapp.com/developer/api/email-api
         """
-        message = self.app.smtp.outbox[index]
-        message = message.get_payload(payload).get_payload(decode=True)
-        return message.decode('utf-8')
+        files = [
+            os.path.join(self.app.maildir, p)
+            for p in os.listdir(self.app.maildir)
+        ]
+        if not files:
+            return None
+
+        # sort by modtime so we're immune to freezegun shenanigans
+        files = sorted(files, key=lambda f: os.path.getmtime(f))
+        with open(files[batch_index]) as fp:
+            messages = json.loads(fp.read())
+
+        if flush_queue:
+            for file in files:
+                os.remove(file)
+        return messages[index]
+
+    def flush_email_queue(self):
+        for path in os.listdir(self.app.maildir):
+            os.remove(os.path.join(self.app.maildir, path))
 
     def extract_href(self, link):
         """ Takes a link (<a href...>) and returns the href address. """

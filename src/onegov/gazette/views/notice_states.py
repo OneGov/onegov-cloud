@@ -1,5 +1,5 @@
-from mailthon.enclosure import Attachment
 from morepath import redirect
+from onegov.core.mail import Attachment
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.templates import render_template
@@ -57,12 +57,10 @@ def send_accepted_mail(request, notice):
         }
     )
 
-    attachments = []
-    for file in notice.files:
-        attachment = Attachment(file.reference.file._file_path)
-        content_disposition = 'attachment; filename="{}"'.format(file.name)
-        attachment.headers['Content-Disposition'] = content_disposition
-        attachments.append(attachment)
+    attachments = [
+        Attachment(file.name, content=file.reference.file)
+        for file in notice.files
+    ]
 
     request.app.send_transactional_email(
         subject=subject,

@@ -1,10 +1,10 @@
 import morepath
 import onegov.onboarding
+import os
 
 from onegov.core.utils import Bunch, scan_morepath_modules
-from tests.shared import utils
+from tests.shared import Client, utils
 from onegov.town6 import TownApp
-from webtest import TestApp as Client
 
 
 def test_view_permissions():
@@ -60,7 +60,7 @@ def test_town_valid_values(onboarding_app):
     assert "'grüen' is not a recognized color" in a
 
 
-def test_town_create(onboarding_app, temporary_directory, smtp, redis_url):
+def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
     c = Client(onboarding_app)
     a = c.get('/for-towns/1')
 
@@ -81,7 +81,7 @@ def test_town_create(onboarding_app, temporary_directory, smtp, redis_url):
 
     assert 'https://new-york.example.org' in a
     assert 'admin@example.org' in a
-    assert len(smtp.outbox) == 1
+    assert len(os.listdir(maildir)) == 1
 
     username = 'admin@example.org'
     password = a.pyquery('.product dd:nth-child(4)').text()

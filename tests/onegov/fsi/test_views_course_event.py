@@ -1,7 +1,7 @@
+import os
+
 from datetime import timedelta
-
 from sedate import utcnow
-
 from onegov.fsi.models import CourseEvent
 
 
@@ -50,7 +50,7 @@ def test_edit_course_event(client_with_db):
     assert 'New Loc' in page
     assert '05. Mai 2015' in page
     assert 'Pres' in page
-    assert f'min. 2 max. 3' in page
+    assert 'min. 2 max. 3' in page
     # String will not be rendered in email preview
     assert 'This course is hidden.' not in page
     # test no changes
@@ -149,9 +149,9 @@ def test_cancel_course_event(client_with_db):
 
     msg = f"Email erfolgreich an {wanted_count + 1} Empfänger gesendet"
     assert msg in client.get(redirect_link)
-    assert len(client.app.smtp.outbox) == wanted_count + 1
+    assert len(os.listdir(client.app.maildir)) == wanted_count + 1
 
-    message = client.app.smtp.outbox.pop()
+    message = client.get_email(-1)
     assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
@@ -167,12 +167,11 @@ def test_register_for_course_event_member(client_with_db):
     page = client.get(f'/fsi/event/{event.id}')
     assert 'Angemeldet' in page
 
-    assert len(client.app.smtp.outbox) == 1
-    message = client.app.smtp.outbox[0]
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
     assert message['To'] == 'member@example.org'
-    assert message['Subject'] == '=?utf-8?q?Anmeldungsbest=C3=A4tigung?='
-    text = message.get_payload(0).get_payload(0).get_payload(decode=True)
-    text = text.decode('utf-8')
+    assert message['Subject'] == 'Anmeldungsbestätigung'
+    text = message['TextBody']
     assert 'Sie haben sich erfolgreich für folgenden Kurs angemeldet' in text
 
     # Test cancellation emails upon unsubscribing
@@ -180,8 +179,8 @@ def test_register_for_course_event_member(client_with_db):
     view = f'/fsi/reservations?course_event_id={event.id}'
     page = client.get(view)
     page.click('Löschen')
-    assert len(client.app.smtp.outbox) == 2
-    message = client.app.smtp.outbox[1]
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
     assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
@@ -196,8 +195,8 @@ def test_register_for_course_event_editor(client_with_db):
     page = client.get(f'/fsi/event/{event.id}')
     assert 'Angemeldet' in page
 
-    assert len(client.app.smtp.outbox) == 1
-    message = client.app.smtp.outbox[0]
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
     assert message['To'] == 'editor@example.org'
 
 
@@ -212,7 +211,7 @@ def test_register_for_course_event_admin(client_with_db):
     page = client.get(f'/fsi/event/{event.id}')
     assert 'Angemeldet' in page
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
 
 def test_add_subscription_for_other_attendee(client_with_db):
@@ -235,7 +234,7 @@ def test_add_subscription_for_other_attendee(client_with_db):
     page = page.form.submit().follow()
     assert "Neue Anmeldung wurde hinzugefügt" in page
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
 
 def test_edit_subscription_for_other_attendee(client_with_db):
@@ -249,7 +248,7 @@ def test_edit_subscription_for_other_attendee(client_with_db):
     new = client.get(f'/fsi/reservations/add?course_event_id={event.id}')
     page = new.form.submit().follow()
     assert 'Neue Anmeldung wurde hinzugefügt' in page
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
 
 def test_delete_subscriptions_past_present(client, scenario):
@@ -285,7 +284,7 @@ def test_delete_subscriptions_past_present(client, scenario):
     response = client.delete(
         page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
     assert response.status_code == 200
-    assert client.app.smtp.outbox.pop()
+    assert client.get_email(-1, flush_queue=True)
 
     page = client.get(event_subscriptions)
     assert 'Keine Einträge gefunden' in page
@@ -298,4 +297,4 @@ def test_delete_subscriptions_past_present(client, scenario):
         page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
 
     assert response.status_code == 200
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0

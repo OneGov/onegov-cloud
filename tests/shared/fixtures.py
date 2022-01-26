@@ -365,56 +365,6 @@ def es_client(es_url):
 
 
 @pytest.fixture(scope="session")
-def smtp_server():
-    # replacement for smtpserver fixture, which also works on Python 3.5
-    # see https://bitbucket.org/pytest-dev/pytest-localserver
-    # /issues/13/broken-on-python-35
-    from pytest_localserver import smtp
-
-    class Server(smtp.Server):
-
-        def getsockname(self):
-            return self.socket.getsockname()
-
-        @property
-        def address(self):
-            return self.addr[:2]
-
-        def outbox_payloads(self, index):
-            return [
-                m.get_payload(index).get_payload(decode=True).decode('utf-8')
-                for m in self.outbox
-            ]
-
-        @property
-        def sent(self):
-            """ Similar to the outbox property, this property returns the
-            sent e-mails, but only the decoded plaintext format.
-
-            """
-            return self.outbox_payloads(0)
-
-        @property
-        def sent_html(self):
-            """ Similar to the outbox property, this property returns the
-            sent e-mails, but only the decoded html format.
-
-            """
-            return self.outbox_payloads(1)
-
-    server = Server()
-    server.start()
-    yield server
-    server.stop()
-
-
-@pytest.fixture(scope="function")
-def smtp(smtp_server):
-    yield smtp_server
-    del smtp_server.outbox[:]
-
-
-@pytest.fixture(scope="session")
 def memcached_server():
     path = shutil.which('memcached')
 
@@ -533,4 +483,11 @@ def glauth_binary():
     # short check if binary is downloaded correctly
     assert os.path.getsize(path) > 6000000
 
+    return path
+
+
+@pytest.fixture(scope="function")
+def maildir(temporary_directory):
+    path = os.path.join(temporary_directory, 'mails')
+    os.makedirs(path)
     return path
