@@ -287,14 +287,19 @@ def test_daily_reservation_overview(org_app):
         assert "Heute keine Reservationen" in mail['TextBody']
         assert "-reservation" not in mail['TextBody']
 
-    # NOTE: these are now in opposite order due to ticking time
-    assert mails[0]['To'] == 'gym@example.org'
-    assert "Allgemein - Gymnasium" in mails[0]['TextBody']
-    assert "Allgemein - Dailypass" not in mails[0]['TextBody']
+    # NOTE: These seem to not always get sent in the same order...
+    #       technically we don't really care so let's determine order
+    if mails[0]['To'] == 'gym@example.org':
+        gym_mail, day_mail = mails
+    else:
+        day_mail, gym_mail = mails
+    assert gym_mail['To'] == 'gym@example.org'
+    assert "Allgemein - Gymnasium" in gym_mail['TextBody']
+    assert "Allgemein - Dailypass" not in gym_mail['TextBody']
 
-    assert mails[1]['To'] == 'day@example.org'
-    assert "Allgemein - Dailypass" in mails[1]['TextBody']
-    assert "Allgemein - Gymnasium" not in mails[1]['TextBody']
+    assert day_mail['To'] == 'day@example.org'
+    assert "Allgemein - Dailypass" in day_mail['TextBody']
+    assert "Allgemein - Gymnasium" not in day_mail['TextBody']
 
     # once we confirm the reservation it shows up in the e-mail
     client.flush_email_queue()
@@ -311,9 +316,12 @@ def test_daily_reservation_overview(org_app):
     with freeze_time(datetime(2017, 1, 7, tzinfo=tz), tick=True):
         client.get(url)
 
-    # NOTE: these are now in opposite order due to ticking time
-    assert '0xdeadbeef' in client.get_email(0)['TextBody']
-    assert '0xdeadbeef' not in client.get_email(1)['TextBody']
+    # NOTE: These seem to not always get sent in the same order...
+    #       technically we don't really care so let's determine order
+    if '0xdeadbeef' in client.get_email(0)['TextBody']:
+        assert '0xdeadbeef' not in client.get_email(1)['TextBody']
+    else:
+        assert '0xdeadbeef' in client.get_email(1)['TextBody']
 
     mail = client.get_email(2)
     assert mail['To'] == 'both@example.org'
@@ -333,14 +341,19 @@ def test_daily_reservation_overview(org_app):
     with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
         client.get(url)
 
-    # NOTE: these are now in opposite order due to ticking time
+    # NOTE: These seem to not always get sent in the same order...
+    #       technically we don't really care so let's determine order
     text = client.get_email(0)['TextBody']
-    assert 'day-reservation' not in text
-    assert 'gym-reservation' in text
+    if 'day-reservation' in text:
+        assert 'gym-reservation' not in text
+    else:
+        assert 'gym-reservation' in text
 
     text = client.get_email(1)['TextBody']
-    assert 'gym-reservation' not in text
-    assert 'day-reservation' in text
+    if 'gym-reservation' in text:
+        assert 'day-reservation' not in text
+    else:
+        assert 'day-reservation' in text
 
 
 def test_send_scheduled_newsletters(org_app):

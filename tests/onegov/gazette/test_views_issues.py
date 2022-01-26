@@ -178,7 +178,7 @@ def test_view_issues_permissions(gazette_app):
 
 
 def test_view_issues_publish(gazette_app):
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 12:00", tick=True):
         client = Client(gazette_app)
         login_publisher(client)
 

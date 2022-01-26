@@ -19,7 +19,7 @@ from webtest import TestApp as Client
 
 
 def test_view_notices(gazette_app):
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
 
         publisher = Client(gazette_app)
         login_publisher(publisher)
@@ -273,7 +273,7 @@ def test_view_notices_order(gazette_app):
             ]
         }
 
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
 
         client = Client(gazette_app)
         login_publisher(client)
@@ -528,7 +528,7 @@ def test_view_notices_pdf_preview(gazette_app):
 
 
 def test_view_notices_index(gazette_app):
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
 
         client = Client(gazette_app)
         login_publisher(client)
@@ -805,7 +805,7 @@ def test_view_notices_statistics_rejected(gazette_app):
     assert statistic() == []
 
     # Add notices
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         for user in 5 * [editor_1] + 2 * [editor_2] + 3 * [editor_3]:
             manage = user.get('/notices/drafted/new-notice')
             manage.form['title'] = "Titel"
@@ -822,7 +822,7 @@ def test_view_notices_statistics_rejected(gazette_app):
 
     assert statistic() == []
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 12:00", tick=True):
         for url in publisher.get('/notices/submitted').pyquery('td a'):
             manage = publisher.get(url.attrib['href']).click("Zurückweisen")
             manage.form['comment'] = 'XYZ'

@@ -1,4 +1,5 @@
 import babel.dates
+import os
 import pytest
 import transaction
 
@@ -209,10 +210,10 @@ def test_submit_event_auto_accept_no_emails(client, mute, mail_count):
     client.login_editor()
     page = client.get('/events')
 
-    assert len(client.app.smtp.outbox) == mail_count
+    assert len(os.listdir(client.app.maildir)) == mail_count
     if not mute:
-        message = client.app.smtp.outbox[0]
-        assert 'Ihre Veranstaltung wurde angenommen' in message.get('subject')
+        message = client.get_email(0)
+        assert 'Ihre Veranstaltung wurde angenommen' in message['Subject']
 
     assert page.pyquery('.open-tickets').attr('data-count') == '0'
     assert page.pyquery('.pending-tickets').attr('data-count') == '0'
@@ -280,7 +281,7 @@ def test_submit_event(client, skip_opening_email):
     # Submit event
     confirmation_page = preview_page.form.submit().follow()
     if skip_opening_email:
-        assert len(client.app.smtp.outbox) == 0
+        assert len(os.listdir(client.app.maildir)) == 0
         return
 
     assert "Vielen Dank für Ihre Eingabe!" in confirmation_page
@@ -289,12 +290,10 @@ def test_submit_event(client, skip_opening_email):
 
     assert "My Event" not in client.get('/events')
 
-    assert len(client.app.smtp.outbox) == 1
-    message = client.app.smtp.outbox[0]
-    assert message.get('to') == "test@example.org"
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
-    assert ticket_nr in message
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message['To'] == "test@example.org"
+    assert ticket_nr in message['TextBody']
 
     assert "Zugriff verweigert" in preview_page.form.submit(expect_errors=True)
 
@@ -334,11 +333,10 @@ def test_submit_event(client, skip_opening_email):
 
     assert "My Event" in client.get('/events')
 
-    assert len(client.app.smtp.outbox) == 2
-    message = client.app.smtp.outbox[1]
-    assert message.get('to') == "test@example.org"
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
+    assert message['To'] == "test@example.org"
+    message = message['TextBody']
     assert "My Event" in message
     assert "My event is an event." in message
     assert "Location" in message
@@ -355,13 +353,10 @@ def test_submit_event(client, skip_opening_email):
     # Close ticket
     ticket_page.click("Ticket abschliessen").follow()
 
-    assert len(client.app.smtp.outbox) == 3
-    message = client.app.smtp.outbox[2]
-    assert message.get('to') == "test@example.org"
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
-
-    assert "Ihre Anfrage wurde abgeschlossen" in message
+    assert len(os.listdir(client.app.maildir)) == 3
+    message = client.get_email(2)
+    assert message['To'] == "test@example.org"
+    assert "Ihre Anfrage wurde abgeschlossen" in message['TextBody']
 
 
 def test_edit_event(client):
@@ -452,11 +447,10 @@ def test_delete_event(client):
     delete_link = ticket_page.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
 
-    assert len(client.app.smtp.outbox) == 3
-    message = client.app.smtp.outbox[2]
-    assert message.get('to') == "test@example.org"
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
+    assert len(os.listdir(client.app.maildir)) == 3
+    message = client.get_email(2)
+    assert message['To'] == "test@example.org"
+    message = message['TextBody']
     assert "My Event" in message
     assert "Ihre Veranstaltung musste leider abgelehnt werden" in message
     assert ticket_nr in message

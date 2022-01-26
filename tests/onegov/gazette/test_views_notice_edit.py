@@ -12,7 +12,7 @@ from tests.onegov.gazette.common import submit_notice
 def test_view_notice_edit(gazette_app):
     admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         manage = editor_1.get('/notices/drafted/new-notice')
 
         assert manage.form['phone_number'].value == '+41415112271'
@@ -171,7 +171,7 @@ def test_view_notice_edit_unrestricted(gazette_app):
     then = "2017-11-01 11:00"
     future = "2020-11-01 11:00"
 
-    with freeze_time(then):
+    with freeze_time(then, tick=True):
         manage = editor_1.get('/notices/drafted/new-notice')
 
         assert manage.form['phone_number'].value == '+41415112271'
@@ -188,7 +188,7 @@ def test_view_notice_edit_unrestricted(gazette_app):
         manage.form.submit()
 
     # drafted
-    with freeze_time(future):
+    with freeze_time(future, tick=True):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
         edit_notice_unrestricted(publisher, 'notice', title='unres_drafted')
         edit_notice_unrestricted(admin, 'notice', phone_number='+41415112291')
@@ -202,9 +202,9 @@ def test_view_notice_edit_unrestricted(gazette_app):
         assert "(Sikh Community)" in manage
 
     # submitted
-    with freeze_time(then):
+    with freeze_time(then, tick=True):
         submit_notice(editor_1, 'notice')
-    with freeze_time(future):
+    with freeze_time(future, tick=True):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
         edit_notice_unrestricted(publisher, 'notice', author_name='Somebody')
         edit_notice_unrestricted(admin, 'notice', title='unres_submitted')
@@ -218,9 +218,9 @@ def test_view_notice_edit_unrestricted(gazette_app):
             assert "(Sikh Community)" in manage
 
     # rejected
-    with freeze_time(then):
+    with freeze_time(then, tick=True):
         reject_notice(publisher, 'notice')
-    with freeze_time(future):
+    with freeze_time(future, tick=True):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
         edit_notice_unrestricted(publisher, 'notice', author_name='Someone')
         edit_notice_unrestricted(admin, 'notice', title='unres_rejected')
@@ -234,10 +234,10 @@ def test_view_notice_edit_unrestricted(gazette_app):
             assert "(Sikh Community)" in manage
 
     # accepted
-    with freeze_time(then):
+    with freeze_time(then, tick=True):
         submit_notice(editor_1, 'notice')
         accept_notice(publisher, 'notice')
-    with freeze_time(future):
+    with freeze_time(future, tick=True):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
         edit_notice_unrestricted(publisher, 'notice', author_name='No one',
                                  note='A note.')
