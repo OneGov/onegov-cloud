@@ -173,14 +173,7 @@ class EmailNotification(Notification):
                         'layout': layout
                     }
                 )
-                # HACK: We need a dummy href here, because bleach
-                #       would consider the $variable an invalid link
-                #       and remove it. We definitely want to do this
-                #       though, since lifting the text_to_html outside
-                #       the loop increases the performance a lot
-                dummy_href = 'http://replacethis.org'
                 plaintext = html_to_text(content)
-                plaintext.replace(layout.optout_link, dummy_href)
 
                 for address in addresses:
                     token = request.new_url_safe_token({'address': address})
@@ -194,7 +187,7 @@ class EmailNotification(Notification):
                             optout_custom
                         ),
                         plaintext=plaintext.replace(
-                            dummy_href,
+                            layout.optout_link,
                             optout_custom
                         ),
                         headers={

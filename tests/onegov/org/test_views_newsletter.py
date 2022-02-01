@@ -229,9 +229,9 @@ def test_newsletter_send(client):
     assert len(send.pyquery('.previous-recipients li')) == 2
 
     # make sure the mail was sent correctly
-    assert len(os.listdir(client.app.maildir)) == 2
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    mail = client.get_email(0)
+    mail = client.get_email(0, 0)
     message = mail['TextBody']
 
     assert "Our town is AWESOME" in message
@@ -243,7 +243,7 @@ def test_newsletter_send(client):
     # make sure the unconfirm link is different for each mail
     unconfirm_1 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
 
-    mail = client.get_email(1)
+    mail = client.get_email(0, 1)
     message = mail['TextBody']
     unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
 

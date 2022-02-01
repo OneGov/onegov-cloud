@@ -4,6 +4,7 @@ import morepath
 
 from collections import OrderedDict
 from itertools import groupby
+from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.event import Occurrence, OccurrenceCollection
@@ -140,10 +141,12 @@ def handle_newsletters(self, request, form, layout=None, mail_layout=None):
                 'title': title
             })
 
-            request.app.send_marketing_email(
+            # TODO: Make this an opt-out instead so we can move it back
+            #       to the marketing stream?
+            request.app.send_transactional_email(
                 subject=title,
                 receivers=(recipient.address, ),
-                content=confirm_mail
+                content=confirm_mail,
             )
 
         request.success(_((
@@ -276,7 +279,7 @@ def delete_page(self, request):
 def send_newsletter(request, newsletter, recipients, is_test=False,
                     layout=None):
     layout = layout or DefaultMailLayout(newsletter, request)
-    html = Template(render_template(
+    _html = render_template(
         'mail_newsletter.pt', request, {
             'layout': layout,
             'lead': layout.linkify(newsletter.lead or ''),
@@ -288,21 +291,31 @@ def send_newsletter(request, newsletter, recipients, is_test=False,
             'publications': publications_by_newsletter(newsletter, request),
             'name_without_extension': name_without_extension
         }
-    ))
+    )
+    html = Template(_html)
+    plaintext = Template(html_to_text(_html))
 
     count = 0
 
-    for count, recipient in enumerate(recipients, start=1):
-        unsubscribe = request.link(recipient.subscription, 'unsubscribe')
+    # We use a generator function to submit the email batch since that is
+    # significantly more memory efficient for large batches.
+    def email_iter():
+        nonlocal count
+        for count, recipient in enumerate(recipients, start=1):
+            unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
-        request.app.send_marketing_email(
-            subject=newsletter.title,
-            receivers=(recipient.address, ),
-            content=html.substitute(unsubscribe=unsubscribe)
-        )
+            yield request.app.prepare_email(
+                subject=newsletter.title,
+                receivers=(recipient.address, ),
+                content=html.substitute(unsubscribe=unsubscribe),
+                plaintext=plaintext.substitute(unsubscribe=unsubscribe),
+                headers={'List-Unsubscribe': f'<{unsubscribe}>'}
+            )
 
-        if not is_test and recipient not in newsletter.recipients:
-            newsletter.recipients.append(recipient)
+            if not is_test and recipient not in newsletter.recipients:
+                newsletter.recipients.append(recipient)
+
+    request.app.send_marketing_email_batch(email_iter())
 
     if not is_test:
         newsletter.sent = newsletter.sent or utcnow()

@@ -2,10 +2,8 @@ import json
 import os.path
 import pytest
 import transaction
-import yaml
 
 from click.testing import CliRunner
-from onegov.core.framework import Framework
 from onegov.core.cli import cli, GroupContext
 from unittest.mock import patch, Mock
 
@@ -175,7 +173,8 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        category="transactional"
     )
 
     transaction.commit()
@@ -234,21 +233,24 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        category="transactional"
     )
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        category="transactional"
     )
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        category="transactional"
     )
 
     transaction.commit()
@@ -280,14 +282,16 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        category="transactional"
     )
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        category="transactional"
     )
 
     transaction.commit()
@@ -316,7 +320,8 @@ def test_sendmail_exception(temporary_directory, maildir_app, monkeypatch):
         reply_to='Gövikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mäil",
-        content="👍"
+        content="👍",
+        category="transactional"
     )
 
     transaction.commit()

@@ -13,7 +13,7 @@ from onegov.core.custom import json
 from onegov.core.framework import Framework
 from onegov.core.html import html_to_text
 from onegov.core.i18n import translation_chain
-from onegov.core.mail import Attachment, prepare_email
+from onegov.core.mail import Attachment
 from onegov.core.redirect import Redirect
 from onegov.core.upgrade import UpgradeState
 from onegov.server import Config, Server
@@ -584,7 +584,8 @@ def test_send_email(tmpdir):
         reply_to='info@example.org',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test",
+        content='This e-mail is just a test. '
+        '<a href="mailto:unsubscribe@example.org">unsubscribe</a>',
         headers={'List-Unsubscribe': '<mailto:unsubscribe@example.org>'}
     )
 
@@ -609,7 +610,7 @@ def test_send_email_with_name(tmpdir):
     maildir = tmpdir.mkdir('mail')
     app = Framework()
     app.mail = {
-        'marketing': {
+        'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
@@ -619,7 +620,8 @@ def test_send_email_with_name(tmpdir):
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        category='transactional'
     )
 
     transaction.commit()
@@ -640,7 +642,7 @@ def test_email_attachments(tmpdir):
     maildir = tmpdir.mkdir('mail')
     app = Framework()
     app.mail = {
-        'marketing': {
+        'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
@@ -661,7 +663,8 @@ def test_email_attachments(tmpdir):
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
         content="This e-mail is just a test",
-        attachments=attachments
+        attachments=attachments,
+        category='transactional'
     )
     transaction.commit()
     files = maildir.listdir()
@@ -747,7 +750,8 @@ def test_send_email_transaction(tmpdir, redis_url):
             reply_to='Gövikon <info@example.org>',
             receivers=['recipient@example.org'],
             subject="Nüws",
-            content="This e-mäil is just a test"
+            content="This e-mäil is just a test",
+            category='transactional'
         )
         assert False
 
@@ -757,7 +761,8 @@ def test_send_email_transaction(tmpdir, redis_url):
             reply_to='Gövikon <info@example.org>',
             receivers=['recipient@example.org'],
             subject="Nüws",
-            content="This e-mäil is just a test"
+            content="This e-mäil is just a test",
+            category='transactional'
         )
 
     maildir = tmpdir.mkdir('mail')
@@ -765,7 +770,7 @@ def test_send_email_transaction(tmpdir, redis_url):
     app.application_id = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
     app.mail = {
-        'marketing': {
+        'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
@@ -790,7 +795,7 @@ def test_send_email_plaintext_alternative(tmpdir):
     maildir = tmpdir.mkdir('mail')
     app = Framework()
     app.mail = {
-        'marketing': {
+        'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
@@ -800,7 +805,8 @@ def test_send_email_plaintext_alternative(tmpdir):
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content='<a href="http://example.org">This e-mail is just a test</a>'
+        content='<a href="http://example.org">This e-mail is just a test</a>',
+        category='transactional'
     )
 
     transaction.commit()
@@ -834,12 +840,15 @@ def test_send_marketing_email_batch(tmpdir):
         }
     }
 
+    unsubscribe = 'mailto:info@example.org'
+
     # NOTE: We use plaintext only to speed up the test
     mails = [
         app.prepare_email(
             reply_to='info@example.org',
             subject=f'Subject {index}',
-            plaintext=f'Content {index}'
+            plaintext=f'Content {index}. {unsubscribe}',
+            headers={'List-Unsubscribe': f'<{unsubscribe}>'}
         )
         for index in range(1, 1251)
     ]
@@ -856,7 +865,6 @@ def test_send_marketing_email_batch(tmpdir):
     assert message['From'] == 'noreply@example.org'
     assert message['ReplyTo'] == 'info@example.org'
     assert message['Subject'] == 'Subject 1'
-    assert message['TextBody'] == 'Content 1'
     assert message['MessageStream'] == 'marketing'
 
     messages = json.loads(files[1].read_text('utf-8'))
@@ -866,7 +874,6 @@ def test_send_marketing_email_batch(tmpdir):
     assert message['From'] == 'noreply@example.org'
     assert message['ReplyTo'] == 'info@example.org'
     assert message['Subject'] == 'Subject 501'
-    assert message['TextBody'] == 'Content 501'
     assert message['MessageStream'] == 'marketing'
 
     messages = json.loads(files[2].read_text('utf-8'))
@@ -876,7 +883,6 @@ def test_send_marketing_email_batch(tmpdir):
     assert message['From'] == 'noreply@example.org'
     assert message['ReplyTo'] == 'info@example.org'
     assert message['Subject'] == 'Subject 1001'
-    assert message['TextBody'] == 'Content 1001'
     assert message['MessageStream'] == 'marketing'
 
 
@@ -892,13 +898,16 @@ def test_send_marketing_email_batch_size_limit(tmpdir):
         }
     }
 
+    unsubscribe = 'mailto:info@example.org'
     content = 'a' * 1_000_000  # 1 MB
+    content += ' ' + unsubscribe
     # NOTE: We use plaintext only to speed up the test
     mails = [
         app.prepare_email(
             reply_to='info@example.org',
             subject=f'Subject {index}',
-            plaintext=content
+            plaintext=content,
+            headers={'List-Unsubscribe': f'<{unsubscribe}>'}
         )
         for index in range(1, 75)
     ]
@@ -929,6 +938,35 @@ def test_send_marketing_email_batch_size_limit(tmpdir):
     assert message['ReplyTo'] == 'info@example.org'
     assert message['Subject'] == 'Subject 50'
     assert message['MessageStream'] == 'marketing'
+
+
+def test_send_marketing_email_batch_missing_unsubscribe(tmpdir):
+
+    maildir = tmpdir.mkdir('mail')
+    app = Framework()
+
+    app.mail = {
+        'marketing': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org'
+        },
+        'transactional': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org'
+        },
+    }
+
+    # NOTE: We use plaintext only to speed up the test
+    with pytest.raises(AssertionError):
+        mails = [
+            app.prepare_email(
+                reply_to='info@example.org',
+                subject=f'Subject {index}',
+                plaintext=f'Content {index}',
+            )
+            for index in range(1, 10)
+        ]
+        app.send_marketing_email_batch(mails)
 
 
 def test_send_marketing_email_batch_illegal_category(tmpdir):

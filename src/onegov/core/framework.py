@@ -705,6 +705,7 @@ class Framework(
          or another iterable to the batch send method.
         """
 
+        assert reply_to
         assert category in ('transactional', 'marketing')
         sender = self.mail[category]['sender']
         assert sender
@@ -737,7 +738,7 @@ class Framework(
 
         return email
 
-    def send_email(self, reply_to, category='marketing',
+    def send_email(self, reply_to=None, category='marketing',
                    receivers=(), cc=(), bcc=(), subject=None, content=None,
                    attachments=(), headers={}, plaintext=None):
         """ Sends a plain-text e-mail to the given recipients. A reply to
@@ -753,6 +754,14 @@ class Framework(
         """
         directory = self.mail[category]['directory']
         assert directory
+
+        # most of the validation happens inside prepare_email
+        # so the send_email signature looks more lax than it
+        # actually is, so applications only need to overwrite
+        # prepare_email to replace required arguments with
+        # optional arguments with a static default value.
+        # this also allows consistent behavior between single
+        # and batch emails.
 
         # currently we send even single emails with the batch
         # endpoint to simplify the queue processing, so we pack
