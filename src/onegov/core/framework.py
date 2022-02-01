@@ -587,6 +587,9 @@ class Framework(
         sacred and should only be used if necessary. This ensures that the
         important stuff is reaching our customers!
 
+        However, marketing emails will always need to contain an unsubscribe
+        link in the email body and in a List-Unsubscribe header.
+
         """
         kwargs['category'] = 'marketing'
         return self.send_email(*args, **kwargs)
@@ -602,6 +605,9 @@ class Framework(
         When in doubt, send a marketing e-mail. Transactional e-mails are
         sacred and should only be used if necessary. This ensures that the
         important stuff is reaching our customers!
+
+        However, marketing emails will always need to contain an unsubscribe
+        link in the email body and in a List-Unsubscribe header.
 
         :param prepared_emails: A list of emails prepared using
             app.prepare_email
@@ -694,15 +700,20 @@ class Framework(
     def prepare_email(self, reply_to, category='marketing',
                       receivers=(), cc=(), bcc=(), subject=None, content=None,
                       attachments=(), headers={}, plaintext=None):
-        """ Used for batch sending. Use this the same way you would use send_email
-        then pass the prepared_email within an iterable to the batch send.
+        """ Common path for batch and single mail sending. Use this the same
+         way you would use send_email then pass the prepared emails in a list
+         or another iterable to the batch send method.
         """
 
         assert category in ('transactional', 'marketing')
         sender = self.mail[category]['sender']
         assert sender
 
-        return prepare_email(
+        # Postmark requires E-Mails in the marketing stream to contain
+        # a List-Unsubscribe header
+        assert category != 'marketing' or 'List-Unsubscribe' in headers
+
+        email = prepare_email(
             sender=sender,
             reply_to=reply_to,
             receivers=receivers,
@@ -716,6 +727,15 @@ class Framework(
             headers=headers,
             plaintext=plaintext
         )
+
+        # Postmark requires emails in the marketing stream to contain
+        # an unsubscribe link in the email content.
+        if category == 'marketing':
+            link = headers['List-Unsubscribe'][1:-1]
+            assert link in email['TextBody']
+            assert 'HtmlBody' not in email or link in email['HtmlBody']
+
+        return email
 
     def send_email(self, reply_to, category='marketing',
                    receivers=(), cc=(), bcc=(), subject=None, content=None,

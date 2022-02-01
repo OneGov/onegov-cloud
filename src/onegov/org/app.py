@@ -159,8 +159,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def publications_count(self):
         return PublicationCollection(self.session()).query().count()
 
-    def send_email(self, **kwargs):
-        """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting
+    def prepare_email(self, **kwargs):
+        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`, setting
         the reply_to address by using the reply address from the organisation
         settings.
 
@@ -174,7 +174,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         #       parseaddr to detect this case
         reply_to = formataddr((self.org.title, reply_to))
 
-        return super().send_email(reply_to=reply_to, **kwargs)
+        return super().prepare_email(reply_to=reply_to, **kwargs)
 
     @property
     def theme_options(self):
