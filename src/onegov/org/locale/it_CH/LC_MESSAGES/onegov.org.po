@@ -1405,6 +1405,9 @@ msgstr ""
 "Disattiva i biglietti singolarmente se la funzione di accettazione "
 "automatica è abilitata."
 
+msgid "Show option for newsletter registration"
+msgstr "Mostra la registrazione per la newsletter"
+
 msgid "Include logo in newsletter"
 msgstr "Includi il logo nella newsletter"
 

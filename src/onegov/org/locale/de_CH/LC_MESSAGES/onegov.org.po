@@ -1400,6 +1400,9 @@ msgstr ""
 "Schalten Sie Tickets individuell auf stumm, wenn sie Tickets automatisch "
 "akzeptieren."
 
+msgid "Show option for newsletter registration"
+msgstr "Anmeldung für Newsletter anzeigen"
+
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 

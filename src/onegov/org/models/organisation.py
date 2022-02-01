@@ -1,5 +1,6 @@
 """ Contains the model describing the organisation proper. """
 
+from email.policy import default
 from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
@@ -151,6 +152,7 @@ class Organisation(Base, TimestampMixin):
     footer_right_width = meta_property(default=4)
 
     # Newsletter settings
+    show_newsletter = meta_property(default=True)
     logo_in_newsletter = meta_property(default=False)
 
     # Chat Settings

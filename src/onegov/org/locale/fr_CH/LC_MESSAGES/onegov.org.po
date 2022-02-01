@@ -1404,6 +1404,9 @@ msgstr ""
 "Mettez les tickets en sourdine individuellement si la fonction d'acceptation "
 "automatique est activée."
 
+msgid "Show option for newsletter registration"
+msgstr "Afficher l'inscription à la newsletter"
+
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"
 
