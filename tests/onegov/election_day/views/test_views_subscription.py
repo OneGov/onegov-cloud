@@ -34,7 +34,7 @@ def test_view_email_subscription(election_day_app_zg):
     optout = headers['List-Unsubscribe'].strip('<>')
 
     html = message['HtmlBody']
-    assert '<a href="http://localhost/unsubscribe-email">Abmelden</a>' in html
+    assert f'<a href="{optout}">Abmelden</a>' in html
     assert 'Die E-Mail-Benachrichtigung wurde abonniert.' in html
 
     # Change the language

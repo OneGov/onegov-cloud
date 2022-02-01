@@ -159,7 +159,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def publications_count(self):
         return PublicationCollection(self.session()).query().count()
 
-    def prepare_email(self, **kwargs):
+    def prepare_email(self, reply_to=None, **kwargs):
         """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`, setting
         the reply_to address by using the reply address from the organisation
         settings.
@@ -167,7 +167,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         """
         category = kwargs.get('category', 'marketing')
 
-        reply_to = kwargs.pop('reply_to', self.org.meta.get('reply_to', None))
+        reply_to = reply_to or self.org.meta.get('reply_to', None)
         reply_to = reply_to or self.mail[category]['sender']
         # TODO: This doesn't handle the case where a user submits a
         #       pre-formatted reply_to with sender name, could use

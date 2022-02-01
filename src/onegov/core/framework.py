@@ -732,7 +732,7 @@ class Framework(
         # Postmark requires emails in the marketing stream to contain
         # an unsubscribe link in the email content.
         if category == 'marketing':
-            link = headers['List-Unsubscribe'][1:-1]
+            link = headers['List-Unsubscribe'].strip('<>')
             assert link in email['TextBody']
             assert 'HtmlBody' not in email or link in email['HtmlBody']
 

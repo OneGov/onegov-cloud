@@ -43,13 +43,19 @@ def test_send_email(maildir):
     client = Client(app)
 
     app.send_email(
-        receivers=['civilian@example.org'], subject='Test', content='Test'
+        receivers=['civilian@example.org'],
+        subject='Test',
+        content='Test',
+        category='transactional'
     )
     assert len(os.listdir(maildir)) == 0
     transaction.abort()
 
     app.send_email(
-        receivers=['civilian@example.org'], subject='Test', content='Test'
+        receivers=['civilian@example.org'],
+        subject='Test',
+        content='Test',
+        category='transactional'
     )
     assert len(os.listdir(maildir)) == 0
     transaction.commit()

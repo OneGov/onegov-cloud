@@ -1,3 +1,5 @@
+from email.utils import formataddr
+
 from onegov.core.collection import Pagination
 from onegov.core.templates import render_template
 from onegov.election_day import _
@@ -116,6 +118,7 @@ class EmailSubscriberCollection(SubscriberCollection):
 
         optout = request.link(request.app.principal, 'unsubscribe-email')
         token = request.new_url_safe_token({'address': subscriber.address})
+        optout_custom = f'{optout}?opaque={token}'
 
         # even though this is technically a transactional e-mail we send
         # it as marketing, since the actual subscription is sent as
@@ -125,11 +128,11 @@ class EmailSubscriberCollection(SubscriberCollection):
                 _("Successfully subscribed to the email service")
             ),
             receivers=(subscriber.address, ),
-            reply_to='{} <{}>'.format(
+            reply_to=formataddr((
                 request.app.principal.name,
                 request.app.principal.reply_to
                 or request.app.mail['marketing']['sender']
-            ),
+            )),
             content=render_template(
                 'mail_subscribed.pt',
                 request,
@@ -138,12 +141,12 @@ class EmailSubscriberCollection(SubscriberCollection):
                         _("Successfully subscribed to the email service")
                     ),
                     'model': None,
-                    'optout': optout,
+                    'optout': optout_custom,
                     'layout': MailLayout(self, request)
                 }
             ),
             headers={
-                'List-Unsubscribe': '<{}?opaque={}>'.format(optout, token),
+                'List-Unsubscribe': f'<{optout_custom}>',
                 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
             }
         )
