@@ -311,10 +311,11 @@ class TilesWidget(object):
                     Link(str(year), link(page.for_year(year)), classes=classes)
                     for year in page.all_years
                 ]
-                links.append(Link(
-                    _("Newsletter"), link(NewsletterCollection(session)),
-                    classes=classes
-                ))
+                if layout.org.show_newsletter:
+                    links.append(Link(
+                        _("Newsletter"), link(NewsletterCollection(session)),
+                        classes=classes
+                    ))
 
                 yield Tile(
                     page=Link(page.title, link(page)),

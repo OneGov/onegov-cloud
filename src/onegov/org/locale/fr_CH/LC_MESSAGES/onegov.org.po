@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-01-06 09:26+0100\n"
+"POT-Creation-Date: 2022-01-18 11:07+0100\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1403,6 +1403,9 @@ msgid "Mute tickets individually if the auto-accept feature is enabled."
 msgstr ""
 "Mettez les tickets en sourdine individuellement si la fonction d'acceptation "
 "automatique est activée."
+
+msgid "Show option for newsletter registration"
+msgstr "Afficher l'inscription à la newsletter"
 
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"

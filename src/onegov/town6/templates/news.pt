@@ -29,7 +29,7 @@
                     </div>
                 </tal:b>
                 <tal:b metal:fill-slot="after-panels">
-                    <div class="newsletter-sidepanel">
+                    <div tal:condition="layout.org.show_newsletter" class="newsletter-sidepanel">
                         <a class="button expanded" href="${layout.newsletter_url}">
                             <span class="h5" i18n:translate="">Newsletter Subscription</span>
                         </a>
