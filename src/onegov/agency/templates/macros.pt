@@ -264,7 +264,7 @@
             </div>
             <ul class="memberships fa-ul" tal:condition="memberships">
                <li tal:repeat="membership memberships" class="person"><span class="fa-li"><i class="fa fa-user-circle"></i></span>
-                   <b><a href="${request.link(membership.person)}">${membership.person.title}</a></b><tal:block tal:condition="membership.person.function">, <a href="${request.link(membership.person)}">${membership.person.function}</a></tal:block>
+                   <b><a href="${request.link(membership.person)}">${membership.person.title}</a></b><tal:block tal:condition="membership.person.function">, <a href="${request.link(membership.person)}">${membership.title}</a></tal:block>
                </li>
             </ul>
             <ul class="children" tal:condition="children">
