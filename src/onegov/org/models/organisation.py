@@ -1,6 +1,5 @@
 """ Contains the model describing the organisation proper. """
 
-from email.policy import default
 from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
