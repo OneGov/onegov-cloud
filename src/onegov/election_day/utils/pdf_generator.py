@@ -1,7 +1,6 @@
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
-from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import log
 from onegov.election_day.pdf import Pdf
@@ -10,9 +9,10 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
-from onegov.election_day.utils.election import get_elected_candidates
-from onegov.election_day.utils.election import get_party_results
-from onegov.election_day.utils.election import get_party_results_deltas
+from onegov.election_day.utils.election_compound import get_elected_candidates
+from onegov.election_day.utils.election_compound import get_list_groups
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -33,17 +33,14 @@ class PdfGenerator():
         self.renderer = renderer or D3Renderer(app)
 
     def remove(self, directory, files):
-        """ Safely removes the given files from the directory. Allows to use
-        wildcards.
-
-        """
+        """ Safely removes the given files from the directory. """
         if not files:
             return
 
         fs = self.app.filestorage
-        for file in fs.filterdir(directory, files=files):
-            path = '{}/{}'.format(directory, file.name)
-            if fs.exists(path) and not file.is_dir:
+        for file in files:
+            path = '{}/{}'.format(directory, file)
+            if fs.exists(path) and not fs.isdir(path):
                 fs.remove(path)
 
     def sign_pdf(self, path):
@@ -184,7 +181,7 @@ class PdfGenerator():
                 ''
             ],
             [
-                election.allocated_mandates(consider_completed=True),
+                election.allocated_mandates,
                 election.absolute_majority if show_majority else '',
                 ''
             ],
@@ -546,7 +543,7 @@ class PdfGenerator():
         # Factoids
         pdf.factoids(
             [_('Seats') if majorz else _('Mandates'), '', ''],
-            [compound.allocated_mandates(consider_completed=True), '', '']
+            [compound.allocated_mandates, '', '']
         )
         pdf.spacer()
         pdf.spacer()
@@ -558,7 +555,7 @@ class PdfGenerator():
             [
                 [
                     e.domain_segment,
-                    e.allocated_mandates(consider_completed=True)
+                    e.allocated_mandates
                 ]
                 for e in compound.elections
             ],
@@ -601,6 +598,46 @@ class PdfGenerator():
                 pdf.style.table_results_3
             )
         pdf.pagebreak()
+
+        # List groups
+        chart = self.renderer.get_list_groups_chart(compound, 'pdf')
+        if compound.show_list_groups and chart:
+            pdf.h2(_('List groups'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('List group'),
+                    _('Mandates'),
+                ],
+                [[
+                    r.name,
+                    r.number_of_mandates
+                ] for r in get_list_groups(compound)],
+                [None, 2 * cm, 2 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.pagebreak()
+
+        # Lists
+        chart = self.renderer.get_lists_chart(compound, 'pdf')
+        if compound.show_lists and chart:
+            pdf.h2(_('Lists'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('List'),
+                    _('Mandates'),
+                ],
+                [[
+                    r.name,
+                    r.number_of_mandates
+                ] for r in get_list_groups(compound)],
+                [None, 2 * cm, 2 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.pagebreak()
 
         # Parties
         chart = self.renderer.get_party_strengths_chart(compound, 'pdf')
@@ -984,11 +1021,25 @@ class PdfGenerator():
         """ Generates all PDFs for the given application.
 
         Only generates PDFs if not already generated since the last change of
-        the election or vote.
+        the election, election compound or vote.
 
-        Optionally cleans up unused PDFs.
+        Cleans up unused files.
 
         """
+
+        publish = self.app.principal.publish_intermediate_results
+
+        def render_item(item):
+            if item.completed:
+                return True
+            counted, total = item.progress
+            if counted == 0:
+                return False
+            if not publish:
+                return False
+            if isinstance(item, Vote) and publish.get('vote'):
+                return True
+            return False
 
         # Get all elections and votes
         items = self.session.query(Election).all()
@@ -1001,29 +1052,15 @@ class PdfGenerator():
             fs.makedir(self.pdf_dir)
         existing = fs.listdir(self.pdf_dir)
 
-        def render_item(item):
-            if item.completed:
-                return True
-            counted, total = item.progress
-            if counted == 0:
-                return False
-            publish = self.app.principal.publish_intermediate_results
-            if not publish:
-                return False
-            if isinstance(item, Vote) and publish.get('vote'):
-                return True
-            return False
-
         # Generate the PDFs
-        created = []
+        created = 0
+        filenames = []
         for locale in self.app.locales:
             for item in items:
-                last_modified = item.last_modified
-                filename = pdf_filename(
-                    item, locale, last_modified=last_modified
-                )
-                created.append(filename.split('.')[0])
+                filename = pdf_filename(item, locale)
+                filenames.append(filename)
                 if filename not in existing and render_item(item):
+                    created += 1
                     path = '{}/{}'.format(self.pdf_dir, filename)
                     if fs.exists(path):
                         fs.remove(path)
@@ -1039,18 +1076,8 @@ class PdfGenerator():
                         if fs.exists(path):
                             fs.remove(path)
 
-        # Delete old PDFs
-        existing = fs.listdir(self.pdf_dir)
-        existing = dict(groupbylist(
-            sorted(existing),
-            key=lambda a: a.split('.')[0]
-        ))
+        # Delete obsolete PDFs
+        obsolete = set(existing) - set(filenames)
+        self.remove(self.pdf_dir, obsolete)
 
-        # ... orphaned files
-        for id in set(existing.keys()) - set(created):
-            self.remove(self.pdf_dir, existing[id])
-
-        # ... old files
-        for files in existing.values():
-            files = sorted(files, reverse=True)
-            self.remove(self.pdf_dir, files[len(self.app.locales):])
+        return created, len(obsolete)

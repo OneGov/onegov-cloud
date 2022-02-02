@@ -49,7 +49,7 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
     assert election.accounted_ballots == 145631
     assert election.accounted_votes == 1732456
 
-    assert election.allocated_mandates() == 12
+    assert election.allocated_mandates == 12
     assert sorted(election.elected_candidates) == [
         ('Barbara', 'Gysi'),
         ('Barbara', 'Keller-Inhelder'),

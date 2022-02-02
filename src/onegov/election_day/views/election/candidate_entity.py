@@ -5,7 +5,6 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import \
     hide_candidate_entity_map_percentages
-from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from sqlalchemy import func
@@ -90,7 +89,7 @@ def view_election_candidate_by_entity_chart(self, request):
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionLayout(self, request),
         'type': 'map',
         'scope': 'entities',
         'year': self.date.year,

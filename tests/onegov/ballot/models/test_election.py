@@ -482,7 +482,7 @@ def test_election_results(session):
     votes = votes.order_by(Candidate.votes)
     assert [vote[0] for vote in votes] == [1, 5, 20, 111, 540]
 
-    assert election.number_of_mandates == election.allocated_mandates()
+    assert election.number_of_mandates == election.allocated_mandates
     assert election.elected_candidates == [('Joe', 'Quimby')]
 
 

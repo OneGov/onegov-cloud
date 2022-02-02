@@ -1,3 +1,4 @@
+import json
 import os
 import re
 
@@ -11,6 +12,7 @@ from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import current_language_tween_factory
 from onegov.core.framework import transaction_tween_factory
+from onegov.core.utils import batched
 from onegov.election_day.directives import CsvFileAction
 from onegov.election_day.directives import JsonFileAction
 from onegov.election_day.directives import ManageFormAction
@@ -65,9 +67,15 @@ class ElectionDayApp(Framework, FormApp, UserApp):
                 self.filestorage.open('principal.yml', encoding='utf-8').read()
             )
 
-    def send_sms(self, receiver=None, content=None):
+    def send_sms(self, receivers=None, content=None):
         """ Sends an SMS by writing a file to the `sms_directory` of the
         principal.
+
+        receivers can be a single phone number or a collection of numbers.
+        Delivery will be split into multiple batches if the number of receivers
+        exceeds 1000, this is due to a limit in the ASPSMS API. This also means
+        more than one file is written in such cases. They will share the same
+        timestamp but will have a batch number prefixed.
 
         SMS sent through this method are bound to the current transaction.
         If that transaction is aborted or not commited, the SMS is not sent.
@@ -80,16 +88,32 @@ class ElectionDayApp(Framework, FormApp, UserApp):
         if not os.path.exists(path):
             os.makedirs(path)
 
-        path = os.path.join(
-            path, '{}.{}'.format(receiver, datetime.now().timestamp())
-        )
+        if isinstance(receivers, str):
+            receivers = [receivers]
 
-        try:
-            content = content.encode('utf-8')
-        except AttributeError:
-            pass
+        if isinstance(content, bytes):
+            # NOTE: This will fail if we want to be able to send
+            #       arbitrary bytes. We could put an errors='ignore'
+            #       on this. But it's probably better if we fail.
+            #       If we need to be able to send arbitrary bytes
+            #       we would need to encode the content in some
+            #       other way, e.g. base64, but since ASPSMS is a
+            #       JSON API this probably is not possible anyways.
+            content = content.decode('utf-8')
 
-        FileDataManager.write_file(content, path)
+        timestamp = datetime.now().timestamp()
+
+        for index, receiver_batch in enumerate(batched(receivers, 1000)):
+            payload = json.dumps({
+                'receivers': receiver_batch,
+                'content': content
+            }).encode('utf-8')
+
+            dest_path = os.path.join(
+                path, '{}.{}.{}'.format(index, len(receiver_batch), timestamp)
+            )
+
+            FileDataManager.write_file(payload, dest_path)
 
     @property
     def logo(self):

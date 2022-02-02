@@ -7,7 +7,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.ballot import get_ballot_data_by_entity
+from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from webob.exc import HTTPNotFound
 
 

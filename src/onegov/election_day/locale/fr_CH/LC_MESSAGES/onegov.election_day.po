@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-17 10:08+0100\n"
-"PO-Revision-Date: 2022-01-17 10:08+0100\n"
+"POT-Creation-Date: 2022-01-25 07:27+0100\n"
+"PO-Revision-Date: 2022-01-25 07:28+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -126,6 +126,10 @@ msgstr "Valeurs non valides"
 msgid "${name} was found twice"
 msgstr "${name} a été trouvé en double"
 
+#, python-format
+msgid "No party results for year ${year}"
+msgstr "Aucun résultat de parti pour l'année ${year}"
+
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids and id ne sont pas consistente"
 
@@ -244,6 +248,22 @@ msgstr "Régional"
 msgid "Communal"
 msgstr "Municipal"
 
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing theID might "
+"break links on external sites!"
+msgstr ""
+"L'ID est utilisé dans l'URL et peut être utilisé ailleurs. En changeant "
+"l'ID, vous risquez de briser des liens sur des sites externes !"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Invalid ID"
+msgstr "ID non valide"
+
+msgid "ID already exists"
+msgstr "L'ID existe déjà"
+
 msgid "Name"
 msgstr "Nom"
 
@@ -291,9 +311,6 @@ msgstr "Suisses de l'étranger"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'élection contient des résultats distincts pour les expatriés."
-
-msgid "Doppelter Pukelsheim"
-msgstr ""
 
 msgid "Date"
 msgstr "Date"
@@ -352,23 +369,47 @@ msgstr "Définitions de couleurs non valides"
 msgid "Domain of the elections"
 msgstr "Echelon des élections"
 
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid ""
+"Enables manual completion of the election compound. No indidvidual election "
+"results are displayed until the election compound is manually completed."
+msgstr ""
+"Permet de compléter manuellement la composante électorale. Aucun résultat "
+"d'élection individuel n'est affiché tant que la composante électoral n'est "
+"pas complété manuellement."
+
+msgid "Completed"
+msgstr "Complété"
+
 msgid "Elections"
 msgstr "Elections"
+
+msgid "List groups"
+msgstr "Groupes de listes"
+
+msgid ""
+"Shows a tab with list group results. Requires party results with voters "
+"counts. Only if Doppelter Pukelsheim."
+msgstr ""
+"Affiche un onglet avec les résultats du groupe de liste. Requiert les "
+"résultats des partis avec le nombre de votants. Uniquement pour Doppelter "
+"Pukelsheim."
+
+msgid "Views"
+msgstr "Vues"
 
 msgid "Lists"
 msgstr "Listes"
 
 msgid ""
-"Shows a tab with aggregated list results over all elections. Requires that "
-"all elections share the same lists. Note that the number of votes is not "
-"really meaningful."
+"Shows a tab with aggregated list results over all elections. Only useful if "
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
 msgstr ""
 "Affiche un onglet avec les résultats agrégés des listes pour toutes les "
-"élections. Il faut que toutes les élections partagent les mêmes listes. "
-"Notez que le nombre de votes n'est pas vraiment significatif."
-
-msgid "Views"
-msgstr "Vues"
+"élections. Seulement utile si les listes correspondent aux groupes de "
+"listes. Uniquement pour Doppelter Pukelsheim."
 
 msgid "Mandate allocation"
 msgstr "Répartition des sièges"
@@ -395,12 +436,7 @@ msgstr "Panachage"
 
 msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
-
-msgid "After Doppelter Pukelsheim"
-msgstr ""
-
-msgid "Mark Pukelsheim Completed"
-msgstr ""
+"Affiche un onglet avec le panachage. Requiert les résultats des parties."
 
 msgid "Notifications"
 msgstr "Notifications"
@@ -603,6 +639,12 @@ msgstr "Districts électorales"
 msgid "Districts"
 msgstr "Circonscriptions électorales"
 
+msgid "region_label_gr"
+msgstr "Circonscription électorale"
+
+msgid "regions_label_gr"
+msgstr "Circonscriptions électorales"
+
 msgid "superregion_label_bl"
 msgstr "Région"
 
@@ -714,6 +756,17 @@ msgstr "Description du format"
 msgid "Embed"
 msgstr "Intégration"
 
+#. Default: The number of votes of a party is divided by the number of seats to
+#. be allocated in the district concerned. The result is called the voters
+#. count. The voters count determines the allocation to the list groups. The
+#. election is finished as soon as the number of mandates appears.
+msgid "figcaption_list_groups"
+msgstr ""
+"Le nombre de voix des partis pour une liste est divisé par le nombre de "
+"sièges à attribuer dans la circonscription électorale en question. Le "
+"résultat est appelé le nombre d'électeurs sur la liste. Le nombre de votants "
+"est réparti entre les groupes de listes."
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés "
@@ -741,6 +794,33 @@ msgstr "Mot de passe oublié?"
 
 msgid "Reset password"
 msgstr "Réinitialiser mot de passe"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "View"
+msgstr "Voir"
+
+msgid "Edit"
+msgstr "Editer"
+
+msgid "Change ID"
+msgstr "Modifier l'ID"
+
+msgid "Upload results"
+msgstr "Mettre à jour les résultats"
+
+msgid "Clear results"
+msgstr "Effacer les résultats"
+
+msgid "Clear media"
+msgstr "Supprimer le média"
+
+msgid "Upload party results"
+msgstr "Uploader les résultats par parti"
+
+msgid "Delete"
+msgstr "Supprimer"
 
 msgid "Yeas"
 msgstr "Oui"
@@ -831,14 +911,17 @@ msgstr "Oui"
 msgid "No"
 msgstr "Non"
 
-msgid "n.a."
-msgstr "nd."
-
 msgid "All candidates"
 msgstr "Tous les candidats"
 
 msgid "Elected candidates only"
 msgstr "Candidats élus seulement"
+
+msgid "List group"
+msgstr "Groupe de listes"
+
+msgid "Voters count"
+msgstr "Nombre de votants"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} de ${total}"
@@ -1024,15 +1107,6 @@ msgstr "Nouvelle cartographie"
 msgid "No mappings yet."
 msgstr "Aucune cartographie pour l'instant."
 
-msgid "Actions"
-msgstr "Actions"
-
-msgid "Delete"
-msgstr "Supprimer"
-
-msgid "Edit"
-msgstr "Editer"
-
 msgid "New data source"
 msgstr "Nouvelle source de données"
 
@@ -1057,23 +1131,8 @@ msgstr "Aucune composante pour le moment."
 msgid "Title"
 msgstr "Titre"
 
-msgid "View"
-msgstr "Voir"
-
-msgid "Upload party results"
-msgstr "Uploader les résultats par parti"
-
-msgid "Clear results"
-msgstr "Effacer les résultats"
-
-msgid "Clear media"
-msgstr "Supprimer le média"
-
 msgid "New election"
 msgstr "Nouveau election"
-
-msgid "Upload results"
-msgstr "Mettre à jour les résultats"
 
 msgid "New screen"
 msgstr "Nouvel écran"

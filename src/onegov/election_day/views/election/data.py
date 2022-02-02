@@ -37,7 +37,7 @@ def view_election_data_as_json(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'data': self.export(consider_completed=True),
+        'data': self.export(),
         'name': normalize_for_url(self.title)
     }
 

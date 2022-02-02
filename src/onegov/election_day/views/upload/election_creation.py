@@ -34,7 +34,7 @@ def view_create_wabsti_proporz(self, request):
 
     # Get Additional params, if None then False/district
     create_compound = bool(request.params.get('create_compound'))
-    after_pukelsheim = bool(request.params.get('after_pukelsheim'))
+    pukelsheim = bool(request.params.get('pukelsheim'))
     domain = {
         'district': 'district',
         'region': 'region',
@@ -68,7 +68,7 @@ def view_create_wabsti_proporz(self, request):
         form.wp_wahl.raw_data[0].file,
         form.wp_wahl.data['mimetype'],
         create_compound=create_compound,
-        after_pukelsheim=after_pukelsheim,
+        pukelsheim=pukelsheim,
         domain=domain
     )
     translate_errors(errors, request)

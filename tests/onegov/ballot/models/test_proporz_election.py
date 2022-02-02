@@ -571,7 +571,7 @@ def test_proporz_election_results(session):
 
     assert sorted((c.votes for c in election.list_connections)) == []
 
-    assert election.number_of_mandates == election.allocated_mandates()
+    assert election.number_of_mandates == election.allocated_mandates
     assert election.elected_candidates == [('Joe', 'Quimby')]
 
     assert sum(
@@ -846,6 +846,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=0,
             votes=0,
+            voters_count=1,
             total_votes=100,
             name='Libertarian',
             color='black',
@@ -856,6 +857,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=2,
             votes=2,
+            voters_count=3,
             total_votes=50,
             name='Libertarian',
             color='black',
@@ -866,6 +868,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=1,
             votes=1,
+            voters_count=2,
             total_votes=100,
             name='Conservative',
             color='red',
@@ -876,6 +879,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=3,
             votes=3,
+            voters_count=4,
             total_votes=50,
             name='Conservative',
             color='red',
@@ -890,6 +894,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 50,
             'votes': 3,
+            'voters_count': 4,
             'year': 2016,
         }, {
             'color': 'black',
@@ -898,6 +903,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 50,
             'votes': 2,
+            'voters_count': 3,
             'year': 2016,
         }, {
             'color': 'red',
@@ -906,6 +912,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 100,
             'votes': 1,
+            'voters_count': 2,
             'year': 2012,
         }, {
             'color': 'black',
@@ -914,6 +921,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 100,
             'votes': 0,
+            'voters_count': 1,
             'year': 2012,
         }
     ]
@@ -941,6 +949,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 50,
             'votes': 3,
+            'voters_count': 4,
             'year': 2016,
             'panachage_votes_from_0': 1,
             'panachage_votes_from_1': 2,
@@ -954,6 +963,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 50,
             'votes': 2,
+            'voters_count': 3,
             'year': 2016,
             'panachage_votes_from_0': 5,
             'panachage_votes_from_1': '',
@@ -966,6 +976,7 @@ def test_proporz_election_export_parties(session):
             'id': 2,
             'total_votes': '',
             'votes': '',
+            'voters_count': '',
             'year': 2016,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
@@ -978,6 +989,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 100,
             'votes': 1,
+            'voters_count': 2,
             'year': 2012,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
@@ -990,6 +1002,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 100,
             'votes': 0,
+            'voters_count': 1,
             'year': 2012,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
@@ -1002,6 +1015,7 @@ def test_proporz_election_export_parties(session):
             'id': 2,
             'total_votes': '',
             'votes': '',
+            'voters_count': '',
             'year': 2012,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',

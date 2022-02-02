@@ -1,11 +1,11 @@
 from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import DefaultLayout, ElectionCompoundLayout
+from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_parameter
-from onegov.election_day.utils.election import get_list_results
-from onegov.election_day.utils.election import get_lists_data
+from onegov.election_day.utils.election_compound import get_list_results
+from onegov.election_day.utils.election_compound import get_lists_data
 
 
 @ElectionDayApp.json(
@@ -20,10 +20,7 @@ def view_election_compound_lists_data(self, request):
     limit = get_parameter(request, 'limit', int, None)
     names = get_parameter(request, 'names', list, None)
 
-    return get_lists_data(
-        self, limit=limit, names=names,
-        mandates_only=self.after_pukelsheim
-    )
+    return get_lists_data(self, limit=limit, names=names)
 
 
 @ElectionDayApp.html(
@@ -42,7 +39,7 @@ def view_election_compound_lists_chart(self, request):
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionCompoundLayout(self, request),
         'type': 'lists-chart',
     }
 
@@ -64,7 +61,7 @@ def view_election_compound_lists_table(self, request):
     return {
         'election': self,
         'lists': get_list_results(self),
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionCompoundLayout(self, request),
         'type': 'election-compound-table',
         'scope': 'lists',
     }

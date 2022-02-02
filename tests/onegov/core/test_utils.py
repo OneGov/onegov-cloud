@@ -1,5 +1,4 @@
 import re
-import textwrap
 
 import onegov.core
 import os.path
@@ -402,6 +401,9 @@ def test_bunch():
     assert bunch.a == 1
     assert bunch.b == 2
 
+    bunch = Bunch(**{'x.y.z': 3})
+    assert bunch.x.y.z == 3
+
     assert (Bunch() == Bunch()) is True
     assert (Bunch(x=1) == Bunch()) is False
     assert (Bunch(x=1) == Bunch(x=1)) is True
@@ -448,3 +450,31 @@ def test_to_html_ul():
     text = "\n".join(('A', '', '', '-B'))
     assert to_html_ul(text) == f'<ul>{li("A")}</ul>' \
                                f'<ul class="bulleted">{li("B")}</ul>'
+
+
+def test_batched():
+    iterable = utils.batched(range(12), 5)
+    assert next(iterable) == (0, 1, 2, 3, 4)
+    assert next(iterable) == (5, 6, 7, 8, 9)
+    assert next(iterable) == (10, 11)
+
+    batched_as_list = list(utils.batched(range(12), 5))
+    assert batched_as_list == [
+        (0, 1, 2, 3, 4),
+        (5, 6, 7, 8, 9),
+        (10, 11)
+    ]
+
+
+def test_batched_list_container():
+    iterable = utils.batched(range(12), 5, list)
+    assert next(iterable) == [0, 1, 2, 3, 4]
+    assert next(iterable) == [5, 6, 7, 8, 9]
+    assert next(iterable) == [10, 11]
+
+    batched_as_list = list(utils.batched(range(12), 5, list))
+    assert batched_as_list == [
+        [0, 1, 2, 3, 4],
+        [5, 6, 7, 8, 9],
+        [10, 11]
+    ]

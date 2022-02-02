@@ -282,40 +282,38 @@
 </metal:partners>
 
 <metal:events define-macro="event-item-card">
-    <div class="card">
-        <div class="date-place" data-equalizer-watch>
-            <a href="${item.url}">
-                <div class="grid-x">
-                    <div class="cell small-1 medium-2">
-                        <i class="far fa-calendar-alt"></i>
+    <a href="${item.url}">
+        <div class="card">
+                <div class="date-place" data-equalizer-watch>
+                    <div class="grid-x">
+                        <div class="cell small-1 medium-2">
+                            <i class="far fa-calendar-alt"></i>
+                        </div>
+                        <div class="cell small-11 medium-10">
+                            ${item.subtitle}
+                        </div>
                     </div>
-                    <div class="cell small-11 medium-10">
-                        ${item.subtitle}
+                    <div class="grid-x">
+                        <div class="cell small-1 medium-2">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="cell small-11 medium-10">
+                            ${item.location}
+                        </div>
                     </div>
                 </div>
-            </a>
-            <a tal:condition="item.location" href="${item.url}">
-                <div class="grid-x">
-                    <div class="cell small-1 medium-2">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    <div class="cell small-11 medium-10">
-                        ${item.location}
-                    </div>
+                <div class="card-section" style="display:none;" >
+                    ${item.location}
                 </div>
-            </a>
+                <img class="contained" tal:condition="item.image_url" src="${item.image_url}">  
+                <div class="image-placeholder card-section contained" tal:condition="not: item.image_url">
+                    <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                </div>
+                <div class="card-section" tal:condition="with_lead|False">
+                    <h5>${item.lead}</h5>
+                </div>
         </div>
-        <div class="card-section" style="display:none;" >
-            ${item.location}
-        </div>
-        <img class="contained" tal:condition="item.image_url" src="${item.image_url}">
-        <div class="image-placeholder card-section contained" tal:condition="not: item.image_url">
-            <i class="far fa-calendar-alt" aria-hidden="true"></i>
-        </div>
-        <div class="card-section" tal:condition="with_lead|False">
-            <a class="lead" href="${item.url}"><h5>${item.lead}</h5></a>
-        </div>
-    </div>
+    </a>    
 </metal:events>
 
 <metal:panel define-macro="event-cards">
@@ -914,9 +912,9 @@
 </metal:payment_status>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town6">
-    <div class="borderless-side-panel" tal:condition="ticket">
-        <h2 i18n:translate>Ticket</h2>
-        <div class="ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
+    <div tal:condition="ticket">
+        <h3 i18n:translate>Ticket</h3>
+            <div class="ticket-number side-panel-with-bg"><a href="${request.link(ticket)}">${ticket.number}</a></div>    
     </div>
 </metal:ticket_callout>
 

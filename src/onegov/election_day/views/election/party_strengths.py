@@ -1,11 +1,11 @@
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import DefaultLayout, ElectionLayout
+from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.election import get_party_results
-from onegov.election_day.utils.election import get_party_results_data
-from onegov.election_day.utils.election import get_party_results_deltas
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_data
+from onegov.election_day.utils.parties import get_party_results_deltas
 
 
 @ElectionDayApp.json(
@@ -39,7 +39,7 @@ def view_election_party_strengths_chart(self, request):
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': ElectionLayout(self, request),
         'type': 'party-strengths-chart',
     }
 

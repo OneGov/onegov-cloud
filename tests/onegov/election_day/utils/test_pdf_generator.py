@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import timedelta
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
@@ -61,14 +62,19 @@ def test_generate_pdf_election(session, election_day_app_zg):
 def test_generate_pdf_election_compound(session, election_day_app_zg):
     generator = PatchedPdfGenerator(election_day_app_zg)
 
-    compound = add_election_compound(session)
+    election = add_proporz_election(session)
+    compound = add_election_compound(session, elections=[election])
+    compound.pukelsheim = True
+    compound.pukelsheim_completed = True
+    compound.show_list_groups = True
+    compound.show_lists = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
     compound.show_mandate_allocation = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 4
+            assert len(PdfReader(f, decompress=False).pages) == 6
 
 
 def test_generate_pdf_vote(session, election_day_app_zg):
@@ -234,35 +240,59 @@ def test_create_pdfs(election_day_app_zg):
     majorz_election = add_majorz_election(session)
     proporz_election = add_proporz_election(session)
     vote = add_vote(session, 'complex')
+    assert majorz_election.last_result_change is None  # used later
 
-    generator.create_pdfs()
+    # create
+    assert generator.create_pdfs() == (12, 0)
     assert len(fs.listdir('pdf')) == 12
 
-    generator.create_pdfs()
+    # don't recreate
+    assert generator.create_pdfs() == (0, 0)
     assert len(fs.listdir('pdf')) == 12
 
+    # remove foreign files
     fs.touch('pdf/somefile')
     fs.touch('pdf/some.file')
     fs.touch('pdf/.somefile')
 
-    generator.create_pdfs()
+    assert generator.create_pdfs() == (0, 3)
     assert len(fs.listdir('pdf')) == 12
 
+    # remove obsolete files
     session.delete(vote)
     session.delete(proporz_election)
     session.flush()
 
-    generator.create_pdfs()
+    assert generator.create_pdfs() == (0, 8)
     assert len(fs.listdir('pdf')) == 4
 
+    # recreate after changes
     majorz_election.title = 'Election'
     session.flush()
 
-    generator.create_pdfs()
+    assert generator.create_pdfs() == (4, 4)
     assert len(fs.listdir('pdf')) == 4
 
+    # recreate with new results
+    majorz_election.last_result_change = majorz_election.timestamp()
+    majorz_election.last_result_change += timedelta(days=1)
+    session.flush()
+
+    assert generator.create_pdfs() == (4, 4)
+    assert len(fs.listdir('pdf')) == 4
+
+    # recreate when clearing results
+    old = fs.listdir('pdf')
+    majorz_election.last_result_change = None
+    session.flush()
+
+    assert generator.create_pdfs() == (4, 4)
+    assert len(fs.listdir('pdf')) == 4
+    assert set(old) & set(fs.listdir('pdf')) == set()
+
+    # remove obsolete
     session.delete(majorz_election)
     session.flush()
 
-    generator.create_pdfs()
+    assert generator.create_pdfs() == (0, 4)
     assert len(fs.listdir('pdf')) == 0

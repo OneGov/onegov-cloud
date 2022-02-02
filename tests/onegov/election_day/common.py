@@ -426,12 +426,12 @@ def upload_proporz_election(client, create=True, canton='gr',
 
 def upload_party_results(client, slug='election/proporz-election'):
     csv_parties = (
-        "year,total_votes,id,name,color,mandates,votes,"
+        "year,total_votes,id,name,color,mandates,votes,voters_count,"
         "panachage_votes_from_1,panachage_votes_from_2,"
         "panachage_votes_from_3,panachage_votes_from_999\n"
-        "2022,11270,1,BDP,#efb52c,1,60387,,11,12,100\n"
-        "2022,11270,2,CVP,#ff6300,1,49117,21,,22,200\n"
-        "2022,11270,3,FDP,,0,35134,31,32,,300\n"
+        "2022,11270,1,BDP,#efb52c,1,60387,603,,11,12,100\n"
+        "2022,11270,2,CVP,#ff6300,1,49117,491,21,,22,200\n"
+        "2022,11270,3,FDP,,0,35134,351,31,32,,300\n"
     ).encode('utf-8')
 
     upload = client.get(f'/{slug}/upload-party-results')
@@ -442,7 +442,7 @@ def upload_party_results(client, slug='election/proporz-election'):
     return upload
 
 
-def create_election_compound(client, canton='gr'):
+def create_election_compound(client, canton='gr', pukelsheim=False):
     domain = {
         'bl': 'region',
         'gr': 'region',
@@ -493,13 +493,16 @@ def create_election_compound(client, canton='gr'):
     new.form[elections_field[canton]] = [
         'regional-election-a', 'regional-election-b'
     ]
+    new.form['pukelsheim'] = pukelsheim
+    new.form['show_list_groups'] = True
     new.form['show_party_strengths'] = True
     new.form['show_party_panachage'] = True
     new.form['show_mandate_allocation'] = True
     new.form.submit()
 
 
-def upload_election_compound(client, create=True, canton='gr'):
+def upload_election_compound(client, create=True, canton='gr',
+                             status='unknown', pukelsheim=False):
     entities = {
         'bl': [2761, 2762],
         'gr': [3506, 3513],
@@ -508,7 +511,7 @@ def upload_election_compound(client, create=True, canton='gr'):
         'zg': [1701, 1702],
     }
     if create:
-        create_election_compound(client, canton=canton)
+        create_election_compound(client, canton=canton, pukelsheim=pukelsheim)
 
     for index, slug in enumerate((
         'regional-election-a', 'regional-election-b'
@@ -518,16 +521,16 @@ def upload_election_compound(client, create=True, canton='gr'):
         entity = entities[canton][index]
         if index:
             csv += (
-                f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
                 f'101,True,Hans,Sieger,0,,0,1\n'
-                f'unknown,{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
                 f'201,False,Peter,Verlierer,2,,2,0\n'
             )
         else:
             csv += (
-                f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
                 f'101,False,Anna,Looser,0,,0,1\n'
-                f'unknown,{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
                 f'201,True,Carol,Winner,2,,2,0\n'
             )
         csv = csv.encode('utf-8')

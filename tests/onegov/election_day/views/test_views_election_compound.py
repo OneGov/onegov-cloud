@@ -64,17 +64,18 @@ def test_view_election_compound_lists(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_election_compound(client)
+    upload_election_compound(client, pukelsheim=True)
 
     for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
         lists = client.get(f'/elections/elections/lists-data{suffix}')
         assert {r['text']: r['value'] for r in lists.json['results']} == {
-            'FDP': 16, 'CVP': 12
+            'FDP': 3,  # 8 / 10 + 8 /5
+            'CVP': 2   # 6 / 10 + 6 / 5
         }
 
     lists = client.get('/elections/elections/lists-data?limit=1')
     assert {r['text']: r['value'] for r in lists.json['results']} == {
-        'FDP': 16
+        'FDP': 3
     }
 
 
@@ -183,6 +184,91 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert all([
         line.startswith(lines_csv[index]) for index, line in enumerate(lines)
     ])
+
+
+def test_view_election_compound_list_groups(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_election_compound(client, pukelsheim=True, status='final')
+    upload_party_results(client, slug='elections/elections')
+
+    # intermediate results
+    main = client.get('/elections/elections/list-groups')
+    assert '<h3>Listengruppen</h3>' in main
+    assert 'BDP' in main
+    assert 'data-text="603"' in main
+
+    groups = client.get('/elections/elections/list-groups-data')
+    groups = groups.json
+    assert groups == {
+        'results': [
+            {
+                'class': 'inactive',
+                'color': '#efb52c',
+                'text': 'BDP',
+                'value': 603,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#ff6300',
+                'text': 'CVP',
+                'value': 491,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#0571b0',
+                'text': 'FDP',
+                'value': 351,
+                'value2': None
+            }
+        ]
+    }
+
+    chart = client.get('/elections/elections/list-groups-chart')
+    assert chart.status_code == 200
+    assert '/elections/elections/list-groups-data' in chart
+
+    # final results
+    edit = client.get('/elections/elections/edit')
+    edit.form['pukelsheim_completed'] = True
+    edit.form.submit()
+
+    main = client.get('/elections/elections/list-groups')
+    assert '<h3>Listengruppen</h3>' in main
+    assert 'BDP' in main
+    # assert 'data-text="603"' not in main
+
+    groups = client.get('/elections/elections/list-groups-data')
+    groups = groups.json
+    assert groups == {
+        'results': [
+            {
+                'class': 'active',
+                'color': '#efb52c',
+                'text': 'BDP',
+                'value': 1,
+                'value2': None
+            },
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'text': 'CVP',
+                'value': 1,
+                'value2': None
+            },
+            {
+                'class': 'inactive',
+                'color': '#0571b0',
+                'text': 'FDP',
+                'value': 0,
+                'value2': None
+            }
+        ]
+    }
 
 
 def test_view_election_compound_mandate_allocation(election_day_app_gr):

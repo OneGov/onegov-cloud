@@ -52,33 +52,36 @@ def get_principal(app):
     model=ElectionCollection,
     path='/manage/elections',
     converters=dict(
-        page=int
+        page=int,
+        year=int
     )
 )
-def get_manage_elections(app, page=0):
-    return ElectionCollection(app.session(), page=page)
+def get_manage_elections(app, page=0, year=None):
+    return ElectionCollection(app.session(), page=page, year=year)
 
 
 @ElectionDayApp.path(
     model=ElectionCompoundCollection,
     path='/manage/election-compounds',
     converters=dict(
-        page=int
+        page=int,
+        year=int
     )
 )
-def get_manage_election_compsites(app, page=0):
-    return ElectionCompoundCollection(app.session(), page=page)
+def get_manage_election_compsites(app, page=0, year=None):
+    return ElectionCompoundCollection(app.session(), page=page, year=year)
 
 
 @ElectionDayApp.path(
     model=VoteCollection,
     path='/manage/votes',
     converters=dict(
-        page=int
+        page=int,
+        year=int
     )
 )
-def get_manage_votes(app, page=0):
-    return VoteCollection(app.session(), page=page)
+def get_manage_votes(app, page=0, year=None):
+    return VoteCollection(app.session(), page=page, year=year)
 
 
 @ElectionDayApp.path(

@@ -36,6 +36,22 @@ class ElectionCompoundForm(Form):
         ]
     )
 
+    pukelsheim = BooleanField(
+        label=_("Doppelter Pukelsheim"),
+        description=_(
+            "Enables manual completion of the election compound. "
+            "No indidvidual election results are displayed until the election "
+            "compound is manually completed."
+        ),
+        render_kw=dict(force_simple=True)
+    )
+
+    pukelsheim_completed = BooleanField(
+        label=_("Completed"),
+        depends_on=('pukelsheim', 'y'),
+        render_kw=dict(force_simple=True)
+    )
+
     date = DateField(
         label=_("Date"),
         validators=[
@@ -122,14 +138,26 @@ class ElectionCompoundForm(Form):
         render_kw={'lang': 'rm'}
     )
 
+    show_list_groups = BooleanField(
+        label=_("List groups"),
+        description=_(
+            "Shows a tab with list group results. Requires party results with "
+            "voters counts. Only if Doppelter Pukelsheim."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True),
+        depends_on=('pukelsheim', 'y'),
+    )
+
     show_lists = BooleanField(
         label=_("Lists"),
         description=_(
             "Shows a tab with aggregated list results over all elections. "
-            "Requires that all elections share the same lists. Note that the "
-            "number of votes is not really meaningful."
+            "Only useful if the lists correspond to the list groups. Only if "
+            "Doppelter Pukelsheim."
         ),
         fieldset=_("Views"),
+        depends_on=('pukelsheim', 'y'),
         render_kw=dict(force_simple=True)
     )
 
@@ -158,19 +186,6 @@ class ElectionCompoundForm(Form):
         description=_(
             "Shows a tab with the panachage. Requires party results."
         ),
-        fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
-    )
-
-    after_pukelsheim = BooleanField(
-        label=_("After Doppelter Pukelsheim"),
-        fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
-    )
-
-    pukelsheim_completed = BooleanField(
-        label=_("Mark Pukelsheim Completed"),
-        depends_on=('after_pukelsheim', 'y'),
         fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
@@ -285,11 +300,12 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        model.show_list_groups = self.show_list_groups.data
         model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
         model.show_mandate_allocation = self.show_mandate_allocation.data
-        model.after_pukelsheim = self.after_pukelsheim.data
+        model.pukelsheim = self.pukelsheim.data
         model.pukelsheim_completed = self.pukelsheim_completed.data
 
         model.elections = []
@@ -352,8 +368,9 @@ class ElectionCompoundForm(Form):
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
-        self.after_pukelsheim.data = model.after_pukelsheim
+        self.pukelsheim.data = model.pukelsheim
         self.pukelsheim_completed.data = model.pukelsheim_completed
+        self.show_list_groups.data = model.show_list_groups
         self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage

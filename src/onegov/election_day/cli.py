@@ -122,9 +122,14 @@ def generate_media():
         if not app.principal or not app.configuration.get('d3_renderer'):
             return
 
+        click.secho(f'Generating media for {app.schema}', fg='yellow')
         renderer = D3Renderer(app)
-        SvgGenerator(app, renderer).create_svgs()
-        PdfGenerator(app, renderer).create_pdfs()
+
+        created, purged = SvgGenerator(app, renderer).create_svgs()
+        click.secho(f'Generated {created} SVGs, purged {purged}', fg='green')
+
+        created, purged = PdfGenerator(app, renderer).create_pdfs()
+        click.secho(f'Generated {created} PDFs, purged {purged}', fg='green')
 
     return generate
 
@@ -162,17 +167,23 @@ def delete_associated(wabsti_token, delete_compound):
 def update_last_result_change():
 
     def update(request, app):
+        click.secho(f'Updating {app.schema}', fg='yellow')
+
+        count = 0
+
         session = request.app.session()
         for item in session.query(Election):
             result = item.results.first()
             if result:
                 item.last_result_change = result.last_change
+                count += 1
 
         for item in session.query(ElectionCompound):
             result = [x.last_result_change for x in item.elections]
             result = [x for x in result if x]
             if result:
                 item.last_result_change = max(result)
+                count += 1
 
         for item in session.query(Vote):
             result = [x.results.first() for x in item.ballots]
@@ -180,5 +191,8 @@ def update_last_result_change():
             result = [x for x in result if x]
             if result:
                 item.last_result_change = max(result)
+                count += 1
+
+        click.secho(f'Updated {count} items', fg='green')
 
     return update

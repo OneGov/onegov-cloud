@@ -18,6 +18,8 @@
                     </div>
                 </div>
 
+                <div metal:use-macro="layout.macros['years-dropdown']" />
+
                 <p tal:condition="not:groups" i18n:translate>
                     No compounds yet.
                 </p>
@@ -38,28 +40,7 @@
                                     <td>${compound.title}</td>
                                     <td><span class="shortcode" tal:condition="compound.shortcode">${compound.shortcode}</span></td>
                                     <td>${layout.format_date(compound.date, 'date')}</td>
-                                    <td class="right-aligned">
-                                        <ul class="actions" data-title="Actions" i18n:attributes="data-title">
-                                            <li>
-                                                <a i18n:translate="" class="action-view" href="${request.link(compound)}">View</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-edit" href="${request.link(compound, 'edit')}">Edit</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-upload" href="${request.link(compound, 'upload-party-results')}">Upload party results</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-clear" href="${request.link(compound, 'clear')}">Clear results</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-clear" href="${request.link(compound, 'clear-media')}">Clear media</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-delete" href="${request.link(compound, 'delete')}">Delete</a>
-                                            </li>
-                                        </ul>
-                                    </td>
+                                    <td class="right-aligned"><div metal:use-macro="layout.macros['election-compound-actions']" /></td>
                                 </tr>
                             </tal:block>
                         </tal:block>

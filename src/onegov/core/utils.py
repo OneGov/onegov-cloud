@@ -23,7 +23,7 @@ from datetime import datetime
 from functools import reduce
 from importlib import import_module
 from io import BytesIO, StringIO
-from itertools import groupby, tee, zip_longest
+from itertools import groupby, islice, tee, zip_longest
 from onegov.core import log
 from onegov.core.cache import lru_cache
 from onegov.core.custom import json
@@ -253,9 +253,22 @@ class Bunch(object):
         point.z = 3
         assert point.z == 3
 
+    Allows the creation of simple nested bunches, for example::
+
+        request = Bunch(**{'app.settings.org.my_setting': True})
+        assert request.app.settings.org.my_setting is True
+
     """
     def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+        self.__dict__.update({
+            key: value for key, value in kwargs.items()
+            if '.' not in key
+        })
+        for key, value in kwargs.items():
+            if '.' in key:
+                name = key.split('.')[0]
+                key = '.'.join(key.split('.')[1:])
+                setattr(self, name, Bunch(**{key: value}))
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -993,3 +1006,20 @@ def safe_move(src, dst):
             os.unlink(src)
         else:
             raise
+
+
+def batched(iterable, batch_size, container_factory=tuple):
+    """ Splits an iterable into container batches of batch_size.
+
+    The container_factory is necessary in order to consume the iterator
+    returned by islice. Otherwise this function would never return.
+
+    """
+
+    iterable = iter(iterable)
+    while True:
+        batch = container_factory(islice(iterable, batch_size))
+        if not batch:
+            return
+
+        yield batch

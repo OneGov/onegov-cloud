@@ -33,6 +33,9 @@
             <tal:b tal:condition="type == 'candidates-chart'">
                 <tal:block metal:use-macro="layout.macros['candidates-chart']" tal:define="embed False"/>
             </tal:b>
+            <tal:b tal:condition="type == 'list-groups-chart'">
+                <tal:block metal:use-macro="layout.macros['list-groups-chart']" tal:define="embed False"/>
+            </tal:b>
             <tal:b tal:condition="type == 'lists-chart'">
                 <tal:block metal:use-macro="layout.macros['lists-chart']" tal:define="embed False"/>
             </tal:b>
@@ -76,6 +79,9 @@
             </tal:b>
             <tal:b tal:condition="type == 'election-table' and scope == 'lists'">
                 <tal:b metal:use-macro="layout.macros['election-lists-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'list-groups'">
+                <tal:b metal:use-macro="layout.macros['election-compound-list-groups-table']"/>
             </tal:b>
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'lists'">
                 <tal:b metal:use-macro="layout.macros['election-compound-lists-table']"/>

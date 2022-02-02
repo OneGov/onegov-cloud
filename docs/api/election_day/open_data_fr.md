@@ -137,6 +137,7 @@ Nom|Description
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
+`voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 `panachage_votes_from_{XX}`|Le nombre de votes que le parti a obtenu de la part du parti avec un `id = XX`. Un `id` avec la valeur `999` marque les votes à partir de la liste vide.
 
 3 Les résultats de la votation

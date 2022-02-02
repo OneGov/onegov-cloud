@@ -516,6 +516,28 @@ $pageref-color-hover: $iron;
     margin-top: 0 !important;
 }
 
+.side-panel-with-bg {
+    background-color: #f8f9f9;
+    margin-bottom: 3rem !important;
+    padding: 1rem;
+
+    .calendar-export-list {
+        list-style: none;
+        margin: 0;
+    }
+}
+
+.occurrence-dates {
+    h3 {
+        hyphens: none;
+    }
+
+    .monthly-view {
+        border-top: 1px solid #e1e4e6;
+        padding-top: 1rem;
+    }
+}    
+
 /*
     Sort topics
 */
