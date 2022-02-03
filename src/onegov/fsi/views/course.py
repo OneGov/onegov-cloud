@@ -57,7 +57,7 @@ def handle_send_invitation_email(
             })
             plaintext = html_to_text(content)
 
-            request.app.send_marketing_email(
+            request.app.send_transactional_email(
                 receivers=(attendee.email,),
                 subject=self.subject,
                 content=content,

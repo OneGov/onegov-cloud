@@ -47,7 +47,7 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
             })
             plaintext = html_to_text(content)
 
-            request.app.send_marketing_email(
+            request.app.send_transactional_email(
                 receivers=(attendee.email,),
                 subject=self.subject,
                 content=content,
