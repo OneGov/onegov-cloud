@@ -120,10 +120,15 @@ def test_newsletter_signup(client):
     assert 'Das OneGov Cloud Team' not in message
 
     confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
+
+    # unsubscribing before the opt-in does nothing, no emails are sent
+    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
 
     # try an illegal token first
-    illegal = confirm.split('/confirm')[0] + 'x/confirm'
-    assert "falsches Token" in client.get(illegal).follow()
+    illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
+    assert "falsches Token" in client.get(illegal_confirm).follow()
 
     # make sure double calls work
     assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
@@ -134,12 +139,64 @@ def test_newsletter_signup(client):
     assert len(os.listdir(client.app.maildir)) == 1
 
     # unsubscribing does not result in an e-mail either
-    assert "falsches Token" in client.get(
-        illegal.replace('/confirm', '/unsubscribe')
-    ).follow()
-    assert "erfolgreich abgemeldet" in client.get(
-        confirm.replace('/confirm', '/unsubscribe')
-    ).follow()
+    illegal_unsub = unsubscribe.split('/unsubscribe')[0] + 'x/unsubscribe'
+    assert "falsches Token" in client.get(illegal_unsub).follow()
+    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
+
+    # no e-mail is sent when unsubscribing
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # however, we can now signup again
+    page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 2
+
+
+def test_newsletter_rfc8058(client):
+
+    page = client.get('/newsletters')
+    page.form['address'] = 'asdf'
+    page = page.form.submit()
+
+    assert 'Ungültig' in page
+
+    page.form['address'] = 'info@example.org'
+    page.form.submit()
+
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # make sure double submissions don't result in multiple e-mails
+    page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    email = client.get_email(0)
+    message = email['TextBody']
+    assert 'Mit freundlichen Grüssen' not in message
+    assert 'Das OneGov Cloud Team' not in message
+    headers = {h['Name']: h['Value'] for h in email['Headers']}
+    assert 'List-Unsubscribe' in headers
+    assert 'List-Unsubscribe-Post' in headers
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
+
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
+
+    # unsubscribing before the opt-in does nothing, no emails are sent
+    client.post(unsubscribe)
+
+    # try an illegal token first
+    illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
+    assert "falsches Token" in client.get(illegal_confirm).follow()
+
+    # make sure double calls work
+    assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
+    assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
+
+    # subscribing still works the same, but there's still no email sent
+    page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # unsubscribing does not result in an e-mail either
+    client.post(unsubscribe)
 
     # no e-mail is sent when unsubscribing
     assert len(os.listdir(client.app.maildir)) == 1

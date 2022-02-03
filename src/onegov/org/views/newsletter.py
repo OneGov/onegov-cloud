@@ -127,6 +127,7 @@ def handle_newsletters(self, request, form, layout=None, mail_layout=None):
 
         if not recipient:
             recipient = recipients.add(address=form.address.data)
+            unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
             title = request.translate(
                 _("Welcome to the ${org} Newsletter", mapping={
@@ -138,15 +139,18 @@ def handle_newsletters(self, request, form, layout=None, mail_layout=None):
                 'layout': mail_layout or DefaultMailLayout(self, request),
                 'newsletters': self,
                 'subscription': recipient.subscription,
-                'title': title
+                'title': title,
+                'unsubscribe': unsubscribe
             })
 
-            # TODO: Make this an opt-out instead so we can move it back
-            #       to the marketing stream?
-            request.app.send_transactional_email(
+            request.app.send_marketing_email(
                 subject=title,
                 receivers=(recipient.address, ),
                 content=confirm_mail,
+                headers={
+                    'List-Unsubscribe': f'<{unsubscribe}>',
+                    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+                },
             )
 
         request.success(_((
@@ -309,7 +313,10 @@ def send_newsletter(request, newsletter, recipients, is_test=False,
                 receivers=(recipient.address, ),
                 content=html.substitute(unsubscribe=unsubscribe),
                 plaintext=plaintext.substitute(unsubscribe=unsubscribe),
-                headers={'List-Unsubscribe': f'<{unsubscribe}>'}
+                headers={
+                    'List-Unsubscribe': f'<{unsubscribe}>',
+                    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+                },
             )
 
             if not is_test and recipient not in newsletter.recipients:
