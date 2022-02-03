@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-01-18 11:07+0100\n"
+"POT-Creation-Date: 2022-02-01 10:13+0100\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1503,6 +1503,13 @@ msgstr "Envoyer un e-mail d'activation avec des directives"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Un utilisateur avec cette adresse e-mail existe déjà"
+
+msgid ""
+"Users can only be in one group. If they already belong to another group and "
+"get added here, they will automatically get removed from the other group."
+msgstr "Les utilisateurs ne peuvent faire partie que d'un seul groupe. "
+"S'ils appartiennent déjà à un autre groupe et sont ajoutés ici, "
+"ils seront automatiquement retirés de l'autre groupe. "
 
 msgid "Ticket permissions"
 msgstr "Autorisation des tickets"
