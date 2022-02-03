@@ -1,8 +1,28 @@
 # Changes
 
+## 2022.10
+
+`2022-02-03` | [ba55b1b9d8...69c649da2c](https://github.com/OneGov/onegov-cloud/compare/ba55b1b9d8^...69c649da2c)
+
+### Election Day
+
+##### Fixes wrong opendata.swiss metadata.
+
+`Bugfix` | [OGC-252](https://linear.app/onegovcloud/issue/OGC-252) | [4ab1240f50](https://github.com/onegov/onegov-cloud/commit/4ab1240f5058863e0332986e31e0262a094ad2b8)
+
+### Org
+
+##### Improve page content macro.
+
+`Other` | [OGC-206](https://linear.app/onegovcloud/issue/OGC-206) | [8190112deb](https://github.com/onegov/onegov-cloud/commit/8190112debc3df1536afd21146a67fd111e63098)
+
+##### Add hint to user group form.
+
+`Other` | [OGC-257](https://linear.app/onegovcloud/issue/OGC-257) | [ed36b3f57f](https://github.com/onegov/onegov-cloud/commit/ed36b3f57fdba9b8d6210b55296a1e2d1fe43c28)
+
 ## 2022.9
 
-`2022-01-25` | [e2b7e13929...ba24957bb8](https://github.com/OneGov/onegov-cloud/compare/e2b7e13929^...ba24957bb8)
+`2022-01-25` | [e2b7e13929...5ad78bf058](https://github.com/OneGov/onegov-cloud/compare/e2b7e13929^...5ad78bf058)
 
 ### Agency
 
@@ -1269,20 +1289,4 @@ Exports manual and stripe payments with ticket information.
 - Adds delete button to edit view
 
 `Other` | [5f5f454c11](https://github.com/onegov/onegov-cloud/commit/5f5f454c11541405273df15b84e20451ec654824)
-
-## 2021.61
-
-`2021-06-23` | [8f72c8071f...59aa2da559](https://github.com/OneGov/onegov-cloud/compare/8f72c8071f^...59aa2da559)
-
-### Agency
-
-##### Display individual links to all parent agencies of a membership.
-
-`Feature` | [STAKABS-30](https://kt-bs.atlassian.net/browse/STAKABS-30) | [8f72c8071f](https://github.com/onegov/onegov-cloud/commit/8f72c8071f5e7890a66c18d324b9da5edab23a21)
-
-### Search
-
-##### Add a CLI argument to fail on reindexing errors.
-
-`Feature` | [455a4c6463](https://github.com/onegov/onegov-cloud/commit/455a4c6463a853649763bcf90dc3b04302a86057)
 
