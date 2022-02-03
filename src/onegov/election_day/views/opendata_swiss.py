@@ -107,7 +107,7 @@ def view_rdf(self, request):
         )
         sub(
             ds, 'dct:accrualPeriodicity',
-            {'rdf:resource': 'http://purl.org/cld/freq/completelyIrregular'}
+            {'rdf:resource': 'http://purl.org/cld/freq/irregular'}
         )
 
         # Theme
