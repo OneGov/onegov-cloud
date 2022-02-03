@@ -828,6 +828,65 @@ def test_send_email_plaintext_alternative(tmpdir):
     )
 
 
+def test_send_transactional_email_batch(tmpdir):
+
+    maildir = tmpdir.mkdir('mail')
+    app = Framework()
+
+    app.mail = {
+        'transactional': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org'
+        }
+    }
+
+    # NOTE: We use plaintext only to speed up the test
+    mails = [
+        app.prepare_email(
+            reply_to='info@example.org',
+            subject=f'Subject {index}',
+            plaintext=f'Content {index}',
+            category='transactional'
+        )
+        for index in range(1, 1251)
+    ]
+    app.send_transactional_email_batch(mails)
+
+    transaction.commit()
+
+    files = sorted(maildir.listdir())
+    assert len(files) == 3
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 500
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 1'
+    assert message['TextBody'] == 'Content 1'
+    assert message['MessageStream'] == 'outbound'
+
+    messages = json.loads(files[1].read_text('utf-8'))
+    assert len(messages) == 500
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 501'
+    assert message['TextBody'] == 'Content 501'
+    assert message['MessageStream'] == 'outbound'
+
+    messages = json.loads(files[2].read_text('utf-8'))
+    assert len(messages) == 250
+
+    message = messages[0]
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Subject 1001'
+    assert message['TextBody'] == 'Content 1001'
+    assert message['MessageStream'] == 'outbound'
+
+
 def test_send_marketing_email_batch(tmpdir):
 
     maildir = tmpdir.mkdir('mail')

@@ -618,71 +618,7 @@ class Framework(
         Batches will be split automatically according to API limits.
 
         """
-
-        directory = self.mail['marketing']['directory']
-        assert directory
-
-        BATCH_LIMIT = 500
-        # NOTE: The API specifies MB, so let's not chance it
-        #       by assuming they meant MiB and just go with
-        #       lower size limit.
-        SIZE_LIMIT = 50_000_000  # 50MB
-        # NOTE: We use a buffer to be a bit more memory efficient
-        #       we don't initialize the buffer, so tell gives us
-        #       the exact size of the buffer.
-        buffer = io.BytesIO()
-        buffer.write(b'[')
-        num_included = 0
-        batch_num = 0
-        timestamp = datetime.now().timestamp()
-
-        def finish_batch():
-            nonlocal buffer
-            nonlocal num_included
-            nonlocal batch_num
-
-            buffer.write(b']')
-
-            # if the batch is empty we just skip it
-            if num_included > 0:
-                assert num_included <= BATCH_LIMIT
-                assert buffer.tell() <= SIZE_LIMIT
-                dest_path = os.path.join(
-                    directory, '{}.{}.{}'.format(
-                        batch_num, num_included, timestamp
-                    )
-                )
-
-                # send e-mails through the transaction machinery
-                FileDataManager.write_file(buffer.getvalue(), dest_path)
-                batch_num += 1
-
-            # prepare vars for next batch
-            buffer.close()
-            buffer = io.BytesIO()
-            buffer.write(b'[')
-            num_included = 0
-
-        for email in prepared_emails:
-            assert email['MessageStream'] == 'marketing'
-            # TODO: we could verify that From is the correct
-            #       sender for the marketing configuration...
-
-            payload = json.dumps(email).encode('utf-8')
-            if buffer.tell() + len(payload) >= SIZE_LIMIT:
-                finish_batch()
-
-            if num_included:
-                buffer.write(b',')
-
-            buffer.write(payload)
-            num_included += 1
-
-            if num_included == BATCH_LIMIT:
-                finish_batch()
-
-        # finish final partially full batch
-        finish_batch()
+        return self.send_email_batch(prepared_emails, category='marketing')
 
     def send_transactional_email(self, *args, **kwargs):
         """ Sends an e-mail categorised as transactional. This is limited to:
@@ -696,6 +632,26 @@ class Framework(
         """
         kwargs['category'] = 'transactional'
         return self.send_email(*args, **kwargs)
+
+    def send_transactional_email_batch(self, prepared_emails):
+        """  Sends an e-mail categorised as transactional. This is limited to:
+
+            * Welcome emails
+            * Reset passwords emails
+            * Notifications
+            * Weekly digests
+            * Receipts and invoices
+
+        :param prepared_emails: A list of emails prepared using
+            app.prepare_email
+
+        Supplying anything other than stream='transactional' in prepare_email
+        will be considered an error.
+
+        Batches will be split automatically according to API limits.
+
+        """
+        return self.send_email_batch(prepared_emails, category='transactional')
 
     def prepare_email(self, reply_to, category='marketing',
                       receivers=(), cc=(), bcc=(), subject=None, content=None,
@@ -714,6 +670,8 @@ class Framework(
         # a List-Unsubscribe header
         assert category != 'marketing' or 'List-Unsubscribe' in headers
 
+        # transactional stream in Postmark is called outbound
+        stream = 'marketing' if category == 'marketing' else 'outbound'
         email = prepare_email(
             sender=sender,
             reply_to=reply_to,
@@ -723,8 +681,7 @@ class Framework(
             subject=subject,
             content=content,
             attachments=attachments,
-            # transactional stream in Postmark is called outbound
-            stream='marketing' if category == 'marketing' else 'outbound',
+            stream=stream,
             headers=headers,
             plaintext=plaintext
         )
@@ -788,6 +745,84 @@ class Framework(
 
         # send e-mails through the transaction machinery
         FileDataManager.write_file(payload, dest_path)
+
+    def send_email_batch(self, prepared_emails, category='marketing'):
+        """ Sends an e-mail batch.
+
+        :param prepared_emails: A list of emails prepared using
+            app.prepare_email
+
+        Batches will be split automatically according to API limits.
+
+        """
+
+        directory = self.mail[category]['directory']
+        assert directory
+
+        # transactional stream in Postmark is called outbound
+        stream = 'marketing' if category == 'marketing' else 'outbound'
+
+        BATCH_LIMIT = 500
+        # NOTE: The API specifies MB, so let's not chance it
+        #       by assuming they meant MiB and just go with
+        #       lower size limit.
+        SIZE_LIMIT = 50_000_000  # 50MB
+        # NOTE: We use a buffer to be a bit more memory efficient
+        #       we don't initialize the buffer, so tell gives us
+        #       the exact size of the buffer.
+        buffer = io.BytesIO()
+        buffer.write(b'[')
+        num_included = 0
+        batch_num = 0
+        timestamp = datetime.now().timestamp()
+
+        def finish_batch():
+            nonlocal buffer
+            nonlocal num_included
+            nonlocal batch_num
+
+            buffer.write(b']')
+
+            # if the batch is empty we just skip it
+            if num_included > 0:
+                assert num_included <= BATCH_LIMIT
+                assert buffer.tell() <= SIZE_LIMIT
+                dest_path = os.path.join(
+                    directory, '{}.{}.{}'.format(
+                        batch_num, num_included, timestamp
+                    )
+                )
+
+                # send e-mails through the transaction machinery
+                FileDataManager.write_file(buffer.getvalue(), dest_path)
+                batch_num += 1
+
+            # prepare vars for next batch
+            buffer.close()
+            buffer = io.BytesIO()
+            buffer.write(b'[')
+            num_included = 0
+
+        for email in prepared_emails:
+            assert email['MessageStream'] == stream
+            # TODO: we could verify that From is the correct
+            #       sender for the category...
+
+            payload = json.dumps(email).encode('utf-8')
+            if buffer.tell() + len(payload) >= SIZE_LIMIT:
+                finish_batch()
+
+            if num_included:
+                buffer.write(b',')
+
+            buffer.write(payload)
+            num_included += 1
+
+            if num_included == BATCH_LIMIT:
+                finish_batch()
+
+        # finish final partially full batch
+        finish_batch()
 
     def send_zulip(self, subject, content):
         """ Sends a hipchat message asynchronously.
