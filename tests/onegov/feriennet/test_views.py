@@ -1329,11 +1329,19 @@ def test_send_email(client, scenario):
 
     page.form['roles'] = ['admin', 'editor']
     assert "an 2 Empfänger gesendet" in page.form.submit().follow()
-    assert len(os.listdir(client.app.maildir)) == 2
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = client.get_email(0)
-    assert "Ferienpass 2016 subject" in message['Subject']
-    assert "Ferienpass 2016 body" in message['TextBody']
+    message_1 = client.get_email(0, 0)
+    assert "Ferienpass 2016 subject" in message_1['Subject']
+    assert "Ferienpass 2016 body" in message_1['TextBody']
+
+    message_2 = client.get_email(0, 1)
+    assert "Ferienpass 2016 subject" in message_2['Subject']
+    assert "Ferienpass 2016 body" in message_2['TextBody']
+
+    recipients = message_1['To'] + message_2['To']
+    assert "editor@example.org" in recipients
+    assert "admin@example.org" in recipients
 
 
 def test_create_duplicate_notification(client):
