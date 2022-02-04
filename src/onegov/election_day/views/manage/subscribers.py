@@ -5,6 +5,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
+from onegov.election_day.forms import DeleteSubscribersForm
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.models import Subscriber
 
@@ -24,7 +25,6 @@ def view_sms_subscribers(self, request):
         'count': self.query().count(),
         'subscribers': self.batch,
         'term': self.term,
-        'export': request.link(self, 'export')
     }
 
 
@@ -42,8 +42,7 @@ def view_email_subscribers(self, request):
         'address_title': _("Email"),
         'count': self.query().count(),
         'subscribers': self.batch,
-        'term': self.term,
-        'export': request.link(self, 'export')
+        'term': self.term
     }
 
 
@@ -75,6 +74,55 @@ def export_email_subscribers(self, request):
         'data': self.export(),
         'name': 'email-subscribers'
     }
+
+
+def handle_delete_subscribers(collection, request, form):
+    layout = ManageSubscribersLayout(collection, request)
+
+    errors = []
+    if form.submitted(request):
+        errors, count = collection.delete(
+            form.file.raw_data[0].file,
+            form.file.data['mimetype']
+        )
+        if not errors:
+            request.message(
+                _('${count} subscribers deleted.', mapping={'count': count}),
+                'success'
+            )
+            return redirect(layout.manage_model_link)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('Delete subscribers'),
+        'cancel': layout.manage_model_link,
+        'errors': errors
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=SmsSubscriberCollection,
+    name='delete',
+    form=DeleteSubscribersForm
+)
+def delete_sms_subscribers(self, request, form):
+
+    """ Deletes a list of SMS subscribers. """
+
+    return handle_delete_subscribers(self, request, form)
+
+
+@ElectionDayApp.manage_form(
+    model=EmailSubscriberCollection,
+    name='delete',
+    form=DeleteSubscribersForm
+)
+def delete_email_subscribers(self, request, form):
+
+    """ Deletes a list of email subscribers. """
+
+    return handle_delete_subscribers(self, request, form)
 
 
 @ElectionDayApp.manage_form(

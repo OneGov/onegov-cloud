@@ -3,6 +3,7 @@ import os
 from onegov.election_day.models import Subscriber
 from tests.onegov.election_day.common import login
 from tests.shared import Client
+from webtest.forms import Upload
 
 
 def test_view_email_subscription(election_day_app_zg):
@@ -101,23 +102,35 @@ def test_view_manage_email_subscription(election_day_app_zg):
     assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
     assert response.headers['Content-Disposition'] == \
         'inline; filename=email-subscribers.csv'
-    assert '123@example.org' in response.text
-    assert '456@example.org' in response.text
+    export = response.text
+    assert '123@example.org' in export
+    assert '456@example.org' in export
 
     manage = client.get('/manage/subscribers/email?term=23')
     assert '123@example.org' in manage
     assert '456@example.org' not in manage
 
-    manage.click('Löschen').click('Abbrechen')
+    manage.click('Löschen', index=1).click('Abbrechen')
 
     manage = client.get('/manage/subscribers/email?term=123')
     assert '123@example.org' in manage
 
-    manage.click('Löschen').form.submit()
+    manage.click('Löschen', index=1).form.submit()
 
     manage = client.get('/manage/subscribers/email')
     assert '123@example.org' not in manage
     assert '456@example.org' in manage
+
+    manage = manage.click('Löschen', index=0)
+    manage.form['file'] = Upload(
+        'data.csv', export.encode('utf-8'), 'text/plain'
+    )
+    manage = manage.form.submit().follow()
+    assert '1 Abonnenten gelöscht.' in manage
+
+    manage = client.get('/manage/subscribers/email')
+    assert '123@example.org' not in manage
+    assert '456@example.org' not in manage
 
 
 def test_view_sms_subscription(election_day_app_zg):
@@ -205,20 +218,32 @@ def test_view_manage_sms_subscription(election_day_app_zg):
     assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
     assert response.headers['Content-Disposition'] == \
         'inline; filename=sms-subscribers.csv'
-    assert '+41791112233' in response.text
-    assert '+41791112244' in response.text
+    export = response.text
+    assert '+41791112233' in export
+    assert '+41791112244' in export
 
     manage = client.get('/manage/subscribers/sms?term=2233')
     assert '+41791112233' in manage
     assert '+41791112244' not in manage
 
-    manage.click('Löschen').click('Abbrechen')
+    manage.click('Löschen', index=1).click('Abbrechen')
 
     manage = client.get('/manage/subscribers/sms?term=2233')
     assert '+41791112233' in manage
 
-    manage.click('Löschen').form.submit()
+    manage.click('Löschen', index=1).form.submit()
 
     manage = client.get('/manage/subscribers/sms')
     assert '+41791112233' not in manage
     assert '+41791112244' in manage
+
+    manage = manage.click('Löschen', index=0)
+    manage.form['file'] = Upload(
+        'data.csv', export.encode('utf-8'), 'text/plain'
+    )
+    manage = manage.form.submit().follow()
+    assert '1 Abonnenten gelöscht.' in manage
+
+    manage = client.get('/manage/subscribers/sms')
+    assert '+41791112233' not in manage
+    assert '+41791112244' not in manage

@@ -1,3 +1,4 @@
+from io import BytesIO
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
@@ -318,3 +319,72 @@ def test_subscriber_collection_export(session):
         {'address': 'b@example.org', 'locale': 'de_CH'},
         {'address': 'c@example.org', 'locale': 'fr_CH'},
     ]
+
+
+def test_subscriber_collection_delete(session):
+    request_de = DummyRequest(locale='de_CH')
+    request_fr = DummyRequest(locale='fr_CH')
+
+    # Add email subscribers
+    collection = EmailSubscriberCollection(session)
+    collection.subscribe('a@example.org', request_de, confirm=False)
+    collection.subscribe('b@EXAMPLE.org', request_de, confirm=False)
+    collection.subscribe('c@example.org', request_fr, confirm=False)
+    collection.subscribe('d@example.org', request_de, confirm=False)
+
+    # Add SMS subscribers
+    collection = SmsSubscriberCollection(session)
+    collection.subscribe('+41791112201', request_de, confirm=False)
+    collection.subscribe('+41791112202', request_fr, confirm=False)
+    collection.subscribe('+41791112203', request_fr, confirm=False)
+
+    assert SubscriberCollection(session).query().count() == 7
+
+    # Test delete email subscribers
+    collection = EmailSubscriberCollection(session)
+
+    errors, count = collection.delete(
+        BytesIO(''.encode('utf-8')),
+        'text/plain'
+    )
+    assert errors
+
+    errors, count = collection.delete(
+        BytesIO((
+            'address,\n'
+            'a@EXAMPLE.org,\n'
+            'b@example.org,\n'
+            'c@example.org,\n'
+            'e@example.org,\n'
+            '123,\n'
+            ',\n'
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    assert not errors
+    assert count == 3
+    assert collection.query().count() == 1
+
+    # Test delete SMS subscribers
+    collection = SmsSubscriberCollection(session)
+
+    errors, count = collection.delete(
+        BytesIO(''.encode('utf-8')),
+        'text/plain'
+    )
+    assert errors
+
+    errors, count = collection.delete(
+        BytesIO((
+            'address,\n'
+            '+41791112201,\n'
+            '+41791112203,\n'
+            '+41791112220,\n'
+            '123,\n'
+            ',\n'
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    assert not errors
+    assert count == 2
+    assert collection.query().count() == 1

@@ -746,6 +746,12 @@ ul.actions {
         font-family: 'FontAwesome';
         margin-right: .75ex;
     }
+
+    .action-delete::before {
+        content: '\f014';
+        font-family: 'FontAwesome';
+        margin-right: .75ex;
+    }
 }
 
 /*

@@ -1,11 +1,12 @@
 from email.utils import formataddr
-
 from onegov.core.collection import Pagination
 from onegov.core.templates import render_template
 from onegov.election_day import _
+from onegov.election_day.formats.common import load_csv
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import Subscriber
+from sqlalchemy import func
 
 
 class SubscriberCollectionPagination(Pagination):
@@ -102,6 +103,21 @@ class SubscriberCollection(SubscriberCollectionPagination):
             {'address': subscriber.address, 'locale': subscriber.locale}
             for subscriber in self.query()
         ]
+
+    def delete(self, file, mimetype):
+        """ Removes the subscribers in the given CSV. """
+
+        csv, error = load_csv(file, mimetype, expected_headers=['address'])
+        if error:
+            return [error], 0
+
+        addresses = [l.address.lower() for l in csv.lines if l.address]
+        query = self.session.query(self.model_class)
+        query = query.filter(
+            func.lower(self.model_class.address).in_(addresses)
+        )
+        count = query.delete()
+        return [], count
 
 
 class EmailSubscriberCollection(SubscriberCollection):

@@ -9,6 +9,7 @@ from onegov.election_day.forms.election_compound import ElectionCompoundForm
 from onegov.election_day.forms.notification import TriggerNotificationForm
 from onegov.election_day.forms.notification import TriggerNotificationsForm
 from onegov.election_day.forms.screen import ScreenForm
+from onegov.election_day.forms.subscription import DeleteSubscribersForm
 from onegov.election_day.forms.subscription import EmailSubscriptionForm
 from onegov.election_day.forms.subscription import SmsSubscriptionForm
 from onegov.election_day.forms.upload import UploadMajorzElectionForm
@@ -28,6 +29,7 @@ __all__ = [
     'ChangeIdForm',
     'DataSourceForm',
     'DataSourceItemForm',
+    'DeleteSubscribersForm',
     'ElectionCompoundForm',
     'ElectionForm',
     'EmailSubscriptionForm',

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-25 07:27+0100\n"
-"PO-Revision-Date: 2022-01-25 07:28+0100\n"
+"POT-Creation-Date: 2022-02-04 10:51+0100\n"
+"PO-Revision-Date: 2022-02-04 10:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -499,6 +499,16 @@ msgstr "CSS aggiuntivo"
 
 msgid "Phone number"
 msgstr "Numero di telefono"
+
+msgid ""
+"Deletes the given subscribers. The same format is used as for export "
+"(without locale)."
+msgstr ""
+"Cancella gli iscritti indicati. Viene utilizzato lo stesso formato "
+"dell'esportazione (senza locale)."
+
+msgid "File"
+msgstr "File"
 
 msgid "File format"
 msgstr "Formato del file"
@@ -1391,6 +1401,13 @@ msgstr "Schermata eliminata."
 
 msgid "Delete screen"
 msgstr "Schermata Elimina"
+
+#, python-format
+msgid "${count} subscribers deleted."
+msgstr "${count} abbonati cancellati."
+
+msgid "Delete subscribers"
+msgstr "Cancellare gli abbonati"
 
 msgid "Subscriber deleted."
 msgstr "Iscritto eliminato."

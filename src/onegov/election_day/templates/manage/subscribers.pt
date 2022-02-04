@@ -17,7 +17,8 @@
                     </div>
                     <div class="small-12 medium-3 columns">
                         <ul class="top-actions text-right">
-                            <li><a class="action-export" href="${export}" i18n:translate>Export</a></li>
+                            <li><a class="action-export" href="${request.link(layout.model, 'export')}" i18n:translate>Export</a></li>
+                            <li><a class="action-delete" href="${request.link(layout.model, 'delete')}" i18n:translate>Delete</a></li>
                         </ul>
                         <form style="margin-top: 1em;">
                             <div class="row collapse">
