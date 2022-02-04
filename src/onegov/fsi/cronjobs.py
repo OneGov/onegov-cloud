@@ -32,7 +32,7 @@ def send_scheduled_reminders(request):
                 'notification': template.text_html,
                 'attendee': attendee
             })
-            request.app.send_marketing_email(
+            request.app.send_transactional_email(
                 receivers=(attendee.email, ),
                 subject=template.subject,
                 content=content

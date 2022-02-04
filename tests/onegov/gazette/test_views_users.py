@@ -1,3 +1,4 @@
+import os
 from freezegun import freeze_time
 from io import BytesIO
 from openpyxl import load_workbook
@@ -6,7 +7,7 @@ from tests.onegov.gazette.common import login_editor_1
 from tests.onegov.gazette.common import login_editor_2
 from tests.onegov.gazette.common import login_editor_3
 from tests.onegov.gazette.common import login_publisher
-from webtest import TestApp as Client
+from tests.shared import Client
 
 
 def test_view_users(gazette_app):
@@ -37,10 +38,8 @@ def test_view_users(gazette_app):
     assert "Benutzer hinzugefügt." in manage
     assert "new_user@example.org" in manage
 
-    assert len(gazette_app.smtp.outbox) == 1
-    message = gazette_app.smtp.outbox[0]
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('utf-8')
+    assert len(os.listdir(gazette_app.maildir)) == 1
+    message = client.get_email(0)['HtmlBody']
     assert "Benutzerkonto Amtsblattredaktion erstellt" in message
 
     # make it an editor

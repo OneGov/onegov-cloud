@@ -6,13 +6,13 @@ from cached_property import cached_property
 import pytz
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
-from mailthon.enclosure import PlainText
 from sedate import utcnow, to_timezone
 from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval, ForeignKey, or_, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
 
+from onegov.core.mail import Attachment
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
@@ -344,11 +344,11 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return vcalendar.to_ical()
 
     def as_ical_attachment(self, url=None):
-        attachment = PlainText(content=self.as_ical(url))
-        name = self.name.lower().replace(' ', '_')
-        content_disposition = f'attachment; filename="{name}.ics"'
-        attachment.headers['Content-Disposition'] = content_disposition
-        return attachment
+        return Attachment(
+            filename=self.name.lower().replace(' ', '_'),
+            content=self.as_ical(url),
+            content_type='text/calendar'
+        )
 
     def can_book(self, attendee_or_id, year=None):
         att_id = attendee_or_id

@@ -2,7 +2,7 @@ import os
 
 from onegov.election_day.models import Subscriber
 from tests.onegov.election_day.common import login
-from webtest import TestApp as Client
+from tests.shared import Client
 
 
 def test_view_email_subscription(election_day_app_zg):
@@ -21,20 +21,20 @@ def test_view_email_subscription(election_day_app_zg):
     assert election_day_app_zg.session().query(Subscriber).one().locale == \
         'de_CH'
 
-    message = election_day_app_zg.smtp.outbox.pop()
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0, flush_queue=True)
     assert message['Subject'] == 'E-Mail-Benachrichtigung abonniert'
     assert message['To'] == 'howard@example.com'
     assert message['From'] == 'Kanton Govikon <mails@govikon.ch>'
-    assert message['Sender'] == 'Kanton Govikon <mails@govikon.ch>'
-    assert message['Reply-To'] == 'Kanton Govikon <mails@govikon.ch>'
-    assert '/unsubscribe-email?opaque=' in message['List-Unsubscribe']
-    assert message['List-Unsubscribe-Post'] == 'List-Unsubscribe=One-Click'
+    assert message['ReplyTo'] == 'Kanton Govikon <mails@govikon.ch>'
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert '/unsubscribe-email?opaque=' in headers['List-Unsubscribe']
+    assert headers['List-Unsubscribe-Post'] == 'List-Unsubscribe=One-Click'
 
-    optout = message['List-Unsubscribe'].strip('<>')
+    optout = headers['List-Unsubscribe'].strip('<>')
 
-    html = message.get_payload(1).get_payload(decode=True)
-    html = html.decode('utf-8')
-    assert '<a href="http://localhost/unsubscribe-email">Abmelden</a>' in html
+    html = message['HtmlBody']
+    assert f'<a href="{optout}">Abmelden</a>' in html
     assert 'Die E-Mail-Benachrichtigung wurde abonniert.' in html
 
     # Change the language
@@ -44,7 +44,7 @@ def test_view_email_subscription(election_day_app_zg):
     subscribe = subscribe.form.submit()
     assert election_day_app_zg.session().query(Subscriber).one().locale == \
         'fr_CH'
-    assert election_day_app_zg.smtp.outbox == []
+    assert len(os.listdir(client.app.maildir)) == 0
 
     manage = Client(election_day_app_zg)
     login(manage)
@@ -61,7 +61,8 @@ def test_view_email_subscription(election_day_app_zg):
     subscribe = subscribe.form.submit()
 
     assert election_day_app_zg.session().query(Subscriber).one()
-    election_day_app_zg.smtp.outbox.pop()
+    assert len(os.listdir(client.app.maildir)) == 1
+    client.flush_email_queue()
 
     # Unsubscribe using the form
     unsubscribe = client.get('/unsubscribe-email')
@@ -72,7 +73,7 @@ def test_view_email_subscription(election_day_app_zg):
     unsubscribe.form['email'] = 'howard@example.com'
     unsubscribe = unsubscribe.form.submit()
     assert "E-Mail-Benachrichtigung wurde beendet." in unsubscribe
-    assert election_day_app_zg.smtp.outbox == []
+    assert len(os.listdir(client.app.maildir)) == 0
 
 
 def test_view_manage_email_subscription(election_day_app_zg):

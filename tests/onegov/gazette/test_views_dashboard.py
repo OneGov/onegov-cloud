@@ -21,7 +21,7 @@ def test_view_dashboard(gazette_app):
 
     # Group: Testgroup (editor_1 & editor_2)
 
-    with freeze_time("2017-10-20 12:00"):
+    with freeze_time("2017-10-20 12:00", tick=True):
         deadline = (
             "<span>Nächster Eingabeschluss</span>: "
             "<strong>Mittwoch 25.10.2017 14:00</strong>"
@@ -72,7 +72,7 @@ def test_view_dashboard(gazette_app):
             "Eingabeschluss bald erreicht ist."
         ) in manage
 
-    with freeze_time("2017-11-02 12:00"):
+    with freeze_time("2017-11-02 12:00", tick=True):
         deadline = (
             "<span>Nächster Eingabeschluss</span>: "
             "<strong>Mittwoch 08.11.2017 13:00</strong>"
@@ -170,7 +170,7 @@ def test_view_dashboard(gazette_app):
 
     # Group: None (editor_3)
 
-    with freeze_time("2017-10-20 12:00"):
+    with freeze_time("2017-10-20 12:00", tick=True):
 
         manage = editor_3.get('/').maybe_follow()
         assert "Keine Meldungen." in manage

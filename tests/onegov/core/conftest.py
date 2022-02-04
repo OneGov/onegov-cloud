@@ -80,3 +80,38 @@ def render_element(request):
         return client.get('/element')
 
     return render
+
+
+@pytest.fixture(scope='function')
+def maildir_app(temporary_directory, maildir):
+    app_cfg = {
+        'mail': {
+            'marketing': {
+                'sender': 'noreply@example.org',
+                'directory': maildir
+            },
+            'transactional': {
+                'sender': 'noreply@example.org',
+                'directory': maildir
+            }
+        }
+    }
+
+    cfg = {
+        'applications': [
+            {
+                'path': '/foobar/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'foobar',
+                'configuration': app_cfg
+            }
+        ]
+    }
+
+    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
+        f.write(yaml.dump(cfg))
+
+    app = Framework()
+    app.configure_application(**app_cfg)
+
+    return app

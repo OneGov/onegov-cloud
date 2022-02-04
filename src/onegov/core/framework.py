@@ -19,18 +19,19 @@ Using the framework does not really differ from using Morepath::
 import dectate
 import hashlib
 import inspect
+import io
+import json
 import morepath
-import traceback
+import os.path
 import random
 import sys
+import traceback
 
 from base64 import b64encode
 from cached_property import cached_property
 from datetime import datetime
 from dectate import directive
-from email.utils import parseaddr, formataddr
 from itsdangerous import BadSignature, Signer
-from mailthon.middleware import TLS, Auth
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
@@ -42,10 +43,9 @@ from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache, log, utils
 from onegov.core import directives
-from onegov.core.cache import lru_cache
 from onegov.core.crypto import stored_random_token
-from onegov.core.datamanager import MailDataManager
-from onegov.core.mail import email, Postman, MaildirPostman
+from onegov.core.datamanager import FileDataManager
+from onegov.core.mail import prepare_email
 from onegov.core.orm import Base, SessionManager, debug, DB_CONNECTION_ERRORS
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.request import CoreRequest
@@ -575,46 +575,6 @@ class Framework(
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
 
-    @lru_cache(maxsize=2)
-    def postman(self, category):
-        """ Returns a Mailthon postman configured with the mail settings in
-        the settings view. See `<http://mailthon.readthedocs.org/>`_ for
-        more information.
-
-        """
-        config = self.mail[category]
-
-        if config['use_directory']:
-            assert config['directory']
-
-            return MaildirPostman(
-                host=None,
-                port=None,
-                options=dict(maildir=config['directory'])
-            )
-        else:
-            assert config['host']
-            assert config['port']
-
-            middlewares = []
-
-            if config['force_tls']:
-                middlewares.append(TLS(force=True))
-
-            if config['username']:
-                middlewares.append(
-                    Auth(
-                        username=config['username'],
-                        password=config['password']
-                    )
-                )
-
-            return Postman(
-                host=config['host'],
-                port=config['port'],
-                middlewares=middlewares
-            )
-
     def send_marketing_email(self, *args, **kwargs):
         """ Sends an e-mail categorised as marketing. This includes but is not
         limited to:
@@ -627,9 +587,38 @@ class Framework(
         sacred and should only be used if necessary. This ensures that the
         important stuff is reaching our customers!
 
+        However, marketing emails will always need to contain an unsubscribe
+        link in the email body and in a List-Unsubscribe header.
+
         """
         kwargs['category'] = 'marketing'
         return self.send_email(*args, **kwargs)
+
+    def send_marketing_email_batch(self, prepared_emails):
+        """ Sends an e-mail batch categorised as marketing. This includes but is not
+        limited to:
+
+            * Announcements
+            * Newsletters
+            * Promotional E-Mails
+
+        When in doubt, send a marketing e-mail. Transactional e-mails are
+        sacred and should only be used if necessary. This ensures that the
+        important stuff is reaching our customers!
+
+        However, marketing emails will always need to contain an unsubscribe
+        link in the email body and in a List-Unsubscribe header.
+
+        :param prepared_emails: A list of emails prepared using
+            app.prepare_email
+
+        Supplying anything other than stream='marketing' in prepare_email
+        will be considered an error.
+
+        Batches will be split automatically according to API limits.
+
+        """
+        return self.send_email_batch(prepared_emails, category='marketing')
 
     def send_transactional_email(self, *args, **kwargs):
         """ Sends an e-mail categorised as transactional. This is limited to:
@@ -644,14 +633,74 @@ class Framework(
         kwargs['category'] = 'transactional'
         return self.send_email(*args, **kwargs)
 
-    def send_email(self, reply_to, category='marketing',
+    def send_transactional_email_batch(self, prepared_emails):
+        """  Sends an e-mail categorised as transactional. This is limited to:
+
+            * Welcome emails
+            * Reset passwords emails
+            * Notifications
+            * Weekly digests
+            * Receipts and invoices
+
+        :param prepared_emails: A list of emails prepared using
+            app.prepare_email
+
+        Supplying anything other than stream='transactional' in prepare_email
+        will be considered an error.
+
+        Batches will be split automatically according to API limits.
+
+        """
+        return self.send_email_batch(prepared_emails, category='transactional')
+
+    def prepare_email(self, reply_to, category='marketing',
+                      receivers=(), cc=(), bcc=(), subject=None, content=None,
+                      attachments=(), headers={}, plaintext=None):
+        """ Common path for batch and single mail sending. Use this the same
+         way you would use send_email then pass the prepared emails in a list
+         or another iterable to the batch send method.
+        """
+
+        assert reply_to
+        assert category in ('transactional', 'marketing')
+        sender = self.mail[category]['sender']
+        assert sender
+
+        # Postmark requires E-Mails in the marketing stream to contain
+        # a List-Unsubscribe header
+        assert category != 'marketing' or 'List-Unsubscribe' in headers
+
+        # transactional stream in Postmark is called outbound
+        stream = 'marketing' if category == 'marketing' else 'outbound'
+        email = prepare_email(
+            sender=sender,
+            reply_to=reply_to,
+            receivers=receivers,
+            cc=cc,
+            bcc=bcc,
+            subject=subject,
+            content=content,
+            attachments=attachments,
+            stream=stream,
+            headers=headers,
+            plaintext=plaintext
+        )
+
+        # Postmark requires emails in the marketing stream to contain
+        # an unsubscribe link in the email content.
+        if category == 'marketing':
+            link = headers['List-Unsubscribe'].strip('<>')
+            assert link in email['TextBody']
+            assert 'HtmlBody' not in email or link in email['HtmlBody']
+
+        return email
+
+    def send_email(self, reply_to=None, category='marketing',
                    receivers=(), cc=(), bcc=(), subject=None, content=None,
-                   encoding='utf-8', attachments=(), headers={},
-                   plaintext=None):
-        """ Sends a plain-text e-mail using :attr:`postman` to the given
-        recipients. A reply to address is used to enable people to answer
-        to the e-mail which is usually sent by a noreply kind of e-mail
-        address.
+                   attachments=(), headers={}, plaintext=None):
+        """ Sends a plain-text e-mail to the given recipients. A reply to
+        address is used to enable people to answer to the e-mail which is
+        usually sent by a noreply kind of e-mail address.
 
         E-mails sent through this method are bound to the current transaction.
         If that transaction is aborted or not commited, the e-mail is not sent.
@@ -659,44 +708,121 @@ class Framework(
         Usually you'll use this method inside a request, where transactions
         are automatically commited at the end.
 
-        For more complex use cases have a look at
-        `<http://mailthon.readthedocs.org/>`_.
-
         """
-        assert category in ('transactional', 'marketing')
+        directory = self.mail[category]['directory']
+        assert directory
 
-        sender = self.mail[category]['sender']
-        assert sender
+        # most of the validation happens inside prepare_email
+        # so the send_email signature looks more lax than it
+        # actually is, so applications only need to overwrite
+        # prepare_email to replace required arguments with
+        # optional arguments with a static default value.
+        # this also allows consistent behavior between single
+        # and batch emails.
 
-        # if the reply to address has a name part (Name <address@host>), use
-        # the name part for the sender address as well to somewhat hide the
-        # fact that we're using a noreply email
-        name, address = parseaddr(reply_to)
-
-        if name and not parseaddr(sender)[0]:
-            sender = formataddr((name, sender))
-
-        envelope = email(
-            sender=sender,
+        # currently we send even single emails with the batch
+        # endpoint to simplify the queue processing, so we pack
+        # the single message into a list
+        payload = json.dumps([self.prepare_email(
+            reply_to=reply_to,
             receivers=receivers,
             cc=cc,
             bcc=bcc,
             subject=subject,
             content=content,
-            encoding=encoding,
             attachments=attachments,
             category=category,
+            headers=headers,
             plaintext=plaintext
+        )]).encode('utf-8')
+
+        # Postmark API Limit
+        assert len(payload) <= 50_000_000
+
+        dest_path = os.path.join(
+            directory, '0.1.{}'.format(datetime.now().timestamp())
         )
 
-        envelope.headers['Sender'] = sender
-        envelope.headers['Reply-To'] = formataddr((name, address))
-
-        for key, value in headers.items():
-            envelope.headers[key] = value
-
         # send e-mails through the transaction machinery
-        MailDataManager.send_email(self.postman(category), envelope)
+        FileDataManager.write_file(payload, dest_path)
+
+    def send_email_batch(self, prepared_emails, category='marketing'):
+        """ Sends an e-mail batch.
+
+        :param prepared_emails: A list of emails prepared using
+            app.prepare_email
+
+        Batches will be split automatically according to API limits.
+
+        """
+
+        directory = self.mail[category]['directory']
+        assert directory
+
+        # transactional stream in Postmark is called outbound
+        stream = 'marketing' if category == 'marketing' else 'outbound'
+
+        BATCH_LIMIT = 500
+        # NOTE: The API specifies MB, so let's not chance it
+        #       by assuming they meant MiB and just go with
+        #       lower size limit.
+        SIZE_LIMIT = 50_000_000  # 50MB
+        # NOTE: We use a buffer to be a bit more memory efficient
+        #       we don't initialize the buffer, so tell gives us
+        #       the exact size of the buffer.
+        buffer = io.BytesIO()
+        buffer.write(b'[')
+        num_included = 0
+        batch_num = 0
+        timestamp = datetime.now().timestamp()
+
+        def finish_batch():
+            nonlocal buffer
+            nonlocal num_included
+            nonlocal batch_num
+
+            buffer.write(b']')
+
+            # if the batch is empty we just skip it
+            if num_included > 0:
+                assert num_included <= BATCH_LIMIT
+                assert buffer.tell() <= SIZE_LIMIT
+                dest_path = os.path.join(
+                    directory, '{}.{}.{}'.format(
+                        batch_num, num_included, timestamp
+                    )
+                )
+
+                # send e-mails through the transaction machinery
+                FileDataManager.write_file(buffer.getvalue(), dest_path)
+                batch_num += 1
+
+            # prepare vars for next batch
+            buffer.close()
+            buffer = io.BytesIO()
+            buffer.write(b'[')
+            num_included = 0
+
+        for email in prepared_emails:
+            assert email['MessageStream'] == stream
+            # TODO: we could verify that From is the correct
+            #       sender for the category...
+
+            payload = json.dumps(email).encode('utf-8')
+            if buffer.tell() + len(payload) >= SIZE_LIMIT:
+                finish_batch()
+
+            if num_included:
+                buffer.write(b',')
+
+            buffer.write(payload)
+            num_included += 1
+
+            if num_included == BATCH_LIMIT:
+                finish_batch()
+
+        # finish final partially full batch
+        finish_batch()
 
     def send_zulip(self, subject, content):
         """ Sends a hipchat message asynchronously.

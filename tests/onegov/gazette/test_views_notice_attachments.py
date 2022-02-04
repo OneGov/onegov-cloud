@@ -1,8 +1,10 @@
+from base64 import b64decode
 from freezegun import freeze_time
 from onegov.core.utils import module_path
 from tests.onegov.gazette.common import accept_notice
 from tests.onegov.gazette.common import login_users
 from tests.onegov.gazette.common import submit_notice
+from tests.shared import Client
 from pytest import mark
 from webtest.forms import Upload
 
@@ -13,9 +15,10 @@ from webtest.forms import Upload
 )])
 def test_view_notice_attachments(gazette_app, temporary_path, pdf_1, pdf_2):
 
+    client = Client(gazette_app)
     admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-10-01 12:00"):
+    with freeze_time("2017-10-01 12:00", tick=True):
         manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
@@ -66,16 +69,17 @@ def test_view_notice_attachments(gazette_app, temporary_path, pdf_1, pdf_2):
         accept_notice(publisher, 'erneuerungswahlen')
 
         # Check email
-        message = gazette_app.smtp.outbox.pop()
-        html = message.get_payload(0).get_payload(1).get_payload(decode=True)
-        html = html.decode('utf-8')
+        message = client.get_email(-1)
+        html = message['HtmlBody']
         assert '1.pdf' in html
 
-        assert message.get_payload(1).get_filename() == '1.pdf'
-        assert message.get_payload(2).get_filename() == '1.pdf'
+        assert message['Attachments'][0]['Name'] == '1.pdf'
+        assert message['Attachments'][1]['Name'] == '1.pdf'
 
-        attachment_1 = message.get_payload(1).get_payload(decode=True)
-        attachment_2 = message.get_payload(2).get_payload(decode=True)
+        attachment_1 = message['Attachments'][0]['Content']
+        attachment_1 = b64decode(attachment_1.encode('ascii'))
+        attachment_2 = message['Attachments'][1]['Content']
+        attachment_2 = b64decode(attachment_2.encode('ascii'))
         assert attachment_1 != attachment_2
         assert attachment_1 == content_1 or attachment_1 == content_2
         assert attachment_2 == content_1 or attachment_2 == content_2

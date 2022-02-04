@@ -1,5 +1,7 @@
+from email.utils import formataddr
 from onegov.ballot.models import Election
 from onegov.ballot.models import Vote
+from onegov.core.html import html_to_text
 from onegov.core.custom import json
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -135,54 +137,67 @@ class EmailNotification(Notification):
 
         self.set_locale(request)
 
-        reply_to = '{} <{}>'.format(
+        reply_to = formataddr((
             request.app.principal.name,
             request.app.principal.reply_to
             or request.app.mail['marketing']['sender']
-        )
+        ))
 
-        for locale in request.app.locales:
-            addresses = request.session.query(EmailSubscriber.address)
-            addresses = addresses.filter(EmailSubscriber.locale == locale)
-            addresses = addresses.all()
-            addresses = [address[0] for address in addresses]
-            if not addresses:
-                continue
+        # We use a generator function to submit the email batch since that
+        # is significantly more memory efficient for large batches.
+        def email_iter():
+            for locale in request.app.locales:
+                addresses = request.session.query(EmailSubscriber.address)
+                addresses = addresses.filter(EmailSubscriber.locale == locale)
+                addresses = addresses.all()
+                addresses = [address[0] for address in addresses]
+                if not addresses:
+                    continue
 
-            self.set_locale(request, locale)
+                self.set_locale(request, locale)
 
-            layout = MailLayout(self, request)
+                layout = MailLayout(self, request)
 
-            if subject:
-                subject_ = request.translate(subject)
-            else:
-                subject_ = layout.subject((elections + votes)[0])
+                if subject:
+                    subject_ = request.translate(subject)
+                else:
+                    subject_ = layout.subject((elections + votes)[0])
 
-            content = render_template(
-                'mail_results.pt',
-                request,
-                {
-                    'title': subject_,
-                    'elections': elections,
-                    'votes': votes,
-                    'layout': layout
-                }
-            )
-
-            for address in addresses:
-                token = request.new_url_safe_token({'address': address})
-                optout_custom = f'{layout.optout_link}?opaque={token}'
-                request.app.send_marketing_email(
-                    subject=subject_,
-                    receivers=(address, ),
-                    reply_to=reply_to,
-                    content=content.replace(layout.optout_link, optout_custom),
-                    headers={
-                        'List-Unsubscribe': f'<{optout_custom}>',
-                        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+                content = render_template(
+                    'mail_results.pt',
+                    request,
+                    {
+                        'title': subject_,
+                        'elections': elections,
+                        'votes': votes,
+                        'layout': layout
                     }
                 )
+                plaintext = html_to_text(content)
 
+                for address in addresses:
+                    token = request.new_url_safe_token({'address': address})
+                    optout_custom = f'{layout.optout_link}?opaque={token}'
+                    yield request.app.prepare_email(
+                        subject=subject_,
+                        receivers=(address, ),
+                        reply_to=reply_to,
+                        content=content.replace(
+                            layout.optout_link,
+                            optout_custom
+                        ),
+                        plaintext=plaintext.replace(
+                            layout.optout_link,
+                            optout_custom
+                        ),
+                        headers={
+                            'List-Unsubscribe': f'<{optout_custom}>',
+                            'List-Unsubscribe-Post':
+                                'List-Unsubscribe=One-Click'
+                        }
+                    )
+
+        request.app.send_marketing_email_batch(email_iter())
         self.set_locale(request)
 
     def trigger(self, request, model):

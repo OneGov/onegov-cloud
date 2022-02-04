@@ -22,7 +22,7 @@ homepage_structure = """<row>
 
 
 def test_initial_content(request):
-    app = create_app(AgencyApp, request, use_smtp=False)
+    app = create_app(AgencyApp, request, use_maildir=False)
     org = create_new_organisation(app, "Test", 'de_CH')
 
     assert org.locales == 'de_CH'

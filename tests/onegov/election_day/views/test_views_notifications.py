@@ -5,7 +5,7 @@ from datetime import date
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_vote
-from webtest import TestApp as Client
+from tests.shared import Client
 
 
 def test_view_notifications_votes(election_day_app_zg):
@@ -58,13 +58,13 @@ def test_view_notifications_votes(election_day_app_zg):
     trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
-    message = election_day_app_zg.smtp.outbox.pop()
+    message = client.get_email(-1)
     assert message['To'] == 'hans@example.org'
-    assert message['Subject'] == '=?utf-8?q?Vote_-_Refus=C3=A9?='
-    unsubscribe = message['List-Unsubscribe'].strip('<>')
+    assert message['Subject'] == 'Vote - Refusé'
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
 
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('utf-8')
+    message = message['HtmlBody']
     assert "http://localhost/unsubscribe-email" in message
     assert "Vote - Refusé" in message
 
@@ -133,16 +133,15 @@ def test_view_notifications_elections(election_day_app_gr):
     trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
-    message = election_day_app_gr.smtp.outbox.pop()
+    message = client.get_email(-1)
     assert message['To'] == 'hans@example.org'
     assert message['Subject'] == (
-        '=?utf-8?q?Majorz_Election_-_'
-        'Nouveaux_r=C3=A9sultats_interm=C3=A9diaires?='
+        'Majorz Election - Nouveaux résultats intermédiaires'
     )
-    unsubscribe = message['List-Unsubscribe'].strip('<>')
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
 
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('utf-8')
+    message = message['HtmlBody']
     assert "http://localhost/unsubscribe-email" in message
     assert "Majorz Election - Nouveaux résultats intermédiaires" in message
     assert unsubscribe in message
@@ -207,7 +206,7 @@ def test_view_notifications_summarized(election_day_app_zg):
     manage = manage.form.submit().maybe_follow()
     assert "Benachrichtigungen ausgelöst" in manage
 
-    assert len(election_day_app_zg.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
     assert not os.path.exists(sms_path)
 
     # Add subscriber
@@ -216,8 +215,8 @@ def test_view_notifications_summarized(election_day_app_zg):
     subscribe = anom.get('/subscribe-email')
     subscribe.form['email'] = 'hans@example.org'
     subscribe.form.submit()
-    assert len(election_day_app_zg.smtp.outbox) == 1
-    election_day_app_zg.smtp.outbox.pop()
+    assert len(os.listdir(client.app.maildir)) == 1
+    client.flush_email_queue()
 
     subscribe = anom.get('/subscribe-sms')
     subscribe.form['phone_number'] = '+41792223344'
@@ -233,16 +232,14 @@ def test_view_notifications_summarized(election_day_app_zg):
     manage = manage.form.submit().maybe_follow()
     assert "Benachrichtigungen ausgelöst" in manage
 
-    assert len(election_day_app_zg.smtp.outbox) == 1
-    message = election_day_app_zg.smtp.outbox.pop()
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0, flush_queue=True)
     assert message['To'] == 'hans@example.org'
-    assert message['Subject'] == (
-        '=?utf-8?q?Les_nouveaux_r=C3=A9sultats_sont_disponibles?='
-    )
-    unsubscribe = message['List-Unsubscribe'].strip('<>')
+    assert message['Subject'] == 'Les nouveaux résultats sont disponibles'
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
 
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('utf-8')
+    message = message['HtmlBody']
     assert "http://localhost/unsubscribe-email" in message
     assert "<h1>Regierungsratswahl</h1>" in message
     assert "<h1>Unternehmenssteuerreformgesetz</h1>" in message

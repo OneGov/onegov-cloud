@@ -3,6 +3,7 @@
 from chameleon import PageTemplate
 from collections import defaultdict
 from dectate import directive
+from email.utils import formataddr
 from more.content_security import SELF
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
@@ -158,19 +159,22 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def publications_count(self):
         return PublicationCollection(self.session()).query().count()
 
-    def send_email(self, **kwargs):
-        """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting
+    def prepare_email(self, reply_to=None, **kwargs):
+        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`, setting
         the reply_to address by using the reply address from the organisation
         settings.
 
         """
         category = kwargs.get('category', 'marketing')
 
-        reply_to = kwargs.pop('reply_to', self.org.meta.get('reply_to', None))
+        reply_to = reply_to or self.org.meta.get('reply_to', None)
         reply_to = reply_to or self.mail[category]['sender']
-        reply_to = "{} <{}>".format(self.org.title, reply_to)
+        # TODO: This doesn't handle the case where a user submits a
+        #       pre-formatted reply_to with sender name, could use
+        #       parseaddr to detect this case
+        reply_to = formataddr((self.org.title, reply_to))
 
-        return super().send_email(reply_to=reply_to, **kwargs)
+        return super().prepare_email(reply_to=reply_to, **kwargs)
 
     @property
     def theme_options(self):

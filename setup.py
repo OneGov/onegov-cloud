@@ -98,7 +98,6 @@ setup(
         'libres>=0.5.2',
         'libsass',
         'lxml',
-        'mailthon',
         'mistletoe',
         'mistune',
         'more.content_security',

@@ -17,7 +17,7 @@ def test_view_notice(gazette_app):
 
     admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         # create a notice for each editor
         for count, user in enumerate((editor_1, editor_2, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
@@ -83,7 +83,7 @@ def test_view_notice_actions(gazette_app):
 
     admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         # create a notice for each editor
         for count, user in enumerate(
             (editor_1, editor_2, editor_3, publisher)
@@ -339,7 +339,7 @@ def test_view_notice_pdf_preview(gazette_app):
 def test_view_notice_delete(gazette_app):
     admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         # delete a drafted notice
         for user in (editor_1, publisher):
             manage = editor_1.get('/notices/drafted/new-notice')

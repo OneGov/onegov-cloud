@@ -73,27 +73,13 @@ configuration: &global-config
   # sentry_version: test
 
   # OneGov holds two sorts of mail. Transactional, non-spammy e-mail or
-  # marketing e-mail. Though they can both have different configurations,
-  # in development we usually use https://mailcatcher.me to look at
-  # sent e-mails.
+  # marketing e-mail. Though they can both have different configurations
   mail:
     transactional:
-      host: localhost
-      port: 1025
-      force_tls: false
-      username:
-      password:
       sender: service@onegovcloud.ch
-      use_directory: false
       directory: '/usr/local/var/onegov/mail'
     marketing:
-      host: localhost
-      port: 1025
-      force_tls: false
-      username:
-      password:
       sender: newsletters@onegovcloud.ch
-      use_directory: false
       directory: '/usr/local/var/onegov/mail'
 
   # To test yubikey integration, a yubikey API access token has to be provided

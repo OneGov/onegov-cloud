@@ -185,6 +185,10 @@ class DummyApp(object):
     def session(self):
         return self._session
 
+    def send_marketing_email_batch(self, prepared_emails):
+        # we'll allow sending empty batches for DummyApp
+        assert not list(prepared_emails)
+
 
 class DummyRequest(object):
 

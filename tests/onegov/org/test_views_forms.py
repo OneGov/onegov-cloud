@@ -8,8 +8,7 @@ from webtest import Upload
 from onegov.form import FormCollection, as_internal_id
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
-from tests.onegov.org.common import get_mail
-from tests.shared.utils import create_image, open_in_browser
+from tests.shared.utils import create_image
 
 
 def test_view_form_alert(client):
@@ -138,10 +137,7 @@ def test_submit_form(client):
     assert tickets[0].group == 'Profile'
 
     # the user should have gotten an e-mail with the entered data
-    message = client.app.smtp.outbox[-1]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
-
+    message = client.get_email(-1)['TextBody']
     assert 'Fury' in message
 
     # unless he opts out of it
@@ -155,10 +151,7 @@ def test_submit_form(client):
     form_page.form.get('send_by_email', index=0).value = False
     ticket_page = form_page.form.submit().follow()
 
-    message = client.app.smtp.outbox[-1]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
-
+    message = client.get_email(-1)['TextBody']
     assert 'Fury' not in message
 
 
@@ -554,7 +547,7 @@ def test_registration_change_limit_after_submissions(client):
 
     client.login_editor()
 
-    with freeze_time('2018-01-01'):
+    with freeze_time('2018-01-01', tick=True):
         for i in range(0, 3):
             page = client.get('/form/meetup')
             page.form['e_mail'] = 'info@example.org'
@@ -620,7 +613,7 @@ def test_registration_ticket_workflow(client):
     def register(client, data_in_email, accept_ticket=True, url='/form/meetup'):
         nonlocal count
         count += 1
-        with freeze_time('2018-01-01'):
+        with freeze_time(f'2018-01-01 00:00:{count:02d}'):
             page = client.get(url)
             page.form['e_mail'] = f'info{count}@example.org'
             page.form['name'] = 'Foobar'
@@ -638,39 +631,39 @@ def test_registration_ticket_workflow(client):
     assert "bestätigen" in page
     assert "ablehnen" in page
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert "Ihre Anfrage wurde unter der folgenden Referenz registriert" in msg
     assert "Foobar" in msg
 
     page = page.click("Anmeldung bestätigen").follow()
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert 'Ihre Anmeldung für "Meetup" wurde bestätigt' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
     page.click("Anmeldung stornieren").follow()
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert 'Ihre Anmeldung für "Meetup" wurde storniert' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
     page = register(client, data_in_email=False)
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert "Ihre Anfrage wurde unter der folgenden Referenz registriert" in msg
     assert "Foobar" not in msg
 
     page.click("Anmeldung ablehnen")
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert 'Ihre Anmeldung für "Meetup" wurde abgelehnt' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" not in msg
 
     # create one undecided submission
-    open_registration = register(client, False, accept_ticket=False)
+    register(client, False, accept_ticket=False)
 
     # Test auto accept reservations for forms
     # views in order:
@@ -688,8 +681,8 @@ def test_registration_ticket_workflow(client):
 
     client = client.spawn()
     page = register(client, False, accept_ticket=False)
-    mail = get_mail(client.app.smtp.outbox, -1)
-    assert '_Meetup=3A_Ihre_Anmeldung_wurde_best=C3=A4tigt?=' in mail['subject']
+    mail = client.get_email(-1)
+    assert 'Meetup: Ihre Anmeldung wurde bestätigt' in mail['Subject']
     assert 'Ihr Anliegen wurde abgeschlossen' in page
 
     # check ownership of the ticket
@@ -726,9 +719,9 @@ def test_registration_ticket_workflow(client):
     message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
     page = message.form.submit().follow()
     assert 'Erfolgreich 4 E-Mails gesendet' in page
-    mail = get_mail(client.app.smtp.outbox, -1)
-    assert 'Message for all the attendees' in mail['html']
-    assert 'Allgemeine Nachricht' in mail['subject']
+    mail = client.get_email(-1)
+    assert 'Message for all the attendees' in mail['HtmlBody']
+    assert 'Allgemeine Nachricht' in mail['Subject']
 
     # navigate to the registration window an cancel all
     window.click('Anmeldezeitraum absagen')
@@ -775,13 +768,15 @@ def test_registration_not_in_front_of_queue(client):
 
     client.login_editor()
 
-    with freeze_time('2018-01-01'):
+    with freeze_time('2018-01-01', tick=True):
         for i in range(0, 2):
             page = client.get('/form/meetup')
             page.form['e_mail'] = 'info@example.org'
             page.form.submit().follow().form.submit().follow()
 
-    page = client.get('/tickets/ALL/open').click("Annehmen", index=1).follow()
+    # NOTE: due to time ticking these are now ordered differently
+    #       so the older entry in the queue is now at index=0
+    page = client.get('/tickets/ALL/open').click("Annehmen", index=0).follow()
     assert "Dies ist nicht die älteste offene Eingabe" in page
 
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()

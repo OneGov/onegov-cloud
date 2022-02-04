@@ -128,7 +128,7 @@ def form_app(request):
         request.include('formcode')
         return self.html
 
-    return create_app(TestApp, request, use_smtp=False)
+    return create_app(TestApp, request, use_maildir=False)
 
 
 @pytest.fixture(scope='function')

@@ -37,6 +37,6 @@ class TestApp(Framework, DepotApp):
 
 @fixture(scope='function')
 def test_app(request):
-    app = create_app(TestApp, request, use_smtp=False)
+    app = create_app(TestApp, request, use_maildir=False)
     yield app
     app.session_manager.dispose()

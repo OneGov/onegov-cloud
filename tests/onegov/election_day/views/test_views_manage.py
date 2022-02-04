@@ -1,5 +1,5 @@
+import os
 from datetime import date
-
 from lxml.html import document_fromstring
 
 from onegov.ballot import ProporzElection
@@ -11,8 +11,8 @@ from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
-from webtest import TestApp as Client
 from tests.onegov.election_day.common import DummyRequest
+from tests.shared import Client
 
 
 def test_view_login_logout(election_day_app_zg):
@@ -408,15 +408,13 @@ def test_reset_password(election_day_app_zg):
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit()
-    assert len(election_day_app_zg.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     request_page.form['email'] = 'admin@example.org'
     assert 'admin@example.org' in request_page.form.submit()
-    assert len(election_day_app_zg.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = election_day_app_zg.smtp.outbox[0]
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
+    message = client.get_email(0)['HtmlBody']
     link = list(document_fromstring(message).iterlinks())[0][2]
     token = link.split('token=')[1]
 
