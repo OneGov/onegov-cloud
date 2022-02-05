@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-04 10:51+0100\n"
-"PO-Revision-Date: 2022-02-04 10:55+0100\n"
+"POT-Creation-Date: 2022-02-05 13:55+0100\n"
+"PO-Revision-Date: 2022-02-05 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -505,11 +505,17 @@ msgid "Phone number"
 msgstr "Téléphone"
 
 msgid ""
-"Deletes the given subscribers. The same format is used as for export "
-"(without locale)."
+"Deactivates or deletes the given subscribers. The same format is used as for "
+"export (only address column)."
 msgstr ""
-"Supprime les abonnés donnés. Le même format est utilisé que pour "
-"l’exportation (sans paramètres régionaux)."
+"Désactive ou supprime les abonnés donnés. Le même format est utilisé que "
+"pour l'exportation (uniquement la colonne adresse)."
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Deactivate"
+msgstr "Désactiver"
 
 msgid "File"
 msgstr "Fichier"
@@ -828,9 +834,6 @@ msgstr "Supprimer le média"
 
 msgid "Upload party results"
 msgstr "Uploader les résultats par parti"
-
-msgid "Delete"
-msgstr "Supprimer"
 
 msgid "Yeas"
 msgstr "Oui"
@@ -1153,11 +1156,26 @@ msgstr "Export"
 msgid "No screens yet."
 msgstr "Pas encore d’écrans."
 
+msgid "Cleanup"
+msgstr "Nettoyage"
+
+msgid "All"
+msgstr "Tout"
+
+msgid "Active only"
+msgstr "Actif uniquement"
+
 msgid "No subscribers yet."
 msgstr "Pas encore d’abonnés."
 
 msgid "Locale"
 msgstr "Locaux"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Activate"
+msgstr "Activez"
 
 msgid "Last notifications:"
 msgstr "Les dernières notifications :"
@@ -1412,17 +1430,37 @@ msgid "Delete screen"
 msgstr "Supprimer l’écran"
 
 #, python-format
-msgid "${count} subscribers deleted."
-msgstr "${count} abonnés supprimés."
+msgid "${count} subscribers cleaned up."
+msgstr "Les abonnés de ${count} ont été nettoyés."
 
-msgid "Delete subscribers"
-msgstr "Supprimer des abonnés"
+msgid "Clean up subscribers"
+msgstr "Nettoyer les abonnés"
 
 msgid "Subscriber deleted."
 msgstr "Souscripteur supprimé."
 
 msgid "Delete subscriber"
 msgstr "Supprimer l'abonné(e)"
+
+msgid "Subscriber activated."
+msgstr "Abonné activé."
+
+#, python-format
+msgid "Do you really want to activate \"${item}\"?"
+msgstr "Voulez-vous vraiment activer \"${item}\" ?"
+
+msgid "Activate subscriber"
+msgstr "Activer l'abonné"
+
+msgid "Subscriber deactivated."
+msgstr "Abonné désactivé."
+
+#, python-format
+msgid "Do you really want to deactivate \"${item}\"?"
+msgstr "Voulez-vous vraiment désactiver \"${item}\" ?"
+
+msgid "Deactivate subscriber"
+msgstr "Désactiver l'abonné"
 
 msgid "Upload token created."
 msgstr "Token créé."

@@ -88,22 +88,28 @@ def get_manage_votes(app, page=0, year=None):
     model=SmsSubscriberCollection,
     path='/manage/subscribers/sms',
     converters=dict(
-        page=int
+        page=int,
+        active_only=bool
     )
 )
-def get_manage_sms_subscribers(app, page=0, term=None):
-    return SmsSubscriberCollection(app.session(), page=page, term=term)
+def get_manage_sms_subscribers(app, page=0, term=None, active_only=None):
+    return SmsSubscriberCollection(
+        app.session(), page=page, term=term, active_only=active_only
+    )
 
 
 @ElectionDayApp.path(
     model=EmailSubscriberCollection,
     path='/manage/subscribers/email',
     converters=dict(
-        page=int
+        page=int,
+        active_only=bool
     )
 )
-def get_manage_email_subscribers(app, page=0, term=None):
-    return EmailSubscriberCollection(app.session(), page=page, term=term)
+def get_manage_email_subscribers(app, page=0, term=None, active_only=None):
+    return EmailSubscriberCollection(
+        app.session(), page=page, term=term, active_only=active_only
+    )
 
 
 @ElectionDayApp.path(

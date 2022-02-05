@@ -11,13 +11,18 @@ from sqlalchemy import func
 
 class SubscriberCollectionPagination(Pagination):
 
-    def __init__(self, session, page=0, term=None):
+    def __init__(self, session, page=0, term=None, active_only=True):
         self.session = session
         self.page = page
         self.term = term
+        self.active_only = active_only
 
     def __eq__(self, other):
-        return (self.page == other.page) and (self.term == other.term)
+        return (
+            (self.page == other.page)
+            and (self.term == other.term)
+            and (self.active_only == other.active_only)
+        )
 
     def subset(self):
         return self.query()
@@ -29,6 +34,9 @@ class SubscriberCollectionPagination(Pagination):
     def page_by_index(self, index):
         return self.__class__(self.session, index)
 
+    def for_active_only(self, active_only):
+        return self.__class__(self.session, 0, self.term, active_only)
+
 
 class SubscriberCollection(SubscriberCollectionPagination):
 
@@ -36,18 +44,26 @@ class SubscriberCollection(SubscriberCollectionPagination):
     def model_class(self):
         return Subscriber
 
-    def query(self):
+    def query(self, active_only=None):
         query = self.session.query(self.model_class)
+
+        active_only = self.active_only if active_only is None else active_only
+        if active_only:
+            query = query.filter(self.model_class.active.is_(True))
+
         if self.term:
             query = query.filter(self.model_class.address.contains(self.term))
             self.batch_size = query.count()
+
         query = query.order_by(self.model_class.address)
+
         return query
 
     def by_id(self, id):
         """ Returns the subscriber by its id. """
 
-        return self.query().filter(self.model_class.id == id).first()
+        query = self.query(active_only=False).filter(self.model_class.id == id)
+        return query.first()
 
     def subscribe(self, address, request, confirm=True):
         """ Subscribe with the given address and locale.
@@ -59,7 +75,8 @@ class SubscriberCollection(SubscriberCollectionPagination):
         locale = request.locale
 
         subscriber = None
-        for existing in self.query().filter_by(address=address):
+        query = self.query(active_only=False)
+        for existing in query.filter_by(address=address):
             if not subscriber:
                 subscriber = existing
                 if subscriber.locale != locale:
@@ -70,12 +87,13 @@ class SubscriberCollection(SubscriberCollectionPagination):
         if not subscriber:
             subscriber = self.model_class(
                 address=address,
-                locale=locale
+                locale=locale,
+                active=True
             )
             self.session.add(subscriber)
 
             if confirm:
-                self.confirm_subscription(subscriber, request)
+                self.send_activation(subscriber, request)
 
         self.session.flush()
 
@@ -100,12 +118,16 @@ class SubscriberCollection(SubscriberCollectionPagination):
         """ Returns all data connected to these subscribers. """
 
         return [
-            {'address': subscriber.address, 'locale': subscriber.locale}
+            {
+                'address': subscriber.address,
+                'locale': subscriber.locale,
+                'active': subscriber.active
+            }
             for subscriber in self.query()
         ]
 
-    def delete(self, file, mimetype):
-        """ Removes the subscribers in the given CSV. """
+    def cleanup(self, file, mimetype, delete):
+        """ Disables or deletes the subscribers in the given CSV. """
 
         csv, error = load_csv(file, mimetype, expected_headers=['address'])
         if error:
@@ -116,7 +138,14 @@ class SubscriberCollection(SubscriberCollectionPagination):
         query = query.filter(
             func.lower(self.model_class.address).in_(addresses)
         )
-        count = query.delete()
+        if delete:
+            count = query.delete()
+        else:
+            query = query.filter(self.model_class.active.is_(True))
+            count = query.count()
+            for subscriber in query:
+                subscriber.active = False
+
         return [], count
 
 
@@ -126,7 +155,7 @@ class EmailSubscriberCollection(SubscriberCollection):
     def model_class(self):
         return EmailSubscriber
 
-    def confirm_subscription(self, subscriber, request):
+    def send_activation(self, subscriber, request):
         """ Give the (new) subscriber a confirmation that he successfully
         subscribed. """
 
@@ -174,7 +203,7 @@ class SmsSubscriberCollection(SubscriberCollection):
     def model_class(self):
         return SmsSubscriber
 
-    def confirm_subscription(self, subscriber, request):
+    def send_activation(self, subscriber, request):
         """ Give the (new) subscriber a confirmation that he successfully
         subscribed. """
 

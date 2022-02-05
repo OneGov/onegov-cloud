@@ -7,6 +7,7 @@ from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
+from wtforms import RadioField
 from wtforms import StringField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
@@ -39,11 +40,22 @@ class SmsSubscriptionForm(Form):
     name = HoneyPotField()
 
 
-class DeleteSubscribersForm(Form):
+class SubscribersCleanupForm(Form):
 
     callout = _(
-        'Deletes the given subscribers. '
-        'The same format is used as for export (without locale).'
+        'Deactivates or deletes the given subscribers. '
+        'The same format is used as for export (only address column).'
+    )
+
+    type = RadioField(
+        label=_("Type"),
+        validators=[
+            InputRequired()
+        ],
+        choices=[
+            ('delete', _("Delete")),
+            ('deactivate', _("Deactivate")),
+        ]
     )
 
     file = UploadField(

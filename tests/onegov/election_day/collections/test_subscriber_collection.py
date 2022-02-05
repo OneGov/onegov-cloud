@@ -296,32 +296,32 @@ def test_subscriber_collection_export(session):
     # Test email export
     data = EmailSubscriberCollection(session).export()
     assert sorted(data, key=lambda x: x['address']) == [
-        {'address': 'a@example.org', 'locale': 'de_CH'},
-        {'address': 'b@example.org', 'locale': 'de_CH'},
-        {'address': 'c@example.org', 'locale': 'fr_CH'},
+        {'active': True, 'address': 'a@example.org', 'locale': 'de_CH'},
+        {'active': True, 'address': 'b@example.org', 'locale': 'de_CH'},
+        {'active': True, 'address': 'c@example.org', 'locale': 'fr_CH'},
     ]
 
     # Test SMS export
     data = SmsSubscriberCollection(session).export()
     assert sorted(data, key=lambda x: x['address']) == [
-        {'address': '+41791112201', 'locale': 'de_CH'},
-        {'address': '+41791112202', 'locale': 'fr_CH'},
-        {'address': '+41791112203', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112201', 'locale': 'de_CH'},
+        {'active': True, 'address': '+41791112202', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112203', 'locale': 'fr_CH'},
     ]
 
     # Test mixed export
     data = SubscriberCollection(session).export()
     assert sorted(data, key=lambda x: x['address']) == [
-        {'address': '+41791112201', 'locale': 'de_CH'},
-        {'address': '+41791112202', 'locale': 'fr_CH'},
-        {'address': '+41791112203', 'locale': 'fr_CH'},
-        {'address': 'a@example.org', 'locale': 'de_CH'},
-        {'address': 'b@example.org', 'locale': 'de_CH'},
-        {'address': 'c@example.org', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112201', 'locale': 'de_CH'},
+        {'active': True, 'address': '+41791112202', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112203', 'locale': 'fr_CH'},
+        {'active': True, 'address': 'a@example.org', 'locale': 'de_CH'},
+        {'active': True, 'address': 'b@example.org', 'locale': 'de_CH'},
+        {'active': True, 'address': 'c@example.org', 'locale': 'fr_CH'},
     ]
 
 
-def test_subscriber_collection_delete(session):
+def test_subscriber_collection_cleanup(session):
     request_de = DummyRequest(locale='de_CH')
     request_fr = DummyRequest(locale='fr_CH')
 
@@ -340,51 +340,83 @@ def test_subscriber_collection_delete(session):
 
     assert SubscriberCollection(session).query().count() == 7
 
-    # Test delete email subscribers
+    # Test deactivate email subscribers
     collection = EmailSubscriberCollection(session)
 
-    errors, count = collection.delete(
+    errors, count = collection.cleanup(
         BytesIO(''.encode('utf-8')),
-        'text/plain'
+        'text/plain',
+        delete=False
     )
     assert errors
 
-    errors, count = collection.delete(
-        BytesIO((
-            'address,\n'
-            'a@EXAMPLE.org,\n'
-            'b@example.org,\n'
-            'c@example.org,\n'
-            'e@example.org,\n'
-            '123,\n'
-            ',\n'
-        ).encode('utf-8')),
-        'text/plain'
+    csv = (
+        'address,\n'
+        'a@EXAMPLE.org,\n'
+        'b@example.org,\n'
+        'c@example.org,\n'
+        'e@example.org,\n'
+        '123,\n'
+        ',\n'
+    )
+
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=False
     )
     assert not errors
     assert count == 3
     assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 4
 
-    # Test delete SMS subscribers
+    # Test delete email subscribers
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=True
+    )
+    assert not errors
+    assert count == 3
+    assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 1
+
+    # Test deactivate SMS subscribers
     collection = SmsSubscriberCollection(session)
 
-    errors, count = collection.delete(
+    errors, count = collection.cleanup(
         BytesIO(''.encode('utf-8')),
-        'text/plain'
+        'text/plain',
+        delete=False
     )
     assert errors
 
-    errors, count = collection.delete(
-        BytesIO((
-            'address,\n'
-            '+41791112201,\n'
-            '+41791112203,\n'
-            '+41791112220,\n'
-            '123,\n'
-            ',\n'
-        ).encode('utf-8')),
-        'text/plain'
+    csv = (
+        'address,\n'
+        '+41791112201,\n'
+        '+41791112203,\n'
+        '+41791112220,\n'
+        '123,\n'
+        ',\n'
+    )
+
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=False
     )
     assert not errors
     assert count == 2
     assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 3
+
+    # Test delete SMS subscribers
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=True
+    )
+    assert not errors
+    assert count == 2
+    assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 1

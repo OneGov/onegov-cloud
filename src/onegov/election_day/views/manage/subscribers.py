@@ -5,7 +5,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
-from onegov.election_day.forms import DeleteSubscribersForm
+from onegov.election_day.forms import SubscribersCleanupForm
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.models import Subscriber
 
@@ -76,18 +76,22 @@ def export_email_subscribers(self, request):
     }
 
 
-def handle_delete_subscribers(collection, request, form):
+def handle_cleanup_subscribers(collection, request, form):
     layout = ManageSubscribersLayout(collection, request)
 
     errors = []
     if form.submitted(request):
-        errors, count = collection.delete(
+        errors, count = collection.cleanup(
             form.file.raw_data[0].file,
-            form.file.data['mimetype']
+            form.file.data['mimetype'],
+            form.type.data == 'delete'
         )
         if not errors:
             request.message(
-                _('${count} subscribers deleted.', mapping={'count': count}),
+                _(
+                    '${count} subscribers cleaned up.',
+                    mapping={'count': count}
+                ),
                 'success'
             )
             return redirect(layout.manage_model_link)
@@ -95,7 +99,7 @@ def handle_delete_subscribers(collection, request, form):
     return {
         'layout': layout,
         'form': form,
-        'title': _('Delete subscribers'),
+        'title': _('Clean up subscribers'),
         'cancel': layout.manage_model_link,
         'errors': errors
     }
@@ -103,26 +107,26 @@ def handle_delete_subscribers(collection, request, form):
 
 @ElectionDayApp.manage_form(
     model=SmsSubscriberCollection,
-    name='delete',
-    form=DeleteSubscribersForm
+    name='cleanup',
+    form=SubscribersCleanupForm
 )
-def delete_sms_subscribers(self, request, form):
+def cleanup_sms_subscribers(self, request, form):
 
     """ Deletes a list of SMS subscribers. """
 
-    return handle_delete_subscribers(self, request, form)
+    return handle_cleanup_subscribers(self, request, form)
 
 
 @ElectionDayApp.manage_form(
     model=EmailSubscriberCollection,
-    name='delete',
-    form=DeleteSubscribersForm
+    name='cleanup',
+    form=SubscribersCleanupForm
 )
-def delete_email_subscribers(self, request, form):
+def cleanup_email_subscribers(self, request, form):
 
     """ Deletes a list of email subscribers. """
 
-    return handle_delete_subscribers(self, request, form)
+    return handle_cleanup_subscribers(self, request, form)
 
 
 @ElectionDayApp.manage_form(
@@ -153,6 +157,70 @@ def delete_subscriber(self, request, form):
         'title': self.address,
         'subtitle': _("Delete subscriber"),
         'button_text': _("Delete subscriber"),
+        'button_class': 'alert',
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=Subscriber,
+    name='activate'
+)
+def activate_subscriber(self, request, form):
+
+    """ Activate a single subscriber. """
+
+    layout = ManageSubscribersLayout(self, request)
+
+    if form.submitted(request):
+        self.active = True
+        request.message(_("Subscriber activated."), 'success')
+        return redirect(layout.manage_model_link)
+
+    return {
+        'message': _(
+            'Do you really want to activate "${item}"?',
+            mapping={
+                'item': self.address
+            }
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.address,
+        'subtitle': _("Activate subscriber"),
+        'button_text': _("Activate subscriber"),
+        'button_class': 'alert',
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=Subscriber,
+    name='deactivate'
+)
+def deactivate_subscriber(self, request, form):
+
+    """ Deactivate a single subscriber. """
+
+    layout = ManageSubscribersLayout(self, request)
+
+    if form.submitted(request):
+        self.active = False
+        request.message(_("Subscriber deactivated."), 'success')
+        return redirect(layout.manage_model_link)
+
+    return {
+        'message': _(
+            'Do you really want to deactivate "${item}"?',
+            mapping={
+                'item': self.address
+            }
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.address,
+        'subtitle': _("Deactivate subscriber"),
+        'button_text': _("Deactivate subscriber"),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }

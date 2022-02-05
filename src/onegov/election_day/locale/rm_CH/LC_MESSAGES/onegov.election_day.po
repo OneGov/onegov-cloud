@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-04 10:51+0100\n"
+"POT-Creation-Date: 2022-02-05 13:55+0100\n"
 "PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -487,8 +487,14 @@ msgid "Phone number"
 msgstr "Numer da telefon"
 
 msgid ""
-"Deletes the given subscribers. The same format is used as for export "
-"(without locale)."
+"Deactivates or deletes the given subscribers. The same format is used as for "
+"export (only address column)."
+msgstr ""
+
+msgid "Delete"
+msgstr "Stizzar"
+
+msgid "Deactivate"
 msgstr ""
 
 msgid "File"
@@ -809,9 +815,6 @@ msgstr ""
 
 msgid "Upload party results"
 msgstr "Chargiar si ils resultats da las partidas"
-
-msgid "Delete"
-msgstr "Stizzar"
 
 msgid "Yeas"
 msgstr "Vuschs affirmativas"
@@ -1135,11 +1138,26 @@ msgstr ""
 msgid "No screens yet."
 msgstr ""
 
+msgid "Cleanup"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "Active only"
+msgstr ""
+
 msgid "No subscribers yet."
 msgstr "Anc nagins abunents."
 
 msgid "Locale"
 msgstr "Regiun linguistica"
+
+msgid "Active"
+msgstr ""
+
+msgid "Activate"
+msgstr ""
 
 msgid "Last notifications:"
 msgstr ""
@@ -1383,10 +1401,10 @@ msgid "Delete screen"
 msgstr ""
 
 #, python-format
-msgid "${count} subscribers deleted."
+msgid "${count} subscribers cleaned up."
 msgstr ""
 
-msgid "Delete subscribers"
+msgid "Clean up subscribers"
 msgstr ""
 
 msgid "Subscriber deleted."
@@ -1394,6 +1412,26 @@ msgstr "Stizzà l'abunent(a)."
 
 msgid "Delete subscriber"
 msgstr "Stizzar l'abunent(a)"
+
+msgid "Subscriber activated."
+msgstr ""
+
+#, python-format
+msgid "Do you really want to activate \"${item}\"?"
+msgstr ""
+
+msgid "Activate subscriber"
+msgstr ""
+
+msgid "Subscriber deactivated."
+msgstr ""
+
+#, python-format
+msgid "Do you really want to deactivate \"${item}\"?"
+msgstr ""
+
+msgid "Deactivate subscriber"
+msgstr ""
 
 msgid "Upload token created."
 msgstr "Creà il token."
