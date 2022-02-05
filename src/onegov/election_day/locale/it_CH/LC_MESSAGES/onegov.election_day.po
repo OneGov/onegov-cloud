@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-05 13:55+0100\n"
-"PO-Revision-Date: 2022-02-05 13:56+0100\n"
+"POT-Creation-Date: 2022-02-05 17:20+0100\n"
+"PO-Revision-Date: 2022-02-05 17:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -24,8 +24,11 @@ msgstr "Nuovi risultati sono disponibili"
 msgid "New results are available on ${url}"
 msgstr "Nuovi risultati sono disponibili su ${url}"
 
-msgid "Successfully subscribed to the email service"
-msgstr "Iscrizione al servizio di posta elettronica avvenuta con successo"
+msgid "Please confirm your email"
+msgstr "Per favore, confermate la vostra e-mail"
+
+msgid "Please confirm your unsubscription"
+msgstr "Per favore, confermate la vostra cancellazione"
 
 msgid ""
 "Successfully subscribed to the SMS service. You will receive a SMS every "
@@ -1087,6 +1090,38 @@ msgstr ""
 msgid "View all details online"
 msgstr "Visualizza tutti i dettagli online"
 
+msgid ""
+"Please confirm your email address to receive email notifications. Click on "
+"the link below."
+msgstr ""
+"Per favore, conferma il tuo indirizzo email per ricevere le notifiche via "
+"email. Clicca sul link qui sotto."
+
+msgid "Confirm email"
+msgstr "Confermare l'e-mail"
+
+msgid ""
+"You can ignore this email if you have not signed up for the email "
+"notifications."
+msgstr ""
+"Puoi ignorare questa e-mail se non ti sei iscritto alle notifiche via e-mail."
+
+msgid "Unsubscribe"
+msgstr "Annulla iscrizione"
+
+msgid "Please confirm your unsubscription. Click on the link below."
+msgstr "Si prega di confermare la cancellazione. Clicca sul link qui sotto."
+
+msgid "Confirm unsubscription"
+msgstr "Confermare la cancellazione"
+
+msgid ""
+"You can ignore this email if you have not unsubscribed from the email "
+"notifications."
+msgstr ""
+"Puoi ignorare questa e-mail se non hai annullato l'iscrizione alle notifiche "
+"via e-mail."
+
 msgid "Dear Sir or Madam,"
 msgstr "Gentilissimo Signore o Signora,"
 
@@ -1095,16 +1130,6 @@ msgstr "Fare clic sul collegamento seguente per impostare una nuova password:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr "Se non si desidera modificare la password, ignorare questa e-mail."
-
-msgid "Unsubscribe"
-msgstr "Annulla iscrizione"
-
-msgid ""
-"Successfully subscribed to the email service. You will receive an email "
-"every time new results are published."
-msgstr ""
-"Iscrizione al servizio di posta elettronica avvenuta con successo. Riceverai "
-"una e-mail ogni volta che dei nuovi risultati saranno pubblicati."
 
 msgid "New mapping"
 msgstr "Nuovo mapping"
@@ -1529,6 +1554,25 @@ msgid ""
 msgstr ""
 "Riceverai una e-mail appena qualche nuovo risultato è stato pubblicato. Puoi "
 "annullare l’iscrizione in qualunque momento."
+
+msgid "You will shortly receive an email to confirm your email."
+msgstr "A breve riceverai un'e-mail di conferma."
+
+msgid "Subscription failed, the link is invalid."
+msgstr "Iscrizione fallita, il link non è valido."
+
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+"Iscrizione al servizio di posta elettronica avvenuta con successo. Riceverai "
+"una e-mail ogni volta che dei nuovi risultati saranno pubblicati."
+
+msgid "You will shortly receive an email to confirm your unsubscription."
+msgstr "Riceverai a breve un'e-mail per confermare la tua disiscrizione."
+
+msgid "Unsubscription failed, the link is invalid."
+msgstr "Annullamento dell'iscrizione fallito, il link non è valido."
 
 msgid ""
 "Successfully unsubscribed from the email services. You will no longer "

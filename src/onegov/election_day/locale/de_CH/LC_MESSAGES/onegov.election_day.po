@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-05 13:55+0100\n"
-"PO-Revision-Date: 2022-02-05 13:56+0100\n"
+"POT-Creation-Date: 2022-02-05 17:20+0100\n"
+"PO-Revision-Date: 2022-02-05 17:23+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -25,8 +25,11 @@ msgstr "Neue Resultate verfügbar"
 msgid "New results are available on ${url}"
 msgstr "Neue Resultate verfügbar auf ${url}"
 
-msgid "Successfully subscribed to the email service"
-msgstr "E-Mail-Benachrichtigung abonniert"
+msgid "Please confirm your email"
+msgstr "Bitte bestätigen Sie Ihre E-Mail-Adresse"
+
+msgid "Please confirm your unsubscription"
+msgstr "Bitte bestätigen Sie Ihre Abmeldung"
 
 msgid ""
 "Successfully subscribed to the SMS service. You will receive a SMS every "
@@ -1092,6 +1095,40 @@ msgstr ""
 msgid "View all details online"
 msgstr "Alle Details online ansehen"
 
+msgid ""
+"Please confirm your email address to receive email notifications. Click on "
+"the link below."
+msgstr ""
+"Bitte bestätigen Sie Ihre E-Mail-Adresse, um E-Mail-Benachrichtigungen zu "
+"erhalten. Klicken Sie auf den untenstehenden Link."
+
+msgid "Confirm email"
+msgstr "E-Mail bestätigen"
+
+msgid ""
+"You can ignore this email if you have not signed up for the email "
+"notifications."
+msgstr ""
+"Sie können diese E-Mail ignorieren, wenn Sie sich nicht für die E-Mail-"
+"Benachrichtigungen angemeldet haben."
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
+msgid "Please confirm your unsubscription. Click on the link below."
+msgstr ""
+"Bitte bestätigen Sie Ihre Abmeldung. Klicken Sie auf den untenstehenden Link."
+
+msgid "Confirm unsubscription"
+msgstr "Abmeldung bestätigen"
+
+msgid ""
+"You can ignore this email if you have not unsubscribed from the email "
+"notifications."
+msgstr ""
+"Sie können diese E-Mail ignorieren, wenn Sie sich nicht von den E-Mail-"
+"Benachrichtigungen abgemeldet haben."
+
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
@@ -1102,16 +1139,6 @@ msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
 "möchten."
-
-msgid "Unsubscribe"
-msgstr "Abmelden"
-
-msgid ""
-"Successfully subscribed to the email service. You will receive an email "
-"every time new results are published."
-msgstr ""
-"Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine E-"
-"Mail, sobald neue Resultate publiziert wurden."
 
 msgid "New mapping"
 msgstr "Neue Zuordnung"
@@ -1532,6 +1559,25 @@ msgid ""
 msgstr ""
 "Sie erhalten eine E-Mail, sobald neue Resultate publiziert wurden. Sie "
 "können sich jederzeit vom Service abmelden."
+
+msgid "You will shortly receive an email to confirm your email."
+msgstr "Sie erhalten in Kürze eine E-Mail, um Ihre E-Mail zu bestätigen."
+
+msgid "Subscription failed, the link is invalid."
+msgstr "Die Anmeldung ist fehlgeschlagen, der Link ist ungültig."
+
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+"Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine E-"
+"Mail, sobald neue Resultate publiziert wurden."
+
+msgid "You will shortly receive an email to confirm your unsubscription."
+msgstr "Sie erhalten in Kürze eine E-Mail, um Ihre Abmeldung zu bestätigen."
+
+msgid "Unsubscription failed, the link is invalid."
+msgstr "Die Abmeldung ist fehlgeschlagen, der Link ist ungültig."
 
 msgid ""
 "Successfully unsubscribed from the email services. You will no longer "
