@@ -190,7 +190,7 @@ setup(
             'port-for',
             'psutil',
             'pyquery',
-            'pytest',
+            'pytest<7.0.0',
             'pytest-localserver',
             'pytest-redis',
             'pytest-rerunfailures',
