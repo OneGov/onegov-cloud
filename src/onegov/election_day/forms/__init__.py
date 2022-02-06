@@ -9,9 +9,9 @@ from onegov.election_day.forms.election_compound import ElectionCompoundForm
 from onegov.election_day.forms.notification import TriggerNotificationForm
 from onegov.election_day.forms.notification import TriggerNotificationsForm
 from onegov.election_day.forms.screen import ScreenForm
-from onegov.election_day.forms.subscription import DeleteSubscribersForm
 from onegov.election_day.forms.subscription import EmailSubscriptionForm
 from onegov.election_day.forms.subscription import SmsSubscriptionForm
+from onegov.election_day.forms.subscription import SubscribersCleanupForm
 from onegov.election_day.forms.upload import UploadMajorzElectionForm
 from onegov.election_day.forms.upload import UploadPartyResultsForm
 from onegov.election_day.forms.upload import UploadProporzElectionForm
@@ -29,7 +29,6 @@ __all__ = [
     'ChangeIdForm',
     'DataSourceForm',
     'DataSourceItemForm',
-    'DeleteSubscribersForm',
     'ElectionCompoundForm',
     'ElectionForm',
     'EmailSubscriptionForm',
@@ -37,6 +36,7 @@ __all__ = [
     'EmptyForm',
     'ScreenForm',
     'SmsSubscriptionForm',
+    'SubscribersCleanupForm',
     'TriggerNotificationForm',
     'TriggerNotificationsForm',
     'UploadMajorzElectionForm',

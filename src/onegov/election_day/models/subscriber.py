@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Text
 from uuid import uuid4
@@ -31,6 +32,9 @@ class Subscriber(Base, TimestampMixin):
 
     #: The locale used by the subscriber
     locale = Column(Text, nullable=False)
+
+    #: True, if the subscriber has been confirmed
+    active = Column(Boolean, nullable=True)
 
 
 class SmsSubscriber(Subscriber):

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-04 10:51+0100\n"
-"PO-Revision-Date: 2022-02-04 10:55+0100\n"
+"POT-Creation-Date: 2022-02-05 17:20+0100\n"
+"PO-Revision-Date: 2022-02-05 17:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -24,8 +24,11 @@ msgstr "Les nouveaux résultats sont disponibles"
 msgid "New results are available on ${url}"
 msgstr "Les nouveaux résultats sont disponibles sur ${url}"
 
-msgid "Successfully subscribed to the email service"
-msgstr "Abonné avec succès au service de messagerie"
+msgid "Please confirm your email"
+msgstr "Veuillez confirmer votre e-mail"
+
+msgid "Please confirm your unsubscription"
+msgstr "Veuillez confirmer votre désinscription"
 
 msgid ""
 "Successfully subscribed to the SMS service. You will receive a SMS every "
@@ -505,11 +508,17 @@ msgid "Phone number"
 msgstr "Téléphone"
 
 msgid ""
-"Deletes the given subscribers. The same format is used as for export "
-"(without locale)."
+"Deactivates or deletes the given subscribers. The same format is used as for "
+"export (only address column)."
 msgstr ""
-"Supprime les abonnés donnés. Le même format est utilisé que pour "
-"l’exportation (sans paramètres régionaux)."
+"Désactive ou supprime les abonnés donnés. Le même format est utilisé que "
+"pour l'exportation (uniquement la colonne adresse)."
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Deactivate"
+msgstr "Désactiver"
 
 msgid "File"
 msgstr "Fichier"
@@ -829,9 +838,6 @@ msgstr "Supprimer le média"
 msgid "Upload party results"
 msgstr "Uploader les résultats par parti"
 
-msgid "Delete"
-msgstr "Supprimer"
-
 msgid "Yeas"
 msgstr "Oui"
 
@@ -1090,6 +1096,40 @@ msgstr ""
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"
 
+msgid ""
+"Please confirm your email address to receive email notifications. Click on "
+"the link below."
+msgstr ""
+"Veuillez confirmer votre adresse e-mail pour recevoir des notifications par "
+"e-mail. Cliquez sur le lien ci-dessous."
+
+msgid "Confirm email"
+msgstr "Confirmer l'email"
+
+msgid ""
+"You can ignore this email if you have not signed up for the email "
+"notifications."
+msgstr ""
+"Vous pouvez ignorer cet e-mail si vous ne vous êtes pas inscrit pour "
+"recevoir les notifications par e-mail."
+
+msgid "Unsubscribe"
+msgstr "Se désabonner"
+
+msgid "Please confirm your unsubscription. Click on the link below."
+msgstr ""
+"Veuillez confirmer votre désinscription. Cliquez sur le lien ci-dessous."
+
+msgid "Confirm unsubscription"
+msgstr "Confirmer la désinscription"
+
+msgid ""
+"You can ignore this email if you have not unsubscribed from the email "
+"notifications."
+msgstr ""
+"Vous pouvez ignorer cet e-mail si vous ne vous êtes pas désinscrit des "
+"notifications par e-mail."
+
 msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"
 
@@ -1100,16 +1140,6 @@ msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
 "message."
-
-msgid "Unsubscribe"
-msgstr "Se désabonner"
-
-msgid ""
-"Successfully subscribed to the email service. You will receive an email "
-"every time new results are published."
-msgstr ""
-"Vous avez souscrit avec succès au service de messagerie. Vous recevrez un e-"
-"mail chaque fois que de nouveaux résultats seront publiés."
 
 msgid "New mapping"
 msgstr "Nouvelle cartographie"
@@ -1153,11 +1183,26 @@ msgstr "Export"
 msgid "No screens yet."
 msgstr "Pas encore d’écrans."
 
+msgid "Cleanup"
+msgstr "Nettoyage"
+
+msgid "All"
+msgstr "Tout"
+
+msgid "Active only"
+msgstr "Actif uniquement"
+
 msgid "No subscribers yet."
 msgstr "Pas encore d’abonnés."
 
 msgid "Locale"
 msgstr "Locaux"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Activate"
+msgstr "Activez"
 
 msgid "Last notifications:"
 msgstr "Les dernières notifications :"
@@ -1412,17 +1457,37 @@ msgid "Delete screen"
 msgstr "Supprimer l’écran"
 
 #, python-format
-msgid "${count} subscribers deleted."
-msgstr "${count} abonnés supprimés."
+msgid "${count} subscribers cleaned up."
+msgstr "Les abonnés de ${count} ont été nettoyés."
 
-msgid "Delete subscribers"
-msgstr "Supprimer des abonnés"
+msgid "Clean up subscribers"
+msgstr "Nettoyer les abonnés"
 
 msgid "Subscriber deleted."
 msgstr "Souscripteur supprimé."
 
 msgid "Delete subscriber"
 msgstr "Supprimer l'abonné(e)"
+
+msgid "Subscriber activated."
+msgstr "Abonné activé."
+
+#, python-format
+msgid "Do you really want to activate \"${item}\"?"
+msgstr "Voulez-vous vraiment activer \"${item}\" ?"
+
+msgid "Activate subscriber"
+msgstr "Activer l'abonné"
+
+msgid "Subscriber deactivated."
+msgstr "Abonné désactivé."
+
+#, python-format
+msgid "Do you really want to deactivate \"${item}\"?"
+msgstr "Voulez-vous vraiment désactiver \"${item}\" ?"
+
+msgid "Deactivate subscriber"
+msgstr "Désactiver l'abonné"
 
 msgid "Upload token created."
 msgstr "Token créé."
@@ -1500,6 +1565,25 @@ msgid ""
 msgstr ""
 "Vous recevrez un e-mail dès que de nouveaux résultats auront été publiés. "
 "Vous pouvez vous désinscrire à tout moment."
+
+msgid "You will shortly receive an email to confirm your email."
+msgstr "Vous recevrez sous peu un courriel de confirmation."
+
+msgid "Subscription failed, the link is invalid."
+msgstr "L'abonnement a échoué, le lien n'est pas valide."
+
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+"Vous avez souscrit avec succès au service de messagerie. Vous recevrez un e-"
+"mail chaque fois que de nouveaux résultats seront publiés."
+
+msgid "You will shortly receive an email to confirm your unsubscription."
+msgstr "Vous recevrez sous peu un courriel confirmant votre désinscription."
+
+msgid "Unsubscription failed, the link is invalid."
+msgstr "La désinscription a échoué, le lien n'est pas valide."
 
 msgid ""
 "Successfully unsubscribed from the email services. You will no longer "

@@ -214,10 +214,17 @@ def test_email_notification_vote(election_day_app_zg, session):
 
         request = DummyRequest(app=election_day_app_zg, session=session)
 
-        session.add(EmailSubscriber(address='de@examp.le', locale='de_CH'))
-        session.add(EmailSubscriber(address='fr@examp.le', locale='fr_CH'))
-        session.add(EmailSubscriber(address='it@examp.le', locale='it_CH'))
-        session.add(EmailSubscriber(address='rm@examp.le', locale='rm_CH'))
+        for address, locale, active in (
+            ('de@examp.le', 'de_CH', True),
+            ('fr@examp.le', 'fr_CH', True),
+            ('it@examp.le', 'it_CH', True),
+            ('rm@examp.le', 'rm_CH', True),
+            ('xx@examp.le', 'de_CH', False),
+            ('yy@examp.le', 'fr_CH', False)
+        ):
+            session.add(
+                EmailSubscriber(address=address, locale=locale, active=active)
+            )
 
         # No results yet
         # ... simple
@@ -445,10 +452,17 @@ def test_email_notification_election(election_day_app_zg, session):
 
         request = DummyRequest(app=election_day_app_zg, session=session)
 
-        session.add(EmailSubscriber(address='de@examp.le', locale='de_CH'))
-        session.add(EmailSubscriber(address='fr@examp.le', locale='fr_CH'))
-        session.add(EmailSubscriber(address='it@examp.le', locale='it_CH'))
-        session.add(EmailSubscriber(address='rm@examp.le', locale='rm_CH'))
+        for address, locale, active in (
+            ('de@examp.le', 'de_CH', True),
+            ('fr@examp.le', 'fr_CH', True),
+            ('it@examp.le', 'it_CH', True),
+            ('rm@examp.le', 'rm_CH', True),
+            ('xx@examp.le', 'de_CH', False),
+            ('yy@examp.le', 'fr_CH', False)
+        ):
+            session.add(
+                EmailSubscriber(address=address, locale=locale, active=active)
+            )
 
         # No results yet
         # ... majorz
@@ -751,10 +765,16 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 0
 
-        session.add(SmsSubscriber(address='+41791112233', locale='de_CH'))
-        session.add(SmsSubscriber(address='+41791112233', locale='en'))
-        session.add(SmsSubscriber(address='+41791112244', locale='en'))
-        session.add(EmailSubscriber(address='t@rg.et', locale='fr_CH'))
+        for address, locale, active in (
+            ('+41791112233', 'de_CH', True),
+            ('+41791112233', 'en', True),
+            ('+41791112244', 'en', True),
+            ('+41791112255', 'fr_CH', False),
+            ('+41791112266', 'it_CH', False),
+        ):
+            session.add(
+                SmsSubscriber(address=address, locale=locale, active=active)
+            )
 
         # Intermediate election results
         notification = SmsNotification()

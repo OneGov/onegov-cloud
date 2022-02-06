@@ -2,6 +2,7 @@ import json
 import os
 
 from datetime import date
+from tests.onegov.election_day.common import get_email_link
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_vote
@@ -53,24 +54,25 @@ def test_view_notifications_votes(election_day_app_zg):
     subscribe = anom.get('/subscribe-email')
     subscribe.form['email'] = 'hans@example.org'
     subscribe.form.submit()
+    message = client.get_email(0, flush_queue=True)
+    anom.get(get_email_link(message, 'optin'))
+
+    anom = Client(election_day_app_zg)
+    anom.get('/locale/de_CH').follow()
+    subscribe = anom.get('/subscribe-email')
+    subscribe.form['email'] = 'peter@example.org'
+    subscribe.form.submit()
+    client.get_email(0, flush_queue=True)
 
     trigger = client.get('/vote/vote/trigger')
     trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
-    message = client.get_email(-1)
+    message = client.get_email(0, flush_queue=True)
     assert message['To'] == 'hans@example.org'
     assert message['Subject'] == 'Vote - Refusé'
-    headers = {h['Name']: h['Value'] for h in message['Headers']}
-    unsubscribe = headers['List-Unsubscribe'].strip('<>')
-
     message = message['HtmlBody']
-    assert "http://localhost/unsubscribe-email" in message
     assert "Vote - Refusé" in message
-
-    assert 'hans@example.org' in client.get('/manage/subscribers/email')
-    anom.post(unsubscribe)
-    assert 'hans@example.org' not in client.get('/manage/subscribers/email')
 
 
 def test_view_notifications_elections(election_day_app_gr):
@@ -129,27 +131,27 @@ def test_view_notifications_elections(election_day_app_gr):
     subscribe.form['email'] = 'hans@example.org'
     subscribe.form.submit()
 
+    message = client.get_email(0, flush_queue=True)
+    anom.get(get_email_link(message, 'optin'))
+
+    anom = Client(election_day_app_gr)
+    anom.get('/locale/de_CH').follow()
+    subscribe = anom.get('/subscribe-email')
+    subscribe.form['email'] = 'peter@example.org'
+    subscribe.form.submit()
+    client.get_email(0, flush_queue=True)
+
     trigger = client.get('/election/majorz-election/trigger')
     trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
-    message = client.get_email(-1)
+    message = client.get_email(0, flush_queue=True)
     assert message['To'] == 'hans@example.org'
     assert message['Subject'] == (
         'Majorz Election - Nouveaux résultats intermédiaires'
     )
-    headers = {h['Name']: h['Value'] for h in message['Headers']}
-    unsubscribe = headers['List-Unsubscribe'].strip('<>')
-
     message = message['HtmlBody']
-    assert "http://localhost/unsubscribe-email" in message
     assert "Majorz Election - Nouveaux résultats intermédiaires" in message
-    assert unsubscribe in message
-
-    assert 'hans@example.org' in client.get('/manage/subscribers/email')
-    assert 'hans@example.org' in anom.get(unsubscribe)
-    anom.post(unsubscribe)
-    assert 'hans@example.org' not in client.get('/manage/subscribers/email')
 
 
 def test_view_notifications_summarized(election_day_app_zg):
@@ -209,19 +211,33 @@ def test_view_notifications_summarized(election_day_app_zg):
     assert len(os.listdir(client.app.maildir)) == 0
     assert not os.path.exists(sms_path)
 
-    # Add subscriber
+    # Add subscriber (2 active, 2 inactive)
     anom = Client(election_day_app_zg)
     anom.get('/locale/fr_CH').follow()
     subscribe = anom.get('/subscribe-email')
     subscribe.form['email'] = 'hans@example.org'
     subscribe.form.submit()
-    assert len(os.listdir(client.app.maildir)) == 1
-    client.flush_email_queue()
+    message = client.get_email(0, flush_queue=True)
+    anom.get(get_email_link(message, 'optin'))
+
+    anom = Client(election_day_app_zg)
+    anom.get('/locale/de_CH').follow()
+    subscribe = anom.get('/subscribe-email')
+    subscribe.form['email'] = 'peter@example.org'
+    subscribe.form.submit()
+    client.get_email(0, flush_queue=True)
 
     subscribe = anom.get('/subscribe-sms')
     subscribe.form['phone_number'] = '+41792223344'
     subscribe.form.submit()
     assert len(os.listdir(sms_path)) == 1
+    client.get('/manage/subscribers/sms').click('Deaktivieren').form.submit()
+
+    anom.get('/locale/fr_CH').follow()
+    subscribe = anom.get('/subscribe-sms')
+    subscribe.form['phone_number'] = '+41792223355'
+    subscribe.form.submit()
+    assert len(os.listdir(sms_path)) == 2
 
     # Trigger all notification
     manage = client.get('/trigger-notifications')
@@ -236,19 +252,13 @@ def test_view_notifications_summarized(election_day_app_zg):
     message = client.get_email(0, flush_queue=True)
     assert message['To'] == 'hans@example.org'
     assert message['Subject'] == 'Les nouveaux résultats sont disponibles'
-    headers = {h['Name']: h['Value'] for h in message['Headers']}
-    unsubscribe = headers['List-Unsubscribe'].strip('<>')
 
     message = message['HtmlBody']
     assert "http://localhost/unsubscribe-email" in message
     assert "<h1>Regierungsratswahl</h1>" in message
     assert "<h1>Unternehmenssteuerreformgesetz</h1>" in message
 
-    assert 'hans@example.org' in client.get('/manage/subscribers/email')
-    anom.post(unsubscribe)
-    assert 'hans@example.org' not in client.get('/manage/subscribers/email')
-
-    assert len(os.listdir(sms_path)) == 2
+    assert len(os.listdir(sms_path)) == 3
     contents = []
     for sms in os.listdir(sms_path):
         with open(os.path.join(sms_path, sms)) as file:

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-04 10:51+0100\n"
+"POT-Creation-Date: 2022-02-05 17:20+0100\n"
 "PO-Revision-Date: 2022-01-22 07:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -24,8 +24,11 @@ msgstr "Novs resultats disponibels"
 msgid "New results are available on ${url}"
 msgstr "Novs resultats disponibels sin ${url}"
 
-msgid "Successfully subscribed to the email service"
-msgstr "Abunà las communicaziuns per e-mail"
+msgid "Please confirm your email"
+msgstr ""
+
+msgid "Please confirm your unsubscription"
+msgstr ""
 
 msgid ""
 "Successfully subscribed to the SMS service. You will receive a SMS every "
@@ -487,8 +490,14 @@ msgid "Phone number"
 msgstr "Numer da telefon"
 
 msgid ""
-"Deletes the given subscribers. The same format is used as for export "
-"(without locale)."
+"Deactivates or deletes the given subscribers. The same format is used as for "
+"export (only address column)."
+msgstr ""
+
+msgid "Delete"
+msgstr "Stizzar"
+
+msgid "Deactivate"
 msgstr ""
 
 msgid "File"
@@ -810,9 +819,6 @@ msgstr ""
 msgid "Upload party results"
 msgstr "Chargiar si ils resultats da las partidas"
 
-msgid "Delete"
-msgstr "Stizzar"
-
 msgid "Yeas"
 msgstr "Vuschs affirmativas"
 
@@ -1072,6 +1078,33 @@ msgstr ""
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
 
+msgid ""
+"Please confirm your email address to receive email notifications. Click on "
+"the link below."
+msgstr ""
+
+msgid "Confirm email"
+msgstr ""
+
+msgid ""
+"You can ignore this email if you have not signed up for the email "
+"notifications."
+msgstr ""
+
+msgid "Unsubscribe"
+msgstr "Deconnectar"
+
+msgid "Please confirm your unsubscription. Click on the link below."
+msgstr ""
+
+msgid "Confirm unsubscription"
+msgstr ""
+
+msgid ""
+"You can ignore this email if you have not unsubscribed from the email "
+"notifications."
+msgstr ""
+
 msgid "Dear Sir or Madam,"
 msgstr "Stimadas dunnas e stimads signurs,"
 
@@ -1082,16 +1115,6 @@ msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Vus pudais ignorar quest e-mail, sche Vus na vulessas betg midar Voss pled-"
 "clav."
-
-msgid "Unsubscribe"
-msgstr "Deconnectar"
-
-msgid ""
-"Successfully subscribed to the email service. You will receive an email "
-"every time new results are published."
-msgstr ""
-"Las communicaziuns per e-mail èn vegnidas abunadas. A partir d'ussa "
-"survegnis Vus in e-mail, uschespert che novs resultats èn vegnids publitgads."
 
 msgid "New mapping"
 msgstr "Nova attribuziun"
@@ -1135,11 +1158,26 @@ msgstr ""
 msgid "No screens yet."
 msgstr ""
 
+msgid "Cleanup"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "Active only"
+msgstr ""
+
 msgid "No subscribers yet."
 msgstr "Anc nagins abunents."
 
 msgid "Locale"
 msgstr "Regiun linguistica"
+
+msgid "Active"
+msgstr ""
+
+msgid "Activate"
+msgstr ""
 
 msgid "Last notifications:"
 msgstr ""
@@ -1383,10 +1421,10 @@ msgid "Delete screen"
 msgstr ""
 
 #, python-format
-msgid "${count} subscribers deleted."
+msgid "${count} subscribers cleaned up."
 msgstr ""
 
-msgid "Delete subscribers"
+msgid "Clean up subscribers"
 msgstr ""
 
 msgid "Subscriber deleted."
@@ -1394,6 +1432,26 @@ msgstr "Stizzà l'abunent(a)."
 
 msgid "Delete subscriber"
 msgstr "Stizzar l'abunent(a)"
+
+msgid "Subscriber activated."
+msgstr ""
+
+#, python-format
+msgid "Do you really want to activate \"${item}\"?"
+msgstr ""
+
+msgid "Activate subscriber"
+msgstr ""
+
+msgid "Subscriber deactivated."
+msgstr ""
+
+#, python-format
+msgid "Do you really want to deactivate \"${item}\"?"
+msgstr ""
+
+msgid "Deactivate subscriber"
+msgstr ""
 
 msgid "Upload token created."
 msgstr "Creà il token."
@@ -1473,6 +1531,25 @@ msgid ""
 msgstr ""
 "Vus survegnis in e-mail, uschespert che novs resultats èn vegnids "
 "publitgads. Vus pudais terminar da tut temp il servetsch dad e-mail."
+
+msgid "You will shortly receive an email to confirm your email."
+msgstr ""
+
+msgid "Subscription failed, the link is invalid."
+msgstr ""
+
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+"Las communicaziuns per e-mail èn vegnidas abunadas. A partir d'ussa "
+"survegnis Vus in e-mail, uschespert che novs resultats èn vegnids publitgads."
+
+msgid "You will shortly receive an email to confirm your unsubscription."
+msgstr ""
+
+msgid "Unsubscription failed, the link is invalid."
+msgstr ""
 
 msgid ""
 "Successfully unsubscribed from the email services. You will no longer "

@@ -7,135 +7,230 @@ from unittest.mock import Mock
 
 
 def test_subscriber_collection(session):
-    request = DummyRequest(locale='de_CH')
-
-    # Add
+    # add generic
     collection = SubscriberCollection(session)
-    collection.subscribe('endpoint', request, confirm=False)
+    collection.add('endpoint', 'de_CH', True)
     subscriber = collection.query().one()
     assert subscriber.address == 'endpoint'
     assert subscriber.locale == 'de_CH'
     assert collection.by_id(subscriber.id) == subscriber
+    assert collection.by_address('endpoint') == subscriber
 
-    # Re-add
-    collection.subscribe('endpoint', request, confirm=False)
+    # add email
+    collection = EmailSubscriberCollection(session)
+    collection.add('a@example.org', 'fr_CH', True)
     subscriber = collection.query().one()
-    assert subscriber.address == 'endpoint'
-    assert subscriber.locale == 'de_CH'
+    assert subscriber.address == 'a@example.org'
+    assert subscriber.locale == 'fr_CH'
+    assert collection.by_id(subscriber.id) == subscriber
+    assert collection.by_address('a@example.org') == subscriber
 
-    # Update locale
-    collection.subscribe('endpoint', DummyRequest(locale='en'), confirm=False)
+    # add sms
+    collection = SmsSubscriberCollection(session)
+    collection.add('+41791112233', 'it_CH', True)
     subscriber = collection.query().one()
-    assert subscriber.address == 'endpoint'
-    assert subscriber.locale == 'en'
-
-    # Add email
-    email_collection = EmailSubscriberCollection(session)
-    email_collection.subscribe('user@example.org', request, confirm=False)
-    subscriber = email_collection.query().one()
-    assert subscriber.address == 'user@example.org'
-    assert subscriber.locale == 'de_CH'
-
-    # Add SMS
-    sms_collection = SmsSubscriberCollection(session)
-    sms_collection.subscribe('+41791112233', request, confirm=False)
-    subscriber = sms_collection.query().one()
     assert subscriber.address == '+41791112233'
-    assert subscriber.locale == 'de_CH'
+    assert subscriber.locale == 'it_CH'
+    assert collection.by_id(subscriber.id) == subscriber
+    assert collection.by_address('+41791112233') == subscriber
 
-    # Unsubscribe
+    # active_only
+    subscriber.active = False
+    collection = SubscriberCollection(session)
+    assert collection.query().count() == 2
+    assert collection.query(active_only=False).count() == 3
+    collection = collection.for_active_only(False)
     assert collection.query().count() == 3
-    email_collection.unsubscribe('+41791112233')
-    email_collection.unsubscribe('endpoint')
-    sms_collection.unsubscribe('user@example.org')
-    sms_collection.unsubscribe('endpoint')
-    assert collection.query().count() == 3
-
-    sms_collection.unsubscribe('+41791112233')
-    email_collection.unsubscribe('user@example.org')
-    assert collection.query().count() == 1
-
-    email_collection.subscribe('user@example.org', request, confirm=False)
-    sms_collection.subscribe('+41791112233', request, confirm=False)
-    assert collection.query().count() == 3
-    collection.unsubscribe('+41791112233')
-    collection.unsubscribe('user@example.org')
-    collection.unsubscribe('endpoint')
-    assert collection.query().count() == 0
+    assert collection.query(active_only=False).count() == 3
 
 
-def test_subscriber_collection_confirm_email(election_day_app_zg, session):
+def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
     mock = Mock()
-    election_day_app_zg.send_email = mock
+    election_day_app_zg.send_marketing_email = mock
     request = DummyRequest(
         app=election_day_app_zg, session=session, locale='de_CH'
     )
-    collection = EmailSubscriberCollection(session)
+    collection = EmailSubscriberCollection(session, active_only=False)
 
-    collection.subscribe('howard@example.org', request)
+    # Unsubscribe but not yet subscribed
+    collection.initiate_unsubscription('howard@example.org', request)
+    assert mock.call_count == 0
+    assert collection.query().count() == 0
+
+    # Initiate
+    collection.initiate_subscription('howard@example.org', request)
     assert mock.call_count == 1
-    assert mock.call_args[1]['receivers'] == ('howard@example.org',)
-    assert mock.call_args[1]['subject'] == 'E-Mail-Benachrichtigung abonniert'
-    assert mock.call_args[1]['headers']['List-Unsubscribe-Post'] == (
+    assert mock.call_args[-1]['receivers'] == ('howard@example.org',)
+    assert mock.call_args[-1]['subject'] == (
+        'Bitte bestätigen Sie Ihre E-Mail-Adresse'
+    )
+    assert mock.call_args[-1]['headers']['List-Unsubscribe-Post'] == (
         'List-Unsubscribe=One-Click'
     )
-    assert mock.call_args[1]['headers']['List-Unsubscribe'] == (
-        "<Principal/unsubscribe-email?"
+    assert mock.call_args[-1]['headers']['List-Unsubscribe'] == (
+        "<Principal/optout-email?"
+        "opaque={'address': 'howard@example.org', 'locale': 'de_CH'}>"
+    )
+    assert (
+        "Principal/optout-email?"
+        "opaque={'address': 'howard@example.org', 'locale': 'de_CH'}"
+    ) in mock.call_args[-1]['content']
+    assert (
+        "Principal/optin-email?"
+        "opaque={'address': 'howard@example.org', 'locale': 'de_CH'}"
+    ) in mock.call_args[-1]['content']
+    subscriber = collection.query().one()
+    assert subscriber.active is False
+    assert subscriber.locale == 'de_CH'
+    assert subscriber.address == 'howard@example.org'
+
+    # Initiate again to send the email again
+    collection.initiate_subscription('howard@example.org', request)
+    assert mock.call_count == 2
+    assert collection.query().one().active is False
+
+    # Unsubscribe, but not yet confirmed
+    collection.initiate_unsubscription('howard@example.org', request)
+    assert mock.call_count == 3
+    assert mock.call_args[-1]['receivers'] == ('howard@example.org',)
+    assert mock.call_args[-1]['subject'] == (
+        'Bitte bestätigen Sie Ihre Abmeldung'
+    )
+    assert mock.call_args[-1]['headers']['List-Unsubscribe-Post'] == (
+        'List-Unsubscribe=One-Click'
+    )
+    assert mock.call_args[-1]['headers']['List-Unsubscribe'] == (
+        "<Principal/optout-email?"
         "opaque={'address': 'howard@example.org'}>"
     )
+    assert (
+        "Principal/optout-email?"
+        "opaque={'address': 'howard@example.org'}"
+    ) in mock.call_args[-1]['content']
+    assert collection.query().one().active is False
 
-    collection.subscribe('howard@example.org', request)
-    assert mock.call_count == 1
+    # Confirm
+    assert collection.confirm_subscription('howard@example.org', 'de_CH')
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.locale == 'de_CH'
+    assert subscriber.address == 'howard@example.org'
 
-    collection.unsubscribe('howard@example.org')
-    collection.subscribe('howard@example.org', request)
-    assert mock.call_count == 2
+    # Confirm again
+    assert collection.confirm_subscription('howard@example.org', 'de_CH')
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.locale == 'de_CH'
+    assert subscriber.address == 'howard@example.org'
+
+    # Confirm with wrong email
+    assert not collection.confirm_subscription('h0wrad@examp1e.org', 'de_CH')
+
+    # Initiate again with different locale, but already confirmed
+    request.locale = 'fr_CH'
+    collection.initiate_subscription('howard@example.org', request)
+    assert mock.call_count == 4
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.locale == 'de_CH'
+    assert subscriber.address == 'howard@example.org'
+
+    # Confirm to change locale
+    assert collection.confirm_subscription('howard@example.org', 'fr_CH')
+    subscriber = collection.query().one()
+    assert subscriber.active is True
+    assert subscriber.locale == 'fr_CH'
+    assert subscriber.address == 'howard@example.org'
+
+    # Unsubscribe
+    collection.initiate_unsubscription('howard@example.org', request)
+    assert mock.call_count == 5
+    assert collection.query().one().active is True
+
+    # Unusbscribe again
+    collection.initiate_unsubscription('howard@example.org', request)
+    assert mock.call_count == 6
+    assert collection.query().one().active is True
+
+    # Cofirm unsubscription
+    assert collection.confirm_unsubscription('howard@example.org')
+    assert collection.query().one().active is False
+
+    # Cofirm unsubscription again
+    assert collection.confirm_unsubscription('howard@example.org')
+    assert collection.query().one().active is False
+
+    # Cofirm unsubscription with wrong email
+    assert not collection.confirm_unsubscription('h0wrad@examp1e.org')
+    assert collection.query().one().active is False
+
+    # Confirm email again to reactivate
+    assert collection.confirm_subscription('howard@example.org', 'de_CH')
+    assert collection.query().one().active is True
 
 
-def test_subscriber_collection_confirm_sms(election_day_app_zg, session):
+def test_subscriber_collection_subscribe_sms(election_day_app_zg, session):
     mock = Mock()
     election_day_app_zg.send_sms = mock
     request = DummyRequest(
         app=election_day_app_zg, session=session, locale='de_CH'
     )
-    collection = SmsSubscriberCollection(session)
+    collection = SmsSubscriberCollection(session, active_only=False)
 
-    collection.subscribe('+41791112233', request)
+    # Unsubscribe but not existing
+    collection.initiate_unsubscription('+41791112233', request)
+    assert collection.query().count() == 0
+
+    # Subscribe
+    collection.initiate_subscription('+41791112233', request)
     assert mock.call_count == 1
     assert mock.call_args[0][0] == '+41791112233'
     assert mock.call_args[0][1] == (
         "Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft "
         "eine SMS, sobald neue Resultate publiziert wurden."
     )
+    subscriber = collection.query().one()
+    assert subscriber.address == '+41791112233'
+    assert subscriber.locale == 'de_CH'
+    assert subscriber.active is True
 
-    collection.subscribe('+41791112233', request)
-    assert mock.call_count == 1
-
-    collection.unsubscribe('+41791112233')
-    collection.subscribe('+41791112233', request)
+    # Subscribe again with different locale
+    request.locale = 'fr_CH'
+    collection.initiate_subscription('+41791112233', request)
     assert mock.call_count == 2
+    subscriber = collection.query().one()
+    assert subscriber.address == '+41791112233'
+    assert subscriber.locale == 'fr_CH'
+    assert subscriber.active is True
+
+    # Unsubscribe
+    collection.initiate_unsubscription('+41791112233', request)
+    assert collection.query().one().active is False
+
+    # Subscribe again
+    collection.initiate_subscription('+41791112233', request)
+    assert mock.call_count == 3
+    assert collection.query().one().active is True
 
 
 def test_subscriber_collection_pagination(session):
-    request = DummyRequest(locale='de_CH')
-
     # Add email subscribers
     collection = EmailSubscriberCollection(session)
     for number in range(100):
-        collection.subscribe(
+        collection.add(
             'user{:02}@example.org'.format(number),
-            request,
-            confirm=False
+            'de_CH',
+            True
         )
     assert collection.query().count() == 100
 
     # Add SMS subscribers
     collection = SmsSubscriberCollection(session)
     for number in range(100):
-        collection.subscribe(
+        collection.add(
             '+417911122{:02}'.format(number),
-            request,
-            confirm=False
+            'de_CH',
+            True
         )
     assert collection.query().count() == 100
 
@@ -184,25 +279,23 @@ def test_subscriber_collection_pagination(session):
 
 
 def test_subscriber_collection_term(session):
-    request = DummyRequest(locale='de_CH')
-
     # Add email subscribers
     collection = EmailSubscriberCollection(session)
     for number in range(100):
-        collection.subscribe(
+        collection.add(
             'user{:02}@example.org'.format(number),
-            request,
-            confirm=False
+            'de_CH',
+            active=True
         )
     assert collection.query().count() == 100
 
     # Add SMS subscribers
     collection = SmsSubscriberCollection(session)
     for number in range(100):
-        collection.subscribe(
+        collection.add(
             '+417911122{:02}'.format(number),
-            request,
-            confirm=False
+            'de_CH',
+            active=True
         )
     assert collection.query().count() == 100
 
@@ -276,115 +369,142 @@ def test_subscriber_collection_term(session):
 
 
 def test_subscriber_collection_export(session):
-    request_de = DummyRequest(locale='de_CH')
-    request_fr = DummyRequest(locale='fr_CH')
-
     # Add email subscribers
-    collection = EmailSubscriberCollection(session)
-    collection.subscribe('a@example.org', request_de, confirm=False)
-    collection.subscribe('b@example.org', request_de, confirm=False)
-    collection.subscribe('c@example.org', request_fr, confirm=False)
+    emails = EmailSubscriberCollection(session, active_only=False)
+    emails.add('a@example.org', 'de_CH', True)
+    emails.add('b@example.org', 'de_CH', False)
+    emails.add('c@example.org', 'fr_CH', True)
 
     # Add SMS subscribers
-    collection = SmsSubscriberCollection(session)
-    collection.subscribe('+41791112201', request_de, confirm=False)
-    collection.subscribe('+41791112202', request_fr, confirm=False)
-    collection.subscribe('+41791112203', request_fr, confirm=False)
+    sms = SmsSubscriberCollection(session, active_only=False)
+    sms.add('+41791112201', 'de_CH', True)
+    sms.add('+41791112202', 'fr_CH', False)
+    sms.add('+41791112203', 'fr_CH', True)
 
-    assert SubscriberCollection(session).query().count() == 6
+    mixed = SubscriberCollection(session, active_only=False)
+    assert mixed.query().count() == 6
 
     # Test email export
-    data = EmailSubscriberCollection(session).export()
+    data = emails.export()
     assert sorted(data, key=lambda x: x['address']) == [
-        {'address': 'a@example.org', 'locale': 'de_CH'},
-        {'address': 'b@example.org', 'locale': 'de_CH'},
-        {'address': 'c@example.org', 'locale': 'fr_CH'},
+        {'active': True, 'address': 'a@example.org', 'locale': 'de_CH'},
+        {'active': False, 'address': 'b@example.org', 'locale': 'de_CH'},
+        {'active': True, 'address': 'c@example.org', 'locale': 'fr_CH'},
     ]
 
     # Test SMS export
-    data = SmsSubscriberCollection(session).export()
+    data = sms.export()
     assert sorted(data, key=lambda x: x['address']) == [
-        {'address': '+41791112201', 'locale': 'de_CH'},
-        {'address': '+41791112202', 'locale': 'fr_CH'},
-        {'address': '+41791112203', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112201', 'locale': 'de_CH'},
+        {'active': False, 'address': '+41791112202', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112203', 'locale': 'fr_CH'},
     ]
 
     # Test mixed export
-    data = SubscriberCollection(session).export()
+    data = mixed.export()
     assert sorted(data, key=lambda x: x['address']) == [
-        {'address': '+41791112201', 'locale': 'de_CH'},
-        {'address': '+41791112202', 'locale': 'fr_CH'},
-        {'address': '+41791112203', 'locale': 'fr_CH'},
-        {'address': 'a@example.org', 'locale': 'de_CH'},
-        {'address': 'b@example.org', 'locale': 'de_CH'},
-        {'address': 'c@example.org', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112201', 'locale': 'de_CH'},
+        {'active': False, 'address': '+41791112202', 'locale': 'fr_CH'},
+        {'active': True, 'address': '+41791112203', 'locale': 'fr_CH'},
+        {'active': True, 'address': 'a@example.org', 'locale': 'de_CH'},
+        {'active': False, 'address': 'b@example.org', 'locale': 'de_CH'},
+        {'active': True, 'address': 'c@example.org', 'locale': 'fr_CH'},
     ]
 
 
-def test_subscriber_collection_delete(session):
-    request_de = DummyRequest(locale='de_CH')
-    request_fr = DummyRequest(locale='fr_CH')
-
+def test_subscriber_collection_cleanup(session):
     # Add email subscribers
     collection = EmailSubscriberCollection(session)
-    collection.subscribe('a@example.org', request_de, confirm=False)
-    collection.subscribe('b@EXAMPLE.org', request_de, confirm=False)
-    collection.subscribe('c@example.org', request_fr, confirm=False)
-    collection.subscribe('d@example.org', request_de, confirm=False)
+    collection.add('a@example.org', 'de_CH', True)
+    collection.add('b@EXAMPLE.org', 'de_CH', True)
+    collection.add('c@example.org', 'fr_CH', True)
+    collection.add('d@example.org', 'de_CH', True)
 
     # Add SMS subscribers
     collection = SmsSubscriberCollection(session)
-    collection.subscribe('+41791112201', request_de, confirm=False)
-    collection.subscribe('+41791112202', request_fr, confirm=False)
-    collection.subscribe('+41791112203', request_fr, confirm=False)
+    collection.add('+41791112201', 'de_CH', True)
+    collection.add('+41791112202', 'fr_CH', True)
+    collection.add('+41791112203', 'fr_CH', True)
 
     assert SubscriberCollection(session).query().count() == 7
 
-    # Test delete email subscribers
+    # Test deactivate email subscribers
     collection = EmailSubscriberCollection(session)
 
-    errors, count = collection.delete(
+    errors, count = collection.cleanup(
         BytesIO(''.encode('utf-8')),
-        'text/plain'
+        'text/plain',
+        delete=False
     )
     assert errors
 
-    errors, count = collection.delete(
-        BytesIO((
-            'address,\n'
-            'a@EXAMPLE.org,\n'
-            'b@example.org,\n'
-            'c@example.org,\n'
-            'e@example.org,\n'
-            '123,\n'
-            ',\n'
-        ).encode('utf-8')),
-        'text/plain'
+    csv = (
+        'address,\n'
+        'a@EXAMPLE.org,\n'
+        'b@example.org,\n'
+        'c@example.org,\n'
+        'e@example.org,\n'
+        '123,\n'
+        ',\n'
+    )
+
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=False
     )
     assert not errors
     assert count == 3
     assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 4
 
-    # Test delete SMS subscribers
+    # Test delete email subscribers
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=True
+    )
+    assert not errors
+    assert count == 3
+    assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 1
+
+    # Test deactivate SMS subscribers
     collection = SmsSubscriberCollection(session)
 
-    errors, count = collection.delete(
+    errors, count = collection.cleanup(
         BytesIO(''.encode('utf-8')),
-        'text/plain'
+        'text/plain',
+        delete=False
     )
     assert errors
 
-    errors, count = collection.delete(
-        BytesIO((
-            'address,\n'
-            '+41791112201,\n'
-            '+41791112203,\n'
-            '+41791112220,\n'
-            '123,\n'
-            ',\n'
-        ).encode('utf-8')),
-        'text/plain'
+    csv = (
+        'address,\n'
+        '+41791112201,\n'
+        '+41791112203,\n'
+        '+41791112220,\n'
+        '123,\n'
+        ',\n'
+    )
+
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=False
     )
     assert not errors
     assert count == 2
     assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 3
+
+    # Test delete SMS subscribers
+    errors, count = collection.cleanup(
+        BytesIO(csv.encode('utf-8')),
+        'text/plain',
+        delete=True
+    )
+    assert not errors
+    assert count == 2
+    assert collection.query().count() == 1
+    assert collection.query(active_only=False).count() == 1

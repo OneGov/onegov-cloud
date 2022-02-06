@@ -148,7 +148,10 @@ class EmailNotification(Notification):
         def email_iter():
             for locale in request.app.locales:
                 addresses = request.session.query(EmailSubscriber.address)
-                addresses = addresses.filter(EmailSubscriber.locale == locale)
+                addresses = addresses.filter(
+                    EmailSubscriber.active.is_(True),
+                    EmailSubscriber.locale == locale
+                )
                 addresses = addresses.all()
                 addresses = [address[0] for address in addresses]
                 if not addresses:
@@ -223,12 +226,15 @@ class SmsNotification(Notification):
     def send_sms(self, request, content):
         """ Sends the given text to all subscribers. """
 
-        subscribers = request.session.query(
+        query = request.session.query(
             SmsSubscriber.locale,
             func.array_agg(SmsSubscriber.address),
-        ).group_by(SmsSubscriber.locale).order_by(SmsSubscriber.locale)
+        )
+        query = query.filter(SmsSubscriber.active.is_(True))
+        query = query.group_by(SmsSubscriber.locale)
+        query = query.order_by(SmsSubscriber.locale)
 
-        for locale, addresses in subscribers:
+        for locale, addresses in query:
             translator = request.app.translations.get(locale)
             translated = translator.gettext(content) if translator else content
             translated = content.interpolate(translated)
