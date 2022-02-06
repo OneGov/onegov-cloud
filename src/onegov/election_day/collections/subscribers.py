@@ -44,6 +44,16 @@ class SubscriberCollection(SubscriberCollectionPagination):
     def model_class(self):
         return Subscriber
 
+    def add(self, address, locale, active):
+        subscriber = self.model_class(
+            address=address,
+            locale=locale,
+            active=active
+        )
+        self.session.add(subscriber)
+        self.session.flush()
+        return subscriber
+
     def query(self, active_only=None):
         query = self.session.query(self.model_class)
 
@@ -82,13 +92,7 @@ class SubscriberCollection(SubscriberCollectionPagination):
 
         subscriber = self.by_address(address)
         if not subscriber:
-            subscriber = self.model_class(
-                address=address,
-                locale=request.locale,
-                active=False
-            )
-            self.session.add(subscriber)
-            self.session.flush()
+            subscriber = self.add(address, request.locale, False)
 
         self.handle_subscription(subscriber, request)
 
@@ -268,8 +272,8 @@ class SmsSubscriberCollection(SubscriberCollection):
 
         """
 
-        subscriber.locale = request.locale
-        if not subscriber.active:
+        if not subscriber.active or subscriber.locale != request.locale:
+            subscriber.locale = request.locale
             subscriber.active = True
             content = _(
                 "Successfully subscribed to the SMS service. You will"
