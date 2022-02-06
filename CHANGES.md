@@ -1,8 +1,40 @@
 # Changes
 
+## 2022.11
+
+`2022-02-06` | [e68aed973c...2c6e8ddc88](https://github.com/OneGov/onegov-cloud/compare/e68aed973c^...2c6e8ddc88)
+
+### Core
+
+##### Add batch sending of emails.
+
+Replace old SMTP mailer with Postmark API.
+
+`Feature` | [OGC-153](https://linear.app/onegovcloud/issue/OGC-153) | [e68aed973c](https://github.com/onegov/onegov-cloud/commit/e68aed973c50374a97591a5096a454d7c2c6ce9a)
+
+### Election Day
+
+##### Allow to bulk deletion of subscribers.
+
+`Feature` | [OGC-147](https://linear.app/onegovcloud/issue/OGC-147) | [ee40c2bb36](https://github.com/onegov/onegov-cloud/commit/ee40c2bb36167e8a403886884895f8427c478324)
+
+##### Add double opt-in and out to email subscriptions.
+
+`Feature` | [OGC-147](https://linear.app/onegovcloud/issue/OGC-147) | [2c6e8ddc88](https://github.com/onegov/onegov-cloud/commit/2c6e8ddc8880ad8c16f877bb837a633802916b7c)
+
+##### Fixes party result calculation for missing voters counts.
+
+`Bugfix` | [07cd12c9d1](https://github.com/onegov/onegov-cloud/commit/07cd12c9d12dabcf2a554169e8e2a7359853ae66)
+
+### Server
+
+##### Fixes race condition in debug server.
+
+`Bugfix` | [022d4e358f](https://github.com/onegov/onegov-cloud/commit/022d4e358f09fda012cbfe4d84b0eb1e3629651e)
+
 ## 2022.10
 
-`2022-02-03` | [ba55b1b9d8...69c649da2c](https://github.com/OneGov/onegov-cloud/compare/ba55b1b9d8^...69c649da2c)
+`2022-02-03` | [ba55b1b9d8...b4b4d08647](https://github.com/OneGov/onegov-cloud/compare/ba55b1b9d8^...b4b4d08647)
 
 ### Election Day
 
@@ -1229,64 +1261,4 @@ to assign a ticket to another user.
 ##### Adds ellipsis to typeahead.
 
 `Feature` | [STAKABS-29](https://kt-bs.atlassian.net/browse/STAKABS-29) | [42eacf219d](https://github.com/onegov/onegov-cloud/commit/42eacf219df3740d0ac0b6829c0edbe0c86878c7)
-
-## 2021.62
-
-`2021-06-30` | [b0e5d8eb3d...97989eb6fb](https://github.com/OneGov/onegov-cloud/compare/b0e5d8eb3d^...97989eb6fb)
-
-### Agency
-
-##### Show function in organisations overview.
-
-`Feature` | [STAKABS-28](https://kt-bs.atlassian.net/browse/STAKABS-28) | [f95e9cef90](https://github.com/onegov/onegov-cloud/commit/f95e9cef9069c6952129c0d4f0ea371fbde48f68)
-
-### Election Day
-
-##### Fix embedded vote views and make them more robust.
-
-`Bugfix` | [df405aa72f](https://github.com/onegov/onegov-cloud/commit/df405aa72f65d24ec506e5a7f23e3f65c4de429e)
-
-### Event
-
-##### Fix virtual occurence being None if event is still far from today.
-
-`Bugfix` | [1506e8e05f](https://github.com/onegov/onegov-cloud/commit/1506e8e05f597e1345d794b12feba4ea8627d1b9)
-
-### Feriennet
-
-##### Fixes empty transaction tid's from xml matching paid transactions without tid
-
-`Bugfix` | [23b6f0991d](https://github.com/onegov/onegov-cloud/commit/23b6f0991d26a883b4032157d05ada58a5bedf1c)
-
-### Org
-
-##### Adds export views for payments (and tickets)
-
-`Feature` | [SEA-428](https://linear.app/seantis/issue/SEA-428) | [b78b88a419](https://github.com/onegov/onegov-cloud/commit/b78b88a41949ed4a4b63ed2a758302fd1e2445b9)
-
-##### Adds export view for payments
-
-Exports manual and stripe payments with ticket information.
-
-`Feature` | [SEA-428](https://linear.app/seantis/issue/SEA-428) | [fd0ebcef42](https://github.com/onegov/onegov-cloud/commit/fd0ebcef42e3f01bfc08ed418d6a38b402652c7e)
-
-##### Adds ticket deletion feature (incl. town6)
-
-- Only applies for decided and closed tickets
-- Delete Button on a single ticket
-- Batch Deletion on the tickets table with confirmation modal
-- Adds modal macro to town6
-
-`Feature` | [SEA-378](https://linear.app/seantis/issue/SEA-378) | [08007f1b8a](https://github.com/onegov/onegov-cloud/commit/08007f1b8a91ba94adb1cf78c4d6298f28d0868c)
-
-##### Adds ticket message when changing payment amount
-
-`Feature` | [26d0343e53](https://github.com/onegov/onegov-cloud/commit/26d0343e53de45da11a470d2db2d04dde52211d1)
-
-##### Improves external links integration
-
-- Adds Access section to external link forms
-- Adds delete button to edit view
-
-`Other` | [5f5f454c11](https://github.com/onegov/onegov-cloud/commit/5f5f454c11541405273df15b84e20451ec654824)
 
