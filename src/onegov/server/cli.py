@@ -434,10 +434,11 @@ class WsgiServer(FileSystemEventHandler):
         }, **self.kwargs)
 
     def join(self, timeout=None):
-        try:
-            self.process.join(timeout)
-        except AssertionError:
-            pass
+        if self.process.is_alive():
+            try:
+                self.process.join(timeout)
+            except AssertionError:
+                pass
 
     def start(self):
         self.process = self.spawn()
@@ -451,6 +452,7 @@ class WsgiServer(FileSystemEventHandler):
         self.process.terminate()
         if block:
             self.join()
+        return self.process.exitcode is not None
 
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """
