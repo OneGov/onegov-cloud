@@ -436,8 +436,9 @@ class WsgiServer(FileSystemEventHandler):
     def join(self, timeout=None):
         try:
             self.process.join(timeout)
-        except AssertionError:
-            # ignore if not yet started or already finished
+        except Exception:
+            # ignore errors such as not yet started, process already finished
+            # or already closed process objects - it's used for debug anyway
             pass
 
     def start(self):
