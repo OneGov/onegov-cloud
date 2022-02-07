@@ -26,7 +26,7 @@ def get_global_tools(request):
 
     # Authentication / Userprofile
     if request.is_logged_in:
-        yield LinkGroup(request.current_username, classes=('user', ), links=(
+        yield LinkGroup(_("Account"), classes=('user', ), links=(
             Link(
                 _("User Profile"), request.link(
                     request.app.org, name='userprofile'
