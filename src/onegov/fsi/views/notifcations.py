@@ -32,30 +32,34 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
 
         mail_layout = MailLayout(self, request)
 
-        for att_id in recipients:
-            if handle_attendees:
-                attendee = att_id
-            else:
-                attendee = request.session.query(
-                    CourseAttendee).filter_by(id=att_id).one()
+        def email_iter():
+            for att_id in recipients:
+                if handle_attendees:
+                    attendee = att_id
+                else:
+                    attendee = request.session.query(
+                        CourseAttendee).filter_by(id=att_id).one()
 
-            content = render_template('mail_notification.pt', request, {
-                'layout': mail_layout,
-                'title': self.subject,
-                'notification': self.text_html,
-                'attendee': attendee
-            })
-            plaintext = html_to_text(content)
+                content = render_template('mail_notification.pt', request, {
+                    'layout': mail_layout,
+                    'title': self.subject,
+                    'notification': self.text_html,
+                    'attendee': attendee
+                })
+                plaintext = html_to_text(content)
 
-            request.app.send_transactional_email(
-                receivers=(attendee.email,),
-                subject=self.subject,
-                content=content,
-                plaintext=plaintext,
-                attachments=attachments or ()
-            )
+                yield request.app.prepare_email(
+                    receivers=(attendee.email, ),
+                    subject=self.subject,
+                    content=content,
+                    plaintext=plaintext,
+                    category='transactional',
+                    attachments=attachments or ()
+                )
 
+        request.app.send_transactional_email_batch(email_iter())
         self.last_sent = utcnow()
+
         if show_sent_count:
             request.success(_(
                 "Successfully sent the e-mail to ${count} recipients",
