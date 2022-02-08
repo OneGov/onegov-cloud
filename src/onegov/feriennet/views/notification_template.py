@@ -138,7 +138,8 @@ def delete_notification(self, request):
     permission=Secret,
     template='notification_template_send_form.pt',
     name='send',
-    form=NotificationTemplateSendForm)
+    form=NotificationTemplateSendForm
+)
 def handle_send_notification(self, request, form):
 
     period = PeriodCollection(request.session).active()
@@ -151,11 +152,6 @@ def handle_send_notification(self, request, form):
         if not recipients:
             request.alert(_("There are no recipients matching the selection"))
         else:
-            # current = request.current_username
-
-            # if current not in recipients:
-            #     recipients.add(current)
-
             subject = variables.render(self.subject)
             content = render_template('mail_notification.pt', request, {
                 'layout': DefaultMailLayout(self, request),

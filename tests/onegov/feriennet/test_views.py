@@ -1322,6 +1322,7 @@ def test_send_email(client, scenario):
     page = page.form.submit().follow()
 
     page = page.click('Versand')
+    page.form['no_spam'] = True
     assert 'selected="False"' not in page
     assert "Ferienpass 2016 subject" in page
     assert "Ferienpass 2016 body" in page
@@ -2302,6 +2303,7 @@ def test_send_email_with_attachment(client, scenario):
     assert "Test" in page
     assert "Test.txt" not in page
     page.form['roles'] = ['admin', 'editor']
+    page.form['no_spam'] = True
     page.form.submit().follow()
 
     # Plaintext version

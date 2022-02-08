@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-11 09:08+0100\n"
+"POT-Creation-Date: 2022-02-08 16:53+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -301,7 +301,7 @@ msgstr "Voce di fattura testo"
 msgid "Invoice Item Paid"
 msgstr "Voce di fattura pagata"
 
-msgid "Invoice Item Paid"
+msgid "Invoice Item Payment Date"
 msgstr "Data di pagamento"
 
 msgid "Invoice Item Transaction ID"
@@ -811,6 +811,12 @@ msgstr "Utenti attivi"
 
 msgid "Inactive users"
 msgstr "Utenti inattivi"
+
+msgid ""
+"I hereby confirm that this message is relevant to the recipients and is not "
+"spam."
+msgstr ""
+"Confermo che questo messaggio è rilevante per i destinatari e non è spam."
 
 #, python-format
 msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
