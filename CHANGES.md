@@ -1,8 +1,56 @@
 # Changes
 
+## 2022.12
+
+`2022-02-08` | [32c4931bf0...0328795335](https://github.com/OneGov/onegov-cloud/compare/32c4931bf0^...0328795335)
+
+### Agency
+
+##### Show membership function in membership instead of person function.
+
+`Bugfix` | [OGC-288](https://linear.app/onegovcloud/issue/OGC-288) | [a22c0e1a7b](https://github.com/onegov/onegov-cloud/commit/a22c0e1a7b40b77592ffe548c07b6a197b1dfc68)
+
+### Ferien
+
+##### Add checkbox to confirm that the notification is not spam.
+
+`Feature` | [PRO-995](https://linear.app/projuventute/issue/PRO-995) | [0328795335](https://github.com/onegov/onegov-cloud/commit/0328795335684e89298ee065ca1ee55d9856bbe6)
+
+### Feriennet
+
+##### Exchange sponsor banners
+
+`Other` | [OGC-989](https://linear.app/onegovcloud/issue/OGC-989) | [a401fa7bfd](https://github.com/onegov/onegov-cloud/commit/a401fa7bfdb875db813b10081699bc031b7c3e2d)
+
+##### Update Italian translations.
+
+`Other` | [PRO-983](https://linear.app/projuventute/issue/PRO-983) | [607cae50d5](https://github.com/onegov/onegov-cloud/commit/607cae50d5dbf1542e3f958d1b1cd813ca5150bb)
+
+### Fsi
+
+##### Send mails in batches.
+
+`Feature` | [OGC-289](https://linear.app/onegovcloud/issue/OGC-289) | [2baa95326a](https://github.com/onegov/onegov-cloud/commit/2baa95326a84d62c424b3f0113164da016ca2458)
+
+### Org
+
+##### Fixes hidden contact in directory-entries.
+
+`Bugfix` | [OGC-297](https://linear.app/onegovcloud/issue/OGC-297) | [32c4931bf0](https://github.com/onegov/onegov-cloud/commit/32c4931bf08e68bc519e8d5986e29d444cb23918)
+
+##### Change email-adress in top-bar to account
+
+`Other` | [PRO-926](https://linear.app/projuventute/issue/PRO-926) | [c422144454](https://github.com/onegov/onegov-cloud/commit/c422144454c532a628ecb8ec23db1f94d6157267)
+
+### Server
+
+##### Make join of debug server more tolerant.
+
+`Bugfix` | [834757a243](https://github.com/onegov/onegov-cloud/commit/834757a243f319d8cf06ad07b5ab89c5514b5835)
+
 ## 2022.11
 
-`2022-02-06` | [e68aed973c...2c6e8ddc88](https://github.com/OneGov/onegov-cloud/compare/e68aed973c^...2c6e8ddc88)
+`2022-02-06` | [e68aed973c...f01da08089](https://github.com/OneGov/onegov-cloud/compare/e68aed973c^...f01da08089)
 
 ### Core
 
@@ -1245,20 +1293,4 @@ to assign a ticket to another user.
 - applies for town6 as well
 
 `Feature` | [SEA-430](https://linear.app/seantis/issue/SEA-430) | [b08f2be09f](https://github.com/onegov/onegov-cloud/commit/b08f2be09f5c11e4d9b425245660919ad22121fc)
-
-## 2021.63
-
-`2021-07-05` | [8bc8876629...efee5c2710](https://github.com/OneGov/onegov-cloud/compare/8bc8876629^...efee5c2710)
-
-### Agency
-
-##### Show full breadcrumb navigation.
-
-`Feature` | [STAKABS-26](https://kt-bs.atlassian.net/browse/STAKABS-26) | [6094289084](https://github.com/onegov/onegov-cloud/commit/6094289084b4b9c580bb47a5cb0a2fe3c99fd639)
-
-### Org
-
-##### Adds ellipsis to typeahead.
-
-`Feature` | [STAKABS-29](https://kt-bs.atlassian.net/browse/STAKABS-29) | [42eacf219d](https://github.com/onegov/onegov-cloud/commit/42eacf219df3740d0ac0b6829c0edbe0c86878c7)
 
