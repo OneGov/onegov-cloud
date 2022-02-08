@@ -69,21 +69,20 @@ def create_new_organisation(app, name, create_files=True, path=None,
         )
     elif locale == 'it_CH':
         forms.add(
-            name='kontakt',
-            title="Kontakt",
+            name='contatto',
+            title="Contatto",
             meta={
                 'lead': (
-                    "Haben Sie Fragen oder eine Anregung? "
-                    "Rufen Sie uns einfach an oder benutzen Sie dieses "
-                    "Formular."
+                    "Avete domande o suggerimenti? "
+                    "Potete telefonarci o riempire questo formulario."
                 )
             },
             definition=textwrap.dedent("""\
-                Vorname *= ___
-                Nachname *= ___
-                Telefon *= ___
-                E-Mail *= @@@
-                Mitteilung *= ...[12]
+                Nome *= ___
+                Cognome *= ___
+                Telefono *= ___
+                E-mail *= @@@
+                Comunicazione *= ...[12]
             """),
             type='builtin'
         )
