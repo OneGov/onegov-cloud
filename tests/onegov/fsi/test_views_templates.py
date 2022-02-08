@@ -1,6 +1,6 @@
-from onegov.fsi.models.course_notification_template import InfoTemplate
+import os
 
-from tests.onegov.org.common import get_mail
+from onegov.fsi.models.course_notification_template import InfoTemplate
 
 
 def test_send_template(client_with_db):
@@ -14,11 +14,11 @@ def test_send_template(client_with_db):
     page = client.get(view)
     page = page.form.submit().follow()
     assert "an 2 Empfänger gesendet" in page
-    assert len(client.app.smtp.outbox) == 2
-    email = get_mail(client.app.smtp.outbox, 0)
+    assert len(os.listdir(client.app.maildir)) == 2
+    email = client.get_email(0)
 
-    assert email['to'] == 'admin@example.org' or 'member@example.org'
-    text = email['text']
+    assert email['To'] == 'admin@example.org' or 'member@example.org'
+    text = email['TextBody']
     assert "Bitte beachten sie die untenstehenden Informationen." in text
 
 

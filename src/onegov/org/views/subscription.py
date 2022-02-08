@@ -2,6 +2,7 @@
 
 import morepath
 
+from morepath.request import Response
 from onegov.core.security import Public
 from onegov.newsletter import NewsletterCollection, Subscription
 from onegov.org import _, OrgApp
@@ -31,6 +32,12 @@ def view_confirm(self, request):
 @OrgApp.view(model=Subscription, name='unsubscribe', permission=Public)
 def view_unsubscribe(self, request):
 
+    # RFC-8058: just return an empty response on a POST request
+    # don't check for success
+    if request.method == 'POST':
+        self.unsubscribe()
+        return Response()
+
     address = self.recipient.address
 
     if self.unsubscribe():
@@ -47,3 +54,17 @@ def view_unsubscribe(self, request):
     return morepath.redirect(
         request.link(NewsletterCollection(request.session))
     )
+
+
+# RFC-8058: respond to POST requests as well
+@OrgApp.view(
+    model=Subscription,
+    name='unsubscribe',
+    permission=Public,
+    request_method='POST'
+)
+def view_unsubscribe_rfc8058(self, request):
+    # it doesn't really make sense to check for success here
+    # since this is an automated action without verficiation
+    self.unsubscribe()
+    return Response()

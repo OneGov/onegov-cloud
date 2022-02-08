@@ -4,7 +4,9 @@
     </tal:block>
     <tal:block metal:fill-slot="body">
         <h1>${title}</h1>
-        <p i18n:translate>Successfully subscribed to the email service. You will receive an email every time new results are published.</p>
+        <p i18n:translate>Please confirm your unsubscription. Click on the link below.</p>
+        <p><a href="${optout}" i18n:translate>Confirm unsubscription</a></p>
+        <p i18n:translate>You can ignore this email if you have not unsubscribed from the email notifications.</p>
     </tal:block>
     <tal:block metal:fill-slot="footer">
         <p><a href="${optout}" i18n:translate>Unsubscribe</a></p>

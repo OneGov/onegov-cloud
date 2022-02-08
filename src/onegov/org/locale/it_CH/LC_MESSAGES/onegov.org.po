@@ -1,7 +1,7 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-01-18 11:07+0100\n"
+"POT-Creation-Date: 2022-02-01 10:13+0100\n"
 "PO-Revision-Date: 2021-09-27 13:23+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1507,6 +1507,13 @@ msgstr "Invia e-mail di attivazione con le istruzioni"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Esiste già un utente con questo indirizzo e-mail"
+
+msgid ""
+"Users can only be in one group. If they already belong to another group and "
+"get added here, they will automatically get removed from the other group."
+msgstr "Gli utenti possono essere solo in un gruppo. Se appartengono già "
+"ad un altro gruppo e vengono aggiunti qui, verranno automaticamente "
+"rimossi dall'altro gruppo. "
 
 msgid "Ticket permissions"
 msgstr "Permessi sul biglietto"

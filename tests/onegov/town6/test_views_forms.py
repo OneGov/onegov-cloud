@@ -4,7 +4,6 @@ from datetime import date
 from onegov.form import FormCollection
 from onegov.ticket import Ticket
 from onegov.user import UserCollection
-from tests.onegov.org.common import get_mail
 from tests.onegov.town6.common import step_class
 import transaction
 from freezegun import freeze_time
@@ -66,7 +65,7 @@ def test_registration_ticket_workflow(client):
     ):
         nonlocal count
         count += 1
-        with freeze_time('2018-01-01'):
+        with freeze_time(f'2018-01-01 00:00:{count:02d}'):
             page = client.get(url)
             page.form['e_mail'] = f'info{count}@example.org'
             page.form['name'] = 'Foobar'
@@ -86,20 +85,20 @@ def test_registration_ticket_workflow(client):
     assert "bestätigen" in page
     assert "ablehnen" in page
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert "Ihre Anfrage wurde unter der folgenden Referenz registriert" in msg
     assert "Foobar" in msg
 
     page = page.click("Anmeldung bestätigen").follow()
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert 'Ihre Anmeldung für "Meetup" wurde bestätigt' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
     page.click("Anmeldung stornieren").follow()
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert 'Ihre Anmeldung für "Meetup" wurde storniert' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
@@ -107,19 +106,19 @@ def test_registration_ticket_workflow(client):
     # user info2
     page = register(client, data_in_email=False)
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert "Ihre Anfrage wurde unter der folgenden Referenz registriert" in msg
     assert "Foobar" not in msg
 
     page.click("Anmeldung ablehnen")
 
-    msg = client.app.smtp.sent[-1]
+    msg = client.get_email(-1)['TextBody']
     assert 'Ihre Anmeldung für "Meetup" wurde abgelehnt' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" not in msg
 
     # create one undecided submission
-    open_registration = register(client, False, accept_ticket=False)
+    register(client, False, accept_ticket=False)
 
     # Test auto accept reservations for forms
     # views in order:
@@ -137,8 +136,8 @@ def test_registration_ticket_workflow(client):
 
     client = client.spawn()
     page = register(client, False, accept_ticket=False)
-    mail = get_mail(client.app.smtp.outbox, -1)
-    assert '_Meetup=3A_Ihre_Anmeldung_wurde_best=C3=A4tigt?=' in mail['subject']
+    email = client.get_email(-1)
+    assert 'Meetup: Ihre Anmeldung wurde bestätigt' in email['Subject']
     assert 'Ihr Anliegen wurde abgeschlossen' in page
 
     # check ownership of the ticket
@@ -175,9 +174,9 @@ def test_registration_ticket_workflow(client):
     message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
     page = message.form.submit().follow()
     assert 'Erfolgreich 4 E-Mails gesendet' in page
-    mail = get_mail(client.app.smtp.outbox, -1)
-    assert 'Message for all the attendees' in mail['html']
-    assert 'Allgemeine Nachricht' in mail['subject']
+    mail = client.get_email(-1)
+    assert 'Message for all the attendees' in mail['HtmlBody']
+    assert 'Allgemeine Nachricht' in mail['Subject']
 
     # navigate to the registration window an cancel all
     window.click('Anmeldezeitraum absagen')

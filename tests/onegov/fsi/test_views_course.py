@@ -1,5 +1,6 @@
+import os
+
 from onegov.fsi.models import Course
-from tests.onegov.org.common import get_mail
 
 
 def test_add_course_and_invite(client):
@@ -24,17 +25,17 @@ def test_add_course_and_invite(client):
     ))
     page = page.form.submit().follow()
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # member not found since the user does not have an attendee before login
     assert 'Emails sind unbekannt: test1@email.com, member@example.org' in page
 
     assert 'Email erfolgreich an 1 Empfänger gesendet' in page
 
-    message = get_mail(client.app.smtp.outbox, 0)
-    assert message['to'] == 'admin@example.org'
-    assert message['subject'] == '=?utf-8?q?Einladung_f=C3=BCr_Kursanmeldung?='
-    text = message['text']
+    message = client.get_email(0)
+    assert message['To'] == 'admin@example.org'
+    assert message['Subject'] == 'Einladung für Kursanmeldung'
+    text = message['TextBody']
     assert 'New Course' in text
     assert 'Verfügbare Kurstermine finden Sie unter' in text
 

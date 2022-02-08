@@ -444,17 +444,14 @@ class WsgiServer(FileSystemEventHandler):
         self.process = self.spawn()
         self.process.start()
 
-    def restart(self, timeout=None):
-        # make sure we wait for the server to stop, otherwise
-        # the new process might not be able to bind the same port
-        if not self.stop(block=True, timeout=timeout):
-            raise RuntimeError('Failed to stop the server')
+    def restart(self):
+        self.stop(block=True)
         self.start()
 
-    def stop(self, *, block=False, timeout=None):
+    def stop(self, block=False):
         self.process.terminate()
         if block:
-            self.join(timeout)
+            self.join()
         return self.process.exitcode is not None
 
     def on_any_event(self, event):

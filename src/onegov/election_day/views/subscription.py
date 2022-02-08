@@ -18,30 +18,68 @@ from onegov.election_day.models import Principal
     permission=Public
 )
 def subscribe_email(self, request, form):
-    """ Adds the given email address to the email subscribers."""
+    """ Initiate the email notification subscription. """
 
     layout = DefaultLayout(self, request)
-
+    message = _(
+        "You will receive an email as soon as new results have been "
+        "published. You can unsubscribe at any time."
+    )
     callout = None
     if form.submitted(request):
         subscribers = EmailSubscriberCollection(request.session)
-        subscribers.subscribe(form.email.data, request)
+        subscribers.initiate_subscription(form.email.data, request)
         callout = _(
-            "Successfully subscribed to the email service. You will receive "
-            "an email every time new results are published."
+            "You will shortly receive an email to confirm your email."
         )
+        message = ''
 
     return {
         'layout': layout,
         'form': form,
         'title': _("Get email alerts"),
-        'message': _(
-            "You will receive an email as soon as new results have been "
-            "published. You can unsubscribe at any time."
-        ),
+        'message': message,
         'cancel': layout.homepage_link,
         'callout': callout,
         'show_form': False if callout else True
+    }
+
+
+@ElectionDayApp.form(
+    model=Principal,
+    name='optin-email',
+    template='form.pt',
+    form=EmailSubscriptionForm,
+    permission=Public
+)
+def optin_email(self, request, form):
+
+    """ Confirm the email used for the subscription. """
+
+    callout = _("Subscription failed, the link is invalid.")
+    try:
+        data = request.params.get('opaque')
+        data = request.load_url_safe_token(data)
+        address = data['address']
+        locale = data['locale']
+        assert address
+        assert locale
+    except Exception:
+        pass
+    else:
+        subscribers = EmailSubscriberCollection(request.session)
+        if subscribers.confirm_subscription(address, locale):
+            callout = _(
+                "Successfully subscribed to the email service. You will "
+                "receive an email every time new results are published."
+            )
+
+    return {
+        'layout': DefaultLayout(self, request),
+        'form': form,
+        'title': _("Get email alerts"),
+        'callout': callout,
+        'show_form': False
     }
 
 
@@ -53,39 +91,16 @@ def subscribe_email(self, request, form):
     permission=Public
 )
 def unsubscribe_email(self, request, form):
-    """ Removes the email number from the email subscribers.
-
-    Allows one-click unsubscription as defined by RFC-8058:
-        curl -X POST http://localhost:8080/xx/zg/unsubscribe-oneclick?opaque=yy
-
-    """
+    """ Initiates the email notification unsubscription. """
 
     layout = DefaultLayout(self, request)
-    subscribers = EmailSubscriberCollection(request.session)
-
-    try:
-        email = request.params.get('opaque')
-        email = request.load_url_safe_token(email)
-        email = email.get('address')
-    except (AttributeError, TypeError):
-        email = None
-
-    # one-click unsubscribe
-    if request.method == 'POST' and email:
-        subscribers.unsubscribe(email)
-        return Response()
-
-    # regular unsubscribe
     callout = None
     if form.submitted(request):
-        subscribers.unsubscribe(form.email.data)
+        subscribers = EmailSubscriberCollection(request.session)
+        subscribers.initiate_unsubscription(form.email.data, request)
         callout = _(
-            "Successfully unsubscribed from the email services. You will no "
-            "longer receive an email when new results are published."
+            "You will shortly receive an email to confirm your unsubscription."
         )
-
-    if email and not form.email.data:
-        form.email.data = email
 
     return {
         'layout': layout,
@@ -94,6 +109,50 @@ def unsubscribe_email(self, request, form):
         'cancel': layout.homepage_link,
         'callout': callout,
         'show_form': False if callout else True
+    }
+
+
+@ElectionDayApp.form(
+    model=Principal,
+    name='optout-email',
+    template='form.pt',
+    form=EmailSubscriptionForm,
+    permission=Public
+)
+def optout_email(self, request, form):
+    """ Deactivates the email subscription.
+
+    Allows one-click unsubscription as defined by RFC-8058:
+        curl -X POST http://localhost:8080/xx/zg/unsubscribe-email?opaque=yy
+
+    """
+
+    callout = _("Unsubscription failed, the link is invalid.")
+    try:
+        data = request.params.get('opaque')
+        data = request.load_url_safe_token(data)
+        address = data['address']
+        assert address
+    except Exception:
+        pass
+    else:
+        subscribers = EmailSubscriberCollection(request.session)
+        result = subscribers.confirm_unsubscription(address)
+        if request.method == 'POST':
+            # one-click unsubscribe
+            return Response()
+        if result:
+            callout = _(
+                "Successfully unsubscribed from the email services. You will "
+                "no longer receive an email when new results are published."
+            )
+
+    return {
+        'layout': DefaultLayout(self, request),
+        'form': form,
+        'title': _("Stop email subscription"),
+        'callout': callout,
+        'show_form': False
     }
 
 
@@ -112,7 +171,10 @@ def subscribe_sms(self, request, form):
     callout = None
     if form.submitted(request):
         subscribers = SmsSubscriberCollection(request.session)
-        subscribers.subscribe(form.phone_number.formatted_data, request)
+        subscribers.initiate_subscription(
+            form.phone_number.formatted_data,
+            request
+        )
         callout = _(
             "Successfully subscribed to the SMS service. You will receive a "
             "SMS every time new results are published."
@@ -148,7 +210,10 @@ def unsubscribe_sms(self, request, form):
     callout = None
     if form.submitted(request):
         subscribers = SmsSubscriberCollection(request.session)
-        subscribers.unsubscribe(form.phone_number.formatted_data)
+        subscribers.initiate_unsubscription(
+            form.phone_number.formatted_data,
+            request
+        )
         callout = _(
             "Successfully unsubscribed from the SMS services. You will no "
             "longer receive SMS when new results are published."

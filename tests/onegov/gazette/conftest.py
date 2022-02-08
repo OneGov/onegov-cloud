@@ -163,7 +163,7 @@ def create_gazette(request, temporary_path):
     app = create_app(
         GazetteApp,
         request,
-        use_smtp=True,
+        use_maildir=True,
         depot_backend='depot.io.local.LocalFileStorage',
         depot_storage_path=str(temporary_path),
     )

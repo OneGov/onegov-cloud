@@ -51,6 +51,11 @@ def test_recipient_subscription(session):
     assert not Subscription(recipient, 'asdf').confirm()
     assert not recipient.confirmed
 
+    # unsubscribe berfore confirm is a noop with success
+    assert recipient.subscription.unsubscribe()
+    assert not recipient.confirmed
+    assert session.query(Recipient).count() == 1
+
     assert recipient.subscription.confirm()
     assert recipient.confirmed
 

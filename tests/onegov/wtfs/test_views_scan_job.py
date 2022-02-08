@@ -35,13 +35,11 @@ def test_views_scan_job(client):
         assert "Scan-Auftrag hinzugefügt." in added
         assert "05.01.2019" in added
 
-        message = client.app.smtp.outbox.pop()
+        message = client.get_email(0, flush_queue=True)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'member@example.org'
-        assert message['Reply-To'] == 'mails@govikon.ch'
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
-        assert "am 05.01.2019 Ihre Sendung abholen" in payload
+        assert message['ReplyTo'] == 'mails@govikon.ch'
+        assert "am 05.01.2019 Ihre Sendung abholen" in message['TextBody']
 
     # View scan job
     view = client.get('/scan-jobs').click("05.01.2019")
@@ -139,13 +137,11 @@ def test_views_scan_job(client):
         assert "Scan-Auftrag hinzugefügt." in added
         assert "01.01.2019" in added
 
-        message = client.app.smtp.outbox.pop()
+        message = client.get_email(0, flush_queue=True)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'editor@example.org'
-        assert message['Reply-To'] == 'mails@govikon.ch'
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
-        assert "Ihre Sendung abholen" in payload
+        assert message['ReplyTo'] == 'mails@govikon.ch'
+        assert "Ihre Sendung abholen" in message['TextBody']
 
     # ... contacts gets an email (express) if admins add scan jobs
     with freeze_time("2019-01-02"):
@@ -158,12 +154,11 @@ def test_views_scan_job(client):
         assert "Scan-Auftrag hinzugefügt." in added
         assert "02.01.2019" in added
 
-        message = client.app.smtp.outbox.pop()
+        message = client.get_email(0, flush_queue=True)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'editor@example.org'
-        assert message['Reply-To'] == 'mails@govikon.ch'
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
+        assert message['ReplyTo'] == 'mails@govikon.ch'
+        payload = message['TextBody']
         assert "Ihr Express-Auftrag wurde entgegengenommen" in payload
 
     # ... express mails are different for normal users, too
@@ -179,12 +174,12 @@ def test_views_scan_job(client):
         assert "Scan-Auftrag hinzugefügt." in added
         assert "03.01.2019" in added
 
-        message = client.app.smtp.outbox.pop()
+        message = client.get_email(0, flush_queue=True)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'editor@example.org'
-        assert message['Reply-To'] == 'mails@govikon.ch'
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
+        assert message['ReplyTo'] == 'mails@govikon.ch'
+        assert message['ReplyTo'] == 'mails@govikon.ch'
+        payload = message['TextBody']
         assert "Ihr Express-Auftrag wurde entgegengenommen" in payload
 
 
@@ -211,12 +206,14 @@ def test_views_scan_jobs_filter(client):
         assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
 
         client.logout()
+    with freeze_time("2019-01-01 00:01:00"):
         client.login_editor()
         add = client.get('/scan-jobs').click(href='/add')
         add.form['type'].select('express')
         add.form['dispatch_date_express'] = "2019-01-04"
         assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
 
+    with freeze_time("2019-01-01 00:01:30"):
         add.form['type'].select('express')
         add.form['dispatch_date_express'] = "2019-01-06"
         assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()

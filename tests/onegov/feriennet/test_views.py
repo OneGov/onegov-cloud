@@ -1,6 +1,7 @@
 import pytest
 
 import onegov.feriennet
+import os
 import re
 import requests_mock
 import transaction
@@ -185,17 +186,17 @@ def test_activity_communication(client, scenario):
 
     editor.get('/activity/learn-python').click("Publikation beantragen")
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
     assert "Ihre Anfrage wurde unter der " \
-           "folgenden Referenz registriert" in admin.get_email(0)
+           "folgenden Referenz registriert" in admin.get_email(0)['HtmlBody']
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
 
     ticket.click("Veröffentlichen")
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
 
-    message = admin.get_email(1)
+    message = admin.get_email(1)['TextBody']
     assert "wurde veröffentlicht" in message
     assert "Learn Python" in message
     assert "Using a Raspberry Pi we will learn Python" in message
@@ -1328,11 +1329,19 @@ def test_send_email(client, scenario):
 
     page.form['roles'] = ['admin', 'editor']
     assert "an 2 Empfänger gesendet" in page.form.submit().follow()
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = client.get_email(0)
-    assert "Ferienpass 2016 subject" in client.app.smtp.outbox[0]['subject']
-    assert "Ferienpass 2016 body" in message
+    message_1 = client.get_email(0, 0)
+    assert "Ferienpass 2016 subject" in message_1['Subject']
+    assert "Ferienpass 2016 body" in message_1['TextBody']
+
+    message_2 = client.get_email(0, 1)
+    assert "Ferienpass 2016 subject" in message_2['Subject']
+    assert "Ferienpass 2016 body" in message_2['TextBody']
+
+    recipients = message_1['To'] + message_2['To']
+    assert "editor@example.org" in recipients
+    assert "admin@example.org" in recipients
 
 
 def test_create_duplicate_notification(client):
@@ -1799,7 +1808,7 @@ def test_fill_out_contact_form(client):
     page = page.form.submit().follow()
     assert "Anfrage eingereicht" in page
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
 
 def test_occasion_number(client, scenario):
@@ -2296,10 +2305,11 @@ def test_send_email_with_attachment(client, scenario):
     page.form.submit().follow()
 
     # Plaintext version
-    assert "[Test](http" in client.get_email(0, 0)
+    email = client.get_email(0)
+    assert "[Test](http" in email['TextBody']
 
     # HTML version
-    assert ">Test</a>" in client.get_email(0, 1)
+    assert ">Test</a>" in email['HtmlBody']
 
 
 def test_max_age_exact(client, scenario):
@@ -2785,7 +2795,7 @@ def test_registration(client):
 
     assert "Vielen Dank" in register.form.submit().follow()
 
-    message = client.get_email(0, 1)
+    message = client.get_email(0)['HtmlBody']
     assert "Anmeldung bestätigen" in message
 
     expr = r'href="[^"]+">Anmeldung bestätigen</a>'

@@ -6,6 +6,7 @@ from tests.onegov.gazette.common import edit_notice
 from tests.onegov.gazette.common import login_users
 from tests.onegov.gazette.common import reject_notice
 from tests.onegov.gazette.common import submit_notice
+from tests.shared import Client
 
 
 def test_view_notice_submit(gazette_app):
@@ -71,7 +72,7 @@ def test_view_notice_submit(gazette_app):
 def test_view_notice_reject(gazette_app):
     admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         # create a notice for each editor
         for count, user in enumerate((editor_1, editor_2, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
@@ -114,9 +115,10 @@ def test_view_notice_reject(gazette_app):
 
 
 def test_view_notice_accept(gazette_app):
+    client = Client(gazette_app)
     admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         # create a notice for each editor
         for count, user in enumerate((editor_1, editor_2, editor_3, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
@@ -151,22 +153,22 @@ def test_view_notice_accept(gazette_app):
         submit_notice(editor_3, 'titel-3', unable=True)
 
     # check redirect for past issues
-    with freeze_time("2017-11-04 11:00"):
+    with freeze_time("2017-11-04 11:00", tick=True):
         accept_notice(publisher, 'titel-1', redirected=True)
 
     # check redirect for invalid category
-    with freeze_time("2017-11-04 11:00"):
+    with freeze_time("2017-11-04 11:00", tick=True):
         change_category(gazette_app, '11', active=False)
         accept_notice(publisher, 'titel-1', redirected=True)
         change_category(gazette_app, '11', active=True)
 
     # check redirect for invalid organization
-    with freeze_time("2017-11-01 11:00"):
+    with freeze_time("2017-11-01 11:00", tick=True):
         change_organization(gazette_app, '410', active=False)
         accept_notice(publisher, 'titel-1', redirected=True)
         change_organization(gazette_app, '410', active=True)
 
-    with freeze_time("2017-11-01 15:00"):
+    with freeze_time("2017-11-01 15:00", tick=True):
         # check if the notices can be accepted
         for user, slug, forbidden in (
             (editor_1, 'titel-1', True),
@@ -179,40 +181,36 @@ def test_view_notice_accept(gazette_app):
         ):
             accept_notice(user, slug, forbidden=forbidden)
 
-        message = gazette_app.smtp.outbox.pop()
+        message = client.get_email(-1)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
-        assert message['Reply-To'] == 'mails@govikon.ch'
+        assert message['ReplyTo'] == 'mails@govikon.ch'
         assert message['Subject'].startswith('44  Titel 3')
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
+        payload = message['HtmlBody']
         assert '44  Titel 3' in payload
         assert "Govikon, 1. Januar 2019" in payload
         assert "State Chancellerist" in payload
         assert "someone<br>street<br>place" not in payload
 
-        message = gazette_app.smtp.outbox.pop()
+        message = client.get_email(-2)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
-        assert message['Reply-To'] == 'mails@govikon.ch'
+        assert message['ReplyTo'] == 'mails@govikon.ch'
         assert message['Subject'].startswith('Kostenpflichtig - 44  Titel 2')
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
+        payload = message['HtmlBody']
         assert '44  Titel 2' in payload
         assert "Govikon, 1. Januar 2019" in payload
         assert "State Chancellerist" in payload
         assert "someone<br>street<br>place" in payload
 
-        message = gazette_app.smtp.outbox.pop()
+        message = client.get_email(-3)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
-        assert message['Reply-To'] == 'mails@govikon.ch'
+        assert message['ReplyTo'] == 'mails@govikon.ch'
         assert message['Subject'].startswith(
             'Kostenpflichtig / Stopp Internet - 44  Titel 1'
         )
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
-        assert '44  Titel 1' in payload
+        assert '44  Titel 1' in message['HtmlBody']
 
         principal = gazette_app.principal
         principal.on_accept['mail_from'] = 'publisher@govikon.ch'
@@ -222,11 +220,9 @@ def test_view_notice_accept(gazette_app):
 
         accept_notice(publisher, 'titel-4')
 
-        message = gazette_app.smtp.outbox.pop()
+        message = client.get_email(-1)
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
-        assert message['Reply-To'] == 'publisher@govikon.ch'
+        assert message['ReplyTo'] == 'publisher@govikon.ch'
         assert '44 xxx Titel 4' in message['Subject']
-        payload = message.get_payload(1).get_payload(decode=True)
-        payload = payload.decode('utf-8')
-        assert '44 xxx Titel 4' in payload
+        assert '44 xxx Titel 4' in message['HtmlBody']

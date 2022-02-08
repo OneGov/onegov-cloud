@@ -67,5 +67,6 @@ INTERPRETING_TYPES = {
     'consecutive': _('Consecutive interpreting'),
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
+    'telephone': _('Telephone interpreting'),
     'written': _('Written translations')
 }

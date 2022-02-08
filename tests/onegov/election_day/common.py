@@ -3,11 +3,12 @@ import tarfile
 
 from datetime import date
 from io import BytesIO
-from onegov.core.utils import module_path
 from onegov.core.utils import append_query_param
+from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
+from pyquery import PyQuery as pq
 from unittest.mock import Mock
 from webtest.forms import Upload
 
@@ -185,6 +186,10 @@ class DummyApp(object):
     def session(self):
         return self._session
 
+    def send_marketing_email_batch(self, prepared_emails):
+        # we'll allow sending empty batches for DummyApp
+        assert not list(prepared_emails)
+
 
 class DummyRequest(object):
 
@@ -229,7 +234,7 @@ class DummyRequest(object):
         self.includes = list(set(self.includes))
 
     def new_url_safe_token(self, data):
-        return str(data)
+        return str({key: data[key] for key in sorted(data)})
 
     def get_translate(self, for_chameleon=False):
         if not self.app.locales:
@@ -576,3 +581,10 @@ def import_wabstic_data(election, tar_file, principal, expats=False):
     )
     print_errors(errors)
     assert not errors
+
+
+def get_email_link(message, contains):
+    elements = pq(message['HtmlBody'])('*')
+    links = [e.attrib['href'] for e in elements if 'href' in e.attrib]
+    links = [l for l in links if contains in l]
+    return links[0]

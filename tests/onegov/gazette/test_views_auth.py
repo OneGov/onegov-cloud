@@ -1,8 +1,8 @@
 import onegov.gazette
+import os
 
 from lxml.html import document_fromstring
-from tests.shared import utils
-from webtest import TestApp as Client
+from tests.shared import Client, utils
 
 
 def test_view_permissions():
@@ -51,15 +51,13 @@ def test_view_reset_password(gazette_app):
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit()
-    assert len(gazette_app.smtp.outbox) == 0
+    assert len(os.listdir(gazette_app.maildir)) == 0
 
     request_page.form['email'] = 'admin@example.org'
     assert 'admin@example.org' in request_page.form.submit()
-    assert len(gazette_app.smtp.outbox) == 1
+    assert len(os.listdir(gazette_app.maildir)) == 1
 
-    message = gazette_app.smtp.outbox[0]
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
+    message = client.get_email(0)['HtmlBody']
     link = list(document_fromstring(message).iterlinks())[0][2]
     token = link.split('token=')[1]
 

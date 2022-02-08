@@ -14,4 +14,9 @@
         <p i18n:translate>If you did not subscribe to this newsletter you can simply ignore this e-mail.</p>
 
     </tal:b>
+    <tal:b metal:fill-slot="above-footer">
+        <p>
+            <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+        </p>
+    </tal:b>
 </div>

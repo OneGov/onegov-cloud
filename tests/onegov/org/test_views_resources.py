@@ -2,6 +2,7 @@ import json
 import textwrap
 from datetime import datetime, date
 
+import os
 import pytest
 import transaction
 from freezegun import freeze_time
@@ -11,7 +12,6 @@ from libres.modules.errors import AffectedReservationError
 from onegov.form import FormSubmission
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
-from tests.onegov.org.common import get_mail
 
 
 def test_resource_slots(client):
@@ -425,7 +425,7 @@ def test_allocation_holidays(client):
     assert slots.json[2]['start'].startswith('2019-08-02')
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_auto_accept_reservations(client):
     # prepare the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -463,10 +463,10 @@ def test_auto_accept_reservations(client):
 
     assert 'Ihr Anliegen wurde abgeschlossen' in page
     assert 'Die Reservationen wurden angenommen' in page
-    assert len(client.app.smtp.outbox) == 1
-    message = get_mail(client.app.smtp.outbox, 0)
-    assert 'Ihre Reservationen wurden angenommen' in message['subject']
-    assert 'Foobar' in message['text']
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert 'Ihre Reservationen wurden angenommen' in message['Subject']
+    assert 'Foobar' in message['TextBody']
 
     # close the ticket and check not email is sent
     tickets = client.get('/tickets/ALL/closed')
@@ -478,7 +478,7 @@ def test_auto_accept_reservations(client):
     assert 'You can pick it up at the counter' in page
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation(client):
 
     # prepate the required data
@@ -510,7 +510,7 @@ def test_reserve_allocation(client):
     ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # make sure the resulting reservation has no session_id set
     ids = [r.session_id for r in scheduler.managed_reservations()]
@@ -551,12 +551,9 @@ def test_reserve_allocation(client):
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
     assert 'Alle Reservationen annehmen' not in ticket
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
 
-    message = client.app.smtp.outbox[1]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
-
+    message = client.get_email(1)['TextBody']
     assert 'Tageskarte' in message
     assert '28. August 2015' in message
     assert '4' in message
@@ -583,12 +580,9 @@ def test_reserve_allocation(client):
     assert '4' in ticket
     assert '0xdeadbeef' in ticket
 
-    assert len(client.app.smtp.outbox) == 3
+    assert len(os.listdir(client.app.maildir)) == 3
 
-    message = client.app.smtp.outbox[2]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
-
+    message = client.get_email(2)['TextBody']
     assert 'Tageskarte' in message
     assert '28. August 2015' in message
     assert '4' in message
@@ -596,10 +590,10 @@ def test_reserve_allocation(client):
     # close the ticket
     ticket.click('Ticket abschliessen')
 
-    assert len(client.app.smtp.outbox) == 4
+    assert len(os.listdir(client.app.maildir)) == 4
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation_partially(client):
 
     # prepate the required data
@@ -626,7 +620,7 @@ def test_reserve_allocation_partially(client):
     ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # open the created ticket
     client.login_admin()
@@ -640,10 +634,7 @@ def test_reserve_allocation_partially(client):
     # accept it
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
-    message = client.app.smtp.outbox[1]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
-
+    message = client.get_email(1)['TextBody']
     assert "Tageskarte" in message
     assert "28. August 2015" in message
     assert "10:00" in message
@@ -655,7 +646,7 @@ def test_reserve_allocation_partially(client):
     assert slots[0]['partitions'] == [[50.0, True], [50.0, False]]
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_no_definition_pick_up_hint(client):
 
     # prepate the required data
@@ -684,7 +675,7 @@ def test_reserve_no_definition_pick_up_hint(client):
     ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
 
 def test_reserve_in_past(client):
@@ -724,7 +715,7 @@ def test_reserve_in_past(client):
     assert reserve_as_editor().json == {'success': True}
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_confirmation_no_definition(client):
 
     resources = ResourceCollection(client.app.libres_context)
@@ -766,7 +757,7 @@ def test_reserve_confirmation_no_definition(client):
     assert "changed@example.org" in confirmation
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_confirmation_with_definition(client):
 
     resources = ResourceCollection(client.app.libres_context)
@@ -810,7 +801,7 @@ def test_reserve_confirmation_with_definition(client):
     assert "Alderson" in confirmation
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_session_bound(client):
 
     # prepate the required data
@@ -844,7 +835,7 @@ def test_reserve_session_bound(client):
     assert client.post(complete_url).follow().status_code == 200
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_delete_reservation_anonymous(client):
 
     # prepate the required data
@@ -883,7 +874,7 @@ def test_delete_reservation_anonymous(client):
     assert len(client.get(reservations_url).json['reservations']) == 0
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_in_parallel(client):
 
     # prepate the required data
@@ -921,7 +912,7 @@ def test_reserve_in_parallel(client):
         in f2.form.submit().follow()
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_occupancy_view(client):
 
     # prepate the required data
@@ -957,7 +948,7 @@ def test_occupancy_view(client):
     assert len(occupancy.pyquery('.occupancy-block')) == 1
 
 
-@freeze_time("2015-08-28")
+@freeze_time("2015-08-28", tick=True)
 def test_reservation_export_view(client):
 
     # prepate the required data
@@ -1007,7 +998,7 @@ def test_reservation_export_view(client):
     assert charlie['form'] == {'vorname': 'Charlie', 'nachname': 'Carson'}
 
 
-@freeze_time("2016-04-28")
+@freeze_time("2016-04-28", tick=True)
 def test_reserve_session_separation(client):
     c1 = client.spawn()
     c1.login_admin()
@@ -1162,7 +1153,7 @@ def test_reserve_multiple_allocations(client):
 
     ticket = confirmation.form.submit().follow()
     assert 'RSV-' in ticket.text
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
     assert "info@example.org" in ticket
@@ -1172,10 +1163,7 @@ def test_reserve_multiple_allocations(client):
     # accept it
     ticket.click('Alle Reservationen annehmen')
 
-    message = client.app.smtp.outbox[1]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
-
+    message = client.get_email(1)['TextBody']
     assert "Tageskarte" in message
     assert "28. April 2016" in message
     assert "29. April 2016" in message
@@ -1191,10 +1179,7 @@ def test_reserve_multiple_allocations(client):
     # now deny them
     client.get(ticket.pyquery('a.delete-link')[0].attrib['ic-get-from'])
 
-    message = client.app.smtp.outbox[2]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
-
+    message = client.get_email(2)['TextBody']
     assert "Tageskarte" in message
     assert "28. April 2016" in message
     assert "29. April 2016" in message
@@ -1250,7 +1235,7 @@ def test_reserve_and_deny_multiple_dates(client):
     client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
     assert resource.scheduler.managed_reserved_slots().count() == 2
 
-    message = client.get_email(1)
+    message = client.get_email(1)['TextBody']
     assert "abgesagt" in message
     assert "29. April 2016" in message
 
@@ -1258,7 +1243,7 @@ def test_reserve_and_deny_multiple_dates(client):
     ticket = ticket.click('Alle Reservationen annehmen').follow()
     assert resource.scheduler.managed_reserved_slots().count() == 2
 
-    message = client.get_email(2)
+    message = client.get_email(2)['TextBody']
     assert "angenommen" in message
     assert "27. April 2016" in message
     assert "28. April 2016" in message
@@ -1267,7 +1252,7 @@ def test_reserve_and_deny_multiple_dates(client):
     client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
-    message = client.get_email(3)
+    message = client.get_email(3)['TextBody']
     assert "abgesagt" in message
     assert "27. April 2016" not in message
     assert "28. April 2016" in message
@@ -1276,7 +1261,7 @@ def test_reserve_and_deny_multiple_dates(client):
     client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
     assert resource.scheduler.managed_reserved_slots().count() == 0
 
-    message = client.get_email(4)
+    message = client.get_email(4)['TextBody']
     assert "abgesagt" in message
     assert "27. April 2016" in message
     assert "28. April 2016" not in message
@@ -1373,7 +1358,7 @@ def test_cleanup_allocations(client):
     assert "1 Einteilungen wurden erfolgreich entfernt" in resource
 
 
-@freeze_time("2017-07-09")
+@freeze_time("2017-07-09", tick=True)
 def test_manual_reservation_payment_with_extra(client):
 
     # prepate the required data
@@ -1440,7 +1425,7 @@ def test_manual_reservation_payment_with_extra(client):
     assert "Offen" in payments
 
 
-@freeze_time("2017-07-09")
+@freeze_time("2017-07-09", tick=True)
 def test_manual_reservation_payment_without_extra(client):
 
     # prepate the required data
@@ -1705,7 +1690,7 @@ def test_allocation_rules_with_holidays(client):
     assert count_allocations() == 705
 
 
-@freeze_time("2019-08-01")
+@freeze_time("2019-08-01", tick=True)
 def test_zipcode_block(client):
     client.login_admin()
 

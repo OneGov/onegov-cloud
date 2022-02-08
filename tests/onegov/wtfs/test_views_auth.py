@@ -1,7 +1,7 @@
-from lxml.html import document_fromstring
-from tests.shared import utils
-from webtest import TestApp as Client
 import onegov
+import os
+from lxml.html import document_fromstring
+from tests.shared import Client, utils
 
 
 def test_view_permissions():
@@ -44,15 +44,14 @@ def test_view_reset_password(wtfs_app):
     request_page = home.click('Anmelden').click('Passwort zurücksetzen')
     request_page.form['email'] = 'someone@example.org'
     request_page.form.submit()
-    assert len(wtfs_app.smtp.outbox) == 0
+    assert len(os.listdir(wtfs_app.maildir)) == 0
 
     request_page.form['email'] = 'admin@example.org'
     request_page.form.submit()
-    assert len(wtfs_app.smtp.outbox) == 1
+    assert len(os.listdir(wtfs_app.maildir)) == 1
 
-    message = wtfs_app.smtp.outbox[0]
-    message = message.get_payload(1).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
+    message = client.get_email(0)
+    message = message['HtmlBody']
     link = list(document_fromstring(message).iterlinks())[0][2]
     token = link.split('token=')[1]
 

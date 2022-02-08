@@ -1,0 +1,14 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <h1>${title}</h1>
+        <p i18n:translate>Please confirm your email address to receive email notifications. Click on the link below.</p>
+        <p><a href="${optin}" i18n:translate>Confirm email</a></p>
+        <p i18n:translate>You can ignore this email if you have not signed up for the email notifications.</p>
+    </tal:block>
+    <tal:block metal:fill-slot="footer">
+        <p><a href="${optout}" i18n:translate>Unsubscribe</a></p>
+    </tal:block>
+</div>

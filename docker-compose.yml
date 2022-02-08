@@ -18,16 +18,6 @@ services:
         volumes:
             - data01:/usr/share/elasticsearch/data
 
-    smtp4dev:
-        image: rnwood/smtp4dev:latest
-        restart: always
-        ports:
-            - "8081:80"
-            - "1025:25"
-            - "143:143"
-        volumes:
-            - smtp4dev-data:/smtp4dev
-
     d3renderer:
         image: node
         command: sh -c "git clone https://github.com/seantis/d3-renderer.git && cd d3-renderer && npm install && ./node_modules/.bin/phantomjs server.js"
@@ -40,6 +30,4 @@ services:
 
 volumes:
     data01:
-        driver: local
-    smtp4dev-data:
         driver: local

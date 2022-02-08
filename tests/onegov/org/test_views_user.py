@@ -139,7 +139,7 @@ def test_add_new_user_with_activation_email(client):
     assert "Passwort" not in added
     assert "Anmeldungs-Anleitung wurde an den Benutzer gesendet" in added
 
-    email = client.get_email(0)
+    email = client.get_email(0)['TextBody']
     reset = re.search(
         r'(http://localhost/auth/reset-password[^)]+)', email).group()
 

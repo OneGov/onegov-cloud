@@ -10,6 +10,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Subscriber
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Text
@@ -291,3 +292,12 @@ def enable_expats(context):
     for election in context.session.query(Election):
         if election.results.filter_by(entity_id=0).first():
             election.expats = True
+
+
+@upgrade_task('Adds active column to subscriber')
+def add_active_column_to_subscriver(context):
+    if not context.has_column('subscribers', 'active'):
+        context.operations.add_column(
+            'subscribers',
+            Column('active', Boolean, nullable=True)
+        )

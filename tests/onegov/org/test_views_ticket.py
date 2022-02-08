@@ -3,12 +3,12 @@ import re
 import textwrap
 from datetime import date, timedelta, datetime
 
+import os
 import transaction
 from webtest import Upload
 
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
-from tests.onegov.org.common import get_mail
 
 
 def test_tickets(client):
@@ -41,15 +41,13 @@ def test_tickets(client):
     form_page = client.get('/form/newsletter')
     form_page.form['e_mail'] = 'info@seantis.ch'
 
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     status_page = form_page.form.submit().follow().form.submit().follow()
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = client.app.smtp.outbox[0]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
+    message = client.get_email(0)['TextBody']
 
     assert 'FRM-' in message
     assert '/status' in message
@@ -90,14 +88,14 @@ def test_tickets(client):
     assert input_field.attr('disabled') == 'disabled'
 
     # Test mail notification on new message
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
     anon = client.spawn()
     ticket_status = ticket_page.request.url + '/status'
     status = anon.get(ticket_status)
     status.form['text'] = 'Testmessage'
     status.form.submit().follow()
 
-    message = get_mail(client.app.smtp.outbox, 1)
+    message = client.get_email(1)
 
     ticket_url = ticket_page.request.path
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
@@ -107,11 +105,9 @@ def test_tickets(client):
     assert page.pyquery('.pending-tickets').attr('data-count') == '0'
     assert page.pyquery('.closed-tickets').attr('data-count') == '1'
 
-    assert len(client.app.smtp.outbox) == 3
+    assert len(os.listdir(client.app.maildir)) == 3
 
-    message = client.app.smtp.outbox[2]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
+    message = client.get_email(2)['TextBody']
 
     assert "Ihre Anfrage wurde abgeschlossen" in message
     assert '/status' in message
@@ -138,9 +134,7 @@ def test_tickets(client):
     assert page.pyquery('.pending-tickets').attr('data-count') == '1'
     assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
-    message = client.app.smtp.outbox[3]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('iso-8859-1')
+    message = client.get_email(3)['TextBody']
 
     assert "Ihre Anfrage wurde wieder " in message
     assert '/status' in message
@@ -174,20 +168,20 @@ def test_ticket_states_idempotent(client):
     page.form['e_mail'] = 'info@seantis.ch'
 
     page.form.submit().follow().form.submit().follow()
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
     assert len(client.get('/timeline/feed').json['messages']) == 1
 
     page = client.get('/tickets/ALL/open')
     page.click('Annehmen')
     page.click('Annehmen')
     page = page.click('Annehmen').follow()
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
     assert len(client.get('/timeline/feed').json['messages']) == 2
 
     page.click('Ticket abschliessen')
     page.click('Ticket abschliessen')
     page = page.click('Ticket abschliessen').follow()
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
     assert len(client.get('/timeline/feed').json['messages']) == 3
 
     page = client.get(
@@ -197,7 +191,7 @@ def test_ticket_states_idempotent(client):
     page.click('Ticket wieder öffnen')
     page.click('Ticket wieder öffnen')
     page = page.click('Ticket wieder öffnen').follow()
-    assert len(client.app.smtp.outbox) == 3
+    assert len(os.listdir(client.app.maildir)) == 3
     assert len(client.get('/timeline/feed').json['messages']) == 4
 
 
@@ -225,18 +219,18 @@ def test_send_ticket_email(client):
 
         page.form.submit().follow().form.submit()
 
-    del client.app.smtp.outbox[:]
+    client.flush_email_queue()
 
     submit_event(admin, 'admin@example.org')
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     submit_event(admin, 'someone-else@example.org')
-    assert len(client.app.smtp.outbox) == 1
-    assert 'someone-else@example.org' == client.app.smtp.outbox[0]['To']
+    assert len(os.listdir(client.app.maildir)) == 1
+    assert 'someone-else@example.org' == client.get_email(0)['To']
 
     submit_event(anon, 'admin@example.org')
-    assert len(client.app.smtp.outbox) == 2
-    assert 'admin@example.org' == client.app.smtp.outbox[1]['To']
+    assert len(os.listdir(client.app.maildir)) == 2
+    assert 'admin@example.org' == client.get_email(1)['To']
 
     # ticket notifications can be manually disabled
     page = admin.get('/tickets/ALL/open').click('Annehmen', index=1).follow()
@@ -246,12 +240,12 @@ def test_send_ticket_email(client):
     ticket_url = page.request.url
     page = page.click('Ticket abschliessen').follow()
 
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
     page = admin.get(ticket_url)
     page = page.click('E-Mails aktivieren').follow()
 
     page = page.click('Ticket wieder öffnen').follow()
-    assert len(client.app.smtp.outbox) == 3
+    assert len(os.listdir(client.app.maildir)) == 3
 
     # make sure the same holds true for forms
     collection = FormCollection(client.app.session())
@@ -267,14 +261,14 @@ def test_send_ticket_email(client):
         page.form['e_mail'] = email
         page.form.submit().follow().form.submit()
 
-    del client.app.smtp.outbox[:]
+    client.flush_email_queue()
 
     submit_form(admin, 'admin@example.org')
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     submit_form(admin, 'someone-else@example.org')
-    assert len(client.app.smtp.outbox) == 1
-    assert 'someone-else@example.org' == client.app.smtp.outbox[0]['To']
+    assert len(os.listdir(client.app.maildir)) == 1
+    assert 'someone-else@example.org' == client.get_email(0)['To']
 
     # and for reservations
     resources = ResourceCollection(client.app.libres_context)
@@ -300,14 +294,14 @@ def test_send_ticket_email(client):
 
         formular.form.submit().follow().form.submit().follow()
 
-    del client.app.smtp.outbox[:]
+    client.flush_email_queue()
 
     submit_reservation(admin, 'admin@example.org')
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     submit_reservation(admin, 'someone-else@example.org')
-    assert len(client.app.smtp.outbox) == 1
-    assert 'someone-else@example.org' == client.app.smtp.outbox[0]['To']
+    assert len(os.listdir(client.app.maildir)) == 1
+    assert 'someone-else@example.org' == client.get_email(0)['To']
 
 
 def test_ticket_notes(client):
@@ -425,7 +419,7 @@ def test_ticket_chat(client):
     assert "Ticket eröffnet" in msgs[0]['html']
 
     # we should also see one e-mail at this point
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # at this point we have the option to send an initial message
     page.form['text'] = "I spelt my name wrong: it's Baz, not Bar"
@@ -450,7 +444,7 @@ def test_ticket_chat(client):
 
     # no e-mail will have been created for this message, as there's no
     # recipient we could send it to
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # add a note and let's ensure that the status page does not contain it
     page = page.click("Neue Notiz")
@@ -480,14 +474,14 @@ def test_ticket_chat(client):
     assert "I will correct your name" in msgs[-1]['html']
 
     # ensure the user sees the message in an e-mail
-    assert len(client.app.smtp.outbox) == 2
-    assert "I will correct your name" in client.get_email(1)
+    assert len(os.listdir(client.app.maildir)) == 2
+    assert "I will correct your name" in client.get_email(1)['TextBody']
 
     # make sure the reply-to story is good
-    mail = client.app.smtp.outbox[1]
+    mail = client.get_email(1)
     assert mail['To'] == 'foo@bar.baz'
     assert mail['From'] == 'Govikon <mails@govikon.ch>'
-    assert mail['Reply-To'] == 'Govikon <admin@example.org>'
+    assert mail['ReplyTo'] == 'Govikon <admin@example.org>'
 
     # ensure the editor sees the messages in the ticket view
     msgs = extract_messages(client.get(ticket_url))
@@ -504,9 +498,9 @@ def test_ticket_chat(client):
     page.form.submit()
 
     # the editor should get a notification with the last message
-    assert len(client.app.smtp.outbox) == 3
+    assert len(os.listdir(client.app.maildir)) == 3
 
-    mail = client.get_email(2)
+    mail = client.get_email(2)['TextBody']
     assert "I will correct your name" in mail
     assert "Great, thanks!" in mail
 
@@ -517,14 +511,14 @@ def test_ticket_chat(client):
     page.form.submit()
 
     # the user always gets a notification
-    assert len(client.app.smtp.outbox) == 4
+    assert len(os.listdir(client.app.maildir)) == 4
 
     # but now, the answering wont create one
     page = client.get(status_url)
     page.form['text'] = 'Can I ask you something else?'
     page.form.submit()
 
-    assert len(client.app.smtp.outbox) == 4
+    assert len(os.listdir(client.app.maildir)) == 4
 
     # though it will still show up in the list
     msgs = extract_messages(client.get(ticket_url))
@@ -636,9 +630,9 @@ def test_assign_tickets(client):
     assert "Ticket zugewiesen (editor@example.org)" in page
 
     # check mail
-    assert len(client.app.smtp.outbox) == 2
-    message = get_mail(client.app.smtp.outbox, 1)
-    assert message['subject'] == (
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
+    assert message['Subject'] == (
         f'{ticket_number} / newsletter: Sie haben ein neues Ticket'
     )
-    assert message['to'] == 'editor@example.org'
+    assert message['To'] == 'editor@example.org'

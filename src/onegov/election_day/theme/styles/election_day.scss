@@ -735,14 +735,26 @@ ul.actions {
     list-style-type: none;
     margin: 1.2rem 0 0;
 
-    .action-new::before {
-        content: '\f055';
+    .action-activate::before {
+        content: '\f00c';
+        font-family: 'FontAwesome';
+        margin-right: .75ex;
+    }
+
+    .action-cleanup::before {
+        content: '\f014';
         font-family: 'FontAwesome';
         margin-right: .75ex;
     }
 
     .action-export::before {
         content: '\f019';
+        font-family: 'FontAwesome';
+        margin-right: .75ex;
+    }
+
+    .action-new::before {
+        content: '\f055';
         font-family: 'FontAwesome';
         margin-right: .75ex;
     }

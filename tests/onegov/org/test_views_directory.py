@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 from io import BytesIO
 
+import os
 import transaction
 from purl import URL
 from pytz import UTC
@@ -266,7 +267,7 @@ def test_directory_change_requests(client):
     # ask for a change, completely empty
     page = client.get(f'{page.request.url}/change-request')
     page.form['submitter'] = 'user@example.org'
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
     assert 'publication_start' not in page.form.fields
     form_preview = page.form.submit().follow()
     assert 'Bitte geben Sie mindestens eine Änderung ein' in form_preview
@@ -275,7 +276,7 @@ def test_directory_change_requests(client):
     page = form_preview.form.submit().form.submit().follow()
 
     # check the ticket
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     assert '<del>Central Park</del><ins>Diana Ross Playground</ins>' in page
     assert 'This is better' in page
@@ -287,7 +288,7 @@ def test_directory_change_requests(client):
     # apply the changes
     page.click("Übernehmen")
     # User gets confirmation email
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
     page = client.get(page.request.url)
     assert 'Central Park' not in page
     assert 'Diana Ross Playground' in page
@@ -351,7 +352,7 @@ def test_directory_submissions(client, postgres):
     page = page.form.submit()
 
     assert "error" in page
-    assert len(client.app.smtp.outbox) == 0
+    assert len(os.listdir(client.app.maildir)) == 0
 
     # add the missing field
     page.form['name'] = 'Washingtom Monument'
@@ -375,7 +376,7 @@ def test_directory_submissions(client, postgres):
     page = page.form.submit().follow()
 
     assert "DIR-" in page
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # the submission has not yet resulted in an entry
     assert 'Washington' not in client.get('/directories/points-of-interest')
@@ -397,7 +398,7 @@ def test_directory_submissions(client, postgres):
     client.post(accept_url)
     poi = client.get('/directories/points-of-interest')
     assert 'Washington' in poi
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
 
     entry = poi.click('Washington')
     # Check open graph meta tags, this time the file is not an image

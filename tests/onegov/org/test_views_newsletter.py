@@ -1,3 +1,4 @@
+import os
 import re
 from datetime import datetime
 
@@ -8,7 +9,6 @@ from sedate import replace_timezone
 from onegov.core.utils import Bunch
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.user import UserCollection
-from tests.onegov.org.common import get_mail
 
 
 def test_unsubscribe_link(client):
@@ -109,24 +109,26 @@ def test_newsletter_signup(client):
     page.form['address'] = 'info@example.org'
     page.form.submit()
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # make sure double submissions don't result in multiple e-mails
     page.form.submit()
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = client.app.smtp.outbox[0]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
-
+    message = client.get_email(0)['TextBody']
     assert 'Mit freundlichen Grüssen' not in message
     assert 'Das OneGov Cloud Team' not in message
 
     confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
+
+    # unsubscribing before the opt-in does nothing, no emails are sent
+    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
 
     # try an illegal token first
-    illegal = confirm.split('/confirm')[0] + 'x/confirm'
-    assert "falsches Token" in client.get(illegal).follow()
+    illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
+    assert "falsches Token" in client.get(illegal_confirm).follow()
 
     # make sure double calls work
     assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
@@ -134,22 +136,74 @@ def test_newsletter_signup(client):
 
     # subscribing still works the same, but there's still no email sent
     page.form.submit()
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # unsubscribing does not result in an e-mail either
-    assert "falsches Token" in client.get(
-        illegal.replace('/confirm', '/unsubscribe')
-    ).follow()
-    assert "erfolgreich abgemeldet" in client.get(
-        confirm.replace('/confirm', '/unsubscribe')
-    ).follow()
+    illegal_unsub = unsubscribe.split('/unsubscribe')[0] + 'x/unsubscribe'
+    assert "falsches Token" in client.get(illegal_unsub).follow()
+    assert "erfolgreich abgemeldet" in client.get(unsubscribe).follow()
 
     # no e-mail is sent when unsubscribing
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     # however, we can now signup again
     page.form.submit()
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
+
+
+def test_newsletter_rfc8058(client):
+
+    page = client.get('/newsletters')
+    page.form['address'] = 'asdf'
+    page = page.form.submit()
+
+    assert 'Ungültig' in page
+
+    page.form['address'] = 'info@example.org'
+    page.form.submit()
+
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # make sure double submissions don't result in multiple e-mails
+    page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    email = client.get_email(0)
+    message = email['TextBody']
+    assert 'Mit freundlichen Grüssen' not in message
+    assert 'Das OneGov Cloud Team' not in message
+    headers = {h['Name']: h['Value'] for h in email['Headers']}
+    assert 'List-Unsubscribe' in headers
+    assert 'List-Unsubscribe-Post' in headers
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
+
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
+
+    # unsubscribing before the opt-in does nothing, no emails are sent
+    client.post(unsubscribe)
+
+    # try an illegal token first
+    illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
+    assert "falsches Token" in client.get(illegal_confirm).follow()
+
+    # make sure double calls work
+    assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
+    assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
+
+    # subscribing still works the same, but there's still no email sent
+    page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # unsubscribing does not result in an e-mail either
+    client.post(unsubscribe)
+
+    # no e-mail is sent when unsubscribing
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # however, we can now signup again
+    page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 2
 
 
 def test_newsletter_subscribers_management(client):
@@ -158,11 +212,9 @@ def test_newsletter_subscribers_management(client):
     page.form['address'] = 'info@example.org'
     page.form.submit()
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = client.app.smtp.outbox[0]
-    message = message.get_payload(0).get_payload(decode=True)
-    message = message.decode('utf-8')
+    message = client.get_email(0)['TextBody']
 
     confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
     assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
@@ -234,10 +286,10 @@ def test_newsletter_send(client):
     assert len(send.pyquery('.previous-recipients li')) == 2
 
     # make sure the mail was sent correctly
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    mail = get_mail(client.app.smtp.outbox, 0)
-    message = mail['text']
+    mail = client.get_email(0, 0)
+    message = mail['TextBody']
 
     assert "Our town is AWESOME" in message
     assert "Like many of you" in message
@@ -248,8 +300,9 @@ def test_newsletter_send(client):
     # make sure the unconfirm link is different for each mail
     unconfirm_1 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
 
-    mail = get_mail(client.app.smtp.outbox, 1)
-    unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', mail['text']).group(1)
+    mail = client.get_email(0, 1)
+    message = mail['TextBody']
+    unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
 
     assert unconfirm_1 and unconfirm_2
     assert unconfirm_1 != unconfirm_2
@@ -262,12 +315,12 @@ def test_newsletter_send(client):
     assert recipients.query().count() == 1
 
     # check content of mail
-    assert 'Like many of you,' in mail['text']
-    assert '150 Jahre Govikon' in mail['text']
-    assert 'Gemeinsames Turnen' in mail['text']
-    assert 'Testnews' in mail['text']
-    assert 'My Lead Text' not in mail['text']
-    assert 'My Html editor text' in mail['text']
+    assert 'Like many of you,' in message
+    assert '150 Jahre Govikon' in message
+    assert 'Gemeinsames Turnen' in message
+    assert 'Testnews' in message
+    assert 'My Lead Text' not in message
+    assert 'My Html editor text' in message
 
 
 def test_newsletter_schedule(client):
@@ -338,13 +391,13 @@ def test_newsletter_test_delivery(client):
     send.form['selected_recipient'] = recipient
     send.form.submit().follow()
 
-    assert len(client.app.smtp.outbox) == 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
     send = newsletter.click('Test')
     send.form['selected_recipient'] = recipient
     send.form.submit().follow()
 
-    assert len(client.app.smtp.outbox) == 2
+    assert len(os.listdir(client.app.maildir)) == 2
 
     newsletter = NewsletterCollection(client.app.session()).query().one()
     assert newsletter.sent is None
