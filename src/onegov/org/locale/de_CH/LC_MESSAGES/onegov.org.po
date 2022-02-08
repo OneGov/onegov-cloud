@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-01 10:13+0100\n"
+"POT-Creation-Date: 2022-02-07 12:40+0100\n"
 "PO-Revision-Date: 2021-01-14 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -53,6 +53,9 @@ msgstr "Allgemein"
 #, python-format
 msgid "${org} Reservation Overview"
 msgstr "${org} Reservations-Übersicht"
+
+msgid "Account"
+msgstr "Konto"
 
 msgid "User Profile"
 msgstr "Benutzerprofil"
@@ -1503,7 +1506,8 @@ msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
 msgid ""
 "Users can only be in one group. If they already belong to another group and "
 "get added here, they will automatically get removed from the other group."
-msgstr "Benutzer können nur in einer Gruppe sein. Wenn sie bereits einer anderen "
+msgstr ""
+"Benutzer können nur in einer Gruppe sein. Wenn sie bereits einer anderen "
 "Gruppe angehören und hier hinzugefügt werden, werden sie automatisch aus der "
 "anderen Gruppe entfernt."
 
@@ -2880,6 +2884,9 @@ msgstr ""
 "Falls Sie sich nicht für diesen Newsletter angemeldet haben können Sie diese "
 "E-Mail einfach ignorieren."
 
+msgid "Click here to unsubscribe."
+msgstr "Klicken Sie hier um sich abzumelden."
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -3009,9 +3016,6 @@ msgstr ""
 
 msgid "Click here to view web version."
 msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
-
-msgid "Click here to unsubscribe."
-msgstr "Klicken Sie hier um sich abzumelden."
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"

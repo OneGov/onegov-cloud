@@ -52,13 +52,13 @@ def test_app_custom(agency_app):
     request.current_username = 'Peter'
     assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
-        {'Peter': ['User Profile', 'Logout']}
+        {'Account': ['User Profile', 'Logout']}
     ]
 
     request.is_manager = True
     assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
-        {'Peter': ['User Profile', 'Logout']},
+        {'Account': ['User Profile', 'Logout']},
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
                         'Archived Tickets', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
@@ -68,7 +68,7 @@ def test_app_custom(agency_app):
     request.is_admin = True
     assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
-        {'Peter': ['User Profile', 'Logout']},
+        {'Account': ['User Profile', 'Logout']},
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
                         'Settings', 'Users', 'User groups', 'Link Check',
                         'Archived Tickets', 'Hidden contents']},
