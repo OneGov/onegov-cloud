@@ -149,10 +149,11 @@ def test_cancel_course_event(client_with_db):
 
     msg = f"Email erfolgreich an {wanted_count + 1} Empfänger gesendet"
     assert msg in client.get(redirect_link)
-    assert len(os.listdir(client.app.maildir)) == wanted_count + 1
+    assert len(os.listdir(client.app.maildir)) == 1
 
-    message = client.get_email(-1)
-    assert message['Subject'] == 'Absage Kursveranstaltung'
+    for number in range(wanted_count):
+        message = client.get_email(0, number)
+        assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
 def test_register_for_course_event_member(client_with_db):
