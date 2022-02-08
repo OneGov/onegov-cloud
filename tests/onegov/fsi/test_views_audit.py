@@ -1,8 +1,10 @@
 from datetime import timedelta
 from sedate import utcnow
 from uuid import uuid4
+from pytest import mark
 
 
+@mark.flaky(reruns=3)
 def test_audit_for_course(client, scenario):
     """
     Story:
