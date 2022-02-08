@@ -13,7 +13,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
-from wtforms.fields import StringField, TextAreaField, RadioField
+from wtforms.fields import BooleanField, StringField, TextAreaField, RadioField
 from wtforms.validators import InputRequired
 
 
@@ -101,6 +101,15 @@ class NotificationTemplateSendForm(Form):
             ('inactive', _("Inactive users")),
         ],
         default=['active'],
+    )
+
+    no_spam = BooleanField(
+        label=_(
+            "I hereby confirm that this message is relevant to the "
+            "recipients and is not spam."
+        ),
+        render_kw=dict(force_simple=True),
+        validators=[InputRequired()]
     )
 
     def on_request(self):

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-11-11 09:08+0100\n"
+"POT-Creation-Date: 2022-02-08 16:53+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -807,6 +807,13 @@ msgstr "Aktive Benutzer"
 
 msgid "Inactive users"
 msgstr "Inaktive Benutzer"
+
+msgid ""
+"I hereby confirm that this message is relevant to the recipients and is not "
+"spam."
+msgstr ""
+"Ich bestätige hiermit, dass diese Mitteilung für die Empfänger relevant ist "
+"und es sich dabei nicht um Spam handelt."
 
 #, python-format
 msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
