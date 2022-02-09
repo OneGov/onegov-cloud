@@ -77,7 +77,7 @@ setup(
         'editdistance',
         'elasticsearch>=7.0.0,<8.0.0',
         'elasticsearch-dsl>=7.0.0,<8.0.0',
-        'faker<=4.17.1',
+        'faker',
         'fastcache',
         'filedepot',
         'fs',
@@ -179,7 +179,6 @@ setup(
         'test': [
             'Pillow!=5.4.0',
             'coverage',
-            'faker',
             'findimports',
             'freezegun',
             'lxml',
