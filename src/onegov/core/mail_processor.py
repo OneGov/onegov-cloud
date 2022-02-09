@@ -169,7 +169,14 @@ class MailQueueProcessor:
 
         # If any list entry contains errors we forward the result
         for index, status in enumerate(result, start=1):
-            if status.get('ErrorCode', 0) != 0:
+            error_code = status.get('ErrorCode', 0)
+            if error_code == 406:
+                # inactive recipient, error can be ignored but still log it
+                log.warning(status.get(
+                    'Message',
+                    f'Inactive recipient at index {index}.'
+                ))
+            elif error_code != 0:
                 return result
 
         return None
