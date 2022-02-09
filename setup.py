@@ -172,9 +172,9 @@ setup(
             'flake8'
         ],
         'docs': [
-            'docutils==0.17',
+            'docutils',
             'alabaster',
-            'sphinx<3.4.0',
+            'sphinx',
         ],
         'test': [
             'Pillow!=5.4.0',
