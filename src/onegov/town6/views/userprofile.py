@@ -13,16 +13,17 @@ from onegov.town6.layout import DefaultLayout
     permission=Personal, form=UserProfileForm)
 def town_handle_user_profile(self, request, form):
     return handle_user_profile(
-        self, request, form, DefaultLayout(self, request))
+        self, request, form, DefaultLayout(self, request)
+    )
 
 
 # the view name must remain english, so that automated tools can detect it
 @TownApp.html(
     model=Organisation,
     name='unsubscribe',
-    template='userprofile.pt',
+    template='unsubscribe.pt',
     permission=Public
 )
 def town_handle_unsubscribe(self, request):
     """ Returns a redirect, no layout passed """
-    return handle_unsubscribe(self, request)
+    return handle_unsubscribe(self, request, DefaultLayout(self, request))
