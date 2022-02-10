@@ -9,6 +9,7 @@ from onegov.org.forms import UserProfileForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Organisation
 from onegov.user import UserCollection
+from webob.exc import HTTPForbidden
 
 
 @OrgApp.form(
@@ -48,7 +49,11 @@ def handle_user_profile(self, request, form, layout=None):
 
 
 def unsubscribe(request):
-    """ Unsubscribe a user from all *regular* e-mails. """
+    """ Unsubscribe a user from all *regular* e-mails.
+
+    Returns True, if the request was valid.
+
+    """
 
     # tokens are valid for 30 days
     max_age = 60 * 60 * 24 * 30
@@ -66,6 +71,9 @@ def unsubscribe(request):
                 user.data = {}
             for newsletter in newsletters:
                 user.data[newsletter] = False
+            return True
+
+    return False
 
 
 # the view name must remain english, so that automated tools can detect it
@@ -87,7 +95,9 @@ def handle_unsubscribe(self, request, layout=None):
 
     """
 
-    unsubscribe(request)
+    if not unsubscribe(request):
+        return HTTPForbidden()
+
     return {'layout': layout or DefaultLayout(self, request)}
 
 
@@ -97,5 +107,5 @@ def handle_unsubscribe(self, request, layout=None):
 def handle_unsubscribe_rfc8058(self, request):
     # it doesn't really make sense to check for success here
     # since this is an automated action without verficiation
-    unsubscribe()
+    unsubscribe(request)
     return Response()

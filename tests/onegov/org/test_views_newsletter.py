@@ -1,53 +1,54 @@
 import os
 import re
-from datetime import datetime
-
 import transaction
-from freezegun import freeze_time
-from sedate import replace_timezone
 
+from datetime import datetime
+from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.user import UserCollection
+from sedate import replace_timezone
 
 
 def test_unsubscribe_link(client):
-
-    user = UserCollection(client.app.session())\
-        .by_username('editor@example.org')
-
-    assert not user.data
-
     request = Bunch(identity_secret=client.app.identity_secret, app=client.app)
 
-    token = client.app.request_class.new_url_safe_token(request, {
-        'user': 'editor@example.org'
-    }, salt='unsubscribe')
+    session = client.app.session()
+    user = UserCollection(session).by_username('editor@example.org')
+    assert not user.data
 
-    client.get('/unsubscribe?token={}'.format(token))
-    page = client.get('/')
-    assert "abgemeldet" in page
+    # valid token
+    token = client.app.request_class.new_url_safe_token(
+        request, {'user': 'editor@example.org'},
+        salt='unsubscribe'
+    )
+    url = '/unsubscribe?token={}'.format(token)
 
-    user = UserCollection(client.app.session())\
-        .by_username('editor@example.org')
+    assert "abgemeldet" in client.get(url)
+    client.post(url)
 
+    user = UserCollection(session).by_username('editor@example.org')
     assert user.data['daily_ticket_statistics'] == False
 
-    token = client.app.request_class.new_url_safe_token(request, {
-        'user': 'unknown@example.org'
-    }, salt='unsubscribe')
+    # unknown user
+    token = client.app.request_class.new_url_safe_token(
+        request, {'user': 'unknown@example.org'},
+        salt='unsubscribe'
+    )
+    url = '/unsubscribe?token={}'.format(token)
 
-    page = client.get(
-        '/unsubscribe?token={}'.format(token), expect_errors=True)
-    assert page.status_code == 403
+    assert client.get(url, expect_errors=True).status_code == 403
+    client.post('/unsubscribe?token={}'.format(token))
 
-    token = client.app.request_class.new_url_safe_token(request, {
-        'user': 'editor@example.org'
-    }, salt='foobar')
+    # invalid token
+    token = client.app.request_class.new_url_safe_token(
+        request, {'user': 'editor@example.org'},
+        salt='foobar'
+    )
+    url = '/unsubscribe?token={}'.format(token)
 
-    page = client.get(
-        '/unsubscribe?token={}'.format(token), expect_errors=True)
-    assert page.status_code == 403
+    assert client.get(url, expect_errors=True).status_code == 403
+    client.post(url)
 
 
 def test_newsletters_crud(client):
