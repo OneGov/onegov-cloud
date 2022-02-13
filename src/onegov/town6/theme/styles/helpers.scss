@@ -1,14 +1,14 @@
 /*
     Hide the spam bot honeypot field
 */
-.field-roboter_falle {
+form .field-roboter_falle {
     display: none;
 }
 
 /*
     Hide hidden fields
 */
-.field-hidden {
+form .field-hidden {
     display: none;
 }
 
