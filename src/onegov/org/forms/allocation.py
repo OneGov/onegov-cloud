@@ -421,7 +421,7 @@ class RoomAllocationForm(AllocationForm):
             ('yes', _("Yes")),
             ('no', _("No"))
         ],
-        default='yes',
+        default='no',
         fieldset=_("Options"),
         depends_on=('as_whole_day', 'no')
     )
