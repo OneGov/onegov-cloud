@@ -503,6 +503,8 @@ def command_group():
             context_settings = get_context_specific_settings(context)
             context.obj = GroupContext(select, config, **context_settings)
             context.obj.validate_guard_conditions(context)
+            context.obj.config.logging.setdefault('version', 1)
+            logging.config.dictConfig(context.obj.config.logging)
         except DB_CONNECTION_ERRORS as e:
             print("Could not connect to database:")
             print(e)
@@ -517,10 +519,6 @@ def command_group():
 
         """
 
-        group_context = click.get_current_context().obj
-        group_context.config.logging.setdefault('version', 1)
-        logging.config.dictConfig(group_context.config.logging)
-
         if not processor:
             return
 
@@ -528,6 +526,8 @@ def command_group():
             processors = (processor, )
         else:
             processors = processor
+
+        group_context = click.get_current_context().obj
 
         # load all applications into the server
         view_path = uuid4().hex
