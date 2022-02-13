@@ -71,7 +71,6 @@ def process_resource_rules(request):
 
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
 def send_daily_ticket_statistics(request):
-
     today = replace_timezone(datetime.utcnow(), 'UTC')
     today = to_timezone(today, 'Europe/Zurich')
 
@@ -141,11 +140,16 @@ def send_daily_ticket_statistics(request):
         content = render_template(
             'mail_daily_ticket_statistics.pt', request, args
         )
+        unsubscribe = args['layout'].unsubscribe_link(args['username'])
 
-        app.send_transactional_email(
+        app.send_marketing_email(
             subject=args['title'],
             receivers=(user.username, ),
-            content=content
+            content=content,
+            headers={
+                'List-Unsubscribe': f'<{unsubscribe}>',
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
         )
 
 

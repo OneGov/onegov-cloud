@@ -162,6 +162,10 @@ def test_ticket_statistics(org_app, handlers):
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
 
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'List-Unsubscribe' in headers
+    assert 'List-Unsubscribe-Post' in headers
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
     assert message['Subject'] == 'Govikon OneGov Cloud Status'
     txt = message['TextBody']
     assert "Folgendes ist während des Wochenendes auf der Govikon" in txt
@@ -174,6 +178,7 @@ def test_ticket_statistics(org_app, handlers):
     assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
+    assert unsubscribe in txt
 
 
 def test_daily_reservation_overview(org_app):
