@@ -1,8 +1,54 @@
 # Changes
 
+## 2022.13
+
+`2022-02-13` | [b6ae0228ad...c3b82dda74](https://github.com/OneGov/onegov-cloud/compare/b6ae0228ad^...c3b82dda74)
+
+### Core
+
+##### Ignores inactive recipient errors in postmark mailer.
+
+`Bugfix` | [d679ef3917](https://github.com/onegov/onegov-cloud/commit/d679ef3917ba23488447e2f7ad18a24c75e7195d)
+
+##### Fixes CLI commands without selectors not logging.
+
+`Bugfix` | [OGC-309](https://linear.app/onegovcloud/issue/OGC-309) | [456156a694](https://github.com/onegov/onegov-cloud/commit/456156a6947166f0d88494841385e72ab449574c)
+
+### Election Day
+
+##### Update translations.
+
+`Other` | [OGC-147](https://linear.app/onegovcloud/issue/OGC-147) | [4f60ddc732](https://github.com/onegov/onegov-cloud/commit/4f60ddc732b95b10a4cd5b2e83edc7e0117b8e6e)
+
+### Feriennet
+
+##### Update bank statement import hint.
+
+`Other` | [PRO-998](https://linear.app/projuventute/issue/PRO-998) | [127c6efdc5](https://github.com/onegov/onegov-cloud/commit/127c6efdc5235061ae738c7b6c1d01cbf93a7d96)
+
+### Org
+
+##### Use a honeypot for newsletter signup.
+
+`Feature` | [OGC-306](https://linear.app/onegovcloud/issue/OGC-306) | [7bfcfca307](https://github.com/onegov/onegov-cloud/commit/7bfcfca307859967c5c4452261caa89d81b0bb22)
+
+##### Send daily ticket statistics as marketing mails.
+
+`Feature` | [OGC-305](https://linear.app/onegovcloud/issue/OGC-305) | [1ea0e47ca8](https://github.com/onegov/onegov-cloud/commit/1ea0e47ca8a33c1b70deb4ba2c15ca697d9b6cca)
+
+##### Set form defaults for room allocations to not partly available.
+
+`Other` | [OGC-308](https://linear.app/onegovcloud/issue/OGC-308) | [c3b82dda74](https://github.com/onegov/onegov-cloud/commit/c3b82dda74e68c63d9bb3697e555f008c414b270)
+
+### Town6
+
+##### Fixes hidden form fields not being hidden.
+
+`Bugfix` | [ec15c054bb](https://github.com/onegov/onegov-cloud/commit/ec15c054bb03ff0b802d863349c7ab4a6fb1f987)
+
 ## 2022.12
 
-`2022-02-08` | [32c4931bf0...0328795335](https://github.com/OneGov/onegov-cloud/compare/32c4931bf0^...0328795335)
+`2022-02-08` | [32c4931bf0...e7bcf7d0af](https://github.com/OneGov/onegov-cloud/compare/32c4931bf0^...e7bcf7d0af)
 
 ### Agency
 
@@ -1270,27 +1316,4 @@ to assign a ticket to another user.
 ##### Adds change-url form to /form/{form-name} to change name of the form
 
 `Feature` | [SEA-381](https://linear.app/seantis/issue/SEA-381) | [4934115701](https://github.com/onegov/onegov-cloud/commit/49341157014507b03b90eedf389f1da138157591)
-
-## 2021.64
-
-`2021-07-07` | [24957f62a8...8f423f4785](https://github.com/OneGov/onegov-cloud/compare/24957f62a8^...8f423f4785)
-
-### Org
-
-##### Improves message sending for tickets and forms
-
-- Adds Email message form to form registration windows
-- Adds /ticket-settings to skip ticket closing emails
-- Adds batch cancellation for attendees of form registration windows
-- Applies for town6 as well
-
-`Feature` | [SEA-379](https://linear.app/seantis/issue/SEA-379) | [1748d18bad](https://github.com/onegov/onegov-cloud/commit/1748d18bad7f6bba9cb31131d479178a1a85b351)
-
-##### Adds bullet list to contact panel
-
-- Changes contact_html and adds a class to ul if the input contains '-'.
-- Adds md explanation to contact form field
-- applies for town6 as well
-
-`Feature` | [SEA-430](https://linear.app/seantis/issue/SEA-430) | [b08f2be09f](https://github.com/onegov/onegov-cloud/commit/b08f2be09f5c11e4d9b425245660919ad22121fc)
 
