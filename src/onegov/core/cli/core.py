@@ -186,6 +186,7 @@ is not executed.
 
 import click
 import inspect
+import logging.config
 import sys
 
 from fnmatch import fnmatch
@@ -516,6 +517,10 @@ def command_group():
 
         """
 
+        group_context = click.get_current_context().obj
+        group_context.config.logging.setdefault('version', 1)
+        logging.config.dictConfig(group_context.config.logging)
+
         if not processor:
             return
 
@@ -523,8 +528,6 @@ def command_group():
             processors = (processor, )
         else:
             processors = processor
-
-        group_context = click.get_current_context().obj
 
         # load all applications into the server
         view_path = uuid4().hex
@@ -579,9 +582,9 @@ def command_group():
         server = Server(
             Config({
                 'applications': applications,
-                'logging': group_context.config.logging
             }),
-            configure_morepath=False
+            configure_morepath=False,
+            configure_logging=False
         )
 
         def expects_request(processor):

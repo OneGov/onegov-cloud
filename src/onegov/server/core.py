@@ -71,6 +71,7 @@ class Server(object):
             self,
             config,
             configure_morepath=True,
+            configure_logging=True,
             post_mortem=False,
             environ_overrides=None,
             exception_hook=None):
@@ -79,7 +80,8 @@ class Server(object):
         self.wildcard_applications = set(
             a.root for a in config.applications if not a.is_static)
 
-        self.configure_logging(config.logging)
+        if configure_logging:
+            self.configure_logging(config.logging)
 
         if configure_morepath:
             self.configure_morepath()
