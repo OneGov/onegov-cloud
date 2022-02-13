@@ -583,7 +583,8 @@ def command_group():
             Config({
                 'applications': applications,
             }),
-            configure_morepath=False
+            configure_morepath=False,
+            configure_logging=False
         )
 
         def expects_request(processor):
