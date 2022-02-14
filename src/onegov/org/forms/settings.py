@@ -847,7 +847,7 @@ class NewsletterSettingsForm(Form):
 
     show_newsletter = BooleanField(
         label=_('Show option for newsletter registration'),
-        default=True
+        default=False
     )
 
     logo_in_newsletter = BooleanField(
