@@ -705,12 +705,13 @@ def get_filters(self, request):
         attrs={'class': 'ticket-filter-my'}
     )
     for id, text in TICKET_STATES.items():
-        yield Link(
-            text=text,
-            url=request.link(self.for_state(id).for_owner(None)),
-            active=self.state == id,
-            attrs={'class': 'ticket-filter-' + id}
-        )
+        if text != "Archived":
+            yield Link(
+                text=text,
+                url=request.link(self.for_state(id).for_owner(None)),
+                active=self.state == id,
+                attrs={'class': 'ticket-filter-' + id}
+            )
 
 
 def get_groups(self, request, groups, handler):
