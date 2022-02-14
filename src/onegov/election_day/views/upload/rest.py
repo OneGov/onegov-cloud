@@ -2,6 +2,8 @@ import transaction
 
 from base64 import b64decode
 from onegov.ballot.models import Election
+from onegov.ballot.models import ElectionCompound
+from onegov.ballot.models import ProporzElection
 from onegov.ballot.models import Vote
 from onegov.core.security import Public
 from onegov.election_day import _
@@ -42,11 +44,12 @@ def view_upload_rest(self, request):
     """ Upload election or vote results via REST using the internal format.
 
     Example usage:
-        curl http://localhost:8080/onegov_election_day/xx/upload
-            --user :<token>
-            --header "Accept-Language: de_CH"
-            --form "type=vote"
-            --form "identifier=vote-against-something"
+        curl http://wahlen-abstimmungen.onegovcloud.ch/upload \
+            --include \
+            --user :<token> \
+            --header "Accept-Language: de_CH" \
+            --form "type=vote" \
+            --form "id=vote-against-something" \
             --form "results=@results.csv"
 
     """
@@ -75,15 +78,23 @@ def view_upload_rest(self, request):
 
     # Check the ID
     session = request.session
-    item = session.query(
-        Vote if form.type.data == 'vote' else Election
-    ).filter_by(id=form.id.data).first()
+    if form.type.data == 'vote':
+        item = session.query(Vote).filter_by(id=form.id.data).first()
+    else:
+        item = session.query(ElectionCompound).filter_by(
+            id=form.id.data
+        ).first()
+        if not item:
+            item = session.query(Election).filter_by(id=form.id.data).first()
     if not item:
         errors.setdefault('id', []).append(_("Invalid id"))
 
     # Check the type
     if item and form.type.data == 'parties':
-        if item.type != 'proporz':
+        if not (
+            isinstance(item, ElectionCompound)
+            or isinstance(item, ProporzElection)
+        ):
             errors.setdefault('id', []).append(
                 _("Use an election based on proportional representation")
             )
@@ -103,7 +114,9 @@ def view_upload_rest(self, request):
         if form.type.data == 'vote':
             err = import_vote_internal(item, self, file, mimetype)
         if form.type.data == 'election':
-            if item.type == 'proporz':
+            if isinstance(item, ElectionCompound):
+                raise NotImplementedError
+            if isinstance(item, ProporzElection):
                 err = import_election_internal_proporz(
                     item, self, file, mimetype
                 )

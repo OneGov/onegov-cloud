@@ -4,6 +4,7 @@ from datetime import date
 from io import BytesIO
 from onegov.ballot import Vote
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import login
@@ -22,7 +23,7 @@ def create_vote(app):
     new.form.submit()
 
 
-def create_election(app, type):
+def create_election(app, type, create_compound=False):
     client = Client(app)
     login(client)
     new = client.get('/manage/elections/new-election')
@@ -30,8 +31,17 @@ def create_election(app, type):
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
     new.form['election_type'] = type
-    new.form['domain'] = 'federation'
+    new.form['domain'] = 'municipality'
     new.form.submit()
+
+    if create_compound:
+        new = client.get('/manage/election-compounds/new-election-compound')
+        new.form['election_de'] = "Elections"
+        new.form['date'] = date(2015, 1, 1)
+        new.form['municipality_elections'] = ['election']
+        new.form['domain'] = 'canton'
+        new.form['domain_elections'] = 'municipality'
+        new.form.submit()
 
 
 def test_view_rest_authenticate(election_day_app_zg):
@@ -57,6 +67,7 @@ def test_view_rest_authenticate(election_day_app_zg):
 
 
 def test_view_rest_validation(election_day_app_zg):
+    # todo:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
@@ -252,22 +263,40 @@ def test_view_rest_parties(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
-    create_election(election_day_app_zg, 'proporz')
+    create_election(election_day_app_zg, 'proporz', True)
 
-    params = (
-        ('id', 'election'),
-        ('type', 'parties'),
-        ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-    )
-
+    # election
     with patch(
         'onegov.election_day.views.upload.rest.import_party_results',
         return_value=[]
     ) as import_:
+        params = (
+            ('id', 'election'),
+            ('type', 'parties'),
+            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+        )
         result = client.post('/upload', params=params)
         assert result.json['status'] == 'success'
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], Election)
+        assert isinstance(import_.call_args[0][1], BytesIO)
+        assert import_.call_args[0][2] == 'application/octet-stream'
+
+    # compound
+    with patch(
+        'onegov.election_day.views.upload.rest.import_party_results',
+        return_value=[]
+    ) as import_:
+        params = (
+            ('id', 'elections'),
+            ('type', 'parties'),
+            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+        )
+        result = client.post('/upload', params=params)
+        assert result.json['status'] == 'success'
+
+        assert import_.called
+        assert isinstance(import_.call_args[0][0], ElectionCompound)
         assert isinstance(import_.call_args[0][1], BytesIO)
         assert import_.call_args[0][2] == 'application/octet-stream'
