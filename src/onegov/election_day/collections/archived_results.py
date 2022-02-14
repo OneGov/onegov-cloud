@@ -445,7 +445,7 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
                 ArchivedResult.meta['answer'].astext.in_(self.answers)
             )
 
-        if self.term:
+        if self.term and self.term != '*':
             query = query.filter(or_(*self.term_filter))
 
         # order by date and type
