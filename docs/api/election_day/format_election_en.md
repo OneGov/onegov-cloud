@@ -65,7 +65,7 @@ The following columns will be evaluated and should exist:
 Name|Description
 ---|---
 `election_absolute_majority`|Absolute majority of the election, only if Majorz election.
-`election_status`|`unknown`, `interim` or `final`.
+`election_status`|Status of the election. `interim` (intermediate results), `final` (final results) or `unknown`.
 `entity_id`|BFS number of the municipality. A value of `0` can be used for expats.
 `entity_counted`|`True` if the result was counted.
 `entity_eligible_voters`|Number of persons entitled to vote in municipality.

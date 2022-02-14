@@ -12,6 +12,7 @@ from onegov.election_day.forms.screen import ScreenForm
 from onegov.election_day.forms.subscription import EmailSubscriptionForm
 from onegov.election_day.forms.subscription import SmsSubscriptionForm
 from onegov.election_day.forms.subscription import SubscribersCleanupForm
+from onegov.election_day.forms.upload import UploadElectionCompoundForm
 from onegov.election_day.forms.upload import UploadMajorzElectionForm
 from onegov.election_day.forms.upload import UploadPartyResultsForm
 from onegov.election_day.forms.upload import UploadProporzElectionForm
@@ -39,6 +40,7 @@ __all__ = [
     'SubscribersCleanupForm',
     'TriggerNotificationForm',
     'TriggerNotificationsForm',
+    'UploadElectionCompoundForm',
     'UploadMajorzElectionForm',
     'UploadPartyResultsForm',
     'UploadProporzElectionForm',

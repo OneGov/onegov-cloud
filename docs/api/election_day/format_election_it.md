@@ -63,7 +63,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 Nome|Descrizione
 ---|---
 `election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
-`election_status`|`interim` (risultati provvisori), `final` (risultati finali) o `unknown` (ignoto).
+`election_status`|Stato delle elezioni. `interim` (risultati provvisori), `final` (risultati finali) o `unknown` (ignoto).
 `entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero di aventi diritto al voto nel Comune.

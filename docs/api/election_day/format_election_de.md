@@ -63,7 +63,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 Name|Beschreibung
 ---|---
 `election_absolute_majority`|Absolutes Mehr der Wahl, nur falls Majorzwahl.
-`election_status`|`unknown`, `interim` oder `final`.
+`election_status`|Status der Wahl. `interim` (Zwischenresultate), `final` (Endresultate) oder `unknown` (unbekannt).
 `entity_id`|BFS Nummer der Gemeinde oder ID des Stadtteils. Der Wert `0` kann für Auslandslebende verwendet werden.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Anzahl Stimmberechtigte der Einheit.
