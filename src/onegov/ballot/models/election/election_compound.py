@@ -132,10 +132,7 @@ class ElectionCompound(
     @property
     def elections(self):
         elections = [association.election for association in self.associations]
-        return sorted(
-            elections,
-            key=lambda x: f"{x.status}{x.shortcode or ''}"
-        )
+        return sorted(elections, key=lambda x: x.shortcode or '')
 
     @elections.setter
     def elections(self, value):
