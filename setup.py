@@ -61,7 +61,7 @@ setup(
         'attrs',
         'babel',
         'bcrypt',
-        'bjoern',
+        'bjoern<3.2.0',
         'bleach',
         'blinker',
         'cached_property',
