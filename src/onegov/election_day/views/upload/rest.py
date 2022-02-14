@@ -135,6 +135,9 @@ def view_upload_rest(self, request):
         if not errors:
             archive = ArchivedResultCollection(session)
             archive.update(item, request)
+            if isinstance(item, ElectionCompound):
+                for election in item.elections:
+                    archive.update(election, request)
             request.app.send_zulip(
                 self.name,
                 'New results available: [{}]({})'.format(

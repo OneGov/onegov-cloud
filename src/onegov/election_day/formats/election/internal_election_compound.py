@@ -30,4 +30,9 @@ def import_election_compound_internal(compound, principal, file, mimetype):
 
         errors.extend(election_errors)
 
+    if not errors:
+        last_result_change = compound.timestamp()
+        for election in compound.elections:
+            election.last_result_change = last_result_change
+
     return errors
