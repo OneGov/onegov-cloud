@@ -62,4 +62,6 @@ def submission_deletable(submission, session, payment_blocks=True):
         return False
     if payment_blocks and submission.payment:
         return False
+    if not ticket:
+        return True
     return ticket
