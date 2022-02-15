@@ -104,6 +104,10 @@ Sch'il status è
 - `final`, vala la votaziun sco terminada
 - `unknown`, l'elecziun vala sco terminada, sche tut las unitads (spetgadas) èn dumbradas
 
+#### Elecziuns colliadas
+
+Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, indem eine einzige Datei mit allen Zeilen der Resultate der einzelnen Wahlen geliefert wird.
+
 #### Project
 
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)

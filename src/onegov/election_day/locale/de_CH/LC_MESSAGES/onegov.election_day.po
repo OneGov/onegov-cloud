@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-13 06:44+0100\n"
+"POT-Creation-Date: 2022-02-15 13:18+0100\n"
 "PO-Revision-Date: 2022-02-05 17:23+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -90,6 +90,10 @@ msgstr "Ungültige Fliesskommazahl: ${col}"
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Nicht alphanumerisch: ${col}"
+
+msgid "This format does not support separate results for expats"
+msgstr ""
+"Dieses Format unterstützt keine separaten Ergebnisse für Auslandsschweizer"
 
 msgid "Invalid election values"
 msgstr "Ungültige Wahldaten"
@@ -830,14 +834,14 @@ msgstr "ID ändern"
 msgid "Upload results"
 msgstr "Resultate hochladen"
 
+msgid "Upload party results"
+msgstr "Parteiresultate hochladen"
+
 msgid "Clear results"
 msgstr "Resultate löschen"
 
 msgid "Clear media"
 msgstr "Medien löschen"
-
-msgid "Upload party results"
-msgstr "Parteiresultate hochladen"
 
 msgid "Yeas"
 msgstr "Ja-Stimmen"

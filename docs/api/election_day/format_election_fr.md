@@ -63,7 +63,7 @@ Les colonnes suivantes seront évaluées et devraient exister :
 Nom|Description
 ---|---
 `election_absolute_majority`|Majorité absolue de l'élection, seulement si c'est une élection Majorz.
-`election_status`|`interim` (résultats intermédiaires), `final` (résultats finaux) or `unknown` (inconnu).
+`election_status`|Statut de l'élection. `interim` (résultats intermédiaires), `final` (résultats finaux) or `unknown` (inconnu).
 `entity_id`|Numéro BFS de la municipalité. Une valeur de `0` peut être utilisée pour les expatriés.
 `entity_counted`|`True` si le résultat a été compté.
 `entity_eligible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
@@ -103,6 +103,10 @@ Si le statut est
 - `interim`, le scrutin n'a pas été terminé dans sa totalité
 - `final`, la totalité du scrutin est considérée comme terminée
 - `unknown`, la totalité du scrutin est considérée comme terminée si toutes les municipalités (prévues) sont décomptées
+
+#### Composantes des élections
+
+Les résultats des composantes des élections peuvent être téléchargés de manière groupée en fournissant un seul fichier avec toutes les lignes des résultats de chaque élection.
 
 #### Modèle
 

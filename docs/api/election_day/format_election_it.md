@@ -63,7 +63,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 Nome|Descrizione
 ---|---
 `election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
-`election_status`|`interim` (risultati provvisori), `final` (risultati finali) o `unknown` (ignoto).
+`election_status`|Stato delle elezioni. `interim` (risultati provvisori), `final` (risultati finali) o `unknown` (ignoto).
 `entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero di aventi diritto al voto nel Comune.
@@ -103,6 +103,10 @@ Se lo stato è
 - `interim`, l’intera elezione non è ancora stata completata
 - `final`, l’intera elezione è stata completata
 - `unknown`, l'intera elezione viene considerata completata, se vengono contati tutti i comuni (previsti)
+
+#### Componenti delle elezioni
+
+Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, indem eine einzige Datei mit allen Zeilen der Resultate der einzelnen Wahlen geliefert wird.
 
 #### Modello
 

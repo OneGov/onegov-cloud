@@ -518,34 +518,27 @@ def upload_election_compound(client, create=True, canton='gr',
     if create:
         create_election_compound(client, canton=canton, pukelsheim=pukelsheim)
 
-    for index, slug in enumerate((
-        'regional-election-a', 'regional-election-b'
-    )):
-        csv = PROPORZ_HEADER
+    csv = PROPORZ_HEADER
+    csv += (
+        f'{status},{entities[canton][0]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+        f'101,False,Anna,Looser,0,,0,1\n'
+        f'{status},{entities[canton][0]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+        f'201,True,Carol,Winner,2,,2,0\n'
+    )
+    csv += (
+        f'{status},{entities[canton][1]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+        f'101,True,Hans,Sieger,0,,0,1\n'
+        f'{status},{entities[canton][1]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+        f'201,False,Peter,Verlierer,2,,2,0\n'
+    )
+    csv = csv.encode('utf-8')
 
-        entity = entities[canton][index]
-        if index:
-            csv += (
-                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-                f'101,True,Hans,Sieger,0,,0,1\n'
-                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-                f'201,False,Peter,Verlierer,2,,2,0\n'
-            )
-        else:
-            csv += (
-                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-                f'101,False,Anna,Looser,0,,0,1\n'
-                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-                f'201,True,Carol,Winner,2,,2,0\n'
-            )
-        csv = csv.encode('utf-8')
+    upload = client.get('/elections/elections/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
 
-        upload = client.get(f'/election/{slug}/upload').follow()
-        upload.form['file_format'] = 'internal'
-        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-        upload = upload.form.submit()
-
-        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
 
 def import_wabstic_data(election, tar_file, principal, expats=False):

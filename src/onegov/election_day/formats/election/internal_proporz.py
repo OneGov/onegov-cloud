@@ -29,7 +29,8 @@ def parse_election(line, errors):
     return status
 
 
-def parse_election_result(line, errors, entities, election, principal):
+def parse_election_result(line, errors, entities, election, principal,
+                          ignore_extra):
     try:
         entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
@@ -54,9 +55,13 @@ def parse_election_result(line, errors, entities, election, principal):
             ))
 
         else:
+            entity_errors = []
             name, district = get_entity_and_district(
-                entity_id, entities, election, principal, errors
+                entity_id, entities, election, principal, entity_errors
             )
+            if ignore_extra and entity_errors:
+                return True
+            errors.extend(entity_errors)
 
             if not errors:
                 return dict(
@@ -73,6 +78,8 @@ def parse_election_result(line, errors, entities, election, principal):
                     blank_votes=blank_votes,
                     invalid_votes=invalid_votes,
                 )
+
+    return False
 
 
 def parse_list(line, errors, election_id):
@@ -205,13 +212,17 @@ def parse_connection(line, errors, election_id):
         return connection, subconnection
 
 
-def import_election_internal_proporz(election, principal, file, mimetype):
+def import_election_internal_proporz(
+    election, principal, file, mimetype, ignore_extra=False
+):
     """ Tries to import the given file (internal format).
 
     This is the format used by onegov.ballot.Election.export().
 
     This function is typically called automatically every few minutes during
     an election day - we use bulk inserts to speed up the import.
+
+    Optionally ignores results not being part of this election.
 
     :return:
         A list containing errors.
@@ -246,10 +257,12 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         line_errors = []
 
         # Parse the line
-        status = parse_election(line, line_errors)
         result = parse_election_result(
-            line, line_errors, entities, election, principal
+            line, line_errors, entities, election, principal, ignore_extra
         )
+        if result is True:
+            continue
+        status = parse_election(line, line_errors)
         candidate = parse_candidate(line, line_errors, election_id)
         candidate_result = parse_candidate_result(line, line_errors)
         list_ = parse_list(line, line_errors, election_id)

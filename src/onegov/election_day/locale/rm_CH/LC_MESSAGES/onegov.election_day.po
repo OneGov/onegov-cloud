@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-13 06:44+0100\n"
+"POT-Creation-Date: 2022-02-15 13:18+0100\n"
 "PO-Revision-Date: 2022-02-13 06:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -90,6 +90,9 @@ msgstr "Cifra a comma fluctuanta nunvalaivla: ${col}"
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Betg alfanumeric: ${col}"
+
+msgid "This format does not support separate results for expats"
+msgstr ""
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
@@ -810,14 +813,14 @@ msgstr ""
 msgid "Upload results"
 msgstr "Chargiar si resultats"
 
+msgid "Upload party results"
+msgstr "Chargiar si ils resultats da las partidas"
+
 msgid "Clear results"
 msgstr "Stizzar ils resultats"
 
 msgid "Clear media"
 msgstr ""
-
-msgid "Upload party results"
-msgstr "Chargiar si ils resultats da las partidas"
 
 msgid "Yeas"
 msgstr "Vuschs affirmativas"

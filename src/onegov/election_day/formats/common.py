@@ -34,6 +34,16 @@ class FileImportError(object):
         self.error = error
         self.line = line
 
+    def __eq__(self, other):
+        def interpolate(text):
+            return text.interpolate() if hasattr(text, 'interpolate') else text
+
+        return (
+            self.filename == other.filename
+            and interpolate(self.error) == interpolate(other.error)
+            and self.line == other.line
+        )
+
 
 def load_csv(
     file, mimetype, expected_headers, filename=None, dialect=None,
@@ -159,6 +169,9 @@ def get_entity_and_district(
     district or region is not part of this election.
 
     """
+
+    if entity_id == 0:
+        return '', ''
 
     entity = entities.get(entity_id, {})
     name = entity.get('name', '')
