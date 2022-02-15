@@ -604,14 +604,20 @@ class PdfGenerator():
         if compound.show_list_groups and chart:
             pdf.h2(_('List groups'))
             pdf.pdf(chart)
+            pdf.figcaption('<b>{}</b>: {}'.format(
+                pdf.translate(_('Voters count')),
+                pdf.translate(_('figcaption_party_strengths'))
+            ))
             pdf.spacer()
             pdf.results(
                 [
                     _('List group'),
+                    _('Voters count'),
                     _('Mandates'),
                 ],
                 [[
                     r.name,
+                    r.voters_count,
                     r.number_of_mandates
                 ] for r in get_list_groups(compound)],
                 [None, 2 * cm, 2 * cm],
