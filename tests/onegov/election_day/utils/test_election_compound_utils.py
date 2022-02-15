@@ -335,49 +335,49 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'color': '#EE7F00',
                 'text': 'CVP',
                 'value': 931,
-                'value2': None
+                'value2': 22
             },
             {
                 'class': 'inactive',
                 'color': '#019040',
                 'text': 'SVP',
                 'value': 899,
-                'value2': None
+                'value2': 19
             },
             {
                 'class': 'inactive',
                 'color': '#0E52A0',
                 'text': 'FDP',
                 'value': 863,
-                'value2': None
+                'value2': 18
             },
             {
                 'class': 'inactive',
                 'color': '#99C040',
                 'text': 'AL',
                 'value': 538,
-                'value2': None
+                'value2': 10
             },
             {
                 'class': 'inactive',
                 'color': '#E53136',
                 'text': 'SP',
                 'value': 418,
-                'value2': None
+                'value2': 7
             },
             {
                 'class': 'inactive',
                 'color': '#acc700',
                 'text': 'GLP',
                 'value': 236,
-                'value2': None
+                'value2': 4
             },
             {
                 'class': 'inactive',
                 'color': '#F9B200',
                 'text': 'Piraten',
                 'value': 19,
-                'value2': None
+                'value2': 0
             }
         ]
     }
@@ -390,50 +390,50 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'active',
                 'color': '#EE7F00',
                 'text': 'CVP',
-                'value': 22,
-                'value2': None
+                'value': 931,
+                'value2': 22
             },
             {
                 'class': 'active',
                 'color': '#019040',
                 'text': 'SVP',
-                'value': 19,
-                'value2': None
+                'value': 899,
+                'value2': 19
             },
             {
                 'class': 'active',
                 'color': '#0E52A0',
                 'text': 'FDP',
-                'value': 18,
-                'value2': None
+                'value': 863,
+                'value2': 18
             },
             {
                 'class': 'active',
                 'color': '#99C040',
                 'text': 'AL',
-                'value': 10,
-                'value2': None
+                'value': 538,
+                'value2': 10
             },
             {
                 'class': 'active',
                 'color': '#E53136',
                 'text': 'SP',
-                'value': 7,
-                'value2': None
+                'value': 418,
+                'value2': 7
             },
             {
                 'class': 'active',
                 'color': '#acc700',
                 'text': 'GLP',
-                'value': 4,
-                'value2': None
+                'value': 236,
+                'value2': 4
             },
             {
                 'class': 'inactive',
                 'color': '#F9B200',
                 'text': 'Piraten',
-                'value': 0,
-                'value2': None
+                'value': 19,
+                'value2': 0
             }
         ]
     }

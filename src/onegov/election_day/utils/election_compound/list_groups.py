@@ -35,11 +35,8 @@ def get_list_groups_data(election_compound):
         'results': [
             {
                 'text': result.name,
-                'value': (
-                    result.number_of_mandates if completed
-                    else result.voters_count
-                ),
-                'value2': None,
+                'value': result.voters_count,
+                'value2': result.number_of_mandates,
                 'class': (
                     'active' if completed and result.number_of_mandates
                     else 'inactive'

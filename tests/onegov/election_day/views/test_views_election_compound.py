@@ -209,21 +209,21 @@ def test_view_election_compound_list_groups(election_day_app_gr):
                 'color': '#efb52c',
                 'text': 'BDP',
                 'value': 603,
-                'value2': None
+                'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#ff6300',
                 'text': 'CVP',
                 'value': 491,
-                'value2': None
+                'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#0571b0',
                 'text': 'FDP',
                 'value': 351,
-                'value2': None
+                'value2': 0
             }
         ]
     }
@@ -250,22 +250,22 @@ def test_view_election_compound_list_groups(election_day_app_gr):
                 'class': 'active',
                 'color': '#efb52c',
                 'text': 'BDP',
-                'value': 1,
-                'value2': None
+                'value': 603,
+                'value2': 1
             },
             {
                 'class': 'active',
                 'color': '#ff6300',
                 'text': 'CVP',
-                'value': 1,
-                'value2': None
+                'value': 491,
+                'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#0571b0',
                 'text': 'FDP',
-                'value': 0,
-                'value2': None
+                'value': 351,
+                'value2': 0
             }
         ]
     }

@@ -359,7 +359,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'data-text="87135"' not in result
     assert 'data-text="1705"' not in result  # voters_count hidden
     assert 'data-text="140"' not in result  # voters_count hidden
-    assert 'data-text="3487"' not in result  # voters_count hidden
+    assert 'data-text="3487"' in result
     assert (
         'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
     ) in result
