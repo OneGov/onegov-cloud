@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-13 06:44+0100\n"
+"POT-Creation-Date: 2022-02-15 13:18+0100\n"
 "PO-Revision-Date: 2022-02-05 17:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -89,6 +89,10 @@ msgstr "Nombre flottant invalide: ${col}"
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Pas un alphanumerique: ${col}"
+
+msgid "This format does not support separate results for expats"
+msgstr ""
+"Ce format ne permet pas d'obtenir des résultats séparés pour les expatriés"
 
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
@@ -829,14 +833,14 @@ msgstr "Modifier l'ID"
 msgid "Upload results"
 msgstr "Mettre à jour les résultats"
 
+msgid "Upload party results"
+msgstr "Uploader les résultats par parti"
+
 msgid "Clear results"
 msgstr "Effacer les résultats"
 
 msgid "Clear media"
 msgstr "Supprimer le média"
-
-msgid "Upload party results"
-msgstr "Uploader les résultats par parti"
 
 msgid "Yeas"
 msgstr "Oui"

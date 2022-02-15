@@ -318,7 +318,7 @@ def test_import_internal_proporz_expats(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Canton(canton='zg')
+    principal = Canton(canton='sg')
 
     for expats in (False, True):
         election.expats = expats

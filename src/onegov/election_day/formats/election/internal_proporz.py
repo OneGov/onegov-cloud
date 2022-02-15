@@ -60,8 +60,7 @@ def parse_election_result(line, errors, entities, election, principal,
                 entity_id, entities, election, principal, entity_errors
             )
             if ignore_extra and entity_errors:
-                return
-
+                return True
             errors.extend(entity_errors)
 
             if not errors:
@@ -79,6 +78,8 @@ def parse_election_result(line, errors, entities, election, principal,
                     blank_votes=blank_votes,
                     invalid_votes=invalid_votes,
                 )
+
+    return False
 
 
 def parse_list(line, errors, election_id):
@@ -259,7 +260,7 @@ def import_election_internal_proporz(
         result = parse_election_result(
             line, line_errors, entities, election, principal, ignore_extra
         )
-        if not result and ignore_extra:
+        if result is True:
             continue
         status = parse_election(line, line_errors)
         candidate = parse_candidate(line, line_errors, election_id)

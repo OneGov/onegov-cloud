@@ -104,6 +104,10 @@ Se lo stato è
 - `final`, l’intera elezione è stata completata
 - `unknown`, l'intera elezione viene considerata completata, se vengono contati tutti i comuni (previsti)
 
+#### Componenti delle elezioni
+
+Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, indem eine einzige Datei mit allen Zeilen der Resultate der einzelnen Wahlen geliefert wird.
+
 #### Modello
 
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)

@@ -104,6 +104,10 @@ Si le statut est
 - `final`, la totalité du scrutin est considérée comme terminée
 - `unknown`, la totalité du scrutin est considérée comme terminée si toutes les municipalités (prévues) sont décomptées
 
+#### Composantes des élections
+
+Les résultats des composantes des élections peuvent être téléchargés de manière groupée en fournissant un seul fichier avec toutes les lignes des résultats de chaque élection.
+
 #### Modèle
 
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)

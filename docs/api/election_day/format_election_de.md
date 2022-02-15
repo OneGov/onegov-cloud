@@ -104,6 +104,10 @@ Für den Status
 - `final` gilt die Wahl als abgeschlossen
 - `unknown` gilt die Wahl als abgeschlossen, falls alle (erwarteten) Einheiten ausgezählt sind
 
+#### Verbundene Wahlen
+
+Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, indem eine einzige Datei mit allen Zeilen der Resultate der einzelnen Wahlen geliefert wird.
+
 #### Vorlage
 
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)

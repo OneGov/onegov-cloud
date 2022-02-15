@@ -106,6 +106,9 @@ If the status is
 - `final`, the whole election is considered completed
 - `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
 
+#### Election compounds
+
+The results of election compounds can be uploaded in a bundle by providing a single file with all the rows of the results of each election.
 
 #### Template
 

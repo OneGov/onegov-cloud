@@ -4,14 +4,15 @@ from datetime import date
 from onegov.ballot import ComplexVote
 from onegov.ballot import Election
 from onegov.ballot import Vote
-from onegov.election_day.forms import UploadPartyResultsForm
+from onegov.election_day.forms import UploadElectionCompoundForm
 from onegov.election_day.forms import UploadMajorzElectionForm
+from onegov.election_day.forms import UploadPartyResultsForm
 from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.forms import UploadVoteForm
+from onegov.election_day.models import Canton
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
-from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 from tests.onegov.election_day.common import DummyPostData
 
@@ -236,5 +237,16 @@ def test_upload_rest_form(session):
     assert form.validate()
 
     form = UploadRestForm(DummyPostData({'type': 'parties', 'id': 'parties'}))
+    form.results.data = {'mimetype': 'text/plain'}
+    assert form.validate()
+
+
+def test_upload_election_compound_form(session):
+    form = UploadElectionCompoundForm()
+    assert not form.validate()
+
+    form = UploadElectionCompoundForm(
+        DummyPostData({'file_format': 'internal'})
+    )
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()

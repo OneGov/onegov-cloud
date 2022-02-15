@@ -67,7 +67,6 @@ def test_view_rest_authenticate(election_day_app_zg):
 
 
 def test_view_rest_validation(election_day_app_zg):
-    # todo:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
     token = str(token.token)
     transaction.commit()
@@ -97,7 +96,7 @@ def test_view_rest_validation(election_day_app_zg):
     result = client.post('/upload', status=400, params=params).json
     assert result['errors']['id'] == [{'message': 'Invalid id'}]
 
-    # No election
+    # No election or compound
     params = (
         ('id', 'election-id'),
         ('type', 'election'),
@@ -230,14 +229,9 @@ def test_view_rest_proporz(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.authorization = ('Basic', ('', token))
 
-    create_election(election_day_app_zg, 'proporz')
+    create_election(election_day_app_zg, 'proporz', True)
 
-    params = (
-        ('id', 'election'),
-        ('type', 'election'),
-        ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-    )
-
+    # election
     with patch(
         (
             'onegov.election_day.views.upload.rest.'
@@ -245,11 +239,38 @@ def test_view_rest_proporz(election_day_app_zg):
         ),
         return_value=[]
     ) as import_:
+        params = (
+            ('id', 'election'),
+            ('type', 'election'),
+            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+        )
         result = client.post('/upload', params=params)
         assert result.json['status'] == 'success'
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], Election)
+        assert isinstance(import_.call_args[0][1], Canton)
+        assert isinstance(import_.call_args[0][2], BytesIO)
+        assert import_.call_args[0][3] == 'application/octet-stream'
+
+    # compound
+    with patch(
+        (
+            'onegov.election_day.views.upload.rest.'
+            'import_election_compound_internal'
+        ),
+        return_value=[]
+    ) as import_:
+        params = (
+            ('id', 'elections'),
+            ('type', 'election'),
+            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+        )
+        result = client.post('/upload', params=params)
+        assert result.json['status'] == 'success'
+
+        assert import_.called
+        assert isinstance(import_.call_args[0][0], ElectionCompound)
         assert isinstance(import_.call_args[0][1], Canton)
         assert isinstance(import_.call_args[0][2], BytesIO)
         assert import_.call_args[0][3] == 'application/octet-stream'
