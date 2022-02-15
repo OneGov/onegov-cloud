@@ -81,7 +81,7 @@ def reindex_published_models(request):
     objects = []
     session = request.app.session()
     now = utcnow()
-    then = now - timedelta(hour=1)
+    then = now - timedelta(hours=1)
     for base in request.app.session_manager.bases:
         for model in publication_models(base):
             query = session.query(model).filter(
@@ -92,7 +92,7 @@ def reindex_published_models(request):
                     ),
                     and_(
                         then <= model.publication_end,
-                        now >= model.publication_en
+                        now >= model.publication_end
                     )
                 )
             )
