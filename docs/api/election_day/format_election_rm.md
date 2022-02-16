@@ -106,7 +106,7 @@ Sch'il status è
 
 #### Elecziuns colliadas
 
-Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, indem eine einzige Datei mit allen Zeilen der Resultate der einzelnen Wahlen geliefert wird.
+Ils resultats d'elecziuns colliadas pon vegnir chargiads si en ina, sch'i vegn furnida in'unica datoteca cun tut las lingias dals resultats da las singulas elecziuns.
 
 #### Project
 

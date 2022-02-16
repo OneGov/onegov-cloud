@@ -106,7 +106,7 @@ Se lo stato è
 
 #### Componenti delle elezioni
 
-Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, indem eine einzige Datei mit allen Zeilen der Resultate der einzelnen Wahlen geliefert wird.
+I risultati di elezioni legate tra loro possono essere caricati tutti insieme mediante un unico file contenente tutte le righe dei risultati delle singole elezioni.
 
 #### Modello
 
