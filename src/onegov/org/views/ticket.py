@@ -540,8 +540,8 @@ def un_archive_ticket(self, request):
     except InvalidStateChange:
         request.alert(_("The ticket cannot be unarchived because it's not archived"))
     else:
-        TicketMessage.create(self, request, 'archived')
-        request.success(_("You have archived ticket ${number}", mapping={
+        TicketMessage.create(self, request, 'unarchived')
+        request.success(_("You have unarchived ticket ${number}", mapping={
             'number': self.number
         }))
 
