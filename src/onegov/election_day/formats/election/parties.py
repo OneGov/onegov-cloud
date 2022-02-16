@@ -5,6 +5,7 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.common import validate_list_id
+from onegov.election_day.formats.common import validate_numeric
 from onegov.election_day.formats.mappings import ELECTION_PARTY_HEADERS
 from re import match
 from sqlalchemy.orm import object_session
@@ -23,8 +24,9 @@ def parse_party_result(
         )
         mandates = validate_integer(line, 'mandates')
         votes = validate_integer(line, 'votes')
-        voters_count = validate_integer(
-            line, 'voters_count', optional=True, default=None
+        voters_count = validate_numeric(
+            line, 'voters_count', precision=12, scale=2,
+            optional=True, default=None
         )
         assert all((year, total_votes, name, color))
         assert match(r'^#[0-9A-Fa-f]{6}$', color)

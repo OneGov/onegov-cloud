@@ -3,6 +3,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import Integer
+from sqlalchemy import Numeric
 from sqlalchemy import Text
 from uuid import uuid4
 
@@ -29,7 +30,7 @@ class PartyResult(Base, TimestampMixin):
 
     #: the number of total votes divided by the total number of mandates,
     #: used instead of total_votes by election compounds
-    voters_count = Column(Integer, nullable=True, default=lambda: 0)
+    voters_count = Column(Numeric(12, 2), nullable=True, default=lambda: 0)
 
     #: the name of the party
     name = Column(Text, nullable=False)

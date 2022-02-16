@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
@@ -846,7 +847,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=0,
             votes=0,
-            voters_count=1,
+            voters_count=Decimal('1.01'),
             total_votes=100,
             name='Libertarian',
             color='black',
@@ -857,7 +858,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=2,
             votes=2,
-            voters_count=3,
+            voters_count=Decimal('3.01'),
             total_votes=50,
             name='Libertarian',
             color='black',
@@ -868,7 +869,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=1,
             votes=1,
-            voters_count=2,
+            voters_count=Decimal('2.01'),
             total_votes=100,
             name='Conservative',
             color='red',
@@ -879,7 +880,7 @@ def test_proporz_election_export_parties(session):
         PartyResult(
             number_of_mandates=3,
             votes=3,
-            voters_count=4,
+            voters_count=Decimal('4.01'),
             total_votes=50,
             name='Conservative',
             color='red',
@@ -894,7 +895,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 50,
             'votes': 3,
-            'voters_count': 4,
+            'voters_count': '4.01',
             'year': 2016,
         }, {
             'color': 'black',
@@ -903,7 +904,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 50,
             'votes': 2,
-            'voters_count': 3,
+            'voters_count': '3.01',
             'year': 2016,
         }, {
             'color': 'red',
@@ -912,7 +913,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 100,
             'votes': 1,
-            'voters_count': 2,
+            'voters_count': '2.01',
             'year': 2012,
         }, {
             'color': 'black',
@@ -921,7 +922,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 100,
             'votes': 0,
-            'voters_count': 1,
+            'voters_count': '1.01',
             'year': 2012,
         }
     ]
@@ -949,7 +950,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 50,
             'votes': 3,
-            'voters_count': 4,
+            'voters_count': '4.01',
             'year': 2016,
             'panachage_votes_from_0': 1,
             'panachage_votes_from_1': 2,
@@ -963,7 +964,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 50,
             'votes': 2,
-            'voters_count': 3,
+            'voters_count': '3.01',
             'year': 2016,
             'panachage_votes_from_0': 5,
             'panachage_votes_from_1': '',
@@ -989,7 +990,7 @@ def test_proporz_election_export_parties(session):
             'id': 0,
             'total_votes': 100,
             'votes': 1,
-            'voters_count': 2,
+            'voters_count': '2.01',
             'year': 2012,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
@@ -1002,7 +1003,7 @@ def test_proporz_election_export_parties(session):
             'id': 1,
             'total_votes': 100,
             'votes': 0,
-            'voters_count': 1,
+            'voters_count': '1.01',
             'year': 2012,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',

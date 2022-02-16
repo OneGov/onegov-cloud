@@ -1,6 +1,7 @@
 import tarfile
 
 from datetime import date
+from decimal import Decimal
 from io import BytesIO
 from onegov.ballot import Election
 from onegov.ballot import ProporzElection
@@ -157,9 +158,9 @@ def test_import_party_results(session):
                     'voters_count',
                 )),
                 '2015,10000,1,P1,#123456,1,5000,4000',
-                '2011,10000,1,P1,#123456,0,3000,3000',
-                '2015,10000,2,P2,#aabbcc,0,5000,2000',
-                '2011,10000,2,P2,#aabbcc,1,7000,1000',
+                '2011,10000,1,P1,#123456,0,3000,3000.',
+                '2015,10000,2,P2,#aabbcc,0,5000,2000.0',
+                '2011,10000,2,P2,#aabbcc,1,7000,1000.01',
             ))
         ).encode('utf-8')), 'text/plain'
     )
@@ -172,10 +173,10 @@ def test_import_party_results(session):
         )
         for r in election.party_results
     ]) == [
-        (2011, 'P1', '#123456', 3000, 3000, 10000, 0),
-        (2011, 'P2', '#aabbcc', 7000, 1000, 10000, 1),
-        (2015, 'P1', '#123456', 5000, 4000, 10000, 1),
-        (2015, 'P2', '#aabbcc', 5000, 2000, 10000, 0)
+        (2011, 'P1', '#123456', 3000, Decimal('3000.00'), 10000, 0),
+        (2011, 'P2', '#aabbcc', 7000, Decimal('1000.01'), 10000, 1),
+        (2015, 'P1', '#123456', 5000, Decimal('4000.00'), 10000, 1),
+        (2015, 'P2', '#aabbcc', 5000, Decimal('2000.00'), 10000, 0)
     ]
 
 
@@ -315,8 +316,8 @@ def test_import_party_results_invalid_values(session):
         (3, 'Invalid values'),
         (4, 'Invalid values'),
         (6, 'FDP/2015 was found twice'),
-        (7, 'Invalid integer: panachage_votes_from_1'),
-        (7, 'Invalid integer: voters_count')
+        (7, 'Invalid decimal number: voters_count'),
+        (7, 'Invalid integer: panachage_votes_from_1')
     ]
 
     # IDs don't match the IDs in the panache results
