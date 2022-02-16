@@ -209,7 +209,3 @@ The endpoint created the following:
 2. A link (`DataSourceItem`) for each election to the data source (token), so that results can be uploaded.
 3. The election compound if using the query param `?create_compound=1` in the url.
 4. With query parameters `?create_compound=1&pukelsheim=1`, it will also flag the compound to show temporary results adapted to the Doppelter Pukelsheim.
-
-### Doppelter Pukelsheim
-
-When an election compound is flagged with `pukelsheim`, elections are completed when the compound's the attribute `pukelsheim_completed` is set to true.

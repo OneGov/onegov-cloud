@@ -509,3 +509,30 @@ def cleanup_pukelsheim_fields(context):
             'after_pukelsheim',
             new_column_name='pukelsheim'
         )
+
+
+@upgrade_task(
+    'Add manual completion fields',
+    requires=(
+        'onegov.ballot:Cleans up pukelsheim fields'
+    )
+)
+def add_manual_completion_fields(context):
+    if not context.has_column('election_compounds', 'completes_manually'):
+        context.add_column_with_defaults(
+            'election_compounds',
+            Column(
+                'completes_manually',
+                Boolean,
+                nullable=False,
+                default=False
+            ),
+            default=lambda x: False
+        )
+
+    if context.has_column('election_compounds', 'pukelsheim_completed'):
+        context.operations.alter_column(
+            'election_compounds',
+            'pukelsheim_completed',
+            new_column_name='manually_completed'
+        )

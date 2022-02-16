@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-15 13:18+0100\n"
+"POT-Creation-Date: 2022-02-16 06:59+0100\n"
 "PO-Revision-Date: 2022-02-05 17:23+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -380,6 +380,9 @@ msgstr "Ebene der Wahlen"
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
+
+msgid "Completes manually"
+msgstr "Wird manuell abgeschlossen"
 
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
@@ -781,6 +784,9 @@ msgstr "Formatbeschreibung"
 msgid "Embed"
 msgstr "Einbetten"
 
+msgid "Voters count"
+msgstr "Wählerzahl"
+
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
@@ -940,9 +946,6 @@ msgstr "Nur gewählte Kandidierende"
 
 msgid "List group"
 msgstr "Listengruppe"
-
-msgid "Voters count"
-msgstr "Wählerzahl"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"

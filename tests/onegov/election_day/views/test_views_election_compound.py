@@ -191,7 +191,9 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_election_compound(client, pukelsheim=True, status='final')
+    upload_election_compound(
+        client, pukelsheim=True, completes_manually=True, status='final'
+    )
     upload_party_results(client, slug='elections/elections')
 
     # intermediate results
@@ -234,7 +236,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
 
     # final results
     edit = client.get('/elections/elections/edit')
-    edit.form['pukelsheim_completed'] = True
+    edit.form['manually_completed'] = True
     edit.form.submit()
 
     main = client.get('/elections/elections/list-groups')

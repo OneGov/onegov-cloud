@@ -97,11 +97,14 @@ class ElectionCompound(
     #: The date of the elections
     date = Column(Date, nullable=False)
 
-    #: Enable Doppelter Pukelsheim for setting status of child elections
+    #: Doppelter Pukelsheim
     pukelsheim = Column(Boolean, nullable=False, default=False)
 
-    #: Status for Doppelter Pukelsheim to set via Website
-    pukelsheim_completed = Column(Boolean, nullable=False, default=False)
+    #: Allow setting the status of the compound and its elections manually
+    completes_manually = Column(Boolean, nullable=False, default=False)
+
+    #: Status of the compound and its elections
+    manually_completed = Column(Boolean, nullable=False, default=False)
 
     #: An election compound may contains n party results
     party_results = relationship(
@@ -216,7 +219,7 @@ class ElectionCompound(
             if not election.completed:
                 return False
 
-        if self.pukelsheim and not self.pukelsheim_completed:
+        if self.completes_manually and not self.manually_completed:
             return False
 
         return True

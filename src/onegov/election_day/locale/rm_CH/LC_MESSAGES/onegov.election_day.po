@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-15 13:18+0100\n"
+"POT-Creation-Date: 2022-02-16 06:59+0100\n"
 "PO-Revision-Date: 2022-02-13 06:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -377,6 +377,9 @@ msgstr ""
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
+
+msgid "Completes manually"
+msgstr ""
 
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
@@ -759,6 +762,9 @@ msgstr "Descripziun dal format"
 msgid "Embed"
 msgstr "Incorporar"
 
+msgid "Voters count"
+msgstr "Cifra electorala"
+
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
@@ -919,9 +925,6 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
 msgstr "Gruppa da glista"
-
-msgid "Voters count"
-msgstr "Cifra electorala"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"

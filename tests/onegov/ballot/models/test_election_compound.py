@@ -910,7 +910,7 @@ def test_election_compound_rename(session):
     assert len(election_compound.elections) == 2
 
 
-def test_election_compound_doppelter_pukelsheim(session):
+def test_election_compound_manual_completion(session):
 
     election_compound = ElectionCompound(
         title='Elections',
@@ -953,9 +953,9 @@ def test_election_compound_doppelter_pukelsheim(session):
     assert election_1.completed is False
     assert election_2.completed is True
 
-    # Doppelter Pukelsheim, not completed
-    election_compound.pukelsheim = True
-    assert election_compound.pukelsheim_completed is False
+    # Manual completion, not completed
+    election_compound.completes_manually = True
+    assert election_compound.manually_completed is False
     assert election_compound.completed is False
     assert election_compound.progress == (0, 2)
     assert election_1.completed is False
@@ -967,8 +967,8 @@ def test_election_compound_doppelter_pukelsheim(session):
     assert election_1.completed is False
     assert election_2.completed is False
 
-    # Doppelter Pukelsheim, completed
-    election_compound.pukelsheim_completed = True
+    # Manual completion, completed
+    election_compound.manually_completed = True
     election_1.status = 'interim'
     assert election_compound.completed is False
     assert election_compound.progress == (1, 2)
@@ -1005,8 +1005,10 @@ def test_list_results(session):
     # Not Doppelter Pukelsheim
     assert election_compound.get_list_results() == []
 
-    # Not Doppelter Pukelsheim
+    # Doppelter Pukelsheim with manual completion
     election_compound.pukelsheim = True
+    election_compound.completes_manually = True
+    election_compound.manually_completed = False
     assert election_compound.get_list_results() == [
         ('Quimby Again!', 3, 953),  # 520 / 1 + 520 / 2 + 520 / 3
         ('Kwik-E-Major', 0, 204)  # 111 / 1 + 111/2 + 111/3
@@ -1080,8 +1082,8 @@ def test_list_results(session):
         ('Kwik-E-Major', 0, 204),
     ]
 
-    # ... completed
-    election_compound.pukelsheim_completed = True
+    # ... manually completed
+    election_compound.manually_completed = True
     assert election_compound.get_list_results() == [
         ('Burns burns!', 5, 200),
         ('Quimby Again!', 3, 953),
