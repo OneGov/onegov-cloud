@@ -518,9 +518,9 @@ def cleanup_pukelsheim_fields(context):
     )
 )
 def add_manual_completion_fields(context):
-    if not context.has_column('elections', 'completes_manually'):
+    if not context.has_column('election_compounds', 'completes_manually'):
         context.add_column_with_defaults(
-            'elections',
+            'election_compounds',
             Column(
                 'completes_manually',
                 Boolean,
