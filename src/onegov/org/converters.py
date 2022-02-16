@@ -3,7 +3,7 @@ import morepath
 from collections import defaultdict
 
 
-def keywords_encode(d):
+def keywords_encode(keywords):
     """ Takes a dictionary of keywords and encodes them into a somewhat
     readable url query format.
 
@@ -25,26 +25,32 @@ def keywords_encode(d):
 
     """
 
-    if not d:
+    if not keywords:
         return ''
 
-    if hasattr(d, 'keywords'):
-        d = d.keywords
+    if hasattr(keywords, 'keywords'):
+        keywords = keywords.keywords
 
-    return '+'.join('{}:{}'.format(k, v) for k in d for v in d[k])
+    def escape(s):
+        return s.replace('+', '++')
+
+    return '+'.join(
+        '{}:{}'.format(escape(key), escape(value))
+        for key in keywords for value in keywords[key]
+    )
 
 
-def keywords_decode(s):
-    """ Deocdes keywords creaged by :func:`keywords_encode`. """
+def keywords_decode(text):
+    """ Decodes keywords creaged by :func:`keywords_encode`. """
 
-    if not s:
+    if not text:
         return None
 
     result = defaultdict(list)
 
-    for item in s.split('+'):
+    for item in text.replace('++', '\0').split('+'):
         key, value = item.split(':', 1)
-        result[key].append(value)
+        result[key.replace('\0', '+')].append(value.replace('\0', '+'))
 
     return result
 
