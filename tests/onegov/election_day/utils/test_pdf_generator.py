@@ -65,7 +65,6 @@ def test_generate_pdf_election_compound(session, election_day_app_zg):
     election = add_proporz_election(session)
     compound = add_election_compound(session, elections=[election])
     compound.pukelsheim = True
-    compound.pukelsheim_completed = True
     compound.show_list_groups = True
     compound.show_lists = True
     compound.show_party_strengths = True

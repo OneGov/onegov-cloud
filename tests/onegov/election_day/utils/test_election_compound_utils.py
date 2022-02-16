@@ -19,7 +19,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     session.add(
         ElectionCompound(
             title='Compound', domain='canton', date=date(2020, 3, 8),
-            pukelsheim=True
+            pukelsheim=True, completes_manually=True
         )
     )
     election_compound = session.query(ElectionCompound).one()
@@ -194,7 +194,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     assert not errors
     session.add(election_1)
     election_compound.elections = [election_1, election_2]
-    election_compound.pukelsheim_completed = True
+    election_compound.manually_completed = True
     session.flush()
 
     assert get_districts_data(election_compound, principal) == {
@@ -327,6 +327,8 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 
     # Pukelsheim, intermediate
     election_compound.pukelsheim = True
+    election_compound.completes_manually = True
+    election_compound.manually_completed = False
     assert len(get_list_groups(election_compound)) == 7
     assert get_list_groups_data(election_compound) == {
         'results': [
@@ -383,7 +385,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     }
 
     # Pukelsheim, final
-    election_compound.pukelsheim_completed = True
+    election_compound.manually_completed = True
     assert get_list_groups_data(election_compound) == {
         'results': [
             {

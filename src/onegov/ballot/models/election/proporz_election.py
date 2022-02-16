@@ -109,13 +109,14 @@ class ProporzElection(Election, PartyResultExportMixin):
 
     @property
     def completed(self):
-        """ Overwrites StatusMixin's 'completed' for Doppelter Pukelsheim """
+        """ Overwrites StatusMixin's 'completed' for compounds with manual
+        completion. """
 
         result = super(ProporzElection, self).completed
 
         compound = self.compound
-        if compound and compound.pukelsheim:
-            return compound.pukelsheim_completed and result
+        if compound and compound.completes_manually:
+            return compound.manually_completed and result
 
         return result
 

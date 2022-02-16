@@ -77,7 +77,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     session.add(
         ElectionCompound(
             title='Compound', domain='canton', date=date(2020, 3, 8),
-            pukelsheim=True,
+            pukelsheim=True, completes_manually=True
         )
     )
     model = session.query(ElectionCompound).one()
@@ -268,7 +268,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert not errors
     session.add(election_1)
     model.elections = [election_1, election_2]
-    model.pukelsheim_completed = True
+    model.manually_completed = True
     session.flush()
 
     layout = ElectionCompoundLayout(model, request)
