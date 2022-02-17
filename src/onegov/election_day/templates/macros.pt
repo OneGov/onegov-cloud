@@ -1129,19 +1129,16 @@
 <metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day">
     <h4 i18n:translate="">Open Data</h4>
     <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
-    <p>
-        <ol>
-            <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
-            <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
-        </ol>
-    </p>
+    <ol>
+        <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
+        <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
+    </ol>    
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
 </metal:open_data_download>
 
 <metal:terms_of_use define-macro="terms_of_use" i18n:domain="onegov.election_day">
     <h5 i18n:translate="">Terms of use</h5>
-    <p>
-        <span i18n:translate="">Open use. Must provide the source.</span>
+        <p><span i18n:translate="">Open use. Must provide the source.</span></p>
         <ul>
             <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
             <li i18n:translate="">You may use this dataset for commercial purposes.</li>
@@ -1153,8 +1150,7 @@
                 </ol>
             </li>
         </ul>
-        <a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a>
-    </p>
+        <p><a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a></p>
 </metal:terms_of_use>
 
 <metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">
