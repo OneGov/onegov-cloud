@@ -473,7 +473,7 @@ msgstr "Gruppe"
 msgid "Use the same group for all screens you want to cycle through."
 msgstr ""
 "Verwenden Sie die gleiche Gruppe für alle Screens, die durchlaufen werden "
-"sollen möchten."
+"sollen."
 
 msgid "Duration"
 msgstr "Dauer"
