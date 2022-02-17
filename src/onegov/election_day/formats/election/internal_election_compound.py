@@ -32,6 +32,10 @@ def import_election_compound_internal(compound, principal, file, mimetype):
         if [str(e.error) for e in election_errors] == ['No data found']:
             continue
 
+        election_errors = [
+            e for e in election_errors if str(e.error) != 'No data found'
+        ]
+
         updated.append(election)
         errors.extend(election_errors)
 
@@ -48,7 +52,7 @@ def import_election_compound_internal(compound, principal, file, mimetype):
             election.last_result_change = compound.last_result_change
 
     result = []
-    for error in sorted(errors, key=lambda x: (x.line, x.error)):
+    for error in sorted(errors, key=lambda x: (x.line or 0, x.error or '')):
         if error not in result:
             result.append(error)
     return result
