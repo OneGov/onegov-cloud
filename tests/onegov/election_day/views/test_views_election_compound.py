@@ -83,6 +83,8 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
+    # xxx
+
     login(client)
     create_election_compound(client)
     upload_party_results(client, slug='elections/elections')
@@ -105,9 +107,9 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     export = client.get('/elections/elections/data-parties').text
     lines = export.split('\r\n')
     assert lines[0].startswith('year,name,id,total_votes,color,mandates,votes')
-    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387')
-    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117')
-    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134')
+    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387,603.01')
+    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117,491.02')
+    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134,351.04')
 
     # Historical data
     csv_parties = (
@@ -200,7 +202,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     main = client.get('/elections/elections/list-groups')
     assert '<h3>Listengruppen</h3>' in main
     assert 'BDP' in main
-    assert 'data-text="603"' in main
+    assert 'data-text="603.01"' in main
 
     groups = client.get('/elections/elections/list-groups-data')
     groups = groups.json

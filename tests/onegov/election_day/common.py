@@ -434,9 +434,9 @@ def upload_party_results(client, slug='election/proporz-election'):
         "year,total_votes,id,name,color,mandates,votes,voters_count,"
         "panachage_votes_from_1,panachage_votes_from_2,"
         "panachage_votes_from_3,panachage_votes_from_999\n"
-        "2022,11270,1,BDP,#efb52c,1,60387,603,,11,12,100\n"
-        "2022,11270,2,CVP,#ff6300,1,49117,491,21,,22,200\n"
-        "2022,11270,3,FDP,,0,35134,351,31,32,,300\n"
+        "2022,11270,1,BDP,#efb52c,1,60387,603.01,,11,12,100\n"
+        "2022,11270,2,CVP,#ff6300,1,49117,491.02,21,,22,200\n"
+        "2022,11270,3,FDP,,0,35134,351.04,31,32,,300\n"
     ).encode('utf-8')
 
     upload = client.get(f'/{slug}/upload-party-results')
