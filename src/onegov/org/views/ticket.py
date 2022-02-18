@@ -513,13 +513,12 @@ def unmute_ticket(self, request):
 
 @OrgApp.view(model=Ticket, name='archive', permission=Private)
 def archive_ticket(self, request):
-    user = UserCollection(request.session).by_username(
-        request.identity.userid)
 
     try:
-        self.archive_ticket(user)
+        self.archive_ticket()
     except InvalidStateChange:
-        request.alert(_("The ticket cannot be archived because it's not closed"))
+        request.alert(
+            _("The ticket cannot be archived because it's not closed"))
     else:
         TicketMessage.create(self, request, 'archived')
         request.success(_("You archived ticket ${number}", mapping={
@@ -530,20 +529,27 @@ def archive_ticket(self, request):
 
 
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
-def un_archive_ticket(self, request):
+def unarchive_ticket(self, request):
+    user = UserCollection(request.session).by_username(
+        request.identity.userid)
 
     try:
-        self.unarchive_ticket(request.current_user)
+        self.unarchive_ticket(user)
     except InvalidStateChange:
-        request.alert(_("The ticket cannot be unarchived because it's not archived"))
+        request.alert(
+            _(
+                "The ticket cannot be recovered from the archive because it's "
+                "not archived"
+            ))
     else:
         TicketMessage.create(self, request, 'unarchived')
         request.success(
-        _("You recovered ticket ${number} from the archive", mapping={
-            'number': self.number
-        }))
+            _("You recovered ticket ${number} from the archive", mapping={
+              'number': self.number
+              }))
 
     return morepath.redirect(request.link(self))
+
 
 @OrgApp.form(model=Ticket, name='assign', permission=Private,
              form=TicketAssignmentForm, template='form.pt')

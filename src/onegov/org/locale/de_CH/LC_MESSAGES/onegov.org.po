@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-07 12:40+0100\n"
-"PO-Revision-Date: 2021-01-14 14:27+0100\n"
+"POT-Creation-Date: 2022-02-18 14:55+0100\n"
+"PO-Revision-Date: 2022-02-18 13:20+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "Open"
 msgstr "Offen"
@@ -3556,6 +3556,9 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
 "den Verweis zu bearbeiten oder zu löschen."
 
+msgid "You have been successfully unsubscribed from all regular emails."
+msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
 msgid "local"
 msgstr "lokal"
 
@@ -4633,9 +4636,18 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
 
+msgid "The ticket cannot be archived because it's not closed"
+msgstr "Das Ticket kann nicht archiviert werden, da es nicht geschlossen ist"
+
 #, python-format
 msgid "You archived ticket ${number}"
 msgstr "Sie haben das Ticket ${number} archiviert"
+
+msgid ""
+"The ticket cannot be recovered from the archive because it's not archived"
+msgstr ""
+"Das Ticket kann nicht aus dem Archiv geholt werden, da es nicht archiviert "
+"ist"
 
 #, python-format
 msgid "You recovered ticket ${number} from the archive"
@@ -4708,6 +4720,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-msgid "You have been successfully unsubscribed from all regular emails."
-msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
