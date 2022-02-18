@@ -56,6 +56,13 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         return True
 
+    @cached_property
+    def has_superregions(self):
+        return (
+            self.principal.has_superregions
+            and self.model.domain_elections == 'region'
+        )
+
     def label(self, value):
         if value == 'district':
             if self.model.domain_elections == 'region':

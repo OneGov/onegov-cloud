@@ -52,7 +52,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def has_superregions(self):
-        return self.principal.has_superregions
+        return False
 
     @cached_property
     def homepage_link(self):
