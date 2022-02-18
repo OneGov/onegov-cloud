@@ -1,12 +1,17 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-02-07 12:40+0100\n"
-"PO-Revision-Date: 2021-09-27 13:23+0200\n"
+"POT-Creation-Date: 2022-02-18 09:48+0100\n"
+"PO-Revision-Date: 2022-02-18 10:10+0100\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+"Project-Id-Version: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"X-Generator: Poedit 3.0\n"
 
 msgid "Open"
 msgstr "Aperto"
@@ -2187,10 +2192,10 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3555,6 +3560,10 @@ msgstr ""
 "Non vieni reindirizzato automaticamente, quindi hai la possibilità di "
 "modificare o eliminare questo collegamento."
 
+msgid "You have been successfully unsubscribed from all regular emails."
+msgstr ""
+"L'iscrizione da tutte le e-mail periodiche è stata annullata correttamente."
+
 msgid "local"
 msgstr "locale"
 
@@ -4640,9 +4649,15 @@ msgstr "Hai disabilitato le e-mail per il biglietto ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Hai abilitato le e-mail per il biglietto ${number}"
 
+msgid "The ticket cannot be archived because it's not closed"
+msgstr "Il biglietto non può essere archiviato perché non è chiuso"
+
 #, python-format
 msgid "You archived ticket ${number}"
 msgstr "Hai archiviato il biglietto ${number}"
+
+msgid "The ticket cannot be recovered because it's not archived"
+msgstr "Il biglietto non può essere recuperato perché non è archiviato"
 
 #, python-format
 msgid "You recovered ticket ${number} from the archive"
@@ -4715,10 +4730,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "You have been successfully unsubscribed from all regular emails."
-msgstr ""
-"L'iscrizione da tutte le e-mail periodiche è stata annullata correttamente."
 
 #~ msgid ""
 #~ "Sort the items using drag and drop.  The new positions are automatically "

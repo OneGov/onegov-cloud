@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-07 12:40+0100\n"
-"PO-Revision-Date: 2021-04-30 10:55+0200\n"
+"POT-Creation-Date: 2022-02-18 09:48+0100\n"
+"PO-Revision-Date: 2022-02-18 10:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -2178,10 +2178,10 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3560,6 +3560,9 @@ msgstr ""
 "Vous n'êtes pas automatiquement redirigé afin que vous puissiez modifier ou "
 "supprimer ce lien."
 
+msgid "You have been successfully unsubscribed from all regular emails."
+msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
 msgid "local"
 msgstr "local"
 
@@ -4643,9 +4646,15 @@ msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Vous avez activé les e-mails pour le ticket ${number}"
 
+msgid "The ticket cannot be archived because it's not closed"
+msgstr "Le ticket ne peut pas être archivé car il n'est pas clôturé"
+
 #, python-format
 msgid "You archived ticket ${number}"
 msgstr "Vous avez archivé le ticket avec le numéro ${number}"
+
+msgid "The ticket cannot be recovered because it's not archived"
+msgstr "Le ticket ne peut pas être récupéré car il n'est pas archivé"
 
 #, python-format
 msgid "You recovered ticket ${number} from the archive"
@@ -4718,9 +4727,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-msgid "You have been successfully unsubscribed from all regular emails."
-msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
 
 #~ msgid "Sort the items using drag and drop."
 #~ msgstr "Triez les éléments par glisser-déposer."
