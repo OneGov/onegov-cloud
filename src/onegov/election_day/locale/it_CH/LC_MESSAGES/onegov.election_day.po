@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 12:58+0100\n"
+"POT-Creation-Date: 2022-02-18 16:55+0100\n"
 "PO-Revision-Date: 2022-02-13 06:41+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -745,12 +745,12 @@ msgstr "Nessuna candidatura."
 msgid "Download"
 msgstr "Scarica"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagramma mostra la distribuzione dei voti e dei mandati in lista e nelle "
@@ -785,12 +785,11 @@ msgstr ""
 "numero di elettori della lista. Il numero di elettori sovraripartizione tra "
 "i gruppi di liste."
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Pagina iniziale"
 
@@ -848,9 +847,9 @@ msgstr "Bianche"
 msgid "Invalid"
 msgstr "Nulle"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
 
@@ -869,8 +868,8 @@ msgstr "Sì"
 msgid "List connection"
 msgstr "Collegamenti tra liste"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Voti"
 
@@ -1009,8 +1008,8 @@ msgstr "Spareggio a favore della iniziativa"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Spareggio a favore della controprogetto"
 
-#. Default: eligible Voters
 #.
+#. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Aventi diritto di voto"
 
@@ -1059,10 +1058,10 @@ msgstr "Attivato"
 msgid "Columns"
 msgstr "Colonne"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagramma mostra i voti e i mandati dei partiti. Le barre cerchiate "
@@ -1075,11 +1074,11 @@ msgstr "Anno"
 msgid "Difference"
 msgstr "Differenza"
 
+#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagramma mostra l'origine dei voti. Le barre sulla sinistra "
@@ -1229,6 +1228,9 @@ msgstr "Utilizzi per favore il formato seguente:"
 
 msgid "No map available for this year."
 msgstr "Nessuna mappa disponibile per quest'anno."
+
+msgid "TPlease check the marked fields. Please check the fields marked in red."
+msgstr ""
 
 msgid "Blank list"
 msgstr "Lista bianca"
@@ -1615,3 +1617,8 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "The form contains errors. Please check the fields marked in red."
+#~ msgstr ""
+#~ "Il modulo contiene errori. Controlli per favore i campi evidenziati in "
+#~ "rosso."
