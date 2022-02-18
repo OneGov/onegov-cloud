@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-16 06:59+0100\n"
+"POT-Creation-Date: 2022-02-18 12:58+0100\n"
 "PO-Revision-Date: 2022-02-13 06:41+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -85,6 +85,10 @@ msgstr "numero intero non valido: ${col}"
 #, python-format
 msgid "Invalid float number: ${col}"
 msgstr "numero di galleggiante non valido: ${col}"
+
+#, python-format
+msgid "Invalid decimal number: ${col}"
+msgstr ""
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
@@ -418,16 +422,6 @@ msgstr ""
 "Mostra una scheda con i risultati delle liste aggregate su tutte le "
 "elezioni. Utile solo se le liste corrispondono ai gruppi di liste. Solo per "
 "Doppelter Pukelsheim."
-
-msgid "Mandate allocation"
-msgstr "Ripartizione dei seggi"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a table. Requires "
-"party results."
-msgstr ""
-"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
-"tabella. Richiede i risultati dei partiti."
 
 msgid "Party strengths"
 msgstr "Forza delle parti"
