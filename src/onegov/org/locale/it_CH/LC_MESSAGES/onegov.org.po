@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2022-02-18 09:48+0100\n"
-"PO-Revision-Date: 2022-02-18 10:10+0100\n"
+"PO-Revision-Date: 2022-02-18 13:56+0100\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -4656,8 +4656,9 @@ msgstr "Il biglietto non può essere archiviato perché non è chiuso"
 msgid "You archived ticket ${number}"
 msgstr "Hai archiviato il biglietto ${number}"
 
-msgid "The ticket cannot be recovered because it's not archived"
-msgstr "Il biglietto non può essere recuperato perché non è archiviato"
+msgid "The ticket cannot be recovered from the archive because it's not archived"
+msgstr ""
+"Il biglietto non può essere recuperato dall'archivio perché non è archiviato"
 
 #, python-format
 msgid "You recovered ticket ${number} from the archive"
