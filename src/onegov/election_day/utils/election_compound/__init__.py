@@ -10,6 +10,8 @@ from onegov.election_day.utils.election_compound.list_groups import \
     get_list_groups
 from onegov.election_day.utils.election_compound.list_groups import \
     get_list_groups_data
+from onegov.election_day.utils.election_compound.superregions import \
+    get_superregions_data
 
 
 __all__ = [
@@ -19,4 +21,5 @@ __all__ = [
     'get_list_groups',
     'get_list_results',
     'get_lists_data',
+    'get_superregions_data',
 ]

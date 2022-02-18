@@ -116,6 +116,9 @@ class ElectionCompoundDistrictsTableWidget(ModelBoundWidget):
         }
 
 
+# todo: superregions
+
+
 @ElectionDayApp.screen_widget(
     tag='election-compound-list-groups-chart',
     category='election_compound'

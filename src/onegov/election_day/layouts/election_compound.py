@@ -33,6 +33,7 @@ class ElectionCompoundLayout(DetailLayout):
         return (
             'list-groups',
             'lists',
+            'superregions',
             'districts',
             'candidates',
             'party-strengths',
@@ -82,6 +83,8 @@ class ElectionCompoundLayout(DetailLayout):
             return _("List groups")
         if tab == 'lists':
             return _("Lists")
+        if tab == 'superregions':
+            return self.label('superregions')
         if tab == 'districts':
             return self.label('districts')
         if tab == 'candidates':
@@ -103,25 +106,27 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         if self.hide_tab(tab):
             return False
+        if tab == 'superregions':
+            return self.has_superregions
         if tab == 'list-groups':
             return (
-                self.model.show_list_groups is True
-                and self.model.pukelsheim is True
+                self.model.show_list_groups
+                and self.model.pukelsheim
                 and self.has_party_results
             )
         if tab == 'lists':
             return (
-                self.model.show_lists is True
-                and self.model.pukelsheim is True
+                self.model.show_lists
+                and self.model.pukelsheim
             )
         if tab == 'party-strengths':
             return (
-                self.model.show_party_strengths is True
+                self.model.show_party_strengths
                 and self.has_party_results
             )
         if tab == 'parties-panachage':
             return (
-                self.model.show_party_panachage is True
+                self.model.show_party_panachage
                 and self.has_party_results
             )
 
