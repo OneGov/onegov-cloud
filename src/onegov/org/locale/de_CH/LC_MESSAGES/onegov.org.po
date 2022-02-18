@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-18 09:48+0100\n"
+"POT-Creation-Date: 2022-02-18 14:55+0100\n"
 "PO-Revision-Date: 2022-02-18 13:20+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2183,10 +2183,10 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4643,7 +4643,8 @@ msgstr "Das Ticket kann nicht archiviert werden, da es nicht geschlossen ist"
 msgid "You archived ticket ${number}"
 msgstr "Sie haben das Ticket ${number} archiviert"
 
-msgid "The ticket cannot be recovered from the archive because it's not archived"
+msgid ""
+"The ticket cannot be recovered from the archive because it's not archived"
 msgstr ""
 "Das Ticket kann nicht aus dem Archiv geholt werden, da es nicht archiviert "
 "ist"

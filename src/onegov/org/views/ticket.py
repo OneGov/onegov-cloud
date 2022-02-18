@@ -537,7 +537,10 @@ def unarchive_ticket(self, request):
         self.unarchive_ticket(user)
     except InvalidStateChange:
         request.alert(
-            _("The ticket cannot be recovered because it's not archived"))
+            _(
+                "The ticket cannot be recovered from the archive because it's "
+                "not archived"
+            ))
     else:
         TicketMessage.create(self, request, 'unarchived')
         request.success(

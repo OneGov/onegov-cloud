@@ -1,16 +1,16 @@
 # This file was generated from translations.onegov.org_it.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-02-18 09:48+0100\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2022-02-18 14:55+0100\n"
 "PO-Revision-Date: 2022-02-18 13:56+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "Language: it_CH\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"Project-Id-Version: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"MIME-Version: 1.0\n"
 "X-Generator: Poedit 3.0\n"
 
 msgid "Open"
@@ -2192,10 +2192,10 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -4656,7 +4656,8 @@ msgstr "Il biglietto non può essere archiviato perché non è chiuso"
 msgid "You archived ticket ${number}"
 msgstr "Hai archiviato il biglietto ${number}"
 
-msgid "The ticket cannot be recovered from the archive because it's not archived"
+msgid ""
+"The ticket cannot be recovered from the archive because it's not archived"
 msgstr ""
 "Il biglietto non può essere recuperato dall'archivio perché non è archiviato"
 
