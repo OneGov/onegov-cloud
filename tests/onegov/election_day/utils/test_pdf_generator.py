@@ -69,7 +69,6 @@ def test_generate_pdf_election_compound(session, election_day_app_zg):
     compound.show_lists = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
-    compound.show_mandate_allocation = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:

@@ -504,7 +504,6 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
     new.form['show_list_groups'] = True
     new.form['show_party_strengths'] = True
     new.form['show_party_panachage'] = True
-    new.form['show_mandate_allocation'] = True
     new.form.submit()
 
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-16 06:59+0100\n"
+"POT-Creation-Date: 2022-02-18 12:58+0100\n"
 "PO-Revision-Date: 2022-02-13 06:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -86,6 +86,10 @@ msgstr "Cifra entira nunvalaivla: ${col}"
 #, python-format
 msgid "Invalid float number: ${col}"
 msgstr "Cifra a comma fluctuanta nunvalaivla: ${col}"
+
+#, python-format
+msgid "Invalid decimal number: ${col}"
+msgstr ""
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
@@ -409,14 +413,6 @@ msgstr "Glistas"
 msgid ""
 "Shows a tab with aggregated list results over all elections. Only useful if "
 "the lists correspond to the list groups. Only if Doppelter Pukelsheim."
-msgstr ""
-
-msgid "Mandate allocation"
-msgstr "Repartiziun dals sezs"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a table. Requires "
-"party results."
 msgstr ""
 
 msgid "Party strengths"
