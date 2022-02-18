@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-16 06:59+0100\n"
+"POT-Creation-Date: 2022-02-18 12:58+0100\n"
 "PO-Revision-Date: 2022-02-05 17:23+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -86,6 +86,10 @@ msgstr "Ungültige Ganzzahl: ${col}"
 #, python-format
 msgid "Invalid float number: ${col}"
 msgstr "Ungültige Fliesskommazahl: ${col}"
+
+#, python-format
+msgid "Invalid decimal number: ${col}"
+msgstr ""
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
@@ -421,16 +425,6 @@ msgstr ""
 "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle Wahlen. "
 "Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur falls "
 "Doppelter Pukelsheim."
-
-msgid "Mandate allocation"
-msgstr "Sitzzuteilung"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a table. Requires "
-"party results."
-msgstr ""
-"Zeigt eine Registerkarte mit dem Vergleich der Parteistärken in Form einer "
-"Tabelle an. Erfordert Parteiergebnisse."
 
 msgid "Party strengths"
 msgstr "Parteistärken"
