@@ -522,7 +522,7 @@ def archive_ticket(self, request):
         request.alert(_("The ticket cannot be archived because it's not closed"))
     else:
         TicketMessage.create(self, request, 'archived')
-        request.success(_("You have archived ticket ${number}", mapping={
+        request.success(_("You archived ticket ${number}", mapping={
             'number': self.number
         }))
 
@@ -531,17 +531,15 @@ def archive_ticket(self, request):
 
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
 def un_archive_ticket(self, request):
-    user = UserCollection(request.session).by_username(
-        request.identity.userid)
-
 
     try:
-        self.un_archive_ticket(user)
+        self.unarchive_ticket(request.current_user)
     except InvalidStateChange:
         request.alert(_("The ticket cannot be unarchived because it's not archived"))
     else:
-        TicketMessage.create(self, request, 'archived')
-        request.success(_("You have archived ticket ${number}", mapping={
+        TicketMessage.create(self, request, 'unarchived')
+        request.success(
+        _("You recovered ticket ${number} from the archive", mapping={
             'number': self.number
         }))
 
