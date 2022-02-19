@@ -50,7 +50,7 @@ def get_party_results(item):
         year['mandates'] = result.number_of_mandates
         total = result.voters_count if pukelsheim else result.votes
         year['voters_count' if pukelsheim else 'votes'] = {
-            'total': total,
+            'total': int(total),
             'permille': int(
                 round(1000 * ((total or 0) / (totals.get(result.year) or 1)))
             )
