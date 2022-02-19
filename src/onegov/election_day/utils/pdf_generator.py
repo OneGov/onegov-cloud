@@ -1093,10 +1093,9 @@ class PdfGenerator():
             return False
 
         # Get all elections and votes
-        items = []
-        # items = self.session.query(Election).all()
+        items = self.session.query(Election).all()
         items.extend(self.session.query(ElectionCompound).all())
-        # items.extend(self.session.query(Vote).all())
+        items.extend(self.session.query(Vote).all())
 
         # Read existing PDFs
         fs = self.app.filestorage
