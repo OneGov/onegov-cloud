@@ -1,8 +1,54 @@
 # Changes
 
+## 2022.15
+
+`2022-02-19` | [b289e1cd6e...35a5e18765](https://github.com/OneGov/onegov-cloud/compare/b289e1cd6e^...35a5e18765)
+
+### Core
+
+##### Update bjeorn.
+
+`Other` | [OGC-313](https://linear.app/onegovcloud/issue/OGC-313) | [b289e1cd6e](https://github.com/onegov/onegov-cloud/commit/b289e1cd6e2851940e369407795e2b0a5ec71429)
+
+### Election Day
+
+##### Fixes wrong API CSV template links.
+
+`Bugfix` | [ca7ffe1ea9](https://github.com/onegov/onegov-cloud/commit/ca7ffe1ea9749ac30b1c0503946c6c9ae2d73e7a)
+
+##### Fixes translation.
+
+`Bugfix` | [3496cb94fb](https://github.com/onegov/onegov-cloud/commit/3496cb94fb02f7f9d126165c6925405c14846f31)
+
+##### Checks panachage data instead of panachage headers and ignores superfluous panachage data.
+
+`Bugfix` | [3c8d16a37e](https://github.com/onegov/onegov-cloud/commit/3c8d16a37ebf0f3e4e5247e5888d5a0560156ede)
+
+##### Removes mandate allocation view.
+
+`Other` | [OGC-322](https://linear.app/onegovcloud/issue/OGC-322) | [5e51608505](https://github.com/onegov/onegov-cloud/commit/5e51608505df35eefe57f7c208f4dd2790462cad)
+
+##### Remove empty paragraphs.
+
+`Bugfix` | [OGC-275](https://linear.app/onegovcloud/issue/OGC-275) | [9f570388f0](https://github.com/onegov/onegov-cloud/commit/9f570388f0489ce04d9546cb8929c00e7b38ed92)
+
+##### Fixes inconsistent progress display in election compounds for election with more than one municipality.
+
+`Bugfix` | [df7a90ed0f](https://github.com/onegov/onegov-cloud/commit/df7a90ed0fdcea037f0fb4a59393adf922ef51cf)
+
+##### Fixes JSON serialization of voters counts.
+
+`Bugfix` | [35a5e18765](https://github.com/onegov/onegov-cloud/commit/35a5e187650a717210e2c4794dccfb91f685404a)
+
+### Org
+
+##### Catch more invalid ticket state changes.
+
+`Other` | [OGC-290](https://linear.app/onegovcloud/issue/OGC-290) | [b44a8e49f6](https://github.com/onegov/onegov-cloud/commit/b44a8e49f6711458b5c4333096e6b1a630fb42a7)
+
 ## 2022.14
 
-`2022-02-17` | [4fe96a321f...0d36c8d33a](https://github.com/OneGov/onegov-cloud/compare/4fe96a321f^...0d36c8d33a)
+`2022-02-17` | [4fe96a321f...d0df117ff2](https://github.com/OneGov/onegov-cloud/compare/4fe96a321f^...d0df117ff2)
 
 ### Election Day
 
@@ -1306,38 +1352,4 @@ Users can directly propose changes to fields of agencies and people. Redactors c
 ##### Send an email when assigning a ticket.
 
 `Feature` | [STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25) | [aad2eb2293](https://github.com/onegov/onegov-cloud/commit/aad2eb2293e56264be4c52009bb67a8e0966ddc9)
-
-## 2021.66
-
-`2021-07-14` | [a9b7ec37d4...4fbfdfc306](https://github.com/OneGov/onegov-cloud/compare/a9b7ec37d4^...4fbfdfc306)
-
-### Org
-
-##### Prevents server error on directory export if files are missing
-
-Will redirect the user to the broken directory entry with missing file hint
-
-`Bugfix` | [FW-92](https://stadt-winterthur.atlassian.net/browse/FW-92) | [a9b7ec37d4](https://github.com/onegov/onegov-cloud/commit/a9b7ec37d43944c4b61f3faba30ccc8b9aa7ef6f)
-
-##### Show pagerefs only for logged in users
-
-- change default to hide the pagerefs
-- Update settings explanation
-
-`Other` | [a8bd9f916b](https://github.com/onegov/onegov-cloud/commit/a8bd9f916bfb73e646d8d13d52a67aca902cd205)
-
-### Town6
-
-##### Adds QrCode link to town6
-
-- Adds Qr Edit Bar Link to /form/{name}
-
-`Feature` | [SEA-380](https://linear.app/seantis/issue/SEA-380) | [aef24f862b](https://github.com/onegov/onegov-cloud/commit/aef24f862b20fdbcdf9b772d9303f704ab03a83e)
-
-##### Improve form styling
-
-- center checkboxes and labels vertical axis
-- Fix long field help indentation for checkboxes
-
-`Other` | [570166bc4d](https://github.com/onegov/onegov-cloud/commit/570166bc4d7cb4905bb249112ecbb9174fbc702f)
 
