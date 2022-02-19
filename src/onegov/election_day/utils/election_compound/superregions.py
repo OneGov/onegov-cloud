@@ -1,6 +1,34 @@
 from onegov.core.utils import groupbylist
 
 
+def get_superregions(compound, principal):
+    """ Returns all superregions. """
+
+    if compound.domain_elections != 'region':
+        return {}
+
+    entities = principal.entities.get(compound.date.year, {})
+    result = {entity.get('superregion') for entity in entities.values()}
+    result = {
+        superregion: {
+            'mandates': {'allocated': 0, 'total': 0},
+            'progress': {'counted': 0, 'total': 0}
+        }
+        for superregion in sorted(s for s in result if s)
+    }
+
+    for election in compound.elections:
+        if election.domain_supersegment in result:
+            key = election.domain_supersegment
+            progress = election.progress
+            result[key]['progress']['counted'] += progress[0]
+            result[key]['progress']['total'] += progress[1]
+            result[key]['mandates']['allocated'] += election.allocated_mandates
+            result[key]['mandates']['total'] += election.number_of_mandates
+
+    return result
+
+
 def get_superregions_data(compound, principal):
     """ Returns the data used by elections compounds for rendering entities and
     districts maps. """

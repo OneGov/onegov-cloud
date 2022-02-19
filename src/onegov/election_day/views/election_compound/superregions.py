@@ -3,6 +3,7 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.election_compound import get_superregions_data
 
 
@@ -20,6 +21,7 @@ def view_election_compound_superregions(self, request):
         'election_compound': self,
         'layout': ElectionCompoundLayout(self, request, 'superregions'),
         'map_type': 'districts',
+        'superregions': get_superregions(self, request.app.principal),
         'data_url': request.link(self, name='by-superregion'),
         'embed_source': request.link(self, name='superregions-map'),
     }

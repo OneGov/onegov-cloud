@@ -8,6 +8,7 @@ from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
 from onegov.election_day.utils.election_compound import get_elected_candidates
+from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
 
 
@@ -66,6 +67,7 @@ def view_election_compound_json(self, request):
         }
         for election in self.elections
     }
+    superregions = get_superregions(self, request.app.principal)
 
     years, parties = get_party_results(self)
 
@@ -82,6 +84,7 @@ def view_election_compound_json(self, request):
             'total': self.progress[1] or 0
         },
         'districts': list(districts.values()),
+        'superregions': superregions,
         'elections': [
             request.link(election) for election in self.elections
         ],
