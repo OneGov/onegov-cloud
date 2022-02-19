@@ -11,6 +11,7 @@ from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
+from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.pdf import LexworkSigner
@@ -531,56 +532,103 @@ class PdfGenerator():
                     return _("Municipalities")
             return principal.label(value)
 
-        majorz = False
-        if compound.elections and compound.elections[0].type == 'majorz':
-            majorz = True
-
         districts = {
-            election.id: election.domain_segment
+            election.id: (
+                election.domain_segment,
+                election.domain_supersegment
+            )
             for election in compound.elections if election.results.first()
         }
 
+        has_superregions = (
+            principal.has_superregions
+            and compound.domain_elections == 'region'
+        )
+
         # Factoids
         pdf.factoids(
-            [_('Seats') if majorz else _('Mandates'), '', ''],
+            [('Mandates'), '', ''],
             [compound.allocated_mandates, '', '']
         )
         pdf.spacer()
         pdf.spacer()
 
+        # Superregions
+        if has_superregions:
+            superregions = get_superregions(compound, principal)
+            if superregions:
+                pdf.h2(label('superregions'))
+                pdf.results(
+                    [label('superregion'), _('Mandates')],
+                    [
+                        [
+                            name,
+                            values['mandates']['allocated']
+                        ]
+                        for name, values in superregions.items()
+                    ],
+                    [None, 2 * cm],
+                    pdf.style.table_results_1
+                )
+                pdf.pagebreak()
+
         # Districts
         pdf.h2(label('districts'))
-        pdf.results(
-            [label('district'), _('Mandates')],
-            [
+        if has_superregions:
+            pdf.results(
                 [
-                    e.domain_segment,
-                    e.allocated_mandates
-                ]
-                for e in compound.elections
-            ],
-            [None, 2 * cm],
-            pdf.style.table_results_1
-        )
+                    label('district'),
+                    label('superregion'),
+                    _('Mandates')
+                ],
+                [
+                    [
+                        e.domain_segment,
+                        districts.get(e.id, ('', ''))[1],
+                        e.allocated_mandates
+                    ]
+                    for e in compound.elections
+                ],
+                [None, None, 2 * cm],
+                pdf.style.table_results_2
+            )
+        else:
+            pdf.results(
+                [
+                    label('district'),
+                    _('Mandates')
+                ],
+                [
+                    [
+                        e.domain_segment,
+                        e.allocated_mandates
+                    ]
+                    for e in compound.elections
+                ],
+                [None, 2 * cm],
+                pdf.style.table_results_1
+            )
         pdf.pagebreak()
 
         # Elected candidates
         pdf.h2(_('Elected candidates'))
         pdf.spacer()
-        if majorz:
+        if has_superregions:
             pdf.results(
                 [
                     _('Candidate'),
-                    _('Party'),
+                    _('List'),
+                    label('superregion'),
                     label('district'),
                 ],
                 [[
                     '{} {}'.format(r[0], r[1]),
-                    r[2],
-                    districts.get(r[5], '')
+                    r[3],
+                    districts.get(r[5], ('', ''))[1],
+                    districts.get(r[5], ('', ''))[0],
                 ] for r in get_elected_candidates(compound, self.session)],
-                [None, 2 * cm, 2 * cm],
-                pdf.style.table_results_2
+                [None, None, 2 * cm, 2 * cm],
+                pdf.style.table_results_3
             )
         else:
             pdf.results(
@@ -592,10 +640,10 @@ class PdfGenerator():
                 [[
                     '{} {}'.format(r[0], r[1]),
                     r[3],
-                    districts.get(r[5], '')
+                    districts.get(r[5], ('', ''))[0]
                 ] for r in get_elected_candidates(compound, self.session)],
-                [None, None, 2.3 * cm, 2 * cm],
-                pdf.style.table_results_3
+                [None, None, 2 * cm],
+                pdf.style.table_results_2
             )
         pdf.pagebreak()
 
@@ -1045,9 +1093,10 @@ class PdfGenerator():
             return False
 
         # Get all elections and votes
-        items = self.session.query(Election).all()
+        items = []
+        # items = self.session.query(Election).all()
         items.extend(self.session.query(ElectionCompound).all())
-        items.extend(self.session.query(Vote).all())
+        # items.extend(self.session.query(Vote).all())
 
         # Read existing PDFs
         fs = self.app.filestorage

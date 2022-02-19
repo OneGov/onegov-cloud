@@ -17,16 +17,18 @@ def get_superregions(compound, principal):
         for superregion in sorted(s for s in result if s)
     }
 
+    keys = set()
     for election in compound.elections:
         if election.domain_supersegment in result:
             key = election.domain_supersegment
+            keys.add(key)
             progress = election.progress
             result[key]['progress']['counted'] += progress[0]
             result[key]['progress']['total'] += progress[1]
             result[key]['mandates']['allocated'] += election.allocated_mandates
             result[key]['mandates']['total'] += election.number_of_mandates
 
-    return result
+    return {k: v for k, v in result.items() if k in keys}
 
 
 def get_superregions_data(compound, principal):
