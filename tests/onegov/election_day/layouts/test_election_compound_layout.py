@@ -23,6 +23,7 @@ def test_election_compound_layout_general(session):
     assert layout.all_tabs == (
         'list-groups',
         'lists',
+        'superregions',
         'districts',
         'candidates',
         'party-strengths',
@@ -34,7 +35,7 @@ def test_election_compound_layout_general(session):
     assert layout.title('undefined') == ''
     assert layout.title('list-groups') == 'List groups'
     assert layout.title('lists') == 'Lists'
-    assert layout.title('districts') == '__districts'
+    assert layout.title('superregions') == '__superregions'
     assert layout.title('districts') == '__districts'
     assert layout.title('candidates') == 'Elected candidates'
     assert layout.title('party-strengths') == 'Party strengths'

@@ -44,7 +44,6 @@
                 </div>
             </div>
 
-            <!-- todo: -->
             <tal:block metal:use-macro="layout.macros['election-compound-superregions-table']" />
             <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link" />
 

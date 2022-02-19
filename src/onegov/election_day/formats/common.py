@@ -172,7 +172,7 @@ def get_entity_and_district(
     """
 
     if entity_id == 0:
-        return '', ''
+        return '', '', ''
 
     entity = entities.get(entity_id, {})
     name = entity.get('name', '')

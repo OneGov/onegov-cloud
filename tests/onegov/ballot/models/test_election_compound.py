@@ -86,7 +86,8 @@ def proporz_election(
         date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=144,
-        status=None
+        status=None,
+        domain_supersegment=''
 ):
 
     # election
@@ -98,7 +99,8 @@ def proporz_election(
         date=date,
         number_of_mandates=number_of_mandates,
         absolute_majority=absolute_majority,
-        status=status
+        status=status,
+        domain_supersegment=domain_supersegment
     )
     election.title_translations['it_CH'] = 'Elezione'
 
@@ -161,7 +163,7 @@ def proporz_election(
         blank_ballots=10,
         invalid_ballots=5,
         blank_votes=80,
-        invalid_votes=120
+        invalid_votes=120,
     )
 
     election_result.candidate_results.append(
@@ -451,6 +453,7 @@ def test_election_compound_export(session):
         'election_mandates': 1,
         'election_absolute_majority': 144,
         'election_status': 'unknown',
+        'entity_superregion': '',
         'entity_district': '',
         'entity_name': 'name',
         'entity_id': 1,
@@ -488,6 +491,7 @@ def test_election_compound_export(session):
         'election_mandates': 1,
         'election_absolute_majority': 144,
         'election_status': 'unknown',
+        'entity_superregion': '',
         'entity_district': '',
         'entity_name': 'name',
         'entity_id': 1,
@@ -530,6 +534,7 @@ def test_election_compound_export(session):
         'election_mandates': 1,
         'election_absolute_majority': 144,
         'election_status': 'unknown',
+        'entity_superregion': '',
         'entity_district': '',
         'entity_name': 'name',
         'entity_id': 1,
@@ -577,6 +582,7 @@ def test_election_compound_export(session):
         'election_mandates': 1,
         'election_absolute_majority': 144,
         'election_status': 'unknown',
+        'entity_superregion': '',
         'entity_district': '',
         'entity_name': 'name',
         'entity_id': 1,
@@ -624,6 +630,7 @@ def test_election_compound_export(session):
         'election_mandates': 1,
         'election_absolute_majority': 144,
         'election_status': 'unknown',
+        'entity_superregion': '',
         'entity_district': '',
         'entity_name': 'name',
         'entity_id': 1,
@@ -662,6 +669,7 @@ def test_election_compound_export(session):
         'election_mandates': 1,
         'election_absolute_majority': 144,
         'election_status': 'unknown',
+        'entity_superregion': '',
         'entity_district': '',
         'entity_name': 'name',
         'entity_id': 1,
@@ -981,6 +989,69 @@ def test_election_compound_manual_completion(session):
     assert election_compound.progress == (2, 2)
     assert election_1.completed is True
     assert election_2.completed is True
+
+
+def test_election_compound_supersegment_progress(session):
+
+    election_compound = ElectionCompound(
+        title='Elections',
+        id='elections',
+        domain='canton',
+        date=date(2020, 3, 22),
+    )
+    elections = [
+        proporz_election(
+            title='Election 1',
+            id='1',
+            shortcode='P1',
+            domain='region',
+            date=date(2020, 3, 22),
+            number_of_mandates=1,
+            status='interim',
+            domain_supersegment='A'
+        ),
+        proporz_election(
+            title='Election 2',
+            id='2',
+            shortcode='P2',
+            domain='region',
+            date=date(2020, 3, 22),
+            number_of_mandates=1,
+            status='final',
+            domain_supersegment='A'
+        ),
+        proporz_election(
+            title='Election 3',
+            id='3',
+            shortcode='P3',
+            domain='region',
+            date=date(2020, 3, 22),
+            number_of_mandates=1,
+            status='final',
+            domain_supersegment='B'
+        ),
+        proporz_election(
+            title='Election 4',
+            id='4',
+            shortcode='P4',
+            domain='region',
+            date=date(2020, 3, 22),
+            number_of_mandates=1,
+            status='interim',
+            domain_supersegment=''
+        )
+    ]
+    session.add_all([election_compound] + elections)
+    session.flush()
+
+    election_compound.elections = elections
+
+    assert elections[0].completed is False
+    assert elections[1].completed is True
+    assert elections[2].completed is True
+    assert elections[3].completed is False
+    assert election_compound.completed is False
+    assert election_compound.progress == (1, 3)
 
 
 def test_list_results(session):
