@@ -38,7 +38,7 @@ class VolunteerForm(Form):
         validators=[InputRequired()])
 
     email = EmailField(
-        label=_("E-Mail Address"),
+        label=_("E-Mail"),
         validators=[InputRequired(), Email()])
 
     phone = StringField(

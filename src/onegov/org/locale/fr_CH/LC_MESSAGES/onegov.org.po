@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-07 12:40+0100\n"
+"POT-Creation-Date: 2022-02-21 12:03+0100\n"
 "PO-Revision-Date: 2021-04-30 10:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1437,9 +1437,6 @@ msgstr ""
 msgid "Internal links only"
 msgstr ""
 
-msgid "E-Mail Address"
-msgstr "Adresse e-mail"
-
 msgid "Your note about this ticket"
 msgstr "Votre note à propos de ce ticket"
 
@@ -2178,10 +2175,10 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Événement"
 
@@ -2519,10 +2516,8 @@ msgstr "Retour à la page d'accueil"
 msgid "Search"
 msgstr "Chercher"
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
-"rouge."
 
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
@@ -3202,6 +3197,9 @@ msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
 "permanence :"
 
+msgid "E-Mail Address"
+msgstr "Adresse e-mail"
+
 msgid "Signup"
 msgstr "S'abonner"
 
@@ -3559,6 +3557,9 @@ msgid ""
 msgstr ""
 "Vous n'êtes pas automatiquement redirigé afin que vous puissiez modifier ou "
 "supprimer ce lien."
+
+msgid "You have been successfully unsubscribed from all regular emails."
+msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
 
 msgid "local"
 msgstr "local"
@@ -4719,8 +4720,10 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "You have been successfully unsubscribed from all regular emails."
-msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+#~ msgid "The form contains errors. Please check the fields marked in red."
+#~ msgstr ""
+#~ "Le formulaire contient des erreurs. Veuillez vérifier les champs marqués "
+#~ "en rouge."
 
 #~ msgid "Sort the items using drag and drop."
 #~ msgstr "Triez les éléments par glisser-déposer."

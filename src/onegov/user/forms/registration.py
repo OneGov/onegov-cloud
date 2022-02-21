@@ -8,7 +8,7 @@ class RegistrationForm(Form):
     """ A generic registration form for onegov.user """
 
     username = StringField(
-        label=_("E-Mail Address"),
+        label=_("E-Mail"),
         validators=[validators.InputRequired(), validators.Email()]
     )
 

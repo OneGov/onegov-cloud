@@ -7,7 +7,7 @@ class LoginForm(Form):
     """ A generic login form for onegov.user """
 
     username = StringField(
-        label=_("E-Mail Address"),
+        label=_("E-Mail"),
         validators=[validators.InputRequired()],
         render_kw={'autofocus': True}
     )
