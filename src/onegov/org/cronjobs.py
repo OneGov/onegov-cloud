@@ -102,8 +102,6 @@ def reindex_published_models(request):
         request.app.es_orm_events.index(request.app.schema, obj)
 
 
-
-
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')
 def process_resource_rules(request):
     resources = ResourceCollection(request.app.libres_context)
@@ -126,6 +124,7 @@ def send_daily_ticket_statistics(request):
 
     args = {}
     app = request.app
+    layout = DefaultMailLayout(object(), request)
 
     # get the current ticket count
     collection = TicketCollection(app.session())
@@ -164,7 +163,7 @@ def send_daily_ticket_statistics(request):
             'org': app.org.title
         })
     )
-    args['layout'] = DefaultMailLayout(object(), request)
+    args['layout'] = layout
     args['is_monday'] = today.weekday() == MON
     args['org'] = app.org.title
 
@@ -180,15 +179,22 @@ def send_daily_ticket_statistics(request):
         if user.data and not user.data.get('daily_ticket_statistics'):
             continue
 
+        unsubscribe = layout.unsubscribe_link(user.username)
+
         args['username'] = user.username
+        args['unsubscribe'] = unsubscribe
         content = render_template(
             'mail_daily_ticket_statistics.pt', request, args
         )
 
-        app.send_transactional_email(
+        app.send_marketing_email(
             subject=args['title'],
             receivers=(user.username, ),
-            content=content
+            content=content,
+            headers={
+                'List-Unsubscribe': f'<{unsubscribe}>',
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
         )
 
 
