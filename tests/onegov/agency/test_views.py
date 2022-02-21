@@ -1,11 +1,15 @@
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
+from freezegun import freeze_time
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.pdf.utils import extract_pdf_info
 from pytest import mark
+from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
+from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+import time
 
 
 def test_views(client):
@@ -711,6 +715,42 @@ def test_basic_search(client_with_es):
     assert '8911 Rivera Nick (Doctor)' in client.get(
         '/search/suggest?q=89'
     ).json
+
+
+def test_search_recently_publicated_object(client_with_es):
+    now = utcnow()
+    in_5_minutes = now + timedelta(minutes=5)
+    in_1_hour = now + timedelta(hours=1)
+    with freeze_time(now):
+        client = client_with_es
+
+        client.login_admin()
+
+        page = client.get('/settings').click("Organisationen", index=1)
+        page.form['agency_phone_internal_digits'] = 4
+        page.form.submit()
+
+        manage = client.get('/people').click('Person', href='new')
+        manage.form['first_name'] = 'Nick'
+        manage.form['last_name'] = 'Rivera'
+        manage.form['publication_start'] = in_5_minutes
+        manage.form.submit()
+
+        # Do reindex cronjob
+        job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+        job.app = client.app
+
+        url = get_cronjob_url(job)
+
+        client.get(url)
+
+    # Reindexing takes a few seconds
+    time.sleep(5)
+
+    # Test search results
+    with freeze_time(in_1_hour):
+        assert 'Rivera' in client.get('/search?q=Nick')
+        assert 'Nick' in client.get('/search?q=Rivera')
 
 
 def test_footer_settings_custom_links(client):
