@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 16:55+0100\n"
+"POT-Creation-Date: 2022-02-21 10:41+0100\n"
 "PO-Revision-Date: 2022-02-05 17:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1235,9 +1235,6 @@ msgstr "Veuillez utiliser le format suivant:"
 
 msgid "No map available for this year."
 msgstr "Aucune carte disponible pour cette année."
-
-msgid "TPlease check the marked fields. Please check the fields marked in red."
-msgstr ""
 
 msgid "Blank list"
 msgstr "Liste vierge"

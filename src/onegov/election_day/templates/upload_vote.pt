@@ -34,7 +34,7 @@
         <div metal:use-macro="layout.macros['upload_errors']" />
 
         <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
-            <tal:block tal:condition="not:form.error_message|nothing" i18n:translate="">TPlease check the marked fields. Please check the fields marked in red.</tal:block>
+            <tal:block tal:condition="not:form.error_message|nothing" i18n:translate="">The form contains errors. Please check the marked fields.</tal:block>
             <tal:block tal:condition="form.error_message|nothing" i18n:translate="">${form.error_message}</tal:block>
         </div>
 
