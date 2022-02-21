@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 12:58+0100\n"
+"POT-Creation-Date: 2022-02-21 14:56+0100\n"
 "PO-Revision-Date: 2022-02-05 17:23+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -751,12 +751,12 @@ msgstr "Keine Kandidaturen."
 msgid "Download"
 msgstr "Herunterladen"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Das Diagramm zeigt die Verteilung der Stimmen und der Mandate auf die "
@@ -796,8 +796,8 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Startseite"
 
@@ -855,9 +855,9 @@ msgstr "Leer"
 msgid "Invalid"
 msgstr "Ungültig"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
 
@@ -876,8 +876,8 @@ msgstr "Ja"
 msgid "List connection"
 msgstr "Listenverbindung"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Stimmen"
 
@@ -1016,8 +1016,8 @@ msgstr "Stichfrage zugunsten der Initiative"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
 
-#. Default: eligible Voters
 #.
+#. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Stimmberechtigte"
 
@@ -1064,10 +1064,10 @@ msgstr "Auswahl"
 msgid "Columns"
 msgstr "Spalten"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Das Diagramm zeigt die Anzahl erhaltener Stimmen und die Anzahl erhaltener "
@@ -1081,11 +1081,11 @@ msgstr "Jahr"
 msgid "Difference"
 msgstr "Differenz"
 
+#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Das Diagramm zeigt die Herkunft der gewonnenen und verlorenen Stimmen durch "
