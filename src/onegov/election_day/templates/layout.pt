@@ -87,12 +87,12 @@ metal:define-macro="layout">
     </div>
 
     <footer tal:condition="not request.browser_session.get('headerless')">
-        <h2 class="visually-hidden">
+        <h2 class="visually-hidden" i18n:translate>
             Footer
         </h2>
         <div class="row">
             <div class="small-12 medium-4 medium-push-4 columns text-center">
-                <h2 class="visually-hidden">
+                <h2 class="visually-hidden" i18n:translate>
                     Language
                 </h2>
                 <ul class="locales">
