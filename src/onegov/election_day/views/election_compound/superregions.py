@@ -87,5 +87,6 @@ def view_election_compound_superregions_table(self, request):
         'election_compound': self,
         'layout': ElectionCompoundLayout(self, request, 'superregions'),
         'type': 'election-compound-table',
-        'scope': 'superregions'
+        'scope': 'superregions',
+        'superregions': get_superregions(self, request.app.principal),
     }
