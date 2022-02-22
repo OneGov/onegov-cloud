@@ -1035,6 +1035,9 @@ msgstr "Cedels da votar entrads"
 msgid "Download a PDF with all the results:"
 msgstr "In PDF cun tut ils resultats pudais Vus chargiar giu qua:"
 
+msgid "PDF Results"
+msgstr ""
+
 msgid ""
 "The raw data used to display the results is available in the following "
 "formats:"

@@ -1033,6 +1033,9 @@ msgstr "Eingegangene Stimmzettel"
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"
 
+msgid "PDF Results"
+msgstr "PDF Resultate"
+
 msgid ""
 "The raw data used to display the results is available in the following "
 "formats:"

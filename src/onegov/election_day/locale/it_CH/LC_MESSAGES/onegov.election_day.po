@@ -1026,6 +1026,9 @@ msgstr "Schede rientrate"
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
 
+msgid "PDF Results"
+msgstr "Risultati PDF"
+
 msgid ""
 "The raw data used to display the results is available in the following "
 "formats:"

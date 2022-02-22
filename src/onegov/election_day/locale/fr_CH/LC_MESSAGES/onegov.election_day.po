@@ -1033,6 +1033,9 @@ msgstr "Suffrages exprimés"
 msgid "Download a PDF with all the results:"
 msgstr "Télécharger tous les résultats dans un PDF :"
 
+msgid "PDF Results"
+msgstr "PDF Résultats"
+
 msgid ""
 "The raw data used to display the results is available in the following "
 "formats:"
