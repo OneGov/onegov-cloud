@@ -38,6 +38,11 @@ class ElectionCompoundForm(Form):
 
     pukelsheim = BooleanField(
         label=_("Doppelter Pukelsheim"),
+        render_kw=dict(force_simple=True)
+    )
+
+    completes_manually = BooleanField(
+        label=_("Completes manually"),
         description=_(
             "Enables manual completion of the election compound. "
             "No indidvidual election results are displayed until the election "
@@ -46,9 +51,9 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    pukelsheim_completed = BooleanField(
+    manually_completed = BooleanField(
         label=_("Completed"),
-        depends_on=('pukelsheim', 'y'),
+        depends_on=('completes_manually', 'y'),
         render_kw=dict(force_simple=True)
     )
 
@@ -158,16 +163,6 @@ class ElectionCompoundForm(Form):
         ),
         fieldset=_("Views"),
         depends_on=('pukelsheim', 'y'),
-        render_kw=dict(force_simple=True)
-    )
-
-    show_mandate_allocation = BooleanField(
-        label=_("Mandate allocation"),
-        description=_(
-            "Shows a tab with the comparison of party strengths as a table. "
-            "Requires party results."
-        ),
-        fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
 
@@ -304,9 +299,9 @@ class ElectionCompoundForm(Form):
         model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
-        model.show_mandate_allocation = self.show_mandate_allocation.data
         model.pukelsheim = self.pukelsheim.data
-        model.pukelsheim_completed = self.pukelsheim_completed.data
+        model.completes_manually = self.completes_manually.data
+        model.manually_completed = self.manually_completed.data
 
         model.elections = []
         query = self.request.session.query(Election)
@@ -369,12 +364,12 @@ class ElectionCompoundForm(Form):
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
         self.pukelsheim.data = model.pukelsheim
-        self.pukelsheim_completed.data = model.pukelsheim_completed
+        self.completes_manually.data = model.completes_manually
+        self.manually_completed.data = model.manually_completed
         self.show_list_groups.data = model.show_list_groups
         self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
-        self.show_mandate_allocation.data = model.show_mandate_allocation
         self.region_elections.data = []
         if model.domain_elections == 'region':
             self.region_elections.data = [e.id for e in model.elections]

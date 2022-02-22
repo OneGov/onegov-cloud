@@ -83,6 +83,8 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
+    # xxx
+
     login(client)
     create_election_compound(client)
     upload_party_results(client, slug='elections/elections')
@@ -105,9 +107,9 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     export = client.get('/elections/elections/data-parties').text
     lines = export.split('\r\n')
     assert lines[0].startswith('year,name,id,total_votes,color,mandates,votes')
-    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387')
-    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117')
-    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134')
+    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387,603.01')
+    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117,491.02')
+    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134,351.04')
 
     # Historical data
     csv_parties = (
@@ -191,14 +193,16 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_election_compound(client, pukelsheim=True, status='final')
+    upload_election_compound(
+        client, pukelsheim=True, completes_manually=True, status='final'
+    )
     upload_party_results(client, slug='elections/elections')
 
     # intermediate results
     main = client.get('/elections/elections/list-groups')
     assert '<h3>Listengruppen</h3>' in main
     assert 'BDP' in main
-    assert 'data-text="603"' in main
+    assert 'data-text="603.01"' in main
 
     groups = client.get('/elections/elections/list-groups-data')
     groups = groups.json
@@ -209,21 +213,21 @@ def test_view_election_compound_list_groups(election_day_app_gr):
                 'color': '#efb52c',
                 'text': 'BDP',
                 'value': 603,
-                'value2': None
+                'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#ff6300',
                 'text': 'CVP',
                 'value': 491,
-                'value2': None
+                'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#0571b0',
                 'text': 'FDP',
                 'value': 351,
-                'value2': None
+                'value2': 0
             }
         ]
     }
@@ -234,7 +238,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
 
     # final results
     edit = client.get('/elections/elections/edit')
-    edit.form['pukelsheim_completed'] = True
+    edit.form['manually_completed'] = True
     edit.form.submit()
 
     main = client.get('/elections/elections/list-groups')
@@ -250,66 +254,25 @@ def test_view_election_compound_list_groups(election_day_app_gr):
                 'class': 'active',
                 'color': '#efb52c',
                 'text': 'BDP',
-                'value': 1,
-                'value2': None
+                'value': 603,
+                'value2': 1
             },
             {
                 'class': 'active',
                 'color': '#ff6300',
                 'text': 'CVP',
-                'value': 1,
-                'value2': None
+                'value': 491,
+                'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#0571b0',
                 'text': 'FDP',
-                'value': 0,
-                'value2': None
+                'value': 351,
+                'value2': 0
             }
         ]
     }
-
-
-def test_view_election_compound_mandate_allocation(election_day_app_gr):
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-    create_election_compound(client, canton='gr')
-    upload_party_results(client, slug='elections/elections')
-
-    main = client.get('/elections/elections/mandate-allocation')
-    assert '<h3>Sitzzuteilung</h3>' in main
-
-    # Historical data
-    csv_parties = (
-        'year,name,id,total_votes,color,mandates,votes\r\n'
-        '2022,BDP,0,60000,#efb52c,1,10000\r\n'
-        '2022,CVP,1,60000,#ff6300,1,30000\r\n'
-        '2022,FDP,2,60000,#4068c8,0,20000\r\n'
-        '2018,BDP,0,40000,#efb52c,1,1000\r\n'
-        '2018,CVP,1,40000,#ff6300,1,15000\r\n'
-        '2018,FDP,2,40000,#4068c8,1,10000\r\n'
-    ).encode('utf-8')
-
-    upload = client.get('/elections/elections/upload-party-results')
-    upload.form['parties'] = Upload('parties.csv', csv_parties, 'text/plain')
-    upload = upload.form.submit()
-    assert "erfolgreich hochgeladen" in upload
-
-    results = client.get('/elections/elections/mandate-allocation').text
-    assert '2.5%' in results
-    assert '16.7%' in results
-    assert '14.2%' in results
-
-    assert '37.5%' in results
-    assert '50.0%' in results
-    assert '12.5%' in results
-
-    assert '25.0%' in results
-    assert '33.3%' in results
-    assert '8.3%' in results
 
 
 def test_view_election_compound_parties_panachage(election_day_app_gr):

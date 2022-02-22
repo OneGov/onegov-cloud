@@ -513,10 +513,15 @@ def unmute_ticket(self, request):
 
 @OrgApp.view(model=Ticket, name='archive', permission=Private)
 def archive_ticket(self, request):
-    self.archive_ticket()
-    TicketMessage.create(self, request, 'archive')
-    request.success(
-        _("You archived ticket ${number}", mapping={
+
+    try:
+        self.archive_ticket()
+    except InvalidStateChange:
+        request.alert(
+            _("The ticket cannot be archived because it's not closed"))
+    else:
+        TicketMessage.create(self, request, 'archived')
+        request.success(_("You archived ticket ${number}", mapping={
             'number': self.number
         }))
 
@@ -524,13 +529,24 @@ def archive_ticket(self, request):
 
 
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
-def un_archive_ticket(self, request):
-    self.unarchive_ticket(request.current_user)
-    TicketMessage.create(self, request, 'unarchive')
-    request.success(
-        _("You recovered ticket ${number} from the archive", mapping={
-            'number': self.number
-        }))
+def unarchive_ticket(self, request):
+    user = UserCollection(request.session).by_username(
+        request.identity.userid)
+
+    try:
+        self.unarchive_ticket(user)
+    except InvalidStateChange:
+        request.alert(
+            _(
+                "The ticket cannot be recovered from the archive because it's "
+                "not archived"
+            ))
+    else:
+        TicketMessage.create(self, request, 'unarchived')
+        request.success(
+            _("You recovered ticket ${number} from the archive", mapping={
+              'number': self.number
+              }))
 
     return morepath.redirect(request.link(self))
 

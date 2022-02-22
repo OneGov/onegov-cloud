@@ -138,12 +138,12 @@ def test_election_compound_form_model(session, related_link_labels):
     model.related_link_label = related_link_labels
     model.show_list_groups = True
     model.show_lists = True
-    model.show_mandate_allocation = True
     model.show_party_strengths = True
     model.show_party_panachage = True
     model.elections = [e_r]
     model.pukelsheim = True
-    model.pukelsheim_completed = True
+    model.completes_manually = True
+    model.manually_completed = True
     model.colors = {
         'FDP': '#3a8bc1',
         'CVP': '#ff9100',
@@ -167,14 +167,14 @@ def test_election_compound_form_model(session, related_link_labels):
     assert form.related_link_label_rm.data == 'RM'
     assert form.show_list_groups.data is True
     assert form.show_lists.data is True
-    assert form.show_mandate_allocation.data is True
     assert form.show_party_strengths.data is True
     assert form.show_party_panachage.data is True
     assert form.region_elections.data == ['e-r']
     assert form.district_elections.data == []
     assert form.municipality_elections.data == []
     assert form.pukelsheim.data is True
-    assert form.pukelsheim_completed.data is True
+    assert form.completes_manually.data is True
+    assert form.manually_completed.data is True
     assert form.colors.data == (
         'CVP #ff9100\n'
         'FDP #3a8bc1'
@@ -191,14 +191,14 @@ def test_election_compound_form_model(session, related_link_labels):
     form.related_link.data = 'http://ur.l'
     form.show_list_groups.data = False
     form.show_lists.data = False
-    form.show_mandate_allocation.data = False
     form.show_party_strengths.data = False
     form.show_party_panachage.data = False
     form.region_elections.data = ['e-r']
     form.district_elections.data = ['e-d']
     form.municipality_elections.data = ['e-m']
     form.pukelsheim.data = False
-    form.pukelsheim_completed.data = False
+    form.completes_manually.data = False
+    form.manually_completed.data = False
     form.colors.data = (
         'CVP #ff9100\r\n'
         'SP Juso #dd0e0e\n'
@@ -220,10 +220,11 @@ def test_election_compound_form_model(session, related_link_labels):
     assert model.domain_elections == 'district'
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
-    assert model.pukelsheim_completed is False
+    assert model.pukelsheim is False
+    assert model.completes_manually is False
+    assert model.manually_completed is False
     assert form.show_list_groups.data is False
     assert form.show_lists.data is False
-    assert form.show_mandate_allocation.data is False
     assert form.show_party_strengths.data is False
     assert form.show_party_panachage.data is False
     assert sorted([e.id for e in model.elections]) == ['e-d']

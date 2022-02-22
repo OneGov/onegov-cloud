@@ -1,5 +1,6 @@
 import re
 
+from decimal import Decimal
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.core.errors import AmbiguousColumnsError
@@ -33,6 +34,16 @@ class FileImportError(object):
         self.filename = filename
         self.error = error
         self.line = line
+
+    def __eq__(self, other):
+        def interpolate(text):
+            return text.interpolate() if hasattr(text, 'interpolate') else text
+
+        return (
+            self.filename == other.filename
+            and interpolate(self.error) == interpolate(other.error)
+            and self.line == other.line
+        )
 
 
 def load_csv(
@@ -160,6 +171,9 @@ def get_entity_and_district(
 
     """
 
+    if entity_id == 0:
+        return '', ''
+
     entity = entities.get(entity_id, {})
     name = entity.get('name', '')
     district = entity.get('district', '')
@@ -217,8 +231,7 @@ def validate_integer(line, col, treat_none_as_default=True, default=0,
     if not result:
         if treat_none_as_default:
             return default
-        raise ValueError(_('Empty value: ${col}',
-                           mapping={'col': col}))
+        raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
     try:
         return int(result)
     except ValueError:
@@ -241,12 +254,43 @@ def validate_float(line, col, treat_none_as_default=True, default=0):
     if not result:
         if treat_none_as_default:
             return default
-        raise ValueError(_('Empty value: ${col}',
-                           mapping={'col': col}))
+        raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
     try:
         return float(result)
     except ValueError:
         raise ValueError(_('Invalid float number: ${col}',
+                           mapping={'col': col}))
+
+
+def validate_numeric(line, col, precision, scale, treat_none_as_default=True,
+                     default=0, optional=False):
+    """
+    Checks line of a csv file for a valid numeric number.
+    Raises an error if the attribute is not there.
+
+    :param line: line object from csv reader
+    :param col: attribute of line object
+    :param precision: the precision (number of decimals)
+    :param scale: the scale (number of decimals after decimal point)
+    :param default: default to return if line.col is None
+    :param treat_none_as_default: raises ValueError if line.col is None
+    :param optional: return the default, if the col does not exist.
+    :return: numeric value of line.col
+    """
+
+    if not hasattr(line, col) and optional:
+        return default
+
+    result = getattr(line, col)
+    if not result:
+        if treat_none_as_default:
+            return default
+        raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
+    try:
+        value = Decimal(result)
+        return Decimal(format(value, f'{precision}.{scale}f'))
+    except Exception:
+        raise ValueError(_('Invalid decimal number: ${col}',
                            mapping={'col': col}))
 
 

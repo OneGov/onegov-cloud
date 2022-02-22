@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-13 06:44+0100\n"
+"POT-Creation-Date: 2022-02-18 12:58+0100\n"
 "PO-Revision-Date: 2022-02-13 06:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -88,8 +88,15 @@ msgid "Invalid float number: ${col}"
 msgstr "Cifra a comma fluctuanta nunvalaivla: ${col}"
 
 #, python-format
+msgid "Invalid decimal number: ${col}"
+msgstr ""
+
+#, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Betg alfanumeric: ${col}"
+
+msgid "This format does not support separate results for expats"
+msgstr ""
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
@@ -375,6 +382,9 @@ msgstr ""
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
+msgid "Completes manually"
+msgstr ""
+
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
 "results are displayed until the election compound is manually completed."
@@ -403,14 +413,6 @@ msgstr "Glistas"
 msgid ""
 "Shows a tab with aggregated list results over all elections. Only useful if "
 "the lists correspond to the list groups. Only if Doppelter Pukelsheim."
-msgstr ""
-
-msgid "Mandate allocation"
-msgstr "Repartiziun dals sezs"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a table. Requires "
-"party results."
 msgstr ""
 
 msgid "Party strengths"
@@ -756,6 +758,9 @@ msgstr "Descripziun dal format"
 msgid "Embed"
 msgstr "Incorporar"
 
+msgid "Voters count"
+msgstr "Cifra electorala"
+
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
@@ -810,14 +815,14 @@ msgstr ""
 msgid "Upload results"
 msgstr "Chargiar si resultats"
 
+msgid "Upload party results"
+msgstr "Chargiar si ils resultats da las partidas"
+
 msgid "Clear results"
 msgstr "Stizzar ils resultats"
 
 msgid "Clear media"
 msgstr ""
-
-msgid "Upload party results"
-msgstr "Chargiar si ils resultats da las partidas"
 
 msgid "Yeas"
 msgstr "Vuschs affirmativas"
@@ -916,9 +921,6 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
 msgstr "Gruppa da glista"
-
-msgid "Voters count"
-msgstr "Cifra electorala"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"

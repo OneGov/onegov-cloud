@@ -19,7 +19,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     session.add(
         ElectionCompound(
             title='Compound', domain='canton', date=date(2020, 3, 8),
-            pukelsheim=True
+            pukelsheim=True, completes_manually=True
         )
     )
     election_compound = session.query(ElectionCompound).one()
@@ -194,7 +194,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     assert not errors
     session.add(election_1)
     election_compound.elections = [election_1, election_2]
-    election_compound.pukelsheim_completed = True
+    election_compound.manually_completed = True
     session.flush()
 
     assert get_districts_data(election_compound, principal) == {
@@ -327,6 +327,8 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 
     # Pukelsheim, intermediate
     election_compound.pukelsheim = True
+    election_compound.completes_manually = True
+    election_compound.manually_completed = False
     assert len(get_list_groups(election_compound)) == 7
     assert get_list_groups_data(election_compound) == {
         'results': [
@@ -335,105 +337,105 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'color': '#EE7F00',
                 'text': 'CVP',
                 'value': 931,
-                'value2': None
+                'value2': 22
             },
             {
                 'class': 'inactive',
                 'color': '#019040',
                 'text': 'SVP',
                 'value': 899,
-                'value2': None
+                'value2': 19
             },
             {
                 'class': 'inactive',
                 'color': '#0E52A0',
                 'text': 'FDP',
                 'value': 863,
-                'value2': None
+                'value2': 18
             },
             {
                 'class': 'inactive',
                 'color': '#99C040',
                 'text': 'AL',
                 'value': 538,
-                'value2': None
+                'value2': 10
             },
             {
                 'class': 'inactive',
                 'color': '#E53136',
                 'text': 'SP',
                 'value': 418,
-                'value2': None
+                'value2': 7
             },
             {
                 'class': 'inactive',
                 'color': '#acc700',
                 'text': 'GLP',
                 'value': 236,
-                'value2': None
+                'value2': 4
             },
             {
                 'class': 'inactive',
                 'color': '#F9B200',
                 'text': 'Piraten',
                 'value': 19,
-                'value2': None
+                'value2': 0
             }
         ]
     }
 
     # Pukelsheim, final
-    election_compound.pukelsheim_completed = True
+    election_compound.manually_completed = True
     assert get_list_groups_data(election_compound) == {
         'results': [
             {
                 'class': 'active',
                 'color': '#EE7F00',
                 'text': 'CVP',
-                'value': 22,
-                'value2': None
+                'value': 931,
+                'value2': 22
             },
             {
                 'class': 'active',
                 'color': '#019040',
                 'text': 'SVP',
-                'value': 19,
-                'value2': None
+                'value': 899,
+                'value2': 19
             },
             {
                 'class': 'active',
                 'color': '#0E52A0',
                 'text': 'FDP',
-                'value': 18,
-                'value2': None
+                'value': 863,
+                'value2': 18
             },
             {
                 'class': 'active',
                 'color': '#99C040',
                 'text': 'AL',
-                'value': 10,
-                'value2': None
+                'value': 538,
+                'value2': 10
             },
             {
                 'class': 'active',
                 'color': '#E53136',
                 'text': 'SP',
-                'value': 7,
-                'value2': None
+                'value': 418,
+                'value2': 7
             },
             {
                 'class': 'active',
                 'color': '#acc700',
                 'text': 'GLP',
-                'value': 4,
-                'value2': None
+                'value': 236,
+                'value2': 4
             },
             {
                 'class': 'inactive',
                 'color': '#F9B200',
                 'text': 'Piraten',
-                'value': 0,
-                'value2': None
+                'value': 19,
+                'value2': 0
             }
         ]
     }

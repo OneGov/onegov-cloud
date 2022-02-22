@@ -156,10 +156,10 @@ def test_view_election_candidate_by_district(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Engler']['Bernina']['entities'] == [3561, 3551]
+        assert set(data['Engler']['Bernina']['entities']) == {3561, 3551}
         assert data['Engler']['Bernina']['counted'] is False
         assert data['Engler']['Bernina']['percentage'] == 0.0
-        assert data['Schmid']['Bernina']['entities'] == [3561, 3551]
+        assert set(data['Schmid']['Bernina']['entities']) == {3561, 3551}
         assert data['Schmid']['Bernina']['counted'] is False
         assert data['Schmid']['Bernina']['percentage'] == 0.0
 
@@ -175,10 +175,10 @@ def test_view_election_candidate_by_district(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Caluori']['Bernina']['entities'] == [3561, 3551]
+        assert set(data['Caluori']['Bernina']['entities']) == {3561, 3551}
         assert data['Caluori']['Bernina']['counted'] is False
         assert data['Caluori']['Bernina']['percentage'] == 0.0
-        assert data['Casanova']['Bernina']['entities'] == [3561, 3551]
+        assert set(data['Casanova']['Bernina']['entities']) == {3561, 3551}
         assert data['Casanova']['Bernina']['counted'] is False
         assert data['Casanova']['Bernina']['percentage'] == 0.0
 

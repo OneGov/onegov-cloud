@@ -29,7 +29,8 @@ def parse_election(line, errors):
     return status
 
 
-def parse_election_result(line, errors, entities, election, principal):
+def parse_election_result(line, errors, entities, election, principal,
+                          ignore_extra):
     try:
         entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
@@ -54,9 +55,13 @@ def parse_election_result(line, errors, entities, election, principal):
             ))
 
         else:
+            entity_errors = []
             name, district = get_entity_and_district(
-                entity_id, entities, election, principal, errors
+                entity_id, entities, election, principal, entity_errors
             )
+            if ignore_extra and entity_errors:
+                return True
+            errors.extend(entity_errors)
 
             if not errors:
                 return dict(
@@ -73,6 +78,8 @@ def parse_election_result(line, errors, entities, election, principal):
                     blank_votes=blank_votes,
                     invalid_votes=invalid_votes,
                 )
+
+    return False
 
 
 def parse_list(line, errors, election_id):
@@ -128,8 +135,9 @@ def parse_panachage_results(line, errors, panachage, panachage_headers):
             for col_name, source in panachage_headers.items():
                 if source == target:
                     continue
-                panachage[target][source] = validate_integer(
-                    line, col_name, treat_none_as_default=False)
+                votes = validate_integer(line, col_name, default=None)
+                if votes is not None:
+                    panachage[target][source] = votes
 
     except ValueError as e:
         errors.append(e.args[0])
@@ -205,13 +213,17 @@ def parse_connection(line, errors, election_id):
         return connection, subconnection
 
 
-def import_election_internal_proporz(election, principal, file, mimetype):
+def import_election_internal_proporz(
+    election, principal, file, mimetype, ignore_extra=False
+):
     """ Tries to import the given file (internal format).
 
     This is the format used by onegov.ballot.Election.export().
 
     This function is typically called automatically every few minutes during
     an election day - we use bulk inserts to speed up the import.
+
+    Optionally ignores results not being part of this election.
 
     :return:
         A list containing errors.
@@ -246,10 +258,12 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         line_errors = []
 
         # Parse the line
-        status = parse_election(line, line_errors)
         result = parse_election_result(
-            line, line_errors, entities, election, principal
+            line, line_errors, entities, election, principal, ignore_extra
         )
+        if result is True:
+            continue
+        status = parse_election(line, line_errors)
         candidate = parse_candidate(line, line_errors, election_id)
         candidate_result = parse_candidate_result(line, line_errors)
         list_ = parse_list(line, line_errors, election_id)
@@ -258,7 +272,8 @@ def import_election_internal_proporz(election, principal, file, mimetype):
             line, line_errors, election_id
         )
         parse_panachage_results(
-            line, line_errors, panachage, panachage_headers)
+            line, line_errors, panachage, panachage_headers
+        )
 
         # Skip expats if not enabled
         if result and result['entity_id'] == 0 and not election.expats:
@@ -308,13 +323,12 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
-    if panachage_headers:
-        for list_id in panachage_headers.values():
-            if not list_id == '999' and list_id not in lists.keys():
+    for values in panachage.values():
+        for list_id in values:
+            if list_id != '999' and list_id not in lists:
                 errors.append(FileImportError(
                     _("Panachage results id ${id} not in list_id's",
                       mapping={'id': list_id})))
-                break
 
     if errors:
         return errors

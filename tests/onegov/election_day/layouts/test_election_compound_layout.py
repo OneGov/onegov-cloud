@@ -25,7 +25,6 @@ def test_election_compound_layout_general(session):
         'lists',
         'districts',
         'candidates',
-        'mandate-allocation',
         'party-strengths',
         'parties-panachage',
         'statistics',
@@ -38,7 +37,6 @@ def test_election_compound_layout_general(session):
     assert layout.title('districts') == '__districts'
     assert layout.title('districts') == '__districts'
     assert layout.title('candidates') == 'Elected candidates'
-    assert layout.title('mandate-allocation') == 'Mandate allocation'
     assert layout.title('party-strengths') == 'Party strengths'
     assert layout.title('parties-panachage') == 'Panachage'
     assert layout.title('data') == 'Downloads'
@@ -197,7 +195,6 @@ def test_election_compound_layout_menu(session):
     compound.pukelsheim = True
     compound.show_list_groups = True
     compound.show_lists = True
-    compound.show_mandate_allocation = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
 
@@ -206,10 +203,6 @@ def test_election_compound_layout_menu(session):
         ('Lists', 'ElectionCompound/lists', False, []),
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
-        (
-            'Mandate allocation', 'ElectionCompound/mandate-allocation', False,
-            []
-        ),
         ('Party strengths', 'ElectionCompound/party-strengths', False, []),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
         ('Election statistics', 'ElectionCompound/statistics', False, []),
@@ -222,7 +215,6 @@ def test_election_compound_layout_menu(session):
     ('lists', 'ElectionCompound/lists-table'),
     ('districts', 'ElectionCompound/districts-table'),
     ('candidates', 'ElectionCompound/candidates-table'),
-    ('mandate-allocation', None),
     ('party-strengths', None),
     ('parties-panachage', None),
     ('data', None)

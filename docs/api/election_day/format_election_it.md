@@ -63,7 +63,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 Nome|Descrizione
 ---|---
 `election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
-`election_status`|`interim` (risultati provvisori), `final` (risultati finali) o `unknown` (ignoto).
+`election_status`|Stato delle elezioni. `interim` (risultati provvisori), `final` (risultati finali) o `unknown` (ignoto).
 `entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero di aventi diritto al voto nel Comune.
@@ -104,10 +104,14 @@ Se lo stato è
 - `final`, l’intera elezione è stata completata
 - `unknown`, l'intera elezione viene considerata completata, se vengono contati tutti i comuni (previsti)
 
+#### Componenti delle elezioni
+
+I risultati di elezioni legate tra loro possono essere caricati tutti insieme mediante un unico file contenente tutte le righe dei risultati delle singole elezioni.
+
 #### Modello
 
-- [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
-- [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+- [election_onegov_majorz.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_onegov_majorz.csv)
+- [election_onegov_proporz.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_onegov_proporz.csv)
 
 ### Wabsti Sistema Maggioritario
 
@@ -150,8 +154,8 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 
 #### Modelli
 
-- [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
-- [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
+- [election_wabsti_majorz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_majorz_candidates.csv)
 
 ### Wabsti Sistema Proporzionale
 
@@ -207,10 +211,10 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 
 #### Modelli
 
-- [election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
-- [election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
-- [election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections.csv)
-- [election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
+- [election_wabsti_proporz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_results.csv)
+- [election_wabsti_proporz_statistics.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_statistics.csv)
+- [election_wabsti_proporz_list_connections.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_list_connections.csv)
+- [election_wabsti_proporz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_candidates.csv)
 
 
 ### WabstiCExport Sistema Maggioritario
@@ -252,4 +256,4 @@ Risultati misti sono aggiunti solo se:
 
 #### Modelli
 
-- [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+- [election_party_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_party_results.csv)

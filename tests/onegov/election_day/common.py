@@ -434,9 +434,9 @@ def upload_party_results(client, slug='election/proporz-election'):
         "year,total_votes,id,name,color,mandates,votes,voters_count,"
         "panachage_votes_from_1,panachage_votes_from_2,"
         "panachage_votes_from_3,panachage_votes_from_999\n"
-        "2022,11270,1,BDP,#efb52c,1,60387,603,,11,12,100\n"
-        "2022,11270,2,CVP,#ff6300,1,49117,491,21,,22,200\n"
-        "2022,11270,3,FDP,,0,35134,351,31,32,,300\n"
+        "2022,11270,1,BDP,#efb52c,1,60387,603.01,,11,12,100\n"
+        "2022,11270,2,CVP,#ff6300,1,49117,491.02,21,,22,200\n"
+        "2022,11270,3,FDP,,0,35134,351.04,31,32,,300\n"
     ).encode('utf-8')
 
     upload = client.get(f'/{slug}/upload-party-results')
@@ -447,7 +447,8 @@ def upload_party_results(client, slug='election/proporz-election'):
     return upload
 
 
-def create_election_compound(client, canton='gr', pukelsheim=False):
+def create_election_compound(client, canton='gr', pukelsheim=False,
+                             completes_manually=False):
     domain = {
         'bl': 'region',
         'gr': 'region',
@@ -499,15 +500,16 @@ def create_election_compound(client, canton='gr', pukelsheim=False):
         'regional-election-a', 'regional-election-b'
     ]
     new.form['pukelsheim'] = pukelsheim
+    new.form['completes_manually'] = completes_manually
     new.form['show_list_groups'] = True
     new.form['show_party_strengths'] = True
     new.form['show_party_panachage'] = True
-    new.form['show_mandate_allocation'] = True
     new.form.submit()
 
 
 def upload_election_compound(client, create=True, canton='gr',
-                             status='unknown', pukelsheim=False):
+                             status='unknown', pukelsheim=False,
+                             completes_manually=False):
     entities = {
         'bl': [2761, 2762],
         'gr': [3506, 3513],
@@ -516,36 +518,34 @@ def upload_election_compound(client, create=True, canton='gr',
         'zg': [1701, 1702],
     }
     if create:
-        create_election_compound(client, canton=canton, pukelsheim=pukelsheim)
+        create_election_compound(
+            client,
+            canton=canton,
+            pukelsheim=pukelsheim,
+            completes_manually=completes_manually
+        )
 
-    for index, slug in enumerate((
-        'regional-election-a', 'regional-election-b'
-    )):
-        csv = PROPORZ_HEADER
+    csv = PROPORZ_HEADER
+    csv += (
+        f'{status},{entities[canton][0]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+        f'101,False,Anna,Looser,0,,0,1\n'
+        f'{status},{entities[canton][0]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+        f'201,True,Carol,Winner,2,,2,0\n'
+    )
+    csv += (
+        f'{status},{entities[canton][1]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+        f'101,True,Hans,Sieger,0,,0,1\n'
+        f'{status},{entities[canton][1]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+        f'201,False,Peter,Verlierer,2,,2,0\n'
+    )
+    csv = csv.encode('utf-8')
 
-        entity = entities[canton][index]
-        if index:
-            csv += (
-                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-                f'101,True,Hans,Sieger,0,,0,1\n'
-                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-                f'201,False,Peter,Verlierer,2,,2,0\n'
-            )
-        else:
-            csv += (
-                f'{status},{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-                f'101,False,Anna,Looser,0,,0,1\n'
-                f'{status},{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-                f'201,True,Carol,Winner,2,,2,0\n'
-            )
-        csv = csv.encode('utf-8')
+    upload = client.get('/elections/elections/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
 
-        upload = client.get(f'/election/{slug}/upload').follow()
-        upload.form['file_format'] = 'internal'
-        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-        upload = upload.form.submit()
-
-        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
 
 def import_wabstic_data(election, tar_file, principal, expats=False):

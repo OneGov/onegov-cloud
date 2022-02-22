@@ -412,7 +412,7 @@ class Pdf(PDFDocument):
     def figcaption(self, text, style=None):
         """ Adds a figure caption. """
 
-        self.p(text, style=style or self.style.figcaption)
+        self.p_markup(text, style=style or self.style.figcaption)
 
     @staticmethod
     # Walk the tree and convert the elements

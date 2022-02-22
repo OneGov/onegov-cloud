@@ -318,7 +318,7 @@ def test_import_internal_proporz_expats(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Canton(canton='zg')
+    principal = Canton(canton='sg')
 
     for expats in (False, True):
         election.expats = expats
@@ -646,3 +646,126 @@ def test_import_internal_proporz_regional(session):
     )
     assert not errors
     assert election.progress == (1, 2)
+
+
+def test_import_internal_proporz_panachage(session):
+
+    def create_csv(headers, results):
+        lines = []
+        lines.append([
+            'election_status',
+            'entity_id',
+            'entity_counted',
+            'entity_eligible_voters',
+            'entity_received_ballots',
+            'entity_blank_ballots',
+            'entity_invalid_ballots',
+            'entity_blank_votes',
+            'entity_invalid_votes',
+            'list_name',
+            'list_id',
+            'list_number_of_mandates',
+            'list_votes',
+            'list_connection',
+            'list_connection_parent',
+            'candidate_family_name',
+            'candidate_first_name',
+            'candidate_id',
+            'candidate_elected',
+            'candidate_votes',
+            'candidate_party',
+        ] + [f'panachage_votes_from_list_{h}' for h in headers])
+        for list_id, panachage in results:
+            lines.append([
+                'unknown',  # election_status
+                '3271',  # entity_id
+                'True',  # entity_counted
+                '111',  # entity_eligible_voters
+                '11',  # entity_received_ballots
+                '1',  # entity_blank_ballots
+                '1',  # entity_invalid_ballots
+                '1',  # entity_blank_votes
+                '1',  # entity_invalid_votes
+                '',  # list_name
+                list_id,  # list_id
+                '',  # list_number_of_mandates
+                '',  # list_votes
+                '',  # list_connection
+                '',  # list_connection_parent
+                list_id,  # candidate_family_name
+                'xxx',  # candidate_first_name
+                list_id,  # candidate_id
+                'false',  # candidate_elected
+                '1',  # candidate_votes
+                '',  # candidate_party
+            ] + panachage)
+
+        return BytesIO(
+            '\n'.join(
+                (','.join(column for column in line)) for line in lines
+            ).encode('utf-8')
+        ), 'text/plain'
+
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='canton',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Canton(canton='sg')
+    query = session.query(PanachageResult)
+
+    # No panachage results
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv([], [('1', [])])
+    )
+    assert not errors
+    assert query.count() == 0
+
+    # Irrelevant panchage headers are ignored
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv(['10', '11'], [('1', ['', ''])])
+    )
+    assert not errors
+    assert query.count() == 0
+
+    # Missing data and data with source == target is ignored, all other data
+    # is parsed correctly
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv(
+            ['1', '2', '3', '999'],
+            [
+                ('1', ['1', '', '3', '']),
+                ('2', ['4', '5', '', '']),
+                ('3', ['', '8', '9', '999']),
+            ]
+        )
+    )
+    assert not errors
+    assert query.count() == 4
+    assert query.filter_by(source='1').one().votes == 4
+    assert query.filter_by(source='2').one().votes == 8
+    assert query.filter_by(source='3').one().votes == 3
+    assert query.filter_by(source='999').one().votes == 999
+
+    # Panachage data with missing lists throws an error
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv(
+            ['1', '2', '3', '999'],
+            [
+                ('1', ['1', '2', '3', '999']),
+                ('2', ['4', '5', '6', '999']),
+            ]
+        )
+    )
+    assert set([e.error.interpolate() for e in errors]) == {
+        "Panachage results id 3 not in list_id's"
+    }

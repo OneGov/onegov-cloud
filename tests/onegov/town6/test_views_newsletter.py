@@ -3,6 +3,10 @@
 def test_news(client):
     client.login_admin().follow()
 
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page = page.form.submit().follow()
+
     page = client.get('/news')
     page = page.click('Nachricht')
     page.form['title'] = "We have a new homepage"
