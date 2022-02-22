@@ -73,13 +73,29 @@ def test_election_compound_layout_general(session):
     )
     assert layout.has_party_results is True
 
+    # test has_superregions
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.has_superregions is False
+
+    request.app.principal.has_superregions = True
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.has_superregions is False
+
+    compound.domain_elections = 'region'
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.has_superregions is True
+
     # test main view
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.main_view == 'ElectionCompound/superregions'
+
     compound.pukelsheim = True
     compound.show_lists = True
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/lists'
 
     request.app.principal.hidden_tabs = {'elections': ['lists']}
+    request.app.principal.has_superregions = False
     layout = ElectionCompoundLayout(compound, request)
     assert layout.hide_tab('lists') is True
     assert layout.main_view == 'ElectionCompound/districts'
@@ -148,10 +164,12 @@ def test_election_compound_layout_menu(session):
     session.flush()
     compound.elections = [election]
 
+    # No results yet
     request = DummyRequest()
     assert ElectionCompoundLayout(compound, request).menu == []
     assert ElectionCompoundLayout(compound, request, 'data').menu == []
 
+    # Results available
     election.results.append(
         ElectionResult(
             name='1',
@@ -173,6 +191,7 @@ def test_election_compound_layout_menu(session):
         ('Downloads', 'ElectionCompound/data', True, [])
     ]
 
+    # Party results available, but no views enabled
     compound.party_results.append(
         PartyResult(
             year=2017,
@@ -185,7 +204,6 @@ def test_election_compound_layout_menu(session):
     compound.panachage_results.append(
         PanachageResult(target='t', source='t ', votes=0)
     )
-
     assert ElectionCompoundLayout(compound, request).menu == [
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
@@ -193,16 +211,19 @@ def test_election_compound_layout_menu(session):
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
+    # All views enabled
+    request.app.principal.has_superregions = True
+    compound.domain_elections = 'region'
     compound.pukelsheim = True
     compound.show_list_groups = True
     compound.show_lists = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
-
     assert ElectionCompoundLayout(compound, request).menu == [
         ('List groups', 'ElectionCompound/list-groups', False, []),
         ('Lists', 'ElectionCompound/lists', False, []),
-        ('__districts', 'ElectionCompound/districts', False, []),
+        ('__superregions', 'ElectionCompound/superregions', False, []),
+        ('__regions', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
         ('Party strengths', 'ElectionCompound/party-strengths', False, []),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
@@ -214,12 +235,12 @@ def test_election_compound_layout_menu(session):
 @pytest.mark.parametrize('tab,expected', [
     ('list-groups', 'ElectionCompound/list-groups-table'),
     ('lists', 'ElectionCompound/lists-table'),
+    ('superregions', 'ElectionCompound/superregions-table'),
     ('districts', 'ElectionCompound/districts-table'),
     ('candidates', 'ElectionCompound/candidates-table'),
     ('party-strengths', None),
     ('parties-panachage', None),
     ('data', None)
-
 ])
 def test_election_compound_layout_table_links(tab, expected):
     election = ElectionCompound(date=date(2100, 1, 1), domain='federation')

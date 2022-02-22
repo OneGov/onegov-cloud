@@ -13,7 +13,8 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'list-groups', 'lists', 'districts', 'candidates', 'statistics'
+        'list-groups', 'lists', 'superregions', 'districts', 'candidates',
+        'statistics'
     )
 
     majorz = False
@@ -110,23 +111,23 @@ class ElectionCompoundLayout(DetailLayout):
             return self.has_superregions
         if tab == 'list-groups':
             return (
-                self.model.show_list_groups
-                and self.model.pukelsheim
+                self.model.show_list_groups is True
+                and self.model.pukelsheim is True
                 and self.has_party_results
             )
         if tab == 'lists':
             return (
-                self.model.show_lists
-                and self.model.pukelsheim
+                self.model.show_lists is True
+                and self.model.pukelsheim is True
             )
         if tab == 'party-strengths':
             return (
-                self.model.show_party_strengths
+                self.model.show_party_strengths is True
                 and self.has_party_results
             )
         if tab == 'parties-panachage':
             return (
-                self.model.show_party_panachage
+                self.model.show_party_panachage is True
                 and self.has_party_results
             )
 
