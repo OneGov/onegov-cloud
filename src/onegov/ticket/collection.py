@@ -40,7 +40,8 @@ class TicketCollectionPagination(Pagination):
 
         if self.state == 'unfinished':
             query = query.filter(
-                Ticket.state != 'closed'
+                Ticket.state != 'closed',
+                Ticket.state != 'archived'
             )
         elif self.state != 'all':
             query = query.filter(Ticket.state == self.state)
@@ -115,9 +116,7 @@ TicketCount = namedtuple('TicketCount', ['open', 'pending', 'closed'])
 class TicketCollection(TicketCollectionPagination):
 
     def query(self):
-        return self.session.query(Ticket).filter(
-            Ticket.state != 'archived'
-        )
+        return self.session.query(Ticket)
 
     def random_number(self, length):
         range_start = 10 ** (length - 1)
@@ -220,6 +219,5 @@ class TicketCollection(TicketCollectionPagination):
 
 
 class ArchivedTicketsCollection(TicketCollectionPagination):
-
     def query(self):
         return self.session.query(Ticket)
