@@ -103,8 +103,7 @@
 
         <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
             <div class="columns small-12 small-centered">
-                <h2 i18n:translate="" tal:condition="not: h2|nothing">Archive</h2>
-                <h2 i18n:translate="" tal:condition="h2|nothing">Archive</h2>
+                <h2 i18n:translate="">Archive</h2>
                 <div class="archive-breadcrumbs">
                     <ul>
                         <li tal:repeat="year years">
