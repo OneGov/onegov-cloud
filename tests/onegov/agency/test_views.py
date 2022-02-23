@@ -9,6 +9,7 @@ from pytest import mark
 from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+from onegov.people.models import Person
 import time
 
 
@@ -717,40 +718,74 @@ def test_basic_search(client_with_es):
     ).json
 
 
-def test_search_recently_publicated_object(client_with_es):
+def test_search_recently_published_object(client_with_es):
     now = utcnow()
     in_5_minutes = now + timedelta(minutes=5)
     in_1_hour = now + timedelta(hours=1)
+    client = client_with_es
+    client.login_admin()
+
     with freeze_time(now):
-        client = client_with_es
-
-        client.login_admin()
-
-        page = client.get('/settings').click("Organisationen", index=1)
-        page.form['agency_phone_internal_digits'] = 4
-        page.form.submit()
-
+        # Create Person, publish
         manage = client.get('/people').click('Person', href='new')
         manage.form['first_name'] = 'Nick'
         manage.form['last_name'] = 'Rivera'
-        manage.form['publication_start'] = in_5_minutes
         manage.form.submit()
 
+        # Set publication date in the future
+        # Cannot be done using the form field
+        # because of timezones
+        client.app.session().query(Person).filter(
+            Person.first_name == 'Nick'
+        ).one().publication_start = in_5_minutes
+
+    with freeze_time(in_1_hour):
         # Do reindex cronjob
         job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
         job.app = client.app
-
         url = get_cronjob_url(job)
-
         client.get(url)
+        client.logout()
 
-    # Reindexing takes a few seconds
-    time.sleep(5)
-
-    # Test search results
-    with freeze_time(in_1_hour):
-        assert 'Rivera' in client.get('/search?q=Nick')
+        # Reindexing takes a few seconds
+        time.sleep(15)
+        # Test search results
         assert 'Nick' in client.get('/search?q=Rivera')
+
+
+def test_search_recently_unpublished_object(client_with_es):
+    now = utcnow()
+    in_5_minutes = now + timedelta(minutes=5)
+    in_1_hour = now + timedelta(hours=1)
+    client = client_with_es
+    client.login_admin()
+
+    with freeze_time(now):
+        # Create Person, publish
+        manage = client.get('/people').click('Person', href='new')
+        manage.form['first_name'] = 'Nick'
+        manage.form['last_name'] = 'Rivera'
+        manage.form.submit()
+
+        # Set publication date in the future
+        # Cannot be done using the form field
+        # because of timezones
+        client.app.session().query(Person).filter(
+            Person.first_name == 'Nick'
+        ).one().publication_end = in_5_minutes
+
+    with freeze_time(in_1_hour):
+        # Do reindex cronjob
+        job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+        job.app = client.app
+        url = get_cronjob_url(job)
+        client.get(url)
+        client.logout()
+
+        # Reindexing takes a few seconds
+        time.sleep(15)
+        # Test search results
+        assert 'Nick' not in client.get('/search?q=Rivera')
 
 
 def test_footer_settings_custom_links(client):
