@@ -705,7 +705,7 @@ def get_filters(self, request):
         attrs={'class': 'ticket-filter-my'}
     )
     for id, text in TICKET_STATES.items():
-        if text != "Archived":
+        if id != 'archived':
             yield Link(
                 text=text,
                 url=request.link(self.for_state(id).for_owner(None)),
