@@ -7,6 +7,9 @@ $event-image-max-height: 150px;
 
 .events {
 
+    .event-item > a {
+        width: 100%;
+    }
 
     .card {
         border: 0;
