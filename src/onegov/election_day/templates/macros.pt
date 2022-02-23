@@ -1116,7 +1116,7 @@
 <metal:pdf_download define-macro="pdf_download" i18n:domain="onegov.election_day">
     <tal:block tal:condition="layout.pdf_path">
         <h4>PDF</h4>
-        <p><span i18n:translate="">Download a PDF with all the results:</span> <a href="${request.link(model, 'pdf')}">PDF</a></p>
+        <p><span i18n:translate="">Download a PDF with all the results:</span> <a i18n:translate="" href="${request.link(model, 'pdf')}">PDF Results</a></p>
     </tal:block>
 </metal:pdf_download>
 
