@@ -462,7 +462,7 @@ msgid "Baking"
 msgstr "Cucina/pasticceria"
 
 msgid "Cinema"
-msgstr "Cinema"
+msgstr "Film"
 
 msgid "Computer"
 msgstr "Computer"
@@ -1264,7 +1264,7 @@ msgid "Cancel"
 msgstr "Interrompere"
 
 msgid "Homepage"
-msgstr "Homepage iniziale"
+msgstr "Pagina iniziale"
 
 msgid "Submit Activity"
 msgstr "Inserisci l'attività"
@@ -1450,7 +1450,7 @@ msgid "Link to the activities."
 msgstr "Link alle attività."
 
 msgid "Link to the homepage."
-msgstr "Link all'homepage iniziale."
+msgstr "Link alla pagina iniziale."
 
 msgid "This item is already in your list."
 msgstr "Questa voce è già nella tua lista."
@@ -1474,7 +1474,7 @@ msgid ""
 "as your children."
 msgstr ""
 "Vi preghiamo di notare che non possiamo garantire che possiate partecipare "
-"alla stessa attività con i vostri figli."
+"alla stessa attività."
 
 msgid "No activities found."
 msgstr "Nessuna attività trovata."

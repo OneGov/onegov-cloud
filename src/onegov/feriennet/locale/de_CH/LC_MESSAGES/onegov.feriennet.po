@@ -49,7 +49,7 @@ msgstr "${count} Buchungen"
 
 #, python-format
 msgid "${count} Wishes per Attendee"
-msgstr "${count} Wünsche pro Teilnehmer"
+msgstr "${count} Wünsche pro Person"
 
 #, python-format
 msgid "${count} accepted"
@@ -69,7 +69,7 @@ msgstr "${count} blockiert"
 
 #, python-format
 msgid "${count} Bookings per Attendee"
-msgstr "${count} Buchungen pro Teilnehmer"
+msgstr "${count} Buchungen pro Person"
 
 #, python-format
 msgid "${count} Attendees"
@@ -77,11 +77,11 @@ msgstr "${count} Teilnehmer"
 
 #, python-format
 msgid "${count} Girls"
-msgstr "${count} Mädchen"
+msgstr "${count} Weiblich"
 
 #, python-format
 msgid "${count} Boys"
-msgstr "${count} Jungen"
+msgstr "${count} Männlich"
 
 #, python-format
 msgid "${amount}% Happiness"
@@ -89,7 +89,7 @@ msgstr "${amount}% Zufriedenheit"
 
 #, python-format
 msgid "${count} Attendees Without Occasion"
-msgstr "${count} Teilnehmer ohne Durchführung"
+msgstr "${count} Teilnehmende ohne Durchführung"
 
 #, python-format
 msgid "${amount} CHF outstanding"
@@ -119,7 +119,7 @@ msgid "Billing"
 msgstr "Fakturierung"
 
 msgid "Volunteers"
-msgstr "Helfer"
+msgstr "Hilfspersonen"
 
 msgid "Notifications"
 msgstr "Mitteilungen"
@@ -404,10 +404,10 @@ msgid "Blocked"
 msgstr "Blockiert"
 
 msgid "Boy"
-msgstr "Junge"
+msgstr "Männlich"
 
 msgid "Girl"
-msgstr "Mädchen"
+msgstr "Weiblich"
 
 msgid "Administrator"
 msgstr "Administrator"
@@ -437,10 +437,10 @@ msgid "Exports occasion needs."
 msgstr "Exportiert den Bedarf von Durchführungen."
 
 msgid "Attendees without Bookings"
-msgstr "Teilnehmer ohne Buchungen"
+msgstr "Teilnehmende ohne Buchungen"
 
 msgid "Attendees who were not granted any of their wishes"
-msgstr "Teilnehmer die keine gewünschten Buchungen erhalten haben"
+msgstr "Teilnehmende die keine gewünschten Buchungen erhalten haben"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -461,7 +461,7 @@ msgid "Baking"
 msgstr "Backen"
 
 msgid "Cinema"
-msgstr "Kino"
+msgstr "Film"
 
 msgid "Computer"
 msgstr "Computer"
@@ -572,7 +572,7 @@ msgid "Map"
 msgstr "Karte"
 
 msgid "You already entered a child with this name"
-msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
+msgstr "Sie haben bereits eine Person mit diesem Namen erfasst"
 
 msgid "First Name"
 msgstr "Vorname"
@@ -613,7 +613,7 @@ msgid "Group Code"
 msgstr "Gruppencode"
 
 msgid "Add a new attendee"
-msgstr "Neuen Teilnehmer erfassen"
+msgstr "Neue Person erfassen"
 
 msgid "The TOS must be accepted to create a booking."
 msgstr ""
@@ -624,14 +624,14 @@ msgid ""
 "any attendees."
 msgstr ""
 "Ihr Benutzerprofil ist unvollständig. Es muss vollständig sein bevor Sie "
-"Teilnehmer anmelden können."
+"Personen anmelden können."
 
 msgid ""
 "The user's userprofile is not complete. It needs to be complete before "
 "signing up any attendees."
 msgstr ""
 "Das Benutzerprofil des Benutzers ist unvollständig. Es muss vollständig sein "
-"bevor Teilnehmer angemeldet werden können."
+"bevor Personen angemeldet werden können."
 
 #, python-format
 msgid "This occasion has already been booked by ${name}"
@@ -647,7 +647,7 @@ msgid "Cannot create a booking outside the prebooking period"
 msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
 
 msgid "Cannot create a booking outside the booking period"
-msgstr "Buchungen können nicht ausserhalb der Buchungsperiode gemacht werden"
+msgstr "Buchungen können nicht ausserhalb der Buchungsphase gemacht werden"
 
 msgid "This occasion is already fully booked"
 msgstr "Diese Durchführung ist bereits ausgebucht"
@@ -660,17 +660,16 @@ msgid ""
 "The attendee already has already reached the maximum number of ${count} "
 "bookings"
 msgstr ""
-"Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen "
-"erreicht"
+"Diese Person hat bereits die maximale Anzahl von ${count} Buchungen erreicht"
 
 msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
 
 msgid "The attendee is too old"
-msgstr "Der Teilnehmer ist zu alt"
+msgstr "Die Person ist zu alt"
 
 msgid "The attendee is too young"
-msgstr "Der Teilnehmer ist zu jung"
+msgstr "Die Person ist zu jung"
 
 msgid "The deadline has passed."
 msgstr "Der Anmeldeschluss wurde erreicht."
@@ -695,8 +694,8 @@ msgstr "Ja, Fakturierung abschliessen"
 
 msgid "I know that after confirmation, bills are made visible to users."
 msgstr ""
-"Mir ist bewusst das Rechnungen nach Abschluss für die jeweiligen Benutzer "
-"sichtbar sind."
+"Mir ist bewusst dass Rechnungen nach Abschluss für die Benutzer sichtbar "
+"sind."
 
 msgid "Target"
 msgstr "Ziel"
@@ -732,13 +731,13 @@ msgid "Invalid amount"
 msgstr "Ungültiger Betrag"
 
 msgid "Children of organisers"
-msgstr "Kinder von Veranstaltern"
+msgstr "Kinder von Veranstaltenden"
 
 msgid "Prefer the following children:"
-msgstr "Folgende Kinder bevorzugen:"
+msgstr "Folgende Personen bevorzugen:"
 
 msgid "Children of administrators"
-msgstr "Kinder von Administratoren"
+msgstr "Kinder von Administrierenden"
 
 msgid "Confirm matching:"
 msgstr "Zuteilung abschliessen:"
@@ -765,7 +764,7 @@ msgid "Myself"
 msgstr "Mich selbst"
 
 msgid "Organisers with an occasion"
-msgstr "Veranstalter mit Durchführungen"
+msgstr "Veranstaltende mit Durchführungen"
 
 msgid "Users of a given role"
 msgstr "Benutzer mit einer bestimmten Rolle"
@@ -782,7 +781,8 @@ msgstr "Benutzer mit unbezahlten Rechnungen"
 msgid ""
 "Users with attenedees that have an occasion on their wish- or booking-list"
 msgstr ""
-"Benutzer mit Teilnehmern die eine Durchführung gewünscht oder gebucht haben"
+"Benutzer mit Teilnehmenden, die eine Durchführung gewünscht oder gebucht "
+"haben"
 
 msgid "Role"
 msgstr "Rolle"
@@ -833,10 +833,10 @@ msgid "Cost"
 msgstr "Kosten"
 
 msgid "The amount paid to the organiser"
-msgstr "Der Betrag welcher dem Veranstalter gezahlt wird"
+msgstr "Der Betrag welcher der/dem Veranstaltenden gezahlt wird"
 
 msgid "Minimum Number of Participants"
-msgstr "Mindestteilnehmerzahl"
+msgstr "Mindestzahl Teilnehmende"
 
 msgid "Participants"
 msgstr "Teilnehmer"
@@ -904,7 +904,7 @@ msgid "Date validation failed"
 msgstr "Datums-Validierung fehlgeschlagen"
 
 msgid "Minimum age must be lower than maximum age."
-msgstr "Das Minimum-Alter muss höher sein als das Maximum-Alter."
+msgstr "Das Minimum-Alter muss tiefer sein als das Maximum-Alter."
 
 msgid ""
 "The minium number of participants cannot be higher than the maximum number "
@@ -946,11 +946,10 @@ msgid "Need up to"
 msgstr "Benötige bis zu"
 
 msgid "Accept signups by volunteers"
-msgstr "Anmeldungen von Helfern akzeptieren"
+msgstr "Anmeldungen von Hilfspersonen akzeptieren"
 
 msgid "Only relevant if the experimental volunteer feature is used"
-msgstr ""
-"Nur relevant wenn die experimentelle Helfer Registration verwendet wird"
+msgstr "Nur relevant wenn die Registration für Hilfspersonen verwendet wird"
 
 msgid "Minimum is larger than maximum"
 msgstr "Das Minimum ist grösser als das Maximum"
@@ -1006,7 +1005,7 @@ msgid "Execution End"
 msgstr "Ende Durchführung"
 
 msgid "How are the activities conducted?"
-msgstr "Wie wird der Ferienpass umgesetzt?"
+msgstr "Wie ist die Umsetzung?"
 
 msgid "Execution"
 msgstr "Ausführung"
@@ -1015,50 +1014,51 @@ msgid ""
 "Each attendee may book as many activites as he likes. Each activity is "
 "billed separately."
 msgstr ""
-"Jeder Teilnehmer kann so viele Angebote buchen wie er möchte. Jedes Angebot "
-"wird einzeln verrechnet."
+"Jede Person kann so viele Angebote buchen wie sie möchte. Jedes Angebot wird "
+"einzeln verrechnet."
 
 msgid ""
 "Each attendee may attend a limited number of activites for a fixed price."
 msgstr ""
-"Jeder Teilnehmer kann für einen fixen Preis an einer limitierten Anzahl von "
+"Jede Person kann für einen fixen Preis an einer limitierten Anzahl von "
 "Angeboten teilnehmen."
 
 msgid ""
 "Each attendee may attend a fixed number of activites. Each activity is "
 "billed separately."
 msgstr ""
-"Jeder Teilnehmer kann eine fixe Anzahl Angebote besuchen. Jede Aktivität "
-"wird separat verrechnet."
+"Jede Person kann eine fixe Anzahl Angebote besuchen. Jede Aktivität wird "
+"separat verrechnet."
 
 msgid "Maximum Number of Activities per Attendee"
-msgstr "Maximale Anzahl Angebote pro Teilnehmer"
+msgstr "Maximale Anzahl Angebote pro Person"
 
 msgid "Maximum Number of Bookings per Attendee and period"
-msgstr "Maximale Anzahl Buchungen per Teilnehmer und Zeitraum"
+msgstr "Maximale Anzahl Buchungen pro Person und Zeitraum"
 
 msgid "Cost of the Pass"
 msgstr "Kosten des Passes"
 
 msgid "How is the organiser paid?"
-msgstr "Wie wird der Veranstalter bezahlt?"
+msgstr "Wie wird die/der Veranstaltende bezahlt?"
 
 msgid "The parents pay everything by bill, the organisers are paid later"
 msgstr ""
-"Die Eltern zahlen alles per Rechnung, die Veranstalter werden später bezahlt"
+"Die Mitglieder zahlen alles per Rechnung, die Veranstaltenden werden später "
+"bezahlt"
 
 msgid ""
 "The parents pay the pass by bill, the organisers are paid in cash at the "
 "beginning of each occasion"
 msgstr ""
-"Die Eltern zahlen den Pass per Rechnung, zusätzliche Teilnahmegebühren "
-"werden dem Veranstalter bar vor Ort bezahlt"
+"Die Mitglieder zahlen den Pass per Rechnung, zusätzliche Teilnahmegebühren "
+"werden der/dem Veranstaltenden bar vor Ort bezahlt"
 
 msgid "Required minutes between bookings"
 msgstr "Blockzeit zwischen Buchungen in Minuten"
 
 msgid "Attendees are limited to one activity per day"
-msgstr "Teilnehmer sind auf ein Angebot pro Tag limitiert"
+msgstr "Teilnehmende sind auf ein Angebot pro Tag limitiert"
 
 msgid "Yes"
 msgstr "Ja"
@@ -1090,11 +1090,11 @@ msgid ""
 "confirmation and before the deadline. Booking costs incurred after "
 "confirmation will be added to the existing bill."
 msgstr ""
-"Standardmässig können nur Administratoren nach der Fakturierung buchen. Mit "
-"dieser Einstellung können reguläre Benutzer auch nach der Rechnungsstellung "
+"Standardmässig können nur Administrierende nach der Fakturierung buchen. Mit "
+"dieser Einstellung können reguläre Nutzende auch nach der Rechnungsstellung "
 "noch Buchungen erstellen. Kosten die durch diese Buchungen entstehen, werden "
 "zur bestehenden Rechnung hinzugefügt. <br><br>Bei Aktivierung dieser Option "
-"wird empfohlen, unter \"Stornierungsschluss\" nur Administratoren zu "
+"wird empfohlen, unter \"Stornierungsschluss\" nur Administrierenden zu "
 "erlauben, bestätigte Buchungen abzusagen, da Stornierungen nicht automatisch "
 "von der bestehenden Rechnung abgezogen werden."
 
@@ -1105,7 +1105,7 @@ msgid "Cancellation Deadline"
 msgstr "Stornierungsschluss"
 
 msgid "No, only allow admins"
-msgstr "Nein, nur Administratoren erlauben"
+msgstr "Nein, nur Administrierenden erlauben"
 
 msgid "Until a fixed day"
 msgstr "Bis zu einem Stichtag"
@@ -1126,15 +1126,15 @@ msgid ""
 "<b>Exact</b> - the attendees need to be of the expected age at the beginning "
 "of the occasion"
 msgstr ""
-"<b>Genau</b> - Die Teilnehmer müssen zu Beginn der Durchführung das "
-"erwartete Alter haben"
+"<b>Genau</b> - Die Teilnehmenden müssen zu Beginn der Durchführung das "
+"vorgegebene Alter haben"
 
 msgid ""
 "<b>Age group</b> - The attendees need to be of the expected age sometime "
 "during the year of the occasion"
 msgstr ""
-"<b>Jahrgang</b> - Die Teilnehmer müssen irgendwann im Jahr der Durchführung "
-"das erwartete Alter haben"
+"<b>Jahrgang</b> - Die Teilnehmenden müssen irgendwann im Jahr der "
+"Durchführung das vorgegebene Alter haben"
 
 msgid "The execution phase conflicts with existing occasions"
 msgstr "Konflikt mit bestehenden Durchführungen"
@@ -1146,7 +1146,7 @@ msgid "Booking must start before it ends"
 msgstr "Die Buchungsphase muss beginnen bevor sie endet"
 
 msgid "Execution must start before it ends"
-msgstr "Die Ausführungsphase muss beginnen bevor sie ended"
+msgstr "Die Durchführungsphase muss beginnen bevor sie endet"
 
 msgid "Prebooking must end before booking starts"
 msgstr "Die Wunschphase muss enden bevor sie beginnt"
@@ -1155,10 +1155,10 @@ msgid "Prebooking must end before execution starts"
 msgstr "Die Buchungsphase muss enden bevor sie beginnt"
 
 msgid "Execution may not start before booking starts"
-msgstr "Die Ausführungsphase kann nicht vor der Buchungsphase beginnen"
+msgstr "Die Durchführungsphase kann nicht vor der Buchungsphase beginnen"
 
 msgid "Execution may not end before booking ends"
-msgstr "Die Ausführungsphase kann nicht vor der Buchungsphase enden"
+msgstr "Die Durchführungsphase kann nicht vor der Buchungsphase enden"
 
 msgid ""
 "It is no longer possible to change the execution settings since the period "
@@ -1171,7 +1171,7 @@ msgid ""
 "It is not possible to have required minutes between bookings when limiting "
 "attendees to one activity per day."
 msgstr ""
-"Es ist nicht möglich eine Blockzeit zu erfassen wenn Teilnehmer auf ein "
+"Es ist nicht möglich eine Blockzeit zu erfassen wenn Teilnehmende auf ein "
 "Angebot pro Tag beschränkt sind."
 
 msgid "Send a daily status e-mail."
@@ -1396,7 +1396,7 @@ msgid "Join as a Volunteer"
 msgstr "Helfen Sie mit"
 
 msgid "Register as Volunteer"
-msgstr "Registration als Helfer"
+msgstr "Registration als Hilfsperson"
 
 msgid "Half day"
 msgstr "Halbtägig"
@@ -1471,9 +1471,7 @@ msgstr ""
 msgid ""
 "Note that we cannot guarantee that you will be placed in the same activity "
 "as your children."
-msgstr ""
-"Beachten Sie dass wir nicht garantieren können dass Sie mit Ihren Kindern am "
-"gleichen Angebot teilnehmen können."
+msgstr "Beachten Sie, dass wir eine Teilnahme nicht garantieren können."
 
 msgid "No activities found."
 msgstr "Keine Angebote gefunden."
@@ -1539,7 +1537,7 @@ msgid ""
 msgstr ""
 "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
 "Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein "
-"Administrator überprüft darauf Ihr Angebot."
+"Administrator überprüft dann Ihr Angebot."
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -1547,7 +1545,7 @@ msgid ""
 msgstr ""
 "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
 "Im Anschluss wählen Sie \"Publikation Beantragen\". Sie oder ein anderer "
-"Administrator können daraufhin das Angebot prüfen und veröffentlichen."
+"Administrator wird dann das Angebot prüfen und veröffentlichen."
 
 msgid "This activity is currently being reviewd by an administrator."
 msgstr "Dieses Angebot wird zur Zeit überprüft."
@@ -1711,15 +1709,17 @@ msgid "No bookings yet."
 msgstr "Noch keine Buchungen."
 
 msgid "Mark up to three occasions per child as favorites."
-msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
+msgstr "Sie können bis zu drei Angebote pro Person als Favorit markieren."
 
 msgid ""
 "Once the pre-booking is over, we will divide all children into activities."
-msgstr "Nach der Wunschphase verteilen wir die Kinder auf die Angebote."
+msgstr ""
+"Nach der Wunschphase werden die Teilnehmenden bestmöglichst auf die Angebote "
+"verteilt."
 
 msgid "We cannot guarantee that everyone gets into their favorite activity."
 msgstr ""
-"Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
+"Wir können nicht garantieren, dass jede Person in ihr Lieblingsangebot "
 "eingeteilt wird."
 
 msgid "Print"
@@ -1750,7 +1750,7 @@ msgid "Free of charge"
 msgstr "Kostenlos"
 
 msgid "This occasion does not have enough attendees yet."
-msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
+msgstr "Diese Durchführung hat noch nicht genügend Anmeldungen."
 
 msgid "Parent"
 msgstr "Elternteil"
@@ -1797,7 +1797,7 @@ msgid ""
 "The bills for this period have already been created. Signing up may add "
 "extra items to your bill, even if you have already paid it."
 msgstr ""
-"Die Rechnungen für diesen Zeitrum wurden bereits erstellt. Eine Anmeldung "
+"Die Rechnungen für diesen Zeitraum wurden bereits erstellt. Eine Anmeldung "
 "kann zu zusätzlichen Einträgen auf der Rechnung führen, auch wenn diese "
 "schon bezahlt wurde."
 
@@ -1811,9 +1811,8 @@ msgid ""
 "Attendees can join their companions in a group to go to activities together. "
 "This increases their chances to go together, but it is not a guarantee."
 msgstr ""
-"Teilnehmer können mit Ihren Gspänli eine Gruppe bilden um gemeinsam an "
-"Angeboten teilzunehmen. Gruppen habe eine höhere Chance zusammen eingeteilt "
-"zu werden, es besteht aber keine Garantie."
+"Teilnehmende können mit anderen Teilnehmenden eine Gruppe bilden um ihre "
+"Chance, gemeinsam an Angeboten teilzunehmen zu erhöhen."
 
 msgid "This group is from an inactive period."
 msgstr "Dies ist eine Gruppe eines inaktiven Zeitraums."
@@ -1865,7 +1864,7 @@ msgid "Online Payment"
 msgstr "Online Bezahlung"
 
 msgid "Bank Transfer"
-msgstr "Bank-Überweisung"
+msgstr "Zahlung"
 
 msgid "Purpose of Payment"
 msgstr "Zahlungszweck"
@@ -1927,13 +1926,13 @@ msgid "${count} spots available"
 msgstr "Noch ${count} Plätze frei"
 
 msgid "${count} attendees"
-msgstr "${count} Teilnehmer"
+msgstr "${count} Teilnehmende"
 
 msgid "${min_spots} - ${max_spots} participants"
-msgstr "${min_spots} - ${max_spots} Teilnehmer"
+msgstr "${min_spots} - ${max_spots} Teilnehmende"
 
 msgid "up to ${max_spots} participants"
-msgstr "bis zu ${max_spots} Teilnehmer"
+msgstr "bis zu ${max_spots} Teilnehmende"
 
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
@@ -1942,7 +1941,7 @@ msgid "Independent of other occasions"
 msgstr "Unabhängig von anderen Durchführungen"
 
 msgid "Please bring ${cost} CHF in cash."
-msgstr "Bitte CHF ${cost} dem Veranstalter vor Ort bezahlen."
+msgstr "Bitte CHF ${cost} der/dem Veranstaltenden vor Ort bezahlen."
 
 msgid "Enter a need"
 msgstr "Bedarf erfassen"
@@ -1965,7 +1964,7 @@ msgid "Delete"
 msgstr "Löschen"
 
 msgid "Enroll your child now."
-msgstr "Melden Sie Ihr Kind jetzt an."
+msgstr "Jetzt anmelden."
 
 msgid "Enroll"
 msgstr "Anmelden"
@@ -2022,22 +2021,22 @@ msgid ""
 "Each child is assigned up to ${count} activities. To ensure a good matching "
 "you can signup for more activities than those."
 msgstr ""
-"Jedes Kind wird in bis zu ${count} Angebote eingeteilt. Für eine gute "
-"Zuteilung können Sie ihr Kind jedoch für mehr als ${count} Angebote anmelden."
+"Teilnehmende werden in bis zu ${count} Angebot(e) eingeteilt. Für eine gute "
+"Zuteilung können Sie sich jedoch für mehr als ${count} Angebot(e) anmelden."
 
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
 msgstr ""
-"Der Ferienpass kostet ${amount} CHF pro Kind. Einzelne Angebote können "
+"Der Ferienpass kostet ${amount} CHF pro Person. Einzelne Angebote können "
 "zusätzliche Teilnahmegebühren verlangen."
 
 msgid ""
 "A booking costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
 msgstr ""
-"Eine Buchung kostet ${amount} CHF pro Kind. Einzelne Angebote können "
-"zusätzliche Teilnahmegebühren verlangen."
+"Eine Buchung kostet ${amount} CHF pro Person. Diese Administrationsgebühr "
+"ist im Kurspreis inbegriffen."
 
 msgid ""
 "Between each booking we enforce ${minutes} minutes of block-time in which no "
@@ -2064,13 +2063,13 @@ msgid "E-Mail"
 msgstr "E-Mail"
 
 msgid "Manage user"
-msgstr "Benutzer verwalten"
+msgstr "Benutzende verwalten"
 
 msgid "No activities in your list."
 msgstr "Keine Angebote in Ihrer Liste."
 
 msgid "Register as volunteer"
-msgstr "Als Helfer registrieren"
+msgstr "Als Hilfsperson registrieren"
 
 msgid "Hello!"
 msgstr "Guten Tag"
@@ -2091,7 +2090,7 @@ msgid "The average happiness is ${happiness}."
 msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}."
 
 msgid "${operability} of all occasions have enough attendees."
-msgstr "${operability} aller Durchführungen haben genug Teilnehmer."
+msgstr "${operability} aller Durchführungen haben genügend Teilnehmende."
 
 msgid "Marking bookings increases their priority during the next matching run."
 msgstr ""
@@ -2193,7 +2192,7 @@ msgid "This period has not been confirmed yet."
 msgstr "In diesem Zeitraum wurde noch keine Zuteilung gemacht."
 
 msgid "No occasions defined yet."
-msgstr "Es wurden noch keine Durchführungen definiert."
+msgstr "Es wurde noch keine Zuteilung gemacht."
 
 msgid "Duty:"
 msgstr "Aufgabe:"
@@ -2270,13 +2269,13 @@ msgid ""
 "get back to you."
 msgstr ""
 "Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage "
-"ansehen und uns wieder bei Ihnen melden."
+"bearbeiten und uns bei Ihnen melden."
 
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
 
 msgid "No activities needing volunteers found."
-msgstr "Keine Angebote gefunden welche Helfer benötigen."
+msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
 msgid "${count} of ${total}"
 msgstr "${count} von ${total}"
@@ -2312,16 +2311,16 @@ msgid "Mark as confirmed"
 msgstr "Als bestätigt markieren"
 
 msgid "Do you really want to remove this volunteer?"
-msgstr "Möchten Sie den Helfer wirklich entfernen?"
+msgstr "Möchten Sie die Hilfsperson wirklich entfernen?"
 
 msgid "Remove volunteer"
-msgstr "Helfer entfernen"
+msgstr "Hilfsperson entfernen"
 
 msgid "Editors"
 msgstr "Veranstalter"
 
 msgid "Only by privileged users"
-msgstr "Beschränkt auf Administratoren"
+msgstr "Beschränkt auf Administrierende"
 
 msgid "Opening Hours"
 msgstr "Termine"
@@ -2330,7 +2329,7 @@ msgid "Opening Hours Link"
 msgstr "Termine Link"
 
 msgid "The opening hours of the municipality"
-msgstr "Wichtige Termine des Ferienpasses"
+msgstr "Wichtige Termine"
 
 msgid "URL pointing to an opening hours page"
 msgstr "URL der auf die Seite der Termine zeigt"
@@ -2406,7 +2405,7 @@ msgid "Do you really want to reinstate \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich reaktivieren?"
 
 msgid "Previous attendees need to re-apply"
-msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
+msgstr "Vorherige Teilnehmende müssen sich neu anmelden"
 
 msgid "Reinstate Occasion"
 msgstr "Durchführung reaktivieren"
@@ -2623,7 +2622,7 @@ msgid "The booking was cancelled successfully"
 msgstr "Die Buchung wurde erfolgreich abgesagt"
 
 msgid "Cannot select more than three favorites per child"
-msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
+msgstr "Pro Person können maximal drei Favoriten gewählt werden"
 
 msgid "The period is not in the wishlist-phase"
 msgstr "Der Zeitraum befindet sich nicht in der Wunschphase"
@@ -2663,13 +2662,13 @@ msgid "The booking does not exist"
 msgstr "Diese Buchung existiert nicht"
 
 msgid "Not permitted to join this attendee to the group"
-msgstr "Keine Berechtigung um diesen Teilnehmer zu der Gruppe hinzuzufügen"
+msgstr "Keine Berechtigung um diese Person zu der Gruppe hinzuzufügen"
 
 msgid "Successfully joined the group"
 msgstr "Erfolgreich der Gruppe beigetreten"
 
 msgid "Not permitted to evict this attendee from the group"
-msgstr "Keine Berechtigung um diesen Teilnehmer von der Gruppe zu entfernen"
+msgstr "Keine Berechtigung um diese Person von der Gruppe zu entfernen"
 
 msgid "Successfully left the group"
 msgstr "Erfolgreich die Gruppe verlassen"
@@ -2746,11 +2745,11 @@ msgid "Run Matching"
 msgstr "Zuteilung ausführen"
 
 msgid "Signup Attendee"
-msgstr "Teilnehmer anmelden"
+msgstr "Teilnehmende anmelden"
 
 msgid "The period has already been finalized. No new attendees may be added."
 msgstr ""
-"Der Zeitraum wurde bereits abgeschlossen. Es können keine neuen Teilnehmer "
+"Der Zeitraum wurde bereits abgeschlossen. Es können keine neue Teilnehmende "
 "mehr hinzugefügt werden."
 
 msgid "Remove Wish"
@@ -2815,7 +2814,7 @@ msgid "The occasion was added to ${name}'s wishlist"
 msgstr "Die Durchführung wurde zu ${name}s Wunschliste hinzugefügt"
 
 msgid "Enroll Attendee"
-msgstr "Teilnehmer anmelden"
+msgstr "Teilnehmende anmelden"
 
 msgid "New need"
 msgstr "Neuer Bedarf"
@@ -2893,7 +2892,7 @@ msgstr "Der Zeitraum wurde erfolgreich hinzugefügt"
 
 msgid "The period could not be deleted as it is still in use"
 msgstr ""
-"Der Zeitraum konnte nicht gelöscht werden, da sie bereits verwendet wird"
+"Der Zeitraum konnte nicht gelöscht werden, da er bereits verwendet wird"
 
 msgid "The period was deleted successfully"
 msgstr "Der Zeitraum wurde erfolgreich gelöscht"
@@ -2945,19 +2944,20 @@ msgstr "Verlange die politische Gemeinde im Benutzerprofil"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
-"Eltern können die Kontaktdaten anderer Eltern des gleichen Angebots sehen"
+"Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen Angebots "
+"sehen"
 
 msgid "Privacy"
 msgstr "Privatsphäre"
 
 msgid "Public organiser data"
-msgstr "Öffentliche Veranstalterdaten"
+msgstr "Öffentliche Daten Veranstaltende"
 
 msgid "Link to the TOS"
 msgstr "Link zu den AGB"
 
 msgid "Require users to accept the TOS before booking"
-msgstr "Zwingt Benutzer dazu, die AGB vor dem Buchen zu akzeptieren"
+msgstr "Zwingt Benutzende dazu, die AGB vor dem Buchen zu akzeptieren"
 
 msgid "Donations"
 msgstr "Spenden"
@@ -2972,7 +2972,7 @@ msgid "One amount per line"
 msgstr "Ein Betrag pro Zeile"
 
 msgid "Volunteer registration"
-msgstr "Helfer Registration"
+msgstr "Registration Hilfsperson"
 
 msgid "Experimental"
 msgstr "Experimentell"
