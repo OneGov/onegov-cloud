@@ -35,7 +35,7 @@
                 <h3 i18n:translate>People</h3>
                 <ul class="memberships">
                     <tal:block tal:repeat="membership memberships">
-                        <li tal:condition="(membership.access == 'public' and membership.published and membership.person.access == 'public' and membership.person.published) or request.is_logged_in">
+                        <li tal:condition="(membership.access == 'public' and membership.published and membership.person and membership.person.access == 'public' and membership.person.published) or request.is_logged_in">
                             <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>, <a href="${request.link(membership)}">${membership.title}</a>
                             <span tal:condition="membership.prefix|None">${membership.prefix}</span>
                             <a tal:condition="request.is_manager_for_model(agency)" href="${request.link(membership, name='edit')}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
@@ -264,7 +264,7 @@
             </div>
             <ul class="memberships fa-ul" tal:condition="memberships">
                 <tal:block tal:repeat="membership memberships" >
-                    <li tal:condition="(membership.access == 'public' and membership.published and membership.person.access == 'public' and membership.person.published) or request.is_logged_in" class="person"><span class="fa-li"><i class="fa fa-user-circle"></i></span>
+                    <li tal:condition="(membership.access == 'public' and membership.published and membership.person and membership.person.access == 'public' and membership.person.published) or request.is_logged_in" class="person"><span class="fa-li"><i class="fa fa-user-circle"></i></span>
                         <b><a href="${request.link(membership.person)}">${membership.person.title}</a></b><tal:block tal:condition="membership.title">, <a href="${request.link(membership.person)}">${membership.title}</a></tal:block>
                     </li>
                 </tal:block>
