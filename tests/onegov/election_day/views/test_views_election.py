@@ -295,10 +295,10 @@ def test_view_election_list_by_district(election_day_app_gr):
             option.text: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['CVP']['Bernina']['entities'] == [3561, 3551]
+        assert set(data['CVP']['Bernina']['entities']) == {3561, 3551}
         assert data['CVP']['Bernina']['counted'] is False
         assert data['CVP']['Bernina']['percentage'] == 0.0
-        assert data['FDP']['Bernina']['entities'] == [3561, 3551]
+        assert set(data['FDP']['Bernina']['entities']) == {3561, 3551}
         assert data['FDP']['Bernina']['counted'] is False
         assert data['FDP']['Bernina']['percentage'] == 0.0
 
