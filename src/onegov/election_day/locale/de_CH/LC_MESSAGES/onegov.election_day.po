@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 12:58+0100\n"
+"POT-Creation-Date: 2022-02-24 12:00+0100\n"
 "PO-Revision-Date: 2022-02-05 17:23+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -801,6 +801,12 @@ msgstr ""
 msgid "homepage"
 msgstr "Startseite"
 
+msgid "Footer"
+msgstr "Fusszeile"
+
+msgid "Language"
+msgstr "Sprache"
+
 msgid "Open Data"
 msgstr "Open Data"
 
@@ -1026,6 +1032,9 @@ msgstr "Eingegangene Stimmzettel"
 
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"
+
+msgid "PDF Results"
+msgstr "PDF Resultate"
 
 msgid ""
 "The raw data used to display the results is available in the following "

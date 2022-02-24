@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 12:58+0100\n"
+"POT-Creation-Date: 2022-02-24 12:00+0100\n"
 "PO-Revision-Date: 2022-02-13 06:41+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -794,6 +794,12 @@ msgstr ""
 msgid "homepage"
 msgstr "Pagina iniziale"
 
+msgid "Footer"
+msgstr "Piè di pagina"
+
+msgid "Language"
+msgstr "Lingua"
+
 msgid "Open Data"
 msgstr "Open Data"
 
@@ -1019,6 +1025,9 @@ msgstr "Schede rientrate"
 
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
+
+msgid "PDF Results"
+msgstr "Risultati PDF"
 
 msgid ""
 "The raw data used to display the results is available in the following "
