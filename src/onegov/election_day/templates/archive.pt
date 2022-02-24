@@ -42,9 +42,9 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="election archive_items[date][domain][type]">
-                                    <td tal:define="prefix election.title_prefix(request)">
+                                    <th tal:define="prefix election.title_prefix(request)">
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
-                                    </td>
+                                    </th>
                                     <td class="right-aligned" tal:condition="not: communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>
@@ -68,9 +68,9 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="vote archive_items[date][domain][type]">
-                                    <td tal:define="prefix vote.title_prefix(request)">
+                                    <th tal:define="prefix vote.title_prefix(request)">
                                         <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
-                                    </td>
+                                    </th>
                                     <td>
                                         <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
                                     </td>
@@ -103,8 +103,7 @@
 
         <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
             <div class="columns small-12 small-centered">
-                <h2 i18n:translate="" tal:condition="not: h2|nothing">Archive</h2>
-                <h2 i18n:translate="" tal:condition="h2|nothing">Archive</h2>
+                <h2 i18n:translate="">Archive</h2>
                 <div class="archive-breadcrumbs">
                     <ul>
                         <li tal:repeat="year years">
