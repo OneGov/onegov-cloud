@@ -1,8 +1,118 @@
 # Changes
 
+## 2022.15
+
+`2022-02-19` | [b289e1cd6e...35a5e18765](https://github.com/OneGov/onegov-cloud/compare/b289e1cd6e^...35a5e18765)
+
+### Core
+
+##### Update bjeorn.
+
+`Other` | [OGC-313](https://linear.app/onegovcloud/issue/OGC-313) | [b289e1cd6e](https://github.com/onegov/onegov-cloud/commit/b289e1cd6e2851940e369407795e2b0a5ec71429)
+
+### Election Day
+
+##### Fixes wrong API CSV template links.
+
+`Bugfix` | [ca7ffe1ea9](https://github.com/onegov/onegov-cloud/commit/ca7ffe1ea9749ac30b1c0503946c6c9ae2d73e7a)
+
+##### Fixes translation.
+
+`Bugfix` | [3496cb94fb](https://github.com/onegov/onegov-cloud/commit/3496cb94fb02f7f9d126165c6925405c14846f31)
+
+##### Checks panachage data instead of panachage headers and ignores superfluous panachage data.
+
+`Bugfix` | [3c8d16a37e](https://github.com/onegov/onegov-cloud/commit/3c8d16a37ebf0f3e4e5247e5888d5a0560156ede)
+
+##### Removes mandate allocation view.
+
+`Other` | [OGC-322](https://linear.app/onegovcloud/issue/OGC-322) | [5e51608505](https://github.com/onegov/onegov-cloud/commit/5e51608505df35eefe57f7c208f4dd2790462cad)
+
+##### Remove empty paragraphs.
+
+`Bugfix` | [OGC-275](https://linear.app/onegovcloud/issue/OGC-275) | [9f570388f0](https://github.com/onegov/onegov-cloud/commit/9f570388f0489ce04d9546cb8929c00e7b38ed92)
+
+##### Fixes inconsistent progress display in election compounds for election with more than one municipality.
+
+`Bugfix` | [df7a90ed0f](https://github.com/onegov/onegov-cloud/commit/df7a90ed0fdcea037f0fb4a59393adf922ef51cf)
+
+##### Fixes JSON serialization of voters counts.
+
+`Bugfix` | [35a5e18765](https://github.com/onegov/onegov-cloud/commit/35a5e187650a717210e2c4794dccfb91f685404a)
+
+### Org
+
+##### Catch more invalid ticket state changes.
+
+`Other` | [OGC-290](https://linear.app/onegovcloud/issue/OGC-290) | [b44a8e49f6](https://github.com/onegov/onegov-cloud/commit/b44a8e49f6711458b5c4333096e6b1a630fb42a7)
+
+## 2022.14
+
+`2022-02-17` | [4fe96a321f...d0df117ff2](https://github.com/OneGov/onegov-cloud/compare/4fe96a321f^...d0df117ff2)
+
+### Election Day
+
+##### Add REST interface for party results of election compounds.
+
+`Feature` | [OGC-295](https://linear.app/onegovcloud/issue/OGC-295) | [3d6dd520f9](https://github.com/onegov/onegov-cloud/commit/3d6dd520f99a0938c0fa48865d54bc807e425b88)
+
+##### Add election compound import format.
+
+`Feature` | [OGC-291](https://linear.app/onegovcloud/issue/OGC-291) | [c439b05596](https://github.com/onegov/onegov-cloud/commit/c439b055966b422c6366525c8b4e4463056ec529)
+
+##### Sort elections of compounds by shortcode only.
+
+`Bugfix` | [OGC-294](https://linear.app/onegovcloud/issue/OGC-294) | [624eab47f6](https://github.com/onegov/onegov-cloud/commit/624eab47f625c1a3d2ceec24ea843fcb951db017)
+
+##### Fixes wildcard archive search.
+
+`Bugfix` | [OGC-303](https://linear.app/onegovcloud/issue/OGC-303) | [fe458ad8e7](https://github.com/onegov/onegov-cloud/commit/fe458ad8e70226a89a623c94577c5de1608e9d4a)
+
+##### Always show number of mandates ander voters count in list groups.
+
+`Other` | [OGC-162](https://linear.app/onegovcloud/issue/OGC-162) | [c7000e717c](https://github.com/onegov/onegov-cloud/commit/c7000e717c8569171d7a3d61e7f258f3e3746a4f)
+
+##### Update figcaption of list groups diagram.
+
+`Other` | [OGC-162](https://linear.app/onegovcloud/issue/OGC-162) | [56dcc274d9](https://github.com/onegov/onegov-cloud/commit/56dcc274d934c5ac6193c448ca26b34b20070ac3)
+
+##### Update translations.
+
+`Other` | [OGC-291](https://linear.app/onegovcloud/issue/OGC-291) | [1ea31ea9b0](https://github.com/onegov/onegov-cloud/commit/1ea31ea9b0ca2df9f441d9786a91e304c3494083)
+
+##### Separate manual completion of election compounds from the Double Pukelsheim setting.
+
+`Other` | [OGC-167](https://linear.app/onegovcloud/issue/OGC-167) | [9dbbd5caca](https://github.com/onegov/onegov-cloud/commit/9dbbd5cacabdce5c416d9f88bf1bb80961e28c4e)
+
+##### Store the voters count as decimal numbers.
+
+`Other` | [OGC-296](https://linear.app/onegovcloud/issue/OGC-296) | [0d36c8d33a](https://github.com/onegov/onegov-cloud/commit/0d36c8d33a74384b0a08bc51cf583c7e5bd99bfd)
+
+### Org
+
+##### Fixes setting up logging too late.
+
+`Bugfix` | [OGC-309](https://linear.app/onegovcloud/issue/OGC-309) | [4fe96a321f](https://github.com/onegov/onegov-cloud/commit/4fe96a321fbd02daecf347fbe9a7860221394647)
+
+##### Fixes submission not deletable if not completed.
+
+`Bugfix` | [OGC-243](https://linear.app/onegovcloud/issue/OGC-243) | [0c01377bbf](https://github.com/onegov/onegov-cloud/commit/0c01377bbf0c6f250c150781aa3cc3f83507ea58)
+
+##### Use the same unsubscribe link in the daily statistics mail body and headers.
+
+`Bugfix` | [c9fc2ae586](https://github.com/onegov/onegov-cloud/commit/c9fc2ae586c8544181d5c06fa160b3d73aa9f777)
+
+##### Disable newsletter by default.
+
+`Other` | [OGC-314](https://linear.app/onegovcloud/issue/OGC-314) | [6d322f612f](https://github.com/onegov/onegov-cloud/commit/6d322f612f00b8a356390453a4b7446e38245370)
+
+##### Fixes keyword converter struggling with plus signs.
+
+`Bugfix` | [OGC-240](https://linear.app/onegovcloud/issue/OGC-240) | [c60082c6dc](https://github.com/onegov/onegov-cloud/commit/c60082c6dcbba1f8e48cbc6c7255aae8213a43eb)
+
 ## 2022.13
 
-`2022-02-13` | [b6ae0228ad...c3b82dda74](https://github.com/OneGov/onegov-cloud/compare/b6ae0228ad^...c3b82dda74)
+`2022-02-13` | [b6ae0228ad...250eadea7f](https://github.com/OneGov/onegov-cloud/compare/b6ae0228ad^...250eadea7f)
 
 ### Core
 
@@ -1242,78 +1352,4 @@ Users can directly propose changes to fields of agencies and people. Redactors c
 ##### Send an email when assigning a ticket.
 
 `Feature` | [STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25) | [aad2eb2293](https://github.com/onegov/onegov-cloud/commit/aad2eb2293e56264be4c52009bb67a8e0966ddc9)
-
-## 2021.66
-
-`2021-07-14` | [a9b7ec37d4...4fbfdfc306](https://github.com/OneGov/onegov-cloud/compare/a9b7ec37d4^...4fbfdfc306)
-
-### Org
-
-##### Prevents server error on directory export if files are missing
-
-Will redirect the user to the broken directory entry with missing file hint
-
-`Bugfix` | [FW-92](https://stadt-winterthur.atlassian.net/browse/FW-92) | [a9b7ec37d4](https://github.com/onegov/onegov-cloud/commit/a9b7ec37d43944c4b61f3faba30ccc8b9aa7ef6f)
-
-##### Show pagerefs only for logged in users
-
-- change default to hide the pagerefs
-- Update settings explanation
-
-`Other` | [a8bd9f916b](https://github.com/onegov/onegov-cloud/commit/a8bd9f916bfb73e646d8d13d52a67aca902cd205)
-
-### Town6
-
-##### Adds QrCode link to town6
-
-- Adds Qr Edit Bar Link to /form/{name}
-
-`Feature` | [SEA-380](https://linear.app/seantis/issue/SEA-380) | [aef24f862b](https://github.com/onegov/onegov-cloud/commit/aef24f862b20fdbcdf9b772d9303f704ab03a83e)
-
-##### Improve form styling
-
-- center checkboxes and labels vertical axis
-- Fix long field help indentation for checkboxes
-
-`Other` | [570166bc4d](https://github.com/onegov/onegov-cloud/commit/570166bc4d7cb4905bb249112ecbb9174fbc702f)
-
-## 2021.65
-
-`2021-07-12` | [fd3d3fef03...cc2737b26a](https://github.com/OneGov/onegov-cloud/compare/fd3d3fef03^...cc2737b26a)
-
-### Agency
-
-##### Add direct phone number to search index.
-
-There are two new settings to enable direct phone numbers in the search 
-index. Direct phone numbers are simply the last n digits of the phone or 
-direct phone number. Direct phone numbers are suggest when searching.
-
-`Feature` | [STAKABS-33](https://kt-bs.atlassian.net/browse/STAKABS-33) | [7db6e64a97](https://github.com/onegov/onegov-cloud/commit/7db6e64a97a0413bca3a91cf1c01b65c046a4627)
-
-### Org
-
-##### Add ticket inbox and ticket assignments.
-
-Adds a 'My Tickets' views where all pending and open tickets of the 
-currently logged-in user are displayed. Furthermore, it's now possible 
-to assign a ticket to another user.
-
-`Feature` | [STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25) | [fd3d3fef03](https://github.com/onegov/onegov-cloud/commit/fd3d3fef031741b56bf2927de212ffbd5f8f7082)
-
-##### Adds modal for message form on ticket status page
-
-`Feature` | [SEA-429](https://linear.app/seantis/issue/SEA-429) | [76df37e465](https://github.com/onegov/onegov-cloud/commit/76df37e46506821da8c992246b2b54fcac967476)
-
-##### Adds copy links for page references
-
-- adds page reference settings to /link-settings
-- enbales '#' copy links on /forms and /resources if grouped
-- applies for town6 as well
-
-`Feature` | [SEA-446](https://linear.app/seantis/issue/SEA-446) | [9f82d1df5d](https://github.com/onegov/onegov-cloud/commit/9f82d1df5d6483e9dae84abd117e2de58ce99da3)
-
-##### Adds change-url form to /form/{form-name} to change name of the form
-
-`Feature` | [SEA-381](https://linear.app/seantis/issue/SEA-381) | [4934115701](https://github.com/onegov/onegov-cloud/commit/49341157014507b03b90eedf389f1da138157591)
 

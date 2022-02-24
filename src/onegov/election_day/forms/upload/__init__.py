@@ -1,3 +1,5 @@
+from onegov.election_day.forms.upload.election_compound \
+    import UploadElectionCompoundForm
 from onegov.election_day.forms.upload.election import UploadMajorzElectionForm
 from onegov.election_day.forms.upload.election import UploadProporzElectionForm
 from onegov.election_day.forms.upload.party_results import \
@@ -12,8 +14,9 @@ from onegov.election_day.forms.upload.wabsti_vote import UploadWabstiVoteForm
 
 
 __all__ = [
-    'UploadPartyResultsForm',
+    'UploadElectionCompoundForm',
     'UploadMajorzElectionForm',
+    'UploadPartyResultsForm',
     'UploadProporzElectionForm',
     'UploadRestForm',
     'UploadVoteForm',

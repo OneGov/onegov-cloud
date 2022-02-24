@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-13 06:44+0100\n"
-"PO-Revision-Date: 2022-02-05 17:23+0100\n"
+"POT-Creation-Date: 2022-02-22 16:34+0100\n"
+"PO-Revision-Date: 2022-02-22 16:41+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -88,8 +88,16 @@ msgid "Invalid float number: ${col}"
 msgstr "Ungültige Fliesskommazahl: ${col}"
 
 #, python-format
+msgid "Invalid decimal number: ${col}"
+msgstr ""
+
+#, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Nicht alphanumerisch: ${col}"
+
+msgid "This format does not support separate results for expats"
+msgstr ""
+"Dieses Format unterstützt keine separaten Ergebnisse für Auslandsschweizer"
 
 msgid "Invalid election values"
 msgstr "Ungültige Wahldaten"
@@ -377,6 +385,9 @@ msgstr "Ebene der Wahlen"
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
+msgid "Completes manually"
+msgstr "Wird manuell abgeschlossen"
+
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
 "results are displayed until the election compound is manually completed."
@@ -414,16 +425,6 @@ msgstr ""
 "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle Wahlen. "
 "Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur falls "
 "Doppelter Pukelsheim."
-
-msgid "Mandate allocation"
-msgstr "Sitzzuteilung"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a table. Requires "
-"party results."
-msgstr ""
-"Zeigt eine Registerkarte mit dem Vergleich der Parteistärken in Form einer "
-"Tabelle an. Erfordert Parteiergebnisse."
 
 msgid "Party strengths"
 msgstr "Parteistärken"
@@ -466,7 +467,7 @@ msgstr "Gruppe"
 msgid "Use the same group for all screens you want to cycle through."
 msgstr ""
 "Verwenden Sie die gleiche Gruppe für alle Screens, die durchlaufen werden "
-"sollen möchten."
+"sollen."
 
 msgid "Duration"
 msgstr "Dauer"
@@ -750,12 +751,12 @@ msgstr "Keine Kandidaturen."
 msgid "Download"
 msgstr "Herunterladen"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Das Diagramm zeigt die Verteilung der Stimmen und der Mandate auf die "
@@ -777,6 +778,9 @@ msgstr "Formatbeschreibung"
 msgid "Embed"
 msgstr "Einbetten"
 
+msgid "Voters count"
+msgstr "Wählerzahl"
+
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
@@ -792,10 +796,16 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Startseite"
+
+msgid "Footer"
+msgstr "Fusszeile"
+
+msgid "Language"
+msgstr "Sprache"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -830,14 +840,14 @@ msgstr "ID ändern"
 msgid "Upload results"
 msgstr "Resultate hochladen"
 
+msgid "Upload party results"
+msgstr "Parteiresultate hochladen"
+
 msgid "Clear results"
 msgstr "Resultate löschen"
 
 msgid "Clear media"
 msgstr "Medien löschen"
-
-msgid "Upload party results"
-msgstr "Parteiresultate hochladen"
 
 msgid "Yeas"
 msgstr "Ja-Stimmen"
@@ -851,9 +861,9 @@ msgstr "Leer"
 msgid "Invalid"
 msgstr "Ungültig"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
 
@@ -872,8 +882,8 @@ msgstr "Ja"
 msgid "List connection"
 msgstr "Listenverbindung"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Stimmen"
 
@@ -936,9 +946,6 @@ msgstr "Nur gewählte Kandidierende"
 
 msgid "List group"
 msgstr "Listengruppe"
-
-msgid "Voters count"
-msgstr "Wählerzahl"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
@@ -1015,8 +1022,8 @@ msgstr "Stichfrage zugunsten der Initiative"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
 
-#. Default: eligible Voters
 #.
+#. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Stimmberechtigte"
 
@@ -1025,6 +1032,9 @@ msgstr "Eingegangene Stimmzettel"
 
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"
+
+msgid "PDF Results"
+msgstr "PDF Resultate"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -1063,10 +1073,10 @@ msgstr "Auswahl"
 msgid "Columns"
 msgstr "Spalten"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Das Diagramm zeigt die Anzahl erhaltener Stimmen und die Anzahl erhaltener "
@@ -1080,11 +1090,11 @@ msgstr "Jahr"
 msgid "Difference"
 msgstr "Differenz"
 
+#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Das Diagramm zeigt die Herkunft der gewonnenen und verlorenen Stimmen durch "

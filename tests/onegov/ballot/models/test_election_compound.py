@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import datetime
+from decimal import Decimal
 from freezegun import freeze_time
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
@@ -701,7 +702,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=0,
             votes=0,
-            voters_count=1,
+            voters_count=Decimal('1.01'),
             total_votes=100,
             name='Libertarian',
             color='black',
@@ -712,7 +713,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=2,
             votes=2,
-            voters_count=3,
+            voters_count=Decimal('3.01'),
             total_votes=50,
             name='Libertarian',
             color='black',
@@ -723,7 +724,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=1,
             votes=1,
-            voters_count=2,
+            voters_count=Decimal('2.01'),
             total_votes=100,
             name='Conservative',
             color='red',
@@ -734,7 +735,7 @@ def test_election_compound_export_parties(session):
         PartyResult(
             number_of_mandates=3,
             votes=3,
-            voters_count=4,
+            voters_count=Decimal('4.01'),
             total_votes=50,
             name='Conservative',
             color='red',
@@ -751,7 +752,7 @@ def test_election_compound_export_parties(session):
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
-            'voters_count': 4,
+            'voters_count': '4.01',
         }, {
             'year': 2016,
             'name': 'Libertarian',
@@ -760,7 +761,7 @@ def test_election_compound_export_parties(session):
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
-            'voters_count': 3,
+            'voters_count': '3.01',
         }, {
             'year': 2012,
             'name': 'Conservative',
@@ -769,7 +770,7 @@ def test_election_compound_export_parties(session):
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
-            'voters_count': 2,
+            'voters_count': '2.01',
         }, {
             'year': 2012,
             'name': 'Libertarian',
@@ -778,7 +779,7 @@ def test_election_compound_export_parties(session):
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
-            'voters_count': 1,
+            'voters_count': '1.01',
         }
     ]
 
@@ -807,7 +808,7 @@ def test_election_compound_export_parties(session):
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
-            'voters_count': 4,
+            'voters_count': '4.01',
             'panachage_votes_from_0': 1,
             'panachage_votes_from_1': 2,
             'panachage_votes_from_2': 3,
@@ -820,7 +821,7 @@ def test_election_compound_export_parties(session):
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
-            'voters_count': 3,
+            'voters_count': '3.01',
             'panachage_votes_from_0': 5,
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -846,7 +847,7 @@ def test_election_compound_export_parties(session):
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
-            'voters_count': 2,
+            'voters_count': '2.01',
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -859,7 +860,7 @@ def test_election_compound_export_parties(session):
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
-            'voters_count': 1,
+            'voters_count': '1.01',
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
@@ -910,7 +911,7 @@ def test_election_compound_rename(session):
     assert len(election_compound.elections) == 2
 
 
-def test_election_compound_doppelter_pukelsheim(session):
+def test_election_compound_manual_completion(session):
 
     election_compound = ElectionCompound(
         title='Elections',
@@ -953,9 +954,9 @@ def test_election_compound_doppelter_pukelsheim(session):
     assert election_1.completed is False
     assert election_2.completed is True
 
-    # Doppelter Pukelsheim, not completed
-    election_compound.pukelsheim = True
-    assert election_compound.pukelsheim_completed is False
+    # Manual completion, not completed
+    election_compound.completes_manually = True
+    assert election_compound.manually_completed is False
     assert election_compound.completed is False
     assert election_compound.progress == (0, 2)
     assert election_1.completed is False
@@ -967,8 +968,8 @@ def test_election_compound_doppelter_pukelsheim(session):
     assert election_1.completed is False
     assert election_2.completed is False
 
-    # Doppelter Pukelsheim, completed
-    election_compound.pukelsheim_completed = True
+    # Manual completion, completed
+    election_compound.manually_completed = True
     election_1.status = 'interim'
     assert election_compound.completed is False
     assert election_compound.progress == (1, 2)
@@ -1005,8 +1006,10 @@ def test_list_results(session):
     # Not Doppelter Pukelsheim
     assert election_compound.get_list_results() == []
 
-    # Not Doppelter Pukelsheim
+    # Doppelter Pukelsheim with manual completion
     election_compound.pukelsheim = True
+    election_compound.completes_manually = True
+    election_compound.manually_completed = False
     assert election_compound.get_list_results() == [
         ('Quimby Again!', 3, 953),  # 520 / 1 + 520 / 2 + 520 / 3
         ('Kwik-E-Major', 0, 204)  # 111 / 1 + 111/2 + 111/3
@@ -1080,8 +1083,8 @@ def test_list_results(session):
         ('Kwik-E-Major', 0, 204),
     ]
 
-    # ... completed
-    election_compound.pukelsheim_completed = True
+    # ... manually completed
+    election_compound.manually_completed = True
     assert election_compound.get_list_results() == [
         ('Burns burns!', 5, 200),
         ('Quimby Again!', 3, 953),

@@ -60,7 +60,7 @@ Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Res
 
 #### Vorlage
 
-- [vote_standard.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_standard.csv)
+- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_standard.csv)
 
 ### OneGov
 
@@ -96,7 +96,7 @@ Falls der Status
 
 #### Vorlage
 
-- [vote_onegov.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_onegov.csv)
+- [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_onegov.csv)
 
 
 ### Wabsti
@@ -128,7 +128,7 @@ Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 
 #### Vorlage
 
-- [vote_wabsti.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_wabsti.csv)
+- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_wabsti.csv)
 
 
 ### WabstiCExport

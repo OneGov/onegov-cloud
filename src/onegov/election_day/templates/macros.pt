@@ -36,14 +36,14 @@
                 <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload results</a>
                 </li>
+                <li tal:condition="election.type == 'proporz' and election.completed">
+                    <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload-party-results')}">Upload party results</a>
+                </li>
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(election, 'clear')}">Clear results</a>
                 </li>
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(election, 'clear-media')}">Clear media</a>
-                </li>
-                <li tal:condition="election.type == 'proporz' and election.completed">
-                    <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload-party-results')}">Upload party results</a>
                 </li>
                 <li tal:condition="layout.principal.notifications">
                     <a i18n:translate="" class="action-trigger" href="${request.link(election, 'trigger')}">Trigger notifications</a>
@@ -68,6 +68,9 @@
                 </li>
                 <li>
                     <a i18n:translate="" class="action-change-id" href="${request.link(compound, 'change-id')}">Change ID</a>
+                </li>
+                <li>
+                    <a i18n:translate="" class="action-upload" href="${request.link(compound, 'upload')}">Upload results</a>
                 </li>
                 <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(compound, 'upload-party-results')}">Upload party results</a>
@@ -370,7 +373,7 @@
             <tr tal:repeat="election election_compound.elections">
                 <td class="column-district left-aligned"><a href="${request.link(election)}">${election.domain_segment}</a></td>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></td>
-                <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress; enable_y_n True" /></td>
+                <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></td>
             </tr>
         </tbody>
     </table>
@@ -574,15 +577,15 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-list-group">List group</th>
-                <th tal:condition="not layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-voters-count right-aligned">Voters count</th>
-                <th tal:condition="layout.completed"  data-tablesaw-priority="1"  i18n:translate="" class="column-mandates right-aligned">Mandates</th>
+                <th data-tablesaw-priority="1" i18n:translate="" class="column-voters-count right-aligned">Voters count</th>
+                <th data-tablesaw-priority="1"  i18n:translate="" class="column-mandates right-aligned">Mandates</th>
             </tr>
         </thead>
         <tbody>
             <tr tal:repeat="group groups">
                 <td class="column-list-group">${group.name}</td>
-                <td tal:condition="not layout.completed" class="column-voters-count right-aligned" data-text="${group.voters_count or 0}">${layout.format_number(group.voters_count or 0)}</td>
-                <td tal:condition="layout.completed" class="column-mandates right-aligned">${group.number_of_mandates}</td>
+                <td class="column-voters-count right-aligned" data-text="${group.voters_count or 0}">${layout.format_number(group.voters_count or 0)}</td>
+                <td class="column-mandates right-aligned">${group.number_of_mandates}</td>
             </tr>
         </tbody>
     </table>
@@ -786,19 +789,10 @@
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
-    <tal:b condition="progress[1]" tal:define="show_y_n enable_y_n|False">
-        <tal:b tal:switch="python:show_y_n and progress[0] in (0, 1) and progress[1] == 1">
-            <tal:b tal:case="False" i18n:translate="">
-                <span tal:replace="progress[0]" i18n:name='counted' />
-                of
-                <span tal:replace="progress[1]" i18n:name='total' />
-            </tal:b>
-            <tal:b tal:case="True">
-                <span tal:condition="progress[0] == 0" i18n:translate="">No</span>
-                <span tal:condition="progress[0] == 1" i18n:translate="">Yes</span>
-            </tal:b>
-        </tal:b>
-
+    <tal:b condition="progress[1]" i18n:translate="">
+        <span tal:replace="progress[0]" i18n:name='counted' />
+        of
+        <span tal:replace="progress[1]" i18n:name='total' />
     </tal:b>
 </metal:progress>
 
@@ -1122,26 +1116,23 @@
 <metal:pdf_download define-macro="pdf_download" i18n:domain="onegov.election_day">
     <tal:block tal:condition="layout.pdf_path">
         <h4>PDF</h4>
-        <p><span i18n:translate="">Download a PDF with all the results:</span> <a href="${request.link(model, 'pdf')}">PDF</a></p>
+        <p><span i18n:translate="">Download a PDF with all the results:</span> <a i18n:translate="" href="${request.link(model, 'pdf')}">PDF Results</a></p>
     </tal:block>
 </metal:pdf_download>
 
 <metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day">
     <h4 i18n:translate="">Open Data</h4>
     <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
-    <p>
-        <ol>
-            <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
-            <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
-        </ol>
-    </p>
+    <ol>
+        <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
+        <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
+    </ol>    
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
 </metal:open_data_download>
 
 <metal:terms_of_use define-macro="terms_of_use" i18n:domain="onegov.election_day">
     <h5 i18n:translate="">Terms of use</h5>
-    <p>
-        <span i18n:translate="">Open use. Must provide the source.</span>
+        <p><span i18n:translate="">Open use. Must provide the source.</span></p>
         <ul>
             <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
             <li i18n:translate="">You may use this dataset for commercial purposes.</li>
@@ -1153,8 +1144,7 @@
                 </ol>
             </li>
         </ul>
-        <a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a>
-    </p>
+        <p><a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a></p>
 </metal:terms_of_use>
 
 <metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">

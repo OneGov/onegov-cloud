@@ -53,8 +53,7 @@ def test_generate_svg(election_day_app_gr, session):
             assert generate(item, 'districts-map', 'de_CH') == 0
 
             item = add_election_compound(
-                session, elections=[item],
-                pukelsheim=True, pukelsheim_completed=True
+                session, elections=[item], pukelsheim=True,
             )
             assert generate(item, 'list-groups', 'de_CH') == 1
             assert generate(item, 'lists', 'de_CH') == 1
@@ -125,7 +124,8 @@ def test_create_svgs(election_day_app_gr):
             proporz = add_proporz_election(session)
             compound = add_election_compound(
                 session, elections=[proporz],
-                pukelsheim=True, pukelsheim_completed=True,
+                pukelsheim=True, completes_manually=True,
+                manually_completed=True,
             )
             vote = add_vote(session, 'complex')
             assert majorz.last_result_change is None  # used later
