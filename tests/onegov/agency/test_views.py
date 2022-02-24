@@ -1,11 +1,12 @@
 from datetime import datetime
 from datetime import timedelta
-from freezegun import freeze_time
 from io import BytesIO
+from onegov.agency.models import ExtendedAgency
+from onegov.agency.models import ExtendedAgencyMembership
+from onegov.agency.models import ExtendedPerson
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.pdf.utils import extract_pdf_info
-from onegov.people.models import Person
 from pytest import mark
 from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
@@ -724,23 +725,43 @@ def test_basic_search(client_with_es):
 def test_search_recently_published_object(client_with_es):
     client = client_with_es
     client.login_admin()
+    anom = client.spawn()
 
-    # Create Person, not yet published
+    # Create objects, not yet published
+    start = datetime.now() + timedelta(days=1)
+
     manage = client.get('/people').click('Person', href='new')
     manage.form['first_name'] = 'Nick'
     manage.form['last_name'] = 'Rivera'
-    manage.form['publication_start'] = utcnow() + timedelta(days=1)
+    manage.form['publication_start'] = start.isoformat()
+    manage.form.submit()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Hospital Springfield'
+    manage.form['publication_start'] = start.isoformat()
+    manage = manage.form.submit().follow()
+
+    manage = manage.click('Mitgliedschaft', href='new')
+    manage.form['title'] = 'Anesthetist'
+    manage.form['person_id'].select(text='Rivera Nick')
+    manage.form['publication_start'] = start.isoformat()
     manage.form.submit()
 
     client.app.es_client.indices.refresh(index='_all')
 
     assert 'Nick' in client.get('/search?q=Rivera')
-    assert 'Nick' not in client.spawn().get('/search?q=Rivera')
+    assert 'Nick' not in anom.get('/search?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
+    assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
+    assert 'Nick' in client.get('/search?q=Anesthetist')
+    assert 'Nick' not in anom.get('/search?q=Anesthetist')
 
     # Publish
+    then = utcnow() - timedelta(minutes=30)
     session = client.app.session()
-    person = session.query(Person).filter(Person.first_name == 'Nick').one()
-    person.publication_start = utcnow() - timedelta(minutes=30)
+    session.query(ExtendedPerson).one().publication_start = then
+    session.query(ExtendedAgencyMembership).one().publication_start = then
+    session.query(ExtendedAgency).one().publication_start = then
     commit()
 
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
@@ -751,13 +772,20 @@ def test_search_recently_published_object(client_with_es):
     sleep(5)
 
     assert 'Nick' in client.get('/search?q=Rivera')
-    assert 'Nick' in client.spawn().get('/search?q=Rivera')
+    assert 'Nick' in anom.get('/search?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
+    assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
+    assert 'Nick' in client.get('/search?q=Anesthetist')
+    assert 'Nick' in anom.get('/search?q=Anesthetist')
 
     # Unpublish
     session = client.app.session()
-    person = session.query(Person).filter(Person.first_name == 'Nick').one()
-    person.publication_start = None
-    person.publication_end = utcnow() - timedelta(minutes=30)
+    session.query(ExtendedPerson).one().publication_start = None
+    session.query(ExtendedPerson).one().publication_end = then
+    session.query(ExtendedAgencyMembership).one().publication_start = None
+    session.query(ExtendedAgencyMembership).one().publication_end = then
+    session.query(ExtendedAgency).one().publication_start = None
+    session.query(ExtendedAgency).one().publication_end = then
     commit()
 
     client.get(url)
@@ -766,6 +794,10 @@ def test_search_recently_published_object(client_with_es):
 
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in client.spawn().get('/search?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
+    assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
+    assert 'Nick' in client.get('/search?q=Anesthetist')
+    assert 'Nick' not in anom.get('/search?q=Anesthetist')
 
 
 def test_footer_settings_custom_links(client):
