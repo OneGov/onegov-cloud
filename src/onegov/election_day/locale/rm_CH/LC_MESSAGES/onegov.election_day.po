@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 08:31+0100\n"
+"POT-Creation-Date: 2022-02-22 16:34+0100\n"
 "PO-Revision-Date: 2022-02-13 06:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -802,6 +802,12 @@ msgstr ""
 #.
 msgid "homepage"
 msgstr "Pagina iniziala"
+
+msgid "Footer"
+msgstr ""
+
+msgid "Language"
+msgstr ""
 
 msgid "Open Data"
 msgstr "Open Data"
