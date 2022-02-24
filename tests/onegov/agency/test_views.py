@@ -1,16 +1,18 @@
 from datetime import datetime
 from datetime import timedelta
-from io import BytesIO
 from freezegun import freeze_time
+from io import BytesIO
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.pdf.utils import extract_pdf_info
+from onegov.people.models import Person
 from pytest import mark
 from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
-from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
-from onegov.people.models import Person
-import time
+from tests.onegov.org.common import get_cronjob_by_name
+from tests.onegov.org.common import get_cronjob_url
+from time import sleep
+from transaction import commit
 
 
 def test_views(client):
@@ -718,74 +720,52 @@ def test_basic_search(client_with_es):
     ).json
 
 
+@mark.flaky(reruns=3)
 def test_search_recently_published_object(client_with_es):
-    now = utcnow()
-    in_5_minutes = now + timedelta(minutes=5)
-    in_1_hour = now + timedelta(hours=1)
     client = client_with_es
     client.login_admin()
 
-    with freeze_time(now):
-        # Create Person, publish
-        manage = client.get('/people').click('Person', href='new')
-        manage.form['first_name'] = 'Nick'
-        manage.form['last_name'] = 'Rivera'
-        manage.form.submit()
+    # Create Person, not yet published
+    manage = client.get('/people').click('Person', href='new')
+    manage.form['first_name'] = 'Nick'
+    manage.form['last_name'] = 'Rivera'
+    manage.form['publication_start'] = utcnow() + timedelta(days=1)
+    manage.form.submit()
 
-        # Set publication date in the future
-        # Cannot be done using the form field
-        # because of timezones
-        client.app.session().query(Person).filter(
-            Person.first_name == 'Nick'
-        ).one().publication_start = in_5_minutes
+    client.app.es_client.indices.refresh(index='_all')
 
-    with freeze_time(in_1_hour):
-        # Do reindex cronjob
-        job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-        job.app = client.app
-        url = get_cronjob_url(job)
-        client.get(url)
-        client.logout()
+    assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' not in client.spawn().get('/search?q=Rivera')
 
-        # Reindexing takes a few seconds
-        time.sleep(15)
-        # Test search results
-        assert 'Nick' in client.get('/search?q=Rivera')
+    # Publish
+    session = client.app.session()
+    person = session.query(Person).filter(Person.first_name == 'Nick').one()
+    person.publication_start = utcnow() - timedelta(minutes=30)
+    commit()
 
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    job.app = client.app
+    url = get_cronjob_url(job)
+    client.get(url)
 
-def test_search_recently_unpublished_object(client_with_es):
-    now = utcnow()
-    in_5_minutes = now + timedelta(minutes=5)
-    in_1_hour = now + timedelta(hours=1)
-    client = client_with_es
-    client.login_admin()
+    sleep(5)
 
-    with freeze_time(now):
-        # Create Person, publish
-        manage = client.get('/people').click('Person', href='new')
-        manage.form['first_name'] = 'Nick'
-        manage.form['last_name'] = 'Rivera'
-        manage.form.submit()
+    assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' in client.spawn().get('/search?q=Rivera')
 
-        # Set publication date in the future
-        # Cannot be done using the form field
-        # because of timezones
-        client.app.session().query(Person).filter(
-            Person.first_name == 'Nick'
-        ).one().publication_end = in_5_minutes
+    # Unpublish
+    session = client.app.session()
+    person = session.query(Person).filter(Person.first_name == 'Nick').one()
+    person.publication_start = None
+    person.publication_end = utcnow() - timedelta(minutes=30)
+    commit()
 
-    with freeze_time(in_1_hour):
-        # Do reindex cronjob
-        job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-        job.app = client.app
-        url = get_cronjob_url(job)
-        client.get(url)
-        client.logout()
+    client.get(url)
 
-        # Reindexing takes a few seconds
-        time.sleep(15)
-        # Test search results
-        assert 'Nick' not in client.get('/search?q=Rivera')
+    sleep(5)
+
+    assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' not in client.spawn().get('/search?q=Rivera')
 
 
 def test_footer_settings_custom_links(client):
