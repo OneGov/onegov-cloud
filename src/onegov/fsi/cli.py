@@ -503,7 +503,8 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             )
         )
         for ix, user_ in enumerate(inactive):
-            log.info(f'Deactivaing inactive user {user_.username}')
+            if user_.active:
+                log.info(f'Deactivating inactive user {user_.username}')
             user_.active = False
             att = user_.attendee
             if att:
