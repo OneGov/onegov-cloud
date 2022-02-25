@@ -503,8 +503,8 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
             )
         )
         for ix, user_ in enumerate(inactive):
-            if verbose:
-                log.info(f'Inactive: {user_.username}')
+            if user_.active:
+                log.info(f'Deactivating inactive user {user_.username}')
             user_.active = False
             att = user_.attendee
             if att:
@@ -517,9 +517,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
-
     synced_users = []
-
     for ix, data in enumerate(users(client.connection)):
 
         if data['type'] == 'ldap':
@@ -562,7 +560,11 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
         if not dry_run:
             if ix % 200 == 0:
                 app.es_indexer.process()
+
+    log.info(f'Synchronized {count} users')
+
     if not skip_deactivate:
         handle_inactive(synced_users)
+
     if dry_run:
         transaction.abort()

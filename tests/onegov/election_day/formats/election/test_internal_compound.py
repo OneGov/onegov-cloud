@@ -1,12 +1,9 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, PanachageResult
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
-from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.models import Canton
-from tests.onegov.election_day.common import print_errors, create_principal
 
 
 def test_import_internal_compound_missing_headers(session):

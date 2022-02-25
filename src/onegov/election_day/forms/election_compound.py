@@ -166,16 +166,6 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    show_mandate_allocation = BooleanField(
-        label=_("Mandate allocation"),
-        description=_(
-            "Shows a tab with the comparison of party strengths as a table. "
-            "Requires party results."
-        ),
-        fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
-    )
-
     show_party_strengths = BooleanField(
         label=_("Party strengths"),
         description=_(
@@ -309,7 +299,6 @@ class ElectionCompoundForm(Form):
         model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
-        model.show_mandate_allocation = self.show_mandate_allocation.data
         model.pukelsheim = self.pukelsheim.data
         model.completes_manually = self.completes_manually.data
         model.manually_completed = self.manually_completed.data
@@ -381,7 +370,6 @@ class ElectionCompoundForm(Form):
         self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
-        self.show_mandate_allocation.data = model.show_mandate_allocation
         self.region_elections.data = []
         if model.domain_elections == 'region':
             self.region_elections.data = [e.id for e in model.elections]

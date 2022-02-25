@@ -140,7 +140,7 @@ Ultra da quai vegnan las vuschs vidas e nunvalaivlas er registradas sco candidat
 
 #### Colonnas "Resultats da las candidatas e dals candidats"
 
-Da das Datenformat nicht zwingend Informationen über die gewählten Kandidaten liefert, können diese in einer zweiten Tabelle mitgeliefert werden. Mintga lingia cuntegna ina candidata u in candidat elegì cun las suandantas colonnas:
+Cunquai ch'il format da la datoteca na furnescha betg adina infurmaziuns davart las candidatas ed ils candidats elegids, pon quellas vegnir furnidas en ina segunda tabella. Mintga lingia cuntegna ina candidata u in candidat elegì cun las suandantas colonnas:
 
 Num|Descripziun
 ---|---

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-16 06:59+0100\n"
-"PO-Revision-Date: 2022-02-13 06:41+0100\n"
+"POT-Creation-Date: 2022-02-24 14:04+0100\n"
+"PO-Revision-Date: 2022-02-24 14:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -85,6 +85,10 @@ msgstr "numero intero non valido: ${col}"
 #, python-format
 msgid "Invalid float number: ${col}"
 msgstr "numero di galleggiante non valido: ${col}"
+
+#, python-format
+msgid "Invalid decimal number: ${col}"
+msgstr ""
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
@@ -419,16 +423,6 @@ msgstr ""
 "elezioni. Utile solo se le liste corrispondono ai gruppi di liste. Solo per "
 "Doppelter Pukelsheim."
 
-msgid "Mandate allocation"
-msgstr "Ripartizione dei seggi"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a table. Requires "
-"party results."
-msgstr ""
-"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
-"tabella. Richiede i risultati dei partiti."
-
 msgid "Party strengths"
 msgstr "Forza delle parti"
 
@@ -751,12 +745,12 @@ msgstr "Nessuna candidatura."
 msgid "Download"
 msgstr "Scarica"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagramma mostra la distribuzione dei voti e dei mandati in lista e nelle "
@@ -795,10 +789,19 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Pagina iniziale"
+
+msgid "Logo: Link to homepage"
+msgstr "Logo: Link alla pagina iniziale"
+
+msgid "Footer"
+msgstr "Piè di pagina"
+
+msgid "Language"
+msgstr "Lingua"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -854,9 +857,9 @@ msgstr "Bianche"
 msgid "Invalid"
 msgstr "Nulle"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
 
@@ -875,8 +878,8 @@ msgstr "Sì"
 msgid "List connection"
 msgstr "Collegamenti tra liste"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Voti"
 
@@ -1015,8 +1018,8 @@ msgstr "Spareggio a favore della iniziativa"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Spareggio a favore della controprogetto"
 
-#. Default: eligible Voters
 #.
+#. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Aventi diritto di voto"
 
@@ -1025,6 +1028,9 @@ msgstr "Schede rientrate"
 
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
+
+msgid "PDF Results"
+msgstr "Risultati PDF"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -1065,10 +1071,10 @@ msgstr "Attivato"
 msgid "Columns"
 msgstr "Colonne"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagramma mostra i voti e i mandati dei partiti. Le barre cerchiate "
@@ -1081,11 +1087,11 @@ msgstr "Anno"
 msgid "Difference"
 msgstr "Differenza"
 
+#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagramma mostra l'origine dei voti. Le barre sulla sinistra "

@@ -135,8 +135,9 @@ def parse_panachage_results(line, errors, panachage, panachage_headers):
             for col_name, source in panachage_headers.items():
                 if source == target:
                     continue
-                panachage[target][source] = validate_integer(
-                    line, col_name, treat_none_as_default=False)
+                votes = validate_integer(line, col_name, default=None)
+                if votes is not None:
+                    panachage[target][source] = votes
 
     except ValueError as e:
         errors.append(e.args[0])
@@ -271,7 +272,8 @@ def import_election_internal_proporz(
             line, line_errors, election_id
         )
         parse_panachage_results(
-            line, line_errors, panachage, panachage_headers)
+            line, line_errors, panachage, panachage_headers
+        )
 
         # Skip expats if not enabled
         if result and result['entity_id'] == 0 and not election.expats:
@@ -321,13 +323,12 @@ def import_election_internal_proporz(
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
-    if panachage_headers:
-        for list_id in panachage_headers.values():
-            if not list_id == '999' and list_id not in lists.keys():
+    for values in panachage.values():
+        for list_id in values:
+            if list_id != '999' and list_id not in lists:
                 errors.append(FileImportError(
                     _("Panachage results id ${id} not in list_id's",
                       mapping={'id': list_id})))
-                break
 
     if errors:
         return errors

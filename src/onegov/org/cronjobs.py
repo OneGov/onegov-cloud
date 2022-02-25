@@ -2,6 +2,8 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
 from onegov.core.cache import lru_cache
+from onegov.core.orm import find_models
+from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
@@ -15,7 +17,7 @@ from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import undefer
 from uuid import UUID
 
@@ -43,6 +45,7 @@ WEEKDAYS = (
 @OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
 def hourly_maintenance_tasks(request):
     publish_files(request)
+    reindex_published_models(request)
     send_scheduled_newsletter(request)
 
 
@@ -61,6 +64,44 @@ def publish_files(request):
     FileCollection(request.session).publish_files()
 
 
+def reindex_published_models(request):
+    """
+    Reindexes all recently published objects
+    in the elasticsearch database.
+    """
+
+    if not hasattr(request.app, 'es_client'):
+        return
+
+    def publication_models(base):
+        yield from find_models(base, lambda cls: issubclass(
+            cls, UTCPublicationMixin)
+        )
+
+    objects = []
+    session = request.app.session()
+    now = utcnow()
+    then = now - timedelta(hours=1)
+    for base in request.app.session_manager.bases:
+        for model in publication_models(base):
+            query = session.query(model).filter(
+                or_(
+                    and_(
+                        then <= model.publication_start,
+                        now >= model.publication_start
+                    ),
+                    and_(
+                        then <= model.publication_end,
+                        now >= model.publication_end
+                    )
+                )
+            )
+            objects.extend(query.all())
+
+    for obj in objects:
+        request.app.es_orm_events.index(request.app.schema, obj)
+
+
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')
 def process_resource_rules(request):
     resources = ResourceCollection(request.app.libres_context)
@@ -71,6 +112,7 @@ def process_resource_rules(request):
 
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
 def send_daily_ticket_statistics(request):
+
     today = replace_timezone(datetime.utcnow(), 'UTC')
     today = to_timezone(today, 'Europe/Zurich')
 

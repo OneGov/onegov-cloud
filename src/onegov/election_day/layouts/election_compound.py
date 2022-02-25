@@ -35,7 +35,6 @@ class ElectionCompoundLayout(DetailLayout):
             'lists',
             'districts',
             'candidates',
-            'mandate-allocation',
             'party-strengths',
             'parties-panachage',
             'statistics',
@@ -80,8 +79,6 @@ class ElectionCompoundLayout(DetailLayout):
             return self.label('districts')
         if tab == 'candidates':
             return _("Elected candidates")
-        if tab == 'mandate-allocation':
-            return _("Mandate allocation")
         if tab == 'party-strengths':
             return _("Party strengths")
         if tab == 'parties-panachage':
@@ -109,11 +106,6 @@ class ElectionCompoundLayout(DetailLayout):
             return (
                 self.model.show_lists is True
                 and self.model.pukelsheim is True
-            )
-        if tab == 'mandate-allocation':
-            return (
-                self.model.show_mandate_allocation is True
-                and self.has_party_results
             )
         if tab == 'party-strengths':
             return (
