@@ -60,6 +60,23 @@ class ElectionCandidatesByEntityTableWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
+    tag='absolute-majority',
+    category='majorz_election'
+)
+class AbsoluteMajorityWidget(ModelBoundWidget):
+    tag = 'absolute-majority'
+    template = """
+        <xsl:template match="absolute-majority">
+            <strong
+                tal:content="election.absolute_majority"
+                class="{@class}"
+                />            
+        </xsl:template>
+    """
+    usage = '<absolute-majority class=""/>'
+
+
+@ElectionDayApp.screen_widget(
     tag='election-lists-table',
     category='proporz_election'
 )
