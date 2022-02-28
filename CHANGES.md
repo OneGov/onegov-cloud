@@ -1,8 +1,52 @@
 # Changes
 
+## 2022.17
+
+`2022-02-28` | [afe9de72f0...1bce8a9f37](https://github.com/OneGov/onegov-cloud/compare/afe9de72f0^...1bce8a9f37)
+
+### Election Day
+
+##### Improve archive titles for screenreaders.
+
+`Feature` | [OGC-281](https://linear.app/onegovcloud/issue/OGC-281) | [2ddd563610](https://github.com/onegov/onegov-cloud/commit/2ddd5636106682617ed509fe1e99b970800ef3ca)
+
+##### Make some tests less flaky.
+
+`Bugfix` | [afe9de72f0](https://github.com/onegov/onegov-cloud/commit/afe9de72f0c57ec580f323bb30ba0708e1fa7f40)
+
+##### Add alt text to logo.
+
+`Other` | [OGC-281](https://linear.app/onegovcloud/issue/OGC-281) | [03b25811ff](https://github.com/onegov/onegov-cloud/commit/03b25811ffdbd2daffa06410a99e596f1679282b)
+
+##### Show file import errors in cleanup subscriber form.
+
+`Bugfix` | [40e9bf14f1](https://github.com/onegov/onegov-cloud/commit/40e9bf14f1b9583dc54e3f93b2766fc6dd17d9f8)
+
+### Feriennet
+
+##### Update translations.
+
+`Other` | [PRO-981](https://linear.app/projuventute/issue/PRO-981) | [175330c738](https://github.com/onegov/onegov-cloud/commit/175330c738910d6b55decf4eb770b9c88963ee71)
+
+##### Remove Lidle and WUP app.
+
+`Other` | [PRO-994](https://linear.app/projuventute/issue/PRO-994) | [c89335fd6e](https://github.com/onegov/onegov-cloud/commit/c89335fd6e66ecdb4080bb2cd89fd72ab14a8f20)
+
+### Fsi
+
+##### Improve LDAP log messages.
+
+`Other` | [OGC-325](https://linear.app/onegovcloud/issue/OGC-325) | [d897928ebc](https://github.com/onegov/onegov-cloud/commit/d897928ebc0f699ea8b912e76fdcc773e38e717b)
+
+### Org
+
+##### Fixes disabling newsletter not working.
+
+`Bugfix` | [OGC-211](https://linear.app/onegovcloud/issue/OGC-211) | [1bce8a9f37](https://github.com/onegov/onegov-cloud/commit/1bce8a9f371b3f20f99dbd4c46aad8d14d83a136)
+
 ## 2022.16
 
-`2022-02-24` | [f66cece404...1a880ca764](https://github.com/OneGov/onegov-cloud/compare/f66cece404^...1a880ca764)
+`2022-02-24` | [f66cece404...9ece574c51](https://github.com/OneGov/onegov-cloud/compare/f66cece404^...9ece574c51)
 
 ### Election Day
 
@@ -1360,14 +1404,4 @@ Agency: Add publication windows to people, agencies and memberships.
 - Fix error on registration window view if ticket to submission is missing
 
 `Bugfix` | [SEA-378](https://linear.app/seantis/issue/SEA-378) | [7ea2a293a1](https://github.com/onegov/onegov-cloud/commit/7ea2a293a1c7bcb6fec15a2d839038c0a2d8759d)
-
-## 2021.68
-
-`2021-07-20` | [f9a40771a4...9c0b161b06](https://github.com/OneGov/onegov-cloud/compare/f9a40771a4^...9c0b161b06)
-
-### Onboarding
-
-##### Change to town6
-
-`Other` | [SEA-265](https://linear.app/seantis/issue/SEA-265) | [554a65007e](https://github.com/onegov/onegov-cloud/commit/554a65007e75e763e39a0c5085bb5c3c48d9b8b9)
 
