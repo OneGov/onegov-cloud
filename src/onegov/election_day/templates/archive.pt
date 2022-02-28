@@ -23,14 +23,62 @@
                 </h2>
                 <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
                     <div tal:repeat="type archive_items[date][domain]" class="type-${type}">
-                        <h3 i18n:translate="" tal:condition="type == 'election' and domain == 'federation'">Federal Elections</h3>
-                        <h3 i18n:translate="" tal:condition="type == 'election' and domain == 'region'">Regional Elections</h3>
-                        <h3 i18n:translate="" tal:condition="type == 'election' and domain == 'canton'">Cantonal Elections</h3>
-                        <h3 i18n:translate="" tal:condition="type == 'election' and domain == 'municipality'">Communal Elections</h3>
-                        <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'federation'">Federal Votes</h3>
-                        <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'region'">Regional Votes</h3>
-                        <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'canton'">Cantonal Votes</h3>
-                        <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'municipality'">Communal Votes</h3>
+                        
+                        <h3 tal:condition="type == 'election' and domain == 'federation'">
+                            <tal:block i18n:translate="">Federal Elections</tal:block>
+                            <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
+
+                        <h3 tal:condition="type == 'election' and domain == 'region'">
+                            <tal:block i18n:translate="">Regional Elections</tal:block>
+                             <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
+
+                        <h3 tal:condition="type == 'election' and domain == 'canton'">
+                            <tal:block i18n:translate="">Cantonal Elections</tal:block>
+                             <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
+
+                        <h3 tal:condition="type == 'election' and domain == 'municipality'">
+                            <tal:block i18n:translate="">Communal Elections</tal:block>
+                             <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
+
+                        <h3 tal:condition="type == 'vote' and domain == 'federation'">
+                            <tal:block i18n:translate="">Federal Votes</tal:block>
+                            <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
+                        
+                        <h3 tal:condition="type == 'vote' and domain == 'region'">
+                            <tal:block i18n:translate="">Regional Votes</tal:block>
+                             <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
+
+                        <h3 tal:condition="type == 'vote' and domain == 'canton'">
+                            <tal:block i18n:translate="">Cantonal Votes</tal:block>
+                             <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
+                        
+                        <h3 tal:condition="type == 'vote' and domain == 'municipality'">
+                            <tal:block i18n:translate="">Communal Votes</tal:block>
+                             <span class="visually-hidden">
+                                <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
+                            </span>
+                        </h3>
 
                         <table class="overview election tablesaw" data-tablesaw-mode="stack" tal:condition="type == 'election'">
                             <thead>
