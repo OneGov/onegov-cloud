@@ -30,7 +30,7 @@ def test_browse_matching(browser, scenario):
     # check the initial state
     assert browser.is_text_present("Ferienpass 2016")
     assert browser.is_text_present("Zufriedenheit liegt bei 0%")
-    assert browser.is_text_present("0% aller Durchführungen haben genug")
+    assert browser.is_text_present("0% aller Durchführungen haben genügend")
     assert browser.is_text_present("0 / 4")
 
     # run a matching
@@ -38,7 +38,7 @@ def test_browse_matching(browser, scenario):
 
     # check the results
     assert browser.is_text_present("Zufriedenheit liegt bei 100%")
-    assert browser.is_text_present("50% aller Durchführungen haben genug")
+    assert browser.is_text_present("50% aller Durchführungen haben genügend")
     assert browser.is_text_present("1 / 4")
     assert browser.is_text_present("2 / 4")
 
@@ -60,7 +60,7 @@ def test_browse_matching(browser, scenario):
 
     # confirm the matching
     assert browser.is_text_present("Zufriedenheit liegt bei 0%")
-    assert browser.is_text_present("0% aller Durchführungen haben genug")
+    assert browser.is_text_present("0% aller Durchführungen haben genügend")
 
     browser.find_by_css('input[value="yes"]').click()
     browser.find_by_css('input[name="sure"]').click()
@@ -254,7 +254,7 @@ def test_volunteers(browser, scenario):
     browser.click_link_by_partial_text("Zu meiner Liste")
     assert browser.is_element_present_by_css('.volunteer-cart-item')
 
-    browser.click_link_by_text("Als Helfer registrieren")
+    browser.click_link_by_text("Als Hilfsperson registrieren")
     browser.fill_form({
         'first_name': "Foo",
         'last_name': "Bar",

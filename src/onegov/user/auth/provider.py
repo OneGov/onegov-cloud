@@ -228,7 +228,7 @@ def ensure_user(source, source_id, session, username, role, force_role=True,
 
     users = UserCollection(session)
 
-    # find the user by source and
+    # find the user by source
     if source and source_id:
         user = users.by_source_id(source, source_id)
     else:
@@ -238,6 +238,7 @@ def ensure_user(source, source_id, session, username, role, force_role=True,
     user = user or users.by_username(username)
 
     if not user:
+        log.info(f'Adding user {username} from {source}:{source_id}')
         user = users.add(
             username=username,
             password=random_token(),
