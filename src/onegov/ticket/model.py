@@ -79,7 +79,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     def created(cls):
         return Column(UTCDateTime, default=cls.timestamp)
 
-    #: the state of this ticket (open, pending, closed)
+    #: the state of this ticket (open, pending, closed, archived)
     state = Column(
         Enum(
             'open',

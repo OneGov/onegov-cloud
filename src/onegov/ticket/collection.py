@@ -61,6 +61,9 @@ class TicketCollectionPagination(Pagination):
                     self.session, query, self.extra_parameters
                 )
 
+        if self.state == 'all':
+            query = query.filter(Ticket.state != 'archived')
+
         return query
 
     @property

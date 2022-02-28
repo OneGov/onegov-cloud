@@ -84,9 +84,7 @@
                     </tr>
                 </tal:b>
                 <tal:b repeat="ticket tickets">
-                    <tal:b condition="ticket.state != 'archived'">
-                        <div metal:use-macro="layout.macros['tickets_table_row']"/>
-                    </tal:b>
+                    <div metal:use-macro="layout.macros['tickets_table_row']"/>
                 </tal:b>
             </tbody>
         </table>
