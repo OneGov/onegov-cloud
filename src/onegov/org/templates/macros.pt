@@ -434,7 +434,7 @@
 
         <h3 class="all-news" tal:condition="show_all_news_link|nothing">
             <a href="${layout.news_url}" i18n:translate>All news</a>
-            <a href="${layout.newsletter_url}" i18n:translate>Newsletter</a>
+            <a tal:condition="layout.org.show_newsletter" href="${layout.newsletter_url}" i18n:translate>Newsletter</a>
         </h3>
     </div>
 </metal:newslist>
@@ -516,7 +516,7 @@
             </div>
             <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
-                <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location" tal:define="hide page.hide_contact|False">   
+                <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location" tal:define="hide page.hide_contact|False">
                         <tal:b condition="contact and not hide" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
                     <h2 i18n:translate tal:condition="not contact">Map</h2>
