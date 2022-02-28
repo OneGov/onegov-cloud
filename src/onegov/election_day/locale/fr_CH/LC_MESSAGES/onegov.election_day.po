@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 12:58+0100\n"
-"PO-Revision-Date: 2022-02-05 17:29+0100\n"
+"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -693,6 +693,9 @@ msgstr "Elections et votes sur ${date}"
 msgid "Federal Elections"
 msgstr "Elections fédéraux"
 
+msgid "on"
+msgstr "sur"
+
 msgid "Regional Elections"
 msgstr "Elections régionales"
 
@@ -790,6 +793,9 @@ msgstr ""
 "résultat est appelé le nombre d'électeurs sur la liste. Le nombre de votants "
 "est réparti entre les groupes de listes."
 
+msgid "The file is invalid."
+msgstr "Le fichier n'est pas valide."
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés "
@@ -799,6 +805,15 @@ msgstr ""
 #. Default: Start
 msgid "homepage"
 msgstr "Page d'accueil"
+
+msgid "Logo: Link to homepage"
+msgstr "Logo : Lien vers la page d'accueil"
+
+msgid "Footer"
+msgstr "Pied de page"
+
+msgid "Language"
+msgstr "Langue"
 
 msgid "Open Data"
 msgstr "Ouvrir les données"
@@ -1026,6 +1041,9 @@ msgstr "Suffrages exprimés"
 
 msgid "Download a PDF with all the results:"
 msgstr "Télécharger tous les résultats dans un PDF :"
+
+msgid "PDF Results"
+msgstr "PDF Résultats"
 
 msgid ""
 "The raw data used to display the results is available in the following "

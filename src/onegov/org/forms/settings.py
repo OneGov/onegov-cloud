@@ -846,7 +846,7 @@ class OrgTicketSettingsForm(Form):
 class NewsletterSettingsForm(Form):
 
     show_newsletter = BooleanField(
-        label=_('Show option for newsletter registration'),
+        label=_('Enable newsletter'),
         default=False
     )
 

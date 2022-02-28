@@ -1,23 +1,19 @@
 """ Provides commands used to initialize org websites. """
-import sys
-from io import BytesIO
-from pathlib import Path
-
 import click
 import html
 import isodate
 import re
 import requests
 import shutil
+import sys
 import textwrap
 
 from cached_property import cached_property
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+from io import BytesIO
 from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
-from wtforms.validators import Email
-
 from onegov.chat import MessageCollection
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
@@ -32,6 +28,7 @@ from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.form import as_internal_id, parse_form
 from onegov.form import FormCollection
+from onegov.newsletter import Newsletter
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms import ReservationForm
@@ -46,6 +43,7 @@ from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
 from onegov.user import UserCollection, User
 from operator import add as add_op
+from pathlib import Path
 from purl import URL
 from sedate import replace_timezone, utcnow
 from sqlalchemy import create_engine, event, text, or_
@@ -53,6 +51,7 @@ from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 from uuid import UUID, uuid4
+from wtforms.validators import Email
 
 cli = command_group()
 
@@ -1364,3 +1363,25 @@ def migrate_publications(group_context, dry_run):
             )
 
     return mark_as_published
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@pass_group_context
+@click.option('--dry-run', is_flag=True, default=False)
+def migrate_newsletter(group_context, dry_run):
+    """ Enable or disables the newsletter depeding on existing newsletters. """
+
+    def set_newsletter(request, app):
+        if hasattr(app, 'org'):
+            count = request.session.query(Newsletter).count()
+            old = app.org.show_newsletter
+            new = count != 0
+
+            click.secho(
+                f'{app.schema}: {count} newsletters found, '
+                f'{"enabling" if new else "disabling"} '
+                f'(was {"enabled" if old else "disabled"})',
+                fg='yellow' if old != new else 'white'
+            )
+
+    return set_newsletter

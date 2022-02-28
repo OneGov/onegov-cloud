@@ -45,7 +45,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="Logo: Link to homepage" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
             </div>
         </tal:block>
@@ -55,7 +55,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 columns text-right">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="Logo: Link to homepage" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
             </div>
         </tal:block>
@@ -87,8 +87,14 @@ metal:define-macro="layout">
     </div>
 
     <footer tal:condition="not request.browser_session.get('headerless')">
+        <h2 class="visually-hidden" i18n:translate>
+            Footer
+        </h2>
         <div class="row">
             <div class="small-12 medium-4 medium-push-4 columns text-center">
+                <h2 class="visually-hidden" i18n:translate>
+                    Language
+                </h2>
                 <ul class="locales">
                     <li tal:repeat="(name, url) layout.locales">
                         <a tal:condition="request.locale not in url" href="${url}">${name}</a>
@@ -97,16 +103,20 @@ metal:define-macro="layout">
                 </ul>
             </div>
             <div class="small-12 medium-4 medium-pull-4 columns small-only-text-center">
+            <p>
                 <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
                 <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a><br>
                 <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
+            </p>
             </div>
             <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
+                <p><a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a></p>
                 <tal:block condition="layout.logout_link" >
+                <p>
                     <span i18n:translate>You are logged in: </span>
                     <a href="${layout.manage_link}" i18n:translate>Manage</a> |
                     <a href="${layout.logout_link}" i18n:translate>Logout</a><br>
+                </p>
                 </tal:block>
             </div>
         </div>

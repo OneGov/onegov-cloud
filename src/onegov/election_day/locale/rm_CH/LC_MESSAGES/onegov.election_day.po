@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 12:58+0100\n"
-"PO-Revision-Date: 2022-02-13 06:38+0100\n"
+"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"PO-Revision-Date: 2022-02-25 13:48+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -695,6 +695,9 @@ msgstr "Votaziun dals ${date}"
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
 
+msgid "on"
+msgstr "dals"
+
 msgid "Regional Elections"
 msgstr "Elecziuns regionalas"
 
@@ -793,6 +796,9 @@ msgstr ""
 "numnà cifra electorala da la glista. Il Cifra electorala attribuziun "
 "superiura a las gruppas da glistas."
 
+msgid "The file is invalid."
+msgstr ""
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
@@ -802,6 +808,15 @@ msgstr ""
 #. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziala"
+
+msgid "Logo: Link to homepage"
+msgstr ""
+
+msgid "Footer"
+msgstr ""
+
+msgid "Language"
+msgstr ""
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -1028,6 +1043,9 @@ msgstr "Cedels da votar entrads"
 
 msgid "Download a PDF with all the results:"
 msgstr "In PDF cun tut ils resultats pudais Vus chargiar giu qua:"
+
+msgid "PDF Results"
+msgstr ""
 
 msgid ""
 "The raw data used to display the results is available in the following "

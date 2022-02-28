@@ -3,6 +3,10 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <div tal:condition="request.is_manager and not request.app.org.show_newsletter" class="panel">
+            <p i18n:translate>The newsletter is disabled. You can only see this page because you are logged in.</p>
+        </div>
+
         <metal:b use-macro="layout.macros.newsletter_signup">
             <div metal:fill-slot="pre_form">
                 <p i18n:translate>Sign up to our newsletter to always stay up to date:</p>

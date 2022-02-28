@@ -1,8 +1,48 @@
 # Changes
 
+## 2022.16
+
+`2022-02-24` | [f66cece404...1a880ca764](https://github.com/OneGov/onegov-cloud/compare/f66cece404^...1a880ca764)
+
+### Election Day
+
+##### Change text of PDF download link.
+
+`Other` | [OGC-286](https://linear.app/onegovcloud/issue/OGC-286) | [3bc90c9149](https://github.com/onegov/onegov-cloud/commit/3bc90c9149d03119af6b1a62ff84ab6a0cf3013c)
+
+##### Improve accessibility of footer.
+
+`Other` | [OGC-270](https://linear.app/onegovcloud/issue/OGC-270) | [228360f89b](https://github.com/onegov/onegov-cloud/commit/228360f89bfd389c46ee99559e9dcb189b6cf47b)
+
+##### Fixes archive header title level.
+
+`Other` | [OGC-335](https://linear.app/onegovcloud/issue/OGC-335) | [b9ebf5752b](https://github.com/onegov/onegov-cloud/commit/b9ebf5752bcdd6e6fa09a891be8f343d17e37a2d)
+
+##### Use table header cells for election and vote titles in archive tables.
+
+`Other` | [OGC-268](https://linear.app/onegovcloud/issue/OGC-268) | [6b074a4c5d](https://github.com/onegov/onegov-cloud/commit/6b074a4c5d589bffe82e1a5bdcbcba193ab88034)
+
+### Fsi
+
+##### Add log messages to LDAP import.
+
+`Other` | [OGC-325](https://linear.app/onegovcloud/issue/OGC-325) | [1a880ca764](https://github.com/onegov/onegov-cloud/commit/1a880ca764019967e2ac7cd38865afcd6e6303d5)
+
+### Org
+
+##### Reindex models with changed publication timestamps during the hourly mainteance task.
+
+`Feature` | [OGC-183](https://linear.app/onegovcloud/issue/OGC-183) | [8d49dcb0a6](https://github.com/onegov/onegov-cloud/commit/8d49dcb0a60672ba119769392fdb06643f00ddce)
+
+### Town6
+
+##### Allow event-links to have full width.
+
+`Bugfix` | [OGC-318](https://linear.app/onegovcloud/issue/OGC-318) | [22fa676dde](https://github.com/onegov/onegov-cloud/commit/22fa676dde821f382e316c45023c101262e98c38)
+
 ## 2022.15
 
-`2022-02-19` | [b289e1cd6e...35a5e18765](https://github.com/OneGov/onegov-cloud/compare/b289e1cd6e^...35a5e18765)
+`2022-02-19` | [b289e1cd6e...c80d1d6686](https://github.com/OneGov/onegov-cloud/compare/b289e1cd6e^...c80d1d6686)
 
 ### Core
 
@@ -1330,26 +1370,4 @@ Agency: Add publication windows to people, agencies and memberships.
 ##### Change to town6
 
 `Other` | [SEA-265](https://linear.app/seantis/issue/SEA-265) | [554a65007e](https://github.com/onegov/onegov-cloud/commit/554a65007e75e763e39a0c5085bb5c3c48d9b8b9)
-
-## 2021.67
-
-`2021-07-17` | [a20fdb76e6...1cc14ad7ec](https://github.com/OneGov/onegov-cloud/compare/a20fdb76e6^...1cc14ad7ec)
-
-### Agency
-
-##### Improves mutations
-
-Users can directly propose changes to fields of agencies and people. Redactors can select, which changes they want to apply.
-
-`Feature` | [STAKABS-34](https://kt-bs.atlassian.net/browse/STAKABS-34) | [ed6fa6b812](https://github.com/onegov/onegov-cloud/commit/ed6fa6b812f8b43f89851899cb3233355f6b6a97)
-
-### Org
-
-##### Adds activity log for ticket assignment.
-
-`Feature` | [STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25) | [a20fdb76e6](https://github.com/onegov/onegov-cloud/commit/a20fdb76e68acda358e714c61651d68383c00e7c)
-
-##### Send an email when assigning a ticket.
-
-`Feature` | [STAKABS-25](https://kt-bs.atlassian.net/browse/STAKABS-25) | [aad2eb2293](https://github.com/onegov/onegov-cloud/commit/aad2eb2293e56264be4c52009bb67a8e0966ddc9)
 

@@ -1151,7 +1151,7 @@
 <metal:pdf_download define-macro="pdf_download" i18n:domain="onegov.election_day">
     <tal:block tal:condition="layout.pdf_path">
         <h4>PDF</h4>
-        <p><span i18n:translate="">Download a PDF with all the results:</span> <a href="${request.link(model, 'pdf')}">PDF</a></p>
+        <p><span i18n:translate="">Download a PDF with all the results:</span> <a i18n:translate="" href="${request.link(model, 'pdf')}">PDF Results</a></p>
     </tal:block>
 </metal:pdf_download>
 
@@ -1161,7 +1161,7 @@
     <ol>
         <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
         <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
-    </ol>    
+    </ol>
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
 </metal:open_data_download>
 
@@ -1187,15 +1187,19 @@
         <div class="alert-box alert" i18n:translate="">
             Your results could not be uploaded.
         </div>
-        <ul>
-            <li tal:repeat="error errors">
-                <span class="error-line" tal:condition="error.filename">${error.filename}</span>
-                <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
-                <span class="error-message">${error.error}</span>
-            </li>
-        </ul>
+        <tal:block metal:use-macro="layout.macros['file_import_errors']" />
     </div>
 </metal:upload_errors>
+
+<metal:file_import_errors define-macro="file_import_errors" i18n:domain="onegov.election_day">
+    <ul>
+        <li tal:repeat="error errors">
+            <span class="error-line" tal:condition="error.filename">${error.filename}</span>
+            <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
+            <span class="error-message">${error.error}</span>
+        </li>
+    </ul>
+</metal:file_import_errors>
 
 <metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.election_day">
     <script>
