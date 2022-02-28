@@ -126,3 +126,18 @@ class ElectionListsChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = '<election-lists-chart limit="" names="," class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='turnout', category='election')
+class TitleWidget(ModelBoundWidget):
+    tag = 'turnout'
+    template = """
+        <xsl:template match="turnout">
+            <strong
+                tal:content="election.turnout"
+                class="{@class}"
+                />
+        </xsl:template>
+    """
+    usage = '<turnout class=""/>'
