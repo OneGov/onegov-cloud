@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-18 14:55+0100\n"
+"POT-Creation-Date: 2022-02-28 08:28+0100\n"
 "PO-Revision-Date: 2022-02-18 13:20+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3199,6 +3199,13 @@ msgstr "Ticket archiviert."
 
 msgid "Ticket recovered from archive."
 msgstr "Ticket aus dem Archiv geholt."
+
+msgid ""
+"The newsletter is disabled. You can only see this page because you are "
+"logged in."
+msgstr ""
+"Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
+"eingeloggt sind."
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""

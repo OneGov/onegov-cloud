@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-02-18 14:55+0100\n"
+"POT-Creation-Date: 2022-02-28 08:28+0100\n"
 "PO-Revision-Date: 2022-02-18 13:56+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3199,6 +3199,13 @@ msgstr "Biglietto archiviato."
 
 msgid "Ticket recovered from archive."
 msgstr "Biglietto recuperato dall'archivio."
+
+msgid ""
+"The newsletter is disabled. You can only see this page because you are "
+"logged in."
+msgstr ""
+"La newsletter è disabilitata. Puoi vedere questa pagina solo perché hai "
+"fatto il login."
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"

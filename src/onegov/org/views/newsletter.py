@@ -30,6 +30,7 @@ from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
 from string import Template
+from webob.exc import HTTPNotFound
 
 
 def get_newsletter_form(model, request):
@@ -116,6 +117,9 @@ def publications_by_newsletter(newsletter, request):
 @OrgApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
              permission=Public, form=SignupForm)
 def handle_newsletters(self, request, form, layout=None, mail_layout=None):
+
+    if not (request.is_manager or request.app.org.show_newsletter):
+        raise HTTPNotFound()
 
     if form.submitted(request):
         recipients = RecipientCollection(request.session)
