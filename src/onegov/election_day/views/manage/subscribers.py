@@ -100,7 +100,7 @@ def handle_cleanup_subscribers(collection, request, form):
         'form': form,
         'title': _('Clean up subscribers'),
         'cancel': layout.manage_model_link,
-        'errors': errors
+        'file_import_errors': errors
     }
 
 

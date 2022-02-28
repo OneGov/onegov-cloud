@@ -10,6 +10,24 @@ from onegov.user import UserCollection
 from sedate import replace_timezone
 
 
+def test_newsletter_disabled(client):
+
+    anon = client.spawn()
+
+    client.login_admin()
+
+    assert anon.get('/newsletters', expect_errors=True).status_code == 404
+    assert client.get('/newsletters').status_code == 200
+
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    assert anon.get('/newsletters').status_code == 200
+    assert client.get('/newsletters').status_code == 200
+
+
 def test_unsubscribe_link(client):
     request = Bunch(identity_secret=client.app.identity_secret, app=client.app)
 
@@ -52,6 +70,12 @@ def test_unsubscribe_link(client):
 
 
 def test_newsletters_crud(client):
+
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
 
     client.login_editor()
 
@@ -100,6 +124,12 @@ def test_newsletters_crud(client):
 
 
 def test_newsletter_signup(client):
+
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
 
     page = client.get('/newsletters')
     page.form['address'] = 'asdf'
@@ -154,12 +184,13 @@ def test_newsletter_signup(client):
 
 def test_newsletter_rfc8058(client):
 
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
     page = client.get('/newsletters')
-    page.form['address'] = 'asdf'
-    page = page.form.submit()
-
-    assert 'Ungültig' in page
-
     page.form['address'] = 'info@example.org'
     page.form.submit()
 
@@ -209,6 +240,12 @@ def test_newsletter_rfc8058(client):
 
 def test_newsletter_subscribers_management(client):
 
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
     page = client.get('/newsletters')
     page.form['address'] = 'info@example.org'
     page.form.submit()
@@ -231,6 +268,13 @@ def test_newsletter_subscribers_management(client):
 
 
 def test_newsletter_send(client):
+
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+    client.logout()
+
     anon = client.spawn()
 
     client.login_editor()
