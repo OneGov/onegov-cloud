@@ -1347,7 +1347,6 @@ def migrate_links_cli(group_context, old_uri, dry_run):
 
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
-@click.option('--dry-run', is_flag=True, default=False)
 def migrate_publications(group_context, dry_run):
     """ Marks signed files for publication. """
 
@@ -1367,7 +1366,6 @@ def migrate_publications(group_context, dry_run):
 
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
-@click.option('--dry-run', is_flag=True, default=False)
 def migrate_newsletter(group_context, dry_run):
     """ Enable or disables the newsletter depeding on existing newsletters. """
 
@@ -1376,6 +1374,7 @@ def migrate_newsletter(group_context, dry_run):
             count = request.session.query(Newsletter).count()
             old = app.org.show_newsletter
             new = count != 0
+            app.org.show_newsletter = new
 
             click.secho(
                 f'{app.schema}: {count} newsletters found, '
