@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-02-28 14:32+0100\n"
 "PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -382,8 +382,8 @@ msgstr "Ungültige Farbdefinitionen"
 msgid "Domain of the elections"
 msgstr "Ebene der Wahlen"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Wahlen"
 
 msgid "Completes manually"
 msgstr "Wird manuell abgeschlossen"
@@ -396,11 +396,34 @@ msgstr ""
 "individuellen Wahlergebnisse angezeigt, bis die Wahlverbindung manuell "
 "abgeschlossen wurde."
 
+msgid "Completion"
+msgstr "Abschluss"
+
 msgid "Completed"
 msgstr "Abgeschlossen"
 
-msgid "Elections"
-msgstr "Wahlen"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View-options"
+msgstr ""
+
+msgid "Allows to display lists and list groups."
+msgstr ""
+
+msgid "Voters counts"
+msgstr "Wählerzahlen"
+
+msgid "Display voters counts instead of votes in views with party results."
+msgstr ""
+"Zeige Wählerzahlen anstelle der Stimmen in den Ansichten mit "
+"Parteiergebnissen."
+
+msgid "Exact voters counts"
+msgstr "Exakte Wählerzahlen"
+
+msgid "Display exact voters counts instead of rounded values."
+msgstr "Zeige genauen Wählerzahlen anstelle von gerundeten Werten."
 
 msgid "List groups"
 msgstr "Listengruppen"

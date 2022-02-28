@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-02-28 14:32+0100\n"
 "PO-Revision-Date: 2022-02-25 13:48+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -382,8 +382,8 @@ msgstr "Definiziuns da colurs nunvalaivlas"
 msgid "Domain of the elections"
 msgstr "Plaun da las elecziuns"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Elecziuns"
 
 msgid "Completes manually"
 msgstr ""
@@ -396,11 +396,32 @@ msgstr ""
 "vegnan mussads nagins resultats individuals da l'elecziun, fin che la "
 "colliaziun cun l'elecziun n'è betg vegnida terminada manualmain."
 
+msgid "Completion"
+msgstr ""
+
 msgid "Completed"
 msgstr "Terminà"
 
-msgid "Elections"
-msgstr "Elecziuns"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View-options"
+msgstr ""
+
+msgid "Allows to display lists and list groups."
+msgstr ""
+
+msgid "Voters counts"
+msgstr ""
+
+msgid "Display voters counts instead of votes in views with party results."
+msgstr ""
+
+msgid "Exact voters counts"
+msgstr ""
+
+msgid "Display exact voters counts instead of rounded values."
+msgstr ""
 
 msgid "List groups"
 msgstr "Gruppas da glistas"

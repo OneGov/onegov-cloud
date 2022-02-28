@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-02-28 14:32+0100\n"
 "PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -380,8 +380,8 @@ msgstr "Définitions de couleurs non valides"
 msgid "Domain of the elections"
 msgstr "Echelon des élections"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Elections"
 
 msgid "Completes manually"
 msgstr "Complète manuellement"
@@ -394,11 +394,34 @@ msgstr ""
 "d'élection individuel n'est affiché tant que la composante électoral n'est "
 "pas complété manuellement."
 
+msgid "Completion"
+msgstr "Achèvement"
+
 msgid "Completed"
 msgstr "Complété"
 
-msgid "Elections"
-msgstr "Elections"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View-options"
+msgstr ""
+
+msgid "Allows to display lists and list groups."
+msgstr ""
+
+msgid "Voters counts"
+msgstr "Nombres de votants"
+
+msgid "Display voters counts instead of votes in views with party results."
+msgstr ""
+"Afficher le nombre d'électeurs au lieu des votes dans les vues avec les "
+"résultats des partis."
+
+msgid "Exact voters counts"
+msgstr "Nombres de votants exacts"
+
+msgid "Display exact voters counts instead of rounded values."
+msgstr "Afficher le nombre exact de votants au lieu des valeurs arrondies."
 
 msgid "List groups"
 msgstr "Groupes de listes"

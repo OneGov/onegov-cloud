@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-02-28 14:32+0100\n"
 "PO-Revision-Date: 2022-02-25 13:47+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -379,8 +379,8 @@ msgstr "Definizioni di colore non valide"
 msgid "Domain of the elections"
 msgstr "Livello di elezione"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Elezioni"
 
 msgid "Completes manually"
 msgstr "Completa manualmente"
@@ -393,11 +393,32 @@ msgstr ""
 "risultato elettorale individuale viene visualizzato fino a quando il "
 "componente elettorale non viene completato manualmente."
 
+msgid "Completion"
+msgstr "Completamento"
+
 msgid "Completed"
 msgstr "Completato"
 
-msgid "Elections"
-msgstr "Elezioni"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View-options"
+msgstr ""
+
+msgid "Allows to display lists and list groups."
+msgstr ""
+
+msgid "Voters counts"
+msgstr ""
+
+msgid "Display voters counts instead of votes in views with party results."
+msgstr ""
+
+msgid "Exact voters counts"
+msgstr ""
+
+msgid "Display exact voters counts instead of rounded values."
+msgstr ""
 
 msgid "List groups"
 msgstr "Gruppi di liste"

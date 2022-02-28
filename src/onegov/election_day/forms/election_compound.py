@@ -36,25 +36,8 @@ class ElectionCompoundForm(Form):
         ]
     )
 
-    pukelsheim = BooleanField(
-        label=_("Doppelter Pukelsheim"),
-        render_kw=dict(force_simple=True)
-    )
-
-    completes_manually = BooleanField(
-        label=_("Completes manually"),
-        description=_(
-            "Enables manual completion of the election compound. "
-            "No indidvidual election results are displayed until the election "
-            "compound is manually completed."
-        ),
-        render_kw=dict(force_simple=True)
-    )
-
-    manually_completed = BooleanField(
-        label=_("Completed"),
-        depends_on=('completes_manually', 'y'),
-        render_kw=dict(force_simple=True)
+    shortcode = StringField(
+        label=_("Shortcode")
     )
 
     date = DateField(
@@ -63,31 +46,6 @@ class ElectionCompoundForm(Form):
             InputRequired()
         ],
         default=date.today
-    )
-
-    shortcode = StringField(
-        label=_("Shortcode")
-    )
-
-    election_de = StringField(
-        label=_("German"),
-        fieldset=_("Title of the election"),
-        render_kw={'lang': 'de'}
-    )
-    election_fr = StringField(
-        label=_("French"),
-        fieldset=_("Title of the election"),
-        render_kw={'lang': 'fr'}
-    )
-    election_it = StringField(
-        label=_("Italian"),
-        fieldset=_("Title of the election"),
-        render_kw={'lang': 'it'}
-    )
-    election_rm = StringField(
-        label=_("Romansh"),
-        fieldset=_("Title of the election"),
-        render_kw={'lang': 'rm'}
     )
 
     region_elections = ChosenSelectMultipleField(
@@ -117,6 +75,45 @@ class ElectionCompoundForm(Form):
         depends_on=('domain_elections', 'municipality'),
     )
 
+    completes_manually = BooleanField(
+        label=_("Completes manually"),
+        description=_(
+            "Enables manual completion of the election compound. "
+            "No indidvidual election results are displayed until the election "
+            "compound is manually completed."
+        ),
+        fieldset=_("Completion"),
+        render_kw=dict(force_simple=True)
+    )
+
+    manually_completed = BooleanField(
+        label=_("Completed"),
+        fieldset=_("Completion"),
+        depends_on=('completes_manually', 'y'),
+        render_kw=dict(force_simple=True)
+    )
+
+    election_de = StringField(
+        label=_("German"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'de'}
+    )
+    election_fr = StringField(
+        label=_("French"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'fr'}
+    )
+    election_it = StringField(
+        label=_("Italian"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'it'}
+    )
+    election_rm = StringField(
+        label=_("Romansh"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'rm'}
+    )
+
     related_link = URLField(
         label=_("Link"),
         fieldset=_("Related link")
@@ -141,6 +138,31 @@ class ElectionCompoundForm(Form):
         label=_("Link label romansh"),
         fieldset=_("Related link"),
         render_kw={'lang': 'rm'}
+    )
+
+    pukelsheim = BooleanField(
+        label=_("Doppelter Pukelsheim"),
+        fieldset=_("View-options"),
+        description=_("Allows to display lists and list groups."),
+        render_kw=dict(force_simple=True)
+    )
+
+    voters_counts = BooleanField(
+        label=_("Voters counts"),
+        fieldset=_("View-options"),
+        description=_(
+            "Display voters counts instead of votes in views with party "
+            "results."
+        ),
+    )
+
+    exact_voters_counts = BooleanField(
+        label=_("Exact voters counts"),
+        fieldset=_("View-options"),
+        description=_(
+            "Display exact voters counts instead of rounded values."
+        ),
+        render_kw=dict(force_simple=True)
     )
 
     show_list_groups = BooleanField(
@@ -187,6 +209,7 @@ class ElectionCompoundForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        fieldset=_('Colors'),
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
@@ -205,10 +228,8 @@ class ElectionCompoundForm(Form):
 
     colors = TextAreaField(
         label=_('Colors'),
+        fieldset=_('Colors'),
         render_kw={'rows': 12},
-        description=(
-
-        )
     )
 
     def parse_colors(self, text):
@@ -302,6 +323,8 @@ class ElectionCompoundForm(Form):
         model.pukelsheim = self.pukelsheim.data
         model.completes_manually = self.completes_manually.data
         model.manually_completed = self.manually_completed.data
+        model.voters_counts = self.voters_counts.data
+        model.exact_voters_counts = self.exact_voters_counts.data
 
         model.elections = []
         query = self.request.session.query(Election)
@@ -366,6 +389,8 @@ class ElectionCompoundForm(Form):
         self.pukelsheim.data = model.pukelsheim
         self.completes_manually.data = model.completes_manually
         self.manually_completed.data = model.manually_completed
+        self.voters_counts.data = model.voters_counts
+        self.exact_voters_counts.data = model.exact_voters_counts
         self.show_list_groups.data = model.show_list_groups
         self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
