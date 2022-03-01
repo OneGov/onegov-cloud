@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-03-01 14:50+0100\n"
 "PO-Revision-Date: 2022-02-25 13:48+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -688,9 +688,8 @@ msgstr "Elecziuns &amp; votaziuns"
 msgid "There are no elections or votes defined yet."
 msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 
-#, python-format
-msgid "Elections and votes on ${date}"
-msgstr "Votaziun dals ${date}"
+msgid "Elections and votes on"
+msgstr "Votaziun dals"
 
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
@@ -804,8 +803,8 @@ msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
 "cotschen."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Pagina iniziala"
 
@@ -1457,6 +1456,10 @@ msgstr ""
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Propi trametter danovamain communicaziuns als abunents?"
+
+#, python-format
+msgid "Elections and votes on ${date}"
+msgstr "Votaziun dals ${date}"
 
 msgid "Screen added."
 msgstr "Agiuntà il screen."

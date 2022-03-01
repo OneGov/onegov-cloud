@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-03-01 14:50+0100\n"
 "PO-Revision-Date: 2022-02-25 13:47+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -681,9 +681,8 @@ msgstr "Elezioni &amp; votazioni"
 msgid "There are no elections or votes defined yet."
 msgstr "Non sono ancora state inserite elezioni o votazioni."
 
-#, python-format
-msgid "Elections and votes on ${date}"
-msgstr "Elezioni e votazioni del ${date}"
+msgid "Elections and votes on"
+msgstr "Elezioni e votazioni del"
 
 msgid "Federal Elections"
 msgstr "Elezioni federali"
@@ -795,8 +794,8 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Pagina iniziale"
 
@@ -1445,6 +1444,10 @@ msgstr ""
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Vuoi davvero riattivare le notifiche?"
+
+#, python-format
+msgid "Elections and votes on ${date}"
+msgstr "Elezioni e votazioni del ${date}"
 
 msgid "Screen added."
 msgstr "Schermo aggiunto."

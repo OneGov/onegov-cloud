@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-03-01 14:50+0100\n"
 "PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -687,9 +687,8 @@ msgstr "Wahlen &amp; Abstimmungen"
 msgid "There are no elections or votes defined yet."
 msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
 
-#, python-format
-msgid "Elections and votes on ${date}"
-msgstr "Urnengang vom ${date}"
+msgid "Elections and votes on"
+msgstr "Urnengang vom"
 
 msgid "Federal Elections"
 msgstr "Eidgenössische Wahlen"
@@ -802,8 +801,8 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Startseite"
 
@@ -1449,6 +1448,10 @@ msgstr "Keine Änderungen seit dem letzten Auslösen der Benachrichtigungen!"
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Benachrichtigungen wirklich erneut auslösen?"
+
+#, python-format
+msgid "Elections and votes on ${date}"
+msgstr "Urnengang vom ${date}"
 
 msgid "Screen added."
 msgstr "Screen hinzugefügt."
