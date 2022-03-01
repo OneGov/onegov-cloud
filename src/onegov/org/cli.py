@@ -28,7 +28,6 @@ from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.form import as_internal_id, parse_form
 from onegov.form import FormCollection
-from onegov.newsletter import Newsletter
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms import ReservationForm
