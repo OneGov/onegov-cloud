@@ -178,15 +178,13 @@ class ChartWidget(ModelBoundWidget):
         }
 
 
-@ElectionDayApp.screen_widget(tag='last-change-date', category='generic')
-class TitleWidget(ModelBoundWidget):
-    tag = 'last-change-date'
+@ElectionDayApp.screen_widget(tag='last-result-change', category='generic')
+class LastResultChangeWidget(ModelBoundWidget):
+    tag = 'last-result-change'
     template = """
-        <xsl:template match="last-change-date">
-            <p tal:condition="layout.has_results" class="{@class}>
-                <strong>
-                    ${layout.format_date(layout.last_result_change, 'relative')} / ${layout.format_date(layout.last_result_change, 'datetime_long')}
-                </strong>
+        <xsl:template match="last-result-change">
+            <span tal:condition="layout.has_results" class="{@class}>
+            </span>
         </xsl:template>
     """
-    usage = '<last-change-date class=""/>'
+    usage = '<last-result-change class=""/>'
