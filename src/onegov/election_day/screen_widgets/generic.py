@@ -184,6 +184,7 @@ class LastResultChangeWidget(ModelBoundWidget):
     template = """
         <xsl:template match="last-result-change">
             <span tal:condition="layout.has_results" class="{@class}>
+                ${layout.format_date(layout.last_result_change, 'relative')} / ${layout.format_date(layout.last_result_change, 'datetime_long')}
             </span>
         </xsl:template>
     """
