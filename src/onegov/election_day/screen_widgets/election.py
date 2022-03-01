@@ -137,12 +137,7 @@ class AbsoluteMajorityWidget(ModelBoundWidget):
     template = """
         <xsl:template match="absolute-majority">
             <span class="{@class}">
-                <tal:block
-                    metal:election_factoids
-                    <strong>
-                        ${layout.format_number(election.absolute_majority or 0)}
-                    </strong>
-                    />          
+                ${layout.format_number(model.absolute_majority or 0)}       
             </span>
         </xsl:template>
     """
