@@ -27,7 +27,6 @@ from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from purl import URL
-from sqlalchemy import desc
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -102,14 +101,14 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     @orm_cached(policy='on-table-change:pages')
     def root_pages(self):
         query = PageCollection(self.session()).query(ordered=False)
-        query = query.order_by(desc(Page.type), Page.order)
+        query = query.order_by(Page.order)
         query = query.filter(Page.parent_id == None)
 
         def include(page):
             if page.type != 'news':
                 return True
 
-            return page.children and True or False
+            return True if page.children else False
 
         return tuple(p for p in query if include(p))
 
