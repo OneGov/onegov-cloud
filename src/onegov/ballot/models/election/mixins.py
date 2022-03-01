@@ -91,13 +91,13 @@ class PartyResultExportMixin(object):
                 row['name'] = party
                 row['id'] = parties.index(party)
                 row['total_votes'] = result.get('total_votes', '')
-                row['total_voters_count'] = str(result.get(
-                    'total_voters_count', ''
-                ))
+                row['total_voters_count'] = str(
+                    result.get('total_voters_count', '') or ''
+                )
                 row['color'] = result.get('color', '')
                 row['mandates'] = result.get('mandates', '')
                 row['votes'] = result.get('votes', '')
-                row['voters_count'] = str(result.get('voters_count', ''))
+                row['voters_count'] = str(result.get('voters_count', '') or '')
 
                 # add the panachage results
                 if self.panachage_results.count():
