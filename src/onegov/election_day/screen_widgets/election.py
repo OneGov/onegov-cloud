@@ -129,15 +129,19 @@ class ElectionListsChartWidget(ChartWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='turnout', category='election')
+    tag='election-turnout', category='election')
 class TitleWidget(ModelBoundWidget):
-    tag = 'turnout'
+    tag = 'election-turnout'
     template = """
-        <xsl:template match="turnout">
-            <strong
-                tal:content="election.turnout"
-                class="{@class}"
-                />
+        <xsl:template match="election-turnout">
+            <span class="{@class}">
+                <tal:block
+                    metal:election_factoids
+                    <strong>
+                        ${'{0:.2f}'.format(election.turnout)} %
+                    </strong>
+                    />
+            </span>
         </xsl:template>
     """
-    usage = '<turnout class=""/>'
+    usage = '<election-turnout class=""/>'

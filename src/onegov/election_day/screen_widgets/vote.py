@@ -343,15 +343,19 @@ class VoteTieBreakerDistrictsMap(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='turnout', category='vote')
+    tag='vote-turnout', category='vote')
 class TitleWidget(ModelBoundWidget):
-    tag = 'turnout'
+    tag = 'vote-turnout'
     template = """
-        <xsl:template match="turnout">
-            <strong
-                tal:content="ballot.turnout"
-                class="{@class}"
-                />
+        <xsl:template match="vote-turnout">
+            <span class="{@class}">
+                <tal:block
+                    metal:vote_factoids
+                    <strong>
+                        ${'{0:.2f}'.format(ballot.turnout)} %
+                    </strong>
+                    />
+            </span>
         </xsl:template>
     """
-    usage = '<turnout class=""/>'
+    usage = '<vote-turnout class=""/>'
