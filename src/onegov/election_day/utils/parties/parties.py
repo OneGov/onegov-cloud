@@ -46,14 +46,14 @@ def get_party_results(item):
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
-        total = getattr(result, attribute)
-        total = int(round(total)) if not exact else total
-        total_year = totals.get(result.year)
+        value = getattr(result, attribute) or 0
+        value = int(round(value)) if not exact else value
+        total = totals.get(result.year)
         permille = 0
-        if total and total_year:
-            permille = int(round(1000 * ((total or 0) / total_year)))
+        if total:
+            permille = int(round(1000 * (value / total)))
         year[attribute] = {
-            'total': total,
+            'total': value,
             'permille': permille
         }
 
