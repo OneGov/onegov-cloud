@@ -142,25 +142,25 @@ class ElectionCompoundForm(Form):
 
     pukelsheim = BooleanField(
         label=_("Doppelter Pukelsheim"),
-        fieldset=_("View-options"),
-        description=_("Allows to display lists and list groups."),
+        fieldset=_("View options"),
+        description=_("Allows to show the list groups and lists views."),
         render_kw=dict(force_simple=True)
     )
 
     voters_counts = BooleanField(
         label=_("Voters counts"),
-        fieldset=_("View-options"),
+        fieldset=_("View options"),
         description=_(
-            "Display voters counts instead of votes in views with party "
-            "results."
+            "Shows voters counts instead of votes in the party strengths "
+            "view."
         ),
     )
 
     exact_voters_counts = BooleanField(
         label=_("Exact voters counts"),
-        fieldset=_("View-options"),
+        fieldset=_("View options"),
         description=_(
-            "Display exact voters counts instead of rounded values."
+            "Shows exact voters counts instead of rounded values."
         ),
         render_kw=dict(force_simple=True)
     )
@@ -181,7 +181,7 @@ class ElectionCompoundForm(Form):
         description=_(
             "Shows a tab with aggregated list results over all elections. "
             "Only useful if the lists correspond to the list groups. Only if "
-            "Doppelter Pukelsheim."
+            "Doppelter Pukelsheim. Always rounded."
         ),
         fieldset=_("Views"),
         depends_on=('pukelsheim', 'y'),
