@@ -17,7 +17,7 @@ def get_party_results(item):
 
     """ Returns the aggregated party results as list.
 
-    Adds `voters_count` for election compounds with Doppelter Pukelsheim, else
+    Adds `voters_count` for election compounds with voters counts enabled, else
     `votes`.
 
     """
@@ -26,10 +26,11 @@ def get_party_results(item):
         return [], {}
 
     session = object_session(item)
-    pukelsheim = getattr(item, 'pukelsheim', False) == True
+    voters_counts = getattr(item, 'voters_counts', False) is True
+    exact_voters_counts = getattr(item, 'exact_voters_counts', False) is True
 
     # Get the totals votes per year
-    if pukelsheim:
+    if voters_counts:
         query = session.query(
             PartyResult.year,
             func.sum(PartyResult.voters_count)
@@ -43,14 +44,20 @@ def get_party_results(item):
     years = sorted((str(key) for key in totals.keys()))
 
     parties = {}
+    key = 'voters_count' if voters_counts else 'votes'
     for result in item.party_results:
         party = parties.setdefault(result.name, {})
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
-        total = result.voters_count if pukelsheim else result.votes
-        year['voters_count' if pukelsheim else 'votes'] = {
-            'total': int(total),
+        if voters_counts:
+            total = result.voters_count
+            if not exact_voters_counts:
+                total = int(round(total))
+        else:
+            total = result.votes
+        year[key] = {
+            'total': total,
             'permille': int(
                 round(1000 * ((total or 0) / (totals.get(result.year) or 1)))
             )
@@ -66,8 +73,8 @@ def get_party_results_deltas(item, years, parties):
 
     """
 
-    pukelsheim = getattr(item, 'pukelsheim', False) == True
-    attribute = 'voters_count' if pukelsheim else 'votes'
+    voters_counts = getattr(item, 'voters_counts', False) == True
+    attribute = 'voters_count' if voters_counts else 'votes'
     deltas = len(years) > 1
     results = {}
     for index, year in enumerate(years):
@@ -116,8 +123,8 @@ def get_party_results_data(item):
             'title': item.title
         }
 
-    pukelsheim = getattr(item, 'pukelsheim', False) == True
-    attribute = 'voters_count' if pukelsheim else 'votes'
+    voters_counts = getattr(item, 'voters_counts', False) == True
+    attribute = 'voters_count' if voters_counts else 'votes'
     years, parties = get_party_results(item)
     names = sorted(parties.keys())
 

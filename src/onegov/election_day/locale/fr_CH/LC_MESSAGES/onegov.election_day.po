@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-03-01 07:34+0100\n"
 "PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -380,8 +380,8 @@ msgstr "Définitions de couleurs non valides"
 msgid "Domain of the elections"
 msgstr "Echelon des élections"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Elections"
 
 msgid "Completes manually"
 msgstr "Complète manuellement"
@@ -394,11 +394,34 @@ msgstr ""
 "d'élection individuel n'est affiché tant que la composante électoral n'est "
 "pas complété manuellement."
 
+msgid "Completion"
+msgstr "Achèvement"
+
 msgid "Completed"
 msgstr "Complété"
 
-msgid "Elections"
-msgstr "Elections"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View options"
+msgstr "Options d'affichage"
+
+msgid "Allows to show the list groups and lists views."
+msgstr "Permet d'afficher les vues des groupes de listes et des listes."
+
+msgid "Voters counts"
+msgstr "Nombres de votants"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Affiche le nombre de votants au lieu des votes dans la vue des forces du "
+"parti."
+
+msgid "Exact voters counts"
+msgstr "Nombres de votants exacts"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Affiche le nombre exact de votants au lieu des valeurs arrondies."
 
 msgid "List groups"
 msgstr "Groupes de listes"
@@ -419,11 +442,12 @@ msgstr "Listes"
 
 msgid ""
 "Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+"Always rounded."
 msgstr ""
 "Affiche un onglet avec les résultats agrégés des listes pour toutes les "
 "élections. Seulement utile si les listes correspondent aux groupes de "
-"listes. Uniquement pour Doppelter Pukelsheim."
+"listes. Uniquement pour Doppelter Pukelsheim. Toujours arrondis."
 
 msgid "Party strengths"
 msgstr "Force des partis"

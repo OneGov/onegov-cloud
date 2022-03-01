@@ -103,10 +103,8 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
-    # xxx
-
     login(client)
-    create_election_compound(client)
+    create_election_compound(client, voters_counts=False)
     upload_party_results(client, slug='elections/elections')
 
     main = client.get('/elections/elections/party-strengths')
@@ -133,13 +131,13 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
 
     # Historical data
     csv_parties = (
-        'year,name,id,total_votes,color,mandates,votes\r\n'
-        '2022,BDP,0,60000,#efb52c,1,10000\r\n'
-        '2022,CVP,1,60000,#ff6300,1,30000\r\n'
-        '2022,FDP,2,60000,#4068c8,0,20000\r\n'
-        '2018,BDP,0,40000,#efb52c,1,1000\r\n'
-        '2018,CVP,1,40000,#ff6300,1,15000\r\n'
-        '2018,FDP,2,40000,#4068c8,1,10000\r\n'
+        'year,name,id,total_votes,color,mandates,votes,voters_count\r\n'
+        '2022,BDP,0,60000,#efb52c,1,10000,100\r\n'
+        '2022,CVP,1,60000,#ff6300,1,30000,300\r\n'
+        '2022,FDP,2,60000,#4068c8,0,20000,200\r\n'
+        '2018,BDP,0,40000,#efb52c,1,1000,10\r\n'
+        '2018,CVP,1,40000,#ff6300,1,15000,150\r\n'
+        '2018,FDP,2,40000,#4068c8,1,10000,100\r\n'
     ).encode('utf-8')
 
     upload = client.get('/elections/elections/upload-party-results')
@@ -207,6 +205,24 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
         line.startswith(lines_csv[index]) for index, line in enumerate(lines)
     ])
 
+    # with exact voters counts
+    edit = client.get('/elections/elections/edit')
+    edit.form['voters_counts'] = True
+    edit.form.submit()
+
+    assert '>10.00<' in client.get('/elections/elections/party-strengths')
+    data = client.get('/elections/elections/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.7
+
+    # with rounded voters counts
+    edit = client.get('/elections/elections/edit')
+    edit.form['exact_voters_counts'] = False
+    edit.form.submit()
+
+    assert '>10<' in client.get('/elections/elections/party-strengths')
+    data = client.get('/elections/elections/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.7
+
 
 def test_view_election_compound_list_groups(election_day_app_gr):
     client = Client(election_day_app_gr)
@@ -264,7 +280,6 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     main = client.get('/elections/elections/list-groups')
     assert '<h3>Listengruppen</h3>' in main
     assert 'BDP' in main
-    # assert 'data-text="603"' not in main
 
     groups = client.get('/elections/elections/list-groups-data')
     groups = groups.json
@@ -293,6 +308,13 @@ def test_view_election_compound_list_groups(election_day_app_gr):
             }
         ]
     }
+
+    # with rounded voters counts
+    edit = client.get('/elections/elections/edit')
+    edit.form['exact_voters_counts'] = False
+    edit.form.submit()
+    main = client.get('/elections/elections/list-groups')
+    assert 'data-text="603"' in main
 
 
 def test_view_election_compound_parties_panachage(election_day_app_gr):

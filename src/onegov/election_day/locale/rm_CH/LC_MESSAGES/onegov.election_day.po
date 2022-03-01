@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
+"POT-Creation-Date: 2022-03-01 07:34+0100\n"
 "PO-Revision-Date: 2022-02-25 13:48+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -382,8 +382,8 @@ msgstr "Definiziuns da colurs nunvalaivlas"
 msgid "Domain of the elections"
 msgstr "Plaun da las elecziuns"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Elecziuns"
 
 msgid "Completes manually"
 msgstr ""
@@ -396,11 +396,32 @@ msgstr ""
 "vegnan mussads nagins resultats individuals da l'elecziun, fin che la "
 "colliaziun cun l'elecziun n'è betg vegnida terminada manualmain."
 
+msgid "Completion"
+msgstr ""
+
 msgid "Completed"
 msgstr "Terminà"
 
-msgid "Elections"
-msgstr "Elecziuns"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View options"
+msgstr ""
+
+msgid "Allows to show the list groups and lists views."
+msgstr ""
+
+msgid "Voters counts"
+msgstr ""
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+
+msgid "Exact voters counts"
+msgstr ""
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr ""
 
 msgid "List groups"
 msgstr "Gruppas da glistas"
@@ -420,7 +441,8 @@ msgstr "Glistas"
 
 msgid ""
 "Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+"Always rounded."
 msgstr ""
 "Mussa ina carta da register cun resultats da glistas agregads per tut las "
 "elecziuns. Mo raschunaivel, sche las glistas correspundan a las gruppas da "

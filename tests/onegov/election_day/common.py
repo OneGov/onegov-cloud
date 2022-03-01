@@ -451,7 +451,8 @@ def upload_party_results(client, slug='election/proporz-election'):
 
 
 def create_election_compound(client, canton='gr', pukelsheim=False,
-                             completes_manually=False):
+                             completes_manually=False, voters_counts=True,
+                             exact_voters_counts=True):
     domain = {
         'bl': 'region',
         'gr': 'region',
@@ -504,6 +505,8 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
     ]
     new.form['pukelsheim'] = pukelsheim
     new.form['completes_manually'] = completes_manually
+    new.form['voters_counts'] = voters_counts
+    new.form['exact_voters_counts'] = exact_voters_counts
     new.form['show_list_groups'] = True
     new.form['show_party_strengths'] = True
     new.form['show_party_panachage'] = True
@@ -512,7 +515,8 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
 
 def upload_election_compound(client, create=True, canton='gr',
                              status='unknown', pukelsheim=False,
-                             completes_manually=False):
+                             completes_manually=False, voters_counts=True,
+                             exact_voters_counts=True):
     entities = {
         'bl': [2761, 2762],
         'gr': [3506, 3513],
@@ -525,7 +529,9 @@ def upload_election_compound(client, create=True, canton='gr',
             client,
             canton=canton,
             pukelsheim=pukelsheim,
-            completes_manually=completes_manually
+            completes_manually=completes_manually,
+            voters_counts=voters_counts,
+            exact_voters_counts=exact_voters_counts,
         )
 
     csv = PROPORZ_HEADER
