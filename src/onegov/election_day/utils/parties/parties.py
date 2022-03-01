@@ -26,8 +26,6 @@ def get_party_results(item):
 
     session = object_session(item)
 
-    # todo: immer alle?
-
     attribute = 'votes'
     totals_column = PartyResult.total_votes
     exact = False
@@ -66,8 +64,6 @@ def get_party_results_deltas(item, years, parties):
     last elections.
 
     """
-
-    # todo: immer alle?
 
     voters_counts = getattr(item, 'voters_counts', False) == True
     attribute = 'voters_count' if voters_counts else 'votes'
