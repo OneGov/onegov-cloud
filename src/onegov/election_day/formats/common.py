@@ -172,13 +172,14 @@ def get_entity_and_district(
     """
 
     if entity_id == 0:
-        return '', ''
+        return '', '', ''
 
     entity = entities.get(entity_id, {})
     name = entity.get('name', '')
     district = entity.get('district', '')
     if election.domain == 'region':
         district = entity.get('region', '')
+    superregion = entity.get('superregion', '')
 
     if errors is not None:
         if election.domain == 'municipality':
@@ -201,7 +202,7 @@ def get_entity_and_district(
                     }
                 ))
 
-    return name, district
+    return name, district, superregion
 
 
 def line_is_relevant(line, number, district=None):

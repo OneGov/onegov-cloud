@@ -175,6 +175,9 @@ class DummyPrincipal(object):
     def label(self, type):
         return '__{}'.format(type)
 
+    def get_superregion(self, region, year):
+        return ''
+
 
 class DummyApp(object):
     def __init__(self, session=None, application_id='application_id'):

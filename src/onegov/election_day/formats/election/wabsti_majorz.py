@@ -84,7 +84,7 @@ def parse_election_result(line, errors, entities, added_entities, election,
                     'name': entity_id
                 }))
         else:
-            name, district = get_entity_and_district(
+            name, district, superregion = get_entity_and_district(
                 entity_id, entities, election, principal, errors
             )
 
@@ -94,6 +94,7 @@ def parse_election_result(line, errors, entities, added_entities, election,
                     id=uuid4(),
                     name=name,
                     district=district,
+                    superregion=superregion,
                     counted=True,
                     entity_id=entity_id,
                     eligible_voters=eligible_voters,
@@ -271,7 +272,7 @@ def import_election_wabsti_majorz(
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:
-        name, district = get_entity_and_district(
+        name, district, superregion = get_entity_and_district(
             entity_id, entities, election, principal
         )
         if election.domain == 'none':
@@ -287,6 +288,7 @@ def import_election_wabsti_majorz(
             id=uuid4(),
             name=name,
             district=district,
+            superregion=superregion,
             entity_id=entity_id,
             counted=False
         )

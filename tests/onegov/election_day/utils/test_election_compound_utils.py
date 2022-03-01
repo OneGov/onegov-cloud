@@ -12,6 +12,9 @@ from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
 
 
+# todo: test superregions with a BL dataset
+
+
 def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     # Empty
     principal = election_day_app_sg.principal
