@@ -343,19 +343,63 @@ class VoteTieBreakerDistrictsMap(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='vote-turnout', category='vote')
-class TitleWidget(ModelBoundWidget):
-    tag = 'vote-turnout'
+    tag='vote-counter-proposal-turnout', category='complex_vote')
+class VoteCounterProposalTurnoutWidget(ModelBoundWidget):
+    tag = 'vote-counter-proposal-turnout'
     template = """
-        <xsl:template match="vote-turnout">
+        <xsl:template match="vote-counter-proposal-turnout">
             <span class="{@class}">
-                <tal:block
-                    metal:vote_factoids
-                    <strong>
-                        ${'{0:.2f}'.format(ballot.turnout)} %
-                    </strong>
-                    />
+                ${'{0:.2f}'.format(counter_proposal.turnout)} %
             </span>
         </xsl:template>
     """
-    usage = '<vote-turnout class=""/>'
+    usage = '<vote-counter-proposal-turnout class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'counter_proposal': model.counter_proposal,
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='vote-proposal-turnout', category='complex_vote')
+class VoteProposalTurnoutWidget(ModelBoundWidget):
+    tag = 'vote-proposal-turnout'
+    template = """
+        <xsl:template match="vote-proposal-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(proposal.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<vote-proposal-turnout class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'proposal': model.proposal,
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='vote-tie-breaker-turnout', category='complex_vote')
+class VoteTieBreakerTurnoutWidget(ModelBoundWidget):
+    tag = 'vote-tie-breaker-turnout'
+    template = """
+        <xsl:template match="vote-tie-breaker-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(tie_breaker.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<vote-tie-breaker-turnout class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'tie_breaker': model.tie_breaker,
+        }
