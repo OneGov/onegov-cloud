@@ -125,7 +125,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
         self.login('editor@example.org', 'hunter2', to)
 
     def logout(self):
-        self.get('/auth/logout')
+        self.visit('/auth/logout')
 
     def wait_for_js_variable(self, variable, timeout=10.0):
         """ Wait until the given javascript variable is no longer undefined """
