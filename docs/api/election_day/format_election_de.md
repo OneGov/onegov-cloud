@@ -235,6 +235,7 @@ Name|Beschreibung
 ---|---
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
+`total_voters_count`|Die Gesamtzahl kumulierter Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `name`|Der Name der Partei.
 `id`|ID der Partei (beliebige Zahl).
 `color`|Die Farbe der Partei.

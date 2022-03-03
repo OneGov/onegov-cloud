@@ -150,6 +150,7 @@ def test_import_party_results(session):
                 ','.join((
                     'year',
                     'total_votes',
+                    'total_voters_count',
                     'id',
                     'name',
                     'color',
@@ -157,10 +158,10 @@ def test_import_party_results(session):
                     'votes',
                     'voters_count',
                 )),
-                '2015,10000,1,P1,#123456,1,5000,4000',
-                '2011,10000,1,P1,#123456,0,3000,3000.',
-                '2015,10000,2,P2,#aabbcc,0,5000,2000.0',
-                '2011,10000,2,P2,#aabbcc,1,7000,1000.01',
+                '2015,10000,8000.01,1,P1,#123456,1,5000,4000',
+                '2011,10000,8000.01,1,P1,#123456,0,3000,3000.',
+                '2015,10000,8000.01,2,P2,#aabbcc,0,5000,2000.0',
+                '2011,10000,8000.01,2,P2,#aabbcc,1,7000,1000.01',
             ))
         ).encode('utf-8')), 'text/plain'
     )
@@ -168,15 +169,27 @@ def test_import_party_results(session):
     assert not errors
     assert sorted([
         (
-            r.year, r.name, r.color, r.votes, r.voters_count, r.total_votes,
-            r.number_of_mandates
+            r.year, r.name, r.color, r.votes, r.voters_count,
+            r.total_votes, r.total_voters_count, r.number_of_mandates
         )
         for r in election.party_results
     ]) == [
-        (2011, 'P1', '#123456', 3000, Decimal('3000.00'), 10000, 0),
-        (2011, 'P2', '#aabbcc', 7000, Decimal('1000.01'), 10000, 1),
-        (2015, 'P1', '#123456', 5000, Decimal('4000.00'), 10000, 1),
-        (2015, 'P2', '#aabbcc', 5000, Decimal('2000.00'), 10000, 0)
+        (
+            2011, 'P1', '#123456', 3000, Decimal('3000.00'),
+            10000, Decimal('8000.01'), 0
+        ),
+        (
+            2011, 'P2', '#aabbcc', 7000, Decimal('1000.01'),
+            10000, Decimal('8000.01'), 1
+        ),
+        (
+            2015, 'P1', '#123456', 5000, Decimal('4000.00'),
+            10000, Decimal('8000.01'), 1
+        ),
+        (
+            2015, 'P2', '#aabbcc', 5000, Decimal('2000.00'),
+            10000, Decimal('8000.01'), 0
+        )
     ]
 
 

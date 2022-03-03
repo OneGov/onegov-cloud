@@ -1,6 +1,5 @@
 from onegov.ballot import PartyResult
 from onegov.election_day import _
-from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
 
@@ -26,41 +25,36 @@ def get_party_results(item):
         return [], {}
 
     session = object_session(item)
-    voters_counts = getattr(item, 'voters_counts', False) is True
-    exact_voters_counts = getattr(item, 'exact_voters_counts', False) is True
+
+    attribute = 'votes'
+    totals_column = PartyResult.total_votes
+    exact = False
+    if getattr(item, 'voters_counts', False) is True:
+        attribute = 'voters_count'
+        totals_column = PartyResult.total_voters_count
+        exact = getattr(item, 'exact_voters_counts', False) is True
 
     # Get the totals votes per year
-    if voters_counts:
-        query = session.query(
-            PartyResult.year,
-            func.sum(PartyResult.voters_count)
-        )
-        query = query.filter(PartyResult.owner == item.id)
-        query = query.group_by(PartyResult.year)
-    else:
-        query = session.query(PartyResult.year, PartyResult.total_votes)
-        query = query.filter(PartyResult.owner == item.id).distinct()
+    query = session.query(PartyResult.year, totals_column)
+    query = query.filter(PartyResult.owner == item.id).distinct()
     totals = dict(query)
     years = sorted((str(key) for key in totals.keys()))
 
     parties = {}
-    key = 'voters_count' if voters_counts else 'votes'
     for result in item.party_results:
         party = parties.setdefault(result.name, {})
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
-        if voters_counts:
-            total = result.voters_count
-            if not exact_voters_counts:
-                total = int(round(total))
-        else:
-            total = result.votes
-        year[key] = {
-            'total': total,
-            'permille': int(
-                round(1000 * ((total or 0) / (totals.get(result.year) or 1)))
-            )
+        value = getattr(result, attribute) or 0
+        value = int(round(value)) if not exact else value
+        total = totals.get(result.year)
+        permille = 0
+        if total:
+            permille = int(round(1000 * (value / total)))
+        year[attribute] = {
+            'total': value,
+            'permille': permille
         }
 
     return years, parties
