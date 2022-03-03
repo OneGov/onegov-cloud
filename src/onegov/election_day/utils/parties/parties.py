@@ -12,7 +12,7 @@ def has_party_results(item):
     return False
 
 
-def get_party_results(item):
+def get_party_results(item, json_serialzable=False):
 
     """ Returns the aggregated party results as list.
 
@@ -34,6 +34,13 @@ def get_party_results(item):
         totals_column = PartyResult.total_voters_count
         exact = getattr(item, 'exact_voters_counts', False) is True
 
+    def convert(value):
+        if not exact:
+            return int(round(value))
+        if json_serialzable:
+            return float(value)
+        return value
+
     # Get the totals votes per year
     query = session.query(PartyResult.year, totals_column)
     query = query.filter(PartyResult.owner == item.id).distinct()
@@ -46,9 +53,8 @@ def get_party_results(item):
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
-        value = getattr(result, attribute) or 0
-        value = int(round(value)) if not exact else value
-        total = totals.get(result.year)
+        value = convert(getattr(result, attribute) or 0)
+        total = convert(totals.get(result.year))
         permille = 0
         if total:
             permille = int(round(1000 * (value / total)))

@@ -69,7 +69,7 @@ def view_election_compound_json(self, request):
     }
     superregions = get_superregions(self, request.app.principal)
 
-    years, parties = get_party_results(self)
+    years, parties = get_party_results(self, json_serialzable=True)
 
     return {
         'completed': self.completed,
