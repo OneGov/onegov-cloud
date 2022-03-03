@@ -14,6 +14,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
+from onegov.core.utils import groupbylist
 from sqlalchemy import cast
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
@@ -21,8 +22,8 @@ from sqlalchemy import desc
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
-from sqlalchemy import Text
 from sqlalchemy import Numeric
+from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
@@ -106,6 +107,12 @@ class ElectionCompound(
     #: Status of the compound and its elections
     manually_completed = Column(Boolean, nullable=False, default=False)
 
+    #: Display voters counts instead of votes in views with party results.
+    voters_counts = meta_property('voters_counts', default=False)
+
+    #: Display exact voters counts instead of rounded values.
+    exact_voters_counts = meta_property('exact_voters_counts', default=False)
+
     #: An election compound may contains n party results
     party_results = relationship(
         'PartyResult',
@@ -178,13 +185,27 @@ class ElectionCompound(
 
     @property
     def progress(self):
-        """ Returns a tuple with the first value being the number of counted
-        elections and the second value being the number of total elections.
+        """ Returns a tuple with the current progress.
+
+        If the elections define a `domain_supersegment` (i.e. superregions),
+        this is the number of fully counted supersegments vs. the total number
+        of supersegments.
+
+        If no `domain_supersegment` is defined, this is the number of counted
+        elections vs. the total number of elections.
 
         """
 
-        results = [election.completed for election in self.elections]
-        return sum(1 for result in results if result), len(results)
+        result = [(e.domain_supersegment, e.completed) for e in self.elections]
+        result = groupbylist(sorted(result), lambda x: x[0])
+        result = {k: [x[1] for x in v] for k, v in result}
+
+        if len(result) == 1 and '' in result:
+            result = list(result.values())[0]
+        else:
+            result = [all(v) for k, v in result.items()]
+
+        return sum(1 for r in result if r), len(result)
 
     @property
     def counted_entities(self):

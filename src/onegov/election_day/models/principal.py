@@ -154,6 +154,13 @@ class Principal(object):
 
         return True
 
+    def get_superregion(self, region, year):
+        if self.has_superregions:
+            for entity in self.entities.get(year, {}).values():
+                if entity.get('region') == region:
+                    return entity.get('superregion', '')
+        return ''
+
     @cached_property
     def notifications(self):
         if (

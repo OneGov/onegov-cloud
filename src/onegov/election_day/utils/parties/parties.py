@@ -1,6 +1,6 @@
+from decimal import Decimal
 from onegov.ballot import PartyResult
 from onegov.election_day import _
-from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
 
@@ -13,11 +13,11 @@ def has_party_results(item):
     return False
 
 
-def get_party_results(item):
+def get_party_results(item, json_serialzable=False):
 
     """ Returns the aggregated party results as list.
 
-    Adds `voters_count` for election compounds with Doppelter Pukelsheim, else
+    Adds `voters_count` for election compounds with voters counts enabled, else
     `votes`.
 
     """
@@ -26,21 +26,20 @@ def get_party_results(item):
         return [], {}
 
     session = object_session(item)
-    pukelsheim = getattr(item, 'pukelsheim', False) == True
+
+    exact = getattr(item, 'exact_voters_counts', False) is True
 
     # Get the totals votes per year
-    if pukelsheim:
-        query = session.query(
-            PartyResult.year,
-            func.sum(PartyResult.voters_count)
-        )
-        query = query.filter(PartyResult.owner == item.id)
-        query = query.group_by(PartyResult.year)
-    else:
-        query = session.query(PartyResult.year, PartyResult.total_votes)
-        query = query.filter(PartyResult.owner == item.id).distinct()
-    totals = dict(query)
-    years = sorted((str(key) for key in totals.keys()))
+    query = session.query(PartyResult.year, PartyResult.total_votes)
+    query = query.filter(PartyResult.owner == item.id).distinct()
+    totals_votes = dict(query)
+    years = sorted((str(key) for key in totals_votes.keys()))
+
+    # Get the totals voters counts per year
+    query = session.query(PartyResult.year, PartyResult.total_voters_count)
+    query = query.filter(PartyResult.owner == item.id).distinct()
+    totals_voters_count = dict(query)
+    years = sorted((str(key) for key in totals_voters_count.keys()))
 
     parties = {}
     for result in item.party_results:
@@ -48,12 +47,31 @@ def get_party_results(item):
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
-        total = result.voters_count if pukelsheim else result.votes
-        year['voters_count' if pukelsheim else 'votes'] = {
-            'total': int(total),
-            'permille': int(
-                round(1000 * ((total or 0) / (totals.get(result.year) or 1)))
+
+        votes = result.votes or 0
+        total_votes = totals_votes.get(result.year) or 0
+        votes_permille = 0
+        if total_votes:
+            votes_permille = int(round(1000 * (votes / total_votes)))
+        year['votes'] = {
+            'total': votes,
+            'permille': votes_permille
+        }
+
+        voters_count = result.voters_count or Decimal(0)
+        total_voters_count = totals_voters_count.get(result.year) or Decimal(0)
+        voters_count_permille = 0
+        if total_voters_count:
+            voters_count_permille = int(
+                round(1000 * (voters_count / total_voters_count))
             )
+        if not exact:
+            voters_count = int(round(voters_count))
+        elif json_serialzable:
+            voters_count = float(voters_count)
+        year['voters_count'] = {
+            'total': voters_count,
+            'permille': voters_count_permille
         }
 
     return years, parties
@@ -66,8 +84,8 @@ def get_party_results_deltas(item, years, parties):
 
     """
 
-    pukelsheim = getattr(item, 'pukelsheim', False) == True
-    attribute = 'voters_count' if pukelsheim else 'votes'
+    voters_counts = getattr(item, 'voters_counts', False) == True
+    attribute = 'voters_count' if voters_counts else 'votes'
     deltas = len(years) > 1
     results = {}
     for index, year in enumerate(years):
@@ -116,8 +134,8 @@ def get_party_results_data(item):
             'title': item.title
         }
 
-    pukelsheim = getattr(item, 'pukelsheim', False) == True
-    attribute = 'voters_count' if pukelsheim else 'votes'
+    voters_counts = getattr(item, 'voters_counts', False) == True
+    attribute = 'voters_count' if voters_counts else 'votes'
     years, parties = get_party_results(item)
     names = sorted(parties.keys())
 

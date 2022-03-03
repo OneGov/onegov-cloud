@@ -13,7 +13,8 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'list-groups', 'lists', 'districts', 'candidates', 'statistics'
+        'list-groups', 'lists', 'superregions', 'districts', 'candidates',
+        'statistics'
     )
 
     majorz = False
@@ -33,6 +34,7 @@ class ElectionCompoundLayout(DetailLayout):
         return (
             'list-groups',
             'lists',
+            'superregions',
             'districts',
             'candidates',
             'party-strengths',
@@ -55,6 +57,13 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         return True
 
+    @cached_property
+    def has_superregions(self):
+        return (
+            self.principal.has_superregions
+            and self.model.domain_elections == 'region'
+        )
+
     def label(self, value):
         if value == 'district':
             if self.model.domain_elections == 'region':
@@ -75,6 +84,8 @@ class ElectionCompoundLayout(DetailLayout):
             return _("List groups")
         if tab == 'lists':
             return _("Lists")
+        if tab == 'superregions':
+            return self.label('superregions')
         if tab == 'districts':
             return self.label('districts')
         if tab == 'candidates':
@@ -96,6 +107,8 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         if self.hide_tab(tab):
             return False
+        if tab == 'superregions':
+            return self.has_superregions
         if tab == 'list-groups':
             return (
                 self.model.show_list_groups is True

@@ -221,6 +221,10 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
     ]
+    assert canton.get_superregion('Pratteln', 1900) == ''
+    assert canton.get_superregion('Basel', 2021) == ''
+    assert canton.get_superregion('Pratteln', 2021) == 'Region 3'
+    assert canton.get_superregion('Reinach', 2022) == 'Region 2'
 
     # GR
     canton = Canton(name='gr', canton='gr')

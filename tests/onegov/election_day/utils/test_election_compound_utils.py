@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from onegov.ballot import ElectionCompound
 from onegov.election_day.utils.election_compound import get_districts_data
 from onegov.election_day.utils.election_compound import get_elected_candidates
@@ -10,6 +11,9 @@ from onegov.election_day.utils.parties import get_parties_panachage_data
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
+
+
+# todo: test superregions with a BL dataset
 
 
 def test_election_utils_compound(import_test_datasets, election_day_app_sg):
@@ -305,7 +309,9 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     election_compound = ElectionCompound(
         title='Compound',
         domain='canton',
-        date=date(2014, 1, 1)
+        date=date(2014, 1, 1),
+        voters_counts=True,
+        exact_voters_counts=False
     )
     election_compound.elections = [election]
     session.add(election_compound)
@@ -329,7 +335,15 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     election_compound.pukelsheim = True
     election_compound.completes_manually = True
     election_compound.manually_completed = False
-    assert len(get_list_groups(election_compound)) == 7
+    assert get_list_groups(election_compound) == [
+        ('CVP', 931, 22, '#EE7F00'),
+        ('SVP', 899, 19, '#019040'),
+        ('FDP', 863, 18, '#0E52A0'),
+        ('AL', 538, 10, '#99C040'),
+        ('SP', 418, 7, '#E53136'),
+        ('GLP', 236, 4, '#acc700'),
+        ('Piraten', 19, 0, '#F9B200')
+    ]
     assert get_list_groups_data(election_compound) == {
         'results': [
             {
@@ -386,6 +400,15 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 
     # Pukelsheim, final
     election_compound.manually_completed = True
+    assert get_list_groups(election_compound) == [
+        ('CVP', 931, 22, '#EE7F00'),
+        ('SVP', 899, 19, '#019040'),
+        ('FDP', 863, 18, '#0E52A0'),
+        ('AL', 538, 10, '#99C040'),
+        ('SP', 418, 7, '#E53136'),
+        ('GLP', 236, 4, '#acc700'),
+        ('Piraten', 19, 0, '#F9B200')
+    ]
     assert get_list_groups_data(election_compound) == {
         'results': [
             {
@@ -525,49 +548,56 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#99C040',
                 'mandates': 10,
-                'voters_count': {'permille': 138, 'total': 538}
+                'voters_count': {'permille': 138, 'total': 538},
+                'votes': {'permille': 138, 'total': 43062}
             }
         },
         'CVP': {
             '2014': {
                 'color': '#EE7F00',
                 'mandates': 22,
-                'voters_count': {'permille': 238, 'total': 931}
+                'voters_count': {'permille': 238, 'total': 931},
+                'votes': {'permille': 238, 'total': 74448}
             }
         },
         'FDP': {
             '2014': {
                 'color': '#0E52A0',
                 'mandates': 18,
-                'voters_count': {'permille': 221, 'total': 863}
+                'voters_count': {'permille': 221, 'total': 863},
+                'votes': {'permille': 221, 'total': 69028},
             }
         },
         'GLP': {
             '2014': {
                 'color': '#acc700',
                 'mandates': 4,
-                'voters_count': {'permille': 60, 'total': 236}
+                'voters_count': {'permille': 60, 'total': 236},
+                'votes': {'permille': 60, 'total': 18864}
             }
         },
         'Piraten': {
             '2014': {
                 'color': '#F9B200',
                 'mandates': 0,
-                'voters_count': {'permille': 5, 'total': 19}
+                'voters_count': {'permille': 5, 'total': 19},
+                'votes': {'permille': 5, 'total': 1487}
             }
         },
         'SP': {
             '2014': {
                 'color': '#E53136',
                 'mandates': 7,
-                'voters_count': {'permille': 107, 'total': 418}
+                'voters_count': {'permille': 107, 'total': 418},
+                'votes': {'permille': 107, 'total': 33459}
             }
         },
         'SVP': {
             '2014': {
                 'color': '#019040',
                 'mandates': 19,
-                'voters_count': {'permille': 230, 'total': 899}
+                'voters_count': {'permille': 230, 'total': 899},
+                'votes': {'permille': 230, 'total': 71930}
             }
         }}
 
@@ -644,3 +674,39 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         ],
         'title': 'Compound'
     }
+
+    # ... with exact voters counts
+    election_compound.exact_voters_counts = True
+
+    groups = get_list_groups(election_compound)
+    assert groups[0][1] == Decimal('931.00')
+
+    data = get_list_groups_data(election_compound)
+    assert data['results'][0]['value'] == 931
+
+    years, parties = get_party_results(election_compound)
+    assert parties['AL']['2014']['voters_count']['total'] == Decimal('538.00')
+
+    deltas = get_party_results_deltas(election_compound, years, parties)
+    assert deltas[1]['2014'][0][2] == Decimal('538.00')
+
+    data = get_party_results_data(election_compound)
+    assert data['results'][0]['value']['back'] == 13.8
+
+    # ... with votes
+    election_compound.voters_counts = False
+
+    groups = get_list_groups(election_compound)
+    assert groups[0][1] == Decimal('931.00')
+
+    data = get_list_groups_data(election_compound)
+    assert data['results'][0]['value'] == 931
+
+    years, parties = get_party_results(election_compound)
+    assert parties['AL']['2014']['votes']['total'] == 43062
+
+    deltas = get_party_results_deltas(election_compound, years, parties)
+    assert deltas[1]['2014'][0][2] == 43062
+
+    data = get_party_results_data(election_compound)
+    assert data['results'][0]['value']['back'] == 13.8

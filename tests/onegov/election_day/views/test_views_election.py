@@ -342,10 +342,12 @@ def test_view_election_party_strengths(election_day_app_gr):
 
     export = client.get('/election/proporz-election/data-parties').text
     lines = export.split('\r\n')
-    assert lines[0].startswith('year,name,id,total_votes,color,mandates,votes')
-    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387')
-    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117')
-    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134')
+    assert lines[0].startswith(
+        'year,name,id,total_votes,total_voters_count,color,mandates,votes'
+    )
+    assert lines[1].startswith('2022,BDP,0,11270,1445.07,#efb52c,1,60387')
+    assert lines[2].startswith('2022,CVP,1,11270,1445.07,#ff6300,1,49117')
+    assert lines[3].startswith('2022,FDP,2,11270,1445.07,#0571b0,0,35134')
 
     # Historical data
     csv_parties = (
@@ -415,13 +417,6 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert '25.0%' in results
     assert '33.3%' in results
     assert '8.3%' in results
-
-    export = client.get('/election/proporz-election/data-parties').text
-    lines = export.split('\r\n')
-    lines_csv = csv_parties.decode('utf-8').split('\r\n')
-    assert all([
-        line.startswith(lines_csv[index]) for index, line in enumerate(lines)
-    ])
 
 
 def test_view_election_connections(election_day_app_gr):
