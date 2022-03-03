@@ -142,6 +142,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2022': {
                 'color': '#efb52c',
                 'mandates': 1,
+                'voters_count': {'permille': 417, 'total': 603.01},
                 'votes': {'permille': 5358, 'total': 60387}
             }
         },
@@ -149,6 +150,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2022': {
                 'color': '#ff6300',
                 'mandates': 1,
+                'voters_count': {'permille': 340, 'total': 491.02},
                 'votes': {'permille': 4358, 'total': 49117}
             }
         },
@@ -156,6 +158,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2022': {
                 'color': '#0571b0',
                 'mandates': 0,
+                'voters_count': {'permille': 243, 'total': 351.04},
                 'votes': {'permille': 3117, 'total': 35134}
             }
         }
@@ -236,11 +239,13 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2018': {
                 'color': '#efb52c',
                 'mandates': 1,
+                'voters_count': {'permille': 25, 'total': 10.0},
                 'votes': {'permille': 25, 'total': 1000}
             },
             '2022': {
                 'color': '#efb52c',
                 'mandates': 1,
+                'voters_count': {'permille': 167, 'total': 100.0},
                 'votes': {'permille': 167, 'total': 10000}
             }
         },
@@ -248,11 +253,13 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2018': {
                 'color': '#ff6300',
                 'mandates': 1,
+                'voters_count': {'permille': 377, 'total': 150.7},
                 'votes': {'permille': 375, 'total': 15000}
             },
             '2022': {
                 'color': '#ff6300',
                 'mandates': 1,
+                'voters_count': {'permille': 500, 'total': 300.0},
                 'votes': {'permille': 500, 'total': 30000}
             }
         },
@@ -260,11 +267,13 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2018': {
                 'color': '#4068c8',
                 'mandates': 1,
+                'voters_count': {'permille': 250, 'total': 100.0},
                 'votes': {'permille': 250, 'total': 10000}
             },
             '2022': {
                 'color': '#4068c8',
                 'mandates': 0,
+                'voters_count': {'permille': 333, 'total': 200.0},
                 'votes': {'permille': 333, 'total': 20000}
             }
         }

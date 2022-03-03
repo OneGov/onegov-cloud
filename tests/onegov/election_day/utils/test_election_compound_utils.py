@@ -548,49 +548,56 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#99C040',
                 'mandates': 10,
-                'voters_count': {'permille': 138, 'total': 538}
+                'voters_count': {'permille': 138, 'total': 538},
+                'votes': {'permille': 138, 'total': 43062}
             }
         },
         'CVP': {
             '2014': {
                 'color': '#EE7F00',
                 'mandates': 22,
-                'voters_count': {'permille': 238, 'total': 931}
+                'voters_count': {'permille': 238, 'total': 931},
+                'votes': {'permille': 238, 'total': 74448}
             }
         },
         'FDP': {
             '2014': {
                 'color': '#0E52A0',
                 'mandates': 18,
-                'voters_count': {'permille': 221, 'total': 863}
+                'voters_count': {'permille': 221, 'total': 863},
+                'votes': {'permille': 221, 'total': 69028},
             }
         },
         'GLP': {
             '2014': {
                 'color': '#acc700',
                 'mandates': 4,
-                'voters_count': {'permille': 60, 'total': 236}
+                'voters_count': {'permille': 60, 'total': 236},
+                'votes': {'permille': 60, 'total': 18864}
             }
         },
         'Piraten': {
             '2014': {
                 'color': '#F9B200',
                 'mandates': 0,
-                'voters_count': {'permille': 5, 'total': 19}
+                'voters_count': {'permille': 5, 'total': 19},
+                'votes': {'permille': 5, 'total': 1487}
             }
         },
         'SP': {
             '2014': {
                 'color': '#E53136',
                 'mandates': 7,
-                'voters_count': {'permille': 107, 'total': 418}
+                'voters_count': {'permille': 107, 'total': 418},
+                'votes': {'permille': 107, 'total': 33459}
             }
         },
         'SVP': {
             '2014': {
                 'color': '#019040',
                 'mandates': 19,
-                'voters_count': {'permille': 230, 'total': 899}
+                'voters_count': {'permille': 230, 'total': 899},
+                'votes': {'permille': 230, 'total': 71930}
             }
         }}
 

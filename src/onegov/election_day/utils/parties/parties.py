@@ -1,3 +1,4 @@
+from decimal import Decimal
 from onegov.ballot import PartyResult
 from onegov.election_day import _
 from sqlalchemy.orm import object_session
@@ -26,26 +27,19 @@ def get_party_results(item, json_serialzable=False):
 
     session = object_session(item)
 
-    attribute = 'votes'
-    totals_column = PartyResult.total_votes
-    exact = False
-    if getattr(item, 'voters_counts', False) is True:
-        attribute = 'voters_count'
-        totals_column = PartyResult.total_voters_count
-        exact = getattr(item, 'exact_voters_counts', False) is True
-
-    def convert(value):
-        if not exact:
-            return int(round(value))
-        if json_serialzable:
-            return float(value)
-        return value
+    exact = getattr(item, 'exact_voters_counts', False) is True
 
     # Get the totals votes per year
-    query = session.query(PartyResult.year, totals_column)
+    query = session.query(PartyResult.year, PartyResult.total_votes)
     query = query.filter(PartyResult.owner == item.id).distinct()
-    totals = dict(query)
-    years = sorted((str(key) for key in totals.keys()))
+    totals_votes = dict(query)
+    years = sorted((str(key) for key in totals_votes.keys()))
+
+    # Get the totals voters counts per year
+    query = session.query(PartyResult.year, PartyResult.total_voters_count)
+    query = query.filter(PartyResult.owner == item.id).distinct()
+    totals_voters_count = dict(query)
+    years = sorted((str(key) for key in totals_voters_count.keys()))
 
     parties = {}
     for result in item.party_results:
@@ -53,14 +47,31 @@ def get_party_results(item, json_serialzable=False):
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
-        value = convert(getattr(result, attribute) or 0)
-        total = convert(totals.get(result.year))
-        permille = 0
-        if total:
-            permille = int(round(1000 * (value / total)))
-        year[attribute] = {
-            'total': value,
-            'permille': permille
+
+        votes = result.votes or 0
+        total_votes = totals_votes.get(result.year) or 0
+        votes_permille = 0
+        if total_votes:
+            votes_permille = int(round(1000 * (votes / total_votes)))
+        year['votes'] = {
+            'total': votes,
+            'permille': votes_permille
+        }
+
+        voters_count = result.voters_count or Decimal(0)
+        total_voters_count = totals_voters_count.get(result.year) or Decimal(0)
+        voters_count_permille = 0
+        if total_voters_count:
+            voters_count_permille = int(
+                round(1000 * (voters_count / total_voters_count))
+            )
+        if not exact:
+            voters_count = int(round(voters_count))
+        elif json_serialzable:
+            voters_count = float(voters_count)
+        year['voters_count'] = {
+            'total': voters_count,
+            'permille': voters_count_permille
         }
 
     return years, parties
