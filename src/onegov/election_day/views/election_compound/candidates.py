@@ -10,7 +10,8 @@ def get_districts(model, layout):
     return {
         election.id: (
             election.domain_segment,
-            layout.request.link(election)
+            layout.request.link(election),
+            election.domain_supersegment,
         )
         for election in layout.model.elections
     }

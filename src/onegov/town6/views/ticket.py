@@ -9,8 +9,8 @@ from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import InternalTicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.town6 import _
-
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket
+from onegov.ticket.collection import TicketCollection
 from onegov.town6.layout import TicketLayout, TicketNoteLayout, \
     TicketChatMessageLayout, TicketsLayout
 

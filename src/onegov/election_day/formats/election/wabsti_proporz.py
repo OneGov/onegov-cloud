@@ -36,7 +36,7 @@ def parse_election_result(line, errors, entities, election, principal):
             ))
 
         else:
-            name, district = get_entity_and_district(
+            name, district, superregion = get_entity_and_district(
                 entity_id, entities, election, principal, errors
             )
 
@@ -45,6 +45,7 @@ def parse_election_result(line, errors, entities, election, principal):
                     id=uuid4(),
                     name=name,
                     district=district,
+                    superregion=superregion,
                     entity_id=entity_id,
                     counted=True
                 )
@@ -440,7 +441,7 @@ def import_election_wabsti_proporz(
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:
-        name, district = get_entity_and_district(
+        name, district, superregion = get_entity_and_district(
             entity_id, entities, election, principal
         )
         if election.domain == 'none':
@@ -456,6 +457,7 @@ def import_election_wabsti_proporz(
             id=uuid4(),
             name=name,
             district=district,
+            superregion=superregion,
             entity_id=entity_id,
             counted=False
         )

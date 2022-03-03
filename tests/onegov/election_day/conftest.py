@@ -101,6 +101,14 @@ def create_election_day(
 
 
 @pytest.fixture(scope="function")
+def election_day_app_bl(request):
+
+    app = create_election_day(request, "bl")
+    yield app
+    app.session_manager.dispose()
+
+
+@pytest.fixture(scope="function")
 def election_day_app_zg(request):
 
     app = create_election_day(

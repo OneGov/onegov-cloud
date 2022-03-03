@@ -349,8 +349,10 @@ def import_election_wabstic_proporz(
             continue
 
         # Get and check the district/region
-        entity_name, entity_district = get_entity_and_district(
-            entity_id, entities, election, principal, line_errors
+        entity_name, entity_district, entity_superregion = (
+            get_entity_and_district(
+                entity_id, entities, election, principal, line_errors
+            )
         )
 
         # Pass the errors and continue to next line
@@ -367,6 +369,7 @@ def import_election_wabstic_proporz(
         added_entities[entity_id] = {
             'name': entity_name,
             'district': entity_district,
+            'superregion': entity_superregion,
             'eligible_voters': eligible_voters
         }
 
@@ -717,6 +720,7 @@ def import_election_wabstic_proporz(
                 election_id=election_id,
                 name=added_entities[entity_id]['name'],
                 district=added_entities[entity_id]['district'],
+                superregion=added_entities[entity_id]['superregion'],
                 entity_id=entity_id,
                 counted=added_entities[entity_id]['counted'],
                 eligible_voters=added_entities[entity_id]['eligible_voters'],
@@ -763,7 +767,7 @@ def import_election_wabstic_proporz(
         remaining.add(0)
     remaining -= set(added_results.keys())
     for entity_id in remaining:
-        name, district = get_entity_and_district(
+        name, district, superregion = get_entity_and_district(
             entity_id, entities, election, principal
         )
         if election.domain == 'none':
@@ -781,6 +785,7 @@ def import_election_wabstic_proporz(
                 election_id=election_id,
                 name=name,
                 district=district,
+                superregion=superregion,
                 entity_id=entity_id,
                 counted=False
             )

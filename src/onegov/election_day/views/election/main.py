@@ -69,7 +69,7 @@ def view_election_json(self, request):
     for tab in ElectionLayout.tabs_with_embedded_tables:
         embed[tab].append(request.link(self, f'{tab}-table'))
 
-    years, parties = get_party_results(self)
+    years, parties = get_party_results(self, json_serialzable=True)
 
     data = {
         'completed': self.completed,
