@@ -343,28 +343,9 @@ class VoteTieBreakerDistrictsMap(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='vote-counter-proposal-turnout', category='complex_vote')
-class VoteCounterProposalTurnoutWidget(ModelBoundWidget):
-    tag = 'vote-counter-proposal-turnout'
-    template = """
-        <xsl:template match="vote-counter-proposal-turnout">
-            <span class="{@class}">
-                ${'{0:.2f}'.format(counter_proposal.turnout)} %
-            </span>
-        </xsl:template>
-    """
-    usage = '<vote-counter-proposal-turnout class=""/>'
-
-    def get_variables(self, layout):
-        model = self.model or layout.model
-        return {
-            'embed': False,
-            'counter_proposal': model.counter_proposal,
-        }
-
-
-@ElectionDayApp.screen_widget(
-    tag='vote-proposal-turnout', category='complex_vote')
+    tag='vote-proposal-turnout',
+    category='vote'
+)
 class VoteProposalTurnoutWidget(ModelBoundWidget):
     tag = 'vote-proposal-turnout'
     template = """
@@ -385,7 +366,32 @@ class VoteProposalTurnoutWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='vote-tie-breaker-turnout', category='complex_vote')
+    tag='vote-counter-proposal-turnout',
+    category='complex_vote'
+)
+class VoteCounterProposalTurnoutWidget(ModelBoundWidget):
+    tag = 'vote-counter-proposal-turnout'
+    template = """
+        <xsl:template match="vote-counter-proposal-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(counter_proposal.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<vote-counter-proposal-turnout class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'counter_proposal': model.counter_proposal,
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='vote-tie-breaker-turnout',
+    category='complex_vote'
+)
 class VoteTieBreakerTurnoutWidget(ModelBoundWidget):
     tag = 'vote-tie-breaker-turnout'
     template = """

@@ -129,7 +129,9 @@ class ElectionListsChartWidget(ChartWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='election-turnout', category='election')
+    tag='election-turnout',
+    category='election'
+)
 class ElectionTurnoutWidget(ModelBoundWidget):
     tag = 'election-turnout'
     template = """
