@@ -14,6 +14,7 @@ from onegov.election_day.screen_widgets import (
     ElectionCandidatesTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
+    LastResultChangeWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
@@ -48,6 +49,9 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <election-candidates-by-entity-table class="my-class-7"/>
             </column>
+            <column span="1">
+                <last-result-change class="my-class-8"/>
+            </column>
         </row>
     """
     widgets = [
@@ -59,6 +63,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
         ElectionCandidatesByEntityTableWidget(),
+        LastResultChangeWidget(),
     ]
 
     # Empty
@@ -96,6 +101,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -205,6 +211,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -376,6 +383,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
 
 def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
@@ -412,6 +420,9 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
                 <election-lists-chart class="my-class-9" limit="3"
                     names="a,b"/>
             </column>
+            <column span="1">
+                <last-result-change class="my-class-a"/>
+            </column>
         </row>
     """
     widgets = [
@@ -424,6 +435,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionCandidatesTableWidget(),
         ElectionListsChartWidget(),
         ElectionListsTableWidget(),
+        LastResultChangeWidget(),
     ]
 
     # Empty
@@ -464,6 +476,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -606,6 +619,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -754,3 +768,4 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
