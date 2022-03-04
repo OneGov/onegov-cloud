@@ -7,11 +7,14 @@ from onegov.election_day.screen_widgets.election_compound import (
     ElectionCompoundListsTableWidget,
 )
 from onegov.election_day.screen_widgets.election import (
+    AllocatedMandatesWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
+    MandatesWidget,
+    NumberOfMandatesWidget,
 )
 from onegov.election_day.screen_widgets.generic import (
     ColumnWidget,
@@ -45,6 +48,7 @@ from onegov.election_day.screen_widgets.vote import (
 
 
 __all__ = (
+    'AllocatedMandatesWidget',
     'ColumnWidget',
     'CountedEntitiesWidget',
     'ElectionCandidatesByEntityTableWidget',
@@ -63,6 +67,8 @@ __all__ = (
     'H3Widget',
     'HRWidget',
     'LogoWidget',
+    'MandatesWidget',
+    'NumberOfMandatesWidget',
     'ProgressWidget',
     'RowWidget',
     'TextWidget',

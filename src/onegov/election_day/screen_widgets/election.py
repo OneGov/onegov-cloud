@@ -126,3 +126,55 @@ class ElectionListsChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = '<election-lists-chart limit="" names="," class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='allocated-mandates',
+    category='proporz_election'
+)
+class AllocatedMandatesWidget(ModelBoundWidget):
+    tag = 'allocated-mandates'
+    template = """
+        <xsl:template match="allocated-mandates">
+            <span class="{@class}">
+                ${layout.format_number(model.allocated_mandates)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<allocated-mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='number-of-mandates',
+    category='proporz_election'
+)
+class NumberOfMandatesWidget(ModelBoundWidget):
+    tag = 'number-of-mandates'
+    template = """
+        <xsl:template match="number-of-mandates">
+            <span class="{@class}">
+                ${layout.format_number(model.number_of_mandates)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<number-of-mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='mandates',
+    category='proporz_election'
+)
+class MandatesWidget(ModelBoundWidget):
+    tag = 'mandates'
+    template = """
+        <xsl:template match="mandates">
+            <span class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['progress']"
+                    tal:define="progress (model.allocated_mandates,\
+                                            model.number_of_mandates)"
+                    />
+            </span>
+        </xsl:template>
+    """
+    usage = '<mandates class=""/>'

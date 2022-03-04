@@ -381,6 +381,7 @@ def test_screen_form_populate(election_day_app_zg):
         '<title class=""/>'
     )
     assert form.tags_proporz_election.text == (
+        '<allocated-mandates class=""/>\n'
         '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-candidates-chart limit="" lists="," elected="" class=""/>\n'
@@ -392,6 +393,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
         '<logo class=""/>\n'
+        '<mandates class=""/>\n'
+        '<number-of-mandates class=""/>\n'
         '<progress class=""/>\n'
         '<row class=""></row>\n'
         '<text class=""></text>\n'

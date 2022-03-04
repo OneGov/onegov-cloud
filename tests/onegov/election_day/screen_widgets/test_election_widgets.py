@@ -7,6 +7,7 @@ from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.screen_widgets import (
+    AllocatedMandatesWidget,
     ColumnWidget,
     CountedEntitiesWidget,
     ElectionCandidatesByEntityTableWidget,
@@ -14,6 +15,8 @@ from onegov.election_day.screen_widgets import (
     ElectionCandidatesTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
+    MandatesWidget,
+    NumberOfMandatesWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
@@ -412,6 +415,15 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
                 <election-lists-chart class="my-class-9" limit="3"
                     names="a,b"/>
             </column>
+            <column span="1">
+                <allocated-mandates class="my-class-a"/>
+            </column>
+            <column span="1">
+                <number-of-mandates class="my-class-b"/>
+            </column>
+            <column span="1">
+                '<mandates class="my-class-c"/>'
+            </column>
         </row>
     """
     widgets = [
@@ -424,6 +436,9 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionCandidatesTableWidget(),
         ElectionListsChartWidget(),
         ElectionListsTableWidget(),
+        AllocatedMandatesWidget(),
+        NumberOfMandatesWidget(),
+        MandatesWidget(),
     ]
 
     # Empty
@@ -464,6 +479,9 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -606,6 +624,9 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -754,3 +775,6 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
