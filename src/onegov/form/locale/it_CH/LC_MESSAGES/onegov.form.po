@@ -6,22 +6,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "POT-Creation-Date: 2021-05-03 13:45+0200\n"
-"PO-Revision-Date: 2019-01-31 08:33+0100\n"
+"PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
 "Language: it_CH\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.1\n"
+"Generated-By: Lingua 3.12\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "Required"
-msgstr ""
+msgstr "Richiesto"
 
 msgid "Optional"
-msgstr ""
+msgstr "Opzionale"
 
 msgid ""
 "Place the field comment beneath the field or choices, always using the same "
@@ -31,22 +31,22 @@ msgstr ""
 "utilizzando sempre la stessa rientranza"
 
 msgid "General"
-msgstr ""
+msgstr "Generale"
 
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 msgid "Text"
-msgstr ""
+msgstr "Testo"
 
 msgid "Multiline"
-msgstr ""
+msgstr "Multilinea"
 
 msgid "E-Mail"
-msgstr ""
+msgstr "E-Mail"
 
 msgid "Website"
-msgstr ""
+msgstr "Sito web"
 
 msgid "Comment"
 msgstr "Commento"
@@ -55,107 +55,108 @@ msgid "Example Comment"
 msgstr "Commento esemplificativo"
 
 msgid "Date and time"
-msgstr ""
+msgstr "Data e ora"
 
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 msgid "Time"
-msgstr ""
+msgstr "Tempo"
 
 msgid "Choices"
-msgstr ""
+msgstr "Scelte"
 
 msgid "Choice"
-msgstr ""
+msgstr "Scelta"
 
 msgid "Multiple Choice"
-msgstr ""
+msgstr "Scelta multipla"
 
 msgid "Files"
-msgstr ""
+msgstr "File"
 
 msgid "Image"
-msgstr ""
+msgstr "Immagine"
 
 msgid "Document"
-msgstr ""
+msgstr "Documento"
 
 msgid "Numbers"
-msgstr ""
+msgstr "Numeri"
 
 msgid "Age"
-msgstr ""
+msgstr "Età"
 
 msgid "Percentage"
-msgstr ""
+msgstr "Percentuale"
 
 msgid "Extended"
-msgstr ""
+msgstr "Esteso"
 
 msgid "IBAN"
-msgstr ""
+msgstr "IBAN"
 
 msgid "Swiss social security number"
-msgstr ""
+msgstr "Numero di sicurezza sociale svizzero"
 
 msgid "Swiss business identifier"
-msgstr ""
+msgstr "Identificatore aziendale svizzero"
 
 msgid "Swiss vat number"
-msgstr ""
+msgstr "Partita iva svizzera"
 
 msgid "Markdown"
-msgstr ""
+msgstr "Markdown"
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr ""
+"Il file è troppo grande, si prega di fornire un file più piccolo di {}."
 
 msgid "Files of this type are not supported."
-msgstr ""
+msgstr "I file di questo tipo non sono supportati."
 
 msgid "The form could not be parsed."
-msgstr ""
+msgstr "Il modulo non può essere analizzato."
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
-msgstr ""
+msgstr "Definisci almeno un campo e-mail obbligatorio ('E-Mail * = @@@')"
 
 #, python-format
 msgid "The syntax on line {line} is not valid."
-msgstr ""
+msgstr "La sintassi sulla linea {line} non è valida."
 
 #, python-format
 msgid "The field '{label}' exists more than once."
-msgstr ""
+msgstr "Il campo '{label}' esiste più di una volta."
 
 #, python-format
 msgid "'{label}' is a reserved name. Please use a different name."
-msgstr ""
+msgstr "'{label}' è un nome riservato. Per favore usa un nome diverso."
 
 msgid "Define at least one required field"
-msgstr ""
+msgstr "Definire almeno un campo obbligatorio"
 
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 
 msgid "Not a valid swiss social security number."
-msgstr ""
+msgstr "Non è un numero di sicurezza sociale svizzero valido."
 
 msgid "This value already exists."
 msgstr "Questo valore esiste già."
 
 msgid "Uploaded file"
-msgstr ""
+msgstr "File caricato"
 
 msgid "Keep file"
-msgstr ""
+msgstr "Conservare il file"
 
 msgid "Delete file"
-msgstr ""
+msgstr "Cancellare il file"
 
 msgid "Replace file"
-msgstr ""
+msgstr "Sostituire il file"
 
 msgid "Select an Option"
 msgstr "Selezionare un'opzione"
