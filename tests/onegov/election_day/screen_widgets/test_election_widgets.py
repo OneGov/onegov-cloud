@@ -9,6 +9,7 @@ from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
+    CountedEntitiesNoWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
@@ -17,6 +18,7 @@ from onegov.election_day.screen_widgets import (
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -48,14 +50,22 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <election-candidates-by-entity-table class="my-class-7"/>
             </column>
+            <column span="1">
+                <counted-entities-no class="my-class-8"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-9"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        CountedEntitiesNoWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
         ElectionCandidatesByEntityTableWidget(),
@@ -96,6 +106,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -205,6 +217,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -376,6 +390,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
 
 def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
@@ -412,14 +428,22 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
                 <election-lists-chart class="my-class-9" limit="3"
                     names="a,b"/>
             </column>
+            <column span="1">
+                <counted-entities-no class="my-class-a"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-b"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        CountedEntitiesNoWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
         ElectionListsChartWidget(),
@@ -464,6 +488,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -606,6 +632,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -754,3 +782,5 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-8' in result
     assert 'my-class-9' in result
+    assert 'my-class-a' in result
+    assert 'my-class-b' in result

@@ -8,6 +8,7 @@ from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
+    CountedEntitiesNoWidget,
     ElectionCompoundCandidatesTableWidget,
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
@@ -17,6 +18,7 @@ from onegov.election_day.screen_widgets import (
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -56,14 +58,22 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             <column span="1">
                 <election-compound-list-groups-chart class="my-class-a"/>
             </column>
+            <column span="1">
+                <counted-entities class="my-class-b"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-c"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        CountedEntitiesNoWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundListsChartWidget(),
@@ -115,6 +125,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
 
     # Add intermediate results
     election_1, errors = import_test_datasets(
@@ -242,6 +254,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
 
     # Add final results
     election_1, errors = import_test_datasets(
@@ -378,3 +392,5 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result

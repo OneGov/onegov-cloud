@@ -9,9 +9,11 @@ from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
+    CountedEntitiesNoWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
     VoteCounterProposalDistrictsMap,
     VoteCounterProposalEntitiesMap,
     VoteCounterProposalEntitiesTableWidget,
@@ -54,14 +56,22 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <vote-proposal-districts-map class="my-class-7"/>
             </column>
+            <column span="1">
+                <counted-entities-no class="my-class-8"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-9"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        CountedEntitiesNoWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
         VoteProposalDistrictsMap(),
@@ -104,6 +114,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -154,6 +166,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -210,6 +224,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
 
 
 def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
@@ -266,14 +282,22 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <vote-tie-breaker-districts-map class="my-class-g"/>
             </column>
+            <column span="1">
+                <counted-entities-no class="my-class-h"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-i"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        CountedEntitiesNoWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         VoteCounterProposalEntitiesTableWidget(),
         VoteCounterProposalResultBarWidget(),
         VoteCounterProposalTitleWidget(),
@@ -340,6 +364,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -406,6 +432,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -478,3 +506,5 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result

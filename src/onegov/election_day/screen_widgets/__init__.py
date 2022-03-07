@@ -16,6 +16,7 @@ from onegov.election_day.screen_widgets.election import (
 from onegov.election_day.screen_widgets.generic import (
     ColumnWidget,
     CountedEntitiesWidget,
+    CountedEntitiesNoWidget,
     H1Widget,
     H2Widget,
     H3Widget,
@@ -25,6 +26,7 @@ from onegov.election_day.screen_widgets.generic import (
     RowWidget,
     TextWidget,
     TitleWidget,
+    TotalEntitiesWidget,
 )
 from onegov.election_day.screen_widgets.vote import (
     VoteCounterProposalDistrictsMap,
@@ -47,6 +49,7 @@ from onegov.election_day.screen_widgets.vote import (
 __all__ = (
     'ColumnWidget',
     'CountedEntitiesWidget',
+    'CountedEntitiesNoWidget',
     'ElectionCandidatesByEntityTableWidget',
     'ElectionCandidatesChartWidget',
     'ElectionCandidatesTableWidget',
@@ -67,6 +70,7 @@ __all__ = (
     'RowWidget',
     'TextWidget',
     'TitleWidget',
+    'TotalEntitiesWidget',
     'VoteCounterProposalDistrictsMap',
     'VoteCounterProposalEntitiesMap',
     'VoteCounterProposalEntitiesTableWidget',
