@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "POT-Creation-Date: 2022-02-28 08:41+0100\n"
-"PO-Revision-Date: 2022-03-07 13:36+0100\n"
+"PO-Revision-Date: 2022-03-07 14:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -41,7 +41,7 @@ msgid "Manual"
 msgstr "Manuell"
 
 msgid "Stripe Connect"
-msgstr "Stripe verbinden"
+msgstr "Stripe Connect"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
