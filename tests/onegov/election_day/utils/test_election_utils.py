@@ -639,11 +639,13 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#a74c97',
                 'mandates': 0,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 154, 'total': 17972}
             },
             '2015': {
                 'color': '#a74c97',
                 'mandates': 0,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 72, 'total': 8352}
             }
         },
@@ -651,11 +653,13 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#ff6300',
                 'mandates': 1,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 243, 'total': 28413}
             },
             '2015': {
                 'color': '#ff6300',
                 'mandates': 1,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 264, 'total': 30856}
             }
         },
@@ -663,11 +667,13 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#4068c8',
                 'mandates': 1,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 192, 'total': 22494}
             },
             '2015': {
                 'color': '#4068c8',
                 'mandates': 1,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 176, 'total': 20584}
             }
         },
@@ -675,11 +681,13 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#aeca00',
                 'mandates': 0,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 68, 'total': 7943}
             },
             '2015': {
                 'color': '#aeca00',
                 'mandates': 0,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 36, 'total': 4178}
             }
         },
@@ -687,11 +695,13 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#db3c27',
                 'mandates': 0,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 53, 'total': 6167}
             },
             '2015': {
                 'color': '#db3c27',
                 'mandates': 0,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 138, 'total': 16048}
             }
         },
@@ -699,11 +709,13 @@ def test_election_utils_parties(import_test_datasets, session):
             '2011': {
                 'color': '#3f841a',
                 'mandates': 1,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 283, 'total': 33116}
             },
             '2015': {
                 'color': '#3f841a',
                 'mandates': 1,
+                'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 305, 'total': 35543}
             }
         }

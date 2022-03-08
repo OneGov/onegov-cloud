@@ -18,7 +18,7 @@ def test_upload_parties_invalidate_cache(election_day_app_gr):
     login(client)
 
     upload_proporz_election(client, canton='gr')
-    upload_election_compound(client, canton='gr')
+    upload_election_compound(client, canton='gr', voters_counts=False)
     urls = (
         '/election/proporz-election/party-strengths',
         '/elections/elections/party-strengths'

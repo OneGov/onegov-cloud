@@ -237,6 +237,7 @@ Num|Descripziun
 ---|---
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da vuschs da l'elecziun.
+`total_voters_count`|Die Gesamtzahl kumulierter Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `name`|Il num da la partida.
 `id`|ID da la partida (cifra casuala).
 `color`|La colur da la partida.

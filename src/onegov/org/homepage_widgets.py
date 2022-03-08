@@ -289,8 +289,12 @@ class TilesWidget(object):
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children = homepage_pages.get(page.id, tuple())
-                children = (session.merge(c, load=False) for c in children)
+                children = []
+                for child in page.children:
+                    if child.id in map(
+                        lambda n: n.id, homepage_pages[page.id]
+                    ):
+                        children.append(child)
 
                 if not request.is_manager:
                     children = (

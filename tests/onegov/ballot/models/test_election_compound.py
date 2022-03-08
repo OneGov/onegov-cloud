@@ -712,6 +712,7 @@ def test_election_compound_export_parties(session):
             votes=0,
             voters_count=Decimal('1.01'),
             total_votes=100,
+            total_voters_count=Decimal('100.02'),
             name='Libertarian',
             color='black',
             year=2012
@@ -723,6 +724,7 @@ def test_election_compound_export_parties(session):
             votes=2,
             voters_count=Decimal('3.01'),
             total_votes=50,
+            total_voters_count=Decimal('50.02'),
             name='Libertarian',
             color='black',
             year=2016
@@ -734,6 +736,7 @@ def test_election_compound_export_parties(session):
             votes=1,
             voters_count=Decimal('2.01'),
             total_votes=100,
+            total_voters_count=Decimal('100.02'),
             name='Conservative',
             color='red',
             year=2012
@@ -745,6 +748,7 @@ def test_election_compound_export_parties(session):
             votes=3,
             voters_count=Decimal('4.01'),
             total_votes=50,
+            total_voters_count=Decimal('50.02'),
             name='Conservative',
             color='red',
             year=2016
@@ -759,6 +763,7 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 3,
             'total_votes': 50,
+            'total_voters_count': '50.02',
             'votes': 3,
             'voters_count': '4.01',
         }, {
@@ -768,6 +773,7 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
+            'total_voters_count': '50.02',
             'votes': 2,
             'voters_count': '3.01',
         }, {
@@ -777,6 +783,7 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 1,
             'total_votes': 100,
+            'total_voters_count': '100.02',
             'votes': 1,
             'voters_count': '2.01',
         }, {
@@ -786,6 +793,7 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
+            'total_voters_count': '100.02',
             'votes': 0,
             'voters_count': '1.01',
         }
@@ -815,6 +823,7 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 3,
             'total_votes': 50,
+            'total_voters_count': '50.02',
             'votes': 3,
             'voters_count': '4.01',
             'panachage_votes_from_0': 1,
@@ -828,6 +837,7 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
+            'total_voters_count': '50.02',
             'votes': 2,
             'voters_count': '3.01',
             'panachage_votes_from_0': 5,
@@ -840,6 +850,7 @@ def test_election_compound_export_parties(session):
             'name': 'Other',
             'id': 2,
             'total_votes': '',
+            'total_voters_count': '',
             'votes': '',
             'voters_count': '',
             'year': 2016,
@@ -854,6 +865,7 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 1,
             'total_votes': 100,
+            'total_voters_count': '100.02',
             'votes': 1,
             'voters_count': '2.01',
             'panachage_votes_from_0': '',
@@ -867,6 +879,7 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
+            'total_voters_count': '100.02',
             'votes': 0,
             'voters_count': '1.01',
             'panachage_votes_from_0': '',
@@ -879,6 +892,7 @@ def test_election_compound_export_parties(session):
             'name': 'Other',
             'id': 2,
             'total_votes': '',
+            'total_voters_count': '',
             'votes': '',
             'voters_count': '',
             'year': 2012,

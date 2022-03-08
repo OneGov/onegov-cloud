@@ -551,7 +551,6 @@ def change_voters_count_to_numeric(context):
             'party_results',
             'voters_count',
             type_=Numeric(12, 2)
-            # new_column_name='manually_completed'
         )
 
 
@@ -560,4 +559,12 @@ def add_superregion_to_election_results(context):
     if not context.has_column('election_results', 'superregion'):
         context.operations.add_column(
             'election_results', Column('superregion', Text, nullable=True)
+        )
+
+
+@upgrade_task('Adds total voters count to party results')
+def add_total_voters_count(context):
+    if not context.has_column('party_results', 'total_voters_count'):
+        context.operations.add_column(
+            'party_results', Column('total_voters_count', Numeric(12, 2))
         )
