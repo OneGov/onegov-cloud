@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-02-28 08:41+0100\n"
+"POT-Creation-Date: 2022-03-08 13:55+0100\n"
 "PO-Revision-Date: 2022-02-18 13:56+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -572,6 +572,9 @@ msgstr "Tradizione"
 
 msgid "Youth"
 msgstr "Giovane"
+
+msgid "Elderly"
+msgstr "Anziani"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto nel giardino del castello"
