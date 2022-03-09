@@ -965,7 +965,7 @@
             <section class="top-bar-section">
                 <ul class="left">
                     <tal:block repeat="(title, link, active, submenu) layout.menu">
-                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else ''">
+                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else '';aria-current 'true' if active else 'false'">
                             <a href="${link}">${title}</a>
                         </li>
                         <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown'">
