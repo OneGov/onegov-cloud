@@ -461,7 +461,7 @@ class DaycareSubsidyCalculator(object):
                 {cfg.max_rate} CHF liegt.
             """)
 
-        if max(daycare.rate - cfg.max_rate, 0) >= rebate:
+        if actual.total >= rebate and rebate > 0:
             actual.op(
                 title="Rabatt",
                 amount=rebate,
