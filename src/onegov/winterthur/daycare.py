@@ -439,31 +439,6 @@ class DaycareSubsidyCalculator(object):
             operation="=",
             amount=min(gross.total, daycare.rate))
 
-        # Rebate
-        # ------
-
-
-        # net = Block('net', "Berechnung des Rabatts")
-
-        # net.op(
-        #     title="Übertrag",
-        #     amount=gross.total)
-
-        # net.op(
-        #     title="Rabatt",
-        #     amount=rebate,
-        #     operation="-",
-        #     note=f"""
-        #         Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
-        #         Tagen pro Woche gilt ein Rabatt von
-        #         {fmt(cfg.rebate).rstrip('0').rstrip('.')}%.
-        #     """)
-
-        # net.op(
-        #     title="Elternbeitrag netto",
-        #     operation="=",
-        #     amount=max(cfg.min_rate, gross.total - rebate))
-
         # Actual contribution
         # -------------------
         rebate = gross.total * cfg.rebate / 100 if rebate else 0
