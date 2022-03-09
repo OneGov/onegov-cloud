@@ -3,11 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2022-03-01 14:50+0100\n"
-=======
-"POT-Creation-Date: 2022-03-01 07:34+0100\n"
->>>>>>> master
+"POT-Creation-Date: 2022-03-09 07:50+0100\n"
 "PO-Revision-Date: 2022-02-25 13:48+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -713,6 +709,9 @@ msgstr "Elecziuns &amp; votaziuns"
 
 msgid "There are no elections or votes defined yet."
 msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
+
+msgid "<dynamic element>"
+msgstr ""
 
 msgid "Elections and votes on"
 msgstr "Votaziun dals"
