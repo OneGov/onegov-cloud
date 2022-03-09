@@ -968,7 +968,7 @@
                         <li tal:condition="not submenu" tal:attributes="class 'active' if active else ''">
                             <a href="${link}">${title}</a>
                         </li>
-                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown'">
+                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown';aria-expanded 'true' if active else 'false'">
                             <a href="#">${title}</a>
                             <ul class="dropdown">
                                 <tal:block repeat="(title, link, active, submenu) submenu">
