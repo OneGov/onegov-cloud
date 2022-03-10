@@ -2,13 +2,16 @@ import click
 import os
 import platform
 import shutil
+import ssl
+import smtplib
 import subprocess
 import sys
 
 from fnmatch import fnmatch
 from onegov.core.cache import lru_cache
 from onegov.core.cli.core import command_group, pass_group_context, abort
-from onegov.core.mail_processor import MailQueueProcessor
+from onegov.core.mail_processor import PostmarkMailQueueProcessor
+from onegov.core.mail_processor import SMTPMailQueueProcessor
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
 from onegov.core.upgrade import get_upgrade_modules
@@ -72,7 +75,7 @@ def delete(group_context):
     return delete_instance
 
 
-@cli.command(context_settings={
+@cli.group(invoke_without_command=True, context_settings={
     'matches_required': False,
     'default_selector': '*'
 })
@@ -80,22 +83,81 @@ def delete(group_context):
               help="The postmark server token to authenticate")
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
-@pass_group_context
-def sendmail(group_context, token, limit):
+@click.pass_context
+def sendmail(context, token, limit):
     """ Iterates over all applications and processes the maildir for each
     application that uses maildir e-mail delivery.
+
+    """
+
+    # TODO: Remove the options and invoke_without_subcommand
+    #       once we use a specific subcommand everywhere, this
+    #       is only for intermediate backwards compatibility
+    if context.invoked_subcommand is None:
+        # if we got no subcommand invoke postmark using forward
+        context.forward(postmark)
+
+
+@sendmail.command()
+@click.option('--token', default=None,
+              help="The postmark server token to authenticate")
+@click.option('--limit', default=25,
+              help="Max number of mails to send before exiting")
+@pass_group_context
+def postmark(group_context, token, limit):
+    """ Iterates over all applications and processes the maildir for each
+    application that uses maildir e-mail delivery using postmark mailer.
 
     """
 
     # applications with a maildir configuration
     cfgs = (c for c in group_context.appcfgs if 'mail' in c.configuration)
     cfgs = (v for c in cfgs for v in c.configuration['mail'].values())
+    # FIXME: If we ever add more mailers this needs to change
+    cfgs = (c for c in cfgs if c.get('mailer') != 'smtp')
     cfgs = (c for c in cfgs if c.get('directory'))
 
     # non-empty maildirs
     dirs = set(c['directory'] for c in cfgs)
-    qp = MailQueueProcessor(token, *dirs, limit=limit)
+    qp = PostmarkMailQueueProcessor(token, *dirs, limit=limit)
     qp.send_messages()
+
+
+@sendmail.command()
+@click.option('--hostname', help="The smtp host")
+@click.option('--port', help="The smtp port")
+@click.option('--force-tls', default=False, is_flag=True,
+              help="Force a TLS connection")
+@click.option('--username', help="The username to authenticate", default=None)
+@click.option('--password', help="The password to authenticate", default=None)
+@click.option('--limit', default=25,
+              help="Max number of mails to send before exiting")
+@pass_group_context
+def smtp(group_context, hostname, port, force_tls, username, password, limit):
+    """ Iterates over all applications and processes the maildir for each
+    application that uses maildir e-mail delivery using smtp mailer.
+
+    """
+
+    # applications with a maildir configuration
+    cfgs = (c for c in group_context.appcfgs if 'mail' in c.configuration)
+    cfgs = (v for c in cfgs for v in c.configuration['mail'].values())
+    cfgs = (c for c in cfgs if c.get('mailer') == 'smtp')
+    cfgs = (c for c in cfgs if c.get('directory'))
+
+    # non-empty maildirs
+    dirs = set(c['directory'] for c in cfgs)
+
+    with smtplib.SMTP(hostname, port) as mailer:
+        if force_tls:
+            context = ssl.create_default_context()
+            mailer.starttls(context=context)
+
+        if username:
+            mailer.login(username, password)
+
+        qp = SMTPMailQueueProcessor(mailer, *dirs, limit=limit)
+        qp.send_messages()
 
 
 @cli.command(context_settings={

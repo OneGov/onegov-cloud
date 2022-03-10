@@ -153,7 +153,7 @@ def test_create_command_default_selector(cli, cli_config):
 def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     mock_send = Mock(return_value=None)
     monkeypatch.setattr(
-        'onegov.core.mail_processor.MailQueueProcessor.send',
+        'onegov.core.mail_processor.PostmarkMailQueueProcessor.send',
         mock_send
     )
     maildir = os.path.join(temporary_directory, 'mails')
@@ -162,7 +162,7 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token',
     ])
 
@@ -176,14 +176,13 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
         content="This e-mail is just a test",
         category="transactional"
     )
-
     transaction.commit()
 
     assert len(os.listdir(maildir)) == 1
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token',
     ])
 
@@ -191,7 +190,7 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     assert mock_send.called
     assert len(os.listdir(maildir)) == 0
 
-    messages = json.loads(mock_send.call_args.args[0])
+    messages = json.loads(mock_send.call_args.args[1])
     assert len(messages) == 1
     message = messages[0]
     assert message['From'] == 'Govikon <noreply@example.org>'
@@ -201,7 +200,7 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token',
     ])
 
@@ -210,10 +209,69 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     assert len(os.listdir(maildir)) == 0
 
 
+def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
+    maildir = os.path.join(temporary_directory, 'mails')
+    app = maildir_smtp_app
+    smtp = app.smtp
+
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail', 'smtp',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
+    ])
+
+    assert result.exit_code == 0
+    assert len(os.listdir(maildir)) == 0
+    assert len(smtp.outbox) == 0
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test",
+        category="transactional"
+    )
+    transaction.commit()
+
+    assert len(os.listdir(maildir)) == 1
+    assert len(smtp.outbox) == 0
+
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail', 'smtp',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
+    ])
+
+    assert result.exit_code == 0
+    assert len(os.listdir(maildir)) == 0
+    assert len(smtp.outbox) == 1
+
+    message = smtp.outbox[0]
+    assert message['from'] == 'Govikon <noreply@example.org>'
+    assert message['reply-to'] == 'Govikon <info@example.org>'
+    assert message['subject'] == 'Test E-Mail'
+
+    # clear outbox
+    del smtp.outbox[:]
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail', 'smtp',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
+    ])
+
+    assert result.exit_code == 0
+    assert len(os.listdir(maildir)) == 0
+    assert len(smtp.outbox) == 0
+
+
 def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     mock_send = Mock(return_value=None)
     monkeypatch.setattr(
-        'onegov.core.mail_processor.MailQueueProcessor.send',
+        'onegov.core.mail_processor.PostmarkMailQueueProcessor.send',
         mock_send
     )
     maildir = os.path.join(temporary_directory, 'mails')
@@ -222,7 +280,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token'
     ])
 
@@ -258,7 +316,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token',
         '--limit', 1
     ])
@@ -270,7 +328,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token',
         '--limit', 2
     ])
@@ -299,7 +357,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token'
     ])
 
@@ -311,7 +369,7 @@ def test_sendmail_exception(temporary_directory, maildir_app, monkeypatch):
     error = RuntimeError('Failed to send request.')
     mock_send = Mock(side_effect=error)
     monkeypatch.setattr(
-        'onegov.core.mail_processor.MailQueueProcessor.send',
+        'onegov.core.mail_processor.PostmarkMailQueueProcessor.send',
         mock_send
     )
     maildir = os.path.join(temporary_directory, 'mails')
@@ -328,7 +386,7 @@ def test_sendmail_exception(temporary_directory, maildir_app, monkeypatch):
 
     result = CliRunner().invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail',
+        'sendmail', 'postmark',
         '--token', 'token',
     ])
 

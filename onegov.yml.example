@@ -74,13 +74,23 @@ configuration: &global-config
 
   # OneGov holds two sorts of mail. Transactional, non-spammy e-mail or
   # marketing e-mail. Though they can both have different configurations
+  # Take care to use separate directories when using multiple different
+  # mailers at once. The mailers will not try to avoid processing
+  # each other's queues.
   mail:
     transactional:
       sender: service@onegovcloud.ch
-      directory: '/usr/local/var/onegov/mail'
+      directory: '/usr/local/var/onegov/mail/postmark'
+      mailer: postmark
     marketing:
       sender: newsletters@onegovcloud.ch
-      directory: '/usr/local/var/onegov/mail'
+      directory: '/usr/local/var/onegov/mail/smtp'
+      mailer: smtp
+      host: localhost
+      port: 1025
+      force_tls: false
+      username:
+      password:
 
   # To test yubikey integration, a yubikey API access token has to be provided
   # yubikey_client_id:
