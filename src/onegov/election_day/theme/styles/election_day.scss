@@ -615,8 +615,22 @@ footer {
         }
 
         .left {
-            li.active {
-                border-left: 2px solid $primary-color;
+
+            li {
+                position: relative;
+
+                ul.dropdown{
+                    display: none;
+                    position: absolute;
+                }
+
+                &:hover ul.dropdown{
+                    display: block;	/* Display the dropdown */
+                }
+
+                &.active {
+                    border-left: 2px solid $primary-color;
+                }
             }
         }
 
