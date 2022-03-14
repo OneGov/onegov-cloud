@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-01 07:34+0100\n"
+"POT-Creation-Date: 2022-03-14 08:55+0100\n"
 "PO-Revision-Date: 2022-02-25 13:48+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -801,6 +801,12 @@ msgstr "Il format da las datas è descrit qua:"
 msgid "Format Description"
 msgstr "Descripziun dal format"
 
+msgid "Embed heatmap"
+msgstr "Incorporar la carta"
+
+msgid "Download heatmap"
+msgstr "Telechargiar la carta"
+
 msgid "Embed"
 msgstr "Incorporar"
 
@@ -826,8 +832,8 @@ msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
 "cotschen."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Pagina iniziala"
 

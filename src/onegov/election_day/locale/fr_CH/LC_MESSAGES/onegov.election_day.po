@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-01 07:34+0100\n"
+"POT-Creation-Date: 2022-03-14 08:55+0100\n"
 "PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -800,6 +800,12 @@ msgstr "Le format des données est décrit ici:"
 msgid "Format Description"
 msgstr "Description du format"
 
+msgid "Embed heatmap"
+msgstr "Intégrer la carte"
+
+msgid "Download heatmap"
+msgstr "Télécharger la carte"
+
 msgid "Embed"
 msgstr "Intégration"
 
@@ -825,8 +831,8 @@ msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés "
 "en rouge."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Page d'accueil"
 
