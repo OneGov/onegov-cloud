@@ -19,7 +19,9 @@
 
             <nav class="skip-links">
                 <ul>
-                    <a tal:repeat="date archive_items" class="show-only-on-tab" i18n:translate="" href="#date-${date}">Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" /></a>
+                    <a tal:repeat="date archive_items" class="show-only-on-tab" i18n:translate="" href="#date-${date}">
+                        Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
+                    </a>
                     <a class="show-only-on-tab" href="#archive" i18n:translate="">Archive</a>
                 </ul>
             </nav>
