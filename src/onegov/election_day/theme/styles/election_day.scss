@@ -1115,3 +1115,7 @@ ul.pagination li.last {
 .visually-hidden {
     @include element-invisible;
 }
+
+.show-only-on-tab:not(:focus) {
+    @include element-invisible;
+}
