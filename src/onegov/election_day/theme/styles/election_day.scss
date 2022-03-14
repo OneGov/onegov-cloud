@@ -1115,3 +1115,8 @@ ul.pagination li.last {
 .visually-hidden {
     @include element-invisible;
 }
+
+a:focus {
+    outline: 2px solid;
+    outline-offset: 1px;
+}
