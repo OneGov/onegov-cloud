@@ -8,7 +8,7 @@ class RequestPasswordResetForm(Form):
     """ A generic password reset request form for onegov.user. """
 
     email = StringField(
-        label=_("E-Mail"),
+        label=_("E-Mail Address"),
         validators=[validators.InputRequired(), validators.Email()],
         render_kw={'autofocus': True}
     )
@@ -18,7 +18,7 @@ class PasswordResetForm(Form):
     """ A generic password reset form for onegov.user. """
 
     email = StringField(
-        label=_("E-Mail"),
+        label=_("E-Mail Address"),
         validators=[validators.InputRequired(), validators.Email()],
         render_kw={'autofocus': True}
     )

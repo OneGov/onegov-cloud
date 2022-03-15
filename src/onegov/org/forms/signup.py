@@ -7,7 +7,7 @@ from wtforms import StringField, validators
 class SignupForm(Form):
 
     address = StringField(
-        label=_("E-Mail"),
+        label=_("E-Mail Address"),
         validators=[validators.InputRequired(), validators.Email()]
     )
 
