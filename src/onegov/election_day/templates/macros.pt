@@ -810,13 +810,13 @@
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
                 <legend>${fieldset.label}</legend>
-                <div class="formfields">
+                <div class="formfields" role="textbox" aria-required="true">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                     <div class="clearfix"></div>
                 </div>
             </fieldset>
             <tal:b condition="not:fieldset.is_visible">
-                <div class="formfields">
+                <div class="formfields" role="textbox" aria-required="true">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                     <div class="clearfix"></div>
                 </div>

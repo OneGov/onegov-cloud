@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-21 11:59+0100\n"
-"PO-Revision-Date: 2022-02-21 12:07+0100\n"
+"PO-Revision-Date: 2022-03-15 10:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
 msgstr "Die Schlussresultate sind verfügbar"
@@ -796,7 +796,7 @@ msgstr ""
 "Wahl ist beendet, sobald die Anzahl Mandate erscheint."
 
 msgid "The form contains errors. Please check the marked fields."
-msgstr ""
+msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
 #. Default: Start
 #.
