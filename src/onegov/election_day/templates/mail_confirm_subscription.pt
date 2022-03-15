@@ -1,6 +1,6 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
     <tal:block metal:fill-slot="title">
-        ${title}
+        ${title} - ${request.app.principal.name}
     </tal:block>
     <tal:block metal:fill-slot="body">
         <h1>${title}</h1>
