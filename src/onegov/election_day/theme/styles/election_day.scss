@@ -331,6 +331,11 @@ table {
             td:nth-child(6) {
                 width: 10%;
             }
+
+            td.no-results {
+                text-align: right;
+                width: 50%;
+            }
         }
 
         &.election {
