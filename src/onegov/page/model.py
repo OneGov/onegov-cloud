@@ -18,10 +18,6 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
 
     __tablename__ = 'pages'
 
-    @property
-    def es_public(self):
-        return self.access == 'public' and self.published
-
     @hybrid_property
     def published_or_created(self):
         return self.publication_start or self.created

@@ -168,7 +168,7 @@ class SearchableContent(ORMSearchable):
 
     @property
     def es_public(self):
-        return self.access == 'public'
+        return self.access == 'public' and self.published
 
     @property
     def es_suggestions(self):
