@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-28 08:41+0100\n"
-"PO-Revision-Date: 2022-03-07 13:33+0100\n"
+"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -571,6 +571,9 @@ msgstr "Tradition"
 
 msgid "Youth"
 msgstr "Jeunesse"
+
+msgid "Elderly"
+msgstr "Âgées"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto dans le jardin du château"
@@ -2524,10 +2527,9 @@ msgstr "Retour à la page d'accueil"
 msgid "Search"
 msgstr "Chercher"
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
-"rouge."
+"Le formulaire contient des erreurs. Prière de vérifier les champs entourés."
 
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-02-24 17:38+0100\n"
+"POT-Creation-Date: 2022-03-01 13:21+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -542,6 +542,15 @@ msgstr "Colonia famiglia"
 msgid "Trecking Camp"
 msgstr "Colonia trekking"
 
+msgid "Water"
+msgstr "Acqua"
+
+msgid "Continuing Education"
+msgstr "Formazione continua"
+
+msgid "Healthy Snacks"
+msgstr "Merende equilibrate"
+
 msgid "Title"
 msgstr "Titolo"
 
@@ -605,8 +614,8 @@ msgstr "Ignorare restrizioni di età"
 msgid "Accept TOS"
 msgstr "Accettare CG"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "CG"
 

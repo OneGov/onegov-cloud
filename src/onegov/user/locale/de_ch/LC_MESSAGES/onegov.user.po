@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-11-09 12:25+0100\n"
+"POT-Creation-Date: 2022-03-20 09:54+0100\n"
 "PO-Revision-Date: 2022-03-07 13:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
