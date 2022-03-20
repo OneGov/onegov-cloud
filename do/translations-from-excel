@@ -43,7 +43,7 @@ function main() {
             tempfile="/tmp/$module-$locale.po"
             pofile="$path/LC_MESSAGES/$module.po"
             xls-to-po "$locale" "$filename" "$tempfile"
-            msgmerge "$tempfile" "$pofile" -o "$pofile"
+            msgmerge --no-fuzzy-matching "$tempfile" "$pofile" -o "$pofile"
         fi
     done
 }

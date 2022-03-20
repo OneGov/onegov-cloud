@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-02-21 12:03+0100\n"
+"POT-Creation-Date: 2022-03-20 08:13+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -572,6 +572,9 @@ msgstr "Tradizione"
 
 msgid "Youth"
 msgstr "Giovane"
+
+msgid "Elderly"
+msgstr "Anziani"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto nel giardino del castello"
@@ -1413,8 +1416,8 @@ msgstr ""
 "Disattiva i biglietti singolarmente se la funzione di accettazione "
 "automatica è abilitata."
 
-msgid "Show option for newsletter registration"
-msgstr "Mostra la registrazione per la newsletter"
+msgid "Enable newsletter"
+msgstr "Attiva la newsletter"
 
 msgid "Include logo in newsletter"
 msgstr "Includi il logo nella newsletter"
@@ -1442,6 +1445,9 @@ msgstr "Solo collegamenti esterni"
 
 msgid "Internal links only"
 msgstr "Solo collegamenti interni"
+
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
 
 msgid "Your note about this ticket"
 msgstr "La tua nota su questo biglietto"
@@ -2189,10 +2195,10 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3197,11 +3203,15 @@ msgstr "Biglietto archiviato."
 msgid "Ticket recovered from archive."
 msgstr "Biglietto recuperato dall'archivio."
 
+msgid ""
+"The newsletter is disabled. You can only see this page because you are "
+"logged in."
+msgstr ""
+"La newsletter è disabilitata. Puoi vedere questa pagina solo perché hai "
+"fatto il login."
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
-
-msgid "E-Mail Address"
-msgstr "Indirizzo e-mail"
 
 msgid "Signup"
 msgstr "Registrati"
@@ -4649,9 +4659,17 @@ msgstr "Hai disabilitato le e-mail per il biglietto ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Hai abilitato le e-mail per il biglietto ${number}"
 
+msgid "The ticket cannot be archived because it's not closed"
+msgstr "Il biglietto non può essere archiviato perché non è chiuso"
+
 #, python-format
 msgid "You archived ticket ${number}"
 msgstr "Hai archiviato il biglietto ${number}"
+
+msgid ""
+"The ticket cannot be recovered from the archive because it's not archived"
+msgstr ""
+"Il biglietto non può essere recuperato dall'archivio perché non è archiviato"
 
 #, python-format
 msgid "You recovered ticket ${number} from the archive"
@@ -4724,14 +4742,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "The form contains errors. Please check the fields marked in red."
-#~ msgstr ""
-#~ "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
-
-#~ msgid ""
-#~ "Sort the items using drag and drop.  The new positions are automatically "
-#~ "saved directly after moving."
-#~ msgstr ""
-#~ "Ordina gli elementi usando il drag and drop. Le nuove posizioni vengono "
-#~ "automaticamente salvate direttamente dopo lo spostamento"

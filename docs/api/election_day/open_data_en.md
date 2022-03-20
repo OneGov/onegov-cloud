@@ -131,6 +131,7 @@ Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
+`total_voters_count`|The total number of cumulative number of votes per total number of mandates per election, for election compounds only.
 `name`|The name of the party.
 `id`|ID of the party.
 `color`|The color of the party.

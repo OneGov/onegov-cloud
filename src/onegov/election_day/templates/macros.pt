@@ -364,6 +364,7 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-district left-aligned">${layout.label('district')}</th>
+                <th data-tablesaw-priority="4" i18n:translate="" class="column-superregion left-aligned" tal:condition="layout.has_superregions" data-sorter="false">${layout.label('superregion')}</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.proporz" data-sorter="false">Mandates</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.majorz" data-sorter="false">Seats</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-counted right-aligned" data-sorter="false">Counted</th>
@@ -372,12 +373,38 @@
         <tbody>
             <tr tal:repeat="election election_compound.elections">
                 <td class="column-district left-aligned"><a href="${request.link(election)}">${election.domain_segment}</a></td>
+                <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${election.domain_supersegment}</td>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></td>
-                <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress; enable_y_n True" /></td>
+                <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></td>
             </tr>
         </tbody>
     </table>
 </metal:election-compound-districts-table>
+
+
+<metal:election-compound-superregions-table define-macro="election-compound-superregions-table" i18n:domain="onegov.election_day">
+    <table
+        class="election-compound-superregions-table results tablesaw sortable"
+        data-tablesaw-mode="columntoggle"
+        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+        data-tablesaw-minimap=""
+        >
+        <thead>
+            <tr>
+                <th data-tablesaw-priority="4" i18n:translate="" class="column-superregion left-aligned" data-sorter="false">${layout.label('superregion')}</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" data-sorter="false">Mandates</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-counted right-aligned" data-sorter="false">Counted</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="superregion superregions">
+                <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${superregion}</td>
+                <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['mandates']['allocated'], superregions[superregion]['mandates']['total'])" /></td>
+                <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['progress']['counted'], superregions[superregion]['progress']['total'])" /></td>
+            </tr>
+        </tbody>
+    </table>
+</metal:election-compound-superregions-table>
 
 <metal:election-statistics-table define-macro="election-statistics-table" i18n:domain="onegov.election_day">
     <table
@@ -390,6 +417,7 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.label('district')}</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_superregions">${layout.label('superregion')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
@@ -409,6 +437,7 @@
                 <tal:block condition="result.counted">
                     <td>${layout.format_name(result)}</td>
                     <td tal:condition="layout.has_districts">${result.district}</td>
+                    <td tal:condition="layout.has_superregions">${result.superregion}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
                     <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
                     <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
@@ -447,17 +476,23 @@
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-candidate">Candidate</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-party right-aligned" tal:condition="layout.majorz">Party</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-list right-aligned" tal:condition="layout.proporz">List</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="column-superregion right-aligned" tal:condition="layout.has_superregions">${layout.label('superregion')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-district right-aligned">${layout.label('district')}</th>
             </tr>
         </thead>
         <tbody>
             <tr tal:repeat="candidate elected_candidates">
-                <td class="column-candidate">${candidate.family_name} ${candidate.first_name}</td>
-                <td class="column-party right-aligned" tal:condition="layout.majorz">${candidate.party}</td>
-                <td class="column-list right-aligned" tal:condition="layout.proporz">${candidate.list}</td>
-                <td class="column-district right-aligned" tal:define="district districts.get(candidate.election_id, None)">
-                    <a tal:condition="district" tal:attributes="href district[1]">${district[0]}</a>
-                </td>
+                <tal:block tal:define="district districts.get(candidate.election_id, None)">
+                    <td class="column-candidate">${candidate.family_name} ${candidate.first_name}</td>
+                    <td class="column-party right-aligned" tal:condition="layout.majorz">${candidate.party}</td>
+                    <td class="column-list right-aligned" tal:condition="layout.proporz">${candidate.list}</td>
+                    <td class="column-list right-aligned" tal:condition="layout.has_superregions">
+                        <tal:block tal:condition="district">${district[2]}</tal:block>
+                    </td>
+                    <td class="column-district right-aligned">
+                        <a tal:condition="district" tal:attributes="href district[1]">${district[0]}</a>
+                    </td>
+                </tal:block>
             </tr>
         </tbody>
     </table>
@@ -789,19 +824,10 @@
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
-    <tal:b condition="progress[1]" tal:define="show_y_n enable_y_n|False">
-        <tal:b tal:switch="python:show_y_n and progress[0] in (0, 1) and progress[1] == 1">
-            <tal:b tal:case="False" i18n:translate="">
-                <span tal:replace="progress[0]" i18n:name='counted' />
-                of
-                <span tal:replace="progress[1]" i18n:name='total' />
-            </tal:b>
-            <tal:b tal:case="True">
-                <span tal:condition="progress[0] == 0" i18n:translate="">No</span>
-                <span tal:condition="progress[0] == 1" i18n:translate="">Yes</span>
-            </tal:b>
-        </tal:b>
-
+    <tal:b condition="progress[1]" i18n:translate="">
+        <span tal:replace="progress[0]" i18n:name='counted' />
+        of
+        <span tal:replace="progress[1]" i18n:name='total' />
     </tal:b>
 </metal:progress>
 
@@ -999,13 +1025,13 @@
 </metal:subscription_links>
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
-    <nav role="navigation" aria-label="Aktuelle Seite">
+    <nav role="navigation" aria-label="Breadcrumb Navigation">
         <ul class="breadcrumbs back-links">
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
             <li tal:condition="item.compound|None"><a href="${request.link(item.compound)}">${item.compound.title}</a></li>
-            <li><a href="${request.link(item)}">${item.title}</a></li>
+            <li><a href="${request.link(item)}" aria-current="You are here" i18n:attributes="aria-current">${item.title}</a></li>
         </ul>
     </nav>
 </metal:election_day_link>
@@ -1125,26 +1151,23 @@
 <metal:pdf_download define-macro="pdf_download" i18n:domain="onegov.election_day">
     <tal:block tal:condition="layout.pdf_path">
         <h4>PDF</h4>
-        <p><span i18n:translate="">Download a PDF with all the results:</span> <a href="${request.link(model, 'pdf')}">PDF</a></p>
+        <p><span i18n:translate="">Download a PDF with all the results:</span> <a i18n:translate="" href="${request.link(model, 'pdf')}">PDF Results</a></p>
     </tal:block>
 </metal:pdf_download>
 
 <metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day">
     <h4 i18n:translate="">Open Data</h4>
     <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
-    <p>
-        <ol>
-            <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
-            <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
-        </ol>
-    </p>
+    <ol>
+        <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
+        <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
+    </ol>
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
 </metal:open_data_download>
 
 <metal:terms_of_use define-macro="terms_of_use" i18n:domain="onegov.election_day">
     <h5 i18n:translate="">Terms of use</h5>
-    <p>
-        <span i18n:translate="">Open use. Must provide the source.</span>
+        <p><span i18n:translate="">Open use. Must provide the source.</span></p>
         <ul>
             <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
             <li i18n:translate="">You may use this dataset for commercial purposes.</li>
@@ -1156,8 +1179,7 @@
                 </ol>
             </li>
         </ul>
-        <a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a>
-    </p>
+        <p><a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a></p>
 </metal:terms_of_use>
 
 <metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">
@@ -1165,15 +1187,19 @@
         <div class="alert-box alert" i18n:translate="">
             Your results could not be uploaded.
         </div>
-        <ul>
-            <li tal:repeat="error errors">
-                <span class="error-line" tal:condition="error.filename">${error.filename}</span>
-                <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
-                <span class="error-message">${error.error}</span>
-            </li>
-        </ul>
+        <tal:block metal:use-macro="layout.macros['file_import_errors']" />
     </div>
 </metal:upload_errors>
+
+<metal:file_import_errors define-macro="file_import_errors" i18n:domain="onegov.election_day">
+    <ul>
+        <li tal:repeat="error errors">
+            <span class="error-line" tal:condition="error.filename">${error.filename}</span>
+            <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
+            <span class="error-message">${error.error}</span>
+        </li>
+    </ul>
+</metal:file_import_errors>
 
 <metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.election_day">
     <script>
@@ -1231,10 +1257,10 @@
                         <tr>
                             <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
                             <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Mandates</th>
-                            <th tal:condition="not pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="not pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th tal:condition="pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
                             <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
                         </tr>
                     </thead>

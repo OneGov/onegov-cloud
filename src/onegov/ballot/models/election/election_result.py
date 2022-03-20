@@ -39,6 +39,9 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     #: the district this entity belongs to
     district = Column(Text, nullable=True)
 
+    #: the superregion this entity belongs to
+    superregion = Column(Text, nullable=True)
+
     #: True if the result has been counted and no changes will be made anymore.
     #: If the result is definite, all the values below must be specified.
     counted = Column(Boolean, nullable=False)
