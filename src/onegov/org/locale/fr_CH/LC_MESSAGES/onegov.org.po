@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-28 08:41+0100\n"
+"POT-Creation-Date: 2022-03-08 13:55+0100\n"
 "PO-Revision-Date: 2022-02-18 13:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -571,6 +571,9 @@ msgstr "Tradition"
 
 msgid "Youth"
 msgstr "Jeunesse"
+
+msgid "Elderly"
+msgstr "Âgées"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto dans le jardin du château"
