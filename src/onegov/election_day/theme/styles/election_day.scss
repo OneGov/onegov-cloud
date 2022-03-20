@@ -1116,6 +1116,11 @@ ul.pagination li.last {
     @include element-invisible;
 }
 
+a:focus {
+    outline: 2px solid;
+    outline-offset: 1px;
+}
+
 .show-only-on-tab:not(:focus) {
     @include element-invisible;
 }
