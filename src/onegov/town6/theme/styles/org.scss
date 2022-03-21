@@ -525,6 +525,11 @@ $pageref-color-hover: $iron;
         list-style: none;
         margin: 0;
     }
+
+    &> *:last-child {
+        margin-bottom: 0 !important;
+        border: 1px blue !important;
+    }
 }
 
 .occurrence-dates {
@@ -536,7 +541,7 @@ $pageref-color-hover: $iron;
         border-top: 1px solid #e1e4e6;
         padding-top: 1rem;
     }
-}    
+}   
 
 /*
     Sort topics
