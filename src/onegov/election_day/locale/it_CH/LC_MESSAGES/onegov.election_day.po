@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-01 07:34+0100\n"
-"PO-Revision-Date: 2022-02-25 13:47+0100\n"
+"POT-Creation-Date: 2022-03-20 08:15+0100\n"
+"PO-Revision-Date: 2022-03-15 10:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
 msgstr "Risultati finali sono disponibili"
@@ -522,6 +522,9 @@ msgstr "Struttura"
 msgid "Additional CSS"
 msgstr "CSS aggiuntivo"
 
+msgid "Email Address"
+msgstr "Indirizzo e-mail"
+
 msgid "Phone number"
 msgstr "Numero di telefono"
 
@@ -811,11 +814,10 @@ msgstr ""
 "i gruppi di liste."
 
 msgid "The file is invalid."
-msgstr "Il file non è valido."
-
-msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
-"Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
+
+msgid "The form contains errors. Please check the marked fields."
+msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
 #.
 #. Default: Start
