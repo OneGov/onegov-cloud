@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-09 07:50+0100\n"
+"POT-Creation-Date: 2022-03-21 08:27+0100\n"
 "PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -709,9 +709,6 @@ msgstr "Wahlen &amp; Abstimmungen"
 
 msgid "There are no elections or votes defined yet."
 msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
-
-msgid "<dynamic element>"
-msgstr ""
 
 msgid "Elections and votes on"
 msgstr "Urnengang vom"
