@@ -133,33 +133,22 @@
                                     <th tal:define="prefix vote.title_prefix(request)">
                                         <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
                                     </th>
-                                    <tal:block tal:switch="votes_started">
-                                        <td tal:case="True">
-                                            <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
-                                            <tal:block tal:condition="not vote.progress[0]" i18n:translate>
-                                                No results yet
-                                            </tal:block>
-                                        </td>
-                                        <td tal:case="False" class="no-results" i18n:translate>    
-                                            No results yet
-                                        </td>    
-                                    </tal:block>    
-                                    <td class="right-aligned" tal:condition="votes_started">
-                                        <tal:block tal:condition="vote.progress[0]">
+                                    <td tal:condition="vote.progress[0]">
+                                        <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)"></div>
+                                    </td>
+                                    <td tal:condition="not vote.progress[0]" colspan="5" class="right-aligned no-results" i18n:translate="">    
+                                        No results yet
+                                    </td>    
+                                    <td class="right-aligned" tal:condition="vote.progress[0]">
                                             ${layout.format_number(vote.display_yeas_percentage(request))}
-                                        </tal:block>    
                                     </td>
-                                    <td class="right-aligned" tal:condition="votes_started">
-                                        <tal:block tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.progress[0]">
                                             ${layout.format_number(vote.display_nays_percentage(request))}
-                                        </tal:block>
                                     </td>
-                                    <td class="right-aligned" tal:condition="votes_started and not communal_instance" >
-                                        <tal:block tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.progress[0] and not communal_instance" >
                                             <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
-                                        </tal:block>
                                     </td>
-                                    <td class="right-aligned" tal:condition="votes_started">
+                                    <td class="right-aligned" tal:condition="vote.progress[0]">
                                         ${layout.format_date(vote.last_result_change, 'datetime')}
                                     </td>
                                 </tr>
