@@ -1025,13 +1025,13 @@
 </metal:subscription_links>
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
-    <nav role="navigation" aria-label="Aktuelle Seite">
+    <nav role="navigation" aria-label="Breadcrumb Navigation">
         <ul class="breadcrumbs back-links">
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
             <li tal:condition="item.compound|None"><a href="${request.link(item.compound)}">${item.compound.title}</a></li>
-            <li><a href="${request.link(item)}">${item.title}</a></li>
+            <li><a href="${request.link(item)}" aria-current="You are here" i18n:attributes="aria-current">${item.title}</a></li>
         </ul>
     </nav>
 </metal:election_day_link>
