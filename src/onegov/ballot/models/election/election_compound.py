@@ -107,6 +107,12 @@ class ElectionCompound(
     #: Status of the compound and its elections
     manually_completed = Column(Boolean, nullable=False, default=False)
 
+    #: Display voters counts instead of votes in views with party results.
+    voters_counts = meta_property('voters_counts', default=False)
+
+    #: Display exact voters counts instead of rounded values.
+    exact_voters_counts = meta_property('exact_voters_counts', default=False)
+
     #: An election compound may contains n party results
     party_results = relationship(
         'PartyResult',

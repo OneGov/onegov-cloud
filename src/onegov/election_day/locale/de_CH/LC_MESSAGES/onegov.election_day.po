@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-28 07:00+0100\n"
-"PO-Revision-Date: 2022-02-25 13:43+0100\n"
+"POT-Creation-Date: 2022-03-20 08:15+0100\n"
+"PO-Revision-Date: 2022-03-15 10:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
 msgstr "Die Schlussresultate sind verfügbar"
@@ -382,8 +382,8 @@ msgstr "Ungültige Farbdefinitionen"
 msgid "Domain of the elections"
 msgstr "Ebene der Wahlen"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Wahlen"
 
 msgid "Completes manually"
 msgstr "Wird manuell abgeschlossen"
@@ -396,11 +396,33 @@ msgstr ""
 "individuellen Wahlergebnisse angezeigt, bis die Wahlverbindung manuell "
 "abgeschlossen wurde."
 
+msgid "Completion"
+msgstr "Abschluss"
+
 msgid "Completed"
 msgstr "Abgeschlossen"
 
-msgid "Elections"
-msgstr "Wahlen"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View options"
+msgstr "Ansichtsoptionen"
+
+msgid "Allows to show the list groups and lists views."
+msgstr "Ermöglicht die Anzeige der Listengruppen- und Listenansichten."
+
+msgid "Voters counts"
+msgstr "Wählerzahlen"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Zeigt die Wählerzahlen statt der Stimmen in der Ansicht der Parteistärken an."
+
+msgid "Exact voters counts"
+msgstr "Exakte Wählerzahlen"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Zeigt exakte Wählerzahlen anstelle von gerundeten Werten."
 
 msgid "List groups"
 msgstr "Listengruppen"
@@ -420,11 +442,12 @@ msgstr "Listen"
 
 msgid ""
 "Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+"Always rounded."
 msgstr ""
 "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle Wahlen. "
 "Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur falls "
-"Doppelter Pukelsheim."
+"Doppelter Pukelsheim. Immer gerundet."
 
 msgid "Party strengths"
 msgstr "Parteistärken"
@@ -505,6 +528,9 @@ msgstr "Struktur"
 
 msgid "Additional CSS"
 msgstr "Zusätzliches CSS"
+
+msgid "Email Address"
+msgstr "E-Mail-Adresse"
 
 msgid "Phone number"
 msgstr "Telefonnummer"
@@ -798,9 +824,8 @@ msgstr ""
 msgid "The file is invalid."
 msgstr "Die Datei ist ungültig."
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 #.
 #. Default: Start
@@ -1635,6 +1660,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid "The file contains errors."
-#~ msgstr "Die Datei enthält Fehler."

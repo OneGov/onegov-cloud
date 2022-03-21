@@ -1025,13 +1025,13 @@
 </metal:subscription_links>
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
-    <nav role="navigation" aria-label="Aktuelle Seite">
+    <nav role="navigation" aria-label="Breadcrumb Navigation">
         <ul class="breadcrumbs back-links">
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
             <li tal:condition="item.compound|None"><a href="${request.link(item.compound)}">${item.compound.title}</a></li>
-            <li><a href="${request.link(item)}">${item.title}</a></li>
+            <li><a href="${request.link(item)}" aria-current="You are here" i18n:attributes="aria-current">${item.title}</a></li>
         </ul>
     </nav>
 </metal:election_day_link>
@@ -1257,10 +1257,10 @@
                         <tr>
                             <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
                             <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Mandates</th>
-                            <th tal:condition="not pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="not pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th tal:condition="pukelsheim" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
                             <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
                         </tr>
                     </thead>

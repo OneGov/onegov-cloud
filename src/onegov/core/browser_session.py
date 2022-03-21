@@ -50,7 +50,7 @@ class BrowserSession(object):
 
     Used by :class:`onegov.core.request.CoreRequest`.
 
-    Example:
+    Example::
 
         browser_session = request.browser_session
         browser_session.name = 'Foo'

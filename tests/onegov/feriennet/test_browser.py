@@ -73,7 +73,6 @@ def test_browse_matching(browser, scenario):
     assert 'finished prebooking' in browser.html
 
 
-@mark.flaky(reruns=3)
 def test_browse_billing(browser, scenario, postgres):
     scenario.add_period(title="Ferienpass 2016", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
@@ -115,102 +114,121 @@ def test_browse_billing(browser, scenario, postgres):
 
     scenario.commit()
 
-    admin = browser
-    member = browser.clone()
-
-    admin.login_admin()
-    member.login('member@example.org', 'hunter2')
+    browser.login_admin()
 
     # initially there are no bills
-    admin.visit('/billing')
-    assert admin.is_text_present("Keine Rechnungen gefunden")
+    browser.visit('/billing')
+    assert browser.is_text_present("Keine Rechnungen gefunden")
 
     # they can be created
-    admin.find_by_css("input[type='submit']").click()
-    assert admin.is_text_present("John Doe")
-    assert admin.is_text_present("Jane Doe")
+    browser.find_by_css("input[type='submit']").click()
+    assert browser.is_text_present("John Doe")
+    assert browser.is_text_present("Jane Doe")
 
     # as long as the period is not finalized, there's no way to pay
-    admin.visit('/billing?username=admin@example.org')
-    assert admin.is_text_present('100.00 Ausstehend')
+    browser.visit('/billing?username=admin@example.org')
+    assert browser.is_text_present('100.00 Ausstehend')
 
-    admin.visit('/billing?username=member@example.org')
-    assert admin.is_text_present('1100.00 Ausstehend')
+    browser.visit('/billing?username=member@example.org')
+    assert browser.is_text_present('1100.00 Ausstehend')
 
-    assert 'mark-paid' not in admin.html
+    assert 'mark-paid' not in browser.html
 
     # as long as the period is not finalized, there are no invoices
-    for client in (member, admin):
-        client.visit('/')
-        assert client.find_by_css('.invoices-count').first['data-count'] == '0'
+    browser.logout()
+    browser.login('member@example.org', 'hunter2')
 
-        client.visit('/my-bills')
-        assert client.is_text_present("noch keine Rechnungen")
+    browser.visit('/')
+    assert browser.find_by_css('.invoices-count').first['data-count'] == '0'
+
+    browser.visit('/my-bills')
+    assert browser.is_text_present("noch keine Rechnungen")
+
+    browser.logout()
+    browser.login_admin()
+
+    browser.visit('/')
+    assert browser.find_by_css('.invoices-count').first['data-count'] == '0'
+
+    browser.visit('/my-bills')
+    assert browser.is_text_present("noch keine Rechnungen")
 
     # once the period is finalized, the invoices become public and they
     # may be marked as paid
-    admin.visit('/billing')
-    admin.find_by_css('input[value="yes"]').click()
-    admin.find_by_css('input[name="sure"]').click()
-    admin.find_by_css("input[type='submit']").click()
+    browser.visit('/billing')
+    browser.find_by_css('input[value="yes"]').click()
+    browser.find_by_css('input[name="sure"]').click()
+    browser.find_by_css("input[type='submit']").click()
 
-    for client in (member, admin):
-        client.visit('/')
-        assert client.find_by_css('.invoices-count').first['data-count'] == '1'
+    browser.logout()
+    browser.login('member@example.org', 'hunter2')
 
-        client.visit('/my-bills')
-        assert not client.is_text_present('noch keine Rechnungen')
-        assert client.is_text_present("Ferienpass 2016")
+    browser.visit('/')
+    assert browser.find_by_css('.invoices-count').first['data-count'] == '1'
 
-    admin.visit('/billing?username=member@example.org&state=all')
-    assert client.is_text_present('1100.00 Ausstehend')
+    browser.visit('/my-bills')
+    assert not browser.is_text_present('noch keine Rechnungen')
+    assert browser.is_text_present("Ferienpass 2016")
+
+    browser.logout()
+    browser.login_admin()
+
+    browser.visit('/')
+    assert browser.find_by_css('.invoices-count').first['data-count'] == '1'
+
+    browser.visit('/my-bills')
+    assert not browser.is_text_present('noch keine Rechnungen')
+    assert browser.is_text_present("Ferienpass 2016")
+
+    browser.visit('/billing?username=member@example.org&state=all')
+    assert browser.is_text_present('1100.00 Ausstehend')
 
     # we'll test a few scenarios here
     postgres.save()
 
     # pay the bill bit by bit
-    assert not admin.is_element_present_by_css('.paid')
+    assert not browser.is_element_present_by_css('.paid')
 
-    admin.find_by_css('.bill button').click()
-    admin.find_by_css('table .unpaid .actions-button').first.click()
-    admin.find_by_css('table .unpaid .mark-paid').first.click()
-
-    time.sleep(0.25)
-    assert admin.is_element_present_by_css('.paid')
-    assert admin.is_element_present_by_css('.unpaid')
-
-    admin.find_by_css('table .unpaid .actions-button').first.click()
-    admin.find_by_css('table .unpaid .mark-paid').first.click()
+    browser.find_by_css('.bill button').click()
+    browser.find_by_css('table .unpaid .actions-button').first.click()
+    browser.find_by_css('table .unpaid .mark-paid').first.click()
 
     time.sleep(0.25)
-    assert admin.is_element_present_by_css('.paid')
-    assert not admin.is_element_present_by_css('.unpaid')
+    assert browser.is_element_present_by_css('.paid')
+    assert browser.is_element_present_by_css('.unpaid')
+
+    browser.find_by_css('table .unpaid .actions-button').first.click()
+    browser.find_by_css('table .unpaid .mark-paid').first.click()
+
+    time.sleep(0.25)
+    assert browser.is_element_present_by_css('.paid')
+    assert not browser.is_element_present_by_css('.unpaid')
 
     # try to introduce a manual booking
     postgres.undo()
 
-    admin.visit('/billing?state=all')
-    admin.find_by_css('.dropdown.right-side').click()
-    admin.find_by_css('.new-booking').click()
+    browser.visit('/billing?state=all')
+    browser.find_by_css('.dropdown.right-side').click()
+    browser.find_by_css('.new-booking').click()
 
-    admin.choose('target', 'all')
-    admin.choose('kind', 'discount')
-    admin.find_by_css('#booking_text').fill('Rabatt')
-    admin.find_by_css('#discount').fill('1.00')
-    admin.find_by_value("Absenden").click()
+    browser.choose('target', 'all')
+    browser.choose('kind', 'discount')
+    browser.find_by_css('#booking_text').fill('Rabatt')
+    browser.find_by_css('#discount').fill('1.00')
+    browser.find_by_value("Absenden").click()
 
-    assert admin.is_text_present("2 manuelle Buchungen wurden erstellt")
-    assert admin.is_element_present_by_css('.remove-manual')
+    assert browser.is_text_present("2 manuelle Buchungen wurden erstellt")
+    assert browser.is_element_present_by_css('.remove-manual')
 
     # remove the manual booking
-    admin.find_by_css('.dropdown.right-side').click()
-    admin.find_by_css('.remove-manual').click()
+    browser.find_by_css('.dropdown.right-side').click()
+    browser.find_by_css('.remove-manual').click()
 
-    assert admin.is_text_present("2 Buchungen entfernen")
-    admin.find_by_text("2 Buchungen entfernen").click()
+    assert browser.is_text_present("2 Buchungen entfernen")
+    browser.find_by_text("2 Buchungen entfernen").click()
 
     time.sleep(0.25)
-    assert not admin.is_element_present_by_css('.remove-manual')
+    assert not browser.is_element_present_by_css('.remove-manual')
 
 
 def test_volunteers(browser, scenario):
