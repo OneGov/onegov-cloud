@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-21 08:27+0100\n"
+"POT-Creation-Date: 2022-03-21 10:04+0100\n"
 "PO-Revision-Date: 2022-02-25 13:48+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -710,8 +710,9 @@ msgstr "Elecziuns &amp; votaziuns"
 msgid "There are no elections or votes defined yet."
 msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 
-msgid "Elections and votes on"
-msgstr "Votaziun dals"
+#, python-format
+msgid "Elections and votes on ${date}"
+msgstr "Votaziun dals ${date}"
 
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
@@ -1479,10 +1480,6 @@ msgstr ""
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Propi trametter danovamain communicaziuns als abunents?"
 
-#, python-format
-msgid "Elections and votes on ${date}"
-msgstr "Votaziun dals ${date}"
-
 msgid "Screen added."
 msgstr "Agiuntà il screen."
 
@@ -1672,3 +1669,6 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Elections and votes on"
+#~ msgstr "Votaziun dals"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-21 08:27+0100\n"
+"POT-Creation-Date: 2022-03-21 10:04+0100\n"
 "PO-Revision-Date: 2022-02-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -710,8 +710,9 @@ msgstr "Elections et votations: données ouvertes"
 msgid "There are no elections or votes defined yet."
 msgstr "Il n'y a pas de élections ou votations définis actuellement."
 
-msgid "Elections and votes on"
-msgstr "Elections et votes sur"
+#, python-format
+msgid "Elections and votes on ${date}"
+msgstr "Elections et votes sur ${date}"
 
 msgid "Federal Elections"
 msgstr "Elections fédéraux"
@@ -1479,10 +1480,6 @@ msgstr ""
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Voulez-vous vraiment réactiver les notifications ?"
 
-#, python-format
-msgid "Elections and votes on ${date}"
-msgstr "Elections et votes sur ${date}"
-
 msgid "Screen added."
 msgstr "Écran ajouté."
 
@@ -1667,3 +1664,6 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Elections and votes on"
+#~ msgstr "Elections et votes sur"

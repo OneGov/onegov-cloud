@@ -18,7 +18,7 @@
             </tal:block>
 
             <div tal:repeat="date archive_items" class="date-${date}">
-                <h2 i18n:translate="">
+                <h2>
                     <a i18n:translate="" href="${request.link(layout.archive.for_date(date))}">
                         Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date'/>
                     </a>
