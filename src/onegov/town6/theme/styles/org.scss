@@ -6,10 +6,10 @@
 //}
 
 /*
-    The maximum width of a line relative to the font. This limits textblocks
+    The maximum width of a line relative to the main font size. This limits textblocks
     to a readable length.
 */
-$max-line-width: 71ex;
+$max-line-width: 36rem;
 
 .limit-line-width {
     max-width: $max-line-width;
@@ -224,7 +224,7 @@ footer {
         display: block;
     }
 
-    p {
+    > * {
         max-width: $max-line-width;
     }
 
