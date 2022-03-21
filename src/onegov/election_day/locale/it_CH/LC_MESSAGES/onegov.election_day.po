@@ -796,6 +796,12 @@ msgstr "Il formato dei dati è descritto qui:"
 msgid "Format Description"
 msgstr "Descrizione del formato"
 
+msgid "Embed heatmap"
+msgstr "incorporare la mappa"
+
+msgid "Download heatmap"
+msgstr "Scarica la mappa"
+
 msgid "Embed"
 msgstr "Incorporare"
 
@@ -819,8 +825,8 @@ msgstr ""
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Pagina iniziale"
 

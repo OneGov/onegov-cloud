@@ -804,6 +804,12 @@ msgstr "Il format da las datas è descrit qua:"
 msgid "Format Description"
 msgstr "Descripziun dal format"
 
+msgid "Embed heatmap"
+msgstr "Incorporar la carta"
+
+msgid "Download heatmap"
+msgstr "Telechargiar la carta"
+
 msgid "Embed"
 msgstr "Incorporar"
 
@@ -828,8 +834,8 @@ msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Pagina iniziala"
 
