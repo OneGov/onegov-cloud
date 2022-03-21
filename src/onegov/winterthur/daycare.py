@@ -439,33 +439,10 @@ class DaycareSubsidyCalculator(object):
             operation="=",
             amount=min(gross.total, daycare.rate))
 
-        # Rebate
-        # ------
-        rebate = gross.total * cfg.rebate / 100 if rebate else 0
-
-        net = Block('net', "Berechnung des Rabatts")
-
-        net.op(
-            title="Übertrag",
-            amount=gross.total)
-
-        net.op(
-            title="Rabatt",
-            amount=rebate,
-            operation="-",
-            note=f"""
-                Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
-                Tagen pro Woche gilt ein Rabatt von
-                {fmt(cfg.rebate).rstrip('0').rstrip('.')}%.
-            """)
-
-        net.op(
-            title="Elternbeitrag netto",
-            operation="=",
-            amount=max(cfg.min_rate, gross.total - rebate))
-
         # Actual contribution
         # -------------------
+        rebate = gross.total * cfg.rebate / 100 if rebate else 0
+
         actual = Block('actual', (
             "Berechnung des Elternbeitrags und des "
             "städtischen Beitrags pro Tag"
@@ -473,7 +450,7 @@ class DaycareSubsidyCalculator(object):
 
         actual.op(
             title="Übertrag",
-            amount=net.total)
+            amount=gross.total)
 
         actual.op(
             title="Zusatzbeitrag Eltern",
@@ -483,6 +460,17 @@ class DaycareSubsidyCalculator(object):
                 Zusatzbeitrag für Kitas, deren Tagestarif über
                 {cfg.max_rate} CHF liegt.
             """)
+
+        if actual.total >= rebate and rebate > 0:
+            actual.op(
+                title="Rabatt",
+                amount=rebate,
+                operation="-",
+                note=f"""
+                    Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
+                    Tagen pro Woche gilt ein Rabatt von
+                    {fmt(cfg.rebate).rstrip('0').rstrip('.')}%.
+                """)
 
         parent_share_per_day = actual.op(
             title="Elternbeitrag pro Tag",
@@ -563,7 +551,7 @@ class DaycareSubsidyCalculator(object):
             + round_to(city_share_per_month, '0.05')
 
         return Bunch(
-            blocks=(base, gross, net, actual, monthly),
+            blocks=(base, gross, actual, monthly),
             parent_share_per_month=format_5_cents(parent_share_per_month),
             city_share_per_month=format_5_cents(city_share_per_month),
             total_per_month=format_5_cents(total),

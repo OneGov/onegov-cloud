@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-14 08:55+0100\n"
-"PO-Revision-Date: 2022-02-25 13:48+0100\n"
+"POT-Creation-Date: 2022-03-20 08:15+0100\n"
+"PO-Revision-Date: 2022-03-15 10:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
 msgstr "Ils resultats finals èn disponibels"
@@ -529,6 +529,9 @@ msgstr "Structura"
 msgid "Additional CSS"
 msgstr "CSS supplementar"
 
+msgid "Email Address"
+msgstr "Adressa dad e-mail"
+
 msgid "Phone number"
 msgstr "Numer da telefon"
 
@@ -827,10 +830,9 @@ msgstr ""
 msgid "The file is invalid."
 msgstr ""
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
-"cotschen."
+"Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
 #. Default: Start
 #.
