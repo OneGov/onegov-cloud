@@ -1179,7 +1179,7 @@
                 </ol>
             </li>
         </ul>
-        <p><a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="Nutzungsbedingungen"></a></p>
+        <p><a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" i18n:attributes="alt" alt="Terms of use"></a></p>
 </metal:terms_of_use>
 
 <metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">
