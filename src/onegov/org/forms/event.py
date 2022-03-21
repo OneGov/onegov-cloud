@@ -59,6 +59,7 @@ TAGS = [(tag, tag) for tag in (
     _("Toy Library"),
     _("Tradition"),
     _("Youth"),
+    _("Elderly"),
 )]
 
 WEEKDAYS = (

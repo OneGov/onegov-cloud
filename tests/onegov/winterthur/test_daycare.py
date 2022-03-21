@@ -130,7 +130,7 @@ def test_calculate_example_1(app):
         rebate=True,
     )
 
-    base, gross, net, actual, monthly = calculation.blocks
+    base, gross, actual, monthly = calculation.blocks
 
     # note, these results slightly differ from the output, as the rounding
     # only happens when the numbers are rendered
@@ -152,17 +152,11 @@ def test_calculate_example_1(app):
         ("Elternbeitrag brutto", "=", Decimal("107")),
     ]
 
-    results = [(r.title, r.operation, r.amount) for r in net.results]
-    assert results == [
-        ("Übertrag", None, Decimal('107')),
-        ("Rabatt", "-", Decimal('5.35')),
-        ("Elternbeitrag netto", "=", Decimal('101.65')),
-    ]
-
     results = [(r.title, r.operation, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", None, Decimal('101.65')),
+        ("Übertrag", None, Decimal('107')),
         ("Zusatzbeitrag Eltern", "+", Decimal('1')),
+        ("Rabatt", "-", Decimal('5.35')),
         ("Elternbeitrag pro Tag", "=", Decimal('102.65')),
         ("Städtischer Beitrag pro Tag", None, Decimal('5.35'))
     ]
@@ -194,7 +188,7 @@ def test_calculate_example_2(app):
         rebate=False,
     )
 
-    base, gross, net, actual, monthly = calculation.blocks
+    base, gross, actual, monthly = calculation.blocks
 
     # note, these results slightly differ from the output, as the rounding
     # only happens when the numbers are rendered
@@ -214,13 +208,6 @@ def test_calculate_example_2(app):
         ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("8.36")),
         ("Mindestbeitrag Eltern", Decimal("15")),
         ("Elternbeitrag brutto", Decimal("23.36")),
-    ]
-
-    results = [(r.title, r.amount) for r in net.results]
-    assert results == [
-        ("Übertrag", Decimal('23.36')),
-        ("Rabatt", Decimal('0')),
-        ("Elternbeitrag netto", Decimal('23.36')),
     ]
 
     results = [(r.title, r.amount) for r in actual.results]
@@ -254,7 +241,7 @@ def test_calculate_example_3(app):
         rebate=True,
     )
 
-    base, gross, net, actual, monthly = calculation.blocks
+    base, gross, actual, monthly = calculation.blocks
 
     # note, these results slightly differ from the output, as the rounding
     # only happens when the numbers are rendered
@@ -276,17 +263,11 @@ def test_calculate_example_3(app):
         ("Elternbeitrag brutto", Decimal("93.47")),
     ]
 
-    results = [(r.title, r.amount) for r in net.results]
-    assert results == [
-        ("Übertrag", Decimal('93.47')),
-        ("Rabatt", Decimal('4.67')),
-        ("Elternbeitrag netto", Decimal('88.80')),
-    ]
-
     results = [(r.title, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", Decimal('88.80')),
+        ("Übertrag", Decimal('93.47')),
         ("Zusatzbeitrag Eltern", Decimal('0')),
+        ("Rabatt", Decimal('4.67')),
         ("Elternbeitrag pro Tag", Decimal('88.80')),
         ("Städtischer Beitrag pro Tag", Decimal('9.20'))
     ]
@@ -314,7 +295,7 @@ def test_caclulate_example_4(app):
         rebate=True,
     )
 
-    base, gross, net, actual, monthly = calculation.blocks
+    base, gross, actual, monthly = calculation.blocks
 
     # note, these results slightly differ from the output, as the rounding
     # only happens when the numbers are rendered
@@ -336,27 +317,21 @@ def test_caclulate_example_4(app):
         ("Elternbeitrag brutto", Decimal("15")),
     ]
 
-    results = [(r.title, r.amount) for r in net.results]
-    assert results == [
-        ("Übertrag", Decimal('15')),
-        ("Rabatt", Decimal('0.75')),
-        ("Elternbeitrag netto", Decimal('15')),
-    ]
-
     results = [(r.title, r.amount) for r in actual.results]
     assert results == [
         ("Übertrag", Decimal('15')),
         ("Zusatzbeitrag Eltern", Decimal('3')),
-        ("Elternbeitrag pro Tag", Decimal('18')),
-        ("Städtischer Beitrag pro Tag", Decimal('92'))
+        ("Rabatt", Decimal('0.75')),
+        ("Elternbeitrag pro Tag", Decimal('17.25')),
+        ("Städtischer Beitrag pro Tag", Decimal('92.75'))
     ]
 
     results = [(r.title, r.amount) for r in monthly.results]
     assert results == [
-        ("Wochentarif", Decimal('18')),
+        ("Wochentarif", Decimal('17.25')),
         ("Faktor", Decimal('4.25')),
-        ("Elternbeitrag pro Monat", Decimal('76.50')),
-        ("Städtischer Beitrag pro Monat", Decimal('391')),
+        ("Elternbeitrag pro Monat", Decimal('73.31')),
+        ("Städtischer Beitrag pro Monat", Decimal('394.19')),
     ]
 
 
@@ -376,7 +351,7 @@ def test_calculate_example_5(app):
         rebate=False,
     )
 
-    base, gross, net, actual, monthly = calculation.blocks
+    base, gross, actual, monthly = calculation.blocks
 
     # note, these results slightly differ from the output, as the rounding
     # only happens when the numbers are rendered
@@ -396,13 +371,6 @@ def test_calculate_example_5(app):
         ("Einkommensabhängiger Elternbeitragsbestandteil", Decimal("36.80")),
         ("Mindestbeitrag Eltern", Decimal("15")),
         ("Elternbeitrag brutto", Decimal("51.80")),
-    ]
-
-    results = [(r.title, r.amount) for r in net.results]
-    assert results == [
-        ("Übertrag", Decimal('51.80')),
-        ("Rabatt", Decimal('0.0')),
-        ("Elternbeitrag netto", Decimal('51.80')),
     ]
 
     results = [(r.title, r.amount) for r in actual.results]
