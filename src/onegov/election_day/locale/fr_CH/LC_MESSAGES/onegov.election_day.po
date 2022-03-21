@@ -803,6 +803,12 @@ msgstr "Le format des données est décrit ici:"
 msgid "Format Description"
 msgstr "Description du format"
 
+msgid "Embed heatmap"
+msgstr "Intégrer la carte"
+
+msgid "Download heatmap"
+msgstr "Télécharger la carte"
+
 msgid "Embed"
 msgstr "Intégration"
 

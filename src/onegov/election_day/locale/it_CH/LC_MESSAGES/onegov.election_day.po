@@ -796,6 +796,12 @@ msgstr "Il formato dei dati è descritto qui:"
 msgid "Format Description"
 msgstr "Descrizione del formato"
 
+msgid "Embed heatmap"
+msgstr "incorporare la mappa"
+
+msgid "Download heatmap"
+msgstr "Scarica la mappa"
+
 msgid "Embed"
 msgstr "Incorporare"
 

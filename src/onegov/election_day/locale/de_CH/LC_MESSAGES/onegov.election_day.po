@@ -804,6 +804,12 @@ msgstr "Das Datenformat ist hier beschrieben:"
 msgid "Format Description"
 msgstr "Formatbeschreibung"
 
+msgid "Embed heatmap"
+msgstr "Karte einbetten"
+
+msgid "Download heatmap"
+msgstr "Karte herunterladen"
+
 msgid "Embed"
 msgstr "Einbetten"
 
