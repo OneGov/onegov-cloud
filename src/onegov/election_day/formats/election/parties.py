@@ -17,10 +17,6 @@ def parse_party_result(
     try:
         year = validate_integer(line, 'year', default=election_year)
         total_votes = validate_integer(line, 'total_votes')
-        total_voters_count = validate_numeric(
-            line, 'total_voters_count', precision=12, scale=2,
-            optional=True, default=None
-        )
         name = line.name or ''
         id_ = validate_list_id(line, 'id')
         color = line.color or (
@@ -30,6 +26,10 @@ def parse_party_result(
         votes = validate_integer(line, 'votes')
         voters_count = validate_numeric(
             line, 'voters_count', precision=12, scale=2,
+            optional=True, default=None
+        )
+        voters_count_percentage = validate_numeric(
+            line, 'voters_count_percentage', precision=12, scale=2,
             optional=True, default=None
         )
         assert all((year, total_votes, name, color))
@@ -52,12 +52,12 @@ def parse_party_result(
                 id=uuid4(),
                 year=year,
                 total_votes=total_votes,
-                total_voters_count=total_voters_count,
                 name=name,
                 color=color,
                 number_of_mandates=mandates,
                 votes=votes,
-                voters_count=voters_count
+                voters_count=voters_count,
+                voters_count_percentage=voters_count_percentage
             )
 
 

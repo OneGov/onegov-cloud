@@ -50,13 +50,13 @@ INTERNAL_MAJORZ_HEADERS = (
 ELECTION_PARTY_HEADERS = (
     'year',
     'total_votes',
-    # 'total_voters_count' optional
     'name',
     'id',
     'color',
     'mandates',
     'votes',
     # 'voters_count'  optional
+    # 'voters_count_percentage' optional
 )
 
 WABSTI_MAJORZ_HEADERS = (

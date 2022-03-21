@@ -131,13 +131,13 @@ Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`total_voters_count`|The total number of cumulative number of votes per total number of mandates per election, for election compounds only.
 `name`|The name of the party.
 `id`|ID of the party.
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
+`voters_count_percentage`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 `panachage_votes_from_{XX}`|The number of votes the party got from the party with `id = XX`. An `id` with the value `999` marks the votes from the blank list.
 
 3 Vote results

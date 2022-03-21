@@ -63,11 +63,11 @@ class PartyResultExportMixin(object):
             year = results.setdefault(result.year, {})
             year[result.name] = {
                 'total_votes': result.total_votes,
-                'total_voters_count': result.total_voters_count,
                 'color': result.color,
                 'mandates': result.number_of_mandates,
                 'votes': result.votes,
-                'voters_count': result.voters_count
+                'voters_count': result.voters_count,
+                'voters_count_percentage': result.voters_count_percentage
             }
             parties |= set([result.name])
 
@@ -91,13 +91,13 @@ class PartyResultExportMixin(object):
                 row['name'] = party
                 row['id'] = parties.index(party)
                 row['total_votes'] = result.get('total_votes', '')
-                row['total_voters_count'] = str(
-                    result.get('total_voters_count', '') or ''
-                )
                 row['color'] = result.get('color', '')
                 row['mandates'] = result.get('mandates', '')
                 row['votes'] = result.get('votes', '')
                 row['voters_count'] = str(result.get('voters_count', '') or '')
+                row['voters_count_percentage'] = str(
+                    result.get('voters_count_percentage', '') or ''
+                )
 
                 # add the panachage results
                 if self.panachage_results.count():
