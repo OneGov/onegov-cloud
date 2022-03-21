@@ -804,6 +804,12 @@ msgstr "Das Datenformat ist hier beschrieben:"
 msgid "Format Description"
 msgstr "Formatbeschreibung"
 
+msgid "Embed heatmap"
+msgstr "Karte einbetten"
+
+msgid "Download heatmap"
+msgstr "Karte herunterladen"
+
 msgid "Embed"
 msgstr "Einbetten"
 
@@ -827,8 +833,8 @@ msgstr "Die Datei ist ungültig."
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Startseite"
 

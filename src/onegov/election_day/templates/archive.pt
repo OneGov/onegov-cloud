@@ -27,8 +27,10 @@
             </nav>
 
             <div tal:repeat="date archive_items" class="date-${date}">
-                <h2 i18n:translate="" id="date-${date}">
-                    Elections and votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
+                <h2>
+                    <a i18n:translate="" href="${request.link(layout.archive.for_date(date))}">
+                        Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date'/>
+                    </a>
                 </h2>
                 <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
                     <div tal:repeat="type archive_items[date][domain]" class="type-${type}">
