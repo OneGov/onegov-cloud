@@ -17,7 +17,7 @@ from wtforms.validators import InputRequired
 class EmailSubscriptionForm(Form):
 
     email = StringField(
-        label=_("Email"),
+        label=_("Email Address"),
         validators=[
             InputRequired(),
             Email()
