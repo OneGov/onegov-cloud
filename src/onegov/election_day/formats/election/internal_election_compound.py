@@ -11,9 +11,6 @@ def import_election_compound_internal(compound, principal, file, mimetype):
     is also the format used by onegov.ballot.ProporzElection.export() with
     all exports in one single file. Does not support separate expat results.
 
-    Imports as much as possible, skipping elections without relevant data in
-    the given file.
-
     :return:
         A list containing errors.
 
@@ -48,7 +45,9 @@ def import_election_compound_internal(compound, principal, file, mimetype):
 
     if not errors:
         compound.last_result_change = compound.timestamp()
-        for election in updated:
+        for election in compound.elections:
+            if election not in updated:
+                election.clear_results()
             election.last_result_change = compound.last_result_change
 
     result = []
