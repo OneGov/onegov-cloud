@@ -49,12 +49,12 @@ INTERNAL_MAJORZ_HEADERS = (
 
 ELECTION_PARTY_HEADERS = (
     'year',
-    'total_votes',
     'name',
     'id',
     'color',
-    'mandates',
-    'votes',
+    # 'mandates', optional
+    # 'votes', optional
+    # 'total_votes', optional
     # 'voters_count'  optional
     # 'voters_count_percentage' optional
 )
