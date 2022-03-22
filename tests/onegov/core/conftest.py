@@ -84,22 +84,28 @@ def render_element(request):
 
 @pytest.fixture(scope='function')
 def maildir_app(temporary_directory, maildir):
+    postmark_cfg = {
+        'mailer': 'postmark',
+        'directory': maildir,
+        'token': 'token'
+    }
     app_cfg = {
         'mail': {
             'marketing': {
-                'sender': 'noreply@example.org',
-                'mailer': 'postmark',
-                'directory': maildir
+                **postmark_cfg,
+                'sender': 'noreply@example.org'
             },
             'transactional': {
-                'sender': 'noreply@example.org',
-                'mailer': 'postmark',
-                'directory': maildir
+                **postmark_cfg,
+                'sender': 'noreply@example.org'
             }
         }
     }
 
     cfg = {
+        'mail_queues': {
+            'postmark': postmark_cfg
+        },
         'applications': [
             {
                 'path': '/foobar/*',
@@ -121,22 +127,33 @@ def maildir_app(temporary_directory, maildir):
 
 @pytest.fixture(scope='function')
 def maildir_smtp_app(temporary_directory, maildir, smtp):
+    smtp_cfg = {
+        'mailer': 'smtp',
+        'directory': maildir,
+        'host': smtp.address[0],
+        'port': smtp.address[1],
+        'force_tls': False,
+        'username': None,
+        'password': None,
+    }
+
     app_cfg = {
         'mail': {
             'marketing': {
-                'sender': 'noreply@example.org',
-                'mailer': 'smtp',
-                'directory': maildir
+                **smtp_cfg,
+                'sender': 'noreply@example.org'
             },
             'transactional': {
-                'sender': 'noreply@example.org',
-                'mailer': 'smtp',
-                'directory': maildir
+                **smtp_cfg,
+                'sender': 'noreply@example.org'
             }
         }
     }
 
     cfg = {
+        'mail_queues': {
+            'smtp': smtp_cfg
+        },
         'applications': [
             {
                 'path': '/foobar/*',

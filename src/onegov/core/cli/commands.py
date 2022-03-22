@@ -79,85 +79,45 @@ def delete(group_context):
     'matches_required': False,
     'default_selector': '*'
 })
-@click.option('--token', default=None,
-              help="The postmark server token to authenticate")
-@click.option('--limit', default=25,
-              help="Max number of mails to send before exiting")
-@click.pass_context
-def sendmail(context, token, limit):
-    """ Iterates over all applications and processes the maildir for each
-    application that uses maildir e-mail delivery.
-
-    """
-
-    # TODO: Remove the options and invoke_without_subcommand
-    #       once we use a specific subcommand everywhere, this
-    #       is only for intermediate backwards compatibility
-    if context.invoked_subcommand is None:
-        # if we got no subcommand invoke postmark using forward
-        context.forward(postmark)
-
-
-@sendmail.command()
-@click.option('--token', default=None,
-              help="The postmark server token to authenticate")
+@click.option('--queue', default='postmark',
+              help="The name of the queue to process")
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
 @pass_group_context
-def postmark(group_context, token, limit):
-    """ Iterates over all applications and processes the maildir for each
-    application that uses maildir e-mail delivery using postmark mailer.
+def sendmail(group_context, queue, limit):
+    """ Sends mail from a specific mail queue. """
 
-    """
+    queues = group_context.config.mail_queues
+    if queue not in queues:
+        click.echo(f'The queue "{queue}" does not exist.', err=True)
+        sys.exit(1)
 
-    # applications with a maildir configuration
-    cfgs = (c for c in group_context.appcfgs if 'mail' in c.configuration)
-    cfgs = (v for c in cfgs for v in c.configuration['mail'].values())
-    # FIXME: If we ever add more mailers this needs to change
-    cfgs = (c for c in cfgs if c.get('mailer') != 'smtp')
-    cfgs = (c for c in cfgs if c.get('directory'))
+    cfg = queues[queue]
+    mailer = cfg.get('mailer', 'postmark')
+    directory = cfg.get('directory')
+    if not directory:
+        click.echo('No directory configured for this queue.', err=True)
+        sys.exit(1)
 
-    # non-empty maildirs
-    dirs = set(c['directory'] for c in cfgs)
-    qp = PostmarkMailQueueProcessor(token, *dirs, limit=limit)
-    qp.send_messages()
-
-
-@sendmail.command()
-@click.option('--hostname', help="The smtp host")
-@click.option('--port', help="The smtp port")
-@click.option('--force-tls', default=False, is_flag=True,
-              help="Force a TLS connection")
-@click.option('--username', help="The username to authenticate", default=None)
-@click.option('--password', help="The password to authenticate", default=None)
-@click.option('--limit', default=25,
-              help="Max number of mails to send before exiting")
-@pass_group_context
-def smtp(group_context, hostname, port, force_tls, username, password, limit):
-    """ Iterates over all applications and processes the maildir for each
-    application that uses maildir e-mail delivery using smtp mailer.
-
-    """
-
-    # applications with a maildir configuration
-    cfgs = (c for c in group_context.appcfgs if 'mail' in c.configuration)
-    cfgs = (v for c in cfgs for v in c.configuration['mail'].values())
-    cfgs = (c for c in cfgs if c.get('mailer') == 'smtp')
-    cfgs = (c for c in cfgs if c.get('directory'))
-
-    # non-empty maildirs
-    dirs = set(c['directory'] for c in cfgs)
-
-    with smtplib.SMTP(hostname, port) as mailer:
-        if force_tls:
-            context = ssl.create_default_context()
-            mailer.starttls(context=context)
-
-        if username:
-            mailer.login(username, password)
-
-        qp = SMTPMailQueueProcessor(mailer, *dirs, limit=limit)
+    if mailer == 'postmark':
+        qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
         qp.send_messages()
+
+    elif mailer == 'smtp':
+        with smtplib.SMTP(cfg['host'], cfg['port']) as mailer:
+            if cfg.get('force_tls', False):
+                context = ssl.create_default_context()
+                mailer.starttls(context=context)
+
+            username = cfg.get('username')
+            if username is not None:
+                mailer.login(username, cfg.get('password'))
+
+            qp = SMTPMailQueueProcessor(mailer, directory, limit=limit)
+            qp.send_messages()
+    else:
+        click.echo(f'Unknown mailer {mailer} specified in config.', err=True)
+        sys.exit(1)
 
 
 @cli.command(context_settings={

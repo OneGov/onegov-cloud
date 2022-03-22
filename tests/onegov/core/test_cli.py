@@ -162,8 +162,8 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token',
+        'sendmail',
+        '--queue', 'postmark'
     ])
 
     assert result.exit_code == 0
@@ -182,8 +182,8 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token',
+        'sendmail',
+        '--queue', 'postmark'
     ])
 
     assert result.exit_code == 0
@@ -200,13 +200,44 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token',
+        'sendmail',
+        '--queue', 'postmark'
     ])
 
     assert result.exit_code == 0
     assert not mock_send.called
     assert len(os.listdir(maildir)) == 0
+
+
+def test_sendmail_invalid_queue(temporary_directory, maildir_app, monkeypatch):
+    mock_send = Mock(return_value=None)
+    monkeypatch.setattr(
+        'onegov.core.mail_processor.PostmarkMailQueueProcessor.send',
+        mock_send
+    )
+    maildir = os.path.join(temporary_directory, 'mails')
+    app = maildir_app
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test",
+        category="transactional"
+    )
+    transaction.commit()
+
+    assert len(os.listdir(maildir)) == 1
+
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--queue', 'bogus'
+    ])
+
+    assert result.exit_code == 1
+    assert len(os.listdir(maildir)) == 1
 
 
 def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
@@ -217,9 +248,8 @@ def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'smtp',
-        '--hostname', smtp.address[0],
-        '--port', smtp.address[1]
+        'sendmail',
+        '--queue', 'smtp'
     ])
 
     assert result.exit_code == 0
@@ -240,9 +270,8 @@ def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'smtp',
-        '--hostname', smtp.address[0],
-        '--port', smtp.address[1]
+        'sendmail', 
+        '--queue', 'smtp'
     ])
 
     assert result.exit_code == 0
@@ -258,9 +287,8 @@ def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
     del smtp.outbox[:]
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'smtp',
-        '--hostname', smtp.address[0],
-        '--port', smtp.address[1]
+        'sendmail', 
+        '--queue', 'smtp'
     ])
 
     assert result.exit_code == 0
@@ -280,8 +308,8 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token'
+        'sendmail', 
+        '--queue', 'postmark'
     ])
 
     assert result.exit_code == 0
@@ -316,8 +344,8 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token',
+        'sendmail', 
+        '--queue', 'postmark',
         '--limit', 1
     ])
 
@@ -328,8 +356,8 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token',
+        'sendmail', 
+        '--queue', 'postmark',
         '--limit', 2
     ])
 
@@ -357,8 +385,8 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token'
+        'sendmail', 
+        '--queue', 'postmark'
     ])
 
     assert mock_send.call_count == 2
@@ -386,8 +414,8 @@ def test_sendmail_exception(temporary_directory, maildir_app, monkeypatch):
 
     result = CliRunner().invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 'postmark',
-        '--token', 'token',
+        'sendmail', 
+        '--queue', 'postmark'
     ])
 
     # should contain a .sending and the actual mail
