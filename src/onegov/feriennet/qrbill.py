@@ -1,5 +1,6 @@
 from base64 import b64encode
 from io import StringIO
+from onegov.feriennet import log
 from qrbill.bill import QRBill, IBAN_ALLOWED_COUNTRIES, QR_IID
 from stdnum import iban
 
@@ -71,6 +72,7 @@ def generate_qr_bill(schema, request, user, invoice):
         'city': user.data.get('place', None),
     }
     if not debtor['name'] or not debtor['pcode'] or not debtor['city']:
+        log.error('Not enough debtor information for qr bill: {user.realname}')
         return None
 
     # Language
@@ -79,15 +81,19 @@ def generate_qr_bill(schema, request, user, invoice):
     )
 
     # Create bill
-    bill = QRBill(
-        account=account,
-        creditor=creditor,
-        debtor=debtor,
-        amount='{:.2f}'.format(invoice.outstanding_amount),
-        ref_number=ref_number,
-        extra_infos=extra_infos,
-        language=language,
-    )
+    try:
+        bill = QRBill(
+            account=account,
+            creditor=creditor,
+            debtor=debtor,
+            amount='{:.2f}'.format(invoice.outstanding_amount),
+            ref_number=ref_number,
+            extra_infos=extra_infos,
+            language=language,
+        )
+    except Exception as e:
+        log.exception(e)
+        return None
 
     # Save as SVG
     svg = StringIO()
