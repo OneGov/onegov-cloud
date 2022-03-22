@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-01 07:34+0100\n"
-"PO-Revision-Date: 2022-02-25 13:48+0100\n"
+"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
 msgstr "Ils resultats finals èn disponibels"
@@ -529,6 +529,9 @@ msgstr "Structura"
 msgid "Additional CSS"
 msgstr "CSS supplementar"
 
+msgid "Email Address"
+msgstr "Adressa dad e-mail"
+
 msgid "Phone number"
 msgstr "Numer da telefon"
 
@@ -714,6 +717,9 @@ msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 msgid "Elections and votes on ${date}"
 msgstr "Votaziun dals ${date}"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
 
@@ -756,9 +762,6 @@ msgstr "% GEA"
 msgid "No %"
 msgstr "% NA"
 
-msgid "Archive"
-msgstr "Archiv"
-
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"
 
@@ -792,14 +795,11 @@ msgstr ""
 "travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
 "cuntegnan il dumber da mandats."
 
-msgid "The raw data is available as:"
-msgstr "Las datas nunelavuradas èn disponiblas en il suandant format:"
+msgid "Embed heatmap"
+msgstr "Incorporar la carta"
 
-msgid "The format of the data is described here:"
-msgstr "Il format da las datas è descrit qua:"
-
-msgid "Format Description"
-msgstr "Descripziun dal format"
+msgid "Download heatmap"
+msgstr "Telechargiar la carta"
 
 msgid "Embed"
 msgstr "Incorporar"
@@ -821,10 +821,9 @@ msgstr ""
 msgid "The file is invalid."
 msgstr ""
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
-"cotschen."
+"Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
 #.
 #. Default: Start
@@ -1075,6 +1074,19 @@ msgid ""
 msgstr ""
 "Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan "
 "a disposiziun en ils suandants formats:"
+
+msgid ""
+"The raw data used to display the party results is available in the following "
+"formats:"
+msgstr ""
+"Las datas nunelavuradas che vegnan duvradas per mussar ils resultats da las "
+"partidas stattan a disposiziun en ils suandants formats:"
+
+msgid "The format of the data is described here:"
+msgstr "Il format da las datas è descrit qua:"
+
+msgid "Format Description"
+msgstr "Descripziun dal format"
 
 msgid "Terms of use"
 msgstr "Cundiziun d'utilisaziun"

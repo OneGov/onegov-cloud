@@ -71,7 +71,7 @@ Retourne les données de la vue principale sous une forme structurée.
 ### Données brutes
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
@@ -123,22 +123,29 @@ Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 ### Résultats du parti
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Les données brutes sont disponibles en tant que CSV. Les champs suivants sont compris :
+Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
-`total_voters_count`|Le nombre total de voix cumulées par rapport au nombre total de mandats par élection, pour les composés électoraux uniquement.
 `name`|La dénomination du parti.
 `id`|Identifiant du parti.
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
+`voters_count_percentage`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 `panachage_votes_from_{XX}`|Le nombre de votes que le parti a obtenu de la part du parti avec un `id = XX`. Un `id` avec la valeur `999` marque les votes à partir de la liste vide.
 
 3 Les résultats de la votation

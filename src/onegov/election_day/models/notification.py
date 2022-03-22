@@ -1,4 +1,4 @@
-from email.utils import formataddr
+from email.headerregistry import Address
 from onegov.ballot.models import Election
 from onegov.ballot.models import Vote
 from onegov.core.html import html_to_text
@@ -137,11 +137,11 @@ class EmailNotification(Notification):
 
         self.set_locale(request)
 
-        reply_to = formataddr((
-            request.app.principal.name,
-            request.app.principal.reply_to
+        reply_to = Address(
+            display_name=request.app.principal.name,
+            addr_spec=request.app.principal.reply_to
             or request.app.mail['marketing']['sender']
-        ))
+        )
 
         # We use a generator function to submit the email batch since that
         # is significantly more memory efficient for large batches.

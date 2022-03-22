@@ -237,13 +237,13 @@ Nom|Description
 ---|---
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
-`total_voters_count`|Le nombre total de voix cumulées par rapport au nombre total de mandats par élection, pour les composés électoraux uniquement.
 `name`|La dénomination du parti.
 `id`|Identifiant du parti (n'importe quel numéro).
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
+`voters_count_percentage`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 
 Les résultats peuvent inclure des résultats avec panachage en ajoutant une colonne par parti :
 

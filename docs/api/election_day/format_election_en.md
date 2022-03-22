@@ -239,13 +239,13 @@ Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`total_voters_count`|The total number of cumulative number of votes per total number of mandates per election, for election compounds only.
 `name`|The name of the party.
 `id`|ID of the party (any number).
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
+`voters_count_percentage`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 
 The results may contain panachage results by adding one column per party:
 

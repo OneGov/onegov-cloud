@@ -16,23 +16,29 @@ def parse_party_result(
         line, errors, party_results, totals, parties, election_year):
     try:
         year = validate_integer(line, 'year', default=election_year)
-        total_votes = validate_integer(line, 'total_votes')
-        total_voters_count = validate_numeric(
-            line, 'total_voters_count', precision=12, scale=2,
-            optional=True, default=None
-        )
         name = line.name or ''
         id_ = validate_list_id(line, 'id')
         color = line.color or (
             '#0571b0' if year == election_year else '#999999'
         )
-        mandates = validate_integer(line, 'mandates')
-        votes = validate_integer(line, 'votes')
+        mandates = validate_integer(
+            line, 'mandates', optional=True, default=None
+        )
+        votes = validate_integer(
+            line, 'votes', optional=True, default=None
+        )
+        total_votes = validate_integer(
+            line, 'total_votes', optional=True, default=None
+        )
         voters_count = validate_numeric(
             line, 'voters_count', precision=12, scale=2,
             optional=True, default=None
         )
-        assert all((year, total_votes, name, color))
+        voters_count_percentage = validate_numeric(
+            line, 'voters_count_percentage', precision=12, scale=2,
+            optional=True, default=None
+        )
+        assert all((year, name, color))
         assert match(r'^#[0-9A-Fa-f]{6}$', color)
         assert totals.get(year, total_votes) == total_votes
     except ValueError as e:
@@ -52,12 +58,12 @@ def parse_party_result(
                 id=uuid4(),
                 year=year,
                 total_votes=total_votes,
-                total_voters_count=total_voters_count,
                 name=name,
                 color=color,
                 number_of_mandates=mandates,
                 votes=votes,
-                voters_count=voters_count
+                voters_count=voters_count,
+                voters_count_percentage=voters_count_percentage
             )
 
 
