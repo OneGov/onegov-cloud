@@ -7,6 +7,7 @@ from onegov.election_day.screen_widgets.election_compound import (
     ElectionCompoundListsTableWidget,
 )
 from onegov.election_day.screen_widgets.election import (
+    AbsoluteMajorityWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
@@ -45,6 +46,7 @@ from onegov.election_day.screen_widgets.vote import (
 
 
 __all__ = (
+    'AbsoluteMajorityWidget',
     'ColumnWidget',
     'CountedEntitiesWidget',
     'ElectionCandidatesByEntityTableWidget',

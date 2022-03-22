@@ -126,3 +126,19 @@ class ElectionListsChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = '<election-lists-chart limit="" names="," class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='absolute-majority',
+    category='majorz_election'
+)
+class AbsoluteMajorityWidget(ModelBoundWidget):
+    tag = 'absolute-majority'
+    template = """
+        <xsl:template match="absolute-majority">
+            <span class="{@class}">
+                ${layout.format_number(model.absolute_majority or 0)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<absolute-majority class=""/>'

@@ -7,6 +7,7 @@ from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.screen_widgets import (
+    AbsoluteMajorityWidget,
     ColumnWidget,
     CountedEntitiesWidget,
     ElectionCandidatesByEntityTableWidget,
@@ -48,6 +49,9 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <election-candidates-by-entity-table class="my-class-7"/>
             </column>
+            <column span="1">
+                <absolute-majority class="my-class-8"/>
+            </column>
         </row>
     """
     widgets = [
@@ -56,6 +60,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         CountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        AbsoluteMajorityWidget(),
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
         ElectionCandidatesByEntityTableWidget(),
@@ -96,6 +101,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -198,6 +204,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         '?limit=02&amp;lists=x,y&amp;elected=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
+    assert '18.191' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -205,6 +212,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -369,6 +377,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         '?limit=02&amp;lists=x,y&amp;elected=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
+    assert '18.191' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -376,6 +385,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
 
 
 def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):

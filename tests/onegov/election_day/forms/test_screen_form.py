@@ -365,6 +365,7 @@ def test_screen_form_populate(election_day_app_zg):
         '<vote-tie-breaker-title class=""/>'
     )
     assert form.tags_majorz_election.text == (
+        '<absolute-majority class=""/>\n'
         '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-candidates-by-entity-table class=""/>\n'
