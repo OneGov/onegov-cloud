@@ -204,6 +204,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         '?limit=02&amp;lists=x,y&amp;elected=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
+    assert '18.191' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -376,6 +377,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         '?limit=02&amp;lists=x,y&amp;elected=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
+    assert '18.191' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
