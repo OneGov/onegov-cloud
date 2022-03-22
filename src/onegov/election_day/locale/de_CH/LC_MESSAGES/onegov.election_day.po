@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-01 07:34+0100\n"
-"PO-Revision-Date: 2022-02-25 13:43+0100\n"
+"POT-Creation-Date: 2022-03-20 08:15+0100\n"
+"PO-Revision-Date: 2022-03-15 10:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
 msgstr "Die Schlussresultate sind verfügbar"
@@ -529,6 +529,9 @@ msgstr "Struktur"
 msgid "Additional CSS"
 msgstr "Zusätzliches CSS"
 
+msgid "Email Address"
+msgstr "E-Mail-Adresse"
+
 msgid "Phone number"
 msgstr "Telefonnummer"
 
@@ -801,6 +804,12 @@ msgstr "Das Datenformat ist hier beschrieben:"
 msgid "Format Description"
 msgstr "Formatbeschreibung"
 
+msgid "Embed heatmap"
+msgstr "Karte einbetten"
+
+msgid "Download heatmap"
+msgstr "Karte herunterladen"
+
 msgid "Embed"
 msgstr "Einbetten"
 
@@ -821,12 +830,11 @@ msgstr ""
 msgid "The file is invalid."
 msgstr "Die Datei ist ungültig."
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Startseite"
 

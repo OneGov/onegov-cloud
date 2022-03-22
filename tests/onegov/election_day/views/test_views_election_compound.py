@@ -125,16 +125,16 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     export = client.get('/elections/elections/data-parties').text
     lines = export.split('\r\n')
     assert lines[0].startswith(
-        'year,name,id,total_votes,total_voters_count,color,mandates,votes'
+        'year,name,id,total_votes,color,mandates,votes'
     )
     assert lines[1].startswith(
-        '2022,BDP,0,11270,1445.07,#efb52c,1,60387,603.01'
+        '2022,BDP,0,11270,#efb52c,1,60387,603.01'
     )
     assert lines[2].startswith(
-        '2022,CVP,1,11270,1445.07,#ff6300,1,49117,491.02'
+        '2022,CVP,1,11270,#ff6300,1,49117,491.02'
     )
     assert lines[3].startswith(
-        '2022,FDP,2,11270,1445.07,#0571b0,0,35134,351.04'
+        '2022,FDP,2,11270,#0571b0,0,35134,351.04'
     )
 
     assert client.get('/elections/elections/json').json['parties'] == {
@@ -142,7 +142,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2022': {
                 'color': '#efb52c',
                 'mandates': 1,
-                'voters_count': {'permille': 417, 'total': 603.01},
+                'voters_count': {'permille': 417.3, 'total': 603.01},
                 'votes': {'permille': 5358, 'total': 60387}
             }
         },
@@ -150,7 +150,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2022': {
                 'color': '#ff6300',
                 'mandates': 1,
-                'voters_count': {'permille': 340, 'total': 491.02},
+                'voters_count': {'permille': 339.8, 'total': 491.02},
                 'votes': {'permille': 4358, 'total': 49117}
             }
         },
@@ -158,7 +158,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2022': {
                 'color': '#0571b0',
                 'mandates': 0,
-                'voters_count': {'permille': 243, 'total': 351.04},
+                'voters_count': {'permille': 242.9, 'total': 351.04},
                 'votes': {'permille': 3117, 'total': 35134}
             }
         }
@@ -166,14 +166,14 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
 
     # Historical data
     csv_parties = (
-        'year,name,id,total_votes,total_voters_count,color,mandates,'
-        'votes,voters_count\r\n'
-        '2022,BDP,0,60000,600,#efb52c,1,10000,100\r\n'
-        '2022,CVP,1,60000,600,#ff6300,1,30000,300\r\n'
-        '2022,FDP,2,60000,600,#4068c8,0,20000,200\r\n'
-        '2018,BDP,0,40000,400,#efb52c,1,1000,10\r\n'
-        '2018,CVP,1,40000,400,#ff6300,1,15000,150.7\r\n'
-        '2018,FDP,2,40000,400,#4068c8,1,10000,100\r\n'
+        'year,name,id,total_votes,color,mandates,'
+        'votes,voters_count,voters_count_percentage\r\n'
+        '2022,BDP,0,60000,#efb52c,1,10000,100,16.67\r\n'
+        '2022,CVP,1,60000,#ff6300,1,30000,300,50\r\n'
+        '2022,FDP,2,60000,#4068c8,0,20000,200,33.33\r\n'
+        '2018,BDP,0,40000,#efb52c,1,1000,10,2.5\r\n'
+        '2018,CVP,1,40000,#ff6300,1,15000,150.7,37.67\r\n'
+        '2018,FDP,2,40000,#4068c8,1,10000,100,25.0\r\n'
     ).encode('utf-8')
 
     upload = client.get('/elections/elections/upload-party-results')
@@ -239,13 +239,13 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2018': {
                 'color': '#efb52c',
                 'mandates': 1,
-                'voters_count': {'permille': 25, 'total': 10.0},
+                'voters_count': {'permille': 25.0, 'total': 10.0},
                 'votes': {'permille': 25, 'total': 1000}
             },
             '2022': {
                 'color': '#efb52c',
                 'mandates': 1,
-                'voters_count': {'permille': 167, 'total': 100.0},
+                'voters_count': {'permille': 166.7, 'total': 100.0},
                 'votes': {'permille': 167, 'total': 10000}
             }
         },
@@ -253,13 +253,13 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2018': {
                 'color': '#ff6300',
                 'mandates': 1,
-                'voters_count': {'permille': 377, 'total': 150.7},
+                'voters_count': {'permille': 376.7, 'total': 150.7},
                 'votes': {'permille': 375, 'total': 15000}
             },
             '2022': {
                 'color': '#ff6300',
                 'mandates': 1,
-                'voters_count': {'permille': 500, 'total': 300.0},
+                'voters_count': {'permille': 500.0, 'total': 300.0},
                 'votes': {'permille': 500, 'total': 30000}
             }
         },
@@ -267,13 +267,13 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             '2018': {
                 'color': '#4068c8',
                 'mandates': 1,
-                'voters_count': {'permille': 250, 'total': 100.0},
+                'voters_count': {'permille': 250.0, 'total': 100.0},
                 'votes': {'permille': 250, 'total': 10000}
             },
             '2022': {
                 'color': '#4068c8',
                 'mandates': 0,
-                'voters_count': {'permille': 333, 'total': 200.0},
+                'voters_count': {'permille': 333.3, 'total': 200.0},
                 'votes': {'permille': 333, 'total': 20000}
             }
         }
@@ -286,7 +286,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
 
     assert '>10.00<' in client.get('/elections/elections/party-strengths')
     data = client.get('/elections/elections/party-strengths-data').json
-    assert data['results'][0]['value']['back'] == 16.7
+    assert data['results'][0]['value']['back'] == 16.67
     data = client.get('/elections/elections/json').json
     assert data['parties']['CVP']['2018']['voters_count']['total'] == 150.7
 
@@ -297,7 +297,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
 
     assert '>10<' in client.get('/elections/elections/party-strengths')
     data = client.get('/elections/elections/party-strengths-data').json
-    assert data['results'][0]['value']['back'] == 16.7
+    assert data['results'][0]['value']['back'] == 16.67
     client.get('/elections/elections/json').json['parties']
     data = client.get('/elections/elections/json').json
     assert data['parties']['CVP']['2018']['voters_count']['total'] == 151

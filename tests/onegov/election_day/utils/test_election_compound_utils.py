@@ -548,7 +548,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#99C040',
                 'mandates': 10,
-                'voters_count': {'permille': 138, 'total': 538},
+                'voters_count': {'permille': Decimal('137.80'), 'total': 538},
                 'votes': {'permille': 138, 'total': 43062}
             }
         },
@@ -556,7 +556,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#EE7F00',
                 'mandates': 22,
-                'voters_count': {'permille': 238, 'total': 931},
+                'voters_count': {'permille': Decimal('238.50'), 'total': 931},
                 'votes': {'permille': 238, 'total': 74448}
             }
         },
@@ -564,7 +564,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#0E52A0',
                 'mandates': 18,
-                'voters_count': {'permille': 221, 'total': 863},
+                'voters_count': {'permille': Decimal('221.10'), 'total': 863},
                 'votes': {'permille': 221, 'total': 69028},
             }
         },
@@ -572,7 +572,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#acc700',
                 'mandates': 4,
-                'voters_count': {'permille': 60, 'total': 236},
+                'voters_count': {'permille': Decimal('60.50'), 'total': 236},
                 'votes': {'permille': 60, 'total': 18864}
             }
         },
@@ -580,7 +580,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#F9B200',
                 'mandates': 0,
-                'voters_count': {'permille': 5, 'total': 19},
+                'voters_count': {'permille': Decimal('4.90'), 'total': 19},
                 'votes': {'permille': 5, 'total': 1487}
             }
         },
@@ -588,7 +588,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#E53136',
                 'mandates': 7,
-                'voters_count': {'permille': 107, 'total': 418},
+                'voters_count': {'permille': Decimal('107.10'), 'total': 418},
                 'votes': {'permille': 107, 'total': 33459}
             }
         },
@@ -596,7 +596,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
             '2014': {
                 'color': '#019040',
                 'mandates': 19,
-                'voters_count': {'permille': 230, 'total': 899},
+                'voters_count': {'permille': Decimal('230.30'), 'total': 899},
                 'votes': {'permille': 230, 'total': 71930}
             }
         }}
@@ -605,13 +605,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         False,
         {
             '2014': [
-                ['AL', 10, 538, '13.8%'],
-                ['CVP', 22, 931, '23.8%'],
-                ['FDP', 18, 863, '22.1%'],
-                ['GLP', 4, 236, '6.0%'],
-                ['Piraten', 0, 19, '0.5%'],
-                ['SP', 7, 418, '10.7%'],
-                ['SVP', 19, 899, '23.0%']
+                ['AL', 10, 538, '13.78%'],
+                ['CVP', 22, 931, '23.85%'],
+                ['FDP', 18, 863, '22.11%'],
+                ['GLP', 4, 236, '6.05%'],
+                ['Piraten', 0, 19, '0.49%'],
+                ['SP', 7, 418, '10.71%'],
+                ['SVP', 19, 899, '23.03%']
             ]
         }
     )
@@ -627,49 +627,49 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'color': '#99C040',
                 'group': 'AL',
                 'item': '2014',
-                'value': {'back': 13.8, 'front': 10}
+                'value': {'back': 13.78, 'front': 10}
             },
             {
                 'active': True,
                 'color': '#EE7F00',
                 'group': 'CVP',
                 'item': '2014',
-                'value': {'back': 23.8, 'front': 22}
+                'value': {'back': 23.85, 'front': 22}
             },
             {
                 'active': True,
                 'color': '#0E52A0',
                 'group': 'FDP',
                 'item': '2014',
-                'value': {'back': 22.1, 'front': 18}
+                'value': {'back': 22.11, 'front': 18}
             },
             {
                 'active': True,
                 'color': '#acc700',
                 'group': 'GLP',
                 'item': '2014',
-                'value': {'back': 6.0, 'front': 4}
+                'value': {'back': 6.05, 'front': 4}
             },
             {
                 'active': True,
                 'color': '#F9B200',
                 'group': 'Piraten',
                 'item': '2014',
-                'value': {'back': 0.5, 'front': 0}
+                'value': {'back': 0.49, 'front': 0}
             },
             {
                 'active': True,
                 'color': '#E53136',
                 'group': 'SP',
                 'item': '2014',
-                'value': {'back': 10.7, 'front': 7}
+                'value': {'back': 10.71, 'front': 7}
             },
             {
                 'active': True,
                 'color': '#019040',
                 'group': 'SVP',
                 'item': '2014',
-                'value': {'back': 23.0, 'front': 19}
+                'value': {'back': 23.03, 'front': 19}
             }
         ],
         'title': 'Compound'
@@ -691,7 +691,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert deltas[1]['2014'][0][2] == Decimal('538.00')
 
     data = get_party_results_data(election_compound)
-    assert data['results'][0]['value']['back'] == 13.8
+    assert data['results'][0]['value']['back'] == 13.78
 
     # ... with votes
     election_compound.voters_counts = False

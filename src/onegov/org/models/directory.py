@@ -303,7 +303,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
 
     @property
     def es_public(self):
-        return self.access == 'public'
+        return self.access == 'public' and self.published
 
     @property
     def display_config(self):
