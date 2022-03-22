@@ -17,7 +17,7 @@ mail_queues:
     token: postmark-server-token
     directory: '/usr/local/var/onegov/mail/postmark'
 
-  # SMTP mailer will ignore the cmail ategory. If you wish to use
+  # SMTP mailer will ignore the mail category. If you wish to use
   # separate SMTP servers for separate categories, then you will
   # need to specify different queues for them.
   local_smtp: &local_smtp
