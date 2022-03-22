@@ -70,7 +70,7 @@ Returns the data of the main view in a structured form.
 ### Raw data
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 The raw data used to display the results of elections is available in the following formats:
@@ -122,10 +122,17 @@ Not yet counted municipalities are not included.
 ### Party results
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-The raw data is available as CSV. The following fields are included:
+The raw data used to display the results of elections is available in the following formats:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+The following fields are included in all formats:
 
 Name|Description
 ---|---

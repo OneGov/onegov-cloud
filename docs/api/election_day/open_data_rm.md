@@ -73,7 +73,7 @@ I vegnan restituidas las medemas datas sco en la vista normala, mo en ina furma 
 ### Datas nunelavuradas
 
 ```
-URL: `/election/{id}/{data-format}`
+URL: /election/{id}/data-{format}
 ```
 
 Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan a disposiziun en ils suandants formats:
@@ -125,10 +125,17 @@ Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 ### Party results
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Las datas nunelavuradas èn disponiblas sco CSV. Ils suandants champs èn cuntegnids:
+Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan a disposiziun en ils suandants formats:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---

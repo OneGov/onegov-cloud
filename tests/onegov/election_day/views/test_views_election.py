@@ -340,7 +340,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert chart.status_code == 200
     assert '/election/proporz-election/party-strengths-data' in chart
 
-    export = client.get('/election/proporz-election/data-parties').text
+    export = client.get('/election/proporz-election/data-parties-csv').text
     lines = export.split('\r\n')
     assert lines[0].startswith(
         'year,name,id,total_votes,color,mandates,votes'
@@ -348,6 +348,55 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387')
     assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117')
     assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134')
+
+    export = client.get('/election/proporz-election/data-parties-json').json
+    assert export == [
+        {
+            'color': '#efb52c',
+            'id': 0,
+            'mandates': 1,
+            'name': 'BDP',
+            'panachage_votes_from_0': None,
+            'panachage_votes_from_1': 11,
+            'panachage_votes_from_2': 12,
+            'panachage_votes_from_999': 100,
+            'total_votes': 11270,
+            'voters_count': 603.01,
+            'voters_count_percentage': 41.73,
+            'votes': 60387,
+            'year': 2022
+        },
+        {
+            'color': '#ff6300',
+            'id': 1,
+            'mandates': 1,
+            'name': 'CVP',
+            'panachage_votes_from_0': 21,
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': 22,
+            'panachage_votes_from_999': 200,
+            'total_votes': 11270,
+            'voters_count': 491.02,
+            'voters_count_percentage': 33.98,
+            'votes': 49117,
+            'year': 2022
+        },
+        {
+            'color': '#0571b0',
+            'id': 2,
+            'mandates': 0,
+            'name': 'FDP',
+            'panachage_votes_from_0': 31,
+            'panachage_votes_from_1': 32,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_999': 300,
+            'total_votes': 11270,
+            'voters_count': 351.04,
+            'voters_count_percentage': 24.29,
+            'votes': 35134,
+            'year': 2022
+        }
+    ]
 
     # Historical data
     csv_parties = (

@@ -71,7 +71,7 @@ Retourne les données de la vue principale sous une forme structurée.
 ### Données brutes
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
@@ -123,10 +123,17 @@ Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 ### Résultats du parti
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Les données brutes sont disponibles en tant que CSV. Les champs suivants sont compris :
+Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---

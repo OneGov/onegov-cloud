@@ -71,7 +71,7 @@ Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Fo
 ### Rohdaten
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
@@ -123,10 +123,18 @@ Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 ### Parteiresultate
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Die Rohdaten sind als CSV verfügbar. Die folgenden Felder sind enthalten:
+Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Die folgenden Felder sind in allen Formaten enthalten:
+
 
 Name|Description
 ---|---
