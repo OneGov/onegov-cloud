@@ -71,7 +71,7 @@ Rimanda i dati della visualizzazione principale in forma strutturata.
 ### Dati grezzi
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
@@ -123,10 +123,17 @@ I comuni non ancora contati non sono inclusi.
 ### Risultati dei partiti
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-I dati grezzi sono disponibili come CSV. Sono inclusi i seguenti campi:
+I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+
+Formato|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---

@@ -13,7 +13,7 @@ def has_party_results(item):
     return False
 
 
-def get_party_results(item, json_serialzable=False):
+def get_party_results(item, json_serializable=False):
 
     """ Returns the aggregated party results as list.
 
@@ -55,11 +55,11 @@ def get_party_results(item, json_serialzable=False):
         voters_count = result.voters_count or Decimal(0)
         if not exact:
             voters_count = int(round(voters_count))
-        elif json_serialzable:
+        elif json_serializable:
             voters_count = float(voters_count)
         voters_count_permille = result.voters_count_percentage or Decimal(0)
         voters_count_permille = 10 * voters_count_permille
-        if json_serialzable:
+        if json_serializable:
             voters_count_permille = float(voters_count_permille)
         year['voters_count'] = {
             'total': voters_count,

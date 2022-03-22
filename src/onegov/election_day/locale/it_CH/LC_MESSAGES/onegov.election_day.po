@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-20 08:15+0100\n"
-"PO-Revision-Date: 2022-03-15 10:56+0100\n"
+"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -710,6 +710,9 @@ msgstr "Non sono ancora state inserite elezioni o votazioni."
 msgid "Elections and votes on ${date}"
 msgstr "Elezioni e votazioni del ${date}"
 
+msgid "Archive"
+msgstr "Archivio"
+
 msgid "Federal Elections"
 msgstr "Elezioni federali"
 
@@ -752,9 +755,6 @@ msgstr "Sì %"
 msgid "No %"
 msgstr "No %"
 
-msgid "Archive"
-msgstr "Archivio"
-
 msgid "Archive Search"
 msgstr "Ricerca in archivio"
 
@@ -787,15 +787,6 @@ msgstr ""
 "liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
 "le barre colorate di blu contengono i numeri dei mandati."
 
-msgid "The raw data is available as:"
-msgstr "I dati grezzi sono disponibili come:"
-
-msgid "The format of the data is described here:"
-msgstr "Il formato dei dati è descritto qui:"
-
-msgid "Format Description"
-msgstr "Descrizione del formato"
-
 msgid "Embed heatmap"
 msgstr "incorporare la mappa"
 
@@ -825,8 +816,8 @@ msgstr ""
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziale"
 
@@ -1074,6 +1065,19 @@ msgid ""
 msgstr ""
 "I dati grezzi usati per mostrare i risultati sono disponibili nei seguenti "
 "formati:"
+
+msgid ""
+"The raw data used to display the party results is available in the following "
+"formats:"
+msgstr ""
+"I dati grezzi usati per mostrare i risultati del partito sono disponibili "
+"nei seguenti formati:"
+
+msgid "The format of the data is described here:"
+msgstr "Il formato dei dati è descritto qui:"
+
+msgid "Format Description"
+msgstr "Descrizione del formato"
 
 msgid "Terms of use"
 msgstr "Condizioni d’uso"
