@@ -30,7 +30,7 @@
                     <div metal:use-macro="layout.macros['ballot-districts-map']" tal:define="embed True"/>
 
                     <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
-                        <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+                        <i class="fa fa-download"></i><tal:block i18n:translate="">Download heatmap</tal:block>
                     </a>
                 </div>
             </div>
