@@ -55,7 +55,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             </column>
             <column span="1">
                 <absolute-majority class="my-class-9"/>
-            /column>
+            </column>
         </row>
     """
     widgets = [
