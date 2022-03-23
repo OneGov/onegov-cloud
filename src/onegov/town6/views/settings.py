@@ -122,7 +122,9 @@ def custom_link_settings_form(model, request):
         open_external_links_target_blank = BooleanField(
             label=_("Open external links in separate window"),
             description=_(
-                'Links of a different domain will be opened in a new window')
+                'Links leading to a different '
+                'website will be opened in a new window'
+            )
         )
 
     return merge_forms(LinksSettingsForm, ExtendedLinksSettings)
