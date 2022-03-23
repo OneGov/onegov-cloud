@@ -364,9 +364,13 @@ class FaviconSettingsForm(Form):
 
 class LinksSettingsForm(Form):
     open_files_target_blank = BooleanField(
-        label=_("Open files in separate window"),
+        label=_("Open files in separate window")
+    )
+
+    open_external_links_target_blank = BooleanField(
+        label=_("Open external links in separate window"),
         description=_(
-            'User will stay on the page when opening images and files')
+            'Links of a different domain will be opened in a new window')
     )
 
     disable_page_refs = BooleanField(
