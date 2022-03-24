@@ -427,6 +427,7 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         assert '38.37%' in result
         assert 'data-dataurl="Ballot/by-entity"' in result
         assert 'data-dataurl="Ballot/by-district"' in result
+        assert '01.01.2008, 04:00:00' in result
         assert '42.21 %' in result
         assert '43.20 %' in result
         assert '42.32 %' in result
@@ -451,7 +452,7 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         assert 'my-class-j' in result
         assert 'my-class-k' in result
 
-    with freeze_time("2008-01-01 03:00"):
+    with freeze_time("2008-01-01 04:00"):
         # Add final results
         model, errors = import_test_datasets(
             'internal',
@@ -507,6 +508,7 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         assert '37.00%' in result
         assert 'data-dataurl="Ballot/by-entity"' in result
         assert 'data-dataurl="Ballot/by-district"' in result
+        assert '01.01.2008, 05:00:00' in result
         assert '44.93 %' in result
         assert '45.92 %' in result
         assert '44.17 %' in result

@@ -237,6 +237,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             '?limit=02&amp;lists=x,y&amp;elected=True"'
         ) in result
         assert 'election-candidates-by-entity-table' in result
+        assert '01.01.2008, 01:00:00' in result
         assert '52.32 %' in result
         assert '18.191' in result
         assert '0' in result
@@ -420,6 +421,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             '?limit=02&amp;lists=x,y&amp;elected=True"'
         ) in result
         assert 'election-candidates-by-entity-table' in result
+        assert '01.01.2008, 02:00:00' in result
         assert '53.01 %' in result
         assert '18.191' in result
         assert '2' in result
@@ -690,6 +692,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         assert (
             'data-dataurl="ProporzElection/lists-data?limit=03&amp;names=a,b"'
         ) in result
+        assert '01.01.2008, 03:00:00' in result
         assert '53.27 %' in result
         assert '0' in result
         assert '1' in result
@@ -852,6 +855,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         assert (
             'data-dataurl="ProporzElection/lists-data?limit=03&amp;names=a,b"'
         ) in result
+        assert '01.01.2008, 04:00:00' in result
         assert '53.74 %' in result
         assert '3' in result
         assert '1' in result

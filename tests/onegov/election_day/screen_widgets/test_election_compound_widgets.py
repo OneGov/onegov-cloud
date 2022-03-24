@@ -243,6 +243,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         assert (
             'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
         ) in result
+        # assert '01.01.2008, 01:00:00' in result # model.last_result_change is empty
         assert 'my-class-1' in result
         assert 'my-class-2' in result
         assert 'my-class-3' in result
@@ -255,7 +256,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         assert 'my-class-a' in result
         assert 'my-class-b' in result
 
-    with freeze_time("2008-01-01 04:00"):
+    with freeze_time("2008-01-01 01:00"):
         # Add final results
         election_1, errors = import_test_datasets(
             'internal',
@@ -383,7 +384,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
         ) in result
         assert 'data-dataurl="ElectionCompound/list-groups-data"' in result
-        assert '"01.01.2008, 05:00:00"'
+        assert '01.01.2008, 02:00:00'
         assert 'my-class-1' in result
         assert 'my-class-2' in result
         assert 'my-class-3' in result
