@@ -184,7 +184,7 @@ class LastResultChangeWidget(ModelBoundWidget):
     template = """
         <xsl:template match="last-result-change">
             <span class="{@class}">
-            "${layout.format_date(layout.last_result_change, 'datetime_long')}"
+            ${layout.format_date(layout.last_result_change, 'datetime_long')}
             </span>
         </xsl:template>
     """
