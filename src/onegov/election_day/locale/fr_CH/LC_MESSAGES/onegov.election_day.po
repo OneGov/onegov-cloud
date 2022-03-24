@@ -481,6 +481,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votations"
 
+msgid "Select at least one election or vote."
+msgstr "Sélectionnez au moins une élection ou un vote."
+
 msgid "Number"
 msgstr "Numéro"
 
