@@ -8,6 +8,7 @@ from onegov.election_day.screen_widgets.election_compound import (
 )
 from onegov.election_day.screen_widgets.election import (
     AllocatedMandatesWidget,
+    AbsoluteMajorityWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
@@ -15,6 +16,7 @@ from onegov.election_day.screen_widgets.election import (
     ElectionListsTableWidget,
     MandatesWidget,
     NumberOfMandatesWidget,
+    ElectionTurnoutWidget
 )
 from onegov.election_day.screen_widgets.generic import (
     ColumnWidget,
@@ -35,20 +37,24 @@ from onegov.election_day.screen_widgets.vote import (
     VoteCounterProposalEntitiesTableWidget,
     VoteCounterProposalResultBarWidget,
     VoteCounterProposalTitleWidget,
+    VoteCounterProposalTurnoutWidget,
     VoteProposalDistrictsMap,
     VoteProposalEntitiesMap,
     VoteProposalEntitiesTableWidget,
     VoteProposalResultBarWidget,
+    VoteProposalTurnoutWidget,
     VoteTieBreakerDistrictsMap,
     VoteTieBreakerEntitiesMap,
     VoteTieBreakerEntitiesTableWidget,
     VoteTieBreakerResultBarWidget,
-    VoteTieBreakerTitleWidget
+    VoteTieBreakerTitleWidget,
+    VoteTieBreakerTurnoutWidget
 )
 
 
 __all__ = (
     'AllocatedMandatesWidget',
+    'AbsoluteMajorityWidget',
     'ColumnWidget',
     'CountedEntitiesWidget',
     'ElectionCandidatesByEntityTableWidget',
@@ -62,6 +68,7 @@ __all__ = (
     'ElectionCompoundListsTableWidget',
     'ElectionListsChartWidget',
     'ElectionListsTableWidget',
+    'ElectionTurnoutWidget',
     'H1Widget',
     'H2Widget',
     'H3Widget',
@@ -78,13 +85,16 @@ __all__ = (
     'VoteCounterProposalEntitiesTableWidget',
     'VoteCounterProposalResultBarWidget',
     'VoteCounterProposalTitleWidget',
+    'VoteCounterProposalTurnoutWidget',
     'VoteProposalDistrictsMap',
     'VoteProposalEntitiesMap',
     'VoteProposalEntitiesTableWidget',
     'VoteProposalResultBarWidget',
+    'VoteProposalTurnoutWidget',
     'VoteTieBreakerDistrictsMap',
     'VoteTieBreakerEntitiesMap',
     'VoteTieBreakerEntitiesTableWidget',
     'VoteTieBreakerResultBarWidget',
     'VoteTieBreakerTitleWidget',
+    'VoteTieBreakerTurnoutWidget',
 )

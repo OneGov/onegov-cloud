@@ -130,7 +130,7 @@ class ElectionListsChartWidget(ChartWidget):
 
 @ElectionDayApp.screen_widget(
     tag='allocated-mandates',
-    category='proporz_election'
+    category='election'
 )
 class AllocatedMandatesWidget(ModelBoundWidget):
     tag = 'allocated-mandates'
@@ -146,7 +146,7 @@ class AllocatedMandatesWidget(ModelBoundWidget):
 
 @ElectionDayApp.screen_widget(
     tag='number-of-mandates',
-    category='proporz_election'
+    category='election'
 )
 class NumberOfMandatesWidget(ModelBoundWidget):
     tag = 'number-of-mandates'
@@ -162,7 +162,7 @@ class NumberOfMandatesWidget(ModelBoundWidget):
 
 @ElectionDayApp.screen_widget(
     tag='mandates',
-    category='proporz_election'
+    category='election'
 )
 class MandatesWidget(ModelBoundWidget):
     tag = 'mandates'
@@ -178,3 +178,35 @@ class MandatesWidget(ModelBoundWidget):
         </xsl:template>
     """
     usage = '<mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-turnout',
+    category='election'
+)
+class ElectionTurnoutWidget(ModelBoundWidget):
+    tag = 'election-turnout'
+    template = """
+        <xsl:template match="election-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(model.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<election-turnout class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='absolute-majority',
+    category='majorz_election'
+)
+class AbsoluteMajorityWidget(ModelBoundWidget):
+    tag = 'absolute-majority'
+    template = """
+        <xsl:template match="absolute-majority">
+            <span class="{@class}">
+                ${layout.format_number(model.absolute_majority or 0)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<absolute-majority class=""/>'

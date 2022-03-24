@@ -1,4 +1,4 @@
-from email.utils import formataddr
+from email.headerregistry import Address
 from onegov.core.collection import Pagination
 from onegov.core.templates import render_template
 from onegov.election_day import _
@@ -180,11 +180,11 @@ class EmailSubscriberCollection(SubscriberCollection):
         request.app.send_marketing_email(
             subject=title,
             receivers=(subscriber.address, ),
-            reply_to=formataddr((
-                request.app.principal.name,
-                request.app.principal.reply_to
+            reply_to=Address(
+                display_name=request.app.principal.name,
+                addr_spec=request.app.principal.reply_to
                 or request.app.mail['marketing']['sender']
-            )),
+            ),
             content=render_template(
                 'mail_confirm_subscription.pt',
                 request,
@@ -229,11 +229,11 @@ class EmailSubscriberCollection(SubscriberCollection):
         request.app.send_marketing_email(
             subject=title,
             receivers=(subscriber.address, ),
-            reply_to=formataddr((
-                request.app.principal.name,
-                request.app.principal.reply_to
+            reply_to=Address(
+                display_name=request.app.principal.name,
+                addr_spec=request.app.principal.reply_to
                 or request.app.mail['marketing']['sender']
-            )),
+            ),
             content=render_template(
                 'mail_confirm_unsubscription.pt',
                 request,

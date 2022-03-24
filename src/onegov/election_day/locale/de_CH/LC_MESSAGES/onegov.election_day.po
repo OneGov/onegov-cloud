@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-01 07:34+0100\n"
-"PO-Revision-Date: 2022-02-25 13:43+0100\n"
+"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"PO-Revision-Date: 2022-03-22 07:58+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
 msgstr "Die Schlussresultate sind verfügbar"
@@ -481,6 +481,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Abstimmungen"
 
+msgid "Select at least one election or vote."
+msgstr "Wählen Sie mindestens eine Wahl oder Abstimmung."
+
 msgid "Number"
 msgstr "Nummer"
 
@@ -528,6 +531,9 @@ msgstr "Struktur"
 
 msgid "Additional CSS"
 msgstr "Zusätzliches CSS"
+
+msgid "Email Address"
+msgstr "E-Mail-Adresse"
 
 msgid "Phone number"
 msgstr "Telefonnummer"
@@ -714,6 +720,9 @@ msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
 msgid "Elections and votes on ${date}"
 msgstr "Urnengang vom ${date}"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Federal Elections"
 msgstr "Eidgenössische Wahlen"
 
@@ -756,9 +765,6 @@ msgstr "Ja %"
 msgid "No %"
 msgstr "Nein %"
 
-msgid "Archive"
-msgstr "Archiv"
-
 msgid "Archive Search"
 msgstr "Archiv-Suche"
 
@@ -792,14 +798,11 @@ msgstr ""
 "proportional zu den Stimmen, blau eingefärbte Balken enthalten die Anzahl "
 "der Mandate."
 
-msgid "The raw data is available as:"
-msgstr "Die Rohdaten sind in folgendem Format verfügbar:"
+msgid "Embed heatmap"
+msgstr "Karte einbetten"
 
-msgid "The format of the data is described here:"
-msgstr "Das Datenformat ist hier beschrieben:"
-
-msgid "Format Description"
-msgstr "Formatbeschreibung"
+msgid "Download heatmap"
+msgstr "Karte herunterladen"
 
 msgid "Embed"
 msgstr "Einbetten"
@@ -821,9 +824,8 @@ msgstr ""
 msgid "The file is invalid."
 msgstr "Die Datei ist ungültig."
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "The form contains errors. Please check the marked fields."
 msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 #.
 #. Default: Start
@@ -1074,6 +1076,19 @@ msgid ""
 msgstr ""
 "Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den "
 "folgenden Formaten verfügbar:"
+
+msgid ""
+"The raw data used to display the party results is available in the following "
+"formats:"
+msgstr ""
+"Die Rohdaten die zur Anzeige der Parteiresultate verwendet werden, sind in "
+"den folgenden Formaten verfügbar:"
+
+msgid "The format of the data is described here:"
+msgstr "Das Datenformat ist hier beschrieben:"
+
+msgid "Format Description"
+msgstr "Formatbeschreibung"
 
 msgid "Terms of use"
 msgstr "Nutzungsbedingungen"
