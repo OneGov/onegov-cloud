@@ -129,6 +129,22 @@ class ElectionListsChartWidget(ChartWidget):
 
 
 @ElectionDayApp.screen_widget(
+    tag='election-turnout',
+    category='election'
+)
+class ElectionTurnoutWidget(ModelBoundWidget):
+    tag = 'election-turnout'
+    template = """
+        <xsl:template match="election-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(model.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<election-turnout class=""/>'
+
+
+@ElectionDayApp.screen_widget(
     tag='absolute-majority',
     category='majorz_election'
 )

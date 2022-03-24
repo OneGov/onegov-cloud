@@ -17,15 +17,18 @@ from onegov.election_day.screen_widgets import (
     VoteCounterProposalEntitiesTableWidget,
     VoteCounterProposalResultBarWidget,
     VoteCounterProposalTitleWidget,
+    VoteCounterProposalTurnoutWidget,
     VoteProposalDistrictsMap,
     VoteProposalEntitiesMap,
     VoteProposalEntitiesTableWidget,
     VoteProposalResultBarWidget,
+    VoteProposalTurnoutWidget,
     VoteTieBreakerDistrictsMap,
     VoteTieBreakerEntitiesMap,
     VoteTieBreakerEntitiesTableWidget,
     VoteTieBreakerResultBarWidget,
-    VoteTieBreakerTitleWidget
+    VoteTieBreakerTitleWidget,
+    VoteTieBreakerTurnoutWidget
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -266,6 +269,15 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <vote-tie-breaker-districts-map class="my-class-g"/>
             </column>
+            <column span="1">
+                <vote-counter-proposal-turnout class="my-class-h"/>
+            </column>
+            <column span="1">
+                <vote-proposal-turnout class="my-class-i"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-turnout class="my-class-j"/>
+            </column>
         </row>
     """
     widgets = [
@@ -277,11 +289,14 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         VoteCounterProposalEntitiesTableWidget(),
         VoteCounterProposalResultBarWidget(),
         VoteCounterProposalTitleWidget(),
+        VoteCounterProposalTurnoutWidget(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
+        VoteProposalTurnoutWidget(),
         VoteTieBreakerEntitiesTableWidget(),
         VoteTieBreakerResultBarWidget(),
         VoteTieBreakerTitleWidget(),
+        VoteTieBreakerTurnoutWidget(),
         VoteCounterProposalDistrictsMap(),
         VoteCounterProposalEntitiesMap(),
         VoteProposalDistrictsMap(),
@@ -340,6 +355,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
+    assert 'my-class-j' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -390,6 +408,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '38.37%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '42.21 %' in result
+    assert '43.20 %' in result
+    assert '42.32 %' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -406,6 +427,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
+    assert 'my-class-j' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -462,6 +486,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '37.00%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '44.93 %' in result
+    assert '45.92 %' in result
+    assert '44.17 %' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -478,3 +505,6 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
+    assert 'my-class-j' in result
