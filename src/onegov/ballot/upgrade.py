@@ -551,5 +551,35 @@ def change_voters_count_to_numeric(context):
             'party_results',
             'voters_count',
             type_=Numeric(12, 2)
-            # new_column_name='manually_completed'
+        )
+
+
+@upgrade_task('Adds superregion to election results')
+def add_superregion_to_election_results(context):
+    if not context.has_column('election_results', 'superregion'):
+        context.operations.add_column(
+            'election_results', Column('superregion', Text, nullable=True)
+        )
+
+
+@upgrade_task('Adds total voters count to party results')
+def add_total_voters_count(context):
+    if not context.has_column('party_results', 'total_voters_count'):
+        context.operations.add_column(
+            'party_results', Column('total_voters_count', Numeric(12, 2))
+        )
+
+
+@upgrade_task(
+    'Change total voters count to percentage',
+    requires='onegov.ballot:Adds total voters count to party results',
+)
+def change_total_voters_count(context):
+    if (
+        context.has_column('party_results', 'total_voters_count')
+        and not context.has_column('party_results', 'voters_count_percentage')
+    ):
+        context.operations.alter_column(
+            'party_results', 'total_voters_count',
+            new_column_name='voters_count_percentage'
         )

@@ -126,3 +126,87 @@ class ElectionListsChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = '<election-lists-chart limit="" names="," class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='allocated-mandates',
+    category='election'
+)
+class AllocatedMandatesWidget(ModelBoundWidget):
+    tag = 'allocated-mandates'
+    template = """
+        <xsl:template match="allocated-mandates">
+            <span class="{@class}">
+                ${layout.format_number(model.allocated_mandates)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<allocated-mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='number-of-mandates',
+    category='election'
+)
+class NumberOfMandatesWidget(ModelBoundWidget):
+    tag = 'number-of-mandates'
+    template = """
+        <xsl:template match="number-of-mandates">
+            <span class="{@class}">
+                ${layout.format_number(model.number_of_mandates)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<number-of-mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='mandates',
+    category='election'
+)
+class MandatesWidget(ModelBoundWidget):
+    tag = 'mandates'
+    template = """
+        <xsl:template match="mandates">
+            <span class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['progress']"
+                    tal:define="progress (model.allocated_mandates,\
+                                            model.number_of_mandates)"
+                    />
+            </span>
+        </xsl:template>
+    """
+    usage = '<mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-turnout',
+    category='election'
+)
+class ElectionTurnoutWidget(ModelBoundWidget):
+    tag = 'election-turnout'
+    template = """
+        <xsl:template match="election-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(model.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<election-turnout class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='absolute-majority',
+    category='majorz_election'
+)
+class AbsoluteMajorityWidget(ModelBoundWidget):
+    tag = 'absolute-majority'
+    template = """
+        <xsl:template match="absolute-majority">
+            <span class="{@class}">
+                ${layout.format_number(model.absolute_majority or 0)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<absolute-majority class=""/>'

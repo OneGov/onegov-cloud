@@ -32,6 +32,11 @@ class PartyResult(Base, TimestampMixin):
     #: used instead of total_votes by election compounds
     voters_count = Column(Numeric(12, 2), nullable=True, default=lambda: 0)
 
+    #: the voters count as percentage
+    voters_count_percentage = Column(
+        Numeric(12, 2), nullable=True, default=lambda: 0
+    )
+
     #: the name of the party
     name = Column(Text, nullable=False)
 

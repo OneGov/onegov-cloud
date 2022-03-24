@@ -83,7 +83,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     session.add(
         ElectionCompound(
             title='Compound', domain='canton', date=date(2020, 3, 8),
-            pukelsheim=True, completes_manually=True
+            pukelsheim=True, completes_manually=True, voters_counts=True,
+            exact_voters_counts=True
         )
     )
     model = session.query(ElectionCompound).one()

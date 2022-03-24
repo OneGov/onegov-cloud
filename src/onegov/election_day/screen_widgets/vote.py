@@ -340,3 +340,72 @@ class VoteTieBreakerDistrictsMap(ModelBoundWidget):
             'embed': False,
             'tie_breaker': model.tie_breaker,
         }
+
+
+@ElectionDayApp.screen_widget(
+    tag='vote-proposal-turnout',
+    category='vote'
+)
+class VoteProposalTurnoutWidget(ModelBoundWidget):
+    tag = 'vote-proposal-turnout'
+    template = """
+        <xsl:template match="vote-proposal-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(proposal.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<vote-proposal-turnout class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'proposal': model.proposal,
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='vote-counter-proposal-turnout',
+    category='complex_vote'
+)
+class VoteCounterProposalTurnoutWidget(ModelBoundWidget):
+    tag = 'vote-counter-proposal-turnout'
+    template = """
+        <xsl:template match="vote-counter-proposal-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(counter_proposal.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<vote-counter-proposal-turnout class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'counter_proposal': model.counter_proposal,
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='vote-tie-breaker-turnout',
+    category='complex_vote'
+)
+class VoteTieBreakerTurnoutWidget(ModelBoundWidget):
+    tag = 'vote-tie-breaker-turnout'
+    template = """
+        <xsl:template match="vote-tie-breaker-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(tie_breaker.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<vote-tie-breaker-turnout class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'tie_breaker': model.tie_breaker,
+        }

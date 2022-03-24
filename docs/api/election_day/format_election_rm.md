@@ -243,6 +243,7 @@ Num|Descripziun
 `mandates`|Il dumber da sezs da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
+`voters_count_percentage`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 
 Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per partida:
 

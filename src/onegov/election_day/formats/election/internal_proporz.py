@@ -56,7 +56,7 @@ def parse_election_result(line, errors, entities, election, principal,
 
         else:
             entity_errors = []
-            name, district = get_entity_and_district(
+            name, district, superregion = get_entity_and_district(
                 entity_id, entities, election, principal, entity_errors
             )
             if ignore_extra and entity_errors:
@@ -69,6 +69,7 @@ def parse_election_result(line, errors, entities, election, principal,
                     election_id=election.id,
                     name=name,
                     district=district,
+                    superregion=superregion,
                     counted=counted,
                     entity_id=entity_id,
                     eligible_voters=eligible_voters,
@@ -339,7 +340,7 @@ def import_election_internal_proporz(
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:
-        name, district = get_entity_and_district(
+        name, district, superregion = get_entity_and_district(
             entity_id, entities, election, principal
         )
         if election.domain == 'none':
@@ -356,6 +357,7 @@ def import_election_internal_proporz(
             election_id=election_id,
             name=name,
             district=district,
+            superregion=superregion,
             entity_id=entity_id,
             counted=False
         )

@@ -283,10 +283,16 @@ class ElectionForm(Form):
         ]
 
     def update_model(self, model):
+        principal = self.request.app.principal
+
         model.date = self.date.data
         model.domain = self.domain.data
+        model.domain_supersegment = ''
         if model.domain == 'region':
             model.domain_segment = self.region.data
+            model.domain_supersegment = principal.get_superregion(
+                self.region.data, self.date.data.year
+            )
         if model.domain == 'district':
             model.domain_segment = self.district.data
         if model.domain == 'municipality':

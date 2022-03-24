@@ -241,6 +241,7 @@ Name|Beschreibung
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
+`voters_count_percentage`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl (prozentual), nur für verbundene Wahlen.
 
 Die Resultate können Panaschierdaten enthalten, indem pro Partei eine Spalte hinzugefügt wird:
 

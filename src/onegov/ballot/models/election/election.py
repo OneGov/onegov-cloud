@@ -241,6 +241,10 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     #: election or the municipality, if this is a communal election.
     domain_segment = meta_property('domain_segment', default='')
 
+    #: The supersegment of the domain. This might be superregion, if it's a
+    #: regional (region) election.
+    domain_supersegment = meta_property('domain_supersegment', default='')
+
     @property
     def votes_by_district(self):
         results = self.results.order_by(None)
@@ -305,6 +309,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             Election.number_of_mandates,
             Election.absolute_majority,
             Election.status,
+            ElectionResult.superregion,
             ElectionResult.district,
             ElectionResult.name,
             ElectionResult.entity_id,
@@ -341,36 +346,32 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             for locale in election_day_i18n_used_locales:
                 title = result[1] and result[1].get(locale) or ''
                 row[f'election_title_{locale}'] = title.strip()
-
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
             row['election_type'] = result[4]
             row['election_mandates'] = result[5]
-
             row['election_absolute_majority'] = result[6]
             row['election_status'] = result[7] or 'unknown'
-            row['entity_district'] = result[8] or ''
-            row['entity_name'] = result[9]
-            row['entity_id'] = result[10]
-            row['entity_counted'] = result[11]
-            row['entity_eligible_voters'] = result[12]
-            row['entity_received_ballots'] = result[13]
-            row['entity_blank_ballots'] = result[14]
-            row['entity_invalid_ballots'] = result[15]
-            row['entity_unaccounted_ballots'] = result[16]
-            row['entity_accounted_ballots'] = result[17]
-            row['entity_blank_votes'] = result[18]
-            row['entity_invalid_votes'] = result[19]
-            row['entity_accounted_votes'] = result[20]
-
-            row['candidate_family_name'] = result[21]
-            row['candidate_first_name'] = result[22]
-            row['candidate_id'] = result[23]
-            row['candidate_elected'] = result[24]
-
-            row['candidate_party'] = result[25]
+            row['entity_superregion'] = result[8] or ''
+            row['entity_district'] = result[9] or ''
+            row['entity_name'] = result[10]
+            row['entity_id'] = result[11]
+            row['entity_counted'] = result[12]
+            row['entity_eligible_voters'] = result[13]
+            row['entity_received_ballots'] = result[14]
+            row['entity_blank_ballots'] = result[15]
+            row['entity_invalid_ballots'] = result[16]
+            row['entity_unaccounted_ballots'] = result[17]
+            row['entity_accounted_ballots'] = result[18]
+            row['entity_blank_votes'] = result[19]
+            row['entity_invalid_votes'] = result[20]
+            row['entity_accounted_votes'] = result[21]
+            row['candidate_family_name'] = result[22]
+            row['candidate_first_name'] = result[23]
+            row['candidate_id'] = result[24]
+            row['candidate_elected'] = result[25]
+            row['candidate_party'] = result[26]
             row['candidate_votes'] = result[0]
-
             rows.append(row)
 
         return rows

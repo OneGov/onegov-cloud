@@ -19,15 +19,18 @@ from onegov.election_day.screen_widgets import (
     VoteCounterProposalEntitiesTableWidget,
     VoteCounterProposalResultBarWidget,
     VoteCounterProposalTitleWidget,
+    VoteCounterProposalTurnoutWidget,
     VoteProposalDistrictsMap,
     VoteProposalEntitiesMap,
     VoteProposalEntitiesTableWidget,
     VoteProposalResultBarWidget,
+    VoteProposalTurnoutWidget,
     VoteTieBreakerDistrictsMap,
     VoteTieBreakerEntitiesMap,
     VoteTieBreakerEntitiesTableWidget,
     VoteTieBreakerResultBarWidget,
-    VoteTieBreakerTitleWidget
+    VoteTieBreakerTitleWidget,
+    VoteTieBreakerTurnoutWidget
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -155,7 +158,7 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
         assert '68.22%' in result
         assert 'data-dataurl="Ballot/by-entity"' in result
         assert 'data-dataurl="Ballot/by-district"' in result
-        assert '"01.01.2008, 02:00:00"' in result
+        assert '01.01.2008, 02:00:00' in result
         assert 'my-class-1' in result
         assert 'my-class-2' in result
         assert 'my-class-3' in result
@@ -214,7 +217,7 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
         assert '69.26%' in result
         assert 'data-dataurl="Ballot/by-entity"' in result
         assert 'data-dataurl="Ballot/by-district"' in result
-        assert '"01.01.2008, 03:00:00"' in result
+        assert '01.01.2008, 03:00:00' in result
         assert 'my-class-1' in result
         assert 'my-class-2' in result
         assert 'my-class-3' in result
@@ -282,6 +285,15 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <last-result-change class="my-class-h"/>
             </column>
+            <column span="1">
+                <vote-counter-proposal-turnout class="my-class-i"/>
+            </column>
+            <column span="1">
+                <vote-proposal-turnout class="my-class-j"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-turnout class="my-class-k"/>
+            </column>
         </row>
     """
     widgets = [
@@ -294,11 +306,14 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         VoteCounterProposalEntitiesTableWidget(),
         VoteCounterProposalResultBarWidget(),
         VoteCounterProposalTitleWidget(),
+        VoteCounterProposalTurnoutWidget(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
+        VoteProposalTurnoutWidget(),
         VoteTieBreakerEntitiesTableWidget(),
         VoteTieBreakerResultBarWidget(),
         VoteTieBreakerTitleWidget(),
+        VoteTieBreakerTurnoutWidget(),
         VoteCounterProposalDistrictsMap(),
         VoteCounterProposalEntitiesMap(),
         VoteProposalDistrictsMap(),
@@ -358,6 +373,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-f' in result
     assert 'my-class-g' in result
     assert 'my-class-h' in result
+    assert 'my-class-i' in result
+    assert 'my-class-j' in result
+    assert 'my-class-k' in result
 
     with freeze_time("2008-01-01 03:00"):
         # Add intermediate results
@@ -409,7 +427,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         assert '38.37%' in result
         assert 'data-dataurl="Ballot/by-entity"' in result
         assert 'data-dataurl="Ballot/by-district"' in result
-        assert '"01.01.2008, 04:00:00"' in result
+        assert '42.21 %' in result
+        assert '43.20 %' in result
+        assert '42.32 %' in result
         assert 'my-class-1' in result
         assert 'my-class-2' in result
         assert 'my-class-3' in result
@@ -427,8 +447,11 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         assert 'my-class-f' in result
         assert 'my-class-g' in result
         assert 'my-class-h' in result
+        assert 'my-class-i' in result
+        assert 'my-class-j' in result
+        assert 'my-class-k' in result
 
-    with freeze_time("2008-01-01 04:00"):
+    with freeze_time("2008-01-01 03:00"):
         # Add final results
         model, errors = import_test_datasets(
             'internal',
@@ -484,7 +507,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         assert '37.00%' in result
         assert 'data-dataurl="Ballot/by-entity"' in result
         assert 'data-dataurl="Ballot/by-district"' in result
-        assert '"01.01.2008, 05:00:00"' in result
+        assert '44.93 %' in result
+        assert '45.92 %' in result
+        assert '44.17 %' in result
         assert 'my-class-1' in result
         assert 'my-class-2' in result
         assert 'my-class-3' in result
@@ -502,3 +527,6 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         assert 'my-class-f' in result
         assert 'my-class-g' in result
         assert 'my-class-h' in result
+        assert 'my-class-i' in result
+        assert 'my-class-j' in result
+        assert 'my-class-k' in result

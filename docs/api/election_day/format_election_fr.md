@@ -243,6 +243,7 @@ Nom|Description
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
+`voters_count_percentage`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 
 Les résultats peuvent inclure des résultats avec panachage en ajoutant une colonne par parti :
 

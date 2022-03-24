@@ -43,7 +43,7 @@ class PartyResultExportMixin(object):
 
     """
 
-    def export_parties(self):
+    def export_parties(self, json_serializable=False):
         """ Returns all party results with the panachage as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -53,7 +53,17 @@ class PartyResultExportMixin(object):
         included in the export (since they are not really connected with the
         lists).
 
+        If `json_serializable` is True, decimals are converted to floats. This
+        might be a lossy conversation!
+
         """
+
+        def convert_decimal(value):
+            if value is None:
+                return value
+            if json_serializable:
+                return float(value)
+            return str(value)
 
         results = {}
         parties = set()
@@ -66,7 +76,8 @@ class PartyResultExportMixin(object):
                 'color': result.color,
                 'mandates': result.number_of_mandates,
                 'votes': result.votes,
-                'voters_count': result.voters_count
+                'voters_count': result.voters_count,
+                'voters_count_percentage': result.voters_count_percentage
             }
             parties |= set([result.name])
 
@@ -89,19 +100,24 @@ class PartyResultExportMixin(object):
                 row['year'] = year
                 row['name'] = party
                 row['id'] = parties.index(party)
-                row['total_votes'] = result.get('total_votes', '')
-                row['color'] = result.get('color', '')
-                row['mandates'] = result.get('mandates', '')
-                row['votes'] = result.get('votes', '')
-                row['voters_count'] = str(result.get('voters_count', ''))
+                row['total_votes'] = result.get('total_votes', None)
+                row['color'] = result.get('color', None)
+                row['mandates'] = result.get('mandates', None)
+                row['votes'] = result.get('votes', None)
+                row['voters_count'] = convert_decimal(
+                    result.get('voters_count', None)
+                )
+                row['voters_count_percentage'] = convert_decimal(
+                    result.get('voters_count_percentage', None)
+                )
 
                 # add the panachage results
                 if self.panachage_results.count():
                     for source in parties:
                         id_ = parties.index(source)
                         column = 'panachage_votes_from_{}'.format(id_)
-                        row[column] = result.get(source, '')
-                    row['panachage_votes_from_999'] = result.get('', '')
+                        row[column] = result.get(source, None)
+                    row['panachage_votes_from_999'] = result.get('', None)
 
                 rows.append(row)
 

@@ -71,7 +71,7 @@ Rimanda i dati della visualizzazione principale in forma strutturata.
 ### Dati grezzi
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
@@ -123,10 +123,17 @@ I comuni non ancora contati non sono inclusi.
 ### Risultati dei partiti
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-I dati grezzi sono disponibili come CSV. Sono inclusi i seguenti campi:
+I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+
+Formato|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
@@ -138,6 +145,7 @@ Nome|Descrizione
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+`voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 `panachage_votes_from_{XX}`|Il numero di voti che i partito ha ottenuto dal partito con `id = XX`. Un `id`con il valore `999` segna i voti dalla lista vuota.
 
 3 Risultati della votazione
