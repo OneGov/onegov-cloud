@@ -37,6 +37,7 @@ def view_vote_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
+    # todo: statstics tables
     embed = defaultdict(list)
     media = {}
     layout = VoteLayout(self, request)

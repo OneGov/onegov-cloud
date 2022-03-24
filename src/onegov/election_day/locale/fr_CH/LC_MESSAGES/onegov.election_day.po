@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"POT-Creation-Date: 2022-03-24 15:56+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -653,6 +653,9 @@ msgstr "Gérer"
 msgid "Mappings"
 msgstr "Cartographie"
 
+msgid "Statistics"
+msgstr ""
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Les résultats finaux sont disponibles sur ${url}"
@@ -889,12 +892,6 @@ msgstr "Oui"
 msgid "Nays"
 msgstr "Non"
 
-msgid "Empty"
-msgstr "Vide"
-
-msgid "Invalid"
-msgstr "Invalide"
-
 #. Default: Turnout
 #. Default: Voter turnout
 #.
@@ -906,6 +903,20 @@ msgstr "Pas encore compté"
 
 msgid "Total"
 msgstr "Total"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Electeurs"
+
+msgid "Cast Ballots"
+msgstr "Suffrages exprimés"
+
+msgid "Empty votes"
+msgstr ""
+
+msgid "Invalid votes"
+msgstr ""
 
 msgid "Nay"
 msgstr "Non"
@@ -1056,14 +1067,6 @@ msgstr "Jeu décisif en faveur de l'initiative"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Jeu décisif en faveur de le contre-projet"
-
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Electeurs"
-
-msgid "Cast Ballots"
-msgstr "Suffrages exprimés"
 
 msgid "Download a PDF with all the results:"
 msgstr "Télécharger tous les résultats dans un PDF :"
@@ -1310,6 +1313,12 @@ msgstr "Résultats interm."
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "Résultats intermédiaires: ${counted} de ${total} ${entities}"
+
+msgid "Empty"
+msgstr "Vide"
+
+msgid "Invalid"
+msgstr "Invalide"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"

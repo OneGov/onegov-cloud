@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"POT-Creation-Date: 2022-03-24 15:56+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -653,6 +653,9 @@ msgstr "Administrar"
 msgid "Mappings"
 msgstr "Attribuziuns"
 
+msgid "Statistics"
+msgstr ""
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Resultats finals disponibels sin ${url}"
@@ -890,12 +893,6 @@ msgstr "Vuschs affirmativas"
 msgid "Nays"
 msgstr "Vuschs negativas"
 
-msgid "Empty"
-msgstr "Vid"
-
-msgid "Invalid"
-msgstr "Nunvalaivel"
-
 #. Default: Turnout
 #. Default: Voter turnout
 #.
@@ -907,6 +904,20 @@ msgstr "Anc betg eruì il resultat"
 
 msgid "Total"
 msgstr "Total"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Persunas cun dretg da votar"
+
+msgid "Cast Ballots"
+msgstr "Cedels da votar entrads"
+
+msgid "Empty votes"
+msgstr ""
+
+msgid "Invalid votes"
+msgstr ""
 
 msgid "Nay"
 msgstr "NA"
@@ -1056,14 +1067,6 @@ msgstr "Dumonda decisiva a favur da l'iniziativa"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Dumonda decisiva a favur da la cuntraproposta"
-
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Persunas cun dretg da votar"
-
-msgid "Cast Ballots"
-msgstr "Cedels da votar entrads"
 
 msgid "Download a PDF with all the results:"
 msgstr "In PDF cun tut ils resultats pudais Vus chargiar giu qua:"
@@ -1311,6 +1314,12 @@ msgstr "Resultats interm."
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "resultats intermediars: ${counted} da ${total} ${entities}"
+
+msgid "Empty"
+msgstr "Vid"
+
+msgid "Invalid"
+msgstr "Nunvalaivel"
 
 msgid "Wrong username or password"
 msgstr ""

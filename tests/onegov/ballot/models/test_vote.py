@@ -431,7 +431,6 @@ def test_vote_turnout(session):
 
     session.flush()
     assert vote.counted_eligible_voters == vote.eligible_voters
-    assert vote.counted_cast_ballots == 10
     assert vote.turnout == 10
     assert vote.proposal.turnout == 10
 

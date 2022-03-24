@@ -12,20 +12,22 @@ class VoteLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
-    tabs_with_embedded_tables = ('entities', 'districts')
-
     @cached_property
     def all_tabs(self):
         """Return all tabs. Ordering is important for the main view."""
         return (
             'entities',
             'districts',
+            'statistics',
             'proposal-entities',
             'proposal-districts',
             'counter-proposal-entities',
             'counter-proposal-districts',
             'tie-breaker-entities',
             'tie-breaker-districts',
+            'proposal-statistics',
+            'tie-breaker-entities',
+            'tie-breaker-statistics',
             'data'
         )
 
@@ -36,6 +38,8 @@ class VoteLayout(DetailLayout):
             return self.principal.label('entities')
         if tab == 'districts':
             return self.app.principal.label('districts')
+        if tab == 'statistics':
+            return _("Statistics")
         if tab.startswith('proposal'):
             return _("Proposal")
         if tab.startswith('counter-proposal'):
@@ -54,6 +58,8 @@ class VoteLayout(DetailLayout):
             return self.principal.label('entities')
         if tab.endswith('-districts'):
             return self.app.principal.label('districts')
+        if tab.endswith('-statistics'):
+            return _("Statistics")
 
         return ''
 
@@ -82,6 +88,15 @@ class VoteLayout(DetailLayout):
             return self.has_districts and self.type == 'complex'
         if tab == 'tie-breaker-districts':
             return self.has_districts and self.type == 'complex'
+
+        if tab == 'statistics':
+            return self.type == 'simple'
+        if tab == 'proposal-statistics':
+            return self.type == 'complex'
+        if tab == 'counter-proposal-statistics':
+            return self.type == 'complex'
+        if tab == 'tie-breaker-statistics':
+            return self.type == 'complex'
 
         return True
 
@@ -115,6 +130,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def table_link(self):
+        # todo: statistics
         if self.tab == 'data':
             return None
         scope = 'entities'
@@ -171,7 +187,11 @@ class VoteLayout(DetailLayout):
                         self.request.link(self.model, tab),
                         self.tab == tab,
                         []
-                    ) for tab in (f'{prefix}-entities', f'{prefix}-districts')]
+                    ) for tab in (
+                        f'{prefix}-entities',
+                        f'{prefix}-districts',
+                        f'{prefix}-statistics'
+                    )]
                 ))
             result.append((
                 self.title('data'),

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"POT-Creation-Date: 2022-03-24 15:56+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -646,6 +646,9 @@ msgstr "Amministrare"
 msgid "Mappings"
 msgstr "Mapping"
 
+msgid "Statistics"
+msgstr ""
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Risultati finali sono disponibili su ${url}"
@@ -881,12 +884,6 @@ msgstr "Voti favorevoli"
 msgid "Nays"
 msgstr "Voti contrari"
 
-msgid "Empty"
-msgstr "Bianche"
-
-msgid "Invalid"
-msgstr "Nulle"
-
 #. Default: Turnout
 #. Default: Voter turnout
 #.
@@ -898,6 +895,20 @@ msgstr "Non ancora conteggiato"
 
 msgid "Total"
 msgstr "Totale"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Aventi diritto di voto"
+
+msgid "Cast Ballots"
+msgstr "Schede rientrate"
+
+msgid "Empty votes"
+msgstr ""
+
+msgid "Invalid votes"
+msgstr ""
 
 msgid "Nay"
 msgstr "No"
@@ -1047,14 +1058,6 @@ msgstr "Spareggio a favore della iniziativa"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Spareggio a favore della controprogetto"
-
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Aventi diritto di voto"
-
-msgid "Cast Ballots"
-msgstr "Schede rientrate"
 
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
@@ -1300,6 +1303,12 @@ msgstr "Risultati prov."
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "Risultati provvisori: ${counted} de ${total} ${entities}"
+
+msgid "Empty"
+msgstr "Bianche"
+
+msgid "Invalid"
+msgstr "Nulle"
 
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
