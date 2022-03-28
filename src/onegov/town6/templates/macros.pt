@@ -1690,8 +1690,12 @@
         <ul class="forms-list more-list">
             <li tal:repeat="record grouped[group]">
             <tal:b tal:define="link edit_link(record)|nothing">
-                <a class="list-title" tal:attributes="href link_func(record); target layout.external_link_target if link else None">
-                        ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+                <a class="list-title" tal:attributes="href link_func(record); target layout.external_link_target">
+                        ${record.title} 
+                        <tal:block condition="layout.external_link_target and  external_link(record)|nothing"> 
+                            <i class="fas fa-external-link-alt fa-xs"></i>
+                            <span class="visually-hidden">(External Link)</span>
+                        </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
                 
                     <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>

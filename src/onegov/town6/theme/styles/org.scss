@@ -541,7 +541,7 @@ $pageref-color-hover: $iron;
         border-top: 1px solid #e1e4e6;
         padding-top: 1rem;
     }
-}   
+}
 
 /*
     Sort topics
@@ -586,4 +586,11 @@ body:not(.editor-layout) {
     .orbit.slider {
         margin-bottom: -2rem;
     }
+}
+
+/*
+    Accessibility
+*/
+.visually-hidden {
+    @include element-invisible;
 }
