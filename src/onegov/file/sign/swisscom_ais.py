@@ -1,8 +1,8 @@
 import os
 
-from AIS import AIS
-from AIS import PDF
+from AIS import AIS, PDF
 from onegov.file.sign.generic import SigningService
+# from .types import RenderedCertificate
 
 
 class SwisscomAIS(SigningService, service_name='swisscom_ais'):
@@ -22,12 +22,8 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         self.client = AIS(customer, key_static, cert_file, cert_key)
 
     def sign(self, infile, outfile):
-        with self.materialise(infile) as fp:
-            pdf = PDF(fp.name)
-            self.client.sign_one_pdf(pdf)
-
-        with open(pdf.out_filename, 'rb') as fp:
-            for chunk in iter(lambda: fp.read(4096), b''):
-                outfile.write(chunk)
-
+        pdf = PDF(infile)
+        pdf.out_stream = outfile
+        self.client.sign_one_pdf(pdf)  # sign the given pdf file
+        print(pdf.out_stream)
         return f'swisscom_ais/{self.customer}/{self.client.last_request_id}'
