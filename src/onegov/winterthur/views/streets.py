@@ -31,7 +31,9 @@ def view_streets(self, request):
         'layout': AddressLayout(self, request),
         'title': _("Streets Directory"),
         'streets': by_letter,
-        'link_to_street': link_to_street
+        'link_to_street': link_to_street,
+        'last_updated': self.last_updated(),
+        'update_state': self.update_state()
     }
 
 
