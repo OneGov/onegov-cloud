@@ -12,6 +12,7 @@ from onegov.election_day.screen_widgets import (
     AbsoluteMajorityWidget,
     ColumnWidget,
     CountedEntitiesWidget,
+    NumberOfCountedEntitiesWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
@@ -23,6 +24,7 @@ from onegov.election_day.screen_widgets import (
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -55,19 +57,25 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
                 <election-candidates-by-entity-table class="my-class-7"/>
             </column>
             <column span="1">
-                <election-turnout class="my-class-8"/>
+                <number-of-counted-entities class="my-class-8"/>
             </column>
             <column span="1">
-                <absolute-majority class="my-class-9"/>
+                <total-entities class="my-class-9"/>
             </column>
             <column span="1">
-                <allocated-mandates class="my-class-a"/>
+                <election-turnout class="my-class-a"/>
             </column>
             <column span="1">
-                <number-of-mandates class="my-class-b"/>
+                <absolute-majority class="my-class-b"/>
             </column>
             <column span="1">
-                <mandates class="my-class-c"/>
+                <allocated-mandates class="my-class-c"/>
+            </column>
+            <column span="1">
+                <number-of-mandates class="my-class-d"/>
+            </column>
+            <column span="1">
+                <mandates class="my-class-e"/>
             </column>
         </row>
     """
@@ -75,8 +83,10 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         AbsoluteMajorityWidget(),
         AllocatedMandatesWidget(),
         ElectionCandidatesChartWidget(),
@@ -127,6 +137,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-a' in result
     assert 'my-class-b' in result
     assert 'my-class-c' in result
+    assert 'my-class-d' in result
+    assert 'my-class-e' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -229,6 +241,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         '?limit=02&amp;lists=x,y&amp;elected=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
+    assert '4' in result
+    assert '11' in result
     assert '52.32 %' in result
     assert '18.191' in result
     assert '0' in result
@@ -246,6 +260,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-a' in result
     assert 'my-class-b' in result
     assert 'my-class-c' in result
+    assert 'my-class-d' in result
+    assert 'my-class-e' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -410,6 +426,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         '?limit=02&amp;lists=x,y&amp;elected=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
+    assert '11' in result
+    assert '11' in result
     assert '53.01 %' in result
     assert '18.191' in result
     assert '2' in result
@@ -427,6 +445,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-a' in result
     assert 'my-class-b' in result
     assert 'my-class-c' in result
+    assert 'my-class-d' in result
+    assert 'my-class-e' in result
 
 
 def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
@@ -464,16 +484,22 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
                     names="a,b"/>
             </column>
             <column span="1">
-                <election-turnout class="my-class-a"/>
+                <number-of-counted-entities class="my-class-a"/>
             </column>
             <column span="1">
-                <allocated-mandates class="my-class-b"/>
+                <total-entities class="my-class-b"/>
             </column>
             <column span="1">
-                <number-of-mandates class="my-class-c"/>
+                <election-turnout class="my-class-c"/>
             </column>
             <column span="1">
-                <mandates class="my-class-d"/>
+                <allocated-mandates class="my-class-d"/>
+            </column>
+            <column span="1">
+                <number-of-mandates class="my-class-e"/>
+            </column>
+            <column span="1">
+                <mandates class="my-class-f"/>
             </column>
         </row>
     """
@@ -481,8 +507,10 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
         ElectionListsChartWidget(),
@@ -535,6 +563,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-b' in result
     assert 'my-class-c' in result
     assert 'my-class-d' in result
+    assert 'my-class-e' in result
+    assert 'my-class-f' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -668,6 +698,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert (
         'data-dataurl="ProporzElection/lists-data?limit=03&amp;names=a,b"'
     ) in result
+    assert '4' in result
+    assert '11' in result
     assert '53.27 %' in result
     assert '0' in result
     assert '1' in result
@@ -685,6 +717,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-b' in result
     assert 'my-class-c' in result
     assert 'my-class-d' in result
+    assert 'my-class-e' in result
+    assert 'my-class-f' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -824,6 +858,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert (
         'data-dataurl="ProporzElection/lists-data?limit=03&amp;names=a,b"'
     ) in result
+    assert '11' in result
+    assert '11' in result
     assert '53.74 %' in result
     assert '3' in result
     assert '1' in result
@@ -841,3 +877,5 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-b' in result
     assert 'my-class-c' in result
     assert 'my-class-d' in result
+    assert 'my-class-e' in result
+    assert 'my-class-f' in result
