@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div tal:condition="streets">
             <p class="last-updated">Zuletzt aktualisiert: ${layout.format_date(last_updated, 'datetime')}</p>
-            <p class="">${update_state}</p>
+            <p aria-hidden="true" class="visually-hidden">${update_state}</p>
             <input type="text" data-street-search placeholder="Search streets" i18n:attributes="placeholder">
         </div>
 
