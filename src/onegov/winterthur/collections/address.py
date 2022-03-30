@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
 from io import BytesIO
 from onegov.core.collection import GenericCollection
 from onegov.core.csv import CSVFile
