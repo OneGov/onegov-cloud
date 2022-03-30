@@ -151,6 +151,15 @@ class ElectionCompound(
             for election in value
         ]
 
+        # update last result change (only newer)
+        new = [x.last_result_change for x in value]
+        new = [x for x in new if x]
+        new = max(new) if new else None
+        if new:
+            old = self.last_result_change
+            if not old or (old and old < new):
+                self.last_result_change = new
+
     @property
     def number_of_mandates(self):
         """ The (total) number of mandates. """
