@@ -40,7 +40,7 @@ class AddressCollection(GenericCollection):
         return result.modified if result else None
 
     def update_state(self):
-        last_updated = self.last_updated
+        last_updated = self.last_updated()
         if not last_updated:
             return 'failed'
 
