@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2022-03-28 15:19+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -177,6 +177,9 @@ msgstr "Oui"
 
 msgid "No"
 msgstr "Non"
+
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
 
 msgid "Exports payments and tickets"
 msgstr "Exporte les paiements et les tickets"
