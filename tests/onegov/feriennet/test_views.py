@@ -584,7 +584,7 @@ def test_occasions_form(client, scenario):
     assert "keine Durchführungen" not in activity
     assert "4. Oktober 10:00 - 12:00" in activity
     assert "10 - 20 Jahre" in activity
-    assert "30 - 40 Teilnehmer" in activity
+    assert "30 - 40 Teilnehmende" in activity
     assert "Franz Karl Weber" in activity
     assert "No griefers" in activity
 
@@ -765,11 +765,11 @@ def test_enroll_child(client, scenario):
 
     # now that we're logged in, the login link automatically skips ahead
     enroll = activity.click("Anmelden", index=1).follow()
-    assert "Teilnehmer anmelden" in enroll
+    assert "Teilnehmende anmelden" in enroll
 
     # the link changes, but the result stays the same
     enroll = client.get('/activity/retreat').click("Anmelden")
-    assert "Teilnehmer anmelden" in enroll
+    assert "Teilnehmende anmelden" in enroll
 
     enroll.form['first_name'] = "Tom"
     enroll.form['last_name'] = "Sawyer"
@@ -796,7 +796,7 @@ def test_enroll_child(client, scenario):
     enroll.form['gender'] = 'male'
 
     # prevent adding two kids with the same name
-    assert "Sie haben bereits ein Kind mit diesem Namen eingegeben"\
+    assert "Sie haben bereits eine Person mit diesem Namen erfasst"\
         in enroll.form.submit()
 
     # prevent enrollment for inactive periods
@@ -1023,7 +1023,7 @@ def test_confirmed_booking_view(scenario, client):
     assert "Buchung stornieren" in page
     assert "Wunsch entfernen" not in page
     assert "Buchung entfernen" not in page
-    assert "nicht genügend Teilnehmer" not in page
+    assert "nicht genügend Anmeldungen" not in page
 
     # Related contacts are now visible
     assert page.pyquery('.attendees-toggle').text() == '1 Teilnehmer'
@@ -1058,7 +1058,7 @@ def test_confirmed_booking_view(scenario, client):
         scenario.latest_occasion.spots = NumericRange(2, 5)
 
     page = client.get('/my-bookings')
-    assert "nicht genügend Teilnehmer" in page
+    assert "nicht genügend Anmeldungen" in page
 
 
 def test_direct_booking_and_storno(client, scenario):
@@ -2774,7 +2774,7 @@ def test_attendee_view(scenario, client, attendee_owner):
     assert page.form['last_name'].value == 'Frisch'
     page.form['first_name'] = 'Max'
     page = page.form.submit()
-    assert "Sie haben bereits ein Kind mit diesem Namen eingegeben" in page
+    assert "Sie haben bereits eine Person mit diesem Namen erfasst" in page
 
 
 def test_registration(client):

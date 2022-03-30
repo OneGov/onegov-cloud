@@ -1,5 +1,5 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
-    <tal:block metal:fill-slot="title">${election_compound.title}</tal:block>
+    <tal:block metal:fill-slot="title">${election_compound.title} - ${request.app.principal.name}</tal:block>
     <tal:block metal:fill-slot="before-content">
         <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound" />
     </tal:block>
@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <div metal:use-macro="layout.macros['party_strengths']" tal:define="pukelsheim election_compound.pukelsheim"/>
+            <div metal:use-macro="layout.macros['party_strengths']" tal:define="voters_counts election_compound.voters_counts"/>
 
         </tal:block>
 

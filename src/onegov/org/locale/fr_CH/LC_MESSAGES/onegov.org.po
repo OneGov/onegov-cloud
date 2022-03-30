@@ -95,7 +95,7 @@ msgid "User groups"
 msgstr "Groupes d'utilisateurs"
 
 msgid "Link Check"
-msgstr ""
+msgstr "Vérification du lien"
 
 msgid "Archived Tickets"
 msgstr "Tickets archivés"
@@ -131,10 +131,10 @@ msgid "Cancel"
 msgstr "Annuler"
 
 msgid "ID Payment Provider"
-msgstr ""
+msgstr "ID Opérateurs de paiement"
 
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
 msgid "Currency"
 msgstr "Devise"
@@ -149,28 +149,28 @@ msgid "Fee"
 msgstr "Tarif"
 
 msgid "Date Paid"
-msgstr ""
+msgstr "Date de paiement"
 
 msgid "References"
-msgstr ""
+msgstr "Références"
 
 msgid "Created Date"
-msgstr ""
+msgstr "Date de création"
 
 msgid "Reference Ticket"
-msgstr ""
+msgstr "Billet de référence"
 
 msgid "Submitter Email"
-msgstr ""
+msgstr "E-mail de l'expéditeur"
 
 msgid "Category Ticket"
-msgstr ""
+msgstr "Catégorie Ticket"
 
 msgid "Status Ticket"
-msgstr ""
+msgstr "Ticket de statut"
 
 msgid "Ticket decided"
-msgstr ""
+msgstr "Ticket décidé"
 
 msgid "Yes"
 msgstr "Oui"
@@ -178,8 +178,11 @@ msgstr "Oui"
 msgid "No"
 msgstr "Non"
 
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
+
 msgid "Exports payments and tickets"
-msgstr ""
+msgstr "Exporte les paiements et les tickets"
 
 msgid "Mo"
 msgstr "Lu"
@@ -572,6 +575,9 @@ msgstr "Tradition"
 msgid "Youth"
 msgstr "Jeunesse"
 
+msgid "Elderly"
+msgstr "Âgées"
+
 msgid "Concerto in the castle garden"
 msgstr "Concerto dans le jardin du château"
 
@@ -920,7 +926,7 @@ msgid "Show the lead if accessing the parent page"
 msgstr "Afficher l'introduction sur la page parent"
 
 msgid "(Redesign only)"
-msgstr ""
+msgstr "(Redesign uniquement)"
 
 msgid "Test run"
 msgstr "Test de fonctionnement"
@@ -1208,21 +1214,23 @@ msgid ""
 "Default social media preview image for rich link previews. Optimal size is "
 "1200:630 px."
 msgstr ""
+"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
+"riches. La taille optimale est de 1200:630 px."
 
 msgid "Icon 16x16 PNG (Windows)"
-msgstr ""
+msgstr "Icône 16x16 PNG (Windows)"
 
 msgid "URL pointing to the icon"
 msgstr "URL pointant vers le Favicon"
 
 msgid "Icon 32x32 PNG (Mac)"
-msgstr ""
+msgstr "Icône 32x32 PNG (Mac)"
 
 msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr ""
+msgstr "Icône 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
-msgstr ""
+msgstr "Icône SVG 20x20 (Safari)"
 
 msgid "Open files in separate window"
 msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
@@ -1407,8 +1415,8 @@ msgstr ""
 "Mettez les tickets en sourdine individuellement si la fonction d'acceptation "
 "automatique est activée."
 
-msgid "Show option for newsletter registration"
-msgstr "Afficher l'inscription à la newsletter"
+msgid "Enable newsletter"
+msgstr "Activer la newsletter"
 
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"
@@ -1429,13 +1437,13 @@ msgid "Domain must contain a dot"
 msgstr "Le domaine doit contenir un point"
 
 msgid "Choose which links to check"
-msgstr ""
+msgstr "Choisissez les liens à vérifier"
 
 msgid "External links only"
-msgstr ""
+msgstr "Liens externes uniquement"
 
 msgid "Internal links only"
-msgstr ""
+msgstr "Liens internes uniquement"
 
 msgid "Your note about this ticket"
 msgstr "Votre note à propos de ce ticket"
@@ -1599,7 +1607,7 @@ msgid "Edit"
 msgstr "Modifier"
 
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -1678,7 +1686,7 @@ msgid "New Note"
 msgstr "Nouveau commentaire"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "New Message"
 msgstr "Nouveau message"
@@ -1918,6 +1926,9 @@ msgid ""
 "- Urls will be transformed into links\n"
 "- Emails and phone numbers as well"
 msgstr ""
+"- Les \"-\" seront convertis en liste à puces.\n"
+"- Les urls seront transformées en liens\n"
+"- Les e-mails et les numéros de téléphone aussi"
 
 msgid "Hide contact info in sidebar"
 msgstr "Nascondi le informazioni di contatto nella sidebar"
@@ -2524,16 +2535,16 @@ msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
 
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 msgid "Healthy"
-msgstr ""
+msgstr "Santé"
 
 msgid "Errors"
-msgstr ""
+msgstr "Erreurs"
 
 msgid "Duration [s]"
-msgstr ""
+msgstr "Durée [s]"
 
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
@@ -2701,6 +2712,9 @@ msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time."
 msgstr ""
+"Votre demande sera traitée sous peu. Pour connaître l'état d'avancement du "
+"traitement de votre demande, vous pouvez revenir sur cette page à tout "
+"moment."
 
 msgid ""
 "Your request has been completed. If you asked for documents to be sent to "
@@ -2828,7 +2842,7 @@ msgid "Accept"
 msgstr "Accepter"
 
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
@@ -3193,6 +3207,13 @@ msgstr "Ticket a été archivé"
 msgid "Ticket recovered from archive."
 msgstr "Ticket récupéré dans les archives"
 
+msgid ""
+"The newsletter is disabled. You can only see this page because you are "
+"logged in."
+msgstr ""
+"La newsletter est désactivée. Vous ne pouvez voir cette page que parce que "
+"vous êtes connecté."
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
@@ -3461,6 +3482,8 @@ msgid ""
 "Sort the items using drag and drop. The new positions are automatically "
 "saved directly after moving."
 msgstr ""
+"Triez les éléments par glisser-déposer. Les nouvelles positions sont "
+"automatiquement enregistrées directement après le déplacement."
 
 msgid "Back to page"
 msgstr "Retour à la page"
@@ -3948,10 +3971,10 @@ msgid "${count} links will be replaced by this action."
 msgstr "${count} liens seront remplacés par cette action."
 
 msgid "The event submitter has not yet completed his submission"
-msgstr ""
+msgstr "L'auteur de l'événement n'a pas encore terminé sa soumission."
 
 msgid "This event has already been published"
-msgstr ""
+msgstr "Cet événement a déjà été publié"
 
 #, python-format
 msgid "You have accepted the event ${title}"
@@ -4483,7 +4506,7 @@ msgid "Favicon"
 msgstr "Favicon"
 
 msgid "Links"
-msgstr ""
+msgstr "Liens"
 
 msgid "Newsletter Settings"
 msgstr "Paramètres de la newsletter"
@@ -4510,10 +4533,10 @@ msgid "No holidays defined"
 msgstr "Aucun jour férié défini"
 
 msgid "Link Migration"
-msgstr ""
+msgstr "Migration des liens"
 
 msgid "Migrate"
-msgstr ""
+msgstr "Migrer"
 
 #, python-format
 msgid "Migrated ${number} links"
@@ -4645,13 +4668,22 @@ msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Vous avez activé les e-mails pour le ticket ${number}"
 
+msgid "The ticket cannot be archived because it's not closed"
+msgstr "Le ticket ne peut pas être archivé car il n'est pas clôturé"
+
 #, python-format
 msgid "You archived ticket ${number}"
 msgstr "Vous avez archivé le ticket avec le numéro ${number}"
 
+msgid ""
+"The ticket cannot be recovered from the archive because it's not archived"
+msgstr ""
+"Le ticket ne peut pas être récupéré à partir de l'archive car il n'est pas "
+"archivé"
+
 #, python-format
 msgid "You recovered ticket ${number} from the archive"
-msgstr ""
+msgstr "Vous avez récupéré le ticket avec le numéro ${number} de l'archive"
 
 msgid "The ticket has already been closed"
 msgstr "Le ticket a déjà été fermé"

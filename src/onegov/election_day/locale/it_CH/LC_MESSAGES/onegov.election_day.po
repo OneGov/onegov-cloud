@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 11:59+0100\n"
-"PO-Revision-Date: 2022-03-15 10:56+0100\n"
+"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -379,8 +379,8 @@ msgstr "Definizioni di colore non valide"
 msgid "Domain of the elections"
 msgstr "Livello di elezione"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Elezioni"
 
 msgid "Completes manually"
 msgstr "Completa manualmente"
@@ -393,11 +393,32 @@ msgstr ""
 "risultato elettorale individuale viene visualizzato fino a quando il "
 "componente elettorale non viene completato manualmente."
 
+msgid "Completion"
+msgstr "Completamento"
+
 msgid "Completed"
 msgstr "Completato"
 
-msgid "Elections"
-msgstr "Elezioni"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View options"
+msgstr "Opzioni di visualizzazione"
+
+msgid "Allows to show the list groups and lists views."
+msgstr "Permette di mostrare i gruppi di liste e le viste delle liste."
+
+msgid "Voters counts"
+msgstr "Numeri di elettori"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+
+msgid "Exact voters counts"
+msgstr "Numeri esatti dei elettori"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Mostra il numero esatto dei elettori invece dei valori arrotondati."
 
 msgid "List groups"
 msgstr "Gruppi di liste"
@@ -417,11 +438,12 @@ msgstr "Liste"
 
 msgid ""
 "Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+"Always rounded."
 msgstr ""
 "Mostra una scheda con i risultati delle liste aggregate su tutte le "
 "elezioni. Utile solo se le liste corrispondono ai gruppi di liste. Solo per "
-"Doppelter Pukelsheim."
+"Doppelter Pukelsheim. Sempre arrotondato."
 
 msgid "Party strengths"
 msgstr "Forza delle parti"
@@ -453,6 +475,9 @@ msgstr "Webhooks"
 
 msgid "Votes"
 msgstr "Votazioni"
+
+msgid "Select at least one election or vote."
+msgstr "Seleziona almeno un'elezione o una votazione."
 
 msgid "Number"
 msgstr "Numero"
@@ -688,8 +713,14 @@ msgstr "Non sono ancora state inserite elezioni o votazioni."
 msgid "Elections and votes on ${date}"
 msgstr "Elezioni e votazioni del ${date}"
 
+msgid "Archive"
+msgstr "Archivio"
+
 msgid "Federal Elections"
 msgstr "Elezioni federali"
+
+msgid "on"
+msgstr "del"
 
 msgid "Regional Elections"
 msgstr "Elezioni regionali"
@@ -727,9 +758,6 @@ msgstr "Sì %"
 msgid "No %"
 msgstr "No %"
 
-msgid "Archive"
-msgstr "Archivio"
-
 msgid "Archive Search"
 msgstr "Ricerca in archivio"
 
@@ -762,14 +790,11 @@ msgstr ""
 "liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
 "le barre colorate di blu contengono i numeri dei mandati."
 
-msgid "The raw data is available as:"
-msgstr "I dati grezzi sono disponibili come:"
+msgid "Embed heatmap"
+msgstr "incorporare la mappa"
 
-msgid "The format of the data is described here:"
-msgstr "Il formato dei dati è descritto qui:"
-
-msgid "Format Description"
-msgstr "Descrizione del formato"
+msgid "Download heatmap"
+msgstr "Scarica la mappa"
 
 msgid "Embed"
 msgstr "Incorporare"
@@ -788,6 +813,9 @@ msgstr ""
 "numero di elettori della lista. Il numero di elettori sovraripartizione tra "
 "i gruppi di liste."
 
+msgid "The file is invalid."
+msgstr ""
+
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
@@ -795,6 +823,15 @@ msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 #.
 msgid "homepage"
 msgstr "Pagina iniziale"
+
+msgid "Logo: Link to homepage"
+msgstr "Logo: Link alla pagina iniziale"
+
+msgid "Footer"
+msgstr "Piè di pagina"
+
+msgid "Language"
+msgstr "Lingua"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -1022,12 +1059,28 @@ msgstr "Schede rientrate"
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
 
+msgid "PDF Results"
+msgstr "Risultati PDF"
+
 msgid ""
 "The raw data used to display the results is available in the following "
 "formats:"
 msgstr ""
 "I dati grezzi usati per mostrare i risultati sono disponibili nei seguenti "
 "formati:"
+
+msgid ""
+"The raw data used to display the party results is available in the following "
+"formats:"
+msgstr ""
+"I dati grezzi usati per mostrare i risultati del partito sono disponibili "
+"nei seguenti formati:"
+
+msgid "The format of the data is described here:"
+msgstr "Il formato dei dati è descritto qui:"
+
+msgid "Format Description"
+msgstr "Descrizione del formato"
 
 msgid "Terms of use"
 msgstr "Condizioni d’uso"

@@ -44,10 +44,6 @@
                             <div class="hint hint-matching" tal:condition="period.wishlist_phase" i18n:translate>
                                 Once the pre-booking is over, we will divide all children into activities.
                             </div>
-
-                            <div class="hint hint-fairness" tal:condition="period.wishlist_phase" i18n:translate>
-                                We cannot guarantee that everyone gets into their favorite activity.
-                            </div>
                         </div>
                     </div>
 

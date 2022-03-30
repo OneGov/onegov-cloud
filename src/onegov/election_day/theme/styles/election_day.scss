@@ -200,6 +200,13 @@ table {
         border-bottom: 1px solid $aluminum;
     }
 
+    tbody {
+        th {
+            border-bottom: none;
+            font-weight: normal;
+        }
+    }
+
     tr.even,
     tr.alt,
     tr:nth-of-type(even) {
@@ -572,6 +579,10 @@ footer {
     padding: 1rem 0 1rem calc(100vw - 100%);
     position: relative;
     width: 100vw;
+
+    p {
+        font-size: inherit;
+    }
 }
 
 
@@ -1098,4 +1109,18 @@ ul.pagination li.last {
 .panel.warning {
     background-color: lighten($warning-color, 10%);
     border-color: darken($warning-color, 10%);
+}
+
+
+.visually-hidden {
+    @include element-invisible;
+}
+
+a:focus {
+    outline: 2px solid;
+    outline-offset: 1px;
+}
+
+.show-only-on-tab:not(:focus) {
+    @include element-invisible;
 }

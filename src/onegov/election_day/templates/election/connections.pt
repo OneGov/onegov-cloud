@@ -1,5 +1,5 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
-    <tal:block metal:fill-slot="title">${election.title}</tal:block>
+    <tal:block metal:fill-slot="title">${election.title} - ${request.app.principal.name}</tal:block>
     <tal:block metal:fill-slot="before-content">
         <div metal:use-macro="layout.macros['election_header']" />
     </tal:block>
@@ -26,7 +26,7 @@
                     <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day" />
                 </div>
                 <div class="small-12 small-centered large-10 columns" tal:condition="not: skip_rendering">
-                    <figure>
+                    <figure aria-hidden="true">
                         <tal:block metal:use-macro="layout.macros['connections-chart']" tal:define="embed True; model election"/>
                         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
                             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>

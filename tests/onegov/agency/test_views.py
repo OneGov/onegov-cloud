@@ -1,11 +1,19 @@
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
+from onegov.agency.models import ExtendedAgency
+from onegov.agency.models import ExtendedAgencyMembership
+from onegov.agency.models import ExtendedPerson
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.pdf.utils import extract_pdf_info
 from pytest import mark
+from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
+from tests.onegov.org.common import get_cronjob_by_name
+from tests.onegov.org.common import get_cronjob_url
+from time import sleep
+from transaction import commit
 
 
 def test_views(client):
@@ -711,6 +719,84 @@ def test_basic_search(client_with_es):
     assert '8911 Rivera Nick (Doctor)' in client.get(
         '/search/suggest?q=89'
     ).json
+
+
+@mark.flaky(reruns=3)
+def test_search_recently_published_object(client_with_es):
+    client = client_with_es
+    client.login_admin()
+    anom = client.spawn()
+
+    # Create objects, not yet published
+    start = datetime.now() + timedelta(days=1)
+
+    manage = client.get('/people').click('Person', href='new')
+    manage.form['first_name'] = 'Nick'
+    manage.form['last_name'] = 'Rivera'
+    manage.form['publication_start'] = start.isoformat()
+    manage.form.submit()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Hospital Springfield'
+    manage.form['publication_start'] = start.isoformat()
+    manage = manage.form.submit().follow()
+
+    manage = manage.click('Mitgliedschaft', href='new')
+    manage.form['title'] = 'Anesthetist'
+    manage.form['person_id'].select(text='Rivera Nick')
+    manage.form['publication_start'] = start.isoformat()
+    manage.form.submit()
+
+    client.app.es_client.indices.refresh(index='_all')
+
+    assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' not in anom.get('/search?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
+    assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
+    assert 'Nick' in client.get('/search?q=Anesthetist')
+    assert 'Nick' not in anom.get('/search?q=Anesthetist')
+
+    # Publish
+    then = utcnow() - timedelta(minutes=30)
+    session = client.app.session()
+    session.query(ExtendedPerson).one().publication_start = then
+    session.query(ExtendedAgencyMembership).one().publication_start = then
+    session.query(ExtendedAgency).one().publication_start = then
+    commit()
+
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    job.app = client.app
+    url = get_cronjob_url(job)
+    client.get(url)
+
+    sleep(5)
+
+    assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' in anom.get('/search?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
+    assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
+    assert 'Nick' in client.get('/search?q=Anesthetist')
+    assert 'Nick' in anom.get('/search?q=Anesthetist')
+
+    # Unpublish
+    session.query(ExtendedPerson).one().publication_start = None
+    session.query(ExtendedPerson).one().publication_end = then
+    session.query(ExtendedAgencyMembership).one().publication_start = None
+    session.query(ExtendedAgencyMembership).one().publication_end = then
+    session.query(ExtendedAgency).one().publication_start = None
+    session.query(ExtendedAgency).one().publication_end = then
+    commit()
+
+    client.get(url)
+
+    sleep(5)
+
+    assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' not in client.spawn().get('/search?q=Rivera')
+    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
+    assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
+    assert 'Nick' in client.get('/search?q=Anesthetist')
+    assert 'Nick' not in anom.get('/search?q=Anesthetist')
 
 
 def test_footer_settings_custom_links(client):

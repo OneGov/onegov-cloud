@@ -245,6 +245,7 @@ Name|Description
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
+`voters_count_percentage`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 
 The results may contain panachage results by adding one column per party:
 

@@ -43,6 +43,8 @@ class TicketCollectionPagination(Pagination):
                 Ticket.state != 'closed',
                 Ticket.state != 'archived'
             )
+        elif self.state == 'all':
+            query = query.filter(Ticket.state != 'archived')
         elif self.state != 'all':
             query = query.filter(Ticket.state == self.state)
 
@@ -219,6 +221,5 @@ class TicketCollection(TicketCollectionPagination):
 
 
 class ArchivedTicketsCollection(TicketCollectionPagination):
-
     def query(self):
         return self.session.query(Ticket)

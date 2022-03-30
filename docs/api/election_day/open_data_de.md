@@ -71,7 +71,7 @@ Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Fo
 ### Rohdaten
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
@@ -123,21 +123,30 @@ Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 ### Parteiresultate
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Die Rohdaten sind als CSV verfügbar. Die folgenden Felder sind enthalten:
+Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Die folgenden Felder sind in allen Formaten enthalten:
+
 
 Name|Description
 ---|---
 `year`|Das Jahr der Wahl.
-The number of votes per total number of mandates.
+`total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
 `name`|Der Name der Partei.
-`id`|ID der Partei.
+`id`|ID der Partei (beliebige Zahl).
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
+`voters_count_percentage`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
 
 3 Abstimmungsresultate

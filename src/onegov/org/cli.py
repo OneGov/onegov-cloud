@@ -1,23 +1,19 @@
 """ Provides commands used to initialize org websites. """
-import sys
-from io import BytesIO
-from pathlib import Path
-
 import click
 import html
 import isodate
 import re
 import requests
 import shutil
+import sys
 import textwrap
 
 from cached_property import cached_property
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+from io import BytesIO
 from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
-from wtforms.validators import Email
-
 from onegov.chat import MessageCollection
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
@@ -46,6 +42,7 @@ from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
 from onegov.user import UserCollection, User
 from operator import add as add_op
+from pathlib import Path
 from purl import URL
 from sedate import replace_timezone, utcnow
 from sqlalchemy import create_engine, event, text, or_
@@ -53,6 +50,7 @@ from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 from uuid import UUID, uuid4
+from wtforms.validators import Email
 
 cli = command_group()
 
@@ -1348,7 +1346,6 @@ def migrate_links_cli(group_context, old_uri, dry_run):
 
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
-@click.option('--dry-run', is_flag=True, default=False)
 def migrate_publications(group_context, dry_run):
     """ Marks signed files for publication. """
 

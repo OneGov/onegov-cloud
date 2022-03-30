@@ -1,4 +1,6 @@
 from onegov.ballot import PartyResult
+from sqlalchemy import func
+from sqlalchemy import Integer
 
 
 def get_list_groups(election_compound):
@@ -7,7 +9,25 @@ def get_list_groups(election_compound):
     if not election_compound.pukelsheim:
         return {}
 
-    query = election_compound.party_results.filter(
+    query = election_compound.party_results
+    if election_compound.exact_voters_counts:
+        query = query.with_entities(
+            PartyResult.name,
+            PartyResult.voters_count,
+            PartyResult.number_of_mandates,
+            PartyResult.color
+        )
+    else:
+        query = query.with_entities(
+            PartyResult.name,
+            func.cast(
+                func.round(PartyResult.voters_count),
+                Integer
+            ).label('voters_count'),
+            PartyResult.number_of_mandates,
+            PartyResult.color
+        )
+    query = query.filter(
         PartyResult.year == election_compound.date.year
     )
     if election_compound.completed:
@@ -20,6 +40,7 @@ def get_list_groups(election_compound):
             PartyResult.voters_count.desc(),
             PartyResult.name,
         )
+
     return query.all()
 
 

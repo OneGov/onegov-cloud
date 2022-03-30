@@ -41,7 +41,7 @@ msgid "Manual"
 msgstr "Manuell"
 
 msgid "Stripe Connect"
-msgstr ""
+msgstr "Stripe Connect"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -94,7 +94,7 @@ msgid "User groups"
 msgstr "Benutzergruppen"
 
 msgid "Link Check"
-msgstr ""
+msgstr "Link-Prüfung"
 
 msgid "Archived Tickets"
 msgstr "Archivierte Tickets"
@@ -176,6 +176,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
 
 msgid "Exports payments and tickets"
 msgstr "Exportiert Zahlungen und Tickets"
@@ -569,6 +572,9 @@ msgstr "Brauchtum"
 
 msgid "Youth"
 msgstr "Jugend"
+
+msgid "Elderly"
+msgstr "Senioren"
 
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
@@ -1210,19 +1216,19 @@ msgstr ""
 "Grösse beträgt 1200:630px."
 
 msgid "Icon 16x16 PNG (Windows)"
-msgstr ""
+msgstr "Icon 16x16 PNG (Windows)"
 
 msgid "URL pointing to the icon"
 msgstr "Link zum Icon"
 
 msgid "Icon 32x32 PNG (Mac)"
-msgstr ""
+msgstr "Icon 32x32 PNG (Mac)"
 
 msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr ""
+msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
-msgstr ""
+msgstr "Icon SVG 20x20 (Safari)"
 
 msgid "Open files in separate window"
 msgstr "Dateien in separatem Fenster öffnen"
@@ -1403,8 +1409,8 @@ msgstr ""
 "Schalten Sie Tickets individuell auf stumm, wenn sie Tickets automatisch "
 "akzeptieren."
 
-msgid "Show option for newsletter registration"
-msgstr "Anmeldung für Newsletter anzeigen"
+msgid "Enable newsletter"
+msgstr "Newsletter aktivieren"
 
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
@@ -1597,7 +1603,7 @@ msgid "Edit"
 msgstr "Bearbeiten"
 
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -1678,7 +1684,7 @@ msgid "New Note"
 msgstr "Neue Notiz"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "New Message"
 msgstr "Neue Nachricht"
@@ -2525,7 +2531,7 @@ msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 msgid "Healthy"
 msgstr "Intakt"
@@ -3196,6 +3202,13 @@ msgstr "Ticket archiviert."
 msgid "Ticket recovered from archive."
 msgstr "Ticket aus dem Archiv geholt."
 
+msgid ""
+"The newsletter is disabled. You can only see this page because you are "
+"logged in."
+msgstr ""
+"Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
+"eingeloggt sind."
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
@@ -3832,7 +3845,7 @@ msgstr "Syntaxfehler im Formular"
 
 #, python-format
 msgid "Syntax error in field ${field_name}"
-msgstr ""
+msgstr "Syntaxfehler im Feld ${field_name}"
 
 #, python-format
 msgid "Error: Duplicate label ${label}"
@@ -3870,8 +3883,8 @@ msgstr "Der Eintrag wurde gelöscht"
 msgid ""
 "On the right side, you can filter the entries of this directory to export."
 msgstr ""
-"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den "
-"Export filtern."
+"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für de "
+"filtern."
 
 msgid "Exports all entries of this directory."
 msgstr "Exportiert alle Einträge dieses Verzeichniseses."
@@ -4468,10 +4481,10 @@ msgid "Search Unavailable"
 msgstr "Suche Nicht Verfügbar"
 
 msgid "Favicon"
-msgstr ""
+msgstr "Favicon"
 
 msgid "Links"
-msgstr ""
+msgstr "Links"
 
 msgid "Newsletter Settings"
 msgstr "Newsletter-Einstellungen"
@@ -4635,9 +4648,18 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
 
+msgid "The ticket cannot be archived because it's not closed"
+msgstr "Das Ticket kann nicht archiviert werden, da es nicht geschlossen ist"
+
 #, python-format
 msgid "You archived ticket ${number}"
 msgstr "Sie haben das Ticket ${number} archiviert"
+
+msgid ""
+"The ticket cannot be recovered from the archive because it's not archived"
+msgstr ""
+"Das Ticket kann nicht aus dem Archiv geholt werden, da es nicht archiviert "
+"ist"
 
 #, python-format
 msgid "You recovered ticket ${number} from the archive"

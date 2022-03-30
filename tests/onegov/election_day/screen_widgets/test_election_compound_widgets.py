@@ -14,9 +14,11 @@ from onegov.election_day.screen_widgets import (
     ElectionCompoundListGroupsTableWidget,
     ElectionCompoundListsChartWidget,
     ElectionCompoundListsTableWidget,
+    NumberOfCountedEntitiesWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -56,14 +58,22 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             <column span="1">
                 <election-compound-list-groups-chart class="my-class-a"/>
             </column>
+            <column span="1">
+                <number-of-counted-entities class="my-class-b"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-c"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundListsChartWidget(),
@@ -77,7 +87,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     session.add(
         ElectionCompound(
             title='Compound', domain='canton', date=date(2020, 3, 8),
-            pukelsheim=True, completes_manually=True
+            pukelsheim=True, completes_manually=True, voters_counts=True,
+            exact_voters_counts=True
         )
     )
     model = session.query(ElectionCompound).one()
@@ -114,6 +125,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-7' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
 
     # Add intermediate results
     election_1, errors = import_test_datasets(
@@ -221,6 +234,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '9 of 9' in result
     assert '0 of 17' in result
     assert '1 of 13' in result
+    assert '0' in result
+    assert '2' in result
     assert 'election-compound-lists-table' in result
     assert 'data-text="31515"' not in result
     assert 'data-text="841"' in result
@@ -241,6 +256,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
 
     # Add final results
     election_1, errors = import_test_datasets(
@@ -367,6 +384,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
     ) in result
     assert 'data-dataurl="ElectionCompound/list-groups-data"' in result
+    assert '2' in result
+    assert '2' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -377,3 +396,5 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result

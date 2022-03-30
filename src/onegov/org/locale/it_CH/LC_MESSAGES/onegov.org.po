@@ -177,6 +177,9 @@ msgstr "Sì"
 msgid "No"
 msgstr "No"
 
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
+
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
 
@@ -572,6 +575,9 @@ msgstr "Tradizione"
 
 msgid "Youth"
 msgstr "Giovane"
+
+msgid "Elderly"
+msgstr "Anziani"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto nel giardino del castello"
@@ -1413,8 +1419,8 @@ msgstr ""
 "Disattiva i biglietti singolarmente se la funzione di accettazione "
 "automatica è abilitata."
 
-msgid "Show option for newsletter registration"
-msgstr "Mostra la registrazione per la newsletter"
+msgid "Enable newsletter"
+msgstr "Attiva la newsletter"
 
 msgid "Include logo in newsletter"
 msgstr "Includi il logo nella newsletter"
@@ -3197,6 +3203,13 @@ msgstr "Biglietto archiviato."
 msgid "Ticket recovered from archive."
 msgstr "Biglietto recuperato dall'archivio."
 
+msgid ""
+"The newsletter is disabled. You can only see this page because you are "
+"logged in."
+msgstr ""
+"La newsletter è disabilitata. Puoi vedere questa pagina solo perché hai "
+"fatto il login."
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
 
@@ -4649,9 +4662,17 @@ msgstr "Hai disabilitato le e-mail per il biglietto ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Hai abilitato le e-mail per il biglietto ${number}"
 
+msgid "The ticket cannot be archived because it's not closed"
+msgstr "Il biglietto non può essere archiviato perché non è chiuso"
+
 #, python-format
 msgid "You archived ticket ${number}"
 msgstr "Hai archiviato il biglietto ${number}"
+
+msgid ""
+"The ticket cannot be recovered from the archive because it's not archived"
+msgstr ""
+"Il biglietto non può essere recuperato dall'archivio perché non è archiviato"
 
 #, python-format
 msgid "You recovered ticket ${number} from the archive"

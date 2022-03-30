@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 11:59+0100\n"
-"PO-Revision-Date: 2022-03-15 10:55+0100\n"
+"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"PO-Revision-Date: 2022-03-22 07:58+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -382,8 +382,8 @@ msgstr "Ungültige Farbdefinitionen"
 msgid "Domain of the elections"
 msgstr "Ebene der Wahlen"
 
-msgid "Doppelter Pukelsheim"
-msgstr "Doppelter Pukelsheim"
+msgid "Elections"
+msgstr "Wahlen"
 
 msgid "Completes manually"
 msgstr "Wird manuell abgeschlossen"
@@ -396,11 +396,33 @@ msgstr ""
 "individuellen Wahlergebnisse angezeigt, bis die Wahlverbindung manuell "
 "abgeschlossen wurde."
 
+msgid "Completion"
+msgstr "Abschluss"
+
 msgid "Completed"
 msgstr "Abgeschlossen"
 
-msgid "Elections"
-msgstr "Wahlen"
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
+msgid "View options"
+msgstr "Ansichtsoptionen"
+
+msgid "Allows to show the list groups and lists views."
+msgstr "Ermöglicht die Anzeige der Listengruppen- und Listenansichten."
+
+msgid "Voters counts"
+msgstr "Wählerzahlen"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Zeigt die Wählerzahlen statt der Stimmen in der Ansicht der Parteistärken an."
+
+msgid "Exact voters counts"
+msgstr "Exakte Wählerzahlen"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Zeigt exakte Wählerzahlen anstelle von gerundeten Werten."
 
 msgid "List groups"
 msgstr "Listengruppen"
@@ -420,11 +442,12 @@ msgstr "Listen"
 
 msgid ""
 "Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim."
+"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+"Always rounded."
 msgstr ""
 "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle Wahlen. "
 "Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur falls "
-"Doppelter Pukelsheim."
+"Doppelter Pukelsheim. Immer gerundet."
 
 msgid "Party strengths"
 msgstr "Parteistärken"
@@ -457,6 +480,9 @@ msgstr "Webhooks"
 
 msgid "Votes"
 msgstr "Abstimmungen"
+
+msgid "Select at least one election or vote."
+msgstr "Wählen Sie mindestens eine Wahl oder Abstimmung."
 
 msgid "Number"
 msgstr "Nummer"
@@ -694,8 +720,14 @@ msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
 msgid "Elections and votes on ${date}"
 msgstr "Urnengang vom ${date}"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Federal Elections"
 msgstr "Eidgenössische Wahlen"
+
+msgid "on"
+msgstr "vom"
 
 msgid "Regional Elections"
 msgstr "Regionale Wahlen"
@@ -733,9 +765,6 @@ msgstr "Ja %"
 msgid "No %"
 msgstr "Nein %"
 
-msgid "Archive"
-msgstr "Archiv"
-
 msgid "Archive Search"
 msgstr "Archiv-Suche"
 
@@ -769,14 +798,11 @@ msgstr ""
 "proportional zu den Stimmen, blau eingefärbte Balken enthalten die Anzahl "
 "der Mandate."
 
-msgid "The raw data is available as:"
-msgstr "Die Rohdaten sind in folgendem Format verfügbar:"
+msgid "Embed heatmap"
+msgstr "Karte einbetten"
 
-msgid "The format of the data is described here:"
-msgstr "Das Datenformat ist hier beschrieben:"
-
-msgid "Format Description"
-msgstr "Formatbeschreibung"
+msgid "Download heatmap"
+msgstr "Karte herunterladen"
 
 msgid "Embed"
 msgstr "Einbetten"
@@ -798,10 +824,22 @@ msgstr ""
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
+msgid "The file is invalid."
+msgstr "Die Datei ist ungültig."
+
 #. Default: Start
 #.
 msgid "homepage"
 msgstr "Startseite"
+
+msgid "Logo: Link to homepage"
+msgstr "Logo: Link zur Startseite"
+
+msgid "Footer"
+msgstr "Fusszeile"
+
+msgid "Language"
+msgstr "Sprache"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -1029,12 +1067,28 @@ msgstr "Eingegangene Stimmzettel"
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"
 
+msgid "PDF Results"
+msgstr "PDF Resultate"
+
 msgid ""
 "The raw data used to display the results is available in the following "
 "formats:"
 msgstr ""
 "Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den "
 "folgenden Formaten verfügbar:"
+
+msgid ""
+"The raw data used to display the party results is available in the following "
+"formats:"
+msgstr ""
+"Die Rohdaten die zur Anzeige der Parteiresultate verwendet werden, sind in "
+"den folgenden Formaten verfügbar:"
+
+msgid "The format of the data is described here:"
+msgstr "Das Datenformat ist hier beschrieben:"
+
+msgid "Format Description"
+msgstr "Formatbeschreibung"
 
 msgid "Terms of use"
 msgstr "Nutzungsbedingungen"

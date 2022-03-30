@@ -174,7 +174,13 @@ class NewsWidget(object):
         if not layout.root_pages:
             return {'news': ()}
 
-        if not isinstance(layout.root_pages[-1], News):
+        news_index = False
+        for index, page in enumerate(layout.root_pages):
+            if isinstance(page, News):
+                news_index = index
+                break
+
+        if not news_index:
             return {'news': ()}
 
         # request more than the required amount of news to account for hidden
@@ -185,7 +191,7 @@ class NewsWidget(object):
             published_only=not layout.request.is_manager
         )
         news = layout.request.exclude_invisible(
-            layout.root_pages[-1].news_query(**query_params).all())
+            layout.root_pages[news_index].news_query(**query_params).all())
 
         # limits the news, but doesn't count sticky news towards that limit
         def limited(news, limit):
@@ -289,8 +295,12 @@ class TilesWidget(object):
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children = homepage_pages.get(page.id, tuple())
-                children = (session.merge(c, load=False) for c in children)
+                children = []
+                for child in page.children:
+                    if child.id in map(
+                        lambda n: n.id, homepage_pages[page.id]
+                    ):
+                        children.append(child)
 
                 if not request.is_manager:
                     children = (

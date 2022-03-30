@@ -243,6 +243,7 @@ Nome|Descrizione
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+`voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 
 I risultati potrebbero contenere risultati misti aggiungendo una colonna per partito:
 

@@ -83,6 +83,7 @@ def test_election_form_model(session, related_link_labels):
     model.date = date.today()
     model.domain = 'region'
     model.domain_segment = 'r1'
+    model.domain_supersegment = 's1'
     model.shortcode = 'xy'
     model.type = 'proporz'
     model.majority_type = 'relative'
@@ -153,6 +154,7 @@ def test_election_form_model(session, related_link_labels):
     assert model.date == date(2016, 1, 1)
     assert model.domain == 'district'
     assert model.domain_segment == 'd1'
+    assert model.domain_supersegment == ''
     assert model.shortcode == 'yz'
     assert model.type == 'majorz'
     assert model.number_of_mandates == 2
@@ -172,6 +174,16 @@ def test_election_form_model(session, related_link_labels):
     form.municipality.data = 'm1'
     form.update_model(model)
     assert model.domain_segment == 'm1'
+
+    # Update supersegment
+    form.request.app.principal = Canton('bl')
+    form.domain.data = 'region'
+    form.date.data = date(2022, 1, 1)
+    form.region.data = 'Reinach'
+    form.update_model(model)
+    assert model.domain == 'region'
+    assert model.domain_segment == 'Reinach'
+    assert model.domain_supersegment == 'Region 2'
 
 
 def test_election_form_relations(session):
