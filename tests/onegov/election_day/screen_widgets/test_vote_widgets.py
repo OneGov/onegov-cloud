@@ -9,7 +9,7 @@ from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
-    CountedEntitiesNoWidget,
+    NumberOfCountedEntitiesWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
@@ -19,15 +19,18 @@ from onegov.election_day.screen_widgets import (
     VoteCounterProposalEntitiesTableWidget,
     VoteCounterProposalResultBarWidget,
     VoteCounterProposalTitleWidget,
+    VoteCounterProposalTurnoutWidget,
     VoteProposalDistrictsMap,
     VoteProposalEntitiesMap,
     VoteProposalEntitiesTableWidget,
     VoteProposalResultBarWidget,
+    VoteProposalTurnoutWidget,
     VoteTieBreakerDistrictsMap,
     VoteTieBreakerEntitiesMap,
     VoteTieBreakerEntitiesTableWidget,
     VoteTieBreakerResultBarWidget,
-    VoteTieBreakerTitleWidget
+    VoteTieBreakerTitleWidget,
+    VoteTieBreakerTurnoutWidget
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -57,7 +60,7 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
                 <vote-proposal-districts-map class="my-class-7"/>
             </column>
             <column span="1">
-                <counted-entities-no class="my-class-8"/>
+                <number-of-counted-entities class="my-class-8"/>
             </column>
             <column span="1">
                 <total-entities class="my-class-9"/>
@@ -68,7 +71,7 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
-        CountedEntitiesNoWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
         TotalEntitiesWidget(),
@@ -159,6 +162,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '68.22%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '1' in result
+    assert '11' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -217,6 +222,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '69.26%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '11' in result
+    assert '11' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -283,10 +290,19 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
                 <vote-tie-breaker-districts-map class="my-class-g"/>
             </column>
             <column span="1">
-                <counted-entities-no class="my-class-h"/>
+                <number-of-counted-entities class="my-class-h"/>
             </column>
             <column span="1">
                 <total-entities class="my-class-i"/>
+            </column>
+            <column span="1">
+                <vote-counter-proposal-turnout class="my-class-j"/>
+            </column>
+            <column span="1">
+                <vote-proposal-turnout class="my-class-k"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-turnout class="my-class-l"/>
             </column>
         </row>
     """
@@ -294,18 +310,21 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
-        CountedEntitiesNoWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
         TotalEntitiesWidget(),
         VoteCounterProposalEntitiesTableWidget(),
         VoteCounterProposalResultBarWidget(),
         VoteCounterProposalTitleWidget(),
+        VoteCounterProposalTurnoutWidget(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
+        VoteProposalTurnoutWidget(),
         VoteTieBreakerEntitiesTableWidget(),
         VoteTieBreakerResultBarWidget(),
         VoteTieBreakerTitleWidget(),
+        VoteTieBreakerTurnoutWidget(),
         VoteCounterProposalDistrictsMap(),
         VoteCounterProposalEntitiesMap(),
         VoteProposalDistrictsMap(),
@@ -366,6 +385,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-g' in result
     assert 'my-class-h' in result
     assert 'my-class-i' in result
+    assert 'my-class-j' in result
+    assert 'my-class-k' in result
+    assert 'my-class-l' in result
 
     # Add intermediate results
     model, errors = import_test_datasets(
@@ -416,6 +438,11 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '38.37%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '1' in result
+    assert '11' in result
+    assert '42.21 %' in result
+    assert '43.20 %' in result
+    assert '42.32 %' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -434,6 +461,9 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-g' in result
     assert 'my-class-h' in result
     assert 'my-class-i' in result
+    assert 'my-class-j' in result
+    assert 'my-class-k' in result
+    assert 'my-class-l' in result
 
     # Add final results
     model, errors = import_test_datasets(
@@ -490,6 +520,11 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '37.00%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '11' in result
+    assert '11' in result
+    assert '44.93 %' in result
+    assert '45.92 %' in result
+    assert '44.17 %' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -508,3 +543,6 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-g' in result
     assert 'my-class-h' in result
     assert 'my-class-i' in result
+    assert 'my-class-j' in result
+    assert 'my-class-k' in result
+    assert 'my-class-l' in result

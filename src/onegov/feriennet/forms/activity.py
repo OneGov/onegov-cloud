@@ -40,6 +40,9 @@ TAGS = tuple((tag, tag) for tag in (
     _("Tent Camp"),
     _("Family Camp"),
     _("Trecking Camp"),
+    _("Water"),
+    _("Continuing Education"),
+    _("Healthy Snacks"),
 ))
 # When adding new tags for WWF, adapt exports/base.py::141
 

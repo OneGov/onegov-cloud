@@ -43,6 +43,13 @@ class TriggerNotificationsForm(TriggerNotificationForm):
         choices=[],
     )
 
+    def ensure_items_selected(self):
+        if not self.votes.data and not self.elections.data:
+            message = _("Select at least one election or vote.")
+            self.votes.errors.append(message)
+            self.elections.errors.append(message)
+            return False
+
     def latest_date(self, session):
         query = session.query(Election.date)
         query = query.order_by(Election.date.desc()).first()

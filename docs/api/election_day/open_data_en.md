@@ -70,7 +70,7 @@ Returns the data of the main view in a structured form.
 ### Raw data
 
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
 The raw data used to display the results of elections is available in the following formats:
@@ -122,22 +122,29 @@ Not yet counted municipalities are not included.
 ### Party results
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-The raw data is available as CSV. The following fields are included:
+The raw data used to display the results of elections is available in the following formats:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+The following fields are included in all formats:
 
 Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`total_voters_count`|The total number of cumulative number of votes per total number of mandates per election, for election compounds only.
 `name`|The name of the party.
 `id`|ID of the party.
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
+`voters_count_percentage`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 `panachage_votes_from_{XX}`|The number of votes the party got from the party with `id = XX`. An `id` with the value `999` marks the votes from the blank list.
 
 3 Vote results

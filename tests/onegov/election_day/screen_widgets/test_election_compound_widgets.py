@@ -8,13 +8,13 @@ from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
-    CountedEntitiesNoWidget,
     ElectionCompoundCandidatesTableWidget,
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
     ElectionCompoundListsChartWidget,
     ElectionCompoundListsTableWidget,
+    NumberOfCountedEntitiesWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
@@ -59,7 +59,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
                 <election-compound-list-groups-chart class="my-class-a"/>
             </column>
             <column span="1">
-                <counted-entities class="my-class-b"/>
+                <number-of-counted-entities class="my-class-b"/>
             </column>
             <column span="1">
                 <total-entities class="my-class-c"/>
@@ -70,7 +70,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
-        CountedEntitiesNoWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
         TotalEntitiesWidget(),
@@ -234,6 +234,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '9 of 9' in result
     assert '0 of 17' in result
     assert '1 of 13' in result
+    assert '0' in result
+    assert '2' in result
     assert 'election-compound-lists-table' in result
     assert 'data-text="31515"' not in result
     assert 'data-text="841"' in result
@@ -382,6 +384,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
     ) in result
     assert 'data-dataurl="ElectionCompound/list-groups-data"' in result
+    assert '2' in result
+    assert '2' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result

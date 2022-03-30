@@ -57,7 +57,27 @@ def view_election_data_as_csv(self, request):
     }
 
 
-@ElectionDayApp.csv_file(model=Election, name='data-parties')
+@ElectionDayApp.json_file(model=Election, name='data-parties-json')
+def view_election_parties_data_as_json(self, request):
+
+    """ View the raw parties data as JSON. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
+    return {
+        'data': self.export_parties(json_serializable=True),
+        'name': normalize_for_url(
+            '{}-{}'.format(
+                self.title,
+                request.translate(_("Parties")).lower()
+            )
+        )
+    }
+
+
+@ElectionDayApp.csv_file(model=Election, name='data-parties-csv')
 def view_election_parties_data_as_csv(self, request):
 
     """ View the raw parties data as CSV. """

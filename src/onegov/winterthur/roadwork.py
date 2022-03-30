@@ -114,11 +114,15 @@ class RoadworkClient(object):
         curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_NTLM)
         curl.setopt(pycurl.USERPWD, f"{self.username}:{self.password}")
         curl.setopt(pycurl.HTTPHEADER, [f'HOST: {self.hostname}'])
+        # This is is not really a good idea as it disables TLS certificate
+        # validation!
+        curl.setopt(pycurl.SSL_VERIFYPEER, 0)
+        curl.setopt(pycurl.SSL_VERIFYHOST, 0)
 
         return curl
 
     def url(self, path):
-        return f'http://{self.endpoint}/{path}'
+        return f'https://{self.endpoint}/{path}'
 
     def get(self, path, lifetime=5 * 60, downtime=60 * 60):
         """ Requests the given path, returning the resulting json if

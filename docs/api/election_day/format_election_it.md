@@ -237,13 +237,13 @@ Nome|Descrizione
 ---|---
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
-`total_voters_count`|Il numero totale di voti cumulativi per il numero totale di mandati per elezione, solo per i composti elettorali.
 `name`|Il nome del partito.
 `id`|ID del partito (qualsiasi numero).
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+`voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 
 I risultati potrebbero contenere risultati misti aggiungendo una colonna per partito:
 

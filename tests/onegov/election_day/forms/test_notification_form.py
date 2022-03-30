@@ -125,6 +125,14 @@ def test_notifications_form(session):
 
     # Test submit
     form = TriggerNotificationsForm(
+        DummyPostData({'notifications': ['email']})
+    )
+    form.request = DummyRequest(session=session)
+    form.request.app.principal.email_notification = True
+    form.on_request()
+    assert not form.validate()
+
+    form = TriggerNotificationsForm(
         DummyPostData({
             'notifications': ['email'],
             'votes': ['vote-3', 'vote-2'],

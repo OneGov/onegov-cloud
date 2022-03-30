@@ -178,17 +178,20 @@ class ChartWidget(ModelBoundWidget):
         }
 
 
-@ElectionDayApp.screen_widget(tag='counted-entities-no', category='generic')
-class CountedEntitiesNoWidget(ModelBoundWidget):
-    tag = 'counted-entities-no'
+@ElectionDayApp.screen_widget(
+    tag='number-of-counted-entities',
+    category='generic'
+)
+class NumberOfCountedEntitiesWidget(ModelBoundWidget):
+    tag = 'number-of-counted-entities'
     template = """
-        <xsl:template match="counted-entities-no">
+        <xsl:template match="number-of-counted-entities">
             <span class="{@class}">
                 ${layout.format_number(model.progress[0])}
             </span>
         </xsl:template>
     """
-    usage = '<counted-entities-no class=""/>'
+    usage = '<number-of-counted-entities class=""/>'
 
 
 @ElectionDayApp.screen_widget(tag='total-entities', category='generic')

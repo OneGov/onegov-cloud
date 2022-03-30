@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-02-28 08:41+0100\n"
-"PO-Revision-Date: 2022-02-18 13:56+0100\n"
+"POT-Creation-Date: 2022-03-28 15:19+0200\n"
+"PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "Open"
 msgstr "Aperto"
@@ -176,6 +176,9 @@ msgstr "Sì"
 
 msgid "No"
 msgstr "No"
+
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
@@ -572,6 +575,9 @@ msgstr "Tradizione"
 
 msgid "Youth"
 msgstr "Giovane"
+
+msgid "Elderly"
+msgstr "Anziani"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto nel giardino del castello"
@@ -2527,8 +2533,8 @@ msgstr "Torna alla pagina principale"
 msgid "Search"
 msgstr "Cerca"
 
-msgid "The form contains errors. Please check the fields marked in red."
-msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
+msgid "The form contains errors. Please check the marked fields."
+msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
 msgid "Copied to Clipboard!"
 msgstr "Copiato negli appunti!"

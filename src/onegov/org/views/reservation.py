@@ -279,7 +279,7 @@ def handle_reservation_form(self, request, form, layout=None):
 
     if not form.errors and blocked:
         request.alert(_(
-            "The form contains errors. Please check the fields marked in red."
+            "The form contains errors. Please check the marked fields."
         ))
 
     layout = layout or layout or ReservationLayout(self, request)

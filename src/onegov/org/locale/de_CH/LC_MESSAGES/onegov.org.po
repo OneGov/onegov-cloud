@@ -1,17 +1,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-28 08:41+0100\n"
-"PO-Revision-Date: 2022-02-18 13:20+0100\n"
+"POT-Creation-Date: 2022-03-28 15:19+0200\n"
+"PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0\n"
+"Generated-By: Lingua 3.12\n"
+"X-Generator: Poedit 3.0.1\n"
 
 msgid "Open"
 msgstr "Offen"
@@ -41,7 +41,7 @@ msgid "Manual"
 msgstr "Manuell"
 
 msgid "Stripe Connect"
-msgstr ""
+msgstr "Stripe Connect"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -94,7 +94,7 @@ msgid "User groups"
 msgstr "Benutzergruppen"
 
 msgid "Link Check"
-msgstr ""
+msgstr "Link-Prüfung"
 
 msgid "Archived Tickets"
 msgstr "Archivierte Tickets"
@@ -176,6 +176,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
 
 msgid "Exports payments and tickets"
 msgstr "Exportiert Zahlungen und Tickets"
@@ -569,6 +572,9 @@ msgstr "Brauchtum"
 
 msgid "Youth"
 msgstr "Jugend"
+
+msgid "Elderly"
+msgstr "Senioren"
 
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
@@ -1210,19 +1216,19 @@ msgstr ""
 "Grösse beträgt 1200:630px."
 
 msgid "Icon 16x16 PNG (Windows)"
-msgstr ""
+msgstr "Icon 16x16 PNG (Windows)"
 
 msgid "URL pointing to the icon"
 msgstr "Link zum Icon"
 
 msgid "Icon 32x32 PNG (Mac)"
-msgstr ""
+msgstr "Icon 32x32 PNG (Mac)"
 
 msgid "Icon 57x57 PNG (iPhone, iPod, iPad)"
-msgstr ""
+msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
-msgstr ""
+msgstr "Icon SVG 20x20 (Safari)"
 
 msgid "Open files in separate window"
 msgstr "Dateien in separatem Fenster öffnen"
@@ -1600,7 +1606,7 @@ msgid "Edit"
 msgstr "Bearbeiten"
 
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -1681,7 +1687,7 @@ msgid "New Note"
 msgstr "Neue Notiz"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "New Message"
 msgstr "Neue Nachricht"
@@ -2521,15 +2527,14 @@ msgstr "Zurück zur Startseite"
 msgid "Search"
 msgstr "Suche"
 
-msgid "The form contains errors. Please check the fields marked in red."
-msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+msgid "The form contains errors. Please check the marked fields."
+msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 msgid "Healthy"
 msgstr "Intakt"
@@ -3840,7 +3845,7 @@ msgstr "Syntaxfehler im Formular"
 
 #, python-format
 msgid "Syntax error in field ${field_name}"
-msgstr ""
+msgstr "Syntaxfehler im Feld ${field_name}"
 
 #, python-format
 msgid "Error: Duplicate label ${label}"
@@ -3878,8 +3883,8 @@ msgstr "Der Eintrag wurde gelöscht"
 msgid ""
 "On the right side, you can filter the entries of this directory to export."
 msgstr ""
-"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den "
-"Export filtern."
+"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für de "
+"filtern."
 
 msgid "Exports all entries of this directory."
 msgstr "Exportiert alle Einträge dieses Verzeichniseses."
@@ -4476,10 +4481,10 @@ msgid "Search Unavailable"
 msgstr "Suche Nicht Verfügbar"
 
 msgid "Favicon"
-msgstr ""
+msgstr "Favicon"
 
 msgid "Links"
-msgstr ""
+msgstr "Links"
 
 msgid "Newsletter Settings"
 msgstr "Newsletter-Einstellungen"

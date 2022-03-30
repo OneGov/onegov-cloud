@@ -12,11 +12,13 @@
             <tal:b metal:fill-slot="before-panels">
                 <div class="borderless-side-panel" tal:condition="forms">
                     <h3 i18n:translate="">Categories</h3>
-                    <ul>
-                        <li tal:repeat="form forms">
-                            <a href="#${form}">${form}</a>
-                        </li>
-                    </ul>
+                    <div class="side-panel-with-bg">
+                        <ul>
+                            <li tal:repeat="form forms">
+                                <a href="#${form}">${form}</a>
+                            </li>
+                        </ul>
+                    </div>                        
                 </div>
             </tal:b>
         </tal:b>
