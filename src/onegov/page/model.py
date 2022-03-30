@@ -25,3 +25,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     @published_or_created.expression
     def published_or_created(self):
         return func.coalesce(Page.publication_start, Page.created)
+
+    @property
+    def es_public(self):
+        return self.access == 'public' and self.published

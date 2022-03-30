@@ -13,7 +13,7 @@ def has_party_results(item):
     return False
 
 
-def get_party_results(item, json_serialzable=False):
+def get_party_results(item, json_serializable=False):
 
     """ Returns the aggregated party results as list.
 
@@ -35,12 +35,6 @@ def get_party_results(item, json_serialzable=False):
     totals_votes = dict(query)
     years = sorted((str(key) for key in totals_votes.keys()))
 
-    # Get the totals voters counts per year
-    query = session.query(PartyResult.year, PartyResult.total_voters_count)
-    query = query.filter(PartyResult.owner == item.id).distinct()
-    totals_voters_count = dict(query)
-    years = sorted((str(key) for key in totals_voters_count.keys()))
-
     parties = {}
     for result in item.party_results:
         party = parties.setdefault(result.name, {})
@@ -59,16 +53,14 @@ def get_party_results(item, json_serialzable=False):
         }
 
         voters_count = result.voters_count or Decimal(0)
-        total_voters_count = totals_voters_count.get(result.year) or Decimal(0)
-        voters_count_permille = 0
-        if total_voters_count:
-            voters_count_permille = int(
-                round(1000 * (voters_count / total_voters_count))
-            )
         if not exact:
             voters_count = int(round(voters_count))
-        elif json_serialzable:
+        elif json_serializable:
             voters_count = float(voters_count)
+        voters_count_permille = result.voters_count_percentage or Decimal(0)
+        voters_count_permille = 10 * voters_count_permille
+        if json_serializable:
+            voters_count_permille = float(voters_count_permille)
         year['voters_count'] = {
             'total': voters_count,
             'permille': voters_count_permille
@@ -144,7 +136,7 @@ def get_party_results_data(item):
         for year in parties[party]:
             front = parties[party].get(year, {}).get('mandates', 0)
             back = parties[party].get(year, {}).get(attribute, {})
-            back = back.get('permille', 0) / 10.0
+            back = float(back.get('permille', 0) / 10)
             color = parties[party].get(year, {}).get('color', '#999999')
             results.append({
                 'group': party,

@@ -62,17 +62,19 @@ def test_election_layout(session):
     assert layout.subtitle('statistics') == ''
     assert layout.subtitle('data') == ''
 
-    layout = ElectionLayout(Election(type='majorz'), DummyRequest())
+    layout = ElectionLayout(Election(), DummyRequest())
     assert layout.majorz
     assert not layout.proporz
     assert layout.main_view == 'Election/candidates'
     assert not layout.tacit
+    assert not layout.has_party_results
 
-    layout = ElectionLayout(Election(type='proporz'), DummyRequest())
+    layout = ElectionLayout(ProporzElection(), DummyRequest())
     assert not layout.majorz
     assert layout.proporz
-    assert layout.main_view == 'Election/lists'
+    assert layout.main_view == 'ProporzElection/lists'
     assert not layout.tacit
+    assert not layout.has_party_results
 
     layout = ElectionLayout(
         Election(type='majorz', tacit=True), DummyRequest()
@@ -161,6 +163,18 @@ def test_election_layout(session):
             ('Second Election', 'Election/second-election')
         ]
         assert ElectionLayout(second_election, request).related_elections == []
+
+    election = ProporzElection()
+    election.party_results.append(
+        PartyResult(
+            year=2017,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name='A',
+        )
+    )
+    assert ElectionLayout(election, DummyRequest()).has_party_results
 
 
 def test_election_layout_menu_majorz(session):

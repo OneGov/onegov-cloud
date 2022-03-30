@@ -33,7 +33,7 @@ def provider_title(payment, providers):
     id='payments',
     form_class=merge_forms(DateRangeForm, ExportForm),
     permission=Private,
-    title=_("Payments"),
+    title=_("Credit card payments"),
     explanation=_("Exports payments and tickets")
 )
 class PaymentsExport(OrgExport):

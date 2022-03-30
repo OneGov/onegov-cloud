@@ -251,10 +251,18 @@ def view_rdf(self, request):
         )
 
         # Distributions
-        for fmt, media_type in (
-            ('csv', 'text/csv'),
-            ('json', 'application/json'),
+        for fmt, extension, media_type, party_result in (
+            ('csv', 'csv', 'text/csv', False),
+            ('json', 'json', 'application/json', False),
+            ('parties-csv', 'csv', 'text/csv', True),
+            ('parties-json', 'json', 'application/json', True),
         ):
+            if party_result:
+                if not hasattr(item, 'party_results'):
+                    continue
+                if not item.party_results.first():
+                    continue
+
             url = request.link(item, 'data-{}'.format(fmt))
 
             # IDs
@@ -269,7 +277,9 @@ def view_rdf(self, request):
             # Title
             for locale, lang in locales.items():
                 title = item.get_title(locale, default_locale) or item.id
-                title = '{}.{}'.format(normalize_for_url(title), fmt)
+                if party_result:
+                    title += ' ({})'.format(translate(_('Parties'), locale))
+                title = '{}.{}'.format(normalize_for_url(title), extension)
                 sub(dist, 'dct:title', {'xml:lang': lang}, title)
 
             # Dates
