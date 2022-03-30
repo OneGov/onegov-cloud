@@ -31,13 +31,13 @@
                     <div metal:use-macro="layout.macros['ballot-entities-map']" tal:define="embed True"/>
 
                     <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
-                        <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+                        <i class="fa fa-download"></i><tal:block i18n:translate="">Download map</tal:block>
                     </a>
                 </div>
             </div>
 
             <tal:b metal:use-macro="layout.macros['ballot-entities-table']"/>
-            <tal:block metal:use-macro="layout.macros['embedded-widget']" tal:define="embed_link layout.table_link"/>
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link"/>
 
         </tal:block>
 

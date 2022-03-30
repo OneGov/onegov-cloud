@@ -251,7 +251,7 @@
             data-canton="${layout.principal.id}"
             data-mapurl="${layout.get_topojson_link(layout.principal.id, ballot.vote.date.year)}"
             data-dataurl="${request.link(ballot, name='by-entity')}"
-            data-embed-link="Embed heatmap"
+            data-embed-link="Embed map"
             data-embed-source="${layout.entities_map_link}"
             data-thumbs="true"
             data-color-scale="rb"
@@ -284,7 +284,7 @@
             data-canton="${layout.app.principal.id}"
             data-mapurl="${layout.get_topojson_link(layout.app.principal.id, ballot.vote.date.year)}"
             data-dataurl="${request.link(ballot, name='by-district')}"
-            data-embed-link="Embed heatmap"
+            data-embed-link="Embed map"
             data-embed-source="${layout.districts_map_link}"
             data-thumbs="true"
             data-color-scale="rb"
@@ -682,7 +682,7 @@
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
                 data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected})}"
-                data-embed-link="Embed heatmap"
+                data-embed-link="Embed diagram"
                 data-embed-source="${request.link(model, name='candidates-chart')}">
             </div>
         </tal:block>
@@ -700,7 +700,7 @@
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
                 data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names})}"
-                data-embed-link="Embed heatmap"
+                data-embed-link="Embed diagram"
                 data-embed-source="${request.link(model, name='lists-chart')}">
             </div>
         </tal:block>
@@ -717,7 +717,7 @@
         <div class="bar-chart"
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='list-groups-data')}"
-            data-embed-link="Embed heatmap"
+            data-embed-link="Embed diagram"
             data-embed-source="${request.link(model, name='list-groups-chart')}">
         </div>
     </tal:block>
@@ -733,7 +733,7 @@
         <div class="grouped-bar-chart"
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='party-strengths-data')}"
-            data-embed-link="Embed heatmap"
+            data-embed-link="Embed diagram"
             data-embed-source="${request.link(model, name='party-strengths-chart')}">
         </div>
     </tal:block>
@@ -750,7 +750,7 @@
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='connections-data')}"
             data-inverse="true"
-            data-embed-link="Embed heatmap"
+            data-embed-link="Embed diagram"
             data-embed-source="${request.link(model, name='connections-chart')}">
         </div>
     </tal:block>
@@ -769,7 +769,7 @@
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='lists-panachage-data')}"
             data-inverse="false"
-            data-embed-link="Embed heatmap"
+            data-embed-link="Embed diagram"
             data-embed-source="${request.link(model, name='lists-panachage-chart')}">
         </div>
     </tal:block>
@@ -787,7 +787,7 @@
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='parties-panachage-data')}"
             data-inverse="false"
-            data-embed-link="Embed heatmap"
+            data-embed-link="Embed diagram"
             data-embed-source="${request.link(model, name='parties-panachage-chart')}">
         </div>
     </tal:block>
@@ -801,7 +801,7 @@
 
 <metal:embedded_widget define-macro="embedded_widget" i18n:domain="onegov.election_day">
     <div tal:condition="embed_link" class="embedded-widget"
-        data-embed-link="Embed heatmap"
+        data-embed-link="Embed table"
         data-embed-source="${embed_link}"
         i18n:attributes="data-embed-link"
         >
