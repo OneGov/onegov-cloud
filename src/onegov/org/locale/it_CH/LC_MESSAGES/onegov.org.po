@@ -4745,14 +4745,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "The form contains errors. Please check the fields marked in red."
-#~ msgstr ""
-#~ "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
-
-#~ msgid ""
-#~ "Sort the items using drag and drop.  The new positions are automatically "
-#~ "saved directly after moving."
-#~ msgstr ""
-#~ "Ordina gli elementi usando il drag and drop. Le nuove posizioni vengono "
-#~ "automaticamente salvate direttamente dopo lo spostamento"

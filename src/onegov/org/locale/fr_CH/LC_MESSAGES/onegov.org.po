@@ -4752,11 +4752,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "The form contains errors. Please check the fields marked in red."
-#~ msgstr ""
-#~ "Le formulaire contient des erreurs. Veuillez vérifier les champs marqués "
-#~ "en rouge."
-
-#~ msgid "Sort the items using drag and drop."
-#~ msgstr "Triez les éléments par glisser-déposer."

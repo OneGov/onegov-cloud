@@ -4732,7 +4732,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "The form contains errors. Please check the fields marked in red."
-#~ msgstr ""
-#~ "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
