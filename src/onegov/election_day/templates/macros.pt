@@ -965,14 +965,14 @@
             <section class="top-bar-section">
                 <ul class="left">
                     <tal:block repeat="(title, link, active, submenu) layout.menu">
-                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else ''">
+                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else '';aria-current 'true' if active else 'false'">
                             <a href="${link}">${title}</a>
                         </li>
-                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown'">
+                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown';aria-current 'true' if active else 'false'">
                             <a href="#">${title}</a>
                             <ul class="dropdown">
                                 <tal:block repeat="(title, link, active, submenu) submenu">
-                                    <li tal:attributes="class 'active' if active else ''">
+                                    <li tal:attributes="class 'active' if active else '';aria-current 'true' if active else 'false'">
                                         <a href="${link}">${title}</a>
                                     </li>
                                 </tal:block>
@@ -1155,32 +1155,39 @@
     </tal:block>
 </metal:pdf_download>
 
-<metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day">
+<metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day" tal:define="has_party_results getattr(layout, 'has_party_results', False)">
     <h4 i18n:translate="">Open Data</h4>
     <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
     <ol>
         <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
         <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
     </ol>
-    <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
-</metal:open_data_download>
 
-<metal:terms_of_use define-macro="terms_of_use" i18n:domain="onegov.election_day">
+    <p tal:condition="has_party_results" i18n:translate="">The raw data used to display the party results is available in the following formats:</p>
+    <ol tal:condition="has_party_results">
+        <li><a href="${request.link(model, 'data-parties-json')}">JSON</a></li>
+        <li><a href="${request.link(model, 'data-parties-csv')}">CSV</a></li>
+    </ol>
+
+    <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
+
     <h5 i18n:translate="">Terms of use</h5>
-        <p><span i18n:translate="">Open use. Must provide the source.</span></p>
-        <ul>
-            <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
-            <li i18n:translate="">You may use this dataset for commercial purposes.</li>
-            <li>
-                <tal:block i18n:translate="">You must provide the source (author, title and link to the dataset).</tal:block>
-                <ol class="citations">
-                    <li>${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-json')}.</li>
-                    <li>${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-csv')}.</li>
-                </ol>
-            </li>
-        </ul>
-        <p><a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a></p>
-</metal:terms_of_use>
+    <p i18n:translate="">Open use. Must provide the source.</p>
+    <ul>
+        <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
+        <li i18n:translate="">You may use this dataset for commercial purposes.</li>
+        <li>
+            <tal:block i18n:translate="">You must provide the source (author, title and link to the dataset).</tal:block>
+            <ol class="citations">
+                <li>${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-json')}.</li>
+                <li>${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-csv')}.</li>
+                <li tal:condition="has_party_results">${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-parties-json')}.</li>
+                <li tal:condition="has_party_results">${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-parties-csv')}.</li>
+            </ol>
+        </li>
+    </ul>
+    <p><a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" i18n:attributes="alt" alt="Terms of use"></a></p>
+</metal:open_data_download>
 
 <metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">
     <div class="after-upload" tal:condition="errors">

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-20 08:15+0100\n"
-"PO-Revision-Date: 2022-03-15 10:59+0100\n"
+"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -481,6 +481,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votaziuns"
 
+msgid "Select at least one election or vote."
+msgstr ""
+
 msgid "Number"
 msgstr "Numer"
 
@@ -528,6 +531,9 @@ msgstr "Structura"
 
 msgid "Additional CSS"
 msgstr "CSS supplementar"
+
+msgid "Email Address"
+msgstr "Adressa dad e-mail"
 
 msgid "Email Address"
 msgstr "Adressa dad e-mail"
@@ -717,6 +723,9 @@ msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 msgid "Elections and votes on ${date}"
 msgstr "Votaziun dals ${date}"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
 
@@ -759,9 +768,6 @@ msgstr "% GEA"
 msgid "No %"
 msgstr "% NA"
 
-msgid "Archive"
-msgstr "Archiv"
-
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"
 
@@ -780,12 +786,12 @@ msgstr "Naginas candidaturas."
 msgid "Download"
 msgstr "Telechargiar"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagram mussa la repartiziun da las vuschs e dals mandats sin las "
@@ -795,14 +801,11 @@ msgstr ""
 "travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
 "cuntegnan il dumber da mandats."
 
-msgid "The raw data is available as:"
-msgstr "Las datas nunelavuradas èn disponiblas en il suandant format:"
+msgid "Embed heatmap"
+msgstr "Incorporar la carta"
 
-msgid "The format of the data is described here:"
-msgstr "Il format da las datas è descrit qua:"
-
-msgid "Format Description"
-msgstr "Descripziun dal format"
+msgid "Download heatmap"
+msgstr "Telechargiar la carta"
 
 msgid "Embed heatmap"
 msgstr "Incorporar la carta"
@@ -902,9 +905,9 @@ msgstr "Vid"
 msgid "Invalid"
 msgstr "Nunvalaivel"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
 
@@ -923,8 +926,8 @@ msgstr "GEA"
 msgid "List connection"
 msgstr "Colliaziun da glistas"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Vuschs"
 
@@ -1063,8 +1066,8 @@ msgstr "Dumonda decisiva a favur da l'iniziativa"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Dumonda decisiva a favur da la cuntraproposta"
 
-#. Default: eligible Voters
 #.
+#. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Persunas cun dretg da votar"
 
@@ -1083,6 +1086,19 @@ msgid ""
 msgstr ""
 "Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan "
 "a disposiziun en ils suandants formats:"
+
+msgid ""
+"The raw data used to display the party results is available in the following "
+"formats:"
+msgstr ""
+"Las datas nunelavuradas che vegnan duvradas per mussar ils resultats da las "
+"partidas stattan a disposiziun en ils suandants formats:"
+
+msgid "The format of the data is described here:"
+msgstr "Il format da las datas è descrit qua:"
+
+msgid "Format Description"
+msgstr "Descripziun dal format"
 
 msgid "Terms of use"
 msgstr "Cundiziun d'utilisaziun"
@@ -1117,10 +1133,10 @@ msgstr "Selecziun"
 msgid "Columns"
 msgstr "Colonnas"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagram mussa las vuschs gudagnadas ed ils mandats da las partidas. Las "
@@ -1133,11 +1149,11 @@ msgstr "Onn"
 msgid "Difference"
 msgstr "Differenza"
 
+#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "

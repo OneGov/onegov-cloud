@@ -174,9 +174,13 @@ class NewsWidget(object):
         if not layout.root_pages:
             return {'news': ()}
 
-        if not any(
-            isinstance(page, News) for page in layout.root_pages
-        ):
+        news_index = False
+        for index, page in enumerate(layout.root_pages):
+            if isinstance(page, News):
+                news_index = index
+                break
+
+        if not news_index:
             return {'news': ()}
 
         # request more than the required amount of news to account for hidden
@@ -187,7 +191,7 @@ class NewsWidget(object):
             published_only=not layout.request.is_manager
         )
         news = layout.request.exclude_invisible(
-            layout.root_pages[-1].news_query(**query_params).all())
+            layout.root_pages[news_index].news_query(**query_params).all())
 
         # limits the news, but doesn't count sticky news towards that limit
         def limited(news, limit):

@@ -1,12 +1,21 @@
 import textwrap
-
 import pytest
 import transaction
-from webtest import Upload
+
+from datetime import datetime
+from datetime import timedelta
 
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import FormCollection
+from onegov.page.model import Page
+
+from tests.onegov.org.common import get_cronjob_by_name
+from tests.onegov.org.common import get_cronjob_url
+from time import sleep
+from sedate import utcnow
+from webtest import Upload
+
 
 
 @pytest.mark.flaky(reruns=3)
@@ -81,6 +90,70 @@ def test_view_search_is_limiting(client_with_es):
     search_page = root_page.form.submit()
 
     assert "1 Resultat" in search_page
+
+
+@pytest.mark.flaky(reruns=3)
+def test_search_recently_published_object(client_with_es):
+    client = client_with_es
+    client.login_admin()
+    anom = client.spawn()
+
+    # Create objects, not yet published
+    start = datetime.now() + timedelta(days=1)
+
+    add_news = client.get('/news').click('Nachricht')
+    add_news.form['title'] = "Now supporting fulltext search"
+    add_news.form['lead'] = "It is pretty awesome"
+    add_news.form['text'] = "Much <em>wow</em>"
+    add_news.form['publication_start'] = start.isoformat()
+    add_news.form.submit()
+
+    client.app.es_client.indices.refresh(index='_all')
+
+    assert 'fulltext' in client.get('/search?q=wow')
+    assert 'fulltext' not in anom.get('/search?q=wow')
+    assert 'It is pretty awesome' in client.get('/search?q=fulltext')
+    assert 'It is pretty awesome' not in anom.get('/search?q=fulltext')
+
+    # Publish
+    then = utcnow() - timedelta(minutes=30)
+    session = client.app.session()
+    transaction.begin()
+    session.query(Page).filter(
+        Page.title == "Now supporting fulltext search"
+    ).one().publication_start = then
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    job.app = client.app
+    url = get_cronjob_url(job)
+    client.get(url)
+
+    sleep(5)
+
+    assert 'fulltext' in client.get('/search?q=wow')
+    assert 'fulltext' in anom.get('/search?q=wow')
+    assert 'It is pretty awesome' in client.get('/search?q=fulltext')
+    assert 'It is pretty awesome' in anom.get('/search?q=fulltext')
+
+    # Unpublish
+    transaction.begin()
+    session.query(Page).filter(
+        Page.title == "Now supporting fulltext search"
+    ).one().publication_start = None
+    session.query(Page).filter(
+        Page.title == "Now supporting fulltext search"
+    ).one().publication_end = then
+    transaction.commit()
+
+    client.get(url)
+
+    sleep(5)
+
+    assert 'fulltext' in client.get('/search?q=wow')
+    assert 'fulltext' not in anom.get('/search?q=wow')
+    assert 'It is pretty awesome' in client.get('/search?q=fulltext')
+    assert 'It is pretty awesome' not in anom.get('/search?q=fulltext')
 
 
 @pytest.mark.flaky(reruns=3)

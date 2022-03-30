@@ -1,5 +1,5 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
-    <tal:block metal:fill-slot="title">${vote.title}</tal:block>
+    <tal:block metal:fill-slot="title">${vote.title} - ${request.app.principal.name}</tal:block>
     <tal:block metal:fill-slot="before-content">
         <div metal:use-macro="layout.macros['election_day_link']" tal:define="item vote"/>
         <div metal:use-macro="layout.macros['vote_header']" tal:define="ballot layout.ballot" />

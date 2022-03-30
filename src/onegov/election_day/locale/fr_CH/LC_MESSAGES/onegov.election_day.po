@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-20 08:15+0100\n"
-"PO-Revision-Date: 2022-03-15 10:56+0100\n"
+"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -481,6 +481,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votations"
 
+msgid "Select at least one election or vote."
+msgstr "Sélectionnez au moins une élection ou un vote."
+
 msgid "Number"
 msgstr "Numéro"
 
@@ -717,6 +720,9 @@ msgstr "Il n'y a pas de élections ou votations définis actuellement."
 msgid "Elections and votes on ${date}"
 msgstr "Elections et votes sur ${date}"
 
+msgid "Archive"
+msgstr "Archive"
+
 msgid "Federal Elections"
 msgstr "Elections fédéraux"
 
@@ -759,9 +765,6 @@ msgstr "Oui %"
 msgid "No %"
 msgstr "Non %"
 
-msgid "Archive"
-msgstr "Archive"
-
 msgid "Archive Search"
 msgstr "Recherche dans les archives"
 
@@ -780,12 +783,12 @@ msgstr "Aucune candidature."
 msgid "Download"
 msgstr "Télécharger"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Le diagramme montre la répartition des voix et des mandats sur la liste et "
@@ -794,14 +797,11 @@ msgstr ""
 "largeur des barres et des connexions est proportionnelle aux votes, les "
 "barres de couleur bleue contiennent le nombre de mandats."
 
-msgid "The raw data is available as:"
-msgstr "Les données brutes sont disponibles comme:"
+msgid "Embed heatmap"
+msgstr "Intégrer la carte"
 
-msgid "The format of the data is described here:"
-msgstr "Le format des données est décrit ici:"
-
-msgid "Format Description"
-msgstr "Description du format"
+msgid "Download heatmap"
+msgstr "Télécharger la carte"
 
 msgid "Embed heatmap"
 msgstr "Intégrer la carte"
@@ -901,9 +901,9 @@ msgstr "Vide"
 msgid "Invalid"
 msgstr "Invalide"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Participation au vote"
 
@@ -922,8 +922,8 @@ msgstr "Oui"
 msgid "List connection"
 msgstr "Connexion de listes"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Votes"
 
@@ -1063,8 +1063,8 @@ msgstr "Jeu décisif en faveur de l'initiative"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Jeu décisif en faveur de le contre-projet"
 
-#. Default: eligible Voters
 #.
+#. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Electeurs"
 
@@ -1083,6 +1083,19 @@ msgid ""
 msgstr ""
 "Les données brutes utilisées pour afficher les résultats sont disponibles "
 "dans les formats suivants:"
+
+msgid ""
+"The raw data used to display the party results is available in the following "
+"formats:"
+msgstr ""
+"Les données brutes utilisées pour afficher les résultats des partis sont "
+"disponibles dans les formats suivants:"
+
+msgid "The format of the data is described here:"
+msgstr "Le format des données est décrit ici:"
+
+msgid "Format Description"
+msgstr "Description du format"
 
 msgid "Terms of use"
 msgstr "Conditions d’utilisation"
@@ -1116,10 +1129,10 @@ msgstr "Levier"
 msgid "Columns"
 msgstr "Colonnes"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
@@ -1132,11 +1145,11 @@ msgstr "Année"
 msgid "Difference"
 msgstr "Différence"
 
+#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Le diagramme montre l'origine des votes. Les barres de gauche correspondent "

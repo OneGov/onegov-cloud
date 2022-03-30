@@ -1,9 +1,12 @@
 from datetime import date
+from datetime import datetime
+from freezegun import freeze_time
 from io import BytesIO
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.models import Canton
+from pytz import utc
 
 
 def test_import_internal_compound_missing_headers(session):
@@ -360,111 +363,146 @@ def test_import_internal_compound_temporary_results(session):
     session.flush()
     compound.elections = [election_1, election_2]
 
+    assert compound.last_result_change is None
+    assert election_1.last_result_change is None
+    assert election_2.last_result_change is None
+
     principal = Canton(canton='sg')
 
-    errors = import_election_compound_internal(
-        compound, principal,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'election_status',
-                    'entity_id',
-                    'entity_counted',
-                    'entity_eligible_voters',
-                    'entity_received_ballots',
-                    'entity_blank_ballots',
-                    'entity_invalid_ballots',
-                    'entity_blank_votes',
-                    'entity_invalid_votes',
-                    'list_name',
-                    'list_id',
-                    'list_number_of_mandates',
-                    'list_votes',
-                    'list_connection',
-                    'list_connection_parent',
-                    'candidate_family_name',
-                    'candidate_first_name',
-                    'candidate_id',
-                    'candidate_elected',
-                    'candidate_votes',
-                    'candidate_party',
-                )),
-                # St. Gallen
-                ','.join((
-                    'unknown',  # election_status
-                    '3201',  # entity_id
-                    'True',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    '',  # list_name
-                    '10.5',  # list_id
-                    '',  # list_number_of_mandates
-                    '',  # list_votes
-                    '',  # list_connection
-                    '',  # list_connection_parent
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
-                )),
-                # Rorschach
-                ','.join((
-                    'unknown',  # election_status
-                    '3211',  # entity_id
-                    'False',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    '',  # list_name
-                    '03B.04',  # list_id
-                    '',  # list_number_of_mandates
-                    '',  # list_votes
-                    '',  # list_connection
-                    '',  # list_connection_parent
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
-                )),
-                # Rheintal
-                ','.join((
-                    'unknown',  # election_status
-                    '3233',  # entity_id
-                    'False',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    '',  # list_name
-                    '03B.04',  # list_id
-                    '',  # list_number_of_mandates
-                    '',  # list_votes
-                    '',  # list_connection
-                    '',  # list_connection_parent
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
-                ))
-            ))
-        ).encode('utf-8')), 'text/plain',
-    )
-    assert not errors
+    csv = '\n'.join((
+        ','.join((
+            'election_status',
+            'entity_id',
+            'entity_counted',
+            'entity_eligible_voters',
+            'entity_received_ballots',
+            'entity_blank_ballots',
+            'entity_invalid_ballots',
+            'entity_blank_votes',
+            'entity_invalid_votes',
+            'list_name',
+            'list_id',
+            'list_number_of_mandates',
+            'list_votes',
+            'list_connection',
+            'list_connection_parent',
+            'candidate_family_name',
+            'candidate_first_name',
+            'candidate_id',
+            'candidate_elected',
+            'candidate_votes',
+            'candidate_party',
+        )),
+        # St. Gallen
+        ','.join((
+            'unknown',  # election_status
+            '3201',  # entity_id
+            'True',  # entity_counted
+            '111',  # entity_eligible_voters
+            '11',  # entity_received_ballots
+            '1',  # entity_blank_ballots
+            '1',  # entity_invalid_ballots
+            '1',  # entity_blank_votes
+            '1',  # entity_invalid_votes
+            '',  # list_name
+            '10.5',  # list_id
+            '',  # list_number_of_mandates
+            '',  # list_votes
+            '',  # list_connection
+            '',  # list_connection_parent
+            'xxx',  # candidate_family_name
+            'xxx',  # candidate_first_name
+            '1',  # candidate_id
+            'false',  # candidate_elected
+            '1',  # candidate_votes
+            '',  # candidate_party
+        )),
+        # Rorschach
+        ','.join((
+            'unknown',  # election_status
+            '3211',  # entity_id
+            'False',  # entity_counted
+            '111',  # entity_eligible_voters
+            '11',  # entity_received_ballots
+            '1',  # entity_blank_ballots
+            '1',  # entity_invalid_ballots
+            '1',  # entity_blank_votes
+            '1',  # entity_invalid_votes
+            '',  # list_name
+            '03B.04',  # list_id
+            '',  # list_number_of_mandates
+            '',  # list_votes
+            '',  # list_connection
+            '',  # list_connection_parent
+            'xxx',  # candidate_family_name
+            'xxx',  # candidate_first_name
+            '1',  # candidate_id
+            'false',  # candidate_elected
+            '1',  # candidate_votes
+            '',  # candidate_party
+        )),
+        # Rheintal (unused)
+        ','.join((
+            'unknown',  # election_status
+            '3233',  # entity_id
+            'False',  # entity_counted
+            '111',  # entity_eligible_voters
+            '11',  # entity_received_ballots
+            '1',  # entity_blank_ballots
+            '1',  # entity_invalid_ballots
+            '1',  # entity_blank_votes
+            '1',  # entity_invalid_votes
+            '',  # list_name
+            '03B.04',  # list_id
+            '',  # list_number_of_mandates
+            '',  # list_votes
+            '',  # list_connection
+            '',  # list_connection_parent
+            'xxx',  # candidate_family_name
+            'xxx',  # candidate_first_name
+            '1',  # candidate_id
+            'false',  # candidate_elected
+            '1',  # candidate_votes
+            '',  # candidate_party
+        ))
+    ))
+
+    # Upload
+    with freeze_time("2022-01-01"):
+        errors = import_election_compound_internal(
+            compound, principal,
+            BytesIO(csv.encode('utf-8')), 'text/plain',
+        )
+        assert not errors
 
     assert compound.progress == (0, 2)
-    assert sorted([e.progress for e in compound.elections]) == [(0, 9), (1, 9)]
+    assert compound.has_results
+    assert compound.last_result_change == datetime(2022, 1, 1, tzinfo=utc)
+    assert election_1.progress == (1, 9)
+    assert election_1.results.first()
+    assert election_1.has_results
+    assert election_1.last_result_change == datetime(2022, 1, 1, tzinfo=utc)
+    assert election_2.progress == (0, 9)
+    assert election_2.results.first()
+    assert not election_2.has_results
+    assert election_2.last_result_change == datetime(2022, 1, 1, tzinfo=utc)
+
+    # Upload only St. Gallen again
+    with freeze_time("2022-01-02"):
+        errors = import_election_compound_internal(
+            compound, principal,
+            BytesIO('\n'.join(csv.split()[:2]).encode('utf-8')), 'text/plain',
+        )
+        assert not errors
+
+    assert compound.progress == (0, 2)
+    assert compound.has_results
+    assert compound.last_result_change == datetime(2022, 1, 2, tzinfo=utc)
+    assert election_1.progress == (1, 9)
+    assert election_1.results.first()
+    assert election_1.has_results
+    assert election_1.last_result_change == datetime(2022, 1, 2, tzinfo=utc)
+    assert election_2.progress == (0, 0)
+    assert not election_2.results.first()
+    assert not election_2.has_results
+    assert election_2.last_result_change == datetime(2022, 1, 2, tzinfo=utc)

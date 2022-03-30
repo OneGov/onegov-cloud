@@ -7,6 +7,7 @@ from onegov.election_day import ElectionDayApp
 from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_majorz_election
+from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
@@ -385,7 +386,9 @@ def test_view_opendata_catalog(election_day_app_zg):
     upload_vote(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
+    upload_party_results(client)
     create_election_compound(client, canton='zg')
+    upload_party_results(client, slug='elections/elections')
 
     root = fromstring(client.get('/catalog.rdf').text)
     assert set([
@@ -405,6 +408,14 @@ def test_view_opendata_catalog(election_day_app_zg):
         'Proporz Election',
         'proporz-election.csv',
         'proporz-election.json',
+        'proporz-election-parteien.csv',
+        'proporz-election-parteien.json',
+        'proporz-election-parti.csv',
+        'proporz-election-parti.json',
+        'proporz-election-partidas.csv',
+        'proporz-election-partidas.json',
+        'proporz-election-partis.csv',
+        'proporz-election-partis.json',
         'Regional Election A',
         'regional-election-a.csv',
         'regional-election-a.json',
@@ -412,6 +423,14 @@ def test_view_opendata_catalog(election_day_app_zg):
         'regional-election-b.csv',
         'regional-election-b.json',
         'Elections',
+        'elections-parteien.csv',
+        'elections-parteien.json',
+        'elections-parti.csv',
+        'elections-parti.json',
+        'elections-partidas.csv',
+        'elections-partidas.json',
+        'elections-partis.csv',
+        'elections-partis.json',
         'elections.csv',
         'elections.json',
         'Vote',

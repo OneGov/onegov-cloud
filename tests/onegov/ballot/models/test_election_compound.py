@@ -212,8 +212,10 @@ def test_election_compound(session):
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
+    assert election_compound.last_result_change is None
 
     # Add two elections
+    last_result_change = datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
     session.add(
         Election(
             title="First election",
@@ -221,7 +223,7 @@ def test_election_compound(session):
             domain_segment='First district',
             date=date(2015, 6, 14),
             number_of_mandates=1,
-            last_result_change=datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
+            last_result_change=last_result_change
         )
     )
     session.add(
@@ -240,6 +242,7 @@ def test_election_compound(session):
     assert set([election.id for election in election_compound.elections]) == {
         'first-election', 'second-election'
     }
+    assert election_compound.last_result_change == last_result_change
 
     assert election_compound.number_of_mandates == 3
     assert election_compound.counted is False
@@ -711,8 +714,8 @@ def test_election_compound_export_parties(session):
             number_of_mandates=0,
             votes=0,
             voters_count=Decimal('1.01'),
+            voters_count_percentage=Decimal('100.02'),
             total_votes=100,
-            total_voters_count=Decimal('100.02'),
             name='Libertarian',
             color='black',
             year=2012
@@ -724,7 +727,7 @@ def test_election_compound_export_parties(session):
             votes=2,
             voters_count=Decimal('3.01'),
             total_votes=50,
-            total_voters_count=Decimal('50.02'),
+            voters_count_percentage=Decimal('50.02'),
             name='Libertarian',
             color='black',
             year=2016
@@ -736,7 +739,7 @@ def test_election_compound_export_parties(session):
             votes=1,
             voters_count=Decimal('2.01'),
             total_votes=100,
-            total_voters_count=Decimal('100.02'),
+            voters_count_percentage=Decimal('100.02'),
             name='Conservative',
             color='red',
             year=2012
@@ -748,7 +751,7 @@ def test_election_compound_export_parties(session):
             votes=3,
             voters_count=Decimal('4.01'),
             total_votes=50,
-            total_voters_count=Decimal('50.02'),
+            voters_count_percentage=Decimal('50.02'),
             name='Conservative',
             color='red',
             year=2016
@@ -763,9 +766,9 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 3,
             'total_votes': 50,
-            'total_voters_count': '50.02',
             'votes': 3,
             'voters_count': '4.01',
+            'voters_count_percentage': '50.02',
         }, {
             'year': 2016,
             'name': 'Libertarian',
@@ -773,9 +776,9 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
-            'total_voters_count': '50.02',
             'votes': 2,
             'voters_count': '3.01',
+            'voters_count_percentage': '50.02',
         }, {
             'year': 2012,
             'name': 'Conservative',
@@ -783,9 +786,9 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 1,
             'total_votes': 100,
-            'total_voters_count': '100.02',
             'votes': 1,
             'voters_count': '2.01',
+            'voters_count_percentage': '100.02',
         }, {
             'year': 2012,
             'name': 'Libertarian',
@@ -793,9 +796,9 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
-            'total_voters_count': '100.02',
             'votes': 0,
             'voters_count': '1.01',
+            'voters_count_percentage': '100.02',
         }
     ]
 
@@ -823,9 +826,9 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 3,
             'total_votes': 50,
-            'total_voters_count': '50.02',
             'votes': 3,
             'voters_count': '4.01',
+            'voters_count_percentage': '50.02',
             'panachage_votes_from_0': 1,
             'panachage_votes_from_1': 2,
             'panachage_votes_from_2': 3,
@@ -837,27 +840,27 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
-            'total_voters_count': '50.02',
             'votes': 2,
             'voters_count': '3.01',
+            'voters_count_percentage': '50.02',
             'panachage_votes_from_0': 5,
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_999': None,
         }, {
-            'color': '',
-            'mandates': '',
+            'color': None,
+            'mandates': None,
             'name': 'Other',
             'id': 2,
-            'total_votes': '',
-            'total_voters_count': '',
-            'votes': '',
-            'voters_count': '',
+            'total_votes': None,
+            'votes': None,
+            'voters_count': None,
+            'voters_count_percentage': None,
             'year': 2016,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
+            'panachage_votes_from_0': None,
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_999': None,
         }, {
             'year': 2012,
             'name': 'Conservative',
@@ -865,13 +868,13 @@ def test_election_compound_export_parties(session):
             'color': 'red',
             'mandates': 1,
             'total_votes': 100,
-            'total_voters_count': '100.02',
             'votes': 1,
             'voters_count': '2.01',
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
+            'voters_count_percentage': '100.02',
+            'panachage_votes_from_0': None,
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_999': None,
         }, {
             'year': 2012,
             'name': 'Libertarian',
@@ -879,27 +882,27 @@ def test_election_compound_export_parties(session):
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
-            'total_voters_count': '100.02',
             'votes': 0,
             'voters_count': '1.01',
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
+            'voters_count_percentage': '100.02',
+            'panachage_votes_from_0': None,
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_999': None,
         }, {
-            'color': '',
-            'mandates': '',
+            'color': None,
+            'mandates': None,
             'name': 'Other',
             'id': 2,
-            'total_votes': '',
-            'total_voters_count': '',
-            'votes': '',
-            'voters_count': '',
+            'total_votes': None,
+            'votes': None,
+            'voters_count': None,
+            'voters_count_percentage': None,
             'year': 2012,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
+            'panachage_votes_from_0': None,
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_999': None,
         }
     ]
 

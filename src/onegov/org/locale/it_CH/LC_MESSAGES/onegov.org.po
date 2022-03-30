@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2022-02-21 12:03+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -176,6 +176,9 @@ msgstr "Sì"
 
 msgid "No"
 msgstr "No"
+
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
@@ -1446,9 +1449,6 @@ msgstr "Solo collegamenti esterni"
 msgid "Internal links only"
 msgstr "Solo collegamenti interni"
 
-msgid "E-Mail Address"
-msgstr "Indirizzo e-mail"
-
 msgid "Your note about this ticket"
 msgstr "La tua nota su questo biglietto"
 
@@ -2195,10 +2195,10 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3212,6 +3212,9 @@ msgstr ""
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
 
 msgid "Signup"
 msgstr "Registrati"
