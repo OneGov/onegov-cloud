@@ -1,6 +1,6 @@
-import re
 from chameleon import PageTemplate
 from datetime import date
+from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import Election
 from onegov.ballot import ProporzElection
@@ -18,6 +18,7 @@ from onegov.election_day.screen_widgets import (
     ElectionCandidatesTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
+    LastResultChangeWidget,
     MandatesWidget,
     NumberOfMandatesWidget,
     ElectionTurnoutWidget,
@@ -77,6 +78,9 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <mandates class="my-class-e"/>
             </column>
+            <column span="1">
+                <last-result-change class="my-class-f"/>
+            </column>
         </row>
     """
     widgets = [
@@ -92,6 +96,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
         ElectionCandidatesByEntityTableWidget(),
+        LastResultChangeWidget(),
         ElectionTurnoutWidget(),
         MandatesWidget(),
         NumberOfMandatesWidget(),
@@ -139,22 +144,24 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-c' in result
     assert 'my-class-d' in result
     assert 'my-class-e' in result
+    assert 'my-class-f' in result
 
     # Add intermediate results
-    model, errors = import_test_datasets(
-        'internal',
-        'election',
-        'zg',
-        'canton',
-        'majorz',
-        date_=date(2015, 10, 18),
-        number_of_mandates=2,
-        dataset_name='staenderatswahl-2015-intermediate',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-01 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'election',
+            'zg',
+            'canton',
+            'majorz',
+            date_=date(2015, 10, 18),
+            number_of_mandates=2,
+            dataset_name='staenderatswahl-2015-intermediate',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -248,6 +255,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '0' in result
     assert '2' in result
     assert '0 of 2' in result
+    assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -262,22 +270,24 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-c' in result
     assert 'my-class-d' in result
     assert 'my-class-e' in result
+    assert 'my-class-f' in result
 
     # Add final results
-    model, errors = import_test_datasets(
-        'internal',
-        'election',
-        'zg',
-        'canton',
-        'majorz',
-        date_=date(2015, 10, 18),
-        number_of_mandates=2,
-        dataset_name='staenderatswahl-2015',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-02 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'election',
+            'zg',
+            'canton',
+            'majorz',
+            date_=date(2015, 10, 18),
+            number_of_mandates=2,
+            dataset_name='staenderatswahl-2015',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -433,6 +443,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '2' in result
     assert '2' in result
     assert '2 of 2' in result
+    assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -447,6 +458,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-c' in result
     assert 'my-class-d' in result
     assert 'my-class-e' in result
+    assert 'my-class-f' in result
 
 
 def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
@@ -501,6 +513,9 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <mandates class="my-class-f"/>
             </column>
+            <column span="1">
+                <last-result-change class="my-class-g"/>
+            </column>
         </row>
     """
     widgets = [
@@ -515,6 +530,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionCandidatesTableWidget(),
         ElectionListsChartWidget(),
         ElectionListsTableWidget(),
+        LastResultChangeWidget(),
         AllocatedMandatesWidget(),
         NumberOfMandatesWidget(),
         MandatesWidget(),
@@ -565,22 +581,24 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-d' in result
     assert 'my-class-e' in result
     assert 'my-class-f' in result
+    assert 'my-class-g' in result
 
     # Add intermediate results
-    model, errors = import_test_datasets(
-        'internal',
-        'election',
-        'zg',
-        'canton',
-        'proporz',
-        date_=date(2015, 10, 18),
-        number_of_mandates=1,
-        dataset_name='nationalratswahlen-2015-intermediate',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-01 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'election',
+            'zg',
+            'canton',
+            'proporz',
+            date_=date(2015, 10, 18),
+            number_of_mandates=1,
+            dataset_name='nationalratswahlen-2015-intermediate',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -704,6 +722,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '0' in result
     assert '1' in result
     assert '0 of 1' in result
+    assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -719,22 +738,24 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-d' in result
     assert 'my-class-e' in result
     assert 'my-class-f' in result
+    assert 'my-class-g' in result
 
     # Add final results
-    model, errors = import_test_datasets(
-        'internal',
-        'election',
-        'zg',
-        'canton',
-        'proporz',
-        date_=date(2015, 10, 18),
-        number_of_mandates=1,
-        dataset_name='nationalratswahlen-2015',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-02 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'election',
+            'zg',
+            'canton',
+            'proporz',
+            date_=date(2015, 10, 18),
+            number_of_mandates=1,
+            dataset_name='nationalratswahlen-2015',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -864,6 +885,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '3' in result
     assert '1' in result
     assert '3 of 1' in result
+    assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -879,3 +901,4 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-d' in result
     assert 'my-class-e' in result
     assert 'my-class-f' in result
+    assert 'my-class-g' in result
