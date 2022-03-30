@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-24 15:56+0100\n"
+"POT-Creation-Date: 2022-03-30 06:44+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -654,7 +654,7 @@ msgid "Mappings"
 msgstr "Attribuziuns"
 
 msgid "Statistics"
-msgstr ""
+msgstr "Statistica"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -1314,12 +1314,6 @@ msgstr "Resultats interm."
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "resultats intermediars: ${counted} da ${total} ${entities}"
-
-msgid "Empty"
-msgstr "Vid"
-
-msgid "Invalid"
-msgstr "Nunvalaivel"
 
 msgid "Wrong username or password"
 msgstr ""

@@ -37,7 +37,6 @@ def view_vote_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
-    # todo: statstics tables
     embed = defaultdict(list)
     media = {}
     layout = VoteLayout(self, request)
@@ -46,17 +45,29 @@ def view_vote_json(self, request):
         media['pdf'] = request.link(self, 'pdf')
     if layout.show_map:
         media['maps'] = {}
-        for ballot in ('', 'proposal-', 'counter-proposal-', 'tie-breaker-'):
-            for map in ('entities', 'districts'):
-                tab = f'{ballot}{map}'
-                layout = VoteLayout(self, request, tab)
-                layout.last_modified = last_modified
-                if layout.visible:
-                    embed[tab].append(
-                        request.link(layout.ballot, name=f'{map}-map'))
-                    if layout.svg_path:
-                        media['maps'][tab] = layout.svg_link
-        embed['entities'].append(request.link(self, name='vote-header-widget'))
+        for tab in (
+            'entities',
+            'proposal-entities',
+            'counter-proposal-entities',
+            'tie-breaker-entities',
+            'districts',
+            'proposal-districts',
+            'counter-proposal-districts',
+            'tie-breaker-districts'
+        ):
+            layout = VoteLayout(self, request, tab)
+            layout.last_modified = last_modified
+            if layout.visible:
+                embed[tab].append(layout.map_link)
+                if layout.svg_path:
+                    media['maps'][tab] = layout.svg_link
+
+    embed['entities'].append(request.link(self, name='vote-header-widget'))
+
+    for tab in layout.tabs_with_embedded_tables:
+        layout = VoteLayout(self, request, tab)
+        if layout.visible:
+            embed[tab].append(layout.table_link)
 
     counted = self.progress[0]
     nays_percentage = self.nays_percentage if counted else None

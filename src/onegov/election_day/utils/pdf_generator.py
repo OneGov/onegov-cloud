@@ -862,8 +862,8 @@ class PdfGenerator():
                         pdf.translate(_('Yes %')).replace('%', '').strip(),
                         pdf.translate(_('No %')).replace('%', '').strip(),
                         '{} / {}'.format(
-                            pdf.translate(_('Empty')),
-                            pdf.translate(_('Invalid'))
+                            pdf.translate(_('Empty votes')),
+                            pdf.translate(_('Invalid votes'))
                         ),
                     ],
                     [
@@ -916,8 +916,8 @@ class PdfGenerator():
                     pdf.results(
                         [
                             principal.label('entity'),
-                            _('Empty'),
-                            _('Invalid'),
+                            _('Empty votes'),
+                            _('Invalid votes'),
                             pdf.translate(_('Yes %')).replace('%', '').strip(),
                             pdf.translate(_('No %')).replace('%', '').strip(),
                         ],
@@ -969,8 +969,8 @@ class PdfGenerator():
                         [
                             principal.label('entity'),
                             principal.label('district'),
-                            _('Empty'),
-                            _('Invalid'),
+                            _('Empty votes'),
+                            _('Invalid votes'),
                             pdf.translate(_('Yes %')).replace('%', '').strip(),
                             pdf.translate(_('No %')).replace('%', '').strip(),
                         ],
@@ -1037,8 +1037,8 @@ class PdfGenerator():
                     pdf.results(
                         [
                             principal.label('district'),
-                            _('Empty'),
-                            _('Invalid'),
+                            _('Empty votes'),
+                            _('Invalid votes'),
                             pdf.translate(_('Yes %')).replace('%', '').strip(),
                             pdf.translate(_('No %')).replace('%', '').strip(),
                         ],

@@ -12,6 +12,21 @@ class VoteLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
+    tabs_with_embedded_tables = (
+        'entities',
+        'districts',
+        'statistics',
+        'proposal-entities',
+        'proposal-districts',
+        'proposal-statistics',
+        'counter-proposal-entities',
+        'counter-proposal-districts',
+        'counter-proposal-statistics',
+        'tie-breaker-entities',
+        'tie-breaker-districts',
+        'tie-breaker-statistics',
+    )
+
     @cached_property
     def all_tabs(self):
         """Return all tabs. Ordering is important for the main view."""
@@ -21,12 +36,12 @@ class VoteLayout(DetailLayout):
             'statistics',
             'proposal-entities',
             'proposal-districts',
+            'proposal-statistics',
             'counter-proposal-entities',
             'counter-proposal-districts',
+            'counter-proposal-statistics',
             'tie-breaker-entities',
             'tie-breaker-districts',
-            'proposal-statistics',
-            'tie-breaker-entities',
             'tie-breaker-statistics',
             'data'
         )
@@ -109,6 +124,13 @@ class VoteLayout(DetailLayout):
         return self.model.type
 
     @cached_property
+    def scope(self):
+        if 'entities' in self.tab:
+            return 'entities'
+        if 'district' in self.tab:
+            return 'districts'
+
+    @cached_property
     def ballot(self):
         if self.type == 'complex' and 'counter' in self.tab:
             return self.model.counter_proposal
@@ -117,27 +139,48 @@ class VoteLayout(DetailLayout):
         return self.model.proposal
 
     @cached_property
+    def map_link(self):
+        if self.scope == 'entities':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-entities-map'
+            )
+
+        if self.scope == 'districts':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-districts-map'
+            )
+
+    @cached_property
     def entities_map_link(self):
+        # todo: remove
         return self.request.link(
             self.model, f'{self.ballot.type}-by-entities-map'
         )
 
     @cached_property
     def districts_map_link(self):
+        # todo: remove
         return self.request.link(
             self.model, f'{self.ballot.type}-by-districts-map'
         )
 
     @cached_property
     def table_link(self):
-        # todo: statistics
-        if self.tab == 'data':
+        if self.tab not in self.tabs_with_embedded_tables:
             return None
-        scope = 'entities'
-        if 'district' in self.tab:
-            scope = 'districts'
+
+        if self.scope == 'entities':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-entities-table'
+            )
+
+        if self.scope == 'districts':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-districts-table'
+            )
+
         return self.request.link(
-            self.model, f'{self.ballot.type}-by-{scope}-table'
+            self.model, f'{self.ballot.type}-statistics-table'
         )
 
     @cached_property

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-24 15:56+0100\n"
+"POT-Creation-Date: 2022-03-30 06:44+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1312,12 +1312,6 @@ msgstr "Zwischenerg."
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "Zwischenresultate: ${counted} von ${total} ${entities}"
-
-msgid "Empty"
-msgstr "Leer"
-
-msgid "Invalid"
-msgstr "Ungültig"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

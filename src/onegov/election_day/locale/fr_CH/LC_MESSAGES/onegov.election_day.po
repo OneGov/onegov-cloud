@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-24 15:56+0100\n"
+"POT-Creation-Date: 2022-03-30 06:44+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -654,7 +654,7 @@ msgid "Mappings"
 msgstr "Cartographie"
 
 msgid "Statistics"
-msgstr ""
+msgstr "Statistiques"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -913,10 +913,10 @@ msgid "Cast Ballots"
 msgstr "Suffrages exprimés"
 
 msgid "Empty votes"
-msgstr ""
+msgstr "Votes blancs"
 
 msgid "Invalid votes"
-msgstr ""
+msgstr "Votes non valides"
 
 msgid "Nay"
 msgstr "Non"
@@ -1313,12 +1313,6 @@ msgstr "Résultats interm."
 #, python-format
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "Résultats intermédiaires: ${counted} de ${total} ${entities}"
-
-msgid "Empty"
-msgstr "Vide"
-
-msgid "Invalid"
-msgstr "Invalide"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"

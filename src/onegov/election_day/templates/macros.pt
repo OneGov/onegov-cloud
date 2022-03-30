@@ -145,7 +145,6 @@
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">Nays</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">Yes %</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">No %</th>
-                <th data-tablesaw-priority="5" i18n:translate="turnout_vote" class="column-turnout right-aligned" tal:condition="layout.completed">Turnout</th>
             </tr>
         </thead>
         <tbody>
@@ -153,7 +152,7 @@
                 <tal:b condition="not: result.counted">
                     <td class="column-entity">${layout.format_name(result)}</td>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
-                    <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
+                    <td class="column-result answer" colspan="5" i18n:translate="">Not yet counted</td>
                 </tal:b>
                 <tal:b condition="result.counted">
                     <td class="column-entity">${layout.format_name(result)}</td>
@@ -164,7 +163,6 @@
                     <td class="column-nays right-aligned" data-text="${result.nays}">${layout.format_number(result.nays)}</td>
                     <td class="column-yeas-percentage right-aligned">${layout.format_number(result.yeas_percentage)}</td>
                     <td class="column-nays-percentage right-aligned">${layout.format_number(result.nays_percentage)}</td>
-                    <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(result.turnout)}</td>
                 </tal:b>
             </tr>
         </tbody>
@@ -179,7 +177,6 @@
                 <td class="column-nays right-aligned">${layout.format_number(ballot.nays)}</td>
                 <td class="column-yeas-percentage right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
                 <td class="column-nays-percentage right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
-                <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(ballot.turnout)}</td>
             </tr>
         </tfoot>
     </table>
@@ -264,7 +261,7 @@
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.cast_ballots)}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
                     <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
-                    <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(result.turnout)}</td>
+                    <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f} %'.format(result.turnout)}</td>
                 </tal:b>
             </tr>
         </tbody>
@@ -276,7 +273,7 @@
                 <td class="column-empty right-aligned">${layout.format_number(ballot.cast_ballots)}</td>
                 <td class="column-empty right-aligned">${layout.format_number(ballot.empty)}</td>
                 <td class="column-invalid right-aligned">${layout.format_number(ballot.invalid)}</td>
-                <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(ballot.turnout)}</td>
+                <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f} %'.format(ballot.turnout)}</td>
             </tr>
         </tfoot>
     </table>
