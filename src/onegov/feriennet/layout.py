@@ -803,3 +803,17 @@ class VolunteerFormLayout(DefaultLayout):
                 '#'
             )
         ]
+
+
+class HomepageLayout(DefaultLayout):
+
+    @property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return[
+                Link(
+                    _("Sort"),
+                    self.request.link(self.model, 'sort'),
+                    attrs={'class': ('sort-link')}
+                )
+            ]
