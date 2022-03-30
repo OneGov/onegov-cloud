@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2022-03-28 15:19+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -176,6 +176,9 @@ msgstr "Sì"
 
 msgid "No"
 msgstr "No"
+
+msgid "Credit card payments"
+msgstr "Kreditkartenzahlungen"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"

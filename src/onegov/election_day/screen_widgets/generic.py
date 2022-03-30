@@ -189,3 +189,32 @@ class LastResultChangeWidget(ModelBoundWidget):
         </xsl:template>
     """
     usage = '<last-result-change class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='number-of-counted-entities',
+    category='generic'
+)
+class NumberOfCountedEntitiesWidget(ModelBoundWidget):
+    tag = 'number-of-counted-entities'
+    template = """
+        <xsl:template match="number-of-counted-entities">
+            <span class="{@class}">
+                ${layout.format_number(model.progress[0])}
+            </span>
+        </xsl:template>
+    """
+    usage = '<number-of-counted-entities class=""/>'
+
+
+@ElectionDayApp.screen_widget(tag='total-entities', category='generic')
+class TotalEntitiesWidget(ModelBoundWidget):
+    tag = 'total-entities'
+    template = """
+        <xsl:template match="total-entities">
+            <span class="{@class}">
+                ${layout.format_number(model.progress[1])}
+            </span>
+        </xsl:template>
+    """
+    usage = '<total-entities class=""/>'
