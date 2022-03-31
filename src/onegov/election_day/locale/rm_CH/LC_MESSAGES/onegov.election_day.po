@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-30 06:44+0200\n"
+"POT-Creation-Date: 2022-03-31 06:13+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -893,12 +893,6 @@ msgstr "Vuschs affirmativas"
 msgid "Nays"
 msgstr "Vuschs negativas"
 
-#. Default: Turnout
-#. Default: Voter turnout
-#.
-msgid "turnout_vote"
-msgstr "Participaziun a la votaziun"
-
 msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"
 
@@ -918,6 +912,12 @@ msgstr ""
 
 msgid "Invalid votes"
 msgstr ""
+
+#. Default: Turnout
+#. Default: Voter turnout
+#.
+msgid "turnout_vote"
+msgstr "Participaziun a la votaziun"
 
 msgid "Nay"
 msgstr "NA"

@@ -178,6 +178,19 @@ class ChartWidget(ModelBoundWidget):
         }
 
 
+@ElectionDayApp.screen_widget(tag='last-result-change', category='generic')
+class LastResultChangeWidget(ModelBoundWidget):
+    tag = 'last-result-change'
+    template = """
+        <xsl:template match="last-result-change">
+            <span class="{@class}">
+            ${layout.format_date(layout.last_result_change, 'datetime_long')}
+            </span>
+        </xsl:template>
+    """
+    usage = '<last-result-change class=""/>'
+
+
 @ElectionDayApp.screen_widget(
     tag='number-of-counted-entities',
     category='generic'

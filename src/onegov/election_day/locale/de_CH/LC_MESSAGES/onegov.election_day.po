@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-30 06:44+0200\n"
+"POT-Creation-Date: 2022-03-31 06:13+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -828,7 +828,7 @@ msgid "The file is invalid."
 msgstr "Die Datei ist ungültig."
 
 msgid "The form contains errors. Please check the marked fields."
-msgstr ""
+msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
 #.
 #. Default: Start
@@ -892,12 +892,6 @@ msgstr "Ja-Stimmen"
 msgid "Nays"
 msgstr "Nein-Stimmen"
 
-#. Default: Turnout
-#. Default: Voter turnout
-#.
-msgid "turnout_vote"
-msgstr "Stimmbeteiligung"
-
 msgid "Not yet counted"
 msgstr "Noch nicht ausgezählt"
 
@@ -917,6 +911,12 @@ msgstr "Leere Stimmen"
 
 msgid "Invalid votes"
 msgstr "Ungültige Stimmen"
+
+#. Default: Turnout
+#. Default: Voter turnout
+#.
+msgid "turnout_vote"
+msgstr "Stimmbeteiligung"
 
 msgid "Nay"
 msgstr "Nein"
