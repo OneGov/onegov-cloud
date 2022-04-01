@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"POT-Creation-Date: 2022-04-01 13:50+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -535,9 +535,6 @@ msgstr "CSS supplementar"
 msgid "Email Address"
 msgstr "Adressa dad e-mail"
 
-msgid "Email Address"
-msgstr "Adressa dad e-mail"
-
 msgid "Phone number"
 msgstr "Numer da telefon"
 
@@ -783,15 +780,15 @@ msgstr "Resultats intermediars"
 msgid "No candidacies."
 msgstr "Naginas candidaturas."
 
-msgid "Download"
-msgstr "Telechargiar"
+msgid "Download diagram"
+msgstr ""
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
+#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagram mussa la repartiziun da las vuschs e dals mandats sin las "
@@ -801,17 +798,14 @@ msgstr ""
 "travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
 "cuntegnan il dumber da mandats."
 
-msgid "Embed heatmap"
+msgid "Embed map"
 msgstr "Incorporar la carta"
 
-msgid "Download heatmap"
+msgid "Download map"
 msgstr "Telechargiar la carta"
 
-msgid "Embed heatmap"
-msgstr "Incorporar la carta"
-
-msgid "Download heatmap"
-msgstr "Telechargiar la carta"
+msgid "Download"
+msgstr "Telechargiar"
 
 msgid "Embed"
 msgstr "Incorporar"
@@ -905,9 +899,9 @@ msgstr "Vid"
 msgid "Invalid"
 msgstr "Nunvalaivel"
 
-#.
 #. Default: Turnout
 #. Default: Voter turnout
+#.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
 
@@ -926,8 +920,8 @@ msgstr "GEA"
 msgid "List connection"
 msgstr "Colliaziun da glistas"
 
-#.
 #. Default: Votes
+#.
 msgid "single_votes"
 msgstr "Vuschs"
 
@@ -990,6 +984,12 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
 msgstr "Gruppa da glista"
+
+msgid "Embed diagram"
+msgstr ""
+
+msgid "Embed table"
+msgstr ""
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
@@ -1066,8 +1066,8 @@ msgstr "Dumonda decisiva a favur da l'iniziativa"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Dumonda decisiva a favur da la cuntraproposta"
 
-#.
 #. Default: eligible Voters
+#.
 msgid "eligible_voters_vote"
 msgstr "Persunas cun dretg da votar"
 
@@ -1133,10 +1133,10 @@ msgstr "Selecziun"
 msgid "Columns"
 msgstr "Colonnas"
 
-#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
+#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagram mussa las vuschs gudagnadas ed ils mandats da las partidas. Las "
@@ -1149,11 +1149,11 @@ msgstr "Onn"
 msgid "Difference"
 msgstr "Differenza"
 
-#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
+#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
@@ -1693,3 +1693,9 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Embed heatmap"
+#~ msgstr "Incorporar la carta"
+
+#~ msgid "Download heatmap"
+#~ msgstr "Telechargiar la carta"
