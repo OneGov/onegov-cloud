@@ -55,4 +55,3 @@ def add_timestamps_to_street(context):
         context.operations.add_column('winterthur_addresses', Column(
             'modified', UTCDateTime
         ))
-
