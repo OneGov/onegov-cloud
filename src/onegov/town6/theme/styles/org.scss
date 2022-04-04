@@ -594,3 +594,10 @@ body:not(.editor-layout) {
 .visually-hidden {
     @include element-invisible;
 }
+
+/*
+    External links
+*/
+a > i.fa-external-link-alt {
+    margin-left: .3rem;
+}
