@@ -66,8 +66,3 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
     def counted_eligible_voters(self):
         """ The number of votes for turnout calculation """
         return 0 if not self.counted else self.eligible_voters
-
-    @hybrid_property
-    def counted_cast_ballots(self):
-        return 0 if not self.counted else \
-            self.yeas + self.nays + self.empty + self.invalid

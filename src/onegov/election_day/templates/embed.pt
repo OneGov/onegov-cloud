@@ -77,6 +77,9 @@
             <tal:b tal:condition="type == 'ballot-table' and scope == 'districts'">
                 <tal:b metal:use-macro="layout.macros['ballot-districts-table']"/>
             </tal:b>
+            <tal:b tal:condition="type == 'ballot-table' and scope == 'statistics'">
+                <tal:b metal:use-macro="layout.macros['ballot-statistics-table']"/>
+            </tal:b>
             <tal:b tal:condition="type == 'election-table' and scope == 'lists'">
                 <tal:b metal:use-macro="layout.macros['election-lists-table']"/>
             </tal:b>

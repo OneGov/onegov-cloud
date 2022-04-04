@@ -355,8 +355,8 @@ def test_view_svg(election_day_app_zg):
         'proporz-election-listen-panaschierstatistik.svg',
         'proporz-election-listen.svg',
         'proporz-election-parteien-parteistaerken.svg',
-        'vote-vorlage.svg',
-        'vote-vorlage.svg'
+        'vote-vorlage-gemeinden.svg',
+        'vote-vorlage-gemeinden.svg'
     ]
 
 

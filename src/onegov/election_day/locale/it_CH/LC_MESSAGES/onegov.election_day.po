@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"POT-Creation-Date: 2022-03-31 06:13+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -646,6 +646,9 @@ msgstr "Amministrare"
 msgid "Mappings"
 msgstr "Mapping"
 
+msgid "Statistics"
+msgstr "Statistiche"
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Risultati finali sono disponibili su ${url}"
@@ -776,12 +779,12 @@ msgstr "Nessuna candidatura."
 msgid "Download"
 msgstr "Scarica"
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
+#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagramma mostra la distribuzione dei voti e dei mandati in lista e nelle "
@@ -819,8 +822,8 @@ msgstr ""
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziale"
 
@@ -881,23 +884,31 @@ msgstr "Voti favorevoli"
 msgid "Nays"
 msgstr "Voti contrari"
 
-msgid "Empty"
-msgstr "Bianche"
-
-msgid "Invalid"
-msgstr "Nulle"
-
-#.
-#. Default: Turnout
-#. Default: Voter turnout
-msgid "turnout_vote"
-msgstr "Partecipazione al voto"
-
 msgid "Not yet counted"
 msgstr "Non ancora conteggiato"
 
 msgid "Total"
 msgstr "Totale"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Aventi diritto di voto"
+
+msgid "Cast Ballots"
+msgstr "Schede rientrate"
+
+msgid "Empty votes"
+msgstr ""
+
+msgid "Invalid votes"
+msgstr ""
+
+#. Default: Turnout
+#. Default: Voter turnout
+#.
+msgid "turnout_vote"
+msgstr "Partecipazione al voto"
 
 msgid "Nay"
 msgstr "No"
@@ -908,8 +919,8 @@ msgstr "Sì"
 msgid "List connection"
 msgstr "Collegamenti tra liste"
 
-#.
 #. Default: Votes
+#.
 msgid "single_votes"
 msgstr "Voti"
 
@@ -1048,14 +1059,6 @@ msgstr "Spareggio a favore della iniziativa"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Spareggio a favore della controprogetto"
 
-#.
-#. Default: eligible Voters
-msgid "eligible_voters_vote"
-msgstr "Aventi diritto di voto"
-
-msgid "Cast Ballots"
-msgstr "Schede rientrate"
-
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
 
@@ -1114,10 +1117,10 @@ msgstr "Attivato"
 msgid "Columns"
 msgstr "Colonne"
 
-#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
+#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagramma mostra i voti e i mandati dei partiti. Le barre cerchiate "
@@ -1130,11 +1133,11 @@ msgstr "Anno"
 msgid "Difference"
 msgstr "Differenza"
 
-#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
 #. is proportional to the votes.
+#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagramma mostra l'origine dei voti. Le barre sulla sinistra "
