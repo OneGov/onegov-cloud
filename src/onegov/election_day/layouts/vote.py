@@ -69,7 +69,7 @@ class VoteLayout(DetailLayout):
     def subtitle(self, tab=None):
         tab = (self.tab if tab is None else tab) or ''
 
-        if tab.endswith('-entities') and self.has_districts:
+        if tab.endswith('-entities'):
             return self.principal.label('entities')
         if tab.endswith('-districts'):
             return self.app.principal.label('districts')
@@ -79,7 +79,6 @@ class VoteLayout(DetailLayout):
         return ''
 
     def tab_visible(self, tab):
-
         if self.hide_tab(tab):
             return False
 
@@ -208,15 +207,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def menu(self):
-        def entry(tab, use_subtitle=False):
-            return (
-                self.subtitle(tab) if use_subtitle else self.title(tab),
-                self.request.link(self.model, tab),
-                self.tab == tab,
-                []
-            )
-
-        if self.type == 'complex' and self.has_districts:
+        if self.type == 'complex':
             result = []
 
             for title, prefix in (
@@ -224,8 +215,8 @@ class VoteLayout(DetailLayout):
                 (_("Counter Proposal"), 'counter-proposal'),
                 (_("Tie-Breaker"), 'tie-breaker')
             ):
-                result.append((
-                    title, '', self.tab.startswith(prefix), [(
+                submenu = [
+                    (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),
                         self.tab == tab,
@@ -234,14 +225,22 @@ class VoteLayout(DetailLayout):
                         f'{prefix}-entities',
                         f'{prefix}-districts',
                         f'{prefix}-statistics'
-                    )]
+                    ) if self.tab_visible(tab)
+                ]
+                if submenu:
+                    result.append((
+                        title,
+                        '',
+                        self.tab.startswith(prefix),
+                        submenu
+                    ))
+            if self.tab_visible('data'):
+                result.append((
+                    self.title('data'),
+                    self.request.link(self.model, 'data'),
+                    self.tab == 'data',
+                    []
                 ))
-            result.append((
-                self.title('data'),
-                self.request.link(self.model, 'data'),
-                self.tab == 'data',
-                []
-            ))
             return result
 
         return [

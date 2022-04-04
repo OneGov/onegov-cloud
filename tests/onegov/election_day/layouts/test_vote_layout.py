@@ -16,41 +16,48 @@ def test_vote_layout(session):
     assert layout.all_tabs == (
         'entities',
         'districts',
+        'statistics',
         'proposal-entities',
         'proposal-districts',
+        'proposal-statistics',
         'counter-proposal-entities',
         'counter-proposal-districts',
+        'counter-proposal-statistics',
         'tie-breaker-entities',
         'tie-breaker-districts',
+        'tie-breaker-statistics',
         'data'
     )
 
     assert layout.title('undefined') == ''
     assert layout.title('entities') == '__entities'
     assert layout.title('districts') == '__districts'
+    assert layout.title('statistics') == 'Statistics'
     assert layout.title('proposal-entities') == 'Proposal'
     assert layout.title('proposal-districts') == 'Proposal'
+    assert layout.title('proposal-statistics') == 'Proposal'
     assert layout.title('counter-proposal-entities') == 'Counter Proposal'
     assert layout.title('counter-proposal-districts') == 'Counter Proposal'
+    assert layout.title('counter-proposal-statistics') == 'Counter Proposal'
     assert layout.title('tie-breaker-entities') == 'Tie-Breaker'
     assert layout.title('tie-breaker-districts') == 'Tie-Breaker'
+    assert layout.title('tie-breaker-statistics') == 'Tie-Breaker'
     assert layout.title('data') == 'Downloads'
 
     assert layout.subtitle('undefined') == ''
     assert layout.subtitle('entities') == ''
     assert layout.subtitle('districts') == ''
-    assert layout.subtitle('proposal-entities') == ''
-    assert layout.subtitle('proposal-districts') == '__districts'
-    assert layout.subtitle('counter-proposal-entities') == ''
-    assert layout.subtitle('counter-proposal-districts') == '__districts'
-    assert layout.subtitle('tie-breaker-entities') == ''
-    assert layout.subtitle('tie-breaker-districts') == '__districts'
-    assert layout.subtitle('data') == ''
-
-    layout.has_districts = True
+    assert layout.subtitle('statistics') == ''
     assert layout.subtitle('proposal-entities') == '__entities'
+    assert layout.subtitle('proposal-districts') == '__districts'
+    assert layout.subtitle('proposal-statistics') == 'Statistics'
     assert layout.subtitle('counter-proposal-entities') == '__entities'
+    assert layout.subtitle('counter-proposal-districts') == '__districts'
+    assert layout.subtitle('counter-proposal-statistics') == 'Statistics'
     assert layout.subtitle('tie-breaker-entities') == '__entities'
+    assert layout.subtitle('tie-breaker-districts') == '__districts'
+    assert layout.subtitle('tie-breaker-statistics') == 'Statistics'
+    assert layout.subtitle('data') == ''
 
     layout = VoteLayout(Vote(), DummyRequest())
     assert layout.type == 'simple'
@@ -170,10 +177,12 @@ def test_vote_layout_menu(session):
     )
     assert VoteLayout(vote, request).menu == [
         ('__entities', 'Vote/entities', True, []),
+        ('Statistics', 'Vote/statistics', False, []),
         ('Downloads', 'Vote/data', False, [])
     ]
     assert VoteLayout(vote, request, 'data').menu == [
         ('__entities', 'Vote/entities', False, []),
+        ('Statistics', 'Vote/statistics', False, []),
         ('Downloads', 'Vote/data', True, [])
     ]
 
@@ -181,6 +190,7 @@ def test_vote_layout_menu(session):
     assert VoteLayout(vote, request).menu == [
         ('__entities', 'Vote/entities', True, []),
         ('__districts', 'Vote/districts', False, []),
+        ('Statistics', 'Vote/statistics', False, []),
         ('Downloads', 'Vote/data', False, [])
     ]
 
@@ -200,47 +210,74 @@ def test_vote_layout_menu_complex(session):
         BallotResult(entity_id='1', name=1, counted=True)
     )
     assert VoteLayout(vote, request).menu == [
-        ('Proposal', 'ComplexVote/proposal-entities', False, []),
+        (
+            'Proposal',
+            '',
+            False,
+            [
+                ('__entities', 'ComplexVote/proposal-entities', False, []),
+                ('Statistics', 'ComplexVote/proposal-statistics', False, [])
+            ]
+        ),
         (
             'Counter Proposal',
-            'ComplexVote/counter-proposal-entities',
+            '',
             False,
-            []
+            [
+                ('__entities', 'ComplexVote/counter-proposal-entities',
+                 False, []),
+                ('Statistics', 'ComplexVote/counter-proposal-statistics',
+                 False, [])
+            ]
         ),
-        ('Tie-Breaker', 'ComplexVote/tie-breaker-entities', False, []),
+        (
+            'Tie-Breaker',
+            '',
+            False,
+            [
+                ('__entities', 'ComplexVote/tie-breaker-entities', False, []),
+                ('Statistics', 'ComplexVote/tie-breaker-statistics', False, [])
+            ]
+        ),
         ('Downloads', 'ComplexVote/data', False, [])
-    ]
-    assert VoteLayout(vote, request, 'data').menu == [
-        ('Proposal', 'ComplexVote/proposal-entities', False, []),
-        (
-            'Counter Proposal',
-            'ComplexVote/counter-proposal-entities',
-            False,
-            []
-        ),
-        ('Tie-Breaker', 'ComplexVote/tie-breaker-entities', False, []),
-        ('Downloads', 'ComplexVote/data', True, [])
     ]
 
     request.app.principal.has_districts = True
     assert VoteLayout(vote, request).menu == [
-        ('Proposal', '', False, [
-            ('__entities', 'ComplexVote/proposal-entities', False, []),
-            ('__districts', 'ComplexVote/proposal-districts', False, [])
-        ]),
-        ('Counter Proposal', '', False, [
-            ('__entities', 'ComplexVote/counter-proposal-entities', False, []),
-            (
-                '__districts',
-                'ComplexVote/counter-proposal-districts',
-                False,
-                []
-            )
-        ]),
-        ('Tie-Breaker', '', False, [
-            ('__entities', 'ComplexVote/tie-breaker-entities', False, []),
-            ('__districts', 'ComplexVote/tie-breaker-districts', False, [])
-        ]),
+        (
+            'Proposal',
+            '',
+            False,
+            [
+                ('__entities', 'ComplexVote/proposal-entities', False, []),
+                ('__districts', 'ComplexVote/proposal-districts', False, []),
+                ('Statistics', 'ComplexVote/proposal-statistics', False, [])
+            ]
+        ),
+        (
+            'Counter Proposal',
+            '',
+            False,
+            [
+                ('__entities', 'ComplexVote/counter-proposal-entities',
+                 False, []),
+                ('__districts', 'ComplexVote/counter-proposal-districts',
+                 False, []),
+                ('Statistics', 'ComplexVote/counter-proposal-statistics',
+                 False, [])
+            ]
+        ),
+        (
+            'Tie-Breaker',
+            '',
+            False,
+            [
+                ('__entities', 'ComplexVote/tie-breaker-entities', False, []),
+                ('__districts', 'ComplexVote/tie-breaker-districts',
+                 False, []),
+                ('Statistics', 'ComplexVote/tie-breaker-statistics', False, [])
+            ]
+        ),
         ('Downloads', 'ComplexVote/data', False, [])
     ]
 
