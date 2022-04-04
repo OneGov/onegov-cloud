@@ -63,20 +63,27 @@ def test_vote_layout(session):
     assert layout.type == 'simple'
     assert layout.main_view == 'Vote/entities'
     assert layout.ballot.type == 'proposal'
-    assert layout.entities_map_link == 'Vote/proposal-by-entities-map'
-    assert layout.districts_map_link == 'Vote/proposal-by-districts-map'
+    assert layout.map_link == 'Vote/proposal-by-entities-map'
     assert layout.table_link == 'Vote/proposal-by-entities-table'
 
+    layout = VoteLayout(Vote(), DummyRequest(), tab='districts')
+    assert layout.map_link == 'Vote/proposal-by-districts-map'
+    assert layout.table_link == 'Vote/proposal-by-districts-table'
+
     layout = VoteLayout(
-        ComplexVote(), DummyRequest(), tab='counter-proposal-entities'
+        ComplexVote(), DummyRequest(), tab='tie-breaker-entities'
     )
     assert layout.type == 'complex'
     assert layout.main_view == 'ComplexVote/proposal-entities'
-    assert layout.ballot.type == 'counter-proposal'
-    assert layout.entities_map_link == \
-        'ComplexVote/counter-proposal-by-entities-map'
-    assert layout.districts_map_link == \
-        'ComplexVote/counter-proposal-by-districts-map'
+    assert layout.ballot.type == 'tie-breaker'
+    assert layout.map_link == 'ComplexVote/tie-breaker-by-entities-map'
+    assert layout.table_link == 'ComplexVote/tie-breaker-by-entities-table'
+
+    layout = VoteLayout(
+        ComplexVote(), DummyRequest(), tab='tie-breaker-districts'
+    )
+    assert layout.map_link == 'ComplexVote/tie-breaker-by-districts-map'
+    assert layout.table_link == 'ComplexVote/tie-breaker-by-districts-table'
 
     with freeze_time("2014-01-01 12:00"):
         vote = ComplexVote(

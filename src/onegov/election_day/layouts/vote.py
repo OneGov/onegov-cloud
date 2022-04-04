@@ -150,20 +150,6 @@ class VoteLayout(DetailLayout):
             )
 
     @cached_property
-    def entities_map_link(self):
-        # todo: remove
-        return self.request.link(
-            self.model, f'{self.ballot.type}-by-entities-map'
-        )
-
-    @cached_property
-    def districts_map_link(self):
-        # todo: remove
-        return self.request.link(
-            self.model, f'{self.ballot.type}-by-districts-map'
-        )
-
-    @cached_property
     def table_link(self):
         if self.tab not in self.tabs_with_embedded_tables:
             return None
