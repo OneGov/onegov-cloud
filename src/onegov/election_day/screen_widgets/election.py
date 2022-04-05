@@ -96,7 +96,9 @@ class ElectionCandidatesChartWidget(ChartWidget):
             <div class="{@class}"
                  tal:define="limit '0{@limit}';
                              lists '{@lists}';
-                             elected '{@elected}'">
+                             elected '{@elected}';
+                             sort_by_lists '{@sort-by-lists}';
+                             ">
                 <tal:block
                     metal:use-macro="layout.macros['candidates-chart']"
                     />
@@ -104,7 +106,8 @@ class ElectionCandidatesChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = (
-        '<election-candidates-chart limit="" lists="," elected="" class=""/>'
+        '<election-candidates-chart limit="" lists="," sort-by-lists=""'
+        ' elected="" class=""/>'
     )
 
 
@@ -117,15 +120,20 @@ class ElectionListsChartWidget(ChartWidget):
     template = """
         <xsl:template match="election-lists-chart">
             <div class="{@class}"
-                 tal:define="limit '0{@limit}'; names '{@names}'"
-                 >
+                 tal:define="limit '0{@limit}';
+                             names '{@names}';
+                             sort_by_names '{@sort-by-names}'
+                             ">
                 <tal:block
                     metal:use-macro="layout.macros['lists-chart']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-lists-chart limit="" names="," class=""/>'
+    usage = (
+        '<election-lists-chart limit="" names="," sort-by-names=""'
+        ' class=""/>'
+    )
 
 
 @ElectionDayApp.screen_widget(

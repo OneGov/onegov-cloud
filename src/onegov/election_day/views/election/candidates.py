@@ -33,8 +33,12 @@ def view_election_candidates_data(self, request):
     limit = get_parameter(request, 'limit', int, None)
     lists = get_parameter(request, 'lists', list, None)
     elected = get_parameter(request, 'elected', bool, None)
+    sort_by_lists = get_parameter(request, 'sort_by_lists', bool, None)
 
-    return get_candidates_data(self, limit=limit, lists=lists, elected=elected)
+    return get_candidates_data(
+        self, limit=limit, lists=lists, elected=elected,
+        sort_by_lists=sort_by_lists
+    )
 
 
 @ElectionDayApp.html(

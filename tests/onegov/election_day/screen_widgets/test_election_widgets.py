@@ -52,7 +52,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             </column>
             <column span="1">
                 <election-candidates-chart class="my-class-6" limit="2"
-                    lists="x,y" elected="True"/>
+                    lists="x,y" sort-by-lists="True" elected="True"/>
             </column>
             <column span="1">
                 <election-candidates-by-entity-table class="my-class-7"/>
@@ -241,11 +241,11 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="2541"' in result
     assert (
         'data-dataurl="Election/candidates-data'
-        '?limit=0&amp;lists=&amp;elected="'
+        '?limit=0&amp;lists=&amp;elected=&amp;sort_by_lists="'
     ) in result
     assert (
         'data-dataurl="Election/candidates-data'
-        '?limit=02&amp;lists=x,y&amp;elected=True"'
+        '?limit=02&amp;lists=x,y&amp;elected=True&amp;sort_by_lists=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
     assert '4' in result
@@ -429,11 +429,11 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="5691"' in result
     assert (
         'data-dataurl="Election/candidates-data'
-        '?limit=0&amp;lists=&amp;elected="'
+        '?limit=0&amp;lists=&amp;elected=&amp;sort_by_lists="'
     ) in result
     assert (
         'data-dataurl="Election/candidates-data'
-        '?limit=02&amp;lists=x,y&amp;elected=True"'
+        '?limit=02&amp;lists=x,y&amp;elected=True&amp;sort_by_lists=True"'
     ) in result
     assert 'election-candidates-by-entity-table' in result
     assert '11' in result
@@ -482,7 +482,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
             </column>
             <column span="1">
                 <election-candidates-chart class="my-class-6" limit="2"
-                    lists="x,y" elected="True"/>
+                    lists="x,y" sort-by-lists="True" elected="True"/>
             </column>
             <column span="1">
                 <election-lists-table class="my-class-7"
@@ -493,7 +493,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
             </column>
             <column span="1">
                 <election-lists-chart class="my-class-9" limit="3"
-                    names="a,b"/>
+                    names="a,b" sort-by-names="True"/>
             </column>
             <column span="1">
                 <number-of-counted-entities class="my-class-a"/>
@@ -699,11 +699,11 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="69"' in result
     assert (
         'data-dataurl="ProporzElection/candidates-data'
-        '?limit=0&amp;lists=&amp;elected="'
+        '?limit=0&amp;lists=&amp;elected=&amp;sort_by_lists="'
     ) in result
     assert (
         'data-dataurl="ProporzElection/candidates-data'
-        '?limit=02&amp;lists=x,y&amp;elected=True"'
+        '?limit=02&amp;lists=x,y&amp;elected=True&amp;sort_by_lists=True"'
     ) in result
     assert 'election-lists-table' in result
     assert 'data-text="13532"' not in result
@@ -711,10 +711,12 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="998"' in result
     assert 'data-text="245"' in result
     assert (
-        'data-dataurl="ProporzElection/lists-data?limit=0&amp;names="'
+        'data-dataurl="ProporzElection/lists-data'
+        '?limit=0&amp;names=&amp;sort_by_names="'
     ) in result
     assert (
-        'data-dataurl="ProporzElection/lists-data?limit=03&amp;names=a,b"'
+        'data-dataurl="ProporzElection/lists-data'
+        '?limit=03&amp;names=a,b&amp;sort_by_names=True"'
     ) in result
     assert '4' in result
     assert '11' in result
@@ -862,11 +864,11 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="168"' in result
     assert (
         'data-dataurl="ProporzElection/candidates-data'
-        '?limit=0&amp;lists=&amp;elected="'
+        '?limit=0&amp;lists=&amp;elected=&amp;sort_by_lists="'
     ) in result
     assert (
         'data-dataurl="ProporzElection/candidates-data'
-        '?limit=02&amp;lists=x,y&amp;elected=True"'
+        '?limit=02&amp;lists=x,y&amp;elected=True&amp;sort_by_lists=True"'
     ) in result
     assert 'election-lists-table' in result
     assert 'data-text="30532"' not in result
@@ -874,10 +876,12 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="2186"' in result
     assert 'data-text="807"' in result
     assert (
-        'data-dataurl="ProporzElection/lists-data?limit=0&amp;names="'
+        'data-dataurl="ProporzElection/lists-data'
+        '?limit=0&amp;names=&amp;sort_by_names="'
     ) in result
     assert (
-        'data-dataurl="ProporzElection/lists-data?limit=03&amp;names=a,b"'
+        'data-dataurl="ProporzElection/lists-data'
+        '?limit=03&amp;names=a,b&amp;sort_by_names=True"'
     ) in result
     assert '11' in result
     assert '11' in result
