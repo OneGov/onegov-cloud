@@ -64,8 +64,9 @@ def view_topic(self, request, layout=None):
         'page': self,
         'children': [
             (child.lead_when_child and child.lead,
-             Link(child.title, request.link(child), model=child),
-             request.link(Editor('edit', child)))
+                child.title,
+                child.content['url'] if child.trait == 'link' else child.path,
+                request.link(Editor('edit', child)))
             for child in children
         ]
     }
