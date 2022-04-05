@@ -20,8 +20,12 @@ function is_external_link(link) {
 for (var i = 0, linksLength = links.length; i < linksLength; i++) {
   if (is_external_link(links[i])) {
         links[i].target = '_blank';
-        let external_link_icon = document.createElement("i")
-        external_link_icon.className = "fas fa-external-link-alt fa-xs"
+        let external_link_icon = document.createElement('i')
+        external_link_icon.className = 'fas fa-external-link-alt fa-xs'
+        let accesibility_info = document.createElement('span')
+        accesibility_info.className = 'visually-hidden'
+        accesibility_info.textContent = '(External Link)'
         links[i].appendChild(external_link_icon)
+        links[i].appendChild(accesibility_info)
   }
 }

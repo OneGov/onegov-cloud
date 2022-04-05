@@ -601,3 +601,10 @@ body:not(.editor-layout) {
 a > i.fa-external-link-alt {
     margin-left: .3rem;
 }
+
+.page-links, .forms-list {
+    .edit-link .fa-edit {
+        color: #cacaca;
+        display: block;
+    }
+}
