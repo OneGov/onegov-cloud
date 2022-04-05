@@ -1,4 +1,3 @@
-from datetime import date
 from freezegun import freeze_time
 from onegov import election_day
 from onegov.ballot import Ballot
@@ -32,7 +31,7 @@ def test_i18n(election_day_app_zg):
     new.form['vote_fr'] = 'Bar'
     new.form['vote_it'] = 'Baz'
     new.form['vote_rm'] = 'Qux'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -53,7 +52,7 @@ def test_i18n(election_day_app_zg):
     new.form['election_fr'] = 'Trick'
     new.form['election_it'] = 'Track'
     new.form['election_rm'] = 'Quack'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -92,7 +91,7 @@ def test_pages_cache(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = '0xdeadbeef'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -133,13 +132,13 @@ def test_view_last_modified(election_day_app_zg):
         new = client.get('/manage/votes/new-vote')
         new.form['vote_type'] = "complex"
         new.form['vote_de'] = "Vote"
-        new.form['date'] = date(2013, 1, 1)
+        new.form['date'] = '2013-01-01'
         new.form['domain'] = 'federation'
         new.form.submit()
 
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = "Election"
-        new.form['date'] = date(2013, 1, 1)
+        new.form['date'] = '2013-01-01'
         new.form['mandates'] = 1
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'municipality'
@@ -147,7 +146,7 @@ def test_view_last_modified(election_day_app_zg):
 
         new = client.get('/manage/election-compounds/new-election-compound')
         new.form['election_de'] = "Elections"
-        new.form['date'] = date(2013, 1, 1)
+        new.form['date'] = '2013-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
         new.form['domain_elections'] = 'municipality'
@@ -459,7 +458,7 @@ def test_view_screen(election_day_app_zg):
     new = client.get('/manage/votes').click('Neue Abstimmung')
     new.form['vote_de'] = 'Einfache Vorlage'
     new.form['vote_type'] = 'simple'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form.submit().follow()
 
