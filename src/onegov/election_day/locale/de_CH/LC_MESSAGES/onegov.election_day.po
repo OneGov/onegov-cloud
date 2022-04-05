@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-31 06:13+0200\n"
+"POT-Creation-Date: 2022-04-05 15:55+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -369,6 +369,9 @@ msgstr "Link Text  Italienisch"
 
 msgid "Link label romansh"
 msgstr "Link Text  Rumantsch"
+
+msgid "Explanations (PDF)"
+msgstr "Erläuterungen (PDF)"
 
 msgid "Color suggestions"
 msgstr "Farbvorschläge"

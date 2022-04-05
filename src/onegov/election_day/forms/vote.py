@@ -1,6 +1,9 @@
 from datetime import date
 from onegov.election_day import _
 from onegov.form import Form
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
 from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
@@ -141,6 +144,14 @@ class VoteForm(Form):
         fieldset=_("Related link"),
         render_kw={'lang': 'rm'}
     )
+    explanations_pdf = UploadField(
+        label=_("Explanations (PDF)"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024)
+        ],
+        fieldset=_("Related link")
+    )
 
     def on_request(self):
         principal = self.request.app.principal
@@ -193,6 +204,12 @@ class VoteForm(Form):
             link_labels['rm_CH'] = self.related_link_label_rm.data
         model.related_link_label = link_labels
 
+        action = getattr(self.explanations_pdf, 'action', '')
+        if action == 'delete':
+            del model.explanations_pdf
+        if action == 'replace' and self.explanations_pdf.data:
+            model.explanations_pdf = self.explanations_pdf.raw_data[-1].file
+
         if model.type == 'complex':
             titles = {}
             if self.counter_proposal_de.data:
@@ -234,6 +251,14 @@ class VoteForm(Form):
         self.expats.data = model.expats
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
+
+        file = model.explanations_pdf
+        if file:
+            self.explanations_pdf.data = {
+                'filename': file.reference.filename,
+                'size': file.reference.file.content_length,
+                'mimetype': file.reference.content_type
+            }
 
         if model.type == 'complex':
             self.vote_type.choices = [

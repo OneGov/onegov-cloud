@@ -1,7 +1,11 @@
+from onegov.ballot.models.file import File
+from onegov.core.crypto import random_token
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
+from onegov.file import AssociatedFiles
+from onegov.file.utils import as_fileintent
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import func
@@ -161,3 +165,26 @@ class LastModifiedMixin(TimestampMixin):
     @last_modified.expression
     def last_modified(cls):
         return func.greatest(cls.last_change, cls.last_result_change)
+
+
+class ExplanationsPdfMixin(AssociatedFiles):
+
+    @property
+    def explanations_pdf(self):
+        for file in self.files:
+            if file.name == 'explanations_pdf':
+                return file
+
+    @explanations_pdf.deleter
+    def explanations_pdf(self):
+        for file in tuple(self.files):
+            if file.name == 'explanations_pdf':
+                self.files.remove(file)
+
+    @explanations_pdf.setter
+    def explanations_pdf(self, value):
+        del self.explanations_pdf
+        file = File(id=random_token())
+        file.name = 'explanations_pdf'
+        file.reference = as_fileintent(value, 'explanations.pdf')
+        self.files.append(file)

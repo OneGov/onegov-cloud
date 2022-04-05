@@ -7,6 +7,9 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
 from re import findall
 from sqlalchemy import or_
 from wtforms import BooleanField
@@ -171,6 +174,14 @@ class ElectionForm(Form):
         fieldset=_("Related link"),
         render_kw={'lang': 'rm'}
     )
+    explanations_pdf = UploadField(
+        label=_("Explanations (PDF)"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024)
+        ],
+        fieldset=_("Related link")
+    )
 
     color_hint = PanelField(
         label=_('Color suggestions'),
@@ -328,6 +339,12 @@ class ElectionForm(Form):
             link_labels['rm_CH'] = self.related_link_label_rm.data
         model.related_link_label = link_labels
 
+        action = getattr(self.explanations_pdf, 'action', '')
+        if action == 'delete':
+            del model.explanations_pdf
+        if action == 'replace' and self.explanations_pdf.data:
+            model.explanations_pdf = self.explanations_pdf.raw_data[-1].file
+
         model.colors = self.parse_colors(self.colors.data)
 
         # use symetric relationships
@@ -360,6 +377,14 @@ class ElectionForm(Form):
         self.related_link_label_fr.data = link_labels.get('fr_CH', '')
         self.related_link_label_it.data = link_labels.get('it_CH', '')
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
+
+        file = model.explanations_pdf
+        if file:
+            self.explanations_pdf.data = {
+                'filename': file.reference.filename,
+                'size': file.reference.file.content_length,
+                'mimetype': file.reference.content_type
+            }
 
         self.date.data = model.date
         self.domain.data = model.domain
