@@ -17,7 +17,7 @@
                         <li tal:repeat="(lead, title, link, edit_link) children">
                             <a href="${link}">${title}</a>
                             <div class="list-lead" tal:condition="lead">${lead}</div>
-                            <a class="edit-link" href="${edit_link}"><i class="far fa-edit"></i></a>
+                            <a tal:condition="edit_link" class="edit-link" href="${edit_link}"><i class="far fa-edit"></i></a>
                         </li>
                     </ul>
                 </tal:b>
