@@ -12,10 +12,10 @@ mail_queues:
   # MessageStream that's used. Currently 'transactional' will be
   # transformed to 'outbound' i.e. the default stream. As such
   # the same queue can be used for both categories.
-  postmark: &postmark
-    mailer: postmark
-    token: postmark-server-token
-    directory: '/usr/local/var/onegov/mail/postmark'
+  # postmark: &postmark
+  #   mailer: postmark
+  #   token: postmark-server-token
+  #   directory: '/usr/local/var/onegov/mail/postmark'
 
   # SMTP mailer will ignore the mail category. If you wish to use
   # separate SMTP servers for separate categories, then you will
@@ -108,7 +108,7 @@ configuration: &global-config
   mail:
     transactional:
       sender: service@onegovcloud.ch
-      <<: *postmark
+      <<: *local_smtp
     marketing:
       sender: newsletters@onegovcloud.ch
       <<: *local_smtp
