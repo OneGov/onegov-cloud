@@ -13,6 +13,7 @@ from tests.shared import utils
 from transaction import commit
 from unittest.mock import patch
 from webtest import TestApp as Client
+from webtest.forms import Upload
 from xml.etree.ElementTree import fromstring
 
 
@@ -485,3 +486,69 @@ def test_view_custom_css(election_day_app_zg):
 
     client = Client(election_day_app_zg)
     assert '<style>tr { display: none }</style>' in client.get('/')
+
+
+def test_view_attachments(election_day_app_gr, explanations_pdf):
+    content = explanations_pdf.read()
+
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    # Vote
+    new = client.get('/manage/votes').click('Neue Abstimmung')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = '2016-01-01'
+    new.form['domain'] = 'federation'
+    new.form['explanations_pdf'] = Upload(
+        'Abstimmungserläuterungen.pdf',
+        content,
+        'application/pdf'
+    )
+    new.form.submit().follow()
+
+    page = client.get('/vote/vote').follow()
+    page = page.click('(PDF)')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'filename="explanations.pdf"' in page.headers['Content-Disposition']
+
+    # Election
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'election'
+    new.form['date'] = '2016-01-01'
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 1
+    new.form['explanations_pdf'] = Upload(
+        'Abstimmungserläuterungen.pdf',
+        content,
+        'application/pdf'
+    )
+    new.form.submit().follow()
+
+    page = client.get('/election/election').follow()
+    page = page.click('(PDF)')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'filename="explanations.pdf"' in page.headers['Content-Disposition']
+
+    # Election Compound
+    new = client.get('/manage/election-compounds').click('Neue Verbindung')
+    new.form['election_de'] = 'elections'
+    new.form['date'] = '2016-01-01'
+    new.form['domain'] = 'canton'
+    new.form['domain_elections'] = 'region'
+    new.form['region_elections'] = ['election']
+    new.form['explanations_pdf'] = Upload(
+        'Abstimmungserläuterungen.pdf',
+        content,
+        'application/pdf'
+    )
+    new.form.submit().follow()
+
+    page = client.get('/elections/elections').follow()
+    page = page.click('(PDF)')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'filename="explanations.pdf"' in page.headers['Content-Disposition']
