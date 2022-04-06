@@ -1,8 +1,44 @@
 # Changes
 
+## 2022.21
+
+`2022-04-06` | [aab7cbddca...309dfa54bb](https://github.com/OneGov/onegov-cloud/compare/aab7cbddca^...309dfa54bb)
+
+### Election Day
+
+##### Add statistics view for votes.
+
+`Feature` | [OGC-311](https://linear.app/onegovcloud/issue/OGC-311) | [75c7b74e97](https://github.com/onegov/onegov-cloud/commit/75c7b74e97518a135a721cb647fb3bb88bc1a4d2)
+
+##### Add sort option to candidates and lists widgets.
+
+`Feature` | [OGC-171](https://linear.app/onegovcloud/issue/OGC-171) | [846d81fb9a](https://github.com/onegov/onegov-cloud/commit/846d81fb9a9b6b2c21f165ce6c7916fd20d08314)
+
+##### Add explanations PDF.
+
+`Feature` | [OGC-72](https://linear.app/onegovcloud/issue/OGC-72) | [309dfa54bb](https://github.com/onegov/onegov-cloud/commit/309dfa54bb84ec7f89b96c80380c9f5e3b922024)
+
+### Feriennet
+
+##### Removes edit button from homepage
+
+`Bugfix` | [PRO-1010](https://linear.app/projuventute/issue/PRO-1010) | [1579c442dd](https://github.com/onegov/onegov-cloud/commit/1579c442dd46a9444e856fc42c314014deb9e46d)
+
+### Fsi
+
+##### Restricts LDAP import to @gibz.ch users.
+
+`Feature` | [OGC-325](https://linear.app/onegovcloud/issue/OGC-325) | [aab7cbddca](https://github.com/onegov/onegov-cloud/commit/aab7cbddca9bb83f77ca2812c76711041d897571)
+
+### Town6
+
+##### Add missing unsubscribe link.
+
+`Bugfix` | [OGC-392](https://linear.app/onegovcloud/issue/OGC-392) | [73a250e567](https://github.com/onegov/onegov-cloud/commit/73a250e567c11b8c4b611ce1b671031fb8a9412f)
+
 ## 2022.20
 
-`2022-03-30` | [9330c1793c...f51f18e6d6](https://github.com/OneGov/onegov-cloud/compare/9330c1793c^...f51f18e6d6)
+`2022-03-30` | [9330c1793c...b5955d3b38](https://github.com/OneGov/onegov-cloud/compare/9330c1793c^...b5955d3b38)
 
 ### Activity
 
@@ -1543,28 +1579,4 @@ This requires to re-upload results from 2020.
 ##### Don't create FSI course attendees when importing from the ldap.
 
 `Bugfix` | [OGC-24](https://linear.app/onegovcloud/issue/OGC-24) | [75541aaa4f](https://github.com/onegov/onegov-cloud/commit/75541aaa4f53ec93663321d67da4daeeff6798ab)
-
-## 2021.72
-
-`2021-08-17` | [5daf5fdef3...11ed322b63](https://github.com/OneGov/onegov-cloud/compare/5daf5fdef3^...11ed322b63)
-
-### All
-
-##### Disable ticket deletion.
-
-`Bugfix` | [e7bae3e990](https://github.com/onegov/onegov-cloud/commit/e7bae3e9905c99d0fcf5db3ba1b8d60129989015)
-
-### Org
-
-##### Validate recurrence dates in event submission form.
-
-`Bugfix` | [0814cbe033](https://github.com/onegov/onegov-cloud/commit/0814cbe03395c9746e90a496200e8cff5444082e)
-
-##### Show ticket state of archived tickets.
-
-`Bugfix` | [2eafdc83d5](https://github.com/onegov/onegov-cloud/commit/2eafdc83d540846677dc2aaaa025fc555533a5f2)
-
-##### Fixes link migration labels.
-
-`Bugfix` | [SEA-357](https://linear.app/seantis/issue/SEA-357) | [33e0bdd6ec](https://github.com/onegov/onegov-cloud/commit/33e0bdd6ecf158a2f91ebffd807291362cb2fc68)
 
