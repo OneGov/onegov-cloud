@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 07:53+0100\n"
+"POT-Creation-Date: 2022-04-05 15:55+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -368,6 +368,9 @@ msgstr "Marquage du lien italien"
 msgid "Link label romansh"
 msgstr "Marquage du lien romanche"
 
+msgid "Explanations (PDF)"
+msgstr "Explications (PDF)"
+
 msgid "Color suggestions"
 msgstr "Suggestions de couleurs"
 
@@ -653,6 +656,9 @@ msgstr "Gérer"
 msgid "Mappings"
 msgstr "Cartographie"
 
+msgid "Statistics"
+msgstr "Statistiques"
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Les résultats finaux sont disponibles sur ${url}"
@@ -889,23 +895,31 @@ msgstr "Oui"
 msgid "Nays"
 msgstr "Non"
 
-msgid "Empty"
-msgstr "Vide"
+msgid "Not yet counted"
+msgstr "Pas encore compté"
 
-msgid "Invalid"
-msgstr "Invalide"
+msgid "Total"
+msgstr "Total"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Electeurs"
+
+msgid "Cast Ballots"
+msgstr "Suffrages exprimés"
+
+msgid "Empty votes"
+msgstr "Votes blancs"
+
+msgid "Invalid votes"
+msgstr "Votes non valides"
 
 #. Default: Turnout
 #. Default: Voter turnout
 #.
 msgid "turnout_vote"
 msgstr "Participation au vote"
-
-msgid "Not yet counted"
-msgstr "Pas encore compté"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Nay"
 msgstr "Non"
@@ -1056,14 +1070,6 @@ msgstr "Jeu décisif en faveur de l'initiative"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Jeu décisif en faveur de le contre-projet"
-
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Electeurs"
-
-msgid "Cast Ballots"
-msgstr "Suffrages exprimés"
 
 msgid "Download a PDF with all the results:"
 msgstr "Télécharger tous les résultats dans un PDF :"

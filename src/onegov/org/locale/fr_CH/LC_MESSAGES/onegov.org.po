@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-28 15:19+0200\n"
+"POT-Creation-Date: 2022-02-21 12:03+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1445,9 +1445,6 @@ msgstr "Liens externes uniquement"
 msgid "Internal links only"
 msgstr "Liens internes uniquement"
 
-msgid "E-Mail Address"
-msgstr "Adresse e-mail"
-
 msgid "Your note about this ticket"
 msgstr "Votre note à propos de ce ticket"
 
@@ -2189,10 +2186,10 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3221,6 +3218,9 @@ msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
 "permanence :"
+
+msgid "E-Mail Address"
+msgstr "Adresse e-mail"
 
 msgid "Signup"
 msgstr "S'abonner"

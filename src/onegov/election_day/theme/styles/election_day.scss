@@ -776,7 +776,7 @@ ul.actions {
 */
 
 form {
-    label > ul {
+    label ul {
         list-style: none;
 
         margin: 0;
@@ -786,6 +786,10 @@ form {
         li input[type="radio"] {
             margin: 0;
         }
+    }
+
+    p {
+        font-size: inherit;
     }
 }
 

@@ -1,7 +1,6 @@
 import os
 import tarfile
 
-from datetime import date
 from io import BytesIO
 from onegov.core.utils import append_query_param
 from onegov.core.utils import module_path
@@ -258,7 +257,7 @@ def upload_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
         new.form['vote_de'] = 'Vote'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
         new.form['vote_type'] = 'simple'
         new.form.submit()
@@ -300,7 +299,7 @@ def upload_complex_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
         new.form['vote_de'] = 'Complex Vote'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
         new.form['vote_type'] = 'complex'
         new.form.submit()
@@ -344,7 +343,7 @@ def upload_majorz_election(client, create=True, canton='gr', status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Majorz Election'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['mandates'] = 2
         new.form['election_type'] = 'majorz'
         new.form['domain'] = 'federation'
@@ -395,7 +394,7 @@ def upload_proporz_election(client, create=True, canton='gr',
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Proporz Election'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['mandates'] = 5
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'federation'
@@ -479,7 +478,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election A'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['election_type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][0]
@@ -488,7 +487,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
 
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election B'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['election_type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][1]
@@ -498,7 +497,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
     new.form['election_de'] = 'Elections'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = domain[canton]
     new.form[elections_field[canton]] = [

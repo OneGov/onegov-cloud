@@ -1,6 +1,5 @@
 import transaction
 
-from datetime import date
 from io import BytesIO
 from onegov.ballot import Vote
 from onegov.ballot import Election
@@ -18,7 +17,7 @@ def create_vote(app):
     login(client)
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Vote'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -28,7 +27,7 @@ def create_election(app, type, create_compound=False):
     login(client)
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = type
     new.form['domain'] = 'municipality'
@@ -37,7 +36,7 @@ def create_election(app, type, create_compound=False):
     if create_compound:
         new = client.get('/manage/election-compounds/new-election-compound')
         new.form['election_de'] = "Elections"
-        new.form['date'] = date(2015, 1, 1)
+        new.form['date'] = '2015-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
         new.form['domain_elections'] = 'municipality'

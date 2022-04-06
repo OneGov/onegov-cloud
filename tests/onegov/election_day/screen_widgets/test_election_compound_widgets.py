@@ -1,5 +1,6 @@
 from chameleon import PageTemplate
 from datetime import date
+from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import ElectionCompound
 from onegov.core.widgets import inject_variables
@@ -14,9 +15,12 @@ from onegov.election_day.screen_widgets import (
     ElectionCompoundListGroupsTableWidget,
     ElectionCompoundListsChartWidget,
     ElectionCompoundListsTableWidget,
+    LastResultChangeWidget,
+    NumberOfCountedEntitiesWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -56,14 +60,26 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             <column span="1">
                 <election-compound-list-groups-chart class="my-class-a"/>
             </column>
+            <column span="1">
+                <number-of-counted-entities class="my-class-b"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-c"/>
+            </column>
+            <column span="1">
+                <last-result-change class="my-class-d"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        LastResultChangeWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundListsChartWidget(),
@@ -113,40 +129,47 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result
 
     # Add intermediate results
-    election_1, errors = import_test_datasets(
-        'internal',
-        'election',
-        'sg',
-        'district',
-        'proporz',
-        date_=date(2020, 3, 8),
-        number_of_mandates=17,
-        domain_segment='Rheintal',
-        dataset_name='kantonsratswahl-2020-wahlkreis-rheintal-intermediate',
-        app_session=session
-    )
-    assert not errors
-    election_2, errors = import_test_datasets(
-        'internal',
-        'election',
-        'sg',
-        'district',
-        'proporz',
-        date_=date(2020, 3, 8),
-        number_of_mandates=10,
-        domain_segment='Rorschach',
-        dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
-        app_session=session
-    )
-    assert not errors
-    session.add(election_1)
-    session.add(election_2)
-    model.elections = [election_1, election_2]
-    session.flush()
+    with freeze_time('2022-01-01 12:00'):
+        election_1, errors = import_test_datasets(
+            'internal',
+            'election',
+            'sg',
+            'district',
+            'proporz',
+            date_=date(2020, 3, 8),
+            number_of_mandates=17,
+            domain_segment='Rheintal',
+            dataset_name=(
+                'kantonsratswahl-2020-wahlkreis-rheintal-intermediate'
+            ),
+            app_session=session
+        )
+        assert not errors
+        election_2, errors = import_test_datasets(
+            'internal',
+            'election',
+            'sg',
+            'district',
+            'proporz',
+            date_=date(2020, 3, 8),
+            number_of_mandates=10,
+            domain_segment='Rorschach',
+            dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
+            app_session=session
+        )
+        assert not errors
+        session.add(election_1)
+        session.add(election_2)
+        model.elections = [election_1, election_2]
+        session.flush()
 
     layout = ElectionCompoundLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -222,16 +245,21 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '9 of 9' in result
     assert '0 of 17' in result
     assert '1 of 13' in result
+    assert '0' in result
+    assert '2' in result
     assert 'election-compound-lists-table' in result
     assert 'data-text="31515"' not in result
     assert 'data-text="841"' in result
     assert 'data-text="140"' in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=0&amp;names=&amp;sort_by_names="'
     ) in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=02&amp;names=a,b&amp;sort_by_names="'
     ) in result
+    assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -242,35 +270,39 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result
 
     # Add final results
-    election_1, errors = import_test_datasets(
-        'internal',
-        'election',
-        'sg',
-        'district',
-        'proporz',
-        date_=date(2020, 3, 8),
-        domain_segment='Rheintal',
-        number_of_mandates=17,
-        dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
-        app_session=session
-    )
-    assert not errors
-    errors = import_test_datasets(
-        'internal',
-        'parties',
-        'sg',
-        'district',
-        'proporz',
-        election=model,
-        dataset_name='kantonsratswahl-2020-parteien',
-    )
-    assert not errors
-    session.add(election_1)
-    model.elections = [election_1, election_2]
-    model.manually_completed = True
-    session.flush()
+    with freeze_time('2022-01-02 12:00'):
+        election_1, errors = import_test_datasets(
+            'internal',
+            'election',
+            'sg',
+            'district',
+            'proporz',
+            date_=date(2020, 3, 8),
+            domain_segment='Rheintal',
+            number_of_mandates=17,
+            dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
+            app_session=session
+        )
+        assert not errors
+        errors = import_test_datasets(
+            'internal',
+            'parties',
+            'sg',
+            'district',
+            'proporz',
+            election=model,
+            dataset_name='kantonsratswahl-2020-parteien',
+        )
+        assert not errors
+        session.add(election_1)
+        model.elections = [election_1, election_2]
+        model.manually_completed = True
+        session.flush()
 
     layout = ElectionCompoundLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -362,12 +394,17 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'data-text="140"' not in result  # voters_count hidden
     assert 'data-text="3487.00"' in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=0&amp;names=&amp;sort_by_names="'
     ) in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=02&amp;names=a,b&amp;sort_by_names="'
     ) in result
     assert 'data-dataurl="ElectionCompound/list-groups-data"' in result
+    assert '2' in result
+    assert '2' in result
+    assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -378,3 +415,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result

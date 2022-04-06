@@ -1087,3 +1087,20 @@ def test_proporz_election_rename(session):
     session.query(ElectionResult).one().election_id == 'elerction'
     session.query(List).one().election_id == 'elerction'
     session.query(ListConnection).first().election_id == 'elerction'
+
+
+def test_proporz_election_attachments(test_app, explanations_pdf):
+    model = ProporzElection(
+        title='Election',
+        domain='canton',
+        date=date(2017, 1, 1),
+    )
+
+    assert model.explanations_pdf is None
+    del model.explanations_pdf
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+    assert model.explanations_pdf.reference.content_type == 'application/pdf'
+    del model.explanations_pdf
+    assert model.explanations_pdf is None

@@ -6,6 +6,7 @@ from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
@@ -72,7 +73,7 @@ class ElectionCompoundAssociation(Base):
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultExportMixin
+    PartyResultExportMixin, ExplanationsPdfMixin
 ):
 
     __tablename__ = 'election_compounds'
@@ -150,6 +151,15 @@ class ElectionCompound(
             ElectionCompoundAssociation(election_id=election.id)
             for election in value
         ]
+
+        # update last result change (only newer)
+        new = [x.last_result_change for x in value]
+        new = [x for x in new if x]
+        new = max(new) if new else None
+        if new:
+            old = self.last_result_change
+            if not old or (old and old < new):
+                self.last_result_change = new
 
     @property
     def number_of_mandates(self):
