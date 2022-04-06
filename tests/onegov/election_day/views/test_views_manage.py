@@ -311,15 +311,15 @@ def test_view_manage_data_sources(election_day_app_zg):
     new.form['number'] = '2222'
     new.form['item'] = 'vote-1'
     manage = new.form.submit().follow()
-    assert all((x in manage for x in ('vote-1', '1111', '2222')))
+    assert all((x in manage for x in ('vote-1', '>1111<', '>2222<')))
 
     edit = manage.click('Bearbeiten')
     edit.form['district'] = '3333'
     edit.form['number'] = '4444'
     edit.form['item'] = 'vote-2'
     manage = edit.form.submit().follow()
-    assert all((x not in manage for x in ('vote-1', '1111', '2222')))
-    assert all((x in manage for x in ('vote-2', '3333', '4444')))
+    assert all((x not in manage for x in ('vote-1', '>1111<', '>2222<')))
+    assert all((x in manage for x in ('vote-2', '>3333<', '>4444<')))
 
     manage = manage.click('Löschen').form.submit().follow()
     assert 'Noch keine Zuordnungen' in manage
@@ -364,7 +364,7 @@ def test_view_manage_data_sources(election_day_app_zg):
     new.form['number'] = '5555'
     new.form['item'] = 'election-majorz'
     manage = new.form.submit().follow()
-    assert all((x in manage for x in ('election-majorz', '4444', '5555')))
+    assert all((x in manage for x in ('election-majorz', '>4444<', '>5555<')))
 
     # ... delete data source
     client.get('/manage/sources').click('Löschen').form.submit()
@@ -390,7 +390,7 @@ def test_view_manage_data_sources(election_day_app_zg):
     new.form['number'] = '7777'
     new.form['item'] = 'election-proporz'
     manage = new.form.submit().follow()
-    assert all((x in manage for x in ('election-proporz', '6666', '7777')))
+    assert all((x in manage for x in ('election-proporz', '>6666<', '>7777<')))
 
     # ... delete data source
     client.get('/manage/sources').click('Löschen').form.submit()
