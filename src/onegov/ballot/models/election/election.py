@@ -5,6 +5,7 @@ from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
@@ -29,7 +30,7 @@ from sqlalchemy.orm import relationship
 
 class Election(Base, ContentMixin, LastModifiedMixin,
                DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
-               DerivedAttributesMixin):
+               DerivedAttributesMixin, ExplanationsPdfMixin):
 
     __tablename__ = 'elections'
 
