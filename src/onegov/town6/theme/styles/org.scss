@@ -608,3 +608,7 @@ a > i.fa-external-link-alt {
         display: block;
     }
 }
+
+.partners i.fa-external-link-alt::before {
+    position: absolute;
+}
