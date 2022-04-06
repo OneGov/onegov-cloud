@@ -79,6 +79,26 @@ def test_view_vote_districts(election_day_app_gr):
         assert data_url in client.get(url).follow()
 
 
+def test_view_vote_statistics(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    upload_vote(client, canton='gr')
+    upload_complex_vote(client, canton='gr')
+
+    for view in (
+        'vote/statistics',
+        'complex-vote/proposal-statistics',
+        'complex-vote/counter-proposal-statistics',
+        'complex-vote/tie-breaker-statistics'
+    ):
+        response = client.get(f'/vote/{view}')
+        assert 'Vaz/Obervaz' in response
+        assert '13’828' in response
+
+
 def test_view_vote_json(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -88,9 +108,35 @@ def test_view_vote_json(election_day_app_zg):
 
     response = client.get('/vote/vote/json')
     assert response.headers['Access-Control-Allow-Origin'] == '*'
-    assert all((expected in str(response.json) for expected in (
-        "Zug", "Cham", "599", "1711", "80"
-    )))
+    data = response.json
+    assert data['ballots'][0]['progress'] == {'counted': 11, 'total': 11}
+    assert data['ballots'][0]['type'] == 'proposal'
+    assert len(data['ballots'][0]['results']['entitites']) == 11
+    assert data['ballots'][0]['results']['total']['yeas'] == 16534
+    assert data['completed'] == True
+    assert data['data'] == {
+        'csv': 'http://localhost/vote/vote/data-csv',
+        'json': 'http://localhost/vote/vote/data-json'
+    }
+    assert data['date'] == '2022-01-01'
+    assert data['domain'] == 'federation'
+    assert data['embed'] == {
+        'entities': [
+            'http://localhost/vote/vote/proposal-by-entities-map',
+            'http://localhost/vote/vote/vote-header-widget',
+            'http://localhost/vote/vote/proposal-by-entities-table'
+        ],
+        'statistics': [
+            'http://localhost/vote/vote/proposal-statistics-table'
+        ]
+    }
+    assert data['media'] == {'maps': {}}
+    assert data['progress'] == {'counted': 11, 'total': 11}
+    assert data['related_link'] == ''
+    assert data['results']['answer'] == 'rejected'
+    assert data['title'] == {'de_CH': 'Vote'}
+    assert data['type'] == 'election'
+    assert data['url'] == 'http://localhost/vote/vote'
 
 
 def test_view_vote_summary(election_day_app_zg):
@@ -136,11 +182,14 @@ def test_view_vote_data(election_day_app_zg):
 
 @pytest.mark.parametrize('url,', [
     'proposal-by-entities-table',
-    'counter-proposal-by-entities-table',
     'proposal-by-districts-table',
+    'proposal-statistics-table',
+    'counter-proposal-by-entities-table',
     'counter-proposal-by-districts-table',
+    'counter-proposal-statistics-table',
     'tie-breaker-by-entities-table',
     'tie-breaker-by-districts-table',
+    'tie-breaker-statistics-table',
     'vote-header-widget'
 ])
 def test_views_vote_embedded_widgets(election_day_app_zg, url):

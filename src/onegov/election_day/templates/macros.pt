@@ -143,11 +143,8 @@
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-result left-aligned">Result</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">Yeas</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">Nays</th>
-                <th data-tablesaw-priority="4" i18n:translate="" class="column-empty right-aligned">Empty</th>
-                <th data-tablesaw-priority="4" i18n:translate="" class="column-invalid right-aligned">Invalid</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">Yes %</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">No %</th>
-                <th data-tablesaw-priority="5" i18n:translate="turnout_vote" class="column-turnout right-aligned" tal:condition="layout.completed">Turnout</th>
             </tr>
         </thead>
         <tbody>
@@ -155,7 +152,7 @@
                 <tal:b condition="not: result.counted">
                     <td class="column-entity">${layout.format_name(result)}</td>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
-                    <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
+                    <td class="column-result answer" colspan="5" i18n:translate="">Not yet counted</td>
                 </tal:b>
                 <tal:b condition="result.counted">
                     <td class="column-entity">${layout.format_name(result)}</td>
@@ -164,11 +161,8 @@
                     <td class="column-result answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
                     <td class="column-yeas right-aligned" data-text="${result.yeas}">${layout.format_number(result.yeas)}</td>
                     <td class="column-nays right-aligned" data-text="${result.nays}">${layout.format_number(result.nays)}</td>
-                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
-                    <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
                     <td class="column-yeas-percentage right-aligned">${layout.format_number(result.yeas_percentage)}</td>
                     <td class="column-nays-percentage right-aligned">${layout.format_number(result.nays_percentage)}</td>
-                    <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(result.turnout)}</td>
                 </tal:b>
             </tr>
         </tbody>
@@ -181,11 +175,8 @@
                 <td class="column-result answer rejected" tal:condition="ballot.vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
                 <td class="column-yeas right-aligned">${layout.format_number(ballot.yeas)}</td>
                 <td class="column-nays right-aligned">${layout.format_number(ballot.nays)}</td>
-                <td class="column-empty right-aligned">${layout.format_number(ballot.empty)}</td>
-                <td class="column-invalid right-aligned">${layout.format_number(ballot.invalid)}</td>
                 <td class="column-yeas-percentage right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
                 <td class="column-nays-percentage right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
-                <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(ballot.turnout)}</td>
             </tr>
         </tfoot>
     </table>
@@ -203,8 +194,6 @@
                 <th data-tablesaw-priority="1" i18n:translate="" class="left-aligned">Result</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
-                <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Empty</th>
-                <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Invalid</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Yes %</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">No %</th>
             </tr>
@@ -221,8 +210,6 @@
                     <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
                     <td class="right-aligned">${layout.format_number(result.yeas)}</td>
                     <td class="right-aligned">${layout.format_number(result.nays)}</td>
-                    <td class="right-aligned">${layout.format_number(result.empty)}</td>
-                    <td class="right-aligned">${layout.format_number(result.invalid)}</td>
                     <td class="right-aligned">${layout.format_number(result.yeas_percentage)} %</td>
                     <td class="right-aligned">${layout.format_number(result.nays_percentage)} %</td>
                 </tal:b>
@@ -236,14 +223,61 @@
                 <td class="answer rejected" tal:condition="ballot.vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
                 <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
-                <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
-                <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)} %</td>
                 <td class="right-aligned">${layout.format_number(ballot.nays_percentage)} %</td>
             </tr>
         </tfoot>
     </table>
 </metal:ballot-districts-table>
+
+<metal:ballot-statistics-table define-macro="ballot-statistics-table" i18n:domain="onegov.election_day">
+    <table
+        class="ballot-statistics-table results tablesaw sortable"
+        data-tablesaw-mode="columntoggle"
+        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+        data-tablesaw-minimap="">
+        <thead>
+            <tr>
+                <th data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
+                <th data-tablesaw-priority="0" i18n:translate="" class="column-district left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="column-empty right-aligned">eligible_voters_vote</th>
+                <th data-tablesaw-priority="4" i18n:translate="" class="column-empty right-aligned">Cast Ballots</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="column-empty right-aligned">Empty votes</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="column-invalid right-aligned">Invalid votes</th>
+                <th data-tablesaw-priority="1" i18n:translate="turnout_vote" class="column-turnout right-aligned" tal:condition="layout.completed">Turnout</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
+                <tal:b condition="not: result.counted">
+                    <td class="column-entity">${layout.format_name(result)}</td>
+                    <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
+                    <td class="answer" colspan="5" i18n:translate="">Not yet counted</td>
+                </tal:b>
+                <tal:b condition="result.counted">
+                    <td class="column-entity">${layout.format_name(result)}</td>
+                    <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
+                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.eligible_voters)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.cast_ballots)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
+                    <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
+                    <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f} %'.format(result.turnout)}</td>
+                </tal:b>
+            </tr>
+        </tbody>
+        <tfoot tal:condition="ballot.results.count() != 1">
+            <tr class="total">
+                <td class="column-entity" i18n:translate="">Total</td>
+                <td class="column-district" tal:condition="layout.has_districts"></td>
+                <td class="column-empty right-aligned">${layout.format_number(ballot.eligible_voters)}</td>
+                <td class="column-empty right-aligned">${layout.format_number(ballot.cast_ballots)}</td>
+                <td class="column-empty right-aligned">${layout.format_number(ballot.empty)}</td>
+                <td class="column-invalid right-aligned">${layout.format_number(ballot.invalid)}</td>
+                <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f} %'.format(ballot.turnout)}</td>
+            </tr>
+        </tfoot>
+    </table>
+</metal:ballot-statistics-table>
 
 <metal:ballot-entities-map define-macro="ballot-entities-map" i18n:domain="onegov.election_day">
     <tal:block tal:condition="embed">
@@ -252,7 +286,7 @@
             data-mapurl="${layout.get_topojson_link(layout.principal.id, ballot.vote.date.year)}"
             data-dataurl="${request.link(ballot, name='by-entity')}"
             data-embed-link="Embed heatmap"
-            data-embed-source="${layout.entities_map_link}"
+            data-embed-source="${layout.map_link}"
             data-thumbs="true"
             data-color-scale="rb"
             data-label-left-hand="Nay"
@@ -285,7 +319,7 @@
             data-mapurl="${layout.get_topojson_link(layout.app.principal.id, ballot.vote.date.year)}"
             data-dataurl="${request.link(ballot, name='by-district')}"
             data-embed-link="Embed heatmap"
-            data-embed-source="${layout.districts_map_link}"
+            data-embed-source="${layout.map_link}"
             data-thumbs="true"
             data-color-scale="rb"
             data-label-left-hand="Nay"
@@ -416,13 +450,13 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.label('district')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_superregions">${layout.label('superregion')}</th>
+                <th data-tablesaw-priority="0" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.label('district')}</th>
+                <th data-tablesaw-priority="0" i18n:translate="" class="left-aligned" tal:condition="layout.has_superregions">${layout.label('superregion')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
-                <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Blank Ballots</th>
-                <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Invalid Ballots</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Blank Ballots</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Invalid Ballots</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Accounted Votes</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned" tal:condition="layout.completed">Turnout</th>
             </tr>
@@ -965,14 +999,14 @@
             <section class="top-bar-section">
                 <ul class="left">
                     <tal:block repeat="(title, link, active, submenu) layout.menu">
-                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else ''">
+                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else '';aria-current 'true' if active else 'false'">
                             <a href="${link}">${title}</a>
                         </li>
-                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown'">
+                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown';aria-current 'true' if active else 'false'">
                             <a href="#">${title}</a>
                             <ul class="dropdown">
                                 <tal:block repeat="(title, link, active, submenu) submenu">
-                                    <li tal:attributes="class 'active' if active else ''">
+                                    <li tal:attributes="class 'active' if active else '';aria-current 'true' if active else 'false'">
                                         <a href="${link}">${title}</a>
                                     </li>
                                 </tal:block>

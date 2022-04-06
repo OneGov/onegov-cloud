@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 07:53+0100\n"
-"PO-Revision-Date: 2022-03-22 07:58+0100\n"
+"POT-Creation-Date: 2022-03-31 06:13+0200\n"
+"PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -481,6 +481,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Abstimmungen"
 
+msgid "Select at least one election or vote."
+msgstr "Wählen Sie mindestens eine Wahl oder Abstimmung."
+
 msgid "Number"
 msgstr "Nummer"
 
@@ -649,6 +652,9 @@ msgstr "Verwalten"
 
 msgid "Mappings"
 msgstr "Zuordnungen"
+
+msgid "Statistics"
+msgstr "Statistik"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -822,7 +828,7 @@ msgid "The file is invalid."
 msgstr "Die Datei ist ungültig."
 
 msgid "The form contains errors. Please check the marked fields."
-msgstr ""
+msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
 #.
 #. Default: Start
@@ -886,23 +892,31 @@ msgstr "Ja-Stimmen"
 msgid "Nays"
 msgstr "Nein-Stimmen"
 
-msgid "Empty"
-msgstr "Leer"
+msgid "Not yet counted"
+msgstr "Noch nicht ausgezählt"
 
-msgid "Invalid"
-msgstr "Ungültig"
+msgid "Total"
+msgstr "Total"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Stimm&shy;berechtigte"
+
+msgid "Cast Ballots"
+msgstr "Eingegangene Stimmzettel"
+
+msgid "Empty votes"
+msgstr "Leere Stimmen"
+
+msgid "Invalid votes"
+msgstr "Ungültige Stimmen"
 
 #. Default: Turnout
 #. Default: Voter turnout
 #.
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
-
-msgid "Not yet counted"
-msgstr "Noch nicht ausgezählt"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Nay"
 msgstr "Nein"
@@ -1052,14 +1066,6 @@ msgstr "Stichfrage zugunsten der Initiative"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
-
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Stimmberechtigte"
-
-msgid "Cast Ballots"
-msgstr "Eingegangene Stimmzettel"
 
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"

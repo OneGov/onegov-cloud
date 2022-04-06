@@ -1,8 +1,72 @@
 # Changes
 
+## 2022.20
+
+`2022-03-30` | [9330c1793c...f51f18e6d6](https://github.com/OneGov/onegov-cloud/compare/9330c1793c^...f51f18e6d6)
+
+### Activity
+
+##### Fixes end of deadline calculation.
+
+`Bugfix` | [PRO-1012](https://linear.app/projuventute/issue/PRO-1012) | [b898b4ce1e](https://github.com/onegov/onegov-cloud/commit/b898b4ce1ef2cf937c6f3911821bb4fcfe35b401)
+
+### Election Day
+
+##### Add turnout widget.
+
+`Feature` | [OGC-178](https://linear.app/onegovcloud/issue/OGC-178) | [f11127ef99](https://github.com/onegov/onegov-cloud/commit/f11127ef9968c63ad5b24c8bb965285a64aa76d8)
+
+##### Ensure at least one election or vote is selected when triggering notifications.
+
+`Feature` | [OGC-302](https://linear.app/onegovcloud/issue/OGC-302) | [3eb06fbd95](https://github.com/onegov/onegov-cloud/commit/3eb06fbd95843a090b372f8c1d0a71626d9cbcf7)
+
+##### Add counted and total number of entities widget.
+
+`Feature` | [OGC-360](https://linear.app/onegovcloud/issue/OGC-360) | [01deeb6cc2](https://github.com/onegov/onegov-cloud/commit/01deeb6cc279653f012bfa2aefe041a758142a3f)
+
+##### Define aria-current attribute to active elements in navigation.
+
+`Feature` | [OGC-271](https://linear.app/onegovcloud/issue/OGC-271) | [4d506b0536](https://github.com/onegov/onegov-cloud/commit/4d506b0536e55e12a24ccbda94d5a020810c2975)
+
+##### Add last result change widget.
+
+`Feature` | [OGC-169](https://linear.app/onegovcloud/issue/OGC-169) | [9c5cbba464](https://github.com/onegov/onegov-cloud/commit/9c5cbba4642a623aa448c6265067e054db30bd2d)
+
+##### Update last result change when assigning elections to compounds.
+
+But only update to a newer date than the existing.
+
+`Bugfix` | [OGC-358](https://linear.app/onegovcloud/issue/OGC-358) | [98e0fdbee0](https://github.com/onegov/onegov-cloud/commit/98e0fdbee0224ee54ea5ec54c1a87bda477396d1)
+
+##### Update translation.
+
+`Bugfix` | [OGC-278](https://linear.app/onegovcloud/issue/OGC-278) | [f51f18e6d6](https://github.com/onegov/onegov-cloud/commit/f51f18e6d6dfc940c12daa40ae910c920271d99d)
+
+### Org
+
+##### Show date of current registration window and available spots in forms list.
+
+`Feature` | [OGC-381](https://linear.app/onegovcloud/issue/OGC-381) | [8a5330e309](https://github.com/onegov/onegov-cloud/commit/8a5330e3093b0697c264e0aa172387a40e132129)
+
+##### Rename Payments to Credit card payments.
+
+`Bugfix` | [PRO-993](https://linear.app/projuventute/issue/PRO-993) | [6f637071ea](https://github.com/onegov/onegov-cloud/commit/6f637071eae7d569a85eab64a5bdad4c22a20d07)
+
+### Swissvotes
+
+##### Add seantis to patrons.
+
+`Feature` | [SWI-31](https://linear.app/swissvotes/issue/SWI-31) | [7a7a8a61d3](https://github.com/onegov/onegov-cloud/commit/7a7a8a61d340e0508c609d15d3936b51818e9236)
+
+### Win
+
+##### Fixes iframe resizer setup
+
+`Bugfix` | [FW-101](https://stadt-winterthur.atlassian.net/browse/FW-101) | [173c88f420](https://github.com/onegov/onegov-cloud/commit/173c88f4209de415096b91e4b625f2507742ef4d)
+
 ## 2022.19
 
-`2022-03-22` | [a99a63595a...3860e7a63a](https://github.com/OneGov/onegov-cloud/compare/a99a63595a^...3860e7a63a)
+`2022-03-22` | [a99a63595a...1aaf29d721](https://github.com/OneGov/onegov-cloud/compare/a99a63595a^...1aaf29d721)
 
 ### Core
 
@@ -1503,24 +1567,4 @@ This requires to re-upload results from 2020.
 ##### Fixes link migration labels.
 
 `Bugfix` | [SEA-357](https://linear.app/seantis/issue/SEA-357) | [33e0bdd6ec](https://github.com/onegov/onegov-cloud/commit/33e0bdd6ecf158a2f91ebffd807291362cb2fc68)
-
-## 2021.71
-
-`2021-07-28` | [7698b0add9...cda5a59e55](https://github.com/OneGov/onegov-cloud/compare/7698b0add9^...cda5a59e55)
-
-### Foundation6
-
-##### Updates jquery to version 3.6
-
-- Introduces browser console inspection in tests
-- Minor fixes in javascripts
-- Rework of foundation update cli command
-
-`Other` | [SEA-469](https://linear.app/seantis/issue/SEA-469) | [48209df535](https://github.com/onegov/onegov-cloud/commit/48209df535b842f0daa2e52540b261897ff003df)
-
-### Town6
-
-##### Adds color darkgray for <row-wide> homepage widget
-
-`Other` | [SEA_467](#SEA_467) | [2acce24eba](https://github.com/onegov/onegov-cloud/commit/2acce24eba094322714c4d08e375692fbfe0f266)
 
