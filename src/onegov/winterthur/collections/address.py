@@ -5,6 +5,7 @@ from onegov.core.csv import CSVFile
 from onegov.core.orm import as_selectable
 from onegov.winterthur.models import WinterthurAddress
 from pycurl import Curl
+from sedate import utcnow
 from sqlalchemy import select, func
 
 HOST = 'https://stadt.winterthur.ch'
@@ -32,6 +33,22 @@ class AddressCollection(GenericCollection):
         """)
 
         return self.session.execute(select(query.c))
+
+    def last_updated(self):
+        result = self.query().first()
+        return result.modified if result else None
+
+    def update_state(self):
+        last_updated = self.last_updated()
+        if not last_updated:
+            return 'failed'
+
+        diff = utcnow() - last_updated
+        diff = (diff.days * 24) + (diff.seconds / 3600)
+        if diff > 24:
+            return 'failed'
+
+        return 'ok'
 
     def update(self, streets=STREETS, addresses=ADDRESSES):
         self.delete_existing()
