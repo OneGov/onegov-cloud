@@ -948,3 +948,10 @@ table.responsive {
         }
     }
 }
+
+/*
+    Accessibility
+*/
+.visually-hidden {
+    @include element-invisible;
+}

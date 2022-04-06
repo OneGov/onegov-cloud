@@ -2479,7 +2479,7 @@ $booking-left-margin: 2rem;
     position: relative;
 
     div > img,
-    div > a > img, {
+    div > a > img {
         border-radius: 2px;
     }
 
@@ -2516,7 +2516,7 @@ $booking-left-margin: 2rem;
     background: $blue-pastel;
 }
 
-.message-activity, {
+.message-activity {
     background: $green-pastel;
 }
 
@@ -3249,4 +3249,11 @@ $booking-left-margin: 2rem;
             color: $red-dark;
         }
     }
+}
+
+/*
+    Accessibility
+*/
+.visually-hidden {
+    @include element-invisible;
 }

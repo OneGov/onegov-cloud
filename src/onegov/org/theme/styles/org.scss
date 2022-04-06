@@ -6341,3 +6341,10 @@ $pageref-color-hover: $iron;
 a > i.fa-external-link-alt {
     margin-left: .3rem;
 }
+
+/*
+    Accessibility
+*/
+.visually-hidden {
+    @include element-invisible;
+}
