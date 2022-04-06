@@ -1,8 +1,28 @@
 # Changes
 
+## 2022.22
+
+`2022-04-06` | [54afaaa8bb...5c1ff9054f](https://github.com/OneGov/onegov-cloud/compare/54afaaa8bb^...5c1ff9054f)
+
+### Core
+
+##### Adds back the ability to send mails through SMTP.
+
+`Feature` | [OGC-307](https://linear.app/onegovcloud/issue/OGC-307) | [54afaaa8bb](https://github.com/onegov/onegov-cloud/commit/54afaaa8bb09d76fe72a6e68b7f2783d40197f91)
+
+##### Adds back smtp4dev for local development.
+
+`Feature` | [OGC-307](https://linear.app/onegovcloud/issue/OGC-307) | [5c1ff9054f](https://github.com/onegov/onegov-cloud/commit/5c1ff9054f87c849cdd6cbd8183e5de616f09a3e)
+
+### Winterthur
+
+##### Add last updated timestamp and status to streets.
+
+`Feature` | [FW-96](https://stadt-winterthur.atlassian.net/browse/FW-96) | [18ee0a32ea](https://github.com/onegov/onegov-cloud/commit/18ee0a32eaa64ec09bf49363125cd2f8c5fb577d)
+
 ## 2022.21
 
-`2022-04-06` | [aab7cbddca...309dfa54bb](https://github.com/OneGov/onegov-cloud/compare/aab7cbddca^...309dfa54bb)
+`2022-04-06` | [aab7cbddca...5ab05b5da9](https://github.com/OneGov/onegov-cloud/compare/aab7cbddca^...5ab05b5da9)
 
 ### Election Day
 
@@ -1551,32 +1571,4 @@ This requires to re-upload results from 2020.
 ##### Make logo position configurable.
 
 `Feature` | [OGC-32](https://linear.app/onegovcloud/issue/OGC-32) | [9e83c9ed1b](https://github.com/onegov/onegov-cloud/commit/9e83c9ed1bdf749eeee23f1b32d49da06007187f)
-
-## 2021.73
-
-`2021-08-19` | [75541aaa4f...121a1c22f7](https://github.com/OneGov/onegov-cloud/compare/75541aaa4f^...121a1c22f7)
-
-### Core
-
-##### Add namespace parameter to transfer command.
-
-`Feature` | [9dd82a4809](https://github.com/onegov/onegov-cloud/commit/9dd82a48096256c0ccfba09c35320424a9c95c66)
-
-### Election Day
-
-##### Log exceptions when creating media rather than failing.
-
-`Bugfix` | [48cc67dbc8](https://github.com/onegov/onegov-cloud/commit/48cc67dbc8707fd92655b67978d3c9bb6c075432)
-
-### Org
-
-##### Fixes ticket view throwing an error for tickets with no users.
-
-`Bugfix` | [84fe7d58b3](https://github.com/onegov/onegov-cloud/commit/84fe7d58b36f0aae88a94d91a6253b3b85cd1a1f)
-
-### Translatordirectory
-
-##### Don't create FSI course attendees when importing from the ldap.
-
-`Bugfix` | [OGC-24](https://linear.app/onegovcloud/issue/OGC-24) | [75541aaa4f](https://github.com/onegov/onegov-cloud/commit/75541aaa4f53ec93663321d67da4daeeff6798ab)
 
