@@ -1141,7 +1141,7 @@ def test_vote_attachments(test_app, explanations_pdf):
     for model in models:
         assert model.explanations_pdf is None
         del model.explanations_pdf
-        model.explanations_pdf = explanations_pdf
+        model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
         assert model.explanations_pdf.name == 'explanations_pdf'
         assert model.explanations_pdf.reference.filename == 'explanations.pdf'
         assert model.explanations_pdf.reference.content_type == \

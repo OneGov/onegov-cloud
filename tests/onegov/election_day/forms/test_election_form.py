@@ -96,7 +96,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     model.number_of_mandates = 5
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
-    model.explanations_pdf = explanations_pdf
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
     model.tacit = False
     model.expats = False
     model.colors = {
@@ -200,7 +200,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     field_storage = FieldStorage()
     field_storage.file = BytesIO('my-file'.encode())
     field_storage.type = 'image/png'  # ignored
-    field_storage.filename = 'my-file.pdf'  # renamed
+    field_storage.filename = 'my-file.pdf'
     form.explanations_pdf.process(
         DummyPostData({'explanations_pdf': field_storage})
     )
@@ -208,7 +208,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     form.update_model(model)
 
     assert model.explanations_pdf.name == 'explanations_pdf'
-    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+    assert model.explanations_pdf.reference.filename == 'my-file.pdf'
     assert model.explanations_pdf.reference.file.read() == b'my-file'
 
 

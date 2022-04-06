@@ -183,8 +183,9 @@ class ExplanationsPdfMixin(AssociatedFiles):
 
     @explanations_pdf.setter
     def explanations_pdf(self, value):
+        content, filename = value
         del self.explanations_pdf
         file = File(id=random_token())
         file.name = 'explanations_pdf'
-        file.reference = as_fileintent(value, 'explanations.pdf')
+        file.reference = as_fileintent(content, filename)
         self.files.append(file)

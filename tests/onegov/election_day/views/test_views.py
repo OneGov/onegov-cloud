@@ -501,7 +501,7 @@ def test_view_attachments(election_day_app_gr, explanations_pdf):
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form['explanations_pdf'] = Upload(
-        'Abstimmungserläuterungen.pdf',
+        'Erläuterungen.pdf',
         content,
         'application/pdf'
     )
@@ -511,7 +511,7 @@ def test_view_attachments(election_day_app_gr, explanations_pdf):
     page = page.click('(PDF)')
     assert page.headers['Content-Type'] == 'application/pdf'
     assert page.headers['Content-Length']
-    assert 'filename="explanations.pdf"' in page.headers['Content-Disposition']
+    assert 'Erlauterungen.pdf' in page.headers['Content-Disposition']
 
     # Election
     new = client.get('/manage/elections').click('Neue Wahl')
@@ -521,7 +521,7 @@ def test_view_attachments(election_day_app_gr, explanations_pdf):
     new.form['domain'] = 'region'
     new.form['mandates'] = 1
     new.form['explanations_pdf'] = Upload(
-        'Abstimmungserläuterungen.pdf',
+        'Erläuterungen.pdf',
         content,
         'application/pdf'
     )
@@ -531,7 +531,7 @@ def test_view_attachments(election_day_app_gr, explanations_pdf):
     page = page.click('(PDF)')
     assert page.headers['Content-Type'] == 'application/pdf'
     assert page.headers['Content-Length']
-    assert 'filename="explanations.pdf"' in page.headers['Content-Disposition']
+    assert 'Erlauterungen.pdf' in page.headers['Content-Disposition']
 
     # Election Compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
@@ -541,7 +541,7 @@ def test_view_attachments(election_day_app_gr, explanations_pdf):
     new.form['domain_elections'] = 'region'
     new.form['region_elections'] = ['election']
     new.form['explanations_pdf'] = Upload(
-        'Abstimmungserläuterungen.pdf',
+        'Erläuterungen.pdf',
         content,
         'application/pdf'
     )
@@ -551,4 +551,4 @@ def test_view_attachments(election_day_app_gr, explanations_pdf):
     page = page.click('(PDF)')
     assert page.headers['Content-Type'] == 'application/pdf'
     assert page.headers['Content-Length']
-    assert 'filename="explanations.pdf"' in page.headers['Content-Disposition']
+    assert 'Erlauterungen.pdf' in page.headers['Content-Disposition']
