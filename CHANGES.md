@@ -1,8 +1,18 @@
 # Changes
 
+## 2022.23
+
+`2022-04-07` | [f0848d421d...f0848d421d](https://github.com/OneGov/onegov-cloud/compare/f0848d421d^...f0848d421d)
+
+### Election Day
+
+##### Fixes flaky test.
+
+`Bugfix` | [f0848d421d](https://github.com/onegov/onegov-cloud/commit/f0848d421d99cac7e50d6ac0c9eb256c5b3acad7)
+
 ## 2022.22
 
-`2022-04-06` | [54afaaa8bb...5c1ff9054f](https://github.com/OneGov/onegov-cloud/compare/54afaaa8bb^...5c1ff9054f)
+`2022-04-06` | [54afaaa8bb...8b0903010b](https://github.com/OneGov/onegov-cloud/compare/54afaaa8bb^...8b0903010b)
 
 ### Core
 
@@ -1547,28 +1557,4 @@ This requires to re-upload results from 2020.
 ##### Enable topics (without sidebar).
 
 `Feature` | [OGC-26](https://linear.app/onegovcloud/issue/OGC-26) | [77256a0752](https://github.com/onegov/onegov-cloud/commit/77256a075296b6e3fddc7f5c03ee71c4ae5d663b)
-
-## 2021.74
-
-`2021-08-30` | [6ed7b747d4...d79ede1b6f](https://github.com/OneGov/onegov-cloud/compare/6ed7b747d4^...d79ede1b6f)
-
-### Core
-
-##### Replace namespace parameter of transfer command with schema parameter.
-
-`Feature` | [9493b3f02d](https://github.com/onegov/onegov-cloud/commit/9493b3f02dd55f1c105fd0f442e7bc31ddde170f)
-
-### Election Day
-
-##### Add map data for 2004-2012.
-
-`Feature` | [OGC-71](https://linear.app/onegovcloud/issue/OGC-71) | [6ed7b747d4](https://github.com/onegov/onegov-cloud/commit/6ed7b747d4168e6c25098fd434db062fcd6e0485)
-
-##### Add subscriber export.
-
-`Feature` | [OGC-59](https://linear.app/onegovcloud/issue/OGC-59) | [c5760bbc35](https://github.com/onegov/onegov-cloud/commit/c5760bbc3541dc146ce973de224a9419bcfe130f)
-
-##### Make logo position configurable.
-
-`Feature` | [OGC-32](https://linear.app/onegovcloud/issue/OGC-32) | [9e83c9ed1b](https://github.com/onegov/onegov-cloud/commit/9e83c9ed1bdf749eeee23f1b32d49da06007187f)
 
