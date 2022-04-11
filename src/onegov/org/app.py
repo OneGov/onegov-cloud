@@ -189,7 +189,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         fs = self.filestorage
         if fs.exists('eventtags.yml'):
             with fs.open('eventtags.yml', 'rb') as f:
-                return yaml.safe_load(f)['categories']
+                return yaml.safe_load(f)['event_tags']
         else:
             return None
 
