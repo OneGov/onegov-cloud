@@ -86,7 +86,6 @@ def view_form_collection(self, request, layout=None):
 
         return lead
 
-
     return {
         'layout': layout,
         'title': _("Forms"),
