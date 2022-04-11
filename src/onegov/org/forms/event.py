@@ -156,7 +156,7 @@ class EventForm(Form):
 
     tags = MultiCheckboxField(
         label=_("Tags"),
-        choices=TAGS,
+        choices=[],
     )
 
     start_date = DateField(
@@ -246,6 +246,11 @@ class EventForm(Form):
             self.email.data = self.request.current_username
 
     def on_request(self):
+        if self.custom_tags():
+            self.tags.choices = [(tag, tag) for tag in self.custom_tags()]
+        else:
+            self.tags.choices = TAGS
+
         for include in self.on_request_include:
             self.request.include(include)
         self.sort_tags()
@@ -254,6 +259,9 @@ class EventForm(Form):
             self.dates.data = self.dates_to_json(None)
         if not self.email.data:
             self.populate_submitter()
+
+    def custom_tags(self):
+        return self.request.app.custom_event_tags
 
     def sort_tags(self):
         self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))
@@ -505,7 +513,12 @@ class EventImportForm(Form):
         headers = self.headers
         session = self.request.session
         events = EventCollection(session)
-        tags = {self.request.translate(tag[0]): tag[0] for tag in TAGS}
+        all_tags = [
+            TAGS + self.custom_tags() if self.custom_tags() else TAGS
+        ]
+        tags = {
+            self.request.translate(tag[0]): tag[0] for tag in all_tags
+        }
         tickets = TicketCollection(session)
 
         if self.clear.data:
