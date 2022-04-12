@@ -52,7 +52,7 @@ setup(
         'onegov.translator_directory',
     ],
     install_requires=[
-        'AIS.py',
+        'AIS2.py',
         'aiohttp',
         'Pillow>=6.2.0',
         'PyYAML',
