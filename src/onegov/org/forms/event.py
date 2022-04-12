@@ -480,6 +480,9 @@ class EventImportForm(Form):
             'end': self.request.translate(_("To")),
         }
 
+    def custom_tags(self):
+        return self.request.app.custom_event_tags
+
     def run_export(self):
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
