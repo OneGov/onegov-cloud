@@ -15,7 +15,6 @@ class GuidleBase(object):
         self.cleaner = Cleaner(
             tags=[],
             attributes={},
-            styles=[],
             strip=True,
             filters=[]
         )
