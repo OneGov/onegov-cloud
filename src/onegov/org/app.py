@@ -5,7 +5,6 @@ from collections import defaultdict
 from dectate import directive
 from email.headerregistry import Address
 from more.content_security import SELF
-from cached_property import cached_property
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
@@ -27,7 +26,6 @@ from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
-from pathlib import Path
 from purl import URL
 import yaml
 
@@ -241,8 +239,6 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return None
 
         return URL(request.link(dashboard)).path()
-
-
 
 
 @OrgApp.webasset_path()
