@@ -19,8 +19,11 @@ def view_election_lists_data(self, request):
 
     limit = get_parameter(request, 'limit', int, None)
     names = get_parameter(request, 'names', list, None)
+    sort_by_names = get_parameter(request, 'sort_by_names', list, None)
 
-    return get_lists_data(self, limit=limit, names=names)
+    return get_lists_data(
+        self, limit=limit, names=names, sort_by_names=sort_by_names
+    )
 
 
 @ElectionDayApp.html(

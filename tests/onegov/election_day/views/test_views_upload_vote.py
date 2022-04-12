@@ -1,4 +1,3 @@
-from datetime import date
 from onegov.ballot import VoteCollection
 from onegov.election_day.collections import ArchivedResultCollection
 from tests.onegov.election_day.common import login
@@ -28,7 +27,7 @@ def test_upload_vote_unknown_result(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
     assert archive.query().one().progress == (0, 0)
@@ -70,7 +69,7 @@ def test_upload_vote_year_unavailable(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
-    new.form['date'] = date(2000, 1, 1)
+    new.form['date'] = '2000-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -93,14 +92,14 @@ def test_upload_vote_submit(election_day_app_zg):
     new = client.get('/manage/votes/new-vote')
     new.form['vote_type'] = 'simple'
     new.form['vote_de'] = 'vote'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_type'] = 'complex'
     new.form['vote_de'] = 'complex'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -223,7 +222,7 @@ def test_upload_vote_available_formats_canton(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'vote'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -234,7 +233,7 @@ def test_upload_vote_available_formats_canton(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'vote'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'canton'
     new.form.submit()
 
@@ -252,7 +251,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'vote'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -263,7 +262,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'vote'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'canton'
     new.form.submit()
 
@@ -274,7 +273,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'vote'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
@@ -316,7 +315,7 @@ def test_upload_vote_all_or_nothing(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form['vote_type'] = 'complex'
     new.form.submit()

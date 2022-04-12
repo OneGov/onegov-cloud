@@ -174,6 +174,7 @@ setup(
         'docs': [
             'docutils==0.17',
             'alabaster',
+            'Jinja2<3.1.0',
             'sphinx<3.4.0',
         ],
         'test': [

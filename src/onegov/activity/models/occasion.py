@@ -270,7 +270,9 @@ class Occasion(Base, TimestampMixin):
         return self.spots.upper - 1
 
     def is_past_deadline(self, now):
-        return now > self.period.as_local_datetime(self.deadline)
+        return now > self.period.as_local_datetime(
+            self.deadline, end_of_day=True
+        )
 
     def is_past_cancellation(self, date):
         cancellation = self.cancellation_deadline

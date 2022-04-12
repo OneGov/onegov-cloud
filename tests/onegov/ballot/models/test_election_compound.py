@@ -212,8 +212,10 @@ def test_election_compound(session):
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
+    assert election_compound.last_result_change is None
 
     # Add two elections
+    last_result_change = datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
     session.add(
         Election(
             title="First election",
@@ -221,7 +223,7 @@ def test_election_compound(session):
             domain_segment='First district',
             date=date(2015, 6, 14),
             number_of_mandates=1,
-            last_result_change=datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
+            last_result_change=last_result_change
         )
     )
     session.add(
@@ -240,6 +242,7 @@ def test_election_compound(session):
     assert set([election.id for election in election_compound.elections]) == {
         'first-election', 'second-election'
     }
+    assert election_compound.last_result_change == last_result_change
 
     assert election_compound.number_of_mandates == 3
     assert election_compound.counted is False
@@ -1183,3 +1186,20 @@ def test_list_results(session):
     ) == [
         ('Quimby Again!', 3, 953),
     ]
+
+
+def test_election_compound_attachments(test_app, explanations_pdf):
+    model = ElectionCompound(
+        title='Legislative Elections',
+        domain='canton',
+        date=date(2015, 6, 14),
+    )
+
+    assert model.explanations_pdf is None
+    del model.explanations_pdf
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+    assert model.explanations_pdf.reference.content_type == 'application/pdf'
+    del model.explanations_pdf
+    assert model.explanations_pdf is None

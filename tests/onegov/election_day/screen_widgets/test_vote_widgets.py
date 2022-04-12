@@ -1,5 +1,6 @@
 from chameleon import PageTemplate
 from datetime import date
+from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
@@ -9,9 +10,12 @@ from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
+    LastResultChangeWidget,
+    NumberOfCountedEntitiesWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
     VoteCounterProposalDistrictsMap,
     VoteCounterProposalEntitiesMap,
     VoteCounterProposalEntitiesTableWidget,
@@ -57,14 +61,26 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <vote-proposal-districts-map class="my-class-7"/>
             </column>
+            <column span="1">
+                <number-of-counted-entities class="my-class-8"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-9"/>
+            </column>
+            <column span="1">
+                <last-result-change class="my-class-a"/>
+            </column>
         </row>
     """
     widgets = [
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        LastResultChangeWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
         VoteProposalDistrictsMap(),
@@ -107,21 +123,25 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
+    assert 'my-class-a' in result
 
     # Add intermediate results
-    model, errors = import_test_datasets(
-        'internal',
-        'vote',
-        'zg',
-        'federation',
-        date_=date(2015, 10, 18),
-        number_of_mandates=2,
-        dataset_name='ndg-intermediate',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-01 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'vote',
+            'zg',
+            'federation',
+            date_=date(2015, 10, 18),
+            number_of_mandates=2,
+            dataset_name='ndg-intermediate',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -150,6 +170,9 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '68.22%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '1' in result
+    assert '11' in result
+    assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -157,21 +180,25 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
+    assert 'my-class-a' in result
 
     # Add final results
-    model, errors = import_test_datasets(
-        'internal',
-        'vote',
-        'zg',
-        'federation',
-        date_=date(2015, 10, 18),
-        number_of_mandates=2,
-        dataset_name='ndg',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-02 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'vote',
+            'zg',
+            'federation',
+            date_=date(2015, 10, 18),
+            number_of_mandates=2,
+            dataset_name='ndg',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -206,6 +233,9 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '69.26%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '11' in result
+    assert '11' in result
+    assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -213,6 +243,9 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-5' in result
     assert 'my-class-6' in result
     assert 'my-class-7' in result
+    assert 'my-class-8' in result
+    assert 'my-class-9' in result
+    assert 'my-class-a' in result
 
 
 def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
@@ -270,13 +303,22 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
                 <vote-tie-breaker-districts-map class="my-class-g"/>
             </column>
             <column span="1">
-                <vote-counter-proposal-turnout class="my-class-h"/>
+                <number-of-counted-entities class="my-class-h"/>
             </column>
             <column span="1">
-                <vote-proposal-turnout class="my-class-i"/>
+                <total-entities class="my-class-i"/>
             </column>
             <column span="1">
-                <vote-tie-breaker-turnout class="my-class-j"/>
+                <vote-counter-proposal-turnout class="my-class-j"/>
+            </column>
+            <column span="1">
+                <vote-proposal-turnout class="my-class-k"/>
+            </column>
+            <column span="1">
+                <vote-tie-breaker-turnout class="my-class-l"/>
+            </column>
+            <column span="1">
+                <last-result-change class="my-class-m"/>
             </column>
         </row>
     """
@@ -284,8 +326,11 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        LastResultChangeWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         VoteCounterProposalEntitiesTableWidget(),
         VoteCounterProposalResultBarWidget(),
         VoteCounterProposalTitleWidget(),
@@ -358,22 +403,26 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-h' in result
     assert 'my-class-i' in result
     assert 'my-class-j' in result
+    assert 'my-class-k' in result
+    assert 'my-class-l' in result
+    assert 'my-class-m' in result
 
     # Add intermediate results
-    model, errors = import_test_datasets(
-        'internal',
-        'vote',
-        'zg',
-        'federation',
-        vote_type='complex',
-        date_=date(2015, 10, 18),
-        number_of_mandates=2,
-        dataset_name='mundart-intermediate',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-01 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'vote',
+            'zg',
+            'federation',
+            vote_type='complex',
+            date_=date(2015, 10, 18),
+            number_of_mandates=2,
+            dataset_name='mundart-intermediate',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -408,9 +457,12 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '38.37%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '1' in result
+    assert '11' in result
     assert '42.21 %' in result
     assert '43.20 %' in result
     assert '42.32 %' in result
+    assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -430,22 +482,26 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-h' in result
     assert 'my-class-i' in result
     assert 'my-class-j' in result
+    assert 'my-class-k' in result
+    assert 'my-class-l' in result
+    assert 'my-class-m' in result
 
     # Add final results
-    model, errors = import_test_datasets(
-        'internal',
-        'vote',
-        'zg',
-        'federation',
-        vote_type='complex',
-        date_=date(2015, 10, 18),
-        number_of_mandates=2,
-        dataset_name='mundart',
-        app_session=session
-    )
-    assert not errors
-    session.add(model)
-    session.flush()
+    with freeze_time('2022-01-02 12:00'):
+        model, errors = import_test_datasets(
+            'internal',
+            'vote',
+            'zg',
+            'federation',
+            vote_type='complex',
+            date_=date(2015, 10, 18),
+            number_of_mandates=2,
+            dataset_name='mundart',
+            app_session=session
+        )
+        assert not errors
+        session.add(model)
+        session.flush()
 
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -486,9 +542,12 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '37.00%' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert '11' in result
+    assert '11' in result
     assert '44.93 %' in result
     assert '45.92 %' in result
     assert '44.17 %' in result
+    assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -508,3 +567,6 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-h' in result
     assert 'my-class-i' in result
     assert 'my-class-j' in result
+    assert 'my-class-k' in result
+    assert 'my-class-l' in result
+    assert 'my-class-m' in result

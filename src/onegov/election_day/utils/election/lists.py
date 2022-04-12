@@ -9,6 +9,7 @@ from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from sqlalchemy import desc
 from sqlalchemy import select
 from sqlalchemy.orm import object_session
+from sqlalchemy.sql.expression import case
 
 
 def get_aggregated_list_results(election, session, use_checks=False):
@@ -92,7 +93,7 @@ def get_aggregated_list_results(election, session, use_checks=False):
     }
 
 
-def get_list_results(election, limit=None, names=None):
+def get_list_results(election, limit=None, names=None, sort_by_names=None):
     """ Returns the aggregated list results as list. """
 
     session = object_session(election)
@@ -103,14 +104,27 @@ def get_list_results(election, limit=None, names=None):
     result = result.filter(List.election_id == election.id)
     if names:
         result = result.filter(List.name.in_(names))
-    result = result.order_by(desc(List.votes))
+
+    order = [desc(List.votes)]
+    if names and sort_by_names:
+        order.insert(0, case(
+            [
+                (List.name == name, index)
+                for index, name in enumerate(names, 1)
+            ],
+            else_=0
+        ))
+    result = result.order_by(*order)
+
     if limit and limit > 0:
         result = result.limit(limit)
 
     return result
 
 
-def get_lists_data(election, limit=None, names=None, mandates_only=False):
+def get_lists_data(
+    election, limit=None, names=None, mandates_only=False, sort_by_names=None
+):
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     completed = election.completed
@@ -136,7 +150,9 @@ def get_lists_data(election, limit=None, names=None, mandates_only=False):
                 ),
                 'color': colors.get(list_.name) or default_color
             }
-            for list_ in get_list_results(election, limit=limit, names=names)
+            for list_ in get_list_results(
+                election, limit=limit, names=names, sort_by_names=sort_by_names
+            )
         ],
         'majority': None,
         'title': election.title
