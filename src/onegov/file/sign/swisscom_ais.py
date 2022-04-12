@@ -34,6 +34,9 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         pdf = PDF(in_stream)
         self.client.sign_one_pdf(pdf)
 
+        with suppress(UnsupportedOperation):
+            pdf.out_stream.seek(0)
+
         for chunk in iter(lambda: pdf.out_stream.read(4096), b''):
             outfile.write(chunk)
 
