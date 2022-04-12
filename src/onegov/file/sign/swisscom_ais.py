@@ -21,7 +21,11 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         self.client = AIS(customer, key_static, cert_file, cert_key)
 
     def sign(self, infile, outfile):
-        pdf = PDF(infile)
-        pdf.out_stream = outfile
-        self.client.sign_one_pdf(pdf)
+        with self.materialise(infile) as fp:
+            pdf = PDF(fp)
+            self.client.sign_one_pdf(pdf)
+
+        for chunk in iter(lambda: pdf.out_stream.read(4096), b''):
+            outfile.write(chunk)
+
         return f'swisscom_ais/{self.customer}/{self.client.last_request_id}'
