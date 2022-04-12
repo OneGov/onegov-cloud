@@ -510,11 +510,11 @@ def test_pdf_mini_html_linkify():
     pdf.mini_html(html, linkify=True)
     paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
     assert paras == [
-        '<a color="#00538c" href="#">Pellentesque habitant</a>'
+        '<a href="#" color="#00538c">Pellentesque habitant</a>'
         ' morbi senectus et '
-        '<a color="#00538c" href="http://netuset.et">http://netuset.et</a>'
+        '<a href="http://netuset.et" color="#00538c">http://netuset.et</a>'
         ' turpis '
-        '<a color="#00538c" href="mailto:mal@fames.ac">mal@fames.ac</a>'
+        '<a href="mailto:mal@fames.ac" color="#00538c">mal@fames.ac</a>'
         '.'
     ]
 
