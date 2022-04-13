@@ -1,8 +1,30 @@
 # Changes
 
+## 2022.24
+
+`2022-04-12` | [52883745a4...ca4eb0c3fb](https://github.com/OneGov/onegov-cloud/compare/52883745a4^...ca4eb0c3fb)
+
+### Event
+
+##### Add compatibility with bleach 5.
+
+`Bugfix` | [03d7cd4776](https://github.com/onegov/onegov-cloud/commit/03d7cd4776bac5601470279425d0d034a2b2d739)
+
+### File
+
+##### Switches to AIS2.py
+
+`Feature` | [OGC-144](https://linear.app/onegovcloud/issue/OGC-144) | [ca4eb0c3fb](https://github.com/onegov/onegov-cloud/commit/ca4eb0c3fb5c83d841499e7a70403865eacdb6dd)
+
+### Pdf
+
+##### Add compatibility with bleach 5.
+
+`Bugfix` | [374ce1a2ae](https://github.com/onegov/onegov-cloud/commit/374ce1a2aec5aeb1b73f10e48647f727c3ed06de)
+
 ## 2022.23
 
-`2022-04-07` | [f0848d421d...f0848d421d](https://github.com/OneGov/onegov-cloud/compare/f0848d421d^...f0848d421d)
+`2022-04-07` | [f0848d421d...ee0b0ad5c5](https://github.com/OneGov/onegov-cloud/compare/f0848d421d^...ee0b0ad5c5)
 
 ### Election Day
 
@@ -1547,14 +1569,4 @@ This requires to re-upload results from 2020.
 ##### Allow adding custom service links.
 
 `Feature` | [OGC-67](https://linear.app/onegovcloud/issue/OGC-67) | [ba603604f7](https://github.com/onegov/onegov-cloud/commit/ba603604f7012c26d29d03c88a4616ecb5f315e1)
-
-## 2021.75
-
-`2021-08-31` | [77256a0752...748908aa6c](https://github.com/OneGov/onegov-cloud/compare/77256a0752^...748908aa6c)
-
-### Agency
-
-##### Enable topics (without sidebar).
-
-`Feature` | [OGC-26](https://linear.app/onegovcloud/issue/OGC-26) | [77256a0752](https://github.com/onegov/onegov-cloud/commit/77256a075296b6e3fddc7f5c03ee71c4ae5d663b)
 

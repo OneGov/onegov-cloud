@@ -1,8 +1,10 @@
+import io
 import os
 
-from AIS import AIS
-from AIS import PDF
+from AIS import AIS, PDF
+from contextlib import suppress
 from onegov.file.sign.generic import SigningService
+from io import UnsupportedOperation
 
 
 class SwisscomAIS(SigningService, service_name='swisscom_ais'):
@@ -22,12 +24,20 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         self.client = AIS(customer, key_static, cert_file, cert_key)
 
     def sign(self, infile, outfile):
-        with self.materialise(infile) as fp:
-            pdf = PDF(fp.name)
-            self.client.sign_one_pdf(pdf)
+        with suppress(UnsupportedOperation):
+            infile.seek(0)
 
-        with open(pdf.out_filename, 'rb') as fp:
-            for chunk in iter(lambda: fp.read(4096), b''):
-                outfile.write(chunk)
+        in_stream = io.BytesIO()
+        for chunk in iter(lambda: infile.read(4096), b''):
+            in_stream.write(chunk)
+
+        pdf = PDF(in_stream)
+        self.client.sign_one_pdf(pdf)
+
+        with suppress(UnsupportedOperation):
+            pdf.out_stream.seek(0)
+
+        for chunk in iter(lambda: pdf.out_stream.read(4096), b''):
+            outfile.write(chunk)
 
         return f'swisscom_ais/{self.customer}/{self.client.last_request_id}'
