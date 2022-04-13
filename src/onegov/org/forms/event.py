@@ -156,7 +156,7 @@ class EventForm(Form):
 
     tags = MultiCheckboxField(
         label=_("Tags"),
-        choices=[],
+        choices=TAGS,
     )
 
     start_date = DateField(
@@ -248,8 +248,6 @@ class EventForm(Form):
     def on_request(self):
         if self.custom_tags():
             self.tags.choices = [(tag, tag) for tag in self.custom_tags()]
-        else:
-            self.tags.choices = TAGS
 
         for include in self.on_request_include:
             self.request.include(include)
