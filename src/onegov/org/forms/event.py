@@ -517,7 +517,7 @@ class EventImportForm(Form):
         events = EventCollection(session)
         all_tags = chain(
             TAGS,
-            self.custom_tags() if self.custom_tags() else []
+            self.custom_tags() or []
         )
         tags = {
             self.request.translate(tag): tag for tag in all_tags
