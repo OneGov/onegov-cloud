@@ -248,7 +248,7 @@ class EventForm(Form):
 
     def on_request(self):
         if self.custom_tags():
-            self.tags.choices = self.custom_tags()
+            self.tags.choices = [(tags, tags) for tags in self.custom_tags()]
 
         for include in self.on_request_include:
             self.request.include(include)
