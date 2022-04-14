@@ -484,6 +484,7 @@ def test_import_export_events(client):
     page.form['price'] = "CHF 75.-"
     page.form['organizer'] = "Sinfonieorchester"
     page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['tags'] = ['Music', 'Tradition']
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = "18:00"
     page.form['end_time'] = "22:00"
@@ -496,6 +497,8 @@ def test_import_export_events(client):
     page = page.click("Veranstaltung annehmen").follow()
 
     assert "Weihnachtssingen" in client.get('/events')
+    assert "Music" in client.get('/events')
+    assert "Tradition" in client.get('/events')
 
     # Export
     page = client.get('/events').click("Export")
