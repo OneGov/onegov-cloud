@@ -1,8 +1,18 @@
 # Changes
 
+## 2022.25
+
+`2022-04-14` | [d5a2f507b2...d5a2f507b2](https://github.com/OneGov/onegov-cloud/compare/d5a2f507b2^...d5a2f507b2)
+
+### Org
+
+##### Allows tenants to specify custom tags
+
+`Feature` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [d5a2f507b2](https://github.com/onegov/onegov-cloud/commit/d5a2f507b21288b529a1e9faf35da9cc590ee441)
+
 ## 2022.24
 
-`2022-04-12` | [52883745a4...ca4eb0c3fb](https://github.com/OneGov/onegov-cloud/compare/52883745a4^...ca4eb0c3fb)
+`2022-04-12` | [52883745a4...fa02e35953](https://github.com/OneGov/onegov-cloud/compare/52883745a4^...fa02e35953)
 
 ### Event
 
@@ -1559,14 +1569,4 @@ This requires to re-upload results from 2020.
 ##### Adds favicon.
 
 `Feature` | [SWI-22](https://linear.app/swissvotes/issue/SWI-22) | [5632c37fd4](https://github.com/onegov/onegov-cloud/commit/5632c37fd4bb4a773fe10427405724857aa65b3e)
-
-## 2021.76
-
-`2021-08-31` | [ba603604f7...a87288c7de](https://github.com/OneGov/onegov-cloud/compare/ba603604f7^...a87288c7de)
-
-### Town6
-
-##### Allow adding custom service links.
-
-`Feature` | [OGC-67](https://linear.app/onegovcloud/issue/OGC-67) | [ba603604f7](https://github.com/onegov/onegov-cloud/commit/ba603604f7012c26d29d03c88a4616ecb5f315e1)
 
