@@ -2,6 +2,7 @@ import babel.dates
 import os
 import pytest
 import transaction
+import yaml
 
 from datetime import datetime, date, timedelta
 from onegov.event.models import Event
@@ -484,6 +485,7 @@ def test_import_export_events(client):
     page.form['price'] = "CHF 75.-"
     page.form['organizer'] = "Sinfonieorchester"
     page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['tags'] = ["Music", "Tradition"]
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = "18:00"
     page.form['end_time'] = "22:00"
@@ -496,6 +498,97 @@ def test_import_export_events(client):
     page = page.click("Veranstaltung annehmen").follow()
 
     assert "Weihnachtssingen" in client.get('/events')
+    assert "Music" in client.get('/events')
+    assert "Tradition" in client.get('/events')
+
+    # Export
+    page = client.get('/events').click("Export")
+    page.form['file_format'] = 'xlsx'
+    page = page.form.submit()
+
+    file = Upload(
+        'file',
+        page.body,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+    # Import (Dry run)
+    page = client.get('/events').click("Import")
+    page.form['dry_run'] = True
+    page.form['file'] = file
+    page = page.form.submit()
+    assert "1 Veranstaltungen werden importiert" in page
+    assert session.query(Event).count() == 1
+
+    # Import
+    page = client.get('/events').click("Import")
+    page.form['file'] = file
+    page = page.form.submit().follow()
+    assert "1 Veranstaltungen importiert" in page
+    assert session.query(Event).count() == 2
+
+    # Re-Import with clear
+    page = client.get('/events').click("Import")
+    page.form['file'] = file
+    page.form['clear'] = True
+    page = page.form.submit().follow()
+    assert "1 Veranstaltungen importiert" in page
+    assert session.query(Event).count() == 2
+
+    events = session.query(Event).all()
+    assert events[0].title == events[1].title
+    assert events[0].description == events[1].description
+    assert events[0].location == events[1].location
+    assert events[0].price == events[1].price
+    assert events[0].organizer == events[1].organizer
+    assert events[0].organizer_email == events[1].organizer_email
+    assert events[0].tags == events[1].tags
+    assert events[0].start == events[1].start
+    assert events[0].end == events[1].end
+    assert events[0].timezone == events[1].timezone
+    assert {event.meta['submitter_email'] for event in events} == {
+        'sinfonieorchester@govikon.org', 'editor@example.org'
+    }
+
+
+def test_import_export_events_with_custom_tags(client):
+    session = client.app.session()
+    for event in session.query(Event):
+        session.delete(event)
+    transaction.commit()
+
+    fs = client.app.filestorage
+    data = {
+        'event_tags': ['Singing', 'Christmas']
+    }
+    with fs.open('eventtags.yml', 'w') as f:
+        yaml.dump(data, f)
+
+    # Submit and publish an event
+    page = client.get('/events').click("Veranstaltung melden")
+    event_date = date.today() + timedelta(days=1)
+    page.form['email'] = "sinfonieorchester@govikon.org"
+    page.form['title'] = "Weihnachtssingen"
+    page.form['description'] = "Das Govikoner Sinfonieorchester lädt ein."
+    page.form['location'] = "Konzertsaal"
+    page.form['price'] = "CHF 75.-"
+    page.form['organizer'] = "Sinfonieorchester"
+    page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['tags'] = ["Singing", "Christmas"]
+    page.form['start_date'] = event_date.isoformat()
+    page.form['start_time'] = "18:00"
+    page.form['end_time'] = "22:00"
+    page.form['repeat'] = 'without'
+    page.form.submit().follow().form.submit().follow()
+
+    client.login_editor()
+
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    page = page.click("Veranstaltung annehmen").follow()
+
+    assert "Weihnachtssingen" in client.get('/events')
+    assert "Singing" in client.get('/events')
+    assert "Christmas" in client.get('/events')
 
     # Export
     page = client.get('/events').click("Export")

@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta
 from dateutil import rrule
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
+from itertools import chain
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.event.collections import EventCollection, OccurrenceCollection
@@ -30,7 +31,7 @@ from wtforms.fields.html5 import DateField
 from wtforms.fields.html5 import EmailField
 
 
-TAGS = [(tag, tag) for tag in (
+TAGS = [
     _("Art"),
     _("Cinema"),
     _("Concert"),
@@ -60,7 +61,7 @@ TAGS = [(tag, tag) for tag in (
     _("Tradition"),
     _("Youth"),
     _("Elderly"),
-)]
+]
 
 WEEKDAYS = (
     ("MO", _("Mo")),
@@ -156,7 +157,7 @@ class EventForm(Form):
 
     tags = MultiCheckboxField(
         label=_("Tags"),
-        choices=TAGS,
+        choices=[(tag, tag) for tag in TAGS],
     )
 
     start_date = DateField(
@@ -246,6 +247,9 @@ class EventForm(Form):
             self.email.data = self.request.current_username
 
     def on_request(self):
+        if self.custom_tags():
+            self.tags.choices = [(tags, tags) for tags in self.custom_tags()]
+
         for include in self.on_request_include:
             self.request.include(include)
         self.sort_tags()
@@ -254,6 +258,9 @@ class EventForm(Form):
             self.dates.data = self.dates_to_json(None)
         if not self.email.data:
             self.populate_submitter()
+
+    def custom_tags(self):
+        return self.request.app.custom_event_tags
 
     def sort_tags(self):
         self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))
@@ -472,6 +479,9 @@ class EventImportForm(Form):
             'end': self.request.translate(_("To")),
         }
 
+    def custom_tags(self):
+        return self.request.app.custom_event_tags
+
     def run_export(self):
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
@@ -505,7 +515,13 @@ class EventImportForm(Form):
         headers = self.headers
         session = self.request.session
         events = EventCollection(session)
-        tags = {self.request.translate(tag[0]): tag[0] for tag in TAGS}
+        all_tags = chain(
+            TAGS,
+            self.custom_tags() or []
+        )
+        tags = {
+            self.request.translate(tag): tag for tag in all_tags
+        }
         tickets = TicketCollection(session)
 
         if self.clear.data:
