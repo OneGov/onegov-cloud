@@ -1,4 +1,3 @@
-import io
 import os
 
 from AIS import AIS, PDF
@@ -27,17 +26,7 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         with suppress(UnsupportedOperation):
             infile.seek(0)
 
-        in_stream = io.BytesIO()
-        for chunk in iter(lambda: infile.read(4096), b''):
-            in_stream.write(chunk)
-
-        pdf = PDF(in_stream)
+        pdf = PDF(infile, out_stream=outfile)
         self.client.sign_one_pdf(pdf)
-
-        with suppress(UnsupportedOperation):
-            pdf.out_stream.seek(0)
-
-        for chunk in iter(lambda: pdf.out_stream.read(4096), b''):
-            outfile.write(chunk)
 
         return f'swisscom_ais/{self.customer}/{self.client.last_request_id}'
