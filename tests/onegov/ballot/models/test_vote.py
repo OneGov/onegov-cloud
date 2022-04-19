@@ -1127,3 +1127,24 @@ def test_vote_rename(session):
     session.flush()
     assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vote'
     assert vote.ballots.count() == 2
+
+
+def test_vote_attachments(test_app, explanations_pdf):
+    models = tuple(
+        cls(
+            title="Universal Healthcare",
+            domain='federation',
+            date=date(2015, 6, 14)
+        ) for cls in (Vote, ComplexVote)
+    )
+
+    for model in models:
+        assert model.explanations_pdf is None
+        del model.explanations_pdf
+        model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+        assert model.explanations_pdf.name == 'explanations_pdf'
+        assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+        assert model.explanations_pdf.reference.content_type == \
+            'application/pdf'
+        del model.explanations_pdf
+        assert model.explanations_pdf is None

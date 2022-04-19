@@ -22,11 +22,12 @@ from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
+from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.user import UserApp
 
 
-class ElectionDayApp(Framework, FormApp, UserApp):
+class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     """ The election day application. Include this in your onegov.yml to serve
     it with onegov-server.
 

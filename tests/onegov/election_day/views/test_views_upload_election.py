@@ -1,4 +1,3 @@
-from datetime import date
 from onegov.ballot import Election
 from onegov.election_day.collections import ArchivedResultCollection
 from tests.onegov.election_day.common import login
@@ -18,7 +17,7 @@ def test_upload_election_year_unavailable(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
-    new.form['date'] = date(1990, 1, 1)
+    new.form['date'] = '1990-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'federation'
@@ -90,7 +89,7 @@ def test_upload_election_temporary_results_majorz(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -208,7 +207,7 @@ def test_upload_election_temporary_results_proporz(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'federation'
@@ -337,7 +336,7 @@ def test_upload_election_available_formats_canton(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'federal-majorz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -349,7 +348,7 @@ def test_upload_election_available_formats_canton(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'federal-proporz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'federation'
@@ -361,7 +360,7 @@ def test_upload_election_available_formats_canton(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'cantonal-majorz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'canton'
@@ -373,7 +372,7 @@ def test_upload_election_available_formats_canton(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'cantonal-proporz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'canton'
@@ -392,7 +391,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'federal-majorz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -404,7 +403,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'federal-proporz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'federation'
@@ -414,7 +413,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'cantonal-majorz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'canton'
@@ -426,7 +425,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'cantonal-proporz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'canton'
@@ -436,7 +435,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'communal-majorz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'municipality'
@@ -448,7 +447,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'communal-proporz-election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'municipality'
@@ -488,7 +487,7 @@ def test_upload_election_submit(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'majorz'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -496,7 +495,7 @@ def test_upload_election_submit(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'proporz'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'federation'

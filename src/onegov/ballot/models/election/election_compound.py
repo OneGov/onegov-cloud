@@ -6,6 +6,7 @@ from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
@@ -72,7 +73,7 @@ class ElectionCompoundAssociation(Base):
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultExportMixin
+    PartyResultExportMixin, ExplanationsPdfMixin
 ):
 
     __tablename__ = 'election_compounds'

@@ -1186,3 +1186,20 @@ def test_list_results(session):
     ) == [
         ('Quimby Again!', 3, 953),
     ]
+
+
+def test_election_compound_attachments(test_app, explanations_pdf):
+    model = ElectionCompound(
+        title='Legislative Elections',
+        domain='canton',
+        date=date(2015, 6, 14),
+    )
+
+    assert model.explanations_pdf is None
+    del model.explanations_pdf
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+    assert model.explanations_pdf.reference.content_type == 'application/pdf'
+    del model.explanations_pdf
+    assert model.explanations_pdf is None

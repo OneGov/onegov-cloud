@@ -1,9 +1,12 @@
+from cgi import FieldStorage
 from datetime import date
+from io import BytesIO
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
+from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
@@ -39,7 +42,8 @@ def test_vote_form_on_request():
     assert form.vote_rm.validators == []
 
 
-def test_vote_form_model(election_day_app_zg, related_link_labels):
+def test_vote_form_model(election_day_app_zg, related_link_labels,
+                         explanations_pdf):
     model = Vote()
     model.title_translations = {
         'de_CH': 'Vote (DE)',
@@ -52,6 +56,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels):
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     form = VoteForm()
     form.apply_model(model)
@@ -76,6 +81,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels):
     assert form.related_link_label_fr.data == 'FR'
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
+    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
     assert form.vote_type.data == 'simple'
     assert form.expats.data is False
 
@@ -91,6 +97,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels):
     form.domain.data = 'canton'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
+    form.explanations_pdf.action = 'delete'
     form.vote_type.data = 'complex'
     form.expats.data = True
 
@@ -106,11 +113,29 @@ def test_vote_form_model(election_day_app_zg, related_link_labels):
     assert model.domain == 'canton'
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
+    assert model.explanations_pdf is None
     assert model.type == 'simple'
     assert model.expats is True
 
+    form.explanations_pdf.action = 'upload'
 
-def test_vote_form_model_complex(related_link_labels):
+    field_storage = FieldStorage()
+    field_storage.file = BytesIO('my-file'.encode())
+    field_storage.type = 'image/png'  # ignored
+    field_storage.filename = 'my-file.pdf'
+    form.explanations_pdf.process(
+        DummyPostData({'explanations_pdf': field_storage})
+    )
+
+    form.update_model(model)
+
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'my-file.pdf'
+    assert model.explanations_pdf.reference.file.read() == b'my-file'
+
+
+def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
+                                 explanations_pdf):
     model = ComplexVote()
     model.title_translations = {
         'de_CH': 'Vote (DE)',
@@ -135,6 +160,7 @@ def test_vote_form_model_complex(related_link_labels):
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     form = VoteForm()
     form.apply_model(model)
@@ -159,6 +185,7 @@ def test_vote_form_model_complex(related_link_labels):
     assert form.related_link_label_fr.data == 'FR'
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
+    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
     assert form.vote_type.data == 'complex'
 
     fieldsets = [f.label for f in form.fieldsets if f.label]
@@ -181,6 +208,7 @@ def test_vote_form_model_complex(related_link_labels):
     form.domain.data = 'canton'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
+    form.explanations_pdf.action = 'delete'
     form.vote_type.data = 'complex'
 
     form.update_model(model)
@@ -207,4 +235,21 @@ def test_vote_form_model_complex(related_link_labels):
     assert model.domain == 'canton'
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
+    assert model.explanations_pdf is None
     assert model.type == 'complex'
+
+    form.explanations_pdf.action = 'upload'
+
+    field_storage = FieldStorage()
+    field_storage.file = BytesIO('my-file'.encode())
+    field_storage.type = 'image/png'  # ignored
+    field_storage.filename = 'my-file.pdf'
+    form.explanations_pdf.process(
+        DummyPostData({'explanations_pdf': field_storage})
+    )
+
+    form.update_model(model)
+
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'my-file.pdf'
+    assert model.explanations_pdf.reference.file.read() == b'my-file'

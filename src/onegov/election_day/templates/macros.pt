@@ -711,36 +711,36 @@
 </metal:ballot-result-bar>
 
 <metal:candidates-chart define-macro="candidates-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|'';">
+    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|''; sort_by_lists sort_by_lists|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected})}"
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}"
                 data-embed-link="Embed heatmap"
                 data-embed-source="${request.link(model, name='candidates-chart')}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected})}">
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}">
             </div>
         </tal:block>
     </tal:block>
 </metal:candidates-chart i18n:domain="onegov.election_day">
 
 <metal:lists-chart define-macro="lists-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''; names names|''">
+    <tal:block tal:define="limit limit|''; names names|''; sort_by_names sort_by_names|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names})}"
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names})}"
                 data-embed-link="Embed heatmap"
                 data-embed-source="${request.link(model, name='lists-chart')}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names})}">
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names})}">
             </div>
         </tal:block>
     </tal:block>
@@ -928,12 +928,17 @@
 </metal:fields>
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
-    <div class="row related" tal:condition="layout.related_link">
-        <div tal:define="label layout.related_link_label" class="columns small-12">
+    <div class="row related" tal:condition="layout.related_link or layout.explanations_pdf">
+        <div class="columns small-12">
             <h2 i18n:translate="">Related link</h2>
-            <p tal:switch="label is None">
-                <a tal:case="True" href="${layout.related_link}" class="related-link">${layout.related_link}</a>
-                <a tal:case="False" href="${layout.related_link}" class="related-link">${label}</a>
+            <p tal:condition="layout.explanations_pdf">
+                <a href="${request.link(layout.explanations_pdf)}" class="related-link" i18n:translate="">Explanations (PDF)</a>
+            </p>
+            <p tal:condition="layout.related_link and layout.related_link_label">
+                <a href="${layout.related_link}" class="related-link">${layout.related_link_label}</a>
+            </p>
+            <p tal:condition="layout.related_link and not layout.related_link_label">
+                <a href="${layout.related_link}" class="related-link">${layout.related_link}</a>
             </p>
         </div>
     </div>

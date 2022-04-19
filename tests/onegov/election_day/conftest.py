@@ -1,15 +1,15 @@
 import os.path
+import pytest
 import re
 import tarfile
-from collections import OrderedDict
-from io import BytesIO
-
-import pytest
 import textwrap
 import transaction
 
-from onegov.ballot import Election, Vote, ProporzElection, ComplexVote
+
+from collections import OrderedDict
 from datetime import date
+from io import BytesIO
+from onegov.ballot import Election, Vote, ProporzElection, ComplexVote
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import \
@@ -23,6 +23,7 @@ from onegov.election_day.formats import import_election_internal_majorz, \
     import_party_results
 from tests.onegov.election_day.common import print_errors, \
     get_tar_file_path, create_principal
+from onegov.pdf import Pdf
 from onegov.user import User
 from tests.shared.utils import create_app
 
@@ -796,3 +797,14 @@ def majorz_election(import_test_datasets):
             app_session=session
         )
     return _majorz_election
+
+
+@pytest.fixture(scope="function")
+def explanations_pdf():
+    result = BytesIO()
+    pdf = Pdf(result)
+    pdf.init_report()
+    pdf.p("Erläuterungen")
+    pdf.generate()
+    result.seek(0)
+    return result

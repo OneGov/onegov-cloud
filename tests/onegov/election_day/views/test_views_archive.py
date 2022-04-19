@@ -1,6 +1,5 @@
 import transaction
 import pytest
-from datetime import date
 from onegov.election_day.collections import ArchivedResultCollection
 from tests.onegov.election_day.common import login
 from webtest import TestApp as Client
@@ -14,13 +13,13 @@ def test_view_latest(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -42,13 +41,13 @@ def test_view_latest_json(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -69,13 +68,13 @@ def test_view_archive(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -103,13 +102,13 @@ def test_view_archive_json(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -141,13 +140,13 @@ def test_view_update_results(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'

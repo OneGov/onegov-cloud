@@ -1,22 +1,8 @@
-"""
-    Send E-Mail through Postmark
-
-    Adapted from repoze.sendmail: https://github.com/repoze/repoze.sendmail
-
-    Usage:
-        qp = EmailQueueProcessor(token, email_dir_1, email_dir_2, ..., limit=x)
-        qp.send_messages()
-"""
-
 import errno
-import json
 import logging
 import os
-import pycurl
 import stat
 import time
-
-from io import BytesIO
 
 
 log = logging.getLogger('onegov.core')
@@ -84,23 +70,9 @@ MAX_SEND_TIME = 60 * 60 * 3
 
 class MailQueueProcessor:
 
-    def __init__(self, postmark_token, *paths, limit=None):
+    def __init__(self, *paths, limit=None):
         self.paths = paths
         self.limit = limit
-
-        # Keep a pycurl object around, to use HTTP keep-alive - though pycurl
-        # is much worse in terms of it's API, the performance is *much* better
-        # than requests and it supports modern features like HTTP/2 or HTTP/3
-        self.url = 'https://api.postmarkapp.com/email/batch'
-        self.curl = pycurl.Curl()
-        self.curl.setopt(pycurl.TCP_KEEPALIVE, 1)
-        self.curl.setopt(pycurl.URL, self.url)
-        self.curl.setopt(pycurl.HTTPHEADER, [
-            'Accept:application/json',
-            'Content-Type:application/json',
-            f'X-Postmark-Server-Token:{postmark_token}'
-        ])
-        self.curl.setopt(pycurl.POST, 1)
 
     def split(self, filename):
         """ Returns the path, the name and the suffix of the given path. """
@@ -151,51 +123,9 @@ class MailQueueProcessor:
 
         return tuple(files)
 
-    def send(self, payload):
-        """ Sends the mail and returns the API response on error.
-
-            On success this returns None.
-        """
-        code, body = self.send_request(payload)
-
-        if 400 <= code < 600:
-            raise RuntimeError(f"{code} calling {self.url}: {body}")
-
-        result = json.loads(body)
-
-        # If we don't get a list we definitely hit an error
-        if not isinstance(result, list):
-            return result
-
-        # If any list entry contains errors we forward the result
-        for index, status in enumerate(result, start=1):
-            error_code = status.get('ErrorCode', 0)
-            if error_code == 406:
-                # inactive recipient, error can be ignored but still log it
-                log.warning(status.get(
-                    'Message',
-                    f'Inactive recipient at index {index}.'
-                ))
-            elif error_code != 0:
-                return result
-
-        return None
-
-    def send_request(self, payload):
-        """ Performes the API request using the given payload. """
-
-        body = BytesIO()
-
-        self.curl.setopt(pycurl.WRITEDATA, body)
-        self.curl.setopt(pycurl.POSTFIELDS, payload)
-        self.curl.perform()
-
-        code = self.curl.getinfo(pycurl.RESPONSE_CODE)
-
-        body.seek(0)
-        body = body.read().decode('utf-8')
-
-        return code, body
+    def send(self, filename, payload):
+        """ Sends the mail and returns success as bool """
+        raise NotImplementedError()
 
     def parse(self, filename):
         # NOTE: For now we don't perform any validation, since it would
@@ -306,16 +236,12 @@ class MailQueueProcessor:
         # read message file and send contents
         payload = self.parse(filename)
         if payload:
-            status = self.send(payload)
-            if status is None:
+            # A status of None means we skipped the message
+            # and maybe will try again.
+            status = self.send(filename, payload)
+            if status is True:
                 log.info(f"Mail batch {filename} sent.")
-            else:
-                # this should cause stderr output, which
-                # will write the cronjob output to chat
-                log.error(
-                    f"Failed sending mail batch {filename} with "
-                    f"API response {status}"
-                )
+            elif status is False:
                 os.link(filename, failed_filename)
         else:
             # this should cause stderr output, which

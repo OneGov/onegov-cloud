@@ -1,8 +1,11 @@
+from cgi import FieldStorage
 from datetime import date
+from io import BytesIO
 from onegov.ballot import Election
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
+from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
@@ -73,7 +76,10 @@ def test_election_form_on_request(session):
     assert isinstance(form.election_rm.validators[0], InputRequired)
 
 
-def test_election_form_model(session, related_link_labels):
+def test_election_form_model(election_day_app_zg, related_link_labels,
+                             explanations_pdf):
+    session = election_day_app_zg.session()
+
     model = Election()
     model.title = 'Election (DE)'
     model.title_translations['de_CH'] = 'Election (DE)'
@@ -90,6 +96,7 @@ def test_election_form_model(session, related_link_labels):
     model.number_of_mandates = 5
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
     model.tacit = False
     model.expats = False
     model.colors = {
@@ -116,6 +123,7 @@ def test_election_form_model(session, related_link_labels):
     assert form.related_link_label_fr.data == 'FR'
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
+    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
     assert form.tacit.data is False
     assert form.expats.data is False
     assert form.colors.data == (
@@ -136,6 +144,7 @@ def test_election_form_model(session, related_link_labels):
     form.majority_type.data = 'absolute'
     form.absolute_majority.data = 10000
     form.related_link.data = 'http://ur.l'
+    form.explanations_pdf.action = 'delete'
     form.tacit.data = True
     form.expats.data = True
     form.colors.data = (
@@ -161,6 +170,7 @@ def test_election_form_model(session, related_link_labels):
     assert model.majority_type == 'absolute'
     assert model.absolute_majority == 10000
     assert model.related_link == 'http://ur.l'
+    assert model.explanations_pdf is None
     assert model.tacit is True
     assert model.expats is True
     assert model.colors == {
@@ -184,6 +194,22 @@ def test_election_form_model(session, related_link_labels):
     assert model.domain == 'region'
     assert model.domain_segment == 'Reinach'
     assert model.domain_supersegment == 'Region 2'
+
+    form.explanations_pdf.action = 'upload'
+
+    field_storage = FieldStorage()
+    field_storage.file = BytesIO('my-file'.encode())
+    field_storage.type = 'image/png'  # ignored
+    field_storage.filename = 'my-file.pdf'
+    form.explanations_pdf.process(
+        DummyPostData({'explanations_pdf': field_storage})
+    )
+
+    form.update_model(model)
+
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'my-file.pdf'
+    assert model.explanations_pdf.reference.file.read() == b'my-file'
 
 
 def test_election_form_relations(session):
