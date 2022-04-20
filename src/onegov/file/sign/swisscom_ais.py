@@ -1,6 +1,8 @@
+import io
 import os
 
 from AIS import AIS, PDF
+from contextlib import suppress
 from onegov.file.sign.generic import SigningService
 
 
@@ -21,11 +23,17 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         self.client = AIS(customer, key_static, cert_file, cert_key)
 
     def sign(self, infile, outfile):
-        # HACK: pyHanko expects the IO interface to be implemented
-        #       and calls writeable() on the out_stream
-        setattr(outfile, 'writeable', lambda s: True)
+        with suppress(io.UnsupportedOperation):
+            infile.seek(0)
 
-        pdf = PDF(infile, out_stream=outfile)
+        # NOTE: We gain nothing from a chunked read, since we need to
+        #       keep the entire file in memory anyways.
+        inout_stream = io.BytesIO(infile.read())
+
+        pdf = PDF(inout_stream=inout_stream)
         self.client.sign_one_pdf(pdf)
+
+        # NOTE: Same with the chunked write, the file is already in memory
+        outfile.write(inout_stream.getvalue())
 
         return f'swisscom_ais/{self.customer}/{self.client.last_request_id}'
