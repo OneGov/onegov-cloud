@@ -483,7 +483,7 @@ del {
 */
 .blank-label {
     @include label($bg: $white);
-    border: 1px solid $gray;
+    border: 1px solid #cbcccc;
     font-size: .8rem;
     margin: 0 4px 7px 0;
 
