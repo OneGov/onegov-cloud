@@ -6093,6 +6093,11 @@ h2 + div.timeline {
         @include icon('\f023');
         color: $red-dark;
     }
+
+    input[value="members"] + label::before {
+        @include icon('\f0c0');
+        color: $blue-dark;
+    }
 }
 
 .secret-hint::before {

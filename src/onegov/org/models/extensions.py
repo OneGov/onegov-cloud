@@ -59,7 +59,10 @@ class AccessExtension(ContentExtension):
     set one of the following access levels:
 
     * 'public' - The default, the model is listed and accessible.
-    * 'private' - Neither listed nor accessible.
+    * 'private' - Neither listed nor accessible, except administrators
+                  and editors.
+    * 'members' - Neither listed nor accessible except administrators, editors
+                  and members.
     * 'secret' - Not listed, but available for anyone that knows the URL.
 
     see :func:`onegov.core.security.rules.has_permission_not_logged_in`
@@ -77,6 +80,7 @@ class AccessExtension(ContentExtension):
                     ('public', _("Public")),
                     ('secret', _("Through URL only (not listed)")),
                     ('private', _("Only by privileged users")),
+                    ('members', _("Only by privileged users and members")),
                 ),
                 default='public',
                 fieldset=_("Security")

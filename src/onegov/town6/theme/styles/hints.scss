@@ -67,6 +67,11 @@
         @include icon-bold('\f023');
         color: $red-dark;
     }
+
+    input[value="members"] + label::before {
+        @include icon-bold('\f0c0');
+        color: $blue-dark;
+    }
 }
 
 .secret-hint::before {
