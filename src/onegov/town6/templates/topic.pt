@@ -14,8 +14,8 @@
              tal:define="lead layout.linkify(page.content.get('lead'));text page.content.get('text'); people page.people; contact layout.contact_html; coordinates page.coordinates">
                 <tal:b metal:fill-slot="after-text">
                     <ul class="more-list page-links limit-line-width">
-                        <li tal:repeat="(lead, title, link, edit_link) children">
-                            <a href="${link}">${title}</a>
+                        <li tal:repeat="(lead, title, link, url, edit_link) children">
+                            <a href="${url}">${title}</a>
                             <div class="list-lead" tal:condition="lead">${lead}</div>
                             <a tal:condition="edit_link" class="edit-link" href="${edit_link}"><i class="far fa-edit"></i></a>
                         </li>
