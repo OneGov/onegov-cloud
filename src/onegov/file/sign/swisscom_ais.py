@@ -1,9 +1,7 @@
 import os
 
 from AIS import AIS, PDF
-from contextlib import suppress
 from onegov.file.sign.generic import SigningService
-from io import UnsupportedOperation
 
 
 class SwisscomAIS(SigningService, service_name='swisscom_ais'):
@@ -23,8 +21,9 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         self.client = AIS(customer, key_static, cert_file, cert_key)
 
     def sign(self, infile, outfile):
-        with suppress(UnsupportedOperation):
-            infile.seek(0)
+        # HACK: pyHanko expects the IO interface to be implemented
+        #       and calls writeable() on the out_stream
+        setattr(outfile, 'writeable', lambda s: True)
 
         pdf = PDF(infile, out_stream=outfile)
         self.client.sign_one_pdf(pdf)
