@@ -6,6 +6,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.upgrade import upgrade_task
 from onegov.org.models import Organisation
 from sqlalchemy import Column, Integer, Enum
+from onegov.core.orm.types import UTCDateTime
 
 from onegov.winterthur.models.mission_report import MISSION_TYPES
 
@@ -42,3 +43,15 @@ def add_mission_count_and_type_to_reports(context):
             Column('mission_count', Integer, default=1),
             default=lambda x: 1
         )
+
+
+@upgrade_task('Add timestamps to street')
+def add_timestamps_to_street(context):
+    if not context.has_column('winterthur_addresses', 'created'):
+        context.operations.add_column('winterthur_addresses', Column(
+            'created', UTCDateTime
+        ))
+    if not context.has_column('winterthur_addresses', 'modified'):
+        context.operations.add_column('winterthur_addresses', Column(
+            'modified', UTCDateTime
+        ))

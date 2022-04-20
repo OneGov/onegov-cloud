@@ -2,13 +2,16 @@ import click
 import os
 import platform
 import shutil
+import ssl
+import smtplib
 import subprocess
 import sys
 
 from fnmatch import fnmatch
 from onegov.core.cache import lru_cache
 from onegov.core.cli.core import command_group, pass_group_context, abort
-from onegov.core.mail_processor import MailQueueProcessor
+from onegov.core.mail_processor import PostmarkMailQueueProcessor
+from onegov.core.mail_processor import SMTPMailQueueProcessor
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
 from onegov.core.upgrade import get_upgrade_modules
@@ -72,30 +75,51 @@ def delete(group_context):
     return delete_instance
 
 
-@cli.command(context_settings={
+@cli.group(invoke_without_command=True, context_settings={
     'matches_required': False,
     'default_selector': '*'
 })
-@click.option('--token', default=None,
-              help="The postmark server token to authenticate")
+@click.option('--queue', default='postmark',
+              help="The name of the queue to process")
+@click.option('--token', default='',
+              help="Deprecated, does nothing")
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
 @pass_group_context
-def sendmail(group_context, token, limit):
-    """ Iterates over all applications and processes the maildir for each
-    application that uses maildir e-mail delivery.
+def sendmail(group_context, queue, token, limit):
+    """ Sends mail from a specific mail queue. """
 
-    """
+    queues = group_context.config.mail_queues
+    if queue not in queues:
+        click.echo(f'The queue "{queue}" does not exist.', err=True)
+        sys.exit(1)
 
-    # applications with a maildir configuration
-    cfgs = (c for c in group_context.appcfgs if 'mail' in c.configuration)
-    cfgs = (v for c in cfgs for v in c.configuration['mail'].values())
-    cfgs = (c for c in cfgs if c.get('directory'))
+    cfg = queues[queue]
+    mailer = cfg.get('mailer', 'postmark')
+    directory = cfg.get('directory')
+    if not directory:
+        click.echo('No directory configured for this queue.', err=True)
+        sys.exit(1)
 
-    # non-empty maildirs
-    dirs = set(c['directory'] for c in cfgs)
-    qp = MailQueueProcessor(token, *dirs, limit=limit)
-    qp.send_messages()
+    if mailer == 'postmark':
+        qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
+        qp.send_messages()
+
+    elif mailer == 'smtp':
+        with smtplib.SMTP(cfg['host'], cfg['port']) as mailer:
+            if cfg.get('force_tls', False):
+                context = ssl.create_default_context()
+                mailer.starttls(context=context)
+
+            username = cfg.get('username')
+            if username is not None:
+                mailer.login(username, cfg.get('password'))
+
+            qp = SMTPMailQueueProcessor(mailer, directory, limit=limit)
+            qp.send_messages()
+    else:
+        click.echo(f'Unknown mailer {mailer} specified in config.', err=True)
+        sys.exit(1)
 
 
 @cli.command(context_settings={

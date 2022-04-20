@@ -1,7 +1,6 @@
 import json
 import os
 
-from datetime import date
 from tests.onegov.election_day.common import get_email_link
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_majorz_election
@@ -17,7 +16,7 @@ def test_view_notifications_votes(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Vote"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -83,7 +82,7 @@ def test_view_notifications_elections(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Majorz Election"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -167,13 +166,13 @@ def test_view_notifications_summarized(election_day_app_zg):
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Unternehmenssteuerreformgesetz"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Regierungsratswahl"
-    new.form['date'] = date(2013, 1, 1)
+    new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'

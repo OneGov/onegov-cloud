@@ -1,4 +1,3 @@
-from datetime import date
 from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
@@ -43,7 +42,7 @@ def test_upload_parties_submit(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'federation'

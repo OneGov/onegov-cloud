@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
@@ -27,7 +28,7 @@ from uuid import uuid4
 
 class Vote(Base, ContentMixin, LastModifiedMixin,
            DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
-           DerivedBallotsCountMixin):
+           DerivedBallotsCountMixin, ExplanationsPdfMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 

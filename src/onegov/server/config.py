@@ -18,6 +18,7 @@ class Config(object):
         self.applications = [
             ApplicationConfig(a) for a in configuration.get('applications')
         ]
+        self.mail_queues = configuration.get('mail_queues', {})
         self.logging = configuration.get('logging', {})
 
         unique_namespaces = set(a.namespace for a in self.applications)
