@@ -24,13 +24,13 @@ def add_data_source(client, name='name', upload_type='vote', fill=False):
         if upload_type == 'vote':
             manage = client.get('/manage/votes/new-vote')
             manage.form['vote_de'] = 'item'
-            manage.form['date'] = date(2015, 1, 1)
+            manage.form['date'] = '2015-01-01'
             manage.form['domain'] = 'federation'
             manage.form.submit()
         else:
             manage = client.get('/manage/elections/new-election')
             manage.form['election_de'] = 'item'
-            manage.form['date'] = date(2015, 1, 1)
+            manage.form['date'] = '2015-01-01'
             manage.form['mandates'] = 1
             manage.form['election_type'] = upload_type
             manage.form['domain'] = 'federation'

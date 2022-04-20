@@ -158,6 +158,11 @@ input[data-street-search]::placeholder {
 /*
     Streets view
 */
+.last-updated {
+    color: darkgray;
+    margin-top: -1rem;
+}
+
 .streetname {
     font-size: $h3-font-size - $h3-font-reduction;
     margin-bottom: 1rem;
@@ -947,4 +952,8 @@ table.responsive {
             display: none;
         }
     }
+}
+
+.visually-hidden {
+    @include element-invisible;
 }

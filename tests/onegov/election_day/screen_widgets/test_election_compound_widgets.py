@@ -252,10 +252,12 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'data-text="841"' in result
     assert 'data-text="140"' in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=0&amp;names=&amp;sort_by_names="'
     ) in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=02&amp;names=a,b&amp;sort_by_names="'
     ) in result
     assert '01.01.2022' in result
     assert 'my-class-1' in result
@@ -392,10 +394,12 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'data-text="140"' not in result  # voters_count hidden
     assert 'data-text="3487.00"' in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=0&amp;names=&amp;sort_by_names="'
     ) in result
     assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
+        'data-dataurl="ElectionCompound/lists-data'
+        '?limit=02&amp;names=a,b&amp;sort_by_names="'
     ) in result
     assert 'data-dataurl="ElectionCompound/list-groups-data"' in result
     assert '2' in result

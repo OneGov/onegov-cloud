@@ -337,6 +337,7 @@ schools = dict(
         'bases': ['ou=ksz,ou=SchulNet,o=Extern']
     },
     GIBZ={
+        'default_filter': '(mail=*@gibz.ch)',
         'org': 'VD / GIBZ',
         'bases': ['ou=gibz,ou=SchulNet,o=Extern']
     }

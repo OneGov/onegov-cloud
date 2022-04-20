@@ -1,10 +1,11 @@
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Text
 
 
-class WinterthurAddress(Base):
+class WinterthurAddress(Base, TimestampMixin):
 
     __tablename__ = 'winterthur_addresses'
 

@@ -62,9 +62,13 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
         return self.model.related_link
 
     @cached_property
-    def show_map(self):
-        return self.principal.is_year_available(self.model.date.year)
-
-    @cached_property
     def related_link_label(self):
         return self.model.related_link_label.get(self.request.locale, None)
+
+    @cached_property
+    def explanations_pdf(self):
+        return self.model.explanations_pdf
+
+    @cached_property
+    def show_map(self):
+        return self.principal.is_year_available(self.model.date.year)

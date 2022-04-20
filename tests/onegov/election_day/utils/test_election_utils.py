@@ -117,6 +117,18 @@ def test_election_utils_majorz(import_test_datasets, session):
         'title': 'majorz_internal_staenderatswahl-2015-parties',
         'results': expected[3:5],
     }
+    assert get_candidates_data(election, lists=['ALG', 'SP'],
+                               sort_by_lists=True) == {
+        'majority': 18191,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': list(reversed(expected[3:5]))
+    }
+    assert get_candidates_data(election, lists=['FDP', 'CVP', 'SP'],
+                               sort_by_lists=True, elected=True) == {
+        'majority': 18191,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': list(reversed(expected[0:2])),
+    }
     assert get_candidates_data(election, elected=True) == {
         'majority': 18191,
         'title': 'majorz_internal_staenderatswahl-2015-parties',
@@ -383,6 +395,12 @@ def test_election_utils_proporz(import_test_datasets, session):
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': expected[1:],
     }
+    assert get_candidates_data(election, lists=['FDP Ost', 'CVP'],
+                               sort_by_lists=True) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': list(reversed(expected[1:])),
+    }
     assert len(get_candidates_data(election, elected=False)['results']) == 50
     assert get_candidates_data(election, limit=1,
                                lists=['FDP Ost', 'CVP', 'GLP']) == {
@@ -408,6 +426,37 @@ def test_election_utils_proporz(import_test_datasets, session):
                 'value': 4093
             }
         ]
+    }
+    assert get_candidates_data(election, lists=['FDP Ost', 'CVP'],
+                               sort_by_lists=True, elected=False, limit=4) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [
+            {
+                'class': 'active',
+                'color': '#999',
+                'text': 'Pezzatti Bruno',
+                'value': 10174
+            },
+            {
+                'class': 'inactive',
+                'color': '#999',
+                'text': 'Ingold Gabriela',
+                'value': 3637
+            },
+            {
+                'class': 'inactive',
+                'color': '#999',
+                'text': 'Mollet Patrick',
+                'value': 2190
+            },
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'text': 'Pfister Gerhard',
+                'value': 16134
+            }
+        ],
     }
 
     # get_list_results
@@ -605,6 +654,12 @@ def test_election_utils_proporz(import_test_datasets, session):
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': [e for e in expected if e['text'] in names][:2],
+    }
+    names = ['SP Juso', 'SP Frauen', 'SP Männer']
+    assert get_lists_data(election, names=names, sort_by_names=True) == {
+        'majority': None,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': list(reversed([e for e in expected if e['text'] in names])),
     }
 
 

@@ -1,6 +1,34 @@
 # OneGov Cloud Example Configuration
 # ----------------------------------
 
+# Mail Queues
+# Each queue will need to have its own unique directory specified.
+# The queues will make no attempt to split up or balance the load
+# between each other if they share the same directory.
+# Use yaml anchors/aliases to refer to the mail queue in the app
+# config
+mail_queues:
+  # Postmark mailer will use the mail category to determine the
+  # MessageStream that's used. Currently 'transactional' will be
+  # transformed to 'outbound' i.e. the default stream. As such
+  # the same queue can be used for both categories.
+  # postmark: &postmark
+  #   mailer: postmark
+  #   token: postmark-server-token
+  #   directory: '/usr/local/var/onegov/mail/postmark'
+
+  # SMTP mailer will ignore the mail category. If you wish to use
+  # separate SMTP servers for separate categories, then you will
+  # need to specify different queues for them.
+  local_smtp: &local_smtp
+    mailer: smtp
+    directory: '/usr/local/var/onegov/mail/smtp'
+    host: localhost
+    port: 1025
+    force_tls: false
+    username:
+    password:
+
 # The following block is shared with all applications below, though each
 # application may override any or all values.
 configuration: &global-config
@@ -74,13 +102,16 @@ configuration: &global-config
 
   # OneGov holds two sorts of mail. Transactional, non-spammy e-mail or
   # marketing e-mail. Though they can both have different configurations
+  # Each mail config can write to one of the mail_queues defined in
+  # global scope. This could all be the same queue. Use *aliases
+  # to refer to the mail queue &anchors declared above.
   mail:
     transactional:
       sender: service@onegovcloud.ch
-      directory: '/usr/local/var/onegov/mail'
+      <<: *local_smtp
     marketing:
       sender: newsletters@onegovcloud.ch
-      directory: '/usr/local/var/onegov/mail'
+      <<: *local_smtp
 
   # To test yubikey integration, a yubikey API access token has to be provided
   # yubikey_client_id:

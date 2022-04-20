@@ -1,8 +1,6 @@
-from datetime import date
-
 import pytest
-from freezegun import freeze_time
 
+from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionLayout
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import MAJORZ_HEADER
@@ -689,7 +687,7 @@ def test_view_election_tacit(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Tacit Election'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -724,7 +722,7 @@ def test_view_election_relations(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'First Election'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -732,7 +730,7 @@ def test_view_election_relations(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Second Election'
-    new.form['date'] = date(2022, 1, 2)
+    new.form['date'] = '2022-01-02'
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
