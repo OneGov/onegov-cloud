@@ -6100,22 +6100,32 @@ h2 + div.timeline {
     }
 }
 
-.secret-hint::before {
-    @include icon('\f21b');
-    color: $yellow-dark;
+
+.secret-hint::before,
+.private-hint::before,
+.member-hint::before,
+.unpublished-hint::before {
     font-style: normal;
+}
+
+.secret-hint::before {
+    @include icon-bold('\f21b');
+    color: $yellow-dark;
 }
 
 .private-hint::before {
-    @include icon('\f023');
+    @include icon-bold('\f023');
     color: $red-dark;
-    font-style: normal;
+}
+
+.member-hint::before {
+    @include icon-bold('\f0c0');
+    color: $blue-dark;
 }
 
 .unpublished-hint::before {
-    @include icon('\f070');
+    @include icon-bold('\f070');
     color: $orange-dark;
-    font-style: normal;
 }
 
 /*

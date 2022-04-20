@@ -443,6 +443,9 @@
     <tal:b condition="item.access == 'private'|False">
         <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
     </tal:b>
+    <tal:b condition="item.access == 'members'|False">
+        <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
+    </tal:b>
     <tal:b condition="item.access == 'secret'|False">
         <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
     </tal:b>

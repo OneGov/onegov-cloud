@@ -74,23 +74,30 @@
     }
 }
 
+.secret-hint::before,
+.private-hint::before,
+.member-hint::before,
+.unpublished-hint::before {
+    font-size: .875rem;
+    font-style: normal;
+}
+
 .secret-hint::before {
     @include icon-bold('\f21b');
     color: $yellow-dark;
-    font-size: .875rem;
-    font-style: normal;
 }
 
 .private-hint::before {
     @include icon-bold('\f023');
     color: $red-dark;
-    font-size: .875rem;
-    font-style: normal;
+}
+
+.members-hint::before {
+    @include icon-bold('\f0c0');
+    color: $blue-dark;
 }
 
 .unpublished-hint::before {
     @include icon-bold('\f070');
     color: $orange-dark;
-    font-size: .875rem;
-    font-style: normal;
 }

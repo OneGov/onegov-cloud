@@ -572,6 +572,9 @@
     <tal:b condition="item.access == 'private'|False">
         <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
     </tal:b>
+    <tal:b condition="item.access == 'members'|False">
+        <i title="This site is private but can also be seen by members" i18n:attributes="title" class="members-hint"></i>
+    </tal:b>
     <tal:b condition="item.access == 'secret'|False">
         <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
     </tal:b>
@@ -590,6 +593,20 @@
                 <div class="panel">
                     <p i18n:translate>
                         This site is not public.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</metal:access_hint_long>
+
+<metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
+    <tal:b condition="item.access == 'members'|False">
+        <div class="grid-x">
+            <div class="small-12 cell">
+                <div class="panel">
+                    <p i18n:translate>
+                        This site is not public but it can be seen by members.
                     </p>
                 </div>
             </div>
