@@ -223,6 +223,37 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
     under=current_language_tween_factory,
     over=transaction_tween_factory
 )
+def cache_control_tween_factory(app, handler):
+
+    def cache_control_tween(request):
+        """ Set headers and cookies for cache control.
+
+        Makes sure, pages are not cached downstream when logged in by setting
+        the cache-control header accordingly.
+
+        Sets `no_cache` cookie which can be used for bypassing a downstream
+        cache.
+
+        """
+
+        response = handler(request)
+        if request.is_logged_in:
+            response.headers.add('cache-control', 'no-store')
+            if request.cookies.get('no_cache', '0') == '0':
+                response.set_cookie('no_cache', '1')
+        else:
+            if request.cookies.get('no_cache', '0') == '1':
+                response.delete_cookie('no_cache')
+
+        return response
+
+    return cache_control_tween
+
+
+@ElectionDayApp.tween_factory(
+    under=current_language_tween_factory,
+    over=transaction_tween_factory
+)
 def micro_cache_anonymous_pages_tween_factory(app, handler):
 
     cache_paths = (
