@@ -265,7 +265,7 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         key = ':'.join((
             request.method,
             request.locale,
-            request.path_info,
+            request.path_qs,
             'hl' if 'headerless' in request.browser_session else 'hf'
         ))
 
