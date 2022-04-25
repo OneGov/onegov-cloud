@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-02-21 12:03+0100\n"
+"POT-Creation-Date: 2022-04-25 14:15+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1449,6 +1449,9 @@ msgstr "Solo collegamenti esterni"
 msgid "Internal links only"
 msgstr "Solo collegamenti interni"
 
+msgid "E-Mail Address"
+msgstr "Indirizzo e-mail"
+
 msgid "Your note about this ticket"
 msgstr "La tua nota su questo biglietto"
 
@@ -1921,6 +1924,9 @@ msgstr "Solo tramite URL (non elencato)"
 msgid "Only by privileged users"
 msgstr "Solo da utenti privilegiati"
 
+msgid "Only by privileged users and members"
+msgstr "Solo da membri e da utenti privilegiati"
+
 msgid "Security"
 msgstr "Sicurezza"
 
@@ -2195,10 +2201,10 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -2590,11 +2596,17 @@ msgstr "Trascina e rilascia il file da caricare"
 msgid "All news"
 msgstr "Tutte le notizie"
 
+msgid "This site is private but can also be seen by members"
+msgstr ""
+
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
 
 msgid "This site is not public."
 msgstr "Questo sito non è pubblico."
+
+msgid "This site is not public but it can be seen by members."
+msgstr ""
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -3212,9 +3224,6 @@ msgstr ""
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
-
-msgid "E-Mail Address"
-msgstr "Indirizzo e-mail"
 
 msgid "Signup"
 msgstr "Registrati"
