@@ -443,7 +443,7 @@
     <tal:b condition="item.access == 'private'|False">
         <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
     </tal:b>
-    <tal:b condition="item.access == 'members'|False">
+    <tal:b condition="item.access == 'member'|False">
         <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
     </tal:b>
     <tal:b condition="item.access == 'secret'|False">
@@ -472,7 +472,7 @@
 </metal:access_hint_long>
 
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
-    <tal:b condition="item.access == 'members'|False">
+    <tal:b condition="item.access == 'member'|False">
         <div class="grid-x">
             <div class="small-12 cell">
                 <div class="panel">
