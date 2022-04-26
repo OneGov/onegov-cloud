@@ -82,6 +82,11 @@ def view_rdf(self, request):
         return text.interpolate(text)
 
     for item in sorted(items, key=lambda i: i.date, reverse=True):
+
+        # todo: Hotfix for load tests. If it's later than 15.5.2022 remove me!
+        if item.date.isoformat().startswith('2022-05-01'):
+            continue
+
         is_vote = isinstance(item, Vote)
 
         # IDs
