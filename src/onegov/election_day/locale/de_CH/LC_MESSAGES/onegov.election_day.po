@@ -1440,8 +1440,8 @@ msgid "Results deleted."
 msgstr "Ergebnisse gelöscht."
 
 #, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr "Möchten Sie wirklich alle Parteiresultate von \"${item}\" löschen?"
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Möchten Sie wirklich alle Resultate von \"${item}\" löschen?"
 
 #, python-format
 msgid "${count} files deleted."
@@ -1472,10 +1472,6 @@ msgstr "Wahl geändert."
 
 msgid "Edit election"
 msgstr "Wahl bearbeiten"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Möchten Sie wirklich alle Resultate von \"${item}\" löschen?"
 
 msgid "Election deleted."
 msgstr "Wahl gelöscht."
