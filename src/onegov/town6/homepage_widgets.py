@@ -353,7 +353,7 @@ class FocusWidget(object):
 
     template = """
     <xsl:template match="focus">
-        <a href="{@focus-url}">
+        <a href="{@focus-url}" class="focus-link">
             <div class="focus-widget">
                 <xsl:variable name="apos">'</xsl:variable>
                 <xsl:variable name="image_src">

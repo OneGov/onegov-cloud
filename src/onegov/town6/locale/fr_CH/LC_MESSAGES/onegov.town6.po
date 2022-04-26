@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-02-28 08:49+0100\n"
+"POT-Creation-Date: 2022-03-23 14:34+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1942,6 +1942,12 @@ msgstr "Affiche le pied de page sur toutes les pages sauf pour les admins"
 
 msgid "Partner display"
 msgstr "Affichage partenaires"
+
+msgid "Open external links in separate window"
+msgstr "Ouvrir les liens externes dans une fenêtre séparée"
+
+msgid "Links leading to a different website will be opened in a new window"
+msgstr "Les liens menant à un autre site web seront ouverts dans une nouvelle fenêtre"
 
 msgid "General"
 msgstr "Général"

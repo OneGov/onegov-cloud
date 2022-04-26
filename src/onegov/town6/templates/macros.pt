@@ -1689,15 +1689,19 @@
 
         <ul class="forms-list more-list">
             <li tal:repeat="record grouped[group]">
-                <a class="list-title" tal:attributes="href link_func(record)">
-                        ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+            <tal:b tal:define="link edit_link(record)|nothing">
+               
+                <a class="list-title" tal:attributes="href link_func(record); target layout.external_link_target">
+                        ${record.title} 
+                        <tal:block condition="layout.external_link_target and  external_link(record)|nothing"> 
+                        </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
-                <tal:b tal:define="link edit_link(record)|nothing">
-                    <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
-                </tal:b>
+                
                 <tal:b tal:define="lead record.meta.get('lead')">
                     <div tal:condition="lead" class="list-lead" tal:content="structure layout.linkify(lead)"></div>
                 </tal:b>
+                 <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+            </tal:b>
             </li>
         </ul>
     </tal:b>

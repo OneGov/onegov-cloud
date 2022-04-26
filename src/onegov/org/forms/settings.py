@@ -363,18 +363,16 @@ class FaviconSettingsForm(Form):
 
 
 class LinksSettingsForm(Form):
-    open_files_target_blank = BooleanField(
-        label=_("Open files in separate window"),
-        description=_(
-            'User will stay on the page when opening images and files')
-    )
-
     disable_page_refs = BooleanField(
         label=_("Disable page references"),
         description=_(
             "Disable showing the copy link '#' for the site reference. "
             "The references themselves will still work. "
             "Those references are only showed for logged in users.")
+    )
+
+    open_files_target_blank = BooleanField(
+        label=_("Open files in separate window")
     )
 
 
