@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-05 15:55+0200\n"
+"POT-Creation-Date: 2022-04-26 08:58+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -707,6 +707,12 @@ msgstr "Région"
 msgid "superregions_label_bl"
 msgstr "Régions"
 
+msgid "Seats"
+msgstr "Sièges"
+
+msgid "Mandates"
+msgstr "Mandats"
+
 msgid "Quarter"
 msgstr "Quartier"
 
@@ -940,12 +946,6 @@ msgstr "Connexion de sous-listes"
 
 msgid "Subtotal"
 msgstr "Sous-total"
-
-msgid "Mandates"
-msgstr "Mandats"
-
-msgid "Seats"
-msgstr "Sièges"
 
 msgid "eligible Voters"
 msgstr "Electeurs"

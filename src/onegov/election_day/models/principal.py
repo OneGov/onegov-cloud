@@ -300,6 +300,10 @@ class Canton(Principal):
             if self.id == 'bl':
                 return _("superregions_label_bl")
             return _("Districts")
+        if value == 'mandates':
+            if self.id == 'gr':
+                return _("Seats")
+            return _("Mandates")
         return ''
 
 

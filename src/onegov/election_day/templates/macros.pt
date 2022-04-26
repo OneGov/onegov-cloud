@@ -399,7 +399,7 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-district left-aligned">${layout.label('district')}</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="column-superregion left-aligned" tal:condition="layout.has_superregions" data-sorter="false">${layout.label('superregion')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.proporz" data-sorter="false">Mandates</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.proporz" data-sorter="false">${layout.label('mandates')}</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.majorz" data-sorter="false">Seats</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-counted right-aligned" data-sorter="false">Counted</th>
             </tr>
@@ -426,7 +426,7 @@
         <thead>
             <tr>
                 <th data-tablesaw-priority="4" i18n:translate="" class="column-superregion left-aligned" data-sorter="false">${layout.label('superregion')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" data-sorter="false">Mandates</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" data-sorter="false">${layout.label('mandates')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-counted right-aligned" data-sorter="false">Counted</th>
             </tr>
         </thead>
@@ -621,7 +621,7 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-list">List</th>
                 <th data-tablesaw-priority="1" i18n:translate="single_votes" class="column-votes right-aligned">Votes</th>
-                <th data-tablesaw-priority="1" i18n:translate="" class="column-mandates right-aligned">Mandates</th>
+                <th data-tablesaw-priority="1" i18n:translate="" class="column-mandates right-aligned">${layout.label('mandates')}</th>
             </tr>
         </thead>
         <tbody>
@@ -647,7 +647,7 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-list-group">List group</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-voters-count right-aligned">Voters count</th>
-                <th data-tablesaw-priority="1"  i18n:translate="" class="column-mandates right-aligned">Mandates</th>
+                <th data-tablesaw-priority="1"  i18n:translate="" class="column-mandates right-aligned">${layout.label('mandates')}</th>
             </tr>
         </thead>
         <tbody>
@@ -672,7 +672,7 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-list">List</th>
                 <th tal:condition="not layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-votes right-aligned">Voters count</th>
-                <th tal:condition="layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-mandates right-aligned">Mandates</th>
+                <th tal:condition="layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-mandates right-aligned">${layout.label('mandates')}</th>
             </tr>
         </thead>
         <tbody>
@@ -1140,7 +1140,7 @@
         <ul class="small-block-grid-1 medium-block-grid-4 factoids">
             <li>
                 <span i18n:translate="" tal:condition="layout.majorz">Seats</span>
-                <span i18n:translate="" tal:condition="layout.proporz">Mandates</span>
+                <span i18n:translate="" tal:condition="layout.proporz">${layout.label('mandates')}</span>
                 <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
             </li>
             <li tal:condition="layout.majorz and election.majority_type=='absolute'">
@@ -1159,7 +1159,7 @@
         </li>
         <li>
             <span i18n:translate="" tal:condition="layout.majorz">Seats</span>
-            <span i18n:translate="" tal:condition="layout.proporz">Mandates</span>
+            <span i18n:translate="" tal:condition="layout.proporz">${layout.label('mandates')}</span>
             <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election_compound.allocated_mandates, election_compound.number_of_mandates)" /></strong>
         </li>
     </ul>
@@ -1301,7 +1301,7 @@
                     <thead>
                         <tr>
                             <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
-                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Mandates</th>
+                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">${layout.label('mandates')}</th>
                             <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
                             <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
                             <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
@@ -1377,7 +1377,7 @@
     <tal:block tal:condition="election.has_results and election.completed and election.type == 'proporz'">
         <!--! Final results, proporz -->
         <dl tal:define="lists python: sorted([(l.number_of_mandates, l.name) for l in election.lists if l.number_of_mandates], reverse=True)">
-            <dt><span i18n:translate>Lists</span> / <span i18n:translate>Mandates</span></dt>
+            <dt><span i18n:translate>Lists</span> / <span i18n:translate>${layout.label('mandates')}</span></dt>
             <dd tal:repeat="list lists"><span>${list[1]}<span> / <span>${list[0]}</span></dd>
             <dt i18n:translate>Elected Candidates</dt>
             <dd tal:repeat="name election.elected_candidates">${name[1]} ${name[0]}</dd>
