@@ -1445,8 +1445,8 @@ msgid "Results deleted."
 msgstr "Stizzà ils resultats."
 
 #, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr "Vulais Vus propi stizzar tut ils resultats da partida da \"${item}\"?"
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Vulais Vus propi stizzar tut ils resultats da \"${item}\"?"
 
 #, python-format
 msgid "${count} files deleted."
@@ -1477,10 +1477,6 @@ msgstr "Midà l'elecziun."
 
 msgid "Edit election"
 msgstr "Modifitgar l'elecziun"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Vulais Vus propi stizzar tut ils resultats da \"${item}\"?"
 
 msgid "Election deleted."
 msgstr "Stizzà l'elecziun."

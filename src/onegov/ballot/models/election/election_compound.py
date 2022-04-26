@@ -352,19 +352,18 @@ class ElectionCompound(
     show_party_panachage = meta_property('show_party_panachage')
 
     def clear_results(self):
-        """ Clears all own results. """
+        """ Clears all related results. """
 
         self.last_result_change = None
-        result = [x.last_result_change for x in self.elections]
-        result = [x for x in result if x]
-        if result:
-            self.last_result_change = max(result)
 
         session = object_session(self)
         for result in self.party_results:
             session.delete(result)
         for result in self.panachage_results:
             session.delete(result)
+
+        for election in self.elections:
+            election.clear_results()
 
     def export(self):
         """ Returns all data connected to this election compound as list with

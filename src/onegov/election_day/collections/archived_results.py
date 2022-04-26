@@ -265,6 +265,8 @@ class ArchivedResultCollection(object):
 
         item.clear_results()
         self.update(item, request)
+        for election in getattr(item, 'elections', []):
+            self.update(election, request)
 
         self.session.flush()
 
