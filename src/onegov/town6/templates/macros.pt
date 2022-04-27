@@ -587,30 +587,29 @@
 </metal:publication_hint>
 
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
-    <tal:b condition="item.access == 'private'|False">
-        <div class="grid-x">
-            <div class="small-12 cell">
-                <div class="panel">
-                    <p i18n:translate>
-                        This site is not public.
-                    </p>
+    <tal:b tal:switch="item.access|False">
+        <tal:b tal:case="'private'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel callout">
+                        <p i18n:translate>
+                            This site is not public.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </tal:b>
-</metal:access_hint_long>
-
-<metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
-    <tal:b condition="item.access == 'member'|False">
-        <div class="grid-x">
-            <div class="small-12 cell">
-                <div class="panel">
-                    <p i18n:translate>
-                        This site is not public but it can be seen by members.
-                    </p>
+        </tal:b>
+        <tal:b tal:case="'member'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel callout">
+                        <p i18n:translate>
+                            This site is not public but it can be seen by members.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </tal:b>
     </tal:b>
 </metal:access_hint_long>
 
