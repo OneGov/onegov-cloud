@@ -4159,7 +4159,7 @@ msgid "Your registration has been confirmed"
 msgstr "Ihre Anmeldung wurde bestätigt"
 
 msgid "The registration has been confirmed"
-msgstr "Die Anmledung wurde bestätigt"
+msgstr "Die Anmeldung wurde bestätigt"
 
 msgid "The registration could not be confirmed"
 msgstr "Die Anmeldung konnte nicht bestätigt werden"
