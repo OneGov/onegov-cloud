@@ -6094,7 +6094,7 @@ h2 + div.timeline {
         color: $red-dark;
     }
 
-    input[value="members"] + label::before {
+    input[value="member"] + label::before {
         @include icon('\f0c0');
         color: $blue-dark;
     }
@@ -6109,22 +6109,22 @@ h2 + div.timeline {
 }
 
 .secret-hint::before {
-    @include icon-bold('\f21b');
+    @include icon('\f21b');
     color: $yellow-dark;
 }
 
 .private-hint::before {
-    @include icon-bold('\f023');
+    @include icon('\f023');
     color: $red-dark;
 }
 
 .member-hint::before {
-    @include icon-bold('\f0c0');
+    @include icon('\f0c0');
     color: $blue-dark;
 }
 
 .unpublished-hint::before {
-    @include icon-bold('\f070');
+    @include icon('\f070');
     color: $orange-dark;
 }
 

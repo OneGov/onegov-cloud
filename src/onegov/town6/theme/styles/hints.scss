@@ -68,7 +68,7 @@
         color: $red-dark;
     }
 
-    input[value="members"] + label::before {
+    input[value="member"] + label::before {
         @include icon-bold('\f0c0');
         color: $blue-dark;
     }
