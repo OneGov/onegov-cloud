@@ -182,7 +182,7 @@ def test_hide_page(client):
     anon = client.spawn()
     page = anon.get('/topics/organisation')
 
-    # Test the links in the
+    # Test the links in the page
     assert 'Test' not in page
 
 
@@ -282,3 +282,32 @@ def test_clipboard_separation(client):
     client.login_admin()
 
     assert 'paste-link' not in client.get('/topics/organisation')
+
+
+def test_view_page_as_member(client):
+    admin = client
+    client.login_admin()
+
+    new_page = admin.get('/topics/organisation').click('Thema')
+    new_page.form['title'] = "Test"
+    new_page.form['access'] = 'member'
+    page = new_page.form.submit().follow()
+    page_url = '/topics/organisation/test'
+
+    # Test if admin can see page
+    admin.get(page_url)
+    page = admin.get('/topics/organisation')
+    assert 'Test' in page
+
+    # Test if a member can see the page
+    member = client.spawn()
+    member.login_member()
+    member.get(page_url)
+    page = member.get('/topics/organisation')
+    assert 'Test' in page
+
+    # Test if a visitor can not see the page
+    anon = client.spawn()
+    anon.get(page_url, status=403)
+    page = anon.get('/topics/organisation')
+    assert 'Test' not in page

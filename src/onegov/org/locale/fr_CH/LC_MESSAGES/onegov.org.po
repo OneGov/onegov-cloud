@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-21 12:03+0100\n"
+"POT-Creation-Date: 2022-04-25 14:15+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1445,6 +1445,9 @@ msgstr "Liens externes uniquement"
 msgid "Internal links only"
 msgstr "Liens internes uniquement"
 
+msgid "E-Mail Address"
+msgstr "Adresse e-mail"
+
 msgid "Your note about this ticket"
 msgstr "Votre note à propos de ce ticket"
 
@@ -1912,6 +1915,9 @@ msgstr "Via URL uniquement (non répertorié)"
 msgid "Only by privileged users"
 msgstr "Seulement par les utilisateurs privilégiés"
 
+msgid "Only by privileged users and members"
+msgstr "Seulement par les membres et les utilisateurs privilégiés"
+
 msgid "Security"
 msgstr "Sécurité"
 
@@ -2186,10 +2192,10 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -2588,11 +2594,17 @@ msgstr "Déposez des fichiers pour télécharger"
 msgid "All news"
 msgstr "Toutes les nouvelles"
 
+msgid "This site is private but can also be seen by members"
+msgstr "Ce site est privé mais peut également être vu par les membres"
+
 msgid "This site is not published."
 msgstr "Cette page n'est pas publiée."
 
 msgid "This site is not public."
 msgstr "Ce site n'est pas public."
+
+msgid "This site is not public but it can be seen by members."
+msgstr "Ce site n'est pas public mais il peut être vu par les membres."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -3218,9 +3230,6 @@ msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
 "permanence :"
-
-msgid "E-Mail Address"
-msgstr "Adresse e-mail"
 
 msgid "Signup"
 msgstr "S'abonner"

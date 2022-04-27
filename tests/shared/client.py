@@ -40,6 +40,9 @@ class Client(TestApp):
     def login_editor(self, to=None):
         return self.login('editor@example.org', 'hunter2', to)
 
+    def login_member(self, to=None):
+        return self.login('member@example.org', 'hunter2', to)
+
     def logout(self):
         return self.get('/auth/logout')
 

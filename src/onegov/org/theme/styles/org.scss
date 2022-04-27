@@ -6093,24 +6093,39 @@ h2 + div.timeline {
         @include icon('\f023');
         color: $red-dark;
     }
+
+    input[value="member"] + label::before {
+        @include icon('\f0c0');
+        color: $blue-dark;
+    }
+}
+
+
+.secret-hint::before,
+.private-hint::before,
+.member-hint::before,
+.unpublished-hint::before {
+    font-style: normal;
 }
 
 .secret-hint::before {
     @include icon('\f21b');
     color: $yellow-dark;
-    font-style: normal;
 }
 
 .private-hint::before {
     @include icon('\f023');
     color: $red-dark;
-    font-style: normal;
+}
+
+.member-hint::before {
+    @include icon('\f0c0');
+    color: $blue-dark;
 }
 
 .unpublished-hint::before {
     @include icon('\f070');
     color: $orange-dark;
-    font-style: normal;
 }
 
 /*

@@ -107,7 +107,7 @@ def test_add_new_user_without_activation_email(client):
 
     assert "existiert bereits" in new.form.submit()
 
-    new.form['username'] = 'member@example.org'
+    new.form['username'] = 'secondadmin@example.org'
     new.form['role'] = 'admin'
 
     assert "müssen zwingend einen YubiKey" in new.form.submit()
@@ -120,7 +120,7 @@ def test_add_new_user_without_activation_email(client):
     password = added.pyquery('.panel strong').text()
 
     login = client.spawn().get('/auth/login')
-    login.form['username'] = 'member@example.org'
+    login.form['username'] = 'secondadmin@example.org'
     login.form['password'] = password
     assert login.form.submit().status_code == 302
 
@@ -131,7 +131,7 @@ def test_add_new_user_with_activation_email(client):
     client.app.enable_yubikey = False
 
     new = client.get('/usermanagement').click('Benutzer', href='new')
-    new.form['username'] = 'member@example.org'
+    new.form['username'] = 'newmember@example.org'
     new.form['role'] = 'member'
     new.form['send_activation_email'] = True
     added = new.form.submit()
@@ -144,12 +144,12 @@ def test_add_new_user_with_activation_email(client):
         r'(http://localhost/auth/reset-password[^)]+)', email).group()
 
     page = client.spawn().get(reset)
-    page.form['email'] = 'member@example.org'
+    page.form['email'] = 'newmember@example.org'
     page.form['password'] = 'p@ssw0rd'
     page.form.submit()
 
     login = client.spawn().get('/auth/login')
-    login.form['username'] = 'member@example.org'
+    login.form['username'] = 'newmember@example.org'
     login.form['password'] = 'p@ssw0rd'
     assert login.form.submit().status_code == 302
 
@@ -167,7 +167,7 @@ def test_edit_user_settings(client):
     users = UserCollection(client.app.session())
     assert not users.by_username('new@example.org').data
 
-    edit = client.get('/usermanagement').click('Ansicht', index=2)
+    edit = client.get('/usermanagement').click('Ansicht', index=3)
     edit = edit.click('Bearbeiten')
     assert "new@example.org" in edit
 
