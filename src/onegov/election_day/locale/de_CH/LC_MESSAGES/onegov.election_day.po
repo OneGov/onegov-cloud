@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-26 08:58+0200\n"
+"POT-Creation-Date: 2022-04-28 14:18+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -815,6 +815,9 @@ msgstr "Karte einbetten"
 
 msgid "Download heatmap"
 msgstr "Karte herunterladen"
+
+msgid "No candidates elected yet."
+msgstr "Noch keine Kandidierenedn gewählt."
 
 msgid "Embed"
 msgstr "Einbetten"
