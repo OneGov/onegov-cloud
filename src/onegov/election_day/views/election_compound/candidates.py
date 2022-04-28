@@ -32,7 +32,7 @@ def view_election_compound_candidates(self, request):
 
     return {
         'election_compound': self,
-        'elected_candidates': get_elected_candidates(self, session),
+        'elected_candidates': get_elected_candidates(self, session).all(),
         'districts': get_districts(self, layout),
         'layout': layout
     }
@@ -57,7 +57,7 @@ def view_election_statistics_table(self, request):
 
     return {
         'election_compound': self,
-        'elected_candidates': get_elected_candidates(self, session),
+        'elected_candidates': get_elected_candidates(self, session).all(),
         'districts': get_districts(self, layout),
         'layout': layout,
         'type': 'election-compound-table',
