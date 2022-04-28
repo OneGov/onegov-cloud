@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 14:18+0200\n"
+"POT-Creation-Date: 2022-04-28 16:03+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -479,6 +479,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votazioni"
 
+msgid "Compounds of elections"
+msgstr "Componenti delle elezioni"
+
 msgid "Select at least one election or vote."
 msgstr "Seleziona almeno un'elezione o una votazione."
 
@@ -606,9 +609,6 @@ msgstr "Risultati finali"
 
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
-
-msgid "Compounds of elections"
-msgstr "Componenti delle elezioni"
 
 msgid "Upload tokens"
 msgstr "Carica token"
@@ -1460,6 +1460,19 @@ msgstr "Componente eliminato."
 msgid "Delete compound"
 msgstr "Elimina componente"
 
+msgid "Notifications triggered."
+msgstr "Notifiche attivate."
+
+msgid ""
+"There are no changes since the last time the notifications have been "
+"triggered!"
+msgstr ""
+"Non ci sono stati cambiamenti dall’ultima che le notifiche sono state "
+"attivate!"
+
+msgid "Do you really want to retrigger the notfications?"
+msgstr "Vuoi davvero riattivare le notifiche?"
+
 msgid "Election added."
 msgstr "Elezione aggiunta."
 
@@ -1474,19 +1487,6 @@ msgstr "Elezione eliminata."
 
 msgid "Delete election"
 msgstr "Elimina elezione"
-
-msgid "Notifications triggered."
-msgstr "Notifiche attivate."
-
-msgid ""
-"There are no changes since the last time the notifications have been "
-"triggered!"
-msgstr ""
-"Non ci sono stati cambiamenti dall’ultima che le notifiche sono state "
-"attivate!"
-
-msgid "Do you really want to retrigger the notfications?"
-msgstr "Vuoi davvero riattivare le notifiche?"
 
 msgid "Screen added."
 msgstr "Schermo aggiunto."

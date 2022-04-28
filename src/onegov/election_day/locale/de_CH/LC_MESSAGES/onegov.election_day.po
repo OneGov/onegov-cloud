@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 14:18+0200\n"
+"POT-Creation-Date: 2022-04-28 16:03+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -484,6 +484,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Abstimmungen"
 
+msgid "Compounds of elections"
+msgstr "Verbundene Wahlen"
+
 msgid "Select at least one election or vote."
 msgstr "Wählen Sie mindestens eine Wahl oder Abstimmung."
 
@@ -613,9 +616,6 @@ msgstr "Schlussresultate"
 
 msgid "Counter proposal accepted"
 msgstr "Gegenentwurf angenommen"
-
-msgid "Compounds of elections"
-msgstr "Verbundene Wahlen"
 
 msgid "Upload tokens"
 msgstr "Upload Token"
@@ -817,7 +817,7 @@ msgid "Download heatmap"
 msgstr "Karte herunterladen"
 
 msgid "No candidates elected yet."
-msgstr "Noch keine Kandidierenedn gewählt."
+msgstr "Noch keine Kandidierenden gewählt."
 
 msgid "Embed"
 msgstr "Einbetten"
@@ -1467,6 +1467,17 @@ msgstr "Verbindung gelöscht."
 msgid "Delete compound"
 msgstr "Verbindung löschen"
 
+msgid "Notifications triggered."
+msgstr "Benachrichtigungen ausgelöst."
+
+msgid ""
+"There are no changes since the last time the notifications have been "
+"triggered!"
+msgstr "Keine Änderungen seit dem letzten Auslösen der Benachrichtigungen!"
+
+msgid "Do you really want to retrigger the notfications?"
+msgstr "Benachrichtigungen wirklich erneut auslösen?"
+
 msgid "Election added."
 msgstr "Wahl hinzugefügt."
 
@@ -1481,17 +1492,6 @@ msgstr "Wahl gelöscht."
 
 msgid "Delete election"
 msgstr "Wahl löschen"
-
-msgid "Notifications triggered."
-msgstr "Benachrichtigungen ausgelöst."
-
-msgid ""
-"There are no changes since the last time the notifications have been "
-"triggered!"
-msgstr "Keine Änderungen seit dem letzten Auslösen der Benachrichtigungen!"
-
-msgid "Do you really want to retrigger the notfications?"
-msgstr "Benachrichtigungen wirklich erneut auslösen?"
 
 msgid "Screen added."
 msgstr "Screen hinzugefügt."
