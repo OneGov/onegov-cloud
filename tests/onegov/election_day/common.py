@@ -555,6 +555,7 @@ def upload_election_compound(client, create=True, canton='gr',
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    return upload
 
 
 def import_wabstic_data(election, tar_file, principal, expats=False):

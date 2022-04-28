@@ -1361,8 +1361,6 @@
         <dl>
             <dt i18n:translate>Elected Candidates</dt>
             <dd tal:repeat="name election_compound.elected_candidates">${name[1]} ${name[0]}</dd>
-            <dt i18n:translate>Turnout</dt>
-            <dd>${'{0:.2f}'.format(election_compound.turnout)} %</dd>
         </dl>
     </tal:block>
     <p><a href="${layout.model_url(election_compound)}" i18n:translate>View all details online</a></p>

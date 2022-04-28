@@ -7,6 +7,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ComplexVote
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListResult
@@ -24,6 +25,7 @@ from pytest import raises
 from time import sleep
 from unittest.mock import Mock
 from unittest.mock import patch
+from unittest.mock import PropertyMock
 
 
 def test_notification(session):
@@ -41,6 +43,7 @@ def test_notification(session):
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
     )
     assert notification.election_id is None
+    assert notification.election_compound_id is None
     assert notification.vote_id is None
 
     with freeze_time("2008-01-01 00:00"):
@@ -60,6 +63,25 @@ def test_notification(session):
         assert notification.vote_id is None
         assert notification.last_modified == datetime(
             2008, 1, 1, 0, 0, tzinfo=timezone.utc
+        )
+
+    with freeze_time("2010-01-01 00:00"):
+        session.add(
+            ElectionCompound(
+                title="Elections",
+                domain='federation',
+                date=date(2011, 1, 1)
+            )
+        )
+        session.flush()
+        election_compound = session.query(ElectionCompound).one()
+
+        notification = Notification()
+        notification.update_from_model(election_compound)
+        assert notification.election_compound_id == election_compound.id
+        assert notification.vote_id is None
+        assert notification.last_modified == datetime(
+            2010, 1, 1, 0, 0, tzinfo=timezone.utc
         )
 
     with freeze_time("2009-01-01 00:00"):
@@ -84,6 +106,8 @@ def test_notification(session):
     with raises(NotImplementedError):
         notification.trigger(DummyRequest(), election)
     with raises(NotImplementedError):
+        notification.trigger(DummyRequest(), election_compound)
+    with raises(NotImplementedError):
         notification.trigger(DummyRequest(), vote)
 
 
@@ -103,6 +127,24 @@ def test_webhook_notification(session):
 
         assert notification.type == 'webhooks'
         assert notification.election_id == election.id
+        assert notification.last_modified == datetime(
+            2008, 1, 1, 0, 0, tzinfo=timezone.utc
+        )
+
+        session.add(
+            ElectionCompound(
+                title="Elections",
+                domain='federation',
+                date=date(2011, 1, 1)
+            )
+        )
+        election_compound = session.query(ElectionCompound).one()
+
+        notification = WebhookNotification()
+        notification.trigger(DummyRequest(), election_compound)
+
+        assert notification.type == 'webhooks'
+        assert notification.election_compound_id == election_compound.id
         assert notification.last_modified == datetime(
             2008, 1, 1, 0, 0, tzinfo=timezone.utc
         )
@@ -148,6 +190,27 @@ def test_webhook_notification(session):
                 'type': 'election',
                 'url': 'Election/election',
                 'turnout': 0
+            }
+
+            notification.trigger(request, election_compound)
+            sleep(5)
+            assert urlopen.called
+
+            headers = urlopen.call_args[0][0].headers
+            data = urlopen.call_args[0][1]
+            assert headers['Content-type'] == 'application/json; charset=utf-8'
+            assert headers['Content-length'] == len(data)
+
+            assert json.loads(data.decode('utf-8')) == {
+                'completed': False,
+                'date': '2011-01-01',
+                'domain': 'federation',
+                'elections': [],
+                'last_modified': '2008-01-01T00:00:00+00:00',
+                'progress': {'counted': 0, 'total': 0},
+                'title': {'de_CH': 'Elections'},
+                'type': 'election_compound',
+                'url': 'ElectionCompound/elections',
             }
 
             notification.trigger(request, vote)
@@ -721,6 +784,177 @@ def test_email_notification_election(election_day_app_zg, session):
         assert "49.83 %" in contents
 
 
+def test_email_notification_election_compound(election_day_app_zg, session):
+    with freeze_time("2008-01-01 00:00"):
+        mock = Mock()
+        election_day_app_zg.send_marketing_email_batch = mock
+
+        principal = election_day_app_zg.principal
+        principal.email_notification = True
+        principal.reply_to = 'reply-to@example.org'
+        election_day_app_zg.cache.set('principal', principal)
+
+        session.add(
+            ProporzElection(
+                title_translations={
+                    'de_CH': "Proporzwahl",
+                },
+                domain='federation',
+                date=date(2011, 1, 1),
+                number_of_mandates=1
+            )
+        )
+        election = session.query(ProporzElection).one()
+
+        session.add(
+            ElectionCompound(
+                title_translations={
+                    'de_CH': "Kantonsratswahl",
+                    'fr_CH': "Élection du Grand Conseil",
+                    'it_CH': "Elezione del Consiglio Cantonale",
+                    # 'rm_CH': missing
+                },
+                domain='federation',
+                date=date(2011, 1, 1)
+            )
+        )
+        compound = session.query(ElectionCompound).one()
+        compound.elections = [election]
+
+        request = DummyRequest(app=election_day_app_zg, session=session)
+
+        for address, locale, active in (
+            ('de@examp.le', 'de_CH', True),
+            ('fr@examp.le', 'fr_CH', True),
+            ('it@examp.le', 'it_CH', True),
+            ('rm@examp.le', 'rm_CH', True),
+            ('xx@examp.le', 'de_CH', False),
+            ('yy@examp.le', 'fr_CH', False)
+        ):
+            session.add(
+                EmailSubscriber(address=address, locale=locale, active=active)
+            )
+
+    with freeze_time("2008-01-01 01:00"):
+        # No results yet
+        mock.reset_mock()
+        notification = EmailNotification()
+        notification.trigger(request, compound)
+        assert notification.type == 'email'
+        assert notification.election_compound_id == compound.id
+        assert notification.last_modified == datetime(
+            2008, 1, 1, 0, 0, tzinfo=timezone.utc
+        )
+        assert mock.call_count == 1
+        emails = list(mock.call_args.args[0])
+        assert sorted([email['Subject'] for email in emails]) == [
+            'Elezione del Consiglio Cantonale - Nuovi risultati provvisori',
+            'Kantonsratswahl - Neue Zwischenresultate',
+            'Kantonsratswahl - Novs resultats intermediars',
+            'Élection du Grand Conseil - Nouveaux résultats intermédiaires'
+        ]
+        contents = ''.join(email['HtmlBody'] for email in emails)
+        assert "Noch keine Resultate" in contents
+        assert "Pas de résultats à l'heure actuelle" in contents
+        assert "Ancora nessun risultato" in contents
+        assert "Anc nagins resultats avant maun" in contents
+
+        # Intermediate results
+        election.lists.append(List(list_id='1', name='FDP'))
+        election.lists.append(List(list_id='2', name='SP'))
+        lids = {
+            '1': session.query(List).filter_by(list_id='1').one().id,
+            '2': session.query(List).filter_by(list_id='2').one().id
+        }
+
+        keys = ['candidate_id', 'first_name', 'family_name', 'elected']
+        for values in (
+            ('1', 'Peter', 'Maier', False),
+            ('2', 'Hans', 'Müller', False),
+        ):
+            kw = {key: values[index] for index, key in enumerate(keys)}
+            kw['list_id'] = lids[kw['candidate_id']]
+            election.candidates.append(Candidate(**kw))
+        pcids = {
+            '1': election.candidates.filter_by(candidate_id='1').one().id,
+            '2': election.candidates.filter_by(candidate_id='2').one().id,
+        }
+
+        keys = [
+            'entity_id', 'name', 'counted', 'eligible_voters',
+            'received_ballots', 'blank_ballots', 'invalid_ballots',
+            'blank_votes', 'invalid_votes'
+        ]
+        for values in (
+            (1711, 'Zug', False, 16516, 8516, 80, 1, 0, 0),
+            (1706, 'Oberägeri', True, 3560, 1560, 18, 0, 0, 0),
+            (1709, 'Unterägeri', True, 5245, 2245, 18, 1, 0, 0),
+            (1704, 'Menzingen', True, 2917, 1917, 17, 0, 0, 0),
+            (1701, 'Baar', True, 13828, 6828, 54, 3, 0, 0),
+            (1702, 'Cham', True, 9687, 4687, 60, 0, 0, 0),
+            (1703, 'Hünenberg', True, 5842, 2842, 15, 1, 0, 0),
+            (1708, 'Steinhausen', True, 5989, 2989, 17, 0, 0, 0),
+            (1707, 'Risch', True, 6068, 3068, 17, 0, 0, 0),
+            (1710, 'Walchwil', True, 2016, 1016, 8, 0, 0, 0),
+            (1705, 'Neuheim', True, 1289, 689, 10, 1, 0, 0),
+        ):
+            kw = {key: values[index] for index, key in enumerate(keys)}
+            result = ElectionResult(**kw)
+            result.candidate_results.append(
+                CandidateResult(candidate_id=pcids['1'], votes=500)
+            )
+            result.candidate_results.append(
+                CandidateResult(candidate_id=pcids['2'], votes=200)
+            )
+            result.list_results.append(
+                ListResult(list_id=lids['1'], votes=700)
+            )
+            result.list_results.append(
+                ListResult(list_id=lids['2'], votes=600)
+            )
+            election.results.append(result)
+
+    with freeze_time("2008-01-01 03:00"):
+        mock.reset_mock()
+        notification = EmailNotification()
+        notification.trigger(request, compound)
+        emails = list(mock.call_args.args[0])
+        assert sorted([email['Subject'] for email in emails]) == [
+            'Elezione del Consiglio Cantonale - Nuovi risultati provvisori',
+            'Kantonsratswahl - Neue Zwischenresultate',
+            'Kantonsratswahl - Novs resultats intermediars',
+            'Élection du Grand Conseil - Nouveaux résultats intermédiaires'
+        ]
+        contents = ''.join(email['HtmlBody'] for email in emails)
+        assert "0 da 1" in contents
+        assert "0 di 1" in contents
+        assert "0 de 1" in contents
+        assert "0 von 1" in contents
+
+        # Final results
+        for result in election.results:
+            result.counted = True
+        for candidate in session.query(Candidate).filter_by(candidate_id='1'):
+            candidate.elected = True
+        for list_ in session.query(List).filter_by(list_id='1'):
+            list_.number_of_mandates = 1
+
+    with freeze_time("2008-01-01 04:00"):
+        mock.reset_mock()
+        notification = EmailNotification()
+        notification.trigger(request, compound)
+        emails = list(mock.call_args.args[0])
+        assert sorted([email['Subject'] for email in emails]) == [
+            'Elezione del Consiglio Cantonale - Risultati finali',
+            'Kantonsratswahl - Resultats finals',
+            'Kantonsratswahl - Schlussresultate',
+            'Élection du Grand Conseil - Résultats finaux'
+        ]
+
+        contents = ''.join(email['HtmlBody'] for email in emails)
+        assert "Maier Peter" in contents
+
+
 def test_sms_notification(request, election_day_app_zg, session):
     with freeze_time("2008-01-01 00:00"):
         election_day_app_zg.send_sms = Mock()
@@ -740,6 +974,15 @@ def test_sms_notification(request, election_day_app_zg, session):
         election = session.query(Election).one()
 
         session.add(
+            ElectionCompound(
+                title="Elections",
+                domain='federation',
+                date=date(2011, 1, 1)
+            )
+        )
+        election_compound = session.query(ElectionCompound).one()
+
+        session.add(
             Vote(
                 title="Vote",
                 domain='federation',
@@ -755,6 +998,13 @@ def test_sms_notification(request, election_day_app_zg, session):
         notification.trigger(request, election)
         assert notification.type == 'sms'
         assert notification.election_id == election.id
+        assert notification.last_modified == freezed
+        assert election_day_app_zg.send_sms.call_count == 0
+
+        notification = SmsNotification()
+        notification.trigger(request, election_compound)
+        assert notification.type == 'sms'
+        assert notification.election_compound_id == election_compound.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 0
 
@@ -793,12 +1043,12 @@ def test_sms_notification(request, election_day_app_zg, session):
             'New intermediate results are available on https://wab.ch.ch'
         )
 
-        # Intermediate vote results
+        # Intermediate election compound results
         notification = SmsNotification()
-        notification.trigger(request, vote)
+        notification.trigger(request, election_compound)
 
         assert notification.type == 'sms'
-        assert notification.vote_id == vote.id
+        assert notification.election_compound_id == election_compound.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 4
         assert election_day_app_zg.send_sms.call_args_list[2][0] == (
@@ -806,6 +1056,23 @@ def test_sms_notification(request, election_day_app_zg, session):
             'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
         )
         assert election_day_app_zg.send_sms.call_args_list[3][0] == (
+            ['+41791112233', '+41791112244'],
+            'New intermediate results are available on https://wab.ch.ch'
+        )
+
+        # Intermediate vote results
+        notification = SmsNotification()
+        notification.trigger(request, vote)
+
+        assert notification.type == 'sms'
+        assert notification.vote_id == vote.id
+        assert notification.last_modified == freezed
+        assert election_day_app_zg.send_sms.call_count == 6
+        assert election_day_app_zg.send_sms.call_args_list[4][0] == (
+            ['+41791112233'],
+            'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
+        )
+        assert election_day_app_zg.send_sms.call_args_list[5][0] == (
             ['+41791112233', '+41791112244'],
             'New intermediate results are available on https://wab.ch.ch'
         )
@@ -818,12 +1085,32 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert notification.type == 'sms'
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
-        assert election_day_app_zg.send_sms.call_count == 6
-        assert election_day_app_zg.send_sms.call_args_list[4][0] == (
+        assert election_day_app_zg.send_sms.call_count == 8
+        assert election_day_app_zg.send_sms.call_args_list[6][0] == (
             ['+41791112233'],
             'Schlussresultate verfügbar auf https://wab.ch.ch'
         )
-        assert election_day_app_zg.send_sms.call_args_list[5][0] == (
+        assert election_day_app_zg.send_sms.call_args_list[7][0] == (
+            ['+41791112233', '+41791112244'],
+            'Final results are available on https://wab.ch.ch'
+        )
+
+        # Final election compound results
+        with patch.object(ElectionCompound, 'completed',
+                          new_callable=PropertyMock) as mock:
+            mock.return_value = True
+            notification = SmsNotification()
+            notification.trigger(request, election_compound)
+
+        assert notification.type == 'sms'
+        assert notification.election_compound_id == election_compound.id
+        assert notification.last_modified == freezed
+        assert election_day_app_zg.send_sms.call_count == 10
+        assert election_day_app_zg.send_sms.call_args_list[8][0] == (
+            ['+41791112233'],
+            'Schlussresultate verfügbar auf https://wab.ch.ch'
+        )
+        assert election_day_app_zg.send_sms.call_args_list[9][0] == (
             ['+41791112233', '+41791112244'],
             'Final results are available on https://wab.ch.ch'
         )
@@ -836,12 +1123,12 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert notification.type == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
-        assert election_day_app_zg.send_sms.call_count == 8
-        assert election_day_app_zg.send_sms.call_args_list[6][0] == (
+        assert election_day_app_zg.send_sms.call_count == 12
+        assert election_day_app_zg.send_sms.call_args_list[10][0] == (
             ['+41791112233'],
             'Schlussresultate verfügbar auf https://wab.ch.ch'
         )
-        assert election_day_app_zg.send_sms.call_args_list[7][0] == (
+        assert election_day_app_zg.send_sms.call_args_list[11][0] == (
             ['+41791112233', '+41791112244'],
             'Final results are available on https://wab.ch.ch'
         )
