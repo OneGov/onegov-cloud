@@ -817,7 +817,7 @@ msgid "Download heatmap"
 msgstr "Karte herunterladen"
 
 msgid "No candidates elected yet."
-msgstr "Noch keine Kandidierenedn gewählt."
+msgstr "Noch keine Kandidierenden gewählt."
 
 msgid "Embed"
 msgstr "Einbetten"
