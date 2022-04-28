@@ -60,7 +60,7 @@ For example:
     The footer can be customized in the settings, by admin users.
 
     TYPE: Feature
-    LINK: 101
+    LINK: OGC-101
 
 Commits that do not follow this scheme are not included in the changelog.
 

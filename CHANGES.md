@@ -1,8 +1,12 @@
 # Changes
 
+## 2022.27
+
+`2022-04-27` | [aebf7f9623...aebf7f9623](https://github.com/OneGov/onegov-cloud/compare/aebf7f9623^...aebf7f9623)
+
 ## 2022.26
 
-`2022-04-26` | [1a1867726e...f2dac55868](https://github.com/OneGov/onegov-cloud/compare/1a1867726e^...f2dac55868)
+`2022-04-26` | [1a1867726e...a00696ed84](https://github.com/OneGov/onegov-cloud/compare/1a1867726e^...a00696ed84)
 
 ### Activity
 
@@ -1532,56 +1536,4 @@ Addionally, store text extracts per file.
 ##### Group policy areas if possible.
 
 `Feature` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [e866168c6f](https://github.com/onegov/onegov-cloud/commit/e866168c6fa0683fc8e0461f7a22b5589338529b)
-
-## 2021.78
-
-`2021-09-16` | [203549ce6f...42f73969e2](https://github.com/OneGov/onegov-cloud/compare/203549ce6f^...42f73969e2)
-
-### Election Day
-
-##### Uses the title of the elections in election compound as default.
-
-`Bugfix` | [6311267e8e](https://github.com/onegov/onegov-cloud/commit/6311267e8e13739a4c63227e24c83ea0b476fd70)
-
-##### Adjust header sizes.
-
-`Other` | [OGC-35](https://linear.app/onegovcloud/issue/OGC-35) | [580100ef0c](https://github.com/onegov/onegov-cloud/commit/580100ef0cd054314f3123b455a7788aa6a033c9)
-
-### Org
-
-##### Fix ticket status view for archived tickets.
-
-`Bugfix` | [d8d41b8e21](https://github.com/onegov/onegov-cloud/commit/d8d41b8e21172b2943cd4556875a031d39e69a5e)
-
-### Pdf
-
-##### Embed fonts.
-
-`Other` | [OGC-81](https://linear.app/onegovcloud/issue/OGC-81) | [2ffa823bdd](https://github.com/onegov/onegov-cloud/commit/2ffa823bdd54fab2d4d2401fd06e17d4964f0b83)
-
-### Swissvotes
-
-##### Order first by selected column, then by BFS number.
-
-`Feature` | [SWI-24](https://linear.app/swissvotes/issue/SWI-24) | [5e4b26da61](https://github.com/onegov/onegov-cloud/commit/5e4b26da61b89c74ed815894eedc0182593a489f)
-
-##### Order policies area by number.
-
-`Feature` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [b3df3df8d6](https://github.com/onegov/onegov-cloud/commit/b3df3df8d6d784e7d0cfaa027c84eca14ef7f1ea)
-
-##### Show turnout in votes view by default.
-
-`Feature` | [SWI-20](https://linear.app/swissvotes/issue/SWI-20) | [9778167650](https://github.com/onegov/onegov-cloud/commit/97781676501c5b332138c29aad99f95d66844a1d)
-
-##### Change order of search filters.
-
-`Feature` | [SWI-21](https://linear.app/swissvotes/issue/SWI-21) | [fd619826c8](https://github.com/onegov/onegov-cloud/commit/fd619826c89d5015830a9a66144722e43b58fc20)
-
-##### Improve hyphenation.
-
-`Other` | [SWI-20](https://linear.app/swissvotes/issue/SWI-20) | [766d08635f](https://github.com/onegov/onegov-cloud/commit/766d08635f4615215b74820a16f1548d2a113d22)
-
-##### Order policy areas by descriptor number.
-
-`Bugfix` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [657e96ee47](https://github.com/onegov/onegov-cloud/commit/657e96ee47f039b41e3636639285790a83a8975b)
 
