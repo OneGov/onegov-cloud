@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 14:18+0200\n"
+"POT-Creation-Date: 2022-04-28 16:03+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -484,6 +484,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votaziuns"
 
+msgid "Compounds of elections"
+msgstr "Elecziuns colliadas"
+
 msgid "Select at least one election or vote."
 msgstr ""
 
@@ -613,9 +616,6 @@ msgstr "Resultats finals"
 
 msgid "Counter proposal accepted"
 msgstr "Acceptà la cuntraproposta"
-
-msgid "Compounds of elections"
-msgstr "Elecziuns colliadas"
 
 msgid "Upload tokens"
 msgstr "Chargiar si tokens"
@@ -1472,6 +1472,19 @@ msgstr "Stizzà la colliaziun."
 msgid "Delete compound"
 msgstr "Stizzar la colliaziun"
 
+msgid "Notifications triggered."
+msgstr "Activà las communicaziuns."
+
+msgid ""
+"There are no changes since the last time the notifications have been "
+"triggered!"
+msgstr ""
+"Naginas midadas dapi l'ultima giada che las communicaziuns èn vegnidas "
+"tramessas als abunents!"
+
+msgid "Do you really want to retrigger the notfications?"
+msgstr "Propi trametter danovamain communicaziuns als abunents?"
+
 msgid "Election added."
 msgstr "Agiuntà l'elecziun."
 
@@ -1486,19 +1499,6 @@ msgstr "Stizzà l'elecziun."
 
 msgid "Delete election"
 msgstr "Stizzar l'elecziun"
-
-msgid "Notifications triggered."
-msgstr "Activà las communicaziuns."
-
-msgid ""
-"There are no changes since the last time the notifications have been "
-"triggered!"
-msgstr ""
-"Naginas midadas dapi l'ultima giada che las communicaziuns èn vegnidas "
-"tramessas als abunents!"
-
-msgid "Do you really want to retrigger the notfications?"
-msgstr "Propi trametter danovamain communicaziuns als abunents?"
 
 msgid "Screen added."
 msgstr "Agiuntà il screen."
