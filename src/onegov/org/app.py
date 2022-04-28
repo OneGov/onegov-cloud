@@ -5,7 +5,6 @@ from collections import defaultdict
 from dectate import directive
 from email.headerregistry import Address
 from more.content_security import SELF
-from cached_property import cached_property
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
@@ -183,14 +182,12 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def font_family(self):
         return self.theme_options.get('font-family-sans-serif')
 
-    @cached_property
+    @property
     def custom_event_tags(self):
         fs = self.filestorage
         if fs.exists('eventtags.yml'):
             with fs.open('eventtags.yml', 'rb') as f:
                 return yaml.safe_load(f)['event_tags']
-        else:
-            return None
 
     def checkout_button(self, button_label, title, price, email, locale):
         provider = self.default_payment_provider
