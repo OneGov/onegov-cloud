@@ -1,8 +1,46 @@
 # Changes
 
+## 2022.28
+
+`2022-04-29` | [e44871e509...4faea51ad6](https://github.com/OneGov/onegov-cloud/compare/e44871e509^...4faea51ad6)
+
+### Election Day
+
+##### Hide empty candidates tables and figures. (#322)
+
+`Feature` | [OGC-427](https://linear.app/onegovcloud/issue/OGC-427) | [3147e96447](https://github.com/onegov/onegov-cloud/commit/3147e9644759236d13c3e5702f5846c82b94b838)
+
+##### Add notifications for election compounds.
+
+`Feature` | [OGC-424](https://linear.app/onegovcloud/issue/OGC-424) | [cc096ff1b0](https://github.com/onegov/onegov-cloud/commit/cc096ff1b09e8782b580de71518835f307c677c3)
+
+##### Use cached layout property instead of model properties in various views.
+
+`Bugfix` | [4faea51ad6](https://github.com/onegov/onegov-cloud/commit/4faea51ad6bce9c2500b3792388396089da74fce)
+
+### Org
+
+##### Add access level "member"
+
+Topics, people, etc. can now be assigned the access level "member"
+
+`Feature` | [393](https://github.com/onegov/onegov-cloud/issues/393) | [e44871e509](https://github.com/onegov/onegov-cloud/commit/e44871e5097cdafe7529132e28a440e28e189c7f)
+
+##### Fix typo
+
+`Bugfix` | [OGC-409](https://linear.app/onegovcloud/issue/OGC-409) | [87768bd84f](https://github.com/onegov/onegov-cloud/commit/87768bd84f5d9825b9da54688ef921435f57b70a)
+
+##### Fix custom_event_tags getting cached globally.
+
+`Bugfix` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [2835da5064](https://github.com/onegov/onegov-cloud/commit/2835da5064177cd4fa8bca1965a7cbc66a41e6a0)
+
+##### Fix topic children links.
+
+`Bugfix` | [OGC-426](https://linear.app/onegovcloud/issue/OGC-426) | [f4b36d4c4e](https://github.com/onegov/onegov-cloud/commit/f4b36d4c4ecacece5c8bf6c71c1cb49155c54e2d)
+
 ## 2022.27
 
-`2022-04-27` | [aebf7f9623...aebf7f9623](https://github.com/OneGov/onegov-cloud/compare/aebf7f9623^...aebf7f9623)
+`2022-04-27` | [aebf7f9623...1eec46ba9d](https://github.com/OneGov/onegov-cloud/compare/aebf7f9623^...1eec46ba9d)
 
 ## 2022.26
 
@@ -1526,14 +1564,4 @@ Addionally, store text extracts per file.
 ##### Change color of news background and date.
 
 `Other` | [OGC-78](https://linear.app/onegovcloud/issue/OGC-78) | [6886672d66](https://github.com/onegov/onegov-cloud/commit/6886672d66a5bf2cf44a2fbf62d60cfb2e349328)
-
-## 2021.79
-
-`2021-09-20` | [e866168c6f...3da2c725ff](https://github.com/OneGov/onegov-cloud/compare/e866168c6f^...3da2c725ff)
-
-### Swissvotes
-
-##### Group policy areas if possible.
-
-`Feature` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [e866168c6f](https://github.com/onegov/onegov-cloud/commit/e866168c6fa0683fc8e0461f7a22b5589338529b)
 
