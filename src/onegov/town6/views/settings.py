@@ -163,7 +163,7 @@ def town_handle_social_media_settings(self, request, form):
 
 @TownApp.form(
     model=Organisation, name='link-settings', template='form.pt',
-    permission=Secret, form=custom_link_settings_form, setting=_("Links"),
+    permission=Secret, form=LinksSettingsForm, setting=_("Links"),
     icon='fa-link', order=-980)
 def town_handle_links_settings(self, request, form):
     return handle_links_settings(
