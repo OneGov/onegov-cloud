@@ -116,20 +116,6 @@ def custom_footer_settings_form(model, request):
     return merge_forms(FooterSettingsForm, ExtendedFooterSettings)
 
 
-def custom_link_settings_form(model, request):
-
-    class ExtendedLinksSettings(Form):
-        open_external_links_target_blank = BooleanField(
-            label=_("Open external links in separate window"),
-            description=_(
-                'Links leading to a different '
-                'website will be opened in a new window'
-            )
-        )
-
-    return merge_forms(LinksSettingsForm, ExtendedLinksSettings)
-
-
 @TownApp.html(
     model=Organisation, name='settings', template='settings.pt',
     permission=Secret)
