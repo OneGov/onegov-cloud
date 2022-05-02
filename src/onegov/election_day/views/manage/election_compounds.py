@@ -5,8 +5,10 @@ from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import NotificationCollection
 from onegov.election_day.forms import ChangeIdForm
 from onegov.election_day.forms import ElectionCompoundForm
+from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 
 
@@ -136,7 +138,7 @@ def clear_election_compound(self, request, form):
 
     return {
         'message': _(
-            'Do you really want to clear all party results of "${item}"?',
+            'Do you really want to clear all results of "${item}"?',
             mapping={
                 'item': self.title
             }
@@ -223,4 +225,52 @@ def delete_election_compound(self, request, form):
         'button_text': _("Delete compound"),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=ElectionCompound,
+    name='trigger',
+    form=TriggerNotificationForm,
+    template='manage/trigger_notification.pt'
+)
+def trigger_election(self, request, form):
+    """ Trigger the notifications related to an election. """
+
+    session = request.session
+    notifications = NotificationCollection(session)
+    layout = ManageElectionCompoundsLayout(self, request)
+
+    if form.submitted(request):
+        notifications.trigger(request, self, form.notifications.data)
+        request.message(_("Notifications triggered."), 'success')
+        return redirect(layout.manage_model_link)
+
+    callout = None
+    message = ''
+    title = _("Trigger notifications")
+    button_class = 'primary'
+
+    if notifications.by_model(self):
+        callout = _(
+            "There are no changes since the last time the notifications "
+            "have been triggered!"
+        )
+        message = _(
+            "Do you really want to retrigger the notfications?",
+        )
+        button_class = 'alert'
+
+    return {
+        'message': message,
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': title,
+        'callout': callout,
+        'button_text': title,
+        'button_class': button_class,
+        'cancel': layout.manage_model_link,
+        'last_notifications': notifications.by_model(self, False)
     }

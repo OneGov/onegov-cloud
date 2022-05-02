@@ -389,6 +389,32 @@ def test_activity_filter_duration(client, scenario):
     assert "Retreat" not in many_day
 
 
+def test_activity_filter_weeks(client, scenario):
+    scenario.add_period(
+        prebooking_start=datetime(2022, 2, 1),
+        prebooking_end=datetime(2022, 2, 28),
+        booking_start=datetime(2022, 3, 1),
+        booking_end=datetime(2022, 3, 31),
+        execution_start=datetime(2022, 4, 1),
+        execution_end=datetime(2022, 4, 30)
+    )
+
+    scenario.add_activity(title="Camping", state='accepted')
+    scenario.add_occasion(
+        start=datetime(2022, 4, 4, 8),
+        end=datetime(2022, 4, 21, 12),
+    )
+
+    scenario.commit()
+
+    page = client.get('/activities')
+
+    # test if all weeks are in the filter, not just the first
+    assert "04.04.2022 - 10.04.2022" in page
+    assert "11.04.2022 - 17.04.2022" in page
+    assert "18.04.2022 - 24.04.2022" in page
+
+
 def test_activity_filter_age_ranges(client, scenario):
     scenario.add_period()
 

@@ -1115,7 +1115,9 @@ ul.pagination li.last {
     border-color: darken($warning-color, 10%);
 }
 
-
+/*
+    Accessibility
+*/
 .visually-hidden {
     @include element-invisible;
 }

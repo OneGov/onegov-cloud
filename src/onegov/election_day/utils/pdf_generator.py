@@ -177,7 +177,7 @@ class PdfGenerator():
         pdf.spacer()
         pdf.factoids(
             [
-                _('Seats') if majorz else _('Mandates'),
+                _('Seats') if majorz else principal.label('mandates'),
                 _('Absolute majority') if show_majority else '',
                 ''
             ],
@@ -197,7 +197,7 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.spacer()
             pdf.results(
-                [_('List'), _('Mandates'), _('single_votes')],
+                [_('List'), principal.label('mandates'), _('single_votes')],
                 [
                     [r['text'], r['value2'], r['value']]
                     for r in data['results']
@@ -325,7 +325,7 @@ class PdfGenerator():
                 pdf.results(
                     [
                         _('Party'),
-                        _('Mandates'),
+                        principal.label('mandates'),
                         _('single_votes'),
                         _('single_votes'),
                         'Δ {}'.format(years[0]),
@@ -344,7 +344,7 @@ class PdfGenerator():
                 pdf.results(
                     [
                         _('Party'),
-                        _('Mandates'),
+                        principal.label('mandates'),
                         _('single_votes'),
                         _('single_votes'),
                     ],
@@ -547,7 +547,7 @@ class PdfGenerator():
 
         # Factoids
         pdf.factoids(
-            [('Mandates'), '', ''],
+            [label('mandates'), '', ''],
             [compound.allocated_mandates, '', '']
         )
         pdf.spacer()
@@ -559,7 +559,7 @@ class PdfGenerator():
             if superregions:
                 pdf.h2(label('superregions'))
                 pdf.results(
-                    [label('superregion'), _('Mandates')],
+                    [label('superregion'), label('mandates')],
                     [
                         [
                             name,
@@ -579,7 +579,7 @@ class PdfGenerator():
                 [
                     label('district'),
                     label('superregion'),
-                    _('Mandates')
+                    label('mandates')
                 ],
                 [
                     [
@@ -596,7 +596,7 @@ class PdfGenerator():
             pdf.results(
                 [
                     label('district'),
-                    _('Mandates')
+                    label('mandates')
                 ],
                 [
                     [
@@ -661,7 +661,7 @@ class PdfGenerator():
                 [
                     _('List group'),
                     _('Voters count'),
-                    _('Mandates'),
+                    label('mandates'),
                 ],
                 [[
                     r.name,
@@ -682,7 +682,7 @@ class PdfGenerator():
             pdf.results(
                 [
                     _('List'),
-                    _('Mandates'),
+                    label('mandates'),
                 ],
                 [[
                     r.name,
@@ -710,7 +710,7 @@ class PdfGenerator():
                     pdf.results(
                         [
                             _('Party'),
-                            _('Mandates'),
+                            label('mandates'),
                             _('single_votes'),
                             _('single_votes'),
                             'Δ {}'.format(years[0]),
@@ -729,7 +729,7 @@ class PdfGenerator():
                     pdf.results(
                         [
                             _('Party'),
-                            _('Mandates'),
+                            label('mandates'),
                             _('single_votes'),
                             _('single_votes'),
                         ],

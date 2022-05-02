@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-21 12:03+0100\n"
+"POT-Creation-Date: 2022-04-25 14:15+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1439,6 +1439,9 @@ msgstr "Externe Seiten"
 msgid "Internal links only"
 msgstr "Interne Seiten"
 
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
+
 msgid "Your note about this ticket"
 msgstr "Ihre Notiz zu dem Ticket"
 
@@ -1912,6 +1915,9 @@ msgstr "Nur wer die URL kennt (wird nicht gelistet)"
 msgid "Only by privileged users"
 msgstr "Beschränkt auf Editoren und Administratoren"
 
+msgid "Only by privileged users and members"
+msgstr "Beschränkt auf Mitglieder, Editoren und Administratoren"
+
 msgid "Security"
 msgstr "Sicherheit"
 
@@ -2186,10 +2192,10 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2584,11 +2590,17 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 msgid "All news"
 msgstr "Alle Nachrichten"
 
+msgid "This site is private but can also be seen by members"
+msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
+
 msgid "This site is not published."
 msgstr "Diese Seite ist nicht publiziert."
 
 msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
+
+msgid "This site is not public but it can be seen by members."
+msgstr "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -2883,8 +2895,8 @@ msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
 "mail."
 msgstr ""
-"Falls Sie sich nicht für diesen Newsletter angemeldet haben, können Sie diese "
-"Nachricht ignorieren."
+"Falls Sie sich nicht für diesen Newsletter angemeldet haben, können Sie "
+"diese Nachricht ignorieren."
 
 msgid "Click here to unsubscribe."
 msgstr "Klicken Sie hier um sich abzumelden."
@@ -3212,9 +3224,6 @@ msgstr ""
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
-
-msgid "E-Mail Address"
-msgstr "E-Mail Adresse"
 
 msgid "Signup"
 msgstr "Abonnieren"
@@ -4159,7 +4168,7 @@ msgid "Your registration has been confirmed"
 msgstr "Ihre Anmeldung wurde bestätigt"
 
 msgid "The registration has been confirmed"
-msgstr "Die Anmledung wurde bestätigt"
+msgstr "Die Anmeldung wurde bestätigt"
 
 msgid "The registration could not be confirmed"
 msgstr "Die Anmeldung konnte nicht bestätigt werden"

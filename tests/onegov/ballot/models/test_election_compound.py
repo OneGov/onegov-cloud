@@ -355,14 +355,11 @@ def test_election_compound(session):
 
     # Clear results
     election_compound.clear_results()
-    assert election_compound.last_result_change.date() == date(2015, 6, 14)
+    assert election_compound.last_result_change is None
     assert election_compound.party_results.first() is None
     assert election_compound.panachage_results.first() is None
-
-    election = session.query(Election).filter_by(title="First election").one()
-    election.clear_results()
-    election_compound.clear_results()
-    assert election_compound.last_result_change is None
+    assert session.query(Candidate).first() is None
+    assert session.query(ElectionResult).first() is None
 
 
 def test_election_compound_id_generation(session):

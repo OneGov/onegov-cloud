@@ -1,8 +1,113 @@
 # Changes
 
+## 2022.28
+
+`2022-04-29` | [e44871e509...4faea51ad6](https://github.com/OneGov/onegov-cloud/compare/e44871e509^...4faea51ad6)
+
+### Election Day
+
+##### Hide empty candidates tables and figures. (#322)
+
+`Feature` | [OGC-427](https://linear.app/onegovcloud/issue/OGC-427) | [3147e96447](https://github.com/onegov/onegov-cloud/commit/3147e9644759236d13c3e5702f5846c82b94b838)
+
+##### Add notifications for election compounds.
+
+`Feature` | [OGC-424](https://linear.app/onegovcloud/issue/OGC-424) | [cc096ff1b0](https://github.com/onegov/onegov-cloud/commit/cc096ff1b09e8782b580de71518835f307c677c3)
+
+##### Use cached layout property instead of model properties in various views.
+
+`Bugfix` | [4faea51ad6](https://github.com/onegov/onegov-cloud/commit/4faea51ad6bce9c2500b3792388396089da74fce)
+
+### Org
+
+##### Add access level "member"
+
+Topics, people, etc. can now be assigned the access level "member"
+
+`Feature` | [393](https://github.com/onegov/onegov-cloud/issues/393) | [e44871e509](https://github.com/onegov/onegov-cloud/commit/e44871e5097cdafe7529132e28a440e28e189c7f)
+
+##### Fix typo
+
+`Bugfix` | [OGC-409](https://linear.app/onegovcloud/issue/OGC-409) | [87768bd84f](https://github.com/onegov/onegov-cloud/commit/87768bd84f5d9825b9da54688ef921435f57b70a)
+
+##### Fix custom_event_tags getting cached globally.
+
+`Bugfix` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [2835da5064](https://github.com/onegov/onegov-cloud/commit/2835da5064177cd4fa8bca1965a7cbc66a41e6a0)
+
+##### Fix topic children links.
+
+`Bugfix` | [OGC-426](https://linear.app/onegovcloud/issue/OGC-426) | [f4b36d4c4e](https://github.com/onegov/onegov-cloud/commit/f4b36d4c4ecacece5c8bf6c71c1cb49155c54e2d)
+
+## 2022.27
+
+`2022-04-27` | [aebf7f9623...1eec46ba9d](https://github.com/OneGov/onegov-cloud/compare/aebf7f9623^...1eec46ba9d)
+
+## 2022.26
+
+`2022-04-26` | [1a1867726e...a00696ed84](https://github.com/OneGov/onegov-cloud/compare/1a1867726e^...a00696ed84)
+
+### Activity
+
+##### Fixes calculation of available weeks.
+
+`Bugfix` | [PRO-997](https://linear.app/projuventute/issue/PRO-997) | [6cc708de97](https://github.com/onegov/onegov-cloud/commit/6cc708de97788d3df5dc2e1e016f49d16d56ec9e)
+
+### Core
+
+##### Removes deprecated mailer argument.
+
+`Other` | [OGC-307](https://linear.app/onegovcloud/issue/OGC-307) | [44159aa6db](https://github.com/onegov/onegov-cloud/commit/44159aa6dbafb0ddd0828e28b9c7e99b2b35f3eb)
+
+##### Disable docs build step for now.
+
+`Other` | [OGC-418](https://linear.app/onegovcloud/issue/OGC-418) | [2ace66d8de](https://github.com/onegov/onegov-cloud/commit/2ace66d8dea38d14aedc51c64924b6d6fb4141ae)
+
+### Election Day
+
+##### Add cache control tween.
+
+`Feature` | [OGC-406](https://linear.app/onegovcloud/issue/OGC-406) | [3f69497348](https://github.com/onegov/onegov-cloud/commit/3f694973482928e0888ca73735b317971c30f96f)
+
+##### Make mandates translation configurable by principal.
+
+`Feature` | [OGC-404](https://linear.app/onegovcloud/issue/OGC-404) | [47b77d7800](https://github.com/onegov/onegov-cloud/commit/47b77d7800aed6b4792ba252aac661e7b93437fe)
+
+##### Hide load test data in open data catalog.
+
+`Other` | [OGC-417](https://linear.app/onegovcloud/issue/OGC-417) | [468b92f6a2](https://github.com/onegov/onegov-cloud/commit/468b92f6a2a1cbec159b12190f0069a63f64ed80)
+
+##### Fixes pages cache not distinquishing query parameters.
+
+Some cached (data) views used for the screen widgets may have query 
+parameters such as limit or other filters.
+
+`Bugfix` | [d8d29f07a6](https://github.com/onegov/onegov-cloud/commit/d8d29f07a67162416f4e4fcdfc2781ce3b2ef859)
+
+##### Avoid showing relative timestamps.
+
+This does not play well with caches.
+
+`Bugfix` | [edee466f93](https://github.com/onegov/onegov-cloud/commit/edee466f9325d8b68ab0c49fa79cca46dba7cf47)
+
+##### Clear all related election results when clearing an election compound result.
+
+`Bugfix` | [OGC-403](https://linear.app/onegovcloud/issue/OGC-403) | [f2dac55868](https://github.com/onegov/onegov-cloud/commit/f2dac558680e456595084e2a9e37b468b8c3530b)
+
+### File
+
+##### Improve AIS2.py efficiency.
+
+`Feature` | [3de2b4fa00](https://github.com/onegov/onegov-cloud/commit/3de2b4fa00b1c5ba86265232191bb46001898b5b)
+
+### Org
+
+##### Fix external links.
+
+`Bugfix` | [OGC-373](https://linear.app/onegovcloud/issue/OGC-373) | [e8a70b7d26](https://github.com/onegov/onegov-cloud/commit/e8a70b7d26d5d1b89547c244a41942bbec40aa18)
+
 ## 2022.25
 
-`2022-04-14` | [d5a2f507b2...d5a2f507b2](https://github.com/OneGov/onegov-cloud/compare/d5a2f507b2^...d5a2f507b2)
+`2022-04-14` | [d5a2f507b2...0011026036](https://github.com/OneGov/onegov-cloud/compare/d5a2f507b2^...0011026036)
 
 ### Org
 
@@ -1459,114 +1564,4 @@ Addionally, store text extracts per file.
 ##### Change color of news background and date.
 
 `Other` | [OGC-78](https://linear.app/onegovcloud/issue/OGC-78) | [6886672d66](https://github.com/onegov/onegov-cloud/commit/6886672d66a5bf2cf44a2fbf62d60cfb2e349328)
-
-## 2021.79
-
-`2021-09-20` | [e866168c6f...3da2c725ff](https://github.com/OneGov/onegov-cloud/compare/e866168c6f^...3da2c725ff)
-
-### Swissvotes
-
-##### Group policy areas if possible.
-
-`Feature` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [e866168c6f](https://github.com/onegov/onegov-cloud/commit/e866168c6fa0683fc8e0461f7a22b5589338529b)
-
-## 2021.78
-
-`2021-09-16` | [203549ce6f...42f73969e2](https://github.com/OneGov/onegov-cloud/compare/203549ce6f^...42f73969e2)
-
-### Election Day
-
-##### Uses the title of the elections in election compound as default.
-
-`Bugfix` | [6311267e8e](https://github.com/onegov/onegov-cloud/commit/6311267e8e13739a4c63227e24c83ea0b476fd70)
-
-##### Adjust header sizes.
-
-`Other` | [OGC-35](https://linear.app/onegovcloud/issue/OGC-35) | [580100ef0c](https://github.com/onegov/onegov-cloud/commit/580100ef0cd054314f3123b455a7788aa6a033c9)
-
-### Org
-
-##### Fix ticket status view for archived tickets.
-
-`Bugfix` | [d8d41b8e21](https://github.com/onegov/onegov-cloud/commit/d8d41b8e21172b2943cd4556875a031d39e69a5e)
-
-### Pdf
-
-##### Embed fonts.
-
-`Other` | [OGC-81](https://linear.app/onegovcloud/issue/OGC-81) | [2ffa823bdd](https://github.com/onegov/onegov-cloud/commit/2ffa823bdd54fab2d4d2401fd06e17d4964f0b83)
-
-### Swissvotes
-
-##### Order first by selected column, then by BFS number.
-
-`Feature` | [SWI-24](https://linear.app/swissvotes/issue/SWI-24) | [5e4b26da61](https://github.com/onegov/onegov-cloud/commit/5e4b26da61b89c74ed815894eedc0182593a489f)
-
-##### Order policies area by number.
-
-`Feature` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [b3df3df8d6](https://github.com/onegov/onegov-cloud/commit/b3df3df8d6d784e7d0cfaa027c84eca14ef7f1ea)
-
-##### Show turnout in votes view by default.
-
-`Feature` | [SWI-20](https://linear.app/swissvotes/issue/SWI-20) | [9778167650](https://github.com/onegov/onegov-cloud/commit/97781676501c5b332138c29aad99f95d66844a1d)
-
-##### Change order of search filters.
-
-`Feature` | [SWI-21](https://linear.app/swissvotes/issue/SWI-21) | [fd619826c8](https://github.com/onegov/onegov-cloud/commit/fd619826c89d5015830a9a66144722e43b58fc20)
-
-##### Improve hyphenation.
-
-`Other` | [SWI-20](https://linear.app/swissvotes/issue/SWI-20) | [766d08635f](https://github.com/onegov/onegov-cloud/commit/766d08635f4615215b74820a16f1548d2a113d22)
-
-##### Order policy areas by descriptor number.
-
-`Bugfix` | [SWI-23](https://linear.app/swissvotes/issue/SWI-23) | [657e96ee47](https://github.com/onegov/onegov-cloud/commit/657e96ee47f039b41e3636639285790a83a8975b)
-
-## 2021.77
-
-`2021-09-03` | [7cd8cedb85...7ffb765b1c](https://github.com/OneGov/onegov-cloud/compare/7cd8cedb85^...7ffb765b1c)
-
-### Agency
-
-##### Enable vCard export of people.
-
-`Feature` | [ZW-328](https://kanton-zug.atlassian.net/browse/ZW-328) | [ec335a2d4d](https://github.com/onegov/onegov-cloud/commit/ec335a2d4d392bddff1a05e6e20386a03aa4d21f)
-
-### Election Day
-
-##### Fix static data of canton SZ for 2020.
-
-This requires to re-upload results from 2020.
-
-`Bugfix` | [OGC-41](https://linear.app/onegovcloud/issue/OGC-41) | [223001a3a8](https://github.com/onegov/onegov-cloud/commit/223001a3a82cd9873cc4fee68953dcfcd95d347d)
-
-##### Fix archive search pagination.
-
-`Bugfix` | [OGC-43](https://linear.app/onegovcloud/issue/OGC-43) | [893be82f16](https://github.com/onegov/onegov-cloud/commit/893be82f1622fd4fff1c88a50f81b3d2f0896a03)
-
-### Org
-
-##### Linkify directory leads.
-
-`Feature` | [ZW-326](https://kanton-zug.atlassian.net/browse/ZW-326) | [0e8affad78](https://github.com/onegov/onegov-cloud/commit/0e8affad78831d6fc855de1f128fc365dbbb6be0)
-
-##### Fixes creating a PDF of a reservation ticket throwing an error if the resource has been deleted.
-
-`Bugfix` | [7cd8cedb85](https://github.com/onegov/onegov-cloud/commit/7cd8cedb8520020658e41613c90624b312bc12d0)
-
-##### Fixes styling of sidepanel titles with links.
-
-`Bugfix` | [FW-93](https://stadt-winterthur.atlassian.net/browse/FW-93) | [4b8c005c15](https://github.com/onegov/onegov-cloud/commit/4b8c005c15967cb638fcb458d104f38639464c1f)
-
-### People
-
-##### Fix vCard export of organizations.
-
-`Bugfix` | [678963bf06](https://github.com/onegov/onegov-cloud/commit/678963bf06106e43a20994278520a8457e6bd4c5)
-
-### Swissvotes
-
-##### Adds favicon.
-
-`Feature` | [SWI-22](https://linear.app/swissvotes/issue/SWI-22) | [5632c37fd4](https://github.com/onegov/onegov-cloud/commit/5632c37fd4bb4a773fe10427405724857aa65b3e)
 

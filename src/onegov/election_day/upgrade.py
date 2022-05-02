@@ -13,6 +13,7 @@ from onegov.election_day.models import Subscriber
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
 from sqlalchemy import Text
 
 
@@ -300,4 +301,18 @@ def add_active_column_to_subscriver(context):
         context.operations.add_column(
             'subscribers',
             Column('active', Boolean, nullable=True)
+        )
+
+
+@upgrade_task('Add election compound notification')
+def add_election_compound_notification(context):
+    if not context.has_column('notifications', 'election_compound_id'):
+        context.operations.add_column(
+            'notifications',
+            Column(
+                'election_compound_id',
+                Text,
+                ForeignKey('election_compounds.id', onupdate='CASCADE'),
+                nullable=True
+            )
         )

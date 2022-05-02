@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-05 15:55+0200\n"
+"POT-Creation-Date: 2022-04-28 16:03+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -479,6 +479,9 @@ msgstr "Webhooks"
 msgid "Votes"
 msgstr "Votazioni"
 
+msgid "Compounds of elections"
+msgstr "Componenti delle elezioni"
+
 msgid "Select at least one election or vote."
 msgstr "Seleziona almeno un'elezione o una votazione."
 
@@ -607,9 +610,6 @@ msgstr "Risultati finali"
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
 
-msgid "Compounds of elections"
-msgstr "Componenti delle elezioni"
-
 msgid "Upload tokens"
 msgstr "Carica token"
 
@@ -699,6 +699,12 @@ msgstr "Regione"
 
 msgid "superregions_label_bl"
 msgstr "Regioni"
+
+msgid "Seats"
+msgstr "Seggi"
+
+msgid "Mandates"
+msgstr "Mandati"
 
 msgid "Quarter"
 msgstr "Quartiere"
@@ -935,12 +941,6 @@ msgstr "Collegamenti tra sottoliste"
 
 msgid "Subtotal"
 msgstr "Subtotale"
-
-msgid "Mandates"
-msgstr "Mandati"
-
-msgid "Seats"
-msgstr "Seggi"
 
 msgid "eligible Voters"
 msgstr "Elettores"
@@ -1442,8 +1442,8 @@ msgid "Results deleted."
 msgstr "Risultati eliminata."
 
 #, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr "Sicuro di voler eliminare tutti i risultati partito di \"${item}\"?"
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
 
 #, python-format
 msgid "${count} files deleted."
@@ -1466,25 +1466,6 @@ msgstr "Componente eliminato."
 msgid "Delete compound"
 msgstr "Elimina componente"
 
-msgid "Election added."
-msgstr "Elezione aggiunta."
-
-msgid "Election modified."
-msgstr "Elezione modificata."
-
-msgid "Edit election"
-msgstr "Modifica elezione"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
-
-msgid "Election deleted."
-msgstr "Elezione eliminata."
-
-msgid "Delete election"
-msgstr "Elimina elezione"
-
 msgid "Notifications triggered."
 msgstr "Notifiche attivate."
 
@@ -1497,6 +1478,21 @@ msgstr ""
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Vuoi davvero riattivare le notifiche?"
+
+msgid "Election added."
+msgstr "Elezione aggiunta."
+
+msgid "Election modified."
+msgstr "Elezione modificata."
+
+msgid "Edit election"
+msgstr "Modifica elezione"
+
+msgid "Election deleted."
+msgstr "Elezione eliminata."
+
+msgid "Delete election"
+msgstr "Elimina elezione"
 
 msgid "Screen added."
 msgstr "Schermo aggiunto."

@@ -1,5 +1,6 @@
 from email.headerregistry import Address
 from onegov.ballot.models import Election
+from onegov.ballot.models import ElectionCompound
 from onegov.ballot.models import Vote
 from onegov.core.html import html_to_text
 from onegov.core.custom import json
@@ -52,6 +53,17 @@ class Notification(Base, TimestampMixin):
     #: The corresponding election
     election = relationship('Election', backref=backref('notifications'))
 
+    #: The corresponding election compound id
+    election_compound_id = Column(
+        Text, ForeignKey(ElectionCompound.id, onupdate='CASCADE'),
+        nullable=True
+    )
+
+    #: The corresponding election compound
+    election_compound = relationship(
+        'ElectionCompound', backref=backref('notifications')
+    )
+
     #: The corresponding vote id
     vote_id = Column(
         Text, ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
@@ -66,6 +78,8 @@ class Notification(Base, TimestampMixin):
         self.last_modified = model.last_modified
         if isinstance(model, Election):
             self.election_id = model.id
+        if isinstance(model, ElectionCompound):
+            self.election_compound_id = model.id
         if isinstance(model, Vote):
             self.vote_id = model.id
 
@@ -124,7 +138,8 @@ class EmailNotification(Notification):
         if 'translator' in request.__dict__:
             del request.__dict__['translator']
 
-    def send_emails(self, request, elections, votes, subject=None):
+    def send_emails(self, request, elections, election_compounds, votes,
+                    subject=None):
         """ Sends the results of the vote or election to all subscribers.
 
         Adds unsubscribe headers (RFC 2369, RFC 8058).
@@ -132,7 +147,7 @@ class EmailNotification(Notification):
         """
         from onegov.election_day.layouts import MailLayout  # circular
 
-        if not elections and not votes:
+        if not elections and not election_compounds and not votes:
             return
 
         self.set_locale(request)
@@ -164,7 +179,9 @@ class EmailNotification(Notification):
                 if subject:
                     subject_ = request.translate(subject)
                 else:
-                    subject_ = layout.subject((elections + votes)[0])
+                    subject_ = layout.subject(
+                        (election_compounds + elections + votes)[0]
+                    )
 
                 content = render_template(
                     'mail_results.pt',
@@ -172,6 +189,7 @@ class EmailNotification(Notification):
                     {
                         'title': subject_,
                         'elections': elections,
+                        'election_compounds': election_compounds,
                         'votes': votes,
                         'layout': layout
                     }
@@ -204,7 +222,8 @@ class EmailNotification(Notification):
         self.set_locale(request)
 
     def trigger(self, request, model):
-        """ Sends the results of the vote or election to all subscribers.
+        """ Sends the results of the vote, election or election compound to
+        all subscribers.
 
         Adds unsubscribe headers (RFC 2369, RFC 8058).
 
@@ -215,6 +234,9 @@ class EmailNotification(Notification):
         self.send_emails(
             request,
             elections=[model] if isinstance(model, Election) else [],
+            election_compounds=(
+                [model] if isinstance(model, ElectionCompound) else []
+            ),
             votes=[model] if isinstance(model, Vote) else []
         )
 

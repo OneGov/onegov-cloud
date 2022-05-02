@@ -572,6 +572,9 @@
     <tal:b condition="item.access == 'private'|False">
         <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
     </tal:b>
+    <tal:b condition="item.access == 'member'|False">
+        <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
+    </tal:b>
     <tal:b condition="item.access == 'secret'|False">
         <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
     </tal:b>
@@ -584,16 +587,29 @@
 </metal:publication_hint>
 
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
-    <tal:b condition="item.access == 'private'|False">
-        <div class="grid-x">
-            <div class="small-12 cell">
-                <div class="panel">
-                    <p i18n:translate>
-                        This site is not public.
-                    </p>
+    <tal:b tal:switch="item.access|False">
+        <tal:b tal:case="'private'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel callout">
+                        <p i18n:translate>
+                            This site is not public.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </tal:b>
+        <tal:b tal:case="'member'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel callout">
+                        <p i18n:translate>
+                            This site is not public but it can be seen by members.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </tal:b>
     </tal:b>
 </metal:access_hint_long>
 
@@ -1689,15 +1705,19 @@
 
         <ul class="forms-list more-list">
             <li tal:repeat="record grouped[group]">
-                <a class="list-title" tal:attributes="href link_func(record)">
-                        ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+            <tal:b tal:define="link edit_link(record)|nothing">
+               
+                <a class="list-title" tal:attributes="href link_func(record); target layout.external_link_target">
+                        ${record.title} 
+                        <tal:block condition="layout.external_link_target and  external_link(record)|nothing"> 
+                        </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
-                <tal:b tal:define="link edit_link(record)|nothing">
-                    <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
-                </tal:b>
+                
                 <tal:b tal:define="lead record.meta.get('lead')">
                     <div tal:condition="lead" class="list-lead" tal:content="structure layout.linkify(lead)"></div>
                 </tal:b>
+                 <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+            </tal:b>
             </li>
         </ul>
     </tal:b>

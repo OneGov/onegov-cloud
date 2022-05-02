@@ -72,6 +72,34 @@ def test_i18n(election_day_app_zg):
     assert "Tick" in homepage
 
 
+def test_cache_control(election_day_app_zg):
+    client = Client(election_day_app_zg)
+
+    response = client.get('/')
+    assert 'cache-control' not in response.headers
+    assert 'no_cache' not in response.headers['Set-Cookie']
+    assert 'no_cache' not in client.cookies
+
+    login(client)
+
+    response = client.get('/')
+    assert response.headers['cache-control'] == 'no-store'
+    assert response.headers['Set-Cookie'] == 'no_cache=1; Path=/'
+    assert client.cookies['no_cache'] == '1'
+
+    response = client.get('/')
+    assert response.headers['cache-control'] == 'no-store'
+    assert 'Set-Cookie' not in response.headers
+    assert client.cookies['no_cache'] == '1'
+
+    client.get('/auth/logout?to=/')
+
+    response = client.get('/')
+    assert 'cache-control' not in response.headers
+    assert 'no_cache=;' in response.headers['Set-Cookie']
+    assert 'no_cache' not in client.cookies
+
+
 def test_pages_cache(election_day_app_zg):
     principal = election_day_app_zg.principal
     principal.open_data = {
