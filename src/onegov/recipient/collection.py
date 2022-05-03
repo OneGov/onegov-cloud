@@ -14,5 +14,4 @@ class GenericRecipientCollection(GenericCollection):
             self.type, GenericRecipient)
 
     def query(self):
-        model_class = self.model_class
-        return self.session.query(model_class).order_by(model_class.order)
+        return super().query().order_by(self.model_class.order)
