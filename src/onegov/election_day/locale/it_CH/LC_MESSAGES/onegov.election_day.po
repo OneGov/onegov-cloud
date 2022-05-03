@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 16:03+0200\n"
+"POT-Creation-Date: 2022-05-03 07:36+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -785,8 +785,8 @@ msgstr "Risultati provvisori"
 msgid "No candidacies."
 msgstr "Nessuna candidatura."
 
-msgid "Download"
-msgstr "Scarica"
+msgid "Download diagram"
+msgstr "Scarica il diagramma"
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -802,11 +802,14 @@ msgstr ""
 "liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
 "le barre colorate di blu contengono i numeri dei mandati."
 
-msgid "Embed heatmap"
-msgstr "incorporare la mappa"
+msgid "Embed map"
+msgstr "Incorporare la mappa"
 
-msgid "Download heatmap"
+msgid "Download map"
 msgstr "Scarica la mappa"
+
+msgid "Download"
+msgstr "Scarica"
 
 msgid "No candidates elected yet."
 msgstr ""
@@ -989,6 +992,12 @@ msgstr "Solo i candidati eletti"
 
 msgid "List group"
 msgstr "Gruppo di liste"
+
+msgid "Embed diagram"
+msgstr "Incorpora il diagramma"
+
+msgid "Embed table"
+msgstr "Incorporare la tabella"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"

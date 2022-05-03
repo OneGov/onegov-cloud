@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 16:03+0200\n"
+"POT-Creation-Date: 2022-05-03 07:36+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -792,8 +792,8 @@ msgstr "Resultats intermediars"
 msgid "No candidacies."
 msgstr "Naginas candidaturas."
 
-msgid "Download"
-msgstr "Telechargiar"
+msgid "Download diagram"
+msgstr ""
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -810,11 +810,14 @@ msgstr ""
 "travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
 "cuntegnan il dumber da mandats."
 
-msgid "Embed heatmap"
+msgid "Embed map"
 msgstr "Incorporar la carta"
 
-msgid "Download heatmap"
+msgid "Download map"
 msgstr "Telechargiar la carta"
+
+msgid "Download"
+msgstr "Telechargiar"
 
 msgid "No candidates elected yet."
 msgstr ""
@@ -998,6 +1001,12 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
 msgstr "Gruppa da glista"
+
+msgid "Embed diagram"
+msgstr ""
+
+msgid "Embed table"
+msgstr ""
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
