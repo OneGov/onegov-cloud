@@ -736,7 +736,7 @@
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names})}"
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names})}"
                 data-embed-link="Embed diagram"
                 data-embed-source="${request.link(model, name='lists-chart')}">
             </div>
