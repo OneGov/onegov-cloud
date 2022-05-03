@@ -206,7 +206,7 @@ def send_daily_resource_usage_overview(request):
     # get all recipients which require an e-mail today
     q = ResourceRecipientCollection(request.session).query()
     q = q.filter(ResourceRecipient.medium == 'email')
-    q = q.order_by(ResourceRecipient.address)
+    q = q.order_by(None).order_by(ResourceRecipient.address)
     q = q.with_entities(
         ResourceRecipient.address,
         ResourceRecipient.content

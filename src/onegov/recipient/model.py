@@ -40,7 +40,6 @@ class GenericRecipient(Base, ContentMixin, TimestampMixin):
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
-        'order_by': 'order'
     }
 
     @observes('name')

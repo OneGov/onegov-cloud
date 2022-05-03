@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 16:03+0200\n"
+"POT-Creation-Date: 2022-05-03 14:14+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -371,7 +371,7 @@ msgid "Link label romansh"
 msgstr "Link Text rumantsch"
 
 msgid "Explanations (PDF)"
-msgstr ""
+msgstr "Explicaziuns (PDF)"
 
 msgid "Color suggestions"
 msgstr "Propostas da colurs"
@@ -389,7 +389,7 @@ msgid "Elections"
 msgstr "Elecziuns"
 
 msgid "Completes manually"
-msgstr ""
+msgstr "Vegn terminà manualmain"
 
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
@@ -400,7 +400,7 @@ msgstr ""
 "colliaziun cun l'elecziun n'è betg vegnida terminada manualmain."
 
 msgid "Completion"
-msgstr ""
+msgstr "Terminaziun"
 
 msgid "Completed"
 msgstr "Terminà"
@@ -409,22 +409,25 @@ msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
 msgid "View options"
-msgstr ""
+msgstr "Opziuns da visualisaziun"
 
 msgid "Allows to show the list groups and lists views."
 msgstr ""
+"Pussibilitescha la visualisaziun da la gruppa da glistas e da las glistas."
 
 msgid "Voters counts"
-msgstr ""
+msgstr "Dumber d'electurs"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
+"Mussa il dumber d'electurs empè da las vuschs en la visualisaziun da las "
+"fermezzas da las partidas."
 
 msgid "Exact voters counts"
-msgstr ""
+msgstr "Dumber d'electurs exact"
 
 msgid "Shows exact voters counts instead of rounded values."
-msgstr ""
+msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
 
 msgid "List groups"
 msgstr "Gruppas da glistas"
@@ -488,7 +491,7 @@ msgid "Compounds of elections"
 msgstr "Elecziuns colliadas"
 
 msgid "Select at least one election or vote."
-msgstr ""
+msgstr "Selecziunai almain ina elecziun u votaziun."
 
 msgid "Number"
 msgstr "Numer"
@@ -792,8 +795,8 @@ msgstr "Resultats intermediars"
 msgid "No candidacies."
 msgstr "Naginas candidaturas."
 
-msgid "Download"
-msgstr "Telechargiar"
+msgid "Download diagram"
+msgstr ""
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -810,17 +813,17 @@ msgstr ""
 "travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
 "cuntegnan il dumber da mandats."
 
-msgid "Embed heatmap"
+msgid "Embed map"
 msgstr "Incorporar la carta"
 
-msgid "Download heatmap"
+msgid "Download map"
 msgstr "Telechargiar la carta"
 
-msgid "No candidates elected yet."
-msgstr ""
+msgid "Download"
+msgstr "Telechargiar"
 
-msgid "Embed"
-msgstr "Incorporar"
+msgid "No candidates elected yet."
+msgstr "Anc betg elegì ina candidata u in candidat."
 
 msgid "Voters count"
 msgstr "Cifra electorala"
@@ -837,7 +840,7 @@ msgstr ""
 "superiura a las gruppas da glistas."
 
 msgid "The file is invalid."
-msgstr ""
+msgstr "La datoteca è nunvalaivla."
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
@@ -849,13 +852,13 @@ msgid "homepage"
 msgstr "Pagina iniziala"
 
 msgid "Logo: Link to homepage"
-msgstr ""
+msgstr "Logo: Link a la pagina iniziala"
 
 msgid "Footer"
-msgstr ""
+msgstr "Pe-pagina"
 
 msgid "Language"
-msgstr ""
+msgstr "Lingua"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -920,10 +923,10 @@ msgid "Cast Ballots"
 msgstr "Cedels da votar entrads"
 
 msgid "Empty votes"
-msgstr ""
+msgstr "Vuschs vidas"
 
 msgid "Invalid votes"
-msgstr ""
+msgstr "Vuschs nunvalaivlas"
 
 #. Default: Turnout
 #. Default: Voter turnout
@@ -998,6 +1001,12 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
 msgstr "Gruppa da glista"
+
+msgid "Embed diagram"
+msgstr "Integrar diagram"
+
+msgid "Embed table"
+msgstr "Integrar tabella"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
@@ -1078,7 +1087,7 @@ msgid "Download a PDF with all the results:"
 msgstr "In PDF cun tut ils resultats pudais Vus chargiar giu qua:"
 
 msgid "PDF Results"
-msgstr ""
+msgstr "Resultats PDF"
 
 msgid ""
 "The raw data used to display the results is available in the following "

@@ -535,11 +535,6 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         """ Use with tal:attributes='target layout.file_link_target' """
         return '_blank' if self.org.open_files_target_blank else None
 
-    @property
-    def external_link_target(self):
-        """ Use with tal:attributes='target layout.external_link_target' """
-        return True if self.org.open_external_links_target_blank else None
-
 
 class DefaultLayoutMixin:
     def hide_from_robots(self):
