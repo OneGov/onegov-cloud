@@ -552,12 +552,12 @@ def test_indexer_process(es_client):
 
     # check if the analyzer was applied correctly (stopword removal)
     search = es_client.search(
-        index=index, body={'query': {'match': {'title': 'and'}}})
+        index=index, query={'match': {'title': 'and'}})
 
     assert search['hits']['total']['value'] == 0
 
     search = es_client.search(
-        index=index, body={'query': {'match': {'title': 'go jump'}}})
+        index=index, query={'match': {'title': 'go jump'}})
 
     assert search['hits']['total']['value'] == 1
 
@@ -643,17 +643,17 @@ def test_tags(es_client):
     assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
-        index=index, body={'query': {'match': {'tags': 'foo'}}})
+        index=index, query={'match': {'tags': 'foo'}})
 
     assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
-        index=index, body={'query': {'match': {'tags': 'bar'}}})
+        index=index, query={'match': {'tags': 'bar'}})
 
     assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
-        index=index, body={'query': {'match': {'tags': 'bad'}}})
+        index=index, query={'match': {'tags': 'bad'}})
 
     assert search['hits']['total']['value'] == 0
 
