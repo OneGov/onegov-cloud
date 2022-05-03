@@ -83,6 +83,9 @@ def view_rdf(self, request):
 
     for item in sorted(items, key=lambda i: i.date, reverse=True):
 
+        if not item.completed:
+            continue
+
         # todo: Hotfix for load tests. If it's later than 15.5.2022 remove me!
         if item.date.isoformat().startswith('2022-05-01'):
             continue

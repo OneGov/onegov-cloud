@@ -3,8 +3,8 @@ from onegov import election_day
 from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
-from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
+from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
@@ -124,31 +124,29 @@ def test_pages_cache(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    urls = ('/vote/0xdeadbeef/entities', '/catalog.rdf')
     no_cache = [('Cache-Control', 'no-cache')]
 
     # Create cache entries
-    for url in urls:
-        assert '0xdeadbeef' in anonymous.get(url)
+    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
 
     # Modify without invalidating the cache
     election_day_app_zg.session().query(Vote).one().title = '0xdeadc0de'
     commit()
 
-    for url in urls:
-        assert '0xdeadc0de' not in anonymous.get(url)
-        assert '0xdeadc0de' in anonymous.get(url, headers=no_cache)
-        assert '0xdeadc0de' in client.get(url)  # never cached
+    assert '0xdeadc0de' not in anonymous.get('/vote/0xdeadbeef/entities')
+    assert '0xdeadc0de' in anonymous.get('/vote/0xdeadbeef/entities',
+                                         headers=no_cache)
+    assert '0xdeadc0de' in client.get('/vote/0xdeadbeef/entities')
 
     # Modify with invalidating the cache
     edit = client.get('/vote/0xdeadbeef/edit')
     edit.form['vote_de'] = '0xd3adc0d3'
     edit.form.submit()
 
-    for url in urls:
-        assert '0xd3adc0d3' in anonymous.get(url)
-        assert '0xd3adc0d3' in anonymous.get(url, headers=no_cache)
-        assert '0xd3adc0d3' in client.get(url)
+    assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities')
+    assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities',
+                                         headers=no_cache)
+    assert '0xd3adc0d3' in client.get('/vote/0xdeadbeef/entities')
 
 
 def test_view_last_modified(election_day_app_zg):
@@ -412,10 +410,10 @@ def test_view_opendata_catalog(election_day_app_zg):
     # With data
     login(client)
     upload_vote(client)
-    upload_majorz_election(client, canton='zg')
-    upload_proporz_election(client, canton='zg')
+    upload_majorz_election(client, canton='zg', status='final')
+    upload_proporz_election(client, canton='zg', status='final')
     upload_party_results(client)
-    create_election_compound(client, canton='zg')
+    upload_election_compound(client, canton='zg', status='final')
     upload_party_results(client, slug='elections/elections')
 
     root = fromstring(client.get('/catalog.rdf').text)
