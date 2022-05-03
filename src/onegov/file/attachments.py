@@ -41,7 +41,9 @@ def limit_and_store_image_size(file, content, content_type):
     image = Image.open(content)
 
     if max(image.size) > IMAGE_MAX_SIZE:
-        image.thumbnail((IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.LANCZOS)
+        image.thumbnail(
+            (IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.Resampling.LANCZOS
+        )
         content = SpooledTemporaryFile(INMEMORY_FILESIZE)
         try:
             # Quality is only supported by jpeg
