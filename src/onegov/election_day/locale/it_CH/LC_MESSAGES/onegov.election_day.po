@@ -1681,9 +1681,3 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
-
-#~ msgid "Embed heatmap"
-#~ msgstr "incorporare la mappa"
-
-#~ msgid "Download heatmap"
-#~ msgstr "Scarica la mappa"

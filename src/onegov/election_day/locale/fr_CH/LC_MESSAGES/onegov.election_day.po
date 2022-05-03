@@ -1692,9 +1692,3 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
-
-#~ msgid "Embed heatmap"
-#~ msgstr "Intégrer la carte"
-
-#~ msgid "Download heatmap"
-#~ msgstr "Télécharger la carte"
