@@ -81,7 +81,6 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         return func.count('1')
 
     __mapper_args__ = {
-        'order_by': order,
         'polymorphic_on': type
     }
 

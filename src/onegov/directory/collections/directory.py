@@ -14,6 +14,9 @@ class DirectoryCollection(GenericCollection):
     def model_class(self):
         return Directory.get_polymorphic_class(self.type, Directory)
 
+    def query(self):
+        return super().query().order_by(self.model_class.order)
+
     def add(self, **kwargs):
         if self.type != '*':
             kwargs.setdefault('type', self.type)
