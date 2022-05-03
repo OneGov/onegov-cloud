@@ -152,7 +152,7 @@ def annotate_html(html, request=None):
             parent = a.getparent()
 
             for i in range(0, 3):
-                if not parent:
+                if parent is None:
                     break
                 if parent.tag == 'p':
                     add_class_to_node(parent, 'has-video')
