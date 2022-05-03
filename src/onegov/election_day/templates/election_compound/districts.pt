@@ -27,7 +27,7 @@
                         data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
                         data-dataurl="${data_url}"
                         data-embed-source="${embed_source}"
-                        data-embed-link="Embed"
+                        data-embed-link="Embed map"
                         data-thumbs="false"
                         data-color-scale="b"
                         data-label-left-hand=""
