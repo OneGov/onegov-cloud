@@ -12,3 +12,7 @@ class GenericRecipientCollection(GenericCollection):
     def model_class(self):
         return GenericRecipient.get_polymorphic_class(
             self.type, GenericRecipient)
+
+    def query(self):
+        model_class = self.model_class
+        return self.session.query(model_class).order_by(model_class.order)
