@@ -47,14 +47,14 @@ def generate_qr_bill(schema, request, user, invoice):
 
     # Reference number
     invoice_bucket = request.app.invoice_bucket()
-    ref_number = None
-    extra_infos = None
+    reference_number = None
+    additional_information = None
     if schema == 'feriennet-v1':
-        extra_infos = invoice.readable_by_bucket(invoice_bucket)
+        additional_information = invoice.readable_by_bucket(invoice_bucket)
     else:
         if not qr_iban(account):
             return None
-        ref_number = invoice.readable_by_bucket(invoice_bucket)
+        reference_number = invoice.readable_by_bucket(invoice_bucket)
 
     # Creditor (mandatory)
     beneficiary = request.app.org.meta.get('bank_beneficiary', None)
@@ -87,8 +87,8 @@ def generate_qr_bill(schema, request, user, invoice):
             creditor=creditor,
             debtor=debtor,
             amount='{:.2f}'.format(invoice.outstanding_amount),
-            ref_number=ref_number,
-            extra_infos=extra_infos,
+            reference_number=reference_number,
+            additional_information=additional_information,
             language=language,
         )
     except Exception as e:
