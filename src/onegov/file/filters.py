@@ -76,7 +76,7 @@ class WithThumbnailFilter(FileFilter):
         output = BytesIO()
 
         thumbnail = Image.open(fp)
-        thumbnail.thumbnail(self.size, Image.LANCZOS)
+        thumbnail.thumbnail(self.size, Image.Resampling.LANCZOS)
         thumbnail = thumbnail.convert('RGBA')
         thumbnail.format = self.format
 
