@@ -1709,7 +1709,7 @@
                
                 <a class="list-title" tal:attributes="href link_func(record); target link">
                         ${record.title} 
-                        <tal:block condition="layout.external_link_target and  external_link(record)|nothing"> 
+                        <tal:block condition="external_link(record)|nothing"> 
                         </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
                 
