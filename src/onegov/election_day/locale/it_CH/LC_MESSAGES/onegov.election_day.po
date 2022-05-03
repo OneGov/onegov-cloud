@@ -943,7 +943,7 @@ msgid "Subtotal"
 msgstr "Subtotale"
 
 msgid "eligible Voters"
-msgstr "Elettores"
+msgstr "Elettori"
 
 msgid "Received Ballots"
 msgstr "Schede ricevute"
