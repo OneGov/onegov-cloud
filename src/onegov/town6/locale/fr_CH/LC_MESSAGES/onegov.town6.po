@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-03-23 14:34+0100\n"
+"POT-Creation-Date: 2022-05-03 16:49+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -713,6 +713,9 @@ msgstr "Adresse e-mail"
 msgid "This site is private"
 msgstr "Ce site est privé"
 
+msgid "This site is private but can also be seen by members"
+msgstr ""
+
 msgid "This site is secret"
 msgstr "Ce site est secret"
 
@@ -721,6 +724,9 @@ msgstr "Cette page n'est pas publiée."
 
 msgid "This site is not public."
 msgstr "Ce site n'est pas public."
+
+msgid "This site is not public but it can be seen by members."
+msgstr ""
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -1111,6 +1117,9 @@ msgstr ""
 "Si vous ne vous êtes pas abonné à cette lettre d'informations, vous pouvez "
 "tout simplement ignorer cet e-mail."
 
+msgid "Click here to unsubscribe."
+msgstr "Cliquer ici pour vous désabonner."
+
 msgid "Good morning,"
 msgstr "Bonjour,"
 
@@ -1246,9 +1255,6 @@ msgstr ""
 msgid "Click here to view web version."
 msgstr "Cliquer ici pour voir la version internet."
 
-msgid "Click here to unsubscribe."
-msgstr "Cliquer ici pour vous désabonner."
-
 msgid "Click the following link to set a new password:"
 msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe:"
 
@@ -1339,6 +1345,12 @@ msgid ""
 msgstr ""
 "Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
 "Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment:"
+
+msgid "The following ticket has just been opened:"
+msgstr "Le ticket suivant vient d'être ouvert:"
+
+msgid "View the ticket"
+msgstr "Voir le billet"
 
 msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
@@ -1943,12 +1955,6 @@ msgstr "Affiche le pied de page sur toutes les pages sauf pour les admins"
 msgid "Partner display"
 msgstr "Affichage partenaires"
 
-msgid "Open external links in separate window"
-msgstr "Ouvrir les liens externes dans une fenêtre séparée"
-
-msgid "Links leading to a different website will be opened in a new window"
-msgstr "Les liens menant à un autre site web seront ouverts dans une nouvelle fenêtre"
-
 msgid "General"
 msgstr "Général"
 
@@ -1987,3 +1993,11 @@ msgstr "Paramètres de la newsletter"
 
 msgid "Link Migration"
 msgstr ""
+
+#~ msgid "Open external links in separate window"
+#~ msgstr "Ouvrir les liens externes dans une fenêtre séparée"
+
+#~ msgid "Links leading to a different website will be opened in a new window"
+#~ msgstr ""
+#~ "Les liens menant à un autre site web seront ouverts dans une nouvelle "
+#~ "fenêtre"

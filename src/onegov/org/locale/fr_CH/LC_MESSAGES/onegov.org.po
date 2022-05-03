@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-04-25 14:15+0200\n"
+"POT-Creation-Date: 2022-05-03 16:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1232,13 +1232,6 @@ msgstr "Icône 57x57 PNG (iPhone, iPod, iPad)"
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icône SVG 20x20 (Safari)"
 
-msgid "Open files in separate window"
-msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
-
-msgid "User will stay on the page when opening images and files"
-msgstr ""
-"L'utilisateur reste sur la page lorsqu'il ouvre des images et des fichiers"
-
 msgid "Disable page references"
 msgstr "Désactiver les références de page"
 
@@ -1250,6 +1243,9 @@ msgstr ""
 "Désactiver le lien pour copier la référence de page. Les références elles-"
 "mêmes fonctionneront toujours. Ces références ne sont affichées que pour les "
 "utilisateurs connectés."
+
+msgid "Open files in separate window"
+msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
 
 msgid "Title header left side"
 msgstr "Titre dans en-tête, face gauche"
@@ -1371,6 +1367,9 @@ msgstr "Veuillez renseigner une date par ligne"
 
 msgid "Please enter only day and month"
 msgstr "Veuillez ne renseigner que des jours et des mois"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "Adresse électronique pour les notifications concernant les tickets ouverts"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -3126,6 +3125,12 @@ msgstr ""
 "Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
 "Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment :"
 
+msgid "The following ticket has just been opened:"
+msgstr "Le ticket suivant vient d'être ouvert:"
+
+msgid "View the ticket"
+msgstr "Voir le billet"
+
 msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
 
@@ -4009,6 +4014,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "Yotre demande a été enregistrée."
 
+msgid "New ticket"
+msgstr "Nouveau billet"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "Votre demande n'a pas pu être traitée automatiquement."
 
@@ -4761,3 +4769,7 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "User will stay on the page when opening images and files"
+#~ msgstr ""
+#~ "L'utilisateur reste sur la page lorsqu'il ouvre des images et des fichiers"

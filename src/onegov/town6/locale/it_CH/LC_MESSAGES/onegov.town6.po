@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-03-23 14:34+0100\n"
+"POT-Creation-Date: 2022-05-03 16:49+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -709,6 +709,9 @@ msgstr "Indirizzo e-mail"
 msgid "This site is private"
 msgstr "Questo sito è privato"
 
+msgid "This site is private but can also be seen by members"
+msgstr ""
+
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
 
@@ -717,6 +720,9 @@ msgstr "Questo sito non è pubblicato."
 
 msgid "This site is not public."
 msgstr "Questo sito non è pubblico."
+
+msgid "This site is not public but it can be seen by members."
+msgstr ""
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -1110,6 +1116,9 @@ msgstr ""
 "Se non ti sei iscritto a questa newsletter puoi semplicemente ignorare "
 "questa e-mail."
 
+msgid "Click here to unsubscribe."
+msgstr "Clicca qui per annullare l'iscrizione."
+
 msgid "Good morning,"
 msgstr "Buongiorno,"
 
@@ -1242,9 +1251,6 @@ msgstr ""
 msgid "Click here to view web version."
 msgstr "Clicca qui per visualizzare la versione web."
 
-msgid "Click here to unsubscribe."
-msgstr "Clicca qui per annullare l'iscrizione."
-
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
 
@@ -1334,6 +1340,12 @@ msgstr ""
 "Ti invieremo un'altra e-mail una volta che il tuo biglietto sarà stato "
 "completato. Nel frattempo puoi controllare in qualsiasi momento lo stato del "
 "tuo biglietto:"
+
+msgid "The following ticket has just been opened:"
+msgstr "Il seguente biglietto è stato appena aperto:"
+
+msgid "View the ticket"
+msgstr "Visualizza il biglietto"
 
 msgid "Your request has been reopened"
 msgstr "La tua richiesta è stata riaperta"
@@ -1939,12 +1951,6 @@ msgstr "Mostra il piè di pagina su tutte le pagine ma per gli amministratori"
 msgid "Partner display"
 msgstr "Visualizzazione dei partner"
 
-msgid "Open external links in separate window"
-msgstr "Aprire i link esterni in una finestra separata"
-
-msgid "Links leading to a different website will be opened in a new window"
-msgstr "I link che portano a un altro sito web saranno aperti in una nuova finestra"
-
 msgid "General"
 msgstr "Generale"
 
@@ -1984,3 +1990,11 @@ msgstr "Abbonamento alla newsletter"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
+
+#~ msgid "Open external links in separate window"
+#~ msgstr "Aprire i link esterni in una finestra separata"
+
+#~ msgid "Links leading to a different website will be opened in a new window"
+#~ msgstr ""
+#~ "I link che portano a un altro sito web saranno aperti in una nuova "
+#~ "finestra"
