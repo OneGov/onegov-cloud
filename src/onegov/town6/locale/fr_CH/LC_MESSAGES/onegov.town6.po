@@ -130,7 +130,7 @@ msgid "Edit"
 msgstr "Modifier"
 
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -215,7 +215,7 @@ msgid "New Note"
 msgstr "Nouveau commentaire"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "Confirmation"
 msgstr ""
@@ -714,7 +714,7 @@ msgid "This site is private"
 msgstr "Ce site est privé"
 
 msgid "This site is private but can also be seen by members"
-msgstr ""
+msgstr "Ce site est privé mais peut également être vu par les membres"
 
 msgid "This site is secret"
 msgstr "Ce site est secret"
@@ -726,7 +726,7 @@ msgid "This site is not public."
 msgstr "Ce site n'est pas public."
 
 msgid "This site is not public but it can be seen by members."
-msgstr ""
+msgstr "Ce site n'est pas public mais il peut être vu par les membres."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -1965,7 +1965,7 @@ msgid "Social Media"
 msgstr "Réseaux sociaux"
 
 msgid "Links"
-msgstr ""
+msgstr "Liens"
 
 msgid "Chat"
 msgstr ""
@@ -1992,7 +1992,7 @@ msgid "Newsletter Settings"
 msgstr "Paramètres de la newsletter"
 
 msgid "Link Migration"
-msgstr ""
+msgstr "Migration des liens"
 
 #~ msgid "Open external links in separate window"
 #~ msgstr "Ouvrir les liens externes dans une fenêtre séparée"

@@ -710,7 +710,7 @@ msgid "This site is private"
 msgstr "Questo sito è privato"
 
 msgid "This site is private but can also be seen by members"
-msgstr ""
+msgstr "Questo sito è privato ma può essere visto dai membri"
 
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
@@ -722,7 +722,7 @@ msgid "This site is not public."
 msgstr "Questo sito non è pubblico."
 
 msgid "This site is not public but it can be seen by members."
-msgstr ""
+msgstr "Questo sito non è pubblico ma può essere visto dai membri."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."

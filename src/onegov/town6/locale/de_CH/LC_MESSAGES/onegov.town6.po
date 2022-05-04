@@ -130,7 +130,7 @@ msgid "Edit"
 msgstr "Bearbeiten"
 
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -217,7 +217,7 @@ msgid "New Note"
 msgstr "Neue Notiz"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "Confirmation"
 msgstr "Bestätigung"
@@ -406,7 +406,7 @@ msgid "Payments"
 msgstr "Zahlungen"
 
 msgid "Stripe Connect"
-msgstr ""
+msgstr "Stripe Connect"
 
 msgid "Payment Provider"
 msgstr "Zahlungsanbieter"
@@ -715,7 +715,7 @@ msgid "This site is private"
 msgstr "Diese Seite ist Privat"
 
 msgid "This site is private but can also be seen by members"
-msgstr ""
+msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
 
 msgid "This site is secret"
 msgstr "Diese Seite ist Geheim"
@@ -728,6 +728,8 @@ msgstr "Diese Seite ist nicht öffentlich."
 
 msgid "This site is not public but it can be seen by members."
 msgstr ""
+"Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
+"werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -1951,13 +1953,13 @@ msgid "General"
 msgstr "Allgemein"
 
 msgid "Favicon"
-msgstr ""
+msgstr "Favicon"
 
 msgid "Social Media"
 msgstr "Soziale Medien"
 
 msgid "Links"
-msgstr ""
+msgstr "Links"
 
 msgid "Chat"
 msgstr ""
