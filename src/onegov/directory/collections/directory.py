@@ -49,6 +49,3 @@ class DirectoryCollection(GenericCollection):
 
     def by_name(self, name):
         return self.query().filter_by(name=name).first()
-
-    def query(self):
-        return super().query().order_by(self.model_class.order)
