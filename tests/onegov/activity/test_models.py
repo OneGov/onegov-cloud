@@ -1006,13 +1006,24 @@ def test_booking_collection(session, owner):
         gender='male'
     )
 
+    sophia = attendees.add(
+        user=owner,
+        name="Sophia Henderson",
+        birth_date=date(2002, 9, 8),
+        gender='female'
+    )
+
+    bookings.add(owner, sophia, tournament, priority=2)
     bookings.add(owner, dustin, tournament)
 
-    assert bookings.query().count() == 1
+    all_bookings = bookings.query().all()
+    assert len(all_bookings) == 2
+    assert all_bookings == sorted(all_bookings, key=lambda b: b.priority)
+
     assert bookings.for_period(Bunch(id=uuid4())).query().count() == 0
     assert bookings.for_username('foobar').query().count() == 0
     assert bookings.for_period(Bunch(id=uuid4())).count(owner.username) == 0
-    assert bookings.booking_count(owner.username) == 1
+    assert bookings.booking_count(owner.username) == 2
 
 
 def test_star_nobble_booking(session, owner):
@@ -1990,10 +2001,13 @@ def test_period_phases(session):
     with freeze_time('2016-12-01'):
         assert period.phase == 'archive'
 
-    # Periods without billing (finalizable=False) will always have finalized=False ?!
+    # Periods without billing (finalizable=False) will always have
+    # finalized=False ?!
     # An example is Domat-Ems period 2020
-    # Furthermore, Ferienpass Zürich used a booking period having the same end as the execution period
-    # I have no idea if this is not something that should not be done or that leads to unintended side effects
+    # Furthermore, Ferienpass Zürich used a booking period having the same
+    # end as the execution period
+    # I have no idea if this is not something that should not be done or that
+    # leads to unintended side effects
     period.finalizable = False
     period.finalized = False
 
@@ -2002,7 +2016,8 @@ def test_period_phases(session):
         assert period.phase == 'inactive'
 
     with freeze_time('2016-11-01'):
-        # This does not make sense and has to be evaluated in the future when there is budget
+        # This does not make sense and has to be evaluated in the future when
+        # there is budget
         assert period.phase == 'inactive'
         # assert period.phase == 'execution'
 
@@ -2010,8 +2025,8 @@ def test_period_phases(session):
         # assert period.phase == 'archive'
         assert period.phase == 'inactive'
 
-    ## The phase might also take into consideration the period.archived attribute for the phase
-
+    # The phase might also take into consideration the period.archived
+    # attribute for the phase
 
 
 def test_invoices(session, owner, prebooking_period, inactive_period):
