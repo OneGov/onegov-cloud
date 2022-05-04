@@ -55,7 +55,7 @@ def test_daypass_single_date():
     assert form.whole_day == True
     assert form.quota == 4
     assert form.quota_limit == 1
-    assert not form.data
+    assert form.data == {'access': 'public'}
 
 
 def test_daypass_multiple_dates():
@@ -99,7 +99,7 @@ def test_room_single_date():
     assert form.whole_day == False
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert not form.data
+    assert form.data == {'access': 'public'}
 
 
 def test_room_whole_day():
@@ -113,7 +113,22 @@ def test_room_whole_day():
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert not form.data
+    assert form.data == {'access': 'public'}
+
+
+def test_room_access():
+    form = RoomAllocationForm(data={
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
+        'as_whole_day': 'yes',
+        'access': 'private'
+    })
+
+    assert form.dates == [(datetime(2015, 8, 4), datetime(2015, 8, 4))]
+    assert form.whole_day == True
+    assert form.quota == 1
+    assert form.quota_limit == 1
+    assert form.data == {'access': 'private'}
 
 
 def test_room_multiple_dates():
@@ -243,7 +258,8 @@ def test_edit_room_allocation_form():
         display_start=lambda: datetime(2015, 1, 1, 12),
         display_end=lambda: datetime(2015, 1, 1, 18),
         whole_day=False,
-        quota=1
+        quota=1,
+        data=None,
     ))
 
     assert form.dates == (
