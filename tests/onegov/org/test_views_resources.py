@@ -374,6 +374,79 @@ def test_allocation_times(client):
     assert slots.json[1]['end'] == '2015-08-26T00:00:00+02:00'
 
 
+def test_allocation_visibility(client):
+    client.login_admin()
+
+    new = client.get('/resources').click('Raum')
+    new.form['title'] = 'Meeting Room'
+    new.form.submit()
+
+    # 12:00 - 14:00 private
+    new = client.get('/resource/meeting-room/new-allocation')
+    new.form['start'] = '2015-08-20'
+    new.form['end'] = '2015-08-20'
+    new.form['start_time'] = '12:00'
+    new.form['end_time'] = '14:00'
+    new.form['as_whole_day'] = 'no'
+    new.form['access'] = 'private'
+    new.form.submit()
+
+    # 14:00 - 16:00 member
+    new = client.get('/resource/meeting-room/new-allocation')
+    new.form['start'] = '2015-08-20'
+    new.form['end'] = '2015-08-20'
+    new.form['start_time'] = '14:00'
+    new.form['end_time'] = '16:00'
+    new.form['as_whole_day'] = 'no'
+    new.form['access'] = 'member'
+    new.form.submit()
+
+    # 16:00 - 18:00 public
+    new = client.get('/resource/meeting-room/new-allocation')
+    new.form['start'] = '2015-08-20'
+    new.form['end'] = '2015-08-20'
+    new.form['start_time'] = '16:00'
+    new.form['end_time'] = '18:00'
+    new.form['as_whole_day'] = 'no'
+    new.form['access'] = 'public'
+    new.form.submit()
+
+    slots = client.get(
+        '/resource/meeting-room/slots?start=2015-08-20&end=2015-08-20'
+    )
+
+    assert len(slots.json) == 3
+    assert slots.json[0]['start'] == '2015-08-20T12:00:00+02:00'
+    assert slots.json[0]['end'] == '2015-08-20T14:00:00+02:00'
+    assert slots.json[1]['start'] == '2015-08-20T14:00:00+02:00'
+    assert slots.json[1]['end'] == '2015-08-20T16:00:00+02:00'
+    assert slots.json[2]['start'] == '2015-08-20T16:00:00+02:00'
+    assert slots.json[2]['end'] == '2015-08-20T18:00:00+02:00'
+
+    client.logout()
+    client.login_member()
+
+    slots = client.get(
+        '/resource/meeting-room/slots?start=2015-08-20&end=2015-08-20'
+    )
+
+    assert len(slots.json) == 2
+    assert slots.json[0]['start'] == '2015-08-20T14:00:00+02:00'
+    assert slots.json[0]['end'] == '2015-08-20T16:00:00+02:00'
+    assert slots.json[1]['start'] == '2015-08-20T16:00:00+02:00'
+    assert slots.json[1]['end'] == '2015-08-20T18:00:00+02:00'
+
+    client.logout()
+
+    slots = client.get(
+        '/resource/meeting-room/slots?start=2015-08-20&end=2015-08-20'
+    )
+
+    assert len(slots.json) == 1
+    assert slots.json[0]['start'] == '2015-08-20T16:00:00+02:00'
+    assert slots.json[0]['end'] == '2015-08-20T18:00:00+02:00'
+
+
 def test_allocation_holidays(client):
     client.login_admin()
 
