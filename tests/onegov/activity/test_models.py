@@ -102,9 +102,9 @@ def test_unique_activity(session, owner):
 def test_activity_order(session, owner):
 
     collection = ActivityCollection(session)
+    collection.add(title="C", username=owner.username)
     collection.add(title="Ä", username=owner.username)
     collection.add(title="B", username=owner.username)
-    collection.add(title="C", username=owner.username)
 
     assert [a.title for a in collection.query().all()] == ["Ä", "B", "C"]
 

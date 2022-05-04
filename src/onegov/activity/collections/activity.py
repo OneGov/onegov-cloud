@@ -345,7 +345,7 @@ class ActivityCollection(RangedPagination):
         if o._criterion is not None:
             query = query.filter(model_class.id.in_(o.subquery()))
 
-        return query
+        return query.order_by(self.model_class.order)
 
     def for_filter(self, **keywords):
         """ Returns a new collection instance.
