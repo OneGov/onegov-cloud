@@ -118,7 +118,7 @@ setup(
         'psycopg2',
         'purl',
         'pycurl',
-        'pyparsing<3.0.0',
+        'pyparsing',
         'pyquery',
         'qrbill',
         'qrcode',
