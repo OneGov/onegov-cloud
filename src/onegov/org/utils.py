@@ -338,6 +338,8 @@ class AllocationEventInfo(object):
     def from_allocations(cls, request, scheduler, allocations):
         events = []
 
+        allocations = request.exclude_invisible(allocations)
+
         for key, group in groupby(allocations, key=attrgetter('_start')):
             grouped = tuple(group)
             availability = scheduler.queries.availability_by_allocations(
