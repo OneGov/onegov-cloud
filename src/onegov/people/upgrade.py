@@ -151,3 +151,13 @@ def add_publication_dates_to_agency_models(context):
                     table,
                     Column(column, UTCDateTime, nullable=True)
                 )
+
+
+@upgrade_task('Make people models polymorphic type non-nullable')
+def make_people_models_polymorphic_type_non_nullable(context):
+    for table in ('people', 'agency_memberships', 'agencies'):
+        context.operations.execute(f"""
+            UPDATE {table} SET type = 'generic' WHERE type IS NULL;
+        """)
+
+        context.operations.alter_column(table, 'type', nullable=False)
