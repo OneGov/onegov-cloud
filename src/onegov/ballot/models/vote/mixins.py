@@ -39,7 +39,10 @@ class DerivedAttributesMixin(object):
 
     @accepted.expression
     def accepted(cls):
-        return case({True: cls.yeas > cls.nays}, cls.counted)
+        return case(
+            (cls.yeas > cls.nays, True),
+            else_=cls.counted
+        )
 
 
 class DerivedBallotsCountMixin(object):
