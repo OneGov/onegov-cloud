@@ -2,3 +2,15 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.upgrade import upgrade_task
+
+
+@upgrade_task('Make recipient polymorphic type non-nullable')
+def make_recipient_polymorphic_type_non_nullable(context):
+    context.operations.execute("""
+        UPDATE generic_recipients SET type = 'generic' WHERE type IS NULL;
+    """)
+
+    context.operations.alter_column(
+        'generic_recipients', 'type', nullable=False
+    )
