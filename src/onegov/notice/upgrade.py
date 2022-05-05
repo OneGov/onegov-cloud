@@ -94,3 +94,12 @@ def add_note_to_notices(context):
             'official_notices',
             Column('note', Text, nullable=True)
         )
+
+
+@upgrade_task('Make official notice polymorphic type non-nullable')
+def make_official_notice_polymorphic_type_non_nullable(context):
+    context.operations.execute("""
+        UPDATE official_notices SET type = 'generic' WHERE type IS NULL;
+    """)
+
+    context.operations.alter_column('official_notices', 'type', nullable=False)
