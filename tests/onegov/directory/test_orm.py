@@ -253,11 +253,8 @@ def test_directory_entry_collection(session):
     ).query().count() == 1
 
     # test ordering
-    sorted_entries = sorted(
-        directory.entries, key=lambda en: en.order, reverse=True)
-
+    sorted_entries = sorted(directory.entries, key=lambda en: en.order)
     assert directory.entries == sorted_entries
-    assert albums.query().all() != sorted_entries
 
 
 def test_validation_error(session):

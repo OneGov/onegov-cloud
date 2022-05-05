@@ -67,7 +67,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     order = Column(Text, nullable=False, index=True)
 
     #: The polymorphic type of the directory
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     #: The data structure of the contained entries
     structure = Column(Text, nullable=False)
@@ -81,7 +81,8 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         return func.count('1')
 
     __mapper_args__ = {
-        'polymorphic_on': type
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic'
     }
 
     entries = relationship(
@@ -96,7 +97,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     @property
     def entry_cls(self):
-        return self.__class__._decl_class_registry[self.entry_cls_name]
+        return self.__class__.registry._class_registry[self.entry_cls_name]
 
     def add(self, values, type=INHERIT):
         start = values.pop('publication_start', None)
