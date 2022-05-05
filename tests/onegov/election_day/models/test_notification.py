@@ -38,7 +38,7 @@ def test_notification(session):
 
     notification = session.query(Notification).one()
     assert notification.id
-    assert notification.type is None
+    assert notification.type == 'generic'
     assert notification.last_modified == datetime(
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
     )

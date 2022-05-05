@@ -108,10 +108,10 @@ def get_list_results(election, limit=None, names=None, sort_by_names=None):
     order = [desc(List.votes)]
     if names and sort_by_names:
         order.insert(0, case(
-            [
+            *tuple(
                 (List.name == name, index)
                 for index, name in enumerate(names, 1)
-            ],
+            ),
             else_=0
         ))
     result = result.order_by(*order)

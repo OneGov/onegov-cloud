@@ -42,7 +42,6 @@ def test_upload_vote_form(session):
     session.flush()
     ds = session.query(DataSource).one()
     ds.items.append(DataSourceItem(vote_id=ds.query_candidates().one().id))
-    transaction.commit()
 
     form.adjust(cantonal_principal, session.query(Vote).one())
     assert sorted(f[0] for f in form.file_format.choices) == [
@@ -168,7 +167,6 @@ def test_upload_election_form(session):
     session.flush()
     ds = session.query(DataSource).one()
     ds.items.append(DataSourceItem(election_id=ds.query_candidates().one().id))
-    transaction.commit()
 
     form_majorz.adjust(cantonal_principal, session.query(Election).one())
     assert sorted(f[0] for f in form_majorz.file_format.choices) == [

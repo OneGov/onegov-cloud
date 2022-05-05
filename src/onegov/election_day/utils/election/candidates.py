@@ -97,10 +97,10 @@ def get_candidates_data(
         order.insert(0, desc(Candidate.elected))
     if lists and sort_by_lists:
         order.insert(0, case(
-            [
+            *tuple(
                 (column == name, index)
                 for index, name in enumerate(lists, 1)
-            ],
+            ),
             else_=0
         ))
     candidates = candidates.order_by(*order)
