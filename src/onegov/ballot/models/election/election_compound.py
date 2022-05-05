@@ -122,7 +122,6 @@ class ElectionCompound(
         ),
         cascade='all, delete-orphan',
         lazy='dynamic',
-        overlaps='party_results'
     )
 
     #: An election compound may contains n panachage results
@@ -133,7 +132,6 @@ class ElectionCompound(
         ),
         cascade='all, delete-orphan',
         lazy='dynamic',
-        overlaps='panachage_results'
     )
 
     #: Defines optional colors for parties

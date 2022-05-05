@@ -46,8 +46,12 @@ class VoteCollection(VoteCollectionPagination):
 
         latest_date = self.query().with_entities(Vote.date)
         latest_date = latest_date.order_by(desc(Vote.date))
-        latest_date = latest_date.limit(1).scalar()
-        return self.by_date(latest_date) if latest_date else None
+        latest_date = latest_date.limit(1).first()
+
+        if not latest_date:
+            return None
+        else:
+            return self.by_date(latest_date)
 
     def get_years(self):
         """ Returns a list of years for which there are votes. """

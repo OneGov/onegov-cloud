@@ -84,7 +84,6 @@ class ProporzElection(Election, PartyResultExportMixin):
         ),
         cascade='all, delete-orphan',
         lazy='dynamic',
-        overlaps='party_results'
     )
 
     #: An election may contains n (party) panachage results
@@ -95,7 +94,6 @@ class ProporzElection(Election, PartyResultExportMixin):
         ),
         cascade='all, delete-orphan',
         lazy='dynamic',
-        overlaps='panachage_results'
     )
 
     @property

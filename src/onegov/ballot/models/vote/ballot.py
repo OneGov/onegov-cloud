@@ -91,11 +91,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
             cast(func.coalesce(func.nullif(yeas + nays, 0), 1), Float)
         )
         nays_percentage = 100 - yeas_percentage
-        accepted = case(
-            (counted.is_(False), None),
-            (yeas > nays, True),
-            else_=False
-        )
+        accepted = case({True: yeas > nays}, counted)
         results = self.results.with_entities(
             BallotResult.district.label('name'),
             counted.label('counted'),
