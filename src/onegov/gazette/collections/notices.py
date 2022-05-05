@@ -215,7 +215,6 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             subquery = subquery.filter(
                 GazetteNoticeChange.owner == self.own_user_id
             )
-            subquery = subquery.subquery()
             return query.filter(GazetteNotice.id.in_(subquery))
 
         return super(GazetteNoticeCollection, self).filter_query(query)
