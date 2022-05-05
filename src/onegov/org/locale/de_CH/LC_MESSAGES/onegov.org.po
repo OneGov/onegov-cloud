@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-04-25 14:15+0200\n"
+"POT-Creation-Date: 2022-05-05 17:32+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -239,6 +239,24 @@ msgstr "Ausser an"
 
 msgid "On holidays"
 msgstr "An Feiertagen"
+
+msgid "During school holidays"
+msgstr "Während Schulferien"
+
+msgid "Access"
+msgstr "Zugriff"
+
+msgid "Public"
+msgstr "Öffentlich"
+
+msgid "Only by privileged users"
+msgstr "Beschränkt auf Editoren und Administratoren"
+
+msgid "Only by privileged users and members"
+msgstr "Beschränkt auf Mitglieder, Editoren und Administratoren"
+
+msgid "Security"
+msgstr "Sicherheit"
 
 msgid "Start date before end date"
 msgstr "Start Datum vor Ende"
@@ -1230,12 +1248,6 @@ msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icon SVG 20x20 (Safari)"
 
-msgid "Open files in separate window"
-msgstr "Dateien in separatem Fenster öffnen"
-
-msgid "User will stay on the page when opening images and files"
-msgstr "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"
-
 msgid "Disable page references"
 msgstr "Seitenreferenzen deaktivieren"
 
@@ -1247,6 +1259,9 @@ msgstr ""
 "Versteckt den Kopier-Link '#' für die Seitenreferenz. Die Referenzen an sich "
 "funktionieren weiterhin. Diese Referenzen sind nur für eingeloggte Nutzer "
 "sichtbar."
+
+msgid "Open files in separate window"
+msgstr "Dateien in separatem Fenster öffnen"
 
 msgid "Title header left side"
 msgstr "Titel Kopfzeile links"
@@ -1359,6 +1374,9 @@ msgstr "Andere Feiertage"
 msgid "Preview"
 msgstr "Vorschau"
 
+msgid "School holidays"
+msgstr "Schulferien"
+
 msgid "Format: Day.Month - Description"
 msgstr "Format: Tag.Monat - Beschreibung"
 
@@ -1367,6 +1385,19 @@ msgstr "Bitte geben Sie ein Datum pro Zeile ein"
 
 msgid "Please enter only day and month"
 msgstr "Bitte geben Sie nur Tag und Monat ein"
+
+#, python-format
+msgid "${date} is not a valid date"
+msgstr "${date} ist kein gültiges Datum"
+
+msgid "Format: Day.Month.Year - Day.Month.Year"
+msgstr "Format: Tag.Monat.Jahr - Tag.Monat.Jahr"
+
+msgid "Please enter one date pair per line"
+msgstr "Bitte geben Sie ein Datumspaar pro Zeile ein"
+
+msgid "End date needs to be after start date"
+msgstr "Das End-Datum muss vor dem Start-Datum sein"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1903,23 +1934,8 @@ msgstr "Die Eingabe wurde abgelehnt"
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
 
-msgid "Access"
-msgstr "Zugriff"
-
-msgid "Public"
-msgstr "Öffentlich"
-
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
-
-msgid "Only by privileged users"
-msgstr "Beschränkt auf Editoren und Administratoren"
-
-msgid "Only by privileged users and members"
-msgstr "Beschränkt auf Mitglieder, Editoren und Administratoren"
-
-msgid "Security"
-msgstr "Sicherheit"
 
 msgid "Visible on homepage"
 msgstr "Auf der Startseite anzeigen"
@@ -2192,10 +2208,10 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2600,7 +2616,9 @@ msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
 
 msgid "This site is not public but it can be seen by members."
-msgstr "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen werden."
+msgstr ""
+"Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
+"werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -4514,7 +4532,7 @@ msgid "Analytics"
 msgstr "Web-Statistik"
 
 msgid "Holidays"
-msgstr "Feiertage"
+msgstr "Feiertage / Schulferien"
 
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"

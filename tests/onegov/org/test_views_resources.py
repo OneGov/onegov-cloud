@@ -498,6 +498,56 @@ def test_allocation_holidays(client):
     assert slots.json[2]['start'].startswith('2019-08-02')
 
 
+def test_allocation_school_holidays(client):
+    client.login_admin()
+
+    page = client.get('/holiday-settings')
+    page.form['school_holidays'] = '31.07.2019 - 01.08.2019'
+    page.form.submit()
+
+    # allocations that are made during holidays
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Foo'
+    page.form.submit()
+
+    new = client.get('/resource/foo/new-allocation')
+    new.form['start'] = '2019-07-30'
+    new.form['end'] = '2019-08-02'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['during_school_holidays'] = 'yes'
+    new.form['as_whole_day'] = 'no'
+    new.form.submit()
+
+    slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
+
+    assert len(slots.json) == 4
+    assert slots.json[0]['start'].startswith('2019-07-30')
+    assert slots.json[1]['start'].startswith('2019-07-31')
+    assert slots.json[2]['start'].startswith('2019-08-01')
+    assert slots.json[3]['start'].startswith('2019-08-02')
+
+    # allocations that are not made during holidays
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Bar'
+    page.form.submit()
+
+    new = client.get('/resource/bar/new-allocation')
+    new.form['start'] = '2019-07-30'
+    new.form['end'] = '2019-08-02'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['during_school_holidays'] = 'no'
+    new.form['as_whole_day'] = 'no'
+    new.form.submit()
+
+    slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
+
+    assert len(slots.json) == 2
+    assert slots.json[0]['start'].startswith('2019-07-30')
+    assert slots.json[1]['start'].startswith('2019-08-02')
+
+
 @freeze_time("2015-08-28", tick=True)
 def test_auto_accept_reservations(client):
     # prepare the required data
@@ -1761,6 +1811,57 @@ def test_allocation_rules_with_holidays(client):
         run_cronjob()
 
     assert count_allocations() == 705
+
+
+def test_allocation_rules_with_school_holidays(client):
+    client.login_admin()
+
+    page = client.get('/holiday-settings')
+    page.form['school_holidays'] = (
+        '01.03.2019 - 15.03.2019\n'
+        '06.03.2020 - 20.03.2020'
+    )
+    page.form.submit()
+
+    resources = client.get('/resources')
+    page = resources.click('Tageskarte', index=0)
+    page.form['title'] = 'Daypass'
+    page.form.submit()
+
+    def count_allocations():
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(
+            f'/resource/daypass/slots?start={s}&end={e}').json)
+
+    def run_cronjob():
+        client.get('/resource/daypass/process-rules')
+
+    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page.form['title'] = 'Jährlich'
+    page.form['extend'] = 'yearly'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-12-31'
+    page.form['daypasses'] = '1'
+    page.form['daypasses_limit'] = '1'
+    page.form['during_school_holidays'] = 'no'
+    page = page.form.submit().follow()
+
+    assert 'Regel aktiv, 350 Einteilungen erstellt' in page
+    assert count_allocations() == 350
+
+    # running the cronjob on an ordinary day will not change anything
+    with freeze_time('2019-01-31 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 350
+
+    # only run at the end of the year does it work
+    with freeze_time('2019-12-31 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 701
 
 
 @freeze_time("2019-08-01", tick=True)
