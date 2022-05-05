@@ -224,4 +224,5 @@ class UserProfileForm(Form):
                 if self.should_skip_key(key):
                     continue
 
-                getattr(self, key).data = modeldata.get(key)
+                default = getattr(self, key).default
+                getattr(self, key).data = modeldata.get(key, default)
