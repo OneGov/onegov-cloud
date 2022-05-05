@@ -265,3 +265,13 @@ def add_language_column(context):
             'files',
             Column('language', Text, nullable=True)
         )
+
+
+@upgrade_task('Make file models polymorphic type non-nullable')
+def make_file_models_polymorphic_type_non_nullable(context):
+    for table in ('files', 'filesets'):
+        context.operations.execute(f"""
+            UPDATE {table} SET type = 'generic' WHERE type IS NULL;
+        """)
+
+        context.operations.alter_column(table, 'type', nullable=False)

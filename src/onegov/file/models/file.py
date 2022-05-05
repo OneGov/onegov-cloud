@@ -133,7 +133,7 @@ class File(Base, Associable, TimestampMixin):
     #:
     #: not to be confused with the the actual filetype which is stored
     #: on the :attr:`reference`!
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
@@ -178,7 +178,8 @@ class File(Base, Associable, TimestampMixin):
     stats = deferred(Column(JSON, nullable=True))
 
     __mapper_args__ = {
-        'polymorphic_on': 'type'
+        'polymorphic_on': 'type',
+        'polymorphic_identity': 'generic'
     }
 
     __table_args__ = (
@@ -196,7 +197,7 @@ class File(Base, Associable, TimestampMixin):
     @signature_timestamp.expression
     def signature_timestamp(self):
         return type_coerce(case(
-            [(
+            (
                 File.signed == True,
                 text("""
                     (
@@ -206,7 +207,7 @@ class File(Base, Associable, TimestampMixin):
                         )::timestamp without time zone
                     )
                 """)
-            )],
+            ),
             else_=text('NULL')
         ), UTCDateTime)
 
