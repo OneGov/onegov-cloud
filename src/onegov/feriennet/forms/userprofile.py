@@ -4,7 +4,7 @@ from onegov.feriennet import _
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.form.validators import Stdnum
-from wtforms import BooleanField, StringField, TextAreaField, RadioField
+from wtforms import StringField, TextAreaField, RadioField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import Optional, URL, ValidationError, InputRequired
 
@@ -22,15 +22,27 @@ class UserProfileForm(Form):
         'phone',
         'website',
         'emergency',
-        'daily_ticket_statistics',
+        'ticket_statistics',
         'bank_account',
         'bank_beneficiary',
         'political_municipality'
     )
 
-    daily_ticket_statistics = BooleanField(
-        label=_("Send a daily status e-mail."),
+    ticket_statistics = RadioField(
+        label=_("Send a periodic status e-mail."),
         fieldset=_("General"),
+        default='weekly',
+        validators=[InputRequired()],
+        choices=(
+            ('daily', _(
+                "Daily (exluding the weekend)")),
+            ('weekly', _(
+                "Weekly (on mondays)")),
+            ('monthly', _(
+                "Monthly (on first monday of the month)")),
+            ('never', _(
+                "Never")),
+        )
     )
 
     salutation = RadioField(
@@ -134,7 +146,7 @@ class UserProfileForm(Form):
 
     def on_request(self):
         self.toggle_political_municipality()
-        self.toggle_daily_ticket_statistics()
+        self.toggle_ticket_statistics()
 
     @property
     def show_political_municipality(self):
@@ -145,13 +157,13 @@ class UserProfileForm(Form):
             self.delete_field('political_municipality')
 
     @property
-    def show_daily_ticket_statistics(self):
+    def show_ticket_statistics(self):
         roles = self.request.app.settings.org.status_mail_roles
         return self.request.current_role in roles
 
-    def toggle_daily_ticket_statistics(self):
-        if not self.show_daily_ticket_statistics:
-            self.delete_field('daily_ticket_statistics')
+    def toggle_ticket_statistics(self):
+        if not self.show_ticket_statistics:
+            self.delete_field('ticket_statistics')
 
     def validate_emergency(self, field):
         if field.data:
@@ -176,8 +188,8 @@ class UserProfileForm(Form):
             if not self.show_political_municipality:
                 return True
 
-        if key == 'daily_ticket_statistics':
-            if not self.show_daily_ticket_statistics:
+        if key == 'ticket_statistics':
+            if not self.show_ticket_statistics:
                 return True
 
         return False

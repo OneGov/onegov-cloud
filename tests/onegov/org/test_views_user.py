@@ -171,8 +171,8 @@ def test_edit_user_settings(client):
     edit = edit.click('Bearbeiten')
     assert "new@example.org" in edit
 
-    edit.form.get('daily_ticket_statistics').checked = False
+    edit.form['ticket_statistics'] = 'never'
     edit.form.submit()
 
-    assert not users.by_username('new@example.org')\
-        .data['daily_ticket_statistics']
+    assert users.by_username('new@example.org')\
+        .data['ticket_statistics'] == 'never'
