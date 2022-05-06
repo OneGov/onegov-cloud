@@ -827,3 +827,13 @@ def add_invoice_item_payment_date(context):
             'invoice_items',
             column=Column('payment_date', Date, nullable=True)
         )
+
+
+@upgrade_task('Make activity polymorphic type non-nullable')
+def make_activity_polymorphic_type_non_nullable(context):
+    if context.has_table('activities'):
+        context.operations.execute("""
+            UPDATE activities SET type = 'generic' WHERE type IS NULL;
+        """)
+
+        context.operations.alter_column('activities', 'type', nullable=False)

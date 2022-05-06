@@ -182,12 +182,12 @@ class Occasion(Base, TimestampMixin):
     def total_cost(self):
         from onegov.activity.models.period import Period
 
-        return coalesce(Occasion.cost, 0) + case([
+        return coalesce(Occasion.cost, 0) + case(
             (Period.all_inclusive == True, 0),
             (Period.all_inclusive == False, func.coalesce(
                 Occasion.booking_cost, Period.booking_cost, 0
             )),
-        ])
+        )
 
     def compute_duration(self, dates):
         if not dates:
@@ -258,12 +258,13 @@ class Occasion(Base, TimestampMixin):
 
     @available_spots.expression
     def available_spots(cls):
-        return case((
+        return case(
             (
                 cls.cancelled == False,
                 func.upper(cls.spots) - 1 - cls.attendee_count
             ),
-        ), else_=0)
+            else_=0
+        )
 
     @property
     def max_spots(self):
