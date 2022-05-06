@@ -142,3 +142,14 @@ def add_content_and_meta_data_columns(context):
             'gazette_organizations',
             Column('content', JSON)
         )
+
+
+@upgrade_task('Make gazette models polymorphic type non-nullable')
+def make_gazette_models_polymorphic_type_non_nullable(context):
+    for table in ('gazette_categories', 'gazette_organizations'):
+        if context.has_table(table):
+            context.operations.execute(f"""
+                UPDATE {table} SET type = 'generic' WHERE type IS NULL;
+            """)
+
+            context.operations.alter_column(table, 'type', nullable=False)
