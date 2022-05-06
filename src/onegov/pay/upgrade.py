@@ -14,3 +14,17 @@ def add_remote_id_field_to_payments(context):
         context.operations.add_column('payments', Column(
             'remote_id', Text, nullable=True
         ))
+
+
+@upgrade_task('Make payment models polymorphic type non-nullable')
+def make_payment_models_polymorphic_type_non_nullable(context):
+    context.operations.execute("""
+        UPDATE payments SET source = 'generic' WHERE source IS NULL;
+    """)
+    context.operations.execute("""
+        UPDATE payment_providers SET type = 'generic' WHERE type IS NULL;
+    """)
+
+    context.operations.alter_column('payments', 'source', nullable=False)
+    context.operations.alter_column('payment_providers', 'type',
+                                    nullable=False)

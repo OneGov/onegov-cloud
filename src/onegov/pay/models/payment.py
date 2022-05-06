@@ -22,7 +22,7 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: the polymorphic source of the payment
-    source = Column(Text, nullable=True)
+    source = Column(Text, nullable=False, default=lambda: 'generic')
 
     #: the amount to pay
     amount = Column(Numeric(precision=8, scale=2))
@@ -47,7 +47,8 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     )
 
     __mapper_args__ = {
-        'polymorphic_on': source
+        'polymorphic_on': source,
+        'polymorphic_identity': 'generic'
     }
 
     @property

@@ -16,8 +16,12 @@ def reset_payment():
     while classes:
         cls = classes.pop()
 
-        for key in (Payment.registered_links or tuple()):
-            del cls.__mapper__._props[key]
+        # todo: it seems that we have a problem that depending on the test/
+        # selection of tests and/or used fixtures different models/table
+        # are created
+        for key in getattr(Payment, 'registered_links', []) or []:
+            if key in cls.__mapper__._props:
+                del cls.__mapper__._props[key]
 
         classes.extend(cls.__subclasses__())
 

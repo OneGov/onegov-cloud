@@ -76,7 +76,7 @@ class PaymentCollection(GenericCollection, Pagination):
             )
 
             q = self.session.query(link.cls)
-            q = q.filter(link.cls.id.in_(targets.subquery()))
+            q = q.filter(link.cls.id.in_(targets))
             q = q.options(joinedload(link.class_attribute))
 
             for record in q:

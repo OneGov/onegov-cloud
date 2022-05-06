@@ -21,13 +21,14 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: the polymorphic type of the provider
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     #: true if this is the default provider (can only ever be one)
     default = Column(Boolean, nullable=False, default=False)
 
     __mapper_args__ = {
-        'polymorphic_on': type
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic'
     }
 
     __table_args__ = (
