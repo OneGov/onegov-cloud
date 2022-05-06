@@ -999,7 +999,7 @@ def test_pickle_model(postgres_dsn):
     assert page.session_manager.__repr__.__self__ is mgr
 
 
-def test_orm_signals(postgres_dsn):
+def test_orm_signals1(postgres_dsn):
     Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
@@ -1097,25 +1097,6 @@ def test_orm_signals(postgres_dsn):
     assert updated[0][1] == 'foo'
     assert updated[1][0].body == 'hello world'
     assert updated[1][1] == 'foo'
-
-    transaction.commit()
-
-    # test on_delete with bulk delete
-    session.add(Comment(id=1, document_id=2, body='foo'))
-    session.add(Comment(id=2, document_id=2, body='bar'))
-    transaction.commit()
-    session.query(Comment).filter(Comment.document_id == 2).delete()
-    assert len(deleted) == 2
-    assert deleted[0][0].id == 1
-    assert deleted[0][0].document_id == 2
-    assert deleted[0][1] == 'foo'
-    assert deleted[1][0].id == 2
-    assert deleted[1][0].document_id == 2
-    assert deleted[1][1] == 'foo'
-
-    # .. since those objects are never loaded, the body is not present
-    assert not deleted[0][0].body
-    assert not deleted[1][0].body
 
 
 def test_get_polymorphic_class():
@@ -1963,7 +1944,7 @@ def test_postgres_timezone(postgres_dsn):
     mgr.set_current_schema('testing')
     session = mgr.session()
     assert session.execute('show timezone;').scalar() in valid_timezones, """
-    Run 
-        ALTER DATABASE onegov SET timezone TO 'UTC';    
+    Run
+        ALTER DATABASE onegov SET timezone TO 'UTC';
     to change the default timezone, then restart postgres service.
     """
