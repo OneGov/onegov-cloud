@@ -147,10 +147,7 @@ class CourseForm(Form):
         model.description = linkify(self.description.data, escape=False)
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
-        if not model.mandatory_refresh:
-            model.refresh_interval = None
-        else:
-            model.refresh_interval = self.refresh_interval.data
+        model.refresh_interval = self.refresh_interval.data
 
 
 class InviteCourseForm(Form):
