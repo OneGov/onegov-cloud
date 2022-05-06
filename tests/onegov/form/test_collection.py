@@ -21,7 +21,7 @@ def test_form_checksum():
     assert hash_definition('abc') == '900150983cd24fb0d6963f7d28e17f72'
 
 
-@pytest.mark.filterwarnings('ignore:SAWarning')
+@pytest.mark.filterwarnings('ignore:.*conflicts with persistent instance.*')
 def test_add_form(session):
     collection = FormCollection(session)
 
