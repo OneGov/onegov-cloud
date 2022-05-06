@@ -31,6 +31,7 @@ class ForceFetchQueryClass(Query):
 
     """
 
+    # todo: this doesn't work anymore, can we remove this?
     def delete(self, synchronize_session=None):
         return super().delete('fetch')
 
@@ -341,15 +342,16 @@ class SessionManager(object):
                 update_context.mapper.class_)
 
             if self.on_update.receivers:
-                assert hasattr(update_context, 'matched_objects'), """
-                    Bulk queries which use synchronize_session=False or
-                    synchronize_session='fetch' cannot be supported because
-                    it is unclear what rows were affected. Manually update
-                    values instead (even though it's way slower). There's no
-                    better solution at the moment.
-                """
+                # todo: how can we test this again?
+                # assert hasattr(update_context, 'matched_objects'), """
+                #     Bulk queries which use synchronize_session=False or
+                #     synchronize_session='fetch' cannot be supported because
+                #     it is unclear what rows were affected. Manually update
+                #     values instead (even though it's way slower). There's no
+                #     better solution at the moment.
+                # """
 
-                for obj in update_context.matched_objects:
+                for obj in update_context.query:
                     self.on_update.send(self.current_schema, obj=obj)
 
         @event.listens_for(session, 'after_bulk_delete')
@@ -357,13 +359,13 @@ class SessionManager(object):
             prevent_bulk_changes_on_aggregate_modules(
                 delete_context.mapper.class_)
 
-            if self.on_delete.receivers:
-                for row in delete_context.matched_rows:
-                    obj = delete_context.mapper.class_(**{
-                        c.name: v for c, v
-                        in zip(delete_context.mapper.primary_key, row)
-                    })
-                    self.on_delete.send(self.current_schema, obj=obj)
+            assert not self.on_delete.receivers, """
+                Bulk delete does not return the affected rows anymore.
+
+                It's not possible to use bulk delete such as
+                session.query(Model).delete() together with applications that
+                use ORM signals.
+            """
 
         zope.sqlalchemy.register(session)
 
@@ -626,7 +628,9 @@ class SessionManager(object):
                     base.metadata.schema = schema
                     base.metadata.create_all(conn)
 
-                    declared_classes.update(base._decl_class_registry.values())
+                    declared_classes.update(
+                        base.registry._class_registry.values()
+                    )
 
                 conn.execute('COMMIT')
             finally:

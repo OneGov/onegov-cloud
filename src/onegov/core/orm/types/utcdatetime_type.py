@@ -12,6 +12,7 @@ class UTCDateTime(types.TypeDecorator):
     """
 
     impl = types.DateTime
+    cache_ok = True
 
     def __init__(self):
         super().__init__(timezone=False)

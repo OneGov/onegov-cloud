@@ -69,7 +69,7 @@ class AdjacencyList(Base):
     #: subclasses of this class. See
     #: `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     @declared_attr
     def children(cls):
@@ -94,7 +94,8 @@ class AdjacencyList(Base):
     @declared_attr
     def __mapper_args__(cls):
         return {
-            "polymorphic_on": cls.type
+            'polymorphic_on': cls.type,
+            'polymorphic_identity': 'generic'
         }
 
     @declared_attr
@@ -372,15 +373,12 @@ class AdjacencyListCollection(object):
 
         return name
 
-    def add(self, parent, title, name=None, type=None, **kwargs):
+    def add(self, parent, title, name=None, type='generic', **kwargs):
         """ Adds a page to the given parent. """
 
         name = name or self.get_unique_child_name(title, parent)
 
-        if type is not None:
-            page_class = self.__listclass__.get_polymorphic_class(type)
-        else:
-            page_class = self.__listclass__
+        page_class = self.__listclass__.get_polymorphic_class(type)
 
         page = page_class(parent=parent, title=title, name=name, **kwargs)
 

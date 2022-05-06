@@ -18,6 +18,7 @@ class JSON(TypeDecorator):
     """
 
     impl = JSONB
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         if value is None:

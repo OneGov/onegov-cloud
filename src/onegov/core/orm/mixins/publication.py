@@ -18,12 +18,10 @@ class UTCPublicationMixin:
 
     @publication_started.expression
     def publication_started(cls):
-        return case((
-            (
-                cls.publication_start == None,
-                True
-            ),
-        ), else_=cls.publication_start <= func.now())
+        return case(
+            (cls.publication_start == None, True),
+            else_=cls.publication_start <= func.now()
+        )
 
     @hybrid_property
     def publication_ended(self):
@@ -33,12 +31,10 @@ class UTCPublicationMixin:
 
     @publication_ended.expression
     def publication_ended(cls):
-        return case((
-            (
-                cls.publication_end == None,
-                False
-            ),
-        ), else_=cls.publication_end < func.now())
+        return case(
+            (cls.publication_end == None, False),
+            else_=cls.publication_end < func.now()
+        )
 
     @hybrid_property
     def published(self):
