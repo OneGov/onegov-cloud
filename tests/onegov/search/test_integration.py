@@ -241,7 +241,8 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         session = request.session
         query = session.query(Document)
         query = query.filter(Document.id == request.params.get('id'))
-        query.delete('fetch')
+        for document in query:
+            session.delete(document)
 
     scan_morepath_modules(App)
     morepath.commit(App)
@@ -427,7 +428,8 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     update()
     assert app.es_search().query('match', content='story').count() == 1
 
-    session.query(Page).filter(Page.type == 'news').delete()
+    for page in session.query(Page).filter(Page.type == 'news'):
+        session.delete(page)
     update()
     assert app.es_search().count() == 2
 
@@ -435,7 +437,8 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     update()
     assert app.es_search().count() == 1
 
-    session.query(Page).delete()
+    for page in session.query(Page):
+        session.delete(page)
     update()
     assert app.es_search().count() == 0
 
