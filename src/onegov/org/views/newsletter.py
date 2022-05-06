@@ -64,7 +64,7 @@ def get_newsletter_form(model, request):
             Occurrence.event_id,
             Occurrence.start)
 
-        s = s.distinct(Occurrence.event_id).subquery()
+        s = s.distinct(Occurrence.event_id)
 
         return q.filter(Occurrence.id.in_(s))
 

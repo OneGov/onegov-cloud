@@ -80,7 +80,8 @@ class SharedMethods(object):
             query = query.filter(FormSubmission.name == None)
             query = query.filter(FormSubmission.id.in_(tokens))
 
-            query.delete('fetch')
+            for submission in query:
+                session.delete(submission)
             queries.remove_expired_reservation_sessions(expiration_date)
 
     def bound_reservations(self, request, status='pending'):

@@ -491,7 +491,8 @@ def handle_delete_rule(self, request):
         not_(Allocation.group.in_(reservations.subquery())))
 
     # delete the allocations
-    count = candidates.delete('fetch')
+    for count, candidate in enumerate(candidates, start=1):
+        request.session.delete(candidate)
 
     delete_rule(self, rule_id)
 

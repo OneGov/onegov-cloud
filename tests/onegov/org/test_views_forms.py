@@ -754,7 +754,8 @@ def test_registration_ticket_workflow(client):
     # we have the case since the ticket deletion mixin that there might be
     # a submission without the ticket
     session = client.app.session()
-    session.query(Ticket).delete('fetch')
+    for ticket in session.query(Ticket):
+        session.delete(ticket)
     transaction.commit()
 
     # the link to the deleted ticket is gone from the view
