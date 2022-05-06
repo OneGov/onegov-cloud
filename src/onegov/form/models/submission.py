@@ -143,13 +143,14 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
     @registration_state.expression
     def registration_state(cls):
-        return case((
+        return case(
             (cls.spots == 0, None),
             (cls.claimed == None, 'open'),
             (cls.claimed == 0, 'cancelled'),
             (cls.claimed == cls.spots, 'confirmed'),
-            (cls.claimed < cls.spots, 'partial')
-        ), else_=None)
+            (cls.claimed < cls.spots, 'partial'),
+            else_=None
+        )
 
     def get_email_field_data(self, form=None):
         form = form or self.form_obj

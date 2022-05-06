@@ -77,7 +77,7 @@ class FormDefinitionCollection(object):
     def query(self):
         return self.session.query(FormDefinition)
 
-    def add(self, title, definition, type=None, meta=None, content=None,
+    def add(self, title, definition, type='generic', meta=None, content=None,
             name=None, payment_method='manual', pick_up=None):
         """ Add the given form to the database. """
 
