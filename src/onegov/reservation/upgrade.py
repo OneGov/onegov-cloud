@@ -98,8 +98,9 @@ def add_default_view_to_existing_resource_types(context):
 
 @upgrade_task('Make resource polymorphic type non-nullable')
 def make_resource_polymorphic_type_non_nullable(context):
-    context.operations.execute("""
-        UPDATE resources SET type = 'generic' WHERE type IS NULL;
-    """)
+    if context.has_table('reservations'):
+        context.operations.execute("""
+            UPDATE resources SET type = 'generic' WHERE type IS NULL;
+        """)
 
-    context.operations.alter_column('resources', 'type', nullable=False)
+        context.operations.alter_column('resources', 'type', nullable=False)

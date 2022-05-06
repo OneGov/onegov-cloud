@@ -321,8 +321,9 @@ def add_election_compound_notification(context):
 @upgrade_task('Make election day models polymorphic type non-nullable')
 def make_election_day_models_polymorphic_type_non_nullable(context):
     for table in ('notifications', 'subscribers'):
-        context.operations.execute(f"""
-            UPDATE {table} SET type = 'generic' WHERE type IS NULL;
-        """)
+        if context.has_table(table):
+            context.operations.execute(f"""
+                UPDATE {table} SET type = 'generic' WHERE type IS NULL;
+            """)
 
-        context.operations.alter_column(table, 'type', nullable=False)
+            context.operations.alter_column(table, 'type', nullable=False)

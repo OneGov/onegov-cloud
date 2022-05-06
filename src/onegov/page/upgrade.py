@@ -35,8 +35,9 @@ def add_publication_dates_to_pages(context):
 
 @upgrade_task('Make pages polymorphic type non-nullable')
 def make_pages_polymorphic_type_non_nullable(context):
-    context.operations.execute("""
-        UPDATE pages SET type = 'generic' WHERE type IS NULL;
-    """)
+    if context.has_table('pages'):
+        context.operations.execute("""
+            UPDATE pages SET type = 'generic' WHERE type IS NULL;
+        """)
 
-    context.operations.alter_column('pages', 'type', nullable=False)
+        context.operations.alter_column('pages', 'type', nullable=False)

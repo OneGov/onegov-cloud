@@ -59,8 +59,9 @@ def add_publication_dates_to_dir_entries(context):
 @upgrade_task('Make directory models polymorphic type non-nullable')
 def make_directory_models_polymorphic_type_non_nullable(context):
     for table in ('directories', 'directory_entries'):
-        context.operations.execute(f"""
-            UPDATE {table} SET type = 'generic' WHERE type IS NULL;
-        """)
+        if context.has_table(table):
+            context.operations.execute(f"""
+                UPDATE {table} SET type = 'generic' WHERE type IS NULL;
+            """)
 
-        context.operations.alter_column(table, 'type', nullable=False)
+            context.operations.alter_column(table, 'type', nullable=False)
