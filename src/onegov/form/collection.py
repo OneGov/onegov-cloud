@@ -130,7 +130,7 @@ class FormDefinitionCollection(object):
         for submission in submissions:
             for file in submission.files:
                 self.session.delete(file)
-        submissions.delete()
+            self.session.delete(submission)
 
         if with_registration_windows:
             registration_windows = self.session.query(FormRegistrationWindow)
@@ -139,11 +139,18 @@ class FormDefinitionCollection(object):
             if handle_registration_windows:
                 handle_registration_windows(registration_windows)
 
-            registration_windows.delete()
+            for registration_window in registration_windows:
+                self.session.delete(registration_window)
             self.session.flush()
 
         # this will fail if there are any submissions left
-        self.query().filter(FormDefinition.name == name).delete('fetch')
+        # todo: this was a bulk delete but this is not possible anymore with
+        # the search integration / ORM signals. Deleting these items one by
+        # one does not raise an IntegrityError anymore!
+        # self.query().filter(FormDefinition.name == name).delete('fetch')
+        for definition in self.query().filter(FormDefinition.name == name):
+            self.session.delete(definition)
+
         self.session.flush()
 
     def by_name(self, name):
