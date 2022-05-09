@@ -169,14 +169,14 @@ def view_edit_course_event(self, request, form):
     layout = EditCourseLayout(self, request)
     layout.include_editor()
 
-    if not form.errors:
-        form.apply_model(self)
-
     if form.submitted(request):
         form.update_model(self)
 
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
+
+    if not form.errors:
+        form.apply_model(self)
 
     return {
         'layout': layout,
