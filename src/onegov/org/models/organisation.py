@@ -143,7 +143,6 @@ class Organisation(Base, TimestampMixin):
 
     # Links Settings
     open_files_target_blank = meta_property(default=True)
-    open_external_links_target_blank = meta_property(default=True)
     disable_page_refs = meta_property(default=True)
 
     # Footer column width settings

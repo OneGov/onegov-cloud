@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-28 16:03+0200\n"
+"POT-Creation-Date: 2022-05-03 17:21+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -368,7 +368,7 @@ msgid "Link label romansh"
 msgstr "Etichetta del link romancio"
 
 msgid "Explanations (PDF)"
-msgstr ""
+msgstr "Spiegazioni (PDF)"
 
 msgid "Color suggestions"
 msgstr "Suggerimenti per il colore"
@@ -386,7 +386,7 @@ msgid "Elections"
 msgstr "Elezioni"
 
 msgid "Completes manually"
-msgstr "Completa manualmente"
+msgstr "Viene concluso manualmente"
 
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
@@ -397,7 +397,7 @@ msgstr ""
 "componente elettorale non viene completato manualmente."
 
 msgid "Completion"
-msgstr "Completamento"
+msgstr "Conclusione"
 
 msgid "Completed"
 msgstr "Completato"
@@ -409,19 +409,21 @@ msgid "View options"
 msgstr "Opzioni di visualizzazione"
 
 msgid "Allows to show the list groups and lists views."
-msgstr "Permette di mostrare i gruppi di liste e le viste delle liste."
+msgstr "Permette di visualizzare i gruppi di liste e le liste."
 
 msgid "Voters counts"
-msgstr "Numeri di elettori"
+msgstr "Numero di elettori"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
+"Indica il numero di elettori anziché i voti nella visualizzazione della "
+"forza dei partiti"
 
 msgid "Exact voters counts"
-msgstr "Numeri esatti dei elettori"
+msgstr "Numero di elettori esatto"
 
 msgid "Shows exact voters counts instead of rounded values."
-msgstr "Mostra il numero esatto dei elettori invece dei valori arrotondati."
+msgstr "Mostra il numero di elettori esatto anziché i valori arrotondati."
 
 msgid "List groups"
 msgstr "Gruppi di liste"
@@ -483,7 +485,7 @@ msgid "Compounds of elections"
 msgstr "Componenti delle elezioni"
 
 msgid "Select at least one election or vote."
-msgstr "Seleziona almeno un'elezione o una votazione."
+msgstr "Selezioni almeno un'elezione o una votazione."
 
 msgid "Number"
 msgstr "Numero"
@@ -785,8 +787,8 @@ msgstr "Risultati provvisori"
 msgid "No candidacies."
 msgstr "Nessuna candidatura."
 
-msgid "Download"
-msgstr "Scarica"
+msgid "Download diagram"
+msgstr "Scarica il diagramma"
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -802,20 +804,20 @@ msgstr ""
 "liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
 "le barre colorate di blu contengono i numeri dei mandati."
 
-msgid "Embed heatmap"
-msgstr "incorporare la mappa"
+msgid "Embed map"
+msgstr "Incorporare la mappa"
 
-msgid "Download heatmap"
+msgid "Download map"
 msgstr "Scarica la mappa"
 
+msgid "Download"
+msgstr "Scarica"
+
 msgid "No candidates elected yet."
-msgstr ""
+msgstr "Ancora nessun candidato eletto."
 
-msgid "Embed"
-msgstr "Incorporare"
-
-msgid "Voters count"
-msgstr "Numero di elettori"
+msgid "Note on the voters count"
+msgstr "Indicazione riguardo al numero di elettori"
 
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
@@ -823,13 +825,21 @@ msgstr "Numero di elettori"
 #. election is finished as soon as the number of mandates appears.
 msgid "figcaption_list_groups"
 msgstr ""
-"Il numero di voti di partito di una lista è diviso per il numero dei seggi "
-"da assegnare nel circondario elettorale in questione. Il risultato è detto "
-"numero di elettori della lista. Il numero di elettori sovraripartizione tra "
-"i gruppi di liste."
+"In una prima fase, la cosiddetta sovraripartizione, tutti i voti espressi "
+"vengono dapprima considerati a livello cantonale. I seggi vengono attribuiti "
+"ai singoli partiti in proporzione alle quote di elettori conquistate. "
+"Affinché i voti ottenuti dai partiti nei singoli circondari elettorali "
+"possano essere comparati a livello cantonale e ogni voto abbia lo stesso "
+"peso, si rende necessaria una ponderazione. A tale scopo i voti ottenuti da "
+"un partito vengono divisi per il numero di seggi da assegnare nel "
+"corrispondente circondario elettorale. Il risultato di questo calcolo è il "
+"numero di elettori."
+
+msgid "Voters count"
+msgstr "Numero di elettori"
 
 msgid "The file is invalid."
-msgstr ""
+msgstr "Il file non è valido."
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
@@ -911,10 +921,10 @@ msgid "Cast Ballots"
 msgstr "Schede rientrate"
 
 msgid "Empty votes"
-msgstr ""
+msgstr "Voti in bianco"
 
 msgid "Invalid votes"
-msgstr ""
+msgstr "Voti nulli"
 
 #. Default: Turnout
 #. Default: Voter turnout
@@ -943,7 +953,7 @@ msgid "Subtotal"
 msgstr "Subtotale"
 
 msgid "eligible Voters"
-msgstr "Elettores"
+msgstr "Elettori"
 
 msgid "Received Ballots"
 msgstr "Schede ricevute"
@@ -989,6 +999,12 @@ msgstr "Solo i candidati eletti"
 
 msgid "List group"
 msgstr "Gruppo di liste"
+
+msgid "Embed diagram"
+msgstr "Incorpora il diagramma"
+
+msgid "Embed table"
+msgstr "Incorporare la tabella"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"

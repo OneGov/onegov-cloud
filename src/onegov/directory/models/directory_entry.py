@@ -64,7 +64,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     )
 
     __mapper_args__ = {
-        'order_by': order,
         'polymorphic_on': type
     }
 

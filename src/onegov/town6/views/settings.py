@@ -116,20 +116,6 @@ def custom_footer_settings_form(model, request):
     return merge_forms(FooterSettingsForm, ExtendedFooterSettings)
 
 
-def custom_link_settings_form(model, request):
-
-    class ExtendedLinksSettings(Form):
-        open_external_links_target_blank = BooleanField(
-            label=_("Open external links in separate window"),
-            description=_(
-                'Links leading to a different '
-                'website will be opened in a new window'
-            )
-        )
-
-    return merge_forms(LinksSettingsForm, ExtendedLinksSettings)
-
-
 @TownApp.html(
     model=Organisation, name='settings', template='settings.pt',
     permission=Secret)
@@ -177,7 +163,7 @@ def town_handle_social_media_settings(self, request, form):
 
 @TownApp.form(
     model=Organisation, name='link-settings', template='form.pt',
-    permission=Secret, form=custom_link_settings_form, setting=_("Links"),
+    permission=Secret, form=LinksSettingsForm, setting=_("Links"),
     icon='fa-link', order=-980)
 def town_handle_links_settings(self, request, form):
     return handle_links_settings(

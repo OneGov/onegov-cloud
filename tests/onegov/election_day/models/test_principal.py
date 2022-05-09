@@ -483,7 +483,7 @@ def test_principal_label(election_day_app_zg):
         ('mandates', 'de_CH', 'Sitze'),
         ('mandates', 'fr_CH', 'Sièges'),
         ('mandates', 'it_CH', 'Seggi'),
-        ('mandates', 'rm_CH', 'sezs'),
+        ('mandates', 'rm_CH', 'Sezs'),
     ):
         assert translate(principal.label(label), locale) == result
 

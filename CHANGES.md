@@ -1,8 +1,64 @@
 # Changes
 
+## 2022.29
+
+`2022-05-04` | [545369b9e1...91ad52e1df](https://github.com/OneGov/onegov-cloud/compare/545369b9e1^...91ad52e1df)
+
+### Core
+
+##### Unpin pytest.
+
+`Other` | [OGC-293](https://linear.app/onegovcloud/issue/OGC-293) | [5a6a758dce](https://github.com/onegov/onegov-cloud/commit/5a6a758dce87b75a97eabc2622053bfa4b6c94ae)
+
+### Election Day
+
+##### Fix Italian translation.
+
+`Bugfix` | [545369b9e1](https://github.com/onegov/onegov-cloud/commit/545369b9e1237e3b26be397eeebb493561e8c972)
+
+##### Fixes embed and download link texts.
+
+`Bugfix` | [OGC-274](https://linear.app/onegovcloud/issue/OGC-274) | [9a943ae864](https://github.com/onegov/onegov-cloud/commit/9a943ae864e58ef4951e12f399776e33a1d2b3de)
+
+##### Fixes another embed link text.
+
+`Bugfix` | [OGC-274](https://linear.app/onegovcloud/issue/OGC-274) | [de701c9324](https://github.com/onegov/onegov-cloud/commit/de701c9324df9d1cb668e8c8f107991a76c87e36)
+
+##### Update Open Data Swiss metadata format.
+
+`Other` | [OGC-416](https://linear.app/onegovcloud/issue/OGC-416) | [b229e4bde9](https://github.com/onegov/onegov-cloud/commit/b229e4bde959b43674a67041c6f0ea0b2ddb3987)
+
+##### Avoid publishing intermediate results on Open Data Swiss.
+
+`Bugfix` | [OGC-414](https://linear.app/onegovcloud/issue/OGC-414) | [d2e7dd1424](https://github.com/onegov/onegov-cloud/commit/d2e7dd1424d0e2b42ec800eb6166725f6e805680)
+
+### Form
+
+##### Adds compatibility with pyparsing 3.
+
+`Other` | [OGC-117](https://linear.app/onegovcloud/issue/OGC-117) | [3ab76c7ae1](https://github.com/onegov/onegov-cloud/commit/3ab76c7ae1cf9ffc13e325eec403622740a66399)
+
+### Org
+
+##### Allows setting of access for individual allocations and rules
+
+`Feature` | [OGC-420](https://linear.app/onegovcloud/issue/OGC-420) | [91ad52e1df](https://github.com/onegov/onegov-cloud/commit/91ad52e1df3aa1f6b20cd654131a74597e58f206)
+
+##### Open only external forms in new tabs
+
+Option for external-links in new tabs removed, only external form links will be opened in new tabs
+
+`Bugfix` | [OGC-373](https://linear.app/onegovcloud/issue/OGC-373) | [0642270f30](https://github.com/onegov/onegov-cloud/commit/0642270f30f2a799fa390739f29bb2a51d0389ab)
+
+### Winterthur
+
+##### Fix styling
+
+`Bugfix` | [FW-96](https://stadt-winterthur.atlassian.net/browse/FW-96) | [627cd4e914](https://github.com/onegov/onegov-cloud/commit/627cd4e914ce6b7efa3f2f12473a343d62fe8770)
+
 ## 2022.28
 
-`2022-04-29` | [e44871e509...4faea51ad6](https://github.com/OneGov/onegov-cloud/compare/e44871e509^...4faea51ad6)
+`2022-04-29` | [e44871e509...f07e6fabb0](https://github.com/OneGov/onegov-cloud/compare/e44871e509^...f07e6fabb0)
 
 ### Election Day
 
@@ -1528,40 +1584,4 @@ Addionally, store text extracts per file.
 ##### Add change role CLI command.
 
 `Feature` | [f5078d8d29](https://github.com/onegov/onegov-cloud/commit/f5078d8d2976c57fa6319735408b64c764dc733e)
-
-## 2021.80
-
-`2021-09-27` | [6886672d66...a5bbfb99ff](https://github.com/OneGov/onegov-cloud/compare/6886672d66^...a5bbfb99ff)
-
-### Election Day
-
-##### Add CSP Connect Source option for analytics.
-
-`Feature` | [OGC-102](https://linear.app/onegovcloud/issue/OGC-102) | [b9f9df8a0a](https://github.com/onegov/onegov-cloud/commit/b9f9df8a0ad1d04abbf34370fa02cf6055c6932f)
-
-##### Add CSP Script Source option for analytics.
-
-`Feature` | [OGC-102](https://linear.app/onegovcloud/issue/OGC-102) | [deec0bc8c7](https://github.com/onegov/onegov-cloud/commit/deec0bc8c70eb1870b562e9e8b1347bc66e2d896)
-
-### Fsi
-
-##### Show next course subscription in the audit view.
-
-`Feature` | [ZW-332](https://kanton-zug.atlassian.net/browse/ZW-332) | [e9b8eac575](https://github.com/onegov/onegov-cloud/commit/e9b8eac5751d68f4daa0a86bbb50b8b127e6e277)
-
-### Org
-
-##### Removes corona banner from event directory.
-
-`Other` | [ZW-333](https://kanton-zug.atlassian.net/browse/ZW-333) | [f373b76021](https://github.com/onegov/onegov-cloud/commit/f373b76021cb33890d4d843f3681037c505db4d2)
-
-### Town6
-
-##### Allow custom icons for custom service panel links.
-
-`Feature` | [OGC-99](https://linear.app/onegovcloud/issue/OGC-99) | [a39af439fa](https://github.com/onegov/onegov-cloud/commit/a39af439fae03502096de17577b9f8ccfbaa6d66)
-
-##### Change color of news background and date.
-
-`Other` | [OGC-78](https://linear.app/onegovcloud/issue/OGC-78) | [6886672d66](https://github.com/onegov/onegov-cloud/commit/6886672d66a5bf2cf44a2fbf62d60cfb2e349328)
 
