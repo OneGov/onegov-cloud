@@ -2629,7 +2629,8 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('110.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    help = [e.text.strip() for e in page.pyquery('.item-text')[:-2]]
+    assert help == [
         'Ferienpass',
         'Fishing',
     ]
