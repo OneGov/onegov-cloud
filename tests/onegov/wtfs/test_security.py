@@ -60,6 +60,11 @@ def test_permissions(wtfs_app, wtfs_password):
     session.query(Municipality).delete()
 
     # Add new
+    session.add(Municipality(
+        name='Municipality',
+        bfs_number=0,
+    ))
+
     municipality_a_id = uuid4()
     session.add(Municipality(
         id=municipality_a_id,
@@ -136,10 +141,10 @@ def test_permissions(wtfs_app, wtfs_password):
     member = query(User).filter_by(realname='Member').one()
     member_a = query(User).filter_by(realname='Member A').one()
     member_b = query(User).filter_by(realname='Member B').one()
-    group = UserGroup()
+    group = query(UserGroup).filter_by(name='Municipality').one()
     group_a = query(UserGroup).filter_by(name='Municipality A').one()
     group_b = query(UserGroup).filter_by(name='Municipality B').one()
-    municipality = Municipality()
+    municipality = query(Municipality).filter_by(name='Municipality').one()
     municipality_a = query(Municipality).filter_by(name='Municipality A').one()
     municipality_b = query(Municipality).filter_by(name='Municipality B').one()
     scan_job = query(ScanJob).one()
