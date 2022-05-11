@@ -8,7 +8,7 @@ from sedate import to_timezone
 from sqlalchemy import (
     Boolean, Column, ForeignKey, Integer, Numeric, Text, Enum
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 from uuid import uuid4
 
 MISSION_TYPES = ('single', 'multi')
@@ -45,11 +45,6 @@ class MissionReport(Base, ContentMixin, AccessExtension):
 
     #: the Zivilschutz was involved
     civil_defence = Column(Boolean, nullable=False, default=False)
-
-    #: the vehicle use of the mission report
-    used_vehicles = relationship(
-        'MissionReportVehicleUse',
-        cascade="all, delete-orphan")
 
     #: pictures of the mission
     pictures = associated(MissionReportFile, 'pictures', 'one-to-many')
@@ -96,8 +91,6 @@ class MissionReportVehicle(Base, ContentMixin, AccessExtension):
     #: a website describing the vehicle
     website = Column(Text, nullable=True)
 
-    uses = relationship('MissionReportVehicleUse')
-
     @property
     def title(self):
         return f'{self.name} - {self.description}'
@@ -118,14 +111,22 @@ class MissionReportVehicleUse(Base):
         ForeignKey('mission_reports.id'),
         primary_key=True)
 
-    mission_report = relationship('MissionReport')
+    mission_report = relationship(
+        'MissionReport',
+        backref=backref(
+            'used_vehicles', cascade='all, delete-orphan'
+        )
+    )
 
     vehicle_id = Column(
         UUID,
         ForeignKey('mission_report_vehicles.id'),
         primary_key=True)
 
-    vehicle = relationship('MissionReportVehicle')
+    vehicle = relationship(
+        'MissionReportVehicle',
+        backref='uses'
+    )
 
     # vehicles may be used multiple times in a single mission_report
     count = Column(
