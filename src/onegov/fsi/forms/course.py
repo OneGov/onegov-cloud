@@ -141,12 +141,11 @@ class CourseForm(Form):
         return result
 
     def ensure_refresh_interval(self):
-        if self.mandatory_refresh.data:
-            if self.refresh_interval.data == None:
-                self.refresh_interval.errors = [
-                    _('Not a valid integer value')
-                ]
-                return False
+        if self.mandatory_refresh.data and self.refresh_interval.data == None:
+            self.refresh_interval.errors = [
+                _('Not a valid integer value')
+            ]
+            return False
 
     def apply_model(self, model):
         self.name.data = model.name
