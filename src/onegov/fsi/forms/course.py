@@ -9,6 +9,7 @@ from onegov.form.fields import HtmlField
 from onegov.fsi import _
 from wtforms import StringField, BooleanField, TextAreaField, IntegerField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
 from wtforms.widgets import TextInput
 
 mapping = OrderedDict({'year': 365, 'month': 30, 'week': 7, 'day': 1})
@@ -120,6 +121,9 @@ class CourseForm(Form):
         description=_('Number of years'),
         depends_on=('mandatory_refresh', 'y'),
         default=6,
+        validators=[
+            Optional()
+        ],
     )
 
     hidden_from_public = BooleanField(
@@ -132,8 +136,17 @@ class CourseForm(Form):
         if self.description.data:
             result['description'] = linkify(
                 self.description.data, escape=False)
-
+        if not self.mandatory_refresh.data:
+            result['refresh_interval'] = None
         return result
+
+    def ensure_refresh_interval(self):
+        if self.mandatory_refresh.data:
+            if self.refresh_interval.data == None:
+                self.refresh_interval.errors = [
+                    _('Not a valid integer value')
+                ]
+                return False
 
     def apply_model(self, model):
         self.name.data = model.name
@@ -147,7 +160,10 @@ class CourseForm(Form):
         model.description = linkify(self.description.data, escape=False)
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
-        model.refresh_interval = self.refresh_interval.data
+        if not self.mandatory_refresh.data:
+            model.refresh_interval = None
+        else:
+            model.refresh_interval = self.refresh_interval.data
 
 
 class InviteCourseForm(Form):
