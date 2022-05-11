@@ -312,6 +312,17 @@ def report_person_change(self, request, form):
             receivers=(form.submitter_email.data, ),
             ticket=ticket
         )
+        if request.email_for_new_tickets:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(request.email_for_new_tickets, ),
+                content={
+                    'model': ticket
+                }
+            )
 
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))
