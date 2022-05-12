@@ -15,8 +15,10 @@ from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
 from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
+    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout, \
+    SelfLayout
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.security import Registered
 from morepath.request import Response
 from onegov.core.custom import json
 
@@ -215,6 +217,22 @@ def export_translator_directory(self, request):
     response.body = output.read()
 
     return response
+
+
+@TranslatorDirectoryApp.html(
+    model=TranslatorCollection,
+    permission=Registered,
+    template='translator.pt',
+    name='self'
+)
+def view_self(self, request):
+    model = request.current_user.translators.first()
+    layout = SelfLayout(model, request)
+    return {
+        'layout': layout,
+        'model': model,
+        'title': layout.title
+    }
 
 
 @TranslatorDirectoryApp.html(

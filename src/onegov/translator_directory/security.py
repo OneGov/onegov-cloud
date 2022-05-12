@@ -1,4 +1,4 @@
-from onegov.core.security import Personal
+from onegov.core.security import Public, Personal, Private, Secret
 from onegov.file import File
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -7,22 +7,59 @@ from onegov.translator_directory.collections.documents import \
 from onegov.translator_directory.models.translator import Translator
 
 """
-The idea for permission is the following:
 
-Personal: beeing logged in by default, can be overwritten model wise
-Private: also editor can access it
-Secret: admins
+In the translator directory
+- anonymous users can log in
+- members can additionally view the translators and their vouchers
+- editors can additionally editor some informations of translators
+- admins can do everything
+- translators can view their own personal informations
 
 """
 
 
+class Registered:
+    """ Translators are allowed to do this. """
+
+
+@TranslatorDirectoryApp.setting_section(section="roles")
+def get_roles_setting():
+
+    return {
+        'admin': set((
+            Public,
+            Registered,
+            Private,
+            Personal,
+            Secret
+        )),
+        'editor': set((
+            Public,
+            Private,
+            Personal,
+        )),
+        'member': set((
+            Public,
+            Personal,
+        )),
+        'translator': set((
+            Public,
+            Registered
+        )),
+        'anonymous': set((
+            Public,
+        ))
+    }
+
+
 @TranslatorDirectoryApp.permission_rule(model=object, permission=Personal)
 def local_is_logged_in(app, identity, model, permission):
-    return identity.role in ('admin', 'editor', 'member')
+    return identity.role in ('admin', 'editor', 'member', 'registered')
 
 
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
 def hide_translator_for_non_admins(app, identity, model, permission):
+    # todo?
     if model.for_admins_only and identity.role != 'admin':
         return False
     return local_is_logged_in(app, identity, model, permission)

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-03 15:02+0100\n"
+"POT-Creation-Date: 2022-05-12 09:39+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -97,6 +97,9 @@ msgstr "Einstellungen"
 msgid "Settings translator directory"
 msgstr "Verzeichniseinstellungen"
 
+msgid "Users"
+msgstr "Benutzer"
+
 msgid "Management"
 msgstr "Verwaltung"
 
@@ -105,6 +108,9 @@ msgstr "Anmelden"
 
 msgid "Translators"
 msgstr "Übersetzer/innen"
+
+msgid "Personal Information"
+msgstr "Persönliche Informationen"
 
 msgid "Languages"
 msgstr "Sprachen"
@@ -142,9 +148,6 @@ msgstr "Selbständig"
 
 msgid "Last name"
 msgstr "Nachname"
-
-msgid "Personal Information"
-msgstr "Persönliche Informationen"
 
 msgid "First name"
 msgstr "Vorname"
@@ -353,6 +356,9 @@ msgstr "Abbrechen"
 msgid "Documents"
 msgstr "Dokumente"
 
+msgid "Report change"
+msgstr "Mutation melden"
+
 msgid "Edit translator"
 msgstr "Übersetzer/in bearbeiten"
 
@@ -410,6 +416,27 @@ msgstr "Sprechende"
 msgid "Writers"
 msgstr "Schreibende"
 
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Translator"
+msgstr "Übersetzer/in"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
+msgid "Editors"
+msgstr "Editoren"
+
+msgid "Members"
+msgstr "Mitglieder"
+
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
@@ -459,54 +486,3 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
-
-#~ msgid "Location Settings"
-#~ msgstr "Standorteinstellungen"
-
-#~ msgid "Uncategorized"
-#~ msgstr "Unkategorisiert"
-
-#~ msgid "File"
-#~ msgstr "Datei"
-
-#~ msgid "Category"
-#~ msgstr "Kategorie"
-
-#~ msgid "Language training"
-#~ msgstr "Sprachausbildung"
-
-#~ msgid "Users"
-#~ msgstr "Benutzer"
-
-#~ msgid "Driving distance"
-#~ msgstr "Wegberechnung"
-
-#~ msgid "Mother tongue"
-#~ msgstr "Muttersprache"
-
-#~ msgid "Not a valid number"
-#~ msgstr "Keine gültige Zahl"
-
-#~ msgid "Certificate"
-#~ msgstr "Zertifikat"
-
-#~ msgid "LanguageCertificate"
-#~ msgstr "Zertifikat"
-
-#~ msgid "Added a new language"
-#~ msgstr "Neue Sprache hinzugefügt"
-
-#~ msgid "Profile"
-#~ msgstr "Profil"
-
-#~ msgid "User Profile"
-#~ msgstr "Benutzerprofil"
-
-#~ msgid "Contact Information"
-#~ msgstr "Kontaktinformationen"
-
-#~ msgid "Languages skills"
-#~ msgstr "Sprachkenntnisse"
-
-#~ msgid "Unknown"
-#~ msgstr "Unbekannt"

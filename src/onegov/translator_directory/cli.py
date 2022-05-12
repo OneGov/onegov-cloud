@@ -5,8 +5,11 @@ import click
 import transaction
 
 from onegov.core.cli import command_group
+from onegov.core.crypto import random_password
 from onegov.core.csv import CSVFile
 from onegov.fsi.cli import fetch_users
+from onegov.translator_directory.collections.translator import \
+    TranslatorCollection
 from onegov.translator_directory.constants import CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
@@ -14,6 +17,8 @@ from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import update_drive_distances, \
     geocode_translator_addresses
+from onegov.user import UserCollection
+
 
 cli = command_group()
 
@@ -381,3 +386,37 @@ def geocode_cli(dry_run, only_empty):
             transaction.abort()
 
     return do_geocode
+
+
+@cli.command(name='create-accounts', context_settings={'singular': True})
+@click.option('--dry-run/-no-dry-run', default=False)
+def create_accounts_cli(dry_run):
+    """ Creates user accounts for translators (if not already existing). """
+
+    def do_create_accounts(request, app):
+
+        translators = TranslatorCollection(request.session, user_role='admin')
+        users = UserCollection(request.session)
+        usernames = {user.username: user for user in users.query()}
+        for translator in translators.query():
+            email = translator.email
+            if not email:
+                click.secho(
+                    f'Translator {translator.full_name} has no email address',
+                    fg='yellow'
+                )
+            elif email not in usernames:
+                click.secho(f'Adding user {email}')
+                users.add(email, random_password(16), 'translator')
+            else:
+                role = usernames[email].role
+                if role != 'translator':
+                    click.secho(
+                        f'User {email} has role {role}',
+                        fg='yellow'
+                    )
+
+        if dry_run:
+            transaction.abort()
+
+    return do_create_accounts

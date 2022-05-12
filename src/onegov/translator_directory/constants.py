@@ -37,6 +37,13 @@ editor_can_see = member_can_see + (
     'iban'
 )
 
+translator_can_see = editor_can_see + (
+    'spoken_languages',
+    'written_languages',
+    'agency_references',
+    'education_as_interpreter'
+)
+
 ADMISSIONS = {
     'uncertified': _('uncertified'),
     'in_progress': _('in progress'),

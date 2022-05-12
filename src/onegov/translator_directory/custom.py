@@ -10,6 +10,7 @@ from onegov.translator_directory import _
 from onegov.org.elements import LinkGroup
 from onegov.org.custom import logout_path
 from onegov.user import Auth
+from onegov.user import UserCollection
 
 
 def get_base_tools(request):
@@ -51,6 +52,12 @@ def get_base_tools(request):
                     ), attrs={'class': 'settings'}
                 )
             )
+            links.append(
+                Link(
+                    _("Users"), request.class_link(UserCollection),
+                    attrs={'class': 'user'}
+                )
+            )
             yield LinkGroup(_("Management"), classes=('management',),
                             links=links)
 
@@ -78,10 +85,17 @@ def get_template_variables(request):
 def get_top_navigation(request):
 
     # inject an activites link in front of all top navigation links
-    yield Link(
-        text=_("Translators"),
-        url=request.class_link(TranslatorCollection)
-    )
+    if request.is_manager or request.is_member:
+        yield Link(
+            text=_("Translators"),
+            url=request.class_link(TranslatorCollection)
+        )
+
+    if request.is_translator:
+        yield Link(
+            text=_("Personal Information"),
+            url=request.class_link(TranslatorCollection, name='self')
+        )
 
     if request.is_manager:
         yield Link(

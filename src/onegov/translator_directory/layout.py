@@ -10,9 +10,9 @@ from onegov.translator_directory.collections.documents import \
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.constants import member_can_see, \
-    editor_can_see, GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, \
-    INTERPRETING_TYPES
+from onegov.translator_directory.constants import \
+    member_can_see, editor_can_see, translator_can_see, \
+    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES
 
 
 class DefaultLayout(BaseLayout):
@@ -44,11 +44,15 @@ class DefaultLayout(BaseLayout):
     def show(self, attribute_name):
         """Some attributes on the translator are hidden for less privileged
         users"""
-        if self.request.is_member:
-            return attribute_name in member_can_see
+        if self.request.is_admin:
+            return True
         if self.request.is_editor:
             return attribute_name in editor_can_see
-        return True
+        if self.request.is_member:
+            return attribute_name in member_can_see
+        if self.request.is_translator:
+            return attribute_name in translator_can_see
+        return False
 
     def color_class(self, count):
         """ Depending how rare a language is offered by translators,
@@ -286,6 +290,21 @@ class TranslatorDocumentsLayout(DefaultLayout):
             self.model.__class__,
             {'translator_id': self.model.translator_id, 'category': category}
         )
+
+
+class SelfLayout(DefaultLayout):
+    @cached_property
+    def title(self):
+        return self.model.title if self.model else _('Personal Information')
+
+    @cached_property
+    def breadcrumbs(self):
+        return super().breadcrumbs + [
+            Link(
+                text=_('Personal Information'),
+                url=self.request.class_link(TranslatorCollection, name='self')
+            )
+        ]
 
 
 class LanguageCollectionLayout(DefaultLayout):

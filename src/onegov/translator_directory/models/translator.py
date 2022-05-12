@@ -6,7 +6,7 @@ from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
@@ -85,6 +85,12 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     iban = Column(Text)
 
     email = Column(Text)
+
+    user = relationship(
+        'User',
+        primaryjoin='foreign(Translator.email) == User.username',
+        backref=backref('translators', lazy='dynamic')
+    )
 
     tel_mobile = Column(Text,)
     tel_private = Column(Text)

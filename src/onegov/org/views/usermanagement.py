@@ -21,7 +21,7 @@ from wtforms.validators import Optional
 
 @OrgApp.html(model=UserCollection, template='usermanagement.pt',
              permission=Secret)
-def view_usermanagement(self, request, layout=None):
+def view_usermanagement(self, request, layout=None, roles=None):
     """ Allows the management of organisation users. """
 
     layout = layout or UserManagementLayout(self, request)
@@ -32,6 +32,12 @@ def view_usermanagement(self, request, layout=None):
     for user in query:
         users[user.role].append(user)
 
+    roles = roles or {
+        'admin': _("Administrator"),
+        'editor': _("Editor"),
+        'member': _("Member"),
+    }
+
     filters = {}
 
     filters['role'] = [
@@ -39,11 +45,7 @@ def view_usermanagement(self, request, layout=None):
             text=request.translate(title),
             active=value in self.filters.get('role', ()),
             url=request.link(self.for_filter(role=value))
-        ) for title, value in (
-            (_("Administrator"), 'admin'),
-            (_("Editor"), 'editor'),
-            (_("Member"), 'member'),
-        )
+        ) for value, title in roles.items()
     ]
 
     filters['active'] = [
@@ -81,6 +83,7 @@ def view_usermanagement(self, request, layout=None):
     return {
         'layout': layout,
         'title': _("User Management"),
+        'roles': roles.keys(),
         'users': users,
         'filters': filters
     }

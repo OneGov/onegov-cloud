@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.translator_directory">
+<body>
+
+    <metal:role_singular define-macro="role-singular" i18n:domain="onegov.translator_directory">
+        <tal:b switch="role">
+            <tal:b case="'admin'" i18n:translate>Administrator</tal:b>
+            <tal:b case="'editor'" i18n:translate>Editor</tal:b>
+            <tal:b case="'member'" i18n:translate>Member</tal:b>
+            <tal:b case="'translator'" i18n:translate>Translator</tal:b>
+        </tal:b>
+    </metal:role_singular>
+
+    <metal:role_plural define-macro="role-plural" i18n:domain="onegov.translator_directory">
+        <tal:b switch="role">
+            <tal:b case="'admin'" i18n:translate>Administrators</tal:b>
+            <tal:b case="'editor'" i18n:translate>Editors</tal:b>
+            <tal:b case="'member'" i18n:translate>Members</tal:b>
+            <tal:b case="'translator'" i18n:translate>Translators</tal:b>
+        </tal:b>
+    </metal:role_plural>
+
+</body>
