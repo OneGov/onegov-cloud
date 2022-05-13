@@ -3,11 +3,21 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <ul class="org-settings">
-            <li tal:repeat="setting settings" class="${setting.name}">
-                <i class="fas ${setting.icon}" aria-hidden="true"></i>
-                <a href="${setting.link}">${setting.title}</a>
-            </li>
-        </ul>
+        <div class="org-settings">
+            <div class="grid-x grid-margin-x small-up-2 medium-up-3">
+                <div tal:repeat="setting settings" class="${setting.name} cell">
+                    <a href="${setting.link}">
+                        <div class="card">
+                            <div class="card-section">
+                                <p>
+                                    <i class="fas ${setting.icon}" aria-hidden="true"></i>
+                                    ${setting.title}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
     </tal:b>
 </div>
