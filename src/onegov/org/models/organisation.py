@@ -101,6 +101,7 @@ class Organisation(Base, TimestampMixin):
     always_show_partners = meta_property(default=False)
 
     # Ticket options
+    email_for_new_tickets = meta_property()
     ticket_auto_accepts = meta_property()
     tickets_skip_opening_email = meta_property()
     tickets_skip_closing_email = meta_property()
