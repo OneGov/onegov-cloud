@@ -404,6 +404,9 @@ class TranslatorForm(Form, FormChoicesMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
+        translators = TranslatorCollection(self.request.session)
+        translators.update_user(model, self.email.data)
+
         model.first_name = self.first_name.data
         model.last_name = self.last_name.data
         model.iban = self.iban.data

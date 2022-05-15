@@ -388,33 +388,18 @@ def geocode_cli(dry_run, only_empty):
     return do_geocode
 
 
-@cli.command(name='create-accounts', context_settings={'singular': True})
+@cli.command(name='update-accounts', context_settings={'singular': True})
 @click.option('--dry-run/-no-dry-run', default=False)
-def create_accounts_cli(dry_run):
-    """ Creates user accounts for translators (if not already existing). """
+def update_accounts_cli(dry_run):
+    """ Updates user accounts for translators. """
 
     def do_create_accounts(request, app):
 
-        translators = TranslatorCollection(request.session, user_role='admin')
-        users = UserCollection(request.session)
-        usernames = {user.username: user for user in users.query()}
+        translators = TranslatorCollection(
+            request.session, user_role='admin', order_by='email'
+        )
         for translator in translators.query():
-            email = translator.email
-            if not email:
-                click.secho(
-                    f'Translator {translator.full_name} has no email address',
-                    fg='yellow'
-                )
-            elif email not in usernames:
-                click.secho(f'Adding user {email}')
-                users.add(email, random_password(16), 'translator')
-            else:
-                role = usernames[email].role
-                if role != 'translator':
-                    click.secho(
-                        f'User {email} has role {role}',
-                        fg='yellow'
-                    )
+            translators.update_user(translator, translator.email)
 
         if dry_run:
             transaction.abort()

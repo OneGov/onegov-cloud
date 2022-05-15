@@ -315,7 +315,7 @@ def edit_translator_as_editor(self, request, form):
     request_method='DELETE',
     permission=Secret
 )
-def delete_course_event(self, request):
+def delete_translator(self, request):
 
     request.assert_valid_csrf_token()
     TranslatorCollection(request.session).delete(self)

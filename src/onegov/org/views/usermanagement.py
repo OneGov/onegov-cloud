@@ -157,7 +157,7 @@ def ticket_links(request, user):
     )
 
 
-def get_manage_user_form(self, request):
+def get_manage_user_form(self, request, base=ManageUserForm):
     userprofile_form = query_form_class(request, self, name='userprofile')
     assert userprofile_form
 
@@ -185,7 +185,7 @@ def get_manage_user_form(self, request):
 
             return super().submitted(request)
 
-    return merge_forms(ManageUserForm, OptionalUserprofile)
+    return merge_forms(base, OptionalUserprofile)
 
 
 @OrgApp.form(model=User, template='form.pt', form=get_manage_user_form,

@@ -1,8 +1,12 @@
 from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
+from onegov.core.crypto import random_password
 from onegov.gis import Coordinates
 from onegov.translator_directory.constants import full_text_max_chars
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory import log
+from onegov.user import UserCollection
+
 
 order_cols = (
     'last_name',
@@ -65,8 +69,81 @@ class TranslatorCollection(GenericCollection, Pagination):
         coordinates = kwargs.pop('coordinates', Coordinates())
         item = super().add(**kwargs)
         item.coordinates = coordinates
+        self.update_user(item, item.email)
         self.session.flush()
         return item
+
+    def delete(self, item):
+        self.update_user(item, None)
+        self.session.delete(item)
+        self.session.flush()
+
+    def update_user(self, item, new_email):
+        """ Keep the translator and its user account in sync.
+
+        * Creates a new user account if an email address is set (if not already
+          existing).
+        * Disable user accounts if an email has been deleted.
+        * Change usernames if an email has changed.
+        * Make sure used user accounts have the right role.
+        * Make sure used user accounts are activated.
+        * Make sure the password is changed if activated or disabled.
+
+        """
+
+        old_email = item.email
+        users = UserCollection(self.session)
+        old_user = users.by_username(old_email)
+        new_user = users.by_username(new_email)
+        create = False
+        enable = None
+        disable = []
+
+        if not new_email:
+            # email has been unset: disable obsolete user
+            disable = [old_user, new_user]
+        else:
+            if new_email == old_email:
+                # email has not changed, old_user == new_user
+                if not old_user:
+                    create = True
+                else:
+                    enable = old_user
+            else:
+                # email has changed: ensure user exist
+                if old_user and new_user:
+                    disable = old_user
+                    enable = new_user
+                elif not old_user and not new_user:
+                    create = True
+                else:
+                    enable = old_user if old_user else new_user
+
+        if create:
+            log.info(f'Creating user {new_email}')
+            users.add(
+                new_email, random_password(16), role='translator',
+                realname=item.full_name
+            )
+
+        if enable:
+            if enable.username != new_email:
+                log.info(f'Changing user {enable.username} to {new_email}')
+                enable.username = new_email
+                enable.password = random_password(16)
+            if enable.role != 'translator':
+                log.info(f'Correcting user role of {enable.username}')
+                enable.role = 'translator'
+            if not enable.active:
+                log.info(f'Activating user {enable.username}')
+                enable.active = True
+                enable.password = random_password(16)
+
+        for user in disable:
+            if user:
+                log.info(f'Activating user {user.username}')
+                user.active = False
+                user.password = random_password(16)
 
     @staticmethod
     def truncate(text, maxchars=25):

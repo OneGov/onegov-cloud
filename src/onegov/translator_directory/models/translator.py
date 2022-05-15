@@ -86,6 +86,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     email = Column(Text)
 
+    # the user acocunt related to this translator
     user = relationship(
         'User',
         primaryjoin='foreign(Translator.email) == User.username',
