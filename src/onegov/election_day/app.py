@@ -300,11 +300,14 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
             'hl' if 'headerless' in request.browser_session else 'hf'
         ))
 
-        return app.pages_cache.get_or_create(
+        result = app.pages_cache.get_or_create(
             key,
             creator=lambda: handler(request),
             should_cache_fn=lambda response: response.status_code == 200
         )
+        if 'Set-Cookie' in result.headers:
+            del result.headers['Set-Cookie']
+        return result
 
     return micro_cache_anonymous_pages_tween
 
