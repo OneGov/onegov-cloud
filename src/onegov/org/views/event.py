@@ -128,6 +128,9 @@ def handle_new_event(self, request, form, layout=None):
         "or reason."
     )
 
+    if request.app.custom_event_form_lead:
+        terms = request.app.custom_event_form_lead
+
     if form.submitted(request):
         event = EventCollection(self.session).add(
             title=form.title.data,
