@@ -2708,7 +2708,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('100.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
     ]
 
@@ -2719,7 +2719,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('150.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
         'Hunting',
     ]
@@ -2731,7 +2731,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('250.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
         'Hunting',
         'Fishing',
