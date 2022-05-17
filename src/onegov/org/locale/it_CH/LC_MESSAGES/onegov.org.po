@@ -178,7 +178,7 @@ msgid "No"
 msgstr "No"
 
 msgid "Credit card payments"
-msgstr "Kreditkartenzahlungen"
+msgstr "Pagamenti carta di credito"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
