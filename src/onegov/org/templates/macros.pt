@@ -1623,7 +1623,7 @@
         <div class="columns small-6 file-status">
 
             <tal:b condition="request.app.enable_yubikey and file.reference['content_type'] == 'application/pdf'">
-                <h3 i18n:translate>Digital Signature</h3>
+                <h3 i18n:translate>Digital Seal</h3>
                 <div class="signature">
                     <div class="file-status-tag">
                         <metal:b use-macro="layout.macros['signature_status']" />

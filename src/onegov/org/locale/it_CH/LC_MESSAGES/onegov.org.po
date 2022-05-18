@@ -2762,8 +2762,8 @@ msgstr "Oggetto"
 msgid "Disbursed"
 msgstr "Erogato"
 
-msgid "Digital Signature"
-msgstr "Firma digitale"
+msgid "Digital Seal"
+msgstr "Sigillo digitale"
 
 msgid "Private"
 msgstr "Privata"
@@ -3333,11 +3333,11 @@ msgstr ""
 "la ricerca in alto a destra."
 
 msgid ""
-"All files have been digitally signed. The digital signature of a downloaded "
+"All files have been digitally signed. The digital seal of a downloaded "
 "file can be viewed in Adobe Acrobat Reader or by dragging an already "
 "downloaded file into the field below:"
 msgstr ""
-"Tutti i file sono stati firmati digitalmente. La firma digitale di un file "
+"Tutti i file sono stati firmati digitalmente. Il sigillo digitale di un file "
 "scaricato può essere visualizzata in Adobe Acrobat Reader oppure trascinando "
 "un file già scaricato nel campo sottostante:"
 
@@ -4055,8 +4055,8 @@ msgstr "Il tuo account non è collegato a Yubikey"
 msgid "The used Yubikey is not linked to your account"
 msgstr "La Yubikey usata non è collegata al tuo account"
 
-msgid "This file already has a digital signature"
-msgstr "Questo file include già una firma digitale"
+msgid "This file already has a digital seal"
+msgstr "Questo file include già un sigillo digitale"
 
 #, fuzzy
 msgid "Your Yubikey could not be validated"
