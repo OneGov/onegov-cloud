@@ -22,16 +22,16 @@ def test_sign_document(client):
 
     pdf = FileCollection(client.app.session()).query().one()
 
-    # signatures are only used if yubikeys are used
+    # seals are only used if yubikeys are used
     page = client.get(f'/storage/{pdf.id}/details')
-    assert 'signature' not in page
+    assert 'seals' not in page
 
     client.app.enable_yubikey = True
 
     page = client.get(f'/storage/{pdf.id}/details')
-    assert 'signature' in page
+    assert 'seals' in page
 
-    # signing only works if the given user has a yubikey setup
+    # applying a seal only works if the given user has a yubikey setup
     def sign(client, page, token):
         rex = r"'(http://\w+/\w+/\w+/sign?[^']+)'"
         url = re.search(rex, str(page)).group(1)
@@ -55,7 +55,7 @@ def test_sign_document(client):
 
     assert "nicht mit Ihrem Konto verknüpft" in sign(client, page, 'foobar')
 
-    # if the key doesn't work, the signature is not applied
+    # if the key doesn't work, the seal is not applied
     with patch.object(Yubico, 'verify') as verify:
         verify.return_value = False
 
@@ -64,7 +64,7 @@ def test_sign_document(client):
 
     assert not FileCollection(client.app.session()).query().one().signed
 
-    # once the signature has been applied, it can't be repeated
+    # once the seal has been applied, it can't be repeated
     tape = module_path('tests.onegov.org', 'cassettes/ais-success.json')
 
     with patch.object(Yubico, 'verify') as verify:
@@ -90,7 +90,8 @@ def test_sign_document(client):
     # and we should see a message in the activity log
     assert 'Datei signiert' in client.get('/timeline')
 
-    # deleting the signed file at this point should yield another message
+    # deleting the file with applied seal
+    # at this point should yield another message
     pdf = FileCollection(client.app.session()).query().one()
     client.get(f'/storage/{pdf.id}/details').click("Löschen")
-    assert 'Signierte Datei gel\\u00f6scht' in client.get('/timeline').text
+    assert 'Datei mit Siegel gel\\u00f6scht' in client.get('/timeline').text
