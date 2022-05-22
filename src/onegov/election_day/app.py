@@ -283,6 +283,10 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
 
         """
 
+        # do not cache HEAD, POST, DELETE etc.
+        if request.method != 'GET':
+            return handler(request)
+
         # no cache if the user is logged in
         if request.is_logged_in:
             return handler(request)
