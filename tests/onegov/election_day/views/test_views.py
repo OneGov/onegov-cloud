@@ -84,7 +84,7 @@ def test_cache_control(election_day_app_zg):
 
     response = client.get('/')
     assert response.headers['cache-control'] == 'no-store'
-    assert response.headers['Set-Cookie'] == 'no_cache=1; Path=/'
+    assert response.headers['Set-Cookie'] == 'no_cache=1; Path=/; SameSite=Lax'
     assert client.cookies['no_cache'] == '1'
 
     response = client.get('/')

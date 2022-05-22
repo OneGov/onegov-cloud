@@ -240,7 +240,7 @@ def cache_control_tween_factory(app, handler):
         if request.is_logged_in:
             response.headers.add('cache-control', 'no-store')
             if request.cookies.get('no_cache', '0') == '0':
-                response.set_cookie('no_cache', '1')
+                response.set_cookie('no_cache', '1', samesite='Lax')
         else:
             if request.cookies.get('no_cache', '0') == '1':
                 response.delete_cookie('no_cache')
