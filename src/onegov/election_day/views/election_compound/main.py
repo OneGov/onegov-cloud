@@ -12,6 +12,19 @@ from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
 
 
+@ElectionDayApp.view(
+    model=ElectionCompound,
+    request_method='HEAD',
+    permission=Public
+)
+def view_election_compound_head(self, request):
+
+    @request.after
+    def add_headers(response):
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
+
+
 @ElectionDayApp.html(
     model=ElectionCompound,
     permission=Public

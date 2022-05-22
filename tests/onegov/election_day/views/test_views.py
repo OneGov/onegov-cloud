@@ -192,6 +192,7 @@ def test_view_last_modified(election_day_app_zg):
         client = Client(election_day_app_zg)
         client.get('/locale/de_CH').follow()
 
+        modified = 'Wed, 01 Jan 2014 12:00:00 GMT'
         for path in (
             '/json',
             '/election/election/summary',
@@ -207,8 +208,13 @@ def test_view_last_modified(election_day_app_zg):
             '/vote/vote/data-json',
             '/vote/vote/data-csv',
         ):
-            assert client.get(path).headers.get('Last-Modified') == \
-                'Wed, 01 Jan 2014 12:00:00 GMT'
+            assert client.get(path).headers.get('Last-Modified') == modified
+        for path in (
+            '/election/election',
+            '/elections/elections',
+            '/vote/vote',
+        ):
+            assert client.head(path).headers.get('Last-Modified') == modified
 
         for path in (
             '/'
