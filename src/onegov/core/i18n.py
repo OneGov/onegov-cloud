@@ -375,7 +375,8 @@ class SiteLocale(object):
             'locale',
             self.locale,
             overwrite=True,
-            samesite=request.app.same_site_cookie_policy
+            samesite=request.app.same_site_cookie_policy,
+            secure=self.app.identity_secure
         )
 
         return response
