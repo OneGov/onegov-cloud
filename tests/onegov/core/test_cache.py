@@ -84,11 +84,26 @@ def test_cache_flush(redis_url):
     baz.configure_application(redis_url=redis_url)
     assert baz.cache.keys() == []
 
+    assert bar.cache.keys() == []
+    assert baz.cache.keys() == []
+
+    assert bar.cache.flush() == 0
+    assert baz.cache.flush() == 0
+
+    assert bar.cache.keys() == []
+    assert baz.cache.keys() == []
+
     bar.cache.set('moo', 'qux')
     baz.cache.set('boo', 'qux')
     assert bar.cache.keys() == [b'foo/bar:short-term:moo']
     assert baz.cache.keys() == [b'foo/baz:short-term:boo']
 
-    baz.cache.flush()
+    assert baz.cache.flush() == 1
+    assert bar.cache.keys() == [b'foo/bar:short-term:moo']
+    assert baz.cache.keys() == []
+
+    for number in range(10000):
+        baz.cache.set(str(number), 'xxx')
+    assert baz.cache.flush() == 10000
     assert bar.cache.keys() == [b'foo/bar:short-term:moo']
     assert baz.cache.keys() == []
