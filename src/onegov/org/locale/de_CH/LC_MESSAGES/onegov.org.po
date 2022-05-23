@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-04-25 14:15+0200\n"
+"POT-Creation-Date: 2022-05-03 16:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1230,12 +1230,6 @@ msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icon SVG 20x20 (Safari)"
 
-msgid "Open files in separate window"
-msgstr "Dateien in separatem Fenster öffnen"
-
-msgid "User will stay on the page when opening images and files"
-msgstr "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"
-
 msgid "Disable page references"
 msgstr "Seitenreferenzen deaktivieren"
 
@@ -1247,6 +1241,9 @@ msgstr ""
 "Versteckt den Kopier-Link '#' für die Seitenreferenz. Die Referenzen an sich "
 "funktionieren weiterhin. Diese Referenzen sind nur für eingeloggte Nutzer "
 "sichtbar."
+
+msgid "Open files in separate window"
+msgstr "Dateien in separatem Fenster öffnen"
 
 msgid "Title header left side"
 msgstr "Titel Kopfzeile links"
@@ -1367,6 +1364,9 @@ msgstr "Bitte geben Sie ein Datum pro Zeile ein"
 
 msgid "Please enter only day and month"
 msgstr "Bitte geben Sie nur Tag und Monat ein"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -2600,7 +2600,9 @@ msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
 
 msgid "This site is not public but it can be seen by members."
-msgstr "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen werden."
+msgstr ""
+"Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
+"werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -3120,6 +3122,12 @@ msgid ""
 msgstr ""
 "Sie erhalten ein weiteres E-Mail, sobald Ihre Anfrage abgeschlossen wurde. "
 "In der Zwischenzeit sehen Sie den Status Ihrer Anfrage jederzeit hier:"
+
+msgid "The following ticket has just been opened:"
+msgstr "Das folgende Ticket wurde soeben eröffnet:"
+
+msgid "View the ticket"
+msgstr "Ticket ansehen"
 
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
@@ -3991,6 +3999,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"
 
+msgid "New ticket"
+msgstr "Neues Ticket"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
 
@@ -4741,3 +4752,7 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "User will stay on the page when opening images and files"
+#~ msgstr ""
+#~ "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"

@@ -452,6 +452,17 @@ def finalize_reservation(self, request):
                 'show_submission': show_submission
             }
         )
+        if request.email_for_new_tickets:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(request.email_for_new_tickets, ),
+                content={
+                    'model': ticket
+                }
+            )
 
         if request.auto_accept(ticket):
             try:

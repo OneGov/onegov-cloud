@@ -32,11 +32,11 @@ class Notification(Base, TimestampMixin):
     #: subclasses of this class. See
     #: `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
-        'polymorphic_identity': None
+        'polymorphic_identity': 'generic'
     }
 
     #: Identifies the notification

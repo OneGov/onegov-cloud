@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-04-25 14:15+0200\n"
+"POT-Creation-Date: 2022-05-03 16:12+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -178,7 +178,7 @@ msgid "No"
 msgstr "No"
 
 msgid "Credit card payments"
-msgstr "Kreditkartenzahlungen"
+msgstr "Pagamenti carta di credito"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
@@ -1233,12 +1233,6 @@ msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icona SVG 20x20 (Safari)"
 
-msgid "Open files in separate window"
-msgstr "Apri i file in una finestra separata"
-
-msgid "User will stay on the page when opening images and files"
-msgstr "L'utente rimarrà sulla pagina durante l'apertura di immagini e file"
-
 msgid "Disable page references"
 msgstr "Disabilita i riferimenti alle pagine"
 
@@ -1250,6 +1244,9 @@ msgstr ""
 "Disabilita la visualizzazione del link di copia \"#\" per il riferimento al "
 "sito. I riferimenti stessi continueranno a funzionare. Questi riferimenti "
 "sono mostrati solo agli utenti che hanno effettuato l'accesso."
+
+msgid "Open files in separate window"
+msgstr "Apri i file in una finestra separata"
 
 msgid "Title header left side"
 msgstr "Lato sinistro dell'intestazione del titolo"
@@ -1372,6 +1369,9 @@ msgstr "Inserisci una data per riga"
 
 msgid "Please enter only day and month"
 msgstr "Inserisci solo giorno e mese"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -2597,7 +2597,7 @@ msgid "All news"
 msgstr "Tutte le notizie"
 
 msgid "This site is private but can also be seen by members"
-msgstr ""
+msgstr "Questo sito è privato ma può essere visto dai membri"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
@@ -2606,7 +2606,7 @@ msgid "This site is not public."
 msgstr "Questo sito non è pubblico."
 
 msgid "This site is not public but it can be seen by members."
-msgstr ""
+msgstr "Questo sito non è pubblico ma può essere visto dai membri."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -3121,6 +3121,12 @@ msgstr ""
 "Ti invieremo un'altra e-mail una volta che il tuo biglietto sarà stato "
 "completato. Nel frattempo puoi controllare in qualsiasi momento lo stato del "
 "tuo biglietto:"
+
+msgid "The following ticket has just been opened:"
+msgstr "Il seguente biglietto è stato appena aperto:"
+
+msgid "View the ticket"
+msgstr "Visualizza il biglietto"
 
 msgid "Your request has been reopened"
 msgstr "La tua richiesta è stata riaperta"
@@ -3998,6 +4004,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"
 
+msgid "New ticket"
+msgstr "Nuovo biglietto"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "La tua richiesta non può essere accettata automaticamente!"
 
@@ -4754,3 +4763,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "User will stay on the page when opening images and files"
+#~ msgstr "L'utente rimarrà sulla pagina durante l'apertura di immagini e file"

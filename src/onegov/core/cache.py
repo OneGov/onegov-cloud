@@ -69,9 +69,11 @@ def flush(cache):
     # we have to keep track of all keys separately
     prefix = cache.key_mangler('').decode()
     return cache.backend.reader_client.eval("""
-        if #redis.pcall('keys', ARGV[1]) > 0 then
-            return redis.pcall('del', unpack(redis.call('keys', ARGV[1])))
+        local keys = redis.call('keys', ARGV[1])
+        for i=1,#keys,5000 do
+            redis.call('del', unpack(keys, i, math.min(i+4999, #keys)))
         end
+        return #keys
     """, 0, f'{prefix}*')
 
 
