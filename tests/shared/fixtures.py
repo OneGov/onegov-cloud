@@ -17,7 +17,7 @@ from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor, TCPExecutor
-from webdriver_manager.utils import ChromeType
+from webdriver_manager.core.utils import ChromeType
 
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
