@@ -141,7 +141,7 @@ class CourseForm(Form):
         return result
 
     def ensure_refresh_interval(self):
-        if self.mandatory_refresh.data and self.refresh_interval.data == None:
+        if self.mandatory_refresh.data and not self.refresh_interval.data:
             self.refresh_interval.errors = [
                 _('Not a valid integer value')
             ]
