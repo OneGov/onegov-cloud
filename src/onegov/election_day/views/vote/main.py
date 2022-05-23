@@ -10,6 +10,19 @@ from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
 
 
+@ElectionDayApp.view(
+    model=Vote,
+    request_method='HEAD',
+    permission=Public
+)
+def view_vote_head(self, request):
+
+    @request.after
+    def add_headers(response):
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
+
+
 @ElectionDayApp.html(
     model=Vote,
     permission=Public

@@ -369,8 +369,14 @@ class SiteLocale(object):
         self.locale = locale
         self.to = to
 
-    def redirect(self):
+    def redirect(self, request):
         response = morepath.redirect(self.to)
-        response.set_cookie('locale', self.locale, overwrite=True)
+        response.set_cookie(
+            'locale',
+            self.locale,
+            overwrite=True,
+            samesite=request.app.same_site_cookie_policy,
+            secure=request.app.identity_secure
+        )
 
         return response
