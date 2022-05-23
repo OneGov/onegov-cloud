@@ -1967,11 +1967,11 @@
                 <i class="fa fa-fw fa-unlock" aria-hidden="true"></i>
 
                 <span i18n:translate class="hide-on-hover">
-                    Unsigned
+                    Without digital seal
                 </span>
 
                 <span i18n:translate class="show-on-hover">
-                    Sign now
+                    Apply digital seal now
                 </span>
             </a>
         </tal:b>
@@ -1980,7 +1980,7 @@
                 <i class="fa fa-fw fa-lock" aria-hidden="true"></i>
 
                 <span i18n:translate class="hide-on-hover">
-                    Unsigned
+                    Without digital seal
                 </span>
 
                 <span i18n:translate class="show-on-hover">

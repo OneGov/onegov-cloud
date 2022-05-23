@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-05-18 14:30+0200\n"
+"POT-Creation-Date: 2022-05-23 08:00+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1021,7 +1021,9 @@ msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
 
 msgid "Please enter your yubikey to apply a digital seal to this file"
-msgstr "Bitte geben Sie Ihren Yubikey ein um ein digitales Siegel auf der Datei anzuwenden"
+msgstr ""
+"Bitte geben Sie Ihren Yubikey ein um ein digitales Siegel auf der Datei "
+"anzuwenden"
 
 msgid "Sign"
 msgstr "Signieren"
@@ -1038,14 +1040,16 @@ msgstr ""
 "über die Suche gefunden und in der Liste der Dokumente mit digitalem Siegel "
 "eingesehen werden. Diese Aktion wird aufgezeichnet und kann nicht rückgängig "
 "gemacht werden."
-msgid "Unsigned"
-msgstr "Unsigniert"
 
-msgid "Sign now"
-msgstr "Jetzt signieren"
+msgid "Without digital seal"
+msgstr "Ohne digitales Siegel"
+
+msgid "Apply digital seal now"
+msgstr "Digitales Siegel anwenden"
 
 msgid "You are not authorised to apply digital seals to documents"
-msgstr "Sie sind nicht dazu berechtigt digitale Siegel auf Dokumente anzuwenden"
+msgstr ""
+"Sie sind nicht dazu berechtigt digitale Siegel auf Dokumente anzuwenden"
 
 msgid "Click to add a description"
 msgstr "Klicken um eine Beschreibung hinzuzufügen"
@@ -1986,6 +1990,12 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Unsigned"
+#~ msgstr "Unsigniert"
+
+#~ msgid "Sign now"
+#~ msgstr "Jetzt signieren"
 
 #~ msgid "Digitally signed"
 #~ msgstr "Digital signiert"
