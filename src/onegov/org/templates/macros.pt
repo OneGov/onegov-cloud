@@ -1570,6 +1570,9 @@
                 <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
                      tal:content="structure lead">
                 </div>
+                <div class="list-hint hints" tal:define="hint hint(record)|False"
+                     tal:content="structure hint" tal:condition="hint">
+                </div>
             </li>
         </ul>
     </tal:b>

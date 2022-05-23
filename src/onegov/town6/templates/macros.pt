@@ -1712,10 +1712,12 @@
                         <tal:block condition="external_link(record)|nothing"> 
                         </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
-                
-                <tal:b tal:define="lead record.meta.get('lead')">
-                    <div tal:condition="lead" class="list-lead" tal:content="structure layout.linkify(lead)"></div>
-                </tal:b>
+                <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                     tal:content="structure lead">
+                </div>
+                <div class="list-hint hints" tal:define="hint hint(record)|False"
+                     tal:content="structure hint" tal:condition="hint">
+                </div>
                  <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
             </tal:b>
             </li>

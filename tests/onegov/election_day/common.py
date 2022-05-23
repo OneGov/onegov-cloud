@@ -246,11 +246,11 @@ class DummyRequest(object):
         return self.app.translations.get(self.locale)
 
 
-def login(client):
-    login = client.get('/auth/login')
+def login(client, to=''):
+    login = client.get(f'/auth/login?to={to}')
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter2'
-    login.form.submit()
+    return login.form.submit()
 
 
 def upload_vote(client, create=True, canton='zg'):

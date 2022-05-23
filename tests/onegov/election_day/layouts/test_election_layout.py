@@ -15,8 +15,21 @@ import pytest
 
 
 def test_election_layout(session):
-    layout = ElectionLayout(Election(date=date(2019, 1, 1)), DummyRequest())
+    majorz = Election(
+        title='Majorz Election',
+        domain='canton',
+        date=date(2019, 1, 1)
+    )
+    proporz = ProporzElection(
+        title='Proporz Election',
+        domain='canton',
+        date=date(2019, 1, 1)
+    )
+    session.add(majorz)
+    session.add(proporz)
+    session.flush()
 
+    layout = ElectionLayout(majorz, DummyRequest())
     assert layout.all_tabs == (
         'lists',
         'list-by-entity',
@@ -62,23 +75,21 @@ def test_election_layout(session):
     assert layout.subtitle('statistics') == ''
     assert layout.subtitle('data') == ''
 
-    layout = ElectionLayout(Election(), DummyRequest())
     assert layout.majorz
     assert not layout.proporz
     assert layout.main_view == 'Election/candidates'
     assert not layout.tacit
     assert not layout.has_party_results
 
-    layout = ElectionLayout(ProporzElection(), DummyRequest())
+    layout = ElectionLayout(proporz, DummyRequest())
     assert not layout.majorz
     assert layout.proporz
     assert layout.main_view == 'ProporzElection/lists'
     assert not layout.tacit
     assert not layout.has_party_results
 
-    layout = ElectionLayout(
-        Election(type='majorz', tacit=True), DummyRequest()
-    )
+    majorz.tacit = True
+    layout = ElectionLayout(majorz, DummyRequest())
     assert layout.tacit
 
     with freeze_time("2014-01-01 12:00"):
@@ -164,8 +175,7 @@ def test_election_layout(session):
         ]
         assert ElectionLayout(second_election, request).related_elections == []
 
-    election = ProporzElection()
-    election.party_results.append(
+    proporz.party_results.append(
         PartyResult(
             year=2017,
             number_of_mandates=0,
@@ -174,7 +184,7 @@ def test_election_layout(session):
             name='A',
         )
     )
-    assert ElectionLayout(election, DummyRequest()).has_party_results
+    assert ElectionLayout(proporz, DummyRequest()).has_party_results
 
 
 def test_election_layout_menu_majorz(session):

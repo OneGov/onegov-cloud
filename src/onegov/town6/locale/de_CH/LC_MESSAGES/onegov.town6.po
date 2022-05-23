@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-03-23 14:34+0100\n"
+"POT-Creation-Date: 2022-05-03 16:49+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -130,7 +130,7 @@ msgid "Edit"
 msgstr "Bearbeiten"
 
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -217,7 +217,7 @@ msgid "New Note"
 msgstr "Neue Notiz"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "Confirmation"
 msgstr "Bestätigung"
@@ -406,7 +406,7 @@ msgid "Payments"
 msgstr "Zahlungen"
 
 msgid "Stripe Connect"
-msgstr ""
+msgstr "Stripe Connect"
 
 msgid "Payment Provider"
 msgstr "Zahlungsanbieter"
@@ -714,6 +714,9 @@ msgstr "E-Mail Adresse"
 msgid "This site is private"
 msgstr "Diese Seite ist Privat"
 
+msgid "This site is private but can also be seen by members"
+msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
+
 msgid "This site is secret"
 msgstr "Diese Seite ist Geheim"
 
@@ -722,6 +725,11 @@ msgstr "Diese Seite ist nicht veröffentlicht."
 
 msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
+
+msgid "This site is not public but it can be seen by members."
+msgstr ""
+"Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
+"werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -1109,8 +1117,11 @@ msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
 "mail."
 msgstr ""
-"Falls Sie sich nicht für diesen Newsletter angemeldet haben, können Sie diese "
-"Nachricht ignorieren."
+"Falls Sie sich nicht für diesen Newsletter angemeldet haben, können Sie "
+"diese Nachricht ignorieren."
+
+msgid "Click here to unsubscribe."
+msgstr "Klicken Sie hier um sich abzumelden."
 
 msgid "Good morning,"
 msgstr "Guten Morgen"
@@ -1248,9 +1259,6 @@ msgstr ""
 msgid "Click here to view web version."
 msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
 
-msgid "Click here to unsubscribe."
-msgstr "Klicken Sie hier um sich abzumelden."
-
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
 
@@ -1340,6 +1348,12 @@ msgid ""
 msgstr ""
 "Sie erhalten ein weiteres E-Mail, sobald Ihre Anfrage abgeschlossen wurde. "
 "In der Zwischenzeit sehen Sie den Status Ihrer Anfrage jederzeit hier:"
+
+msgid "The following ticket has just been opened:"
+msgstr "Das folgende Ticket wurde soeben eröffnet:"
+
+msgid "View the ticket"
+msgstr "Ticket ansehen"
 
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
@@ -1935,23 +1949,17 @@ msgstr "Zeige die Fusszeile auf allen Seiten, ausser für Administratoren"
 msgid "Partner display"
 msgstr "Anzeige Partner"
 
-msgid "Open external links in separate window"
-msgstr "Externe Links in einem separatem Fenster öffnen"
-
-msgid "Links leading to a different website will be opened in a new window"
-msgstr "Links, welche auf eine adere Webseite führen, werden in einem separaten Fenster geöffnet."
-
 msgid "General"
 msgstr "Allgemein"
 
 msgid "Favicon"
-msgstr ""
+msgstr "Favicon"
 
 msgid "Social Media"
 msgstr "Soziale Medien"
 
 msgid "Links"
-msgstr ""
+msgstr "Links"
 
 msgid "Chat"
 msgstr ""
@@ -1979,3 +1987,11 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Open external links in separate window"
+#~ msgstr "Externe Links in einem separatem Fenster öffnen"
+
+#~ msgid "Links leading to a different website will be opened in a new window"
+#~ msgstr ""
+#~ "Links, welche auf eine adere Webseite führen, werden in einem separaten "
+#~ "Fenster geöffnet."
