@@ -11,6 +11,7 @@ from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
 from transaction import commit
+from transaction import begin
 from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
@@ -84,7 +85,7 @@ def test_cache_control(election_day_app_zg):
 
     response = client.get('/')
     assert response.headers['cache-control'] == 'no-store'
-    assert response.headers['Set-Cookie'] == 'no_cache=1; Path=/'
+    assert response.headers['Set-Cookie'] == 'no_cache=1; Path=/; SameSite=Lax'
     assert client.cookies['no_cache'] == '1'
 
     response = client.get('/')
@@ -101,21 +102,15 @@ def test_cache_control(election_day_app_zg):
 
 
 def test_pages_cache(election_day_app_zg):
-    principal = election_day_app_zg.principal
-    principal.open_data = {
-        'id': 'kanton-govikon',
-        'mail': 'info@govikon',
-        'name': 'Staatskanzlei Kanton Govikon'
-    }
-    election_day_app_zg.cache.set('principal', principal)
-
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH')
 
     # make sure codes != 200 are not cached
     anonymous = Client(election_day_app_zg)
     anonymous.get('/vote/0xdeadbeef/entities', status=404)
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
 
+    # create vote
     login(client)
 
     new = client.get('/manage/votes/new-vote')
@@ -124,18 +119,35 @@ def test_pages_cache(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    no_cache = [('Cache-Control', 'no-cache')]
+    # make sure set-cookies are not cached
+    client.get('/auth/logout')
+    response = login(client, to='/vote/0xdeadbeef/entities').follow()
+    assert 'Set-Cookie' in response.headers  # no_cache
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
+
+    anonymous = Client(election_day_app_zg)
+    response = anonymous.get('/vote/0xdeadbeef/entities')
+    assert 'Set-Cookie' in response.headers  # session_id
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
+
+    # make sure HEAD requests are not cached
+    anonymous.head('/vote/0xdeadbeef/')
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
 
     # Create cache entries
     assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
+    assert len(election_day_app_zg.pages_cache.keys()) == 1
 
     # Modify without invalidating the cache
+    begin()
     election_day_app_zg.session().query(Vote).one().title = '0xdeadc0de'
     commit()
 
     assert '0xdeadc0de' not in anonymous.get('/vote/0xdeadbeef/entities')
-    assert '0xdeadc0de' in anonymous.get('/vote/0xdeadbeef/entities',
-                                         headers=no_cache)
+    assert '0xdeadc0de' in anonymous.get(
+        '/vote/0xdeadbeef/entities',
+        headers=[('Cache-Control', 'no-cache')]
+    )
     assert '0xdeadc0de' in client.get('/vote/0xdeadbeef/entities')
 
     # Modify with invalidating the cache
@@ -144,8 +156,10 @@ def test_pages_cache(election_day_app_zg):
     edit.form.submit()
 
     assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities')
-    assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities',
-                                         headers=no_cache)
+    assert '0xd3adc0d3' in anonymous.get(
+        '/vote/0xdeadbeef/entities',
+        headers=[('Cache-Control', 'no-cache')]
+    )
     assert '0xd3adc0d3' in client.get('/vote/0xdeadbeef/entities')
 
 
@@ -182,6 +196,7 @@ def test_view_last_modified(election_day_app_zg):
         client = Client(election_day_app_zg)
         client.get('/locale/de_CH').follow()
 
+        modified = 'Wed, 01 Jan 2014 12:00:00 GMT'
         for path in (
             '/json',
             '/election/election/summary',
@@ -197,8 +212,13 @@ def test_view_last_modified(election_day_app_zg):
             '/vote/vote/data-json',
             '/vote/vote/data-csv',
         ):
-            assert client.get(path).headers.get('Last-Modified') == \
-                'Wed, 01 Jan 2014 12:00:00 GMT'
+            assert client.get(path).headers.get('Last-Modified') == modified
+        for path in (
+            '/election/election',
+            '/elections/elections',
+            '/vote/vote',
+        ):
+            assert client.head(path).headers.get('Last-Modified') == modified
 
         for path in (
             '/'

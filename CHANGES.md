@@ -1,8 +1,96 @@
 # Changes
 
+## 2022.30
+
+`2022-05-18` | [a381989943...632cb4871f](https://github.com/OneGov/onegov-cloud/compare/a381989943^...632cb4871f)
+
+### Ballot
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [f1855379fb](https://github.com/onegov/onegov-cloud/commit/f1855379fbc9e7542376b4787a6027126d25898b)
+
+### Core
+
+##### Pin pytest-localserver.
+
+Also, remove unused smtp fixture for old python version.
+
+`Bugfix` | [OGC-444](https://linear.app/onegovcloud/issue/OGC-444) | [17a7c7d70b](https://github.com/onegov/onegov-cloud/commit/17a7c7d70b228c3a976bc3d84f4b7db1bc914785)
+
+### Election Day
+
+##### Improve compatibility with SQLAlchemy 1.4. (#338)
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [3bf5fbda3d](https://github.com/onegov/onegov-cloud/commit/3bf5fbda3de5f5202f05f1d6c7fc58078980f635)
+
+##### Update Italian translations.
+
+`Bugfix` | [f1f56d41ae](https://github.com/onegov/onegov-cloud/commit/f1f56d41aec4c60d0c467805e8d18969bba06c80)
+
+##### Remove Set-Cookie header from cached pages.
+
+`Bugfix` | [SEA-708](https://linear.app/seantis/issue/SEA-708) | [7c7be1908b](https://github.com/onegov/onegov-cloud/commit/7c7be1908be147cc54adab9e2d867a8885637fb0)
+
+### Event
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [86d8c5f60d](https://github.com/onegov/onegov-cloud/commit/86d8c5f60d0f58af4b3d239935843fdbc77cebee)
+
+### Feriennet
+
+##### Fix invoice layout
+
+`Bugfix` | [PRO-1020](https://linear.app/projuventute/issue/PRO-1020) | [191c35cc7f](https://github.com/onegov/onegov-cloud/commit/191c35cc7f1807153d36f98a212d49175d8c4177)
+
+### Notice
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [a381989943](https://github.com/onegov/onegov-cloud/commit/a38198994383d3822e1e164f1dc4bf164e28b8cf)
+
+### Org
+
+##### Notifications for new tickets
+
+Add field for standard new ticket notification email
+
+`Feature` | [OGC-227](https://linear.app/onegovcloud/issue/OGC-227) | [aefb383e1a](https://github.com/onegov/onegov-cloud/commit/aefb383e1ad082792f7dc5b7202fb321948d6881)
+
+##### Make registration hints more visible
+
+`Feature` | [OGC-399](https://linear.app/onegovcloud/issue/OGC-399) | [a858d4687a](https://github.com/onegov/onegov-cloud/commit/a858d4687a70d27d77916518a1b385344b2d5603)
+
+##### Cache custom event tags in redis
+
+`Bugfix` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [6e23afe751](https://github.com/onegov/onegov-cloud/commit/6e23afe751ded23fe42895392c237fb39ded9c54)
+
+##### Credit card payment translations
+
+`Bugfix` | [OGC-993](https://linear.app/onegovcloud/issue/OGC-993) | [086187f155](https://github.com/onegov/onegov-cloud/commit/086187f15583a532503db6e69ec3b0564ad35383)
+
+### Town6
+
+##### Fix position of hr-tag
+
+`Bugfix` | [OGC-434](https://linear.app/onegovcloud/issue/OGC-434) | [632cb4871f](https://github.com/onegov/onegov-cloud/commit/632cb4871f1bd02cec2aca367d2a99358c3b7b27)
+
+### Winterthur
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [1a82c60e89](https://github.com/onegov/onegov-cloud/commit/1a82c60e89bc422be5c890241009eb38a698ec7c)
+
+### Wtfs
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [542e174dc8](https://github.com/onegov/onegov-cloud/commit/542e174dc8ec8db8b1783bbeba34c7db4b9ebc06)
+
 ## 2022.29
 
-`2022-05-04` | [545369b9e1...91ad52e1df](https://github.com/OneGov/onegov-cloud/compare/545369b9e1^...91ad52e1df)
+`2022-05-04` | [545369b9e1...984c251bdf](https://github.com/OneGov/onegov-cloud/compare/545369b9e1^...984c251bdf)
 
 ### Core
 
@@ -1550,38 +1638,4 @@ Addionally, store text extracts per file.
 ##### Add Italian.
 
 `Feature` | [PRO-805](https://linear.app/projuventute/issue/PRO-805) | [00040c2121](https://github.com/onegov/onegov-cloud/commit/00040c212114090e548e823a81dcde75a45f913c)
-
-## 2021.81
-
-`2021-09-27` | [d52dfb0ec4...cd55d0249a](https://github.com/OneGov/onegov-cloud/compare/d52dfb0ec4^...cd55d0249a)
-
-### Election Day
-
-##### Add menu entry for updating archived results.
-
-`Feature` | [d52dfb0ec4](https://github.com/onegov/onegov-cloud/commit/d52dfb0ec47c1dfd859cda56a1e81b5e9cf1ad1b)
-
-##### Make pages cache expiration time configurable and add a menu entry for busting the cache.
-
-`Feature` | [974c9b1bab](https://github.com/onegov/onegov-cloud/commit/974c9b1babdc48cabd758ed8bdba8750b7a7fa82)
-
-##### Fix admin view permissions.
-
-`Bugfix` | [6e96f971df](https://github.com/onegov/onegov-cloud/commit/6e96f971dfa653e4a4ad572c8a566a46877e3cfe)
-
-##### Set a default value for CSP Connect Source.
-
-`Bugfix` | [b5278a0cb2](https://github.com/onegov/onegov-cloud/commit/b5278a0cb2ded8f2eb1797aa1d92c137a1c0f45a)
-
-### Form
-
-##### Add a CSS field.
-
-`Feature` | [288fa08778](https://github.com/onegov/onegov-cloud/commit/288fa087782056fb4afe990f2d436a2549cea1a8)
-
-### User
-
-##### Add change role CLI command.
-
-`Feature` | [f5078d8d29](https://github.com/onegov/onegov-cloud/commit/f5078d8d2976c57fa6319735408b64c764dc733e)
 
