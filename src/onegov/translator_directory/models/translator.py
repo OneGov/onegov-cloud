@@ -84,13 +84,14 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     account_owner = Column(Text)
     iban = Column(Text)
 
-    email = Column(Text)
+    email = Column(Text, unique=True)
 
-    # the user acocunt related to this translator
+    # the user account related to this translator
     user = relationship(
         'User',
         primaryjoin='foreign(Translator.email) == User.username',
-        backref=backref('translators', lazy='dynamic')
+        uselist=False,
+        backref=backref('translator', uselist=False, passive_deletes='all')
     )
 
     tel_mobile = Column(Text,)
