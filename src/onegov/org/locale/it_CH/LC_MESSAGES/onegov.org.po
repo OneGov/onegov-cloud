@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-03 16:12+0200\n"
+"POT-Creation-Date: 2022-05-24 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -239,6 +239,24 @@ msgstr "Eccetto per"
 
 msgid "On holidays"
 msgstr "Nei giorni festivi"
+
+msgid "During school holidays"
+msgstr "Durante le vacanze scolastiche"
+
+msgid "Access"
+msgstr "Accesso"
+
+msgid "Public"
+msgstr "Pubblico"
+
+msgid "Only by privileged users"
+msgstr "Solo da utenti privilegiati"
+
+msgid "Only by privileged users and members"
+msgstr "Solo da membri e da utenti privilegiati"
+
+msgid "Security"
+msgstr "Sicurezza"
 
 msgid "Start date before end date"
 msgstr "Data di inizio precedente la data di fine"
@@ -1361,6 +1379,9 @@ msgstr "Altre feste"
 msgid "Preview"
 msgstr "Anteprima"
 
+msgid "School holidays"
+msgstr "Vacanze scolastiche"
+
 msgid "Format: Day.Month - Description"
 msgstr "Formato: Giorno.Mese - Descrizione"
 
@@ -1369,6 +1390,19 @@ msgstr "Inserisci una data per riga"
 
 msgid "Please enter only day and month"
 msgstr "Inserisci solo giorno e mese"
+
+#, python-format
+msgid "${date} is not a valid date"
+msgstr "${date} non è una data valida"
+
+msgid "Format: Day.Month.Year - Day.Month.Year"
+msgstr "Formato: Giorno.Mese.Anno - Giorno.Mese.Anno"
+
+msgid "Please enter one date pair per line"
+msgstr "Inserisci una coppia di date per riga"
+
+msgid "End date needs to be after start date"
+msgstr "La data di fine deve essere successiva alla data di inizio"
 
 msgid "Email adress for notifications about newly opened tickets"
 msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
@@ -1912,23 +1946,8 @@ msgstr "L'iscrizione è stata rifiutata"
 msgid "Your directory submission has been rejected"
 msgstr "L'invio della cartella è stato rifiutato"
 
-msgid "Access"
-msgstr "Accesso"
-
-msgid "Public"
-msgstr "Pubblico"
-
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
-
-msgid "Only by privileged users"
-msgstr "Solo da utenti privilegiati"
-
-msgid "Only by privileged users and members"
-msgstr "Solo da membri e da utenti privilegiati"
-
-msgid "Security"
-msgstr "Sicurezza"
 
 msgid "Visible on homepage"
 msgstr "Visibile sulla pagina principale"
@@ -2201,10 +2220,10 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Evento"
 
@@ -4538,7 +4557,7 @@ msgid "Analytics"
 msgstr "Analitica"
 
 msgid "Holidays"
-msgstr "Festività"
+msgstr "Festività / Vacanze scolastiche"
 
 msgid "No holidays defined"
 msgstr "Nessuna festività definita"

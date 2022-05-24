@@ -83,7 +83,7 @@ class AllocationFormHelpers(object):
 
         return datetime.combine(d, t)
 
-    def is_excluded(self, date):
+    def is_excluded(self, dt):
         return False
 
 
@@ -231,6 +231,15 @@ class AllocationForm(Form, AllocationFormHelpers):
         default='yes',
         fieldset=_("Date"))
 
+    during_school_holidays = RadioField(
+        label=_("During school holidays"),
+        choices=(
+            ('yes', _("Yes")),
+            ('no', _("No"))
+        ),
+        default='yes',
+        fieldset=_("Date"))
+
     access = RadioField(
         label=_("Access"),
         choices=(
@@ -245,6 +254,8 @@ class AllocationForm(Form, AllocationFormHelpers):
     def on_request(self):
         if not self.request.app.org.holidays:
             self.delete_field('on_holidays')
+        if not self.request.app.org.school_holidays:
+            self.delete_field('during_school_holidays')
 
     def ensure_start_before_end(self):
         if self.start.data and self.end.data:
@@ -271,8 +282,28 @@ class AllocationForm(Form, AllocationFormHelpers):
 
         return self.request.app.org.holidays
 
-    def is_excluded(self, date):
-        return date.date() in self.exceptions
+    @property
+    def ranged_exceptions(self):
+        if not hasattr(self, 'request'):
+            return ()
+
+        if not self.during_school_holidays:
+            return ()
+
+        if self.during_school_holidays.data == 'yes':
+            return ()
+
+        return self.request.app.org.school_holidays
+
+    def is_excluded(self, dt):
+        date = dt.date()
+        if date in self.exceptions:
+            return True
+
+        for start, end in self.ranged_exceptions:
+            if start <= date <= end:
+                return True
+        return False
 
     @property
     def dates(self):
