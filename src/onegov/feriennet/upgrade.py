@@ -73,7 +73,7 @@ def reinstate_daily_ticket_status_email(context):
 
     for user in UserCollection(context.session).by_roles('admin'):
         user.data = user.data or {}
-        user.data['daily_ticket_statistics'] = True
+        user.data['ticket_statistics'] = 'daily'
 
 
 @upgrade_task('Change Periode to Zeitraum')

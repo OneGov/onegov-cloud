@@ -9,6 +9,13 @@ ACTIVITY_STATES = {
     'published': _("Published")
 }
 
+FREQUENCIES = {
+    'daily': _("Daily"),
+    'weekly': _("Weekly"),
+    'monthly': _("Monthly"),
+    'never': _("Never")
+}
+
 SALUTATIONS = {
     'mr': _("Mr."),
     'ms': _("Ms.")

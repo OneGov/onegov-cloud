@@ -6,6 +6,7 @@ from onegov.core import mail
 from onegov.feriennet import _
 from onegov.feriennet.exports.const import ACTIVITY_STATES
 from onegov.feriennet.exports.const import BOOKING_STATES
+from onegov.feriennet.exports.const import FREQUENCIES
 from onegov.feriennet.exports.const import GENDERS
 from onegov.feriennet.exports.const import ROLES
 from onegov.feriennet.exports.const import SALUTATIONS
@@ -141,7 +142,7 @@ class FeriennetExport(Export):
         user_data = user.data or {}
         salutation = user_data.get('salutation')
         first_name, last_name = decode_name(user.realname)
-        daily_email = bool(user_data.get('daily_ticket_statistics'))
+        status_email = user_data.get('ticket_statistics', 'never')
         street = extract_street(user_data.get('address', None))
 
         yield _("User Login"), user.username
@@ -165,7 +166,7 @@ class FeriennetExport(Export):
         yield _("User Website"), user_data.get('website', '')
         yield _("User Bank Account"), user_data.get('bank_account', '')
         yield _("User Beneficiary"), user_data.get('bank_beneficiary', '')
-        yield _("User Status E-Mail"), daily_email
+        yield _("User Status E-Mail"), FREQUENCIES.get(status_email, '')
         yield _("User TOS Accepted"), user_data.get('tos_accepted', False)
 
     def invoice_item_fields(self, item):
