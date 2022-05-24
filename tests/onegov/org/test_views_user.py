@@ -31,6 +31,10 @@ def test_disable_users(client):
 def test_change_role(client):
     client.login_admin()
 
+    user = client.spawn()
+    user.login_editor()
+    assert user.get('/userprofile').status_code == 200
+
     client.app.enable_yubikey = True
 
     editor = client.get('/usermanagement').click('Ansicht', index=1)
@@ -39,21 +43,28 @@ def test_change_role(client):
 
     editor.form['role'] = 'member'
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
+    user.login_editor()
 
     editor.form['role'] = 'admin'
     editor.form['state'] = 'inactive'
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
+    user.login_editor()
 
     editor.form['role'] = 'admin'
     editor.form['state'] = 'active'
     editor.form['yubikey'] = 'cccccccdefgh'
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
+    user.login_editor()
 
     client.app.enable_yubikey = False
     editor.form['role'] = 'admin'
     editor.form['state'] = 'active'
     editor.form['yubikey'] = ''
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
 
 
 def test_user_source(client):
