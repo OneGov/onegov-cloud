@@ -593,8 +593,8 @@ def test_view_mutations(client):
 
     # Deleted content
     client.login_admin()
-    agency.click("Löschen")
-    person.click("Löschen")
+    client.get(agency.request.url).click("Löschen")
+    client.get(person.request.url).click("Löschen")
 
     manage = client.get(agency_ticket_number)
     assert "Der hinterlegte Datensatz wurde entfernt." in manage
