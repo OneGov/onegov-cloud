@@ -240,7 +240,7 @@ def cache_control_tween_factory(app, handler):
         if request.is_logged_in:
             response.headers.add('cache-control', 'no-store')
             if request.cookies.get('no_cache', '0') == '0':
-                response.set_cookie('no_cache', '1')
+                response.set_cookie('no_cache', '1', samesite='Lax')
         else:
             if request.cookies.get('no_cache', '0') == '1':
                 response.delete_cookie('no_cache')
@@ -264,8 +264,13 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/screen/.*',
         '/catalog.rdf',
     )
-
     cache_paths = re.compile(r'^({})$'.format('|'.join(cache_paths)))
+
+    def should_cache_fn(response):
+        return (
+            response.status_code == 200
+            and 'Set-Cookie' not in response.headers
+        )
 
     def micro_cache_anonymous_pages_tween(request):
         """ Cache all pages for 5 minutes.
@@ -277,6 +282,10 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         That is to say, we observe the Cache-Control header.
 
         """
+
+        # do not cache HEAD, POST, DELETE etc.
+        if request.method != 'GET':
+            return handler(request)
 
         # no cache if the user is logged in
         if request.is_logged_in:
@@ -300,14 +309,11 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
             'hl' if 'headerless' in request.browser_session else 'hf'
         ))
 
-        result = app.pages_cache.get_or_create(
+        return app.pages_cache.get_or_create(
             key,
             creator=lambda: handler(request),
-            should_cache_fn=lambda response: response.status_code == 200
+            should_cache_fn=should_cache_fn
         )
-        if 'Set-Cookie' in result.headers:
-            del result.headers['Set-Cookie']
-        return result
 
     return micro_cache_anonymous_pages_tween
 

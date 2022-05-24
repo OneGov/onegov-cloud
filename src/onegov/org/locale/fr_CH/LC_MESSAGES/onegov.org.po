@@ -179,7 +179,7 @@ msgid "No"
 msgstr "Non"
 
 msgid "Credit card payments"
-msgstr "Kreditkartenzahlungen"
+msgstr "Paiements carte de crédit"
 
 msgid "Exports payments and tickets"
 msgstr "Exporte les paiements et les tickets"

@@ -217,6 +217,7 @@ footer {
 
     hr {
         @include hairline;
+        margin: 1.25rem 0 !important;
     }
 
     img {
@@ -436,6 +437,25 @@ $formlist-padding: .75rem 0;
     li:last-of-type {
         border: 0;
         padding-bottom: 1.5rem;
+    }
+
+    .list-hint {
+        border-bottom: 0 !important;
+        border-top: 1px solid #e0e3e5;
+        color: #707070;
+        margin-bottom: .2em;
+        max-width: 90%;
+
+        & > div {
+            &.hint-stop::before {
+                color: #b2232f;
+            }
+
+            &::before {
+                font-weight: bold;
+                margin-right: .5rem;
+            }
+        }
     }
 }
 

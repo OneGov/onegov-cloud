@@ -10,4 +10,4 @@ from onegov.swissvotes import SwissvotesApp
 def change_site_locale(self, request):
     """ Changes the locale. """
 
-    return self.redirect()
+    return self.redirect(request)
