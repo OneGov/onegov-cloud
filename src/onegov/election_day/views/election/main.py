@@ -15,6 +15,19 @@ from onegov.election_day.utils.parties import get_party_results
 from sqlalchemy.orm import object_session
 
 
+@ElectionDayApp.view(
+    model=Election,
+    request_method='HEAD',
+    permission=Public
+)
+def view_election_head(self, request):
+
+    @request.after
+    def add_headers(response):
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
+
+
 @ElectionDayApp.html(
     model=Election,
     permission=Public

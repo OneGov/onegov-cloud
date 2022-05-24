@@ -17,7 +17,7 @@ from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor, TCPExecutor
-from webdriver_manager.utils import ChromeType
+from webdriver_manager.core.utils import ChromeType
 
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
@@ -364,52 +364,10 @@ def es_client(es_url):
     yield Elasticsearch(es_url)
 
 
-@pytest.fixture(scope="session")
-def smtp_server():
-    # replacement for smtpserver fixture, which also works on Python 3.5
-    # see https://bitbucket.org/pytest-dev/pytest-localserver
-    # /issues/13/broken-on-python-35
-    from pytest_localserver import smtp
-
-    class Server(smtp.Server):
-
-        def getsockname(self):
-            return self.socket.getsockname()
-
-        @property
-        def address(self):
-            return self.addr[:2]
-
-        def outbox_payloads(self, index):
-            return [
-                m.get_payload(index).get_payload(decode=True).decode('utf-8')
-                for m in self.outbox
-            ]
-
-        @property
-        def sent(self):
-            """ Similar to the outbox property, this property returns the
-            sent e-mails, but only the decoded plaintext format.
-            """
-            return self.outbox_payloads(0)
-
-        @property
-        def sent_html(self):
-            """ Similar to the outbox property, this property returns the
-            sent e-mails, but only the decoded html format.
-            """
-            return self.outbox_payloads(1)
-
-    server = Server()
-    server.start()
-    yield server
-    server.stop()
-
-
 @pytest.fixture(scope="function")
-def smtp(smtp_server):
-    yield smtp_server
-    del smtp_server.outbox[:]
+def smtp(smtpserver):
+    yield smtpserver
+    del smtpserver.outbox[:]
 
 
 @pytest.fixture(scope="session")

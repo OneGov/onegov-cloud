@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-05 13:11+0200\n"
+"POT-Creation-Date: 2022-05-24 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -179,7 +179,7 @@ msgid "No"
 msgstr "Non"
 
 msgid "Credit card payments"
-msgstr "Kreditkartenzahlungen"
+msgstr "Paiements carte de crédit"
 
 msgid "Exports payments and tickets"
 msgstr "Exporte les paiements et les tickets"
@@ -240,6 +240,9 @@ msgstr "À l'exception de"
 
 msgid "On holidays"
 msgstr "En vacances"
+
+msgid "During school holidays"
+msgstr "Durant les vacances scolaires"
 
 msgid "Access"
 msgstr "Accès"
@@ -1264,6 +1267,9 @@ msgstr ""
 msgid "Open files in separate window"
 msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
 
+msgid "Open files in separate window"
+msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
+
 msgid "Title header left side"
 msgstr "Titre dans en-tête, face gauche"
 
@@ -1376,6 +1382,9 @@ msgstr "Autres jours fériés"
 msgid "Preview"
 msgstr "Preview"
 
+msgid "School holidays"
+msgstr "Vacances scolaires"
+
 msgid "Format: Day.Month - Description"
 msgstr "Format : Jour.Mois - Description"
 
@@ -1384,6 +1393,22 @@ msgstr "Veuillez renseigner une date par ligne"
 
 msgid "Please enter only day and month"
 msgstr "Veuillez ne renseigner que des jours et des mois"
+
+#, python-format
+msgid "${date} is not a valid date"
+msgstr "${date} n'est pas une date valide"
+
+msgid "Format: Day.Month.Year - Day.Month.Year"
+msgstr "Format : Jour.Mois.Année - Jour.Mois.Année"
+
+msgid "Please enter one date pair per line"
+msgstr "Veuillez renseigner une paire de dates par ligne"
+
+msgid "End date needs to be after start date"
+msgstr "La date de fin doit être postérieure à la date de début"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "Adresse électronique pour les notifications concernant les tickets ouverts"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -2204,6 +2229,7 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
@@ -3186,6 +3212,12 @@ msgstr ""
 "Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
 "Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment :"
 
+msgid "The following ticket has just been opened:"
+msgstr "Le ticket suivant vient d'être ouvert:"
+
+msgid "View the ticket"
+msgstr "Voir le billet"
+
 msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
 
@@ -4081,6 +4113,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "Yotre demande a été enregistrée."
 
+msgid "New ticket"
+msgstr "Nouveau billet"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "Votre demande n'a pas pu être traitée automatiquement."
 
@@ -4609,7 +4644,7 @@ msgid "Analytics"
 msgstr "Analytics"
 
 msgid "Holidays"
-msgstr "Jours fériés"
+msgstr "Jours fériés / Vacances scolaires"
 
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"

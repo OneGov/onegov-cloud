@@ -229,8 +229,8 @@ class OccurrenceCollection(Pagination):
                         Occurrence.start >= localized_start
                     )
                 )
-
-            query = query.filter(or_(*expressions))
+            if expressions:
+                query = query.filter(or_(*expressions))
 
         if self.end is not None:
             end = as_datetime(self.end)

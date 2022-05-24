@@ -250,6 +250,12 @@ class Auth(object):
 
         response = self.redirect(request, to)
 
+        # Rotate the session ID
+        if 'session_id' in request.cookies:
+            del request.cookies['session_id']
+        if 'browser_session' in request.__dict__:
+            del request.__dict__['browser_session']
+
         request.app.remember_identity(response, request, identity)
 
         if hasattr(request.app, 'on_login'):

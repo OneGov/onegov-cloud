@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-05 13:11+0200\n"
+"POT-Creation-Date: 2022-05-24 11:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -239,6 +239,9 @@ msgstr "Ausser an"
 
 msgid "On holidays"
 msgstr "An Feiertagen"
+
+msgid "During school holidays"
+msgstr "Während Schulferien"
 
 msgid "Access"
 msgstr "Zugriff"
@@ -1371,6 +1374,9 @@ msgstr "Andere Feiertage"
 msgid "Preview"
 msgstr "Vorschau"
 
+msgid "School holidays"
+msgstr "Schulferien"
+
 msgid "Format: Day.Month - Description"
 msgstr "Format: Tag.Monat - Beschreibung"
 
@@ -1379,6 +1385,22 @@ msgstr "Bitte geben Sie ein Datum pro Zeile ein"
 
 msgid "Please enter only day and month"
 msgstr "Bitte geben Sie nur Tag und Monat ein"
+
+#, python-format
+msgid "${date} is not a valid date"
+msgstr "${date} ist kein gültiges Datum"
+
+msgid "Format: Day.Month.Year - Day.Month.Year"
+msgstr "Format: Tag.Monat.Jahr - Tag.Monat.Jahr"
+
+msgid "Please enter one date pair per line"
+msgstr "Bitte geben Sie ein Datumspaar pro Zeile ein"
+
+msgid "End date needs to be after start date"
+msgstr "Das End-Datum muss vor dem Start-Datum sein"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -3173,6 +3195,12 @@ msgstr ""
 "Sie erhalten ein weiteres E-Mail, sobald Ihre Anfrage abgeschlossen wurde. "
 "In der Zwischenzeit sehen Sie den Status Ihrer Anfrage jederzeit hier:"
 
+msgid "The following ticket has just been opened:"
+msgstr "Das folgende Ticket wurde soeben eröffnet:"
+
+msgid "View the ticket"
+msgstr "Ticket ansehen"
+
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
 
@@ -4054,6 +4082,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"
 
+msgid "New ticket"
+msgstr "Neues Ticket"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
 
@@ -4577,7 +4608,7 @@ msgid "Analytics"
 msgstr "Web-Statistik"
 
 msgid "Holidays"
-msgstr "Feiertage"
+msgstr "Feiertage / Schulferien"
 
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
@@ -4804,3 +4835,7 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "User will stay on the page when opening images and files"
+#~ msgstr ""
+#~ "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"

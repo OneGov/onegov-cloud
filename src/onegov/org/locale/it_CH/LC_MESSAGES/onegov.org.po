@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-05 13:11+0200\n"
+"POT-Creation-Date: 2022-05-24 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -178,7 +178,7 @@ msgid "No"
 msgstr "No"
 
 msgid "Credit card payments"
-msgstr "Kreditkartenzahlungen"
+msgstr "Pagamenti carta di credito"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
@@ -239,6 +239,9 @@ msgstr "Eccetto per"
 
 msgid "On holidays"
 msgstr "Nei giorni festivi"
+
+msgid "During school holidays"
+msgstr "Durante le vacanze scolastiche"
 
 msgid "Access"
 msgstr "Accesso"
@@ -1377,6 +1380,9 @@ msgstr "Altre feste"
 msgid "Preview"
 msgstr "Anteprima"
 
+msgid "School holidays"
+msgstr "Vacanze scolastiche"
+
 msgid "Format: Day.Month - Description"
 msgstr "Formato: Giorno.Mese - Descrizione"
 
@@ -1385,6 +1391,22 @@ msgstr "Inserisci una data per riga"
 
 msgid "Please enter only day and month"
 msgstr "Inserisci solo giorno e mese"
+
+#, python-format
+msgid "${date} is not a valid date"
+msgstr "${date} non è una data valida"
+
+msgid "Format: Day.Month.Year - Day.Month.Year"
+msgstr "Formato: Giorno.Mese.Anno - Giorno.Mese.Anno"
+
+msgid "Please enter one date pair per line"
+msgstr "Inserisci una coppia di date per riga"
+
+msgid "End date needs to be after start date"
+msgstr "La data di fine deve essere successiva alla data di inizio"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "Indirizzo e-mail per le notifiche dei biglietti aperti"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -2212,6 +2234,7 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
@@ -2609,7 +2632,7 @@ msgid "All news"
 msgstr "Tutte le notizie"
 
 msgid "This site is private but can also be seen by members"
-msgstr "Questo sito è privato ma può essere visualizzato anche dai membri"
+msgstr "Questo sito è privato ma può essere visto dai membri"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
@@ -2618,7 +2641,7 @@ msgid "This site is not public."
 msgstr "Questo sito non è pubblico."
 
 msgid "This site is not public but it can be seen by members."
-msgstr "Questo sito non è pubblico ma può essere visualizzato dai membri."
+msgstr "Questo sito non è pubblico ma può essere visto dai membri."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -3176,6 +3199,12 @@ msgstr ""
 "Ti invieremo un'altra e-mail una volta che il tuo biglietto sarà stato "
 "completato. Nel frattempo puoi controllare in qualsiasi momento lo stato del"
 " tuo biglietto:"
+
+msgid "The following ticket has just been opened:"
+msgstr "Il seguente biglietto è stato appena aperto:"
+
+msgid "View the ticket"
+msgstr "Visualizza il biglietto"
 
 msgid "Your request has been reopened"
 msgstr "La tua richiesta è stata riaperta"
@@ -4067,6 +4096,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"
 
+msgid "New ticket"
+msgstr "Nuovo biglietto"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "La tua richiesta non può essere accettata automaticamente!"
 
@@ -4598,7 +4630,7 @@ msgid "Analytics"
 msgstr "Analitica"
 
 msgid "Holidays"
-msgstr "Festività"
+msgstr "Festività / Vacanze scolastiche"
 
 msgid "No holidays defined"
 msgstr "Nessuna festività definita"
