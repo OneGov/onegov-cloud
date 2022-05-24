@@ -270,7 +270,7 @@ def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 
+        'sendmail',
         '--queue', 'smtp'
     ])
 
@@ -287,7 +287,7 @@ def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
     del smtp.outbox[:]
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 
+        'sendmail',
         '--queue', 'smtp'
     ])
 
@@ -308,7 +308,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 
+        'sendmail',
         '--queue', 'postmark'
     ])
 
@@ -344,7 +344,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 
+        'sendmail',
         '--queue', 'postmark',
         '--limit', 1
     ])
@@ -356,7 +356,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 
+        'sendmail',
         '--queue', 'postmark',
         '--limit', 2
     ])
@@ -385,7 +385,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     mock_send.reset_mock()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 
+        'sendmail',
         '--queue', 'postmark'
     ])
 
@@ -414,7 +414,7 @@ def test_sendmail_exception(temporary_directory, maildir_app, monkeypatch):
 
     result = CliRunner().invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
-        'sendmail', 
+        'sendmail',
         '--queue', 'postmark'
     ])
 

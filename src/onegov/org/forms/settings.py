@@ -813,6 +813,12 @@ class HolidaySettingsForm(Form):
 
 class OrgTicketSettingsForm(Form):
 
+    email_for_new_tickets = StringField(
+        label=_("Email adress for notifications "
+                "about newly opened tickets"),
+        description=("info@example.ch")
+    )
+
     ticket_auto_accepts = MultiCheckboxField(
         label=_("Accept request and close ticket automatically "
                 "for these ticket categories"),

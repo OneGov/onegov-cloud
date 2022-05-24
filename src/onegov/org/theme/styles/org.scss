@@ -1182,13 +1182,29 @@ dl.field-display > dt {
         font-weight: bold;
     }
 
-    .list-lead {
+    .list-lead,
+    .list-hint {
         margin-bottom: .2em;
         max-width: $max-line-width;
 
         em {
             font-style: normal;
             font-weight: bold;
+        }
+    }
+
+    .list-hint {
+        border-bottom: 0 !important;
+        border-top: 1px solid #e0e3e5;
+
+        & > div {
+            &.hint-stop::before {
+                color: #b2232f;
+            }
+
+            &::before {
+                margin-right: .5rem;
+            }
         }
     }
 }

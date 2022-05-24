@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-05 17:32+0200\n"
+"POT-Creation-Date: 2022-05-24 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -179,7 +179,7 @@ msgid "No"
 msgstr "Non"
 
 msgid "Credit card payments"
-msgstr "Kreditkartenzahlungen"
+msgstr "Paiements carte de crédit"
 
 msgid "Exports payments and tickets"
 msgstr "Exporte les paiements et les tickets"
@@ -1401,6 +1401,9 @@ msgstr "Veuillez renseigner une paire de dates par ligne"
 
 msgid "End date needs to be after start date"
 msgstr "La date de fin doit être postérieure à la date de début"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "Adresse électronique pour les notifications concernant les tickets ouverts"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -3141,6 +3144,12 @@ msgstr ""
 "Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
 "Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment :"
 
+msgid "The following ticket has just been opened:"
+msgstr "Le ticket suivant vient d'être ouvert:"
+
+msgid "View the ticket"
+msgstr "Voir le billet"
+
 msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
 
@@ -4024,6 +4033,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "Yotre demande a été enregistrée."
 
+msgid "New ticket"
+msgstr "Nouveau billet"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "Votre demande n'a pas pu être traitée automatiquement."
 
@@ -4776,3 +4788,7 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "User will stay on the page when opening images and files"
+#~ msgstr ""
+#~ "L'utilisateur reste sur la page lorsqu'il ouvre des images et des fichiers"

@@ -130,8 +130,8 @@ def maildir_smtp_app(temporary_directory, maildir, smtp):
     smtp_cfg = {
         'mailer': 'smtp',
         'directory': maildir,
-        'host': smtp.address[0],
-        'port': smtp.address[1],
+        'host': smtp.addr[0],
+        'port': smtp.addr[1],
         'force_tls': False,
         'username': None,
         'password': None,

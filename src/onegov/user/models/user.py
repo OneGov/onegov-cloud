@@ -281,7 +281,10 @@ class User(Base, TimestampMixin, ORMSearchable):
         """ Terminates all open browser sessions. """
 
         self.sessions = self.sessions or {}
+        count = len(self.sessions)
         for session_id in self.sessions:
             forget(request.app, session_id)
 
         self.cleanup_sessions(request)
+
+        return count
