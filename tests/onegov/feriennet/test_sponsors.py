@@ -1,3 +1,4 @@
+from datetime import date
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.feriennet.sponsors import Sponsor
@@ -16,6 +17,10 @@ def test_translate_sponsor():
                 'url': {
                     'de': 'die-url',
                     'fr': 'le-url'
+                },
+                'info': {
+                    'de': 'Partner',
+                    'fr': 'Partenaires'
                 }
             }
         }
@@ -27,7 +32,8 @@ def test_translate_sponsor():
     assert de.logo == 'das-logo.png'
     assert de.banners == {
         'bookings': {
-            'url': 'die-url'
+            'url': 'die-url',
+            'info': 'Partner'
         }
     }
 
@@ -37,9 +43,87 @@ def test_translate_sponsor():
     assert fr.logo == 'le-logo.png'
     assert fr.banners == {
         'bookings': {
-            'url': 'le-url'
+            'url': 'le-url',
+            'info': 'Partenaires'
         }
     }
+
+
+def test_sponsor_languages(client, scenario):
+    client.login_admin()
+
+    scenario.add_period(
+        title='Testperiod',
+        phase='wishlist',
+        active=True,
+        confirmable=True,
+        finalizable=True,
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    data = [
+        {
+            'name': 'CompanyOne',
+            'banners': {
+                'bookings': {
+                    'src': {
+                        'de': 'sponsors/CompanyOne-de.jpg',
+                        'fr': 'sponsors/CompanyOne-de.jpg'
+                    },
+                    'url': {
+                        'de': 'https://www.company-one.ch',
+                        'fr': 'https://www.company-one.ch/fr'
+                    }
+                },
+                'invoices': {
+                    'src': {
+                        'de': 'sponsors/CompanyOne-de.jpg',
+                        'fr': 'sponsors/CompanyOne-de.jpg'
+                    },
+                    'url': {
+                        'de': 'https://www.company-one.ch',
+                        'fr': 'https://www.company-one.ch/fr'
+                    }
+                }
+            }
+        },
+        {
+            'name': 'CompanyTwo',
+            'banners': {
+                'bookings': {
+                    'src': {
+                        'de': 'sponsors/CompanyTwo-de.jpg'
+                    },
+                    'url': {
+                        'de': 'https://www.company-two.ch'
+                    },
+                    'info': {
+                        'de': 'Partner'
+                    }
+                },
+                'invoices': {
+                    'src': {
+                        'de': 'sponsors/Companytwo-de.jpg'
+                    },
+                    'url': {
+                        'de': 'https://www.company-two.ch'
+                    },
+                    'info': {
+                        'de': 'Partner'
+                    }
+                }
+            }
+        }
+    ]
+
+    del client.app.sponsors
+
+    client.app.sponsors = [Sponsor(**sponsor) for sponsor in data]
+
+    page = client.get('/')
+    page = page.click('Wunschliste')
+    assert "Company" in page
 
 
 def test_timestamp_sponsor():
