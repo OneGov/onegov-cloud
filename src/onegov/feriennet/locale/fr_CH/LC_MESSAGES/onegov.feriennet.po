@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-01 13:21+0100\n"
+"POT-Creation-Date: 2022-05-05 13:21+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -387,6 +387,18 @@ msgstr "Soumis"
 msgid "Published"
 msgstr "Publié"
 
+msgid "Daily"
+msgstr "Quotidiennement"
+
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+msgid "Monthly"
+msgstr "Mensuel"
+
+msgid "Never"
+msgstr "Jamais"
+
 msgid "Mr."
 msgstr "M"
 
@@ -615,8 +627,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "Conditions de participation"
 
@@ -1194,11 +1206,20 @@ msgstr ""
 "Il n'est pas possible de définir un temps de transfert vu que les "
 "participant·e·s sont limité·e·s à une activité par jour."
 
-msgid "Send a daily status e-mail."
-msgstr "Envoyez un e-mail de suivi quotidien."
+msgid "Send a periodic status e-mail."
+msgstr "Envoyer un e-mail d'état périodique."
 
 msgid "General"
 msgstr "Général"
+
+msgid "Daily (exluding the weekend)"
+msgstr "Quotidiennement (sauf le week-end)"
+
+msgid "Weekly (on mondays)"
+msgstr "Hebdomadaire (le lundi)"
+
+msgid "Monthly (on first monday of the month)"
+msgstr "Mensuel (le premier lundi du mois)"
 
 msgid "Salutation"
 msgstr "Civilité"

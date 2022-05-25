@@ -269,9 +269,9 @@
     </div>
 </metal:partners>
 
-<metal:partners define-macro="partner-cards" i18n:domain="onegov.town6">
+<metal:partners define-macro="partner-cards" i18n:domain="onegov.town6" tal:define="subpage subpage|False">
     <div class="partners grid-x grid-padding-x">
-        <div class="cell small-12" tal:condition="show_title|True">
+        <div class="cell small-12" tal:condition="show_title|True and not subpage">
             <h3 tal:condition="not: title" i18n:translate>Partner</h3>
             <h3 tal:condition="title">${title}</h3>
         </div>
@@ -1712,10 +1712,12 @@
                         <tal:block condition="external_link(record)|nothing"> 
                         </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
-                
-                <tal:b tal:define="lead record.meta.get('lead')">
-                    <div tal:condition="lead" class="list-lead" tal:content="structure layout.linkify(lead)"></div>
-                </tal:b>
+                <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                     tal:content="structure lead">
+                </div>
+                <div class="list-hint hints" tal:define="hint hint(record)|False"
+                     tal:content="structure hint" tal:condition="hint">
+                </div>
                  <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
             </tal:b>
             </li>

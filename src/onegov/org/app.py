@@ -45,7 +45,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     boardlet = directive(directives.Boardlet)
 
     #: cronjob settings
-    send_daily_ticket_statistics = True
+    send_ticket_statistics = True
 
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
@@ -184,6 +184,11 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @property
     def custom_event_tags(self):
+        return self.cache.get_or_create(
+            'custom_event_tags', self.load_custom_event_tags
+        )
+
+    def load_custom_event_tags(self):
         fs = self.filestorage
         if fs.exists('eventtags.yml'):
             with fs.open('eventtags.yml', 'rb') as f:

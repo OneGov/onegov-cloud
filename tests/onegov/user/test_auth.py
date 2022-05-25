@@ -219,6 +219,15 @@ def test_auth_integration(session, redis_url):
     user = UserCollection(session).by_username('AzureDiamond')
     assert not user.sessions
 
+    response = client.get('/auth?username=AzureDiamond&password=hunter2')
+    assert response.status_code == 302
+    assert response.location == 'http://localhost/go'
+    assert response.headers['Set-Cookie'].startswith('session_id')
+    new_session_id = app.unsign(response.request.cookies['session_id'])
+    assert new_session_id != session_id
+    user = UserCollection(session).by_username('AzureDiamond')
+    assert new_session_id in user.sessions
+
 
 def test_signup_token_data(session):
     auth = Auth(DummyApp(session, 'foo'), signup_token_secret='bar')

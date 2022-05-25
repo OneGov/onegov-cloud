@@ -218,7 +218,7 @@
                                 <div class="grid-container">
                                     <div class="grid-x grid-padding-x grid-padding-y">
                                         <div class="cell small-12">
-                                            <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners"/>
+                                            <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners; subpage layout.show_partners"/>
                                         </div>
                                     </div>
                                 </div>

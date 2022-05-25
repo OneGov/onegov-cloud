@@ -473,6 +473,18 @@ def reopen_ticket(self, request):
                 'number': self.number
             }))
 
+            if request.email_for_new_tickets:
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened_info.pt',
+                    subject=_("New ticket"),
+                    ticket=self,
+                    receivers=(request.email_for_new_tickets, ),
+                    content={
+                        'model': self
+                    }
+                )
+
             email_missing = send_email_if_enabled(
                 ticket=self,
                 request=request,

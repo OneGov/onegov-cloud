@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-04-25 14:15+0200\n"
+"POT-Creation-Date: 2022-05-24 11:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -239,6 +239,24 @@ msgstr "Ausser an"
 
 msgid "On holidays"
 msgstr "An Feiertagen"
+
+msgid "During school holidays"
+msgstr "Während Schulferien"
+
+msgid "Access"
+msgstr "Zugriff"
+
+msgid "Public"
+msgstr "Öffentlich"
+
+msgid "Only by privileged users"
+msgstr "Beschränkt auf Editoren und Administratoren"
+
+msgid "Only by privileged users and members"
+msgstr "Beschränkt auf Mitglieder, Editoren und Administratoren"
+
+msgid "Security"
+msgstr "Sicherheit"
 
 msgid "Start date before end date"
 msgstr "Start Datum vor Ende"
@@ -1230,12 +1248,6 @@ msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icon SVG 20x20 (Safari)"
 
-msgid "Open files in separate window"
-msgstr "Dateien in separatem Fenster öffnen"
-
-msgid "User will stay on the page when opening images and files"
-msgstr "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"
-
 msgid "Disable page references"
 msgstr "Seitenreferenzen deaktivieren"
 
@@ -1247,6 +1259,9 @@ msgstr ""
 "Versteckt den Kopier-Link '#' für die Seitenreferenz. Die Referenzen an sich "
 "funktionieren weiterhin. Diese Referenzen sind nur für eingeloggte Nutzer "
 "sichtbar."
+
+msgid "Open files in separate window"
+msgstr "Dateien in separatem Fenster öffnen"
 
 msgid "Title header left side"
 msgstr "Titel Kopfzeile links"
@@ -1359,6 +1374,9 @@ msgstr "Andere Feiertage"
 msgid "Preview"
 msgstr "Vorschau"
 
+msgid "School holidays"
+msgstr "Schulferien"
+
 msgid "Format: Day.Month - Description"
 msgstr "Format: Tag.Monat - Beschreibung"
 
@@ -1367,6 +1385,22 @@ msgstr "Bitte geben Sie ein Datum pro Zeile ein"
 
 msgid "Please enter only day and month"
 msgstr "Bitte geben Sie nur Tag und Monat ein"
+
+#, python-format
+msgid "${date} is not a valid date"
+msgstr "${date} ist kein gültiges Datum"
+
+msgid "Format: Day.Month.Year - Day.Month.Year"
+msgstr "Format: Tag.Monat.Jahr - Tag.Monat.Jahr"
+
+msgid "Please enter one date pair per line"
+msgstr "Bitte geben Sie ein Datumspaar pro Zeile ein"
+
+msgid "End date needs to be after start date"
+msgstr "Das End-Datum muss vor dem Start-Datum sein"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1525,8 +1559,20 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
-msgid "Send a daily status e-mail."
-msgstr "Ein tägliches Status E-Mail senden."
+msgid "Send a periodic status e-mail."
+msgstr "Ein periodisches Status E-Mail senden."
+
+msgid "Daily (exluding the weekend)"
+msgstr "Täglich (abgesehen vom Wochenende)"
+
+msgid "Weekly (on mondays)"
+msgstr "Wöchentlich (am Montag)"
+
+msgid "Monthly (on first monday of the month)"
+msgstr "Monatlich (am ersten Montag des Monats)"
+
+msgid "Never"
+msgstr "Nie"
 
 msgid "1 entry"
 msgstr "1 Eintrag"
@@ -1903,23 +1949,8 @@ msgstr "Die Eingabe wurde abgelehnt"
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
 
-msgid "Access"
-msgstr "Zugriff"
-
-msgid "Public"
-msgstr "Öffentlich"
-
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
-
-msgid "Only by privileged users"
-msgstr "Beschränkt auf Editoren und Administratoren"
-
-msgid "Only by privileged users and members"
-msgstr "Beschränkt auf Mitglieder, Editoren und Administratoren"
-
-msgid "Security"
-msgstr "Sicherheit"
 
 msgid "Visible on homepage"
 msgstr "Auf der Startseite anzeigen"
@@ -2192,10 +2223,10 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
+#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
-#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2600,7 +2631,9 @@ msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
 
 msgid "This site is not public but it can be seen by members."
-msgstr "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen werden."
+msgstr ""
+"Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
+"werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -2947,17 +2980,42 @@ msgstr "Tickets wurden geschlossen."
 msgid "ticket was closed."
 msgstr "Ticket wurde geschlossen."
 
-msgid "There are currently ${currently_open} tickets open and"
-msgstr "Zur Zeit sind ${currently_open} Tickets offen und"
+#. Default: open
+#. Used in sentence: "There are currently ${currently_open} tickets ${open_n}
+#. and"
+msgid "open_n"
+msgstr "offen"
 
-msgid "There is currently ${currently_open} ticket open and"
-msgstr "Zur Zeit ist ${currently_open} Ticket offen und"
+#. Canonical text for ${open_n} is: "open"
+msgid "There are currently ${currently_open} tickets ${open_n} and"
+msgstr "Zur Zeit sind ${currently_open} Tickets ${open_n} und"
 
-msgid "tickets are pending."
-msgstr "Tickets sind in Bearbeitung."
+#. Default: open
+#. Used in sentence: "There is currently 1 ticket ${open_1} and"
+msgid "open_1"
+msgstr "offen"
 
-msgid "ticket is pending."
-msgstr "Ticket ist in Bearbeitung."
+#. Canonical text for ${open_1} is: "open"
+msgid "There is currently 1 ticket ${open_1} and"
+msgstr "Zur Zeit ist 1 Ticket ${open_1} und"
+
+#. Default: pending
+#. Used in sentence: "tickets are ${pending_n}."
+msgid "pending_n"
+msgstr "in Bearbeitung"
+
+#. Canonical text for ${pending_n} is: "pending"
+msgid "tickets are ${pending_n}."
+msgstr "Tickets sind ${pending_n}."
+
+#. Default: pending
+#. Used in sentence: "1 ticket is ${pending_1}."
+msgid "pending_1"
+msgstr "in Bearbeitung"
+
+#. Canonical text for ${pending_1} is: "pending"
+msgid "1 ticket is ${pending_1}."
+msgstr "1 Ticket ist ${pending_1}."
 
 msgid "Have a great week!"
 msgstr "Wir wünschen Ihnen eine schöne Woche!"
@@ -2972,9 +3030,10 @@ msgstr ""
 msgid "unsubscribe"
 msgstr "abmelden"
 
-msgid "Or by changing the settings in your user profile."
-msgstr ""
-"Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
+msgid ""
+"Or you can receive it less frequently by changing the settings in your user "
+"profile."
+msgstr "Alternativ können Sie die Häufigkeit in Ihrem Benutzerprofil anpassen."
 
 msgid "Your directory submission has been adopted:"
 msgstr "Ihr Verzeichniseintrag wurde übernommen:"
@@ -2996,6 +3055,21 @@ msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
 msgid "The OneGov Cloud Team"
 msgstr "Das OneGov Cloud Team"
+
+msgid "This is what happend on the ${org} website over the past month:"
+msgstr ""
+"Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
+
+msgid ""
+"This is the monthly OneGov Cloud status e-mail. If you don't want to receive "
+"this e-mail you may deactivate it by clicking on"
+msgstr ""
+"Dies ist das monatliche Status E-Mail der OneGov Cloud. Sie können sich "
+"jederzeit über den folgenden Link"
+
+msgid "Or by changing the settings in your user profile."
+msgstr ""
+"Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -3121,8 +3195,25 @@ msgstr ""
 "Sie erhalten ein weiteres E-Mail, sobald Ihre Anfrage abgeschlossen wurde. "
 "In der Zwischenzeit sehen Sie den Status Ihrer Anfrage jederzeit hier:"
 
+msgid "The following ticket has just been opened:"
+msgstr "Das folgende Ticket wurde soeben eröffnet:"
+
+msgid "View the ticket"
+msgstr "Ticket ansehen"
+
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
+
+msgid "This is what happend on the ${org} website over the past week:"
+msgstr ""
+"Folgendes ist während der letzten Woche auf der ${org} Webseite geschehen:"
+
+msgid ""
+"This is the weekly OneGov Cloud status e-mail. If you don't want to receive "
+"this e-mail you may deactivate it by clicking on"
+msgstr ""
+"Dies ist das eöchentliche Status E-Mail der OneGov Cloud. Sie können sich "
+"jederzeit über den folgenden Link"
 
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
@@ -3991,6 +4082,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"
 
+msgid "New ticket"
+msgstr "Neues Ticket"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
 
@@ -4514,7 +4608,7 @@ msgid "Analytics"
 msgstr "Web-Statistik"
 
 msgid "Holidays"
-msgstr "Feiertage"
+msgstr "Feiertage / Schulferien"
 
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
@@ -4741,3 +4835,7 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "User will stay on the page when opening images and files"
+#~ msgstr ""
+#~ "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"

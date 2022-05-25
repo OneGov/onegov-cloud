@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.ballot import Vote
 from onegov.ballot import Election
 from onegov.election_day.layouts import MailLayout
@@ -45,15 +46,20 @@ def test_mail_layout_optout(session):
 
 def test_mail_layout_subject(session):
     # Note: the dummy setup does not translate the strings
-    layout = MailLayout(None, DummyRequest(locale='de_CH'))
-    assert layout.subject(Vote()) == 'New intermediate results'
+
+    vote = Vote(
+        title_translations={'de_CH': 'DE', 'fr_CH': 'FR'},
+        date=date(2020, 1, 1),
+        domain='federation'
+    )
+    session.add(vote)
+    session.flush()
 
     layout = MailLayout(None, DummyRequest(locale='de_CH'))
-    assert layout.subject(Vote(title_translations={'de_CH': "DE"})) == \
-        'DE - New intermediate results'
+    assert layout.subject(vote) == 'DE - New intermediate results'
 
     layout = MailLayout(None, DummyRequest(locale='fr_CH'))
-    assert layout.subject(Vote(title_translations={'fr_CH': "FR"})) == \
-        'FR - New intermediate results'
+    assert layout.subject(vote) == 'FR - New intermediate results'
 
-    assert layout.subject(Vote(status='final')) == 'Final results'
+    vote.status = 'final'
+    assert layout.subject(vote) == 'FR - Final results'
