@@ -4,11 +4,13 @@ import humanize
 from contextlib import suppress
 from html import escape
 from morepath.error import LinkError
+from onegov.chat import TextModuleCollection
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import _
 from wtforms.widgets import FileInput
 from wtforms.widgets import ListWidget
 from wtforms.widgets import Select
+from wtforms.widgets import TextArea
 from wtforms.widgets import TextInput
 from wtforms.widgets.core import HTMLString, html_params
 
@@ -173,6 +175,63 @@ class UploadWidget(FileInput):
                 replace_label=field.gettext(_('Replace file')),
                 preview=preview,
             ))
+
+
+class TextAreaWithTextModules(TextArea):
+    """An extension of a regular textarea with a button that lets
+       you select and insert text modules. If no text modules have
+       been defined this will be no different from textarea.
+    """
+    template = chameleon.PageTemplate("""
+        <div class="textarea-widget">
+            <div class="text-module-picker">
+                <span class="text-module-picker-label"
+                      role="button"
+                      aria-expanded="false"
+                      aria-controls="text-module-options_${id}">
+                    ${label}
+                </span>
+                <ul id="text-module-options_${id}"
+                    class="text-module-options"
+                    aria-hidden="true"
+                    tabindex="-1">
+                    <li tal:repeat="text_module text_modules"
+                        class="text-module-option"
+                        tabindex="0"
+                        role="button"
+                        data-value="${text_module.text}">
+                        ${text_module.name}
+                    </li>
+                </ul>
+            </div>
+            <textarea tal:replace="structure input_html"/>
+        </div>
+    """)
+
+    def text_modules(self, field):
+        if not hasattr(field.meta, 'request'):
+            # we depend on the field containing a reference to
+            # the current request, which should be passed from
+            # the form via the meta class
+            return {}
+
+        request = field.meta.request
+        collection = TextModuleCollection(request.session)
+        return collection.query().all()
+
+    def __call__(self, field, **kwargs):
+        input_html = super().__call__(field, **kwargs)
+        text_modules = self.text_modules(field)
+        if not text_modules:
+            return input_html
+
+        field.meta.request.include('text-module-picker')
+        return HTMLString(self.template.render(
+            id=field.id,
+            label=field.gettext(_('Text modules')),
+            text_modules=text_modules,
+            input_html=input_html
+        ))
 
 
 class TagsWidget(TextInput):

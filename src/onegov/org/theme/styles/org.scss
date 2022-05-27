@@ -339,6 +339,7 @@ $globals-height: 2.5rem;
     .management::before { @include icon('\f013'); }
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon('\f016'); }
+    .text-modules::before { @include icon('\f249'); }
     .settings::before { @include icon('\f1de'); }
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
@@ -1588,6 +1589,7 @@ $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $new-stripe-connect-icon: '\f1f5';
 $new-user-icon: '\f234';
+$new-text-module-icon: '\f24a';
 $paste-link-icon: '\f0ea';
 $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
@@ -1715,6 +1717,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-room::before { @include icon($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon($new-user-icon); }
+    .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }

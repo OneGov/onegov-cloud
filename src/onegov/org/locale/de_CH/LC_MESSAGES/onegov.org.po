@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-24 11:23+0200\n"
+"POT-Creation-Date: 2022-05-27 13:30+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -83,6 +83,9 @@ msgstr "Zahlungsanbieter"
 
 msgid "Payments"
 msgstr "Zahlungen"
+
+msgid "Text modules"
+msgstr "Textbausteine"
 
 msgid "Settings"
 msgstr "Einstellungen"
@@ -1476,6 +1479,9 @@ msgstr "Interne Seiten"
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
+msgid "Short name to identify the text module"
+msgstr "Kurzer Name um den Textbaustein zu identifizieren"
+
 msgid "Your note about this ticket"
 msgstr "Ihre Notiz zu dem Ticket"
 
@@ -1740,6 +1746,15 @@ msgstr "Neue Nachricht"
 
 msgid "Ticket Status"
 msgstr "Ticket Status"
+
+msgid "Text module"
+msgstr "Textbaustein"
+
+msgid "Do you really want to delete this text module?"
+msgstr "Möchten Sie diesen Textbaustein wirklich löschen"
+
+msgid "Delete text module"
+msgstr "Textbaustein löschen"
 
 msgid "Reservations"
 msgstr "Reservationen"
@@ -4652,6 +4667,18 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
+
+msgid "Added a new text module"
+msgstr "Textbaustein hinzugefügt"
+
+msgid "New text module"
+msgstr "Neuer Textbaustein"
+
+msgid "Edit text module"
+msgstr "Textbaustein bearbeiten"
+
+msgid "The text module was deleted"
+msgstr "Der Textbaustein wurde gelöscht"
 
 msgid "Delete Ticket"
 msgstr "Ticket löschen"
