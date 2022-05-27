@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-27 13:30+0200\n"
+"POT-Creation-Date: 2022-05-27 15:03+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2221,6 +2221,9 @@ msgstr "Dettagli sulla prenotazione"
 msgid "Edit details"
 msgstr "Modifica dettagli"
 
+msgid "Accept all with message"
+msgstr ""
+
 msgid "Reject all"
 msgstr "Rifiuta tutto"
 
@@ -2232,6 +2235,9 @@ msgstr "Il rifiuto di queste prenotazioni non può essere annullato."
 
 msgid "Reject reservations"
 msgstr "Rifiuta le prenotazioni"
+
+msgid "Reject all with message"
+msgstr ""
 
 #, python-format
 msgid "Reject ${title}"
@@ -3161,6 +3167,9 @@ msgstr "Il numero del biglietto è"
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
 
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
@@ -3169,9 +3178,6 @@ msgstr "Hai un nuovo biglietto"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
-
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
 
 #. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
@@ -4546,6 +4552,20 @@ msgstr "Le prenotazioni sono state accettate"
 msgid "The reservations have already been accepted"
 msgstr "Le prenotazioni sono già state accettate"
 
+msgid "The submitter email is not available"
+msgstr "L'e-mail del mittente non è disponibile"
+
+msgid "Accept all reservation with message"
+msgstr ""
+
+#, python-format
+msgid ""
+"The following message will be sent to ${address} and it will be recorded for "
+"future reference."
+msgstr ""
+"Il seguente messaggio verrà inviato a ${address} e sarà registrato per "
+"riferimento futuro."
+
 msgid ""
 "The payment associated with this reservation needs to be refunded before the "
 "reservation can be rejected"
@@ -4561,6 +4581,9 @@ msgstr "Le prenotazioni sono state rifiutate"
 
 msgid "The reservation was rejected"
 msgstr "La prenotazione è stata rifiutata"
+
+msgid "Reject all reservations with message"
+msgstr ""
 
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"
@@ -4772,9 +4795,6 @@ msgstr "Il biglietto non può essere chiuso perché non è in sospeso"
 msgid "You have closed ticket ${number}"
 msgstr "Hai chiuso il biglietto ${number}"
 
-msgid "The submitter email is not available"
-msgstr "L'e-mail del mittente non è disponibile"
-
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Il biglietto non può essere riaperto perché non è chiuso"
 
@@ -4814,14 +4834,6 @@ msgstr "Il biglietto è già stato chiuso"
 
 msgid "Your message has been sent"
 msgstr "Il tuo messaggio è stato inviato"
-
-#, python-format
-msgid ""
-"The following message will be sent to ${address} and it will be recorded for "
-"future reference."
-msgstr ""
-"Il seguente messaggio verrà inviato a ${address} e sarà registrato per "
-"riferimento futuro."
 
 msgid "Your request has been submitted"
 msgstr "La tua richiesta è stata inviata"

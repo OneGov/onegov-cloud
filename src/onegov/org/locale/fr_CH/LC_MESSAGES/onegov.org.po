@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-27 13:30+0200\n"
+"POT-Creation-Date: 2022-05-27 15:03+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2212,6 +2212,9 @@ msgstr "Détails à propos de la réservation"
 msgid "Edit details"
 msgstr "Modifier les détails"
 
+msgid "Accept all with message"
+msgstr ""
+
 msgid "Reject all"
 msgstr "Tout refuser"
 
@@ -2223,6 +2226,9 @@ msgstr "Le refus de ces réservations est irréversible."
 
 msgid "Reject reservations"
 msgstr "Refuser les réservations"
+
+msgid "Reject all with message"
+msgstr ""
 
 #, python-format
 msgid "Reject ${title}"
@@ -3167,6 +3173,9 @@ msgstr "Le numéro du ticket est"
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées :"
 
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées :"
 
@@ -3175,9 +3184,6 @@ msgstr "Vous avez un nouveau ticket"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Un message a été envoyé à propos de ${ref} :"
-
-msgid "${author} wrote"
-msgstr "${author} a écrit"
 
 #. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
@@ -4551,6 +4557,20 @@ msgstr "Les réservations ont été acceptées"
 msgid "The reservations have already been accepted"
 msgstr "Les réservations ont déjà été acceptées"
 
+msgid "The submitter email is not available"
+msgstr "L'adresse e-mail de l'expéditeur n'est pas disponible"
+
+msgid "Accept all reservation with message"
+msgstr ""
+
+#, python-format
+msgid ""
+"The following message will be sent to ${address} and it will be recorded for "
+"future reference."
+msgstr ""
+"Le message suivant sera envoyé à ${adresse} et sera enregistré pour des "
+"références futures."
+
 msgid ""
 "The payment associated with this reservation needs to be refunded before the "
 "reservation can be rejected"
@@ -4566,6 +4586,9 @@ msgstr "Les réservations ont été rejetées"
 
 msgid "The reservation was rejected"
 msgstr "La réservation a été rejetée"
+
+msgid "Reject all reservations with message"
+msgstr ""
 
 msgid "Added a new daypass"
 msgstr "Nouvel abonnement à la journée ajouté"
@@ -4776,9 +4799,6 @@ msgstr "Le ticket ne peut pas être clôturé car il est en attente"
 msgid "You have closed ticket ${number}"
 msgstr "Vous avez clôturé ${number} ticket(s)"
 
-msgid "The submitter email is not available"
-msgstr "L'adresse e-mail de l'expéditeur n'est pas disponible"
-
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
 
@@ -4819,14 +4839,6 @@ msgstr "Le ticket a déjà été fermé"
 
 msgid "Your message has been sent"
 msgstr "Votre message a été envoyé"
-
-#, python-format
-msgid ""
-"The following message will be sent to ${address} and it will be recorded for "
-"future reference."
-msgstr ""
-"Le message suivant sera envoyé à ${adresse} et sera enregistré pour des "
-"références futures."
 
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"
