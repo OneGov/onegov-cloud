@@ -1,4 +1,3 @@
-from datetime import date
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.feriennet.sponsors import Sponsor
@@ -49,7 +48,7 @@ def test_translate_sponsor():
     }
 
 
-def test_sponsor_languages(client, scenario):
+def test_sponsors(client, scenario):
     client.login_admin()
 
     scenario.add_period(
@@ -69,7 +68,7 @@ def test_sponsor_languages(client, scenario):
                 'bookings': {
                     'src': {
                         'de': 'sponsors/CompanyOne-de.jpg',
-                        'fr': 'sponsors/CompanyOne-de.jpg'
+                        'fr': 'sponsors/CompanyOne-fr.jpg'
                     },
                     'url': {
                         'de': 'https://www.company-one.ch',
@@ -79,7 +78,7 @@ def test_sponsor_languages(client, scenario):
                 'invoices': {
                     'src': {
                         'de': 'sponsors/CompanyOne-de.jpg',
-                        'fr': 'sponsors/CompanyOne-de.jpg'
+                        'fr': 'sponsors/CompanyOne-fr.jpg'
                     },
                     'url': {
                         'de': 'https://www.company-one.ch',
@@ -93,24 +92,30 @@ def test_sponsor_languages(client, scenario):
             'banners': {
                 'bookings': {
                     'src': {
-                        'de': 'sponsors/CompanyTwo-de.jpg'
+                        'fr': 'sponsors/CompanyTwo-fr.jpg',
+                        'de': None
                     },
                     'url': {
-                        'de': 'https://www.company-two.ch'
+                        'fr': 'https://www.company-two.ch',
+                        'de': None
                     },
                     'info': {
-                        'de': 'Partner'
+                        'fr': 'Partenaiere',
+                        'de': None
                     }
                 },
                 'invoices': {
                     'src': {
-                        'de': 'sponsors/Companytwo-de.jpg'
+                        'fr': 'sponsors/Companytwo-fr.jpg',
+                        'de': None
                     },
                     'url': {
-                        'de': 'https://www.company-two.ch'
+                        'fr': 'https://www.company-two.ch',
+                        'de': None
                     },
                     'info': {
-                        'de': 'Partner'
+                        'fr': 'Partenaiere',
+                        'de': None
                     }
                 }
             }
@@ -118,12 +123,15 @@ def test_sponsor_languages(client, scenario):
     ]
 
     del client.app.sponsors
-
     client.app.sponsors = [Sponsor(**sponsor) for sponsor in data]
 
+    # Check if there's a banner and that the company with only french
+    # banners doesn't cause a problem and doesn't show up
     page = client.get('/')
     page = page.click('Wunschliste')
-    assert "Company" in page
+    assert "CompanyOne" in page
+    assert "ConpanyTwo" not in page
+    assert "Partenaiere" not in page
 
 
 def test_timestamp_sponsor():
