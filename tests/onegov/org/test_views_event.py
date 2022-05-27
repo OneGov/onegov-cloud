@@ -561,7 +561,7 @@ def test_import_export_events_with_custom_tags(client):
     data = {
         'event_tags': ['Singing', 'Christmas']
     }
-    with fs.open('eventtags.yml', 'w') as f:
+    with fs.open('eventsettings.yml', 'w') as f:
         yaml.dump(data, f)
 
     # Submit and publish an event
@@ -638,3 +638,15 @@ def test_import_export_events_with_custom_tags(client):
     assert {event.meta['submitter_email'] for event in events} == {
         'sinfonieorchester@govikon.org', 'editor@example.org'
     }
+
+
+def test_event_form_with_custom_lead(client):
+    fs = client.app.filestorage
+    data = {
+        'event_form_lead': 'A completely different lead text'
+    }
+    with fs.open('eventsettings.yml', 'w') as f:
+        yaml.dump(data, f)
+
+    page = client.get('/events').click("Veranstaltung melden")
+    assert 'A completely different lead text' in page
