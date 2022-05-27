@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-27 15:03+0200\n"
+"POT-Creation-Date: 2022-05-27 15:34+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -85,7 +85,7 @@ msgid "Payments"
 msgstr "Pagamenti"
 
 msgid "Text modules"
-msgstr ""
+msgstr "Moduli di testo"
 
 msgid "Settings"
 msgstr "Impostazioni"
@@ -1490,7 +1490,7 @@ msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
 
 msgid "Short name to identify the text module"
-msgstr ""
+msgstr "Nome breve per identificare il modulo di testo"
 
 msgid "Your note about this ticket"
 msgstr "La tua nota su questo biglietto"
@@ -1759,13 +1759,13 @@ msgid "Ticket Status"
 msgstr "Stato del biglietto"
 
 msgid "Text module"
-msgstr ""
+msgstr "Modulo di testo"
 
 msgid "Do you really want to delete this text module?"
-msgstr ""
+msgstr "Confermi di voler eliminare questo modulo di testo?"
 
 msgid "Delete text module"
-msgstr ""
+msgstr "Elimina modulo di testo"
 
 msgid "Reservations"
 msgstr "Prenotazioni"
@@ -2222,7 +2222,7 @@ msgid "Edit details"
 msgstr "Modifica dettagli"
 
 msgid "Accept all with message"
-msgstr ""
+msgstr "Accetta tutto con messaggio"
 
 msgid "Reject all"
 msgstr "Rifiuta tutto"
@@ -2237,7 +2237,7 @@ msgid "Reject reservations"
 msgstr "Rifiuta le prenotazioni"
 
 msgid "Reject all with message"
-msgstr ""
+msgstr "Rifiuta tutto con messaggio"
 
 #, python-format
 msgid "Reject ${title}"
@@ -4556,7 +4556,7 @@ msgid "The submitter email is not available"
 msgstr "L'e-mail del mittente non è disponibile"
 
 msgid "Accept all reservation with message"
-msgstr ""
+msgstr "Accetta tutte le prenotazioni con messaggio"
 
 #, python-format
 msgid ""
@@ -4583,7 +4583,7 @@ msgid "The reservation was rejected"
 msgstr "La prenotazione è stata rifiutata"
 
 msgid "Reject all reservations with message"
-msgstr ""
+msgstr "Rifiuta tutte le prenotazioni con messaggio"
 
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"
@@ -4709,16 +4709,16 @@ msgid "${address} could not be unsubscribed, wrong token"
 msgstr "Impossibile annullare l'iscrizione di ${address}, token errato"
 
 msgid "Added a new text module"
-msgstr ""
+msgstr "Aggiunto un nuovo modulo di testo"
 
 msgid "New text module"
-msgstr ""
+msgstr "Nuovo modulo di testo"
 
 msgid "Edit text module"
-msgstr ""
+msgstr "Modifica modulo di testo"
 
 msgid "The text module was deleted"
-msgstr ""
+msgstr "Il modulo di testo è stato eliminato"
 
 msgid "Delete Ticket"
 msgstr "Cancella biglietto"

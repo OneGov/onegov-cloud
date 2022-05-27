@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-27 15:03+0200\n"
+"POT-Creation-Date: 2022-05-27 15:34+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -86,7 +86,7 @@ msgid "Payments"
 msgstr "Paiements"
 
 msgid "Text modules"
-msgstr ""
+msgstr "Modules de texte"
 
 msgid "Settings"
 msgstr "Paramètres"
@@ -1486,7 +1486,7 @@ msgid "E-Mail Address"
 msgstr "Adresse e-mail"
 
 msgid "Short name to identify the text module"
-msgstr ""
+msgstr "Nom court pour identifier le module de texte"
 
 msgid "Your note about this ticket"
 msgstr "Votre note à propos de ce ticket"
@@ -1750,13 +1750,13 @@ msgid "Ticket Status"
 msgstr "Statut du ticket"
 
 msgid "Text module"
-msgstr ""
+msgstr "Module de texte"
 
 msgid "Do you really want to delete this text module?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer ce module de texte ?"
 
 msgid "Delete text module"
-msgstr ""
+msgstr "Supprimer le module de texte"
 
 msgid "Reservations"
 msgstr "Réservations"
@@ -2213,7 +2213,7 @@ msgid "Edit details"
 msgstr "Modifier les détails"
 
 msgid "Accept all with message"
-msgstr ""
+msgstr "Tout accepter avec message"
 
 msgid "Reject all"
 msgstr "Tout refuser"
@@ -2228,7 +2228,7 @@ msgid "Reject reservations"
 msgstr "Refuser les réservations"
 
 msgid "Reject all with message"
-msgstr ""
+msgstr "Tout refuser avec message"
 
 #, python-format
 msgid "Reject ${title}"
@@ -4561,7 +4561,7 @@ msgid "The submitter email is not available"
 msgstr "L'adresse e-mail de l'expéditeur n'est pas disponible"
 
 msgid "Accept all reservation with message"
-msgstr ""
+msgstr "Accepter toutes les réservations avec le message"
 
 #, python-format
 msgid ""
@@ -4588,7 +4588,7 @@ msgid "The reservation was rejected"
 msgstr "La réservation a été rejetée"
 
 msgid "Reject all reservations with message"
-msgstr ""
+msgstr "Refuser toutes les réservations avec le message"
 
 msgid "Added a new daypass"
 msgstr "Nouvel abonnement à la journée ajouté"
@@ -4713,16 +4713,16 @@ msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
 
 msgid "Added a new text module"
-msgstr ""
+msgstr "Ajout d'un nouveau module de texte"
 
 msgid "New text module"
-msgstr ""
+msgstr "Nouveau module de texte"
 
 msgid "Edit text module"
-msgstr ""
+msgstr "Modifier le module de texte"
 
 msgid "The text module was deleted"
-msgstr ""
+msgstr "Le module de texte a été supprimé"
 
 msgid "Delete Ticket"
 msgstr "Supprimer le ticket"
