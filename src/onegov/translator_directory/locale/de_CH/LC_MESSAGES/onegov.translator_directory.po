@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-12 09:39+0200\n"
+"POT-Creation-Date: 2022-05-29 09:18+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -323,6 +323,18 @@ msgstr "Absteigend"
 msgid "Search in first and last name"
 msgstr "Suche in Vor- und Nachname"
 
+msgid "Admin"
+msgstr "Administrator"
+
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Translator"
+msgstr "Übersetzer/in"
+
 msgid "Yes"
 msgstr "Ja"
 
@@ -356,20 +368,17 @@ msgstr "Abbrechen"
 msgid "Documents"
 msgstr "Dokumente"
 
-msgid "Report change"
-msgstr "Mutation melden"
-
 msgid "Edit translator"
 msgstr "Übersetzer/in bearbeiten"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
 
-msgid "Add language"
-msgstr "Sprache hinzufügen"
-
 msgid "Export Excel"
 msgstr "Export Excel"
+
+msgid "Add language"
+msgstr "Sprache hinzufügen"
 
 msgid "This language is used and can't be deleted."
 msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden."
@@ -419,15 +428,6 @@ msgstr "Schreibende"
 msgid "Administrator"
 msgstr "Administrator"
 
-msgid "Editor"
-msgstr "Editor"
-
-msgid "Member"
-msgstr "Mitglied"
-
-msgid "Translator"
-msgstr "Übersetzer/in"
-
 msgid "Administrators"
 msgstr "Administratoren"
 
@@ -471,6 +471,9 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
+
+msgid "An account was created for you"
+msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "Submit Search"
 msgstr "Suchen"

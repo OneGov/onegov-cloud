@@ -214,13 +214,6 @@ class TranslatorCollectionLayout(DefaultLayout):
                             ),
                             attrs={'class': 'new-person'}
                         ),
-                        Link(
-                            text=_("Add language"),
-                            url=self.request.class_link(
-                                LanguageCollection, name='new'
-                            ),
-                            attrs={'class': 'new-language'}
-                        )
                     )
                 ),
                 Link(
