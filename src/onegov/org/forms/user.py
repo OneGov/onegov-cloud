@@ -70,6 +70,12 @@ class ManageUserForm(Form):
         self.request.include('tags-input')
 
     def populate_obj(self, model):
+        if (
+            model.role != self.role.data
+            or model.active != self.active
+        ):
+            model.logout_all_sessions(self.request)
+
         super().populate_obj(model)
         model.active = self.active
 

@@ -239,6 +239,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         If no data is written to the browser_session, no session_id cookie
         is created.
 
+        The session_id is rotated when users log in but not when they log out,
+        that way we can still identify them and send messages when they log
+        out.
+
         """
 
         if 'session_id' in self.cookies:
@@ -249,9 +253,6 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         def on_dirty(session, token):
 
-            # once the cookie has been set, we do not change it, not even if
-            # the user logs out - this way we can still identify the user and
-            # send him messages, for example when logging out
             if 'session_id' in self.cookies:
                 return
 

@@ -238,7 +238,7 @@ To list database changes since a release:
 
 To run all tests (this will take ~ 30 minutes):
 
-    py.test
+    pytest
 
 To run all tests concurrently with 2 processes (~ 15 minutes):
 
@@ -246,15 +246,15 @@ To run all tests concurrently with 2 processes (~ 15 minutes):
 
 To run the tests of a single module:
 
-    py.test tests/onegov/core
+    pytest tests/onegov/core
 
 To keep track of changes and only re-run necessary tests:
 
-    py.test --testmon
+    pytest --testmon
 
 To get an image with profiling information (requires graphviz):
 
-    py.test --profile-svg
+    pytest --profile-svg
 
 To use a RAM located database:
 
