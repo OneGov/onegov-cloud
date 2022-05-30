@@ -18,7 +18,7 @@ from onegov.translator_directory.theme import TranslatorDirectoryTheme
 
 class TranslatorDirectoryApp(OrgApp):
 
-    send_daily_ticket_statistics = False
+    send_ticket_statistics = False
     request_class = TranslatorAppRequest
 
     def es_may_use_private_search(self, request):

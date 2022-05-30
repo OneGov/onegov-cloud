@@ -156,11 +156,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line.value = self.email
 
         if 'phone' not in exclude and self.phone:
-            line = result.add('tel')
+            line = result.add('tel;type=work')
             line.value = self.phone
 
         if 'phone_direct' not in exclude and self.phone_direct:
-            line = result.add('tel')
+            line = result.add('tel;type=work;type=pref')
             line.value = self.phone_direct
 
         if 'website' not in exclude and self.website:

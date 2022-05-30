@@ -6,11 +6,11 @@ $footer-hover-color: $primary-fg-color;
 
 .footer-container {
     background-color: $primary-color;
-    margin-top: 50px;
+    padding: 1rem 0;
 }
 
-#page-root .footer-container {
-    margin-top: 0;
+#page-root .content {
+    padding-bottom: 0;
 }
 
 .footer-content {
@@ -41,8 +41,9 @@ $footer-hover-color: $primary-fg-color;
             margin-bottom: .5rem;
         }
 
-        p, span {
-            opacity: 0.75;
+        p,
+        span {
+            opacity: .75;
         }
 
         a:hover {

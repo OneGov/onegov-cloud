@@ -4,8 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="body">
         <p i18n:translate>Good morning,</p>
-        <p i18n:translate tal:condition="not:is_monday">This is what happend on the <span tal:replace='org' i18n:name='org' /> website yesterday:</p>
-        <p i18n:translate tal:condition="is_monday">This is what happend on the <span tal:replace='org' i18n:name='org' /> website over the weekend:</p>
+        <p i18n:translate>This is what happend on the <span tal:replace='org' i18n:name='org' /> website over the past week:</p>
 
         <ul>
             <li tal:condition="opened != 1">${opened} <span i18n:translate>tickets were opened.</span></li>
@@ -25,15 +24,14 @@
             <span tal:condition="currently_pending == 1"><span i18n:translate>1 ticket is <a href="${pending_link}" i18n:name="pending_1" i18n:translate="pending_1">pending</a>.</span></span>
         </p>
 
-        <p i18n:translate tal:condition="is_monday">Have a great week!</p>
-        <p i18n:translate tal:condition="not:is_monday">Have a great day!</p>
+        <p i18n:translate>Have a great week!</p>
 
         <tal:b metal:use-macro="layout.macros['sender']" />
     </tal:b>
     <tal:b metal:fill-slot="above-footer">
         <p>
             <span i18n:translate>
-                This is the daily OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it by clicking on
+                This is the weekly OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it by clicking on
             </span>
             <strong>
                 <a href="${unsubscribe}" i18n:translate>unsubscribe</a>.

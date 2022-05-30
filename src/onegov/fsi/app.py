@@ -13,8 +13,8 @@ class FsiApp(OrgApp):
     request_class = FsiRequest
 
     # FSI doesn't really deal with tickets much, so no reason to send the
-    # daily ticket statistics.
-    send_daily_ticket_statistics = False
+    # ticket statistics.
+    send_ticket_statistics = False
 
     def es_may_use_private_search(self, request):
         return request.is_admin

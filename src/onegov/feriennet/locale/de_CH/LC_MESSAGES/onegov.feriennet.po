@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-01 13:21+0100\n"
+"POT-Creation-Date: 2022-05-05 13:21+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -385,6 +385,18 @@ msgstr "Beantragt"
 msgid "Published"
 msgstr "Veröffentlicht"
 
+msgid "Daily"
+msgstr "Täglich"
+
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+msgid "Monthly"
+msgstr "Monatlich"
+
+msgid "Never"
+msgstr "Nie"
+
 msgid "Mr."
 msgstr "Herr"
 
@@ -613,8 +625,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "AGB"
 
@@ -1183,11 +1195,20 @@ msgstr ""
 "Es ist nicht möglich eine Blockzeit zu erfassen wenn Teilnehmende auf ein "
 "Angebot pro Tag beschränkt sind."
 
-msgid "Send a daily status e-mail."
-msgstr "Ein tägliches Status E-Mail senden."
+msgid "Send a periodic status e-mail."
+msgstr "Ein periodisches Status E-Mail senden."
 
 msgid "General"
 msgstr "Allgemein"
+
+msgid "Daily (exluding the weekend)"
+msgstr "Täglich (abgesehen vom Wochenende)"
+
+msgid "Weekly (on mondays)"
+msgstr "Wöchentlich (am Montag)"
+
+msgid "Monthly (on first monday of the month)"
+msgstr "Monatlich (am ersten Montag des Monats)"
 
 msgid "Salutation"
 msgstr "Anrede"
