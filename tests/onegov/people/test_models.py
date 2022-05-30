@@ -85,8 +85,8 @@ def test_vcard(session):
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard
     assert "ORG;CHARSET=utf-8:Agency\\, Membership" in vcard
     assert "PHOTO:https://thats.me/hans-maulwurf/picture" in vcard
-    assert "TEL:11122334455" in vcard
-    assert "TEL:11122334456" in vcard
+    assert "TEL;TYPE=WORK:11122334455" in vcard
+    assert "TEL;TYPE=WORK;TYPE=PREF:11122334456" in vcard
     assert "TITLE;CHARSET=utf-8:Director" in vcard
     assert "URL:https://thats.me/hans-maulwurf" in vcard
     assert "NOTE;CHARSET=utf-8:" not in vcard
@@ -111,8 +111,8 @@ def test_vcard(session):
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;;" in vcard
     assert "ORG;CHARSET=utf-8:Agency\\, Membership" in vcard
     assert "PHOTO:" not in vcard
-    assert "TEL:11122334455" in vcard
-    assert "TEL:11122334456" not in vcard
+    assert "TEL;TYPE=WORK:11122334455" in vcard
+    assert "TEL;TYPE=WORK;TYPE=PREF:11122334456" not in vcard
     assert "TITLE;CHARSET=utf-8:" not in vcard
     assert "URL:" not in vcard
     assert "NOTE;CHARSET=utf-8:Has bad vision." in vcard
@@ -127,8 +127,8 @@ def test_vcard(session):
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard
     assert "ORG;CHARSET=utf-8:Agency\\, Membership" in vcard
     assert "PHOTO:https://thats.me/hans-maulwurf/picture" in vcard
-    assert "TEL:11122334455" in vcard
-    assert "TEL:11122334456" in vcard
+    assert "TEL;TYPE=WORK:11122334455" in vcard
+    assert "TEL;TYPE=WORK;TYPE=PREF:11122334456" in vcard
     assert "TITLE;CHARSET=utf-8:Director" in vcard
     assert "URL:https://thats.me/hans-maulwurf" in vcard
     assert "NOTE;CHARSET=utf-8:" not in vcard
