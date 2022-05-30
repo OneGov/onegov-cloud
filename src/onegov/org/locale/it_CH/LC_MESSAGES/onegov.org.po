@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-23 11:05+0200\n"
+"POT-Creation-Date: 2022-05-30 14:43+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3155,8 +3155,8 @@ msgstr "${event} ritirato."
 msgid "File signed."
 msgstr "File firmato."
 
-msgid "Signed file removed."
-msgstr "File firmato rimosso."
+msgid "File with digital seal removed."
+msgstr "File con sigillo digitale cancellato."
 
 msgid "${amount} marked as paid."
 msgstr "${amount} contrassegnato come pagato."
@@ -4763,6 +4763,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Signed file removed."
+#~ msgstr "File firmato rimosso."
 
 #~ msgid "Unsigned"
 #~ msgstr "Non firmato"

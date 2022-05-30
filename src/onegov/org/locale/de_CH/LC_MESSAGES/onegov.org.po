@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-23 11:05+0200\n"
+"POT-Creation-Date: 2022-05-30 14:38+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3159,8 +3159,8 @@ msgstr "${event} zurückgezogen."
 msgid "File signed."
 msgstr "Datei signiert."
 
-msgid "Signed file removed."
-msgstr "Signierte Datei gelöscht."
+msgid "File with digital seal removed."
+msgstr "Datei mit digitalem Siegel gelöscht."
 
 msgid "${amount} marked as paid."
 msgstr "${amount} als bezahlt markiert."
@@ -4755,6 +4755,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Signed file removed."
+#~ msgstr "Signierte Datei gelöscht."
 
 #~ msgid "Unsigned"
 #~ msgstr "Unsigniert"

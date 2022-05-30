@@ -24,12 +24,12 @@ def test_sign_document(client):
 
     # seals are only used if yubikeys are used
     page = client.get(f'/storage/{pdf.id}/details')
-    assert 'seals' not in page
+    assert 'Siegel' not in page
 
     client.app.enable_yubikey = True
 
     page = client.get(f'/storage/{pdf.id}/details')
-    assert 'seals' in page
+    assert 'Siegel' in page
 
     # applying a seal only works if the given user has a yubikey setup
     def sign(client, page, token):
@@ -72,12 +72,12 @@ def test_sign_document(client):
 
         with vcr.use_cassette(tape, record_mode='none'):
 
-            assert "signiert von admin@example.org" in sign(
+            assert "Digitales Siegel angewendet von admin@example.org" in sign(
                 client, page, 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded')
 
         with vcr.use_cassette(tape, record_mode='none'):
 
-            assert "Datei hat bereits eine digital Signatur" in sign(
+            assert "Diese Datei hat bereits ein digitales Siegel" in sign(
                 client, page, 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded')
 
     # we should at this point see some useful metadata on the file
@@ -94,4 +94,5 @@ def test_sign_document(client):
     # at this point should yield another message
     pdf = FileCollection(client.app.session()).query().one()
     client.get(f'/storage/{pdf.id}/details').click("Löschen")
-    assert 'Datei mit Siegel gel\\u00f6scht' in client.get('/timeline').text
+    assert 'Datei mit digitalem Siegel gel\\u00f6scht' in client.get(
+        '/timeline').text
