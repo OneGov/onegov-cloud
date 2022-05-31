@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-05 13:21+0200\n"
+"POT-Creation-Date: 2022-05-24 15:51+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -626,8 +626,8 @@ msgstr "Ignorare restrizioni di età"
 msgid "Accept TOS"
 msgstr "Accettare CG"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "CG"
 
@@ -1431,6 +1431,9 @@ msgstr "Aiutare"
 msgid "Register as Volunteer"
 msgstr "Registrazione come aiutante"
 
+msgid "Sort"
+msgstr ""
+
 msgid "Half day"
 msgstr "Mezza giornata"
 
@@ -2048,6 +2051,9 @@ msgstr ""
 "una buona ripartizione, è possibile registrare il bambino per più attività "
 "di ${count}."
 
+msgid "Each child can be registered for up to ${count} activities."
+msgstr "Ad ogni bambino può essere iscritto a fino a ${count} attività."
+
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
@@ -2473,6 +2479,9 @@ msgstr "L'attività è stata rifiutata"
 
 msgid "Your ticket has been opened"
 msgstr "Il biglietto è stato aperto"
+
+msgid "New ticket"
+msgstr ""
 
 msgid "Thank you for your proposal!"
 msgstr "Grazie per la vostra applicazione!"

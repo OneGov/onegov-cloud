@@ -649,6 +649,11 @@
             Each child is assigned up to <tal:b i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> activities. To ensure a good matching you can signup for more activities than those.
     </div>
 
+    <div tal:condition="period.max_bookings_per_attendee and not period.confirmable"
+         class="hint hint-max-activities" i18n:translate>
+            Each child can be registered for up to <tal:b i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> activities.
+    </div>
+
     <div tal:condition="period.all_inclusive and period.booking_cost"
          class="hint hint-costs" i18n:translate>
             The passport costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
