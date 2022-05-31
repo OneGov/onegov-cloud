@@ -1,0 +1,42 @@
+.text-module-picker {
+    position: relative;
+    display: inline-block;
+    float: right;
+    padding: 3px 5px;
+    cursor: pointer;
+}
+
+.text-module-options {
+    display: none;
+    position: absolute;
+    top: 31px;
+    left: 0;
+    min-width: 100%;
+    margin: 0;
+    border: 1px solid #ccc;
+    list-style: none;
+}
+
+.text-module-picker.active .text-module-options {
+    display: block;
+}
+
+.text-module-option {
+    padding: 3px 5px;
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.text-module-option:hover, .text-module-option:focus {
+    background: #eee;
+    outline: none;
+}
+
+.text-module-option:last-child {
+    border-bottom: 0;
+}
+
+.text-module-picker textarea {
+    clear: both;
+}
