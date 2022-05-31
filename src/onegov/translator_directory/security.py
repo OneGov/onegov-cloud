@@ -1,4 +1,3 @@
-from onegov.core.security import Personal
 from onegov.file import File
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -16,16 +15,11 @@ Secret: admins
 """
 
 
-@TranslatorDirectoryApp.permission_rule(model=object, permission=Personal)
-def local_is_logged_in(app, identity, model, permission):
-    return identity.role in ('admin', 'editor', 'member')
-
-
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
 def hide_translator_for_non_admins(app, identity, model, permission):
     if model.for_admins_only and identity.role != 'admin':
         return False
-    return local_is_logged_in(app, identity, model, permission)
+    return permission in getattr(app.settings.roles, identity.role)
 
 
 @TranslatorDirectoryApp.permission_rule(

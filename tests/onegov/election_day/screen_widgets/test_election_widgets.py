@@ -167,66 +167,62 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
 
-    assert data == {
-        'candidates': [
-            ('Hegglin', 'Peter', True, 'CVP', 10693, None, None),
-            ('Eder', 'Joachim', True, 'FDP', 10103, None, None),
-            ('Brandenberg', 'Manuel', False, 'SVP', 4845, None, None),
-            ('Gysel', 'Barbara', False, 'SP', 2890, None, None),
-            ('Lustenberger', 'Andreas', False, 'Grüne', 2541, None, None),
-            ('Thöni', 'Stefan', False, 'Piraten', 746, None, None)
-        ],
-        'candidates_by_entites': (
-            [
-                ('Brandenberg', 'Manuel', 4845),
-                ('Eder', 'Joachim', 10103),
-                ('Gysel', 'Barbara', 2890),
-                ('Hegglin', 'Peter', 10693),
-                ('Lustenberger', 'Andreas', 2541),
-                ('Thöni', 'Stefan', 746)
-            ],
-            [
-                ('Baar', [
-                    ('Baar', 'Brandenberg', 'Manuel', 2100),
-                    ('Baar', 'Eder', 'Joachim', 4237),
-                    ('Baar', 'Gysel', 'Barbara', 1264),
-                    ('Baar', 'Hegglin', 'Peter', 4207),
-                    ('Baar', 'Lustenberger', 'Andreas', 1269),
-                    ('Baar', 'Thöni', 'Stefan', 320)
-                ]),
-                ('Cham', [
-                    ('Cham', 'Brandenberg', 'Manuel', 1404),
-                    ('Cham', 'Eder', 'Joachim', 2726),
-                    ('Cham', 'Gysel', 'Barbara', 888),
-                    ('Cham', 'Hegglin', 'Peter', 2905),
-                    ('Cham', 'Lustenberger', 'Andreas', 685),
-                    ('Cham', 'Thöni', 'Stefan', 232)
-                ]),
-                ('Hünenberg', [
-                    ('Hünenberg', 'Brandenberg', 'Manuel', 881),
-                    ('Hünenberg', 'Eder', 'Joachim', 2098),
-                    ('Hünenberg', 'Gysel', 'Barbara', 540),
-                    ('Hünenberg', 'Hegglin', 'Peter', 2205),
-                    ('Hünenberg', 'Lustenberger', 'Andreas', 397),
-                    ('Hünenberg', 'Thöni', 'Stefan', 140)
-                ]),
-                ('Menzingen', [
-                    ('Menzingen', 'Brandenberg', 'Manuel', 460),
-                    ('Menzingen', 'Eder', 'Joachim', 1042),
-                    ('Menzingen', 'Gysel', 'Barbara', 198),
-                    ('Menzingen', 'Hegglin', 'Peter', 1376),
-                    ('Menzingen', 'Lustenberger', 'Andreas', 190),
-                    ('Menzingen', 'Thöni', 'Stefan', 54)
-                ])
-            ]
-        ),
-        'election': model,
-        'embed': False,
-        'entities': 'Baar, Cham, Hünenberg, Menzingen',
-        'layout': layout,
-        'model': model,
-        'request': request,
-    }
+    assert data['candidates'] == [
+        ('Hegglin', 'Peter', True, 'CVP', 10693, None, None),
+        ('Eder', 'Joachim', True, 'FDP', 10103, None, None),
+        ('Brandenberg', 'Manuel', False, 'SVP', 4845, None, None),
+        ('Gysel', 'Barbara', False, 'SP', 2890, None, None),
+        ('Lustenberger', 'Andreas', False, 'Grüne', 2541, None, None),
+        ('Thöni', 'Stefan', False, 'Piraten', 746, None, None)
+    ]
+    assert [c[1:] for c in data['candidates_by_entites'][0]] == [
+        ('Hegglin', 'Peter', 10693),
+        ('Eder', 'Joachim', 10103),
+        ('Brandenberg', 'Manuel', 4845),
+        ('Gysel', 'Barbara', 2890),
+        ('Lustenberger', 'Andreas', 2541),
+        ('Thöni', 'Stefan', 746)
+    ]
+    assert data['candidates_by_entites'][1] == [
+        ('Baar', [
+            ('Baar', 'Hegglin', 'Peter', 4207),
+            ('Baar', 'Eder', 'Joachim', 4237),
+            ('Baar', 'Brandenberg', 'Manuel', 2100),
+            ('Baar', 'Gysel', 'Barbara', 1264),
+            ('Baar', 'Lustenberger', 'Andreas', 1269),
+            ('Baar', 'Thöni', 'Stefan', 320)
+        ]),
+        ('Cham', [
+            ('Cham', 'Hegglin', 'Peter', 2905),
+            ('Cham', 'Eder', 'Joachim', 2726),
+            ('Cham', 'Brandenberg', 'Manuel', 1404),
+            ('Cham', 'Gysel', 'Barbara', 888),
+            ('Cham', 'Lustenberger', 'Andreas', 685),
+            ('Cham', 'Thöni', 'Stefan', 232)
+        ]),
+        ('Hünenberg', [
+            ('Hünenberg', 'Hegglin', 'Peter', 2205),
+            ('Hünenberg', 'Eder', 'Joachim', 2098),
+            ('Hünenberg', 'Brandenberg', 'Manuel', 881),
+            ('Hünenberg', 'Gysel', 'Barbara', 540),
+            ('Hünenberg', 'Lustenberger', 'Andreas', 397),
+            ('Hünenberg', 'Thöni', 'Stefan', 140)
+        ]),
+        ('Menzingen', [
+            ('Menzingen', 'Hegglin', 'Peter', 1376),
+            ('Menzingen', 'Eder', 'Joachim', 1042),
+            ('Menzingen', 'Brandenberg', 'Manuel', 460),
+            ('Menzingen', 'Gysel', 'Barbara', 198),
+            ('Menzingen', 'Lustenberger', 'Andreas', 190),
+            ('Menzingen', 'Thöni', 'Stefan', 54)
+        ])
+    ]
+    assert data['election'] == model
+    assert data['embed'] == False
+    assert data['entities'] == 'Baar, Cham, Hünenberg, Menzingen'
+    assert data['layout'] == layout
+    assert data['model'] == model
+    assert data['request'] == request
 
     result = transform_structure(widgets, structure)
     result = PageTemplate(result)(**data)
@@ -293,125 +289,122 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
 
-    assert data == {
-        'candidates': [
-            ('Hegglin', 'Peter', True, 'CVP', 24132, None, None),
-            ('Eder', 'Joachim', True, 'FDP', 23620, None, None),
-            ('Brandenberg', 'Manuel', False, 'SVP', 10997, None, None),
-            ('Gysel', 'Barbara', False, 'SP', 6612, None, None),
-            ('Lustenberger', 'Andreas', False, 'Grüne', 5691, None, None),
-            ('Thöni', 'Stefan', False, 'Piraten', 1709, None, None)
-        ],
-        'candidates_by_entites': (
-            [
-                ('Brandenberg', 'Manuel', 10997),
-                ('Eder', 'Joachim', 23620),
-                ('Gysel', 'Barbara', 6612),
-                ('Hegglin', 'Peter', 24132),
-                ('Lustenberger', 'Andreas', 5691),
-                ('Thöni', 'Stefan', 1709)
-            ],
-            [
-                ('Baar', [
-                    ('Baar', 'Brandenberg', 'Manuel', 2100),
-                    ('Baar', 'Eder', 'Joachim', 4237),
-                    ('Baar', 'Gysel', 'Barbara', 1264),
-                    ('Baar', 'Hegglin', 'Peter', 4207),
-                    ('Baar', 'Lustenberger', 'Andreas', 1269),
-                    ('Baar', 'Thöni', 'Stefan', 320)
-                ]),
-                ('Cham', [
-                    ('Cham', 'Brandenberg', 'Manuel', 1404),
-                    ('Cham', 'Eder', 'Joachim', 2726),
-                    ('Cham', 'Gysel', 'Barbara', 888),
-                    ('Cham', 'Hegglin', 'Peter', 2905),
-                    ('Cham', 'Lustenberger', 'Andreas', 685),
-                    ('Cham', 'Thöni', 'Stefan', 232)
-                ]),
-                ('Hünenberg', [
-                    ('Hünenberg', 'Brandenberg', 'Manuel', 881),
-                    ('Hünenberg', 'Eder', 'Joachim', 2098),
-                    ('Hünenberg', 'Gysel', 'Barbara', 540),
-                    ('Hünenberg', 'Hegglin', 'Peter', 2205),
-                    ('Hünenberg', 'Lustenberger', 'Andreas', 397),
-                    ('Hünenberg', 'Thöni', 'Stefan', 140)
-                ]),
-                ('Menzingen', [
-                    ('Menzingen', 'Brandenberg', 'Manuel', 460),
-                    ('Menzingen', 'Eder', 'Joachim', 1042),
-                    ('Menzingen', 'Gysel', 'Barbara', 198),
-                    ('Menzingen', 'Hegglin', 'Peter', 1376),
-                    ('Menzingen', 'Lustenberger', 'Andreas', 190),
-                    ('Menzingen', 'Thöni', 'Stefan', 54)
-                ]),
-                ('Neuheim', [
-                    ('Neuheim', 'Brandenberg', 'Manuel', 235),
-                    ('Neuheim', 'Eder', 'Joachim', 453),
-                    ('Neuheim', 'Gysel', 'Barbara', 92),
-                    ('Neuheim', 'Hegglin', 'Peter', 511),
-                    ('Neuheim', 'Lustenberger', 'Andreas', 94),
-                    ('Neuheim', 'Thöni', 'Stefan', 26)
-                ]),
-                ('Oberägeri', [
-                    ('Oberägeri', 'Brandenberg', 'Manuel', 656),
-                    ('Oberägeri', 'Eder', 'Joachim', 1380),
-                    ('Oberägeri', 'Gysel', 'Barbara', 191),
-                    ('Oberägeri', 'Hegglin', 'Peter', 1276),
-                    ('Oberägeri', 'Lustenberger', 'Andreas', 150),
-                    ('Oberägeri', 'Thöni', 'Stefan', 72)
-                ]),
-                ('Risch', [
-                    ('Risch', 'Brandenberg', 'Manuel', 1041),
-                    ('Risch', 'Eder', 'Joachim', 1797),
-                    ('Risch', 'Gysel', 'Barbara', 391),
-                    ('Risch', 'Hegglin', 'Peter', 1730),
-                    ('Risch', 'Lustenberger', 'Andreas', 362),
-                    ('Risch', 'Thöni', 'Stefan', 137)
-                ]),
-                ('Steinhausen', [
-                    ('Steinhausen', 'Brandenberg', 'Manuel', 789),
-                    ('Steinhausen', 'Eder', 'Joachim', 1827),
-                    ('Steinhausen', 'Gysel', 'Barbara', 523),
-                    ('Steinhausen', 'Hegglin', 'Peter', 1883),
-                    ('Steinhausen', 'Lustenberger', 'Andreas', 490),
-                    ('Steinhausen', 'Thöni', 'Stefan', 171)
-                ]),
-                ('Unterägeri', [
-                    ('Unterägeri', 'Brandenberg', 'Manuel', 860),
-                    ('Unterägeri', 'Eder', 'Joachim', 2054),
-                    ('Unterägeri', 'Gysel', 'Barbara', 320),
-                    ('Unterägeri', 'Hegglin', 'Peter', 1779),
-                    ('Unterägeri', 'Lustenberger', 'Andreas', 258),
-                    ('Unterägeri', 'Thöni', 'Stefan', 85)
-                ]),
-                ('Walchwil', [
-                    ('Walchwil', 'Brandenberg', 'Manuel', 416),
-                    ('Walchwil', 'Eder', 'Joachim', 756),
-                    ('Walchwil', 'Gysel', 'Barbara', 151),
-                    ('Walchwil', 'Hegglin', 'Peter', 801),
-                    ('Walchwil', 'Lustenberger', 'Andreas', 93),
-                    ('Walchwil', 'Thöni', 'Stefan', 39)
-                ]),
-                ('Zug', [
-                    ('Zug', 'Brandenberg', 'Manuel', 2155),
-                    ('Zug', 'Eder', 'Joachim', 5250),
-                    ('Zug', 'Gysel', 'Barbara', 2054),
-                    ('Zug', 'Hegglin', 'Peter', 5459),
-                    ('Zug', 'Lustenberger', 'Andreas', 1703),
-                    ('Zug', 'Thöni', 'Stefan', 433)
-                ])
-            ]
-        ),
-        'election': model,
-        'embed': False,
-        'entities': (
-            'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
-            'Steinhausen, Unterägeri, Walchwil, Zug'
-        ),
-        'layout': layout,
-        'model': model,
-        'request': request,
-    }
+    assert data['candidates'] == [
+        ('Hegglin', 'Peter', True, 'CVP', 24132, None, None),
+        ('Eder', 'Joachim', True, 'FDP', 23620, None, None),
+        ('Brandenberg', 'Manuel', False, 'SVP', 10997, None, None),
+        ('Gysel', 'Barbara', False, 'SP', 6612, None, None),
+        ('Lustenberger', 'Andreas', False, 'Grüne', 5691, None, None),
+        ('Thöni', 'Stefan', False, 'Piraten', 1709, None, None)
+    ]
+    assert [c[1:] for c in data['candidates_by_entites'][0]] == [
+        ('Hegglin', 'Peter', 24132),
+        ('Eder', 'Joachim', 23620),
+        ('Brandenberg', 'Manuel', 10997),
+        ('Gysel', 'Barbara', 6612),
+        ('Lustenberger', 'Andreas', 5691),
+        ('Thöni', 'Stefan', 1709)
+    ]
+    assert data['candidates_by_entites'][1] == [
+        ('Baar', [
+            ('Baar', 'Hegglin', 'Peter', 4207),
+            ('Baar', 'Eder', 'Joachim', 4237),
+            ('Baar', 'Brandenberg', 'Manuel', 2100),
+            ('Baar', 'Gysel', 'Barbara', 1264),
+            ('Baar', 'Lustenberger', 'Andreas', 1269),
+            ('Baar', 'Thöni', 'Stefan', 320)
+        ]),
+        ('Cham', [
+            ('Cham', 'Hegglin', 'Peter', 2905),
+            ('Cham', 'Eder', 'Joachim', 2726),
+            ('Cham', 'Brandenberg', 'Manuel', 1404),
+            ('Cham', 'Gysel', 'Barbara', 888),
+            ('Cham', 'Lustenberger', 'Andreas', 685),
+            ('Cham', 'Thöni', 'Stefan', 232)
+        ]),
+        ('Hünenberg', [
+            ('Hünenberg', 'Hegglin', 'Peter', 2205),
+            ('Hünenberg', 'Eder', 'Joachim', 2098),
+            ('Hünenberg', 'Brandenberg', 'Manuel', 881),
+            ('Hünenberg', 'Gysel', 'Barbara', 540),
+            ('Hünenberg', 'Lustenberger', 'Andreas', 397),
+            ('Hünenberg', 'Thöni', 'Stefan', 140)
+        ]),
+        ('Menzingen', [
+            ('Menzingen', 'Hegglin', 'Peter', 1376),
+            ('Menzingen', 'Eder', 'Joachim', 1042),
+            ('Menzingen', 'Brandenberg', 'Manuel', 460),
+            ('Menzingen', 'Gysel', 'Barbara', 198),
+            ('Menzingen', 'Lustenberger', 'Andreas', 190),
+            ('Menzingen', 'Thöni', 'Stefan', 54)
+        ]),
+        ('Neuheim', [
+            ('Neuheim', 'Hegglin', 'Peter', 511),
+            ('Neuheim', 'Eder', 'Joachim', 453),
+            ('Neuheim', 'Brandenberg', 'Manuel', 235),
+            ('Neuheim', 'Gysel', 'Barbara', 92),
+            ('Neuheim', 'Lustenberger', 'Andreas', 94),
+            ('Neuheim', 'Thöni', 'Stefan', 26)
+        ]),
+        ('Oberägeri', [
+            ('Oberägeri', 'Hegglin', 'Peter', 1276),
+            ('Oberägeri', 'Eder', 'Joachim', 1380),
+            ('Oberägeri', 'Brandenberg', 'Manuel', 656),
+            ('Oberägeri', 'Gysel', 'Barbara', 191),
+            ('Oberägeri', 'Lustenberger', 'Andreas', 150),
+            ('Oberägeri', 'Thöni', 'Stefan', 72)
+        ]),
+        ('Risch', [
+            ('Risch', 'Hegglin', 'Peter', 1730),
+            ('Risch', 'Eder', 'Joachim', 1797),
+            ('Risch', 'Brandenberg', 'Manuel', 1041),
+            ('Risch', 'Gysel', 'Barbara', 391),
+            ('Risch', 'Lustenberger', 'Andreas', 362),
+            ('Risch', 'Thöni', 'Stefan', 137)
+        ]),
+        ('Steinhausen', [
+            ('Steinhausen', 'Hegglin', 'Peter', 1883),
+            ('Steinhausen', 'Eder', 'Joachim', 1827),
+            ('Steinhausen', 'Brandenberg', 'Manuel', 789),
+            ('Steinhausen', 'Gysel', 'Barbara', 523),
+            ('Steinhausen', 'Lustenberger', 'Andreas', 490),
+            ('Steinhausen', 'Thöni', 'Stefan', 171)
+        ]),
+        ('Unterägeri', [
+            ('Unterägeri', 'Hegglin', 'Peter', 1779),
+            ('Unterägeri', 'Eder', 'Joachim', 2054),
+            ('Unterägeri', 'Brandenberg', 'Manuel', 860),
+            ('Unterägeri', 'Gysel', 'Barbara', 320),
+            ('Unterägeri', 'Lustenberger', 'Andreas', 258),
+            ('Unterägeri', 'Thöni', 'Stefan', 85)
+        ]),
+        ('Walchwil', [
+            ('Walchwil', 'Hegglin', 'Peter', 801),
+            ('Walchwil', 'Eder', 'Joachim', 756),
+            ('Walchwil', 'Brandenberg', 'Manuel', 416),
+            ('Walchwil', 'Gysel', 'Barbara', 151),
+            ('Walchwil', 'Lustenberger', 'Andreas', 93),
+            ('Walchwil', 'Thöni', 'Stefan', 39)
+        ]),
+        ('Zug', [
+            ('Zug', 'Hegglin', 'Peter', 5459),
+            ('Zug', 'Eder', 'Joachim', 5250),
+            ('Zug', 'Brandenberg', 'Manuel', 2155),
+            ('Zug', 'Gysel', 'Barbara', 2054),
+            ('Zug', 'Lustenberger', 'Andreas', 1703),
+            ('Zug', 'Thöni', 'Stefan', 433)
+        ])
+    ]
+
+    assert data['election'] == model
+    assert data['embed'] == False
+    assert data['entities'] == (
+        'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
+        'Steinhausen, Unterägeri, Walchwil, Zug'
+    )
+    assert data['layout'] == layout
+    assert data['model'] == model
+    assert data['request'] == request
 
     result = transform_structure(widgets, structure)
     result = PageTemplate(result)(**data)
