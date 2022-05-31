@@ -186,6 +186,7 @@ class TextAreaWithTextModules(TextArea):
         <div class="textarea-widget">
             <div class="text-module-picker">
                 <span class="text-module-picker-label"
+                      title="Ctrl+i"
                       role="button"
                       aria-expanded="false"
                       aria-controls="text-module-options_${id}">
