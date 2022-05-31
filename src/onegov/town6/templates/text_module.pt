@@ -1,0 +1,15 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <dl class="field-display">
+            <div>
+                <dt i18n:translate>Text</dt>
+                <dd>
+                    ${structure:layout.model.formatted_text}
+                </dd>
+            </div>
+        </dl>
+    </tal:block>
+</div>

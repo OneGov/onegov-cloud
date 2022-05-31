@@ -98,6 +98,12 @@ def get_preview_widget_asset():
     yield 'preview-widget.js'
 
 
+@FormApp.webasset('text-module-picker')
+def get_text_module_picker_asset():
+    yield 'text-module-picker.css'
+    yield 'text-module-picker.js'
+
+
 @FormApp.webasset('lazy-wolves')
 def get_honeypot_asset():
     yield 'honeypot.css'

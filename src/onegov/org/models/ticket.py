@@ -506,6 +506,18 @@ class ReservationHandler(Handler, TicketDeletionMixin):
                 )
             )
 
+        if not all(accepted):
+            advanced_links.append(
+                Link(
+                    text=_("Accept all with message"),
+                    url=request.return_here(
+                        request.link(self.reservations[0],
+                                     'accept-with-message')
+                    ),
+                    attrs={'class': 'accept-link'}
+                )
+            )
+
         advanced_links.append(Link(
             text=_("Reject all"),
             url=request.return_here(
@@ -524,6 +536,14 @@ class ReservationHandler(Handler, TicketDeletionMixin):
                     redirect_after=request.url
                 )
             )
+        ))
+
+        advanced_links.append(Link(
+            text=_("Reject all with message"),
+            url=request.return_here(
+                request.link(self.reservations[0], 'reject-with-message')
+            ),
+            attrs={'class': 'delete-link'},
         ))
 
         for reservation in self.reservations:
