@@ -6,6 +6,8 @@ from onegov.core.security import Secret
 from onegov.file import File
 from onegov.org.models import GeneralFile
 from onegov.org.models import GeneralFileCollection
+from onegov.ticket import Ticket
+from onegov.ticket import TicketCollection
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.documents import \
@@ -164,6 +166,18 @@ def test_security_permissions(translator_app):
     assert_no_access(users['anonymous'], model)
 
     model = GeneralFileCollection(session)
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)
+    assert_no_access(users['member'], model)
+    assert_no_access(users['anonymous'], model)
+    
+    model = Ticket()
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)
+    assert_no_access(users['member'], model)
+    assert_no_access(users['anonymous'], model)
+
+    model = TicketCollection(session)
     assert_admin(users['admin'], model)
     assert_no_access(users['editor'], model)
     assert_no_access(users['member'], model)
