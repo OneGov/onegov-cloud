@@ -132,7 +132,8 @@ def handle_registration(self, request, form, layout=None):
             )
             request.success(_(
                 "Thank you for registering. Please follow the instructions "
-                "on the activiation e-mail sent to you."
+                "on the activiation e-mail sent to you. Please check your "
+                "spam folder if you have not received the email."
             ))
 
             return morepath.redirect(request.link(request.app.org))
