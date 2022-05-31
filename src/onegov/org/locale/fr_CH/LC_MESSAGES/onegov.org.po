@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-27 15:34+0200\n"
+"POT-Creation-Date: 2022-05-31 11:51+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2244,10 +2244,10 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3910,10 +3910,12 @@ msgstr "Votre inscription sur ${org}"
 
 msgid ""
 "Thank you for registering. Please follow the instructions on the activiation "
-"e-mail sent to you."
+"e-mail sent to you. Please check your spam folder if you have not received "
+"the email."
 msgstr ""
 "Merci de votre inscription. Suivez les instructions sur l'e-mail "
-"d'activation qui vous a été envoyé."
+"d'activation qui vous a été envoyé. Si vous n'avez pas reçu cet e-mail, "
+"veuillez vérifier votre dossier spam."
 
 msgid "Account Registration"
 msgstr "Enregistrement du compte"

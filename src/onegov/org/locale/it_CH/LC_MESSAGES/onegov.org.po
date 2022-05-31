@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-27 15:34+0200\n"
+"POT-Creation-Date: 2022-05-31 11:51+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2253,10 +2253,10 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 #. Used in sentence: "${event} withdrawn."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3905,10 +3905,12 @@ msgstr "La tua registrazione a ${org}"
 
 msgid ""
 "Thank you for registering. Please follow the instructions on the activiation "
-"e-mail sent to you."
+"e-mail sent to you. Please check your spam folder if you have not received "
+"the email."
 msgstr ""
 "Grazie per esserti registrato. Segui le istruzioni sull'e-mail di "
-"attivazione che ti è stata inviata."
+"attivazione che ti è stata inviata. Se non avete ricevuto l'e-mail, "
+"controllate la cartella spam."
 
 msgid "Account Registration"
 msgstr "Registrazione dell'account"
