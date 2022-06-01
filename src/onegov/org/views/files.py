@@ -441,7 +441,7 @@ def handle_sign(self, request, layout=None):
                 token=token)
 
     except AlreadySignedError:
-        request.alert(_("This file already has a digital signature"))
+        request.alert(_("This file already has a digital seal"))
     except InvalidTokenError:
         request.alert(_("Your Yubikey could not be validated"))
 

@@ -452,13 +452,14 @@ def test_find_by_content_signed(app, temporary_path):
 
         transaction.commit()
 
-    # after signing we can still lookup the file using the old content
+    # after applying the digital seal we can still
+    # lookup the file using the old content
     files = FileCollection(app.session())
 
     with open(path, 'rb') as f:
         assert files.by_content(f).count() == 1
 
-    # and of course by using the content of the signed file
+    # and of course by using the content of the file with a digital seal
     pdf = app.session().query(File).one()
     assert files.by_content(pdf.reference.file.read()).count() == 1
 
@@ -469,7 +470,7 @@ def test_signature_file_messages(app):
     with vcr.use_cassette(tape, record_mode='none'):
         ensure_correct_depot(app)
 
-        # sign the file
+        # apply digital seal to file
         transaction.begin()
         path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
         with open(path, 'rb') as f:
@@ -495,7 +496,7 @@ def test_signature_file_messages(app):
             assert messages[0].meta['action_metadata']\
                 == pdf.signature_metadata
 
-        # ensure that deleting a signed file is logged as well
+        # ensure that deleting a file with a digital seal is logged as well
         session = app.session()
         pdf = session.query(File).one()
         delete_file(self=pdf, request=Bunch(
