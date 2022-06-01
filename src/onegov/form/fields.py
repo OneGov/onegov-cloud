@@ -18,6 +18,7 @@ from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
+from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import UploadWidget
 from wtforms import FileField
 from wtforms import SelectField
@@ -185,6 +186,12 @@ class UploadFileWithORMSupport(UploadField):
             }
         else:
             super().process_data(value)
+
+
+class TextAreaFieldWithTextModules(TextAreaField):
+    """ A textfield with text module selection/insertion. """
+
+    widget = TextAreaWithTextModules()
 
 
 class HtmlField(TextAreaField):

@@ -41,6 +41,7 @@ $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $new-stripe-connect-icon: '\f1f5';
 $new-user-icon: '\f234';
+$new-text-module-icon: '\f249';
 $paste-link-icon: '\f0ea';
 $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
@@ -160,6 +161,7 @@ $qr-code-icon: '\f029';
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon-bold('\f0fa'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
+    .text-modules::before { @include icon('\f249'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -363,6 +365,7 @@ $editbar-fg-color-active: $white;
     .new-room::before { @include icon-bold($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon-bold($new-user-icon); }
+    .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon-bold($paste-link-icon); }
     .payment-provider::before { @include icon-bold($payment-provider-icon); }

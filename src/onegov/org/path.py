@@ -4,6 +4,8 @@ import sedate
 
 from datetime import date
 from onegov.chat import MessageCollection
+from onegov.chat import TextModule
+from onegov.chat import TextModuleCollection
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import json_converter
 from onegov.directory import Directory
@@ -568,6 +570,22 @@ def get_messages(app, channel_id='*', type='*',
         limit=min(25, limit),  # bind the limit to a max of 25
         load='newer-first' if load == 'newer-first' else 'older-first'
     )
+
+
+@OrgApp.path(
+    model=TextModuleCollection,
+    path='/text-modules')
+def get_text_modules(app):
+    return TextModuleCollection(app.session())
+
+
+@OrgApp.path(
+    model=TextModule,
+    path='/text-module/{id}',
+    converters=dict(id=UUID)
+)
+def get_text_module(app, id):
+    return TextModuleCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(

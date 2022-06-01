@@ -52,7 +52,9 @@ class ElectionCandidatesByEntityTableWidget(ModelBoundWidget):
 
     def get_variables(self, layout):
         model = self.model or layout.model
-        candidates_by_entites = get_candidates_results_by_entity(model)
+        candidates_by_entites = get_candidates_results_by_entity(
+            model, sort_by_votes=True
+        )
         return {
             'election': model,
             'candidates_by_entites': candidates_by_entites,
