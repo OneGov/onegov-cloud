@@ -4,12 +4,25 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.core.utils import groupbylist
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.sql.expression import case
+from sqlalchemy.sql.expression import literal_column
 
 
 def get_candidates_results(election, session):
-    """ Returns the aggregated candidates results as list. """
+    """ Returns the aggregated candidates results as list.
+
+    Also includes percentages of votes for majorz elections. Be aware that this
+    may contain rounding errors.
+    """
+
+    percentage = literal_column('0').label('percentage')
+    if election.type == 'majorz':
+        accounted_votes = election.accounted_ballots or 1
+        percentage = func.round(
+            100 * Candidate.votes / float(accounted_votes), 1
+        ).label('percentage')
 
     result = session.query(
         Candidate.family_name,
@@ -17,8 +30,9 @@ def get_candidates_results(election, session):
         Candidate.elected,
         Candidate.party,
         Candidate.votes.label('votes'),
-        List.name,
-        List.list_id
+        percentage,
+        List.name.label('list_name'),
+        List.list_id.label('list_id')
     )
     result = result.outerjoin(List)
     result = result.filter(Candidate.election_id == election.id)
