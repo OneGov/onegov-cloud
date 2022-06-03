@@ -2,9 +2,11 @@ from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
 from onegov.form.validators import FileSizeLimit
+from onegov.form.widgets import TextAreaWithTextModules
 from onegov.org import _
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
 from onegov.user import User
@@ -17,7 +19,7 @@ from wtforms import validators
 
 class TicketNoteForm(Form):
 
-    text = TextAreaField(
+    text = TextAreaFieldWithTextModules(
         label=_("Text"),
         description=_("Your note about this ticket"),
         validators=[
@@ -60,6 +62,7 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     )
 
     def on_request(self):
+        self.text.widget = TextAreaWithTextModules()
         if self.request.app.org.ticket_always_notify:
             if isinstance(self.notify.render_kw, dict):
                 self.notify.render_kw.update({'disabled': True})

@@ -1,4 +1,4 @@
-from onegov.chat import MessageCollection
+from onegov.chat import MessageCollection, TextModuleCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.org import _, OrgApp
 from onegov.org.models import GeneralFileCollection, ImageFileCollection, \
@@ -92,6 +92,13 @@ def get_global_tools(request):
                 _("Payments"),
                 request.class_link(PaymentCollection),
                 attrs={'class': 'payment'}
+            )
+        )
+
+        links.append(
+            Link(
+                _("Text modules"), request.class_link(TextModuleCollection),
+                attrs={'class': 'text-modules'}
             )
         )
 

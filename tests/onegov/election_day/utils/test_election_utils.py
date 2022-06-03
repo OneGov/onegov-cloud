@@ -170,6 +170,7 @@ def test_election_utils_majorz(import_test_datasets, session):
 
     # get_candidates_results_by_entity
     candidates, entities = get_candidates_results_by_entity(election)
+    candidates = [candidate[1:] for candidate in candidates]
     assert candidates == [
         ('Brandenberg', 'Manuel', 10997),
         ('Eder', 'Joachim', 23620),
@@ -267,6 +268,27 @@ def test_election_utils_majorz(import_test_datasets, session):
             ('Zug', 'Lustenberger', 'Andreas', 1703),
             ('Zug', 'Thöni', 'Stefan', 433)
         ])
+    ]
+
+    candidates, entities = get_candidates_results_by_entity(
+        election, sort_by_votes=True
+    )
+    candidates = [candidate[1:] for candidate in candidates]
+    assert candidates == [
+        ('Hegglin', 'Peter', 24132),
+        ('Eder', 'Joachim', 23620),
+        ('Brandenberg', 'Manuel', 10997),
+        ('Gysel', 'Barbara', 6612),
+        ('Lustenberger', 'Andreas', 5691),
+        ('Thöni', 'Stefan', 1709)
+    ]
+    assert entities[0][1] == [
+        ('Baar', 'Hegglin', 'Peter', 4207),
+        ('Baar', 'Eder', 'Joachim', 4237),
+        ('Baar', 'Brandenberg', 'Manuel', 2100),
+        ('Baar', 'Gysel', 'Barbara', 1264),
+        ('Baar', 'Lustenberger', 'Andreas', 1269),
+        ('Baar', 'Thöni', 'Stefan', 320)
     ]
 
 

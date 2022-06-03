@@ -64,7 +64,6 @@ class AgencyPdfDefault(Pdf):
         """ Adds the memberships of an agency as table. """
 
         data = []
-        with_title = 'membership.title' in agency.export_fields
         for membership in agency.memberships:
             if (
                 membership.access == 'private'
@@ -75,31 +74,35 @@ class AgencyPdfDefault(Pdf):
                 continue
 
             description = []
+            first_attribute = None
             if membership.person:
                 for field in agency.export_fields or []:
-                    if field == 'membership.title':
-                        continue
                     if field.startswith('membership.'):
                         field = field.split('membership.')[1]
-                        description.append(getattr(membership, field))
+                        if not first_attribute:
+                            first_attribute = getattr(membership, field)
+                        else:
+                            description.append(getattr(membership, field))
                     if field.startswith('person.'):
                         field = field.split('person.')[1]
                         if field in exclude:
                             continue
-                        description.append(getattr(membership.person, field))
+                        if not first_attribute:
+                            first_attribute = getattr(membership.person, field)
+                        else:
+                            description.append(
+                                getattr(membership.person, field)
+                            )
             description = ', '.join([part for part in description if part])
 
             prefix = membership.meta.get('prefix', '') or ''
             data.append(
-                [membership.title, prefix, description] if with_title else
-                [f'{prefix} {description}'.strip()]
+                [first_attribute, prefix, description]
             )
 
         if data:
-            # If the membership title is not exported, make a 1col table
             self.table(
-                data,
-                [5.5 * cm, 0.5 * cm, None] if with_title else 'even'
+                data, [5.5 * cm, 0.5 * cm, None]
             )
 
     def agency(self, agency, exclude, level=1, content_so_far=False,

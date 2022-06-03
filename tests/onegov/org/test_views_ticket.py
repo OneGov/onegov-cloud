@@ -285,11 +285,15 @@ def test_send_ticket_email(client):
     reserve = admin.bound_reserve(allocations[0])
     transaction.commit()
 
-    def submit_reservation(client, email):
+    def submit_reservation(client, email, remembered=None):
         assert reserve('10:00', '12:00').json == {'success': True}
 
         # fill out the form
         formular = client.get('/resource/tageskarte/form')
+
+        # check whether we remembered the previous submission
+        if remembered:
+            assert formular.form['email'].value == remembered
         formular.form['email'] = email
 
         formular.form.submit().follow().form.submit().follow()
@@ -299,7 +303,7 @@ def test_send_ticket_email(client):
     submit_reservation(admin, 'admin@example.org')
     assert len(os.listdir(client.app.maildir)) == 0
 
-    submit_reservation(admin, 'someone-else@example.org')
+    submit_reservation(admin, 'someone-else@example.org', 'admin@example.org')
     assert len(os.listdir(client.app.maildir)) == 1
     assert 'someone-else@example.org' == client.get_email(0)['To']
 
@@ -371,7 +375,6 @@ def test_email_for_new_tickets(client):
     assert 'Das folgende Ticket wurde soeben ' in mails[1]['TextBody']
     assert 'new-tickets@test.org' == mails[2]['To']
     assert 'Das folgende Ticket wurde soeben ' in mails[2]['TextBody']
-
 
 
 def test_ticket_notes(client):
