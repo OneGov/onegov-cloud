@@ -244,7 +244,7 @@ def export_translator_directory(self, request):
     name='self'
 )
 def view_self(self, request):
-    model = request.current_user.translators.first()
+    model = request.current_user.translator
     layout = SelfLayout(model, request)
     return {
         'layout': layout,

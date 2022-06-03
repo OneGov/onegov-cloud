@@ -8,12 +8,17 @@ from onegov.translator_directory.models.translator import Translator
 
 """
 
-In the translator directory
-- anonymous users can log in
-- members can additionally view the translators and their vouchers
-- editors can additionally editor some informations of translators
-- admins can do everything
-- translators can view their own personal informations
+The standard permission model is used and mapped as followed:
+- Anonymous users can log in.
+- Members can additionally view the translators and their vouchers.
+- Editors can additionally editor some informations of translators.
+- Admins can do everything.
+
+Furthermore, there is a special permission `Registered` for the users linked to
+a specific translator entry:
+- Translators can view only their own personal informations. They don't have
+  access to the translator model, only to specialized views which query the
+  right translator model.
 
 """
 
@@ -53,8 +58,7 @@ def get_roles_setting():
 
 
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
-def hide_translator_for_non_admins(app, identity, model, permission):
-    # todo
+def restrict_translator_access(app, identity, model, permission):
     if model.for_admins_only and identity.role != 'admin':
         return False
     return permission in getattr(app.settings.roles, identity.role)

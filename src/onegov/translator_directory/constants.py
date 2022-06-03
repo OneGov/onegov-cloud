@@ -41,7 +41,8 @@ translator_can_see = editor_can_see + (
     'spoken_languages',
     'written_languages',
     'agency_references',
-    'education_as_interpreter'
+    'education_as_interpreter',
+    'operation_comments'
 )
 
 ADMISSIONS = {
