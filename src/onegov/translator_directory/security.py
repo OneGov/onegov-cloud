@@ -5,6 +5,7 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.models.translator import Translator
+from onegov.user import Auth
 
 """
 
@@ -55,6 +56,14 @@ def get_roles_setting():
             Public,
         ))
     }
+
+
+@TranslatorDirectoryApp.permission_rule(model=Auth, permission=object)
+def restrict_auth_access(app, identity, model, permission):
+    if permission == Personal and identity.role == 'translator':
+        return True
+
+    return permission in getattr(app.settings.roles, identity.role)
 
 
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)

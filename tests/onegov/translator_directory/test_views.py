@@ -1,4 +1,5 @@
 import copy
+import re
 import transaction
 
 from datetime import datetime
@@ -7,6 +8,7 @@ from onegov.gis import Coordinates
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
+from onegov.user import UserCollection
 from openpyxl import load_workbook
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
@@ -25,7 +27,7 @@ class FakeResponse:
         return self.json_data
 
 
-def test_view_new_translator(client):
+def test_view_translator(client):
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -36,6 +38,8 @@ def test_view_new_translator(client):
 
     client.login_editor()
     client.get('/translators/new', status=403)
+    client.logout()
+
     client.login_admin()
     page = client.get('/translators/new')
 
@@ -92,6 +96,7 @@ def test_view_new_translator(client):
         settings.form.submit()
         page = page.form.submit().follow()
 
+    translator_url = page.request.url
     assert '978654' in page
     assert 'Uncle' in page
     assert 'Bob' in page
@@ -104,29 +109,64 @@ def test_view_new_translator(client):
     assert 'Psychologie' in page
     assert 'Simultandolmetschen' in page
     assert str(round(drive_distance, 1)) in page
-
-    # Test mother tongue set to the first ordered option
     assert language_names[3] in page
-
-    # test spoken languages
     assert language_names[0] in page
     assert language_names[1] in page
-
-    # test written languages
     assert language_names[2] in page
 
+    # test user account created and activation mail sent
+    user = UserCollection(session).by_username('test@test.com')
+    assert user.translator.title == 'Bob, Uncle'
+    assert user.active is True
+    assert user.role == 'translator'
+
+    mail = client.get_email(0)
+    assert mail['To'] == 'test@test.com'
+    assert mail['Subject'] == 'Ein Konto wurde für Sie erstellt'
+
+    # test translator can login and view his own data
+    client.logout()
+    reset_password_url = re.search(
+        r'(http://localhost/auth/reset-password[^)]+)',
+        mail['TextBody']
+    ).group()
+    page = client.get(reset_password_url)
+    page.form['email'] = 'test@test.com'
+    page.form['password'] = 'p@ssw0rd'
+    page.form.submit()
+
+    page = client.login('test@test.com', 'p@ssw0rd', None).follow().follow()
+    assert '978654' in page
+    assert 'Uncle' in page
+    assert 'Bob' in page
+    assert '<a href="mailto:test@test.com">test@test.com</a>' in page
+    assert '756.1234.5678.97' in page
+    assert 'All okay' in page
+    assert '7890' in page
+    assert 'DE07 1234 1234 1234 1234 12' in page
+    assert 'Ernährung und Landwirtschaft' in page
+    assert 'Psychologie' in page
+    assert 'Simultandolmetschen' in page
+    assert str(round(drive_distance, 1)) in page
+    assert language_names[3] in page
+    assert language_names[0] in page
+    assert language_names[1] in page
+    assert language_names[2] in page
+    client.logout()
+
     # test editors access on the edit view
-    trs_url = page.request.url
-    editor = client.spawn()
-    editor.login_editor()
-    edit_page = editor.get(trs_url).click('Bearbeiten')
+    client.login_editor()
+    page = client.get(translator_url).click('Bearbeiten')
     assert '978654' in page
     assert 'Abrechnungsvorlage' in page
-    edit_page.form['pers_id'] = 123456
-    edit_page.form.submit().follow()
+    page.form['pers_id'] = 123456
+    page = page.form.submit().follow()
+    assert '123456' in page
+    client.logout()
 
     # edit some key attribute
-    page = page.click('Bearbeiten')
+    client.login_admin()
+    page = client.get(translator_url).click('Bearbeiten')
     assert 'Zulassung' in page
     assert decode_map_value(page.form['coordinates'].value) == Coordinates(
         lat=46, lon=7, zoom=12
@@ -243,9 +283,10 @@ def test_view_new_translator(client):
     assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
 
     # Test if the for_admins_only works
-    editor = client.spawn()
-    editor.login_editor()
-    editor.get(trs_url, status=403)
+    client.logout()
+    client.login_editor()
+    client.get(translator_url, status=403)
+    client.logout()
 
 
 def test_view_languages(client):
@@ -440,7 +481,7 @@ def test_file_security(client):
 def test_translator_directory_settings(client):
     client.login_admin()
     client.get('/voucher-template', status=404)
-    settings = client.get('/').click('Verzeichniseinstellungen')
+    settings = client.get('/').follow().click('Verzeichniseinstellungen')
 
     def map_value(page):
         return decode_map_value(page.form['coordinates'].value)

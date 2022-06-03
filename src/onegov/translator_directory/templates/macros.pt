@@ -25,10 +25,10 @@
     </metal:role_plural>
 
     <metal:b define-macro="extra_usermanagement_fields">
-        <div tal:condition="user.translators.first()">
+        <div tal:condition="user.translator">
             <dt i18n:translate>Translator</dt>
-            <dd tal:repeat="translator user.translators">
-                <a href="${request.link(translator)}">${translator.full_name}</a>
+            <dd>
+                <a href="${request.link(user.translator)}">${user.translator.full_name}</a>
             </dd>
         </div>
     </metal:b>
