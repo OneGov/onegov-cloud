@@ -295,9 +295,40 @@ class SelfLayout(DefaultLayout):
         return super().breadcrumbs + [
             Link(
                 text=_('Personal Information'),
-                url=self.request.class_link(TranslatorCollection, name='self')
+                url=self.request.link(self.model, name='personal-information')
             )
         ]
+
+    @cached_property
+    def editbar_links(self):
+        return [
+            Link(
+                _('Report change'),
+                self.request.link(self.model, name='report-change'),
+                attrs={'class': 'report-change'}
+            )
+        ]
+
+
+class ReportChangesLayout(SelfLayout):
+    @cached_property
+    def title(self):
+        return _('Report changes')
+
+    @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Report changes')))
+        return links
+
+
+class ApplyTranslatorChangesLayout(DefaultLayout):
+    # todo:
+    pass
 
 
 class LanguageCollectionLayout(DefaultLayout):

@@ -33,5 +33,19 @@
         </div>
     </metal:b>
 
+    <metal:display_translator_mutation define-macro="display_translator_mutation" i18n:domain="onegov.translator_directory">
+        <h2 i18n:translate>Mutation report</h2>
+        <dl class="translator-mutation">
+            <dt i18n:translate>Translator</dt>
+            <dd><a href="${request.link(translator)}">${translator.title}</a></dd>
+
+            <dt tal:condition="message" i18n:translate>Message</dt>
+            <dd tal:condition="message" tal:content="structure message"></dd>
+
+            <dt tal:condition="proposed_changes" i18n:translate>Proposed changes</dt>
+            <dd tal:condition="proposed_changes" tal:repeat="change proposed_changes">${labels.get(change, change)}: ${proposed_changes[change]}</dd>
+        </dl>
+    </metal:display_translator_mutation>
+
 
 </body>

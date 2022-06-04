@@ -6,6 +6,7 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.models.ticket import TranslatorMutationTicket
 from onegov.user import Auth
 
 """
@@ -17,10 +18,9 @@ The standard permission model is used and mapped as followed:
 - Admins can do everything.
 
 Furthermore, there is a special permission `Registered` for the users linked to
-a specific translator entry:
-- Translators can view only their own personal informations. They don't have
-  access to the translator model, only to specialized views which query the
-  right translator model.
+a specific translator entry.
+- Translators can view only their own personal informations and suggests
+  changes.
 
 """
 
@@ -69,8 +69,12 @@ def restrict_auth_access(app, identity, model, permission):
 
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
 def restrict_translator_access(app, identity, model, permission):
-    if model.for_admins_only and identity.role != 'admin':
+    if identity.role == 'translator' and identity.userid != model.email:
         return False
+
+    if model.for_admins_only and identity.role not in ('admin', 'translator'):
+        return False
+
     return permission in getattr(app.settings.roles, identity.role)
 
 
@@ -106,4 +110,14 @@ def restricts_ticket(app, identity, model, permission):
 
 @TranslatorDirectoryApp.permission_rule(model=Ticket, permission=object)
 def restrict_ticket(app, identity, model, permission):
+    return identity.role == 'admin'
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=TranslatorMutationTicket, permission=object)
+def restrict_translator_mutation_ticket(app, identity, model, permission):
+    if permission == Public and identity.role == 'translator':
+        if model.handler:
+            return model.handler.email == identity.userid
+
     return identity.role == 'admin'
