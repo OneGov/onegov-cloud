@@ -162,13 +162,27 @@ class TranslatorLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
-        links = super().breadcrumbs + [
-            Link(
-                text=_('Translators'),
-                url=self.request.class_link(TranslatorCollection)
-            ),
-            Link(text=self.model.title)
-        ]
+        links = super().breadcrumbs
+        if self.request.is_translator:
+            links.append(
+                Link(
+                    text=_('Personal Information'),
+                    url=self.request.link(self.model)
+                ),
+            )
+        else:
+            links.append(
+                Link(
+                    text=_('Translators'),
+                    url=self.request.class_link(TranslatorCollection)
+                ),
+            )
+            links.append(
+                Link(
+                    text=self.model.title,
+                    url=self.request.link(self.model)
+                )
+            )
 
         return links
 
@@ -177,6 +191,10 @@ class EditTranslatorLayout(TranslatorLayout):
     @cached_property
     def title(self):
         return _('Edit translator')
+
+    @cached_property
+    def editbar_links(self):
+        return []
 
     @cached_property
     def breadcrumbs(self):
@@ -283,21 +301,6 @@ class TranslatorDocumentsLayout(DefaultLayout):
             self.model.__class__,
             {'translator_id': self.model.translator_id, 'category': category}
         )
-
-
-class SelfLayout(DefaultLayout):
-    @cached_property
-    def title(self):
-        return self.model.title if self.model else _('Personal Information')
-
-    @cached_property
-    def breadcrumbs(self):
-        return super().breadcrumbs + [
-            Link(
-                text=_('Personal Information'),
-                url=self.request.class_link(TranslatorCollection, name='self')
-            )
-        ]
 
 
 class LanguageCollectionLayout(DefaultLayout):

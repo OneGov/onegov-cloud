@@ -15,10 +15,8 @@ from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
 from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout, \
-    SelfLayout
+    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
 from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.security import Registered
 from webob.exc import HTTPNotFound
 from xlsxwriter import Workbook
 
@@ -235,22 +233,6 @@ def export_translator_directory(self, request):
     response.body = output.read()
 
     return response
-
-
-@TranslatorDirectoryApp.html(
-    model=TranslatorCollection,
-    permission=Registered,
-    template='translator.pt',
-    name='self'
-)
-def view_self(self, request):
-    model = request.current_user.translator
-    layout = SelfLayout(model, request)
-    return {
-        'layout': layout,
-        'model': model,
-        'title': layout.title
-    }
 
 
 @TranslatorDirectoryApp.html(

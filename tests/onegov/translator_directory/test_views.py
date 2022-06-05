@@ -156,9 +156,10 @@ def test_view_translator(client):
 
     # test editors access on the edit view
     client.login_editor()
-    page = client.get(translator_url).click('Bearbeiten')
+    page = client.get(translator_url)
     assert '978654' in page
     assert 'Abrechnungsvorlage' in page
+    page = page.click('Bearbeiten')
     page.form['pers_id'] = 123456
     page = page.form.submit().follow()
     assert '123456' in page

@@ -14,7 +14,7 @@ def view_org(self, request, layout=None):
     if not request.is_logged_in:
         return redirect(request.class_link(Auth, name='login'))
 
-    if request.is_translator:
-        return redirect(request.class_link(TranslatorCollection, name='self'))
+    if request.is_translator and request.current_user.translator:
+        return redirect(request.link(request.current_user.translator))
 
     return redirect(request.class_link(TranslatorCollection))
