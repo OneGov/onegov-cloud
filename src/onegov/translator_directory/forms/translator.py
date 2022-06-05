@@ -333,7 +333,7 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     @property
     def cert_collection(self):
-        return LanguageCollection(self.request.session)
+        return LanguageCertificateCollection(self.request.session)
 
     @property
     def certificates(self):
