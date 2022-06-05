@@ -1,9 +1,14 @@
 from onegov.agency import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.translator_directory.layout import DefaultLayout
 from wtforms import StringField
 from wtforms import TextAreaField
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import IntegerField
 from wtforms.fields.html5 import EmailField
+from onegov.form.validators import ValidPhoneNumber, \
+    ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
 
 
 class TranslatorMutationForm(Form):
@@ -24,7 +29,7 @@ class TranslatorMutationForm(Form):
     def proposal_fields(self):
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
-                return fieldset.fields
+                return fieldset.fields.copy()
         return {}
 
     @property
@@ -47,63 +52,63 @@ class TranslatorMutationForm(Form):
                 return False
 
     def on_request(self):
+        layout = DefaultLayout(self.model, self.request)
         for name, field in self.proposal_fields.items():
             field.description = getattr(self.model, name)
+            if not layout.show(name):
+                self.delete_field(name)
+
+    first_name = StringField(
+        label=_('First name'),
+        fieldset=_("Proposed changes"),
+    )
+
+    last_name = StringField(
+        label=_('Last name'),
+        fieldset=_("Proposed changes"),
+    )
 
     # pers_id = IntegerField(
     #     label=_('Personal ID'),
-    #     validators=[Optional()]
+    #     fieldset=_("Proposed changes"),
     # )
-    #
+
     # admission = RadioField(
     #     label=_('Admission'),
     #     choices=tuple(
     #         (id_, label) for id_, label in ADMISSIONS.items()
     #     ),
-    #     default=list(ADMISSIONS)[0]
+    #     fieldset=_("Proposed changes"),
     # )
-    #
+
     # withholding_tax = BooleanField(
     #     label=_('Withholding tax'),
-    #     default=False
+    #     fieldset=_("Proposed changes"),
     # )
-    #
+
     # self_employed = BooleanField(
     #     label=_('Self-employed'),
-    #     default=False
+    #     fieldset=_("Proposed changes"),
     # )
-
-    last_name = StringField(
-        label=_('Last name'),
-        # validators=[InputRequired()],
-        fieldset=_("Proposed changes"),
-    )
-
-    first_name = StringField(
-        label=_('First name'),
-        # validators=[InputRequired()],
-        fieldset=_("Proposed changes"),
-    )
 
     # gender = SelectField(
     #     label=_('Gender'),
-    #     validators=[StrictOptional()],
-    #     choices=[],
-    #     fieldset=_('Personal Information')
+    #     # validators=[StrictOptional()],
+    #     # choices=[],
+    #     fieldset=_("Proposed changes"),
     # )
-    #
+
     # date_of_birth = DateField(
     #     label=_('Date of birth'),
-    #     validators=[Optional()],
-    #     fieldset=_('Personal Information')
+    #     fieldset=_("Proposed changes"),
     # )
-    #
-    # nationality = StringField(
-    #     label=_('Nationality'),
-    #     validators=[Optional()],
-    #     fieldset=_('Personal Information')
-    # )
-    #
+
+    nationality = StringField(
+        label=_('Nationality'),
+        fieldset=_("Proposed changes"),
+    )
+
+    # todo????
     # coordinates = CoordinatesField(
     #     label=_("Location"),
     #     description=_(
@@ -113,99 +118,95 @@ class TranslatorMutationForm(Form):
     #     fieldset=_("Address"),
     #     render_kw={'data-map-type': 'marker'}
     # )
-    #
-    # address = StringField(
-    #     label=_('Street and house number'),
-    #     fieldset=_('Address')
-    # )
-    #
-    # zip_code = StringField(
-    #     label=_('Zip Code'),
-    #     fieldset=_('Address')
-    # )
-    #
-    # city = StringField(
-    #     label=_('City'),
-    #     fieldset=_('Address')
-    # )
-    #
+
+    address = StringField(
+        label=_('Street and house number'),
+        fieldset=_("Proposed changes"),
+    )
+
+    zip_code = StringField(
+        label=_('Zip Code'),
+        fieldset=_("Proposed changes"),
+    )
+
+    city = StringField(
+        label=_('City'),
+        fieldset=_("Proposed changes"),
+    )
+
     # drive_distance = FloatField(
     #     label=_('Drive distance (km)'),
     #     validators=[Optional()],
     #     fieldset=_('Address'),
     # )
-    #
-    # social_sec_number = StringField(
-    #     label=_('Swiss social security number'),
-    #     validators=[Optional(), ValidSwissSocialSecurityNumber()],
-    #     fieldset=_('Identification / bank account')
-    # )
-    #
-    # bank_name = StringField(
-    #     label=_('Bank name')
-    # )
-    #
-    # bank_address = StringField(
-    #     label=_('Bank address')
-    # )
-    #
-    # account_owner = StringField(
-    #     label=_('Account owner')
-    # )
-    #
-    # iban = StringField(
-    #     label=_('IBAN'),
-    #     validators=[Optional(), Stdnum(format='iban')]
-    # )
+
+    social_sec_number = StringField(
+        label=_('Swiss social security number'),
+        validators=[ValidSwissSocialSecurityNumber()],
+        fieldset=_("Proposed changes"),
+    )
+
+    bank_name = StringField(
+        label=_('Bank name'),
+        fieldset=_("Proposed changes"),
+    )
+
+    bank_address = StringField(
+        label=_('Bank address'),
+        fieldset=_("Proposed changes"),
+    )
+
+    account_owner = StringField(
+        label=_('Account owner'),
+        fieldset=_("Proposed changes"),
+    )
+
+    iban = StringField(
+        label=_('IBAN'),
+        validators=[Stdnum(format='iban')],
+        fieldset=_("Proposed changes"),
+    )
     #
     # email = EmailField(
     #     label=_('Email'),
     #     validators=[Optional(), Email()],
     #     fieldset=_('Contact information')
     # )
-    #
-    # tel_mobile = StringField(
-    #     label=_('Mobile Number'),
-    #     validators=[Optional(), ValidPhoneNumber()],
-    # )
-    #
-    # tel_private = StringField(
-    #     label=_('Private Phone Number'),
-    #     validators=[Optional(), ValidPhoneNumber()],
-    # )
-    #
-    # tel_office = StringField(
-    #     label=_('Office Phone Number'),
-    #     validators=[Optional(), ValidPhoneNumber()],
-    # )
-    #
-    # availability = StringField(
-    #     label=_('Availability'),
-    # )
-    #
-    # operation_comments = TextAreaField(
-    #     label=_('Comments on possible field of application'),
-    #     render_kw={'rows': 3}
-    # )
-    #
+
+    tel_mobile = StringField(
+        label=_('Mobile Number'),
+        validators=[ValidPhoneNumber()],
+        fieldset=_("Proposed changes"),
+    )
+
+    tel_private = StringField(
+        label=_('Private Phone Number'),
+        validators=[ValidPhoneNumber()],
+        fieldset=_("Proposed changes"),
+    )
+
+    tel_office = StringField(
+        label=_('Office Phone Number'),
+        validators=[ValidPhoneNumber()],
+        fieldset=_("Proposed changes"),
+    )
+
+    availability = StringField(
+        label=_('Availability'),
+        fieldset=_("Proposed changes"),
+    )
+
+    operation_comments = TextAreaField(
+        label=_('Comments on possible field of application'),
+        render_kw={'rows': 3},
+        fieldset=_("Proposed changes"),
+    )
+
     # confirm_name_reveal = BooleanField(
     #     label=_('Name revealing confirmation'),
-    #     fieldset=_('Legal information'),
-    #     description=_('Consent to the disclosure of the name '
-    #                   'to other persons and authorities')
+    #     fieldset=_("Proposed changes"),
     # )
-    #
-    # date_of_application = DateField(
-    #     label=_('Date of application'),
-    #     validators=[Optional()],
-    #     fieldset=_('Admission to the directory')
-    # )
-    #
-    # date_of_decision = DateField(
-    #     label=_('Date of decision'),
-    #     validators=[Optional()],
-    # )
-    #
+
     # mother_tongues_ids = ChosenSelectMultipleField(
     #     label=_('Mother tongues'),
     #     validators=[InputRequired()],
@@ -242,35 +243,27 @@ class TranslatorMutationForm(Form):
     #         (id_, label) for id_, label in INTERPRETING_TYPES.items()
     #     ]
     # )
-    #
-    # proof_of_preconditions = StringField(
-    #     label=_('Proof of preconditions')
-    # )
-    #
-    # agency_references = TextAreaField(
-    #     label=_('Agency references'),
-    #     validators=[InputRequired()],
-    #     render_kw={'rows': 3}
-    # )
-    #
+
+    proof_of_preconditions = StringField(
+        label=_('Proof of preconditions'),
+        fieldset=_("Proposed changes"),
+    )
+
+    agency_references = TextAreaField(
+        label=_('Agency references'),
+        render_kw={'rows': 3},
+        fieldset=_("Proposed changes"),
+    )
+
     # education_as_interpreter = BooleanField(
     #     label=_('Education as interpreter'),
-    #     default=False
+    #     fieldset=_("Proposed changes"),
     # )
-    #
+
     # certificates_ids = ChosenSelectMultipleField(
     #     label=_('Language Certificates'),
     #     validators=[Optional()],
     #     choices=[]
-    # )
-    #
-    # comments = TextAreaField(
-    #     label=_('Comments')
-    # )
-    #
-    # for_admins_only = BooleanField(
-    #     label=_('Hidden'),
-    #     default=False
     # )
 
 

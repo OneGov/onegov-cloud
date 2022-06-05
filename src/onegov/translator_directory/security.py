@@ -1,4 +1,6 @@
 from onegov.core.security import Public, Personal, Private, Secret
+from onegov.core.security.roles import get_roles_setting as \
+    get_roles_setting_base
 from onegov.file import File
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.ticket import Ticket, TicketCollection
@@ -13,50 +15,19 @@ from onegov.user import Auth
 
 The standard permission model is used and mapped as followed:
 - Anonymous users can log in.
+- Translators can view their own personal information and report changes.
 - Members can additionally view the translators and their vouchers.
 - Editors can additionally editor some informations of translators.
 - Admins can do everything.
 
-Furthermore, there is a special permission `Registered` for the users linked to
-a specific translator entry.
-- Translators can view only their own personal informations and suggests
-  changes.
-
 """
-
-
-class Registered:
-    """ Translators are allowed to do this. """
 
 
 @TranslatorDirectoryApp.setting_section(section="roles")
 def get_roles_setting():
-
-    return {
-        'admin': set((
-            Public,
-            Registered,
-            Private,
-            Personal,
-            Secret
-        )),
-        'editor': set((
-            Public,
-            Private,
-            Personal,
-        )),
-        'member': set((
-            Public,
-            Personal,
-        )),
-        'translator': set((
-            Public,
-            Registered
-        )),
-        'anonymous': set((
-            Public,
-        ))
-    }
+    result = get_roles_setting_base()
+    result['translator'] = {Public}
+    return result
 
 
 @TranslatorDirectoryApp.permission_rule(model=Auth, permission=object)
@@ -69,11 +40,15 @@ def restrict_auth_access(app, identity, model, permission):
 
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
 def restrict_translator_access(app, identity, model, permission):
-    if identity.role == 'translator' and identity.userid != model.email:
-        return False
-
     if model.for_admins_only and identity.role not in ('admin', 'translator'):
         return False
+
+    if (
+        identity.role == 'translator'
+        and identity.userid == model.email
+        and permission == Personal
+    ):
+        return True
 
     return permission in getattr(app.settings.roles, identity.role)
 

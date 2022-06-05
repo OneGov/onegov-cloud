@@ -15,8 +15,6 @@ def view_org(self, request, layout=None):
         return redirect(request.class_link(Auth, name='login'))
 
     if request.is_translator and request.current_user.translator:
-        return redirect(request.link(
-            request.current_user.translator, name='personal-information'
-        ))
+        return redirect(request.link(request.current_user.translator))
 
     return redirect(request.class_link(TranslatorCollection))

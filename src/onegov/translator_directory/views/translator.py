@@ -21,9 +21,8 @@ from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout, \
-    SelfLayout, ReportChangesLayout
+    ReportTranslatorChangesLayout
 from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.security import Registered
 from uuid import uuid4
 from webob.exc import HTTPNotFound
 from xlsxwriter import Workbook
@@ -257,21 +256,6 @@ def view_translator(self, request):
     }
 
 
-@TranslatorDirectoryApp.html(
-    model=Translator,
-    permission=Registered,
-    template='translator.pt',
-    name='personal-information'
-)
-def view_personal_information(self, request):
-    layout = SelfLayout(self, request)
-    return {
-        'layout': layout,
-        'model': self,
-        'title': layout.title
-    }
-
-
 @TranslatorDirectoryApp.form(
     model=Translator,
     template='form.pt',
@@ -368,7 +352,7 @@ def get_static_excel_file(self, request):
     model=Translator,
     name='report-change',
     template='form.pt',
-    permission=Registered,
+    permission=Personal,
     form=TranslatorMutationForm
 )
 def report_translator_change(self, request, form):
@@ -410,7 +394,7 @@ def report_translator_change(self, request, form):
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))
 
-    layout = ReportChangesLayout(self, request)
+    layout = ReportTranslatorChangesLayout(self, request)
 
     return {
         'layout': layout,

@@ -157,9 +157,7 @@ def get_top_navigation(request):
     if request.is_translator and request.current_user.translator:
         yield Link(
             text=_("Personal Information"),
-            url=request.link(
-                request.current_user.translator, name='personal-information'
-            )
+            url=request.link(request.current_user.translator)
         )
 
     if request.is_manager:

@@ -146,6 +146,11 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
                     attrs={'class': 'create-excel'}
@@ -154,21 +159,48 @@ class TranslatorLayout(DefaultLayout):
         elif self.request.is_member:
             return [
                 Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
                     attrs={'class': 'create-excel'}
                 )
             ]
+        elif self.request.is_translator:
+            return [
+                Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                )
+            ]
 
     @cached_property
     def breadcrumbs(self):
-        links = super().breadcrumbs + [
-            Link(
-                text=_('Translators'),
-                url=self.request.class_link(TranslatorCollection)
-            ),
-            Link(text=self.model.title)
-        ]
+        links = super().breadcrumbs
+        if self.request.is_translator:
+            links.append(
+                Link(
+                    text=_('Personal Information'),
+                    url=self.request.link(self.model)
+                ),
+            )
+        else:
+            links.append(
+                Link(
+                    text=_('Translators'),
+                    url=self.request.class_link(TranslatorCollection)
+                ),
+            )
+            links.append(
+                Link(
+                    text=self.model.title,
+                    url=self.request.link(self.model)
+                )
+            )
 
         return links
 
@@ -179,9 +211,45 @@ class EditTranslatorLayout(TranslatorLayout):
         return _('Edit translator')
 
     @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
         links.append(Link(_('Edit')))
+        return links
+
+
+class ReportTranslatorChangesLayout(TranslatorLayout):
+    @cached_property
+    def title(self):
+        return _('Report changes')
+
+    @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Report changes')))
+        return links
+
+
+class ApplyTranslatorChangesLayout(TranslatorLayout):
+    @cached_property
+    def title(self):
+        return _('Report changes')
+
+    @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Apply changes')))
         return links
 
 
@@ -283,52 +351,6 @@ class TranslatorDocumentsLayout(DefaultLayout):
             self.model.__class__,
             {'translator_id': self.model.translator_id, 'category': category}
         )
-
-
-class SelfLayout(DefaultLayout):
-    @cached_property
-    def title(self):
-        return self.model.title if self.model else _('Personal Information')
-
-    @cached_property
-    def breadcrumbs(self):
-        return super().breadcrumbs + [
-            Link(
-                text=_('Personal Information'),
-                url=self.request.link(self.model, name='personal-information')
-            )
-        ]
-
-    @cached_property
-    def editbar_links(self):
-        return [
-            Link(
-                _('Report change'),
-                self.request.link(self.model, name='report-change'),
-                attrs={'class': 'report-change'}
-            )
-        ]
-
-
-class ReportChangesLayout(SelfLayout):
-    @cached_property
-    def title(self):
-        return _('Report changes')
-
-    @cached_property
-    def editbar_links(self):
-        return []
-
-    @cached_property
-    def breadcrumbs(self):
-        links = super().breadcrumbs
-        links.append(Link(_('Report changes')))
-        return links
-
-
-class ApplyTranslatorChangesLayout(DefaultLayout):
-    # todo:
-    pass
 
 
 class LanguageCollectionLayout(DefaultLayout):

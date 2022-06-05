@@ -108,6 +108,10 @@
                                 <dt i18n:translate>Comments on possible field of application</dt>
                                 <dd>${model.operation_comments}</dd>
                             </dl>
+                            <dl class="field-display" tal:condition="layout.show('confirm_name_reveal')">
+                                <dt i18n:translate>Name revealing confirmation</dt>
+                                <dd>${layout.format_boolean(model.confirm_name_reveal)}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.date_of_application and layout.show('date_of_application')">
                                 <dt i18n:translate>Date of application</dt>
                                 <dd>${layout.format_date(model.date_of_application, 'date')}</dd>
