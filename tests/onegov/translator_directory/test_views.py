@@ -25,10 +25,11 @@ class FakeResponse:
         return self.json_data
 
 
-def test_view_new_translator(client):
+def test_view_translator(client):
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
+    cert_ids = [str(cert.id) for cert in certs]
     cert_names = [cert.name for cert in certs]
     language_ids = [str(lang.id) for lang in languages]
     language_names = [lang.name for lang in languages]
@@ -36,6 +37,8 @@ def test_view_new_translator(client):
 
     client.login_editor()
     client.get('/translators/new', status=403)
+    client.logout()
+
     client.login_admin()
     page = client.get('/translators/new')
 
@@ -69,6 +72,7 @@ def test_view_new_translator(client):
     page.form['email'] = 'Test@test.com'
     page.form['spoken_languages_ids'] = [language_ids[0], language_ids[1]]
     page.form['written_languages_ids'] = [language_ids[2]]
+    page.form['certificates_ids'] = [cert_ids[0]]
     page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
     page.form.get('expertise_professional_guilds', index=0).checked = True
     page.form['expertise_professional_guilds_other'] = ['Psychologie']
@@ -92,54 +96,63 @@ def test_view_new_translator(client):
         settings.form.submit()
         page = page.form.submit().follow()
 
-    assert '978654' in page
+    translator_url = page.request.url
     assert 'Uncle' in page
     assert 'Bob' in page
     assert '<a href="mailto:test@test.com">test@test.com</a>' in page
-    assert '756.1234.5678.97' in page
-    assert 'All okay' in page
-    assert '7890' in page
-    assert 'DE07 1234 1234 1234 1234 12' in page
-    assert 'Ernährung und Landwirtschaft' in page
-    assert 'Psychologie' in page
-    assert 'Simultandolmetschen' in page
-    assert str(round(drive_distance, 1)) in page
-
-    # Test mother tongue set to the first ordered option
-    assert language_names[3] in page
-
-    # test spoken languages
-    assert language_names[0] in page
-    assert language_names[1] in page
-
-    # test written languages
-    assert language_names[2] in page
+    values = {
+        dl.find('dt').text_content().strip():
+        dl.find('dd').text_content().strip()
+        for dl in page.pyquery('dl')
+    }
+    assert values['Personal Nr.'] == '978654'
+    assert values['Zulassung'] == 'nicht zertifiziert / Einsatz Dringlichkeit'
+    assert values['Quellensteuer'] == 'Nein'
+    assert values['Selbständig'] == 'Nein'
+    assert values['Geschlecht'] == 'Männlich'
+    assert values['PLZ'] == '7890'
+    assert values['Wegberechnung'] == f'{round(drive_distance, 1)} km'
+    assert values['AHV-Nr.'] == '756.1234.5678.97'
+    assert values['IBAN'] == 'DE07 1234 1234 1234 1234 12'
+    assert values['Email'] == 'test@test.com'
+    assert values['Telefon Mobile'] == '079 700 80 97'
+    assert values['Fachkenntnisse nach Dolmetscherart'] == \
+        'Simultandolmetschen'
+    assert 'Ernährung' in values['Fachkenntnisse nach Berufssparte']
+    assert 'Psychologie' in values['Fachkenntnisse nach Berufssparte']
+    assert values['Muttersprachen'] == language_names[3]
+    assert language_names[0] in values['Sprachen Wort']
+    assert language_names[1] in values['Sprachen Wort']
+    assert values['Sprachen Schrift'] == language_names[2]
+    assert values['Referenzen Behörden'] == 'All okay'
+    assert values['Ausbildung Dolmetscher'] == 'Nein'
+    assert values['Versteckt'] == 'Nein'
+    assert values['Zertifikate'] == cert_names[0]
 
     # test editors access on the edit view
-    trs_url = page.request.url
-    editor = client.spawn()
-    editor.login_editor()
-    edit_page = editor.get(trs_url).click('Bearbeiten')
+    client.login_editor()
+    page = client.get(translator_url).click('Bearbeiten')
     assert '978654' in page
     assert 'Abrechnungsvorlage' in page
-    edit_page.form['pers_id'] = 123456
-    edit_page.form.submit().follow()
+    page.form['pers_id'] = 123456
+    page = page.form.submit().follow()
+    assert '123456' in page
+    client.logout()
 
     # edit some key attribute
-    page = page.click('Bearbeiten')
+    client.login_admin()
+    page = client.get(translator_url).click('Bearbeiten')
     assert 'Zulassung' in page
     assert decode_map_value(page.form['coordinates'].value) == Coordinates(
         lat=46, lon=7, zoom=12
     )
     drive_distance = 60.01
-    iban = 'CH5604835012345678009'
-
     tel_mobile = '044 123 50 50'
+
     page.form['first_name'] = 'Aunt'
     page.form['last_name'] = 'Maggie'
-    page.form['iban'] = iban
-
-    page.form['pers_id'] = 123456
+    page.form['iban'] = 'CH5604835012345678009'
+    page.form['pers_id'] = 234567
     page.form['admission'] = 'in_progress'
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
@@ -172,10 +185,10 @@ def test_view_new_translator(client):
     page.form['expertise_professional_guilds_other'] = ['Religion']
     page.form.get('expertise_interpreting_types', index=0).checked = False
     page.form.get('expertise_interpreting_types', index=1).checked = True
-
-    # test removing all languages
-    page.form['spoken_languages_ids'] = []
-    page.form['written_languages_ids'] = []
+    page.form['mother_tongues_ids'] = [language_ids[1]]
+    page.form['spoken_languages_ids'] = [language_ids[2]]
+    page.form['written_languages_ids'] = [language_ids[3]]
+    page.form['certificates_ids'] = [cert_ids[1]]
 
     new_drive_distance = 250.666
     # when old and new coords are not same, we update the driving_distance
@@ -191,46 +204,51 @@ def test_view_new_translator(client):
         page = page.form.submit().follow()
 
     assert 'Ihre Änderungen wurden gespeichert' in page
-
-    assert '123456' in page
     assert 'Aunt' in page
     assert 'Maggie' in page
-    assert iban in page
-    assert 'im Zulassungsverfahren' in page
-    assert 'Ja' in page
-    assert 'Weiblich' in page
-    assert '01.01.2019' in page
-    assert 'PERU' in page
-    assert 'Somestreet' in page
-    assert '4052' in page
-    assert 'Somecity' in page
-    assert str(round(new_drive_distance, 1)) in page
-    assert str(drive_distance) not in page
-    assert '756.1111.1111.11' in page
-    assert 'Abank' in page
-    assert 'AB Address' in page
-    assert 'AccountOwner' in page
     assert f'<a href="tel:{tel_mobile}">{tel_mobile}</a>' in page
-    assert '044 123 50 51' in page
-    assert '044 123 50 52' in page
-    assert 'always 24h' in page
-    assert '01.01.2015' in page
-    assert '01.01.2016' in page
-    assert 'ZHCW' in page
-    assert 'Kt. ZG' in page
-    assert 'My Comments' in page
-    assert 'operational' in page
-    assert 'Ernährung und Landwirtschaft' not in page
-    assert 'Wirtschaft' in page
-    assert 'Psychologie' not in page
-    assert 'Religion' in page
-    assert 'Simultandolmetschen' not in page
-    assert 'Konsektutivdolmetschen' in page
-
-    assert language_names[3] in page
-    assert language_names[0] not in page
-    assert language_names[1] not in page
-    assert language_names[2] not in page
+    values = {
+        dl.find('dt').text_content().strip():
+        dl.find('dd').text_content().strip()
+        for dl in page.pyquery('dl')
+    }
+    assert values['AHV-Nr.'] == '756.1111.1111.11'
+    assert values['Anschrift'] == 'Somestreet'
+    assert values['Ausbildung Dolmetscher'] == 'Ja'
+    assert values['Bank Adresse'] == 'AB Address'
+    assert values['Bank Konto lautend auf'] == 'AccountOwner'
+    assert values['Bank Name'] == 'Abank'
+    assert values['Bemerkungen'] == 'My Comments'
+    assert values['Besondere Hinweise Einsatzmöglichkeiten'] == 'operational'
+    assert values['Bewerbung Datum'] == '01.01.2015'
+    assert values['Email'] == 'test@test.com'
+    assert values['Entscheid Datum'] == '01.01.2016'
+    assert values['Erreich- und Verfügbarkeit'] == 'always 24h'
+    assert 'Wirtschaft' in values['Fachkenntnisse nach Berufssparte']
+    assert 'Religion' in values['Fachkenntnisse nach Berufssparte']
+    assert values['Fachkenntnisse nach Dolmetscherart'] == \
+        'Konsektutivdolmetschen'
+    assert values['Geburtsdatum'] == '01.01.2019'
+    assert values['Geschlecht'] == 'Weiblich'
+    assert values['IBAN'] == 'CH5604835012345678009'
+    assert values['Nachweis der Voraussetzung'] == 'ZHCW'
+    assert values['Nationalität'] == 'PERU'
+    assert values['Ort'] == 'Somecity'
+    assert values['PLZ'] == '4052'
+    assert values['Personal Nr.'] == '234567'
+    assert values['Quellensteuer'] == 'Ja'
+    assert values['Referenzen Behörden'] == 'Kt. ZG'
+    assert values['Selbständig'] == 'Ja'
+    assert values['Telefon Geschäft'] == '044 123 50 52'
+    assert values['Telefon Mobile'] == '044 123 50 50'
+    assert values['Telefon Privat'] == '044 123 50 51'
+    assert values['Versteckt'] == 'Ja'
+    assert values['Wegberechnung'] == f'{round(new_drive_distance, 1)} km'
+    assert values['Zulassung'] == 'im Zulassungsverfahren'
+    assert values['Muttersprachen'] == language_names[1]
+    assert values['Sprachen Wort'] == language_names[2]
+    assert values['Sprachen Schrift'] == language_names[3]
+    assert values['Zertifikate'] == cert_names[1]
 
     # try adding another with same email
     page = client.get('/translators/new')
@@ -243,9 +261,10 @@ def test_view_new_translator(client):
     assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
 
     # Test if the for_admins_only works
-    editor = client.spawn()
-    editor.login_editor()
-    editor.get(trs_url, status=403)
+    client.logout()
+    client.login_editor()
+    client.get(translator_url, status=403)
+    client.logout()
 
 
 def test_view_languages(client):
