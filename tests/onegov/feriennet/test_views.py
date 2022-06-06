@@ -114,6 +114,43 @@ def test_view_permissions():
         onegov.feriennet, onegov.feriennet.FeriennetApp)
 
 
+def test_view_hint_max_activities(client, scenario):
+    client.login_admin()
+
+    scenario.add_period(
+        title='Testperiod',
+        active=True,
+        confirmable=True,
+        finalizable=True,
+        max_bookings_per_attendee=4,
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    page = client.get('/')
+    page = page.click('Wunschliste')
+    assert "Teilnehmende werden in bis zu 4 Angebot(e) eingeteilt." in page
+    assert "bis zu 4 Angebot(e) angemeldet werden." not in page
+
+    period_settings = client.get('/periods')
+    period_settings.click('Deaktivieren')
+
+    scenario.add_period(
+        title='Testperiod2',
+        active=True,
+        confirmable=False,
+        finalizable=True,
+        max_bookings_per_attendee=4,
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    page = client.get('/')
+    page = page.click('Wunschliste')
+    assert "bis zu 4 Angebot(e) angemeldet werden." in page
+    assert "Teilnehmende werden in bis zu 4 Angebot(e) eingeteilt." not in page
+
+
 def test_activity_permissions(client, scenario):
     anon = client.spawn()
     admin = client.spawn()

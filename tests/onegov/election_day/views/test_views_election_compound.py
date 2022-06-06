@@ -69,10 +69,10 @@ def test_view_election_compound_elected_candidates(election_day_app_gr):
     upload_election_compound(client)
 
     candidates = client.get('/elections/elections/candidates')
-    assert "Carol Winner" in candidates
-    assert "Hans Sieger" in candidates
-    assert "Anna Looser" not in candidates
-    assert "Peter Verlierer" not in candidates
+    assert "Winner Carol" in candidates
+    assert "Sieger Hans" in candidates
+    assert "Looser Anna" not in candidates
+    assert "Verlierer Peter" not in candidates
     assert "regional-election-b" in candidates
     assert "regional-election-a" in candidates
     assert "Alvaschein" in candidates
@@ -505,15 +505,15 @@ def test_view_election_compound_json(election_day_app_gr):
     assert data['elected_candidates'] == [
         {
             'district': 'Belfort',
-            'family_name': 'Hans',
-            'first_name': 'Sieger',
+            'family_name': 'Sieger',
+            'first_name': 'Hans',
             'list': 'FDP',
             'party': ''
         },
         {
             'district': 'Alvaschein',
-            'family_name': 'Carol',
-            'first_name': 'Winner',
+            'family_name': 'Winner',
+            'first_name': 'Carol',
             'list': 'CVP',
             'party': ''
         }

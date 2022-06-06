@@ -9,7 +9,7 @@
                     File signed.
                 </tal:b>
                 <tal:b case="'signed-file-removal'" i18n:translate>
-                    Signed file removed.
+                    File with digital seal removed.
                 </tal:b>
             </tal:b>
         </metal:b>

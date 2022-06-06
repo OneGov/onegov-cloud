@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-05 13:21+0200\n"
+"POT-Creation-Date: 2022-05-24 15:51+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -625,8 +625,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "AGB"
 
@@ -1428,6 +1428,9 @@ msgstr "Helfen Sie mit"
 msgid "Register as Volunteer"
 msgstr "Registration als Hilfsperson"
 
+msgid "Sort"
+msgstr ""
+
 msgid "Half day"
 msgstr "Halbtägig"
 
@@ -2049,6 +2052,9 @@ msgstr ""
 "Teilnehmende werden in bis zu ${count} Angebot(e) eingeteilt. Für eine gute "
 "Zuteilung können Sie sich jedoch für mehr als ${count} Angebot(e) anmelden."
 
+msgid "Each child can be registered for up to ${count} activities."
+msgstr "Teilnehmende können für bis zu ${count} Angebot(e) angemeldet werden."
+
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
@@ -2475,6 +2481,9 @@ msgstr "Das Angebot wurde verworfen"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
+
+msgid "New ticket"
+msgstr ""
 
 msgid "Thank you for your proposal!"
 msgstr "Vielen Dank für Ihren Antrag!"
@@ -3049,3 +3058,6 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Each child can register for up to ${count} activities."
+#~ msgstr "Jedes Kind kann sich für bis zu 12 Angebote anmelden."
