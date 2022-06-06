@@ -104,3 +104,11 @@ table.translator-documents {
         font-size: 1.2rem;
     }
 }
+
+#fieldset-proposed-changes .long-field-help {
+    color: $aluminum;
+
+    p {
+        color: $aluminum;
+    }
+}

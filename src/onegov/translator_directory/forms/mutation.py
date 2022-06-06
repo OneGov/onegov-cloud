@@ -1,14 +1,23 @@
 from onegov.agency import _
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.validators import Stdnum
+from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidSwissSocialSecurityNumber
+from onegov.translator_directory.constants import ADMISSIONS
+from onegov.translator_directory.constants import full_text_max_chars
+from onegov.translator_directory.constants import GENDERS
+from onegov.translator_directory.constants import INTERPRETING_TYPES
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
 from onegov.translator_directory.layout import DefaultLayout
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import IntegerField
 from wtforms.fields.html5 import EmailField
-from onegov.form.validators import ValidPhoneNumber, \
-    ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
+from wtforms.fields.html5 import IntegerField
+from wtforms.validators import Optional
 
 
 class TranslatorMutationForm(Form):
@@ -34,29 +43,51 @@ class TranslatorMutationForm(Form):
 
     @property
     def proposed_changes(self):
-        return {
-            name: field.data
+        def convert(data):
+            return {'None': None, 'True': True, 'False': False}.get(data, data)
+
+        data = {
+            name: convert(field.data)
             for name, field in self.proposal_fields.items()
-            if field.data
         }
+        data = {
+            name: value for name, value in data.items()
+            if (
+                value != ''
+                and value is not None
+                and value != getattr(self.model, name)
+            )
+        }
+        return data
 
     def ensure_has_content(self):
-        if not self.submitter_message.data:
-            if not any((f.data for f in self.proposal_fields.values())):
-                self.submitter_message.errors.append(
-                    _(
-                        "Please enter a message or suggest some changes "
-                        "using the fields below."
-                    )
+        if not self.submitter_message.data and not self.proposed_changes:
+            self.submitter_message.errors.append(
+                _(
+                    "Please enter a message or suggest some changes "
+                    "using the fields below."
                 )
-                return False
+            )
+            return False
 
     def on_request(self):
         layout = DefaultLayout(self.model, self.request)
         for name, field in self.proposal_fields.items():
-            field.description = getattr(self.model, name)
             if not layout.show(name):
                 self.delete_field(name)
+                continue
+
+            value = getattr(self.model, name)
+            if isinstance(field, ChosenSelectField):
+                field.choices = [
+                    (choice[0], self.request.translate(choice[1]))
+                    for choice in field.choices
+                ]
+                field.choices.insert(0, ('', ''))
+                field.default = ''
+                field.description = dict(field.choices).get(str(value), '')
+            else:
+                field.description = str(value)
 
     first_name = StringField(
         label=_('First name'),
@@ -68,35 +99,38 @@ class TranslatorMutationForm(Form):
         fieldset=_("Proposed changes"),
     )
 
-    # pers_id = IntegerField(
-    #     label=_('Personal ID'),
-    #     fieldset=_("Proposed changes"),
-    # )
+    pers_id = IntegerField(
+        label=_('Personal ID'),
+        fieldset=_("Proposed changes"),
+        validators=[Optional()]
+    )
 
-    # admission = RadioField(
-    #     label=_('Admission'),
-    #     choices=tuple(
-    #         (id_, label) for id_, label in ADMISSIONS.items()
-    #     ),
-    #     fieldset=_("Proposed changes"),
-    # )
+    admission = ChosenSelectField(
+        label=_('Admission'),
+        choices=tuple(ADMISSIONS.items()),
+        fieldset=_("Proposed changes"),
+    )
 
-    # withholding_tax = BooleanField(
-    #     label=_('Withholding tax'),
-    #     fieldset=_("Proposed changes"),
-    # )
+    withholding_tax = ChosenSelectField(
+        label=_('Withholding tax'),
+        fieldset=_("Proposed changes"),
+        choices=(('True', _("Yes")), ('False', _("No"))),
+        validators=[Optional()]
+    )
 
-    # self_employed = BooleanField(
-    #     label=_('Self-employed'),
-    #     fieldset=_("Proposed changes"),
-    # )
+    self_employed = ChosenSelectField(
+        label=_('Self-employed'),
+        fieldset=_("Proposed changes"),
+        choices=(('True', _("Yes")), ('False', _("No"))),
+        validators=[Optional()]
+    )
 
-    # gender = SelectField(
-    #     label=_('Gender'),
-    #     # validators=[StrictOptional()],
-    #     # choices=[],
-    #     fieldset=_("Proposed changes"),
-    # )
+    gender = ChosenSelectField(
+        label=_('Gender'),
+        fieldset=_("Proposed changes"),
+        choices=tuple(GENDERS.items()),
+        validators=[Optional()]
+    )
 
     # date_of_birth = DateField(
     #     label=_('Date of birth'),
@@ -202,10 +236,12 @@ class TranslatorMutationForm(Form):
         fieldset=_("Proposed changes"),
     )
 
-    # confirm_name_reveal = BooleanField(
-    #     label=_('Name revealing confirmation'),
-    #     fieldset=_("Proposed changes"),
-    # )
+    confirm_name_reveal = ChosenSelectField(
+        label=_('Name revealing confirmation'),
+        fieldset=_("Proposed changes"),
+        choices=(('True', _("Yes")), ('False', _("No"))),
+        validators=[Optional()]
+    )
 
     # mother_tongues_ids = ChosenSelectMultipleField(
     #     label=_('Mother tongues'),
@@ -244,21 +280,18 @@ class TranslatorMutationForm(Form):
     #     ]
     # )
 
-    proof_of_preconditions = StringField(
-        label=_('Proof of preconditions'),
-        fieldset=_("Proposed changes"),
-    )
-
     agency_references = TextAreaField(
         label=_('Agency references'),
         render_kw={'rows': 3},
-        fieldset=_("Proposed changes"),
+        fieldset=_("Proposed changes")
     )
 
-    # education_as_interpreter = BooleanField(
-    #     label=_('Education as interpreter'),
-    #     fieldset=_("Proposed changes"),
-    # )
+    education_as_interpreter = ChosenSelectField(
+        label=_('Education as interpreter'),
+        fieldset=_("Proposed changes"),
+        choices=(('True', _("Yes")), ('False', _("No"))),
+        validators=[Optional()]
+    )
 
     # certificates_ids = ChosenSelectMultipleField(
     #     label=_('Language Certificates'),
@@ -278,8 +311,15 @@ class ApplyMutationForm(Form):
         def translate(name):
             return self.request.translate(self.model.labels.get(name, name))
 
+        def convert(value):
+            if value is True:
+                return self.request.translate(_('Yes'))
+            if value is False:
+                return self.request.translate(_('No'))
+            return value
+
         self.changes.choices = tuple(
-            (name, f'{translate(name)}: {value}')
+            (name, f'{translate(name)}: {convert(value)}')
             for name, value in self.model.changes.items()
         )
 

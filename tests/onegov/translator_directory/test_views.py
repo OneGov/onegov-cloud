@@ -116,7 +116,7 @@ def test_view_translator(client):
     assert values['Wegberechnung'] == f'{round(drive_distance, 1)} km'
     assert values['AHV-Nr.'] == '756.1234.5678.97'
     assert values['IBAN'] == 'DE07 1234 1234 1234 1234 12'
-    assert values['Email'] == 'test@test.com'
+    assert values['E-Mail'] == 'test@test.com'
     assert values['Telefon Mobile'] == '079 700 80 97'
     assert values['Fachkenntnisse nach Dolmetscherart'] == \
         'Simultandolmetschen'
@@ -266,7 +266,7 @@ def test_view_translator(client):
     assert values['Bemerkungen'] == 'My Comments'
     assert values['Besondere Hinweise Einsatzmöglichkeiten'] == 'operational'
     assert values['Bewerbung Datum'] == '01.01.2015'
-    assert values['Email'] == 'aunt.maggie@translators.com'
+    assert values['E-Mail'] == 'aunt.maggie@translators.com'
     assert values['Entscheid Datum'] == '01.01.2016'
     assert values['Erreich- und Verfügbarkeit'] == 'always 24h'
     assert 'Wirtschaft' in values['Fachkenntnisse nach Berufssparte']
@@ -311,7 +311,7 @@ def test_view_translator(client):
     page.form['email'] = 'aunt.maggie@translators.com'
 
     page = page.form.submit()
-    assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
+    assert 'Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits' in page
 
     # Test if the for_admins_only works
     client.logout()

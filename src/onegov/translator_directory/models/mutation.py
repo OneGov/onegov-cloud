@@ -74,7 +74,6 @@ class TranslatorMutation:
             'expertise_interpreting_types': _(
                 'Expertise by interpreting type'
             ),
-            'proof_of_preconditions': _('Proof of preconditions'),
             'agency_references': _('Agency references'),
             'education_as_interpreter': _('Education as interpreter'),
             'certificates_ids': _('Language Certificates'),

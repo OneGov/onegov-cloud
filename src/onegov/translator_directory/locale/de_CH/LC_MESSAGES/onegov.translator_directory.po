@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-04 09:10+0200\n"
+"POT-Creation-Date: 2022-06-06 09:13+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -143,6 +143,82 @@ msgstr "Dieses Feld wird benötigt."
 msgid "${language} already exists"
 msgstr "${language} existiert bereits"
 
+msgid ""
+"This form can be used to report mutations to the data. You can either leave "
+"us a message or directly suggest changes to the corresponding fields."
+msgstr ""
+"Mit diesem Formular können Sie Mutationen melden. Sie können uns entweder "
+"eine Nachricht hinterlassen oder direkt Änderungen an den entsprechenden "
+"Einträgen vorschlagen."
+
+msgid "Your message"
+msgstr "Ihre Nachricht"
+
+msgid "Message"
+msgstr "Nachricht"
+
+msgid "Please enter a message or suggest some changes using the fields below."
+msgstr ""
+"Bitte geben Sie entweder eine Nachricht oder mindestens einen "
+"Änderungsvorschlag in die unten stehenden Felder ein."
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Proposed changes"
+msgstr "Vorgeschlagene Änderungen"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Nationality"
+msgstr "Nationalität"
+
+msgid "Street and house number"
+msgstr "Strasse und Hausnummer"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
+
+msgid "Swiss social security number"
+msgstr "AHV-Nr."
+
+msgid "Bank name"
+msgstr "Bank Name"
+
+msgid "Bank address"
+msgstr "Bank Adresse"
+
+msgid "Account owner"
+msgstr "Bank Konto lautend auf"
+
+msgid "IBAN"
+msgstr ""
+
+msgid "Mobile Number"
+msgstr "Telefon Mobile"
+
+msgid "Private Phone Number"
+msgstr "Telefon Privat"
+
+msgid "Office Phone Number"
+msgstr "Telefon Geschäft"
+
+msgid "Availability"
+msgstr "Erreich- und Verfügbarkeit"
+
+msgid "Comments on possible field of application"
+msgstr "Besondere Hinweise Einsatzmöglichkeiten"
+
+msgid "Proof of preconditions"
+msgstr "Nachweis der Voraussetzung"
+
+msgid "Agency references"
+msgstr "Referenzen Behörden"
+
 msgid "Home Location"
 msgstr "Eigener Standort"
 
@@ -164,20 +240,11 @@ msgstr "Quellensteuer"
 msgid "Self-employed"
 msgstr "Selbständig"
 
-msgid "Last name"
-msgstr "Nachname"
-
-msgid "First name"
-msgstr "Vorname"
-
 msgid "Gender"
 msgstr "Geschlecht"
 
 msgid "Date of birth"
 msgstr "Geburtsdatum"
-
-msgid "Nationality"
-msgstr "Nationalität"
 
 msgid "Location"
 msgstr "Standort"
@@ -192,56 +259,17 @@ msgstr ""
 msgid "Address"
 msgstr "Anschrift"
 
-msgid "Street and house number"
-msgstr "Strasse und Hausnummer"
-
-msgid "Zip Code"
-msgstr "PLZ"
-
-msgid "City"
-msgstr "Ort"
-
 msgid "Drive distance (km)"
 msgstr "Fahrdistanz (km)"
-
-msgid "Swiss social security number"
-msgstr "AHV-Nr."
 
 msgid "Identification / bank account"
 msgstr "Identifikation / Bankverbindung"
 
-msgid "Bank name"
-msgstr "Bank Name"
-
-msgid "Bank address"
-msgstr "Bank Adresse"
-
-msgid "Account owner"
-msgstr "Bank Konto lautend auf"
-
-msgid "IBAN"
-msgstr ""
-
 msgid "Email"
-msgstr ""
+msgstr "E-Mail"
 
 msgid "Contact information"
 msgstr "Kontakt"
-
-msgid "Mobile Number"
-msgstr "Telefon Mobile"
-
-msgid "Private Phone Number"
-msgstr "Telefon Privat"
-
-msgid "Office Phone Number"
-msgstr "Telefon Geschäft"
-
-msgid "Availability"
-msgstr "Erreich- und Verfügbarkeit"
-
-msgid "Comments on possible field of application"
-msgstr "Besondere Hinweise Einsatzmöglichkeiten"
 
 msgid "Name revealing confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
@@ -282,12 +310,6 @@ msgstr "Fachkenntnisse nach Berufssparte: andere"
 msgid "Expertise by interpreting type"
 msgstr "Fachkenntnisse nach Dolmetscherart"
 
-msgid "Proof of preconditions"
-msgstr "Nachweis der Voraussetzung"
-
-msgid "Agency references"
-msgstr "Referenzen Behörden"
-
 msgid "Education as interpreter"
 msgstr "Ausbildung Dolmetscher"
 
@@ -304,7 +326,7 @@ msgid "Zip code must consist of 4 digits"
 msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 
 msgid "A translator with this email already exists"
-msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
+msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 
 msgid ""
 "Home location is not configured. Please complete location settings first"
@@ -386,8 +408,14 @@ msgstr "Abbrechen"
 msgid "Documents"
 msgstr "Dokumente"
 
+msgid "Report change"
+msgstr "Mutation melden"
+
 msgid "Edit translator"
 msgstr "Übersetzer/in bearbeiten"
+
+msgid "Apply proposed changes"
+msgstr "Vorgeschlagene Änderungen übernehmen"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
@@ -406,6 +434,9 @@ msgstr "Wollen Sie diese Sprache wirklich löschen?"
 
 msgid "Delete language"
 msgstr "Sprache löschen"
+
+msgid "Mutation"
+msgstr "Mutation"
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -454,6 +485,12 @@ msgstr "Editoren"
 
 msgid "Members"
 msgstr "Mitglieder"
+
+msgid "Mutation report"
+msgstr "Mutationsmeldung"
+
+msgid "Proposed changes applied."
+msgstr "Vorgeschlagene Änderungen übernommen."
 
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
@@ -507,3 +544,12 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+msgid "Your ticket has been opened"
+msgstr "Ihr Ticket wurde eröffnet"
+
+msgid "New ticket"
+msgstr "Neues Ticket"
+
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"

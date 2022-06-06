@@ -224,7 +224,7 @@ class EditTranslatorLayout(TranslatorLayout):
 class ReportTranslatorChangesLayout(TranslatorLayout):
     @cached_property
     def title(self):
-        return _('Report changes')
+        return _('Report change')
 
     @cached_property
     def editbar_links(self):
@@ -233,14 +233,14 @@ class ReportTranslatorChangesLayout(TranslatorLayout):
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
-        links.append(Link(_('Report changes')))
+        links.append(Link(_('Report change')))
         return links
 
 
 class ApplyTranslatorChangesLayout(TranslatorLayout):
     @cached_property
     def title(self):
-        return _('Report changes')
+        return _('Report change')
 
     @cached_property
     def editbar_links(self):
@@ -249,7 +249,7 @@ class ApplyTranslatorChangesLayout(TranslatorLayout):
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
-        links.append(Link(_('Apply changes')))
+        links.append(Link(_('Apply proposed changes')))
         return links
 
 

@@ -109,6 +109,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         validators=[Optional()]
     )
 
+    # todo: ChosenSelectField?
     admission = RadioField(
         label=_('Admission'),
         choices=tuple(
@@ -279,6 +280,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         choices=[]
     )
 
+    # todo: ChosenSelectMultipleField?
     expertise_professional_guilds = MultiCheckboxField(
         label=_('Expertise by professional guild'),
         choices=[
@@ -290,6 +292,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Expertise by professional guild: other')
     )
 
+    # todo: ChosenSelectMultipleField?
     expertise_interpreting_types = MultiCheckboxField(
         label=_('Expertise by interpreting type'),
         choices=[
