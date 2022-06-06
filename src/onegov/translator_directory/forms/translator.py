@@ -371,8 +371,10 @@ class TranslatorForm(Form, FormChoicesMixin):
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
-            exclude={'csrf_token', *self.special_fields.keys()})
+            exclude={'csrf_token', *self.special_fields.keys()}
+        )
 
+        data['email'] = data['email'] or None
         data['mother_tongues'] = self.mother_tongues
         data['spoken_languages'] = self.spoken_languages
         data['written_languages'] = self.written_languages

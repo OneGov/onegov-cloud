@@ -1,4 +1,4 @@
-from onegov.core.security import Public, Personal, Private, Secret
+from onegov.core.security import Public, Personal
 from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
 from onegov.file import File

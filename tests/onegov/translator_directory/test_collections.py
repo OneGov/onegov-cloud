@@ -3,11 +3,12 @@ from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import INTERPRETING_TYPES, \
     PROFESSIONAL_GUILDS
+from onegov.user import UserCollection
 from tests.onegov.translator_directory.shared import create_languages, \
     create_translator
 
 
-def test_translator_search(session):
+def test_translator_collection_search(session):
     interpreting_types = list(INTERPRETING_TYPES.keys())
     guild_types = list(PROFESSIONAL_GUILDS.keys())
     seba = create_translator(
@@ -120,11 +121,78 @@ def test_translator_collection(session):
     assert collection.query().all() == [james, bob]
 
 
-def test_collection_wrong_user_input(session):
+def test_translator_collection_wrong_user_input(session):
     # Prevent wrong user input from going to the db query
     coll = TranslatorCollection(session, order_by='nothing', order_desc='hey')
     assert coll.order_desc is False
     assert coll.order_by == 'last_name'
+
+
+def test_translator_collection_update(session):
+    collection = TranslatorCollection(session)
+    users = UserCollection(session)
+
+    # Create
+    translator_a = collection.add(first_name='A', last_name='A', email=None)
+    translator_b = collection.add(first_name='B', last_name='B', email='b@b.b')
+    assert not translator_a.user
+    assert translator_b.user.username == 'b@b.b'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+
+    # Correct role and state
+    translator_b.user.active = False
+    translator_b.user.role = 'member'
+    session.flush()
+    session.expire_all()
+    collection.update_user(translator_a, translator_a.email)
+    collection.update_user(translator_b, translator_b.email)
+    session.flush()
+    session.expire_all()
+    assert not translator_a.user
+    assert translator_b.user.username == 'b@b.b'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+
+    # Add / Deactivate
+    collection.update_user(translator_a, 'a@a.a')
+    collection.update_user(translator_b, None)
+    translator_a.email = 'a@a.a'
+    translator_b.email = None
+    session.flush()
+    session.expire_all()
+    user_b = users.by_username('b@b.b')
+    assert translator_a.user.username == 'a@a.a'
+    assert translator_a.user.role == 'translator'
+    assert translator_a.user.active is True
+    assert not translator_b.user
+    assert not user_b.active
+
+    # Delete / Reactivate
+    user_b.role = 'member'
+    session.flush()
+    session.expire_all()
+    collection.delete(translator_a)
+    collection.update_user(translator_b, 'b@b.b')
+    translator_b.email = 'b@b.b'
+    session.flush()
+    session.expire_all()
+    user_a = users.by_username('a@a.a')
+    assert not user_a.active
+    assert not user_a.translator
+    assert translator_b.user.username == 'b@b.b'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+
+    # Change
+    collection.update_user(translator_b, 'c@c.c')
+    translator_b.email = 'c@c.c'
+    session.flush()
+    session.expire_all()
+    assert translator_b.user.username == 'c@c.c'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+    assert user_b.username == 'c@c.c'
 
 
 def test_language_collection(session):

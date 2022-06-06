@@ -1351,11 +1351,11 @@
     <tal:block tal:condition="election_compound.has_results and not election_compound.completed">
         <!--! Intermediate results -->
         <h2 i18n:translate>Intermediate results</h2>
-        <dl tal:define="elected_candidates election_compound.elected_candidates">
+        <dl tal:define="elected_candidates python: sorted([(c[1], c[0]) for c in election_compound.elected_candidates])">
             <dt i18n:translate>Counted</dt>
             <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress election_compound.progress" /></dd>
             <dt i18n:translate tal:condition="elected_candidates">Elected Candidates</dt>
-            <dd tal:repeat="name elected_candidates">${name[1]} ${name[0]}</dd>
+            <dd tal:repeat="name elected_candidates">${name[0]} ${name[1]}</dd>
         </dl>
     </tal:block>
     <tal:block tal:condition="election_compound.has_results and election_compound.completed">

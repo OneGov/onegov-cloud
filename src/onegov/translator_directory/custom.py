@@ -13,7 +13,7 @@ from onegov.user import Auth
 from onegov.user import UserCollection
 
 
-def get_base_tools(request):
+def get_global_tools(request):
 
     if request.is_logged_in:
 
@@ -132,19 +132,6 @@ def get_base_tools(request):
         )
 
 
-def get_global_tools(request):
-    yield from get_base_tools(request)
-
-
-@TranslatorDirectoryApp.template_variables()
-def get_template_variables(request):
-    return {
-        'global_tools': tuple(get_global_tools(request)),
-        'top_navigation': tuple(get_top_navigation(request)),
-        'hide_search_header': not request.is_logged_in
-    }
-
-
 def get_top_navigation(request):
 
     # inject an activites link in front of all top navigation links
@@ -168,3 +155,12 @@ def get_top_navigation(request):
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation
+
+
+@TranslatorDirectoryApp.template_variables()
+def get_template_variables(request):
+    return {
+        'global_tools': tuple(get_global_tools(request)),
+        'top_navigation': tuple(get_top_navigation(request)),
+        'hide_search_header': not request.is_logged_in
+    }
