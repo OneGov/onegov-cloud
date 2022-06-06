@@ -152,7 +152,7 @@ def test_view_translator(client):
     page.form['password'] = 'p@ssw0rd'
     page.form.submit()
 
-    page = client.login('test@test.com', 'p@ssw0rd', None).follow().follow()
+    page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
     assert '978654' in page
     assert 'Uncle' in page
     assert 'Bob' in page
@@ -195,6 +195,7 @@ def test_view_translator(client):
 
     page.form['first_name'] = 'Aunt'
     page.form['last_name'] = 'Maggie'
+    page.form['email'] = 'aunt.maggie@translators.com'
     page.form['iban'] = 'CH5604835012345678009'
     page.form['pers_id'] = 234567
     page.form['admission'] = 'in_progress'
@@ -265,7 +266,7 @@ def test_view_translator(client):
     assert values['Bemerkungen'] == 'My Comments'
     assert values['Besondere Hinweise Einsatzmöglichkeiten'] == 'operational'
     assert values['Bewerbung Datum'] == '01.01.2015'
-    assert values['Email'] == 'test@test.com'
+    assert values['Email'] == 'aunt.maggie@translators.com'
     assert values['Entscheid Datum'] == '01.01.2016'
     assert values['Erreich- und Verfügbarkeit'] == 'always 24h'
     assert 'Wirtschaft' in values['Fachkenntnisse nach Berufssparte']
@@ -294,12 +295,20 @@ def test_view_translator(client):
     assert values['Sprachen Schrift'] == language_names[3]
     assert values['Zertifikate'] == cert_names[1]
 
+    # test user account updated
+    users = UserCollection(session)
+    assert not users.by_username('test@test.com')
+    user = users.by_username('aunt.maggie@translators.com')
+    assert user.translator.title == 'Maggie, Aunt'
+    assert user.active is True
+    assert user.role == 'translator'
+
     # try adding another with same email
     page = client.get('/translators/new')
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
     page.form['agency_references'] = 'All okay'
-    page.form['email'] = 'test@test.com'
+    page.form['email'] = 'aunt.maggie@translators.com'
 
     page = page.form.submit()
     assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
@@ -537,3 +546,65 @@ def test_translator_directory_settings(client):
     # Get the file
     file_page = client.get('/voucher')
     assert filename in file_page.content_disposition
+
+
+def test_view_redirects(client):
+    # Create a translator
+    languages = create_languages(client.app.session())
+    language_id = str(languages[0].id)
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/translators/new')
+    page.form['pers_id'] = 123456
+    page.form['first_name'] = 'First'
+    page.form['last_name'] = 'Last'
+    page.form['email'] = 'translator@example.org'
+    page.form['agency_references'] = 'OK'
+    page.form['mother_tongues_ids'] = [language_id]
+    page = page.form.submit().follow()
+    assert 'Übersetzer/in hinzugefügt' in page
+    translator_url = page.request.url
+    client.logout()
+
+    mail = client.get_email(0)['TextBody']
+    reset_password_url = re.search(
+        r'(http://localhost/auth/reset-password[^)]+)', mail
+    ).group()
+    page = client.get(reset_password_url)
+    page.form['email'] = 'translator@example.org'
+    page.form['password'] = 'p@ssword'
+    page.form.submit()
+
+    # Test redirects
+    urls = {
+        'translator@example.org': {
+            'homepage': translator_url,
+            'login': translator_url,
+            'logout': 'http://localhost/auth/login',
+            'password': 'p@ssword',
+            'to': 'http://localhost/topics/informationen'
+        },
+        'member@example.org': {
+            'homepage': 'http://localhost/translators',
+            'login': 'http://localhost/translators',
+            'logout': 'http://localhost/auth/login',
+            'password': 'hunter2',
+            'to': translator_url
+        }
+    }
+    urls['editor@example.org'] = urls['member@example.org']
+    urls['admin@example.org'] = urls['member@example.org']
+
+    for user, data in urls.items():
+        page = client.login(user, data['password']).maybe_follow()
+        assert page.request.url == data['login']
+
+        page = client.login(user, data['password'], data['to']).maybe_follow()
+        assert page.request.url == data['to']
+
+        page = client.get('/').maybe_follow()
+        assert page.request.url == data['homepage']
+
+        page = client.logout().maybe_follow()
+        assert page.request.url == data['logout']

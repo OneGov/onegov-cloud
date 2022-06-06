@@ -141,7 +141,7 @@ class TranslatorCollection(GenericCollection, Pagination):
 
         for user in disable:
             if user:
-                log.info(f'Activating user {user.username}')
+                log.info(f'Deactivating user {user.username}')
                 user.active = False
                 user.password = random_password(16)
 
