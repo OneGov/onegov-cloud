@@ -23,7 +23,6 @@ from wtforms import FloatField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms.fields.html5 import DateField
-# from wtforms.fields.html5 import EmailField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import Optional
 
@@ -33,11 +32,22 @@ BOOLS = [('True', _('Yes')), ('False', _('No'))]
 
 class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
-    callout = _(
-        "This form can be used to report mutations to the data. "
-        "You can either leave us a message or directly suggest changes to "
-        "the corresponding fields."
-    )
+    hints = [
+        ('text', _('You can use this form to report mutations.')),
+        ('bullet', _('You can either leave us a message or directly suggest '
+                     'changes in the corresponding fields.')),
+        ('bullet', _('You only need to specify the fields that are to be '
+                     'changed. The current value is greyed out.')),
+        ('bullet', _('Please note that the address must be entered via the '
+                     'location.')),
+        ('bullet', _('Make sure that if you make multiple selections '
+                     '(e.g. languages) you select all options, not just those '
+                     'you want changed.')),
+        ('bullet', _('Expertise by professional guild (other) can be listed '
+                     'comma-separated.')),
+        ('bullet', _('If you would like to change the e-mail address, please '
+                     'note this in the message.'))
+    ]
 
     @cached_property
     def language_choices(self):
@@ -257,12 +267,6 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         fieldset=_("Proposed changes"),
     )
 
-    # email = EmailField(
-    #     label=_('Email'),
-    #     validators=[Optional(), Email()],
-    #     fieldset=_('Contact information')
-    # )
-
     tel_mobile = StringField(
         label=_('Mobile Number'),
         validators=[ValidPhoneNumber()],
@@ -330,6 +334,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     expertise_professional_guilds_other = TagsField(
         label=_('Expertise by professional guild: other'),
         fieldset=_("Proposed changes"),
+        render_kw={'show_help': True}
     )
 
     expertise_interpreting_types = ChosenSelectMultipleField(

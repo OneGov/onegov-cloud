@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-07 09:46+0200\n"
+"POT-Creation-Date: 2022-06-07 17:05+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -143,19 +143,69 @@ msgstr "Dieses Feld wird benötigt."
 msgid "${language} already exists"
 msgstr "${language} existiert bereits"
 
+msgid ""
+"Home location is not configured. Please complete location settings first"
+msgstr ""
+"Der eigene Standort ist nicht konfiguriert. Bitte vervollständigen Sie die "
+"Standorteinstellungen"
+
+#, python-format
+msgid "Error in requesting directions from Mapbox (${status})"
+msgstr "Fehler bei der Anfrage nach einer Route bei Mapbox (${status})"
+
+msgid "Could not find a route. Check the address again"
+msgstr "Konnte keine Route finden. Überprüfen Sie den Standort nochmals"
+
+msgid "Check if the location of the translator is near a road"
+msgstr ""
+"Überprüfen Sie, ob der sich Standort in der Nähe einer Strasse befindet"
+
 msgid "Yes"
 msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
 
+msgid "You can use this form to report mutations."
+msgstr "Mit diesem Formular können Sie Mutationen melden."
+
 msgid ""
-"This form can be used to report mutations to the data. You can either leave "
-"us a message or directly suggest changes to the corresponding fields."
+"You can either leave us a message or directly suggest changes in the "
+"corresponding fields."
 msgstr ""
-"Mit diesem Formular können Sie Mutationen melden. Sie können uns entweder "
-"eine Nachricht hinterlassen oder direkt Änderungen an den entsprechenden "
-"Einträgen vorschlagen."
+"Sie können uns entweder eine Nachricht hinterlassen oder direkt Änderungen "
+"in den entsprechenden Feldern vorschlagen."
+
+msgid ""
+"You only need to specify the fields that are to be changed. The current "
+"value is greyed out."
+msgstr ""
+"Sie müssen nur die Felder angeben, die geändert werden sollen. Der aktuelle "
+"Wert ist grau hinterlegt."
+
+msgid "Please note that the address must be entered via the location."
+msgstr ""
+"Bitte beachten Sie, dass die Adresse über den Standort eingegeben werden "
+"muss."
+
+msgid ""
+"Make sure that if you make multiple selections (e.g. languages) you select "
+"all options, not just those you want changed."
+msgstr ""
+"Achten Sie darauf, dass Sie bei einer Mehrfachauswahl (z.B. Sprachen) alle "
+"Optionen auswählen, nicht nur diejenigen, die Sie geändert haben möchten."
+
+msgid "Expertise by professional guild (other) can be listed comma-separated."
+msgstr ""
+"Fachkenntnisse nach Berufssparte (andere) können kommagetrennt aufgeführt "
+"werden."
+
+msgid ""
+"If you would like to change the e-mail address, please note this in the "
+"message."
+msgstr ""
+"Wenn Sie die E-Mail Adresse ändern möchten, vermerken Sie dies bitte in "
+"Ihrer Nachricht."
 
 msgid "Please enter a message or suggest some changes using the fields below."
 msgstr ""
@@ -198,6 +248,16 @@ msgstr "Geburtsdatum"
 msgid "Nationality"
 msgstr "Nationalität"
 
+msgid "Location"
+msgstr "Standort"
+
+msgid ""
+"Search for the exact address to set a marker. The address fields beneath are "
+"filled out automatically."
+msgstr ""
+"Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. Die Address-"
+"Felder unterhalb werden automatisch ausgefüllt."
+
 msgid "Street and house number"
 msgstr "Strasse und Hausnummer"
 
@@ -206,6 +266,9 @@ msgstr "PLZ"
 
 msgid "City"
 msgstr "Ort"
+
+msgid "Drive distance (km)"
+msgstr "Fahrdistanz (km)"
 
 msgid "Swiss social security number"
 msgstr "AHV-Nr."
@@ -252,6 +315,9 @@ msgstr "Sprachen Schrift"
 msgid "Expertise by professional guild"
 msgstr "Fachkenntnisse nach Berufssparte"
 
+msgid "Expertise by professional guild: other"
+msgstr "Fachkenntnisse nach Berufssparte: andere"
+
 msgid "Expertise by interpreting type"
 msgstr "Fachkenntnisse nach Dolmetscherart"
 
@@ -273,21 +339,8 @@ msgstr "Abrechnungsvorlage"
 msgid "Templates"
 msgstr "Vorlagen"
 
-msgid "Location"
-msgstr "Standort"
-
-msgid ""
-"Search for the exact address to set a marker. The address fields beneath are "
-"filled out automatically."
-msgstr ""
-"Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. Die Address-"
-"Felder unterhalb werden automatisch ausgefüllt."
-
 msgid "Address"
 msgstr "Anschrift"
-
-msgid "Drive distance (km)"
-msgstr "Fahrdistanz (km)"
 
 msgid "Identification / bank account"
 msgstr "Identifikation / Bankverbindung"
@@ -316,9 +369,6 @@ msgstr "Entscheid Datum"
 msgid "Language training and expertise"
 msgstr "Sprachausbildung und Expertise"
 
-msgid "Expertise by professional guild: other"
-msgstr "Fachkenntnisse nach Berufssparte: andere"
-
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
 
@@ -333,23 +383,6 @@ msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 
 msgid "A translator with this email already exists"
 msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
-
-msgid ""
-"Home location is not configured. Please complete location settings first"
-msgstr ""
-"Der eigene Standort ist nicht konfiguriert. Bitte vervollständigen Sie die "
-"Standorteinstellungen"
-
-#, python-format
-msgid "Error in requesting directions from Mapbox (${status})"
-msgstr "Fehler bei der Anfrage nach einer Route bei Mapbox (${status})"
-
-msgid "Could not find a route. Check the address again"
-msgstr "Konnte keine Route finden. Überprüfen Sie den Standort nochmals"
-
-msgid "Check if the location of the translator is near a road"
-msgstr ""
-"Überprüfen Sie, ob der sich Standort in der Nähe einer Strasse befindet"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -553,3 +586,12 @@ msgstr "Neues Ticket"
 
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
+
+#~ msgid ""
+#~ "This form can be used to report mutations to the data. You can either "
+#~ "leave us a message or directly suggest changes to the corresponding "
+#~ "fields."
+#~ msgstr ""
+#~ "Mit diesem Formular können Sie Mutationen melden. Sie können uns entweder "
+#~ "eine Nachricht hinterlassen oder direkt Änderungen an den entsprechenden "
+#~ "Einträgen vorschlagen."

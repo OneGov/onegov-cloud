@@ -84,7 +84,7 @@ class TranslatorMutation:
             for language in self.language_collection.query()
         }
         CERTIFICATES = {
-            (str(cert.id), cert.name)
+            str(cert.id): cert.name
             for cert in self.certificate_collection.query()
         }
         BOOLS = {True: _('Yes'), False: _('No')}
