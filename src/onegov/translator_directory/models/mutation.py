@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from onegov.gis import Coordinates
 from onegov.translator_directory import _
 from onegov.translator_directory.constants import ADMISSIONS
 from onegov.translator_directory.constants import GENDERS
@@ -54,6 +55,9 @@ class TranslatorMutation:
             return request.translate(self.labels.get(name, name))
 
         def convert(name, value):
+            if isinstance(value, Coordinates):
+                return f'{value.lat}, {value.lon}'
+
             translations = self.translations.get(name)
             if translations:
                 if isinstance(value, list):
@@ -62,10 +66,11 @@ class TranslatorMutation:
                         for v in value
                     ])
                 return request.translate(translations.get(value, value))
+
             return value
 
         return {
-            key: (label(key), convert(key, value))
+            key: (label(key), convert(key, value), value)
             for key, value in (changes or self.changes).items()
         }
 

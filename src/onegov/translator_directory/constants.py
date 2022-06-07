@@ -11,6 +11,7 @@ member_can_see = (
     'gender',
     'date_of_birth',
     'nationality',
+    'coordinates',
     'address',
     'zip_code',
     'city',

@@ -6,6 +6,8 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.validators import Stdnum
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import ValidSwissSocialSecurityNumber
+from onegov.gis import Coordinates
+from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
@@ -14,7 +16,9 @@ from onegov.translator_directory.constants import ADMISSIONS
 from onegov.translator_directory.constants import GENDERS
 from onegov.translator_directory.constants import INTERPRETING_TYPES
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
+from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
 from onegov.translator_directory.layout import DefaultLayout
+from wtforms import FloatField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms.fields.html5 import DateField
@@ -26,7 +30,7 @@ from wtforms.validators import Optional
 BOOLS = [('True', _('Yes')), ('False', _('No'))]
 
 
-class TranslatorMutationForm(Form):
+class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     callout = _(
         "This form can be used to report mutations to the data. "
@@ -80,6 +84,8 @@ class TranslatorMutationForm(Form):
                     dict(field.choices).get(str(getattr(v, 'id', v)), '')
                     for v in value
                 ])
+            elif isinstance(field, CoordinatesField):
+                pass
             else:
                 field.description = str(value)
 
@@ -94,6 +100,8 @@ class TranslatorMutationForm(Form):
     def proposed_changes(self):
         def convert(data):
             if isinstance(data, list):
+                return data
+            if isinstance(data, Coordinates):
                 return data
             return {'None': None, 'True': True, 'False': False}.get(data, data)
 
@@ -182,38 +190,40 @@ class TranslatorMutationForm(Form):
         fieldset=_("Proposed changes"),
     )
 
-    # todo????
-    # coordinates = CoordinatesField(
-    #     label=_("Location"),
-    #     description=_(
-    #         "Search for the exact address to set a marker.
-    # The address fields "
-    #         "beneath are filled out automatically."
-    #     ),
-    #     fieldset=_("Address"),
-    #     render_kw={'data-map-type': 'marker'}
-    # )
+    coordinates = CoordinatesField(
+        label=_("Location"),
+        description=_(
+            "Search for the exact address to set a marker. The address fields "
+            "beneath are filled out automatically."
+        ),
+        fieldset=_("Proposed changes"),
+        render_kw={'data-map-type': 'marker'}
+    )
 
     address = StringField(
         label=_('Street and house number'),
         fieldset=_("Proposed changes"),
+        render_kw={'readonly': True}
     )
 
     zip_code = StringField(
         label=_('Zip Code'),
         fieldset=_("Proposed changes"),
+        render_kw={'readonly': True}
     )
 
     city = StringField(
         label=_('City'),
         fieldset=_("Proposed changes"),
+        render_kw={'readonly': True}
     )
 
-    # drive_distance = FloatField(
-    #     label=_('Drive distance (km)'),
-    #     validators=[Optional()],
-    #     fieldset=_('Address'),
-    # )
+    drive_distance = FloatField(
+        label=_('Drive distance (km)'),
+        fieldset=_("Proposed changes"),
+        validators=[Optional()],
+        render_kw={'readonly': True}
+    )
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
@@ -241,7 +251,7 @@ class TranslatorMutationForm(Form):
         validators=[Stdnum(format='iban')],
         fieldset=_("Proposed changes"),
     )
-    #
+
     # email = EmailField(
     #     label=_('Email'),
     #     validators=[Optional(), Email()],
@@ -355,7 +365,7 @@ class ApplyMutationForm(Form):
         choices = self.model.translated(self.request)
         self.changes.choices = tuple(
             (name, f'{label}: {choice}')
-            for name, (label, choice) in choices.items()
+            for name, (label, choice, original) in choices.items()
         )
 
     def apply_model(self):
