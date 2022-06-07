@@ -67,6 +67,9 @@ class TranslatorMutation:
                     ])
                 return request.translate(translations.get(value, value))
 
+            if isinstance(value, list):
+                return ', '.join(value)
+
             return value
 
         return {

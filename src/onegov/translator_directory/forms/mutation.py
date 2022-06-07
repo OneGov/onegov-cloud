@@ -3,6 +3,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TagsField
 from onegov.form.validators import Stdnum
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import ValidSwissSocialSecurityNumber
@@ -55,6 +56,8 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         ]
 
     def on_request(self):
+        self.request.include('tags-input')
+
         self.mother_tongues.choices = self.language_choices
         self.spoken_languages.choices = self.language_choices
         self.written_languages.choices = self.language_choices
@@ -86,6 +89,8 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                 ])
             elif isinstance(field, CoordinatesField):
                 pass
+            elif isinstance(field, TagsField):
+                field.description = ', '.join(value)
             else:
                 field.description = str(value)
 
@@ -102,7 +107,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             if isinstance(data, list):
                 return data
             if isinstance(data, Coordinates):
-                return data
+                return data if data.lat and data.lon else None
             return {'None': None, 'True': True, 'False': False}.get(data, data)
 
         data = {
@@ -322,9 +327,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         validators=[Optional()]
     )
 
-    # expertise_professional_guilds_other = TagsField(
-    #     label=_('Expertise by professional guild: other')
-    # )
+    expertise_professional_guilds_other = TagsField(
+        label=_('Expertise by professional guild: other'),
+        fieldset=_("Proposed changes"),
+    )
 
     expertise_interpreting_types = ChosenSelectMultipleField(
         label=_('Expertise by interpreting type'),
