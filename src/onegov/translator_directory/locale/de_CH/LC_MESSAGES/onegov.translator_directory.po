@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-06 09:13+0200\n"
+"POT-Creation-Date: 2022-06-07 09:46+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -143,6 +143,12 @@ msgstr "Dieses Feld wird benötigt."
 msgid "${language} already exists"
 msgstr "${language} existiert bereits"
 
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
 msgid ""
 "This form can be used to report mutations to the data. You can either leave "
 "us a message or directly suggest changes to the corresponding fields."
@@ -151,16 +157,16 @@ msgstr ""
 "eine Nachricht hinterlassen oder direkt Änderungen an den entsprechenden "
 "Einträgen vorschlagen."
 
+msgid "Please enter a message or suggest some changes using the fields below."
+msgstr ""
+"Bitte geben Sie entweder eine Nachricht oder mindestens einen "
+"Änderungsvorschlag in die unten stehenden Felder ein."
+
 msgid "Your message"
 msgstr "Ihre Nachricht"
 
 msgid "Message"
 msgstr "Nachricht"
-
-msgid "Please enter a message or suggest some changes using the fields below."
-msgstr ""
-"Bitte geben Sie entweder eine Nachricht oder mindestens einen "
-"Änderungsvorschlag in die unten stehenden Felder ein."
 
 msgid "First name"
 msgstr "Vorname"
@@ -170,6 +176,24 @@ msgstr "Vorgeschlagene Änderungen"
 
 msgid "Last name"
 msgstr "Nachname"
+
+msgid "Personal ID"
+msgstr "Personal Nr."
+
+msgid "Admission"
+msgstr "Zulassung"
+
+msgid "Withholding tax"
+msgstr "Quellensteuer"
+
+msgid "Self-employed"
+msgstr "Selbständig"
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
 
 msgid "Nationality"
 msgstr "Nationalität"
@@ -213,11 +237,32 @@ msgstr "Erreich- und Verfügbarkeit"
 msgid "Comments on possible field of application"
 msgstr "Besondere Hinweise Einsatzmöglichkeiten"
 
-msgid "Proof of preconditions"
-msgstr "Nachweis der Voraussetzung"
+msgid "Name revealing confirmation"
+msgstr "Zustimmung Namensbekanntgabe"
+
+msgid "Mother tongues"
+msgstr "Muttersprachen"
+
+msgid "Spoken languages"
+msgstr "Sprachen Wort"
+
+msgid "Written languages"
+msgstr "Sprachen Schrift"
+
+msgid "Expertise by professional guild"
+msgstr "Fachkenntnisse nach Berufssparte"
+
+msgid "Expertise by interpreting type"
+msgstr "Fachkenntnisse nach Dolmetscherart"
 
 msgid "Agency references"
 msgstr "Referenzen Behörden"
+
+msgid "Education as interpreter"
+msgstr "Ausbildung Dolmetscher"
+
+msgid "Language Certificates"
+msgstr "Zertifikate"
 
 msgid "Home Location"
 msgstr "Eigener Standort"
@@ -227,24 +272,6 @@ msgstr "Abrechnungsvorlage"
 
 msgid "Templates"
 msgstr "Vorlagen"
-
-msgid "Personal ID"
-msgstr "Personal Nr."
-
-msgid "Admission"
-msgstr "Zulassung"
-
-msgid "Withholding tax"
-msgstr "Quellensteuer"
-
-msgid "Self-employed"
-msgstr "Selbständig"
-
-msgid "Gender"
-msgstr "Geschlecht"
-
-msgid "Date of birth"
-msgstr "Geburtsdatum"
 
 msgid "Location"
 msgstr "Standort"
@@ -271,9 +298,6 @@ msgstr "E-Mail"
 msgid "Contact information"
 msgstr "Kontakt"
 
-msgid "Name revealing confirmation"
-msgstr "Zustimmung Namensbekanntgabe"
-
 msgid "Legal information"
 msgstr "Rechtliches"
 
@@ -289,32 +313,14 @@ msgstr "Zulassung ins Verzeichnis"
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
-msgid "Mother tongues"
-msgstr "Muttersprachen"
-
 msgid "Language training and expertise"
 msgstr "Sprachausbildung und Expertise"
-
-msgid "Spoken languages"
-msgstr "Sprachen Wort"
-
-msgid "Written languages"
-msgstr "Sprachen Schrift"
-
-msgid "Expertise by professional guild"
-msgstr "Fachkenntnisse nach Berufssparte"
 
 msgid "Expertise by professional guild: other"
 msgstr "Fachkenntnisse nach Berufssparte: andere"
 
-msgid "Expertise by interpreting type"
-msgstr "Fachkenntnisse nach Dolmetscherart"
-
-msgid "Education as interpreter"
-msgstr "Ausbildung Dolmetscher"
-
-msgid "Language Certificates"
-msgstr "Zertifikate"
+msgid "Proof of preconditions"
+msgstr "Nachweis der Voraussetzung"
 
 msgid "Comments"
 msgstr "Bemerkungen"
@@ -374,12 +380,6 @@ msgstr "Mitglied"
 
 msgid "Translator"
 msgstr "Übersetzer/in"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
 
 msgid "Add"
 msgstr "Hinzufügen"

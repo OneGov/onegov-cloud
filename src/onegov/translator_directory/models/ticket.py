@@ -75,14 +75,14 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
 
     def get_summary(self, request):
         layout = TranslatorLayout(self.translator, request)
+        changes = self.mutation.translated(request, self.proposed_changes)
         return render_macro(
             layout.macros['display_translator_mutation'],
             request,
             {
                 'translator': self.translator,
                 'message': linkify(self.message).replace('\n', '<br>'),
-                'proposed_changes': self.proposed_changes,
-                'labels': self.mutation.labels,
+                'changes': changes,
                 'layout': layout
             }
         )

@@ -377,7 +377,8 @@ def report_translator_change(self, request, form):
             template='mail_ticket_opened.pt',
             subject=_("Your ticket has been opened"),
             receivers=(self.email, ),
-            ticket=ticket
+            ticket=ticket,
+            force=True
         )
         if request.email_for_new_tickets:
             send_ticket_mail(

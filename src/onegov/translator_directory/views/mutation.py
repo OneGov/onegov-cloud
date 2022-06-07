@@ -1,6 +1,5 @@
 from morepath import redirect
 from onegov.core.security import Secret
-from onegov.org.elements import Link
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.forms.mutation import ApplyMutationForm
@@ -29,7 +28,6 @@ def apply_translator_mutation(self, request, form):
         form.apply_model()
 
     layout = ApplyTranslatorChangesLayout(self.target, request)
-    layout.breadcrumbs.append(Link(_("Apply proposed changes"), '#'))
 
     return {
         'layout': layout,

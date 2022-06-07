@@ -1,5 +1,9 @@
 from cached_property import cached_property
-from onegov.agency import _
+from onegov.translator_directory import _
+from onegov.translator_directory.constants import ADMISSIONS
+from onegov.translator_directory.constants import GENDERS
+from onegov.translator_directory.constants import INTERPRETING_TYPES
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
 
 
 class TranslatorMutation:
@@ -14,6 +18,18 @@ class TranslatorMutation:
         from onegov.translator_directory.collections.translator import \
             TranslatorCollection
         return TranslatorCollection(self.session, user_role='admin')
+
+    @cached_property
+    def language_collection(self):
+        from onegov.translator_directory.collections.language import \
+            LanguageCollection
+        return LanguageCollection(self.session)
+
+    @cached_property
+    def certificate_collection(self):
+        from onegov.translator_directory.collections.certificate import \
+            LanguageCertificateCollection
+        return LanguageCertificateCollection(self.session)
 
     @cached_property
     def target(self):
@@ -31,7 +47,56 @@ class TranslatorMutation:
         result = {k: v for k, v in result.items() if hasattr(self.target, k)}
         return result
 
-    @property
+    def translated(self, request, changes=None):
+        self.session = self.session or request.session
+
+        def label(name):
+            return request.translate(self.labels.get(name, name))
+
+        def convert(name, value):
+            translations = self.translations.get(name)
+            if translations:
+                if isinstance(value, list):
+                    return ', '.join([
+                        request.translate(translations.get(v, v))
+                        for v in value
+                    ])
+                return request.translate(translations.get(value, value))
+            return value
+
+        return {
+            key: (label(key), convert(key, value))
+            for key, value in (changes or self.changes).items()
+        }
+
+    @cached_property
+    def translations(self):
+        LANGUAGES = {
+            str(language.id): language.name
+            for language in self.language_collection.query()
+        }
+        CERTIFICATES = {
+            (str(cert.id), cert.name)
+            for cert in self.certificate_collection.query()
+        }
+        BOOLS = {True: _('Yes'), False: _('No')}
+
+        return {
+            'admission': ADMISSIONS,
+            'confirm_name_reveal': BOOLS,
+            'education_as_interpreter': BOOLS,
+            'expertise_interpreting_types': INTERPRETING_TYPES,
+            'expertise_professional_guilds': PROFESSIONAL_GUILDS,
+            'gender': GENDERS,
+            'self_employed': BOOLS,
+            'withholding_tax': BOOLS,
+            'mother_tongues': LANGUAGES,
+            'spoken_languages': LANGUAGES,
+            'written_languages': LANGUAGES,
+            'certificates': CERTIFICATES
+        }
+
+    @cached_property
     def labels(self):
         return {
             'first_name': _('First name'),
@@ -62,9 +127,9 @@ class TranslatorMutation:
                 'Comments on possible field of application'
             ),
             'confirm_name_reveal': _('Name revealing confirmation'),
-            'mother_tongues_ids': _('Mother tongues'),
-            'spoken_languages_ids': _('Spoken languages'),
-            'written_languages_ids': _('Written languages'),
+            'mother_tongues': _('Mother tongues'),
+            'spoken_languages': _('Spoken languages'),
+            'written_languages': _('Written languages'),
             'expertise_professional_guilds': _(
                 'Expertise by professional guild'
             ),
@@ -76,11 +141,19 @@ class TranslatorMutation:
             ),
             'agency_references': _('Agency references'),
             'education_as_interpreter': _('Education as interpreter'),
-            'certificates_ids': _('Language Certificates'),
+            'certificates': _('Language Certificates'),
         }
 
     def apply(self, items):
         self.ticket.handler_data['state'] = 'applied'
         for item in items:
             if item in self.changes:
-                setattr(self.target, item, self.changes[item])
+                changes = self.changes[item]
+                if item in (
+                    'mother_tongues', 'spoken_languages', 'written_languages'
+                ):
+                    changes = self.language_collection.by_ids(changes)
+                if item == 'certificates':
+                    changes = self.certificate_collection.by_ids(changes)
+
+                setattr(self.target, item, changes)
