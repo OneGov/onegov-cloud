@@ -37,6 +37,7 @@ SELECT
     volunteers.zip_code AS zip_code,                     -- Text
     volunteers.place AS place,                           -- Text
     volunteers.organisation AS organisation,             -- Text
+    volunteers.birth_date AS birth_date,                 -- DateTime
     EXTRACT(
         YEAR FROM age(volunteers.birth_date)) as age,    -- Integer
     volunteers.email AS email,                           -- Text
