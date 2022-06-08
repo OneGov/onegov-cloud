@@ -79,7 +79,9 @@ class PartyResultExportMixin(object):
                 'voters_count': result.voters_count,
                 'voters_count_percentage': result.voters_count_percentage
             }
-            parties[result.name] = result.party_id
+            parties.setdefault(result.name, result.party_id)
+            if parties[result.name] is None and result.party_id is not None:
+                parties[result.name] = result.party_id
 
         # get the panachage results
         for result in self.panachage_results:
@@ -97,6 +99,7 @@ class PartyResultExportMixin(object):
                 while str(next_id) in parties.values():
                     next_id += 1
                 parties[party] = str(next_id)
+        parties = dict(sorted(parties.items(), key=lambda x: x[1]))
 
         rows = []
         for year in sorted(results.keys(), reverse=True):
