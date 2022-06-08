@@ -66,7 +66,7 @@ class PartyResultExportMixin(object):
             return str(value)
 
         results = {}
-        parties = set()
+        parties = {}
 
         # get the party results
         for result in self.party_results:
@@ -79,16 +79,24 @@ class PartyResultExportMixin(object):
                 'voters_count': result.voters_count,
                 'voters_count_percentage': result.voters_count_percentage
             }
-            parties |= set([result.name])
+            parties[result.name] = result.party_id
 
         # get the panachage results
         for result in self.panachage_results:
             year = results.setdefault(self.date.year, {})
             target = year.setdefault(result.target, {})
             target[result.source] = result.votes
-            parties |= set([result.source, result.target])
+            parties.setdefault(result.source, None)
+            parties.setdefault(result.target, None)
 
-        parties = sorted([party for party in parties if party])
+        # assign party_ids if missing
+        parties = {key: value for key, value in parties.items() if key}
+        next_id = 0
+        for party in sorted(parties):
+            if party and parties[party] is None:
+                while str(next_id) in parties.values():
+                    next_id += 1
+                parties[party] = str(next_id)
 
         rows = []
         for year in sorted(results.keys(), reverse=True):
@@ -99,7 +107,7 @@ class PartyResultExportMixin(object):
                 row = OrderedDict()
                 row['year'] = year
                 row['name'] = party
-                row['id'] = parties.index(party)
+                row['id'] = parties[party]
                 row['total_votes'] = result.get('total_votes', None)
                 row['color'] = result.get('color', None)
                 row['mandates'] = result.get('mandates', None)
@@ -114,8 +122,7 @@ class PartyResultExportMixin(object):
                 # add the panachage results
                 if self.panachage_results.count():
                     for source in parties:
-                        id_ = parties.index(source)
-                        column = 'panachage_votes_from_{}'.format(id_)
+                        column = f'panachage_votes_from_{parties[source]}'
                         row[column] = result.get(source, None)
                     row['panachage_votes_from_999'] = result.get('', None)
 

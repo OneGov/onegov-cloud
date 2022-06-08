@@ -583,3 +583,12 @@ def change_total_voters_count(context):
             'party_results', 'total_voters_count',
             new_column_name='voters_count_percentage'
         )
+
+
+@upgrade_task('Add party id column')
+def add_party_id_column(context):
+    if not context.has_column('party_results', 'party_id'):
+        context.operations.add_column(
+            'party_results',
+            Column('party_id', Text())
+        )
