@@ -183,4 +183,4 @@ class TranslatorCollection(GenericCollection, Pagination):
         query = self.session.query(
             Translator.meta['expertise_professional_guilds_other']
         )
-        return sorted([tag for result in query for tag in result[0]])
+        return sorted({tag for result in query for tag in result[0]})
