@@ -9,11 +9,12 @@ from tests.onegov.translator_directory.shared import create_languages, \
 from onegov.user import User, UserCollection
 
 
-def test_translator(session):
+def test_translator(translator_app):
+    session = translator_app.session()
     langs = create_languages(session)
     assert all((lang.deletable for lang in langs))
 
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(translator_app)
     translator = translators.add(**translator_data, mother_tongues=[langs[0]])
 
     assert translator.mother_tongues
@@ -107,8 +108,8 @@ def test_translator_user(session):
     assert session.query(User).one().username == 'user@example.org'
 
 
-def test_translator_collection(session):
-    translators = TranslatorCollection(session)
+def test_translator_collection(translator_app):
+    translators = TranslatorCollection(translator_app)
     trs = translators.add(
         **translator_data,
         coordinates=Coordinates()

@@ -175,7 +175,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['anonymous'], model)  # restricted
 
     # TranslatorCollection
-    model = TranslatorCollection(session)
+    model = TranslatorCollection(translator_app)
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)

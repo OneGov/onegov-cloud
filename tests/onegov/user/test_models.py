@@ -156,7 +156,7 @@ def test_user_logout_all_sessions():
             assert 'xxx' in user.sessions
             assert 'yyy' in user.sessions
 
-            count = user.logout_all_sessions(DummyRequest('zzz'))
+            count = user.logout_all_sessions(DummyRequest('zzz').app)
             assert count == 2
             assert call(None, 'xxx') in forget.mock_calls
             assert call(None, 'yyy') in forget.mock_calls
@@ -174,7 +174,7 @@ def test_user_cleanup_sessions():
             assert 'xxx' in user.sessions
 
             remembered.return_value = False
-            user.cleanup_sessions(DummyRequest('zzz'))
+            user.cleanup_sessions(DummyRequest('zzz').app)
             assert 'xxx' not in user.sessions
 
             # ... while adding
@@ -207,7 +207,7 @@ def test_user_cleanup_sessions():
             assert 'yyy' in user.sessions
 
             remembered.return_value = False
-            user.logout_all_sessions(DummyRequest('zzz'))
+            user.logout_all_sessions(DummyRequest('zzz').app)
             assert 'xxx' not in user.sessions
             assert 'yyy' not in user.sessions
 
