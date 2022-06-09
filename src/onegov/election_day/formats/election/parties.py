@@ -17,7 +17,7 @@ def parse_party_result(
     try:
         year = validate_integer(line, 'year', default=election_year)
         name = line.name or ''
-        id_ = validate_list_id(line, 'id')
+        party_id = validate_list_id(line, 'id')
         color = line.color or (
             '#0571b0' if year == election_year else '#999999'
         )
@@ -49,13 +49,14 @@ def parse_party_result(
         key = '{}/{}'.format(name, year)
         totals[year] = total_votes
         if year == election_year:
-            parties[id_] = name
+            parties[party_id] = name
 
         if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
         else:
             party_results[key] = PartyResult(
                 id=uuid4(),
+                party_id=party_id,
                 year=year,
                 total_votes=total_votes,
                 name=name,
