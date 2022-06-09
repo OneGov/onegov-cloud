@@ -191,7 +191,7 @@ setup(
             'psutil',
             'pyquery',
             'pytest',
-            'pytest-localserver',
+            'pytest-localserver<0.6',
             'pytest-redis',
             'pytest-rerunfailures',
             'pytest-timeout',

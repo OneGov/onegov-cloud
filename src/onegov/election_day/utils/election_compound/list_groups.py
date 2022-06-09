@@ -30,16 +30,10 @@ def get_list_groups(election_compound):
     query = query.filter(
         PartyResult.year == election_compound.date.year
     )
-    if election_compound.completed:
-        query = query.order_by(
-            PartyResult.number_of_mandates.desc(),
-            PartyResult.name,
-        )
-    else:
-        query = query.order_by(
-            PartyResult.voters_count.desc(),
-            PartyResult.name,
-        )
+    query = query.order_by(
+        PartyResult.voters_count.desc(),
+        PartyResult.name,
+    )
 
     return query.all()
 
@@ -56,7 +50,7 @@ def get_list_groups_data(election_compound):
         'results': [
             {
                 'text': result.name,
-                'value': round(result.voters_count),
+                'value': round(result.voters_count or 0),
                 'value2': result.number_of_mandates,
                 'class': (
                     'active' if completed and result.number_of_mandates

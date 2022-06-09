@@ -92,9 +92,8 @@ def test_view_notifications_elections(election_day_app_gr):
 
     # Test retrigger messages
     assert "Benachrichtigungen auslösen" not in client.get('/manage/elections')
-    assert "Benachrichtigungen ausupload_election_compoundzulösen" not in upload_majorz_election(
-        client, False
-    )
+    assert "Benachrichtigungen ausupload_election_compoundzulösen" not in \
+        upload_majorz_election(client, False)
 
     principal = election_day_app_gr.principal
     principal.webhooks = {'http://example.com/1': None}
@@ -226,6 +225,8 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     )
     message = message['HtmlBody']
     assert 'Elections - Nouveaux résultats intermédiaires' in message
+    assert 'Winner Carol' in message
+    assert 'Sieger Hans' in message
 
 
 def test_view_notifications_summarized(election_day_app_zg):

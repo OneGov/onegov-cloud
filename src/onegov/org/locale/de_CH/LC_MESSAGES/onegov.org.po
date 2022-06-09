@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-04-25 14:15+0200\n"
+"POT-Creation-Date: 2022-05-31 11:51+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -83,6 +83,9 @@ msgstr "Zahlungsanbieter"
 
 msgid "Payments"
 msgstr "Zahlungen"
+
+msgid "Text modules"
+msgstr "Textbausteine"
 
 msgid "Settings"
 msgstr "Einstellungen"
@@ -239,6 +242,24 @@ msgstr "Ausser an"
 
 msgid "On holidays"
 msgstr "An Feiertagen"
+
+msgid "During school holidays"
+msgstr "Während Schulferien"
+
+msgid "Access"
+msgstr "Zugriff"
+
+msgid "Public"
+msgstr "Öffentlich"
+
+msgid "Only by privileged users"
+msgstr "Beschränkt auf Editoren und Administratoren"
+
+msgid "Only by privileged users and members"
+msgstr "Beschränkt auf Mitglieder, Editoren und Administratoren"
+
+msgid "Security"
+msgstr "Sicherheit"
 
 msgid "Start date before end date"
 msgstr "Start Datum vor Ende"
@@ -1230,12 +1251,6 @@ msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icon SVG 20x20 (Safari)"
 
-msgid "Open files in separate window"
-msgstr "Dateien in separatem Fenster öffnen"
-
-msgid "User will stay on the page when opening images and files"
-msgstr "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"
-
 msgid "Disable page references"
 msgstr "Seitenreferenzen deaktivieren"
 
@@ -1247,6 +1262,9 @@ msgstr ""
 "Versteckt den Kopier-Link '#' für die Seitenreferenz. Die Referenzen an sich "
 "funktionieren weiterhin. Diese Referenzen sind nur für eingeloggte Nutzer "
 "sichtbar."
+
+msgid "Open files in separate window"
+msgstr "Dateien in separatem Fenster öffnen"
 
 msgid "Title header left side"
 msgstr "Titel Kopfzeile links"
@@ -1359,6 +1377,9 @@ msgstr "Andere Feiertage"
 msgid "Preview"
 msgstr "Vorschau"
 
+msgid "School holidays"
+msgstr "Schulferien"
+
 msgid "Format: Day.Month - Description"
 msgstr "Format: Tag.Monat - Beschreibung"
 
@@ -1367,6 +1388,22 @@ msgstr "Bitte geben Sie ein Datum pro Zeile ein"
 
 msgid "Please enter only day and month"
 msgstr "Bitte geben Sie nur Tag und Monat ein"
+
+#, python-format
+msgid "${date} is not a valid date"
+msgstr "${date} ist kein gültiges Datum"
+
+msgid "Format: Day.Month.Year - Day.Month.Year"
+msgstr "Format: Tag.Monat.Jahr - Tag.Monat.Jahr"
+
+msgid "Please enter one date pair per line"
+msgstr "Bitte geben Sie ein Datumspaar pro Zeile ein"
+
+msgid "End date needs to be after start date"
+msgstr "Das End-Datum muss vor dem Start-Datum sein"
+
+msgid "Email adress for notifications about newly opened tickets"
+msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
@@ -1441,6 +1478,9 @@ msgstr "Interne Seiten"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
+
+msgid "Short name to identify the text module"
+msgstr "Kurzer Name um den Textbaustein zu identifizieren"
 
 msgid "Your note about this ticket"
 msgstr "Ihre Notiz zu dem Ticket"
@@ -1525,8 +1565,20 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
-msgid "Send a daily status e-mail."
-msgstr "Ein tägliches Status E-Mail senden."
+msgid "Send a periodic status e-mail."
+msgstr "Ein periodisches Status E-Mail senden."
+
+msgid "Daily (exluding the weekend)"
+msgstr "Täglich (abgesehen vom Wochenende)"
+
+msgid "Weekly (on mondays)"
+msgstr "Wöchentlich (am Montag)"
+
+msgid "Monthly (on first monday of the month)"
+msgstr "Monatlich (am ersten Montag des Monats)"
+
+msgid "Never"
+msgstr "Nie"
 
 msgid "1 entry"
 msgstr "1 Eintrag"
@@ -1694,6 +1746,15 @@ msgstr "Neue Nachricht"
 
 msgid "Ticket Status"
 msgstr "Ticket Status"
+
+msgid "Text module"
+msgstr "Textbaustein"
+
+msgid "Do you really want to delete this text module?"
+msgstr "Möchten Sie diesen Textbaustein wirklich löschen"
+
+msgid "Delete text module"
+msgstr "Textbaustein löschen"
 
 msgid "Reservations"
 msgstr "Reservationen"
@@ -1903,23 +1964,8 @@ msgstr "Die Eingabe wurde abgelehnt"
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
 
-msgid "Access"
-msgstr "Zugriff"
-
-msgid "Public"
-msgstr "Öffentlich"
-
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
-
-msgid "Only by privileged users"
-msgstr "Beschränkt auf Editoren und Administratoren"
-
-msgid "Only by privileged users and members"
-msgstr "Beschränkt auf Mitglieder, Editoren und Administratoren"
-
-msgid "Security"
-msgstr "Sicherheit"
 
 msgid "Visible on homepage"
 msgstr "Auf der Startseite anzeigen"
@@ -2166,6 +2212,9 @@ msgstr "Details zu Ihrer Reservation"
 msgid "Edit details"
 msgstr "Details bearbeiten"
 
+msgid "Accept all with message"
+msgstr "Alle annehmen mit Kommentar"
+
 msgid "Reject all"
 msgstr "Alle absagen"
 
@@ -2177,6 +2226,9 @@ msgstr "Die Absage aller Reservationen kann nicht rückgängig gemacht werden."
 
 msgid "Reject reservations"
 msgstr "Reservationen absagen"
+
+msgid "Reject all with message"
+msgstr "Alle absagen mit Kommentar"
 
 #, python-format
 msgid "Reject ${title}"
@@ -2600,7 +2652,9 @@ msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
 
 msgid "This site is not public but it can be seen by members."
-msgstr "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen werden."
+msgstr ""
+"Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
+"werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -2695,8 +2749,8 @@ msgstr ""
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
 
-msgid "Digitally signed"
-msgstr "Digital signiert"
+msgid "Has a digital seal"
+msgstr "Hat ein digitales Siegel"
 
 msgid "${count} page"
 msgstr "${count} Seite"
@@ -2756,8 +2810,8 @@ msgstr "Objekt"
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
-msgid "Digital Signature"
-msgstr "Digitale Signatur"
+msgid "Digital seal"
+msgstr "Digitales Siegel"
 
 msgid "Private"
 msgstr "Privat"
@@ -2801,33 +2855,36 @@ msgstr "Bitte geben Sie einen neuen Namen für die Datei ein"
 msgid "Rename"
 msgstr "Umbenennen"
 
-msgid "Digitally signed by ${signee} on ${date}"
-msgstr "Digital signiert von ${signee} am ${date}"
+msgid "Digital seal applied by ${signee} on ${date}"
+msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
 
-msgid "Please enter your yubikey to digitally sign this file"
-msgstr "Bitte geben Sie Ihren Yubikey ein um die Datei digital zu signieren"
+msgid "Please enter your yubikey to apply a digital seal to this file"
+msgstr ""
+"Bitte geben Sie Ihren Yubikey ein um ein digitales Siegel auf der Datei "
+"anzuwenden"
 
 msgid "Sign"
 msgstr "Signieren"
 
 msgid ""
-"Published and digitally signed documents can be discovered through the site-"
-"search and in the list of digitally signed documents. This action will be "
+"Published documents with a digital seal can be discovered through the site-"
+"search and in the list of documents with a digital seal. This action will be "
 "logged and cannot be undone."
 msgstr ""
-"Publizierte und digital signierte Dokumente können von der Öffentlichkeit "
-"über die Suche gefunden und in der Liste der digital signierten Dokumente "
+"Publizierte Dokumente mit digitalem Siegel können von der Öffentlichkeit "
+"über die Suche gefunden und in der Liste der Dokumente mit digitalem Siegel "
 "eingesehen werden. Diese Aktion wird aufgezeichnet und kann nicht rückgängig "
 "gemacht werden."
 
-msgid "Unsigned"
-msgstr "Unsigniert"
+msgid "Without digital seal"
+msgstr "Ohne digitales Siegel"
 
-msgid "Sign now"
-msgstr "Jetzt signieren"
+msgid "Apply digital seal now"
+msgstr "Digitales Siegel anwenden"
 
-msgid "You are not authorised to digitally sign documents"
-msgstr "Sie sind nicht dazu berechtigt Dokumente digital zu signieren"
+msgid "You are not authorised to apply digital seals to documents"
+msgstr ""
+"Sie sind nicht dazu berechtigt digitale Siegel auf Dokumente anzuwenden"
 
 msgid "Click to add a description"
 msgstr "Klicken um eine Beschreibung hinzuzufügen"
@@ -2838,8 +2895,8 @@ msgstr "Möchten Sie das Bild wirklich löschen?"
 msgid "Delete Image"
 msgstr "Bild Löschen"
 
-msgid "${name} was digitally signed on ${date}"
-msgstr "${name} wurde am ${date} digital signiert"
+msgid "${name} was provided with a digital seal on ${date}"
+msgstr "${name} wurde am ${date} mit einem digitalen Siegel versehen"
 
 msgid "${name} is not in our database"
 msgstr "${name} ist nicht in unserer Datenbank"
@@ -2947,17 +3004,42 @@ msgstr "Tickets wurden geschlossen."
 msgid "ticket was closed."
 msgstr "Ticket wurde geschlossen."
 
-msgid "There are currently ${currently_open} tickets open and"
-msgstr "Zur Zeit sind ${currently_open} Tickets offen und"
+#. Default: open
+#. Used in sentence: "There are currently ${currently_open} tickets ${open_n}
+#. and"
+msgid "open_n"
+msgstr "offen"
 
-msgid "There is currently ${currently_open} ticket open and"
-msgstr "Zur Zeit ist ${currently_open} Ticket offen und"
+#. Canonical text for ${open_n} is: "open"
+msgid "There are currently ${currently_open} tickets ${open_n} and"
+msgstr "Zur Zeit sind ${currently_open} Tickets ${open_n} und"
 
-msgid "tickets are pending."
-msgstr "Tickets sind in Bearbeitung."
+#. Default: open
+#. Used in sentence: "There is currently 1 ticket ${open_1} and"
+msgid "open_1"
+msgstr "offen"
 
-msgid "ticket is pending."
-msgstr "Ticket ist in Bearbeitung."
+#. Canonical text for ${open_1} is: "open"
+msgid "There is currently 1 ticket ${open_1} and"
+msgstr "Zur Zeit ist 1 Ticket ${open_1} und"
+
+#. Default: pending
+#. Used in sentence: "tickets are ${pending_n}."
+msgid "pending_n"
+msgstr "in Bearbeitung"
+
+#. Canonical text for ${pending_n} is: "pending"
+msgid "tickets are ${pending_n}."
+msgstr "Tickets sind ${pending_n}."
+
+#. Default: pending
+#. Used in sentence: "1 ticket is ${pending_1}."
+msgid "pending_1"
+msgstr "in Bearbeitung"
+
+#. Canonical text for ${pending_1} is: "pending"
+msgid "1 ticket is ${pending_1}."
+msgstr "1 Ticket ist ${pending_1}."
 
 msgid "Have a great week!"
 msgstr "Wir wünschen Ihnen eine schöne Woche!"
@@ -2972,9 +3054,10 @@ msgstr ""
 msgid "unsubscribe"
 msgstr "abmelden"
 
-msgid "Or by changing the settings in your user profile."
-msgstr ""
-"Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
+msgid ""
+"Or you can receive it less frequently by changing the settings in your user "
+"profile."
+msgstr "Alternativ können Sie die Häufigkeit in Ihrem Benutzerprofil anpassen."
 
 msgid "Your directory submission has been adopted:"
 msgstr "Ihr Verzeichniseintrag wurde übernommen:"
@@ -2996,6 +3079,21 @@ msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
 msgid "The OneGov Cloud Team"
 msgstr "Das OneGov Cloud Team"
+
+msgid "This is what happend on the ${org} website over the past month:"
+msgstr ""
+"Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
+
+msgid ""
+"This is the monthly OneGov Cloud status e-mail. If you don't want to receive "
+"this e-mail you may deactivate it by clicking on"
+msgstr ""
+"Dies ist das monatliche Status E-Mail der OneGov Cloud. Sie können sich "
+"jederzeit über den folgenden Link"
+
+msgid "Or by changing the settings in your user profile."
+msgstr ""
+"Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -3074,6 +3172,9 @@ msgstr "Ihre Ticket Referenz"
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
 
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
@@ -3082,9 +3183,6 @@ msgstr "Sie haben ein neues Ticket"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 #. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
@@ -3121,8 +3219,25 @@ msgstr ""
 "Sie erhalten ein weiteres E-Mail, sobald Ihre Anfrage abgeschlossen wurde. "
 "In der Zwischenzeit sehen Sie den Status Ihrer Anfrage jederzeit hier:"
 
+msgid "The following ticket has just been opened:"
+msgstr "Das folgende Ticket wurde soeben eröffnet:"
+
+msgid "View the ticket"
+msgstr "Ticket ansehen"
+
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
+
+msgid "This is what happend on the ${org} website over the past week:"
+msgstr ""
+"Folgendes ist während der letzten Woche auf der ${org} Webseite geschehen:"
+
+msgid ""
+"This is the weekly OneGov Cloud status e-mail. If you don't want to receive "
+"this e-mail you may deactivate it by clicking on"
+msgstr ""
+"Dies ist das eöchentliche Status E-Mail der OneGov Cloud. Sie können sich "
+"jederzeit über den folgenden Link"
 
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
@@ -3148,8 +3263,8 @@ msgstr "${event} zurückgezogen."
 msgid "File signed."
 msgstr "Datei signiert."
 
-msgid "Signed file removed."
-msgstr "Signierte Datei gelöscht."
+msgid "File with digital seal removed."
+msgstr "Datei mit digitalem Siegel gelöscht."
 
 msgid "${amount} marked as paid."
 msgstr "${amount} als bezahlt markiert."
@@ -3327,11 +3442,11 @@ msgstr ""
 "durchsuchen."
 
 msgid ""
-"All files have been digitally signed. The digital signature of a downloaded "
-"file can be viewed in Adobe Acrobat Reader or by dragging an already "
-"downloaded file into the field below:"
+"All files have a digital seal. The digital seal of a downloaded file can be "
+"viewed in Adobe Acrobat Reader or by dragging an already downloaded file "
+"into the field below:"
 msgstr ""
-"Alle Dateien wurden digital signiert. Die digitale Signatur einer "
+"Alle Dateien haben ein digitales Siegel. Das digitale Siegel einer "
 "heruntergeladenen Datei kann im Adobe Acrobat Reader oder durch das Ziehen "
 "der Datei in das untenstehende Feld geprüft werden:"
 
@@ -3783,10 +3898,12 @@ msgstr "Ihre ${org} Registration"
 
 msgid ""
 "Thank you for registering. Please follow the instructions on the activiation "
-"e-mail sent to you."
+"e-mail sent to you. Please check your spam folder if you have not received "
+"the email."
 msgstr ""
 "Vielen Dank für Ihre Registrierung. Bitte folgen Sie den Anleitungen im "
-"Aktivierungs-Email das wir Ihnen gesendet haben."
+"Aktivierungs-Email das wir Ihnen gesendet haben. Wenn sie das Email nicht "
+"erhalten haben, prüfen Sie bitte ihren Spamordner."
 
 msgid "Account Registration"
 msgstr "Benutzerkonto Registration"
@@ -3991,6 +4108,9 @@ msgstr ""
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"
 
+msgid "New ticket"
+msgstr "Neues Ticket"
+
 msgid "Your request could not be accepted automatically!"
 msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
 
@@ -4036,8 +4156,8 @@ msgstr "Ihr Konto ist nicht mit einem Yubikey verknüpft"
 msgid "The used Yubikey is not linked to your account"
 msgstr "Der verwendete Yubikey ist nicht mit Ihrem Konto verknüpft"
 
-msgid "This file already has a digital signature"
-msgstr "Diese Datei hat bereits eine digital Signatur"
+msgid "This file already has a digital seal"
+msgstr "Diese Datei hat bereits ein digitales Siegel"
 
 msgid "Your Yubikey could not be validated"
 msgstr "Ihr Yubikey konnte nicht validiert werden"
@@ -4421,6 +4541,20 @@ msgstr "Die Reservationen wurden angenommen"
 msgid "The reservations have already been accepted"
 msgstr "Die Reservationen wurden bereits angenommen"
 
+msgid "The submitter email is not available"
+msgstr "Die Email des Antragstellers fehlt"
+
+msgid "Accept all reservation with message"
+msgstr "Alle Reservationen annehmen mit Kommentar"
+
+#, python-format
+msgid ""
+"The following message will be sent to ${address} and it will be recorded for "
+"future reference."
+msgstr ""
+"Die folgende Nachricht wird an ${address} gesendet und als zukünftige "
+"Referenz gespeichert."
+
 msgid ""
 "The payment associated with this reservation needs to be refunded before the "
 "reservation can be rejected"
@@ -4436,6 +4570,9 @@ msgstr "Die Reservationen wurden abgelehnt"
 
 msgid "The reservation was rejected"
 msgstr "Die Reservation wurde abgelehnt"
+
+msgid "Reject all reservations with message"
+msgstr "Alle Reservationen absagen mit Kommentar"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"
@@ -4514,7 +4651,7 @@ msgid "Analytics"
 msgstr "Web-Statistik"
 
 msgid "Holidays"
-msgstr "Feiertage"
+msgstr "Feiertage / Schulferien"
 
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
@@ -4558,6 +4695,18 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
+
+msgid "Added a new text module"
+msgstr "Textbaustein hinzugefügt"
+
+msgid "New text module"
+msgstr "Neuer Textbaustein"
+
+msgid "Edit text module"
+msgstr "Textbaustein bearbeiten"
+
+msgid "The text module was deleted"
+msgstr "Der Textbaustein wurde gelöscht"
 
 msgid "Delete Ticket"
 msgstr "Ticket löschen"
@@ -4635,9 +4784,6 @@ msgstr ""
 msgid "You have closed ticket ${number}"
 msgstr "Sie haben das Ticket ${number} abgeschlossen"
 
-msgid "The submitter email is not available"
-msgstr "Die Email des Antragstellers fehlt"
-
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr ""
 "Das Ticket kann nicht wieder geöffnet werden da es nicht geschlossen ist"
@@ -4679,14 +4825,6 @@ msgstr "Das Ticket wurde bereits geschlossen"
 
 msgid "Your message has been sent"
 msgstr "Ihre Nachricht wurde gesendet"
-
-#, python-format
-msgid ""
-"The following message will be sent to ${address} and it will be recorded for "
-"future reference."
-msgstr ""
-"Die folgende Nachricht wird an ${address} gesendet und als zukünftige "
-"Referenz gespeichert."
 
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
@@ -4741,3 +4879,37 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Signed file removed."
+#~ msgstr "Signierte Datei gelöscht."
+
+#~ msgid "Unsigned"
+#~ msgstr "Unsigniert"
+
+#~ msgid "Sign now"
+#~ msgstr "Jetzt signieren"
+
+#~ msgid "Digital seal applied"
+#~ msgstr "Digitales Siegel angewendet"
+
+#~ msgid "Please enter your yubikey to digitally sign this file"
+#~ msgstr "Bitte geben Sie Ihren Yubikey ein um die Datei digital zu signieren"
+
+#~ msgid "You are not authorised to digitally sign documents"
+#~ msgstr "Sie sind nicht dazu berechtigt Dokumente digital zu signieren"
+
+#~ msgid "${name} was digitally signed on ${date}"
+#~ msgstr "${name} wurde am ${date} digital signiert"
+
+#~ msgid ""
+#~ "All files have been digitally signed. The digital seal of a downloaded "
+#~ "file can be viewed in Adobe Acrobat Reader or by dragging an already "
+#~ "downloaded file into the field below:"
+#~ msgstr ""
+#~ "Alle Dateien wurden digital signiert. Das digitale Siegel einer "
+#~ "heruntergeladenen Datei kann im Adobe Acrobat Reader oder durch das "
+#~ "Ziehen der Datei in das untenstehende Feld geprüft werden:"
+
+#~ msgid "User will stay on the page when opening images and files"
+#~ msgstr ""
+#~ "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"

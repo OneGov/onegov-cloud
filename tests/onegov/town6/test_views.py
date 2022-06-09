@@ -83,6 +83,30 @@ def test_top_navigation(client):
     links = client.get('/').pyquery('.side-navigation a span')
     assert links.text() == 'Organisation Themen Kontakt Aktuelles'
 
+    client.login_admin()
+
+    # Set all pages to private
+    page = client.get('/editor/edit/page/1')
+    page.form['access'] = 'private'
+    page = page.form.submit().follow()
+    page = client.get('/editor/edit/page/2')
+    page.form['access'] = 'private'
+    page = page.form.submit().follow()
+    page = client.get('/editor/edit/page/3')
+    page.form['access'] = 'private'
+    page = page.form.submit().follow()
+    page = client.get('/editor/edit/news/4')
+    page.form['access'] = 'private'
+    page = page.form.submit().follow()
+
+    # Make sure the admin still sees the navigation icon
+    page = client.get('/')
+    assert 'fas fa-bars' in page
+    # And the visitor doesn't
+    visitor = client.spawn()
+    page = visitor.get('/')
+    assert 'fas fa-bars' not in page
+
 
 def test_announcement(client):
     client.login_admin()

@@ -246,11 +246,11 @@ class DummyRequest(object):
         return self.app.translations.get(self.locale)
 
 
-def login(client):
-    login = client.get('/auth/login')
+def login(client, to=''):
+    login = client.get(f'/auth/login?to={to}')
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter2'
-    login.form.submit()
+    return login.form.submit()
 
 
 def upload_vote(client, create=True, canton='zg'):
@@ -537,15 +537,15 @@ def upload_election_compound(client, create=True, canton='gr',
     csv = PROPORZ_HEADER
     csv += (
         f'{status},{entities[canton][0]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-        f'101,False,Anna,Looser,0,,0,1\n'
+        f'101,False,Looser,Anna,0,,0,1\n'
         f'{status},{entities[canton][0]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-        f'201,True,Carol,Winner,2,,2,0\n'
+        f'201,True,Winner,Carol,2,,2,0\n'
     )
     csv += (
         f'{status},{entities[canton][1]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-        f'101,True,Hans,Sieger,0,,0,1\n'
+        f'101,True,Sieger,Hans,0,,0,1\n'
         f'{status},{entities[canton][1]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-        f'201,False,Peter,Verlierer,2,,2,0\n'
+        f'201,False,Verlierer,Peter,2,,2,0\n'
     )
     csv = csv.encode('utf-8')
 

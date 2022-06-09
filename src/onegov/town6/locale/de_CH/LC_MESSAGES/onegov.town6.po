@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-03-23 14:34+0100\n"
+"POT-Creation-Date: 2022-05-30 14:43+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -130,7 +130,7 @@ msgid "Edit"
 msgstr "Bearbeiten"
 
 msgid "QR"
-msgstr ""
+msgstr "QR"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -217,7 +217,7 @@ msgid "New Note"
 msgstr "Neue Notiz"
 
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 msgid "Confirmation"
 msgstr "Bestätigung"
@@ -406,7 +406,7 @@ msgid "Payments"
 msgstr "Zahlungen"
 
 msgid "Stripe Connect"
-msgstr ""
+msgstr "Stripe Connect"
 
 msgid "Payment Provider"
 msgstr "Zahlungsanbieter"
@@ -714,6 +714,9 @@ msgstr "E-Mail Adresse"
 msgid "This site is private"
 msgstr "Diese Seite ist Privat"
 
+msgid "This site is private but can also be seen by members"
+msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
+
 msgid "This site is secret"
 msgstr "Diese Seite ist Geheim"
 
@@ -722,6 +725,11 @@ msgstr "Diese Seite ist nicht veröffentlicht."
 
 msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
+
+msgid "This site is not public but it can be seen by members."
+msgstr ""
+"Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
+"werden."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -885,8 +893,8 @@ msgstr ""
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
 
-msgid "Digitally signed"
-msgstr "Digital signiert"
+msgid "Has a digital seal"
+msgstr "Hat ein digitales Siegel"
 
 msgid "${count} page"
 msgstr "${count} Seite"
@@ -958,8 +966,8 @@ msgstr "Erstellt"
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
-msgid "Digital Signature"
-msgstr "Digitale Signatur"
+msgid "Digital seal"
+msgstr "Digitales Siegel"
 
 msgid "Access"
 msgstr "Zugriff"
@@ -1009,11 +1017,13 @@ msgstr "Bitte geben Sie einen neuen Namen für die Datei ein"
 msgid "Rename"
 msgstr "Umbenennen"
 
-msgid "Digitally signed by ${signee} on ${date}"
-msgstr "Digital signiert von ${signee} am ${date}"
+msgid "Digital seal applied by ${signee} on ${date}"
+msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
 
-msgid "Please enter your yubikey to digitally sign this file"
-msgstr "Bitte geben Sie Ihren Yubikey ein um die Datei digital zu signieren"
+msgid "Please enter your yubikey to apply a digital seal to this file"
+msgstr ""
+"Bitte geben Sie Ihren Yubikey ein um ein digitales Siegel auf der Datei "
+"anzuwenden"
 
 msgid "Sign"
 msgstr "Signieren"
@@ -1022,23 +1032,24 @@ msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "YubiKey anschliessen und Knopf drücken."
 
 msgid ""
-"Published and digitally signed documents can be discovered through the site-"
-"search and in the list of digitally signed documents. This action will be "
+"Published documents with a digital seal can be discovered through the site-"
+"search and in the list of documents with a digital seal. This action will be "
 "logged and cannot be undone."
 msgstr ""
-"Publizierte und digital signierte Dokumente können von der Öffentlichkeit "
-"über die Suche gefunden und in der Liste der digital signierten Dokumente "
+"Publizierte Dokumente mit digitalem Siegel können von der Öffentlichkeit "
+"über die Suche gefunden und in der Liste der Dokumente mit digitalem Siegel "
 "eingesehen werden. Diese Aktion wird aufgezeichnet und kann nicht rückgängig "
 "gemacht werden."
 
-msgid "Unsigned"
-msgstr "Unsigniert"
+msgid "Without digital seal"
+msgstr "Ohne digitales Siegel"
 
-msgid "Sign now"
-msgstr "Jetzt signieren"
+msgid "Apply digital seal now"
+msgstr "Digitales Siegel anwenden"
 
-msgid "You are not authorised to digitally sign documents"
-msgstr "Sie sind nicht dazu berechtigt Dokumente digital zu signieren"
+msgid "You are not authorised to apply digital seals to documents"
+msgstr ""
+"Sie sind nicht dazu berechtigt digitale Siegel auf Dokumente anzuwenden"
 
 msgid "Click to add a description"
 msgstr "Klicken um eine Beschreibung hinzuzufügen"
@@ -1049,8 +1060,8 @@ msgstr "Möchten Sie das Bild wirklich löschen?"
 msgid "Delete Image"
 msgstr "Bild Löschen"
 
-msgid "${name} was digitally signed on ${date}"
-msgstr "${name} wurde am ${date} digital signiert"
+msgid "${name} was provided with a digital seal on ${date}"
+msgstr "${name} wurde am ${date} mit einem digitalen Siegel versehen"
 
 msgid "${name} is not in our database"
 msgstr "${name} ist nicht in unserer Datenbank"
@@ -1109,8 +1120,11 @@ msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
 "mail."
 msgstr ""
-"Falls Sie sich nicht für diesen Newsletter angemeldet haben, können Sie diese "
-"Nachricht ignorieren."
+"Falls Sie sich nicht für diesen Newsletter angemeldet haben, können Sie "
+"diese Nachricht ignorieren."
+
+msgid "Click here to unsubscribe."
+msgstr "Klicken Sie hier um sich abzumelden."
 
 msgid "Good morning,"
 msgstr "Guten Morgen"
@@ -1248,9 +1262,6 @@ msgstr ""
 msgid "Click here to view web version."
 msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
 
-msgid "Click here to unsubscribe."
-msgstr "Klicken Sie hier um sich abzumelden."
-
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
 
@@ -1341,6 +1352,12 @@ msgstr ""
 "Sie erhalten ein weiteres E-Mail, sobald Ihre Anfrage abgeschlossen wurde. "
 "In der Zwischenzeit sehen Sie den Status Ihrer Anfrage jederzeit hier:"
 
+msgid "The following ticket has just been opened:"
+msgstr "Das folgende Ticket wurde soeben eröffnet:"
+
+msgid "View the ticket"
+msgstr "Ticket ansehen"
+
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
 
@@ -1374,8 +1391,8 @@ msgstr "${event} zurückgezogen."
 msgid "File signed."
 msgstr "Datei signiert."
 
-msgid "Signed file removed."
-msgstr "Signierte Datei gelöscht."
+msgid "File with digital seal removed."
+msgstr "Datei mit digitalem Siegel gelöscht."
 
 msgid "${amount} marked as paid."
 msgstr "${amount} als bezahlt markiert."
@@ -1562,11 +1579,11 @@ msgstr ""
 "durchsuchen."
 
 msgid ""
-"All files have been digitally signed. The digital signature of a downloaded "
-"file can be viewed in Adobe Acrobat Reader or by dragging an already "
-"downloaded file into the field below:"
+"All files have a digital seal. The digital seal of a downloaded file can be "
+"viewed in Adobe Acrobat Reader or by dragging an already downloaded file "
+"into the field below:"
 msgstr ""
-"Alle Dateien wurden digital signiert. Die digitale Signatur einer "
+"Alle Dateien haben ein digitales Siegel. Das digitale Siegel einer "
 "heruntergeladenen Datei kann im Adobe Acrobat Reader oder durch das Ziehen "
 "der Datei in das untenstehende Feld geprüft werden:"
 
@@ -1935,23 +1952,17 @@ msgstr "Zeige die Fusszeile auf allen Seiten, ausser für Administratoren"
 msgid "Partner display"
 msgstr "Anzeige Partner"
 
-msgid "Open external links in separate window"
-msgstr "Externe Links in einem separatem Fenster öffnen"
-
-msgid "Links leading to a different website will be opened in a new window"
-msgstr "Links, welche auf eine adere Webseite führen, werden in einem separaten Fenster geöffnet."
-
 msgid "General"
 msgstr "Allgemein"
 
 msgid "Favicon"
-msgstr ""
+msgstr "Favicon"
 
 msgid "Social Media"
 msgstr "Soziale Medien"
 
 msgid "Links"
-msgstr ""
+msgstr "Links"
 
 msgid "Chat"
 msgstr ""
@@ -1979,3 +1990,54 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Signed file removed."
+#~ msgstr "Signierte Datei gelöscht."
+
+#~ msgid "Unsigned"
+#~ msgstr "Unsigniert"
+
+#~ msgid "Sign now"
+#~ msgstr "Jetzt signieren"
+
+#~ msgid "Digitally signed"
+#~ msgstr "Digital signiert"
+
+#~ msgid "Digitally signed by ${signee} on ${date}"
+#~ msgstr "Digital signiert von ${signee} am ${date}"
+
+#~ msgid "Please enter your yubikey to digitally sign this file"
+#~ msgstr "Bitte geben Sie Ihren Yubikey ein um die Datei digital zu signieren"
+
+#~ msgid ""
+#~ "Published and digitally signed documents can be discovered through the "
+#~ "site-search and in the list of digitally signed documents. This action "
+#~ "will be logged and cannot be undone."
+#~ msgstr ""
+#~ "Publizierte und digital signierte Dokumente können von der Öffentlichkeit "
+#~ "über die Suche gefunden und in der Liste der digital signierten Dokumente "
+#~ "eingesehen werden. Diese Aktion wird aufgezeichnet und kann nicht "
+#~ "rückgängig gemacht werden."
+
+#~ msgid "You are not authorised to digitally sign documents"
+#~ msgstr "Sie sind nicht dazu berechtigt Dokumente digital zu signieren"
+
+#~ msgid "${name} was digitally signed on ${date}"
+#~ msgstr "${name} wurde am ${date} digital signiert"
+
+#~ msgid ""
+#~ "All files have been digitally signed. The digital seal of a downloaded "
+#~ "file can be viewed in Adobe Acrobat Reader or by dragging an already "
+#~ "downloaded file into the field below:"
+#~ msgstr ""
+#~ "Alle Dateien wurden digital signiert. Das digitale Siegel einer "
+#~ "heruntergeladenen Datei kann im Adobe Acrobat Reader oder durch das "
+#~ "Ziehen der Datei in das untenstehende Feld geprüft werden:"
+
+#~ msgid "Open external links in separate window"
+#~ msgstr "Externe Links in einem separatem Fenster öffnen"
+
+#~ msgid "Links leading to a different website will be opened in a new window"
+#~ msgstr ""
+#~ "Links, welche auf eine adere Webseite führen, werden in einem separaten "
+#~ "Fenster geöffnet."

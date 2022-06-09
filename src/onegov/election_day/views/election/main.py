@@ -15,6 +15,19 @@ from onegov.election_day.utils.parties import get_party_results
 from sqlalchemy.orm import object_session
 
 
+@ElectionDayApp.view(
+    model=Election,
+    request_method='HEAD',
+    permission=Public
+)
+def view_election_head(self, request):
+
+    @request.after
+    def add_headers(response):
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
+
+
 @ElectionDayApp.html(
     model=Election,
     permission=Public
@@ -129,24 +142,24 @@ def view_election_json(self, request):
             data['absolute_majority'] = self.absolute_majority
         data['candidates'] = [
             {
-                'family_name': candidate[0],
-                'first_name': candidate[1],
-                'elected': candidate[2],
-                'party': candidate[3],
-                'votes': candidate[4],
+                'family_name': candidate.family_name,
+                'first_name': candidate.first_name,
+                'elected': candidate.elected,
+                'party': candidate.party,
+                'votes': candidate.votes,
             } for candidate in get_candidates_results(self, session)
         ]
 
     if self.type == 'proporz':
         data['candidates'] = [
             {
-                'family_name': candidate[0],
-                'first_name': candidate[1],
-                'elected': candidate[2],
-                'party': candidate[3],
-                'votes': candidate[4],
-                'list_name': candidate[5],
-                'list_list_id': candidate[6]
+                'family_name': candidate.family_name,
+                'first_name': candidate.first_name,
+                'elected': candidate.elected,
+                'party': candidate.party,
+                'votes': candidate.votes,
+                'list_name': candidate.list_name,
+                'list_list_id': candidate.list_id
             } for candidate in get_candidates_results(self, session)
         ]
 

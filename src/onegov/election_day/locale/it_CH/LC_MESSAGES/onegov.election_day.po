@@ -15,14 +15,14 @@ msgstr ""
 "X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
-msgstr "Risultati finali sono disponibili"
+msgstr "Risultati finali disponibili"
 
 msgid "New results are available"
-msgstr "Nuovi risultati sono disponibili"
+msgstr "Nuovi risultati disponibili"
 
 #, python-format
 msgid "New results are available on ${url}"
-msgstr "Nuovi risultati sono disponibili su ${url}"
+msgstr "Nuovi risultati disponibili su ${url}"
 
 msgid "Please confirm your email"
 msgstr "La preghiamo di confermare il Suo indirizzo e-mail"
@@ -451,7 +451,7 @@ msgstr ""
 "Doppelter Pukelsheim. Sempre arrotondato."
 
 msgid "Party strengths"
-msgstr "Forza delle parti"
+msgstr "Forza dei partiti"
 
 msgid ""
 "Shows a tab with the comparison of party strengths as a bar chart. Requires "
@@ -656,7 +656,7 @@ msgstr "Statistiche"
 
 #, python-format
 msgid "Final results are available on ${url}"
-msgstr "Risultati finali sono disponibili su ${url}"
+msgstr "Risultati finali disponibili su ${url}"
 
 #, python-format
 msgid "New intermediate results are available on ${url}"

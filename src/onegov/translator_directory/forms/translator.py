@@ -88,7 +88,7 @@ class FormChoicesMixin:
             for k, v in PROFESSIONAL_GUILDS.items()
         ]
         result.extend([(k, k) for k in self.available_additional_guilds])
-        return sorted(result, key=lambda x: x[0].upper())
+        return sorted(result, key=lambda x: x[1].upper())
 
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
@@ -333,7 +333,7 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     @property
     def cert_collection(self):
-        return LanguageCollection(self.request.session)
+        return LanguageCertificateCollection(self.request.session)
 
     @property
     def certificates(self):

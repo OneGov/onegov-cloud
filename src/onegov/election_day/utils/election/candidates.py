@@ -4,12 +4,25 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.core.utils import groupbylist
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.sql.expression import case
+from sqlalchemy.sql.expression import literal_column
 
 
 def get_candidates_results(election, session):
-    """ Returns the aggregated candidates results as list. """
+    """ Returns the aggregated candidates results as list.
+
+    Also includes percentages of votes for majorz elections. Be aware that this
+    may contain rounding errors.
+    """
+
+    percentage = literal_column('0').label('percentage')
+    if election.type == 'majorz':
+        accounted_votes = election.accounted_ballots or 1
+        percentage = func.round(
+            100 * Candidate.votes / float(accounted_votes), 1
+        ).label('percentage')
 
     result = session.query(
         Candidate.family_name,
@@ -17,8 +30,9 @@ def get_candidates_results(election, session):
         Candidate.elected,
         Candidate.party,
         Candidate.votes.label('votes'),
-        List.name,
-        List.list_id
+        percentage,
+        List.name.label('list_name'),
+        List.list_id.label('list_id')
     )
     result = result.outerjoin(List)
     result = result.filter(Candidate.election_id == election.id)
@@ -140,21 +154,35 @@ def get_candidates_data(
     }
 
 
-def get_candidates_results_by_entity(election):
-    """ Returns the candidates results by entity. """
+def get_candidates_results_by_entity(election, sort_by_votes=False):
+    """ Returns the candidates results by entity.
+
+    Allows to optionally order by the number of total votes instead of the
+    candidate names.
+
+    """
 
     session = object_session(election)
 
     candidates = session.query(
+        Candidate.id,
         Candidate.family_name,
         Candidate.first_name,
         Candidate.votes.label('votes')
     )
-    candidates = candidates.order_by(
-        Candidate.family_name,
-        Candidate.first_name
-    )
+    if sort_by_votes:
+        candidates = candidates.order_by(
+            Candidate.votes.desc(),
+            Candidate.family_name,
+            Candidate.first_name
+        )
+    else:
+        candidates = candidates.order_by(
+            Candidate.family_name,
+            Candidate.first_name
+        )
     candidates = candidates.filter(Candidate.election_id == election.id)
+    candidates = candidates.all()
 
     results = session.query(
         ElectionResult.name,
@@ -165,10 +193,16 @@ def get_candidates_results_by_entity(election):
     results = results.outerjoin(Candidate, ElectionResult)
     results = results.filter(ElectionResult.election_id == election.id)
     results = results.filter(Candidate.election_id == election.id)
-    results = results.order_by(
-        ElectionResult.name,
-        Candidate.family_name,
-        Candidate.first_name
-    )
+    if candidates:
+        results = results.order_by(
+            ElectionResult.name,
+            case(
+                [
+                    (Candidate.id == candidate.id, index)
+                    for index, candidate in enumerate(candidates, 1)
+                ],
+                else_=0
+            )
+        )
 
-    return candidates.all(), groupbylist(results, key=lambda x: x[0])
+    return candidates, groupbylist(results, key=lambda x: x[0])

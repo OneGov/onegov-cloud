@@ -30,6 +30,7 @@ from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
 from onegov.org.forms.settings import ModuleSettingsForm
 from onegov.org.forms.signup import SignupForm
+from onegov.org.forms.text_module import TextModuleForm
 from onegov.org.forms.ticket import InternalTicketChatMessageForm
 from onegov.org.forms.ticket import TicketAssignmentForm
 from onegov.org.forms.ticket import TicketChatMessageForm
@@ -79,6 +80,7 @@ __all__ = [
     'RoomAllocationEditForm',
     'RoomAllocationForm',
     'SignupForm',
+    'TextModuleForm',
     'TicketAssignmentForm',
     'TicketChatMessageForm',
     'TicketNoteForm',

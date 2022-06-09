@@ -542,7 +542,7 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
-        tal:define="lists [n.strip() for n in lists.split(',') if n.strip()]|[]"
+        tal:define="lists [n.strip() for n in lists.split(',') if n.strip()]|[]; show_percentage show_percentage|False"
         >
         <thead>
             <tr>
@@ -550,16 +550,18 @@
                 <th data-tablesaw-priority="2" tal:condition="not:layout.tacit" i18n:translate="single_votes" class="column-votes right-aligned">Votes</th>
                 <th data-tablesaw-priority="3" tal:condition="layout.majorz" i18n:translate="" class="column-party right-aligned">Party</th>
                 <th data-tablesaw-priority="3" tal:condition="layout.proporz" i18n:translate="" class="column-list right-aligned">List</th>
+                <th data-tablesaw-priority="3" tal:condition="layout.majorz and show_percentage" i18n:translate="single_votes" class="column-party right-aligned">Votes</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-elected right-aligned">Elected</th>
             </tr>
         </thead>
         <tbody>
             <tal:block tal:repeat="candidate candidates">
-                <tr tal:condition="not lists or candidate.party in lists or candidate.name in lists" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
+                <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
                     <td class="column-candidate">${candidate.family_name} ${candidate.first_name}</td>
                     <td tal:condition="not:layout.tacit" class="column-votes right-aligned" data-text="${candidate.votes}">${layout.format_number(candidate.votes)}</td>
                     <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>
-                    <td tal:condition="layout.proporz" class="column-list right-aligned">${candidate.name}</td>
+                    <td tal:condition="layout.proporz" class="column-list right-aligned">${candidate.list_name}</td>
+                    <td tal:condition="layout.majorz and show_percentage" class="column-party right-aligned">${layout.format_number(candidate.percentage, 1)}%</td>
                     <td class="column-elected answer accepted right-aligned" tal:condition="candidate.elected is True" i18n:translate="">Yes</td>
                     <td class="column-elected answer rejected right-aligned" tal:condition="candidate.elected is False" i18n:translate="">No</td>
                     <td class="column-elected answer right-aligned" tal:condition="candidate.elected is None" i18n:translate=""></td>
@@ -1349,11 +1351,11 @@
     <tal:block tal:condition="election_compound.has_results and not election_compound.completed">
         <!--! Intermediate results -->
         <h2 i18n:translate>Intermediate results</h2>
-        <dl tal:define="elected_candidates election_compound.elected_candidates">
+        <dl tal:define="elected_candidates python: sorted([(c[1], c[0]) for c in election_compound.elected_candidates])">
             <dt i18n:translate>Counted</dt>
             <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress election_compound.progress" /></dd>
             <dt i18n:translate tal:condition="elected_candidates">Elected Candidates</dt>
-            <dd tal:repeat="name elected_candidates">${name[1]} ${name[0]}</dd>
+            <dd tal:repeat="name elected_candidates">${name[0]} ${name[1]}</dd>
         </dl>
     </tal:block>
     <tal:block tal:condition="election_compound.has_results and election_compound.completed">

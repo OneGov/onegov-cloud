@@ -3,6 +3,7 @@ import sedate
 import transaction
 
 from datetime import time, timedelta
+from dill import pickles
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.security import Public, Private
@@ -11,10 +12,11 @@ from onegov.org import _, OrgApp
 from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
-from onegov.org.forms import ReservationForm
-from onegov.org.layout import ReservationLayout
+from onegov.org.forms import ReservationForm, InternalTicketChatMessageForm
+from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import TicketMessage, ReservationMessage
+from onegov.org.models import (
+    TicketMessage, TicketChatMessage, ReservationMessage)
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
 from purl import URL
@@ -254,6 +256,13 @@ def handle_reservation_form(self, request, form, layout=None):
             forms.submissions.update(
                 submission, form, exclude=form.reserved_fields
             )
+    # set defaults based on remembered submissions from session
+    else:
+        remembered = request.browser_session.get('remembered_submissions', {})
+        for field_name in form.data:
+            if field_name not in remembered:
+                continue
+            getattr(form, field_name).default = remembered[field_name]
 
     # enforce the zip-code block if configured
     if request.POST:
@@ -263,6 +272,15 @@ def handle_reservation_form(self, request, form, layout=None):
 
     # go to the next step if the submitted data is valid
     if form.submitted(request) and not blocked:
+        # also remember submitted form data
+        remembered = request.browser_session.get('remembered_submissions', {})
+        remembered.update(form.data)
+        # but don't remember submitted csrf_token
+        if 'csrf_token' in remembered:
+            del remembered['csrf_token']
+        # only remember the data if we can pickle the data
+        if pickles(remembered, recurse=True, safe=True):
+            request.browser_session.remembered_submissions = remembered
         return morepath.redirect(request.link(self, 'confirmation'))
     else:
         data = {}
@@ -452,6 +470,17 @@ def finalize_reservation(self, request):
                 'show_submission': show_submission
             }
         )
+        if request.email_for_new_tickets:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(request.email_for_new_tickets, ),
+                content={
+                    'model': ticket
+                }
+            )
 
         if request.auto_accept(ticket):
             try:
@@ -469,7 +498,7 @@ def finalize_reservation(self, request):
 
 
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
-def accept_reservation(self, request):
+def accept_reservation(self, request, text=None, notify=False):
     if not self.data or not self.data.get('accepted'):
         resource = request.app.libres_resources.by_reservation(self)
         reservations = resource.scheduler.reservations_by_token(self.token)
@@ -490,6 +519,26 @@ def accept_reservation(self, request):
         # Include all the forms details to be able to print it out
         show_submission = True
 
+        for reservation in reservations:
+            reservation.data = reservation.data or {}
+            reservation.data['accepted'] = True
+
+            # libres does not automatically detect changes yet
+            flag_modified(reservation, 'data')
+
+        ReservationMessage.create(
+            reservations, ticket, request, 'accepted')
+
+        message = None
+        if text:
+            message = TicketChatMessage.create(
+                ticket, request,
+                text=text,
+                owner=request.current_username,
+                recipient=self.email,
+                notify=notify,
+                origin='internal')
+
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
@@ -501,19 +550,10 @@ def accept_reservation(self, request):
                 'resource': resource,
                 'reservations': reservations,
                 'show_submission': show_submission,
-                'form': form
+                'form': form,
+                'message': message
             }
         )
-
-        for reservation in reservations:
-            reservation.data = reservation.data or {}
-            reservation.data['accepted'] = True
-
-            # libres does not automatically detect changes yet
-            flag_modified(reservation, 'data')
-
-        ReservationMessage.create(
-            reservations, ticket, request, 'accepted')
 
         request.success(_("The reservations were accepted"))
     else:
@@ -522,8 +562,33 @@ def accept_reservation(self, request):
     return request.redirect(request.link(self))
 
 
+@OrgApp.form(model=Reservation, name='accept-with-message', permission=Private,
+             form=InternalTicketChatMessageForm, template='form.pt')
+def accept_reservation_with_message(self, request, form, layout=None):
+    recipient = self.email
+    if not recipient:
+        request.alert(_("The submitter email is not available"))
+        return request.redirect(request.link(self))
+
+    if form.submitted(request):
+        return accept_reservation(
+            self, request, text=form.text.data, notify=form.notify.data)
+
+    return {
+        'title': _("Accept all reservation with message"),
+        'layout': layout or TicketChatMessageLayout(self, request),
+        'form': form,
+        'helptext': _(
+            "The following message will be sent to ${address} and it will be "
+            "recorded for future reference.", mapping={
+                'address': recipient
+            }
+        )
+    }
+
+
 @OrgApp.view(model=Reservation, name='reject', permission=Private)
-def reject_reservation(self, request):
+def reject_reservation(self, request, text=None, notify=False):
     resource = request.app.libres_resources.by_reservation(self)
     token = self.token.hex
     reservation_id = int(request.params.get('reservation-id', '0')) or None
@@ -560,6 +625,18 @@ def reject_reservation(self, request):
     if payment:
         request.session.delete(payment)
 
+    ReservationMessage.create(targeted, ticket, request, 'rejected')
+
+    message = None
+    if text:
+        message = TicketChatMessage.create(
+            ticket, request,
+            text=text,
+            owner=request.current_username,
+            recipient=self.email,
+            notify=notify,
+            origin='internal')
+
     send_ticket_mail(
         request=request,
         template='mail_reservation_rejected.pt',
@@ -569,11 +646,10 @@ def reject_reservation(self, request):
         content={
             'model': self,
             'resource': resource,
-            'reservations': targeted
+            'reservations': targeted,
+            'message': message
         }
     )
-
-    ReservationMessage.create(targeted, ticket, request, 'rejected')
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:
@@ -593,3 +669,28 @@ def reject_reservation(self, request):
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):
         return request.redirect(request.link(self))
+
+
+@OrgApp.form(model=Reservation, name='reject-with-message', permission=Private,
+             form=InternalTicketChatMessageForm, template='form.pt')
+def reject_reservation_with_message(self, request, form, layout=None):
+    recipient = self.email
+    if not recipient:
+        request.alert(_("The submitter email is not available"))
+        return request.redirect(request.link(self))
+
+    if form.submitted(request):
+        return reject_reservation(
+            self, request, text=form.text.data, notify=form.notify.data)
+
+    return {
+        'title': _("Reject all reservations with message"),
+        'layout': layout or TicketChatMessageLayout(self, request),
+        'form': form,
+        'helptext': _(
+            "The following message will be sent to ${address} and it will be "
+            "recorded for future reference.", mapping={
+                'address': recipient
+            }
+        )
+    }
