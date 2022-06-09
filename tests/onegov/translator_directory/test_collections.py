@@ -202,6 +202,16 @@ def test_translator_collection_update(translator_app):
     assert translator_b.user.active
     assert user_b.username == 'c@c.c'
 
+    collection.update_user(translator_b, 'a@a.a')
+    translator_b.email = 'a@a.a'
+    session.flush()
+    session.expire_all()
+    assert translator_b.user.username == 'a@a.a'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+    assert user_a.translator == translator_b
+    assert not user_b.translator
+
 
 def test_language_collection(session):
     coll = LanguageCollection(session)
