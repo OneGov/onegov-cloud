@@ -128,33 +128,27 @@ class TranslatorCollection(GenericCollection, Pagination):
             )
 
         if enable:
-            changed = False
-            if enable.username != new_email:
-                log.info(f'Changing user {enable.username} to {new_email}')
-                enable.username = new_email
-                changed = True
-            if enable.role != 'translator':
-                log.info(f'Correcting user role of {enable.username}')
-                enable.role = 'translator'
-                changed = True
-            if not enable.active:
-                log.info(f'Activating user {enable.username}')
-                enable.active = True
-                changed = True
-            if enable.source or enable.source_id:
-                log.info(f'Making user {enable.username} local')
-                enable.source = None
-                enable.source_id = None
-                changed = True
-            if changed:
-                enable.password = random_password(16)
+            corrections = {
+                'username': new_email,
+                'role': 'translator',
+                'active': True,
+                'source': None,
+                'source_id': None
+            }
+            corrections = {
+                attribute: value for attribute, value in corrections.items()
+                if getattr(enable, attribute) != value
+            }
+            if corrections:
+                log.info(f'Correcting user {enable.username} to {corrections}')
+                for attribute, value in corrections.items():
+                    setattr(enable, attribute, value)
                 enable.logout_all_sessions(self.app)
 
         for user in disable:
             if user:
                 log.info(f'Deactivating user {user.username}')
                 user.active = False
-                user.password = random_password(16)
                 user.logout_all_sessions(self.app)
 
     @staticmethod
