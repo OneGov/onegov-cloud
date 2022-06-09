@@ -72,10 +72,12 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         ]
         values.sort(key=keyword_group)
 
-        query = query.filter(and_(
+        values = [
             cls._keywords.has_any(array(group_values))
             for group, group_values in groupby(values, key=keyword_group)
-        ))
+        ]
+        if values:
+            query = query.filter(and_(*values))
 
         if self.directory.configuration.direction == 'desc':
             query = query.order_by(desc(cls.order))
