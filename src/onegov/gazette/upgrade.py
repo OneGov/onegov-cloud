@@ -38,7 +38,7 @@ def migrate_organization_ids(context):
                 del notice.meta['organization_id']
 
 
-@upgrade_task('Migrate gazette categories', always_run=True)
+@upgrade_task('Migrate gazette categories')
 def migrate_categories(context):
     principal = getattr(context.app, 'principal', None)
     if not principal:
@@ -61,7 +61,7 @@ def migrate_categories(context):
         collection.add_root(name=name, title=title, active=True)
 
 
-@upgrade_task('Migrate gazette organizations', always_run=True)
+@upgrade_task('Migrate gazette organizations')
 def migrate_organizations(context):
     principal = getattr(context.app, 'principal', None)
     if not principal:
@@ -89,7 +89,7 @@ def migrate_organizations(context):
         )
 
 
-@upgrade_task('Migrate gazette issues', always_run=True)
+@upgrade_task('Migrate gazette issues')
 def migrate_issues(context):
     principal = getattr(context.app, 'principal', None)
     if not principal:

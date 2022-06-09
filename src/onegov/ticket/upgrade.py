@@ -8,12 +8,10 @@ from onegov.ticket import Ticket
 from sqlalchemy import Boolean, Column, Integer, Text, Enum
 
 
-@upgrade_task('Add handler_id to ticket', always_run=True)
+@upgrade_task('Add handler_id to ticket')
 def add_handler_id_to_ticket(context):
 
-    if context.has_column('tickets', 'handler_id'):
-        return False
-    else:
+    if not context.has_column('tickets', 'handler_id'):
         context.operations.add_column(
             'tickets', Column(
                 'handler_id', Text, nullable=True, unique=True, index=True

@@ -50,7 +50,7 @@ def get_list_groups_data(election_compound):
         'results': [
             {
                 'text': result.name,
-                'value': round(result.voters_count),
+                'value': round(result.voters_count or 0),
                 'value2': result.number_of_mandates,
                 'class': (
                     'active' if completed and result.number_of_mandates
