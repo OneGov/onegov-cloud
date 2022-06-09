@@ -164,6 +164,10 @@
                                             <td colspan="7">
                                                 <dl class="field-display">
                                                     <div>
+                                                        <dt i18n:translate>Birthdate</dt>
+                                                        <dd>${layout.format_date(record.birth_date, 'date')}</dd>
+                                                    </div>
+                                                    <div>
                                                         <dt i18n:translate>Address</dt>
                                                         <dd>
                                                             ${record.address}<br>

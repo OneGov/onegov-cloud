@@ -45,3 +45,6 @@ class PartyResult(Base, TimestampMixin):
 
     #: the color code
     color = Column(Text, nullable=True)
+
+    #: the id of the party
+    party_id = Column(Text, nullable=True)
