@@ -512,7 +512,11 @@ def test_user_group_form(session):
     )
     session.flush()
 
-    request = Bunch(session=session, current_user=None)
+    request = Bunch(
+        session=session,
+        app=Bunch(session=lambda: session),
+        current_user=None
+    )
     form = ManageUserGroupForm()
     form.request = request
     form.on_request()
