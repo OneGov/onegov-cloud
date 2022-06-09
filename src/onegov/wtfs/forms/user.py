@@ -56,7 +56,7 @@ class UserForm(Form):
         if not model.modified:
             model.modified = model.timestamp()
 
-        model.logout_all_sessions(self.request)
+        model.logout_all_sessions(self.request.app)
 
         return logged_out
 

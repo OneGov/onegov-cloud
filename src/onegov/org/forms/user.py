@@ -74,7 +74,7 @@ class ManageUserForm(Form):
             model.role != self.role.data
             or model.active != self.active
         ):
-            model.logout_all_sessions(self.request)
+            model.logout_all_sessions(self.request.app)
 
         super().populate_obj(model)
         model.active = self.active
@@ -196,7 +196,7 @@ class ManageUserGroupForm(Form):
         users = users.filter(User.id.in_(user_ids)).all()
         for user in users:
             if user != self.request.current_user:
-                user.logout_all_sessions(self.request)
+                user.logout_all_sessions(self.request.app)
 
         # Update model
         users = UserCollection(session).query()

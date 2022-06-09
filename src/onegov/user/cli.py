@@ -156,7 +156,7 @@ def deactivate(username):
             abort("{} does not exist".format(username))
 
         user.active = False
-        user.logout_all_sessions(request)
+        user.logout_all_sessions(request.app)
         click.secho("{} was deactivated".format(username), fg='green')
 
     return deactivate_user
@@ -173,7 +173,7 @@ def logout(username):
         if not user:
             abort("{} does not exist".format(username))
 
-        user.logout_all_sessions(request)
+        user.logout_all_sessions(request.app)
         click.secho("{} logged out".format(username), fg='green')
 
     return logout_user
@@ -185,7 +185,7 @@ def logout_all():
 
     def logout_user(request, app):
         for user in UserCollection(app.session()).query():
-            count = user.logout_all_sessions(request)
+            count = user.logout_all_sessions(request.app)
             if count:
                 click.secho("{} logged out".format(user.username), fg='green')
 
@@ -245,7 +245,7 @@ def change_password(username, password):
 
         user = users.by_username(username)
         user.password = password
-        user.logout_all_sessions(request)
+        user.logout_all_sessions(request.app)
 
         click.secho("{}'s password was changed".format(username), fg='green')
 
@@ -277,7 +277,7 @@ def change_yubikey(username, yubikey):
             }
         else:
             user.second_factor = None
-        user.logout_all_sessions(request)
+        user.logout_all_sessions(request.app)
 
         click.secho("{}'s yubikey was changed".format(username), fg='green')
 
@@ -298,7 +298,7 @@ def change_role(username, role):
 
         user = users.by_username(username)
         user.role = role
-        user.logout_all_sessions(request)
+        user.logout_all_sessions(request.app)
 
         click.secho("{}'s role was changed".format(username), fg='green')
 
