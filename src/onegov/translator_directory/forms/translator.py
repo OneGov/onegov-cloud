@@ -46,7 +46,7 @@ class FormChoicesMixin:
 
     @property
     def available_additional_guilds(self):
-        translators = TranslatorCollection(self.request.session)
+        translators = TranslatorCollection(self.request.app)
         return translators.available_additional_professional_guilds
 
     @cached_property
@@ -371,8 +371,10 @@ class TranslatorForm(Form, FormChoicesMixin):
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
-            exclude={'csrf_token', *self.special_fields.keys()})
+            exclude={'csrf_token', *self.special_fields.keys()}
+        )
 
+        data['email'] = data['email'] or None
         data['mother_tongues'] = self.mother_tongues
         data['spoken_languages'] = self.spoken_languages
         data['written_languages'] = self.written_languages
@@ -404,6 +406,9 @@ class TranslatorForm(Form, FormChoicesMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
+        translators = TranslatorCollection(self.request.app)
+        translators.update_user(model, self.email.data)
+
         model.first_name = self.first_name.data
         model.last_name = self.last_name.data
         model.iban = self.iban.data

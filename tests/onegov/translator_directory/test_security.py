@@ -50,7 +50,7 @@ def test_security_permissions(translator_app):
         session.add(result)
         return result
 
-    roles = ('admin', 'editor', 'member', 'anonymous')
+    roles = ('admin', 'editor', 'member', 'anonymous', 'translator')
     users = {}
     for role in roles:
         users[role] = create_user(role, role)
@@ -85,6 +85,12 @@ def test_security_permissions(translator_app):
         assert not permits(user, model, Private)
         assert not permits(user, model, Secret)
 
+    def assert_translator(user, model):
+        assert permits(user, model, Public)
+        assert not permits(user, model, Personal)
+        assert not permits(user, model, Private)
+        assert not permits(user, model, Secret)
+
     def assert_anonymous(user, model):
         assert permits(user, model, Public)
         assert not permits(user, model, Personal)
@@ -97,74 +103,113 @@ def test_security_permissions(translator_app):
         assert not permits(user, model, Private)
         assert not permits(user, model, Secret)
 
+        # LanguageCertificate
     model = LanguageCertificate()
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
 
+    # LanguageCertificateCollection
     model = LanguageCertificateCollection(session)
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
 
+    # TranslatorDocumentCollection
     model = TranslatorDocumentCollection(session, None, None)
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)
-    assert_no_access(users['member'], model)
-    assert_no_access(users['anonymous'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
 
+    # Language
     model = Language()
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
 
+    # LanguageCollection
     model = LanguageCollection(session)
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
 
+    # Translator
     model = Translator()
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
 
     model.for_admins_only = True
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)
-    assert_no_access(users['member'], model)
-    assert_no_access(users['anonymous'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_translator(users['translator'], model)
+    assert_no_access(users['anonymous'], model)  # restricted
 
-    model = TranslatorCollection(session)
+    model.for_admins_only = False
+    model.email = 'translator@example.org'
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
+    assert_member(users['translator'], model)  # elevated
     assert_anonymous(users['anonymous'], model)
 
+    model.for_admins_only = True
+    model.email = 'translator@example.org'
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_member(users['translator'], model)  # elevated
+    assert_no_access(users['anonymous'], model)  # restricted
+
+    # TranslatorCollection
+    model = TranslatorCollection(translator_app)
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
+    assert_anonymous(users['anonymous'], model)
+
+    # File
     model = File()
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)
-    assert_no_access(users['member'], model)
-    assert_no_access(users['anonymous'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
 
+    # TranslatorVoucherFile
     model = TranslatorVoucherFile()
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)
-    assert_no_access(users['member'], model)
-    assert_no_access(users['anonymous'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
 
+    # GeneralFile
     model = GeneralFile()
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)
-    assert_no_access(users['member'], model)
-    assert_no_access(users['anonymous'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
 
+    # GeneralFileCollection
     model = GeneralFileCollection(session)
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)
-    assert_no_access(users['member'], model)
-    assert_no_access(users['anonymous'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted

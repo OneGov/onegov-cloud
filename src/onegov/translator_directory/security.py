@@ -1,24 +1,53 @@
+from onegov.core.security import Public, Personal
+from onegov.core.security.roles import get_roles_setting as \
+    get_roles_setting_base
 from onegov.file import File
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.models.translator import Translator
+from onegov.user import Auth
 
 """
-The idea for permission is the following:
 
-Personal: beeing logged in by default, can be overwritten model wise
-Private: also editor can access it
-Secret: admins
+The standard permission model is used and mapped as followed:
+- Anonymous users can log in.
+- Translators can view their own personal information and report changes.
+- Members can additionally view the translators and their vouchers.
+- Editors can additionally editor some informations of translators.
+- Admins can do everything.
 
 """
+
+
+@TranslatorDirectoryApp.setting_section(section="roles")
+def get_roles_setting():
+    result = get_roles_setting_base()
+    result['translator'] = {Public}
+    return result
+
+
+@TranslatorDirectoryApp.permission_rule(model=Auth, permission=object)
+def restrict_auth_access(app, identity, model, permission):
+    if permission == Personal and identity.role == 'translator':
+        return True
+
+    return permission in getattr(app.settings.roles, identity.role)
 
 
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
-def hide_translator_for_non_admins(app, identity, model, permission):
-    if model.for_admins_only and identity.role != 'admin':
+def restrict_translator_access(app, identity, model, permission):
+    if model.for_admins_only and identity.role not in ('admin', 'translator'):
         return False
+
+    if (
+        identity.role == 'translator'
+        and identity.userid == model.email
+        and permission == Personal
+    ):
+        return True
+
     return permission in getattr(app.settings.roles, identity.role)
 
 

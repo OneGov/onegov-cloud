@@ -14,12 +14,9 @@ from onegov.user import Auth
     form=LoginForm
 )
 def handle_login(self, request, form):
-    # custom default redirect
-    if self.to == '/':
-        self.to = '/translators'
-
     # custom username handle
     form.username.label.text = request.translate(
-        _("E-Mail Address / Username / Shortcut"))
+        _("E-Mail Address / Username / Shortcut")
+    )
 
     return handle_login_base(self, request, form)

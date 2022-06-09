@@ -3,15 +3,18 @@ from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.models.translator import Translator
 from tests.onegov.translator_directory.shared import create_languages, \
     translator_data
+from onegov.user import User, UserCollection
 
 
-def test_translator(session):
+def test_translator(translator_app):
+    session = translator_app.session()
     langs = create_languages(session)
     assert all((lang.deletable for lang in langs))
 
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(translator_app)
     translator = translators.add(**translator_data, mother_tongues=[langs[0]])
 
     assert translator.mother_tongues
@@ -57,8 +60,56 @@ def test_translator(session):
     assert translator.expertise_professional_guilds_all == ('Psychologie', )
 
 
-def test_translator_collection(session):
-    translators = TranslatorCollection(session)
+def test_translator_user(session):
+    users = UserCollection(session)
+    user_a = users.add(username='a@example.org', password='a', role='member')
+    user_b = users.add(username='b@example.org', password='b', role='member')
+
+    translator = Translator(
+        first_name='Hugo',
+        last_name='Benito',
+    )
+    session.add(translator)
+    session.flush()
+
+    assert translator.user is None
+    assert user_a.translator is None
+    assert user_b.translator is None
+
+    translator.email = 'a@example.org'
+    session.flush()
+    session.expire_all()
+    assert translator.user == user_a
+    assert user_a.translator == translator
+    assert user_b.translator is None
+
+    translator.email = 'b@example.org'
+    session.flush()
+    session.expire_all()
+    assert translator.user == user_b
+    assert user_a.translator is None
+    assert user_b.translator == translator
+
+    session.delete(user_b)
+    session.flush()
+    translator = session.query(Translator).one()
+    user = session.query(User).one()
+    assert translator.email == 'b@example.org'
+
+    user.username = 'user@example.org'
+    translator.email = 'user@example.org'
+    session.flush()
+    session.expire_all()
+    assert translator.user == user
+    assert user.translator == translator
+
+    session.delete(translator)
+    session.flush()
+    assert session.query(User).one().username == 'user@example.org'
+
+
+def test_translator_collection(translator_app):
+    translators = TranslatorCollection(translator_app)
     trs = translators.add(
         **translator_data,
         coordinates=Coordinates()

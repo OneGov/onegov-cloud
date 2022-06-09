@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-02-03 15:02+0100\n"
+"POT-Creation-Date: 2022-06-09 09:23+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -97,6 +97,9 @@ msgstr "Einstellungen"
 msgid "Settings translator directory"
 msgstr "Verzeichniseinstellungen"
 
+msgid "Users"
+msgstr "Benutzer"
+
 msgid "Management"
 msgstr "Verwaltung"
 
@@ -105,6 +108,9 @@ msgstr "Anmelden"
 
 msgid "Translators"
 msgstr "Übersetzer/innen"
+
+msgid "Personal Information"
+msgstr "Persönliche Informationen"
 
 msgid "Languages"
 msgstr "Sprachen"
@@ -142,9 +148,6 @@ msgstr "Selbständig"
 
 msgid "Last name"
 msgstr "Nachname"
-
-msgid "Personal Information"
-msgstr "Persönliche Informationen"
 
 msgid "First name"
 msgstr "Vorname"
@@ -320,6 +323,18 @@ msgstr "Absteigend"
 msgid "Search in first and last name"
 msgstr "Suche in Vor- und Nachname"
 
+msgid "Admin"
+msgstr "Administrator"
+
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Translator"
+msgstr "Übersetzer/in"
+
 msgid "Yes"
 msgstr "Ja"
 
@@ -359,11 +374,11 @@ msgstr "Übersetzer/in bearbeiten"
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
 
-msgid "Add language"
-msgstr "Sprache hinzufügen"
-
 msgid "Export Excel"
 msgstr "Export Excel"
+
+msgid "Add language"
+msgstr "Sprache hinzufügen"
 
 msgid "This language is used and can't be deleted."
 msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden."
@@ -410,11 +425,26 @@ msgstr "Sprechende"
 msgid "Writers"
 msgstr "Schreibende"
 
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
+msgid "Editors"
+msgstr "Editoren"
+
+msgid "Members"
+msgstr "Mitglieder"
+
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
 msgid "Certificates"
 msgstr "Zertifikate"
+
+msgid "User"
+msgstr "Benutzer"
 
 msgid "Phone numbers"
 msgstr "Telefonischer Kontakt"
@@ -445,6 +475,9 @@ msgstr "Ihre Änderungen wurden gespeichert"
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
+msgid "An account was created for you"
+msgstr "Ein Konto wurde für Sie erstellt"
+
 msgid "Submit Search"
 msgstr "Suchen"
 
@@ -459,54 +492,3 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
-
-#~ msgid "Location Settings"
-#~ msgstr "Standorteinstellungen"
-
-#~ msgid "Uncategorized"
-#~ msgstr "Unkategorisiert"
-
-#~ msgid "File"
-#~ msgstr "Datei"
-
-#~ msgid "Category"
-#~ msgstr "Kategorie"
-
-#~ msgid "Language training"
-#~ msgstr "Sprachausbildung"
-
-#~ msgid "Users"
-#~ msgstr "Benutzer"
-
-#~ msgid "Driving distance"
-#~ msgstr "Wegberechnung"
-
-#~ msgid "Mother tongue"
-#~ msgstr "Muttersprache"
-
-#~ msgid "Not a valid number"
-#~ msgstr "Keine gültige Zahl"
-
-#~ msgid "Certificate"
-#~ msgstr "Zertifikat"
-
-#~ msgid "LanguageCertificate"
-#~ msgstr "Zertifikat"
-
-#~ msgid "Added a new language"
-#~ msgstr "Neue Sprache hinzugefügt"
-
-#~ msgid "Profile"
-#~ msgstr "Profil"
-
-#~ msgid "User Profile"
-#~ msgstr "Benutzerprofil"
-
-#~ msgid "Contact Information"
-#~ msgstr "Kontaktinformationen"
-
-#~ msgid "Languages skills"
-#~ msgstr "Sprachkenntnisse"
-
-#~ msgid "Unknown"
-#~ msgstr "Unbekannt"
