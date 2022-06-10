@@ -8,10 +8,9 @@ from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
 from onegov.translator_directory.layout import TranslatorLayout
 from onegov.translator_directory.models.mutation import TranslatorMutation
+from onegov.translator_directory.models.translator import Translator
 
 
 class TranslatorMutationTicket(OrgTicketMixin, Ticket):
@@ -29,12 +28,10 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
     code_title = _("Translators")
 
     @cached_property
-    def collection(self):
-        return TranslatorCollection(self.session, user_role='admin')
-
-    @cached_property
     def translator(self):
-        return self.collection.by_id(self.data['handler_data']['id'])
+        return self.session.query(Translator).filter_by(
+            id=self.data['handler_data']['id']
+        ).first()
 
     @cached_property
     def mutation(self):

@@ -54,9 +54,24 @@ def restrict_translator_access(app, identity, model, permission):
 
 
 @TranslatorDirectoryApp.permission_rule(
+    model=Translator, permission=object, identity=None)
+def restrict_translator_access_anon(app, identity, model, permission):
+    if model.for_admins_only:
+        return False
+
+    return permission in app.settings.roles.anonymous
+
+
+@TranslatorDirectoryApp.permission_rule(
     model=GeneralFileCollection, permission=object)
-def restrict_general_file_collection_access(app, identity, model, permission):
+def restrict_general_file_coll_access(app, identity, model, permission):
     return identity.role == 'admin'
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=GeneralFileCollection, permission=object, identity=None)
+def restrict_general_file_coll_access_anon(app, identity, model, permission):
+    return False
 
 
 @TranslatorDirectoryApp.permission_rule(
@@ -78,9 +93,21 @@ def restrict_translator_docs_coll_access(app, identity, model, permission):
 
 
 @TranslatorDirectoryApp.permission_rule(
+    model=TranslatorDocumentCollection, permission=object, identity=None)
+def disable_translator_docs_coll_access_anon(app, identity, model, permission):
+    return False
+
+
+@TranslatorDirectoryApp.permission_rule(
     model=TicketCollection, permission=object)
 def restricts_ticket(app, identity, model, permission):
     return identity.role == 'admin'
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=TicketCollection, permission=object, identity=None)
+def restricts_ticket_anon(app, identity, model, permission):
+    return False
 
 
 @TranslatorDirectoryApp.permission_rule(model=Ticket, permission=object)
@@ -89,10 +116,19 @@ def restrict_ticket(app, identity, model, permission):
 
 
 @TranslatorDirectoryApp.permission_rule(
+    model=Ticket, permission=object, identity=None)
+def restrict_ticket_anon(app, identity, model, permission):
+    return False
+
+
+@TranslatorDirectoryApp.permission_rule(
     model=TranslatorMutationTicket, permission=object)
 def restrict_translator_mutation_ticket(app, identity, model, permission):
-    if permission == Public and identity.role == 'translator':
-        if model.handler:
-            return model.handler.email == identity.userid
+    if (
+        permission == Public
+        and identity.role in ('editor', 'member', 'translator')
+        and model.handler
+    ):
+        return model.handler.email == identity.userid
 
     return identity.role == 'admin'

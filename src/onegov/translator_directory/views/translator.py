@@ -364,7 +364,7 @@ def report_translator_change(self, request, form):
                 handler_id=uuid4().hex,
                 handler_data={
                     'id': str(self.id),
-                    'submitter_email': self.email,
+                    'submitter_email': request.current_username,
                     'submitter_message': form.submitter_message.data,
                     'proposed_changes': form.proposed_changes
                 }
@@ -376,7 +376,7 @@ def report_translator_change(self, request, form):
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("Your ticket has been opened"),
-            receivers=(self.email, ),
+            receivers=(request.current_username, ),
             ticket=ticket,
             send_self=True
         )
