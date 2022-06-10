@@ -174,6 +174,6 @@ def delete_user(self, request):
     """ Delete a user. """
 
     request.assert_valid_csrf_token()
-    self.logout_all_sessions(request)
+    self.logout_all_sessions(request.app)
     UserCollection(request.session).delete(self.username)
     request.message(_("User deleted."), 'success')

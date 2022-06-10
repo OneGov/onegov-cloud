@@ -127,26 +127,20 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert lines[0].startswith(
         'year,name,id,total_votes,color,mandates,votes'
     )
-    assert lines[1].startswith(
-        '2022,BDP,0,11270,#efb52c,1,60387,603.01'
-    )
-    assert lines[2].startswith(
-        '2022,CVP,1,11270,#ff6300,1,49117,491.02'
-    )
-    assert lines[3].startswith(
-        '2022,FDP,2,11270,#0571b0,0,35134,351.04'
-    )
+    assert lines[1].startswith('2022,BDP,1,11270,#efb52c,1,60387,603.01')
+    assert lines[2].startswith('2022,CVP,2,11270,#ff6300,1,49117,491.02')
+    assert lines[3].startswith('2022,FDP,3,11270,#0571b0,0,35134,351.04')
 
     export = client.get('/elections/elections/data-parties-json').json
     assert export == [
         {
             'color': '#efb52c',
-            'id': 0,
+            'id': '1',
             'mandates': 1,
             'name': 'BDP',
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_1': 11,
-            'panachage_votes_from_2': 12,
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': 11,
+            'panachage_votes_from_3': 12,
             'panachage_votes_from_999': 100,
             'total_votes': 11270,
             'voters_count': 603.01,
@@ -156,12 +150,12 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
         },
         {
             'color': '#ff6300',
-            'id': 1,
+            'id': '2',
             'mandates': 1,
             'name': 'CVP',
-            'panachage_votes_from_0': 21,
-            'panachage_votes_from_1': None,
-            'panachage_votes_from_2': 22,
+            'panachage_votes_from_1': 21,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_3': 22,
             'panachage_votes_from_999': 200,
             'total_votes': 11270,
             'voters_count': 491.02,
@@ -171,12 +165,12 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
         },
         {
             'color': '#0571b0',
-            'id': 2,
+            'id': '3',
             'mandates': 0,
             'name': 'FDP',
-            'panachage_votes_from_0': 31,
-            'panachage_votes_from_1': 32,
-            'panachage_votes_from_2': None,
+            'panachage_votes_from_1': 31,
+            'panachage_votes_from_2': 32,
+            'panachage_votes_from_3': None,
             'panachage_votes_from_999': 300,
             'total_votes': 11270,
             'voters_count': 351.04,
@@ -217,12 +211,12 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     csv_parties = (
         'year,name,id,total_votes,color,mandates,'
         'votes,voters_count,voters_count_percentage\r\n'
-        '2022,BDP,0,60000,#efb52c,1,10000,100,16.67\r\n'
-        '2022,CVP,1,60000,#ff6300,1,30000,300,50\r\n'
-        '2022,FDP,2,60000,#4068c8,0,20000,200,33.33\r\n'
-        '2018,BDP,0,40000,#efb52c,1,1000,10,2.5\r\n'
-        '2018,CVP,1,40000,#ff6300,1,15000,150.7,37.67\r\n'
-        '2018,FDP,2,40000,#4068c8,1,10000,100,25.0\r\n'
+        '2022,BDP,1,60000,#efb52c,1,10000,100,16.67\r\n'
+        '2022,CVP,2,60000,#ff6300,1,30000,300,50\r\n'
+        '2022,FDP,3,60000,#4068c8,0,20000,200,33.33\r\n'
+        '2018,BDP,1,40000,#efb52c,1,1000,10,2.5\r\n'
+        '2018,CVP,2,40000,#ff6300,1,15000,150.7,37.67\r\n'
+        '2018,FDP,3,40000,#4068c8,1,10000,100,25.0\r\n'
     ).encode('utf-8')
 
     upload = client.get('/elections/elections/upload-party-results')

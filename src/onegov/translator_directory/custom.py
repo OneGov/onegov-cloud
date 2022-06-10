@@ -10,9 +10,10 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory import _
 from onegov.translator_directory.layout import DefaultLayout
 from onegov.user import Auth
+from onegov.user import UserCollection
 
 
-def get_base_tools(request):
+def get_global_tools(request):
 
     if request.is_logged_in:
 
@@ -24,7 +25,8 @@ def get_base_tools(request):
                     _("Logout"), request.link(
                         Auth.from_request(
                             request, to=logout_path(request)), name='logout'
-                    ), attrs={'class': 'logout'}
+                    ),
+                    attrs={'class': 'logout'}
                 ),
             )
         )
@@ -41,12 +43,18 @@ def get_base_tools(request):
                     Link(
                         _("Settings"), request.link(
                             request.app.org, 'settings'
-                        ), attrs={'class': 'settings'}
+                        ),
+                        attrs={'class': 'settings'}
                     ),
                     Link(
                         _("Settings translator directory"), request.link(
                             request.app.org, 'directory-settings'
-                        ), attrs={'class': 'settings'}
+                        ),
+                        attrs={'class': 'settings'}
+                    ),
+                    Link(
+                        _("Users"), request.class_link(UserCollection),
+                        attrs={'class': 'user'}
                     )
                 )
             )
@@ -127,26 +135,20 @@ def get_base_tools(request):
         )
 
 
-def get_global_tools(request):
-    yield from get_base_tools(request)
-
-
-@TranslatorDirectoryApp.template_variables()
-def get_template_variables(request):
-    return {
-        'global_tools': tuple(get_global_tools(request)),
-        'top_navigation': tuple(get_top_navigation(request)),
-        'hide_search_header': not request.is_logged_in
-    }
-
-
 def get_top_navigation(request):
 
     # inject an activites link in front of all top navigation links
-    yield Link(
-        text=_("Translators"),
-        url=request.class_link(TranslatorCollection)
-    )
+    if request.is_manager or request.is_member:
+        yield Link(
+            text=_("Translators"),
+            url=request.class_link(TranslatorCollection)
+        )
+
+    if request.is_translator and request.current_user.translator:
+        yield Link(
+            text=_("Personal Information"),
+            url=request.link(request.current_user.translator)
+        )
 
     if request.is_manager:
         yield Link(
@@ -156,3 +158,12 @@ def get_top_navigation(request):
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation
+
+
+@TranslatorDirectoryApp.template_variables()
+def get_template_variables(request):
+    return {
+        'global_tools': tuple(get_global_tools(request)),
+        'top_navigation': tuple(get_top_navigation(request)),
+        'hide_search_header': not request.is_logged_in
+    }

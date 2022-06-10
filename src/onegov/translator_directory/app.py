@@ -1,7 +1,4 @@
 from datetime import datetime
-
-from sqlalchemy.orm import object_session
-
 from onegov.core import utils
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent, extension_for_content_type, \
@@ -11,9 +8,12 @@ from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.models import Organisation
 from onegov.translator_directory.models.voucher import TranslatorVoucherFile
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
+from purl import URL
+from sqlalchemy.orm import object_session
 
 
 class TranslatorDirectoryApp(OrgApp):
@@ -63,6 +63,11 @@ class TranslatorDirectoryApp(OrgApp):
             session = object_session(self.org)
             session.add(file)
             session.flush()
+
+    def redirect_after_login(self, identity, request, default):
+        if default != '/' and '/auth/login' not in str(default):
+            return None
+        return URL(request.class_link(Organisation)).path()
 
 
 @TranslatorDirectoryApp.template_directory()
