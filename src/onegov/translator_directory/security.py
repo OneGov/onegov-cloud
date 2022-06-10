@@ -3,6 +3,7 @@ from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
 from onegov.file import File
 from onegov.org.models import GeneralFileCollection, GeneralFile
+from onegov.ticket import Ticket, TicketCollection
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
@@ -72,4 +73,15 @@ def restrict_file_access(app, identity, model, permission):
 @TranslatorDirectoryApp.permission_rule(
     model=TranslatorDocumentCollection, permission=object)
 def restrict_translator_docs_coll_access(app, identity, model, permission):
+    return identity.role == 'admin'
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=TicketCollection, permission=object)
+def restricts_ticket(app, identity, model, permission):
+    return identity.role == 'admin'
+
+
+@TranslatorDirectoryApp.permission_rule(model=Ticket, permission=object)
+def restrict_ticket(app, identity, model, permission):
     return identity.role == 'admin'

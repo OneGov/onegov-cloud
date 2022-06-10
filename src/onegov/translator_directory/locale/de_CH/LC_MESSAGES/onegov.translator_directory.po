@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-09 09:23+0200\n"
+"POT-Creation-Date: 2022-06-10 06:47+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -88,6 +88,9 @@ msgstr "Schriftliche Übersetzungen"
 msgid "Logout"
 msgstr "Abmelden"
 
+msgid "Management"
+msgstr "Verwaltung"
+
 msgid "Files"
 msgstr "Allg. Dateiablage"
 
@@ -97,11 +100,26 @@ msgstr "Einstellungen"
 msgid "Settings translator directory"
 msgstr "Verzeichniseinstellungen"
 
+msgid "Tickets"
+msgstr "Tickets"
+
+msgid "Ticket"
+msgstr "Ticket"
+
+msgid "My Tickets"
+msgstr "Meine Tickets"
+
+msgid "Open Tickets"
+msgstr "Offene Tickets"
+
+msgid "Pending Tickets"
+msgstr "Tickets in Bearbeitung"
+
+msgid "Closed Tickets"
+msgstr "Abgeschlossene Tickets"
+
 msgid "Users"
 msgstr "Benutzer"
-
-msgid "Management"
-msgstr "Verwaltung"
 
 msgid "Login"
 msgstr "Anmelden"
