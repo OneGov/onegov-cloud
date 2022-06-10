@@ -93,16 +93,19 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                     (choice[0], self.request.translate(choice[1]))
                     for choice in field.choices
                 ]
-                field.description = ', '.join([
+                field.long_description = ', '.join([
                     dict(field.choices).get(str(getattr(v, 'id', v)), '')
                     for v in value
                 ])
             elif isinstance(field, CoordinatesField):
                 pass
             elif isinstance(field, TagsField):
-                field.description = ', '.join(value)
+                field.long_description = ', '.join(value)
+            elif isinstance(field, DateField):
+                if value:
+                    field.long_description = layout.format_date(value, 'date')
             else:
-                field.description = str(value)
+                field.long_description = str(value or '')
 
     @property
     def proposal_fields(self):
@@ -139,103 +142,103 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         if not self.submitter_message.data and not self.proposed_changes:
             self.submitter_message.errors.append(
                 _(
-                    "Please enter a message or suggest some changes "
-                    "using the fields below."
+                    'Please enter a message or suggest some changes '
+                    'using the fields below.'
                 )
             )
             return False
 
     submitter_message = TextAreaField(
-        fieldset=_("Your message"),
-        label=_("Message"),
+        fieldset=_('Your message'),
+        label=_('Message'),
         render_kw={'rows': 8}
     )
 
     first_name = StringField(
         label=_('First name'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     last_name = StringField(
         label=_('Last name'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     pers_id = IntegerField(
         label=_('Personal ID'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         validators=[Optional()]
     )
 
     admission = ChosenSelectField(
         label=_('Admission'),
         choices=list(ADMISSIONS.items()),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     withholding_tax = ChosenSelectField(
         label=_('Withholding tax'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=BOOLS,
         validators=[Optional()]
     )
 
     self_employed = ChosenSelectField(
         label=_('Self-employed'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=BOOLS,
         validators=[Optional()]
     )
 
     gender = ChosenSelectField(
         label=_('Gender'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=list(GENDERS.items()),
         validators=[Optional()]
     )
 
     date_of_birth = DateField(
         label=_('Date of birth'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         validators=[Optional()]
     )
 
     nationality = StringField(
         label=_('Nationality'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     coordinates = CoordinatesField(
-        label=_("Location"),
+        label=_('Location'),
         description=_(
-            "Search for the exact address to set a marker. The address fields "
-            "beneath are filled out automatically."
+            'Search for the exact address to set a marker. The address fields '
+            'beneath are filled out automatically.'
         ),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         render_kw={'data-map-type': 'marker'}
     )
 
     address = StringField(
         label=_('Street and house number'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         render_kw={'readonly': True}
     )
 
     zip_code = StringField(
         label=_('Zip Code'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         render_kw={'readonly': True}
     )
 
     city = StringField(
         label=_('City'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         render_kw={'readonly': True}
     )
 
     drive_distance = FloatField(
         label=_('Drive distance (km)'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         validators=[Optional()],
         render_kw={'readonly': True}
     )
@@ -243,132 +246,154 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     social_sec_number = StringField(
         label=_('Swiss social security number'),
         validators=[ValidSwissSocialSecurityNumber()],
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     bank_name = StringField(
         label=_('Bank name'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     bank_address = StringField(
         label=_('Bank address'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     account_owner = StringField(
         label=_('Account owner'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     iban = StringField(
         label=_('IBAN'),
         validators=[Stdnum(format='iban')],
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     tel_mobile = StringField(
         label=_('Mobile Number'),
         validators=[ValidPhoneNumber()],
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     tel_private = StringField(
         label=_('Private Phone Number'),
         validators=[ValidPhoneNumber()],
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     tel_office = StringField(
         label=_('Office Phone Number'),
         validators=[ValidPhoneNumber()],
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     availability = StringField(
         label=_('Availability'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     operation_comments = TextAreaField(
         label=_('Comments on possible field of application'),
         render_kw={'rows': 3},
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
     )
 
     confirm_name_reveal = ChosenSelectField(
         label=_('Name revealing confirmation'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=BOOLS,
         validators=[Optional()]
     )
 
+    date_of_application = DateField(
+        label=_('Date of application'),
+        fieldset=_('Proposed changes'),
+        validators=[Optional()],
+    )
+
+    date_of_decision = DateField(
+        label=_('Date of decision'),
+        fieldset=_('Proposed changes'),
+        validators=[Optional()],
+    )
+
     mother_tongues = ChosenSelectMultipleField(
         label=_('Mother tongues'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=[],
         validators=[Optional()]
     )
 
     spoken_languages = ChosenSelectMultipleField(
         label=_('Spoken languages'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=[],
         validators=[Optional()],
     )
 
     written_languages = ChosenSelectMultipleField(
         label=_('Written languages'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=[],
         validators=[Optional()],
     )
 
     expertise_professional_guilds = ChosenSelectMultipleField(
         label=_('Expertise by professional guild'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=list(PROFESSIONAL_GUILDS.items()),
         validators=[Optional()]
     )
 
     expertise_professional_guilds_other = TagsField(
         label=_('Expertise by professional guild: other'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         render_kw={'show_help': True}
     )
 
     expertise_interpreting_types = ChosenSelectMultipleField(
         label=_('Expertise by interpreting type'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=list(INTERPRETING_TYPES.items()),
         validators=[Optional()]
+    )
+
+    proof_of_preconditions = StringField(
+        label=_('Proof of preconditions'),
+        fieldset=_('Proposed changes'),
     )
 
     agency_references = TextAreaField(
         label=_('Agency references'),
         render_kw={'rows': 3},
-        fieldset=_("Proposed changes")
+        fieldset=_('Proposed changes')
     )
 
     education_as_interpreter = ChosenSelectField(
         label=_('Education as interpreter'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=BOOLS,
         validators=[Optional()]
     )
 
     certificates = ChosenSelectMultipleField(
         label=_('Language Certificates'),
-        fieldset=_("Proposed changes"),
+        fieldset=_('Proposed changes'),
         choices=[],
         validators=[Optional()],
+    )
+
+    comments = TextAreaField(
+        label=_('Comments'),
+        fieldset=_('Proposed changes'),
     )
 
 
 class ApplyMutationForm(Form):
 
     changes = MultiCheckboxField(
-        label=_("Proposed changes"),
+        label=_('Proposed changes'),
         choices=[]
     )
 

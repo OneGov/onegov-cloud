@@ -5,6 +5,7 @@ from onegov.translator_directory.constants import ADMISSIONS
 from onegov.translator_directory.constants import GENDERS
 from onegov.translator_directory.constants import INTERPRETING_TYPES
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
+from onegov.translator_directory.models.translator import Translator
 
 
 class TranslatorMutation:
@@ -13,12 +14,6 @@ class TranslatorMutation:
         self.session = session
         self.target_id = target_id
         self.ticket_id = ticket_id
-
-    @cached_property
-    def collection(self):
-        from onegov.translator_directory.collections.translator import \
-            TranslatorCollection
-        return TranslatorCollection(self.session, user_role='admin')
 
     @cached_property
     def language_collection(self):
@@ -34,7 +29,9 @@ class TranslatorMutation:
 
     @cached_property
     def target(self):
-        return self.collection.by_id(self.target_id)
+        return self.session.query(Translator).filter_by(
+            id=self.target_id
+        ).first()
 
     @cached_property
     def ticket(self):
@@ -135,6 +132,8 @@ class TranslatorMutation:
                 'Comments on possible field of application'
             ),
             'confirm_name_reveal': _('Name revealing confirmation'),
+            'date_of_application': _('Date of application'),
+            'date_of_decision': _('Date of decision'),
             'mother_tongues': _('Mother tongues'),
             'spoken_languages': _('Spoken languages'),
             'written_languages': _('Written languages'),
@@ -147,9 +146,11 @@ class TranslatorMutation:
             'expertise_interpreting_types': _(
                 'Expertise by interpreting type'
             ),
+            'proof_of_preconditions': _('Proof of preconditions'),
             'agency_references': _('Agency references'),
             'education_as_interpreter': _('Education as interpreter'),
             'certificates': _('Language Certificates'),
+            'comments': _('Comments'),
         }
 
     def apply(self, items):

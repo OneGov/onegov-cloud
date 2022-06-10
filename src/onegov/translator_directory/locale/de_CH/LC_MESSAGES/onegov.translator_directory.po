@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-10 09:24+0200\n"
+"POT-Creation-Date: 2022-06-10 09:47+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -303,6 +303,12 @@ msgstr "Besondere Hinweise Einsatzmöglichkeiten"
 msgid "Name revealing confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
+msgid "Date of application"
+msgstr "Bewerbung Datum"
+
+msgid "Date of decision"
+msgstr "Entscheid Datum"
+
 msgid "Mother tongues"
 msgstr "Muttersprachen"
 
@@ -321,6 +327,9 @@ msgstr "Fachkenntnisse nach Berufssparte: andere"
 msgid "Expertise by interpreting type"
 msgstr "Fachkenntnisse nach Dolmetscherart"
 
+msgid "Proof of preconditions"
+msgstr "Nachweis der Voraussetzung"
+
 msgid "Agency references"
 msgstr "Referenzen Behörden"
 
@@ -329,6 +338,9 @@ msgstr "Ausbildung Dolmetscher"
 
 msgid "Language Certificates"
 msgstr "Zertifikate"
+
+msgid "Comments"
+msgstr "Bemerkungen"
 
 msgid "Home Location"
 msgstr "Eigener Standort"
@@ -357,23 +369,11 @@ msgstr "Rechtliches"
 msgid "Consent to the disclosure of the name to other persons and authorities"
 msgstr "Zustimmung zur Bekanntgabe des Namens an weitere Personen und Behörden"
 
-msgid "Date of application"
-msgstr "Bewerbung Datum"
-
 msgid "Admission to the directory"
 msgstr "Zulassung ins Verzeichnis"
 
-msgid "Date of decision"
-msgstr "Entscheid Datum"
-
 msgid "Language training and expertise"
 msgstr "Sprachausbildung und Expertise"
-
-msgid "Proof of preconditions"
-msgstr "Nachweis der Voraussetzung"
-
-msgid "Comments"
-msgstr "Bemerkungen"
 
 msgid "Hidden"
 msgstr "Versteckt"
