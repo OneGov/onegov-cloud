@@ -325,7 +325,7 @@ def edit_translator_as_editor(self, request, form):
 def delete_translator(self, request):
 
     request.assert_valid_csrf_token()
-    TranslatorCollection(request.session).delete(self)
+    TranslatorCollection(request.app).delete(self)
     request.success(_('Translator successfully deleted'))
 
 

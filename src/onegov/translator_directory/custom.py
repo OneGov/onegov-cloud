@@ -25,7 +25,8 @@ def get_global_tools(request):
                     _("Logout"), request.link(
                         Auth.from_request(
                             request, to=logout_path(request)), name='logout'
-                    ), attrs={'class': 'logout'}
+                    ),
+                    attrs={'class': 'logout'}
                 ),
             )
         )
@@ -42,12 +43,14 @@ def get_global_tools(request):
                     Link(
                         _("Settings"), request.link(
                             request.app.org, 'settings'
-                        ), attrs={'class': 'settings'}
+                        ),
+                        attrs={'class': 'settings'}
                     ),
                     Link(
                         _("Settings translator directory"), request.link(
                             request.app.org, 'directory-settings'
-                        ), attrs={'class': 'settings'}
+                        ),
+                        attrs={'class': 'settings'}
                     ),
                     Link(
                         _("Users"), request.class_link(UserCollection),

@@ -259,7 +259,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
 
     sources = ZugUserSource.factory(verbose=verbose)
 
-    translators = TranslatorCollection(session, user_role='admin')
+    translators = TranslatorCollection(app, user_role='admin')
     translators = {translator.email for translator in translators.query()}
 
     def users(connection):
@@ -506,7 +506,7 @@ def update_accounts_cli(dry_run):
 
     def do_update_accounts(request, app):
 
-        translators = TranslatorCollection(request.session, user_role='admin')
+        translators = TranslatorCollection(request.app, user_role='admin')
         for translator in translators.query():
             translators.update_user(translator, translator.email)
 

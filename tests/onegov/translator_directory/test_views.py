@@ -380,7 +380,7 @@ def test_view_search_translator(client):
     session = client.app.session()
     languages = create_languages(session)
     lang_ids = [str(lang.id) for lang in languages]
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(client.app)
 
     data = copy.deepcopy(translator_data)
     mail = 'first@test.com'
@@ -433,7 +433,7 @@ def test_view_search_translator(client):
 def test_view_export_translators(client):
     session = client.app.session()
     languages = create_languages(session)
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(client.app)
 
     data = copy.deepcopy(translator_data)
     data['spoken_languages'] = [languages[0]]
@@ -491,8 +491,7 @@ def test_view_export_translators(client):
 
 
 def test_file_security(client):
-    session = client.app.session()
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(client.app)
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 

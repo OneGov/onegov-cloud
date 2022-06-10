@@ -8,11 +8,11 @@ from tests.onegov.translator_directory.shared import create_languages, \
     create_translator
 
 
-def test_translator_collection_search(session):
+def test_translator_collection_search(translator_app):
     interpreting_types = list(INTERPRETING_TYPES.keys())
     guild_types = list(PROFESSIONAL_GUILDS.keys())
     seba = create_translator(
-        session,
+        translator_app,
         email='sm@mh.ch',
         first_name='Sebastian Hans',
         last_name='Meier Hugentobler',
@@ -22,7 +22,7 @@ def test_translator_collection_search(session):
     )
 
     mary = create_translator(
-        session,
+        translator_app,
         email='mary@t.ch',
         first_name='Mary Astiana',
         last_name='Sitkova Lavrova',
@@ -31,7 +31,7 @@ def test_translator_collection_search(session):
         expertise_professional_guilds_other=['Geologie']
     )
 
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(translator_app)
 
     # term
     translators.search = 'Lavrov'
@@ -70,17 +70,22 @@ def test_translator_collection_search(session):
     assert translators.query().all() == [mary]
 
 
-def test_translator_collection(session):
+def test_translator_collection(translator_app):
+    session = translator_app.session()
     langs = create_languages(session)
-    collection = TranslatorCollection(session)
-    james = create_translator(session, email='james@memo.com', last_name='Z')
+    collection = TranslatorCollection(translator_app)
+    james = create_translator(
+        translator_app, email='james@memo.com', last_name='Z'
+    )
 
     translator = session.query(collection.model_class).one()
     assert translator == collection.by_id(translator.id)
     assert collection.query().all() == [translator]
 
     # Adds second translator
-    bob = create_translator(session, email='bob@memo.com', last_name='X')
+    bob = create_translator(
+        translator_app, email='bob@memo.com', last_name='X'
+    )
 
     # Test filter spoken language
     collection.spoken_langs = [langs[0].id]
@@ -121,15 +126,18 @@ def test_translator_collection(session):
     assert collection.query().all() == [james, bob]
 
 
-def test_translator_collection_wrong_user_input(session):
+def test_translator_collection_wrong_user_input(translator_app):
     # Prevent wrong user input from going to the db query
-    coll = TranslatorCollection(session, order_by='nothing', order_desc='hey')
+    coll = TranslatorCollection(
+        translator_app, order_by='nothing', order_desc='hey'
+    )
     assert coll.order_desc is False
     assert coll.order_by == 'last_name'
 
 
-def test_translator_collection_update(session):
-    collection = TranslatorCollection(session)
+def test_translator_collection_update(translator_app):
+    session = translator_app.session()
+    collection = TranslatorCollection(translator_app)
     users = UserCollection(session)
 
     # Create
@@ -193,6 +201,16 @@ def test_translator_collection_update(session):
     assert translator_b.user.role == 'translator'
     assert translator_b.user.active
     assert user_b.username == 'c@c.c'
+
+    collection.update_user(translator_b, 'a@a.a')
+    translator_b.email = 'a@a.a'
+    session.flush()
+    session.expire_all()
+    assert translator_b.user.username == 'a@a.a'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+    assert user_a.translator == translator_b
+    assert not user_b.translator
 
 
 def test_language_collection(session):

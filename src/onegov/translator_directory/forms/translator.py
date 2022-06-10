@@ -44,7 +44,7 @@ class FormChoicesMixin:
 
     @property
     def available_additional_guilds(self):
-        translators = TranslatorCollection(self.request.session)
+        translators = TranslatorCollection(self.request.app)
         return translators.available_additional_professional_guilds
 
     @cached_property
@@ -404,7 +404,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
-        translators = TranslatorCollection(self.request.session)
+        translators = TranslatorCollection(self.request.app)
         translators.update_user(model, self.email.data)
 
         model.first_name = self.first_name.data

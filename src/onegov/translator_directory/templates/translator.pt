@@ -168,6 +168,10 @@
                                 <dt i18n:translate>Hidden</dt>
                                 <dd >${layout.format_boolean(model.for_admins_only)}</dd>
                             </dl>
+                            <dl class="field-display" tal:condition="request.is_admin and model.user">
+                                <dt i18n:translate>User</dt>
+                                <dd ><a href="${request.link(model.user)}">${model.user.title}</a></dd>
+                            </dl>
                        </tal:b>
                     </div>
                 </div>
