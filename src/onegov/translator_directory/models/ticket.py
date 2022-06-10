@@ -30,13 +30,15 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
     @cached_property
     def translator(self):
         return self.session.query(Translator).filter_by(
-            id=self.data['handler_data']['id']
+            id=self.data['handler_data'].get('id')
         ).first()
 
     @cached_property
     def mutation(self):
         if self.translator:
-            return TranslatorMutation(None, self.translator.id, self.ticket.id)
+            return TranslatorMutation(
+                self.session, self.translator.id, self.ticket.id
+            )
 
     @property
     def deleted(self):

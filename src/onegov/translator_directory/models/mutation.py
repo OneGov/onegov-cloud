@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.gis import Coordinates
 from onegov.translator_directory import _
 from onegov.translator_directory.constants import ADMISSIONS
+from onegov.translator_directory.constants import field_order
 from onegov.translator_directory.constants import GENDERS
 from onegov.translator_directory.constants import INTERPRETING_TYPES
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
@@ -57,7 +58,7 @@ class TranslatorMutation:
 
             translations = self.translations.get(name)
             if translations:
-                if isinstance(value, list):
+                if isinstance(value, (list, tuple)):
                     return ', '.join([
                         request.translate(translations.get(v, v))
                         for v in value
@@ -69,10 +70,18 @@ class TranslatorMutation:
 
             return value
 
-        return {
-            key: (label(key), convert(key, value), value)
+        result = [
+            (key, (label(key), convert(key, value), value))
             for key, value in (changes or self.changes).items()
-        }
+        ]
+        result = sorted(
+            result,
+            key=(
+                lambda x: field_order.index(x[0])
+                if x[0] in field_order else 999
+            )
+        )
+        return dict(result)
 
     @cached_property
     def translations(self):

@@ -1,3 +1,4 @@
+from onegov.gis import Coordinates
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
@@ -5,7 +6,7 @@ from onegov.translator_directory.constants import INTERPRETING_TYPES, \
     PROFESSIONAL_GUILDS
 from onegov.user import UserCollection
 from tests.onegov.translator_directory.shared import create_languages, \
-    create_translator
+    create_translator, translator_data
 
 
 def test_translator_collection_search(translator_app):
@@ -124,6 +125,17 @@ def test_translator_collection(translator_app):
     assert collection.query().all() == [bob, james]
     collection.order_desc = True
     assert collection.query().all() == [james, bob]
+
+
+def test_translator_collection_coordinates(translator_app):
+    translators = TranslatorCollection(translator_app)
+    trs = translators.add(
+        **translator_data,
+        coordinates=Coordinates()
+    )
+    # somehow, the instance has to be created in order to have deferred content
+    # def add() would not have been overwritten
+    assert trs.coordinates == Coordinates()
 
 
 def test_translator_collection_wrong_user_input(translator_app):
