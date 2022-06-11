@@ -1,6 +1,4 @@
-from base64 import b64encode
 from datetime import date
-from json import dumps
 from onegov.core.utils import Bunch
 from onegov.gis import Coordinates
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
@@ -8,6 +6,7 @@ from onegov.translator_directory.models.translator import Translator
 from tests.onegov.translator_directory.shared import create_certificates
 from tests.onegov.translator_directory.shared import create_languages
 from tests.onegov.translator_directory.shared import create_translator
+from tests.shared.utils import encode_map_value
 
 
 class DummyPostData(dict):
@@ -218,9 +217,7 @@ def test_translator_mutation_form_on(translator_app):
         'gender': 'M',
         'date_of_birth': '1970-01-01',
         'nationality': 'CH',
-        'coordinates': b64encode(
-            dumps({'lat': 1, 'lon': 2, 'zoom': 12}).encode('ascii')
-        ).decode('ascii'),
+        'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'address': 'Downing Street 5',
         'zip_code': '4000',
         'city': 'Luzern',
