@@ -106,10 +106,10 @@ table.translator-documents {
 }
 
 #fieldset-proposed-changes .long-field-help {
-    color: $aluminum;
+    color: $jumbo;
 
     p {
-        color: $aluminum;
+        color: $jumbo;
     }
 }
 
@@ -122,8 +122,9 @@ table.translator-documents {
     }
 
     &.hint-bullet {
-        &::before { content: "-"; }
         margin-bottom: .375em;
+
+        &::before { content: "-"; }
     }
 
 }

@@ -68,10 +68,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     def on_request(self):
         self.request.include('tags-input')
 
-        self.mother_tongues.choices = self.language_choices
-        self.spoken_languages.choices = self.language_choices
-        self.written_languages.choices = self.language_choices
-        self.certificates.choices = self.certificate_choices
+        self.mother_tongues.choices = self.language_choices.copy()
+        self.spoken_languages.choices = self.language_choices.copy()
+        self.written_languages.choices = self.language_choices.copy()
+        self.certificates.choices = self.certificate_choices.copy()
 
         layout = DefaultLayout(self.model, self.request)
         for name, field in self.proposal_fields.items():
@@ -86,7 +86,9 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                     (choice[0], self.request.translate(choice[1]))
                     for choice in field.choices
                 ]
-                field.description = dict(field.choices).get(str(value), '')
+                field.long_description = dict(field.choices).get(
+                    str(value), ''
+                )
             elif isinstance(field, ChosenSelectMultipleField):
                 field.choices.insert(0, ('', ''))
                 field.choices = [
@@ -123,6 +125,13 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                 return data if data.lat and data.lon else None
             return {'None': None, 'True': True, 'False': False}.get(data, data)
 
+        def has_changed(name, value):
+            old = getattr(self.model, name)
+            if name in ('mother_tongues', 'spoken_languages',
+                        'written_languages', 'certificates'):
+                old = [str(x.id) for x in getattr(self.model, name, [])]
+            return value != old
+
         data = {
             name: convert(field.data)
             for name, field in self.proposal_fields.items()
@@ -133,7 +142,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                 value != ''
                 and value is not None
                 and value != []
-                and value != getattr(self.model, name)
+                and has_changed(name, value)
             )
         }
         return data
@@ -172,8 +181,9 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     admission = ChosenSelectField(
         label=_('Admission'),
-        choices=list(ADMISSIONS.items()),
         fieldset=_('Proposed changes'),
+        choices=list(ADMISSIONS.items()),
+        validators=[Optional()]
     )
 
     withholding_tax = ChosenSelectField(
