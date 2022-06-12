@@ -964,19 +964,20 @@ def test_view_translator_mutation(client):
     page.form.get('changes', index=37).checked = False
     page = page.form.submit().follow()
     assert (
-        'Vorgeschlagene \u00c4nderungen \u00fcbernommen: '
+        'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
         'Vorname, Nachname, Personal Nr., Zulassung, Quellensteuer, '
-        'Selbst\u00e4ndig, Geschlecht, Geburtsdatum, Nationalit\u00e4t, '
+        'Selbst\\u00e4ndig, Geschlecht, Geburtsdatum, Nationalit\\u00e4t, '
         'Standort, Strasse und Hausnummer, PLZ, Ort, Fahrdistanz (km), '
         'AHV-Nr., Bank Name, Bank Adresse, Bank Konto lautend auf, IBAN, '
-        'Telefon Privat, Telefon Mobile, Telefon Gesch\u00e4ft, '
-        'Erreich- und Verf\u00fcgbarkeit, Fachkenntnisse nach Dolmetscherart, '
+        'Telefon Privat, Telefon Mobile, Telefon Gesch\\u00e4ft, '
+        'Erreich- und Verf\\u00fcgbarkeit, '
+        'Fachkenntnisse nach Dolmetscherart, '
         'Fachkenntnisse nach Berufssparte, '
         'Fachkenntnisse nach Berufssparte: andere, '
-        'Besondere Hinweise Einsatzm\u00f6glichkeiten, '
+        'Besondere Hinweise Einsatzm\\u00f6glichkeiten, '
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
         'Muttersprachen, Sprachen Wort, Sprachen Schrift, '
-        'Nachweis der Voraussetzung, Referenzen Beh\u00f6rden, '
+        'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page
     page = page.click('Anny, Aunt', index=0)
