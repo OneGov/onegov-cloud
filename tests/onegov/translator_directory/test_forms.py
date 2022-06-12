@@ -1,0 +1,312 @@
+from datetime import date
+from onegov.core.utils import Bunch
+from onegov.gis import Coordinates
+from onegov.translator_directory.forms.mutation import TranslatorMutationForm
+from onegov.translator_directory.models.translator import Translator
+from tests.onegov.translator_directory.shared import create_certificates
+from tests.onegov.translator_directory.shared import create_languages
+from tests.onegov.translator_directory.shared import create_translator
+from tests.shared.utils import encode_map_value
+
+
+class DummyPostData(dict):
+    def getlist(self, key):
+        v = self[key]
+        if not isinstance(v, (list, tuple)):
+            v = [v]
+        return v
+
+
+def test_translator_mutation_form_on(translator_app):
+    session = translator_app.session()
+    certificates = create_certificates(session)
+    languages = create_languages(session)
+
+    translator = create_translator(
+        translator_app,
+        admission='uncertified',
+        comments='Some other comment',
+        confirm_name_reveal=True,
+        date_of_application=date(2000, 1, 1),
+        date_of_birth=date(1970, 1, 1),
+        date_of_decision=date(2001, 1, 1),
+        drive_distance=1.1,
+        expertise_professional_guilds=['economy', 'military'],
+        expertise_professional_guilds_other=['Psychology'],
+        expertise_interpreting_types=['whisper', 'written'],
+        gender='M',
+        iban='CH9300762011623852957',
+        operation_comments='Some comment',
+        tel_private='041 444 44 45',
+    )
+    translator.certificates = certificates[0:2]
+    translator.mother_tongues = languages[0:2]
+    translator.spoken_languages = languages[1:3]
+    translator.written_languages = languages[2:4]
+    translator.coordinates = Coordinates(1, 2, 12)
+
+    request = Bunch(
+        app=translator_app,
+        session=session,
+        locale='de_CH',
+        is_manager=True,
+        is_admin=True,
+        is_editor=False,
+        is_member=False,
+        is_translator=False,
+        include=lambda x: x,
+        translate=lambda x: f'_{x}'
+    )
+
+    form = TranslatorMutationForm()
+    form.model = translator
+    form.request = request
+    form.on_request()
+
+    # Test long descriptions
+    assert form.first_name.long_description == 'Hugo'
+    assert form.last_name.long_description == 'Benito'
+    assert form.pers_id.long_description == '1234'
+    assert form.admission.long_description == '_uncertified'
+    assert form.withholding_tax.long_description == '_No'
+    assert form.self_employed.long_description == '_No'
+    assert form.gender.long_description == '_masculin'
+    assert form.date_of_birth.long_description == '01.01.1970'
+    assert form.nationality.long_description == 'CH'
+    assert form.address.long_description == 'Downing Street 5'
+    assert form.zip_code.long_description == '4000'
+    assert form.city.long_description == 'Luzern'
+    assert form.drive_distance.long_description == '1.1'
+    assert form.social_sec_number.long_description == '756.1234.4568.90'
+    assert form.bank_name.long_description == 'R-BS'
+    assert form.bank_address.long_description == 'Bullstreet 5'
+    assert form.account_owner.long_description == 'Hugo Benito'
+    assert form.iban.long_description == 'CH9300762011623852957'
+    assert form.tel_mobile.long_description == '079 000 00 00'
+    assert form.tel_private.long_description == '041 444 44 45'
+    assert form.tel_office.long_description == '041 444 44 44'
+    assert form.availability.long_description == 'always'
+    assert form.operation_comments.long_description == 'Some comment'
+    assert form.confirm_name_reveal.long_description == '_Yes'
+    assert form.date_of_application.long_description == '01.01.2000'
+    assert form.date_of_decision.long_description == '01.01.2001'
+    assert form.mother_tongues.long_description == '_German, _French'
+    assert form.spoken_languages.long_description == '_French, _Italian'
+    assert form.written_languages.long_description == '_Italian, _Arabic'
+    assert form.expertise_professional_guilds.long_description == \
+        '_Economy, _Military'
+    assert form.expertise_professional_guilds_other.long_description == \
+        'Psychology'
+    assert form.expertise_interpreting_types.long_description == \
+        '_Whisper interpreting, _Written translations'
+    assert form.proof_of_preconditions.long_description == 'all okay'
+    assert form.agency_references.long_description == 'Some ref'
+    assert form.education_as_interpreter.long_description == '_No'
+    assert form.certificates.long_description == '_AAAA, _BBBB'
+    assert form.comments.long_description == 'Some other comment'
+
+    # Test inserting of no choice
+    assert form.admission.choices[0] == ('', '_')
+    assert form.withholding_tax.choices[0] == ('', '_')
+    assert form.self_employed.choices[0] == ('', '_')
+    assert form.gender.choices[0] == ('', '_')
+    assert form.confirm_name_reveal.choices[0] == ('', '_')
+    assert form.mother_tongues.choices[0] == ('', '_')
+    assert form.spoken_languages.choices[0] == ('', '_')
+    assert form.written_languages.choices[0] == ('', '_')
+    assert form.expertise_professional_guilds.choices[0] == ('', '_')
+    assert form.expertise_interpreting_types.choices[0] == ('', '_')
+    assert form.education_as_interpreter.choices[0] == ('', '_')
+    assert form.certificates.choices[0] == ('', '_')
+
+    # Test translating choices
+    assert form.admission.choices[1][1] == '_uncertified'
+    assert form.withholding_tax.choices[1][1] == '_Yes'
+    assert form.self_employed.choices[1][1] == '_Yes'
+    assert form.gender.choices[1][1] == '_masculin'
+    assert form.confirm_name_reveal.choices[1][1] == '_Yes'
+    assert form.mother_tongues.choices[1][1] == '_Arabic'
+    assert form.spoken_languages.choices[1][1] == '_Arabic'
+    assert form.written_languages.choices[1][1] == '_Arabic'
+    assert form.expertise_professional_guilds.choices[1][1] == \
+        '_Nutrition and agriculture'
+    assert form.expertise_interpreting_types.choices[1][1] == \
+        '_Simultaneous interpreting'
+    assert form.education_as_interpreter.choices[1][1] == '_Yes'
+    assert form.certificates.choices[1][1] == '_AAAA'
+
+    # Test removing fields by role
+    form = TranslatorMutationForm()
+    form.model = translator
+    form.request = request
+    form.request.is_admin = False
+    form.request.is_translator = True
+    form.on_request()
+    assert len(form._fields) == 39
+    assert len(form.proposal_fields) == 38
+
+    form = TranslatorMutationForm()
+    form.model = translator
+    form.request = request
+    form.request.is_translator = False
+    form.request.is_editor = True
+    form.on_request()
+    assert len(form._fields) == 28
+    assert len(form.proposal_fields) == 27
+    assert form.operation_comments is None
+    assert form.confirm_name_reveal is None
+    assert form.date_of_application is None
+    assert form.date_of_decision is None
+    assert form.spoken_languages is None
+    assert form.written_languages is None
+    assert form.proof_of_preconditions is None
+    assert form.agency_references is None
+    assert form.education_as_interpreter is None
+    assert form.certificates is None
+    assert form.comments is None
+
+    form = TranslatorMutationForm()
+    form.model = translator
+    form.request = request
+    form.request.is_editor = False
+    form.request.is_member = True
+    form.on_request()
+    assert len(form._fields) == 23
+    assert len(form.proposal_fields) == 22
+    assert form.operation_comments is None
+    assert form.confirm_name_reveal is None
+    assert form.date_of_application is None
+    assert form.date_of_decision is None
+    assert form.spoken_languages is None
+    assert form.written_languages is None
+    assert form.proof_of_preconditions is None
+    assert form.agency_references is None
+    assert form.education_as_interpreter is None
+    assert form.certificates is None
+    assert form.comments is None
+    assert form.social_sec_number is None
+    assert form.bank_name is None
+    assert form.bank_address is None
+    assert form.account_owner is None
+    assert form.iban is None
+
+    # Test proposed changes
+    form = TranslatorMutationForm(DummyPostData({}))
+    assert not form.validate()
+    assert form.errors == {
+        'submitter_message': [
+            'Please enter a message or suggest some changes using the '
+            'fields below.'
+        ]
+    }
+    assert form.proposed_changes == {}
+
+    form = TranslatorMutationForm(DummyPostData({
+        'submitter_message': 'Please delete me!'
+    }))
+    assert form.validate()
+    assert form.proposed_changes == {}
+
+    form = TranslatorMutationForm(DummyPostData({
+        'first_name': 'Hugo',
+        'last_name': 'Benito',
+        'pers_id': '1234',
+        'admission': 'uncertified',
+        'withholding_tax': False,
+        'self_employed': False,
+        'gender': 'M',
+        'date_of_birth': '1970-01-01',
+        'nationality': 'CH',
+        'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
+        'address': 'Downing Street 5',
+        'zip_code': '4000',
+        'city': 'Luzern',
+        'drive_distance': 1.1,
+        'social_sec_number': '756.1234.4568.90',
+        'bank_name': 'R-BS',
+        'bank_address': 'Bullstreet 5',
+        'account_owner': 'Hugo Benito',
+        'iban': 'CH9300762011623852957',
+        'tel_mobile': '079 000 00 00',
+        'tel_private': '041 444 44 45',
+        'tel_office': '041 444 44 44',
+        'availability': 'always',
+        'operation_comments': 'Some comment',
+        'confirm_name_reveal': True,
+        'date_of_application': '2000-01-01',
+        'date_of_decision': '2001-01-01',
+        'mother_tongues': [str(x.id) for x in languages[0:2]],
+        'spoken_languages': [str(x.id) for x in languages[1:3]],
+        'written_languages': [str(x.id) for x in languages[2:4]],
+        'expertise_professional_guilds': ['economy', 'military'],
+        'expertise_professional_guilds_other': ['Psychology'],
+        'expertise_interpreting_types': ['whisper', 'written'],
+        'proof_of_preconditions': 'all okay',
+        'agency_references': 'Some ref',
+        'education_as_interpreter': False,
+        'certificates': [str(x.id) for x in certificates[0:2]],
+        'comments': 'Some other comment',
+    }))
+    form.model = translator
+    form.request = request
+    form.request.is_admin = True
+    form.on_request()
+    assert not form.validate()
+    assert form.errors == {
+        'submitter_message': [
+            'Please enter a message or suggest some changes using the '
+            'fields below.'
+        ]
+    }
+    assert form.proposed_changes == {}
+
+    form.model = Translator()
+    form.model.content = {}
+    form.model.coordinates = Coordinates()
+    assert not form.validate()
+    assert form.errors == {
+        'drive_distance': [
+            'Home location is not configured. Please complete location '
+            'settings first'
+        ]
+    }
+    assert form.proposed_changes == {
+        'first_name': 'Hugo',
+        'last_name': 'Benito',
+        'pers_id': 1234,
+        'admission': 'uncertified',
+        'withholding_tax': False,
+        'self_employed': False,
+        'gender': 'M',
+        'date_of_birth': date(1970, 1, 1),
+        'nationality': 'CH',
+        'coordinates': Coordinates(1, 2, 12),
+        'address': 'Downing Street 5',
+        'zip_code': '4000',
+        'city': 'Luzern',
+        'drive_distance': 1.1,
+        'social_sec_number': '756.1234.4568.90',
+        'bank_name': 'R-BS',
+        'bank_address': 'Bullstreet 5',
+        'account_owner': 'Hugo Benito',
+        'iban': 'CH9300762011623852957',
+        'tel_mobile': '079 000 00 00',
+        'tel_private': '041 444 44 45',
+        'tel_office': '041 444 44 44',
+        'availability': 'always',
+        'operation_comments': 'Some comment',
+        'confirm_name_reveal': True,
+        'date_of_application': date(2000, 1, 1),
+        'date_of_decision': date(2001, 1, 1),
+        'mother_tongues': [str(x.id) for x in languages[0:2]],
+        'spoken_languages': [str(x.id) for x in languages[1:3]],
+        'written_languages': [str(x.id) for x in languages[2:4]],
+        'expertise_professional_guilds': ['economy', 'military'],
+        'expertise_professional_guilds_other': ['Psychology'],
+        'expertise_interpreting_types': ['whisper', 'written'],
+        'proof_of_preconditions': 'all okay',
+        'agency_references': 'Some ref',
+        'education_as_interpreter': False,
+        'certificates': [str(x.id) for x in certificates[0:2]],
+        'comments': 'Some other comment',
+    }

@@ -1,22 +1,29 @@
 from datetime import datetime
 from io import BytesIO
+from morepath import redirect
 from morepath.request import Response
 from onegov.core.custom import json
 from onegov.core.security import Secret, Personal, Private
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import Organisation
+from onegov.org.models import TicketMessage
+from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
     INTERPRETING_TYPES, ADMISSIONS, GENDERS
+from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
+    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout, \
+    ReportTranslatorChangesLayout
 from onegov.translator_directory.models.translator import Translator
+from uuid import uuid4
 from webob.exc import HTTPNotFound
 from xlsxwriter import Workbook
 
@@ -50,6 +57,7 @@ def add_new_translator(self, request, form):
                 receivers=(translator.user.username, ),
                 content=content,
             )
+            request.success(_('Activation E-Mail sent'))
 
         return request.redirect(request.link(translator))
 
@@ -339,3 +347,59 @@ def get_static_excel_file(self, request):
         ),
         content_disposition=f'inline; filename={file.filename}'
     )
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    name='report-change',
+    template='form.pt',
+    permission=Personal,
+    form=TranslatorMutationForm
+)
+def report_translator_change(self, request, form):
+    if form.submitted(request):
+        session = request.session
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='TRN',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'id': str(self.id),
+                    'submitter_email': request.current_username,
+                    'submitter_message': form.submitter_message.data,
+                    'proposed_changes': form.proposed_changes
+                }
+            )
+            TicketMessage.create(ticket, request, 'opened')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(request.current_username, ),
+            ticket=ticket,
+            send_self=True
+        )
+        if request.email_for_new_tickets:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(request.email_for_new_tickets, ),
+                content={
+                    'model': ticket
+                }
+            )
+
+        request.success(_("Thank you for your submission!"))
+        return redirect(request.link(ticket, 'status'))
+
+    layout = ReportTranslatorChangesLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': layout.title,
+        'form': form
+    }

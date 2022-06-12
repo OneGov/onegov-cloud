@@ -1,4 +1,5 @@
 from morepath import Identity
+from morepath.authentication import NoIdentity
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -19,6 +20,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
 from onegov.translator_directory.models.language import Language
+from onegov.translator_directory.models.ticket import TranslatorMutationTicket
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.models.voucher import TranslatorVoucherFile
 from onegov.user.models import User
@@ -58,16 +60,15 @@ def test_security_permissions(translator_app):
         users[role] = create_user(role, role)
 
     def permits(user, model, permission):
-        return translator_app._permits(
-            Identity(
+        identity = NoIdentity()
+        if user:
+            identity = Identity(
                 userid=user.username,
                 groupid=user.group_id.hex if user.group_id else '',
                 role=user.role,
                 application_id=translator_app.application_id
-            ),
-            model,
-            permission
-        )
+            )
+        return translator_app._permits(identity, model, permission)
 
     def assert_admin(user, model):
         assert permits(user, model, Public)
@@ -105,13 +106,14 @@ def test_security_permissions(translator_app):
         assert not permits(user, model, Private)
         assert not permits(user, model, Secret)
 
-        # LanguageCertificate
+    # LanguageCertificate
     model = LanguageCertificate()
     assert_admin(users['admin'], model)
     assert_editor(users['editor'], model)
     assert_member(users['member'], model)
     assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     # LanguageCertificateCollection
     model = LanguageCertificateCollection(session)
@@ -120,6 +122,7 @@ def test_security_permissions(translator_app):
     assert_member(users['member'], model)
     assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     # TranslatorDocumentCollection
     model = TranslatorDocumentCollection(session, None, None)
@@ -128,6 +131,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     # Language
     model = Language()
@@ -136,6 +140,7 @@ def test_security_permissions(translator_app):
     assert_member(users['member'], model)
     assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     # LanguageCollection
     model = LanguageCollection(session)
@@ -144,6 +149,7 @@ def test_security_permissions(translator_app):
     assert_member(users['member'], model)
     assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     # Translator
     model = Translator()
@@ -152,6 +158,7 @@ def test_security_permissions(translator_app):
     assert_member(users['member'], model)
     assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     model.for_admins_only = True
     assert_admin(users['admin'], model)
@@ -159,6 +166,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_translator(users['translator'], model)
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     model.for_admins_only = False
     model.email = 'translator@example.org'
@@ -167,6 +175,7 @@ def test_security_permissions(translator_app):
     assert_member(users['member'], model)
     assert_member(users['translator'], model)  # elevated
     assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     model.for_admins_only = True
     model.email = 'translator@example.org'
@@ -175,6 +184,25 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_member(users['translator'], model)  # elevated
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
+
+    model.for_admins_only = False
+    model.email = 'translator@example.org'
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_member(users['translator'], model)  # elevated
+    assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
+
+    model.for_admins_only = True
+    model.email = 'translator@example.org'
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_member(users['translator'], model)  # elevated
+    assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     # TranslatorCollection
     model = TranslatorCollection(translator_app)
@@ -183,6 +211,7 @@ def test_security_permissions(translator_app):
     assert_member(users['member'], model)
     assert_translator(users['translator'], model)
     assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     # File
     model = File()
@@ -191,6 +220,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     # TranslatorVoucherFile
     model = TranslatorVoucherFile()
@@ -199,6 +229,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     # GeneralFile
     model = GeneralFile()
@@ -207,6 +238,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     # GeneralFileCollection
     model = GeneralFileCollection(session)
@@ -215,6 +247,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     # Ticket
     model = Ticket()
@@ -223,6 +256,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
 
     # TicketCollection
     model = TicketCollection(session)
@@ -231,3 +265,52 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
+
+    # TranslatorMutationTicket
+    model = TranslatorMutationTicket(
+        handler_code='TRN',
+        handler_data={'handler_data': {'submitter_email': None}}
+    )
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
+
+    model.handler_data['handler_data']['submitter_email'] = \
+        'admin@example.org'
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
+
+    model.handler_data['handler_data']['submitter_email'] = \
+        'editor@example.org'
+    assert_admin(users['admin'], model)
+    assert_anonymous(users['editor'], model)  # elevated
+    assert_no_access(users['member'], model)  # restricted
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
+
+    model.handler_data['handler_data']['submitter_email'] = \
+        'member@example.org'
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_anonymous(users['member'], model)  # elevated
+    assert_no_access(users['translator'], model)  # restricted
+    assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
+
+    model.handler_data['handler_data']['submitter_email'] = \
+        'translator@example.org'
+    assert_admin(users['admin'], model)
+    assert_no_access(users['editor'], model)  # restricted
+    assert_no_access(users['member'], model)  # restricted
+    assert_anonymous(users['translator'], model)  # elevated
+    assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
