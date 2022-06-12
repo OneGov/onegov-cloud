@@ -1,0 +1,19 @@
+<tal:b i18n:domain="onegov.translator_directory">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b switch="model.meta['change']">
+                <tal:b case="'applied'">
+                    <tal:b tal:condition="not model.applied_changes">
+                        <tal:b i18n:translate>Proposed changes applied</tal:b>.
+                    </tal:b>
+                    <tal:b tal:condition="model.applied_changes">
+                        <tal:b i18n:translate>Proposed changes applied</tal:b>: <tal:b tal:repeat="change model.applied_changes"><tal:b i18n:translate>${change}</tal:b><tal:b tal:condition="not repeat.change.end">, </tal:b></tal:b>.
+                    </tal:b>
+                </tal:b>
+            </tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>

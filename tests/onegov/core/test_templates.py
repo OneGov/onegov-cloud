@@ -189,21 +189,13 @@ def test_boolean_attrs_directly():
     See https://github.com/malthe/chameleon/issues/318
     """
     from chameleon.zpt.template import PageTemplate
-    ts = textwrap.dedent(
-        """
-         <select>
-            <option value="1"
-                tal:attributes="selected True"
-                >Selected</option>
-            <option value="2"
-                tal:attributes="selected False"
-                >Not selected</option>
-            <option value="3"
-                tal:attributes="selected None"
-                >OK</option>
-        </select>
-        """
-    )
+    ts = textwrap.dedent("""
+     <select>
+        <option value="1" tal:attributes="selected True">Selected</option>
+        <option value="2" tal:attributes="selected False">Not selected</option>
+        <option value="3" tal:attributes="selected None">OK</option>
+    </select>
+    """)
     page = PageTemplate(ts, boolean_attributes=BOOLEAN_HTML_ATTRS)()
     assert '<option value="1" selected="selected">Selected</option>' in page
     assert '<option value="2">Not selected</option>' in page

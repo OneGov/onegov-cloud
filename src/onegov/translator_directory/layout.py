@@ -146,6 +146,11 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
                     attrs={'class': 'create-excel'}
@@ -154,9 +159,22 @@ class TranslatorLayout(DefaultLayout):
         elif self.request.is_member:
             return [
                 Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
                     attrs={'class': 'create-excel'}
+                )
+            ]
+        elif self.request.is_translator:
+            return [
+                Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
                 )
             ]
 
@@ -200,6 +218,38 @@ class EditTranslatorLayout(TranslatorLayout):
     def breadcrumbs(self):
         links = super().breadcrumbs
         links.append(Link(_('Edit')))
+        return links
+
+
+class ReportTranslatorChangesLayout(TranslatorLayout):
+    @cached_property
+    def title(self):
+        return _('Report change')
+
+    @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Report change')))
+        return links
+
+
+class ApplyTranslatorChangesLayout(TranslatorLayout):
+    @cached_property
+    def title(self):
+        return _('Report change')
+
+    @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Apply proposed changes')))
         return links
 
 

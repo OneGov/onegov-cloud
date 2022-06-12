@@ -32,7 +32,7 @@ def app(request, postgres_dsn, temporary_path, redis_url):
     with (temporary_path / 'bust').open('w') as f:
         f.write('\n'.join((
             '#!/usr/bin/env sh',
-            'touch {temporary_path}/$1'
+            f'touch {temporary_path}/$1'
         )))
 
     signing_services = (temporary_path / 'signing-services')

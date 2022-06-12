@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-10 06:47+0200\n"
+"POT-Creation-Date: 2022-06-12 07:27+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -100,6 +100,9 @@ msgstr "Einstellungen"
 msgid "Settings translator directory"
 msgstr "Verzeichniseinstellungen"
 
+msgid "Users"
+msgstr "Benutzer"
+
 msgid "Tickets"
 msgstr "Tickets"
 
@@ -117,9 +120,6 @@ msgstr "Tickets in Bearbeitung"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
-
-msgid "Users"
-msgstr "Benutzer"
 
 msgid "Login"
 msgstr "Anmelden"
@@ -143,14 +143,89 @@ msgstr "Dieses Feld wird benötigt."
 msgid "${language} already exists"
 msgstr "${language} existiert bereits"
 
-msgid "Home Location"
-msgstr "Eigener Standort"
+msgid ""
+"Home location is not configured. Please complete location settings first"
+msgstr ""
+"Der eigene Standort ist nicht konfiguriert. Bitte vervollständigen Sie die "
+"Standorteinstellungen"
 
-msgid "Voucher template"
-msgstr "Abrechnungsvorlage"
+#, python-format
+msgid "Error in requesting directions from Mapbox (${status})"
+msgstr "Fehler bei der Anfrage nach einer Route bei Mapbox (${status})"
 
-msgid "Templates"
-msgstr "Vorlagen"
+msgid "Could not find a route. Check the address again"
+msgstr "Konnte keine Route finden. Überprüfen Sie den Standort nochmals"
+
+msgid "Check if the location of the translator is near a road"
+msgstr ""
+"Überprüfen Sie, ob der sich Standort in der Nähe einer Strasse befindet"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "You can use this form to report mutations."
+msgstr "Mit diesem Formular können Sie Mutationen melden."
+
+msgid ""
+"You can either leave us a message or directly suggest changes in the "
+"corresponding fields."
+msgstr ""
+"Sie können uns entweder eine Nachricht hinterlassen oder direkt Änderungen "
+"in den entsprechenden Feldern vorschlagen."
+
+msgid ""
+"You only need to specify the fields that are to be changed. The current "
+"value is greyed out."
+msgstr ""
+"Sie müssen nur die Felder angeben, die geändert werden sollen. Der aktuelle "
+"Wert ist grau hinterlegt."
+
+msgid "Please note that the address must be entered via the location."
+msgstr ""
+"Bitte beachten Sie, dass die Adresse über den Standort eingegeben werden "
+"muss."
+
+msgid ""
+"Make sure that if you make multiple selections (e.g. languages) you select "
+"all options, not just those you want changed."
+msgstr ""
+"Achten Sie darauf, dass Sie bei einer Mehrfachauswahl (z.B. Sprachen) alle "
+"Optionen auswählen, nicht nur diejenigen, die Sie geändert haben möchten."
+
+msgid "Expertise by professional guild (other) can be listed comma-separated."
+msgstr ""
+"Fachkenntnisse nach Berufssparte (andere) können kommagetrennt aufgeführt "
+"werden."
+
+msgid ""
+"If you would like to change the e-mail address, please note this in the "
+"message."
+msgstr ""
+"Wenn Sie die E-Mail Adresse ändern möchten, vermerken Sie dies bitte in "
+"Ihrer Nachricht."
+
+msgid "Please enter a message or suggest some changes using the fields below."
+msgstr ""
+"Bitte geben Sie entweder eine Nachricht oder mindestens einen "
+"Änderungsvorschlag in die unten stehenden Felder ein."
+
+msgid "Your message"
+msgstr "Ihre Nachricht"
+
+msgid "Message"
+msgstr "Nachricht"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Proposed changes"
+msgstr "Vorgeschlagene Änderungen"
+
+msgid "Last name"
+msgstr "Nachname"
 
 msgid "Personal ID"
 msgstr "Personal Nr."
@@ -163,12 +238,6 @@ msgstr "Quellensteuer"
 
 msgid "Self-employed"
 msgstr "Selbständig"
-
-msgid "Last name"
-msgstr "Nachname"
-
-msgid "First name"
-msgstr "Vorname"
 
 msgid "Gender"
 msgstr "Geschlecht"
@@ -189,9 +258,6 @@ msgstr ""
 "Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. Die Address-"
 "Felder unterhalb werden automatisch ausgefüllt."
 
-msgid "Address"
-msgstr "Anschrift"
-
 msgid "Street and house number"
 msgstr "Strasse und Hausnummer"
 
@@ -207,9 +273,6 @@ msgstr "Fahrdistanz (km)"
 msgid "Swiss social security number"
 msgstr "AHV-Nr."
 
-msgid "Identification / bank account"
-msgstr "Identifikation / Bankverbindung"
-
 msgid "Bank name"
 msgstr "Bank Name"
 
@@ -221,12 +284,6 @@ msgstr "Bank Konto lautend auf"
 
 msgid "IBAN"
 msgstr ""
-
-msgid "Email"
-msgstr ""
-
-msgid "Contact information"
-msgstr "Kontakt"
 
 msgid "Mobile Number"
 msgstr "Telefon Mobile"
@@ -246,26 +303,14 @@ msgstr "Besondere Hinweise Einsatzmöglichkeiten"
 msgid "Name revealing confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
-msgid "Legal information"
-msgstr "Rechtliches"
-
-msgid "Consent to the disclosure of the name to other persons and authorities"
-msgstr "Zustimmung zur Bekanntgabe des Namens an weitere Personen und Behörden"
-
 msgid "Date of application"
 msgstr "Bewerbung Datum"
-
-msgid "Admission to the directory"
-msgstr "Zulassung ins Verzeichnis"
 
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
 msgid "Mother tongues"
 msgstr "Muttersprachen"
-
-msgid "Language training and expertise"
-msgstr "Sprachausbildung und Expertise"
 
 msgid "Spoken languages"
 msgstr "Sprachen Wort"
@@ -297,6 +342,39 @@ msgstr "Zertifikate"
 msgid "Comments"
 msgstr "Bemerkungen"
 
+msgid "Home Location"
+msgstr "Eigener Standort"
+
+msgid "Voucher template"
+msgstr "Abrechnungsvorlage"
+
+msgid "Templates"
+msgstr "Vorlagen"
+
+msgid "Address"
+msgstr "Anschrift"
+
+msgid "Identification / bank account"
+msgstr "Identifikation / Bankverbindung"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Contact information"
+msgstr "Kontakt"
+
+msgid "Legal information"
+msgstr "Rechtliches"
+
+msgid "Consent to the disclosure of the name to other persons and authorities"
+msgstr "Zustimmung zur Bekanntgabe des Namens an weitere Personen und Behörden"
+
+msgid "Admission to the directory"
+msgstr "Zulassung ins Verzeichnis"
+
+msgid "Language training and expertise"
+msgstr "Sprachausbildung und Expertise"
+
 msgid "Hidden"
 msgstr "Versteckt"
 
@@ -304,24 +382,7 @@ msgid "Zip code must consist of 4 digits"
 msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 
 msgid "A translator with this email already exists"
-msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
-
-msgid ""
-"Home location is not configured. Please complete location settings first"
-msgstr ""
-"Der eigene Standort ist nicht konfiguriert. Bitte vervollständigen Sie die "
-"Standorteinstellungen"
-
-#, python-format
-msgid "Error in requesting directions from Mapbox (${status})"
-msgstr "Fehler bei der Anfrage nach einer Route bei Mapbox (${status})"
-
-msgid "Could not find a route. Check the address again"
-msgstr "Konnte keine Route finden. Überprüfen Sie den Standort nochmals"
-
-msgid "Check if the location of the translator is near a road"
-msgstr ""
-"Überprüfen Sie, ob der sich Standort in der Nähe einer Strasse befindet"
+msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -353,12 +414,6 @@ msgstr "Mitglied"
 msgid "Translator"
 msgstr "Übersetzer/in"
 
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -386,8 +441,14 @@ msgstr "Abbrechen"
 msgid "Documents"
 msgstr "Dokumente"
 
+msgid "Report change"
+msgstr "Mutation melden"
+
 msgid "Edit translator"
 msgstr "Übersetzer/in bearbeiten"
+
+msgid "Apply proposed changes"
+msgstr "Vorgeschlagene Änderungen übernehmen"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
@@ -406,6 +467,9 @@ msgstr "Wollen Sie diese Sprache wirklich löschen?"
 
 msgid "Delete language"
 msgstr "Sprache löschen"
+
+msgid "Mutation"
+msgstr "Mutation"
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -455,6 +519,12 @@ msgstr "Editoren"
 msgid "Members"
 msgstr "Mitglieder"
 
+msgid "Mutation report"
+msgstr "Mutationsmeldung"
+
+msgid "Proposed changes applied"
+msgstr "Vorgeschlagene Änderungen übernommen"
+
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
@@ -496,6 +566,9 @@ msgstr "Übersetzer/in hinzugefügt"
 msgid "An account was created for you"
 msgstr "Ein Konto wurde für Sie erstellt"
 
+msgid "Activation E-Mail sent"
+msgstr "Aktivierungs-Email verschickt"
+
 msgid "Submit Search"
 msgstr "Suchen"
 
@@ -510,3 +583,12 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+msgid "Your ticket has been opened"
+msgstr "Ihr Ticket wurde eröffnet"
+
+msgid "New ticket"
+msgstr "Neues Ticket"
+
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"
