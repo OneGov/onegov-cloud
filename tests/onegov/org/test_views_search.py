@@ -17,7 +17,6 @@ from sedate import utcnow
 from webtest import Upload
 
 
-
 @pytest.mark.flaky(reruns=3)
 def test_basic_search(client_with_es):
     client = client_with_es
@@ -175,7 +174,6 @@ def test_search_for_page_with_member_access(client_with_es):
     assert 'Test' in client.get('/search?q=Memberius')
     assert 'Test' in member.get('/search?q=Memberius')
     assert 'Test' not in anom.get('/search?q=Memberius')
-
 
 
 @pytest.mark.flaky(reruns=3)

@@ -57,7 +57,8 @@ def test_archive_create(session, temporary_path):
 
     archive = DirectoryArchive(temporary_path, 'json')
 
-    with patch.object(archive, 'write_directory_entries', return_value=None) as po:
+    with patch.object(archive, 'write_directory_entries',
+                      return_value=None) as po:
         archive.write(businesses, query=query)
     po.assert_called_once_with(businesses, None, query)
 

@@ -83,25 +83,25 @@ def test_views_daily_job(client):
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')
 def test_views_daily_jobs_permissions(mock_method, client):
-    client.get(f'/daily-list/boxes/2019-01-10', status=403)
-    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
+    client.get('/daily-list/boxes/2019-01-10', status=403)
+    client.get('/daily-list/boxes-and-forms/2019-01-10', status=403)
 
     client.login_optimo()
-    client.get(f'/daily-list/boxes/2019-01-10')
-    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
+    client.get('/daily-list/boxes/2019-01-10')
+    client.get('/daily-list/boxes-and-forms/2019-01-10', status=403)
     client.logout()
 
     client.login_member()
-    client.get(f'/daily-list/boxes/2019-01-10', status=403)
-    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
+    client.get('/daily-list/boxes/2019-01-10', status=403)
+    client.get('/daily-list/boxes-and-forms/2019-01-10', status=403)
     client.logout()
 
     client.login_editor()
-    client.get(f'/daily-list/boxes/2019-01-10', status=403)
-    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
+    client.get('/daily-list/boxes/2019-01-10', status=403)
+    client.get('/daily-list/boxes-and-forms/2019-01-10', status=403)
     client.logout()
 
     client.login_admin()
-    client.get(f'/daily-list/boxes/2019-01-10')
-    client.get(f'/daily-list/boxes-and-forms/2019-01-10')
+    client.get('/daily-list/boxes/2019-01-10')
+    client.get('/daily-list/boxes-and-forms/2019-01-10')
     client.logout()

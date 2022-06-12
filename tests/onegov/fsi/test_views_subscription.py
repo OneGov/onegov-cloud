@@ -1,6 +1,6 @@
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.models import CourseSubscription, CourseAttendee, CourseEvent, \
-    Course
+from onegov.fsi.models import CourseSubscription, CourseAttendee, \
+    CourseEvent, Course
 from onegov.user import User
 
 
@@ -151,7 +151,7 @@ def test_create_delete_reservation(client_with_db):
 
     assert attendee.user_id == member.id
     assert attendee.organisation == 'ORG'
-    view = f'/fsi/reservations/add'
+    view = '/fsi/reservations/add'
 
     client.login_editor()
 
@@ -205,7 +205,9 @@ def test_create_delete_reservation(client_with_db):
     new = client.get(view)
     options = [opt[2] for opt in new.form['course_event_id'].options]
     # must asscending order from newest to oldest, past events excluded
-    assert options == ['Course - 01.01.2050 01:00', 'Course - 01.01.2060 01:00']
+    assert options == [
+        'Course - 01.01.2050 01:00', 'Course - 01.01.2060 01:00'
+    ]
     new.form['dummy_desc'] = 'Safe!'
     page = new.form.submit().follow()
     assert 'Safe!' in page
