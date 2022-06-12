@@ -57,6 +57,7 @@ def add_new_translator(self, request, form):
                 receivers=(translator.user.username, ),
                 content=content,
             )
+            request.success(_('Activation E-Mail sent'))
 
         return request.redirect(request.link(translator))
 

@@ -19,8 +19,13 @@ from onegov.translator_directory.models.mutation import TranslatorMutation
 def apply_translator_mutation(self, request, form):
     if form.submitted(request):
         form.update_model()
-        request.success(_("Proposed changes applied."))
-        TranslatorMutationMessage.create(self.ticket, request, 'applied')
+        request.success(_("Proposed changes applied"))
+        TranslatorMutationMessage.create(
+            self.ticket,
+            request,
+            'applied',
+            form.changes.data
+        )
         if 'return-to' in request.GET:
             return request.redirect(request.url)
         return redirect(request.link(self))

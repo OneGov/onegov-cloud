@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-10 09:47+0200\n"
+"POT-Creation-Date: 2022-06-12 07:27+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -522,8 +522,8 @@ msgstr "Mitglieder"
 msgid "Mutation report"
 msgstr "Mutationsmeldung"
 
-msgid "Proposed changes applied."
-msgstr "Vorgeschlagene Änderungen übernommen."
+msgid "Proposed changes applied"
+msgstr "Vorgeschlagene Änderungen übernommen"
 
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
@@ -565,6 +565,9 @@ msgstr "Übersetzer/in hinzugefügt"
 
 msgid "An account was created for you"
 msgstr "Ein Konto wurde für Sie erstellt"
+
+msgid "Activation E-Mail sent"
+msgstr "Aktivierungs-Email verschickt"
 
 msgid "Submit Search"
 msgstr "Suchen"

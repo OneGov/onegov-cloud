@@ -5,8 +5,13 @@
         </metal:b>
         <metal:b fill-slot="text">
             <tal:b switch="model.meta['change']">
-                <tal:b case="'applied'" i18n:translate>
-                    Proposed changes applied.
+                <tal:b case="'applied'">
+                    <tal:b tal:condition="not model.applied_changes">
+                        <tal:b i18n:translate>Proposed changes applied</tal:b>.
+                    </tal:b>
+                    <tal:b tal:condition="model.applied_changes">
+                        <tal:b i18n:translate>Proposed changes applied</tal:b>: <tal:b tal:repeat="change model.applied_changes"><tal:b i18n:translate>${change}</tal:b><tal:b tal:condition="not repeat.change.end">, </tal:b></tal:b>.
+                    </tal:b>
                 </tal:b>
             </tal:b>
         </metal:b>
