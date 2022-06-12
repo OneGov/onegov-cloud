@@ -75,7 +75,7 @@ def test_formcode_format(browser):
 def test_formcode_select_empty_checkbox(browser):
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script(f"""
+    browser.driver.execute_script("""
         var watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
 
@@ -106,7 +106,7 @@ def test_formcode_select_empty_checkbox(browser):
 def test_formcode_select_empty_radio(browser):
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script(f"""
+    browser.driver.execute_script("""
         var watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
 

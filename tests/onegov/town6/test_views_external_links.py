@@ -36,4 +36,3 @@ def test_external_links_in_forms(client):
 
     page = page.form.submit().follow()
     assert page.request.url.endswith('/forms')
-

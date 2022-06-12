@@ -226,8 +226,10 @@ def test_directory_publication_change_request(client):
     new_end = now + timedelta(days=9, minutes=5)
     form_preview.form['publication_end'] = dt_for_form(new_end)
     changes = form_preview.form.submit()
-    assert changes.pyquery('.diff ins')[0].text == dt_repr(replace_timezone(new_end, 'CET'))
-    assert changes.pyquery('.diff del')[0].text == dt_repr(standardize_date(end, 'UTC'))
+    assert changes.pyquery('.diff ins')[0].text == \
+        dt_repr(replace_timezone(new_end, 'CET'))
+    assert changes.pyquery('.diff del')[0].text == \
+        dt_repr(standardize_date(end, 'UTC'))
 
     page = changes.form.submit().follow()
     ticket_page = accecpt_latest_submission(client)
@@ -235,8 +237,10 @@ def test_directory_publication_change_request(client):
     assert 'User Address' in ticket_page
     annual_entry = dir_query(client).first()
     assert annual_entry.name == 'annual'
-    assert annual_entry.publication_end == strip_s(new_end, timezone='Europe/Zurich')
-    assert annual_entry.publication_start == strip_s(now, timezone='Europe/Zurich')
+    assert annual_entry.publication_end == \
+        strip_s(new_end, timezone='Europe/Zurich')
+    assert annual_entry.publication_start == \
+        strip_s(now, timezone='Europe/Zurich')
 
 
 def test_directory_change_requests(client):
@@ -311,7 +315,7 @@ def test_directory_submissions(client, postgres):
     page.form['structure'] = """
         Name *= ___
         Description = ...
-        File = *.txt|*.csv 
+        File = *.txt|*.csv
     """
     page.form['enable_submissions'] = False
     page.form['title_format'] = '[Name]'
@@ -426,7 +430,7 @@ def test_directory_submissions(client, postgres):
     page.form['structure'] = """
         Name *= ___
         Description = ...
-        File = *.txt|*.csv 
+        File = *.txt|*.csv
         Category *= ___
     """
     page.form['lead_format'] = '[Description] [Category]'
@@ -647,7 +651,7 @@ def test_directory_export(client):
                     [ ] Z: with semicolon
                 Choice =
                     (x) yes
-                    ( ) no                
+                    ( ) no
             """
 
     events = directories.add(

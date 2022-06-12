@@ -385,7 +385,8 @@ class Scenario(BaseScenario):
         ticket.reopen_ticket(user or self.latest_user)
 
     def delete_ticket(self, ticket=None):
-        """Using the view function allows to check for TicketDeletionError's """
+        """Using the view function allows to check for
+        TicketDeletionError's """
         ticket = ticket or self.tickets[-1]
         delete_ticket(ticket, self.request)
 
