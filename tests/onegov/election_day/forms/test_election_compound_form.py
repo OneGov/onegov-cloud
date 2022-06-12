@@ -7,7 +7,6 @@ from onegov.ballot import ProporzElection
 from onegov.election_day.forms import ElectionCompoundForm
 from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import DummyPostData
-from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 

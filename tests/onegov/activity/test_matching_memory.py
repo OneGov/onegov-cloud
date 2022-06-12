@@ -1,5 +1,4 @@
 import sys
-import time
 
 from datetime import date, timedelta, datetime
 from functools import partial
@@ -760,7 +759,7 @@ def test_limited_bookings_regression():
 
     result = match(
         bookings, (o1, o2, o3),
-        default_limit=2,        
+        default_limit=2,
     )
 
     # in the regression, this would be 2, even though 3 were possible
