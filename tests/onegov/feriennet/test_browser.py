@@ -265,14 +265,14 @@ def test_volunteers(browser, scenario):
     assert browser.is_text_present('Helfen')
 
     # users can sign up as volunteers
-    browser.click_link_by_text("Helfen")
+    browser.links.find_by_text("Helfen").click()
     assert browser.is_text_present("Begleiter")
     assert not browser.is_element_present_by_css('.volunteer-cart-item')
 
-    browser.click_link_by_partial_text("Zu meiner Liste")
+    browser.links.find_by_partial_text("Zu meiner Liste").click()
     assert browser.is_element_present_by_css('.volunteer-cart-item')
 
-    browser.click_link_by_text("Als Hilfsperson registrieren")
+    browser.links.find_by_text("Als Hilfsperson registrieren").click()
     browser.fill_form({
         'first_name': "Foo",
         'last_name': "Bar",
@@ -295,8 +295,7 @@ def test_volunteers(browser, scenario):
     assert not browser.is_text_present("Bestätigt")
 
     browser.find_by_css('.actions-button').first.click()
-    browser.find_link_by_partial_text("Als bestätigt markieren")
-    browser.click_link_by_partial_text("Als bestätigt markieren")
+    browser.links.find_by_partial_text("Als bestätigt markieren").click()
     assert browser.is_text_present("Bestätigt")
 
     # now the volunteer is in the list

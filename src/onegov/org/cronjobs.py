@@ -110,6 +110,41 @@ def process_resource_rules(request):
         handle_rules_cronjob(resources.bind(resource), request)
 
 
+def ticket_statistics_common_template_args(request, collection):
+    args = {}
+    layout = DefaultMailLayout(object(), request)
+
+    # get the current ticket count
+    count = collection.get_count()
+    args['currently_open'] = count.open
+    args['currently_pending'] = count.pending
+    args['currently_closed'] = count.closed
+    args['open_link'] = request.link(
+        collection.for_state('open').for_owner(None))
+    args['pending_link'] = request.link(
+        collection.for_state('pending').for_owner(None))
+    args['closed_link'] = request.link(
+        collection.for_state('closed').for_owner(None))
+
+    args['title'] = request.translate(
+        _("${org} OneGov Cloud Status", mapping={
+            'org': request.app.org.title
+        })
+    )
+    args['layout'] = layout
+    args['org'] = request.app.org.title
+
+    return args
+
+
+def ticket_statistics_users(app):
+    users = UserCollection(app.session()).query()
+    users = users.filter(User.active == True)
+    users = users.filter(User.role.in_(app.settings.org.status_mail_roles))
+    users = users.options(undefer('data'))
+    return users.all()
+
+
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
 def send_daily_ticket_statistics(request):
 
@@ -119,19 +154,12 @@ def send_daily_ticket_statistics(request):
     if today.weekday() in (SAT, SUN):
         return
 
-    if not request.app.send_daily_ticket_statistics:
+    if not request.app.send_ticket_statistics:
         return
 
-    args = {}
     app = request.app
-    layout = DefaultMailLayout(object(), request)
-
-    # get the current ticket count
     collection = TicketCollection(app.session())
-    count = collection.get_count()
-    args['currently_open'] = count.open
-    args['currently_pending'] = count.pending
-    args['currently_closed'] = count.closed
+    args = ticket_statistics_common_template_args(request, collection)
 
     # get tickets created yesterday or on the weekend
     end = datetime(today.year, today.month, today.day, tzinfo=today.tzinfo)
@@ -157,34 +185,147 @@ def send_daily_ticket_statistics(request):
     query = query.filter(Ticket.state == 'closed')
     args['closed'] = query.count()
 
-    # render the email
-    args['title'] = request.translate(
-        _("${org} OneGov Cloud Status", mapping={
-            'org': app.org.title
-        })
-    )
-    args['layout'] = layout
     args['is_monday'] = today.weekday() == MON
-    args['org'] = app.org.title
 
-    # send one e-mail per user
-    users = UserCollection(app.session()).query()
-    users = users.filter(User.active == True)
-    users = users.filter(User.role.in_(app.settings.org.status_mail_roles))
-    users = users.options(undefer('data'))
-    users = users.all()
+    for user in ticket_statistics_users(app):
 
-    for user in users:
-
-        if user.data and not user.data.get('daily_ticket_statistics'):
+        if not user.data or user.data.get('ticket_statistics') != 'daily':
             continue
 
-        unsubscribe = layout.unsubscribe_link(user.username)
+        unsubscribe = args['layout'].unsubscribe_link(user.username)
 
         args['username'] = user.username
         args['unsubscribe'] = unsubscribe
         content = render_template(
             'mail_daily_ticket_statistics.pt', request, args
+        )
+
+        app.send_marketing_email(
+            subject=args['title'],
+            receivers=(user.username, ),
+            content=content,
+            headers={
+                'List-Unsubscribe': f'<{unsubscribe}>',
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
+        )
+
+
+@OrgApp.cronjob(hour=8, minute=45, timezone='Europe/Zurich')
+def send_weekly_ticket_statistics(request):
+
+    today = replace_timezone(datetime.utcnow(), 'UTC')
+    today = to_timezone(today, 'Europe/Zurich')
+
+    if today.weekday() != MON:
+        return
+
+    if not request.app.send_ticket_statistics:
+        return
+
+    app = request.app
+    collection = TicketCollection(app.session())
+    args = ticket_statistics_common_template_args(request, collection)
+
+    # get tickets created in the last week
+    end = datetime(today.year, today.month, today.day, tzinfo=today.tzinfo)
+    start = end - timedelta(days=7)
+
+    query = collection.query()
+    query = query.filter(Ticket.created >= start)
+    query = query.filter(Ticket.created <= end)
+    args['opened'] = query.count()
+
+    query = collection.query()
+    query = query.filter(Ticket.modified >= start)
+    query = query.filter(Ticket.modified <= end)
+    query = query.filter(Ticket.state == 'pending')
+    args['pending'] = query.count()
+
+    query = collection.query()
+    query = query.filter(Ticket.modified >= start)
+    query = query.filter(Ticket.modified <= end)
+    query = query.filter(Ticket.state == 'closed')
+    args['closed'] = query.count()
+
+    # send one e-mail per user
+    for user in ticket_statistics_users(app):
+
+        if user.data and user.data.get('ticket_statistics') != 'weekly':
+            continue
+
+        unsubscribe = args['layout'].unsubscribe_link(user.username)
+
+        args['username'] = user.username
+        args['unsubscribe'] = unsubscribe
+        content = render_template(
+            'mail_weekly_ticket_statistics.pt', request, args
+        )
+
+        app.send_marketing_email(
+            subject=args['title'],
+            receivers=(user.username, ),
+            content=content,
+            headers={
+                'List-Unsubscribe': f'<{unsubscribe}>',
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
+        )
+
+
+@OrgApp.cronjob(hour=9, minute=0, timezone='Europe/Zurich')
+def send_monthly_ticket_statistics(request):
+
+    today = replace_timezone(datetime.utcnow(), 'UTC')
+    today = to_timezone(today, 'Europe/Zurich')
+
+    if today.weekday() != MON or today.day > 7:
+        return
+
+    if not request.app.send_ticket_statistics:
+        return
+
+    args = {}
+    app = request.app
+    collection = TicketCollection(app.session())
+    args = ticket_statistics_common_template_args(request, collection)
+
+    # get tickets created in the last four or five weeks
+    # depending on when the first monday was last month
+    end = datetime(today.year, today.month, today.day, tzinfo=today.tzinfo)
+    start = end - timedelta(days=28)
+    if start.day > 7:
+        start -= timedelta(days=7)
+
+    query = collection.query()
+    query = query.filter(Ticket.created >= start)
+    query = query.filter(Ticket.created <= end)
+    args['opened'] = query.count()
+
+    query = collection.query()
+    query = query.filter(Ticket.modified >= start)
+    query = query.filter(Ticket.modified <= end)
+    query = query.filter(Ticket.state == 'pending')
+    args['pending'] = query.count()
+
+    query = collection.query()
+    query = query.filter(Ticket.modified >= start)
+    query = query.filter(Ticket.modified <= end)
+    query = query.filter(Ticket.state == 'closed')
+    args['closed'] = query.count()
+
+    # send one e-mail per user
+    for user in ticket_statistics_users(app):
+
+        if not user.data or user.data.get('ticket_statistics') != 'monthly':
+            continue
+
+        unsubscribe = args['layout'].unsubscribe_link(user.username)
+
+        args['username'] = user.username
+        args['unsubscribe'] = unsubscribe
+        content = render_template(
+            'mail_monthly_ticket_statistics.pt', request, args
         )
 
         app.send_marketing_email(

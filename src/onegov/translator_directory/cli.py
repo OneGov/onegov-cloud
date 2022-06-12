@@ -1,12 +1,13 @@
-import re
-from datetime import datetime
-
 import click
+import re
 import transaction
 
+from datetime import datetime
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
-from onegov.fsi.cli import fetch_users
+from onegov.translator_directory.collections.translator import \
+    TranslatorCollection
+from onegov.translator_directory import log
 from onegov.translator_directory.constants import CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
@@ -14,6 +15,12 @@ from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import update_drive_distances, \
     geocode_translator_addresses
+from onegov.user import User
+from onegov.user.auth.clients import LDAPClient
+from onegov.user.auth.provider import ensure_user
+from onegov.user.sync import ZugUserSource
+from sqlalchemy import or_, and_
+
 
 cli = command_group()
 
@@ -242,18 +249,125 @@ def do_import(path, clear):
     return execute
 
 
+def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
+                admin_group, editor_group, verbose=False,
+                skip_deactivate=False, dry_run=False):
+    """ Implements the fetch-users cli command. """
+
+    admin_group = admin_group.lower()
+    editor_group = editor_group.lower()
+
+    sources = ZugUserSource.factory(verbose=verbose)
+
+    translators = TranslatorCollection(app, user_role='admin')
+    translators = {translator.email for translator in translators.query()}
+
+    def users(connection):
+        for src in sources:
+            for base, search_filter, attrs in src.bases_filters_attributes:
+                success = connection.search(
+                    base, search_filter, attributes=attrs
+                )
+                if not success:
+                    log.error("Error importing events", exc_info=True)
+                    raise RuntimeError(
+                        f"Could not query '{base}' "
+                        f"with filter '{search_filter}'"
+                    )
+
+                yield from src.map_entries(
+                    connection.entries,
+                    admin_group=admin_group,
+                    editor_group=editor_group,
+                    base=base,
+                    search_filter=search_filter
+                )
+
+    def handle_inactive(synced_ids):
+        inactive = session.query(User).filter(
+            and_(
+                User.id.notin_(synced_ids),
+                or_(
+                    User.source == 'ldap',
+                    User.role == 'member'
+                )
+            )
+        )
+        for ix, user_ in enumerate(inactive):
+            if user_.active:
+                log.info(f'Deactivating inactive user {user_.username}')
+            user_.active = False
+
+            if not dry_run:
+                if ix % 200 == 0:
+                    app.es_indexer.process()
+
+    client = LDAPClient(ldap_server, ldap_username, ldap_password)
+    client.try_configuration()
+    count = 0
+    synced_users = []
+    for ix, data in enumerate(users(client.connection)):
+
+        if data['mail'] in translators:
+            log.info(f'Skipping {data["mail"]}, translator exists')
+            continue
+
+        if data['type'] == 'ldap':
+            source = 'ldap'
+            source_id = data['source_id']
+            force_role = True
+        elif data['type'] == 'regular':
+            source = None
+            source_id = None
+            force_role = False
+        else:
+            log.error("Unknown auth provider", exc_info=False)
+            raise NotImplementedError()
+
+        user = ensure_user(
+            source=source,
+            source_id=source_id,
+            session=session,
+            username=data['mail'],
+            role=data['role'],
+            force_role=force_role,
+            force_active=True
+        )
+
+        synced_users.append(user.id)
+
+        count += 1
+        if not dry_run:
+            if ix % 200 == 0:
+                app.es_indexer.process()
+
+    log.info(f'Synchronized {count} users')
+
+    if not skip_deactivate:
+        handle_inactive(synced_users)
+
+    if dry_run:
+        transaction.abort()
+
+
 @cli.command(name='fetch-users', context_settings={'singular': True})
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
 @click.option('--ldap-password', required=True)
 @click.option('--admin-group', required=True, help='group id for role admin')
 @click.option('--editor-group', required=True, help='group id for role editor')
+@click.option('--verbose', is_flag=True, default=False)
+@click.option('--skip-deactivate', is_flag=True, default=False)
+@click.option('--dry-run', is_flag=True, default=False)
 def fetch_users_cli(
         ldap_server,
         ldap_username,
         ldap_password,
         admin_group,
-        editor_group
+        editor_group,
+        verbose,
+        skip_deactivate,
+        dry_run
 ):
     """ Updates the list of users by fetching matching users
     from a remote LDAP server.
@@ -281,7 +395,9 @@ def fetch_users_cli(
             ldap_password,
             admin_group,
             editor_group,
-            add_attendee=False
+            verbose,
+            skip_deactivate,
+            dry_run
         )
 
     return execute
@@ -381,3 +497,20 @@ def geocode_cli(dry_run, only_empty):
             transaction.abort()
 
     return do_geocode
+
+
+@cli.command(name='update-accounts', context_settings={'singular': True})
+@click.option('--dry-run/-no-dry-run', default=False)
+def update_accounts_cli(dry_run):
+    """ Updates user accounts for translators. """
+
+    def do_update_accounts(request, app):
+
+        translators = TranslatorCollection(request.app, user_role='admin')
+        for translator in translators.query():
+            translators.update_user(translator, translator.email)
+
+        if dry_run:
+            transaction.abort()
+
+    return do_update_accounts

@@ -574,6 +574,8 @@ class Form(BaseForm):
         """ Returns the field description in modified form if
          the description should be rendered separately in the field macro.
          """
+        if hasattr(field, 'long_description'):
+            return field.long_description
         if not field.description:
             return None
         desc, is_md = Form.as_maybe_markdown(

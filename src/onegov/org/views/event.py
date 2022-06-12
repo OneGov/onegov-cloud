@@ -128,6 +128,9 @@ def handle_new_event(self, request, form, layout=None):
         "or reason."
     )
 
+    if request.app.custom_event_form_lead:
+        terms = request.app.custom_event_form_lead
+
     if form.submitted(request):
         event = EventCollection(self.session).add(
             title=form.title.data,
@@ -197,6 +200,17 @@ def view_event(self, request, layout=None):
             receivers=(self.meta['submitter_email'],),
             ticket=ticket,
         )
+        if request.email_for_new_tickets:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(request.email_for_new_tickets, ),
+                content={
+                    'model': ticket
+                }
+            )
 
         if request.auto_accept(ticket):
             try:

@@ -1,12 +1,12 @@
 from datetime import datetime
 from io import BytesIO
-
-from webob.exc import HTTPNotFound
-from xlsxwriter import Workbook
-
+from morepath.request import Response
+from onegov.core.custom import json
+from onegov.core.security import Secret, Personal, Private
+from onegov.core.templates import render_template
+from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import Organisation
 from onegov.translator_directory import _
-from onegov.core.security import Secret, Personal, Private
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
@@ -17,8 +17,8 @@ from onegov.translator_directory.forms.translator import TranslatorForm, \
 from onegov.translator_directory.layout import AddTranslatorLayout, \
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
 from onegov.translator_directory.models.translator import Translator
-from morepath.request import Response
-from onegov.core.custom import json
+from webob.exc import HTTPNotFound
+from xlsxwriter import Workbook
 
 
 @TranslatorDirectoryApp.form(
@@ -31,8 +31,26 @@ from onegov.core.custom import json
 def add_new_translator(self, request, form):
 
     if form.submitted(request):
-        translator = self.add(**form.get_useful_data())
+        data = form.get_useful_data()
+        translator = self.add(**data)
         request.success(_('Added a new translator'))
+
+        if translator.user:
+            subject = request.translate(
+                _('An account was created for you')
+            )
+            content = render_template('mail_new_user.pt', request, {
+                'user': translator.user,
+                'org': request.app.org,
+                'layout': DefaultMailLayout(translator.user, request),
+                'title': subject
+            })
+            request.app.send_transactional_email(
+                subject=subject,
+                receivers=(translator.user.username, ),
+                content=content,
+            )
+
         return request.redirect(request.link(translator))
 
     layout = AddTranslatorLayout(self, request)
@@ -297,10 +315,10 @@ def edit_translator_as_editor(self, request, form):
     request_method='DELETE',
     permission=Secret
 )
-def delete_course_event(self, request):
+def delete_translator(self, request):
 
     request.assert_valid_csrf_token()
-    TranslatorCollection(request.session).delete(self)
+    TranslatorCollection(request.app).delete(self)
     request.success(_('Translator successfully deleted'))
 
 

@@ -37,6 +37,20 @@ editor_can_see = member_can_see + (
     'iban'
 )
 
+translator_can_see = editor_can_see + (
+    'operation_comments',
+    'confirm_name_reveal',
+    'date_of_application',
+    'date_of_decision',
+    'spoken_languages',
+    'written_languages',
+    'proof_of_preconditions',
+    'agency_references',
+    'education_as_interpreter',
+    'certificates',
+    'comments'
+)
+
 ADMISSIONS = {
     'uncertified': _('uncertified'),
     'in_progress': _('in progress'),

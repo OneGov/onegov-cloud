@@ -114,6 +114,43 @@ def test_view_permissions():
         onegov.feriennet, onegov.feriennet.FeriennetApp)
 
 
+def test_view_hint_max_activities(client, scenario):
+    client.login_admin()
+
+    scenario.add_period(
+        title='Testperiod',
+        active=True,
+        confirmable=True,
+        finalizable=True,
+        max_bookings_per_attendee=4,
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    page = client.get('/')
+    page = page.click('Wunschliste')
+    assert "Teilnehmende werden in bis zu 4 Angebot(e) eingeteilt." in page
+    assert "bis zu 4 Angebot(e) angemeldet werden." not in page
+
+    period_settings = client.get('/periods')
+    period_settings.click('Deaktivieren')
+
+    scenario.add_period(
+        title='Testperiod2',
+        active=True,
+        confirmable=False,
+        finalizable=True,
+        max_bookings_per_attendee=4,
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    page = client.get('/')
+    page = page.click('Wunschliste')
+    assert "bis zu 4 Angebot(e) angemeldet werden." in page
+    assert "Teilnehmende werden in bis zu 4 Angebot(e) eingeteilt." not in page
+
+
 def test_activity_permissions(client, scenario):
     anon = client.spawn()
     admin = client.spawn()
@@ -2629,7 +2666,8 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('110.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    help = [e.text.strip() for e in page.pyquery('.item-text')[:-2]]
+    assert help == [
         'Ferienpass',
         'Fishing',
     ]
@@ -2641,7 +2679,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Ferienpass',
         'Fishing',
         'Ferienpass',
@@ -2657,7 +2695,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 0
     assert str(page).count('230.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Ferienpass',
         'Fishing',
         'Hunting',
@@ -2707,7 +2745,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('100.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
     ]
 
@@ -2718,7 +2756,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('150.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
         'Hunting',
     ]
@@ -2730,7 +2768,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('250.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
         'Hunting',
         'Fishing',

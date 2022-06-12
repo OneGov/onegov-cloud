@@ -64,6 +64,10 @@ def test_elections_by_id(session):
 
 
 def test_elections_get_latest(session):
+    collection = ElectionCollection(session)
+
+    assert collection.get_latest() is None
+
     session.add(Election(
         title="latest",
         domain='federation',
@@ -78,8 +82,6 @@ def test_elections_get_latest(session):
     ))
 
     session.flush()
-
-    collection = ElectionCollection(session)
 
     # sort by domain, then by date
     assert [v.title for v in collection.get_latest()] == ['latest']

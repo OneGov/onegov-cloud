@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
@@ -13,8 +14,8 @@ from onegov.form import FormDefinition
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
 from onegov.reservation import Resource
+from onegov.user import User
 from sqlalchemy.orm import undefer
-from onegov.core.crypto import random_token
 
 
 @upgrade_task('Move from town to organisation', always_run=True)
@@ -186,3 +187,22 @@ def cache_news_hashtags_in_meta(context):
             news.hashtags = news.es_tags or []
     except Exception:
         pass
+
+
+@upgrade_task('Change daily_ticket_statistics data format')
+def change_daily_ticket_statistics_data_format(context):
+    users = context.session.query(User).options(undefer(User.data))
+    unset = object()
+
+    for user in users:
+        if not user.data:
+            continue
+
+        daily = user.data.pop('daily_ticket_statistics', unset)
+        if daily is unset:
+            continue
+
+        user.data.setdefault(
+            'ticket_statistics',
+            'daily' if daily else 'never'
+        )
