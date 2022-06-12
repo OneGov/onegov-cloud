@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-31 11:51+0200\n"
+"POT-Creation-Date: 2022-06-12 10:48+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2694,6 +2694,9 @@ msgstr "Soumis"
 
 msgid "Withdrawn"
 msgstr "Retiré"
+
+msgid "Secret Edit Link"
+msgstr "Lien secret pour l'édition"
 
 msgid "List Preview"
 msgstr "Aperçu de la liste"
