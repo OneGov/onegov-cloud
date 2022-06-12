@@ -28,16 +28,16 @@ def create_form(session, confirmable, start, delta=timedelta(days=10)):
         return start_.strftime(fmt)
 
     form = PeriodForm(MultiDict([
-            ('title', 'My Period'),
-            ('confirmable', confirmable),
-            ('finalizable', False),
-            ('prebooking_start', start.strftime(fmt)),
-            ('prebooking_end', iter_start()),
-            ('booking_start', iter_start()),
-            ('booking_end', iter_start()),
-            ('execution_start', iter_start()),
-            ('execution_end', iter_start())
-        ]))
+        ('title', 'My Period'),
+        ('confirmable', confirmable),
+        ('finalizable', False),
+        ('prebooking_start', start.strftime(fmt)),
+        ('prebooking_end', iter_start()),
+        ('booking_start', iter_start()),
+        ('booking_end', iter_start()),
+        ('execution_start', iter_start()),
+        ('execution_end', iter_start())
+    ]))
     form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
     form.model = PeriodCollection(session)
     return form
@@ -56,6 +56,7 @@ def add_period_by_form(form, session):
         active=False
     )
 
+
 def edit_period_by_form(form, period):
     # simulated the edit view
     form.model = period
@@ -67,7 +68,7 @@ def edit_period_by_form(form, period):
 ])
 def test_period_form(session, confirmable, start, delta):
     # Fixes issue FER-861
-    booking_start = start + 2*delta
+    booking_start = start + 2 * delta
 
     form = create_form(session, confirmable, start, delta)
     assert form.confirmable.data is confirmable
@@ -89,7 +90,8 @@ def test_period_form(session, confirmable, start, delta):
     form.model = period
     assert not form.is_new
     form.process(obj=period)
-    assert form.prebooking_start.data == start if confirmable else booking_start
+    assert form.prebooking_start.data == start if confirmable \
+        else booking_start
 
     # Start earlier, no intersections
     new_booking_start = form.booking_start.data

@@ -94,11 +94,11 @@ def test_layout_menu():
     ]
 
     exports_menu_tab = ('Exports', None, False, [
-            ('Issues', '/IssueCollection/export', False, []),
-            ('Organizations', '/OrganizationCollection/export', False, []),
-            ('Categories', '/CategoryCollection/export', False, []),
-            ('Users', '/UserCollection/export', False, []),
-        ])
+        ('Issues', '/IssueCollection/export', False, []),
+        ('Organizations', '/OrganizationCollection/export', False, []),
+        ('Categories', '/CategoryCollection/export', False, []),
+        ('Users', '/UserCollection/export', False, []),
+    ])
 
     request._is_private = True
     assert layout.menu == [

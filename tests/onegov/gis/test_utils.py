@@ -30,7 +30,7 @@ def test_mapbox_requests():
     assert url.as_string() == \
            f'{host}/directions/v5/mapbox/driving/{luzern[1]},{luzern[0]};' \
            f'{luzern_2[1]},{luzern_2[0]}?access_token={token}'.\
-               replace(',', '%2C').replace(';', '%3B')
+           replace(',', '%2C').replace(';', '%3B')
 
 
 @pytest.mark.parametrize('coord,outcome', [

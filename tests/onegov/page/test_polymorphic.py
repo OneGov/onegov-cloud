@@ -10,8 +10,9 @@ def test_article(session):
     pages = PageCollection(session)
     root = pages.add_root("Root")
     assert pages.query().filter(
-                Page.publication_started == True,
-                Page.publication_ended == False).one()
+        Page.publication_started == True,
+        Page.publication_ended == False
+    ).one()
 
     page = pages.add(parent=root, title='Article', type='article')
     assert isinstance(page, Article)

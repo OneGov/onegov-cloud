@@ -22,7 +22,7 @@ def test_views_user_manual(client, pdf_1, pdf_2):
     assert "Noch kein Benutzerhandbuch vorhanden." in view
 
     add = view.click("Bearbeiten")
-    add.form['pdf'] = Upload(f'Handbuch.pdf', pdf_1, 'application/pdf')
+    add.form['pdf'] = Upload('Handbuch.pdf', pdf_1, 'application/pdf')
     added = add.form.submit().follow()
     assert "Benutzerhandbuch geändert." in added
     assert "Benutzerhandbuch (PDF, 8.1 kB)." in added
@@ -32,7 +32,7 @@ def test_views_user_manual(client, pdf_1, pdf_2):
     edited = view.click("Bearbeiten")
     assert "user_manual.pdf (8.1 kB)" in str(edited.form.html)
     edited.form.get('pdf', 0).select('replace')
-    edited.form.get('pdf', 1).value = Upload(f'xx', pdf_2, 'application/pdf')
+    edited.form.get('pdf', 1).value = Upload('xx', pdf_2, 'application/pdf')
     editeded = edited.form.submit().follow()
     assert "Benutzerhandbuch geändert." in editeded
     assert "Benutzerhandbuch (PDF, 9.1 kB)." in editeded

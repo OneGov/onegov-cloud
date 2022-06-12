@@ -1963,7 +1963,7 @@ def test_postgres_timezone(postgres_dsn):
     mgr.set_current_schema('testing')
     session = mgr.session()
     assert session.execute('show timezone;').scalar() in valid_timezones, """
-    Run 
-        ALTER DATABASE onegov SET timezone TO 'UTC';    
+    Run
+        ALTER DATABASE onegov SET timezone TO 'UTC';
     to change the default timezone, then restart postgres service.
     """

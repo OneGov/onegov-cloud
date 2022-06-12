@@ -42,7 +42,8 @@ def test_pages_cache(client):
 
     url_page.form['name'] = 'my govikoN'
     url_page = url_page.form.submit()
-    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in url_page
+    assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in \
+        url_page
     url_page.form['name'] = new_name
     url_page.form['test'] = True
     url_page = url_page.form.submit()
