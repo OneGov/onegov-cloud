@@ -1,8 +1,9 @@
-from datetime import date, timedelta
-
 import babel
 import os
+import transaction
 
+from datetime import date, timedelta
+from onegov.event import Event
 from tests.onegov.town6.common import step_class
 
 
@@ -87,7 +88,22 @@ def test_event_steps(client):
     assert message['To'] == "test@example.org"
     assert ticket_nr in message['TextBody']
 
-    assert "Zugriff verweigert" in preview_page.form.submit(expect_errors=True)
+    # Make corrections
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['description'] = "My event is exceptional."
+    preview_page = form_page.form.submit().follow()
+    assert "My event is exceptional." in preview_page
+
+    session = client.app.session()
+    event = session.query(Event).filter_by(title="My Event").one()
+    event.meta['session_ids'] = []
+    session.flush()
+    transaction.commit()
+
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['location'] = "A special place"
+    preview_page = form_page.form.submit().follow()
+    assert "A special place" in preview_page
 
     # Accept ticket
     client.login_editor()
@@ -101,8 +117,8 @@ def test_event_steps(client):
     assert ticket_nr in ticket_page
     assert "test@example.org" in ticket_page
     assert "My Event" in ticket_page
-    assert "My event is an event." in ticket_page
-    assert "Location" in ticket_page
+    assert "My event is exceptional." in ticket_page
+    assert "A special place" in ticket_page
     assert "The Organizer" in ticket_page
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
@@ -130,8 +146,8 @@ def test_event_steps(client):
     assert message['To'] == "test@example.org"
     message = message['TextBody']
     assert "My Event" in message
-    assert "My event is an event." in message
-    assert "Location" in message
+    assert "My event is exceptional." in message
+    assert "A special place" in message
     assert "Ausstellung" in message
     assert "Bibliothek" in message
     assert "The Organizer" in message
