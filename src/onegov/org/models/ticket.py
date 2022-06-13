@@ -108,6 +108,22 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
     def reference_group(self, request):
         return self.title
 
+    def unguessable_edit_link(self, request):
+        if (
+            self.handler
+            and self.handler.ticket
+            and self.handler.ticket.state in ('open', 'pending')
+            and self.handler.event
+            and self.handler.event.state == 'submitted'
+            and self.handler.event.meta
+            and 'token' in self.handler.event.meta
+        ):
+            return request.link(
+                self.handler.event,
+                name='edit',
+                query_params={'token': self.handler.event.meta['token']}
+            )
+
 
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'DIR'}

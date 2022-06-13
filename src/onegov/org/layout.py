@@ -1758,9 +1758,11 @@ class EventLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        imported_editable = self.request.is_manager and self.model.source
+        if not self.request.is_manager:
+            return
+
         links = []
-        if imported_editable:
+        if self.model.source:
             links = [
                 Link(
                     text=_("Edit"),
@@ -1773,7 +1775,7 @@ class EventLayout(EventBaseLayout):
                         )
                     )
                 )]
-        if imported_editable and self.model.state == 'published':
+        if self.model.source and self.model.state == 'published':
             links.append(
                 Link(
                     text=_("Withdraw event"),
@@ -1795,7 +1797,7 @@ class EventLayout(EventBaseLayout):
                     )
                 )
             )
-        if imported_editable and self.model.state == 'withdrawn':
+        if self.model.source and self.model.state == 'withdrawn':
             links.append(
                 Link(
                     text=_("Re-publish event"),
@@ -1804,7 +1806,7 @@ class EventLayout(EventBaseLayout):
                     attrs={'class': 'accept-link'}
                 )
             )
-        if imported_editable:
+        if self.model.source:
             return links
 
         edit_link = Link(

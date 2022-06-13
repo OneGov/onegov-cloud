@@ -2,6 +2,7 @@
 import morepath
 
 from morepath.request import Response
+from onegov.core.crypto import random_token
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.org import _, OrgApp
@@ -29,25 +30,31 @@ def assert_anonymous_access_only_temporary(request, event):
     """ Raises exceptions if the current user is anonymous and no longer
     should be given access to the event.
 
-    This could probably be done using morepath's security system, but it would
-    not be quite as straight-forward. This approach is, though we have
-    to manually add this function to all public views the anonymous user
-    should be able to access when creating a new event, but not anymore
-    after that.
+    Anonymous user should be able to access when creating a new event, but not
+    anymore after that (i.e. when intiated and submitted). This is done by
+    checking the browser session and/or a secret token in the URL.
 
     """
     if request.is_manager:
         return
 
-    if event.state != 'initiated':
+    if event.state not in ('initiated', 'submitted'):
         raise exc.HTTPForbidden()
 
-    session_id = event.meta.get('session_id') if event.meta else None
-    if not session_id:
+    if not event.meta:
         raise exc.HTTPForbidden()
 
-    if session_id != get_session_id(request):
-        raise exc.HTTPForbidden()
+    session_id = get_session_id(request)
+    if session_id in event.meta.get('session_ids', []):
+        return
+
+    token = event.meta.get('token')
+    if token and token == request.params.get('token'):
+        event.meta.setdefault('session_ids', [])
+        event.meta['session_ids'].append(session_id)
+        return
+
+    raise exc.HTTPForbidden()
 
 
 def event_form(model, request, form=None):
@@ -76,6 +83,11 @@ def publish_event(self, request):
         request.warning(
             _('This event has already been published'))
         return request.redirect(request.link(self))
+
+    if self.meta and 'session_ids' in self.meta:
+        del self.meta['session_ids']
+    if self.meta and 'token' in self.meta:
+        del self.meta['token']
 
     self.publish()
 
@@ -138,8 +150,10 @@ def handle_new_event(self, request, form, layout=None):
             end=form.end,
             timezone=form.timezone,
         )
-
-        event.meta.update({'session_id': get_session_id(request)})
+        event.meta.update({
+            'session_ids': [get_session_id(request)],
+            'token': random_token()
+        })
         form.populate_obj(event)
 
         return morepath.redirect(request.link(event))
@@ -180,57 +194,55 @@ def view_event(self, request, layout=None):
 
     assert_anonymous_access_only_temporary(request, self)
 
-    if 'complete' in request.POST and self.state == 'initiated':
-        if self.meta and 'session_id' in self.meta:
-            del self.meta['session_id']
+    session = request.session
+    ticket = TicketCollection(session).by_handler_id(self.id.hex)
 
-        self.submit()
+    if 'complete' in request.POST:
+        if self.state == 'initiated':
+            self.submit()
 
-        session = request.session
-        with session.no_autoflush:
-            ticket = TicketCollection(session).open_ticket(
-                handler_code='EVN', handler_id=self.id.hex
-            )
-            TicketMessage.create(ticket, request, 'opened')
+            if not ticket:
+                with session.no_autoflush:
+                    ticket = TicketCollection(session).open_ticket(
+                        handler_code='EVN', handler_id=self.id.hex
+                    )
+                    TicketMessage.create(ticket, request, 'opened')
 
-        send_ticket_mail(
-            request=request,
-            template='mail_ticket_opened.pt',
-            subject=_("Your request has been registered"),
-            receivers=(self.meta['submitter_email'],),
-            ticket=ticket,
-        )
-        if request.email_for_new_tickets:
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
-                ticket=ticket,
-                receivers=(request.email_for_new_tickets, ),
-                content={
-                    'model': ticket
-                }
-            )
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened.pt',
+                    subject=_("Your request has been registered"),
+                    receivers=(self.meta['submitter_email'],),
+                    ticket=ticket,
+                )
+                if request.email_for_new_tickets:
+                    send_ticket_mail(
+                        request=request,
+                        template='mail_ticket_opened_info.pt',
+                        subject=_("New ticket"),
+                        ticket=ticket,
+                        receivers=(request.email_for_new_tickets, ),
+                        content={
+                            'model': ticket
+                        }
+                    )
 
-        if request.auto_accept(ticket):
-            try:
-                ticket.accept_ticket(request.auto_accept_user)
-                request.view(self, name='publish')
-            except Exception:
-                request.warning(_("Your request could not be "
-                                  "accepted automatically!"))
-            else:
-                close_ticket(ticket, request.auto_accept_user, request)
+                if request.auto_accept(ticket):
+                    try:
+                        ticket.accept_ticket(request.auto_accept_user)
+                        request.view(self, name='publish')
+                    except Exception:
+                        request.warning(_("Your request could not be "
+                                          "accepted automatically!"))
+                    else:
+                        close_ticket(ticket, request.auto_accept_user, request)
 
         request.success(_("Thank you for your submission!"))
 
         return morepath.redirect(request.link(ticket, 'status'))
 
-    session = request.session
-    ticket = TicketCollection(session).by_handler_id(self.id.hex)
-
     return {
-        'completable': self.state == 'initiated',
+        'completable': self.state in ('initiated', 'submitted'),
         'edit_url': request.link(self, 'edit'),
         'event': self,
         'layout': layout or EventLayout(self, request),
@@ -259,6 +271,9 @@ def handle_edit_event(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self)
 
+        ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+        if ticket:
+            EventMessage.create(self, ticket, request, 'changed')
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
