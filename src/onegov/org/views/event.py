@@ -197,51 +197,52 @@ def view_event(self, request, layout=None):
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.id.hex)
 
-    if 'complete' in request.POST and self.state == 'initiated':
-        self.submit()
+    if 'complete' in request.POST:
+        if self.state == 'initiated':
+            self.submit()
 
-        if not ticket:
-            with session.no_autoflush:
-                ticket = TicketCollection(session).open_ticket(
-                    handler_code='EVN', handler_id=self.id.hex
-                )
-                TicketMessage.create(ticket, request, 'opened')
+            if not ticket:
+                with session.no_autoflush:
+                    ticket = TicketCollection(session).open_ticket(
+                        handler_code='EVN', handler_id=self.id.hex
+                    )
+                    TicketMessage.create(ticket, request, 'opened')
 
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened.pt',
-                subject=_("Your request has been registered"),
-                receivers=(self.meta['submitter_email'],),
-                ticket=ticket,
-            )
-            if request.email_for_new_tickets:
                 send_ticket_mail(
                     request=request,
-                    template='mail_ticket_opened_info.pt',
-                    subject=_("New ticket"),
+                    template='mail_ticket_opened.pt',
+                    subject=_("Your request has been registered"),
+                    receivers=(self.meta['submitter_email'],),
                     ticket=ticket,
-                    receivers=(request.email_for_new_tickets, ),
-                    content={
-                        'model': ticket
-                    }
                 )
+                if request.email_for_new_tickets:
+                    send_ticket_mail(
+                        request=request,
+                        template='mail_ticket_opened_info.pt',
+                        subject=_("New ticket"),
+                        ticket=ticket,
+                        receivers=(request.email_for_new_tickets, ),
+                        content={
+                            'model': ticket
+                        }
+                    )
 
-            if request.auto_accept(ticket):
-                try:
-                    ticket.accept_ticket(request.auto_accept_user)
-                    request.view(self, name='publish')
-                except Exception:
-                    request.warning(_("Your request could not be "
-                                      "accepted automatically!"))
-                else:
-                    close_ticket(ticket, request.auto_accept_user, request)
+                if request.auto_accept(ticket):
+                    try:
+                        ticket.accept_ticket(request.auto_accept_user)
+                        request.view(self, name='publish')
+                    except Exception:
+                        request.warning(_("Your request could not be "
+                                          "accepted automatically!"))
+                    else:
+                        close_ticket(ticket, request.auto_accept_user, request)
 
         request.success(_("Thank you for your submission!"))
 
         return morepath.redirect(request.link(ticket, 'status'))
 
     return {
-        'completable': self.state == 'initiated',
+        'completable': self.state in ('initiated', 'submitted'),
         'edit_url': request.link(self, 'edit'),
         'event': self,
         'layout': layout or EventLayout(self, request),
@@ -270,6 +271,9 @@ def handle_edit_event(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self)
 
+        ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+        if ticket:
+            EventMessage.create(self, ticket, request, 'changed')
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-12 10:48+0200\n"
+"POT-Creation-Date: 2022-06-13 07:29+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2245,8 +2245,6 @@ msgid "Reject reservation"
 msgstr "Reservation absagen"
 
 #. Used in sentence: "${event} published."
-#. Used in sentence: "${event} deleted."
-#. Used in sentence: "${event} withdrawn."
 #.
 msgid "Event"
 msgstr "Veranstaltung"
@@ -2692,9 +2690,6 @@ msgstr "Gemeldet"
 
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
-
-msgid "Secret Edit Link"
-msgstr "Geheimer Bearbeitungslink"
 
 msgid "List Preview"
 msgstr "Listen-Vorschau"
@@ -3251,17 +3246,18 @@ msgstr "Änderungswunsch übernommen."
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
 
+msgid "Event edited."
+msgstr "Veranstaltung bearbeitet."
+
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."
 msgstr "${event} veröffentlicht."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} deleted."
-msgstr "${event} gelöscht."
+msgid "Event deleted."
+msgstr "Veranstaltung gelöscht."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} withdrawn."
-msgstr "${event} zurückgezogen."
+msgid "Event withdrawn."
+msgstr "Veranstaltung zurückgezogen."
 
 msgid "File signed."
 msgstr "Datei signiert."
@@ -3663,11 +3659,17 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Referenz Anfrage"
 
+msgid "Would you like to make corrections to the event?"
+msgstr "Mächten Sie Korrekturen an der Veranstaltung vornehmen?"
+
+msgid "Edit this event."
+msgstr "Bearbeiten Sie diese Veranstaltung."
+
 msgid "Forgot something or have a special request?"
 msgstr "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen?"
 
 msgid "Add a message to the ticket."
-msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
+msgstr "Fügen Sie der Anfrage eine Nachricht hinzu."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
@@ -4882,37 +4884,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "Signed file removed."
-#~ msgstr "Signierte Datei gelöscht."
-
-#~ msgid "Unsigned"
-#~ msgstr "Unsigniert"
-
-#~ msgid "Sign now"
-#~ msgstr "Jetzt signieren"
-
-#~ msgid "Digital seal applied"
-#~ msgstr "Digitales Siegel angewendet"
-
-#~ msgid "Please enter your yubikey to digitally sign this file"
-#~ msgstr "Bitte geben Sie Ihren Yubikey ein um die Datei digital zu signieren"
-
-#~ msgid "You are not authorised to digitally sign documents"
-#~ msgstr "Sie sind nicht dazu berechtigt Dokumente digital zu signieren"
-
-#~ msgid "${name} was digitally signed on ${date}"
-#~ msgstr "${name} wurde am ${date} digital signiert"
-
-#~ msgid ""
-#~ "All files have been digitally signed. The digital seal of a downloaded "
-#~ "file can be viewed in Adobe Acrobat Reader or by dragging an already "
-#~ "downloaded file into the field below:"
-#~ msgstr ""
-#~ "Alle Dateien wurden digital signiert. Das digitale Siegel einer "
-#~ "heruntergeladenen Datei kann im Adobe Acrobat Reader oder durch das "
-#~ "Ziehen der Datei in das untenstehende Feld geprüft werden:"
-
-#~ msgid "User will stay on the page when opening images and files"
-#~ msgstr ""
-#~ "Benutzer verbleiben auf der Seite wenn sie Bilder und Dateien öffnen"
