@@ -468,6 +468,7 @@ def view_activities_as_json(self, request):
             # todo: Angebot Ort – ist eine komplette Adresse
             # todo: PLZ
             # todo: Geo-Location
+            # todo: Kategorien (so wie «Computer» oder «Gestalten»)
         } for activity in self.query()
     ]
 
