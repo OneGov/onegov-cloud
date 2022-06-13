@@ -1842,7 +1842,7 @@ msgid "Subject"
 msgstr "Betreff"
 
 msgid "Would you like to make corrections to the event?"
-msgstr "Mächten Sie Korrekturen an der Veranstaltung vornehmen?"
+msgstr "Möchten Sie Korrekturen an der Veranstaltung vornehmen?"
 
 msgid "Edit this event."
 msgstr "Bearbeiten Sie diese Veranstaltung."
