@@ -310,15 +310,6 @@ def activity_min_cost(activity, request):
     return min(o.total_cost for o in occasions)
 
 
-def activity_max_cost(activity, request):
-    occasions = period_bound_occasions(activity, request)
-
-    if not occasions:
-        return None
-
-    return max(o.total_cost for o in occasions)
-
-
 def is_filtered(filters):
     for links in filters.values():
         for link in links:
@@ -418,60 +409,6 @@ def view_activities(self, request):
         'current_location': request.link(
             self.by_page_range((0, self.pages[-1])))
     }
-
-
-@FeriennetApp.json(
-    model=VacationActivityCollection,
-    name='json',
-    permission=Public
-)
-def view_activities_as_json(self, request):
-
-    # todo: filters
-    # Konditionen
-    #     Startdatum nur heute oder Zukunft
-    #     Status (veröffentlicht, archiviert, in Bearbeitung etc.), nur ausgeloggt sichtbar
-    #     Wunsch / Buchungsphase (muss aktiv sein)
-
-    def image(activity):
-        url = (activity.meta or {}).get('thumbnail', '') or ''
-        return {'thumbnail': url, 'full': url.replace('/thumbnail', '')}
-
-    def age(activity):
-        ages = activity_ages(activity, request)
-        min_age = min(age.lower for age in ages) if ages else None
-        max_age = max(age.upper - 1 for age in ages) if ages else None
-        return {'min': min_age, 'max': max_age}
-
-    def cost(activity):
-        min_cost = activity_min_cost(activity, request)
-        max_cost = activity_max_cost(activity, request)
-        return {
-            'min': float(min_cost) if min_cost is not None else 0.0,
-            'max': float(max_cost) if max_cost is not None else 0.0
-        }
-        return
-
-    provider = request.app.org.title
-
-    return [
-        {
-            'provider': provider,
-            'url': request.link(activity),
-            'title': activity.title or '',
-            'lead': (activity.meta or {}).get('lead', '') or '',
-            'image': image(activity),
-            'age': age(activity),
-            'cost': cost(activity),
-            'spots': activity_spots(activity, request)
-            # todo: Daten (Startdatum, Startzeit, Enddatum, Endzeit)
-            # todo: Angebot Ort – ist eine komplette Adresse
-            # todo: PLZ
-            # todo: Geo-Location
-        } for activity in self.query()
-    ]
-
-    return {}
 
 
 @FeriennetApp.html(
