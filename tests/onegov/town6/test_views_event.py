@@ -122,6 +122,7 @@ def test_event_steps(client):
     assert "The Organizer" in ticket_page
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
+    assert "Veranstaltung bearbeitet" in ticket_page
 
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
@@ -136,21 +137,41 @@ def test_event_steps(client):
         assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
             ticket_page
 
+    client.logout()
+
+    # Make some more corrections
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['organizer'] = "A carful organizer"
+    preview_page = form_page.form.submit().follow()
+    assert "My event is exceptional." in preview_page
+
+    session = client.app.session()
+    event = session.query(Event).filter_by(title="My Event").one()
+    event.meta['session_ids'] = []
+    session.flush()
+    transaction.commit()
+
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['title'] = "My special event"
+    preview_page = form_page.form.submit().follow()
+    assert "A special place" in preview_page
+
     # Publish event
+    client.login_editor()
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
 
-    assert "My Event" in client.get('/events')
+    assert "My special event" in client.get('/events')
 
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
     assert message['To'] == "test@example.org"
     message = message['TextBody']
-    assert "My Event" in message
+    assert "My special event" in message
     assert "My event is exceptional." in message
     assert "A special place" in message
     assert "Ausstellung" in message
     assert "Bibliothek" in message
-    assert "The Organizer" in message
+    assert "A carful organizer" in message
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
@@ -165,3 +186,12 @@ def test_event_steps(client):
     message = client.get_email(2)
     assert message['To'] == "test@example.org"
     assert "Ihre Anfrage wurde abgeschlossen" in message['TextBody']
+
+    client.logout()
+
+    # Make sure, no more corrections can be done
+    confirmation_page = client.get(confirmation_page.request.url)
+    assert "Ihr Anliegen wurde abgeschlossen" in confirmation_page
+    assert "Bearbeiten Sie diese Veranstaltung." not in confirmation_page
+    assert client.get(form_page.request.url, expect_errors=True).status_code \
+        == 403
