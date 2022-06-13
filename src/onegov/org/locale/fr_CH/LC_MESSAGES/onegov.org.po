@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-31 11:51+0200\n"
+"POT-Creation-Date: 2022-06-13 07:29+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2245,8 +2245,6 @@ msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
 #. Used in sentence: "${event} published."
-#. Used in sentence: "${event} deleted."
-#. Used in sentence: "${event} withdrawn."
 #.
 msgid "Event"
 msgstr "Événement"
@@ -3250,17 +3248,18 @@ msgstr "Demande de modification effectuée."
 msgid "Directory entry rejected."
 msgstr "L'entrée de répertoire a été rejetée."
 
+msgid "Event edited."
+msgstr "Événement édité"
+
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."
 msgstr "${event} publié."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} deleted."
-msgstr "${event} effacé."
+msgid "Event deleted."
+msgstr "Événement effacé."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} withdrawn."
-msgstr "${event} retiré."
+msgid "Event withdrawn."
+msgstr "Événement retiré."
 
 msgid "File signed."
 msgstr "Fichier signé."
@@ -3670,6 +3669,12 @@ msgstr ""
 
 msgid "Request Reference"
 msgstr "Référence"
+
+msgid "Would you like to make corrections to the event?"
+msgstr "Vous souhaitez apporter des corrections à l'événement ?"
+
+msgid "Edit this event."
+msgstr "Modifiez cet événement."
 
 msgid "Forgot something or have a special request?"
 msgstr "Vous avez oublié quelque chose ou avez une demande spéciale?"
@@ -4896,51 +4901,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "Signed file removed."
-#~ msgstr "Fichier signé supprimé. "
-
-#~ msgid "Unsigned"
-#~ msgstr "Non signé"
-
-#~ msgid "Sign now"
-#~ msgstr "Signez maintenant"
-
-#~ msgid "Digitally signed"
-#~ msgstr "Signé électroniquement"
-
-#~ msgid "Digitally signed by ${signee} on ${date}"
-#~ msgstr "Signé électroniquement par ${signee} le ${date}"
-
-#~ msgid "Please enter your yubikey to digitally sign this file"
-#~ msgstr ""
-#~ "Veuillez saisir votre yubikey pour signer électroniquement ce fichier"
-
-#~ msgid ""
-#~ "Published and digitally signed documents can be discovered through the "
-#~ "site-search and in the list of digitally signed documents. This action "
-#~ "will be logged and cannot be undone."
-#~ msgstr ""
-#~ "Les documents publiés et signés électroniquement peuvent être trouvés "
-#~ "grâce au moteur de recherche sur le site et dans la liste des documents "
-#~ "signés électroniquement. Cette action sera enregistrée et ne pourra pas "
-#~ "être annulée."
-
-#~ msgid "You are not authorised to digitally sign documents"
-#~ msgstr "Vous n'êtes pas autorisé à signer électroniquement des documents"
-
-#~ msgid "${name} was digitally signed on ${date}"
-#~ msgstr "${name} a été signé numériquement le ${date}"
-
-#~ msgid ""
-#~ "All files have been digitally signed. The digital seal of a downloaded "
-#~ "file can be viewed in Adobe Acrobat Reader or by dragging an already "
-#~ "downloaded file into the field below:"
-#~ msgstr ""
-#~ "Tous les fichiers ont été signés numériquement. Le sceau digital d'un "
-#~ "fichier téléchargé peut être visualisée dans Adobe Acrobat Reader ou en "
-#~ "faisant glisser un fichier déjà téléchargé dans le champ ci-dessous :"
-
-#~ msgid "User will stay on the page when opening images and files"
-#~ msgstr ""
-#~ "L'utilisateur reste sur la page lorsqu'il ouvre des images et des fichiers"

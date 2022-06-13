@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-05-30 14:43+0200\n"
+"POT-Creation-Date: 2022-06-13 08:13+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -227,6 +227,18 @@ msgstr "Neue Nachricht"
 
 msgid "Ticket Status"
 msgstr "Ticket Status"
+
+msgid "Text modules"
+msgstr "Textbausteine"
+
+msgid "Text module"
+msgstr "Textbaustein"
+
+msgid "Do you really want to delete this text module?"
+msgstr "Möchten Sie diesen Textbaustein wirklich löschen"
+
+msgid "Delete text module"
+msgstr "Textbaustein löschen"
 
 msgid "Recipients"
 msgstr "Empfänger"
@@ -1308,14 +1320,14 @@ msgstr "Ihre Ticket Referenz"
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
 
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 #. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
@@ -1370,23 +1382,22 @@ msgstr "Änderungswunsch übernommen."
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
 
+msgid "Event edited."
+msgstr "Veranstaltung bearbeitet."
+
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."
 msgstr "${event} veröffentlicht."
 
 #. Used in sentence: "${event} published."
-#. Used in sentence: "${event} deleted."
-#. Used in sentence: "${event} withdrawn."
 msgid "Event"
 msgstr "Veranstaltung"
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} deleted."
-msgstr "${event} gelöscht."
+msgid "Event deleted."
+msgstr "Veranstaltung gelöscht."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} withdrawn."
-msgstr "${event} zurückgezogen."
+msgid "Event withdrawn."
+msgstr "Veranstaltung zurückgezogen."
 
 msgid "File signed."
 msgstr "Datei signiert."
@@ -1728,6 +1739,15 @@ msgstr ""
 "Ihr Registrationslink wurde wie folgt erstellt. Bitte kopieren Sie diesen "
 "bevor Sie weiterfahren, der Link wird Ihnen nicht wieder angezeigt:"
 
+msgid "Text"
+msgstr "Text"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "View"
+msgstr "Ansicht"
+
 msgid ""
 "The record behind this ticket was removed. The following information is a "
 "snapshot kept for future reference."
@@ -1821,6 +1841,12 @@ msgstr "Referenz Anfrage"
 msgid "Subject"
 msgstr "Betreff"
 
+msgid "Would you like to make corrections to the event?"
+msgstr "Möchten Sie Korrekturen an der Veranstaltung vornehmen?"
+
+msgid "Edit this event."
+msgstr "Bearbeiten Sie diese Veranstaltung."
+
 msgid "Forgot something or have a special request?"
 msgstr "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen?"
 
@@ -1882,12 +1908,6 @@ msgstr "Benutzer"
 
 msgid "Ticket permissions"
 msgstr "Ticketberechtigungen"
-
-msgid "All"
-msgstr "Alle"
-
-msgid "View"
-msgstr "Ansicht"
 
 msgid "Yubikey"
 msgstr "YubiKey"
@@ -1990,54 +2010,3 @@ msgstr "Newsletter Einstellungen"
 
 msgid "Link Migration"
 msgstr "Migration Links"
-
-#~ msgid "Signed file removed."
-#~ msgstr "Signierte Datei gelöscht."
-
-#~ msgid "Unsigned"
-#~ msgstr "Unsigniert"
-
-#~ msgid "Sign now"
-#~ msgstr "Jetzt signieren"
-
-#~ msgid "Digitally signed"
-#~ msgstr "Digital signiert"
-
-#~ msgid "Digitally signed by ${signee} on ${date}"
-#~ msgstr "Digital signiert von ${signee} am ${date}"
-
-#~ msgid "Please enter your yubikey to digitally sign this file"
-#~ msgstr "Bitte geben Sie Ihren Yubikey ein um die Datei digital zu signieren"
-
-#~ msgid ""
-#~ "Published and digitally signed documents can be discovered through the "
-#~ "site-search and in the list of digitally signed documents. This action "
-#~ "will be logged and cannot be undone."
-#~ msgstr ""
-#~ "Publizierte und digital signierte Dokumente können von der Öffentlichkeit "
-#~ "über die Suche gefunden und in der Liste der digital signierten Dokumente "
-#~ "eingesehen werden. Diese Aktion wird aufgezeichnet und kann nicht "
-#~ "rückgängig gemacht werden."
-
-#~ msgid "You are not authorised to digitally sign documents"
-#~ msgstr "Sie sind nicht dazu berechtigt Dokumente digital zu signieren"
-
-#~ msgid "${name} was digitally signed on ${date}"
-#~ msgstr "${name} wurde am ${date} digital signiert"
-
-#~ msgid ""
-#~ "All files have been digitally signed. The digital seal of a downloaded "
-#~ "file can be viewed in Adobe Acrobat Reader or by dragging an already "
-#~ "downloaded file into the field below:"
-#~ msgstr ""
-#~ "Alle Dateien wurden digital signiert. Das digitale Siegel einer "
-#~ "heruntergeladenen Datei kann im Adobe Acrobat Reader oder durch das "
-#~ "Ziehen der Datei in das untenstehende Feld geprüft werden:"
-
-#~ msgid "Open external links in separate window"
-#~ msgstr "Externe Links in einem separatem Fenster öffnen"
-
-#~ msgid "Links leading to a different website will be opened in a new window"
-#~ msgstr ""
-#~ "Links, welche auf eine adere Webseite führen, werden in einem separaten "
-#~ "Fenster geöffnet."
