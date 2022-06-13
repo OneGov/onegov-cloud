@@ -21,7 +21,7 @@ class BookingCollection(GenericCollection):
         if self.period_id is not None:
             query = query.filter(Booking.period_id == self.period_id)
 
-        return query
+        return query.order_by(self.model_class.priority)
 
     def for_period(self, period):
         return self.__class__(self.session, period.id, self.username)
