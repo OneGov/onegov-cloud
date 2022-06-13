@@ -1,8 +1,20 @@
 # Changes
 
+## 2022.33
+
+`2022-06-13` | [6c05577c73...1bd8bc51a9](https://github.com/OneGov/onegov-cloud/compare/6c05577c73^...1bd8bc51a9)
+
+### Feriennet
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+Removes the order_by mapper argument from activities and bookings.
+
+`Feature` | [PRO-1028](https://linear.app/projuventute/issue/PRO-1028) | [1bd8bc51a9](https://github.com/onegov/onegov-cloud/commit/1bd8bc51a9762b84544bc1d61a525c9f86f6daef)
+
 ## 2022.32
 
-`2022-06-13` | [96e5b775d4...4b1c2c0cb9](https://github.com/OneGov/onegov-cloud/compare/96e5b775d4^...4b1c2c0cb9)
+`2022-06-13` | [96e5b775d4...e3432d6a6f](https://github.com/OneGov/onegov-cloud/compare/96e5b775d4^...e3432d6a6f)
 
 ### Core
 
@@ -1777,34 +1789,4 @@ Addionally, store text extracts per file.
 ##### Update address import URL.
 
 `Other` | [FW-95](https://stadt-winterthur.atlassian.net/browse/FW-95) | [3044f0f510](https://github.com/onegov/onegov-cloud/commit/3044f0f510aee60ffa30975be14652e6bf5b8752)
-
-## 2021.84
-
-`2021-10-09` | [9f2b0880f1...a2b3a5bcbb](https://github.com/OneGov/onegov-cloud/compare/9f2b0880f1^...a2b3a5bcbb)
-
-### Fsi
-
-##### Update translations.
-
-`Other` | [ZW-339](https://kanton-zug.atlassian.net/browse/ZW-339) | [217851ab6a](https://github.com/onegov/onegov-cloud/commit/217851ab6ad2f357e69700d0e6ec0aa1a217ec2e)
-
-### Org
-
-##### Also check the agency's portrait links with the link checker.
-
-`Feature` | [82dbf59880](https://github.com/onegov/onegov-cloud/commit/82dbf59880c23f610f311c1ee2cc878c8f4168d6)
-
-##### Add flag for marking files for publication.
-
-`Feature` | [OGC-112](https://linear.app/onegovcloud/issue/OGC-112) | [280fac05e4](https://github.com/onegov/onegov-cloud/commit/280fac05e4476dc4ef4bbbc5a50fda84ff9b3afb)
-
-### Town6
-
-##### Adds missing styling.
-
-`Bugfix` | [OGC-77](https://linear.app/onegovcloud/issue/OGC-77) | [bf1e6eb60b](https://github.com/onegov/onegov-cloud/commit/bf1e6eb60b0b44b35afd97bace215596750d1c5d)
-
-##### Fix file details not visible.
-
-`Bugfix` | [9b276379f1](https://github.com/onegov/onegov-cloud/commit/9b276379f1835fd92fcf14b7860d716e9dc73497)
 
