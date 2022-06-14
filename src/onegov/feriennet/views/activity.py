@@ -7,6 +7,7 @@ from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
 from onegov.activity.models import ACTIVITY_STATES, DAYS
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -25,9 +26,9 @@ from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
-from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
 from purl import URL
+from re import search
 from sedate import dtrange, overlaps
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
@@ -427,15 +428,23 @@ def view_activities(self, request):
 )
 def view_activities_as_json(self, request):
 
-    # todo: filters
-    # Konditionen
-    #     Startdatum nur heute oder Zukunft
-    #     Status (veröffentlicht, archiviert, in Bearbeitung etc.), nur ausgeloggt sichtbar
-    #     Wunsch / Buchungsphase (muss aktiv sein)
+    period_ids = {
+        period.id for period in request.app.periods
+        if period.is_currently_prebooking or period.is_currently_booking
+    }
+    if not period_ids:
+        return []
+
+    self.filter.period_ids = period_ids
+    self.filter.timelines = {'now', 'future'}
+    self.filter.states = {'accepted'}
 
     def image(activity):
-        url = (activity.meta or {}).get('thumbnail', '') or ''
-        return {'thumbnail': url, 'full': url.replace('/thumbnail', '')}
+        url = (activity.meta or {}).get('thumbnail', '')
+        return {
+            'thumbnail': url,
+            'full': url.replace('/thumbnail', '') if url else None
+        }
 
     def age(activity):
         ages = activity_ages(activity, request)
@@ -452,27 +461,48 @@ def view_activities_as_json(self, request):
         }
         return
 
+    def dates(activity):
+        occasion_dates = []
+        for occasion in activity.occasions:
+            for occasion_date in occasion.dates:
+                start = occasion_date.localized_start
+                end = occasion_date.localized_end
+                occasion_dates.append({
+                    'start_date': start.date().isoformat(),
+                    'start_time': start.time().isoformat(),
+                    'end_date': end.date().isoformat(),
+                    'end_time': end.time().isoformat(),
+                })
+        return occasion_dates
+
+    def zip_code(activity):
+        match = search(r'(\d){4}', activity.location or '')
+        return int(match.group()) if match else None
+
+    def coordinates(activity):
+        lat = activity.coordinates.lat if activity.coordinates else None
+        lon = activity.coordinates.lon if activity.coordinates else None
+        return {'lat': lat, 'lon': lon}
+
     provider = request.app.org.title
 
     return [
         {
             'provider': provider,
             'url': request.link(activity),
-            'title': activity.title or '',
-            'lead': (activity.meta or {}).get('lead', '') or '',
+            'title': activity.title,
+            'lead': (activity.meta or {}).get('lead', ''),
             'image': image(activity),
             'age': age(activity),
             'cost': cost(activity),
-            'spots': activity_spots(activity, request)
-            # todo: Daten (Startdatum, Startzeit, Enddatum, Endzeit)
-            # todo: Angebot Ort – ist eine komplette Adresse
-            # todo: PLZ
-            # todo: Geo-Location
-            # todo: Kategorien (so wie «Computer» oder «Gestalten»)
+            'spots': activity_spots(activity, request),
+            'dates': dates(activity),
+            'location': activity.location,
+            'zip_code': zip_code(activity),
+            'coordinate': coordinates(activity),
+            'tags': activity.ordered_tags(request)
         } for activity in self.query()
     ]
-
-    return {}
 
 
 @FeriennetApp.html(
