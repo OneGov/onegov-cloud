@@ -83,10 +83,6 @@ class Booking(Base, TimestampMixin):
         default='open'
     )
 
-    __mapper_args__ = {
-        'order_by': priority
-    }
-
     __table_args__ = (
         Index(
             'one_booking_per_attendee', 'occasion_id', 'attendee_id',
