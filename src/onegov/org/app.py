@@ -381,6 +381,7 @@ def get_public_ticket_messages():
         'submission',
         'ticket',
         'ticket_chat',
+        'translator_mutation'
     )
 
 

@@ -1,4 +1,5 @@
 import copy
+import re
 import transaction
 
 from datetime import datetime
@@ -7,6 +8,7 @@ from onegov.gis import Coordinates
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
+from onegov.user import UserCollection
 from openpyxl import load_workbook
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
@@ -114,7 +116,7 @@ def test_view_translator(client):
     assert values['Wegberechnung'] == f'{round(drive_distance, 1)} km'
     assert values['AHV-Nr.'] == '756.1234.5678.97'
     assert values['IBAN'] == 'DE07 1234 1234 1234 1234 12'
-    assert values['Email'] == 'test@test.com'
+    assert values['E-Mail'] == 'test@test.com'
     assert values['Telefon Mobile'] == '079 700 80 97'
     assert values['Fachkenntnisse nach Dolmetscherart'] == \
         'Simultandolmetschen'
@@ -129,11 +131,53 @@ def test_view_translator(client):
     assert values['Versteckt'] == 'Nein'
     assert values['Zertifikate'] == cert_names[0]
 
+    # test user account created and activation mail sent
+    user = UserCollection(session).by_username('test@test.com')
+    assert user.translator.title == 'Bob, Uncle'
+    assert user.active is True
+    assert user.role == 'translator'
+
+    mail = client.get_email(0)
+    assert mail['To'] == 'test@test.com'
+    assert mail['Subject'] == 'Ein Konto wurde für Sie erstellt'
+
+    # test translator can login and view his own data
+    client.logout()
+    reset_password_url = re.search(
+        r'(http://localhost/auth/reset-password[^)]+)',
+        mail['TextBody']
+    ).group()
+    page = client.get(reset_password_url)
+    page.form['email'] = 'test@test.com'
+    page.form['password'] = 'p@ssw0rd'
+    page.form.submit()
+
+    page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+    assert '978654' in page
+    assert 'Uncle' in page
+    assert 'Bob' in page
+    assert '<a href="mailto:test@test.com">test@test.com</a>' in page
+    assert '756.1234.5678.97' in page
+    assert 'All okay' in page
+    assert '7890' in page
+    assert 'DE07 1234 1234 1234 1234 12' in page
+    assert 'Ernährung und Landwirtschaft' in page
+    assert 'Psychologie' in page
+    assert 'Simultandolmetschen' in page
+    assert 'Versteckt' not in page
+    assert str(round(drive_distance, 1)) in page
+    assert language_names[3] in page
+    assert language_names[0] in page
+    assert language_names[1] in page
+    assert language_names[2] in page
+    client.logout()
+
     # test editors access on the edit view
     client.login_editor()
-    page = client.get(translator_url).click('Bearbeiten')
+    page = client.get(translator_url)
     assert '978654' in page
     assert 'Abrechnungsvorlage' in page
+    page = page.click('Bearbeiten')
     page.form['pers_id'] = 123456
     page = page.form.submit().follow()
     assert '123456' in page
@@ -151,6 +195,7 @@ def test_view_translator(client):
 
     page.form['first_name'] = 'Aunt'
     page.form['last_name'] = 'Maggie'
+    page.form['email'] = 'aunt.maggie@translators.com'
     page.form['iban'] = 'CH5604835012345678009'
     page.form['pers_id'] = 234567
     page.form['admission'] = 'in_progress'
@@ -221,7 +266,7 @@ def test_view_translator(client):
     assert values['Bemerkungen'] == 'My Comments'
     assert values['Besondere Hinweise Einsatzmöglichkeiten'] == 'operational'
     assert values['Bewerbung Datum'] == '01.01.2015'
-    assert values['Email'] == 'test@test.com'
+    assert values['E-Mail'] == 'aunt.maggie@translators.com'
     assert values['Entscheid Datum'] == '01.01.2016'
     assert values['Erreich- und Verfügbarkeit'] == 'always 24h'
     assert 'Wirtschaft' in values['Fachkenntnisse nach Berufssparte']
@@ -250,15 +295,23 @@ def test_view_translator(client):
     assert values['Sprachen Schrift'] == language_names[3]
     assert values['Zertifikate'] == cert_names[1]
 
+    # test user account updated
+    users = UserCollection(session)
+    assert not users.by_username('test@test.com')
+    user = users.by_username('aunt.maggie@translators.com')
+    assert user.translator.title == 'Maggie, Aunt'
+    assert user.active is True
+    assert user.role == 'translator'
+
     # try adding another with same email
     page = client.get('/translators/new')
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
     page.form['agency_references'] = 'All okay'
-    page.form['email'] = 'test@test.com'
+    page.form['email'] = 'aunt.maggie@translators.com'
 
     page = page.form.submit()
-    assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
+    assert 'Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits' in page
 
     # Test if the for_admins_only works
     client.logout()
@@ -327,7 +380,7 @@ def test_view_search_translator(client):
     session = client.app.session()
     languages = create_languages(session)
     lang_ids = [str(lang.id) for lang in languages]
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(client.app)
 
     data = copy.deepcopy(translator_data)
     mail = 'first@test.com'
@@ -380,7 +433,7 @@ def test_view_search_translator(client):
 def test_view_export_translators(client):
     session = client.app.session()
     languages = create_languages(session)
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(client.app)
 
     data = copy.deepcopy(translator_data)
     data['spoken_languages'] = [languages[0]]
@@ -438,8 +491,7 @@ def test_view_export_translators(client):
 
 
 def test_file_security(client):
-    session = client.app.session()
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(client.app)
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 
@@ -459,7 +511,7 @@ def test_file_security(client):
 def test_translator_directory_settings(client):
     client.login_admin()
     client.get('/voucher-template', status=404)
-    settings = client.get('/').click('Verzeichniseinstellungen')
+    settings = client.get('/').follow().click('Verzeichniseinstellungen')
 
     def map_value(page):
         return decode_map_value(page.form['coordinates'].value)
@@ -493,3 +545,482 @@ def test_translator_directory_settings(client):
     # Get the file
     file_page = client.get('/voucher')
     assert filename in file_page.content_disposition
+
+
+def test_view_redirects(client):
+    # Create a translator
+    languages = create_languages(client.app.session())
+    language_id = str(languages[0].id)
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/translators/new')
+    page.form['pers_id'] = 123456
+    page.form['first_name'] = 'First'
+    page.form['last_name'] = 'Last'
+    page.form['email'] = 'translator@example.org'
+    page.form['agency_references'] = 'OK'
+    page.form['mother_tongues_ids'] = [language_id]
+    page = page.form.submit().follow()
+    assert 'Übersetzer/in hinzugefügt' in page
+    translator_url = page.request.url
+    client.logout()
+
+    mail = client.get_email(0)['TextBody']
+    reset_password_url = re.search(
+        r'(http://localhost/auth/reset-password[^)]+)', mail
+    ).group()
+    page = client.get(reset_password_url)
+    page.form['email'] = 'translator@example.org'
+    page.form['password'] = 'p@ssword'
+    page.form.submit()
+
+    # Test redirects
+    urls = {
+        'translator@example.org': {
+            'homepage': translator_url,
+            'login': translator_url,
+            'logout': 'http://localhost/auth/login',
+            'password': 'p@ssword',
+            'to': 'http://localhost/topics/informationen'
+        },
+        'member@example.org': {
+            'homepage': 'http://localhost/translators',
+            'login': 'http://localhost/translators',
+            'logout': 'http://localhost/auth/login',
+            'password': 'hunter2',
+            'to': translator_url
+        }
+    }
+    urls['editor@example.org'] = urls['member@example.org']
+    urls['admin@example.org'] = urls['member@example.org']
+
+    for user, data in urls.items():
+        page = client.login(user, data['password']).maybe_follow()
+        assert page.request.url == data['login']
+
+        page = client.login(user, data['password'], data['to']).maybe_follow()
+        assert page.request.url == data['to']
+
+        page = client.get('/').maybe_follow()
+        assert page.request.url == data['homepage']
+
+        page = client.logout().maybe_follow()
+        assert page.request.url == data['logout']
+
+
+def test_view_translator_mutation(client):
+    session = client.app.session()
+    languages = create_languages(session)
+    certs = create_certificates(session)
+    cert_ids = [str(cert.id) for cert in certs]
+    language_ids = [str(lang.id) for lang in languages]
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    settings.form.submit()
+
+    # Create a new translator
+    page = client.get('/translators/new')
+    # fields visible by members
+    page.form['first_name'] = 'Uncle'
+    page.form['last_name'] = 'Bob'
+    page.form['pers_id'] = 978654
+    page.form['admission'] = 'uncertified'
+    page.form['gender'] = 'M'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['date_of_birth'] = '1970-01-01'
+    page.form['nationality'] = 'CH'
+    page.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    page.form['address'] = 'Fakestreet 123'
+    page.form['zip_code'] = '6000'
+    page.form['city'] = 'Luzern'
+    page.form['email'] = 'test@test.com'
+    page.form['tel_private'] = '+41412223344'
+    page.form['tel_mobile'] = '+41412223345'
+    page.form['tel_office'] = '+41412223346'
+    page.form['availability'] = 'Always'
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form.get('expertise_professional_guilds', index=0).checked = True
+    page.form['expertise_professional_guilds_other'] = ['Psychologie']
+    page.form.get('expertise_interpreting_types', index=0).checked = True
+    # additional editor fields
+    page.form['social_sec_number'] = '756.1234.5678.97'
+    page.form['bank_name'] = 'Luzerner Bank'
+    page.form['bank_address'] = 'Bankplatz Luzern'
+    page.form['account_owner'] = 'Oncle Bob'
+    page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
+    # additional fields visible by translators
+    page.form['operation_comments'] = 'No operation comments'
+    page.form['confirm_name_reveal'] = False
+    page.form['date_of_application'] = '2020-01-01'
+    page.form['date_of_decision'] = '2020-02-02'
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['proof_of_preconditions'] = 'None'
+    page.form['agency_references'] = 'All okay'
+    page.form['education_as_interpreter'] = False
+    page.form['certificates_ids'] = cert_ids[0:1]
+    page.form['comments'] = 'No comments'
+    with mock.patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok',
+                'routes': [{'distance': 1000}]
+            })
+    ):
+        assert 'hinzugefügt' in page.form.submit().follow()
+
+    client.logout()
+    reset_password_url = re.search(
+        r'(http://localhost/auth/reset-password[^)]+)',
+        client.get_email(0)['TextBody']
+    ).group()
+    page = client.get(reset_password_url)
+    page.form['email'] = 'test@test.com'
+    page.form['password'] = 'p@ssw0rd'
+    page.form.submit()
+
+    # Report changes as member
+    client.login_member()
+    page = client.get('/').maybe_follow().click('Uncle Bob')
+    page = page.click('Mutation melden')
+    page.form['submitter_message'] = 'Hallo!'
+    page.form['first_name'] = 'Aunt'
+    page.form['last_name'] = 'Anny'
+    page.form['pers_id'] = 123456
+    page.form['admission'] = 'in_progress'
+    page.form['gender'] = 'F'
+    page.form['withholding_tax'] = True
+    page.form['self_employed'] = True
+    page.form['date_of_birth'] = '1960-01-01'
+    page.form['nationality'] = 'DE'
+    page.form['coordinates'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 13
+    })
+    page.form['address'] = 'Fakestreet 321'
+    page.form['zip_code'] = '6010'
+    page.form['city'] = 'Kriens'
+    page.form['tel_private'] = '+41412223347'
+    page.form['tel_mobile'] = '+41412223348'
+    page.form['tel_office'] = '+41412223349'
+    page.form['availability'] = 'Nie'
+    page.form['mother_tongues'] = language_ids[1:3]
+    page.form['expertise_interpreting_types'].select_multiple([
+        'consecutive', 'negotiation'
+    ])
+    page.form['expertise_professional_guilds'].select_multiple([
+        'economy', 'art_leisure'
+    ])
+    page.form['expertise_professional_guilds_other'] = ['Exorzismus']
+    with mock.patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok',
+                'routes': [{'distance': 2000}]
+            })
+    ):
+        page = page.form.submit().follow()
+        assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.logout()
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Hallo!' in page
+    assert 'Vorname: Aunt' in page
+    assert 'Nachname: Anny' in page
+    assert 'Personal Nr.: 123456' in page
+    assert 'Zulassung: im Zulassungsverfahren' in page
+    assert 'Geschlecht: Weiblich' in page
+    assert 'Quellensteuer: Ja' in page
+    assert 'Selbständig: Ja' in page
+    assert 'Geburtsdatum: 1960-01-01' in page
+    assert 'Nationalität: DE' in page
+    assert 'Standort: 47, 8' in page
+    assert 'Strasse und Hausnummer: Fakestreet 321' in page
+    assert 'PLZ: 6010' in page
+    assert 'Ort: Kriens' in page
+    assert 'Fahrdistanz (km): 2.0' in page
+    assert 'Telefon Privat: +41412223347' in page
+    assert 'Telefon Mobile: +41412223348' in page
+    assert 'Telefon Geschäft: +41412223349' in page
+    assert 'Erreich- und Verfügbarkeit: Nie' in page
+    assert 'Muttersprachen: French, Italian' in page
+    assert (
+        'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
+        'Verhandlungsdolmetschen'
+    ) in page
+    assert (
+        'Fachkenntnisse nach Berufssparte: Wirtschaft, Kunst und Freizeit'
+    ) in page
+    assert 'Fachkenntnisse nach Berufssparte: andere: Exorzismus' in page
+    page.click('Ticket abschliessen')
+
+    # Report change as editor
+    client.logout()
+    client.login_editor()
+    page = client.get('/').maybe_follow().click('Uncle Bob')
+    page = page.click('Mutation melden')
+    page.form['submitter_message'] = 'Hallo!'
+    page.form['first_name'] = 'Aunt'
+    page.form['last_name'] = 'Anny'
+    page.form['pers_id'] = 123456
+    page.form['admission'] = 'in_progress'
+    page.form['gender'] = 'F'
+    page.form['withholding_tax'] = True
+    page.form['self_employed'] = True
+    page.form['date_of_birth'] = '1960-01-01'
+    page.form['nationality'] = 'DE'
+    page.form['coordinates'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 13
+    })
+    page.form['address'] = 'Fakestreet 321'
+    page.form['zip_code'] = '6010'
+    page.form['city'] = 'Kriens'
+    page.form['tel_private'] = '+41412223347'
+    page.form['tel_mobile'] = '+41412223348'
+    page.form['tel_office'] = '+41412223349'
+    page.form['availability'] = 'Nie'
+    page.form['mother_tongues'] = language_ids[1:3]
+    page.form['expertise_interpreting_types'].select_multiple([
+        'consecutive', 'negotiation'
+    ])
+    page.form['expertise_professional_guilds'].select_multiple([
+        'economy', 'art_leisure'
+    ])
+    page.form['expertise_professional_guilds_other'] = ['Exorzismus']
+    # additional editor fields
+    page.form['social_sec_number'] = '756.9217.0769.85'
+    page.form['bank_name'] = 'Krienser Bank'
+    page.form['bank_address'] = 'Bankplatz Kriens'
+    page.form['account_owner'] = 'Aunt Anny'
+    page.form['iban'] = 'CH5604835012345678009'
+    with mock.patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok',
+                'routes': [{'distance': 2000}]
+            })
+    ):
+        page = page.form.submit().follow()
+        assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.logout()
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Hallo!' in page
+    assert 'Vorname: Aunt' in page
+    assert 'Nachname: Anny' in page
+    assert 'Personal Nr.: 123456' in page
+    assert 'Zulassung: im Zulassungsverfahren' in page
+    assert 'Geschlecht: Weiblich' in page
+    assert 'Quellensteuer: Ja' in page
+    assert 'Selbständig: Ja' in page
+    assert 'Geburtsdatum: 1960-01-01' in page
+    assert 'Nationalität: DE' in page
+    assert 'Standort: 47, 8' in page
+    assert 'Strasse und Hausnummer: Fakestreet 321' in page
+    assert 'PLZ: 6010' in page
+    assert 'Ort: Kriens' in page
+    assert 'Fahrdistanz (km): 2.0' in page
+    assert 'Telefon Privat: +41412223347' in page
+    assert 'Telefon Mobile: +41412223348' in page
+    assert 'Telefon Geschäft: +41412223349' in page
+    assert 'Erreich- und Verfügbarkeit: Nie' in page
+    assert 'Muttersprachen: French, Italian' in page
+    assert (
+        'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
+        'Verhandlungsdolmetschen'
+    ) in page
+    assert (
+        'Fachkenntnisse nach Berufssparte: Wirtschaft, Kunst und Freizeit'
+    ) in page
+    assert 'Fachkenntnisse nach Berufssparte: andere: Exorzismus' in page
+    assert 'AHV-Nr.: 756.9217.0769.85' in page
+    assert 'Bank Name: Krienser Bank' in page
+    assert 'Bank Adresse: Bankplatz Kriens' in page
+    assert 'Bank Konto lautend auf: Aunt Anny' in page
+    assert 'IBAN: CH5604835012345678009' in page
+    page.click('Ticket abschliessen')
+
+    # Report change as translator
+    client.logout()
+    client.login('test@test.com', 'p@ssw0rd', None)
+    page = client.get('/').maybe_follow()
+    page = page.click('Mutation melden')
+    page.form['submitter_message'] = 'Hallo!'
+    page.form['first_name'] = 'Aunt'
+    page.form['last_name'] = 'Anny'
+    page.form['pers_id'] = 123456
+    page.form['admission'] = 'in_progress'
+    page.form['gender'] = 'F'
+    page.form['withholding_tax'] = True
+    page.form['self_employed'] = True
+    page.form['date_of_birth'] = '1960-01-01'
+    page.form['nationality'] = 'DE'
+    page.form['coordinates'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 13
+    })
+    page.form['address'] = 'Fakestreet 321'
+    page.form['zip_code'] = '6010'
+    page.form['city'] = 'Kriens'
+    page.form['tel_private'] = '+41412223347'
+    page.form['tel_mobile'] = '+41412223348'
+    page.form['tel_office'] = '+41412223349'
+    page.form['availability'] = 'Nie'
+    page.form['mother_tongues'] = language_ids[1:3]
+    page.form['expertise_interpreting_types'].select_multiple([
+        'consecutive', 'negotiation'
+    ])
+    page.form['expertise_professional_guilds'].select_multiple([
+        'economy', 'art_leisure'
+    ])
+    page.form['expertise_professional_guilds_other'] = ['Exorzismus']
+    # additional editor fields
+    page.form['social_sec_number'] = '756.9217.0769.85'
+    page.form['bank_name'] = 'Krienser Bank'
+    page.form['bank_address'] = 'Bankplatz Kriens'
+    page.form['account_owner'] = 'Aunt Anny'
+    page.form['iban'] = 'CH5604835012345678009'
+    # additional translator fields
+    page.form['operation_comments'] = 'Keine'
+    page.form['confirm_name_reveal'] = True
+    page.form['date_of_application'] = '2021-01-01'
+    page.form['date_of_decision'] = '2021-02-02'
+    page.form['spoken_languages'] = language_ids[0:2]
+    page.form['written_languages'] = language_ids[2:4]
+    page.form['proof_of_preconditions'] = 'Keine'
+    page.form['agency_references'] = 'Kanton LU'
+    page.form['education_as_interpreter'] = True
+    page.form['certificates'] = cert_ids[1:3]
+    page.form['comments'] = 'Kein Kommentar'
+    with mock.patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok',
+                'routes': [{'distance': 2000}]
+            })
+    ):
+        page = page.form.submit().follow()
+        assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.logout()
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Hallo!' in page
+    assert 'Vorname: Aunt' in page
+    assert 'Nachname: Anny' in page
+    assert 'Personal Nr.: 123456' in page
+    assert 'Zulassung: im Zulassungsverfahren' in page
+    assert 'Geschlecht: Weiblich' in page
+    assert 'Quellensteuer: Ja' in page
+    assert 'Selbständig: Ja' in page
+    assert 'Geburtsdatum: 1960-01-01' in page
+    assert 'Nationalität: DE' in page
+    assert 'Standort: 47, 8' in page
+    assert 'Strasse und Hausnummer: Fakestreet 321' in page
+    assert 'PLZ: 6010' in page
+    assert 'Ort: Kriens' in page
+    assert 'Fahrdistanz (km): 2.0' in page
+    assert 'Telefon Privat: +41412223347' in page
+    assert 'Telefon Mobile: +41412223348' in page
+    assert 'Telefon Geschäft: +41412223349' in page
+    assert 'Erreich- und Verfügbarkeit: Nie' in page
+    assert 'Muttersprachen: French, Italian' in page
+    assert (
+        'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
+        'Verhandlungsdolmetschen'
+    ) in page
+    assert (
+        'Fachkenntnisse nach Berufssparte: Wirtschaft, Kunst und Freizeit'
+    ) in page
+    assert 'Fachkenntnisse nach Berufssparte: andere: Exorzismus' in page
+    assert 'AHV-Nr.: 756.9217.0769.85' in page
+    assert 'Bank Name: Krienser Bank' in page
+    assert 'Bank Adresse: Bankplatz Kriens' in page
+    assert 'Bank Konto lautend auf: Aunt Anny' in page
+    assert 'IBAN: CH5604835012345678009' in page
+    assert 'Besondere Hinweise Einsatzmöglichkeiten: Keine' in page
+    assert 'Zustimmung Namensbekanntgabe: Ja' in page
+    assert 'Bewerbung Datum: 2021-01-01' in page
+    assert 'Entscheid Datum: 2021-02-02' in page
+    assert 'Sprachen Wort: French, German' in page
+    assert 'Sprachen Schrift: Arabic, Italian' in page
+    assert 'Nachweis der Voraussetzung: Keine' in page
+    assert 'Referenzen Behörden: Kanton LU' in page
+    assert 'Ausbildung Dolmetscher: Ja' in page
+    assert 'Zertifikate: BBBB, CCCC' in page
+    assert 'Bemerkungen: Kein Kommentar' in page
+
+    page = page.click('Vorgeschlagene Änderungen übernehmen')
+    page.form.get('changes', index=37).checked = False
+    page = page.form.submit().follow()
+    assert (
+        'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
+        'Vorname, Nachname, Personal Nr., Zulassung, Quellensteuer, '
+        'Selbst\\u00e4ndig, Geschlecht, Geburtsdatum, Nationalit\\u00e4t, '
+        'Standort, Strasse und Hausnummer, PLZ, Ort, Fahrdistanz (km), '
+        'AHV-Nr., Bank Name, Bank Adresse, Bank Konto lautend auf, IBAN, '
+        'Telefon Privat, Telefon Mobile, Telefon Gesch\\u00e4ft, '
+        'Erreich- und Verf\\u00fcgbarkeit, '
+        'Fachkenntnisse nach Dolmetscherart, '
+        'Fachkenntnisse nach Berufssparte, '
+        'Fachkenntnisse nach Berufssparte: andere, '
+        'Besondere Hinweise Einsatzm\\u00f6glichkeiten, '
+        'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
+        'Muttersprachen, Sprachen Wort, Sprachen Schrift, '
+        'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
+        'Ausbildung Dolmetscher, Zertifikate.'
+    ) in page
+    page = page.click('Anny, Aunt', index=0)
+    assert 'Aunt' in page
+    assert 'Anny' in page
+    assert '123456' in page
+    assert 'im Zulassungsverfahren' in page
+    assert 'Weiblich' in page
+    assert 'Ja' in page
+    assert 'Ja' in page
+    assert '01.01.1960' in page
+    assert 'DE' in page
+    assert 'Fakestreet 321' in page
+    assert '6010' in page
+    assert 'Kriens' in page
+    assert '2.0' in page
+    assert '+41412223347' in page
+    assert '+41412223348' in page
+    assert '+41412223349' in page
+    assert 'Nie' in page
+    assert 'French' in page
+    assert 'Italian' in page
+    assert 'Konsektutivdolmetschen' in page
+    assert 'Verhandlungsdolmetschen' in page
+    assert 'Wirtschaft' in page
+    assert 'Kunst und Freizeit' in page
+    assert 'Exorzismus' in page
+    assert '756.9217.0769.85' in page
+    assert 'Krienser Bank' in page
+    assert 'Bankplatz Kriens' in page
+    assert 'Aunt Anny' in page
+    assert 'CH5604835012345678009' in page
+    assert 'Keine' in page
+    assert 'Ja' in page
+    assert '01.01.2021' in page
+    assert '02.02.2021' in page
+    assert 'French' in page
+    assert 'German' in page
+    assert 'Arabic' in page
+    assert 'Italian' in page
+    assert 'Keine' in page
+    assert 'Kanton LU' in page
+    assert 'Ja' in page
+    assert 'BBBB' in page
+    assert 'CCCC' in page
+    assert 'Kein Kommentar' not in page

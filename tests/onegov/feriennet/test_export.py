@@ -8,7 +8,6 @@ from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
 import transaction
 
 
-
 def test_exports(client, scenario):
     # add old period
     scenario.add_period(

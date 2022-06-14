@@ -31,7 +31,7 @@ def app(request, postgres_dsn, temporary_path, redis_url):
 
     with (temporary_path / 'bust').open('w') as f:
         f.write('\n'.join((
-            f'#!/usr/bin/env sh',
+            '#!/usr/bin/env sh',
             f'touch {temporary_path}/$1'
         )))
 

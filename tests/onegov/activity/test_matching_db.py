@@ -3,7 +3,7 @@ import random
 from datetime import date, timedelta
 from functools import partial
 
-from sedate import to_timezone, replace_timezone
+from sedate import replace_timezone
 
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.activity.matching import PreferAdminChildren
@@ -34,8 +34,14 @@ def new_occasion(collections, period, offset, length,
     if not activity:
         activity = collections.activities.add(activity_name, username=username)
     return collections.occasions.add(
-        start=replace_timezone(period.prebooking_start, 'UTC') + timedelta(days=offset),
-        end=replace_timezone(period.prebooking_start, 'UTC') + timedelta(days=offset + length),
+        start=(
+            replace_timezone(period.prebooking_start, 'UTC')
+            + timedelta(days=offset)
+        ),
+        end=(
+            replace_timezone(period.prebooking_start, 'UTC')
+            + timedelta(days=offset + length)
+        ),
         timezone="Europe/Zurich",
         activity=activity,
         period=period,

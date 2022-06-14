@@ -1,8 +1,12 @@
 from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
+from onegov.core.crypto import random_password
 from onegov.gis import Coordinates
 from onegov.translator_directory.constants import full_text_max_chars
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory import log
+from onegov.user import UserCollection
+
 
 order_cols = (
     'last_name',
@@ -15,7 +19,7 @@ class TranslatorCollection(GenericCollection, Pagination):
     batch_size = 10
 
     def __init__(
-            self, session,
+            self, app,
             page=0,
             written_langs=None,
             spoken_langs=None,
@@ -26,7 +30,8 @@ class TranslatorCollection(GenericCollection, Pagination):
             guilds=None,
             interpret_types=None
     ):
-        super().__init__(session)
+        super().__init__(app.session())
+        self.app = app
         self.page = page
         self.user_role = user_role
         self.search = self.truncate(search, maxchars=full_text_max_chars)
@@ -65,8 +70,86 @@ class TranslatorCollection(GenericCollection, Pagination):
         coordinates = kwargs.pop('coordinates', Coordinates())
         item = super().add(**kwargs)
         item.coordinates = coordinates
+        self.update_user(item, item.email)
         self.session.flush()
         return item
+
+    def delete(self, item):
+        self.update_user(item, None)
+        self.session.delete(item)
+        self.session.flush()
+
+    def update_user(self, item, new_email):
+        """ Keep the translator and its user account in sync.
+
+        * Creates a new user account if an email address is set (if not already
+          existing).
+        * Disable user accounts if an email has been deleted.
+        * Change usernames if an email has changed.
+        * Make sure used user accounts have the right role.
+        * Make sure used user accounts are activated.
+        * Make sure the password is changed if activated or disabled.
+
+        """
+
+        old_email = item.email
+        users = UserCollection(self.session)
+        old_user = users.by_username(old_email)
+        new_user = users.by_username(new_email)
+        create = False
+        enable = None
+        disable = []
+
+        if not new_email:
+            # email has been unset: disable obsolete users
+            disable.extend([old_user, new_user])
+        else:
+            if new_email == old_email:
+                # email has not changed, old_user == new_user
+                if not old_user:
+                    create = True
+                else:
+                    enable = old_user
+            else:
+                # email has changed: ensure user exist
+                if old_user and new_user:
+                    disable.append(old_user)
+                    enable = new_user
+                elif not old_user and not new_user:
+                    create = True
+                else:
+                    enable = old_user if old_user else new_user
+
+        if create:
+            log.info(f'Creating user {new_email}')
+            users.add(
+                new_email, random_password(16), role='translator',
+                realname=item.full_name
+            )
+
+        if enable:
+            corrections = {
+                'username': new_email,
+                'role': 'translator',
+                'active': True,
+                'source': None,
+                'source_id': None
+            }
+            corrections = {
+                attribute: value for attribute, value in corrections.items()
+                if getattr(enable, attribute) != value
+            }
+            if corrections:
+                log.info(f'Correcting user {enable.username} to {corrections}')
+                for attribute, value in corrections.items():
+                    setattr(enable, attribute, value)
+                enable.logout_all_sessions(self.app)
+
+        for user in disable:
+            if user:
+                log.info(f'Deactivating user {user.username}')
+                user.active = False
+                user.logout_all_sessions(self.app)
 
     @staticmethod
     def truncate(text, maxchars=25):
@@ -129,7 +212,7 @@ class TranslatorCollection(GenericCollection, Pagination):
 
     def page_by_index(self, index):
         return self.__class__(
-            self.session,
+            self.app,
             page=index,
             written_langs=self.written_langs,
             spoken_langs=self.spoken_langs,
@@ -170,7 +253,7 @@ class TranslatorCollection(GenericCollection, Pagination):
 
     def by_form(self, form):
         return self.__class__(
-            self.session,
+            self.app,
             page=0,
             order_desc=form.order_desc.data,
             written_langs=form.written_langs.data,

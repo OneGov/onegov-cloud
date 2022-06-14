@@ -57,3 +57,16 @@ def add_self_employed_column(context):
             column=Column('self_employed', Boolean),
             default=lambda x: False
         )
+
+
+@upgrade_task('Add unique constraint to translator email')
+def add_unique_constraint_to_translator_email(context):
+    if not context.has_table('translators'):
+        return
+    if context.has_column('translators', 'email'):
+        context.operations.execute(
+            "UPDATE translators SET email=NULL WHERE email='';"
+        )
+        context.operations.create_unique_constraint(
+            'unique_translators_email', 'translators', ['email']
+        )

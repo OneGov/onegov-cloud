@@ -5,6 +5,8 @@ import transaction
 from datetime import datetime
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
+from onegov.translator_directory.collections.translator import \
+    TranslatorCollection
 from onegov.translator_directory import log
 from onegov.translator_directory.constants import CERTIFICATES
 from onegov.translator_directory.models.certificate import \
@@ -257,6 +259,9 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
 
     sources = ZugUserSource.factory(verbose=verbose)
 
+    translators = TranslatorCollection(app, user_role='admin')
+    translators = {translator.email for translator in translators.query()}
+
     def users(connection):
         for src in sources:
             for base, search_filter, attrs in src.bases_filters_attributes:
@@ -302,6 +307,10 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password,
     count = 0
     synced_users = []
     for ix, data in enumerate(users(client.connection)):
+
+        if data['mail'] in translators:
+            log.info(f'Skipping {data["mail"]}, translator exists')
+            continue
 
         if data['type'] == 'ldap':
             source = 'ldap'
@@ -488,3 +497,20 @@ def geocode_cli(dry_run, only_empty):
             transaction.abort()
 
     return do_geocode
+
+
+@cli.command(name='update-accounts', context_settings={'singular': True})
+@click.option('--dry-run/-no-dry-run', default=False)
+def update_accounts_cli(dry_run):
+    """ Updates user accounts for translators. """
+
+    def do_update_accounts(request, app):
+
+        translators = TranslatorCollection(request.app, user_role='admin')
+        for translator in translators.query():
+            translators.update_user(translator, translator.email)
+
+        if dry_run:
+            transaction.abort()
+
+    return do_update_accounts

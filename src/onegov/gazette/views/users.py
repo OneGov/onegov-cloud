@@ -139,7 +139,7 @@ def edit_user(self, request, form):
 
     if form.submitted(request):
         form.update_model(self)
-        self.logout_all_sessions(request)
+        self.logout_all_sessions(request.app)
         request.message(_("User modified."), 'success')
         return redirect(layout.manage_users_link)
 
@@ -184,7 +184,7 @@ def delete_user(self, request, form):
         collection = UserCollection(request.session)
         user = collection.by_username(self.username)
         if user.role != 'admin':
-            self.logout_all_sessions(request)
+            self.logout_all_sessions(request.app)
             collection.delete(self.username)
             request.message(_("User deleted."), 'success')
         return redirect(layout.manage_users_link)
@@ -245,7 +245,7 @@ def clear_user_sessions(self, request, form):
     )
 
     if form.submitted(request):
-        self.logout_all_sessions(request)
+        self.logout_all_sessions(request.app)
         return redirect(cancel)
 
     return {

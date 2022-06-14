@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from uuid import uuid4
 
 from sedate import utcnow
@@ -253,7 +253,7 @@ def test_audit_collection(scenario):
         )
         # Add not completed courses more recent, should be discarded in query
         scenario.add_subscription(
-            scenario.course_events[i+3],
+            scenario.course_events[i + 3],
             scenario.attendees[i],
             event_completed=False
         )
@@ -263,7 +263,6 @@ def test_audit_collection(scenario):
 
     # Add inactive attendee
     scenario.add_attendee(active=False)
-    inactive = scenario.latest_attendee
 
     scenario.commit()
     scenario.refresh()
@@ -286,8 +285,8 @@ def test_audit_collection(scenario):
 
     # Change all event dates to the past
     for event in scenario.course_events:
-        event.start -= timedelta(days=5*365)
-        event.end -= timedelta(days=5*365)
+        event.start -= timedelta(days=5 * 365)
+        event.end -= timedelta(days=5 * 365)
 
     scenario.commit()
     scenario.refresh()

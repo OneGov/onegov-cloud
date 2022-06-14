@@ -43,7 +43,7 @@ def send_marketing_html_mail(*args, **kwargs):
 
 
 def send_ticket_mail(request, template, subject, receivers, ticket,
-                     content=None, force=False, **kwargs):
+                     content=None, force=False, send_self=False, **kwargs):
     org = request.app.org
     if not force:
 
@@ -68,7 +68,7 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
             if ticket.handler_code in skip_handler_codes_c:
                 return
 
-        if request.current_username in receivers:
+        if not send_self and request.current_username in receivers:
             if len(receivers) == 1:
                 return
 

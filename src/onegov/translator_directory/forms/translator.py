@@ -1,4 +1,3 @@
-import json
 import re
 
 from cached_property import cached_property
@@ -16,8 +15,7 @@ from onegov.form.fields import ChosenSelectMultipleField, MultiCheckboxField, \
 from onegov.form.validators import ValidPhoneNumber, \
     ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
 from onegov.gis import CoordinatesField
-from onegov.gis.utils import MapboxRequests
-from onegov.translator_directory import _, log
+from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
@@ -27,11 +25,11 @@ from onegov.translator_directory.constants import (
     full_text_max_chars, GENDERS, ADMISSIONS,
     INTERPRETING_TYPES, PROFESSIONAL_GUILDS
 )
+from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
 from onegov.translator_directory.models.translator import Translator, \
     mother_tongue_association_table, \
     spoken_association_table, written_association_table, \
     certificate_association_table
-from onegov.translator_directory.utils import parse_directions_result
 
 
 class FormChoicesMixin:
@@ -46,7 +44,7 @@ class FormChoicesMixin:
 
     @property
     def available_additional_guilds(self):
-        translators = TranslatorCollection(self.request.session)
+        translators = TranslatorCollection(self.request.app)
         return translators.available_additional_professional_guilds
 
     @cached_property
@@ -102,7 +100,7 @@ class EditorTranslatorForm(Form, FormChoicesMixin):
         model.pers_id = self.pers_id.data or None
 
 
-class TranslatorForm(Form, FormChoicesMixin):
+class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     pers_id = IntegerField(
         label=_('Personal ID'),
@@ -371,8 +369,10 @@ class TranslatorForm(Form, FormChoicesMixin):
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
-            exclude={'csrf_token', *self.special_fields.keys()})
+            exclude={'csrf_token', *self.special_fields.keys()}
+        )
 
+        data['email'] = data['email'] or None
         data['mother_tongues'] = self.mother_tongues
         data['spoken_languages'] = self.spoken_languages
         data['written_languages'] = self.written_languages
@@ -404,6 +404,9 @@ class TranslatorForm(Form, FormChoicesMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
+        translators = TranslatorCollection(self.request.app)
+        translators.update_user(model, self.email.data)
+
         model.first_name = self.first_name.data
         model.last_name = self.last_name.data
         model.iban = self.iban.data
@@ -449,72 +452,6 @@ class TranslatorForm(Form, FormChoicesMixin):
             self.expertise_professional_guilds_other.data
         model.expertise_interpreting_types = \
             self.expertise_interpreting_types.data
-
-    def ensure_updated_driving_distance(self):
-
-        if not self.coordinates.data:
-            return
-        # also includes the zoom...
-        if isinstance(self.model, Translator) and \
-                self.model.coordinates == self.coordinates.data:
-            return
-
-        def to_tuple(coordinate):
-            return coordinate.lat, coordinate.lon
-
-        if not self.request.app.coordinates:
-            self.drive_distance.errors.append(
-                _("Home location is not configured. "
-                  "Please complete location settings first")
-            )
-            return False
-
-        response = self.directions_api.directions([
-            to_tuple(self.request.app.coordinates),
-            to_tuple(self.coordinates.data)
-        ])
-
-        if response.status_code == 422:
-            message = response.json()['message']
-            self.drive_distance.errors.append(message)
-            log.warning(f'ensure_update_driving_distance: {message}')
-            return False
-
-        if response.status_code != 200:
-            self.drive_distance.errors.append(
-                _('Error in requesting directions from Mapbox (${status})',
-                  mapping={'status': response.status_code})
-            )
-            log.warning(f'Failed to fetch directions for translator '
-                        f'{self.model.id}, '
-                        f'status {response.status_code}, '
-                        f'url: {response.url}')
-            log.warning(json.dumps(response.json(), indent=2))
-            return False
-
-        data = response.json()
-
-        if data['code'] == 'NoRoute':
-            self.drive_distance.errors.append(
-                _('Could not find a route. Check the address again')
-            )
-            return False
-
-        if data['code'] == 'NoSegment':
-            self.drive_distance.errors.append(
-                _('Check if the location of the translator is near a road')
-            )
-            return False
-
-        self.drive_distance.data = parse_directions_result(response)
-
-    @property
-    def directions_api(self):
-        return MapboxRequests(
-            self.request.app.mapbox_token,
-            endpoint='directions',
-            profile='driving'
-        )
 
 
 class TranslatorSearchForm(Form, FormChoicesMixin):
