@@ -148,9 +148,7 @@ def add_registration_window_columns(context):
 def make_form_polymorphic_type_non_nullable(context):
     if context.has_table('forms'):
         context.operations.execute("""
-            UPDATE generic_recipients SET type = 'generic' WHERE type IS NULL;
+            UPDATE forms SET type = 'generic' WHERE type IS NULL;
         """)
 
-        context.operations.alter_column(
-            'generic_recipients', 'type', nullable=False
-        )
+        context.operations.alter_column('forms', 'type', nullable=False)
