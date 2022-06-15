@@ -13,6 +13,7 @@ from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.feriennet.utils import NAME_SEPARATOR
 from onegov.file import FileCollection
+from onegov.gis import Coordinates
 from onegov.pay import Payment
 from psycopg2.extras import NumericRange
 from tests.shared import utils
@@ -172,6 +173,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities/json')
+    assert "Learn How to Program" not in editor.get('/activities/json')
+    assert "Learn How to Program" not in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
@@ -181,6 +185,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities/json')
+    assert "Learn How to Program" not in editor.get('/activities/json')
+    assert "Learn How to Program" not in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
 
@@ -190,6 +197,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" in anon.get('/activities/json')
+    assert "Learn How to Program" in editor.get('/activities/json')
+    assert "Learn How to Program" in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=200)
     assert admin.get(url, status=200)
@@ -200,6 +210,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities/json')
+    assert "Learn How to Program" not in editor.get('/activities/json')
+    assert "Learn How to Program" not in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
@@ -1912,6 +1925,7 @@ def test_main_views_without_period(client):
     # if there isn't we must be sure to not show an exeption (this happens
     # because we tend to be very optimistic about periods being there)
     assert client.get('/activities').status_code == 200
+    assert client.get('/activities/json').status_code == 200
     assert client.get('/my-bookings').status_code == 200
     assert client.get('/notifications').status_code == 200
 
@@ -2912,3 +2926,57 @@ def test_view_qrbill(client, scenario):
 
     page = client.get('/my-bills?username=admin@example.org')
     assert '<img class="qr-bill" src="data:image/svg+xml;base64,' in page
+
+
+def test_activities_json(client, scenario):
+    scenario.add_period(confirmed=True)
+    activity = scenario.add_activity(
+        title='Backen',
+        lead='Backen mit Johann.',
+        state='accepted',
+        location='Bäckerei Govikon, Rathausplatz, 4001 Govikon',
+        tags=['Farm', 'Adventure'],
+        content={}
+    )
+    activity.coordinates = Coordinates(1.1, 2.2)
+    occasion = scenario.add_occasion(
+        age=(1, 11),
+        cost=None,
+        spots=(4, 5),
+    )
+    start_date = occasion.dates[0].localized_start.date().isoformat()
+    scenario.add_occasion(
+        age=(10, 15),
+        cost=100,
+        spots=(0, 10),
+    )
+    scenario.commit()
+
+    assert client.get('/activities/json').json == [{
+        'age': {'min': 1, 'max': 15},
+        'coordinate': {'lat': 1.1, 'lon': 2.2},
+        'cost': {'min': 0.0, 'max': 100.0},
+        'dates': [
+            {
+                'start_date': start_date,
+                'start_time': '00:00:00',
+                'end_date': start_date,
+                'end_time': '01:00:00'
+            },
+            {
+                'start_date': start_date,
+                'start_time': '01:00:00',
+                'end_date': start_date,
+                'end_time': '02:00:00'
+            },
+        ],
+        'image': {'thumbnail': None, 'full': None},
+        'lead': 'Backen mit Johann.',
+        'location': 'Bäckerei Govikon, Rathausplatz, 4001 Govikon',
+        'provider': 'Govikon',
+        'spots': 15,
+        'tags': ['Abenteuer', 'Bauernhof', 'Halbtägig'],
+        'title': 'Backen',
+        'url': 'http://localhost/activity/backen',
+        'zip_code': 4001
+    }]

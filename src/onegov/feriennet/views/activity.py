@@ -2,6 +2,7 @@ import sedate
 
 from datetime import date, timedelta
 from itertools import groupby
+from onegov.activity import Activity
 from onegov.activity import Booking
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
@@ -32,6 +33,8 @@ from re import search
 from sedate import dtrange, overlaps
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import undefer
 from webob import exc
 
 
@@ -440,7 +443,7 @@ def view_activities_as_json(self, request):
     self.filter.states = {'accepted'}
 
     def image(activity):
-        url = (activity.meta or {}).get('thumbnail', '')
+        url = (activity.meta or {}).get('thumbnail')
         return {
             'thumbnail': url,
             'full': url.replace('/thumbnail', '') if url else None
@@ -484,6 +487,10 @@ def view_activities_as_json(self, request):
         lon = activity.coordinates.lon if activity.coordinates else None
         return {'lat': lat, 'lon': lon}
 
+    def tags(activity):
+        durations = sum({o.duration for o in activity.occasions})
+        return activity.ordered_tags(request, durations)
+
     provider = request.app.org.title
 
     return [
@@ -500,8 +507,11 @@ def view_activities_as_json(self, request):
             'location': activity.location,
             'zip_code': zip_code(activity),
             'coordinate': coordinates(activity),
-            'tags': activity.ordered_tags(request)
-        } for activity in self.query()
+            'tags': tags(activity),
+        } for activity in self.query().options(
+            joinedload(Activity.occasions),
+            undefer(Activity.content)
+        )
     ]
 
 
