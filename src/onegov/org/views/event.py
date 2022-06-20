@@ -140,7 +140,10 @@ def handle_new_event(self, request, form, layout=None):
         "or reason."
     )
 
-    if request.app.custom_event_form_lead:
+    if (
+        request.app.custom_event_form_lead
+        or request.app.custom_event_form_lead == ""
+    ):
         terms = request.app.custom_event_form_lead
 
     if form.submitted(request):
