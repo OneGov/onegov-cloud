@@ -66,12 +66,12 @@ class PartyResultExportMixin(object):
             return str(value)
 
         results = {}
-        parties = {}
 
         # get the party results
         for result in self.party_results:
             year = results.setdefault(result.year, {})
-            year[result.name] = {
+            year[result.party_id] = {
+                'name': result.name,
                 'total_votes': result.total_votes,
                 'color': result.color,
                 'mandates': result.number_of_mandates,
@@ -79,38 +79,24 @@ class PartyResultExportMixin(object):
                 'voters_count': result.voters_count,
                 'voters_count_percentage': result.voters_count_percentage
             }
-            parties.setdefault(result.name, result.party_id)
-            if parties[result.name] is None and result.party_id is not None:
-                parties[result.name] = result.party_id
 
         # get the panachage results
         for result in self.panachage_results:
             year = results.setdefault(self.date.year, {})
             target = year.setdefault(result.target, {})
             target[result.source] = result.votes
-            parties.setdefault(result.source, None)
-            parties.setdefault(result.target, None)
-
-        # assign party_ids if missing
-        parties = {key: value for key, value in parties.items() if key}
-        next_id = 0
-        for party in sorted(parties):
-            if party and parties[party] is None:
-                while str(next_id) in parties.values():
-                    next_id += 1
-                parties[party] = str(next_id)
-        parties = dict(sorted(parties.items(), key=lambda x: x[1]))
 
         rows = []
+        parties = sorted({key for r in results.values() for key in r.keys()})
         for year in sorted(results.keys(), reverse=True):
-            for party in parties:
-                result = results[year].get(party, {})
+            for party_id in parties:
+                result = results[year].get(party_id, {})
 
                 # add the party results
                 row = OrderedDict()
                 row['year'] = year
-                row['name'] = party
-                row['id'] = parties[party]
+                row['name'] = result.get('name', None)
+                row['id'] = party_id
                 row['total_votes'] = result.get('total_votes', None)
                 row['color'] = result.get('color', None)
                 row['mandates'] = result.get('mandates', None)
@@ -125,7 +111,7 @@ class PartyResultExportMixin(object):
                 # add the panachage results
                 if self.panachage_results.count():
                     for source in parties:
-                        column = f'panachage_votes_from_{parties[source]}'
+                        column = f'panachage_votes_from_{source}'
                         row[column] = result.get(source, None)
                     row['panachage_votes_from_999'] = result.get('', None)
 

@@ -34,21 +34,20 @@ def test_import_party_results_fixtures(session):
 
     # Test content directly from csv
     assert [
-        (pr.name, pr.total_votes, pr.number_of_mandates, pr.votes)
+        (pr.party_id, pr.name, pr.total_votes, pr.number_of_mandates, pr.votes)
         for pr in election.party_results] == [
-        ('BDP', total_votes, 0, 150),
-        ('CVP', total_votes, 0, 397),
-        ('FDP', total_votes, 0, 53),
-        ('GLP', total_votes, 0, 100),
-        ('SP', total_votes, 0, 650),
-        ('SVP', total_votes, 0, 100),
-        ('VERDA', total_votes, 0, 300),
+        ('01', 'BDP', total_votes, 0, 150),
+        ('02', 'CVP', total_votes, 0, 397),
+        ('03', 'FDP', total_votes, 0, 53),
+        ('04', 'GLP', total_votes, 0, 100),
+        ('05', 'SP', total_votes, 0, 650),
+        ('06', 'SVP', total_votes, 0, 100),
+        ('07', 'VERDA', total_votes, 0, 300),
     ]
 
     assert election.panachage_results
     for pana_r in election.panachage_results:
-        # assert len(pana_r.target) > 10, 'target must be casted list.id'
-        assert pana_r.votes == 0, "Panachage votes from own list don't count"
+        assert pana_r.votes == 0
 
 
 def test_import_party_results(session):
@@ -87,13 +86,16 @@ def test_import_party_results(session):
 
     assert not errors
     assert sorted([
-        (r.year, r.name, r.color, r.votes, r.total_votes, r.number_of_mandates)
+        (
+            r.year, r.party_id, r.name, r.color, r.votes, r.total_votes,
+            r.number_of_mandates
+        )
         for r in election.party_results
     ]) == [
-        (2011, 'P1', '#123456', 3000, 10000, 0),
-        (2011, 'P2', '#aabbcc', 7000, 10000, 1),
-        (2015, 'P1', '#123456', 5000, 10000, 1),
-        (2015, 'P2', '#aabbcc', 5000, 10000, 0)
+        (2011, '1', 'P1', '#123456', 3000, 10000, 0),
+        (2011, '2', 'P2', '#aabbcc', 7000, 10000, 1),
+        (2015, '1', 'P1', '#123456', 5000, 10000, 1),
+        (2015, '2', 'P2', '#aabbcc', 5000, 10000, 0)
     ]
 
     # with panachage results
@@ -123,23 +125,26 @@ def test_import_party_results(session):
 
     assert not errors
     assert sorted([
-        (r.year, r.name, r.color, r.votes, r.total_votes, r.number_of_mandates)
+        (
+            r.year, r.party_id, r.name, r.color, r.votes, r.total_votes,
+            r.number_of_mandates
+        )
         for r in election.party_results
     ]) == [
-        (2011, 'P1', '#123456', 3000, 10000, 0),
-        (2011, 'P2', '#aabbcc', 7000, 10000, 1),
-        (2015, 'P1', '#123456', 5000, 10000, 1),
-        (2015, 'P2', '#aabbcc', 5000, 10000, 0)
+        (2011, '1', 'P1', '#123456', 3000, 10000, 0),
+        (2011, '2', 'P2', '#aabbcc', 7000, 10000, 1),
+        (2015, '1', 'P1', '#123456', 5000, 10000, 1),
+        (2015, '2', 'P2', '#aabbcc', 5000, 10000, 0)
     ]
 
     results = sorted([
         (r.target, r.source, r.votes) for r in election.panachage_results
     ])
     assert results == [
-        ('P1', '', 12),
-        ('P1', 'P2', 11),
-        ('P2', '', 22),
-        ('P2', 'P1', 20),
+        ('1', '', 12),
+        ('1', '2', 11),
+        ('2', '', 22),
+        ('2', '1', 20),
     ]
 
     # with voters count

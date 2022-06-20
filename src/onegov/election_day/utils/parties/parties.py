@@ -182,7 +182,7 @@ def get_parties_panachage_data(item, request=None):
     parties = sorted(
         set([result.source for result in results])
         | set([result.target for result in results])
-        | set([result.name for result in party_results])
+        | set([result.party_id for result in party_results])
     )
 
     def left_node(party):
@@ -191,8 +191,8 @@ def get_parties_panachage_data(item, request=None):
     def right_node(party):
         return parties.index(party) + len(parties)
 
-    colors = dict(set((r.name, r.color) for r in party_results))
-    intra_party_votes = dict(set((r.name, r.votes) for r in party_results))
+    colors = dict(set((r.party_id, r.color) for r in party_results))
+    intra_party_votes = dict(set((r.party_id, r.votes) for r in party_results))
 
     # Create the links
     links = []
@@ -216,10 +216,11 @@ def get_parties_panachage_data(item, request=None):
         })
 
     # Create the nodes
+    names = {result.party_id: result.name for result in party_results}
     blank = request.translate(_("Blank list")) if request else '-'
     nodes = [
         {
-            'name': name or blank,
+            'name': names.get(name, '') or blank,
             'id': count + 1,
             'color': colors.get(name, '#999')
         }

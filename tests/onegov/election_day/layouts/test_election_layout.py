@@ -182,6 +182,7 @@ def test_election_layout(session):
             votes=0,
             total_votes=100,
             name='A',
+            party_id='1'
         )
     )
     assert ElectionLayout(proporz, DummyRequest()).has_party_results
@@ -370,6 +371,7 @@ def test_election_layout_menu_proporz(session):
             votes=0,
             total_votes=100,
             name='A',
+            party_id='1'
         )
     )
     election.list_connections.append(ListConnection(connection_id='A'))

@@ -69,6 +69,7 @@ def test_election_compound_layout_general(session):
             votes=0,
             total_votes=100,
             name='A',
+            party_id='1'
         )
     )
     assert layout.has_party_results is True
@@ -199,6 +200,7 @@ def test_election_compound_layout_menu(session):
             votes=0,
             total_votes=100,
             name='A',
+            party_id='1'
         )
     )
     compound.panachage_results.append(

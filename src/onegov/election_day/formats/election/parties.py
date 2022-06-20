@@ -49,7 +49,7 @@ def parse_party_result(
         key = '{}/{}'.format(name, year)
         totals[year] = total_votes
         if year == election_year:
-            parties[party_id] = name
+            parties.add(party_id)
 
         if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
@@ -106,7 +106,7 @@ def import_party_results(election, file, mimetype):
     """
 
     errors = []
-    parties = {}
+    parties = set()
     party_results = {}
     party_totals = {}
     panachage_results = {}
@@ -149,7 +149,7 @@ def import_party_results(election, file, mimetype):
 
     if panachage_headers and parties:
         for list_id in panachage_headers.values():
-            if not list_id == '999' and list_id not in parties.keys():
+            if not list_id == '999' and list_id not in parties:
                 errors.append(FileImportError(
                     _("Panachage results ids and id not consistent"))
                 )
@@ -177,8 +177,8 @@ def import_party_results(election, file, mimetype):
                         PanachageResult(
                             owner=election.id,
                             id=uuid4(),
-                            source=parties.get(source, ''),
-                            target=parties[target],
+                            source=source if source != '999' else '',
+                            target=target,
                             votes=votes
                         )
                     )

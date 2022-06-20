@@ -334,6 +334,7 @@ def test_election_compound(session):
         votes=0,
         total_votes=100,
         name='Libertarian',
+        party_id='1',
         color='black'
     )
     session.add(party_result)
@@ -727,6 +728,7 @@ def test_election_compound_export_parties(session):
             total_votes=50,
             voters_count_percentage=Decimal('50.02'),
             name='Libertarian',
+            party_id='3',
             color='black',
             year=2016
         )
@@ -739,6 +741,7 @@ def test_election_compound_export_parties(session):
             total_votes=100,
             voters_count_percentage=Decimal('100.02'),
             name='Conservative',
+            party_id='5',
             color='red',
             year=2012
         )
@@ -791,7 +794,6 @@ def test_election_compound_export_parties(session):
             'voters_count': '1.01',
             'voters_count_percentage': '100.02',
         },
-
         {
             'year': 2012,
             'name': 'Conservative',
@@ -806,37 +808,22 @@ def test_election_compound_export_parties(session):
     ]
 
     # Add panachage results
-    for idx, source in enumerate(('Conservative', 'Libertarian', 'Other', '')):
+    for idx, source in enumerate(('5', '3', '0', '')):
         election_compound.panachage_results.append(
             PanachageResult(
-                target='Conservative',
+                target='5',
                 source=source,
                 votes=idx + 1
             )
         )
     election_compound.panachage_results.append(
         PanachageResult(
-            target='Libertarian',
-            source='Conservative',
+            target='3',
+            source='5',
             votes=5,
         )
     )
     assert election_compound.export_parties() == [
-        {
-            'year': 2016,
-            'name': 'Other',
-            'id': '0',
-            'color': None,
-            'mandates': None,
-            'total_votes': None,
-            'votes': None,
-            'voters_count': None,
-            'voters_count_percentage': None,
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_3': None,
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
-        },
         {
             'year': 2016,
             'name': 'Libertarian',
@@ -847,7 +834,6 @@ def test_election_compound_export_parties(session):
             'votes': 2,
             'voters_count': '3.01',
             'voters_count_percentage': '50.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_3': None,
             'panachage_votes_from_5': 5,
             'panachage_votes_from_999': None,
@@ -862,25 +848,9 @@ def test_election_compound_export_parties(session):
             'votes': 3,
             'voters_count': '4.01',
             'voters_count_percentage': '50.02',
-            'panachage_votes_from_0': 3,
             'panachage_votes_from_3': 2,
             'panachage_votes_from_5': 1,
             'panachage_votes_from_999': 4,
-        },
-        {
-            'year': 2012,
-            'name': 'Other',
-            'id': '0',
-            'color': None,
-            'mandates': None,
-            'total_votes': None,
-            'votes': None,
-            'voters_count': None,
-            'voters_count_percentage': None,
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_3': None,
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
         },
         {
             'year': 2012,
@@ -892,7 +862,6 @@ def test_election_compound_export_parties(session):
             'votes': 0,
             'voters_count': '1.01',
             'voters_count_percentage': '100.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_3': None,
             'panachage_votes_from_5': None,
             'panachage_votes_from_999': None,
@@ -907,7 +876,6 @@ def test_election_compound_export_parties(session):
             'votes': 1,
             'voters_count': '2.01',
             'voters_count_percentage': '100.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_3': None,
             'panachage_votes_from_5': None,
             'panachage_votes_from_999': None,
