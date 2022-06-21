@@ -635,3 +635,11 @@ a > i.fa-external-link-alt {
 .partners i.fa-external-link-alt::before {
     position: absolute;
 }
+
+/*
+    Edit-bar
+*/
+.is-dropdown-submenu {
+    max-height: 60vh;
+    overflow: auto;/* to get scroll */
+}
