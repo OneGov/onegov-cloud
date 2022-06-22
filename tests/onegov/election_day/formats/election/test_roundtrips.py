@@ -20,7 +20,9 @@ def test_roundtrip_wabstic_internal_alphanum(import_test_datasets, session):
         date_=date(2019, 10, 20)
     )
     assert not errors
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     election_copy = ProporzElection(
         title='copy',

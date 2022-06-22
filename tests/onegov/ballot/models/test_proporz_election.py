@@ -694,7 +694,7 @@ def test_proporz_election_export(session):
     session.add(election)
     session.flush()
 
-    assert election.export() == []
+    assert election.export(['de_CH']) == []
 
     election_result = ElectionResult(
         name='name',
@@ -744,12 +744,11 @@ def test_proporz_election_export(session):
 
     session.flush()
 
-    assert election.export() == [
+    assert election.export(['de_CH', 'fr_CH', 'it_CH']) == [
         {
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
-            'election_title_rm_CH': '',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'proporz',
@@ -790,7 +789,6 @@ def test_proporz_election_export(session):
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
-            'election_title_rm_CH': '',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'proporz',
