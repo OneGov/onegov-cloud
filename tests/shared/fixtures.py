@@ -1,3 +1,4 @@
+import logging
 import os
 import platform
 import re
@@ -43,6 +44,10 @@ except ImportError:
 
 redis_path = find_executable('redis-server')
 redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
+
+logging.getLogger('faker').setLevel(logging.INFO)
+logging.getLogger('txn').setLevel(logging.INFO)
+logging.getLogger('morepath').setLevel(logging.INFO)
 
 
 def pytest_addoption(parser):
