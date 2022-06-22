@@ -85,7 +85,7 @@ class SvgGenerator():
             ),
             'ballot': (
                 'entities-map', 'districts-map'
-            ) if principal.has_districts else ('entities-map')
+            ) if principal.has_districts else ('entities-map',)
         }
 
         # Read existing SVGs
