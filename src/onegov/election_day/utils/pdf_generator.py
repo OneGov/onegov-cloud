@@ -30,7 +30,6 @@ class PdfGenerator():
         self.pdf_dir = 'pdf'
         self.session = self.app.session()
         self.pdf_signing = self.app.principal.pdf_signing
-        self.default_locale = self.app.settings.i18n.default_locale
         self.renderer = renderer or D3Renderer(app)
 
     def remove(self, directory, files):
@@ -69,11 +68,14 @@ class PdfGenerator():
         """ Generates the PDF for an election or a vote. """
         principal = self.app.principal
 
+        old_locale = item.session_manager.current_locale
+        item.session_manager.current_locale = locale
+
         with self.app.filestorage.open(path, 'wb') as f:
 
             pdf = Pdf(
                 f,
-                title=item.get_title(locale, self.default_locale),
+                title=item.title,
                 author=principal.name,
                 locale=locale,
                 translations=self.app.translations
@@ -84,7 +86,7 @@ class PdfGenerator():
             )
 
             # Add Header
-            pdf.h1(item.get_title(locale, self.default_locale))
+            pdf.h1(item.title)
 
             # Add dates
             changed = item.last_result_change
@@ -113,6 +115,8 @@ class PdfGenerator():
                 pdf.p_markup('<a href="{link}">{link}</a>'.format(link=link))
 
             pdf.generate()
+
+        item.session_manager.current_locale = old_locale
 
     def add_tacit_election(self, principal, election, pdf):
 
@@ -828,7 +832,7 @@ class PdfGenerator():
             subtitle = pdf.h2
             if title:
                 subtitle = pdf.h3
-                detail = ballot.get_title(locale, self.default_locale)
+                detail = ballot.title
                 if detail:
                     pdf.h2('{}: {}'.format(pdf.translate(title), detail))
                 else:
