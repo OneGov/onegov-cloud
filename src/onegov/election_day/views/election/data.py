@@ -37,7 +37,7 @@ def view_election_data_as_json(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'data': self.export(),
+        'data': self.export(sorted(request.app.locales)),
         'name': normalize_for_url(self.title)
     }
 
@@ -52,7 +52,7 @@ def view_election_data_as_csv(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'data': self.export(),
+        'data': self.export(sorted(request.app.locales)),
         'name': normalize_for_url(self.title)
     }
 

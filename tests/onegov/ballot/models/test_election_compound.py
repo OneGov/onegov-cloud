@@ -430,24 +430,22 @@ def test_election_compound_export(session):
     election_compound = session.query(ElectionCompound).one()
     election_compound.title_translations['it_CH'] = 'Elezioni'
 
-    assert election_compound.export() == []
+    assert election_compound.export(['de_CH']) == []
 
     election_compound.elections = session.query(Election).filter_by(
         id='majorz'
     ).all()
     session.flush()
-    exports = election_compound.export()
-    assert exports[0] == {
+    export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
+    assert export[0] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 1,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -475,17 +473,15 @@ def test_election_compound_export(session):
         'candidate_party': 'Democratic Party',
         'candidate_votes': 111
     }
-    assert exports[1] == {
+    assert export[1] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 1,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -516,19 +512,17 @@ def test_election_compound_export(session):
 
     election_compound.elections = session.query(Election).all()
     session.flush()
-    exports = election_compound.export()
+    export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
 
-    assert exports[0] == {
+    assert export[0] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Proporz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'proporz',
@@ -566,17 +560,15 @@ def test_election_compound_export(session):
         'panachage_votes_from_list_99': None
     }
 
-    assert exports[1] == {
+    assert export[1] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Proporz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'proporz',
@@ -614,17 +606,15 @@ def test_election_compound_export(session):
         'panachage_votes_from_list_99': 4
     }
 
-    assert exports[2] == {
+    assert export[2] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -653,17 +643,15 @@ def test_election_compound_export(session):
         'candidate_votes': 111
     }
 
-    assert exports[3] == {
+    assert export[3] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
