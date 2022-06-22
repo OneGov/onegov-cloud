@@ -181,7 +181,7 @@ def test_election_layout(session):
             number_of_mandates=0,
             votes=0,
             total_votes=100,
-            name='A',
+            name_translations={'de_CH': 'A'},
             party_id='1'
         )
     )
@@ -370,7 +370,7 @@ def test_election_layout_menu_proporz(session):
             number_of_mandates=0,
             votes=0,
             total_votes=100,
-            name='A',
+            name_translations={'de_CH': 'A'},
             party_id='1'
         )
     )

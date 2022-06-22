@@ -113,12 +113,18 @@ def add_proporz_election(session, year=2015):
 
     election.party_results.append(
         PartyResult(
-            name='Party 1', party_id='0', number_of_mandates=1, votes=10
+            name_translations={'de_CH': 'Party 1'},
+            party_id='0',
+            number_of_mandates=1,
+            votes=10
         )
     )
     election.party_results.append(
         PartyResult(
-            name='Party 2', party_id='1', number_of_mandates=1, votes=20
+            name_translations={'de_CH': 'Party 2'},
+            party_id='1',
+            number_of_mandates=1,
+            votes=20
         )
     )
     election.panachage_results.append(
@@ -242,13 +248,19 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
 
     compound.party_results.append(
         PartyResult(
-            year=year, name='Party 1', party_id='0', number_of_mandates=1,
+            name_translations={'de_CH': 'Party 1'},
+            year=year,
+            party_id='0',
+            number_of_mandates=1,
             votes=10
         )
     )
     compound.party_results.append(
         PartyResult(
-            year=year, name='Party 2', party_id='1', number_of_mandates=1,
+            name_translations={'de_CH': 'Party 2'},
+            year=year,
+            party_id='1',
+            number_of_mandates=1,
             votes=20
         )
     )

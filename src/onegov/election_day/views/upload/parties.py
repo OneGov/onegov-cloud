@@ -29,7 +29,9 @@ def view_upload_election_party_results(self, request, form):
         errors = import_party_results(
             self,
             form.parties.raw_data[0].file,
-            form.parties.data['mimetype']
+            form.parties.data['mimetype'],
+            request.app.locales,
+            request.app.default_locale
         )
 
         archive = ArchivedResultCollection(request.session)
@@ -82,7 +84,9 @@ def view_upload_election_compound_party_results(self, request, form):
         errors = import_party_results(
             self,
             form.parties.raw_data[0].file,
-            form.parties.data['mimetype']
+            form.parties.data['mimetype'],
+            request.app.locales,
+            request.app.default_locale
         )
 
         archive = ArchivedResultCollection(request.session)

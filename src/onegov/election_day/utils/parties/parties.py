@@ -37,10 +37,11 @@ def get_party_results(item, json_serializable=False):
 
     parties = {}
     for result in item.party_results:
-        party = parties.setdefault(result.name, {})
+        party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
+        year['name'] = result.name
 
         votes = result.votes or 0
         total_votes = totals_votes.get(result.year) or 0
@@ -83,18 +84,17 @@ def get_party_results_deltas(item, years, parties):
     for index, year in enumerate(years):
         results[year] = []
         for key in sorted(parties.keys()):
-            result = [key]
+            result = ['', '', '', '']
             party = parties[key]
             values = party.get(year)
             if values:
-                result.append(values.get('mandates', ''))
-                result.append(values.get(attribute, {}).get('total', ''))
                 permille = values.get(attribute, {}).get('permille')
-                result.append(f'{permille/10}%' if permille else '')
-            else:
-                result.append('')
-                result.append('')
-                result.append('')
+                result = [
+                    values.get('name', ''),
+                    values.get('mandates', ''),
+                    values.get(attribute, {}).get('total', ''),
+                    f'{permille/10}%' if permille else ''
+                ]
 
             if deltas:
                 delta = ''
@@ -129,17 +129,19 @@ def get_party_results_data(item):
     voters_counts = getattr(item, 'voters_counts', False) == True
     attribute = 'voters_count' if voters_counts else 'votes'
     years, parties = get_party_results(item)
-    names = sorted(parties.keys())
-
+    groups = {}
     results = []
-    for party in names:
-        for year in parties[party]:
-            front = parties[party].get(year, {}).get('mandates', 0)
-            back = parties[party].get(year, {}).get(attribute, {})
+    for party_id in parties:
+        for year in sorted(parties[party_id], reverse=True):
+            group = groups.setdefault(
+                party_id, parties[party_id].get(year, {}).get('name', party_id)
+            )
+            front = parties[party_id].get(year, {}).get('mandates', 0)
+            back = parties[party_id].get(year, {}).get(attribute, {})
             back = float(back.get('permille', 0) / 10)
-            color = parties[party].get(year, {}).get('color', '#999999')
+            color = parties[party_id].get(year, {}).get('color', '#999999')
             results.append({
-                'group': party,
+                'group': group,
                 'item': year,
                 'value': {
                     'front': front,
@@ -150,7 +152,7 @@ def get_party_results_data(item):
             })
 
     return {
-        'groups': names,
+        'groups': list(groups.values()),
         'labels': years,
         'maximum': {
             'front': item.number_of_mandates,
@@ -216,15 +218,15 @@ def get_parties_panachage_data(item, request=None):
         })
 
     # Create the nodes
-    names = {result.party_id: result.name for result in party_results}
+    names = {r.party_id: r.name for r in party_results}
     blank = request.translate(_("Blank list")) if request else '-'
     nodes = [
         {
-            'name': names.get(name, '') or blank,
+            'name': names.get(party_id, '') or blank,
             'id': count + 1,
-            'color': colors.get(name, '#999')
+            'color': colors.get(party_id, '#999')
         }
-        for count, name in enumerate(2 * parties)
+        for count, party_id in enumerate(2 * parties)
     ]
 
     return {

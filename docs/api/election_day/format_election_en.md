@@ -239,13 +239,16 @@ Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`name`|The name of the party.
+`name`|The name of the party in the default language. Optional*.
+`name_{locale}`|Translated name of the party, e.g. `name_de_ch` for the German name. Optional*.
 `id`|ID of the party (any number).
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 `voters_count_percentage`|The cumulative number of votes per total number of mandates per election, for election compounds only.
+
+*Make sure to provide the name of the party in the default language either with the `name` or `name_{default_locale}` column.
 
 The results may contain panachage results by adding one column per party:
 

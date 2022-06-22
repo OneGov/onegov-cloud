@@ -43,7 +43,7 @@ class PartyResultExportMixin(object):
 
     """
 
-    def export_parties(self, json_serializable=False):
+    def export_parties(self, locales, default_locale, json_serializable=False):
         """ Returns all party results with the panachage as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -71,7 +71,7 @@ class PartyResultExportMixin(object):
         for result in self.party_results:
             year = results.setdefault(result.year, {})
             year[result.party_id] = {
-                'name': result.name,
+                'name_translations': result.name_translations,
                 'total_votes': result.total_votes,
                 'color': result.color,
                 'mandates': result.number_of_mandates,
@@ -95,17 +95,21 @@ class PartyResultExportMixin(object):
                 # add the party results
                 row = OrderedDict()
                 row['year'] = year
-                row['name'] = result.get('name', None)
                 row['id'] = party_id
-                row['total_votes'] = result.get('total_votes', None)
-                row['color'] = result.get('color', None)
-                row['mandates'] = result.get('mandates', None)
-                row['votes'] = result.get('votes', None)
-                row['voters_count'] = convert_decimal(
-                    result.get('voters_count', None)
+                row['name'] = result['name_translations'].get(
+                    default_locale, None
                 )
+                for locale in locales:
+                    row[f'name_{locale}'] = result['name_translations'].get(
+                        locale, None
+                    )
+                row['total_votes'] = result['total_votes']
+                row['color'] = result['color']
+                row['mandates'] = result['mandates']
+                row['votes'] = result['votes']
+                row['voters_count'] = convert_decimal(result['voters_count'])
                 row['voters_count_percentage'] = convert_decimal(
-                    result.get('voters_count_percentage', None)
+                    result['voters_count_percentage']
                 )
 
                 # add the panachage results
