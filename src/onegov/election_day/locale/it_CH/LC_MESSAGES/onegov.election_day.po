@@ -1088,13 +1088,13 @@ msgid "PDF Results"
 msgstr "Risultati PDF"
 
 msgid "Candidate results"
-msgstr ""
+msgstr "Risultati dei candidati"
 
 msgid "The raw data of the candidates are available in the following formats:"
-msgstr ""
+msgstr "I dati grezzi dei candidati sono disponibili nei formati seguenti:"
 
 msgid "The raw data of the parties are available in the following formats:"
-msgstr ""
+msgstr "I dati grezzi dei partiti sono disponibili nei formati seguenti:"
 
 msgid "The format of the data is described here:"
 msgstr "Il formato dei dati è descritto qui:"

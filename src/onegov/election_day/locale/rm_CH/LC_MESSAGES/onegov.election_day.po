@@ -1098,13 +1098,17 @@ msgid "PDF Results"
 msgstr "Resultats PDF"
 
 msgid "Candidate results"
-msgstr ""
+msgstr "Resultats da las candidatas e dals candidats"
 
 msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
+"Las datas nunelavuradas da las candidatas e dals candidats èn disponiblas en "
+"ils suandants formats:"
 
 msgid "The raw data of the parties are available in the following formats:"
 msgstr ""
+"Las datas nunelavuradas da las partidas èn disponiblas en ils suandants "
+"formats:"
 
 msgid "The format of the data is described here:"
 msgstr "Il format da las datas è descrit qua:"
