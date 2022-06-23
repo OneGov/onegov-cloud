@@ -82,9 +82,14 @@ steps:
     env:
       CONTAINER: "onegov-cloud:head"
 
-  - command: echo "End of concurrency gate"
-    concurrency_group: onegovcloud
-    concurrency: 1
+  - wait
+
+  - command: "test-container"
+    label: "Finishing"
 
     agents:
       - queue=generic
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+      CONTAINER_TEST_SCRIPT: ".buildkite/finish"
