@@ -270,7 +270,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         for ballot in self.ballots:
             ballot.clear_results()
 
-    def export(self):
+    def export(self, locales):
         """ Returns all data connected to this vote as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -289,8 +289,8 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
                 titles = (
                     ballot.title_translations or self.title_translations or {}
                 )
-                for locale, title in titles.items():
-                    row['title_{}'.format(locale)] = (title or '').strip()
+                for locale in locales:
+                    row[f'title_{locale}'] = titles.get(locale, '')
                 row['date'] = self.date.isoformat()
                 row['shortcode'] = self.shortcode
                 row['domain'] = self.domain

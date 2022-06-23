@@ -295,15 +295,6 @@ def validate_numeric(line, col, precision, scale, treat_none_as_default=True,
                            mapping={'col': col}))
 
 
-def validate_empty(line, col, treat_empty_as_default=True, default=''):
-    result = getattr(line, col)
-    if result:
-        return result
-    elif treat_empty_as_default:
-        return default
-    raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
-
-
 def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     """ Used to validate list_id that can also be alphanumeric.
      Example: 03B.04
