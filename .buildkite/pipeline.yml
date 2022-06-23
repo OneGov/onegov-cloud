@@ -86,6 +86,8 @@ steps:
 
   - command: "test-container"
     label: "Finishing"
+    concurrency_group: onegovcloud
+    concurrency: 1
 
     agents:
       - queue=generic
