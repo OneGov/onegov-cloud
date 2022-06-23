@@ -85,3 +85,6 @@ steps:
   - command: echo "End of concurrency gate"
     concurrency_group: onegovcloud
     concurrency: 1
+
+    agents:
+      - queue=generic
