@@ -37,7 +37,9 @@ def test_import_internal_vote(session, import_test_datasets):
     assert vote.proposal.invalid == 52
 
     # Test a roundtrip
-    csv = convert_list_of_dicts_to_csv(vote.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        vote.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_vote_internal(
         vote,
