@@ -1452,7 +1452,7 @@ msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
 
 #, python-format
 msgid "${count} files deleted."
-msgstr "$ {count} file eliminati."
+msgstr "${count} file eliminati."
 
 msgid ""
 "Deletes all SVGs and PDFs. They are regenerated in the background and are "

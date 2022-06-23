@@ -518,7 +518,7 @@ def test_election_export(session):
     session.add(election)
     session.flush()
 
-    assert election.export() == []
+    assert election.export(['de_CH']) == []
 
     election_result = ElectionResult(
         name='name',
@@ -548,13 +548,12 @@ def test_election_export(session):
 
     session.flush()
 
-    exports = election.export()\
+    export = election.export(['de_CH', 'fr_CH', 'it_CH'])
 
-    assert exports[0] == {
+    assert export[0] == {
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -582,11 +581,10 @@ def test_election_export(session):
         'candidate_party': 'Democratic Party',
         'candidate_votes': 111,
     }
-    assert exports[1] == {
+    assert export[1] == {
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',

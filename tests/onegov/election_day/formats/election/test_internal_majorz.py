@@ -42,7 +42,9 @@ def test_import_internal_majorz_cantonal_zg(
     ]
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election, create_principal(principal), BytesIO(csv), 'text/plain'
@@ -95,7 +97,9 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
     assert election.elected_candidates == [('Johannes', 'Stöckli')]
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election, create_principal(principal), BytesIO(csv), 'text/plain'
@@ -146,7 +150,9 @@ def test_import_internal_majorz_municipality_bern(
     assert election.candidates.count() == 4
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election,
@@ -202,7 +208,9 @@ def test_import_internal_majorz_municipality_kriens(
     assert sorted(election.elected_candidates) == [('Tschäppät', 'Alexander')]
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election,

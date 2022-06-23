@@ -207,7 +207,7 @@ table {
 
     tbody {
         th {
-            border-bottom: none;
+            border-bottom: 0;
             font-weight: normal;
         }
     }
@@ -734,7 +734,7 @@ td.row-actions {
 ul.actions {
     direction: rtl;
     list-style-type: circle;
-    margin: .2em 1.1em 1em 0;
+    margin: 3em 1.1em 1em 0;
 
     li {
         font-size: $table-row-font-size;

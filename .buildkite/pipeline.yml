@@ -3,6 +3,8 @@ steps:
   # build the container…
   - command: "build-container"
     label: "Building"
+    concurrency_group: onegovcloud
+    concurrency: 1
 
     agents:
       - queue=builder
@@ -79,3 +81,15 @@ steps:
 
     env:
       CONTAINER: "onegov-cloud:head"
+
+  - wait
+
+  - command: "test-container"
+    label: "Finishing"
+
+    agents:
+      - queue=generic
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+      CONTAINER_TEST_SCRIPT: ".buildkite/finish"
