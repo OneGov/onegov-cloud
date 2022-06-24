@@ -26,12 +26,15 @@ class SvgGenerator():
             if fs.exists(path) and not fs.isdir(path):
                 fs.remove(path)
 
-    def generate_svg(self, item, type_, filename, locale=None):
+    def generate_svg(self, item, type_, filename, locale):
         """ Creates the requested SVG.
 
         Returns the number of created files.
 
         """
+
+        old_locale = item.session_manager.current_locale
+        item.session_manager.current_locale = locale
 
         chart = None
         if type_ == 'candidates':
@@ -52,6 +55,9 @@ class SvgGenerator():
             chart = self.renderer.get_entities_map(item, 'svg', locale)
         if type_ == 'districts-map':
             chart = self.renderer.get_districts_map(item, 'svg', locale)
+
+        item.session_manager.current_locale = old_locale
+
         if chart:
             path = '{}/{}'.format(self.svg_dir, filename)
             with self.app.filestorage.open(path, 'w') as f:
