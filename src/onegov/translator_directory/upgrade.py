@@ -2,10 +2,9 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sqlalchemy import Column, Boolean
-
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import Column, Boolean, Text
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -69,4 +68,19 @@ def add_unique_constraint_to_translator_email(context):
         )
         context.operations.create_unique_constraint(
             'unique_translators_email', 'translators', ['email']
+        )
+
+
+@upgrade_task('Add translator type')
+def add_translator_type(context):
+    if not context.has_column('translators', 'type'):
+        context.add_column_with_defaults(
+            'translators',
+            Column(
+                'type',
+                Text(),
+                nullable=False,
+                default='published'
+            ),
+            default=lambda x: 'published'
         )
