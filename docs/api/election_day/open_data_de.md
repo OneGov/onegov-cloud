@@ -70,11 +70,13 @@ Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Fo
 
 ### Rohdaten
 
+#### Kandidierendenresultate
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+Die Rohdaten der Kandidierenden sind in den folgenden Formaten verfügbar:
 
 Format|URL
 ---|---
@@ -120,13 +122,13 @@ Name|Beschreibung
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 
-### Parteiresultate
+#### Parteiresultate
 
 ```
 URL: /election/{id}/data-parties-{format}
 ```
 
-Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+Die Rohdaten der Parteien sind in den folgenden Formaten verfügbar:
 
 Format|URL
 ---|---
