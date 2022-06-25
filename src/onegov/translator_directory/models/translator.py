@@ -44,16 +44,15 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the type of the item, this can be used to create custom polymorphic
-    #: subclasses of this class. See
-    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
-    #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=False, default=lambda: 'published')
-
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'published'
-    }
+    state = Column(
+        Enum(
+            'proposed',
+            'published',
+            name='translator_state'
+        ),
+        nullable=False,
+        default='published'
+    )
 
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
@@ -185,8 +184,3 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     @property
     def unique_categories(self):
         return sorted({f.note for f in self.files})
-
-
-class ProposedTranslator(Translator):
-
-    __mapper_args__ = {'polymorphic_identity': 'proposed'}

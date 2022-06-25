@@ -4,6 +4,7 @@ from onegov.translator_directory.collections.documents import \
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
@@ -67,3 +68,12 @@ def get_translator_documents(app, translator_id, category=None):
 )
 def get_translator_mutation(app, target_id, ticket_id):
     return TranslatorMutation(app.session(), target_id, ticket_id)
+
+
+@TranslatorDirectoryApp.path(
+    model=Accreditation,
+    path='/accreditation/{target_id}/{ticket_id}',
+    converters=dict(target_id=UUID, ticket_id=UUID)
+)
+def get_accreditation(app, target_id, ticket_id):
+    return Accreditation(app.session(), target_id, ticket_id)

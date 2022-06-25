@@ -39,6 +39,7 @@ class TranslatorDocumentCollection(FileCollection):
     def unique_categories(self):
         """Returns a list of the defined default categories and the ones in
         the database."""
+        # todo: only constants?
         q = self.session.query(File.note).filter(File.note != None)
         from_files = tuple(f.note for f in q.distinct())
         return sorted(set(from_files + DEFAULT_DOCUMENT_CATEGORIES))
