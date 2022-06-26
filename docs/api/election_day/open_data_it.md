@@ -70,11 +70,13 @@ Rimanda i dati della visualizzazione principale in forma strutturata.
 
 ### Dati grezzi
 
+#### Risultati dei candidati
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+I dati grezzi dei candidati sono disponibili nei formati seguenti:
 
 Formato|URL
 ---|---
@@ -120,13 +122,13 @@ Nome|Descrizione
 
 I comuni non ancora contati non sono inclusi.
 
-### Risultati dei partiti
+#### Risultati dei partiti
 
 ```
 URL: /election/{id}/data-parties-{format}
 ```
 
-I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+I dati grezzi dei partiti sono disponibili nei formati seguenti:
 
 Formato|URL
 ---|---

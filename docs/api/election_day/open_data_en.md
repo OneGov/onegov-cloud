@@ -69,11 +69,13 @@ Returns the data of the main view in a structured form.
 
 ### Raw data
 
+#### Candidate results
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-The raw data used to display the results of elections is available in the following formats:
+The raw data of the candidates are available in the following formats:
 
 Format|URL
 ---|---
@@ -125,7 +127,7 @@ Not yet counted municipalities are not included.
 URL: /election/{id}/data-parties-{format}
 ```
 
-The raw data used to display the results of elections is available in the following formats:
+The raw data of the parties are available in the following formats:
 
 Format|URL
 ---|---

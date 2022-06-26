@@ -72,11 +72,13 @@ I vegnan restituidas las medemas datas sco en la vista normala, mo en ina furma 
 
 ### Datas nunelavuradas
 
+#### Resultats da las candidatas e dals candidats
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan a disposiziun en ils suandants formats:
+Las datas nunelavuradas da las candidatas e dals candidats èn disponiblas en ils suandants formats:
 
 Format|URL
 ---|---
@@ -122,13 +124,13 @@ Num|Descripziun
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
-### Party results
+#### Resultats da las partidas
 
 ```
 URL: /election/{id}/data-parties-{format}
 ```
 
-Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan a disposiziun en ils suandants formats:
+Las datas nunelavuradas da las partidas èn disponiblas en ils suandants formats:
 
 Format|URL
 ---|---
