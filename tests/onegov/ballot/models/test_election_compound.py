@@ -362,6 +362,36 @@ def test_election_compound(session):
     assert session.query(Candidate).first() is None
     assert session.query(ElectionResult).first() is None
 
+    # Add results again and delete compound
+    party_result = PartyResult(
+        owner=election_compound.id,
+        number_of_mandates=0,
+        votes=0,
+        total_votes=100,
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1',
+        color='black'
+    )
+    session.add(party_result)
+    session.flush()
+    assert election_compound.party_results.one() == party_result
+
+    panachage_result = PanachageResult(
+        owner=election_compound.id,
+        source='A',
+        target='B',
+        votes=0,
+    )
+    session.add(panachage_result)
+    session.flush()
+    assert election_compound.panachage_results.one() == panachage_result
+
+    session.delete(election_compound)
+    session.flush()
+
+    assert session.query(PartyResult).first() is None
+    assert session.query(PanachageResult).first() is None
+
 
 def test_election_compound_id_generation(session):
     election_compound = ElectionCompound(
@@ -1051,7 +1081,7 @@ def test_election_compound_supersegment_progress(session):
     assert election_compound.progress == (1, 3)
 
 
-def test_list_results(session):
+def test_election_compound_list_results(session):
     election_compound = ElectionCompound(
         title='Elections',
         domain='canton',
