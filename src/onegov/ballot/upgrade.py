@@ -618,5 +618,19 @@ def add_party_name_translations(context):
         """)
 
 
-# todo: add an upgrade step to remove party_results.name
-# todo: add an upgrade step to set party_results.party_id:nullable False
+@upgrade_task(
+    'Remove obsolete party names',
+    requires='onegov.ballot:Add party name translations',
+)
+def remove_obsolete_party_names(context):
+    if context.has_column('party_results', 'name'):
+        context.operations.drop_column('party_results', 'name')
+
+    if context.has_column('party_results', 'party_id'):
+        context.operations.execute("""
+            DELETE FROM party_results WHERE party_id is NULL;
+        """)
+
+        context.operations.alter_column(
+            'party_results', 'party_id', nullable=False
+        )
