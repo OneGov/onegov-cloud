@@ -237,13 +237,16 @@ Num|Descripziun
 ---|---
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da vuschs da l'elecziun.
-`name`|Il num da la partida.
+`name`|Il num da la partida en la lingua da standard. Opziunal*.
+`name_{locale}`|Translaziun dal num da la partida, p.ex. `name_de_CH` per il num tudestg. Opziunal*.
 `id`|ID da la partida (cifra casuala).
 `color`|La colur da la partida.
 `mandates`|Il dumber da sezs da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `voters_count_percentage`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
+
+*Guardai che Vus inditgeschias il num da la partida en la lingua da standard ubain en la colonna name ubain en la colonna name_{default_locale}.
 
 Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per partida:
 

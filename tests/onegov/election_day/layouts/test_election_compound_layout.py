@@ -68,7 +68,8 @@ def test_election_compound_layout_general(session):
             number_of_mandates=0,
             votes=0,
             total_votes=100,
-            name='A',
+            name_translations={'de_CH': 'A'},
+            party_id='1'
         )
     )
     assert layout.has_party_results is True
@@ -198,7 +199,8 @@ def test_election_compound_layout_menu(session):
             number_of_mandates=0,
             votes=0,
             total_votes=100,
-            name='A',
+            name_translations={'de_CH': 'A'},
+            party_id='1'
         )
     )
     compound.panachage_results.append(

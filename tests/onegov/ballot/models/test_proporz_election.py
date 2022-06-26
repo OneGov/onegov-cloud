@@ -76,7 +76,8 @@ def proporz_election():
             number_of_mandates=0,
             votes=0,
             total_votes=100,
-            name='A',
+            name_translations={'en_US': 'A'},
+            party_id='1'
         )
     )
 
@@ -143,7 +144,8 @@ def test_proporz_election_create_all_models(session):
         number_of_mandates=0,
         votes=0,
         total_votes=100,
-        name='Libertarian',
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1',
         color='black'
     )
 
@@ -370,14 +372,22 @@ def test_proporz_election_results(session):
     # Add party results
     election.party_results.append(
         PartyResult(
-            name='Republican Party', number_of_mandates=1, votes=10,
-            total_votes=100, color='red'
+            name_translations={'en_US': 'Republican Party'},
+            number_of_mandates=1,
+            votes=10,
+            total_votes=100,
+            color='red',
+            party_id='1',
         )
     )
     election.party_results.append(
         PartyResult(
-            name='Democratic Party', number_of_mandates=1, votes=20,
-            total_votes=100, color='blue'
+            name_translations={'en_US': 'Democratic Party'},
+            number_of_mandates=1,
+            votes=20,
+            total_votes=100,
+            color='blue',
+            party_id='2',
         )
     )
 
@@ -623,14 +633,15 @@ def test_proporz_election_results(session):
     assert [int(vote[0]) for vote in votes] == [26, 111, 540]
 
     parties = session.query(
-        PartyResult.name,
+        PartyResult.party_id,
+        PartyResult.name_translations['en_US'],
         PartyResult.votes,
         PartyResult.number_of_mandates
     )
-    parties = parties.order_by(PartyResult.name)
+    parties = parties.order_by(PartyResult.name_translations['en_US'])
     assert parties.all() == [
-        ('Democratic Party', 20, 1),
-        ('Republican Party', 10, 1)
+        ('2', 'Democratic Party', 20, 1),
+        ('1', 'Republican Party', 10, 1)
     ]
 
 
@@ -841,7 +852,7 @@ def test_proporz_election_export_parties(session):
     session.flush()
     election = session.query(ProporzElection).one()
 
-    assert election.export_parties() == []
+    assert election.export_parties(['en_US'], 'en_US') == []
 
     # Add party results
     election.party_results.append(
@@ -851,7 +862,8 @@ def test_proporz_election_export_parties(session):
             voters_count=Decimal('1.01'),
             voters_count_percentage=Decimal('100.02'),
             total_votes=100,
-            name='Libertarian',
+            name_translations={'en_US': 'Libertarian'},
+            party_id='2',
             color='black',
             year=2012
         )
@@ -863,7 +875,7 @@ def test_proporz_election_export_parties(session):
             voters_count=Decimal('3.01'),
             voters_count_percentage=Decimal('50.02'),
             total_votes=50,
-            name='Libertarian',
+            name_translations={'en_US': 'Libertarian'},
             party_id='2',
             color='black',
             year=2016
@@ -876,7 +888,8 @@ def test_proporz_election_export_parties(session):
             voters_count=Decimal('2.01'),
             voters_count_percentage=Decimal('100.02'),
             total_votes=100,
-            name='Conservative',
+            name_translations={'en_US': 'Conservative'},
+            party_id='1',
             color='red',
             year=2012
         )
@@ -888,17 +901,20 @@ def test_proporz_election_export_parties(session):
             voters_count=Decimal('4.01'),
             voters_count_percentage=Decimal('50.02'),
             total_votes=50,
-            name='Conservative',
+            name_translations={'en_US': 'Conservative'},
+            party_id='1',
             color='red',
             year=2016
         )
     )
-    assert election.export_parties() == [
+    assert election.export_parties(['en_US', 'de_CH'], 'en_US') == [
         {
             'color': 'red',
             'mandates': 3,
             'name': 'Conservative',
-            'id': '0',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '1',
             'total_votes': 50,
             'votes': 3,
             'voters_count': '4.01',
@@ -908,6 +924,8 @@ def test_proporz_election_export_parties(session):
             'color': 'black',
             'mandates': 2,
             'name': 'Libertarian',
+            'name_en_US': 'Libertarian',
+            'name_de_CH': None,
             'id': '2',
             'total_votes': 50,
             'votes': 2,
@@ -918,7 +936,9 @@ def test_proporz_election_export_parties(session):
             'color': 'red',
             'mandates': 1,
             'name': 'Conservative',
-            'id': '0',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '1',
             'total_votes': 100,
             'votes': 1,
             'voters_count': '2.01',
@@ -928,6 +948,8 @@ def test_proporz_election_export_parties(session):
             'color': 'black',
             'mandates': 0,
             'name': 'Libertarian',
+            'name_en_US': 'Libertarian',
+            'name_de_CH': None,
             'id': '2',
             'total_votes': 100,
             'votes': 0,
@@ -937,55 +959,43 @@ def test_proporz_election_export_parties(session):
         }
     ]
 
-    for idx, source in enumerate(('Conservative', 'Libertarian', 'Other', '')):
+    for idx, source in enumerate(('1', '2', '3', '')):
         election.panachage_results.append(
             PanachageResult(
-                target='Conservative',
+                target='1',
                 source=source,
                 votes=idx + 1
             )
         )
     election.panachage_results.append(
         PanachageResult(
-            target='Libertarian',
-            source='Conservative',
+            target='2',
+            source='1',
             votes=5,
         )
     )
-    assert election.export_parties() == [
+    assert election.export_parties(['de_CH', 'en_US'], 'de_CH') == [
         {
             'year': 2016,
-            'name': 'Conservative',
-            'id': '0',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Conservative',
+            'id': '1',
             'color': 'red',
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
             'voters_count': '4.01',
             'voters_count_percentage': '50.02',
-            'panachage_votes_from_0': 1,
-            'panachage_votes_from_1': 3,
+            'panachage_votes_from_1': 1,
             'panachage_votes_from_2': 2,
             'panachage_votes_from_999': 4,
         },
         {
             'year': 2016,
-            'name': 'Other',
-            'id': '1',
-            'color': None,
-            'mandates': None,
-            'total_votes': None,
-            'votes': None,
-            'voters_count': None,
-            'voters_count_percentage': None,
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_1': None,
-            'panachage_votes_from_2': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'year': 2016,
-            'name': 'Libertarian',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Libertarian',
             'id': '2',
             'color': 'black',
             'mandates': 2,
@@ -993,44 +1003,31 @@ def test_proporz_election_export_parties(session):
             'votes': 2,
             'voters_count': '3.01',
             'voters_count_percentage': '50.02',
-            'panachage_votes_from_0': 5,
-            'panachage_votes_from_1': None,
+            'panachage_votes_from_1': 5,
             'panachage_votes_from_2': None,
             'panachage_votes_from_999': None,
         },
         {
             'year': 2012,
-            'name': 'Conservative',
-            'id': '0',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Conservative',
+            'id': '1',
             'color': 'red',
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
             'voters_count': '2.01',
             'voters_count_percentage': '100.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_1': None,
             'panachage_votes_from_2': None,
             'panachage_votes_from_999': None,
         },
         {
             'year': 2012,
-            'name': 'Other',
-            'id': '1',
-            'color': None,
-            'mandates': None,
-            'total_votes': None,
-            'votes': None,
-            'voters_count': None,
-            'voters_count_percentage': None,
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_1': None,
-            'panachage_votes_from_2': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'year': 2012,
-            'name': 'Libertarian',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Libertarian',
             'id': '2',
             'color': 'black',
             'mandates': 0,
@@ -1038,7 +1035,6 @@ def test_proporz_election_export_parties(session):
             'votes': 0,
             'voters_count': '1.01',
             'voters_count_percentage': '100.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_1': None,
             'panachage_votes_from_2': None,
             'panachage_votes_from_999': None,

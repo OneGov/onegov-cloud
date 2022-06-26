@@ -333,7 +333,8 @@ def test_election_compound(session):
         number_of_mandates=0,
         votes=0,
         total_votes=100,
-        name='Libertarian',
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1',
         color='black'
     )
     session.add(party_result)
@@ -691,7 +692,7 @@ def test_election_compound_export_parties(session):
     session.flush()
     election_compound = session.query(ElectionCompound).one()
 
-    assert election_compound.export_parties() == []
+    assert election_compound.export_parties(['de_CH'], 'de_CH') == []
 
     # Add party results
     election_compound.party_results.append(
@@ -701,7 +702,7 @@ def test_election_compound_export_parties(session):
             voters_count=Decimal('1.01'),
             voters_count_percentage=Decimal('100.02'),
             total_votes=100,
-            name='Libertarian',
+            name_translations={'en_US': 'Libertarian'},
             party_id='3',
             color='black',
             year=2012
@@ -714,7 +715,8 @@ def test_election_compound_export_parties(session):
             voters_count=Decimal('3.01'),
             total_votes=50,
             voters_count_percentage=Decimal('50.02'),
-            name='Libertarian',
+            name_translations={'en_US': 'Libertarian'},
+            party_id='3',
             color='black',
             year=2016
         )
@@ -726,7 +728,8 @@ def test_election_compound_export_parties(session):
             voters_count=Decimal('2.01'),
             total_votes=100,
             voters_count_percentage=Decimal('100.02'),
-            name='Conservative',
+            name_translations={'en_US': 'Conservative'},
+            party_id='5',
             color='red',
             year=2012
         )
@@ -738,17 +741,19 @@ def test_election_compound_export_parties(session):
             voters_count=Decimal('4.01'),
             total_votes=50,
             voters_count_percentage=Decimal('50.02'),
-            name='Conservative',
+            name_translations={'en_US': 'Conservative'},
             party_id='5',
             color='red',
             year=2016
         )
     )
 
-    assert election_compound.export_parties() == [
+    assert election_compound.export_parties(['en_US', 'de_CH'], 'en_US') == [
         {
             'year': 2016,
             'name': 'Libertarian',
+            'name_en_US': 'Libertarian',
+            'name_de_CH': None,
             'id': '3',
             'color': 'black',
             'mandates': 2,
@@ -760,6 +765,8 @@ def test_election_compound_export_parties(session):
         {
             'year': 2016,
             'name': 'Conservative',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
             'id': '5',
             'color': 'red',
             'mandates': 3,
@@ -771,6 +778,8 @@ def test_election_compound_export_parties(session):
         {
             'year': 2012,
             'name': 'Libertarian',
+            'name_en_US': 'Libertarian',
+            'name_de_CH': None,
             'id': '3',
             'color': 'black',
             'mandates': 0,
@@ -779,10 +788,11 @@ def test_election_compound_export_parties(session):
             'voters_count': '1.01',
             'voters_count_percentage': '100.02',
         },
-
         {
             'year': 2012,
             'name': 'Conservative',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
             'id': '5',
             'color': 'red',
             'mandates': 1,
@@ -794,40 +804,27 @@ def test_election_compound_export_parties(session):
     ]
 
     # Add panachage results
-    for idx, source in enumerate(('Conservative', 'Libertarian', 'Other', '')):
+    for idx, source in enumerate(('5', '3', '0', '')):
         election_compound.panachage_results.append(
             PanachageResult(
-                target='Conservative',
+                target='5',
                 source=source,
                 votes=idx + 1
             )
         )
     election_compound.panachage_results.append(
         PanachageResult(
-            target='Libertarian',
-            source='Conservative',
+            target='3',
+            source='5',
             votes=5,
         )
     )
-    assert election_compound.export_parties() == [
+    assert election_compound.export_parties(['de_CH', 'en_US'], 'de_CH') == [
         {
             'year': 2016,
-            'name': 'Other',
-            'id': '0',
-            'color': None,
-            'mandates': None,
-            'total_votes': None,
-            'votes': None,
-            'voters_count': None,
-            'voters_count_percentage': None,
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_3': None,
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'year': 2016,
-            'name': 'Libertarian',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Libertarian',
             'id': '3',
             'color': 'black',
             'mandates': 2,
@@ -835,14 +832,15 @@ def test_election_compound_export_parties(session):
             'votes': 2,
             'voters_count': '3.01',
             'voters_count_percentage': '50.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_3': None,
             'panachage_votes_from_5': 5,
             'panachage_votes_from_999': None,
         },
         {
             'year': 2016,
-            'name': 'Conservative',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Conservative',
             'id': '5',
             'color': 'red',
             'mandates': 3,
@@ -850,29 +848,15 @@ def test_election_compound_export_parties(session):
             'votes': 3,
             'voters_count': '4.01',
             'voters_count_percentage': '50.02',
-            'panachage_votes_from_0': 3,
             'panachage_votes_from_3': 2,
             'panachage_votes_from_5': 1,
             'panachage_votes_from_999': 4,
         },
         {
             'year': 2012,
-            'name': 'Other',
-            'id': '0',
-            'color': None,
-            'mandates': None,
-            'total_votes': None,
-            'votes': None,
-            'voters_count': None,
-            'voters_count_percentage': None,
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_3': None,
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'year': 2012,
-            'name': 'Libertarian',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Libertarian',
             'id': '3',
             'color': 'black',
             'mandates': 0,
@@ -880,14 +864,15 @@ def test_election_compound_export_parties(session):
             'votes': 0,
             'voters_count': '1.01',
             'voters_count_percentage': '100.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_3': None,
             'panachage_votes_from_5': None,
             'panachage_votes_from_999': None,
         },
         {
             'year': 2012,
-            'name': 'Conservative',
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Conservative',
             'id': '5',
             'color': 'red',
             'mandates': 1,
@@ -895,7 +880,6 @@ def test_election_compound_export_parties(session):
             'votes': 1,
             'voters_count': '2.01',
             'voters_count_percentage': '100.02',
-            'panachage_votes_from_0': None,
             'panachage_votes_from_3': None,
             'panachage_votes_from_5': None,
             'panachage_votes_from_999': None,

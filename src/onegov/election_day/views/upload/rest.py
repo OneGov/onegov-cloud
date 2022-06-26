@@ -128,7 +128,13 @@ def view_upload_rest(self, request):
                     item, self, file, mimetype
                 )
         if form.type.data == 'parties':
-            err = import_party_results(item, file, mimetype)
+            err = import_party_results(
+                item,
+                file,
+                mimetype,
+                request.app.locales,
+                request.app.default_locale
+            )
         if err:
             errors.setdefault('results', []).extend(err)
 

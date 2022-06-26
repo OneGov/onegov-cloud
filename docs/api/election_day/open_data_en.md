@@ -140,7 +140,8 @@ Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`name`|The name of the party.
+`name`|The name of the party in the default language.
+`name_{locale}`|Translated name of the party, e.g. `name_de_ch` for the German name.
 `id`|ID of the party.
 `color`|The color of the party.
 `mandates`|The number of mandates.

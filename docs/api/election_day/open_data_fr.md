@@ -141,7 +141,8 @@ Nom|Description
 ---|---
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
-`name`|La dénomination du parti.
+`name`|Le dénomination du parti dans la langue par défaut.
+`name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand.
 `id`|Identifiant du parti.
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.

@@ -592,3 +592,31 @@ def add_party_id_column(context):
             'party_results',
             Column('party_id', Text())
         )
+
+
+@upgrade_task('Add party name translations')
+def add_party_name_translations(context):
+    if context.has_column('party_results', 'name'):
+        context.operations.alter_column(
+            'party_results', 'name',
+            nullable=True
+        )
+
+    if not context.has_column('party_results', 'name_translations'):
+        context.add_column_with_defaults(
+            table='party_results',
+            column=Column('name_translations', HSTORE, nullable=False),
+            default=lambda x: {}
+        )
+
+    if (
+        context.has_column('party_results', 'name_translations')
+        and context.has_column('party_results', 'name')
+    ):
+        context.operations.execute("""
+            UPDATE party_results SET name_translations = hstore('de_CH', name);
+        """)
+
+
+# todo: add an upgrade step to remove party_results.name
+# todo: add an upgrade step to set party_results.party_id:nullable False

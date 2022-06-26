@@ -12,14 +12,14 @@ def get_list_groups(election_compound):
     query = election_compound.party_results
     if election_compound.exact_voters_counts:
         query = query.with_entities(
-            PartyResult.name,
+            PartyResult.name.label('name'),
             PartyResult.voters_count,
             PartyResult.number_of_mandates,
             PartyResult.color
         )
     else:
         query = query.with_entities(
-            PartyResult.name,
+            PartyResult.name.label('name'),
             func.cast(
                 func.round(PartyResult.voters_count),
                 Integer

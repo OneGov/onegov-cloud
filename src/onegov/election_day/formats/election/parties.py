@@ -13,10 +13,24 @@ from uuid import uuid4
 
 
 def parse_party_result(
-        line, errors, party_results, totals, parties, election_year):
+    line, errors, party_results, totals, parties, election_year,
+    locales, default_locale
+):
     try:
         year = validate_integer(line, 'year', default=election_year)
-        name = line.name or ''
+
+        name_translations = {
+            locale: getattr(line, f'name_{locale.lower()}', '').strip()
+            for locale in locales
+        }
+        name_translations = {
+            locale: name for locale, name in name_translations.items()
+            if name
+        }
+        if hasattr(line, 'name'):
+            if not name_translations.get(default_locale):
+                name_translations[default_locale] = line.name or ''
+
         party_id = validate_list_id(line, 'id')
         color = line.color or (
             '#0571b0' if year == election_year else '#999999'
@@ -38,7 +52,7 @@ def parse_party_result(
             line, 'voters_count_percentage', precision=12, scale=2,
             optional=True, default=None
         )
-        assert all((year, name, color))
+        assert all((year, color, name_translations.get(default_locale)))
         assert match(r'^#[0-9A-Fa-f]{6}$', color)
         assert totals.get(year, total_votes) == total_votes
     except ValueError as e:
@@ -46,10 +60,10 @@ def parse_party_result(
     except AssertionError:
         errors.append(_("Invalid values"))
     else:
-        key = '{}/{}'.format(name, year)
+        key = '{}/{}'.format(party_id, year)
         totals[year] = total_votes
         if year == election_year:
-            parties[party_id] = name
+            parties.add(party_id)
 
         if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
@@ -59,7 +73,7 @@ def parse_party_result(
                 party_id=party_id,
                 year=year,
                 total_votes=total_votes,
-                name=name,
+                name_translations=name_translations,
                 color=color,
                 number_of_mandates=mandates,
                 votes=votes,
@@ -94,7 +108,7 @@ def parse_panachage_results(line, errors, results, headers, election_year):
         errors.append(e.args[0])
 
 
-def import_party_results(election, file, mimetype):
+def import_party_results(election, file, mimetype, locales, default_locale):
     """ Tries to import the given file.
 
     This is our own format used for party results. Supports per party panachage
@@ -106,7 +120,7 @@ def import_party_results(election, file, mimetype):
     """
 
     errors = []
-    parties = {}
+    parties = set()
     party_results = {}
     party_totals = {}
     panachage_results = {}
@@ -126,7 +140,8 @@ def import_party_results(election, file, mimetype):
                 parse_party_result(
                     line, line_errors,
                     party_results, party_totals, parties,
-                    election.date.year
+                    election.date.year,
+                    locales, default_locale
                 )
                 parse_panachage_results(
                     line, line_errors,
@@ -149,7 +164,7 @@ def import_party_results(election, file, mimetype):
 
     if panachage_headers and parties:
         for list_id in panachage_headers.values():
-            if not list_id == '999' and list_id not in parties.keys():
+            if not list_id == '999' and list_id not in parties:
                 errors.append(FileImportError(
                     _("Panachage results ids and id not consistent"))
                 )
@@ -177,8 +192,8 @@ def import_party_results(election, file, mimetype):
                         PanachageResult(
                             owner=election.id,
                             id=uuid4(),
-                            source=parties.get(source, ''),
-                            target=parties[target],
+                            source=source if source != '999' else '',
+                            target=target,
                             votes=votes
                         )
                     )
