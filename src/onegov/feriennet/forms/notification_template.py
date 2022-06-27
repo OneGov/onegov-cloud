@@ -182,7 +182,8 @@ class NotificationTemplateSendForm(Form):
         if not self.period.wishlist_phase:
             return set()
 
-        q = bookings.query().filter_by(period_id=self.period.id)
+        q = bookings.query().order_by(None)
+        q = q.filter_by(period_id=self.period.id)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
         return {b.username for b in q}
@@ -193,7 +194,8 @@ class NotificationTemplateSendForm(Form):
         if self.period.wishlist_phase:
             return set()
 
-        q = bookings.query().filter_by(
+        q = bookings.query().order_by(None)
+        q = q.filter_by(
             period_id=self.period.id,
             state='accepted')
 
@@ -223,7 +225,8 @@ class NotificationTemplateSendForm(Form):
     def recipients_by_occasion_query(self, occasions):
         bookings = BookingCollection(self.request.session)
 
-        q = bookings.query().filter_by(period_id=self.period.id)
+        q = bookings.query().order_by(None)
+        q = q.filter_by(period_id=self.period.id)
         q = q.join(Booking.occasion)
 
         if not occasions:

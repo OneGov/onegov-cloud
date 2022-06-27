@@ -472,6 +472,7 @@ class PeriodForm(Form):
 
         return tuple(
             session.query(Activity).filter(Activity.id.in_(q.subquery()))
+            .order_by(Activity.order)
         )
 
     def ensure_dependant_fields_empty(self):

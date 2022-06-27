@@ -3,6 +3,7 @@ import sedate
 import transaction
 
 from datetime import time, timedelta
+from dill import pickles
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.security import Public, Private
@@ -255,6 +256,13 @@ def handle_reservation_form(self, request, form, layout=None):
             forms.submissions.update(
                 submission, form, exclude=form.reserved_fields
             )
+    # set defaults based on remembered submissions from session
+    else:
+        remembered = request.browser_session.get('remembered_submissions', {})
+        for field_name in form.data:
+            if field_name not in remembered:
+                continue
+            getattr(form, field_name).default = remembered[field_name]
 
     # enforce the zip-code block if configured
     if request.POST:
@@ -264,6 +272,15 @@ def handle_reservation_form(self, request, form, layout=None):
 
     # go to the next step if the submitted data is valid
     if form.submitted(request) and not blocked:
+        # also remember submitted form data
+        remembered = request.browser_session.get('remembered_submissions', {})
+        remembered.update(form.data)
+        # but don't remember submitted csrf_token
+        if 'csrf_token' in remembered:
+            del remembered['csrf_token']
+        # only remember the data if we can pickle the data
+        if pickles(remembered, recurse=True, safe=True):
+            request.browser_session.remembered_submissions = remembered
         return morepath.redirect(request.link(self, 'confirmation'))
     else:
         data = {}

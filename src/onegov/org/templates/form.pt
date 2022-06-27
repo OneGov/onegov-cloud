@@ -35,17 +35,17 @@
              <p>${form.callout|callout}</p>
         </div>
 
-        <div class="panel" tal:condition="helptext|nothing">
-             <p>${helptext}</p>
+        <div class="panel" tal:condition="form.helptext|helptext|nothing">
+             <p>${form.helptext|helptext}</p>
         </div>
 
         <tal:b metal:use-macro="layout.macros.page_content"
                    tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing">
             <tal:b metal:fill-slot="after-text">
-                <tal: tal:condition="hints|nothing">
-                    <div class="panel ${hints_callout and 'callout' or ''}">
-                        <div class="hints" tal:condition="hints|nothing">
-                            <div tal:repeat="(name, hint) hints" class="hint hint-${name}">${hint}</div>
+                <tal: tal:condition="form.hints|hints|nothing" tal:define="use_callout form.hints_callout|hints_callout|False">
+                    <div class="panel ${'callout' if use_callout else ''}">
+                        <div class="hints">
+                            <div tal:repeat="(name, hint) form.hints|hints" class="hint hint-${name}">${hint}</div>
                         </div>
                     </div>
                 </tal:>

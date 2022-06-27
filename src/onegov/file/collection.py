@@ -51,12 +51,12 @@ class FileCollection(object):
         if not self.allow_duplicates:
             self.assert_not_duplicate(content)
 
-        type = self.type != '*' and self.type or None
+        type_ = self.type if self.type != '*' else 'generic'
 
-        file = File.get_polymorphic_class(type, File)()
+        file = File.get_polymorphic_class(type_, File)()
         file.name = filename
         file.note = note
-        file.type = type
+        file.type = type_
         file.published = published
         file.publish_date = publish_date
         file.reference = as_fileintent(content, filename)
@@ -239,11 +239,11 @@ class FileSetCollection(object):
         return self.session.query(FileSet)
 
     def add(self, title, meta=None, content=None):
-        type = self.type != '*' and self.type or None
+        type_ = self.type if self.type != '*' else 'generic'
 
-        fileset = FileSet.get_polymorphic_class(type, FileSet)()
+        fileset = FileSet.get_polymorphic_class(type_, FileSet)()
         fileset.title = title
-        fileset.type = type
+        fileset.type = type_
         fileset.meta = meta
         fileset.content = content
 

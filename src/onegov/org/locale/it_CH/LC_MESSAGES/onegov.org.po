@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-31 11:51+0200\n"
+"POT-Creation-Date: 2022-06-13 07:29+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2254,8 +2254,6 @@ msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
 #. Used in sentence: "${event} published."
-#. Used in sentence: "${event} deleted."
-#. Used in sentence: "${event} withdrawn."
 #.
 msgid "Event"
 msgstr "Evento"
@@ -2753,8 +2751,8 @@ msgstr ""
 "le foto, aggiungi alcune foto a un album e contrassegnalo come disponibile "
 "per la home page."
 
-msgid "Digitally signed"
-msgstr "Firmato digitalmente"
+msgid "Has a digital seal"
+msgstr "Ha un sigillo digitale"
 
 msgid "${count} page"
 msgstr "${count} pagina"
@@ -2814,8 +2812,8 @@ msgstr "Oggetto"
 msgid "Disbursed"
 msgstr "Erogato"
 
-msgid "Digital Signature"
-msgstr "Firma digitale"
+msgid "Digital seal"
+msgstr "Sigillo digitale"
 
 msgid "Private"
 msgstr "Privata"
@@ -2859,33 +2857,33 @@ msgstr "Indica il nuovo nome del file"
 msgid "Rename"
 msgstr "Rinomina"
 
-msgid "Digitally signed by ${signee} on ${date}"
-msgstr "Firmato digitalmente da ${signee} il ${date}"
+msgid "Digital seal applied by ${signee} on ${date}"
+msgstr "Sigillo digitale applicato da ${signee} il ${date}"
 
-#, fuzzy
-msgid "Please enter your yubikey to digitally sign this file"
-msgstr "Inserisci la Yubikey per firmare digitalmente questo file"
+msgid "Please enter your yubikey to apply a digital seal to this file"
+msgstr ""
+"Inserisci il tuo yubikey per applicare un sigillo digitale a questo file"
 
 msgid "Sign"
 msgstr "Firma"
 
 msgid ""
-"Published and digitally signed documents can be discovered through the site-"
-"search and in the list of digitally signed documents. This action will be "
+"Published documents with a digital seal can be discovered through the site-"
+"search and in the list of documents with a digital seal. This action will be "
 "logged and cannot be undone."
 msgstr ""
-"I documenti pubblicati e firmati digitalmente possono essere individuati "
-"tramite la ricerca nel sito e nell'elenco dei documenti firmati "
-"digitalmente. Questa operazione verrà registrata e non può essere annullata."
+"Documenti pubblicati con sigillo digitale possono essere individuati tramite "
+"la ricerca nel sito e nell'elenco dei documenti con sigillo digitale. Questa "
+"operazione verrà registrata e non può essere annullata."
 
-msgid "Unsigned"
-msgstr "Non firmato"
+msgid "Without digital seal"
+msgstr "Senza sigillo digitale"
 
-msgid "Sign now"
-msgstr "Firma ora"
+msgid "Apply digital seal now"
+msgstr "Applica ora il sigillo digitale"
 
-msgid "You are not authorised to digitally sign documents"
-msgstr "Non sei autorizzato a firmare digitalmente i documenti"
+msgid "You are not authorised to apply digital seals to documents"
+msgstr "Non sei autorizzati ad applicare sigilli digitali ai documenti"
 
 msgid "Click to add a description"
 msgstr "Clicca per aggiungere una descrizione"
@@ -2896,8 +2894,8 @@ msgstr "Vuoi davvero eliminare l'immagine?"
 msgid "Delete Image"
 msgstr "Elimina immagine"
 
-msgid "${name} was digitally signed on ${date}"
-msgstr "${name} è stato firmato digitalmente il ${date}"
+msgid "${name} was provided with a digital seal on ${date}"
+msgstr "${name} è stato dotato di sigillo digitale il ${date}"
 
 msgid "${name} is not in our database"
 msgstr "${name} non è contenuto nel nostro database"
@@ -3245,23 +3243,24 @@ msgstr "Richiesta di modifica applicata."
 msgid "Directory entry rejected."
 msgstr "Elemento della cartella rifiutato."
 
+msgid "Event edited."
+msgstr "Evento montato."
+
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."
 msgstr "${event} pubblicato."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} deleted."
-msgstr "${event} eliminato."
+msgid "Event deleted."
+msgstr "Evento eliminato."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} withdrawn."
-msgstr "${event} ritirato."
+msgid "Event withdrawn."
+msgstr "Evento ritirato."
 
 msgid "File signed."
 msgstr "File firmato."
 
-msgid "Signed file removed."
-msgstr "File firmato rimosso."
+msgid "File with digital seal removed."
+msgstr "File con sigillo digitale cancellato."
 
 msgid "${amount} marked as paid."
 msgstr "${amount} contrassegnato come pagato."
@@ -3438,11 +3437,11 @@ msgstr ""
 "la ricerca in alto a destra."
 
 msgid ""
-"All files have been digitally signed. The digital signature of a downloaded "
-"file can be viewed in Adobe Acrobat Reader or by dragging an already "
-"downloaded file into the field below:"
+"All files have a digital seal. The digital seal of a downloaded file can be "
+"viewed in Adobe Acrobat Reader or by dragging an already downloaded file "
+"into the field below:"
 msgstr ""
-"Tutti i file sono stati firmati digitalmente. La firma digitale di un file "
+"Tutti i file hanno un sigillo digitale. Il sigillo digitale di un file "
 "scaricato può essere visualizzata in Adobe Acrobat Reader oppure trascinando "
 "un file già scaricato nel campo sottostante:"
 
@@ -3661,6 +3660,12 @@ msgstr ""
 
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"
+
+msgid "Would you like to make corrections to the event?"
+msgstr "Volete apportare correzioni all'evento?"
+
+msgid "Edit this event."
+msgstr "Modificare questo evento."
 
 msgid "Forgot something or have a special request?"
 msgstr "Hai dimenticato qualcosa o hai una richiesta speciale?"
@@ -4164,8 +4169,8 @@ msgstr "Il tuo account non è collegato a Yubikey"
 msgid "The used Yubikey is not linked to your account"
 msgstr "La Yubikey usata non è collegata al tuo account"
 
-msgid "This file already has a digital signature"
-msgstr "Questo file include già una firma digitale"
+msgid "This file already has a digital seal"
+msgstr "Questo file include già un sigillo digitale"
 
 #, fuzzy
 msgid "Your Yubikey could not be validated"
@@ -4890,6 +4895,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "User will stay on the page when opening images and files"
-#~ msgstr "L'utente rimarrà sulla pagina durante l'apertura di immagini e file"

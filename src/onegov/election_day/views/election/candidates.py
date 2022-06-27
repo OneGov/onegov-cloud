@@ -75,7 +75,7 @@ def view_election_candidates(self, request):
     """" The main view. """
 
     candidates = get_candidates_results(self, object_session(self)).all()
-    any_elected = any([candidate[2] for candidate in candidates])
+    any_elected = any([candidate.elected for candidate in candidates])
 
     return {
         'skip_rendering': hide_candidates_chart(self, request),
