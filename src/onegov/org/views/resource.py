@@ -1,6 +1,7 @@
 import icalendar
 import morepath
 import sedate
+import collections
 
 from collections import OrderedDict, namedtuple
 from datetime import datetime, timedelta
@@ -19,6 +20,8 @@ from onegov.org.forms import (
     ResourceForm, ResourceCleanupForm, ResourceExportForm
 )
 from onegov.org.layout import ResourcesLayout, ResourceLayout
+from onegov.org.models.external_link import ExternalLinkCollection, \
+    ExternalLink
 from onegov.org.models.resource import DaypassResource, RoomResource, \
     ItemResource
 from onegov.org.utils import group_by_column, keywords_first
@@ -49,6 +52,18 @@ RESOURCE_TYPES = {
 }
 
 
+def combine_grouped(items, external_links, sort=None):
+    for key, values in external_links.items():
+        if key not in items:
+            items[key] = values
+        else:
+            if sort:
+                items[key] = sorted(items[key] + values, key=sort)
+            else:
+                items[key] += values
+    return collections.OrderedDict(sorted(items.items()))
+
+
 def get_daypass_form(self, request):
     return get_resource_form(self, request, 'daypass')
 
@@ -74,13 +89,27 @@ def get_resource_form(self, request, type=None):
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request, layout=None):
+
+    resources = group_by_column(
+        request=request,
+        query=self.query(),
+        group_column=Resource.group,
+        sort_column=Resource.title
+    )
+
+    ext_resources = group_by_column(
+        request,
+        query=ExternalLinkCollection.for_model(
+            request.session, ResourceCollection
+        ).query(),
+        group_column=ExternalLink.group,
+        sort_column=ExternalLink.order
+    )
+
     return {
         'title': _("Reservations"),
-        'resources': group_by_column(
-            request=request,
-            query=self.query(),
-            group_column=Resource.group,
-            sort_column=Resource.title
+        'resources': combine_grouped(
+            resources, ext_resources, sort=lambda x: x.title
         ),
         'layout': layout or ResourcesLayout(self, request)
     }
