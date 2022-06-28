@@ -7,6 +7,7 @@ from onegov.core.orm.mixins import ContentMixin, \
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection
+from onegov.reservation import ResourceCollection
 from onegov.org.models import AccessExtension
 from onegov.search import SearchableContent
 from sqlalchemy import Column, Text
@@ -53,6 +54,7 @@ class ExternalLinkCollection(GenericCollection):
 
     supported_collections = (
         FormCollection,
+        ResourceCollection
     )
 
     def __init__(

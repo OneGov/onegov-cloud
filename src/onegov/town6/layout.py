@@ -868,6 +868,14 @@ class ResourcesLayout(DefaultLayout):
             Link(_("Reservations"), self.request.link(self.model))
         ]
 
+    @property
+    def external_resources(self):
+        return ExternalLinkCollection(self.request.session)
+
+    @property
+    def resources_url(self):
+        return self.request.class_link(ResourceCollection)
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
@@ -903,6 +911,19 @@ class ResourcesLayout(DefaultLayout):
                                 name='new-daily-item'
                             ),
                             attrs={'class': 'new-daily-item'}
+                        ),
+                        Link(
+                            text=_("Resource Link"),
+                            url=self.request.link(
+                                self.external_resources,
+                                query_params={
+                                    'to': self.resources_url,
+                                    'title': self.request.translate(
+                                        _("New external resource"))
+                                },
+                                name='new'
+                            ),
+                            attrs={'class': 'new-resource-link'}
                         )
                     ]
                 ),
