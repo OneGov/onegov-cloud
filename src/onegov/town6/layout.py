@@ -517,7 +517,8 @@ class FormCollectionLayout(DefaultLayout):
                                 query_params={
                                     'to': self.forms_url,
                                     'title': self.request.translate(
-                                        _("New external form"))
+                                        _("New external form")),
+                                    'type': 'form'
                                 },
                                 name='new'
                             ),
@@ -913,13 +914,14 @@ class ResourcesLayout(DefaultLayout):
                             attrs={'class': 'new-daily-item'}
                         ),
                         Link(
-                            text=_("Resource Link"),
+                            text=_("External resource link"),
                             url=self.request.link(
                                 self.external_resources,
                                 query_params={
                                     'to': self.resources_url,
                                     'title': self.request.translate(
-                                        _("New external resource"))
+                                        _("New external resource")),
+                                    'type': 'resource'
                                 },
                                 name='new'
                             ),

@@ -106,12 +106,48 @@ def view_resources(self, request, layout=None):
         sort_column=ExternalLink.order
     )
 
+    def link_func(model):
+        if isinstance(model, ExternalLink):
+            return model.url
+        return request.link(model)
+
+    def edit_link(model):
+        if isinstance(model, ExternalLink) and request.is_manager:
+            title = request.translate(_("Edit resource"))
+            to = request.class_link(ResourceCollection)
+            return request.link(
+                model,
+                query_params={'title': title, 'to': to},
+                name='edit'
+            )
+
+    def external_link(model):
+        if isinstance(model, ExternalLink):
+            title = request.translate(_("Edit resource"))
+            to = request.class_link(ResourceCollection)
+            return request.link(
+                model,
+                query_params={'title': title, 'to': to},
+                name='edit'
+            )
+
+    def lead_func(model):
+        lead = model.meta.get('lead')
+        if not lead:
+            lead = ''
+        lead = layout.linkify(lead)
+        return lead
+
     return {
         'title': _("Reservations"),
         'resources': combine_grouped(
             resources, ext_resources, sort=lambda x: x.title
         ),
-        'layout': layout or ResourcesLayout(self, request)
+        'layout': layout or ResourcesLayout(self, request),
+        'link_func': link_func,
+        'edit_link': edit_link,
+        'external_link': external_link,
+        'lead_func': lead_func,
     }
 
 
