@@ -28,6 +28,8 @@ from wtforms_components import ColorField
 from onegov.ticket import handlers
 from onegov.user import User
 
+from .user import AVAILABLE_ROLES
+
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
 
@@ -819,6 +821,19 @@ class OrgTicketSettingsForm(Form):
         description=("info@example.ch")
     )
 
+    ticket_auto_accept_style = RadioField(
+        label=_("Auto-accept tickets rule style"),
+        description=_("Choose ticket category to auto-accept tickets "
+                      "based on their category or choose user roles "
+                      "to auto-accept them based on the submitting "
+                      "user's role."),
+        choices=(
+            ('category', _("Ticket category")),
+            ('role', _("User role")),
+        ),
+        default='category'
+    )
+
     ticket_auto_accepts = MultiCheckboxField(
         label=_("Accept request and close ticket automatically "
                 "for these ticket categories"),
@@ -826,6 +841,17 @@ class OrgTicketSettingsForm(Form):
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
         choices=[],
+        depends_on=('ticket_auto_accept_style', 'category')
+    )
+
+    ticket_auto_accept_roles = MultiCheckboxField(
+        label=_("Accept request and close ticket automatically "
+                "for these user roles"),
+        description=_("If auto-accepting is not possible, the ticket will be "
+                      "in state pending. Also note, that after the ticket is "
+                      "closed, the submitter can't send any messages."),
+        choices=AVAILABLE_ROLES,
+        depends_on=('ticket_auto_accept_style', 'role')
     )
 
     auto_closing_user = ChosenSelectField(
