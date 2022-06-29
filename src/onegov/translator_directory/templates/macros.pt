@@ -51,7 +51,7 @@
     </metal:display_translator_mutation>
 
     <metal:display_accreditation define-macro="display_accreditation" i18n:domain="onegov.translator_directory">
-        <h2 i18n:translate>Request accredidation</h2>
+        <h2 i18n:translate>Accreditation</h2>
 
         <h3 i18n:translate>Personal Information</h3>
         <dl class="accreditation">
@@ -212,22 +212,11 @@
         </dl>
 
         <h3 i18n:translate>Documents</h3>
-        <dl class="accreditation">
-            <!-- todo: Documents
-            declaration_of_authorization
-            letter_of_motivation
-            resume
-            certificates
-            social_security_card
-            passport
-            passport_photo
-            debt_collection_register_extract
-            criminal_register_extract
-            certificate_of_capability
-            -->
-            remarks
-            confirm_submission
-        </dl>
+        <ul tal:condition="translator.files">
+            <li tal:repeat="file translator.files">
+                <a href="${request.link(file)}">${file.name}</a>
+            </li>
+        </ul>
 
         <h3 i18n:translate>Submission</h3>
         <dl class="accreditation">

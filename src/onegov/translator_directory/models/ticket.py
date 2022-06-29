@@ -9,6 +9,8 @@ from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
+from onegov.translator_directory.collections.documents import \
+    TranslatorDocumentCollection
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
 from onegov.translator_directory.models.accreditation import Accreditation
@@ -192,9 +194,9 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
         if self.state is None:
             links.append(
                 Link(
-                    text=_('Accept accreditation'),
+                    text=_('Grant accreditation'),
                     url=request.return_here(
-                        request.link(self.accreditation, 'accept')
+                        request.link(self.accreditation, 'grant')
                     ),
                     attrs={'class': 'accept-link'},
                 )
@@ -208,6 +210,29 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
                         request.link(self.translator, 'edit')
                     ),
                     attrs={'class': ('edit-link', 'border')}
+                )
+            )
+            advanced_links.append(
+                Link(
+                    text=_('Edit documents'),
+                    url=request.return_here(
+                        request.class_link(
+                            TranslatorDocumentCollection,
+                            {
+                                'translator_id': self.translator.id,
+                            }
+                        )
+                    ),
+                    attrs={'class': ('edit-link', 'border')}
+                )
+            )
+            advanced_links.append(
+                Link(
+                    text=_('Refuse accreditation'),
+                    url=request.return_here(
+                        request.link(self.accreditation, 'refuse')
+                    ),
+                    attrs={'class': 'delete-link'},
                 )
             )
 

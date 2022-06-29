@@ -25,3 +25,7 @@ class Accreditation:
         self.ticket.handler_data['state'] = 'accepted'
         self.target.state = 'published'
         self.target.date_of_decision = date.today()
+
+    def deny(self):
+        self.ticket.handler_data['state'] = 'denied'
+        self.session.delete(self.target)

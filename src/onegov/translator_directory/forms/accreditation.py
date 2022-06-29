@@ -1,5 +1,8 @@
 from datetime import date
 from cached_property import cached_property
+from onegov.core.crypto import random_token
+from onegov.file import File
+from onegov.file.utils import as_fileintent
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
@@ -358,6 +361,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -368,6 +372,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -378,6 +383,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -392,6 +398,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -402,6 +409,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -412,6 +420,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -422,6 +431,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -433,6 +443,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -447,6 +458,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -458,17 +470,20 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
+        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
     submission_hint = PanelField(
         text=_('Your data will be treated with strict confidentiality.'),
         kind='',
+        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
     remarks = TextAreaField(
         label=_('Remarks'),
+        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
@@ -596,19 +611,35 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         result['admission'] = 'certificed' if data.get('admission') else \
             'uncertified'
 
-        # todo:
-        # declaration_of_authorization
-        # letter_of_motivation
-        # resume
-        # certificates
-        # social_security_card
-        # passport
-        # passport_photo
-        # debt_collection_register_extract
-        # criminal_register_extract
-        # certificate_of_capability
-
         return result
+
+    def get_files(self):
+
+        def as_file(field, category):
+            name = self.request.translate(field.label.text)
+            name = name.replace(' (PDF)', '')
+            return File(
+                id=random_token(),
+                name=f'{name}.pdf',
+                note=category,
+                reference=as_fileintent(
+                    content=field.file,
+                    filename=field.filename
+                )
+            )
+
+        return [
+            as_file(self.declaration_of_authorization, 'Antrag'),
+            as_file(self.letter_of_motivation, 'Antrag'),
+            as_file(self.resume, 'Antrag'),
+            as_file(self.certificates, 'Diplome und Zertifikate'),
+            as_file(self.social_security_card, 'Antrag'),
+            as_file(self.passport, 'Antrag'),
+            as_file(self.passport_photo, 'Antrag'),
+            as_file(self.debt_collection_register_extract, 'Antrag'),
+            as_file(self.criminal_register_extract, 'Antrag'),
+            as_file(self.certificate_of_capability, 'Antrag'),
+        ]
 
     def get_ticket_data(self):
         data = self.get_useful_data()
@@ -625,19 +656,24 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             )
         }
 
-    # todo: uploads dissapear on errors
-    # todo: apply_model, update_model?
 
+class GrantAccreditationForm(Form):
 
-class AcceptAccreditationForm(Form):
-
-    callout = _('Publish the directory entry.')
+    callout = _('Create a user account and publish the translator.')
 
     # todo: admission type?
     # todo: certificates
 
     def update_model(self):
-        self.model.accept()
-        # todo: set date_of_decision
+        self.model.grant()
         # todo: set admission and more
-        # todo: copy documents?
+
+
+class RefuseAccreditationForm(Form):
+
+    callout = _('Delete all related data.')
+
+    # todo: message
+
+    def update_model(self):
+        self.model.refuse()

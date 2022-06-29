@@ -58,7 +58,12 @@ def get_language_collection(app, page=0, letter=None):
     model=TranslatorDocumentCollection, path='/documents/{translator_id}'
 )
 def get_translator_documents(app, translator_id, category=None):
-    return TranslatorDocumentCollection(app.session(), translator_id, category)
+    result = TranslatorDocumentCollection(
+        app.session(), translator_id, category
+    )
+    if not result.translator:
+        return None
+    return result
 
 
 @TranslatorDirectoryApp.path(

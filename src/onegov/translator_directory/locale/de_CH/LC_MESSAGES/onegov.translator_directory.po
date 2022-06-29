@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-25 08:17+0200\n"
+"POT-Creation-Date: 2022-06-29 10:34+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -363,7 +363,7 @@ msgid "Social security card (PDF)"
 msgstr "AHV-Ausweis (PDF)"
 
 msgid "Identity card, passport or foreigner identity card (PDF)"
-msgstr "ID, Passes oder Ausländerausweis (PDF)"
+msgstr "ID, Pass oder Ausländerausweis (PDF)"
 
 msgid "Current passport photo (PDF)"
 msgstr "Aktuelles Passfoto (PDF)"
@@ -410,8 +410,11 @@ msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 msgid "Please confirm the correctness of the above data."
 msgstr "Bitte bestätigen Sie die Richtigkeit der vorstehenden Daten."
 
-msgid "Publish the directory entry."
-msgstr ""
+msgid "Create a user account and publish the translator."
+msgstr "Benutzerkonto erstellen und Übersetzereintrag veröffentlichen."
+
+msgid "Delete all related data."
+msgstr "Alle zugehörigen Daten löschen."
 
 msgid "Name"
 msgstr "Name"
@@ -649,19 +652,28 @@ msgid "Delete language"
 msgstr "Sprache löschen"
 
 msgid "Accreditation"
-msgstr ""
+msgstr "Akkreditierung"
 
-msgid "Accept accreditation"
-msgstr ""
+msgid "Grant accreditation"
+msgstr "Akkreditierung erteilen"
+
+msgid "Refuse accreditation"
+msgstr "Akkreditierung verweigern"
 
 msgid "Mutation"
 msgstr "Mutation"
 
 msgid "Accreditations"
-msgstr ""
+msgstr "Akkreditierungen"
 
 msgid "Request Accreditation"
-msgstr ""
+msgstr "Akkreditierung beantragen"
+
+msgid "Edit documents"
+msgstr "Dokumente bearbeiten"
+
+msgid "Advanced"
+msgstr "Erweitert"
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -714,14 +726,26 @@ msgstr "Mitglieder"
 msgid "Mutation report"
 msgstr "Mutationsmeldung"
 
-msgid "Proposed changes applied"
-msgstr "Vorgeschlagene Änderungen übernommen"
+msgid "Coordinates"
+msgstr "Koordinaten"
 
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
+msgid "Accreditation granted."
+msgstr "Akkreditierung erteilt."
+
+msgid "Accreditation refused."
+msgstr "Akkreditierung verweigert."
+
+msgid "Proposed changes applied"
+msgstr "Vorgeschlagene Änderungen übernommen"
+
+msgid "This translator is in the accreditation process!"
+msgstr "Dieser Übersetzer ist im Akkreditierungsverfahren!"
+
 msgid "Certificates"
-msgstr ""
+msgstr "Zertifikate"
 
 msgid "User"
 msgstr "Benutzer"
@@ -744,9 +768,6 @@ msgid ""
 msgstr ""
 "Antrag auf Akkreditierung als Dolmetscher/in für die Zuger Behörden und "
 "Gerichte"
-
-msgid "Translator created."
-msgstr ""
 
 #, python-format
 msgid "Added language ${name}"
@@ -794,15 +815,3 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
-
-#~ msgid ""
-#~ "I apply for accreditation for the following working languages. German C2 "
-#~ "is a prerequisite."
-#~ msgstr ""
-#~ "Ich beantrage die Akkreditierung für folgende Arbeitssprachen. Deutsch C2 "
-#~ "ist Voraussetzung."
-
-#~ msgid "German C2 is a prerequisite. Mention only languages with level C2."
-#~ msgstr ""
-#~ "Deutsch C2 ist Voraussetzung. Erwähnen Sie nur Ihre Übersetzungssprachen "
-#~ "mit Voraussetzung Niveau C2."

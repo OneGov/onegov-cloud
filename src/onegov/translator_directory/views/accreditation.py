@@ -10,11 +10,14 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.forms.accreditation import \
-    AcceptAccreditationForm
+    GrantAccreditationForm
+from onegov.translator_directory.forms.accreditation import \
+    RefuseAccreditationForm
 from onegov.translator_directory.forms.accreditation import \
     RequestAccreditationForm
+from onegov.translator_directory.layout import GrantAccreditationLayout
+from onegov.translator_directory.layout import RefuseAccreditationLayout
 from onegov.translator_directory.layout import RequestAccreditationLayout
-from onegov.translator_directory.layout import AcceptAccreditationLayout
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.message import AccreditationMessage
 from uuid import uuid4
@@ -34,6 +37,7 @@ def request_accreditation(self, request, form):
             state='proposed',
             update_user=False  # todo: create user account already?
         )
+        translator.files.extend(form.get_files())
         session = request.session
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
@@ -84,26 +88,51 @@ def request_accreditation(self, request, form):
 
 @TranslatorDirectoryApp.form(
     model=Accreditation,
-    name='accept',
+    name='grant',
     template='form.pt',
     permission=Secret,
-    form=AcceptAccreditationForm
+    form=GrantAccreditationForm
 )
-def accept_accreditation(self, request, form):
+def grant_accreditation(self, request, form):
     if form.submitted(request):
         form.update_model()
-        request.success(_("Translator published."))
+        request.success(_("Accreditation granted."))
         # todo: create user account
         # todo: send activation mail!
-        AccreditationMessage.create(self.ticket, request, 'accepted')
+        AccreditationMessage.create(self.ticket, request, 'granted')
         if 'return-to' in request.GET:
             return request.redirect(request.url)
         return redirect(request.link(self))
 
-    layout = AcceptAccreditationLayout(self, request)
+    layout = GrantAccreditationLayout(self, request)
 
     return {
         'layout': layout,
-        'title': _("Accept accreditation"),
+        'title': _('Grant accreditation'),
+        'form': form
+    }
+
+
+@TranslatorDirectoryApp.form(
+    model=Accreditation,
+    name='refuse',
+    template='form.pt',
+    permission=Secret,
+    form=RefuseAccreditationForm
+)
+def refuse_accreditation(self, request, form):
+    if form.submitted(request):
+        form.update_model()
+        request.success(_("Accreditation refused."))
+        AccreditationMessage.create(self.ticket, request, 'refused')
+        if 'return-to' in request.GET:
+            return request.redirect(request.url)
+        return redirect(request.link(self))
+
+    layout = RefuseAccreditationLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': _('Refuse accreditation'),
         'form': form
     }

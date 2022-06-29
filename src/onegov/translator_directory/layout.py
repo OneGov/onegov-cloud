@@ -489,7 +489,7 @@ class RequestAccreditationLayout(DefaultLayout):
         return links
 
 
-class AcceptAccreditationLayout(DefaultLayout):
+class GrantAccreditationLayout(DefaultLayout):
 
     @property
     def breadcrumbs(self):
@@ -500,5 +500,20 @@ class AcceptAccreditationLayout(DefaultLayout):
                 url=self.request.link(self.model.ticket)
             )
         )
-        links.append(Link(_('Accept accreditation')))
+        links.append(Link(_('Grant accreditation')))
+        return links
+
+
+class RefuseAccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.link(self.model.ticket)
+            )
+        )
+        links.append(Link(_('Refuse accreditation')))
         return links
