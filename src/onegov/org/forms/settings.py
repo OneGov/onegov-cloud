@@ -822,11 +822,7 @@ class OrgTicketSettingsForm(Form):
     )
 
     ticket_auto_accept_style = RadioField(
-        label=_("Auto-accept tickets rule style"),
-        description=_("Choose ticket category to auto-accept tickets "
-                      "based on their category or choose user roles "
-                      "to auto-accept them based on the submitting "
-                      "user's role."),
+        label=_("Accept request and close ticket automatically based on:"),
         choices=(
             ('category', _("Ticket category")),
             ('role', _("User role")),
