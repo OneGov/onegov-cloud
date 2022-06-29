@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-13 07:29+0200\n"
+"POT-Creation-Date: 2022-06-29 10:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1405,6 +1405,15 @@ msgstr "Das End-Datum muss vor dem Start-Datum sein"
 msgid "Email adress for notifications about newly opened tickets"
 msgstr "E-Mail-Adresse für Benachrichtigungen zu geöffneten Tickets"
 
+msgid "Accept request and close ticket automatically based on:"
+msgstr "Akzeptiere und schliesse Tickets automatisch basierend auf:"
+
+msgid "Ticket category"
+msgstr "Ticket-Kategorie"
+
+msgid "User role"
+msgstr "Benutzer-Rolle"
+
 msgid ""
 "Accept request and close ticket automatically for these ticket categories"
 msgstr "Akzeptiere und schliesse Tickets automatisch für diese Kategorien"
@@ -1416,6 +1425,10 @@ msgstr ""
 "Wenn das automatische Akzeptieren nicht möglich ist, verbleibt ein Ticket in "
 "Bearbeitung. Bedenken Sie weiter, dass nach Abschluss des Tickets von der "
 "antragstellenden Person keine Nachrichten mehr gesendet werden können."
+
+msgid "Accept request and close ticket automatically for these user roles"
+msgstr ""
+"Akzeptiere und schliesse Tickets automatisch für diese Benutezer-Rollen"
 
 msgid "User used to auto-accept tickets"
 msgstr "Benutzer für das automatische Akzeptieren von Tickets"
@@ -1462,7 +1475,7 @@ msgid "Compares links to the current domain"
 msgstr "Vergleicht Links mit der aktuellen Domain"
 
 msgid "Use a domain name without http(s)"
-msgstr "Benutze eine Domai ohne http(s)"
+msgstr "Benutze eine Domain ohne http(s)"
 
 msgid "Domain must contain a dot"
 msgstr "Die Domain muss einen Punkt enthalten"
@@ -2244,8 +2257,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
