@@ -3,6 +3,7 @@ from onegov.form import Form
 from wtforms import StringField, TextAreaField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import InputRequired
+from onegov.org.models.external_link import ExternalLinkCollection
 
 
 class ExternalLinkForm(Form):
@@ -28,13 +29,12 @@ class ExternalLinkForm(Form):
         description=_("Used to group this link in the overview")
     )
 
-    member_of = SelectField(
-        label=_("Name of the list view this link will be shown"),
-        choices=[]
-    )
-
     def on_request(self):
-        self.member_of.choices = [
-            (id_, self.request.translate(_(name)))
-            for id_, name in self.model.form_choices()
-        ]
+        if isinstance(self.model, ExternalLinkCollection):
+            self.member_of = SelectField(
+                label=_("Name of the list view this link will be shown"),
+                choices=[
+                    (id_, self.request.translate(_(name)))
+                    for id_, name in self.model.form_choices()
+                ]
+            )

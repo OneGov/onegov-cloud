@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-06-13 07:29+0200\n"
+"POT-Creation-Date: 2022-06-29 10:34+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1778,6 +1778,12 @@ msgstr "Camera"
 
 msgid "Resource Item"
 msgstr "Elemento risorsa"
+
+msgid "External resource link"
+msgstr "Link a risorse esterne"
+
+msgid "New external resource"
+msgstr "Nuova risorsa esterna"
 
 msgid "Notifications"
 msgstr "Notifiche"
@@ -4136,8 +4142,8 @@ msgstr "Accesso negato"
 msgid "Not Found"
 msgstr "Non trovato"
 
-msgid "Added a new external form"
-msgstr "Aggiunto un nuovo modulo esterno"
+msgid "Added a new external link"
+msgstr "Aggiunto un nuovo link esterno"
 
 msgid "New external link"
 msgstr "Nuovo collegamento esterno"
@@ -4609,6 +4615,9 @@ msgstr "Aggiunto un nuovo elemento"
 
 msgid "New Item"
 msgstr "Nuovo elemento"
+
+msgid "Edit resource"
+msgstr ""
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"

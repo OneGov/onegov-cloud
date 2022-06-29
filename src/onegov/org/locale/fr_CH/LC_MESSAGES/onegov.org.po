@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-13 07:29+0200\n"
+"POT-Creation-Date: 2022-06-29 10:34+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1769,6 +1769,12 @@ msgstr "Espace"
 
 msgid "Resource Item"
 msgstr "Article"
+
+msgid "External resource link"
+msgstr "Lien de ressource externe"
+
+msgid "New external resource"
+msgstr "Nouvelle ressource externe"
 
 msgid "Notifications"
 msgstr "Notifications"
@@ -4146,8 +4152,8 @@ msgstr "Accès refusé"
 msgid "Not Found"
 msgstr "Pas trouvé"
 
-msgid "Added a new external form"
-msgstr "A ajouté un nouveau formulaire externe"
+msgid "Added a new external link"
+msgstr "A ajouté un nouveau lien externe"
 
 msgid "New external link"
 msgstr "Noveau lien externe"
@@ -4615,6 +4621,9 @@ msgstr "Nouveau article ajouté"
 
 msgid "New Item"
 msgstr "Nouveau article"
+
+msgid "Edit resource"
+msgstr ""
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"
