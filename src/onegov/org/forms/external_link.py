@@ -29,12 +29,16 @@ class ExternalLinkForm(Form):
         description=_("Used to group this link in the overview")
     )
 
+    member_of = SelectField(
+        label=_("Name of the list view this link will be shown"),
+        choices=[]
+    )
+
     def on_request(self):
         if isinstance(self.model, ExternalLinkCollection):
-            self.member_of = SelectField(
-                label=_("Name of the list view this link will be shown"),
-                choices=[
-                    (id_, self.request.translate(_(name)))
-                    for id_, name in self.model.form_choices()
-                ]
-            )
+            self.member_of.choices = [
+                (id_, self.request.translate(_(name)))
+                for id_, name in self.model.form_choices()
+            ]
+        else:
+            self.delete_field('member_of')
