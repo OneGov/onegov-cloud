@@ -1,9 +1,15 @@
 from morepath import redirect
-from onegov.org.mail import send_ticket_mail
-from onegov.org.models import Organisation
+from onegov.core.crypto import random_token
 from onegov.core.security import Public
 from onegov.core.security import Secret
+from onegov.core.templates import render_template
+from onegov.file import File
+from onegov.file.utils import as_fileintent
+from onegov.org.layout import DefaultMailLayout
+from onegov.org.mail import send_ticket_mail
+from onegov.org.models import Organisation
 from onegov.org.models import TicketMessage
+from onegov.org.pdf.ticket import TicketPdf
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -35,7 +41,7 @@ def request_accreditation(self, request, form):
         translator = TranslatorCollection(request.app).add(
             **form.get_translator_data(),
             state='proposed',
-            update_user=False  # todo: create user account already?
+            update_user=False
         )
         translator.files.extend(form.get_files())
         session = request.session
@@ -95,11 +101,41 @@ def request_accreditation(self, request, form):
 )
 def grant_accreditation(self, request, form):
     if form.submitted(request):
-        form.update_model()
-        request.success(_("Accreditation granted."))
-        # todo: create user account
-        # todo: send activation mail!
+        self.grant()
         AccreditationMessage.create(self.ticket, request, 'granted')
+        request.success(_("Accreditation granted."))
+
+        # store a PDF of the ticket on the translator
+        content = TicketPdf.from_ticket(request, self.ticket)
+        self.target.files.append(
+            File(
+                id=random_token(),
+                name='Ticket.pdf',
+                note='Antrag',
+                reference=as_fileintent(
+                    content=content,
+                    filename='Ticket.pdf'
+                )
+            )
+        )
+
+        # create a user account and send an activation mail
+        translators = TranslatorCollection(request.app)
+        translators.update_user(self.target, self.target.email)
+        subject = request.translate(_('An account was created for you'))
+        content = render_template('mail_new_user.pt', request, {
+            'user': self.target.user,
+            'org': request.app.org,
+            'layout': DefaultMailLayout(self.target.user, request),
+            'title': subject
+        })
+        request.app.send_transactional_email(
+            subject=subject,
+            receivers=(self.target.user.username, ),
+            content=content,
+        )
+        request.success(_('Activation E-Mail sent'))
+
         if 'return-to' in request.GET:
             return request.redirect(request.url)
         return redirect(request.link(self))
@@ -122,7 +158,7 @@ def grant_accreditation(self, request, form):
 )
 def refuse_accreditation(self, request, form):
     if form.submitted(request):
-        form.update_model()
+        self.refuse()
         request.success(_("Accreditation refused."))
         AccreditationMessage.create(self.ticket, request, 'refused')
         if 'return-to' in request.GET:

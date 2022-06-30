@@ -212,11 +212,17 @@
         </dl>
 
         <h3 i18n:translate>Documents</h3>
-        <ul tal:condition="translator.files">
-            <li tal:repeat="file translator.files">
-                <a href="${request.link(file)}">${file.name}</a>
-            </li>
-        </ul>
+        <dl class="accreditation">
+            <dt i18n:translate style='display: None;'>Documents</dt>
+            <dd>
+                <ul tal:condition="translator.files">
+                    <li tal:repeat="file translator.files">
+                        <a href="${request.link(file)}">${file.name}</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+
 
         <h3 i18n:translate>Submission</h3>
         <dl class="accreditation">

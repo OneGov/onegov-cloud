@@ -226,15 +226,16 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
                     attrs={'class': ('edit-link', 'border')}
                 )
             )
-            advanced_links.append(
-                Link(
-                    text=_('Refuse accreditation'),
-                    url=request.return_here(
-                        request.link(self.accreditation, 'refuse')
-                    ),
-                    attrs={'class': 'delete-link'},
+            if self.state is None:
+                advanced_links.append(
+                    Link(
+                        text=_('Refuse accreditation'),
+                        url=request.return_here(
+                            request.link(self.accreditation, 'refuse')
+                        ),
+                        attrs={'class': 'delete-link'},
+                    )
                 )
-            )
 
         if advanced_links:
             links.append(

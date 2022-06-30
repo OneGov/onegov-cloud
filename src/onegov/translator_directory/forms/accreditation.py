@@ -664,16 +664,7 @@ class GrantAccreditationForm(Form):
     # todo: admission type?
     # todo: certificates
 
-    def update_model(self):
-        self.model.grant()
-        # todo: set admission and more
-
 
 class RefuseAccreditationForm(Form):
 
     callout = _('Delete all related data.')
-
-    # todo: message
-
-    def update_model(self):
-        self.model.refuse()

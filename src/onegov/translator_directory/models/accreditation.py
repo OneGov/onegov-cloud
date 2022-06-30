@@ -21,11 +21,11 @@ class Accreditation:
         from onegov.ticket import TicketCollection
         return TicketCollection(self.session).by_id(self.ticket_id)
 
-    def accept(self):
-        self.ticket.handler_data['state'] = 'accepted'
+    def grant(self):
+        self.ticket.handler_data['state'] = 'granted'
         self.target.state = 'published'
         self.target.date_of_decision = date.today()
 
-    def deny(self):
-        self.ticket.handler_data['state'] = 'denied'
+    def refuse(self):
+        self.ticket.handler_data['state'] = 'refused'
         self.session.delete(self.target)
