@@ -544,56 +544,63 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     years, parties = get_party_results(election_compound)
     assert years == ['2014']
     assert parties == {
-        'AL': {
+        '0': {
             '2014': {
+                'name': 'AL',
                 'color': '#99C040',
                 'mandates': 10,
                 'voters_count': {'permille': Decimal('137.80'), 'total': 538},
                 'votes': {'permille': 138, 'total': 43062}
             }
         },
-        'CVP': {
+        '1': {
             '2014': {
+                'name': 'CVP',
                 'color': '#EE7F00',
                 'mandates': 22,
                 'voters_count': {'permille': Decimal('238.50'), 'total': 931},
                 'votes': {'permille': 238, 'total': 74448}
             }
         },
-        'FDP': {
+        '2': {
             '2014': {
+                'name': 'FDP',
                 'color': '#0E52A0',
                 'mandates': 18,
                 'voters_count': {'permille': Decimal('221.10'), 'total': 863},
                 'votes': {'permille': 221, 'total': 69028},
             }
         },
-        'GLP': {
+        '3': {
             '2014': {
+                'name': 'GLP',
                 'color': '#acc700',
                 'mandates': 4,
                 'voters_count': {'permille': Decimal('60.50'), 'total': 236},
                 'votes': {'permille': 60, 'total': 18864}
             }
         },
-        'Piraten': {
+        '4': {
             '2014': {
+                'name': 'Piraten',
                 'color': '#F9B200',
                 'mandates': 0,
                 'voters_count': {'permille': Decimal('4.90'), 'total': 19},
                 'votes': {'permille': 5, 'total': 1487}
             }
         },
-        'SP': {
+        '5': {
             '2014': {
+                'name': 'SP',
                 'color': '#E53136',
                 'mandates': 7,
                 'voters_count': {'permille': Decimal('107.10'), 'total': 418},
                 'votes': {'permille': 107, 'total': 33459}
             }
         },
-        'SVP': {
+        '6': {
             '2014': {
+                'name': 'SVP',
                 'color': '#019040',
                 'mandates': 19,
                 'voters_count': {'permille': Decimal('230.30'), 'total': 899},
@@ -685,7 +692,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert data['results'][0]['value'] == 931
 
     years, parties = get_party_results(election_compound)
-    assert parties['AL']['2014']['voters_count']['total'] == Decimal('538.00')
+    assert parties['0']['2014']['voters_count']['total'] == Decimal('538.00')
 
     deltas = get_party_results_deltas(election_compound, years, parties)
     assert deltas[1]['2014'][0][2] == Decimal('538.00')
@@ -703,7 +710,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert data['results'][0]['value'] == 931
 
     years, parties = get_party_results(election_compound)
-    assert parties['AL']['2014']['votes']['total'] == 43062
+    assert parties['0']['2014']['votes']['total'] == 43062
 
     deltas = get_party_results_deltas(election_compound, years, parties)
     assert deltas[1]['2014'][0][2] == 43062

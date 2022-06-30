@@ -729,7 +729,7 @@ def test_vote_export(session):
     session.add(vote)
     session.flush()
 
-    assert vote.export() == []
+    assert vote.export(['de_CH']) == []
 
     vote.ballots.append(Ballot(type='proposal'))
     vote.ballots.append(
@@ -780,9 +780,10 @@ def test_vote_export(session):
 
     session.flush()
 
-    assert vote.export() == [
+    assert vote.export(['de_CH', 'fr_CH', 'it_CH']) == [
         {
             'title_de_CH': "Abstimmung",
+            'title_fr_CH': "",
             'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
@@ -801,6 +802,7 @@ def test_vote_export(session):
         },
         {
             'title_de_CH': "Abstimmung",
+            'title_fr_CH': "",
             'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
@@ -819,6 +821,7 @@ def test_vote_export(session):
         },
         {
             'title_de_CH': "Gegenvorschlag",
+            'title_fr_CH': "",
             'title_it_CH': "Controprogetto",
             'date': "2015-06-14",
             'shortcode': "FOO",

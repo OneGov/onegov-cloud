@@ -237,6 +237,8 @@ Nome|Descrizione
 ---|---
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
+`name`|Il nome del partito nella lingua definita come standard. Quale opzione*.
+`name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco. Quale opzione*.
 `name`|Il nome del partito.
 `id`|ID del partito (qualsiasi numero).
 `color`|Il colore del partito.
@@ -244,6 +246,8 @@ Nome|Descrizione
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 `voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+
+*Si assicuri di aver indicato nella colonna name oppure nella colonna name_{default_locale} il nome del partito nella lingua definita come standard.
 
 I risultati potrebbero contenere risultati misti aggiungendo una colonna per partito:
 

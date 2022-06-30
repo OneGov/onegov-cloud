@@ -259,6 +259,7 @@ class ElectionLayout(DetailLayout):
             svg_filename(
                 self.model,
                 self.tab,
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

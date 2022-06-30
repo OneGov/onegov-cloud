@@ -169,11 +169,7 @@ class D3Renderer():
     def get_party_strengths_chart(self, item, fmt, return_data=False):
         chart = None
         data = None
-        if isinstance(item, Election):
-            data = get_party_results_data(item)
-            if data and data.get('results'):
-                chart = self.get_chart('grouped', fmt, data)
-        elif isinstance(item, ElectionCompound):
+        if isinstance(item, (Election, ElectionCompound)):
             data = get_party_results_data(item)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', fmt, data)
@@ -191,11 +187,7 @@ class D3Renderer():
     def get_parties_panachage_chart(self, item, fmt, return_data=False):
         chart = None
         data = None
-        if isinstance(item, Election):
-            data = get_parties_panachage_data(item, None)
-            if data and data.get('links') and data.get('nodes'):
-                chart = self.get_chart('sankey', fmt, data)
-        elif isinstance(item, ElectionCompound):
+        if isinstance(item, (Election, ElectionCompound)):
             data = get_parties_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart('sankey', fmt, data)

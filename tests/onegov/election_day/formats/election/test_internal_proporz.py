@@ -46,7 +46,9 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
     ]
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     principal = create_principal('zg')
 
@@ -133,7 +135,9 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     assert panachge_vote_count == votes_panachage_csv
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_proporz(
         election, principal, BytesIO(csv), 'text/plain'

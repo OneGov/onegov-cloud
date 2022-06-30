@@ -26,12 +26,15 @@ class SvgGenerator():
             if fs.exists(path) and not fs.isdir(path):
                 fs.remove(path)
 
-    def generate_svg(self, item, type_, filename, locale=None):
+    def generate_svg(self, item, type_, filename, locale):
         """ Creates the requested SVG.
 
         Returns the number of created files.
 
         """
+
+        old_locale = item.session_manager.current_locale
+        item.session_manager.current_locale = locale
 
         chart = None
         if type_ == 'candidates':
@@ -52,6 +55,9 @@ class SvgGenerator():
             chart = self.renderer.get_entities_map(item, 'svg', locale)
         if type_ == 'districts-map':
             chart = self.renderer.get_districts_map(item, 'svg', locale)
+
+        item.session_manager.current_locale = old_locale
+
         if chart:
             path = '{}/{}'.format(self.svg_dir, filename)
             with self.app.filestorage.open(path, 'w') as f:
@@ -85,7 +91,7 @@ class SvgGenerator():
             ),
             'ballot': (
                 'entities-map', 'districts-map'
-            ) if principal.has_districts else ('entities-map')
+            ) if principal.has_districts else ('entities-map',)
         }
 
         # Read existing SVGs
@@ -99,25 +105,35 @@ class SvgGenerator():
         filenames = []
         for election in self.session.query(Election):
             last_modified = election.last_modified
-            for type_ in types[election.type]:
-                filename = svg_filename(election, type_, None, last_modified)
-                filenames.append(filename)
-                if filename not in existing:
-                    created += self.generate_svg(election, type_, filename)
+            for locale in self.app.locales:
+                for type_ in types[election.type]:
+                    filename = svg_filename(
+                        election, type_, locale, last_modified
+                    )
+                    filenames.append(filename)
+                    if filename not in existing:
+                        created += self.generate_svg(
+                            election, type_, filename, locale
+                        )
 
         for compound in self.session.query(ElectionCompound):
             last_modified = compound.last_modified
-            for type_ in types['compound']:
-                filename = svg_filename(compound, type_, None, last_modified)
-                filenames.append(filename)
-                if filename not in existing:
-                    created += self.generate_svg(compound, type_, filename)
+            for locale in self.app.locales:
+                for type_ in types['compound']:
+                    filename = svg_filename(
+                        compound, type_, locale, last_modified
+                    )
+                    filenames.append(filename)
+                    if filename not in existing:
+                        created += self.generate_svg(
+                            compound, type_, filename, locale
+                        )
 
         if principal.use_maps:
             for ballot in self.session.query(Ballot):
                 if principal.is_year_available(ballot.vote.date.year):
+                    last_modified = ballot.vote.last_modified
                     for locale in self.app.locales:
-                        last_modified = ballot.vote.last_modified
                         for type_ in types['ballot']:
                             filename = svg_filename(
                                 ballot, type_, locale, last_modified

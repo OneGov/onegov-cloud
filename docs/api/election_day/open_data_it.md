@@ -70,11 +70,13 @@ Rimanda i dati della visualizzazione principale in forma strutturata.
 
 ### Dati grezzi
 
+#### Risultati dei candidati
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+I dati grezzi dei candidati sono disponibili nei formati seguenti:
 
 Formato|URL
 ---|---
@@ -120,13 +122,13 @@ Nome|Descrizione
 
 I comuni non ancora contati non sono inclusi.
 
-### Risultati dei partiti
+#### Risultati dei partiti
 
 ```
 URL: /election/{id}/data-parties-{format}
 ```
 
-I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+I dati grezzi dei partiti sono disponibili nei formati seguenti:
 
 Formato|URL
 ---|---
@@ -139,7 +141,8 @@ Nome|Descrizione
 ---|---
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
-`name`|Il nome del partito.
+`name`|Il nome del partito nella lingua definita come standard.
+`name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco.
 `id`|ID del partito.
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.

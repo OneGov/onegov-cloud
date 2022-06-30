@@ -715,84 +715,96 @@ def test_election_utils_parties(import_test_datasets, session):
     years, parties = get_party_results(election)
     assert years == ['2011', '2015']
     assert parties == {
-        'AL': {
+        '0': {
             '2011': {
+                'name': 'AL',
                 'color': '#a74c97',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 154, 'total': 17972}
             },
             '2015': {
+                'name': 'AL',
                 'color': '#a74c97',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 72, 'total': 8352}
             }
         },
-        'CVP': {
+        '1': {
             '2011': {
+                'name': 'CVP',
                 'color': '#ff6300',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 243, 'total': 28413}
             },
             '2015': {
+                'name': 'CVP',
                 'color': '#ff6300',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 264, 'total': 30856}
             }
         },
-        'FDP': {
+        '2': {
             '2011': {
+                'name': 'FDP',
                 'color': '#4068c8',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 192, 'total': 22494}
             },
             '2015': {
+                'name': 'FDP',
                 'color': '#4068c8',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 176, 'total': 20584}
             }
         },
-        'GLP': {
+        '3': {
             '2011': {
+                'name': 'GLP',
                 'color': '#aeca00',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 68, 'total': 7943}
             },
             '2015': {
+                'name': 'GLP',
                 'color': '#aeca00',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 36, 'total': 4178}
             }
         },
-        'SP': {
+        '4': {
             '2011': {
+                'name': 'SP',
                 'color': '#db3c27',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 53, 'total': 6167}
             },
             '2015': {
+                'name': 'SP',
                 'color': '#db3c27',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 138, 'total': 16048}
             }
         },
-        'SVP': {
+        '5': {
             '2011': {
+                'name': 'SVP',
                 'color': '#3f841a',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 283, 'total': 33116}
             },
             '2015': {
+                'name': 'SVP',
                 'color': '#3f841a',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},

@@ -69,11 +69,13 @@ Returns the data of the main view in a structured form.
 
 ### Raw data
 
+#### Candidate results
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-The raw data used to display the results of elections is available in the following formats:
+The raw data of the candidates are available in the following formats:
 
 Format|URL
 ---|---
@@ -125,7 +127,7 @@ Not yet counted municipalities are not included.
 URL: /election/{id}/data-parties-{format}
 ```
 
-The raw data used to display the results of elections is available in the following formats:
+The raw data of the parties are available in the following formats:
 
 Format|URL
 ---|---
@@ -138,7 +140,8 @@ Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`name`|The name of the party.
+`name`|The name of the party in the default language.
+`name_{locale}`|Translated name of the party, e.g. `name_de_ch` for the German name.
 `id`|ID of the party.
 `color`|The color of the party.
 `mandates`|The number of mandates.

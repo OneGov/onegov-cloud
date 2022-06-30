@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.list import List
@@ -367,7 +366,7 @@ class ElectionCompound(
         for election in self.elections:
             election.clear_results()
 
-    def export(self):
+    def export(self, locales):
         """ Returns all data connected to this election compound as list with
         dicts.
 
@@ -384,17 +383,16 @@ class ElectionCompound(
         """
 
         common = OrderedDict()
-        for locale in election_day_i18n_used_locales:
-            common[f'compound_title_{locale}'] = \
-                self.title_translations.get(locale, '')
-        for locale, title in self.title_translations.items():
-            common[f'compound_title_{locale}'] = (title or '').strip()
+        for locale in locales:
+            common[f'compound_title_{locale}'] = self.title_translations.get(
+                locale, ''
+            )
         common['compound_date'] = self.date.isoformat()
         common['compound_mandates'] = self.number_of_mandates
 
         rows = []
         for election in self.elections:
-            for row in election.export():
+            for row in election.export(locales):
                 rows.append(
                     OrderedDict(list(common.items()) + list(row.items()))
                 )

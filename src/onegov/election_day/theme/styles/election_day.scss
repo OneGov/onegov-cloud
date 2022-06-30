@@ -2,6 +2,26 @@ $accepted-color: #0571b0;
 $rejected-color: #ca0020;
 $footer-border-color: #d8d8d8;
 
+h2 {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 1rem;
+    text-decoration: underline;
+}
+
+h5 {
+    font-size: 1rem;
+    font-style: italic;
+}
+
 /*
     get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
@@ -108,24 +128,9 @@ html {
     }
 }
 
-
 /*
     Homepage
 */
-
-h2 {
-    font-size: 1.3rem;
-    font-weight: bold;
-}
-
-h3,
-h4,
-h5 {
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-
 .homepage {
     h2 {
         font-size: $h3-font-size;
@@ -202,7 +207,7 @@ table {
 
     tbody {
         th {
-            border-bottom: none;
+            border-bottom: 0;
             font-weight: normal;
         }
     }
@@ -729,7 +734,7 @@ td.row-actions {
 ul.actions {
     direction: rtl;
     list-style-type: circle;
-    margin: .2em 1.1em 1em 0;
+    margin: 3em 1.1em 1em 0;
 
     li {
         font-size: $table-row-font-size;

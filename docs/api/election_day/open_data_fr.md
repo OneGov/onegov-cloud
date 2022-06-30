@@ -70,11 +70,13 @@ Retourne les données de la vue principale sous une forme structurée.
 
 ### Données brutes
 
+#### Résultats des candidats
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
+Les données brutes des candidats sont disponibles dans les formats suivants :
 
 Format|URL
 ---|---
@@ -120,13 +122,13 @@ Nom|Description
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 
-### Résultats du parti
+#### Résultats du parti
 
 ```
 URL: /election/{id}/data-parties-{format}
 ```
 
-Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
+Les données brutes des parties sont disponibles dans les formats suivants :
 
 Format|URL
 ---|---
@@ -139,7 +141,8 @@ Nom|Description
 ---|---
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
-`name`|La dénomination du parti.
+`name`|Le dénomination du parti dans la langue par défaut.
+`name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand.
 `id`|Identifiant du parti.
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.

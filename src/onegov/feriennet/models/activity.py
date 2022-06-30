@@ -60,15 +60,16 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
         return organiser
 
-    def ordered_tags(self, request):
+    def ordered_tags(self, request, durations=None):
         tags = [request.translate(_(tag)) for tag in self.tags]
 
-        durations = sum(o.duration for o in (
-            request.session.query(Occasion)
-            .with_entities(Occasion.duration)
-            .distinct()
-            .filter_by(activity_id=self.id)
-        ))
+        if durations is None:
+            durations = sum(o.duration for o in (
+                request.session.query(Occasion)
+                .with_entities(Occasion.duration)
+                .distinct()
+                .filter_by(activity_id=self.id)
+            ))
 
         if DAYS.has(durations, DAYS.half):
             tags.append(request.translate(_("Half day")))

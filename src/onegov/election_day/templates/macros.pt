@@ -1200,13 +1200,15 @@
 
 <metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day" tal:define="has_party_results getattr(layout, 'has_party_results', False)">
     <h4 i18n:translate="">Open Data</h4>
-    <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
+    <h5 i18n:translate="">Candidate results</h5>
+    <p i18n:translate="">The raw data of the candidates are available in the following formats:</p>
     <ol>
         <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
         <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
     </ol>
 
-    <p tal:condition="has_party_results" i18n:translate="">The raw data used to display the party results is available in the following formats:</p>
+    <h5 tal:condition="has_party_results" i18n:translate="">Party results</h5>
+    <p tal:condition="has_party_results" i18n:translate="">The raw data of the parties are available in the following formats:</p>
     <ol tal:condition="has_party_results">
         <li><a href="${request.link(model, 'data-parties-json')}">JSON</a></li>
         <li><a href="${request.link(model, 'data-parties-csv')}">CSV</a></li>
