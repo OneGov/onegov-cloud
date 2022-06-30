@@ -5,7 +5,6 @@ import os
 
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -195,50 +194,5 @@ def update_last_result_change():
                 count += 1
 
         click.secho(f'Updated {count} items', fg='green')
-
-    return update
-
-
-@cli.command('migrate-party-ids')
-def migrate_party_ids():
-
-    def update(request, app):
-        click.secho(f'Updating {app.schema}', fg='yellow')
-
-        session = request.app.session()
-        items = session.query(ProporzElection).all()
-        items.extend(session.query(ElectionCompound).all())
-        for item in items:
-            parties = {
-                result.name: result.party_id
-                for result in item.party_results
-            }
-            next_id = 0
-            for party in sorted(parties):
-                if parties[party] is None:
-                    while str(next_id) in parties.values():
-                        next_id += 1
-                    parties[party] = str(next_id)
-            for result in item.party_results:
-                if result.party_id != parties[result.name]:
-                    click.secho(
-                        f'  Setting party result {item.id} {result.name} '
-                        f'from {result.party_id} '
-                        f'to {parties[result.name]}'
-                    )
-                    result.party_id = parties[result.name]
-            for result in item.panachage_results:
-                if result.source and result.source in parties:
-                    click.secho(
-                        f'  Setting panachage result {item.id} '
-                        f'{result.source}  to {parties[result.source]}'
-                    )
-                    result.source = parties[result.source]
-                if result.target and result.target in parties:
-                    click.secho(
-                        f'  Setting panachage result {item.id} '
-                        f'{result.target}  to {parties[result.target]}'
-                    )
-                    result.target = parties[result.target]
 
     return update

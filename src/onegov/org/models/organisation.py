@@ -103,7 +103,9 @@ class Organisation(Base, TimestampMixin):
 
     # Ticket options
     email_for_new_tickets = meta_property()
+    ticket_auto_accept_style = meta_property()
     ticket_auto_accepts = meta_property()
+    ticket_auto_accept_roles = meta_property()
     tickets_skip_opening_email = meta_property()
     tickets_skip_closing_email = meta_property()
     mute_all_tickets = meta_property()

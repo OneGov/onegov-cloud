@@ -152,7 +152,7 @@ def get_party_results_data(item):
             })
 
     return {
-        'groups': list(groups.values()),
+        'groups': [items[1] for items in sorted(list(groups.items()))],
         'labels': years,
         'maximum': {
             'front': item.number_of_mandates,
