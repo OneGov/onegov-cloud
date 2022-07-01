@@ -226,3 +226,14 @@ def add_source_id_column(context):
 
     context.operations.create_unique_constraint(
         'unique_source_id', 'users', ('source', 'source_id'))
+
+
+@upgrade_task('Make user models polymorphic type non-nullable')
+def make_user_models_polymorphic_type_non_nullable(context):
+    for table in ('users', 'groups', 'role_mappings'):
+        if context.has_table(table):
+            context.operations.execute(f"""
+                UPDATE {table} SET type = 'generic' WHERE type IS NULL;
+            """)
+
+            context.operations.alter_column(table, 'type', nullable=False)

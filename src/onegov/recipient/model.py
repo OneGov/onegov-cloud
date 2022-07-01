@@ -36,10 +36,11 @@ class GenericRecipient(Base, ContentMixin, TimestampMixin):
     extra = Column(Text, nullable=True)
 
     #: the polymorphic recipient type
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
+        'polymorphic_identity': 'generic'
     }
 
     @observes('name')
