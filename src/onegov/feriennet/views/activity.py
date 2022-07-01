@@ -433,7 +433,9 @@ def view_activities_as_json(self, request):
 
     period_ids = {
         period.id for period in request.app.periods
-        if period.is_currently_prebooking or period.is_currently_booking
+        if period.is_currently_prebooking
+        or period.is_currently_booking
+        or period.payment_phase
     }
     if not period_ids:
         return []
