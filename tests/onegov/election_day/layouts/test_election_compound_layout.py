@@ -8,7 +8,6 @@ from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionCompoundLayout
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
-import pytest
 
 
 def test_election_compound_layout_general(session):
@@ -22,7 +21,6 @@ def test_election_compound_layout_general(session):
     layout = ElectionCompoundLayout(compound, request)
     assert layout.all_tabs == (
         'list-groups',
-        'lists',
         'superregions',
         'districts',
         'candidates',
@@ -34,7 +32,6 @@ def test_election_compound_layout_general(session):
     assert layout.title() == ''
     assert layout.title('undefined') == ''
     assert layout.title('list-groups') == 'List groups'
-    assert layout.title('lists') == 'Lists'
     assert layout.title('superregions') == '__superregions'
     assert layout.title('districts') == '__districts'
     assert layout.title('candidates') == 'Elected candidates'
@@ -91,19 +88,15 @@ def test_election_compound_layout_general(session):
     assert layout.main_view == 'ElectionCompound/superregions'
 
     compound.pukelsheim = True
-    compound.show_lists = True
-    layout = ElectionCompoundLayout(compound, request)
-    assert layout.main_view == 'ElectionCompound/lists'
-
-    request.app.principal.hidden_tabs = {'elections': ['lists']}
-    request.app.principal.has_superregions = False
-    layout = ElectionCompoundLayout(compound, request)
-    assert layout.hide_tab('lists') is True
-    assert layout.main_view == 'ElectionCompound/districts'
-
     compound.show_list_groups = True
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/list-groups'
+
+    request.app.principal.hidden_tabs = {'elections': ['list-groups']}
+    request.app.principal.has_superregions = False
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.hide_tab('list-groups') is True
+    assert layout.main_view == 'ElectionCompound/districts'
 
     # test file paths
     with freeze_time("2014-01-01 12:00"):
@@ -218,12 +211,10 @@ def test_election_compound_layout_menu(session):
     compound.domain_elections = 'region'
     compound.pukelsheim = True
     compound.show_list_groups = True
-    compound.show_lists = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
     assert ElectionCompoundLayout(compound, request).menu == [
         ('List groups', 'ElectionCompound/list-groups', False, []),
-        ('Lists', 'ElectionCompound/lists', False, []),
         ('__superregions', 'ElectionCompound/superregions', False, []),
         ('__regions', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
@@ -234,17 +225,16 @@ def test_election_compound_layout_menu(session):
     ]
 
 
-@pytest.mark.parametrize('tab,expected', [
-    ('list-groups', 'ElectionCompound/list-groups-table'),
-    ('lists', 'ElectionCompound/lists-table'),
-    ('superregions', 'ElectionCompound/superregions-table'),
-    ('districts', 'ElectionCompound/districts-table'),
-    ('candidates', 'ElectionCompound/candidates-table'),
-    ('party-strengths', None),
-    ('parties-panachage', None),
-    ('data', None)
-])
-def test_election_compound_layout_table_links(tab, expected):
-    election = ElectionCompound(date=date(2100, 1, 1), domain='federation')
-    layout = ElectionCompoundLayout(election, DummyRequest(), tab=tab)
-    assert expected == layout.table_link
+def test_election_compound_layout_table_links():
+    for tab, expected in (
+        ('list-groups', 'ElectionCompound/list-groups-table'),
+        ('superregions', 'ElectionCompound/superregions-table'),
+        ('districts', 'ElectionCompound/districts-table'),
+        ('candidates', 'ElectionCompound/candidates-table'),
+        ('party-strengths', None),
+        ('parties-panachage', None),
+        ('data', None)
+    ):
+        election = ElectionCompound(date=date(2100, 1, 1), domain='federation')
+        layout = ElectionCompoundLayout(election, DummyRequest(), tab=tab)
+        assert expected == layout.table_link

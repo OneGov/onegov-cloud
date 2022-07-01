@@ -13,8 +13,6 @@ from onegov.election_day.screen_widgets import (
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
-    ElectionCompoundListsChartWidget,
-    ElectionCompoundListsTableWidget,
     LastResultChangeWidget,
     NumberOfCountedEntitiesWidget,
     ProgressWidget,
@@ -44,17 +42,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
                 <election-compound-districts-table class="my-class-5"/>
             </column>
             <column span="1">
-                <election-compound-lists-table class="my-class-6"
-                    names="GRÜ   ,  FDP_J     "/>
-            </column>
-            <column span="1">
-                <election-compound-lists-chart class="my-class-7"/>
-            </column>
-            <column span="1">
-                <election-compound-lists-chart class="my-class-8" limit="2"
-                    names="a,b"/>
-            </column>
-            <column span="1">
                 <election-compound-list-groups-table class="my-class-9"/>
             </column>
             <column span="1">
@@ -82,8 +69,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsTableWidget(),
-        ElectionCompoundListsChartWidget(),
-        ElectionCompoundListsTableWidget(),
         ElectionCompoundListGroupsChartWidget(),
         ElectionCompoundListGroupsTableWidget(),
     ]
@@ -112,7 +97,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'entities': '',
         'groups': [],
         'layout': layout,
-        'lists': [],
         'model': model,
         'request': request
     }
@@ -127,9 +111,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-3' in result
     assert 'my-class-4' in result
     assert 'my-class-5' in result
-    assert 'my-class-6' in result
-    assert 'my-class-7' in result
-    assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
     assert 'my-class-b' in result
@@ -217,16 +198,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'entities': '',
         'groups': [],
         'layout': layout,
-        'lists': [
-            ('SVP', 9, 2702),
-            ('CVP', 6, 2399),
-            ('FDP', 5, 1780),
-            ('SP', 4, 1567),
-            ('GRÜ', 2, 841),
-            ('GLP', 1, 652),
-            ('EVP', 0, 283),
-            ('FDP_J', 0, 140)
-        ],
         'model': model,
         'request': request
     }
@@ -247,27 +218,12 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '1 of 13' in result
     assert '0' in result
     assert '2' in result
-    assert 'election-compound-lists-table' in result
-    assert 'data-text="31515"' not in result
-    assert 'data-text="841"' in result
-    assert 'data-text="140"' in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data'
-        '?limit=0&amp;names=&amp;sort_by_names="'
-    ) in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data'
-        '?limit=02&amp;names=a,b&amp;sort_by_names="'
-    ) in result
     assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
     assert 'my-class-4' in result
     assert 'my-class-5' in result
-    assert 'my-class-6' in result
-    assert 'my-class-7' in result
-    assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
     assert 'my-class-b' in result
@@ -364,16 +320,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             ('EVP', 369, 2)
         ],
         'layout': layout,
-        'lists': [
-            ('SVP', 9, 5973),
-            ('CVP', 6, 4911),
-            ('FDP', 5, 3874),
-            ('SP', 4, 2737),
-            ('GRÜ', 2, 1705),
-            ('GLP', 1, 1412),
-            ('EVP', 0, 283),
-            ('FDP_J', 0, 140)
-        ],
         'model': model,
         'request': request
     }
@@ -388,19 +334,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '9 of 9' in result
     assert '17 of 17' in result
     assert '13 of 13' in result
-    assert 'election-compound-lists-table' in result
-    assert 'data-text="87135"' not in result
-    assert 'data-text="1705"' not in result  # voters_count hidden
-    assert 'data-text="140"' not in result  # voters_count hidden
     assert 'data-text="3487.00"' in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data'
-        '?limit=0&amp;names=&amp;sort_by_names="'
-    ) in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data'
-        '?limit=02&amp;names=a,b&amp;sort_by_names="'
-    ) in result
     assert 'data-dataurl="ElectionCompound/list-groups-data"' in result
     assert '2' in result
     assert '2' in result
@@ -410,9 +344,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-3' in result
     assert 'my-class-4' in result
     assert 'my-class-5' in result
-    assert 'my-class-6' in result
-    assert 'my-class-7' in result
-    assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
     assert 'my-class-b' in result

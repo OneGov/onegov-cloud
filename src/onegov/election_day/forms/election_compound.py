@@ -187,18 +187,6 @@ class ElectionCompoundForm(Form):
         depends_on=('pukelsheim', 'y'),
     )
 
-    show_lists = BooleanField(
-        label=_("Lists"),
-        description=_(
-            "Shows a tab with aggregated list results over all elections. "
-            "Only useful if the lists correspond to the list groups. Only if "
-            "Doppelter Pukelsheim. Always rounded."
-        ),
-        fieldset=_("Views"),
-        depends_on=('pukelsheim', 'y'),
-        render_kw=dict(force_simple=True)
-    )
-
     show_party_strengths = BooleanField(
         label=_("Party strengths"),
         description=_(
@@ -328,7 +316,6 @@ class ElectionCompoundForm(Form):
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
         model.show_list_groups = self.show_list_groups.data
-        model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
         model.pukelsheim = self.pukelsheim.data
@@ -420,7 +407,6 @@ class ElectionCompoundForm(Form):
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.show_list_groups.data = model.show_list_groups
-        self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
         self.region_elections.data = []
