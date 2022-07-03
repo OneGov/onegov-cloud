@@ -16,42 +16,44 @@ from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
 
 
+class EchoTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'EHO'}
+    es_type_name = 'echo_tickets'
+
+
+class EchoHandler(Handler):
+
+    handler_title = "Echo"
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def email(self):
+        return self.data.get('email')
+
+    @property
+    def title(self):
+        return self.data.get('title')
+
+    @property
+    def subtitle(self):
+        return self.data.get('subtitle')
+
+    @property
+    def group(self):
+        return self.data.get('group')
+
+    def get_summary(self, request):
+        return self.data.get('summary')
+
+    def get_links(self, request):
+        return self.data.get('links')
+
+
 def register_echo_handler(handlers):
-
-    class EchoTicket(Ticket):
-        __mapper_args__ = {'polymorphic_identity': 'EHO'}
-        es_type_name = 'echo_tickets'
-
-    @handlers.registered_handler('EHO')
-    class EchoHandler(Handler):
-
-        handler_title = "Echo"
-
-        @property
-        def deleted(self):
-            return False
-
-        @property
-        def email(self):
-            return self.data.get('email')
-
-        @property
-        def title(self):
-            return self.data.get('title')
-
-        @property
-        def subtitle(self):
-            return self.data.get('subtitle')
-
-        @property
-        def group(self):
-            return self.data.get('group')
-
-        def get_summary(self, request):
-            return self.data.get('summary')
-
-        def get_links(self, request):
-            return self.data.get('links')
+    handlers.register('EHO', EchoHandler)
 
 
 def test_daily_ticket_statistics(org_app, handlers):

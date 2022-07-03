@@ -79,26 +79,6 @@ def test_view_election_compound_elected_candidates(election_day_app_gr):
     assert "Belfort" in candidates
 
 
-def test_view_election_compound_lists(election_day_app_gr):
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-    upload_election_compound(client, pukelsheim=True)
-
-    for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
-        lists = client.get(f'/elections/elections/lists-data{suffix}')
-        assert {r['text']: r['value'] for r in lists.json['results']} == {
-            'FDP': 3,  # 8 / 10 + 8 /5
-            'CVP': 2   # 6 / 10 + 6 / 5
-        }
-
-    lists = client.get('/elections/elections/lists-data?limit=1')
-    assert {r['text']: r['value'] for r in lists.json['results']} == {
-        'FDP': 3
-    }
-
-
 def test_view_election_compound_party_strengths(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
