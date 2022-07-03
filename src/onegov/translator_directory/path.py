@@ -12,7 +12,8 @@ from uuid import UUID
 
 
 @TranslatorDirectoryApp.path(
-    model=Translator, path='/translator/{id}'
+    model=Translator, path='/translator/{id}',
+    converters=dict(id=UUID)
 )
 def get_translator(request, id):
     return request.session.query(Translator).filter_by(id=id).first()
@@ -41,7 +42,8 @@ def get_translators(request, page=None, written_langs=None, spoken_langs=None,
 
 
 @TranslatorDirectoryApp.path(
-    model=Language, path='/language/{id}'
+    model=Language, path='/language/{id}',
+    converters=dict(id=UUID)
 )
 def get_language(app, id):
     return LanguageCollection(app.session()).by_id(id)
@@ -55,7 +57,8 @@ def get_language_collection(app, page=0, letter=None):
 
 
 @TranslatorDirectoryApp.path(
-    model=TranslatorDocumentCollection, path='/documents/{translator_id}'
+    model=TranslatorDocumentCollection, path='/documents/{translator_id}',
+    converters=dict(translator_id=UUID)
 )
 def get_translator_documents(app, translator_id, category=None):
     result = TranslatorDocumentCollection(

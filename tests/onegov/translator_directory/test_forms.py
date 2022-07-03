@@ -1,6 +1,11 @@
+from cgi import FieldStorage
 from datetime import date
+from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.gis import Coordinates
+from onegov.pdf import Pdf
+from onegov.translator_directory.forms.accreditation import \
+    RequestAccreditationForm
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.models.translator import Translator
 from tests.onegov.translator_directory.shared import create_certificates
@@ -17,7 +22,22 @@ class DummyPostData(dict):
         return v
 
 
-def test_translator_mutation_form_on(translator_app):
+def create_file(filename):
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_report()
+    pdf.p(filename)
+    pdf.generate()
+    file.seek(0)
+
+    result = FieldStorage()
+    result.type = 'application/pdf'
+    result.filename = filename
+    result.file = file
+    return result
+
+
+def test_translator_mutation_form(translator_app):
     session = translator_app.session()
     certificates = create_certificates(session)
     languages = create_languages(session)
@@ -309,4 +329,184 @@ def test_translator_mutation_form_on(translator_app):
         'education_as_interpreter': False,
         'certificates': [str(x.id) for x in certificates[0:2]],
         'comments': 'Some other comment',
+    }
+
+
+def test_accreditation_form(translator_app):
+    session = translator_app.session()
+    languages = create_languages(session)
+    create_translator(translator_app)
+
+    request = Bunch(
+        # todo: remove unused attributes
+        app=translator_app,
+        session=session,
+        locale='de_CH',
+        is_manager=True,
+        is_admin=True,
+        is_editor=False,
+        is_member=False,
+        is_translator=False,
+        include=lambda x: x,
+        translate=lambda x: f'_{x}'
+    )
+
+    # Test translations of choices
+    form = RequestAccreditationForm()
+    form.request = request
+    form.on_request()
+
+    assert '_neutral' in dict(form.gender.choices).values()
+    assert 'German' in dict(form.mother_tongues_ids.choices).values()
+    assert 'German' in dict(form.spoken_languages_ids.choices).values()
+    assert 'German' in dict(form.written_languages_ids.choices).values()
+    assert '_Military' in \
+        dict(form.expertise_professional_guilds.choices).values()
+    assert '_Written translations' in \
+        dict(form.expertise_interpreting_types.choices).values()
+
+    # Test validation
+    form = RequestAccreditationForm(DummyPostData({
+        'email': 'hugo@benito.com',
+        'zip_code': '12'
+    }))
+    form.request = request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors['confirm_submission'] == [
+        'Please confirm the correctness of the above data.'
+    ]
+    assert form.errors['zip_code'] == [
+        'Zip code must consist of 4 digits'
+    ]
+    assert form.errors['email'] == [
+        'A translator with this email already exists'
+    ]
+
+    # Test get data
+    form = RequestAccreditationForm(DummyPostData({
+        'last_name': 'Benito',
+        'first_name': 'Hugo',
+        'gender': 'M',
+        'date_of_birth': '1970-01-01',
+        'hometown': 'Zug',
+        'nationality': 'CH',
+        'marital_status': 'married',
+        'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
+        'address': 'Downing Street 5',
+        'zip_code': '4000',
+        'city': 'Luzern',
+        'drive_distance': 1.1,
+        'withholding_tax': False,
+        'self_employed': False,
+        'social_sec_number': '756.1234.4568.90',
+        'bank_name': 'R-BS',
+        'bank_address': 'Bullstreet 5',
+        'account_owner': 'Hugo Benito',
+        'iban': 'CH9300762011623852957',
+        'email': 'hugo.benito@translators.com',
+        'tel_private': '041 444 44 45',
+        'tel_office': '041 444 44 44',
+        'tel_mobile': '079 000 00 00',
+        'availability': '24h',
+        'availability_has_restriction': True,
+        'availability_restriction': 'Only weekdays',
+        'confirm_name_reveal': True,
+        'learned_profession': 'Baker',
+        'current_profession': 'Reporter',
+        'education_as_interpreter': False,
+        'mother_tongues_ids': [str(languages[0].id)],
+        'spoken_languages_ids': [str(languages[1].id)],
+        'written_languages_ids': [str(languages[2].id)],
+        'expertise_professional_guilds': ['economy', 'military'],
+        'expertise_professional_guilds_other': ['Psychology'],
+        'expertise_interpreting_types': ['whisper', 'written'],
+        'agency_references': 'Some ref',
+        'admission': False,
+        'admission_course_agreement': True,
+        'declaration_of_authorization': create_file('1.pdf'),
+        'letter_of_motivation': create_file('2.pdf'),
+        'resume': create_file('3.pdf'),
+        'certificates': create_file('4.pdf'),
+        'social_security_card': create_file('5.pdf'),
+        'passport': create_file('6.pdf'),
+        'passport_photo': create_file('7.pdf'),
+        'debt_collection_register_extract': create_file('8.pdf'),
+        'criminal_register_extract': create_file('9.pdf'),
+        'certificate_of_capability': create_file('A.pdf'),
+        'remarks': 'Some remarks',
+        'confirm_submission': True
+    }))
+    form.request = request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors == {
+        'drive_distance': [
+            'Home location is not configured. Please complete location '
+            'settings first'
+        ]
+    }
+
+    assert form.get_translator_data() == {
+        'state': 'proposed',
+        'last_name': 'Benito',
+        'first_name': 'Hugo',
+        'gender': 'M',
+        'date_of_birth': date(1970, 1, 1),
+        'nationality': 'CH',
+        'coordinates': Coordinates(1, 2, 12),
+        'address': 'Downing Street 5',
+        'zip_code': '4000',
+        'city': 'Luzern',
+        'drive_distance': 1.1,
+        'withholding_tax': False,
+        'self_employed': False,
+        'social_sec_number': '756.1234.4568.90',
+        'bank_name': 'R-BS',
+        'bank_address': 'Bullstreet 5',
+        'account_owner': 'Hugo Benito',
+        'iban': 'CH9300762011623852957',
+        'email': 'hugo.benito@translators.com',
+        'tel_private': '041 444 44 45',
+        'tel_office': '041 444 44 44',
+        'tel_mobile': '079 000 00 00',
+        'availability': '24h',
+        'confirm_name_reveal': True,
+        'education_as_interpreter': False,
+        'mother_tongues': [languages[0]],
+        'spoken_languages': [languages[1]],
+        'written_languages': [languages[2]],
+        'expertise_professional_guilds': ['economy', 'military'],
+        'expertise_professional_guilds_other': ['Psychology'],
+        'expertise_interpreting_types': ['whisper', 'written'],
+        'agency_references': 'Some ref',
+        'admission': 'uncertified',
+        'date_of_application': date.today()
+    }
+    files = form.get_files()
+    files = {(file.note, file.name, file.reference.filename) for file in files}
+    assert files == {
+        ('Antrag', '_Signed declaration of authorization.pdf', '1.pdf'),
+        ('Antrag', '_Short letter of motivation.pdf', '2.pdf'),
+        ('Antrag', '_Resume.pdf', '3.pdf'),
+        ('Diplome und Zertifikate', '_Certificates.pdf', '4.pdf'),
+        ('Antrag', '_Social security card.pdf', '5.pdf'),
+        ('Antrag', '_Identity card, passport or foreigner identity card.pdf',
+         '6.pdf'),
+        ('Antrag', '_Current passport photo.pdf', '7.pdf'),
+        ('Antrag', '_Current extract from the debt collection register.pdf',
+         '8.pdf'),
+        ('Antrag', '_Current extract from the Central Criminal Register.pdf',
+         '9.pdf'),
+        ('Antrag', '_Certificate of Capability.pdf', 'A.pdf'),
+    }
+    assert form.get_ticket_data() == {
+        'hometown': 'Zug',
+        'marital_status': 'married',
+        'availability_has_restriction': True,
+        'availability_restriction': 'Only weekdays',
+        'learned_profession': 'Baker',
+        'current_profession': 'Reporter',
+        'admission_course_agreement': True,
+        'remarks': 'Some remarks',
     }

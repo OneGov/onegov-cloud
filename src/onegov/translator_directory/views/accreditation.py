@@ -40,7 +40,6 @@ def request_accreditation(self, request, form):
     if form.submitted(request):
         translator = TranslatorCollection(request.app).add(
             **form.get_translator_data(),
-            state='proposed',
             update_user=False
         )
         translator.files.extend(form.get_files())

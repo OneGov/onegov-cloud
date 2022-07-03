@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-29 10:34+0200\n"
+"POT-Creation-Date: 2022-07-03 09:21+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -769,6 +769,12 @@ msgstr ""
 "Antrag auf Akkreditierung als Dolmetscher/in für die Zuger Behörden und "
 "Gerichte"
 
+msgid "An account was created for you"
+msgstr "Ein Konto wurde für Sie erstellt"
+
+msgid "Activation E-Mail sent"
+msgstr "Aktivierungs-Email verschickt"
+
 #, python-format
 msgid "Added language ${name}"
 msgstr "Sprache ${name} hinzugefügt"
@@ -794,12 +800,6 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
-
-msgid "An account was created for you"
-msgstr "Ein Konto wurde für Sie erstellt"
-
-msgid "Activation E-Mail sent"
-msgstr "Aktivierungs-Email verschickt"
 
 msgid "Submit Search"
 msgstr "Suchen"

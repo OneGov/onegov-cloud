@@ -120,7 +120,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         validators=[InputRequired()],
     )
 
-    # todo: hide?
     drive_distance = FloatField(
         label=_('Drive distance (km)'),
         fieldset=_('Personal Information'),
@@ -353,7 +352,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         fieldset=_('Documents')
     )
 
-    # todo: Hint where to download
     declaration_of_authorization = UploadField(
         label=_('Signed declaration of authorization (PDF)'),
         validators=[
@@ -513,8 +511,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 _('Please confirm the correctness of the above data.')
             )
 
-    # todo: ensure at least on phone number?
-
     @cached_property
     def gender_choices(self):
         return tuple(
@@ -604,6 +600,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'agency_references',
             )
         }
+        result['state'] = 'proposed'
         result['mother_tongues'] = self.mother_tongues
         result['spoken_languages'] = self.spoken_languages
         result['written_languages'] = self.written_languages
@@ -660,9 +657,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 class GrantAccreditationForm(Form):
 
     callout = _('Create a user account and publish the translator.')
-
-    # todo: admission type?
-    # todo: certificates
 
 
 class RefuseAccreditationForm(Form):

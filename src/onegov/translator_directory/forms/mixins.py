@@ -18,9 +18,12 @@ class DrivingDistanceMixin:
     def ensure_updated_driving_distance(self):
         if not self.coordinates.data:
             return
-        # also includes the zoom...
-        if isinstance(self.model, Translator) and \
-                self.model.coordinates == self.coordinates.data:
+
+        if (
+            hasattr(self, 'model')
+            and isinstance(self.model, Translator)
+            and self.model.coordinates == self.coordinates.data
+        ):
             return
 
         def to_tuple(coordinate):
@@ -49,8 +52,7 @@ class DrivingDistanceMixin:
                 _('Error in requesting directions from Mapbox (${status})',
                   mapping={'status': response.status_code})
             )
-            log.warning(f'Failed to fetch directions for translator '
-                        f'{self.model.id}, '
+            log.warning(f'Failed to fetch directions '
                         f'status {response.status_code}, '
                         f'url: {response.url}')
             log.warning(dumps(response.json(), indent=2))
