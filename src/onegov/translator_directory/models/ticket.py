@@ -152,10 +152,6 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
         return self.data['handler_data'].get('submitter_email', '')
 
     @cached_property
-    def message(self):
-        return self.data['handler_data'].get('submitter_message', '')
-
-    @cached_property
     def state(self):
         return self.data.get('state')
 
@@ -179,7 +175,6 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
             {
                 'translator': self.translator,
                 'ticket_data': self.data['handler_data'],
-                'message': linkify(self.message).replace('\n', '<br>'),
                 'layout': layout
             }
         )
