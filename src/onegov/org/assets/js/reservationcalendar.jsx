@@ -141,6 +141,8 @@ rc.getFullcalendarOptions = function(options) {
                 center: '',
                 right: views.join(',')
             };
+            fcOptions.navLinks = true;
+            fcOptions.weekNumbers = true;
             break;
         case 'daily-item':
             views = ['month'];

@@ -94,3 +94,13 @@ def add_default_view_to_existing_resource_types(context):
                 resource.default_view = 'month'
             else:
                 resource.default_view = 'agendaWeek'
+
+
+@upgrade_task('Make resource polymorphic type non-nullable')
+def make_resource_polymorphic_type_non_nullable(context):
+    if context.has_table('reservations'):
+        context.operations.execute("""
+            UPDATE resources SET type = 'generic' WHERE type IS NULL;
+        """)
+
+        context.operations.alter_column('resources', 'type', nullable=False)

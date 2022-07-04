@@ -18,6 +18,7 @@ steps:
 
     agents:
       - queue=generic
+      - ram=2048
 
     env:
       CONTAINER: "onegov-cloud:head"

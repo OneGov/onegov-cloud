@@ -63,4 +63,9 @@ class OrgRequest(CoreRequest):
         return self.app.org.email_for_new_tickets
 
     def auto_accept(self, ticket):
+        if self.app.org.ticket_auto_accept_style == 'role':
+            roles = self.app.org.ticket_auto_accept_roles
+            if not roles:
+                return False
+            return self.has_role(*roles)
         return ticket.handler_code in (self.app.org.ticket_auto_accepts or [])

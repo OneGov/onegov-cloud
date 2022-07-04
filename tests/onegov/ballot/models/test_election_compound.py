@@ -362,6 +362,36 @@ def test_election_compound(session):
     assert session.query(Candidate).first() is None
     assert session.query(ElectionResult).first() is None
 
+    # Add results again and delete compound
+    party_result = PartyResult(
+        owner=election_compound.id,
+        number_of_mandates=0,
+        votes=0,
+        total_votes=100,
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1',
+        color='black'
+    )
+    session.add(party_result)
+    session.flush()
+    assert election_compound.party_results.one() == party_result
+
+    panachage_result = PanachageResult(
+        owner=election_compound.id,
+        source='A',
+        target='B',
+        votes=0,
+    )
+    session.add(panachage_result)
+    session.flush()
+    assert election_compound.panachage_results.one() == panachage_result
+
+    session.delete(election_compound)
+    session.flush()
+
+    assert session.query(PartyResult).first() is None
+    assert session.query(PanachageResult).first() is None
+
 
 def test_election_compound_id_generation(session):
     election_compound = ElectionCompound(
@@ -1049,123 +1079,6 @@ def test_election_compound_supersegment_progress(session):
     assert elections[3].completed is False
     assert election_compound.completed is False
     assert election_compound.progress == (1, 3)
-
-
-def test_list_results(session):
-    election_compound = ElectionCompound(
-        title='Elections',
-        domain='canton',
-        date=date(2015, 6, 14),
-    )
-    session.add(election_compound)
-    session.flush()
-
-    assert election_compound.get_list_results() == []
-    elections = [
-        proporz_election(id='1', number_of_mandates=1),
-        proporz_election(id='2', number_of_mandates=2),
-        proporz_election(id='3', number_of_mandates=3)
-    ]
-    for election in elections:
-        session.add(election)
-    election_compound.elections = elections
-    session.flush()
-
-    # Not Doppelter Pukelsheim
-    assert election_compound.get_list_results() == []
-
-    # Doppelter Pukelsheim with manual completion
-    election_compound.pukelsheim = True
-    election_compound.completes_manually = True
-    election_compound.manually_completed = False
-    assert election_compound.get_list_results() == [
-        ('Quimby Again!', 3, 953),  # 520 / 1 + 520 / 2 + 520 / 3
-        ('Kwik-E-Major', 0, 204)  # 111 / 1 + 111/2 + 111/3
-    ]
-
-    # Add another list
-    list_id = uuid4()
-    list_ = List(
-        id=list_id,
-        list_id='3',
-        number_of_mandates=5,
-        name='Burns burns!',
-    )
-    list_result = ListResult(
-        list_id=list_id,
-        votes=200
-    )
-    election_result = ElectionResult(
-        name='name',
-        entity_id=1,
-        counted=True,
-    )
-    election_result.list_results.append(list_result)
-    elections[0].lists.append(list_)
-    elections[0].results.append(election_result)
-    session.flush()
-
-    assert election_compound.get_list_results() == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)  # 200 + 0 / 2 + 0 / 3
-    ]
-
-    # Test optional parameters
-    # ... limit
-    assert election_compound.get_list_results(limit=0) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=None) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=-5) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=2) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-    ]
-
-    # ... names
-    assert election_compound.get_list_results(names=[]) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(names=None) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(
-        names=['Quimby Again!', 'Kwik-E-Major', 'All others']
-    ) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-    ]
-
-    # ... manually completed
-    election_compound.manually_completed = True
-    assert election_compound.get_list_results() == [
-        ('Burns burns!', 5, 200),
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204)
-    ]
-
-    # ... limit & names & order_by
-    assert election_compound.get_list_results(
-        limit=1,
-        names=['Quimby Again!'],
-    ) == [
-        ('Quimby Again!', 3, 953),
-    ]
 
 
 def test_election_compound_attachments(test_app, explanations_pdf):

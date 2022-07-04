@@ -665,33 +665,6 @@
     </table>
 </metal:election-compound-list-groups-table>
 
-<metal:election-compound-lists-table define-macro="election-compound-lists-table" i18n:domain="onegov.election_day">
-    <table
-        class="election-compound-lists-table results tablesaw sortable"
-        data-tablesaw-mode="columntoggle"
-        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-        data-tablesaw-minimap=""
-        tal:define="names names|''"
-        >
-        <thead>
-            <tr>
-                <th data-tablesaw-priority="persist" i18n:translate="" class="column-list">List</th>
-                <th tal:condition="not layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-votes right-aligned">Voters count</th>
-                <th tal:condition="layout.completed" data-tablesaw-priority="1" i18n:translate="" class="column-mandates right-aligned">${layout.label('mandates')}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr tal:repeat="list lists">
-                <tal:block tal:condition="not names or list.name in [n.strip() for n in names.split(',')]">
-                    <td class="column-list">${list.name}</td>
-                    <td tal:condition="not layout.completed" class="column-votes right-aligned" data-text="${list.voters_count or 0}">${layout.format_number(list.voters_count or 0)}</td>
-                    <td tal:condition="layout.completed" class="column-mandates right-aligned">${list.number_of_mandates}</td>
-                </tal:block>
-            </tr>
-        </tbody>
-    </table>
-</metal:election-compound-lists-table>
-
 <metal:ballot-result-bar define-macro="ballot-result-bar">
     <div class="ballot-result-bar" tal:condition="layout.has_results and ballot">
         <div class="percentages flex-container justify-between align-center">

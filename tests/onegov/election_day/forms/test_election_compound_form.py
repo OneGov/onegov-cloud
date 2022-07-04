@@ -143,7 +143,6 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     model.related_link_label = related_link_labels
     model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
     model.show_list_groups = True
-    model.show_lists = True
     model.show_party_strengths = True
     model.show_party_panachage = True
     model.elections = [e_r]
@@ -175,7 +174,6 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     assert form.related_link_label_rm.data == 'RM'
     assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
     assert form.show_list_groups.data is True
-    assert form.show_lists.data is True
     assert form.show_party_strengths.data is True
     assert form.show_party_panachage.data is True
     assert form.region_elections.data == ['e-r']
@@ -202,7 +200,6 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     form.related_link.data = 'http://ur.l'
     form.explanations_pdf.action = 'delete'
     form.show_list_groups.data = False
-    form.show_lists.data = False
     form.show_party_strengths.data = False
     form.show_party_panachage.data = False
     form.region_elections.data = ['e-r']
@@ -241,7 +238,6 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     assert model.voters_counts is False
     assert model.exact_voters_counts is False
     assert form.show_list_groups.data is False
-    assert form.show_lists.data is False
     assert form.show_party_strengths.data is False
     assert form.show_party_panachage.data is False
     assert sorted([e.id for e in model.elections]) == ['e-d']

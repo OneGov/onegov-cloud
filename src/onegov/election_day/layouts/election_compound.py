@@ -13,7 +13,7 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'list-groups', 'lists', 'superregions', 'districts', 'candidates',
+        'list-groups', 'superregions', 'districts', 'candidates',
         'statistics'
     )
 
@@ -33,7 +33,6 @@ class ElectionCompoundLayout(DetailLayout):
         """ Return the tabs in order of their appearance. """
         return (
             'list-groups',
-            'lists',
             'superregions',
             'districts',
             'candidates',
@@ -82,8 +81,6 @@ class ElectionCompoundLayout(DetailLayout):
 
         if tab == 'list-groups':
             return _("List groups")
-        if tab == 'lists':
-            return _("Lists")
         if tab == 'superregions':
             return self.label('superregions')
         if tab == 'districts':
@@ -114,11 +111,6 @@ class ElectionCompoundLayout(DetailLayout):
                 self.model.show_list_groups is True
                 and self.model.pukelsheim is True
                 and self.has_party_results
-            )
-        if tab == 'lists':
-            return (
-                self.model.show_lists is True
-                and self.model.pukelsheim is True
             )
         if tab == 'party-strengths':
             return (
