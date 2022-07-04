@@ -93,10 +93,10 @@
             <dd>${layout.format_drive_distance(translator.drive_distance)}</dd>
 
             <dt i18n:translate>Withholding tax</dt>
-            <dd>${layout.format_boolean(translator.withholding_tax)}</dd>
+            <dd class="withholding-tax">${layout.format_boolean(translator.withholding_tax)}</dd>
 
             <dt i18n:translate>Self-employed</dt>
-            <dd>${layout.format_boolean(translator.self_employed)}</dd>
+            <dd class="self-employed">${layout.format_boolean(translator.self_employed)}</dd>
         </dl>
 
         <h3 i18n:translate>Identification / Bank details</h3>
@@ -135,7 +135,7 @@
             <dd>${translator.availability}</dd>
 
             <dt i18n:translate>Restriction regarding availability</dt>
-            <dd>${layout.format_boolean(ticket_data.get('availability_has_restriction'))}</dd>
+            <dd class="availability-has-restriction">${layout.format_boolean(ticket_data.get('availability_has_restriction'))}</dd>
 
             <dt i18n:translate>Restriction</dt>
             <dd>${ticket_data.get('availability_restriction')}</dd>
@@ -144,7 +144,7 @@
         <h3 i18n:translate>Legal</h3>
         <dl class="accreditation">
             <dt i18n:translate>Name revealing confirmation</dt>
-            <dd>${layout.format_boolean(translator.confirm_name_reveal)}</dd>
+            <dd class="confirm-name-reveal">${layout.format_boolean(translator.confirm_name_reveal)}</dd>
         </dl>
 
         <h3 i18n:translate>Training</h3>
@@ -156,7 +156,7 @@
             <dd>${ticket_data.get('current_profession')}</dd>
 
             <dt i18n:translate>Education as interpreter</dt>
-            <dd >${layout.format_boolean(translator.education_as_interpreter)}</dd>
+            <dd class="education-as-interpreter">${layout.format_boolean(translator.education_as_interpreter)}</dd>
         </dl>
 
         <h3 i18n:translate>Language training - Expertise</h3>
@@ -208,7 +208,7 @@
             <dd>${layout.format_admission(translator.admission)}</dd>
 
             <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
-            <dd>${layout.format_boolean(ticket_data.get('admission_course_agreement'))}</dd>
+            <dd class="admission-course-agreement">${layout.format_boolean(ticket_data.get('admission_course_agreement'))}</dd>
         </dl>
 
         <h3 i18n:translate>Documents</h3>
@@ -222,7 +222,6 @@
                 </ul>
             </dd>
         </dl>
-
 
         <h3 i18n:translate>Submission</h3>
         <dl class="accreditation">

@@ -419,8 +419,8 @@ def test_accreditation(translator_app):
     assert not ticket.handler.deleted
     assert ticket.handler.email == 'translator@example.org'
     assert ticket.handler.state is None
-    assert ticket.handler.title == 'Request Accreditation'
-    assert ticket.handler.subtitle == ''
+    assert ticket.handler.title == 'Benito, Hugo'
+    assert ticket.handler.subtitle == 'Request Accreditation'
     assert ticket.handler.group == 'Accreditation'
     assert accreditation.target == translator
     assert accreditation.ticket == ticket

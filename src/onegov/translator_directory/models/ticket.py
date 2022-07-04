@@ -157,11 +157,11 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
 
     @property
     def title(self):
-        return _('Request Accreditation')
+        return self.translator.title
 
     @property
     def subtitle(self):
-        return ''
+        return _('Request Accreditation')
 
     @cached_property
     def group(self):
