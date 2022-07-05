@@ -83,6 +83,8 @@ Num|Descripziun
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
 `candidate_party`|Il num da la partida.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
 `candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
 
 #### Panachage results

@@ -309,3 +309,12 @@ def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     elif treat_empty_as_default:
         return default
     raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
+
+
+def validate_gender(line):
+    result = getattr(line, 'candidate_gender', None) or None
+    if result not in (None, 'male', 'female', 'undetermined'):
+        raise ValueError(
+            _('Invalid gender: ${value}', mapping={'value': result})
+        )
+    return result

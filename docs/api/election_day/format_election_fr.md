@@ -83,6 +83,8 @@ Nom|Description
 `candidate_first_name`|Prénom du candidat.
 `candidate_elected`|Vrai, si le candidat a été élu.
 `candidate_party`|Nom de le parti.
+`candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé). Facultatif.
+`candidate_year_of_birth`|L'année de naissance du candidat. Facultatif.
 `candidate_votes`|Nombre de votes de candidats dans la municipalité.
 
 #### Résultats du panachage
