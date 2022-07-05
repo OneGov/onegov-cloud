@@ -9,6 +9,7 @@ from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
 from onegov.translator_directory.layout import TranslatorLayout
+from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
 
@@ -112,3 +113,93 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
             )
 
         return links
+
+
+class AccreditationTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'AKK'}
+    es_type_name = 'translator_accreditations'
+
+    def reference_group(self, request):
+        return self.title
+
+
+@handlers.registered_handler('AKK')
+class AccreditationHandler(Handler, TicketDeletionMixin):
+
+    handler_title = _("Accreditation")
+    code_title = _("Accreditations")
+
+    # @cached_property
+    # def translator(self):
+    #     return self.session.query(Translator).filter_by(
+    #         id=self.data['handler_data'].get('id')
+    #     ).first()
+
+    @cached_property
+    def accreditation(self):
+        return Accreditation(self.session, self.ticket.id)
+
+    @property
+    def deleted(self):
+        return False
+
+    @cached_property
+    def email(self):
+        return self.data['handler_data'].get('submitter_email', '')
+
+    # @cached_property
+    # def message(self):
+    #     return self.data['handler_data'].get('submitter_message', '')
+
+    # @cached_property
+    # def proposed_changes(self):
+    #     return self.data['handler_data'].get('proposed_changes', {})
+
+    @cached_property
+    def state(self):
+        return self.data.get('state')
+
+    @property
+    def title(self):
+        return _("Request Accreditation")
+
+    @property
+    def subtitle(self):
+        return ""
+
+    @cached_property
+    def group(self):
+        return _("Accreditation")
+
+    def get_summary(self, request):
+        return ""
+        # layout = TranslatorLayout(self.translator, request)
+        # changes = self.mutation.translated(request, self.proposed_changes)
+        # return render_macro(
+        #     layout.macros['display_translator_mutation'],
+        #     request,
+        #     {
+        #         'translator': self.translator,
+        #         'message': linkify(self.message).replace('\n', '<br>'),
+        #         'changes': changes,
+        #         'layout': layout
+        #     }
+        # )
+
+    def get_links(self, request):
+        if self.deleted:
+            return []
+
+        if self.state is None:
+            # todo: edit link
+            return [
+                Link(
+                    text=_("Accept accreditation"),
+                    url=request.return_here(
+                        request.link(self.accreditation, 'accept')
+                    ),
+                    attrs={'class': 'accept-link'},
+                )
+            ]
+
+        return []

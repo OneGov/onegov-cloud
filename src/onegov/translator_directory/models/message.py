@@ -21,3 +21,22 @@ class TranslatorMutationMessage(Message, TicketMessageMixin):
             labels = TranslatorMutation(None, None, None).labels
             changes = [labels.get(change, change) for change in changes]
         return changes
+
+
+class AccreditationMessage(Message, TicketMessageMixin):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'translator_accreditation'
+    }
+
+    @classmethod
+    def create(cls, ticket, request, change, changes):
+        return super().create(ticket, request, change=change, changes=changes)
+
+    @cached_property
+    def applied_changes(self):
+        changes = self.meta.get('changes', [])
+        if changes:
+            labels = TranslatorMutation(None, None, None).labels
+            changes = [labels.get(change, change) for change in changes]
+        return changes

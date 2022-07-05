@@ -9,6 +9,7 @@ from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
+from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.orm import backref, object_session
@@ -41,6 +42,9 @@ class Candidate(Base, TimestampMixin):
         Enum('male', 'female', 'undetermined', name='candidate_gender'),
         nullable=True
     )
+
+    #: the year of birth
+    year_of_birth = Column(Integer, nullable=True)
 
     #: the election this candidate belongs to
     election_id = Column(

@@ -44,6 +44,13 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    state = Column(
+        Enum('initiated', 'submitted', 'published', 'withdrawn',
+             name='event_state'),
+        nullable=False,
+        default='initiated'
+    )
+
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
 
@@ -173,4 +180,5 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     @property
     def unique_categories(self):
+        # todo: ?
         return sorted({f.note for f in self.files})

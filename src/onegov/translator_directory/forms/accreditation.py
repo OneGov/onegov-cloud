@@ -1,0 +1,417 @@
+from cached_property import cached_property
+from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TagsField
+from onegov.form.validators import Stdnum
+from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidSwissSocialSecurityNumber
+from onegov.gis import Coordinates
+from onegov.gis import CoordinatesField
+from onegov.translator_directory import _
+from onegov.translator_directory.collections.certificate import \
+    LanguageCertificateCollection
+from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.constants import ADMISSIONS
+from onegov.translator_directory.constants import GENDERS
+from onegov.translator_directory.constants import INTERPRETING_TYPES
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
+from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
+from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.layout import DefaultLayout
+from wtforms import FloatField
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import IntegerField
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+
+
+BOOLS = [('True', _('Yes')), ('False', _('No'))]
+
+
+# todo:
+# class RequestAccreditationForm(Form, DrivingDistanceMixin):
+class RequestAccreditationForm(Form):
+
+    @cached_property
+    def language_choices(self):
+        languages = LanguageCollection(self.request.session)
+        return [
+            (str(language.id), language.name)
+            for language in languages.query()
+        ]
+
+    @cached_property
+    def certificate_choices(self):
+        certificates = LanguageCertificateCollection(self.request.session)
+        return [
+            (str(certificate.id), certificate.name)
+            for certificate in certificates.query()
+        ]
+
+    def on_request(self):
+        self.request.include('tags-input')
+
+        # self.mother_tongues.choices = self.language_choices.copy()
+        # self.spoken_languages.choices = self.language_choices.copy()
+        # self.written_languages.choices = self.language_choices.copy()
+        # self.certificates.choices = self.certificate_choices.copy()
+
+        # layout = DefaultLayout(self.model, self.request)
+        # for name, field in self.proposal_fields.items():
+        #     if not layout.show(name):
+        #         self.delete_field(name)
+        #         continue
+        #
+        #     value = getattr(self.model, name)
+        #     if isinstance(field, ChosenSelectField):
+        #         field.choices.insert(0, ('', ''))
+        #         field.choices = [
+        #             (choice[0], self.request.translate(choice[1]))
+        #             for choice in field.choices
+        #         ]
+        #         field.long_description = dict(field.choices).get(
+        #             str(value), ''
+        #         )
+        #     elif isinstance(field, ChosenSelectMultipleField):
+        #         field.choices.insert(0, ('', ''))
+        #         field.choices = [
+        #             (choice[0], self.request.translate(choice[1]))
+        #             for choice in field.choices
+        #         ]
+        #         field.long_description = ', '.join([
+        #             dict(field.choices).get(str(getattr(v, 'id', v)), '')
+        #             for v in value
+        #         ])
+        #     elif isinstance(field, CoordinatesField):
+        #         pass
+        #     elif isinstance(field, TagsField):
+        #         field.long_description = ', '.join(value)
+        #     elif isinstance(field, DateField):
+        #         if value:
+        #             field.long_description = layout.format_date(value, 'date')
+        #     else:
+        #         field.long_description = str(value or '')
+
+    # @property
+    # def proposal_fields(self):
+    #     for fieldset in self.fieldsets:
+    #         if fieldset.label == 'Proposed changes':
+    #             return fieldset.fields.copy()
+    #     return {}
+
+    # @property
+    # def proposed_changes(self):
+    #     def convert(data):
+    #         if isinstance(data, list):
+    #             return data
+    #         if isinstance(data, Coordinates):
+    #             return data if data.lat and data.lon else None
+    #         return {'None': None, 'True': True, 'False': False}.get(data, data)
+    #
+    #     def has_changed(name, value):
+    #         old = getattr(self.model, name)
+    #         if name in ('mother_tongues', 'spoken_languages',
+    #                     'written_languages', 'certificates'):
+    #             old = [str(x.id) for x in getattr(self.model, name, [])]
+    #         return value != old
+    #
+    #     data = {
+    #         name: convert(field.data)
+    #         for name, field in self.proposal_fields.items()
+    #     }
+    #     data = {
+    #         name: value for name, value in data.items()
+    #         if (
+    #             value != ''
+    #             and value is not None
+    #             and value != []
+    #             and has_changed(name, value)
+    #         )
+    #     }
+    #     return data
+
+    # def ensure_has_content(self):
+    #     if not self.submitter_message.data and not self.proposed_changes:
+    #         self.submitter_message.errors.append(
+    #             _(
+    #                 'Please enter a message or suggest some changes '
+    #                 'using the fields below.'
+    #             )
+    #         )
+    #         return False
+
+    # submitter_message = TextAreaField(
+    #     fieldset=_('Your message'),
+    #     label=_('Message'),
+    #     render_kw={'rows': 8}
+    # )
+
+    first_name = StringField(
+        label=_('First name'),
+        fieldset=_('Personal information'),
+        validators=[InputRequired()],
+    )
+
+    last_name = StringField(
+        label=_('Last name'),
+        fieldset=_('Personal information'),
+        validators=[InputRequired()],
+    )
+
+    # todo: ensure unique
+    email = EmailField(
+        label=_('Email'),
+        validators=[InputRequired(), Email()],
+        fieldset=_('Contact information')
+    )
+
+
+    # pers_id = IntegerField(
+    #     label=_('Personal ID'),
+    #     fieldset=_('Proposed changes'),
+    #     validators=[Optional()]
+    # )
+    #
+    # admission = ChosenSelectField(
+    #     label=_('Admission'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=list(ADMISSIONS.items()),
+    #     validators=[Optional()]
+    # )
+    #
+    # withholding_tax = ChosenSelectField(
+    #     label=_('Withholding tax'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=BOOLS,
+    #     validators=[Optional()]
+    # )
+    #
+    # self_employed = ChosenSelectField(
+    #     label=_('Self-employed'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=BOOLS,
+    #     validators=[Optional()]
+    # )
+    #
+    # gender = ChosenSelectField(
+    #     label=_('Gender'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=list(GENDERS.items()),
+    #     validators=[Optional()]
+    # )
+    #
+    # date_of_birth = DateField(
+    #     label=_('Date of birth'),
+    #     fieldset=_('Proposed changes'),
+    #     validators=[Optional()]
+    # )
+    #
+    # nationality = StringField(
+    #     label=_('Nationality'),
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # coordinates = CoordinatesField(
+    #     label=_('Location'),
+    #     description=_(
+    #         'Search for the exact address to set a marker. The address fields '
+    #         'beneath are filled out automatically.'
+    #     ),
+    #     fieldset=_('Proposed changes'),
+    #     render_kw={'data-map-type': 'marker'}
+    # )
+    #
+    # address = StringField(
+    #     label=_('Street and house number'),
+    #     fieldset=_('Proposed changes'),
+    #     render_kw={'readonly': True}
+    # )
+    #
+    # zip_code = StringField(
+    #     label=_('Zip Code'),
+    #     fieldset=_('Proposed changes'),
+    #     render_kw={'readonly': True}
+    # )
+    #
+    # city = StringField(
+    #     label=_('City'),
+    #     fieldset=_('Proposed changes'),
+    #     render_kw={'readonly': True}
+    # )
+    #
+    # drive_distance = FloatField(
+    #     label=_('Drive distance (km)'),
+    #     fieldset=_('Proposed changes'),
+    #     validators=[Optional()],
+    #     render_kw={'readonly': True}
+    # )
+    #
+    # social_sec_number = StringField(
+    #     label=_('Swiss social security number'),
+    #     validators=[ValidSwissSocialSecurityNumber()],
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # bank_name = StringField(
+    #     label=_('Bank name'),
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # bank_address = StringField(
+    #     label=_('Bank address'),
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # account_owner = StringField(
+    #     label=_('Account owner'),
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # iban = StringField(
+    #     label=_('IBAN'),
+    #     validators=[Stdnum(format='iban')],
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # tel_mobile = StringField(
+    #     label=_('Mobile Number'),
+    #     validators=[ValidPhoneNumber()],
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # tel_private = StringField(
+    #     label=_('Private Phone Number'),
+    #     validators=[ValidPhoneNumber()],
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # tel_office = StringField(
+    #     label=_('Office Phone Number'),
+    #     validators=[ValidPhoneNumber()],
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # availability = StringField(
+    #     label=_('Availability'),
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # operation_comments = TextAreaField(
+    #     label=_('Comments on possible field of application'),
+    #     render_kw={'rows': 3},
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # confirm_name_reveal = ChosenSelectField(
+    #     label=_('Name revealing confirmation'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=BOOLS,
+    #     validators=[Optional()]
+    # )
+    #
+    # date_of_application = DateField(
+    #     label=_('Date of application'),
+    #     fieldset=_('Proposed changes'),
+    #     validators=[Optional()],
+    # )
+    #
+    # date_of_decision = DateField(
+    #     label=_('Date of decision'),
+    #     fieldset=_('Proposed changes'),
+    #     validators=[Optional()],
+    # )
+    #
+    # mother_tongues = ChosenSelectMultipleField(
+    #     label=_('Mother tongues'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=[],
+    #     validators=[Optional()]
+    # )
+    #
+    # spoken_languages = ChosenSelectMultipleField(
+    #     label=_('Spoken languages'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=[],
+    #     validators=[Optional()],
+    # )
+    #
+    # written_languages = ChosenSelectMultipleField(
+    #     label=_('Written languages'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=[],
+    #     validators=[Optional()],
+    # )
+    #
+    # expertise_professional_guilds = ChosenSelectMultipleField(
+    #     label=_('Expertise by professional guild'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=list(PROFESSIONAL_GUILDS.items()),
+    #     validators=[Optional()]
+    # )
+    #
+    # expertise_professional_guilds_other = TagsField(
+    #     label=_('Expertise by professional guild: other'),
+    #     fieldset=_('Proposed changes'),
+    #     render_kw={'show_help': True}
+    # )
+    #
+    # expertise_interpreting_types = ChosenSelectMultipleField(
+    #     label=_('Expertise by interpreting type'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=list(INTERPRETING_TYPES.items()),
+    #     validators=[Optional()]
+    # )
+    #
+    # proof_of_preconditions = StringField(
+    #     label=_('Proof of preconditions'),
+    #     fieldset=_('Proposed changes'),
+    # )
+    #
+    # agency_references = TextAreaField(
+    #     label=_('Agency references'),
+    #     render_kw={'rows': 3},
+    #     fieldset=_('Proposed changes')
+    # )
+    #
+    # education_as_interpreter = ChosenSelectField(
+    #     label=_('Education as interpreter'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=BOOLS,
+    #     validators=[Optional()]
+    # )
+    #
+    # certificates = ChosenSelectMultipleField(
+    #     label=_('Language Certificates'),
+    #     fieldset=_('Proposed changes'),
+    #     choices=[],
+    #     validators=[Optional()],
+    # )
+    #
+    # comments = TextAreaField(
+    #     label=_('Comments'),
+    #     fieldset=_('Proposed changes'),
+    # )
+
+
+class AcceptAccreditationForm(Form):
+
+    callout = _(
+        'Create a new translator directory entry and send an activation email.'
+    )
+
+    def ensure_unique_email(self):
+        email = self.model.data.get('email')
+        if email:
+            query = self.request.session.query(Translator)
+            if query.filter_by(email=email).first():
+                self.request.alert('E-Mail already in use')
+                return False
+
+    def update_model(self):
+        self.model.accept()
