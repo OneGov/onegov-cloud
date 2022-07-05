@@ -459,7 +459,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         identity = self.identity
         if user:
             identity = self.app.application_bound_identity(
-                user.id, user.group_id, user.role
+                user.username,
+                user.group_id.hex if user.group_id else user.group_id,
+                user.role
             )
 
         return self.app._permits(identity, model, permission)
