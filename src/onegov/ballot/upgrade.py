@@ -657,3 +657,13 @@ def add_year_of_birth_column(context):
             'candidates',
             Column('year_of_birth', Integer(), nullable=True)
         )
+
+
+@upgrade_task('Add exapts columns')
+def add_exapts_columns(context):
+    for table in ('election_results', 'ballot_results'):
+        if not context.has_column(table, 'expats'):
+            context.operations.add_column(
+                table,
+                Column('expats', Integer(), nullable=True)
+            )

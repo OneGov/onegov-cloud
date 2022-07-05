@@ -81,6 +81,7 @@ Num|Descripziun
 `invalid`|Il dumber da las vuschs nunvalaivlas.
 `empty`|Il dumber da las vuschs vidas.
 `eligible_voters`|Il dumber da las persunas cun dretg da votar.
+`expats`|Anzahl Auslandschweizer. Optional.
 
 
 #### Resultats temporars

@@ -49,6 +49,9 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     #: number of eligible voters
     eligible_voters = Column(Integer, nullable=False, default=lambda: 0)
 
+    #: number of expats
+    expats = Column(Integer, nullable=True)
+
     #: number of received ballots
     received_ballots = Column(Integer, nullable=False, default=lambda: 0)
 

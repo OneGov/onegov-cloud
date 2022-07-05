@@ -315,6 +315,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             ElectionResult.entity_id,
             ElectionResult.counted,
             ElectionResult.eligible_voters,
+            ElectionResult.expats,
             ElectionResult.received_ballots,
             ElectionResult.blank_ballots,
             ElectionResult.invalid_ballots,
@@ -361,6 +362,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             row['entity_id'] = result.entity_id
             row['entity_counted'] = result.counted
             row['entity_eligible_voters'] = result.eligible_voters
+            row['entity_expats'] = result.expats
             row['entity_received_ballots'] = result.received_ballots
             row['entity_blank_ballots'] = result.blank_ballots
             row['entity_invalid_ballots'] = result.invalid_ballots

@@ -98,6 +98,7 @@ Name|Description
 `entity_district`|The district of the municipality.
 `entity_counted`|`True` if the result was counted.
 `entity_eligible_voters`|The number of people eligible to vote for this municipality.
+`entity_expats`|Number of expats for this municipality.
 `entity_received_ballots`|The number of received ballots for this municipality.
 `entity_blank_ballots`|The number of blank ballots for this municipality.
 `entity_invalid_ballots`|The number of invalid ballots for this municipality.
@@ -196,3 +197,4 @@ Name|Description
 `invalid`|The number of invalid votes.
 `empty`|The number of empty votes.
 `eligible_voters`|The number of people eligible to vote.
+`expats`|Number of expats.
