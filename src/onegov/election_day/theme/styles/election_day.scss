@@ -367,10 +367,20 @@ table {
 
         td,
         th {
+            padding-left: 0;
+            padding-right: 0;
             text-align: left;
         }
 
+        th {
+            border-bottom: 1px dashed #ddd;
+            border-top: 1px solid #ddd;
+            margin-top: 1rem;
+        }
+
         td {
+            border-bottom: 1px dashed #ddd;
+
             .tablesaw-cell-label {
                 color: $black;
                 font-weight: normal;
@@ -379,6 +389,10 @@ table {
             .tablesaw-cell-content {
                 float: right;
             }
+        }
+
+        td:last-child {
+            border-bottom: 0;
         }
 
         td:first-child {
@@ -395,6 +409,13 @@ table {
                 text-align: center;
                 width: 100%;
             }
+        }
+    }
+
+    th.right-aligned-small {
+        span, a {
+            float: right;
+            text-align: right;
         }
     }
 }
