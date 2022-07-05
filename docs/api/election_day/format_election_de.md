@@ -84,6 +84,7 @@ Name|Beschreibung
 `candidate_elected`|True, falls der Kandidierenden gewählt wurde.
 `candidate_party`|Der Name der Partei.
 `candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
 `candidate_votes`|Anzahl Kandidierendenstimmen in der Einheit.
 
 #### Panaschierdaten

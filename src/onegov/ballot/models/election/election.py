@@ -328,7 +328,8 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             Candidate.candidate_id,
             Candidate.elected,
             Candidate.party,
-            Candidate.gender
+            Candidate.gender,
+            Candidate.year_of_birth,
         )
         results = results.outerjoin(CandidateResult.candidate)
         results = results.outerjoin(CandidateResult.election_result)
@@ -374,6 +375,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             row['candidate_elected'] = result.elected
             row['candidate_party'] = result.party
             row['candidate_gender'] = result.gender or ''
+            row['candidate_year_of_birth'] = result.year_of_birth or ''
             row['candidate_votes'] = result.votes
             rows.append(row)
 

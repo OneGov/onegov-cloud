@@ -503,7 +503,8 @@ def test_election_export(session):
         family_name='Quimby',
         first_name='Joe',
         party='Republican Party',
-        gender='male'
+        gender='male',
+        year_of_birth=1970
     )
     candidate_2 = Candidate(
         id=uuid4(),
@@ -581,6 +582,7 @@ def test_election_export(session):
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
         'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111,
     }
     assert export[1] == {
@@ -613,6 +615,7 @@ def test_election_export(session):
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
         'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
     }
 

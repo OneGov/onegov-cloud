@@ -247,6 +247,7 @@ def test_import_internal_proporz_invalid_values(session):
                         'candidate_votes',
                         'candidate_party',
                         'candidate_gender',
+                        'candidate_year_of_birth',
                     )),
                     ','.join((
                         'xxx',  # election_status
@@ -271,6 +272,7 @@ def test_import_internal_proporz_invalid_values(session):
                         'xxx',  # candidate_votes
                         'xxx',  # candidate_party
                         '',  # candidate_gender
+                        '',  # candidate_year_of_birth
                     )),
                     ','.join((
                         'unknown',  # election_status
@@ -295,6 +297,32 @@ def test_import_internal_proporz_invalid_values(session):
                         '',  # candidate_votes
                         '',  # candidate_party
                         'xxx',  # candidate_gender
+                        '',  # candidate_year_of_birth
+                    )),
+                    ','.join((
+                        'unknown',  # election_status
+                        '3251',  # entity_id
+                        'True',  # entity_counted
+                        '100',  # entity_eligible_voters
+                        '10',  # entity_received_ballots
+                        '0',  # entity_blank_ballots
+                        '0',  # entity_invalid_ballots
+                        '0',  # entity_blank_votes
+                        '0',  # entity_invalid_votes
+                        '',  # list_name
+                        '1',  # list_id
+                        '',  # list_number_of_mandates
+                        '',  # list_votes
+                        '',  # list_connection
+                        '',  # list_connection_parent
+                        '',  # candidate_family_name
+                        '',  # candidate_first_name
+                        '',  # candidate_id
+                        '',  # candidate_elected
+                        '',  # candidate_votes
+                        '',  # candidate_party
+                        '',  # candidate_gender
+                        'xxx',  # candidate_year_of_birth
                     )),
                 ))
                 ).encode('utf-8')), 'text/plain',
@@ -311,6 +339,7 @@ def test_import_internal_proporz_invalid_values(session):
         (3, 'Empty value: list_id'),
         (3, 'Empty value: list_id'),
         (3, 'Invalid gender: xxx'),
+        (4, 'Invalid integer: candidate_year_of_birth'),
     ]
 
 
@@ -818,6 +847,7 @@ def test_import_internal_proproz_optional_columns(session):
                     'candidate_votes',
                     'candidate_party',
                     'candidate_gender',
+                    'candidate_year_of_birth',
                 )),
                 ','.join((
                     'unknown',  # election_status
@@ -842,9 +872,12 @@ def test_import_internal_proproz_optional_columns(session):
                     '1',  # candidate_votes
                     '',  # candidate_party
                     'female',  # candidate_gender
+                    '1970',  # candidate_year_of_birth
                 ))
             ))
         ).encode('utf-8')), 'text/plain',
     )
     assert not errors
-    assert election.candidates.one().gender == 'female'
+    candidate = election.candidates.one()
+    assert candidate.gender == 'female'
+    assert candidate.year_of_birth == 1970

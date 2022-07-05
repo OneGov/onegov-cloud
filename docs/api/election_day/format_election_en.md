@@ -86,6 +86,7 @@ Name|Description
 `candidate_elected`|True, if the candidate was elected.
 `candidate_party`|The name of the party.
 `candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`. Optional.
+`candidate_year_of_birth`|The year of the candidate. Optional.
 `candidate_votes`|Number of candidate votes in municipality.
 
 #### Panachage results
