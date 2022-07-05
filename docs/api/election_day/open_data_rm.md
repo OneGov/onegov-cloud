@@ -119,6 +119,8 @@ Num|Descripziun
 `candidate_first_name`|Il prenum da la persuna che candidescha.
 `candidate_id`|La ID da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
+`candidate_party`|Il num da la partida.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
 `panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 

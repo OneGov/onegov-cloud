@@ -83,6 +83,7 @@ Nome|Descrizione
 `candidate_first_name`|Nome del candidato.
 `candidate_elected`|Vero, se il candidato è stato eletto.
 `candidate_party`|Il nome del partito.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
 `candidate_votes`|Numero di voti per il candidato nel Comune.
 
 #### Risultati panachage
