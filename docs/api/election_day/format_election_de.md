@@ -67,6 +67,7 @@ Name|Beschreibung
 `entity_id`|BFS Nummer der Gemeinde oder ID des Stadtteils. Der Wert `0` kann für Auslandslebende verwendet werden.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Anzahl Stimmberechtigte der Einheit.
+`entity_expats`|Anzahl Auslandslebende der Einheit. Optional.
 `entity_received_ballots`|Anzahl abgegebene Stimmzettel der Einheit.
 `entity_blank_ballots`|Anzahl leere Stimmzettel der Einheit.
 `entity_invalid_ballots`|Anzahl ungültige Stimmzettel der Einheit.

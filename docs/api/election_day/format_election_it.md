@@ -67,6 +67,7 @@ Nome|Descrizione
 `entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero di aventi diritto al voto nel Comune.
+`entity_expats`|Anzahl Auslandslebende der Einheit. Optional.
 `entity_received_ballots`|Numero di schede presentate nel Comune.
 `entity_blank_ballots`|Numero di schede bianche nel Comune.
 `entity_invalid_ballots`|Numero di schede nulle nel Comune.

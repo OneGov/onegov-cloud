@@ -69,6 +69,7 @@ Name|Description
 `entity_id`|BFS number of the municipality. A value of `0` can be used for expats.
 `entity_counted`|`True` if the result was counted.
 `entity_eligible_voters`|Number of persons entitled to vote in municipality.
+`entity_expats`|Number of expats in the unit. Optional.
 `entity_received_ballots`|Number of submitted ballots in municipality.
 `entity_blank_ballots`|Number empty ballots in municipality.
 `entity_invalid_ballots`|Number invalid ballots in municipality.
