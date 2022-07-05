@@ -5,8 +5,6 @@ from onegov.election_day.utils.election_compound import get_districts_data
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_list_groups_data
-from onegov.election_day.utils.election_compound import get_list_results
-from onegov.election_day.utils.election_compound import get_lists_data
 from onegov.election_day.utils.parties import get_parties_panachage_data
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
@@ -30,8 +28,6 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
 
     assert get_districts_data(election_compound, principal) == {}
     assert get_elected_candidates(election_compound, session).all() == []
-    assert get_list_results(election_compound) == []
-    assert get_lists_data(election_compound) == {'results': []}
 
     # Add intermediate results
     election_1, errors = import_test_datasets(
@@ -109,78 +105,6 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
         ('Losa', 'Jeannette', '', 'GRÜ', '06', election_2.id),
         ('Mattle', 'Ruedi', '', 'GLP', '06', election_1.id)
     ]
-    assert get_list_results(election_compound) == [
-        ('SVP', 9, 2702),
-        ('CVP', 6, 2399),
-        ('FDP', 5, 1780),
-        ('SP', 4, 1567),
-        ('GRÜ', 2, 841),
-        ('GLP', 1, 652),
-        ('EVP', 0, 283),
-        ('FDP_J', 0, 140)
-    ]
-    assert get_lists_data(election_compound) == {
-        'results': [{
-            'class': 'inactive',
-            'color': '',
-            'text': 'SVP',
-            'value': 2702,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'CVP',
-            'value': 2399,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'FDP',
-            'value': 1780,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'SP',
-            'value': 1567,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'GRÜ',
-            'value': 841,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'GLP',
-            'value': 652,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'EVP',
-            'value': 283,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'FDP_J',
-            'value': 140,
-            'value2': None
-        }]
-    }
-    assert get_lists_data(election_compound, limit=1, names=['SP', 'Grü']) == {
-        'results': [
-            {
-                'text': 'SP',
-                'value': 1567,
-                'value2': None,
-                'class': 'inactive',
-                'color': ''
-            }
-        ]
-    }
 
     # Add final results
     election_1, errors = import_test_datasets(
@@ -215,78 +139,6 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
             'percentage': 100.0,
             'votes': 0
         }
-    }
-    assert get_list_results(election_compound) == [
-        ('SVP', 9, 5973),
-        ('CVP', 6, 4911),
-        ('FDP', 5, 3874),
-        ('SP', 4, 2737),
-        ('GRÜ', 2, 1705),
-        ('GLP', 1, 1412),
-        ('EVP', 0, 283),
-        ('FDP_J', 0, 140)
-    ]
-    assert get_lists_data(election_compound) == {
-        'results': [{
-            'class': 'active',
-            'color': '',
-            'text': 'SVP',
-            'value': 9,
-            'value2': None
-        }, {
-            'class': 'active',
-            'color': '',
-            'text': 'CVP',
-            'value': 6,
-            'value2': None
-        }, {
-            'class': 'active',
-            'color': '',
-            'text': 'FDP',
-            'value': 5,
-            'value2': None
-        }, {
-            'class': 'active',
-            'color': '',
-            'text': 'SP',
-            'value': 4,
-            'value2': None
-        }, {
-            'class': 'active',
-            'color': '',
-            'text': 'GRÜ',
-            'value': 2,
-            'value2': None
-        }, {
-            'class': 'active',
-            'color': '',
-            'text': 'GLP',
-            'value': 1,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'EVP',
-            'value': 0,
-            'value2': None
-        }, {
-            'class': 'inactive',
-            'color': '',
-            'text': 'FDP_J',
-            'value': 0,
-            'value2': None
-        }]
-    }
-    assert get_lists_data(election_compound, limit=1, names=['SP', 'Grü']) == {
-        'results': [
-            {
-                'text': 'SP',
-                'value': 4,
-                'value2': None,
-                'class': 'active',
-                'color': ''
-            }
-        ]
     }
 
 
@@ -544,59 +396,66 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     years, parties = get_party_results(election_compound)
     assert years == ['2014']
     assert parties == {
-        'AL': {
+        '0': {
             '2014': {
+                'name': 'AL',
                 'color': '#99C040',
                 'mandates': 10,
-                'voters_count': {'permille': 138, 'total': 538},
+                'voters_count': {'permille': Decimal('137.80'), 'total': 538},
                 'votes': {'permille': 138, 'total': 43062}
             }
         },
-        'CVP': {
+        '1': {
             '2014': {
+                'name': 'CVP',
                 'color': '#EE7F00',
                 'mandates': 22,
-                'voters_count': {'permille': 238, 'total': 931},
+                'voters_count': {'permille': Decimal('238.50'), 'total': 931},
                 'votes': {'permille': 238, 'total': 74448}
             }
         },
-        'FDP': {
+        '2': {
             '2014': {
+                'name': 'FDP',
                 'color': '#0E52A0',
                 'mandates': 18,
-                'voters_count': {'permille': 221, 'total': 863},
+                'voters_count': {'permille': Decimal('221.10'), 'total': 863},
                 'votes': {'permille': 221, 'total': 69028},
             }
         },
-        'GLP': {
+        '3': {
             '2014': {
+                'name': 'GLP',
                 'color': '#acc700',
                 'mandates': 4,
-                'voters_count': {'permille': 60, 'total': 236},
+                'voters_count': {'permille': Decimal('60.50'), 'total': 236},
                 'votes': {'permille': 60, 'total': 18864}
             }
         },
-        'Piraten': {
+        '4': {
             '2014': {
+                'name': 'Piraten',
                 'color': '#F9B200',
                 'mandates': 0,
-                'voters_count': {'permille': 5, 'total': 19},
+                'voters_count': {'permille': Decimal('4.90'), 'total': 19},
                 'votes': {'permille': 5, 'total': 1487}
             }
         },
-        'SP': {
+        '5': {
             '2014': {
+                'name': 'SP',
                 'color': '#E53136',
                 'mandates': 7,
-                'voters_count': {'permille': 107, 'total': 418},
+                'voters_count': {'permille': Decimal('107.10'), 'total': 418},
                 'votes': {'permille': 107, 'total': 33459}
             }
         },
-        'SVP': {
+        '6': {
             '2014': {
+                'name': 'SVP',
                 'color': '#019040',
                 'mandates': 19,
-                'voters_count': {'permille': 230, 'total': 899},
+                'voters_count': {'permille': Decimal('230.30'), 'total': 899},
                 'votes': {'permille': 230, 'total': 71930}
             }
         }}
@@ -605,13 +464,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         False,
         {
             '2014': [
-                ['AL', 10, 538, '13.8%'],
-                ['CVP', 22, 931, '23.8%'],
-                ['FDP', 18, 863, '22.1%'],
-                ['GLP', 4, 236, '6.0%'],
-                ['Piraten', 0, 19, '0.5%'],
-                ['SP', 7, 418, '10.7%'],
-                ['SVP', 19, 899, '23.0%']
+                ['AL', 10, 538, '13.78%'],
+                ['CVP', 22, 931, '23.85%'],
+                ['FDP', 18, 863, '22.11%'],
+                ['GLP', 4, 236, '6.05%'],
+                ['Piraten', 0, 19, '0.49%'],
+                ['SP', 7, 418, '10.71%'],
+                ['SVP', 19, 899, '23.03%']
             ]
         }
     )
@@ -627,49 +486,49 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'color': '#99C040',
                 'group': 'AL',
                 'item': '2014',
-                'value': {'back': 13.8, 'front': 10}
+                'value': {'back': 13.78, 'front': 10}
             },
             {
                 'active': True,
                 'color': '#EE7F00',
                 'group': 'CVP',
                 'item': '2014',
-                'value': {'back': 23.8, 'front': 22}
+                'value': {'back': 23.85, 'front': 22}
             },
             {
                 'active': True,
                 'color': '#0E52A0',
                 'group': 'FDP',
                 'item': '2014',
-                'value': {'back': 22.1, 'front': 18}
+                'value': {'back': 22.11, 'front': 18}
             },
             {
                 'active': True,
                 'color': '#acc700',
                 'group': 'GLP',
                 'item': '2014',
-                'value': {'back': 6.0, 'front': 4}
+                'value': {'back': 6.05, 'front': 4}
             },
             {
                 'active': True,
                 'color': '#F9B200',
                 'group': 'Piraten',
                 'item': '2014',
-                'value': {'back': 0.5, 'front': 0}
+                'value': {'back': 0.49, 'front': 0}
             },
             {
                 'active': True,
                 'color': '#E53136',
                 'group': 'SP',
                 'item': '2014',
-                'value': {'back': 10.7, 'front': 7}
+                'value': {'back': 10.71, 'front': 7}
             },
             {
                 'active': True,
                 'color': '#019040',
                 'group': 'SVP',
                 'item': '2014',
-                'value': {'back': 23.0, 'front': 19}
+                'value': {'back': 23.03, 'front': 19}
             }
         ],
         'title': 'Compound'
@@ -685,13 +544,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert data['results'][0]['value'] == 931
 
     years, parties = get_party_results(election_compound)
-    assert parties['AL']['2014']['voters_count']['total'] == Decimal('538.00')
+    assert parties['0']['2014']['voters_count']['total'] == Decimal('538.00')
 
     deltas = get_party_results_deltas(election_compound, years, parties)
     assert deltas[1]['2014'][0][2] == Decimal('538.00')
 
     data = get_party_results_data(election_compound)
-    assert data['results'][0]['value']['back'] == 13.8
+    assert data['results'][0]['value']['back'] == 13.78
 
     # ... with votes
     election_compound.voters_counts = False
@@ -703,7 +562,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert data['results'][0]['value'] == 931
 
     years, parties = get_party_results(election_compound)
-    assert parties['AL']['2014']['votes']['total'] == 43062
+    assert parties['0']['2014']['votes']['total'] == 43062
 
     deltas = get_party_results_deltas(election_compound, years, parties)
     assert deltas[1]['2014'][0][2] == 43062

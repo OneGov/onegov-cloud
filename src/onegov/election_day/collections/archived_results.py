@@ -113,12 +113,8 @@ class ArchivedResultCollection(object):
 
         latest_date = self.query().with_entities(ArchivedResult.date)
         latest_date = latest_date.order_by(desc(ArchivedResult.date))
-        latest_date = latest_date.limit(1).first()
-
-        if not latest_date:
-            return [], None
-        else:
-            return self.by_date(latest_date)
+        latest_date = latest_date.limit(1).scalar()
+        return self.by_date(latest_date) if latest_date else ([], None)
 
     def by_year(self, year):
         """ Returns the results for the given year. """
@@ -265,6 +261,8 @@ class ArchivedResultCollection(object):
 
         item.clear_results()
         self.update(item, request)
+        for election in getattr(item, 'elections', []):
+            self.update(election, request)
 
         self.session.flush()
 

@@ -446,11 +446,20 @@ def test_registration_form_hints(client):
     edit.form.submit()
 
     with freeze_time('2018-01-01'):
+        page = client.get('/forms')
+        assert 'Meetup' in page
+        assert "Zur Zeit keine Anmeldung möglich" in page
+
         page = client.get('/form/meetup')
         assert "Zur Zeit keine Anmeldung möglich" in page
 
         edit.form['stop'] = False
         edit.form.submit()
+
+        page = client.get('/forms')
+        assert 'Meetup' in page
+        assert "Die Anmeldung endet am Mittwoch, 31. Januar 2018" in page
+        assert "Die Anmeldung ist auf 2 Teilnehmer begrenzt" in page
 
         page = client.get('/form/meetup')
         assert "Die Anmeldung endet am Mittwoch, 31. Januar 2018" in page
@@ -459,17 +468,29 @@ def test_registration_form_hints(client):
         edit.form['waitinglist'] = 'no'
         edit.form.submit()
 
+        page = client.get('/forms')
+        assert 'Meetup' in page
+        assert "Es sind noch 2 Plätze verfügbar" in page
+
         page = client.get('/form/meetup')
         assert "Es sind noch 2 Plätze verfügbar" in page
 
         edit.form['limit'] = 1
         edit.form.submit()
 
+        page = client.get('/forms')
+        assert 'Meetup' in page
+        assert "Es ist noch ein Platz verfügbar" in page
+
         page = client.get('/form/meetup')
         assert "Es ist noch ein Platz verfügbar" in page
 
         page.form['e_mail'] = 'info@example.org'
         page.form.submit().follow().form.submit()
+
+        page = client.get('/forms')
+        assert 'Meetup' in page
+        assert "Keine Plätze mehr verfügbar" in page
 
         page = client.get('/form/meetup')
         assert "Keine Plätze mehr verfügbar" in page
@@ -610,7 +631,8 @@ def test_registration_ticket_workflow(client):
 
     count = 0
 
-    def register(client, data_in_email, accept_ticket=True, url='/form/meetup'):
+    def register(client, data_in_email, accept_ticket=True,
+                 url='/form/meetup'):
         nonlocal count
         count += 1
         with freeze_time(f'2018-01-01 00:00:{count:02d}'):

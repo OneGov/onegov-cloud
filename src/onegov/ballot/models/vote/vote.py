@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
@@ -27,7 +28,7 @@ from uuid import uuid4
 
 class Vote(Base, ContentMixin, LastModifiedMixin,
            DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
-           DerivedBallotsCountMixin):
+           DerivedBallotsCountMixin, ExplanationsPdfMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
@@ -197,8 +198,6 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: the total eligible voters
     eligible_voters = summarized_property('eligible_voters')
 
-    counted_cast_ballots = summarized_property('counted_cast_ballots')
-
     counted_eligible_voters = summarized_property('counted_eligible_voters')
 
     def aggregate_results(self, attribute):
@@ -271,7 +270,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         for ballot in self.ballots:
             ballot.clear_results()
 
-    def export(self):
+    def export(self, locales):
         """ Returns all data connected to this vote as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -290,8 +289,8 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
                 titles = (
                     ballot.title_translations or self.title_translations or {}
                 )
-                for locale, title in titles.items():
-                    row['title_{}'.format(locale)] = (title or '').strip()
+                for locale in locales:
+                    row[f'title_{locale}'] = titles.get(locale, '')
                 row['date'] = self.date.isoformat()
                 row['shortcode'] = self.shortcode
                 row['domain'] = self.domain

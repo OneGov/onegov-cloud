@@ -28,7 +28,7 @@ def test_message_edited(session):
 
 def test_message_order(session):
 
-    for i in range(0, 25):
+    for i in range(25, 0):
         session.add(Message(text=str(i), channel_id='#public'))
         # the order of messages created within a milisecond of each other
         # are not necessarily ordered correctly (ms is the highest resolution)

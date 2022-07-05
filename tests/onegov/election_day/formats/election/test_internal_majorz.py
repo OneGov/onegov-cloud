@@ -42,7 +42,9 @@ def test_import_internal_majorz_cantonal_zg(
     ]
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election, create_principal(principal), BytesIO(csv), 'text/plain'
@@ -95,7 +97,9 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
     assert election.elected_candidates == [('Johannes', 'Stöckli')]
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election, create_principal(principal), BytesIO(csv), 'text/plain'
@@ -146,7 +150,9 @@ def test_import_internal_majorz_municipality_bern(
     assert election.candidates.count() == 4
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election,
@@ -202,7 +208,9 @@ def test_import_internal_majorz_municipality_kriens(
     assert sorted(election.elected_candidates) == [('Tschäppät', 'Alexander')]
 
     # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+    csv = convert_list_of_dicts_to_csv(
+        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
 
     errors = import_election_internal_majorz(
         election,
@@ -300,6 +308,8 @@ def test_import_internal_majorz_invalid_values(session):
                     'candidate_elected',
                     'candidate_votes',
                     'candidate_party',
+                    'candidate_gender',
+                    'candidate_year_of_birth',
                 )),
                 ','.join((
                     'xxx',  # election_absolute_majority
@@ -318,6 +328,8 @@ def test_import_internal_majorz_invalid_values(session):
                     'xxx',  # candidate_elected
                     'xxx',  # candidate_votes
                     'xxx',  # candidate_party
+                    '',  # candidate_gender
+                    '',  # candidate_year_of_birth
                 )),
                 ','.join((
                     '',  # election_absolute_majority
@@ -336,12 +348,33 @@ def test_import_internal_majorz_invalid_values(session):
                     '',  # candidate_elected
                     '',  # candidate_votes
                     '',  # candidate_party
+                    'xxx',  # candidate_gender
+                    '',  # candidate_year_of_birth
+                )),
+                ','.join((
+                    '',  # election_absolute_majority
+                    'unknown',  # election_status
+                    '3251',  # entity_id
+                    'True',  # entity_counted
+                    '100',  # entity_eligible_voters
+                    '10',  # entity_received_ballots
+                    '0',  # entity_blank_ballots
+                    '0',  # entity_invalid_ballots
+                    '0',  # entity_blank_votes
+                    '0',  # entity_invalid_votes
+                    '',  # candidate_family_name
+                    '',  # candidate_first_name
+                    '',  # candidate_id
+                    '',  # candidate_elected
+                    '',  # candidate_votes
+                    '',  # candidate_party
+                    '',  # candidate_gender
+                    'xxx',  # candidate_year_of_birth
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
     )
     errors = sorted([(e.line, e.error.interpolate()) for e in errors])
-    print(errors)
     assert errors == [
         (2, 'Invalid integer: candidate_id'),
         (2, 'Invalid integer: candidate_votes'),
@@ -349,6 +382,8 @@ def test_import_internal_majorz_invalid_values(session):
         (2, 'Invalid integer: entity_id'),
         (2, 'Invalid status'),
         (3, '1234 is unknown'),
+        (3, 'Invalid gender: xxx'),
+        (4, 'Invalid integer: candidate_year_of_birth')
     ]
 
 
@@ -655,3 +690,69 @@ def test_import_internal_majorz_regional(session):
     )
     assert not errors
     assert election.progress == (1, 2)
+
+
+def test_import_internal_majorz_optional_columns(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Canton(canton='zg')
+
+    errors = import_election_internal_majorz(
+        election, principal,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'election_absolute_majority',
+                    'election_status',
+                    'entity_id',
+                    'entity_counted',
+                    'entity_eligible_voters',
+                    'entity_received_ballots',
+                    'entity_blank_ballots',
+                    'entity_invalid_ballots',
+                    'entity_blank_votes',
+                    'entity_invalid_votes',
+                    'candidate_family_name',
+                    'candidate_first_name',
+                    'candidate_id',
+                    'candidate_elected',
+                    'candidate_votes',
+                    'candidate_party',
+                    'candidate_gender',
+                    'candidate_year_of_birth',
+                )),
+                ','.join((
+                    '',  # election_absolute_majority
+                    'unknown',  # election_status
+                    '1701',  # entity_id
+                    'True',  # entity_counted
+                    '111',  # entity_eligible_voters
+                    '11',  # entity_received_ballots
+                    '1',  # entity_blank_ballots
+                    '1',  # entity_invalid_ballots
+                    '1',  # entity_blank_votes
+                    '1',  # entity_invalid_votes
+                    'xxx',  # candidate_family_name
+                    'xxx',  # candidate_first_name
+                    '1',  # candidate_id
+                    'false',  # candidate_elected
+                    '1',  # candidate_votes
+                    '',  # candidate_party
+                    'female',  # candidate_gender,
+                    '1970',  # candidate_year_of_birth
+                ))
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+    assert not errors
+    candidate = election.candidates.one()
+    assert candidate.gender == 'female'
+    assert candidate.year_of_birth == 1970

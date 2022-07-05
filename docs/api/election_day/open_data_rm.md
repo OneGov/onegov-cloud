@@ -72,11 +72,13 @@ I vegnan restituidas las medemas datas sco en la vista normala, mo en ina furma 
 
 ### Datas nunelavuradas
 
+#### Resultats da las candidatas e dals candidats
+
 ```
-URL: `/election/{id}/{data-format}`
+URL: /election/{id}/data-{format}
 ```
 
-Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan a disposiziun en ils suandants formats:
+Las datas nunelavuradas da las candidatas e dals candidats èn disponiblas en ils suandants formats:
 
 Format|URL
 ---|---
@@ -117,29 +119,40 @@ Num|Descripziun
 `candidate_first_name`|Il prenum da la persuna che candidescha.
 `candidate_id`|La ID da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
+`candidate_party`|Il num da la partida.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
 `panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
-### Party results
+#### Resultats da las partidas
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Las datas nunelavuradas èn disponiblas sco CSV. Ils suandants champs èn cuntegnids:
+Las datas nunelavuradas da las partidas èn disponiblas en ils suandants formats:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da las vuschs da l'elecziun.
-`total_voters_count`|Die Gesamtzahl kumulierter Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
-`name`|Il num da la partida.
+`name`|Il num da la partida en la lingua da standard.
+`name_{locale}`|Translaziun dal num da la partida, p.ex. `name_de_ch` per il num tudestg.
 `color`|La colur da la partida.
 `mandates`|Il dumber da mandats da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
+`voters_count_percentage`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `panachage_votes_from_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 3 Resultats da la votaziun

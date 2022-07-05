@@ -1,5 +1,5 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
-    <tal:block metal:fill-slot="title">${election_compound.title}</tal:block>
+    <tal:block metal:fill-slot="title">${election_compound.title} - ${request.app.principal.name}</tal:block>
     <tal:block metal:fill-slot="before-content">
         <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound"/>
     </tal:block>
@@ -11,8 +11,8 @@
 
         <tal:block tal:condition="layout.visible">
 
-            <h2 i18n:translate tal:condition="election_compound.completed">Results</h2>
-            <h2 i18n:translate tal:condition="not: election_compound.completed">Intermediate results</h2>
+            <h2 i18n:translate tal:condition="layout.completed">Results</h2>
+            <h2 i18n:translate tal:condition="not: layout.completed">Intermediate results</h2>
 
 
             <div metal:use-macro="layout.macros['election_compound_factoids']" />
@@ -26,10 +26,10 @@
                     <figure>
                         <tal:block metal:use-macro="layout.macros['list-groups-chart']" tal:define="embed True; model election_compound"/>
                         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
-                            <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+                            <i class="fa fa-download"></i><tal:block i18n:translate="">Download diagram</tal:block>
                         </a>
-                        <figcaption tal:condition="not: layout.completed">
-                            <strong i18n:translate>Voters count</strong>:
+                        <figcaption>
+                            <strong i18n:translate>Note on the voters count</strong>:
                             <tal:block i18n:translate="figcaption_list_groups">
                                 The number of votes of a party is divided by the number of seats to be allocated in the district concerned.
                                 The result is called the voters count. The voters count determines the allocation to the list groups.

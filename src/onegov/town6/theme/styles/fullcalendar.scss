@@ -100,7 +100,7 @@
             }
 
             &.fc-day-top,
-            &.fc-day-header, {
+            &.fc-day-header {
                 background: $yellow-light !important;
                 opacity: 1;
             }
@@ -615,6 +615,7 @@
         display: inline-block;
         font-size: .875rem;
         margin-right: 1rem;
+        width: 100%;
     }
 
     label {

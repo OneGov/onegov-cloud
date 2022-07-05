@@ -108,6 +108,22 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
     def reference_group(self, request):
         return self.title
 
+    def unguessable_edit_link(self, request):
+        if (
+            self.handler
+            and self.handler.ticket
+            and self.handler.ticket.state in ('open', 'pending')
+            and self.handler.event
+            and self.handler.event.state == 'submitted'
+            and self.handler.event.meta
+            and 'token' in self.handler.event.meta
+        ):
+            return request.link(
+                self.handler.event,
+                name='edit',
+                query_params={'token': self.handler.event.meta['token']}
+            )
+
 
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'DIR'}
@@ -506,6 +522,18 @@ class ReservationHandler(Handler, TicketDeletionMixin):
                 )
             )
 
+        if not all(accepted):
+            advanced_links.append(
+                Link(
+                    text=_("Accept all with message"),
+                    url=request.return_here(
+                        request.link(self.reservations[0],
+                                     'accept-with-message')
+                    ),
+                    attrs={'class': 'accept-link'}
+                )
+            )
+
         advanced_links.append(Link(
             text=_("Reject all"),
             url=request.return_here(
@@ -524,6 +552,14 @@ class ReservationHandler(Handler, TicketDeletionMixin):
                     redirect_after=request.url
                 )
             )
+        ))
+
+        advanced_links.append(Link(
+            text=_("Reject all with message"),
+            url=request.return_here(
+                request.link(self.reservations[0], 'reject-with-message')
+            ),
+            attrs={'class': 'delete-link'},
         ))
 
         for reservation in self.reservations:

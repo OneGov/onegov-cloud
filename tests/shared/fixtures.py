@@ -1,3 +1,4 @@
+import logging
 import os
 import platform
 import re
@@ -17,7 +18,7 @@ from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor, TCPExecutor
-from webdriver_manager.utils import ChromeType
+from webdriver_manager.core.utils import ChromeType
 
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
@@ -43,6 +44,10 @@ except ImportError:
 
 redis_path = find_executable('redis-server')
 redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
+
+logging.getLogger('faker').setLevel(logging.INFO)
+logging.getLogger('txn').setLevel(logging.INFO)
+logging.getLogger('morepath').setLevel(logging.INFO)
 
 
 def pytest_addoption(parser):
@@ -362,6 +367,12 @@ def es_url(es_process):
 def es_client(es_url):
     """ Provides an elasticsearch client. """
     yield Elasticsearch(es_url)
+
+
+@pytest.fixture(scope="function")
+def smtp(smtpserver):
+    yield smtpserver
+    del smtpserver.outbox[:]
 
 
 @pytest.fixture(scope="session")

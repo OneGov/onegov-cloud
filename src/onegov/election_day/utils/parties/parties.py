@@ -13,7 +13,7 @@ def has_party_results(item):
     return False
 
 
-def get_party_results(item, json_serialzable=False):
+def get_party_results(item, json_serializable=False):
 
     """ Returns the aggregated party results as list.
 
@@ -35,18 +35,13 @@ def get_party_results(item, json_serialzable=False):
     totals_votes = dict(query)
     years = sorted((str(key) for key in totals_votes.keys()))
 
-    # Get the totals voters counts per year
-    query = session.query(PartyResult.year, PartyResult.total_voters_count)
-    query = query.filter(PartyResult.owner == item.id).distinct()
-    totals_voters_count = dict(query)
-    years = sorted((str(key) for key in totals_voters_count.keys()))
-
     parties = {}
     for result in item.party_results:
-        party = parties.setdefault(result.name, {})
+        party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color
         year['mandates'] = result.number_of_mandates
+        year['name'] = result.name
 
         votes = result.votes or 0
         total_votes = totals_votes.get(result.year) or 0
@@ -59,16 +54,14 @@ def get_party_results(item, json_serialzable=False):
         }
 
         voters_count = result.voters_count or Decimal(0)
-        total_voters_count = totals_voters_count.get(result.year) or Decimal(0)
-        voters_count_permille = 0
-        if total_voters_count:
-            voters_count_permille = int(
-                round(1000 * (voters_count / total_voters_count))
-            )
         if not exact:
             voters_count = int(round(voters_count))
-        elif json_serialzable:
+        elif json_serializable:
             voters_count = float(voters_count)
+        voters_count_permille = result.voters_count_percentage or Decimal(0)
+        voters_count_permille = 10 * voters_count_permille
+        if json_serializable:
+            voters_count_permille = float(voters_count_permille)
         year['voters_count'] = {
             'total': voters_count,
             'permille': voters_count_permille
@@ -91,18 +84,17 @@ def get_party_results_deltas(item, years, parties):
     for index, year in enumerate(years):
         results[year] = []
         for key in sorted(parties.keys()):
-            result = [key]
+            result = ['', '', '', '']
             party = parties[key]
             values = party.get(year)
             if values:
-                result.append(values.get('mandates', ''))
-                result.append(values.get(attribute, {}).get('total', ''))
                 permille = values.get(attribute, {}).get('permille')
-                result.append(f'{permille/10}%' if permille else '')
-            else:
-                result.append('')
-                result.append('')
-                result.append('')
+                result = [
+                    values.get('name', ''),
+                    values.get('mandates', ''),
+                    values.get(attribute, {}).get('total', ''),
+                    f'{permille/10}%' if permille else ''
+                ]
 
             if deltas:
                 delta = ''
@@ -137,17 +129,19 @@ def get_party_results_data(item):
     voters_counts = getattr(item, 'voters_counts', False) == True
     attribute = 'voters_count' if voters_counts else 'votes'
     years, parties = get_party_results(item)
-    names = sorted(parties.keys())
-
+    groups = {}
     results = []
-    for party in names:
-        for year in parties[party]:
-            front = parties[party].get(year, {}).get('mandates', 0)
-            back = parties[party].get(year, {}).get(attribute, {})
-            back = back.get('permille', 0) / 10.0
-            color = parties[party].get(year, {}).get('color', '#999999')
+    for party_id in parties:
+        for year in sorted(parties[party_id], reverse=True):
+            group = groups.setdefault(
+                party_id, parties[party_id].get(year, {}).get('name', party_id)
+            )
+            front = parties[party_id].get(year, {}).get('mandates', 0)
+            back = parties[party_id].get(year, {}).get(attribute, {})
+            back = float(back.get('permille', 0) / 10)
+            color = parties[party_id].get(year, {}).get('color', '#999999')
             results.append({
-                'group': party,
+                'group': group,
                 'item': year,
                 'value': {
                     'front': front,
@@ -158,7 +152,7 @@ def get_party_results_data(item):
             })
 
     return {
-        'groups': names,
+        'groups': [items[1] for items in sorted(list(groups.items()))],
         'labels': years,
         'maximum': {
             'front': item.number_of_mandates,
@@ -190,7 +184,7 @@ def get_parties_panachage_data(item, request=None):
     parties = sorted(
         set([result.source for result in results])
         | set([result.target for result in results])
-        | set([result.name for result in party_results])
+        | set([result.party_id for result in party_results])
     )
 
     def left_node(party):
@@ -199,8 +193,8 @@ def get_parties_panachage_data(item, request=None):
     def right_node(party):
         return parties.index(party) + len(parties)
 
-    colors = dict(set((r.name, r.color) for r in party_results))
-    intra_party_votes = dict(set((r.name, r.votes) for r in party_results))
+    colors = dict(set((r.party_id, r.color) for r in party_results))
+    intra_party_votes = dict(set((r.party_id, r.votes) for r in party_results))
 
     # Create the links
     links = []
@@ -224,14 +218,15 @@ def get_parties_panachage_data(item, request=None):
         })
 
     # Create the nodes
+    names = {r.party_id: r.name for r in party_results}
     blank = request.translate(_("Blank list")) if request else '-'
     nodes = [
         {
-            'name': name or blank,
+            'name': names.get(party_id, '') or blank,
             'id': count + 1,
-            'color': colors.get(name, '#999')
+            'color': colors.get(party_id, '#999')
         }
-        for count, name in enumerate(2 * parties)
+        for count, party_id in enumerate(2 * parties)
     ]
 
     return {

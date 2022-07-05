@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-02-28 08:49+0100\n"
+"POT-Creation-Date: 2022-06-13 08:13+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -220,6 +220,18 @@ msgstr "Nuovo messaggio"
 
 msgid "Ticket Status"
 msgstr "Stato del biglietto"
+
+msgid "Text modules"
+msgstr "Moduli di testo"
+
+msgid "Text module"
+msgstr "Modulo di testo"
+
+msgid "Do you really want to delete this text module?"
+msgstr "Confermi di voler eliminare questo modulo di testo?"
+
+msgid "Delete text module"
+msgstr "Elimina modulo di testo"
 
 msgid "Recipients"
 msgstr "Destinatari"
@@ -709,6 +721,9 @@ msgstr "Indirizzo e-mail"
 msgid "This site is private"
 msgstr "Questo sito è privato"
 
+msgid "This site is private but can also be seen by members"
+msgstr "Questo sito è privato ma può essere visto dai membri"
+
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
 
@@ -717,6 +732,9 @@ msgstr "Questo sito non è pubblicato."
 
 msgid "This site is not public."
 msgstr "Questo sito non è pubblico."
+
+msgid "This site is not public but it can be seen by members."
+msgstr "Questo sito non è pubblico ma può essere visto dai membri."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -883,8 +901,8 @@ msgstr ""
 "le foto, aggiungi alcune foto a un album e contrassegnalo come disponibile "
 "per la home page."
 
-msgid "Digitally signed"
-msgstr "Firmato digitalmente"
+msgid "Has a digital seal"
+msgstr "Ha un sigillo digitale"
 
 msgid "${count} page"
 msgstr "${count} pagina"
@@ -956,8 +974,8 @@ msgstr "Creato"
 msgid "Disbursed"
 msgstr "Erogato"
 
-msgid "Digital Signature"
-msgstr "Firma digitale"
+msgid "Digital seal"
+msgstr "Sigillo digitale"
 
 msgid "Access"
 msgstr "Accesso"
@@ -1008,11 +1026,12 @@ msgstr "Indica il nuovo nome del file"
 msgid "Rename"
 msgstr "Rinomina"
 
-msgid "Digitally signed by ${signee} on ${date}"
-msgstr "Firmato digitalmente da ${signee} il ${date}"
+msgid "Digital seal applied by ${signee} on ${date}"
+msgstr "Sigillo digitale applicato da ${signee} il ${date}"
 
-msgid "Please enter your yubikey to digitally sign this file"
-msgstr "Inserisci il tuo yubikey per firmare digitalmente questo file"
+msgid "Please enter your yubikey to apply a digital seal to this file"
+msgstr ""
+"Inserisci il tuo yubikey per applicare un sigillo digitale a questo file"
 
 msgid "Sign"
 msgstr "Firma"
@@ -1021,23 +1040,22 @@ msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "Collega il dispositivo YubiKey a una porta USB e premi."
 
 msgid ""
-"Published and digitally signed documents can be discovered through the site-"
-"search and in the list of digitally signed documents. This action will be "
+"Published documents with a digital seal can be discovered through the site-"
+"search and in the list of documents with a digital seal. This action will be "
 "logged and cannot be undone."
 msgstr ""
-"I documenti pubblicati e firmati digitalmente possono essere individuati "
-"tramite la ricerca nel sito e nell'elenco dei documenti firmati "
-"digitalmente. Questa operazione verrà registrata e non può essere annullata."
+"Documenti pubblicati con sigillo digitale possono essere individuati tramite "
+"la ricerca nel sito e nell'elenco dei documenti con sigillo digitale. Questa "
+"operazione verrà registrata e non può essere annullata."
 
-msgid "Unsigned"
-msgstr "Non firmato"
+msgid "Without digital seal"
+msgstr "Senza sigillo digitale"
 
-msgid "Sign now"
-msgstr "Firma ora"
+msgid "Apply digital seal now"
+msgstr "Applica ora il sigillo digitale"
 
-#, fuzzy
-msgid "You are not authorised to digitally sign documents"
-msgstr "Inserisci il tuo yubikey per firmare digitalmente questo file"
+msgid "You are not authorised to apply digital seals to documents"
+msgstr "Non sei autorizzati ad applicare sigilli digitali ai documenti"
 
 msgid "Click to add a description"
 msgstr "Clicca per aggiungere una descrizione"
@@ -1048,8 +1066,8 @@ msgstr "Vuoi davvero eliminare l'immagine?"
 msgid "Delete Image"
 msgstr "Elimina immagine"
 
-msgid "${name} was digitally signed on ${date}"
-msgstr "${name} è stato firmato digitalmente il ${date}"
+msgid "${name} was provided with a digital seal on ${date}"
+msgstr "${name} è stato dotato di sigillo digitale il ${date}"
 
 msgid "${name} is not in our database"
 msgstr "${name} non è contenuto nel nostro database"
@@ -1109,6 +1127,9 @@ msgid ""
 msgstr ""
 "Se non ti sei iscritto a questa newsletter puoi semplicemente ignorare "
 "questa e-mail."
+
+msgid "Click here to unsubscribe."
+msgstr "Clicca qui per annullare l'iscrizione."
 
 msgid "Good morning,"
 msgstr "Buongiorno,"
@@ -1242,9 +1263,6 @@ msgstr ""
 msgid "Click here to view web version."
 msgstr "Clicca qui per visualizzare la versione web."
 
-msgid "Click here to unsubscribe."
-msgstr "Clicca qui per annullare l'iscrizione."
-
 msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
 
@@ -1289,14 +1307,14 @@ msgstr "Il numero del biglietto è"
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
 
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
-
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
 
 #. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
@@ -1335,6 +1353,12 @@ msgstr ""
 "completato. Nel frattempo puoi controllare in qualsiasi momento lo stato del "
 "tuo biglietto:"
 
+msgid "The following ticket has just been opened:"
+msgstr "Il seguente biglietto è stato appena aperto:"
+
+msgid "View the ticket"
+msgstr "Visualizza il biglietto"
+
 msgid "Your request has been reopened"
 msgstr "La tua richiesta è stata riaperta"
 
@@ -1347,29 +1371,28 @@ msgstr "Richiesta di modifica applicata."
 msgid "Directory entry rejected."
 msgstr "Elemento della cartella rifiutato."
 
+msgid "Event edited."
+msgstr "Evento montato."
+
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."
 msgstr "${event} pubblicato."
 
 #. Used in sentence: "${event} published."
-#. Used in sentence: "${event} deleted."
-#. Used in sentence: "${event} withdrawn."
 msgid "Event"
 msgstr "Evento"
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} deleted."
-msgstr "${event} eliminato."
+msgid "Event deleted."
+msgstr "Evento eliminato."
 
-#. Canonical text for ${event} is: "Event"
-msgid "${event} withdrawn."
-msgstr "${event} ritirato."
+msgid "Event withdrawn."
+msgstr "Evento ritirato."
 
 msgid "File signed."
 msgstr "File firmato."
 
-msgid "Signed file removed."
-msgstr "File firmato rimosso."
+msgid "File with digital seal removed."
+msgstr "File con sigillo digitale cancellato."
 
 msgid "${amount} marked as paid."
 msgstr "${amount} contrassegnato come pagato."
@@ -1557,11 +1580,11 @@ msgstr ""
 "la ricerca in alto a destra."
 
 msgid ""
-"All files have been digitally signed. The digital signature of a downloaded "
-"file can be viewed in Adobe Acrobat Reader or by dragging an already "
-"downloaded file into the field below:"
+"All files have a digital seal. The digital seal of a downloaded file can be "
+"viewed in Adobe Acrobat Reader or by dragging an already downloaded file "
+"into the field below:"
 msgstr ""
-"Tutti i file sono stati firmati digitalmente. La firma digitale di un file "
+"Tutti i file hanno un sigillo digitale. Il sigillo digitale di un file "
 "scaricato può essere visualizzata in Adobe Acrobat Reader oppure trascinando "
 "un file già scaricato nel campo sottostante:"
 
@@ -1712,6 +1735,15 @@ msgstr ""
 "Il tuo collegamento di registrazione è stato creato come segue. Copialo "
 "prima di proseguire, non ti verrà più mostrato:"
 
+msgid "Text"
+msgstr "Testo"
+
+msgid "All"
+msgstr "Tutti"
+
+msgid "View"
+msgstr "Visualizza"
+
 msgid ""
 "The record behind this ticket was removed. The following information is a "
 "snapshot kept for future reference."
@@ -1806,6 +1838,12 @@ msgstr "Riferimento della richiesta"
 msgid "Subject"
 msgstr "Oggetto"
 
+msgid "Would you like to make corrections to the event?"
+msgstr "Volete apportare correzioni all'evento?"
+
+msgid "Edit this event."
+msgstr "Modificare questo evento."
+
 msgid "Forgot something or have a special request?"
 msgstr "Hai dimenticato qualcosa o hai una richiesta speciale?"
 
@@ -1869,12 +1907,6 @@ msgstr "Utenti"
 
 msgid "Ticket permissions"
 msgstr "Permessi sul biglietto"
-
-msgid "All"
-msgstr "Tutti"
-
-msgid "View"
-msgstr "Visualizza"
 
 msgid "Yubikey"
 msgstr "Yubikey"

@@ -1,5 +1,5 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
-    <tal:block metal:fill-slot="title">${election_compound.title}</tal:block>
+    <tal:block metal:fill-slot="title">${election_compound.title} - ${request.app.principal.name}</tal:block>
     <tal:block metal:fill-slot="before-content">
         <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound" />
     </tal:block>
@@ -11,8 +11,8 @@
 
         <tal:block tal:condition="layout.visible">
 
-            <h2 i18n:translate tal:condition="election_compound.completed">Results</h2>
-            <h2 i18n:translate tal:condition="not: election_compound.completed">Intermediate results</h2>
+            <h2 i18n:translate tal:condition="layout.completed">Results</h2>
+            <h2 i18n:translate tal:condition="not: layout.completed">Intermediate results</h2>
 
             <div metal:use-macro="layout.macros['election_compound_factoids']" />
 

@@ -47,7 +47,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     directory_id = Column(ForeignKey('directories.id'), nullable=False)
 
     #: the polymorphic type of the entry
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     #: The order of the entry in the directory
     order = Column(Text, nullable=False, index=True)
@@ -64,8 +64,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     )
 
     __mapper_args__ = {
-        'order_by': order,
-        'polymorphic_on': type
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic',
     }
 
     __table_args__ = (

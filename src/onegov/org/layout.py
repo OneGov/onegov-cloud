@@ -8,6 +8,7 @@ from datetime import date, datetime, time, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from decimal import Decimal
+from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Confirm, Intercooler
@@ -533,7 +534,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @property
     def file_link_target(self):
         """ Use with tal:attributes='target layout.file_link_target' """
-        return self.org.open_files_target_blank and '_blank' or None
+        return '_blank' if self.org.open_files_target_blank else None
 
 
 class DefaultLayoutMixin:
@@ -1202,6 +1203,83 @@ class TicketChatMessageLayout(DefaultLayout):
         ]
 
 
+class TextModulesLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Text modules"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Text module"),
+                            url=self.request.link(
+                                self.model,
+                                name='add'
+                            ),
+                            attrs={'class': 'new-text-module'}
+                        )
+                    ]
+                ),
+            ]
+
+
+class TextModuleLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self):
+        return TextModuleCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Text modules'), self.request.link(self.collection)),
+            Link(self.model.name, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                "Do you really want to delete this text "
+                                "module?"
+                            ),
+                            _("This cannot be undone."),
+                            _("Delete text module"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
+                )
+            ]
+
+
 class ResourcesLayout(DefaultLayout):
 
     @cached_property
@@ -1680,9 +1758,11 @@ class EventLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        imported_editable = self.request.is_manager and self.model.source
+        if not self.request.is_manager:
+            return
+
         links = []
-        if imported_editable:
+        if self.model.source:
             links = [
                 Link(
                     text=_("Edit"),
@@ -1695,7 +1775,7 @@ class EventLayout(EventBaseLayout):
                         )
                     )
                 )]
-        if imported_editable and self.model.state == 'published':
+        if self.model.source and self.model.state == 'published':
             links.append(
                 Link(
                     text=_("Withdraw event"),
@@ -1717,7 +1797,7 @@ class EventLayout(EventBaseLayout):
                     )
                 )
             )
-        if imported_editable and self.model.state == 'withdrawn':
+        if self.model.source and self.model.state == 'withdrawn':
             links.append(
                 Link(
                     text=_("Re-publish event"),
@@ -1726,7 +1806,7 @@ class EventLayout(EventBaseLayout):
                     attrs={'class': 'accept-link'}
                 )
             )
-        if imported_editable:
+        if self.model.source:
             return links
 
         edit_link = Link(

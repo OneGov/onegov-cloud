@@ -84,20 +84,28 @@ def render_element(request):
 
 @pytest.fixture(scope='function')
 def maildir_app(temporary_directory, maildir):
+    postmark_cfg = {
+        'mailer': 'postmark',
+        'directory': maildir,
+        'token': 'token'
+    }
     app_cfg = {
         'mail': {
             'marketing': {
-                'sender': 'noreply@example.org',
-                'directory': maildir
+                **postmark_cfg,
+                'sender': 'noreply@example.org'
             },
             'transactional': {
-                'sender': 'noreply@example.org',
-                'directory': maildir
+                **postmark_cfg,
+                'sender': 'noreply@example.org'
             }
         }
     }
 
     cfg = {
+        'mail_queues': {
+            'postmark': postmark_cfg
+        },
         'applications': [
             {
                 'path': '/foobar/*',
@@ -113,5 +121,54 @@ def maildir_app(temporary_directory, maildir):
 
     app = Framework()
     app.configure_application(**app_cfg)
+
+    return app
+
+
+@pytest.fixture(scope='function')
+def maildir_smtp_app(temporary_directory, maildir, smtp):
+    smtp_cfg = {
+        'mailer': 'smtp',
+        'directory': maildir,
+        'host': smtp.addr[0],
+        'port': smtp.addr[1],
+        'force_tls': False,
+        'username': None,
+        'password': None,
+    }
+
+    app_cfg = {
+        'mail': {
+            'marketing': {
+                **smtp_cfg,
+                'sender': 'noreply@example.org'
+            },
+            'transactional': {
+                **smtp_cfg,
+                'sender': 'noreply@example.org'
+            }
+        }
+    }
+
+    cfg = {
+        'mail_queues': {
+            'smtp': smtp_cfg
+        },
+        'applications': [
+            {
+                'path': '/foobar/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'foobar',
+                'configuration': app_cfg
+            }
+        ]
+    }
+
+    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
+        f.write(yaml.dump(cfg))
+
+    app = Framework()
+    app.configure_application(**app_cfg)
+    app.smtp = smtp
 
     return app

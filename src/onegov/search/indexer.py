@@ -273,7 +273,7 @@ class Indexer(object):
         self.es_client.index(
             index=index,
             id=task['id'],
-            body=task['properties']
+            document=task['properties']
         )
 
     def delete(self, task):
@@ -452,7 +452,7 @@ class IndexManager(object):
 
         return set(
             ix for ix in self.es_client.cat.indices(
-                f'{self.normalized_hostname}-*', h='index'
+                index=f'{self.normalized_hostname}-*', h='index'
             ).splitlines()
         )
 
@@ -463,7 +463,8 @@ class IndexManager(object):
         result = set()
 
         infos = self.es_client.indices.get_alias(
-            '{}-*'.format(self.normalized_hostname))
+            index='{}-*'.format(self.normalized_hostname)
+        )
 
         for info in infos.values():
             for alias in info['aliases']:
@@ -505,16 +506,17 @@ class IndexManager(object):
         if internal in self.created_indices:
             return return_value
 
-        if self.es_client.indices.exists(internal):
+        if self.es_client.indices.exists(index=internal):
             self.created_indices.add(internal)
             return return_value
 
         # create the index
-        self.es_client.indices.create(internal, body={
-            'mappings': {
+        self.es_client.indices.create(
+            index=internal,
+            mappings={
                 'properties': mapping.for_language(language)
             },
-            'settings': {
+            settings={
                 'analysis': ANALYSIS_CONFIG,
                 'index': {
                     'number_of_shards': 1,
@@ -522,7 +524,7 @@ class IndexManager(object):
                     'refresh_interval': '5s'
                 }
             }
-        })
+        )
 
         # point the alias to the new index
         self.es_client.indices.put_alias(name=external, index=internal)
@@ -546,7 +548,7 @@ class IndexManager(object):
             info = parse_index_name(index)
 
             if info.version and info.version not in active_versions:
-                self.es_client.indices.delete(index)
+                self.es_client.indices.delete(index=index)
                 self.created_indices.remove(index)
                 count += 1
 

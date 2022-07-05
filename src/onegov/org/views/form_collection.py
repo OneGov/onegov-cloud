@@ -7,6 +7,7 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import FormCollectionLayout
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
+from onegov.org.views.form_definition import get_hints
 from onegov.org.utils import group_by_column
 
 
@@ -41,6 +42,8 @@ def view_form_collection(self, request, layout=None):
         sort_column=ExternalLink.order
     )
 
+    layout = layout or FormCollectionLayout(self, request)
+
     def link_func(model):
         if isinstance(model, ExternalLink):
             return model.url
@@ -56,10 +59,54 @@ def view_form_collection(self, request, layout=None):
                 name='edit'
             )
 
+    def external_link(model):
+        if isinstance(model, ExternalLink):
+            title = request.translate(_("Edit external form"))
+            to = request.class_link(FormCollection)
+            return request.link(
+                model,
+                query_params={'title': title, 'to': to},
+                name='edit'
+            )
+
+    def lead_func(model):
+        lead = model.meta.get('lead')
+        if not lead:
+            lead = ''
+        lead = layout.linkify(lead)
+        return lead
+
+    def hint(model):
+        hints = dict(get_hints(layout, model.current_registration_window))
+        if hints:
+            if 'stop' in hints:
+                hint = (
+                    f'<div class="hint-stop">'
+                    f'{request.translate(hints["stop"])}'
+                    f'</div>'
+                )
+            else:
+                if 'date' in hints:
+                    hint = (
+                        f'<div class="hint-date">'
+                        f'{request.translate(hints["date"])}'
+                        f'</div>'
+                    )
+                if 'count' in hints:
+                    hint += (
+                        f'<div class="hint-count">'
+                        f'{request.translate(hints["count"])}'
+                        f'</div>'
+                    )
+        return hint
+
     return {
-        'layout': layout or FormCollectionLayout(self, request),
+        'layout': layout,
         'title': _("Forms"),
         'forms': combine_grouped(forms, ext_forms, sort=lambda x: x.order),
         'link_func': link_func,
-        'edit_link': edit_link
+        'edit_link': edit_link,
+        'external_link': external_link,
+        'lead_func': lead_func,
+        'hint': hint
     }

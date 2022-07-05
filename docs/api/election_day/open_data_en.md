@@ -69,11 +69,13 @@ Returns the data of the main view in a structured form.
 
 ### Raw data
 
+#### Candidate results
+
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
-The raw data used to display the results of elections is available in the following formats:
+The raw data of the candidates are available in the following formats:
 
 Format|URL
 ---|---
@@ -114,6 +116,9 @@ Name|Description
 `candidate_first_name`|The first name of the candidate.
 `candidate_id`|The ID of the candidate.
 `candidate_elected`|True if the candidate has been elected.
+`candidate_party`|The name of the party.
+`candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
+`candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
 `panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
@@ -122,22 +127,30 @@ Not yet counted municipalities are not included.
 ### Party results
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-The raw data is available as CSV. The following fields are included:
+The raw data of the parties are available in the following formats:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+The following fields are included in all formats:
 
 Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`total_voters_count`|The total number of cumulative number of votes per total number of mandates per election, for election compounds only.
-`name`|The name of the party.
+`name`|The name of the party in the default language.
+`name_{locale}`|Translated name of the party, e.g. `name_de_ch` for the German name.
 `id`|ID of the party.
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
+`voters_count_percentage`|The cumulative number of votes per total number of mandates per election, for election compounds only.
 `panachage_votes_from_{XX}`|The number of votes the party got from the party with `id = XX`. An `id` with the value `999` marks the votes from the blank list.
 
 3 Vote results

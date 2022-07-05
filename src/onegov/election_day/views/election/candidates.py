@@ -33,8 +33,12 @@ def view_election_candidates_data(self, request):
     limit = get_parameter(request, 'limit', int, None)
     lists = get_parameter(request, 'lists', list, None)
     elected = get_parameter(request, 'elected', bool, None)
+    sort_by_lists = get_parameter(request, 'sort_by_lists', bool, None)
 
-    return get_candidates_data(self, limit=limit, lists=lists, elected=elected)
+    return get_candidates_data(
+        self, limit=limit, lists=lists, elected=elected,
+        sort_by_lists=sort_by_lists
+    )
 
 
 @ElectionDayApp.html(
@@ -70,12 +74,16 @@ def view_election_candidates(self, request):
 
     """" The main view. """
 
+    candidates = get_candidates_results(self, object_session(self)).all()
+    any_elected = any([candidate.elected for candidate in candidates])
+
     return {
         'skip_rendering': hide_candidates_chart(self, request),
         'help_text': election_incomplete_text,
         'election': self,
         'layout': ElectionLayout(self, request, 'candidates'),
-        'candidates': get_candidates_results(self, object_session(self))
+        'candidates': candidates,
+        'any_elected': any_elected
     }
 
 

@@ -1,4 +1,10 @@
-from onegov.chat.models import Message, MessageFile
-from onegov.chat.collections import MessageCollection
+from onegov.chat.models import Message, MessageFile, TextModule
+from onegov.chat.collections import MessageCollection, TextModuleCollection
 
-__all__ = ('Message', 'MessageCollection', 'MessageFile')
+__all__ = (
+    'Message',
+    'MessageCollection',
+    'MessageFile',
+    'TextModule',
+    'TextModuleCollection',
+)

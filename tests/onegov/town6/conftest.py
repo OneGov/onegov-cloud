@@ -17,9 +17,6 @@ class Client(BaseClient):
     skip_first_form = True
     use_intercooler = True
 
-    def login_member(self, to=None):
-        return self.login('member@example.org', 'hunter2', to)
-
     def bound_reserve(self, allocation):
 
         default_start = '{:%H:%M}'.format(allocation.start)
@@ -121,6 +118,11 @@ def create_town_app(request, use_elasticsearch):
         username='editor@example.org',
         password_hash=test_password,
         role='editor'
+    ))
+    session.add(User(
+        username='member@example.org',
+        password_hash=test_password,
+        role='member'
     ))
 
     transaction.commit()

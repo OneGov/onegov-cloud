@@ -13,8 +13,25 @@ from onegov.file import File
 
 
 def test_directory_title_and_order(session):
-    doctors = DirectoryCollection(session).add(
+    collection = DirectoryCollection(session)
+    doctors = collection.add(
         title='Doctors',
+        structure="""
+            Name = ___
+        """,
+        configuration=DirectoryConfiguration()
+    )
+
+    patients = collection.add(
+        title='Patients',
+        structure="""
+            Name = ___
+        """,
+        configuration=DirectoryConfiguration()
+    )
+
+    staff = collection.add(
+        title='Staff',
         structure="""
             Name = ___
         """,
@@ -29,6 +46,8 @@ def test_directory_title_and_order(session):
 
     assert doctors.name == 'doctors'
     assert doctors.order == 'general-practicioners'
+
+    assert collection.query().all() == [doctors, patients, staff]
 
 
 def test_directory_fields(session):
@@ -157,6 +176,7 @@ def test_directory_entry_collection(session):
                 [ ] Hip Hop
                 [ ] Pop
                 [ ] Rock
+                [ ] Funk
             German =
                 ( ) Yes
                 ( ) No
@@ -231,6 +251,13 @@ def test_directory_entry_collection(session):
     ).for_filter(
         genre='Rock'
     ).query().count() == 1
+
+    # test ordering
+    sorted_entries = sorted(
+        directory.entries, key=lambda en: en.order, reverse=True)
+
+    assert directory.entries == sorted_entries
+    assert albums.query().all() != sorted_entries
 
 
 def test_validation_error(session):

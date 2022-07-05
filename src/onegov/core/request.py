@@ -239,6 +239,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         If no data is written to the browser_session, no session_id cookie
         is created.
 
+        The session_id is rotated when users log in but not when they log out,
+        that way we can still identify them and send messages when they log
+        out.
+
         """
 
         if 'session_id' in self.cookies:
@@ -249,9 +253,6 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         def on_dirty(session, token):
 
-            # once the cookie has been set, we do not change it, not even if
-            # the user logs out - this way we can still identify the user and
-            # send him messages, for example when logging out
             if 'session_id' in self.cookies:
                 return
 
@@ -259,28 +260,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
             @self.after
             def store_session(response):
-
-                # Safari 12.x has a nasty bug, where same-site will lead
-                # to a failure to safe cookies in certain scenarios. As a
-                # work around, we do not send the same-site directive to
-                # this specific Safari release. At the point of this
-                # writing this version is about to be phased out, so this
-                # has only a minor security impact.
-                #
-                # See https://bugs.webkit.org/show_bug.cgi?id=198181
-                ua = self.agent['user_agent']
-
-                if ua['family'] == 'Safari' and ua['major'] == '12':
-                    samesite = None
-                else:
-                    samesite = self.app.same_site_cookie_policy
-
                 response.set_cookie(
                     'session_id',
                     self.cookies['session_id'],
                     secure=self.app.identity_secure,
                     httponly=True,
-                    samesite=samesite
+                    samesite=self.app.same_site_cookie_policy
                 )
 
         return self.app.modules.browser_session.BrowserSession(
@@ -474,7 +459,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         identity = self.identity
         if user:
             identity = self.app.application_bound_identity(
-                user.id, user.group_id, user.role
+                user.username,
+                user.group_id.hex if user.group_id else user.group_id,
+                user.role
             )
 
         return self.app._permits(identity, model, permission)

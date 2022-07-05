@@ -3,7 +3,6 @@ from datetime import timedelta, datetime
 from uuid import uuid4
 
 import pytz
-import transaction
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
@@ -11,7 +10,6 @@ from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
     SubscriptionTemplate, ReminderTemplate, CancellationTemplate
 from onegov.user import User
-from tests.shared.scenario import BaseScenario
 
 global_password = 'hunter2'
 hashed_password = hash_password(global_password)
@@ -252,7 +250,9 @@ def db_mock(session):
 
     attendee, data = attendee_factory(session, organisation='ORG')
     planner, data = admin_attendee_factory(session)
-    planner_editor, data = editor_attendee_factory(session, permissions=['ORG'])
+    planner_editor, data = editor_attendee_factory(
+        session, permissions=['ORG']
+    )
     course_event, data = course_event_factory(session)
     future_course_event, data = future_course_event_factory(session)
     empty_course_event, data = future_course_event_factory(

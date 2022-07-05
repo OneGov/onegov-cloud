@@ -70,11 +70,13 @@ Retourne les données de la vue principale sous une forme structurée.
 
 ### Données brutes
 
+#### Résultats des candidats
+
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
-Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
+Les données brutes des candidats sont disponibles dans les formats suivants :
 
 Format|URL
 ---|---
@@ -115,30 +117,41 @@ Nom|Description
 `candidate_first_name`|Le prénom du candidat.
 `candidate_id`|L'identifiant du candidat.
 `candidate_elected`|Vrai si le candidat a été élu.
+`candidate_party`|Nom de le parti.
+`candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé).
+`candidate_year_of_birth`|L'année de naissance du candidat.
 `candidate_votes`|Le nombre de voix que ce candidat a obtenu.
 `panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 
-### Résultats du parti
+#### Résultats du parti
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Les données brutes sont disponibles en tant que CSV. Les champs suivants sont compris :
+Les données brutes des parties sont disponibles dans les formats suivants :
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
-`total_voters_count`|Le nombre total de voix cumulées par rapport au nombre total de mandats par élection, pour les composés électoraux uniquement.
-`name`|La dénomination du parti.
+`name`|Le dénomination du parti dans la langue par défaut.
+`name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand.
 `id`|Identifiant du parti.
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
+`voters_count_percentage`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 `panachage_votes_from_{XX}`|Le nombre de votes que le parti a obtenu de la part du parti avec un `id = XX`. Un `id` avec la valeur `999` marque les votes à partir de la liste vide.
 
 3 Les résultats de la votation

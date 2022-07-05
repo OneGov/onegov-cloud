@@ -396,6 +396,10 @@ def test_principal_label(election_day_app_zg):
         ('superregions', 'fr_CH', 'Circonscriptions électorales'),
         ('superregions', 'it_CH', 'Distretti elettorali'),
         ('superregions', 'rm_CH', 'Circuls electorals'),
+        ('mandates', 'de_CH', 'Mandate'),
+        ('mandates', 'fr_CH', 'Mandats'),
+        ('mandates', 'it_CH', 'Mandati'),
+        ('mandates', 'rm_CH', 'Mandats'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -434,6 +438,10 @@ def test_principal_label(election_day_app_zg):
         ('superregions', 'fr_CH', 'Régions'),
         ('superregions', 'it_CH', 'Regioni'),
         ('superregions', 'rm_CH', 'Regiuns'),
+        ('mandates', 'de_CH', 'Mandate'),
+        ('mandates', 'fr_CH', 'Mandats'),
+        ('mandates', 'it_CH', 'Mandati'),
+        ('mandates', 'rm_CH', 'Mandats'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -472,6 +480,10 @@ def test_principal_label(election_day_app_zg):
         ('superregions', 'fr_CH', 'Circonscriptions électorales'),
         ('superregions', 'it_CH', 'Distretti elettorali'),
         ('superregions', 'rm_CH', 'Circuls electorals'),
+        ('mandates', 'de_CH', 'Sitze'),
+        ('mandates', 'fr_CH', 'Sièges'),
+        ('mandates', 'it_CH', 'Seggi'),
+        ('mandates', 'rm_CH', 'Sezs'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -510,6 +522,10 @@ def test_principal_label(election_day_app_zg):
         ('superregions', 'fr_CH', 'Circonscriptions électorales'),
         ('superregions', 'it_CH', 'Distretti elettorali'),
         ('superregions', 'rm_CH', 'Circuls electorals'),
+        ('mandates', 'de_CH', 'Mandate'),
+        ('mandates', 'fr_CH', 'Mandats'),
+        ('mandates', 'it_CH', 'Mandati'),
+        ('mandates', 'rm_CH', 'Mandats'),
     ):
         assert translate(principal.label(label), locale) == result
 
@@ -548,6 +564,10 @@ def test_principal_label(election_day_app_zg):
         ('superregions', 'fr_CH', 'Circonscriptions électorales'),
         ('superregions', 'it_CH', 'Distretti elettorali'),
         ('superregions', 'rm_CH', 'Circuls electorals'),
+        ('mandates', 'de_CH', 'Mandate'),
+        ('mandates', 'fr_CH', 'Mandats'),
+        ('mandates', 'it_CH', 'Mandati'),
+        ('mandates', 'rm_CH', 'Mandats'),
     ):
         assert translate(principal.label(label), locale) == result
 

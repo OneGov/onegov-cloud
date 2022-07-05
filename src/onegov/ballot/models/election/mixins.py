@@ -43,7 +43,7 @@ class PartyResultExportMixin(object):
 
     """
 
-    def export_parties(self):
+    def export_parties(self, locales, default_locale, json_serializable=False):
         """ Returns all party results with the panachage as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -53,59 +53,71 @@ class PartyResultExportMixin(object):
         included in the export (since they are not really connected with the
         lists).
 
+        If `json_serializable` is True, decimals are converted to floats. This
+        might be a lossy conversation!
+
         """
 
+        def convert_decimal(value):
+            if value is None:
+                return value
+            if json_serializable:
+                return float(value)
+            return str(value)
+
         results = {}
-        parties = set()
 
         # get the party results
         for result in self.party_results:
             year = results.setdefault(result.year, {})
-            year[result.name] = {
+            year[result.party_id] = {
+                'name_translations': result.name_translations,
                 'total_votes': result.total_votes,
-                'total_voters_count': result.total_voters_count,
                 'color': result.color,
                 'mandates': result.number_of_mandates,
                 'votes': result.votes,
-                'voters_count': result.voters_count
+                'voters_count': result.voters_count,
+                'voters_count_percentage': result.voters_count_percentage
             }
-            parties |= set([result.name])
 
         # get the panachage results
         for result in self.panachage_results:
             year = results.setdefault(self.date.year, {})
             target = year.setdefault(result.target, {})
             target[result.source] = result.votes
-            parties |= set([result.source, result.target])
-
-        parties = sorted([party for party in parties if party])
 
         rows = []
+        parties = sorted({key for r in results.values() for key in r.keys()})
         for year in sorted(results.keys(), reverse=True):
-            for party in parties:
-                result = results[year].get(party, {})
+            for party_id in parties:
+                result = results[year].get(party_id, {})
 
                 # add the party results
                 row = OrderedDict()
                 row['year'] = year
-                row['name'] = party
-                row['id'] = parties.index(party)
-                row['total_votes'] = result.get('total_votes', '')
-                row['total_voters_count'] = str(
-                    result.get('total_voters_count', '') or ''
+                row['id'] = party_id
+                row['name'] = result['name_translations'].get(
+                    default_locale, None
                 )
-                row['color'] = result.get('color', '')
-                row['mandates'] = result.get('mandates', '')
-                row['votes'] = result.get('votes', '')
-                row['voters_count'] = str(result.get('voters_count', '') or '')
+                for locale in locales:
+                    row[f'name_{locale}'] = result['name_translations'].get(
+                        locale, None
+                    )
+                row['total_votes'] = result['total_votes']
+                row['color'] = result['color']
+                row['mandates'] = result['mandates']
+                row['votes'] = result['votes']
+                row['voters_count'] = convert_decimal(result['voters_count'])
+                row['voters_count_percentage'] = convert_decimal(
+                    result['voters_count_percentage']
+                )
 
                 # add the panachage results
                 if self.panachage_results.count():
                     for source in parties:
-                        id_ = parties.index(source)
-                        column = 'panachage_votes_from_{}'.format(id_)
-                        row[column] = result.get(source, '')
-                    row['panachage_votes_from_999'] = result.get('', '')
+                        column = f'panachage_votes_from_{source}'
+                        row[column] = result.get(source, None)
+                    row['panachage_votes_from_999'] = result.get('', None)
 
                 rows.append(row)
 

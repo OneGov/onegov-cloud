@@ -43,6 +43,8 @@ def majorz_election():
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male',
+            year_of_birth=1970
         )
     )
     election.candidates.append(
@@ -139,6 +141,8 @@ def proporz_election(
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male',
+            year_of_birth=1970
         )
     )
     election.candidates.append(
@@ -212,8 +216,10 @@ def test_election_compound(session):
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
+    assert election_compound.last_result_change is None
 
     # Add two elections
+    last_result_change = datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
     session.add(
         Election(
             title="First election",
@@ -221,7 +227,7 @@ def test_election_compound(session):
             domain_segment='First district',
             date=date(2015, 6, 14),
             number_of_mandates=1,
-            last_result_change=datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
+            last_result_change=last_result_change
         )
     )
     session.add(
@@ -240,6 +246,7 @@ def test_election_compound(session):
     assert set([election.id for election in election_compound.elections]) == {
         'first-election', 'second-election'
     }
+    assert election_compound.last_result_change == last_result_change
 
     assert election_compound.number_of_mandates == 3
     assert election_compound.counted is False
@@ -330,7 +337,8 @@ def test_election_compound(session):
         number_of_mandates=0,
         votes=0,
         total_votes=100,
-        name='Libertarian',
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1',
         color='black'
     )
     session.add(party_result)
@@ -352,14 +360,41 @@ def test_election_compound(session):
 
     # Clear results
     election_compound.clear_results()
-    assert election_compound.last_result_change.date() == date(2015, 6, 14)
+    assert election_compound.last_result_change is None
     assert election_compound.party_results.first() is None
     assert election_compound.panachage_results.first() is None
+    assert session.query(Candidate).first() is None
+    assert session.query(ElectionResult).first() is None
 
-    election = session.query(Election).filter_by(title="First election").one()
-    election.clear_results()
-    election_compound.clear_results()
-    assert election_compound.last_result_change is None
+    # Add results again and delete compound
+    party_result = PartyResult(
+        owner=election_compound.id,
+        number_of_mandates=0,
+        votes=0,
+        total_votes=100,
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1',
+        color='black'
+    )
+    session.add(party_result)
+    session.flush()
+    assert election_compound.party_results.one() == party_result
+
+    panachage_result = PanachageResult(
+        owner=election_compound.id,
+        source='A',
+        target='B',
+        votes=0,
+    )
+    session.add(panachage_result)
+    session.flush()
+    assert election_compound.panachage_results.one() == panachage_result
+
+    session.delete(election_compound)
+    session.flush()
+
+    assert session.query(PartyResult).first() is None
+    assert session.query(PanachageResult).first() is None
 
 
 def test_election_compound_id_generation(session):
@@ -429,24 +464,22 @@ def test_election_compound_export(session):
     election_compound = session.query(ElectionCompound).one()
     election_compound.title_translations['it_CH'] = 'Elezioni'
 
-    assert election_compound.export() == []
+    assert election_compound.export(['de_CH']) == []
 
     election_compound.elections = session.query(Election).filter_by(
         id='majorz'
     ).all()
     session.flush()
-    exports = election_compound.export()
-    assert exports[0] == {
+    export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
+    assert export[0] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 1,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -472,19 +505,19 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111
     }
-    assert exports[1] == {
+    assert export[1] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 1,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -510,24 +543,24 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520
     }
 
     election_compound.elections = session.query(Election).all()
     session.flush()
-    exports = election_compound.export()
+    export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
 
-    assert exports[0] == {
+    assert export[0] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Proporz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'proporz',
@@ -559,23 +592,23 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': None,
         'panachage_votes_from_list_99': None
     }
 
-    assert exports[1] == {
+    assert export[1] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Proporz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'proporz',
@@ -607,23 +640,23 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': 12,
         'panachage_votes_from_list_99': 4
     }
 
-    assert exports[2] == {
+    assert export[2] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -649,20 +682,20 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111
     }
 
-    assert exports[3] == {
+    assert export[3] == {
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
-        'compound_title_rm_CH': '',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -688,6 +721,8 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520
     }
 
@@ -703,7 +738,7 @@ def test_election_compound_export_parties(session):
     session.flush()
     election_compound = session.query(ElectionCompound).one()
 
-    assert election_compound.export_parties() == []
+    assert election_compound.export_parties(['de_CH'], 'de_CH') == []
 
     # Add party results
     election_compound.party_results.append(
@@ -711,9 +746,10 @@ def test_election_compound_export_parties(session):
             number_of_mandates=0,
             votes=0,
             voters_count=Decimal('1.01'),
+            voters_count_percentage=Decimal('100.02'),
             total_votes=100,
-            total_voters_count=Decimal('100.02'),
-            name='Libertarian',
+            name_translations={'en_US': 'Libertarian'},
+            party_id='3',
             color='black',
             year=2012
         )
@@ -724,8 +760,9 @@ def test_election_compound_export_parties(session):
             votes=2,
             voters_count=Decimal('3.01'),
             total_votes=50,
-            total_voters_count=Decimal('50.02'),
-            name='Libertarian',
+            voters_count_percentage=Decimal('50.02'),
+            name_translations={'en_US': 'Libertarian'},
+            party_id='3',
             color='black',
             year=2016
         )
@@ -736,8 +773,9 @@ def test_election_compound_export_parties(session):
             votes=1,
             voters_count=Decimal('2.01'),
             total_votes=100,
-            total_voters_count=Decimal('100.02'),
-            name='Conservative',
+            voters_count_percentage=Decimal('100.02'),
+            name_translations={'en_US': 'Conservative'},
+            party_id='5',
             color='red',
             year=2012
         )
@@ -748,159 +786,150 @@ def test_election_compound_export_parties(session):
             votes=3,
             voters_count=Decimal('4.01'),
             total_votes=50,
-            total_voters_count=Decimal('50.02'),
-            name='Conservative',
+            voters_count_percentage=Decimal('50.02'),
+            name_translations={'en_US': 'Conservative'},
+            party_id='5',
             color='red',
             year=2016
         )
     )
 
-    assert election_compound.export_parties() == [
+    assert election_compound.export_parties(['en_US', 'de_CH'], 'en_US') == [
         {
             'year': 2016,
-            'name': 'Conservative',
-            'id': 0,
-            'color': 'red',
-            'mandates': 3,
-            'total_votes': 50,
-            'total_voters_count': '50.02',
-            'votes': 3,
-            'voters_count': '4.01',
-        }, {
-            'year': 2016,
             'name': 'Libertarian',
-            'id': 1,
+            'name_en_US': 'Libertarian',
+            'name_de_CH': None,
+            'id': '3',
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
-            'total_voters_count': '50.02',
             'votes': 2,
             'voters_count': '3.01',
-        }, {
-            'year': 2012,
+            'voters_count_percentage': '50.02',
+        },
+        {
+            'year': 2016,
             'name': 'Conservative',
-            'id': 0,
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '5',
             'color': 'red',
-            'mandates': 1,
-            'total_votes': 100,
-            'total_voters_count': '100.02',
-            'votes': 1,
-            'voters_count': '2.01',
-        }, {
+            'mandates': 3,
+            'total_votes': 50,
+            'votes': 3,
+            'voters_count': '4.01',
+            'voters_count_percentage': '50.02',
+        },
+        {
             'year': 2012,
             'name': 'Libertarian',
-            'id': 1,
+            'name_en_US': 'Libertarian',
+            'name_de_CH': None,
+            'id': '3',
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
-            'total_voters_count': '100.02',
             'votes': 0,
             'voters_count': '1.01',
+            'voters_count_percentage': '100.02',
+        },
+        {
+            'year': 2012,
+            'name': 'Conservative',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '5',
+            'color': 'red',
+            'mandates': 1,
+            'total_votes': 100,
+            'votes': 1,
+            'voters_count': '2.01',
+            'voters_count_percentage': '100.02',
         }
     ]
 
     # Add panachage results
-    for idx, source in enumerate(('Conservative', 'Libertarian', 'Other', '')):
+    for idx, source in enumerate(('5', '3', '0', '')):
         election_compound.panachage_results.append(
             PanachageResult(
-                target='Conservative',
+                target='5',
                 source=source,
                 votes=idx + 1
             )
         )
     election_compound.panachage_results.append(
         PanachageResult(
-            target='Libertarian',
-            source='Conservative',
+            target='3',
+            source='5',
             votes=5,
         )
     )
-    assert election_compound.export_parties() == [
+    assert election_compound.export_parties(['de_CH', 'en_US'], 'de_CH') == [
         {
             'year': 2016,
-            'name': 'Conservative',
-            'id': 0,
-            'color': 'red',
-            'mandates': 3,
-            'total_votes': 50,
-            'total_voters_count': '50.02',
-            'votes': 3,
-            'voters_count': '4.01',
-            'panachage_votes_from_0': 1,
-            'panachage_votes_from_1': 2,
-            'panachage_votes_from_2': 3,
-            'panachage_votes_from_999': 4,
-        }, {
-            'year': 2016,
-            'name': 'Libertarian',
-            'id': 1,
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Libertarian',
+            'id': '3',
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
-            'total_voters_count': '50.02',
             'votes': 2,
             'voters_count': '3.01',
-            'panachage_votes_from_0': 5,
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
-        }, {
-            'color': '',
-            'mandates': '',
-            'name': 'Other',
-            'id': 2,
-            'total_votes': '',
-            'total_voters_count': '',
-            'votes': '',
-            'voters_count': '',
+            'voters_count_percentage': '50.02',
+            'panachage_votes_from_3': None,
+            'panachage_votes_from_5': 5,
+            'panachage_votes_from_999': None,
+        },
+        {
             'year': 2016,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
-        }, {
-            'year': 2012,
-            'name': 'Conservative',
-            'id': 0,
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Conservative',
+            'id': '5',
             'color': 'red',
-            'mandates': 1,
-            'total_votes': 100,
-            'total_voters_count': '100.02',
-            'votes': 1,
-            'voters_count': '2.01',
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
-        }, {
+            'mandates': 3,
+            'total_votes': 50,
+            'votes': 3,
+            'voters_count': '4.01',
+            'voters_count_percentage': '50.02',
+            'panachage_votes_from_3': 2,
+            'panachage_votes_from_5': 1,
+            'panachage_votes_from_999': 4,
+        },
+        {
             'year': 2012,
-            'name': 'Libertarian',
-            'id': 1,
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Libertarian',
+            'id': '3',
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
-            'total_voters_count': '100.02',
             'votes': 0,
             'voters_count': '1.01',
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
-        }, {
-            'color': '',
-            'mandates': '',
-            'name': 'Other',
-            'id': 2,
-            'total_votes': '',
-            'total_voters_count': '',
-            'votes': '',
-            'voters_count': '',
+            'voters_count_percentage': '100.02',
+            'panachage_votes_from_3': None,
+            'panachage_votes_from_5': None,
+            'panachage_votes_from_999': None,
+        },
+        {
             'year': 2012,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': '',
-            'panachage_votes_from_2': '',
-            'panachage_votes_from_999': '',
-        }
+            'name': None,
+            'name_de_CH': None,
+            'name_en_US': 'Conservative',
+            'id': '5',
+            'color': 'red',
+            'mandates': 1,
+            'total_votes': 100,
+            'votes': 1,
+            'voters_count': '2.01',
+            'voters_count_percentage': '100.02',
+            'panachage_votes_from_3': None,
+            'panachage_votes_from_5': None,
+            'panachage_votes_from_999': None,
+        },
     ]
 
 
@@ -1068,118 +1097,18 @@ def test_election_compound_supersegment_progress(session):
     assert election_compound.progress == (1, 3)
 
 
-def test_list_results(session):
-    election_compound = ElectionCompound(
-        title='Elections',
+def test_election_compound_attachments(test_app, explanations_pdf):
+    model = ElectionCompound(
+        title='Legislative Elections',
         domain='canton',
         date=date(2015, 6, 14),
     )
-    session.add(election_compound)
-    session.flush()
 
-    assert election_compound.get_list_results() == []
-    elections = [
-        proporz_election(id='1', number_of_mandates=1),
-        proporz_election(id='2', number_of_mandates=2),
-        proporz_election(id='3', number_of_mandates=3)
-    ]
-    for election in elections:
-        session.add(election)
-    election_compound.elections = elections
-    session.flush()
-
-    # Not Doppelter Pukelsheim
-    assert election_compound.get_list_results() == []
-
-    # Doppelter Pukelsheim with manual completion
-    election_compound.pukelsheim = True
-    election_compound.completes_manually = True
-    election_compound.manually_completed = False
-    assert election_compound.get_list_results() == [
-        ('Quimby Again!', 3, 953),  # 520 / 1 + 520 / 2 + 520 / 3
-        ('Kwik-E-Major', 0, 204)  # 111 / 1 + 111/2 + 111/3
-    ]
-
-    # Add another list
-    list_id = uuid4()
-    list_ = List(
-        id=list_id,
-        list_id='3',
-        number_of_mandates=5,
-        name='Burns burns!',
-    )
-    list_result = ListResult(
-        list_id=list_id,
-        votes=200
-    )
-    election_result = ElectionResult(
-        name='name',
-        entity_id=1,
-        counted=True,
-    )
-    election_result.list_results.append(list_result)
-    elections[0].lists.append(list_)
-    elections[0].results.append(election_result)
-    session.flush()
-
-    assert election_compound.get_list_results() == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)  # 200 + 0 / 2 + 0 / 3
-    ]
-
-    # Test optional parameters
-    # ... limit
-    assert election_compound.get_list_results(limit=0) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=None) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=-5) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=2) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-    ]
-
-    # ... names
-    assert election_compound.get_list_results(names=[]) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(names=None) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(
-        names=['Quimby Again!', 'Kwik-E-Major', 'All others']
-    ) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-    ]
-
-    # ... manually completed
-    election_compound.manually_completed = True
-    assert election_compound.get_list_results() == [
-        ('Burns burns!', 5, 200),
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204)
-    ]
-
-    # ... limit & names & order_by
-    assert election_compound.get_list_results(
-        limit=1,
-        names=['Quimby Again!'],
-    ) == [
-        ('Quimby Again!', 3, 953),
-    ]
+    assert model.explanations_pdf is None
+    del model.explanations_pdf
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+    assert model.explanations_pdf.reference.content_type == 'application/pdf'
+    del model.explanations_pdf
+    assert model.explanations_pdf is None

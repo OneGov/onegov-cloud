@@ -67,7 +67,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     order = Column(Text, nullable=False, index=True)
 
     #: The polymorphic type of the directory
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     #: The data structure of the contained entries
     structure = Column(Text, nullable=False)
@@ -81,8 +81,8 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         return func.count('1')
 
     __mapper_args__ = {
-        'order_by': order,
-        'polymorphic_on': type
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic'
     }
 
     entries = relationship(

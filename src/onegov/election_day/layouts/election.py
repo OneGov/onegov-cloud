@@ -174,6 +174,12 @@ class ElectionLayout(DetailLayout):
         return False
 
     @cached_property
+    def has_party_results(self):
+        if self.proporz:
+            return self.model.party_results.first() is not None
+        return False
+
+    @cached_property
     def summarize(self):
         return self.model.results.count() != 1
 
@@ -253,6 +259,7 @@ class ElectionLayout(DetailLayout):
             svg_filename(
                 self.model,
                 self.tab,
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

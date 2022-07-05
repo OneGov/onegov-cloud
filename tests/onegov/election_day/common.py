@@ -1,7 +1,6 @@
 import os
 import tarfile
 
-from datetime import date
 from io import BytesIO
 from onegov.core.utils import append_query_param
 from onegov.core.utils import module_path
@@ -247,18 +246,18 @@ class DummyRequest(object):
         return self.app.translations.get(self.locale)
 
 
-def login(client):
-    login = client.get('/auth/login')
+def login(client, to=''):
+    login = client.get(f'/auth/login?to={to}')
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter2'
-    login.form.submit()
+    return login.form.submit()
 
 
 def upload_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
         new.form['vote_de'] = 'Vote'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
         new.form['vote_type'] = 'simple'
         new.form.submit()
@@ -300,7 +299,7 @@ def upload_complex_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
         new.form['vote_de'] = 'Complex Vote'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
         new.form['vote_type'] = 'complex'
         new.form.submit()
@@ -344,7 +343,7 @@ def upload_majorz_election(client, create=True, canton='gr', status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Majorz Election'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['mandates'] = 2
         new.form['election_type'] = 'majorz'
         new.form['domain'] = 'federation'
@@ -395,7 +394,7 @@ def upload_proporz_election(client, create=True, canton='gr',
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Proporz Election'
-        new.form['date'] = date(2022, 1, 1)
+        new.form['date'] = '2022-01-01'
         new.form['mandates'] = 5
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'federation'
@@ -434,13 +433,13 @@ def upload_proporz_election(client, create=True, canton='gr',
 
 def upload_party_results(client, slug='election/proporz-election'):
     csv_parties = (
-        "year,total_votes,total_voters_count,id,name,color,mandates,"
-        "votes,voters_count,"
+        "year,total_votes,id,name,color,mandates,"
+        "votes,voters_count,voters_count_percentage,"
         "panachage_votes_from_1,panachage_votes_from_2,"
         "panachage_votes_from_3,panachage_votes_from_999\n"
-        "2022,11270,1445.07,1,BDP,#efb52c,1,60387,603.01,,11,12,100\n"
-        "2022,11270,1445.07,2,CVP,#ff6300,1,49117,491.02,21,,22,200\n"
-        "2022,11270,1445.07,3,FDP,,0,35134,351.04,31,32,,300\n"
+        "2022,11270,1,BDP,#efb52c,1,60387,603.01,41.73,,11,12,100\n"
+        "2022,11270,2,CVP,#ff6300,1,49117,491.02,33.98,21,,22,200\n"
+        "2022,11270,3,FDP,,0,35134,351.04,24.29,31,32,,300\n"
     ).encode('utf-8')
 
     upload = client.get(f'/{slug}/upload-party-results')
@@ -479,7 +478,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election A'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['election_type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][0]
@@ -488,7 +487,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
 
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election B'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['election_type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][1]
@@ -498,7 +497,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
     new.form['election_de'] = 'Elections'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = domain[canton]
     new.form[elections_field[canton]] = [
@@ -538,15 +537,15 @@ def upload_election_compound(client, create=True, canton='gr',
     csv = PROPORZ_HEADER
     csv += (
         f'{status},{entities[canton][0]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-        f'101,False,Anna,Looser,0,,0,1\n'
+        f'101,False,Looser,Anna,0,,0,1\n'
         f'{status},{entities[canton][0]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-        f'201,True,Carol,Winner,2,,2,0\n'
+        f'201,True,Winner,Carol,2,,2,0\n'
     )
     csv += (
         f'{status},{entities[canton][1]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-        f'101,True,Hans,Sieger,0,,0,1\n'
+        f'101,True,Sieger,Hans,0,,0,1\n'
         f'{status},{entities[canton][1]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-        f'201,False,Peter,Verlierer,2,,2,0\n'
+        f'201,False,Verlierer,Peter,2,,2,0\n'
     )
     csv = csv.encode('utf-8')
 
@@ -556,6 +555,7 @@ def upload_election_compound(client, create=True, canton='gr',
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    return upload
 
 
 def import_wabstic_data(election, tar_file, principal, expats=False):

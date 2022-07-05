@@ -95,7 +95,7 @@ def test_detect_renamed_fields():
             First Name = ___
             Bottom = ___
         """,
-        """ 
+        """
             Top = ___
             Name = ___
             Bottom = ___
@@ -320,10 +320,10 @@ def test_directory_migration(session):
         # General
         Employees = 0..1000
         << All sorts are counted >>
-        Epoch *= 
+        Epoch *=
             ( ) Before 1950
             ( ) After 1950
-        Landscapes = 
+        Landscapes =
             [ ] Tundra
             [ ] Arctic
             [ ] Desert

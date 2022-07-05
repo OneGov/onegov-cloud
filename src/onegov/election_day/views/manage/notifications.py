@@ -25,6 +25,7 @@ def view_trigger_notficiations(self, request, form):
         notifications.trigger_summarized(
             request,
             form.election_models(session),
+            form.election_compound_models(session),
             form.vote_models(session),
             form.notifications.data
         )

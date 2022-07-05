@@ -54,9 +54,6 @@ class Client(BaseClient):
     skip_first_form = True
     use_intercooler = True
 
-    def login_member(self, to=None):
-        return self.login('member@example.org', 'hunter2', to)
-
     def bound_reserve(self, allocation):
 
         default_start = '{:%H:%M}'.format(allocation.start)
@@ -157,6 +154,11 @@ def create_org_app(request, use_elasticsearch, cls=OrgApp):
         username='editor@example.org',
         password_hash=test_password,
         role='editor'
+    ))
+    session.add(User(
+        username='member@example.org',
+        password_hash=test_password,
+        role='member'
     ))
 
     transaction.commit()
@@ -270,7 +272,9 @@ class Scenario(BaseScenario):
         self.tickets.append(ticket)
         return self.latest_ticket
 
-    def add_ticket_FRM(self, submission=None, handler_id=None, owner=None, **handler_data):
+    def add_ticket_FRM(
+        self, submission=None, handler_id=None, owner=None, **handler_data
+    ):
         """ Adds a ticket for the latest form submission """
 
         if not handler_id:
@@ -381,7 +385,8 @@ class Scenario(BaseScenario):
         ticket.reopen_ticket(user or self.latest_user)
 
     def delete_ticket(self, ticket=None):
-        """Using the view function allows to check for TicketDeletionError's """
+        """Using the view function allows to check for
+        TicketDeletionError's """
         ticket = ticket or self.tickets[-1]
         delete_ticket(ticket, self.request)
 

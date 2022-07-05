@@ -1,6 +1,6 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
     <tal:block metal:fill-slot="title">
-        ${title}
+        ${title} - ${request.app.principal.name}
     </tal:block>
     <tal:block metal:fill-slot="content">
         <span class="shortcode large" tal:condition="shortcode|nothing">${shortcode}</span>
@@ -12,7 +12,7 @@
         <div class="panel">
             <p i18n:translate>Last notifications:</p>
             <ul tal:condition="last_notifications">
-                <li tal:repeat="last_notification last_notifications">${layout.format_date(last_notification.last_change, 'datetime_long')}: ${last_notification.type} (${layout.format_date(last_notification.last_modified, 'datetime_long')})</li>
+                <li tal:repeat="last_notification last_notifications[:20]">${layout.format_date(last_notification.last_change, 'datetime_long')}: ${last_notification.type} (${layout.format_date(last_notification.last_modified, 'datetime_long')})</li>
             </ul>
         </div>
         <p tal:condition="message|nothing">${message}</p>

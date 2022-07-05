@@ -22,11 +22,12 @@ from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
+from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.user import UserApp
 
 
-class ElectionDayApp(Framework, FormApp, UserApp):
+class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     """ The election day application. Include this in your onegov.yml to serve
     it with onegov-server.
 
@@ -222,6 +223,37 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
     under=current_language_tween_factory,
     over=transaction_tween_factory
 )
+def cache_control_tween_factory(app, handler):
+
+    def cache_control_tween(request):
+        """ Set headers and cookies for cache control.
+
+        Makes sure, pages are not cached downstream when logged in by setting
+        the cache-control header accordingly.
+
+        Sets `no_cache` cookie which can be used for bypassing a downstream
+        cache.
+
+        """
+
+        response = handler(request)
+        if request.is_logged_in:
+            response.headers.add('cache-control', 'no-store')
+            if request.cookies.get('no_cache', '0') == '0':
+                response.set_cookie('no_cache', '1', samesite='Lax')
+        else:
+            if request.cookies.get('no_cache', '0') == '1':
+                response.delete_cookie('no_cache')
+
+        return response
+
+    return cache_control_tween
+
+
+@ElectionDayApp.tween_factory(
+    under=current_language_tween_factory,
+    over=transaction_tween_factory
+)
 def micro_cache_anonymous_pages_tween_factory(app, handler):
 
     cache_paths = (
@@ -232,8 +264,13 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/screen/.*',
         '/catalog.rdf',
     )
-
     cache_paths = re.compile(r'^({})$'.format('|'.join(cache_paths)))
+
+    def should_cache_fn(response):
+        return (
+            response.status_code == 200
+            and 'Set-Cookie' not in response.headers
+        )
 
     def micro_cache_anonymous_pages_tween(request):
         """ Cache all pages for 5 minutes.
@@ -245,6 +282,10 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         That is to say, we observe the Cache-Control header.
 
         """
+
+        # do not cache HEAD, POST, DELETE etc.
+        if request.method != 'GET':
+            return handler(request)
 
         # no cache if the user is logged in
         if request.is_logged_in:
@@ -264,14 +305,14 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         key = ':'.join((
             request.method,
             request.locale,
-            request.path_info,
+            request.path_qs,
             'hl' if 'headerless' in request.browser_session else 'hf'
         ))
 
         return app.pages_cache.get_or_create(
             key,
             creator=lambda: handler(request),
-            should_cache_fn=lambda response: response.status_code == 200
+            should_cache_fn=should_cache_fn
         )
 
     return micro_cache_anonymous_pages_tween

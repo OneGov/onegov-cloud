@@ -83,6 +83,8 @@ Nom|Description
 `candidate_first_name`|Prénom du candidat.
 `candidate_elected`|Vrai, si le candidat a été élu.
 `candidate_party`|Nom de le parti.
+`candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé). Facultatif.
+`candidate_year_of_birth`|L'année de naissance du candidat. Facultatif.
 `candidate_votes`|Nombre de votes de candidats dans la municipalité.
 
 #### Résultats du panachage
@@ -237,13 +239,16 @@ Nom|Description
 ---|---
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
-`total_voters_count`|Le nombre total de voix cumulées par rapport au nombre total de mandats par élection, pour les composés électoraux uniquement.
-`name`|La dénomination du parti.
+`name`|Le dénomination du parti dans la langue par défaut. Optionnel*.
+`name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand. Optionnel*.
 `id`|Identifiant du parti (n'importe quel numéro).
 `color`|La couleur du parti.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
+`voters_count_percentage`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
+
+*Assurez-vous de fournir le nom de la partie dans la langue par défaut soit avec la colonne `name` ou `name_{default_locale}`.
 
 Les résultats peuvent inclure des résultats avec panachage en ajoutant une colonne par parti :
 

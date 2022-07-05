@@ -12,7 +12,20 @@ class VoteLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
-    tabs_with_embedded_tables = ('entities', 'districts')
+    tabs_with_embedded_tables = (
+        'entities',
+        'districts',
+        'statistics',
+        'proposal-entities',
+        'proposal-districts',
+        'proposal-statistics',
+        'counter-proposal-entities',
+        'counter-proposal-districts',
+        'counter-proposal-statistics',
+        'tie-breaker-entities',
+        'tie-breaker-districts',
+        'tie-breaker-statistics',
+    )
 
     @cached_property
     def all_tabs(self):
@@ -20,12 +33,16 @@ class VoteLayout(DetailLayout):
         return (
             'entities',
             'districts',
+            'statistics',
             'proposal-entities',
             'proposal-districts',
+            'proposal-statistics',
             'counter-proposal-entities',
             'counter-proposal-districts',
+            'counter-proposal-statistics',
             'tie-breaker-entities',
             'tie-breaker-districts',
+            'tie-breaker-statistics',
             'data'
         )
 
@@ -36,6 +53,8 @@ class VoteLayout(DetailLayout):
             return self.principal.label('entities')
         if tab == 'districts':
             return self.app.principal.label('districts')
+        if tab == 'statistics':
+            return _("Statistics")
         if tab.startswith('proposal'):
             return _("Proposal")
         if tab.startswith('counter-proposal'):
@@ -50,15 +69,16 @@ class VoteLayout(DetailLayout):
     def subtitle(self, tab=None):
         tab = (self.tab if tab is None else tab) or ''
 
-        if tab.endswith('-entities') and self.has_districts:
+        if tab.endswith('-entities'):
             return self.principal.label('entities')
         if tab.endswith('-districts'):
             return self.app.principal.label('districts')
+        if tab.endswith('-statistics'):
+            return _("Statistics")
 
         return ''
 
     def tab_visible(self, tab):
-
         if self.hide_tab(tab):
             return False
 
@@ -83,6 +103,15 @@ class VoteLayout(DetailLayout):
         if tab == 'tie-breaker-districts':
             return self.has_districts and self.type == 'complex'
 
+        if tab == 'statistics':
+            return self.type == 'simple'
+        if tab == 'proposal-statistics':
+            return self.type == 'complex'
+        if tab == 'counter-proposal-statistics':
+            return self.type == 'complex'
+        if tab == 'tie-breaker-statistics':
+            return self.type == 'complex'
+
         return True
 
     @cached_property
@@ -94,6 +123,13 @@ class VoteLayout(DetailLayout):
         return self.model.type
 
     @cached_property
+    def scope(self):
+        if 'entities' in self.tab:
+            return 'entities'
+        if 'district' in self.tab:
+            return 'districts'
+
+    @cached_property
     def ballot(self):
         if self.type == 'complex' and 'counter' in self.tab:
             return self.model.counter_proposal
@@ -102,26 +138,34 @@ class VoteLayout(DetailLayout):
         return self.model.proposal
 
     @cached_property
-    def entities_map_link(self):
-        return self.request.link(
-            self.model, f'{self.ballot.type}-by-entities-map'
-        )
+    def map_link(self):
+        if self.scope == 'entities':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-entities-map'
+            )
 
-    @cached_property
-    def districts_map_link(self):
-        return self.request.link(
-            self.model, f'{self.ballot.type}-by-districts-map'
-        )
+        if self.scope == 'districts':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-districts-map'
+            )
 
     @cached_property
     def table_link(self):
-        if self.tab == 'data':
+        if self.tab not in self.tabs_with_embedded_tables:
             return None
-        scope = 'entities'
-        if 'district' in self.tab:
-            scope = 'districts'
+
+        if self.scope == 'entities':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-entities-table'
+            )
+
+        if self.scope == 'districts':
+            return self.request.link(
+                self.model, f'{self.ballot.type}-by-districts-table'
+            )
+
         return self.request.link(
-            self.model, f'{self.ballot.type}-by-{scope}-table'
+            self.model, f'{self.ballot.type}-statistics-table'
         )
 
     @cached_property
@@ -149,15 +193,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def menu(self):
-        def entry(tab, use_subtitle=False):
-            return (
-                self.subtitle(tab) if use_subtitle else self.title(tab),
-                self.request.link(self.model, tab),
-                self.tab == tab,
-                []
-            )
-
-        if self.type == 'complex' and self.has_districts:
+        if self.type == 'complex':
             result = []
 
             for title, prefix in (
@@ -165,20 +201,32 @@ class VoteLayout(DetailLayout):
                 (_("Counter Proposal"), 'counter-proposal'),
                 (_("Tie-Breaker"), 'tie-breaker')
             ):
-                result.append((
-                    title, '', self.tab.startswith(prefix), [(
+                submenu = [
+                    (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),
                         self.tab == tab,
                         []
-                    ) for tab in (f'{prefix}-entities', f'{prefix}-districts')]
+                    ) for tab in (
+                        f'{prefix}-entities',
+                        f'{prefix}-districts',
+                        f'{prefix}-statistics'
+                    ) if self.tab_visible(tab)
+                ]
+                if submenu:
+                    result.append((
+                        title,
+                        '',
+                        self.tab.startswith(prefix),
+                        submenu
+                    ))
+            if self.tab_visible('data'):
+                result.append((
+                    self.title('data'),
+                    self.request.link(self.model, 'data'),
+                    self.tab == 'data',
+                    []
                 ))
-            result.append((
-                self.title('data'),
-                self.request.link(self.model, 'data'),
-                self.tab == 'data',
-                []
-            ))
             return result
 
         return [

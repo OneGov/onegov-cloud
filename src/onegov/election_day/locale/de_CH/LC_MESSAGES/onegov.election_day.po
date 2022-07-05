@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-20 08:15+0100\n"
-"PO-Revision-Date: 2022-03-15 10:55+0100\n"
+"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -370,6 +370,9 @@ msgstr "Link Text  Italienisch"
 msgid "Link label romansh"
 msgstr "Link Text  Rumantsch"
 
+msgid "Explanations (PDF)"
+msgstr "Erläuterungen (PDF)"
+
 msgid "Color suggestions"
 msgstr "Farbvorschläge"
 
@@ -480,6 +483,12 @@ msgstr "Webhooks"
 
 msgid "Votes"
 msgstr "Abstimmungen"
+
+msgid "Compounds of elections"
+msgstr "Verbundene Wahlen"
+
+msgid "Select at least one election or vote."
+msgstr "Wählen Sie mindestens eine Wahl oder Abstimmung."
 
 msgid "Number"
 msgstr "Nummer"
@@ -608,9 +617,6 @@ msgstr "Schlussresultate"
 msgid "Counter proposal accepted"
 msgstr "Gegenentwurf angenommen"
 
-msgid "Compounds of elections"
-msgstr "Verbundene Wahlen"
-
 msgid "Upload tokens"
 msgstr "Upload Token"
 
@@ -649,6 +655,9 @@ msgstr "Verwalten"
 
 msgid "Mappings"
 msgstr "Zuordnungen"
+
+msgid "Statistics"
+msgstr "Statistik"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -698,6 +707,12 @@ msgstr "Region"
 msgid "superregions_label_bl"
 msgstr "Regionen"
 
+msgid "Seats"
+msgstr "Sitze"
+
+msgid "Mandates"
+msgstr "Mandate"
+
 msgid "Quarter"
 msgstr "Stadtteil"
 
@@ -716,6 +731,9 @@ msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Urnengang vom ${date}"
+
+msgid "Archive"
+msgstr "Archiv"
 
 msgid "Federal Elections"
 msgstr "Eidgenössische Wahlen"
@@ -759,9 +777,6 @@ msgstr "Ja %"
 msgid "No %"
 msgstr "Nein %"
 
-msgid "Archive"
-msgstr "Archiv"
-
 msgid "Archive Search"
 msgstr "Archiv-Suche"
 
@@ -777,8 +792,8 @@ msgstr "Zwischenergebnisse"
 msgid "No candidacies."
 msgstr "Keine Kandidaturen."
 
-msgid "Download"
-msgstr "Herunterladen"
+msgid "Download diagram"
+msgstr "Diagramm herunterladen"
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -795,20 +810,20 @@ msgstr ""
 "proportional zu den Stimmen, blau eingefärbte Balken enthalten die Anzahl "
 "der Mandate."
 
-msgid "The raw data is available as:"
-msgstr "Die Rohdaten sind in folgendem Format verfügbar:"
+msgid "Embed map"
+msgstr "Karte einbetten"
 
-msgid "The format of the data is described here:"
-msgstr "Das Datenformat ist hier beschrieben:"
+msgid "Download map"
+msgstr "Karte herunterladen"
 
-msgid "Format Description"
-msgstr "Formatbeschreibung"
+msgid "Download"
+msgstr "Herunterladen"
 
-msgid "Embed"
-msgstr "Einbetten"
+msgid "No candidates elected yet."
+msgstr "Noch keine Kandidierenden gewählt."
 
-msgid "Voters count"
-msgstr "Wählerzahl"
+msgid "Note on the voters count"
+msgstr "Hinweis zur Wählerzahl"
 
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
@@ -816,16 +831,23 @@ msgstr "Wählerzahl"
 #. election is finished as soon as the number of mandates appears.
 msgid "figcaption_list_groups"
 msgstr ""
-"Die Parteistimmenzahl einer Liste wird durch die Zahl der im betreffenden "
-"Wahlkreis zu vergebenden Sitze geteilt. Das Ergebnis heisst Wählerzahl der "
-"Liste. Die Wählerzahl bestimmt die Oberzuteilung auf die Listengruppen. Die "
-"Wahl ist beendet, sobald die Anzahl Mandate erscheint."
+"In einem ersten Schritt – der sogenannten Oberzuteilung - werden zunächst "
+"alle abgegeben Stimmen auf Kantonsebene betrachtet. Die Sitze werden "
+"entsprechend den erzielten Wähleranteilen auf die einzelnen Parteien "
+"verteilt. Damit die Stimmen, welche die Parteien in den einzelnen "
+"Wahlkreisen erzielen, kantonal vergleichbar sind und jede Stimme gleich viel "
+"zählt, braucht es eine Gewichtung. Dafür werden die erzielten Stimmen einer "
+"Partei jeweils durch die Anzahl der zu vergebenden Sitze im entsprechenden "
+"Wahlkreis geteilt. Das Ergebnis davon ist die Wählerzahl."
+
+msgid "Voters count"
+msgstr "Wählerzahl"
 
 msgid "The file is invalid."
 msgstr "Die Datei ist ungültig."
 
 msgid "The form contains errors. Please check the marked fields."
-msgstr ""
+msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
 #.
 #. Default: Start
@@ -889,23 +911,31 @@ msgstr "Ja-Stimmen"
 msgid "Nays"
 msgstr "Nein-Stimmen"
 
-msgid "Empty"
-msgstr "Leer"
+msgid "Not yet counted"
+msgstr "Noch nicht ausgezählt"
 
-msgid "Invalid"
-msgstr "Ungültig"
+msgid "Total"
+msgstr "Total"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Stimm&shy;berechtigte"
+
+msgid "Cast Ballots"
+msgstr "Eingegangene Stimmzettel"
+
+msgid "Empty votes"
+msgstr "Leere Stimmen"
+
+msgid "Invalid votes"
+msgstr "Ungültige Stimmen"
 
 #. Default: Turnout
 #. Default: Voter turnout
 #.
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
-
-msgid "Not yet counted"
-msgstr "Noch nicht ausgezählt"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Nay"
 msgstr "Nein"
@@ -926,12 +956,6 @@ msgstr "Unterlistenverbindung"
 
 msgid "Subtotal"
 msgstr "Zwischensumme"
-
-msgid "Mandates"
-msgstr "Mandate"
-
-msgid "Seats"
-msgstr "Sitze"
 
 msgid "eligible Voters"
 msgstr "Wahlberechtigte"
@@ -980,6 +1004,12 @@ msgstr "Nur gewählte Kandidierende"
 
 msgid "List group"
 msgstr "Listengruppe"
+
+msgid "Embed diagram"
+msgstr "Diagramm einbetten"
+
+msgid "Embed table"
+msgstr "Tabelle einbetten"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
@@ -1056,26 +1086,27 @@ msgstr "Stichfrage zugunsten der Initiative"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
 
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Stimmberechtigte"
-
-msgid "Cast Ballots"
-msgstr "Eingegangene Stimmzettel"
-
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"
 
 msgid "PDF Results"
 msgstr "PDF Resultate"
 
-msgid ""
-"The raw data used to display the results is available in the following "
-"formats:"
+msgid "Candidate results"
+msgstr "Kandidierendenresultate"
+
+msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
-"Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den "
-"folgenden Formaten verfügbar:"
+"Die Rohdaten der Kandidierenden sind in den folgenden Formaten verfügbar:"
+
+msgid "The raw data of the parties are available in the following formats:"
+msgstr "Die Rohdaten der Parteien sind in den folgenden Formaten verfügbar:"
+
+msgid "The format of the data is described here:"
+msgstr "Das Datenformat ist hier beschrieben:"
+
+msgid "Format Description"
+msgstr "Formatbeschreibung"
 
 msgid "Terms of use"
 msgstr "Nutzungsbedingungen"
@@ -1421,8 +1452,8 @@ msgid "Results deleted."
 msgstr "Ergebnisse gelöscht."
 
 #, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr "Möchten Sie wirklich alle Parteiresultate von \"${item}\" löschen?"
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Möchten Sie wirklich alle Resultate von \"${item}\" löschen?"
 
 #, python-format
 msgid "${count} files deleted."
@@ -1445,25 +1476,6 @@ msgstr "Verbindung gelöscht."
 msgid "Delete compound"
 msgstr "Verbindung löschen"
 
-msgid "Election added."
-msgstr "Wahl hinzugefügt."
-
-msgid "Election modified."
-msgstr "Wahl geändert."
-
-msgid "Edit election"
-msgstr "Wahl bearbeiten"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Möchten Sie wirklich alle Resultate von \"${item}\" löschen?"
-
-msgid "Election deleted."
-msgstr "Wahl gelöscht."
-
-msgid "Delete election"
-msgstr "Wahl löschen"
-
 msgid "Notifications triggered."
 msgstr "Benachrichtigungen ausgelöst."
 
@@ -1474,6 +1486,21 @@ msgstr "Keine Änderungen seit dem letzten Auslösen der Benachrichtigungen!"
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Benachrichtigungen wirklich erneut auslösen?"
+
+msgid "Election added."
+msgstr "Wahl hinzugefügt."
+
+msgid "Election modified."
+msgstr "Wahl geändert."
+
+msgid "Edit election"
+msgstr "Wahl bearbeiten"
+
+msgid "Election deleted."
+msgstr "Wahl gelöscht."
+
+msgid "Delete election"
+msgstr "Wahl löschen"
 
 msgid "Screen added."
 msgstr "Screen hinzugefügt."

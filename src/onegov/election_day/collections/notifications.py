@@ -1,4 +1,5 @@
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.election_day import _
 from onegov.election_day.models import EmailNotification
@@ -24,6 +25,8 @@ class NotificationCollection(object):
         query = self.query()
         if isinstance(model, Election):
             query = query.filter(Notification.election_id == model.id)
+        if isinstance(model, ElectionCompound):
+            query = query.filter(Notification.election_compound_id == model.id)
         if isinstance(model, Vote):
             query = query.filter(Notification.vote_id == model.id)
 
@@ -58,13 +61,14 @@ class NotificationCollection(object):
 
         self.session.flush()
 
-    def trigger_summarized(self, request, elections, votes, options):
+    def trigger_summarized(self, request, elections, election_compounds, votes,
+                           options):
         """ Triggers and adds a single notification for all given votes and
         elections.
 
         """
 
-        if not (elections or votes) or not options:
+        if not (elections or election_compounds or votes) or not options:
             return
 
         if 'email' in options and request.app.principal.email_notification:
@@ -73,6 +77,11 @@ class NotificationCollection(object):
                 completed &= election.completed
                 notification = EmailNotification()
                 notification.update_from_model(election)
+                self.session.add(notification)
+            for election_compound in election_compounds:
+                completed &= election_compound.completed
+                notification = EmailNotification()
+                notification.update_from_model(election_compound)
                 self.session.add(notification)
             for vote in votes:
                 completed &= vote.completed
@@ -84,6 +93,7 @@ class NotificationCollection(object):
             notification.send_emails(
                 request,
                 elections,
+                election_compounds,
                 votes,
                 _("The final results are available") if completed else
                 _("New results are available")
@@ -93,6 +103,10 @@ class NotificationCollection(object):
             for election in elections:
                 notification = SmsNotification()
                 notification.update_from_model(election)
+                self.session.add(notification)
+            for election_compound in election_compounds:
+                notification = SmsNotification()
+                notification.update_from_model(election_compound)
                 self.session.add(notification)
             for vote in votes:
                 notification = SmsNotification()
@@ -112,6 +126,10 @@ class NotificationCollection(object):
             for election in elections:
                 notification = WebhookNotification()
                 notification.trigger(request, election)
+                self.session.add(notification)
+            for election_compound in election_compounds:
+                notification = WebhookNotification()
+                notification.trigger(request, election_compound)
                 self.session.add(notification)
             for vote in votes:
                 notification = WebhookNotification()

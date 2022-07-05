@@ -1,4 +1,3 @@
-from datetime import date
 from onegov.election_day.collections import ArchivedResultCollection
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
@@ -16,7 +15,7 @@ def test_upload_election_compound_year_unavailable(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
-    new.form['date'] = date(1990, 1, 1)
+    new.form['date'] = '1990-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'municipality'
@@ -24,7 +23,7 @@ def test_upload_election_compound_year_unavailable(election_day_app_zg):
 
     new = client.get('/manage/election-compounds/new-election-compound')
     new.form['election_de'] = "Elections"
-    new.form['date'] = date(1990, 1, 1)
+    new.form['date'] = '1990-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'municipality'
@@ -96,7 +95,7 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'election'
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'region'
@@ -105,7 +104,7 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
 
     new = client.get('/manage/election-compounds/new-election-compound')
     new.form['election_de'] = "Elections"
-    new.form['date'] = date(2022, 1, 1)
+    new.form['date'] = '2022-01-01'
     new.form['region_elections'] = ['election']
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'region'
@@ -207,7 +206,7 @@ def test_upload_election_compound_submit(election_day_app_zg):
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'municipality'
@@ -215,7 +214,7 @@ def test_upload_election_compound_submit(election_day_app_zg):
 
     new = client.get('/manage/election-compounds/new-election-compound')
     new.form['election_de'] = "Elections"
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'municipality'

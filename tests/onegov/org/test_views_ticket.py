@@ -285,11 +285,15 @@ def test_send_ticket_email(client):
     reserve = admin.bound_reserve(allocations[0])
     transaction.commit()
 
-    def submit_reservation(client, email):
+    def submit_reservation(client, email, remembered=None):
         assert reserve('10:00', '12:00').json == {'success': True}
 
         # fill out the form
         formular = client.get('/resource/tageskarte/form')
+
+        # check whether we remembered the previous submission
+        if remembered:
+            assert formular.form['email'].value == remembered
         formular.form['email'] = email
 
         formular.form.submit().follow().form.submit().follow()
@@ -299,9 +303,78 @@ def test_send_ticket_email(client):
     submit_reservation(admin, 'admin@example.org')
     assert len(os.listdir(client.app.maildir)) == 0
 
-    submit_reservation(admin, 'someone-else@example.org')
+    submit_reservation(admin, 'someone-else@example.org', 'admin@example.org')
     assert len(os.listdir(client.app.maildir)) == 1
     assert 'someone-else@example.org' == client.get_email(0)['To']
+
+
+def test_email_for_new_tickets(client):
+    client.login_admin()
+
+    # set email adress for new tickets
+    settings = client.get('/ticket-settings')
+    settings.form['email_for_new_tickets'] = 'new-tickets@test.org'
+    settings.form.submit().follow()
+
+    # fill out a form to automatically send a notification mail
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Profile', definition=textwrap.dedent("""
+        Name * = ___
+        E-Mail * = @@@
+    """), type='custom')
+    transaction.commit()
+
+    page = client.get('/forms').click('Profile')
+    page.form['name'] = 'foobar'
+    page.form['e_mail'] = 'person@example.org'
+    page.form.submit().follow().form.submit()
+
+    # same for new events
+    start = date.today() + timedelta(days=1)
+
+    page = client.get('/events').click("Veranstaltung melden")
+    page.form['email'] = "person@example.org"
+    page.form['title'] = "My Event"
+    page.form['description'] = "My event is an event."
+    page.form['organizer'] = "The Organizer"
+    page.form['location'] = "A place"
+    page.form['start_date'] = start.isoformat()
+    page.form['start_time'] = "18:00"
+    page.form['end_time'] = "22:00"
+    page.form['repeat'] = 'without'
+
+    page.form.submit().follow().form.submit()
+
+    # and for reservations
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True,
+        quota=10
+    )
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'person@example.org'
+    formular.form.submit().follow().form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 6
+    mails = list()
+    for i in range(6):
+        mails.append(client.get_email(i))
+    mails = sorted(mails, key=lambda d: d['To'])
+
+    assert 'new-tickets@test.org' == mails[0]['To']
+    assert 'Das folgende Ticket wurde soeben ' in mails[0]['TextBody']
+    assert 'new-tickets@test.org' == mails[1]['To']
+    assert 'Das folgende Ticket wurde soeben ' in mails[1]['TextBody']
+    assert 'new-tickets@test.org' == mails[2]['To']
+    assert 'Das folgende Ticket wurde soeben ' in mails[2]['TextBody']
 
 
 def test_ticket_notes(client):

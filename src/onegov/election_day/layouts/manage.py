@@ -189,8 +189,9 @@ class ManageLayout(DefaultLayout):
             for locale in app.locales
         ])
         paths.extend([
-            'svg/{}'.format(svg_filename(self.model, tab))
+            'svg/{}'.format(svg_filename(self.model, tab, locale))
             for tab in tabs
+            for locale in app.locales
         ])
         count = 0
         for path in paths:

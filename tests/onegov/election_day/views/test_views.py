@@ -1,18 +1,20 @@
-from datetime import date
 from freezegun import freeze_time
 from onegov import election_day
 from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
-from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
+from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
+from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
 from transaction import commit
+from transaction import begin
 from unittest.mock import patch
 from webtest import TestApp as Client
+from webtest.forms import Upload
 from xml.etree.ElementTree import fromstring
 
 
@@ -31,7 +33,7 @@ def test_i18n(election_day_app_zg):
     new.form['vote_fr'] = 'Bar'
     new.form['vote_it'] = 'Baz'
     new.form['vote_rm'] = 'Qux'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -52,7 +54,7 @@ def test_i18n(election_day_app_zg):
     new.form['election_fr'] = 'Trick'
     new.form['election_it'] = 'Track'
     new.form['election_rm'] = 'Quack'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
@@ -71,55 +73,94 @@ def test_i18n(election_day_app_zg):
     assert "Tick" in homepage
 
 
-def test_pages_cache(election_day_app_zg):
-    principal = election_day_app_zg.principal
-    principal.open_data = {
-        'id': 'kanton-govikon',
-        'mail': 'info@govikon',
-        'name': 'Staatskanzlei Kanton Govikon'
-    }
-    election_day_app_zg.cache.set('principal', principal)
+def test_cache_control(election_day_app_zg):
+    client = Client(election_day_app_zg)
 
+    response = client.get('/')
+    assert 'cache-control' not in response.headers
+    assert 'no_cache' not in response.headers['Set-Cookie']
+    assert 'no_cache' not in client.cookies
+
+    login(client)
+
+    response = client.get('/')
+    assert response.headers['cache-control'] == 'no-store'
+    assert response.headers['Set-Cookie'] == 'no_cache=1; Path=/; SameSite=Lax'
+    assert client.cookies['no_cache'] == '1'
+
+    response = client.get('/')
+    assert response.headers['cache-control'] == 'no-store'
+    assert 'Set-Cookie' not in response.headers
+    assert client.cookies['no_cache'] == '1'
+
+    client.get('/auth/logout?to=/')
+
+    response = client.get('/')
+    assert 'cache-control' not in response.headers
+    assert 'no_cache=;' in response.headers['Set-Cookie']
+    assert 'no_cache' not in client.cookies
+
+
+def test_pages_cache(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH')
 
     # make sure codes != 200 are not cached
     anonymous = Client(election_day_app_zg)
     anonymous.get('/vote/0xdeadbeef/entities', status=404)
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
 
+    # create vote
     login(client)
 
     new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = '0xdeadbeef'
-    new.form['date'] = date(2015, 1, 1)
+    new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    urls = ('/vote/0xdeadbeef/entities', '/catalog.rdf')
-    no_cache = [('Cache-Control', 'no-cache')]
+    # make sure set-cookies are not cached
+    client.get('/auth/logout')
+    response = login(client, to='/vote/0xdeadbeef/entities').follow()
+    assert 'Set-Cookie' in response.headers  # no_cache
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
+
+    anonymous = Client(election_day_app_zg)
+    response = anonymous.get('/vote/0xdeadbeef/entities')
+    assert 'Set-Cookie' in response.headers  # session_id
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
+
+    # make sure HEAD requests are not cached
+    anonymous.head('/vote/0xdeadbeef/')
+    assert len(election_day_app_zg.pages_cache.keys()) == 0
 
     # Create cache entries
-    for url in urls:
-        assert '0xdeadbeef' in anonymous.get(url)
+    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
+    assert len(election_day_app_zg.pages_cache.keys()) == 1
 
     # Modify without invalidating the cache
+    begin()
     election_day_app_zg.session().query(Vote).one().title = '0xdeadc0de'
     commit()
 
-    for url in urls:
-        assert '0xdeadc0de' not in anonymous.get(url)
-        assert '0xdeadc0de' in anonymous.get(url, headers=no_cache)
-        assert '0xdeadc0de' in client.get(url)  # never cached
+    assert '0xdeadc0de' not in anonymous.get('/vote/0xdeadbeef/entities')
+    assert '0xdeadc0de' in anonymous.get(
+        '/vote/0xdeadbeef/entities',
+        headers=[('Cache-Control', 'no-cache')]
+    )
+    assert '0xdeadc0de' in client.get('/vote/0xdeadbeef/entities')
 
     # Modify with invalidating the cache
     edit = client.get('/vote/0xdeadbeef/edit')
     edit.form['vote_de'] = '0xd3adc0d3'
     edit.form.submit()
 
-    for url in urls:
-        assert '0xd3adc0d3' in anonymous.get(url)
-        assert '0xd3adc0d3' in anonymous.get(url, headers=no_cache)
-        assert '0xd3adc0d3' in client.get(url)
+    assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities')
+    assert '0xd3adc0d3' in anonymous.get(
+        '/vote/0xdeadbeef/entities',
+        headers=[('Cache-Control', 'no-cache')]
+    )
+    assert '0xd3adc0d3' in client.get('/vote/0xdeadbeef/entities')
 
 
 def test_view_last_modified(election_day_app_zg):
@@ -132,13 +173,13 @@ def test_view_last_modified(election_day_app_zg):
         new = client.get('/manage/votes/new-vote')
         new.form['vote_type'] = "complex"
         new.form['vote_de'] = "Vote"
-        new.form['date'] = date(2013, 1, 1)
+        new.form['date'] = '2013-01-01'
         new.form['domain'] = 'federation'
         new.form.submit()
 
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = "Election"
-        new.form['date'] = date(2013, 1, 1)
+        new.form['date'] = '2013-01-01'
         new.form['mandates'] = 1
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'municipality'
@@ -146,7 +187,7 @@ def test_view_last_modified(election_day_app_zg):
 
         new = client.get('/manage/election-compounds/new-election-compound')
         new.form['election_de'] = "Elections"
-        new.form['date'] = date(2013, 1, 1)
+        new.form['date'] = '2013-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
         new.form['domain_elections'] = 'municipality'
@@ -155,6 +196,7 @@ def test_view_last_modified(election_day_app_zg):
         client = Client(election_day_app_zg)
         client.get('/locale/de_CH').follow()
 
+        modified = 'Wed, 01 Jan 2014 12:00:00 GMT'
         for path in (
             '/json',
             '/election/election/summary',
@@ -170,8 +212,13 @@ def test_view_last_modified(election_day_app_zg):
             '/vote/vote/data-json',
             '/vote/vote/data-csv',
         ):
-            assert client.get(path).headers.get('Last-Modified') == \
-                'Wed, 01 Jan 2014 12:00:00 GMT'
+            assert client.get(path).headers.get('Last-Modified') == modified
+        for path in (
+            '/election/election',
+            '/elections/elections',
+            '/vote/vote',
+        ):
+            assert client.head(path).headers.get('Last-Modified') == modified
 
         for path in (
             '/'
@@ -354,8 +401,8 @@ def test_view_svg(election_day_app_zg):
         'proporz-election-listen-panaschierstatistik.svg',
         'proporz-election-listen.svg',
         'proporz-election-parteien-parteistaerken.svg',
-        'vote-vorlage.svg',
-        'vote-vorlage.svg'
+        'vote-vorlage-gemeinden.svg',
+        'vote-vorlage-gemeinden.svg'
     ]
 
 
@@ -383,9 +430,11 @@ def test_view_opendata_catalog(election_day_app_zg):
     # With data
     login(client)
     upload_vote(client)
-    upload_majorz_election(client, canton='zg')
-    upload_proporz_election(client, canton='zg')
-    create_election_compound(client, canton='zg')
+    upload_majorz_election(client, canton='zg', status='final')
+    upload_proporz_election(client, canton='zg', status='final')
+    upload_party_results(client)
+    upload_election_compound(client, canton='zg', status='final')
+    upload_party_results(client, slug='elections/elections')
 
     root = fromstring(client.get('/catalog.rdf').text)
     assert set([
@@ -405,6 +454,14 @@ def test_view_opendata_catalog(election_day_app_zg):
         'Proporz Election',
         'proporz-election.csv',
         'proporz-election.json',
+        'proporz-election-parteien.csv',
+        'proporz-election-parteien.json',
+        'proporz-election-parti.csv',
+        'proporz-election-parti.json',
+        'proporz-election-partidas.csv',
+        'proporz-election-partidas.json',
+        'proporz-election-partis.csv',
+        'proporz-election-partis.json',
         'Regional Election A',
         'regional-election-a.csv',
         'regional-election-a.json',
@@ -412,6 +469,14 @@ def test_view_opendata_catalog(election_day_app_zg):
         'regional-election-b.csv',
         'regional-election-b.json',
         'Elections',
+        'elections-parteien.csv',
+        'elections-parteien.json',
+        'elections-parti.csv',
+        'elections-parti.json',
+        'elections-partidas.csv',
+        'elections-partidas.json',
+        'elections-partis.csv',
+        'elections-partis.json',
         'elections.csv',
         'elections.json',
         'Vote',
@@ -440,7 +505,7 @@ def test_view_screen(election_day_app_zg):
     new = client.get('/manage/votes').click('Neue Abstimmung')
     new.form['vote_de'] = 'Einfache Vorlage'
     new.form['vote_type'] = 'simple'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form.submit().follow()
 
@@ -467,3 +532,69 @@ def test_view_custom_css(election_day_app_zg):
 
     client = Client(election_day_app_zg)
     assert '<style>tr { display: none }</style>' in client.get('/')
+
+
+def test_view_attachments(election_day_app_gr, explanations_pdf):
+    content = explanations_pdf.read()
+
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    # Vote
+    new = client.get('/manage/votes').click('Neue Abstimmung')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = '2016-01-01'
+    new.form['domain'] = 'federation'
+    new.form['explanations_pdf'] = Upload(
+        'Erläuterungen.pdf',
+        content,
+        'application/pdf'
+    )
+    new.form.submit().follow()
+
+    page = client.get('/vote/vote').follow()
+    page = page.click('(PDF)')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'Erlauterungen.pdf' in page.headers['Content-Disposition']
+
+    # Election
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'election'
+    new.form['date'] = '2016-01-01'
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 1
+    new.form['explanations_pdf'] = Upload(
+        'Erläuterungen.pdf',
+        content,
+        'application/pdf'
+    )
+    new.form.submit().follow()
+
+    page = client.get('/election/election').follow()
+    page = page.click('(PDF)')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'Erlauterungen.pdf' in page.headers['Content-Disposition']
+
+    # Election Compound
+    new = client.get('/manage/election-compounds').click('Neue Verbindung')
+    new.form['election_de'] = 'elections'
+    new.form['date'] = '2016-01-01'
+    new.form['domain'] = 'canton'
+    new.form['domain_elections'] = 'region'
+    new.form['region_elections'] = ['election']
+    new.form['explanations_pdf'] = Upload(
+        'Erläuterungen.pdf',
+        content,
+        'application/pdf'
+    )
+    new.form.submit().follow()
+
+    page = client.get('/elections/elections').follow()
+    page = page.click('(PDF)')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'Erlauterungen.pdf' in page.headers['Content-Disposition']

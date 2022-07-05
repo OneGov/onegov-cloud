@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-20 08:15+0100\n"
-"PO-Revision-Date: 2022-03-15 10:56+0100\n"
+"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -15,14 +15,14 @@ msgstr ""
 "X-Generator: Poedit 3.0.1\n"
 
 msgid "The final results are available"
-msgstr "Risultati finali sono disponibili"
+msgstr "Risultati finali disponibili"
 
 msgid "New results are available"
-msgstr "Nuovi risultati sono disponibili"
+msgstr "Nuovi risultati disponibili"
 
 #, python-format
 msgid "New results are available on ${url}"
-msgstr "Nuovi risultati sono disponibili su ${url}"
+msgstr "Nuovi risultati disponibili su ${url}"
 
 msgid "Please confirm your email"
 msgstr "La preghiamo di confermare il Suo indirizzo e-mail"
@@ -367,6 +367,9 @@ msgstr "Etichetta del link italiano"
 msgid "Link label romansh"
 msgstr "Etichetta del link romancio"
 
+msgid "Explanations (PDF)"
+msgstr "Spiegazioni (PDF)"
+
 msgid "Color suggestions"
 msgstr "Suggerimenti per il colore"
 
@@ -383,7 +386,7 @@ msgid "Elections"
 msgstr "Elezioni"
 
 msgid "Completes manually"
-msgstr "Completa manualmente"
+msgstr "Viene concluso manualmente"
 
 msgid ""
 "Enables manual completion of the election compound. No indidvidual election "
@@ -394,7 +397,7 @@ msgstr ""
 "componente elettorale non viene completato manualmente."
 
 msgid "Completion"
-msgstr "Completamento"
+msgstr "Conclusione"
 
 msgid "Completed"
 msgstr "Completato"
@@ -406,19 +409,21 @@ msgid "View options"
 msgstr "Opzioni di visualizzazione"
 
 msgid "Allows to show the list groups and lists views."
-msgstr "Permette di mostrare i gruppi di liste e le viste delle liste."
+msgstr "Permette di visualizzare i gruppi di liste e le liste."
 
 msgid "Voters counts"
-msgstr "Numeri di elettori"
+msgstr "Numero di elettori"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
+"Indica il numero di elettori anziché i voti nella visualizzazione della "
+"forza dei partiti"
 
 msgid "Exact voters counts"
-msgstr "Numeri esatti dei elettori"
+msgstr "Numero di elettori esatto"
 
 msgid "Shows exact voters counts instead of rounded values."
-msgstr "Mostra il numero esatto dei elettori invece dei valori arrotondati."
+msgstr "Mostra il numero di elettori esatto anziché i valori arrotondati."
 
 msgid "List groups"
 msgstr "Gruppi di liste"
@@ -446,7 +451,7 @@ msgstr ""
 "Doppelter Pukelsheim. Sempre arrotondato."
 
 msgid "Party strengths"
-msgstr "Forza delle parti"
+msgstr "Forza dei partiti"
 
 msgid ""
 "Shows a tab with the comparison of party strengths as a bar chart. Requires "
@@ -475,6 +480,12 @@ msgstr "Webhooks"
 
 msgid "Votes"
 msgstr "Votazioni"
+
+msgid "Compounds of elections"
+msgstr "Componenti delle elezioni"
+
+msgid "Select at least one election or vote."
+msgstr "Selezioni almeno un'elezione o una votazione."
 
 msgid "Number"
 msgstr "Numero"
@@ -601,9 +612,6 @@ msgstr "Risultati finali"
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
 
-msgid "Compounds of elections"
-msgstr "Componenti delle elezioni"
-
 msgid "Upload tokens"
 msgstr "Carica token"
 
@@ -643,9 +651,12 @@ msgstr "Amministrare"
 msgid "Mappings"
 msgstr "Mapping"
 
+msgid "Statistics"
+msgstr "Statistiche"
+
 #, python-format
 msgid "Final results are available on ${url}"
-msgstr "Risultati finali sono disponibili su ${url}"
+msgstr "Risultati finali disponibili su ${url}"
 
 #, python-format
 msgid "New intermediate results are available on ${url}"
@@ -691,6 +702,12 @@ msgstr "Regione"
 msgid "superregions_label_bl"
 msgstr "Regioni"
 
+msgid "Seats"
+msgstr "Seggi"
+
+msgid "Mandates"
+msgstr "Mandati"
+
 msgid "Quarter"
 msgstr "Quartiere"
 
@@ -709,6 +726,9 @@ msgstr "Non sono ancora state inserite elezioni o votazioni."
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Elezioni e votazioni del ${date}"
+
+msgid "Archive"
+msgstr "Archivio"
 
 msgid "Federal Elections"
 msgstr "Elezioni federali"
@@ -752,9 +772,6 @@ msgstr "Sì %"
 msgid "No %"
 msgstr "No %"
 
-msgid "Archive"
-msgstr "Archivio"
-
 msgid "Archive Search"
 msgstr "Ricerca in archivio"
 
@@ -770,8 +787,8 @@ msgstr "Risultati provvisori"
 msgid "No candidacies."
 msgstr "Nessuna candidatura."
 
-msgid "Download"
-msgstr "Scarica"
+msgid "Download diagram"
+msgstr "Scarica il diagramma"
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -787,20 +804,20 @@ msgstr ""
 "liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
 "le barre colorate di blu contengono i numeri dei mandati."
 
-msgid "The raw data is available as:"
-msgstr "I dati grezzi sono disponibili come:"
+msgid "Embed map"
+msgstr "Incorporare la mappa"
 
-msgid "The format of the data is described here:"
-msgstr "Il formato dei dati è descritto qui:"
+msgid "Download map"
+msgstr "Scarica la mappa"
 
-msgid "Format Description"
-msgstr "Descrizione del formato"
+msgid "Download"
+msgstr "Scarica"
 
-msgid "Embed"
-msgstr "Incorporare"
+msgid "No candidates elected yet."
+msgstr "Ancora nessun candidato eletto."
 
-msgid "Voters count"
-msgstr "Numero di elettori"
+msgid "Note on the voters count"
+msgstr "Indicazione riguardo al numero di elettori"
 
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
@@ -808,13 +825,21 @@ msgstr "Numero di elettori"
 #. election is finished as soon as the number of mandates appears.
 msgid "figcaption_list_groups"
 msgstr ""
-"Il numero di voti di partito di una lista è diviso per il numero dei seggi "
-"da assegnare nel circondario elettorale in questione. Il risultato è detto "
-"numero di elettori della lista. Il numero di elettori sovraripartizione tra "
-"i gruppi di liste."
+"In una prima fase, la cosiddetta sovraripartizione, tutti i voti espressi "
+"vengono dapprima considerati a livello cantonale. I seggi vengono attribuiti "
+"ai singoli partiti in proporzione alle quote di elettori conquistate. "
+"Affinché i voti ottenuti dai partiti nei singoli circondari elettorali "
+"possano essere comparati a livello cantonale e ogni voto abbia lo stesso "
+"peso, si rende necessaria una ponderazione. A tale scopo i voti ottenuti da "
+"un partito vengono divisi per il numero di seggi da assegnare nel "
+"corrispondente circondario elettorale. Il risultato di questo calcolo è il "
+"numero di elettori."
+
+msgid "Voters count"
+msgstr "Numero di elettori"
 
 msgid "The file is invalid."
-msgstr ""
+msgstr "Il file non è valido."
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
@@ -881,23 +906,31 @@ msgstr "Voti favorevoli"
 msgid "Nays"
 msgstr "Voti contrari"
 
-msgid "Empty"
-msgstr "Bianche"
+msgid "Not yet counted"
+msgstr "Non ancora conteggiato"
 
-msgid "Invalid"
-msgstr "Nulle"
+msgid "Total"
+msgstr "Totale"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Aventi diritto di voto"
+
+msgid "Cast Ballots"
+msgstr "Schede rientrate"
+
+msgid "Empty votes"
+msgstr "Voti in bianco"
+
+msgid "Invalid votes"
+msgstr "Voti nulli"
 
 #. Default: Turnout
 #. Default: Voter turnout
 #.
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
-
-msgid "Not yet counted"
-msgstr "Non ancora conteggiato"
-
-msgid "Total"
-msgstr "Totale"
 
 msgid "Nay"
 msgstr "No"
@@ -919,14 +952,8 @@ msgstr "Collegamenti tra sottoliste"
 msgid "Subtotal"
 msgstr "Subtotale"
 
-msgid "Mandates"
-msgstr "Mandati"
-
-msgid "Seats"
-msgstr "Seggi"
-
 msgid "eligible Voters"
-msgstr "Elettores"
+msgstr "Elettori"
 
 msgid "Received Ballots"
 msgstr "Schede ricevute"
@@ -972,6 +999,12 @@ msgstr "Solo i candidati eletti"
 
 msgid "List group"
 msgstr "Gruppo di liste"
+
+msgid "Embed diagram"
+msgstr "Incorpora il diagramma"
+
+msgid "Embed table"
+msgstr "Incorporare la tabella"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"
@@ -1048,26 +1081,26 @@ msgstr "Spareggio a favore della iniziativa"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Spareggio a favore della controprogetto"
 
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Aventi diritto di voto"
-
-msgid "Cast Ballots"
-msgstr "Schede rientrate"
-
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
 
 msgid "PDF Results"
 msgstr "Risultati PDF"
 
-msgid ""
-"The raw data used to display the results is available in the following "
-"formats:"
-msgstr ""
-"I dati grezzi usati per mostrare i risultati sono disponibili nei seguenti "
-"formati:"
+msgid "Candidate results"
+msgstr "Risultati dei candidati"
+
+msgid "The raw data of the candidates are available in the following formats:"
+msgstr "I dati grezzi dei candidati sono disponibili nei formati seguenti:"
+
+msgid "The raw data of the parties are available in the following formats:"
+msgstr "I dati grezzi dei partiti sono disponibili nei formati seguenti:"
+
+msgid "The format of the data is described here:"
+msgstr "Il formato dei dati è descritto qui:"
+
+msgid "Format Description"
+msgstr "Descrizione del formato"
 
 msgid "Terms of use"
 msgstr "Condizioni d’uso"
@@ -1414,12 +1447,12 @@ msgid "Results deleted."
 msgstr "Risultati eliminata."
 
 #, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr "Sicuro di voler eliminare tutti i risultati partito di \"${item}\"?"
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
 
 #, python-format
 msgid "${count} files deleted."
-msgstr "$ {count} file eliminati."
+msgstr "${count} file eliminati."
 
 msgid ""
 "Deletes all SVGs and PDFs. They are regenerated in the background and are "
@@ -1438,25 +1471,6 @@ msgstr "Componente eliminato."
 msgid "Delete compound"
 msgstr "Elimina componente"
 
-msgid "Election added."
-msgstr "Elezione aggiunta."
-
-msgid "Election modified."
-msgstr "Elezione modificata."
-
-msgid "Edit election"
-msgstr "Modifica elezione"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
-
-msgid "Election deleted."
-msgstr "Elezione eliminata."
-
-msgid "Delete election"
-msgstr "Elimina elezione"
-
 msgid "Notifications triggered."
 msgstr "Notifiche attivate."
 
@@ -1469,6 +1483,21 @@ msgstr ""
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Vuoi davvero riattivare le notifiche?"
+
+msgid "Election added."
+msgstr "Elezione aggiunta."
+
+msgid "Election modified."
+msgstr "Elezione modificata."
+
+msgid "Edit election"
+msgstr "Modifica elezione"
+
+msgid "Election deleted."
+msgstr "Elezione eliminata."
+
+msgid "Delete election"
+msgstr "Elimina elezione"
 
 msgid "Screen added."
 msgstr "Schermo aggiunto."

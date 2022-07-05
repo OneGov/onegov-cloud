@@ -83,6 +83,8 @@ Nome|Descrizione
 `candidate_first_name`|Nome del candidato.
 `candidate_elected`|Vero, se il candidato è stato eletto.
 `candidate_party`|Il nome del partito.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
 `candidate_votes`|Numero di voti per il candidato nel Comune.
 
 #### Risultati panachage
@@ -237,13 +239,17 @@ Nome|Descrizione
 ---|---
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
-`total_voters_count`|Il numero totale di voti cumulativi per il numero totale di mandati per elezione, solo per i composti elettorali.
+`name`|Il nome del partito nella lingua definita come standard. Quale opzione*.
+`name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco. Quale opzione*.
 `name`|Il nome del partito.
 `id`|ID del partito (qualsiasi numero).
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+`voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+
+*Si assicuri di aver indicato nella colonna name oppure nella colonna name_{default_locale} il nome del partito nella lingua definita come standard.
 
 I risultati potrebbero contenere risultati misti aggiungendo una colonna per partito:
 

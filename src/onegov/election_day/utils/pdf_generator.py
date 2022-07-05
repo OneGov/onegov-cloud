@@ -30,7 +30,6 @@ class PdfGenerator():
         self.pdf_dir = 'pdf'
         self.session = self.app.session()
         self.pdf_signing = self.app.principal.pdf_signing
-        self.default_locale = self.app.settings.i18n.default_locale
         self.renderer = renderer or D3Renderer(app)
 
     def remove(self, directory, files):
@@ -69,11 +68,14 @@ class PdfGenerator():
         """ Generates the PDF for an election or a vote. """
         principal = self.app.principal
 
+        old_locale = item.session_manager.current_locale
+        item.session_manager.current_locale = locale
+
         with self.app.filestorage.open(path, 'wb') as f:
 
             pdf = Pdf(
                 f,
-                title=item.get_title(locale, self.default_locale),
+                title=item.title,
                 author=principal.name,
                 locale=locale,
                 translations=self.app.translations
@@ -84,7 +86,7 @@ class PdfGenerator():
             )
 
             # Add Header
-            pdf.h1(item.get_title(locale, self.default_locale))
+            pdf.h1(item.title)
 
             # Add dates
             changed = item.last_result_change
@@ -113,6 +115,8 @@ class PdfGenerator():
                 pdf.p_markup('<a href="{link}">{link}</a>'.format(link=link))
 
             pdf.generate()
+
+        item.session_manager.current_locale = old_locale
 
     def add_tacit_election(self, principal, election, pdf):
 
@@ -177,7 +181,7 @@ class PdfGenerator():
         pdf.spacer()
         pdf.factoids(
             [
-                _('Seats') if majorz else _('Mandates'),
+                _('Seats') if majorz else principal.label('mandates'),
                 _('Absolute majority') if show_majority else '',
                 ''
             ],
@@ -197,7 +201,7 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.spacer()
             pdf.results(
-                [_('List'), _('Mandates'), _('single_votes')],
+                [_('List'), principal.label('mandates'), _('single_votes')],
                 [
                     [r['text'], r['value2'], r['value']]
                     for r in data['results']
@@ -325,7 +329,7 @@ class PdfGenerator():
                 pdf.results(
                     [
                         _('Party'),
-                        _('Mandates'),
+                        principal.label('mandates'),
                         _('single_votes'),
                         _('single_votes'),
                         'Δ {}'.format(years[0]),
@@ -344,7 +348,7 @@ class PdfGenerator():
                 pdf.results(
                     [
                         _('Party'),
-                        _('Mandates'),
+                        principal.label('mandates'),
                         _('single_votes'),
                         _('single_votes'),
                     ],
@@ -547,7 +551,7 @@ class PdfGenerator():
 
         # Factoids
         pdf.factoids(
-            [('Mandates'), '', ''],
+            [label('mandates'), '', ''],
             [compound.allocated_mandates, '', '']
         )
         pdf.spacer()
@@ -559,7 +563,7 @@ class PdfGenerator():
             if superregions:
                 pdf.h2(label('superregions'))
                 pdf.results(
-                    [label('superregion'), _('Mandates')],
+                    [label('superregion'), label('mandates')],
                     [
                         [
                             name,
@@ -579,7 +583,7 @@ class PdfGenerator():
                 [
                     label('district'),
                     label('superregion'),
-                    _('Mandates')
+                    label('mandates')
                 ],
                 [
                     [
@@ -596,7 +600,7 @@ class PdfGenerator():
             pdf.results(
                 [
                     label('district'),
-                    _('Mandates')
+                    label('mandates')
                 ],
                 [
                     [
@@ -661,31 +665,11 @@ class PdfGenerator():
                 [
                     _('List group'),
                     _('Voters count'),
-                    _('Mandates'),
+                    label('mandates'),
                 ],
                 [[
                     r.name,
                     r.voters_count,
-                    r.number_of_mandates
-                ] for r in get_list_groups(compound)],
-                [None, 2 * cm, 2 * cm],
-                pdf.style.table_results_2
-            )
-            pdf.pagebreak()
-
-        # Lists
-        chart = self.renderer.get_lists_chart(compound, 'pdf')
-        if compound.show_lists and chart:
-            pdf.h2(_('Lists'))
-            pdf.pdf(chart)
-            pdf.spacer()
-            pdf.results(
-                [
-                    _('List'),
-                    _('Mandates'),
-                ],
-                [[
-                    r.name,
                     r.number_of_mandates
                 ] for r in get_list_groups(compound)],
                 [None, 2 * cm, 2 * cm],
@@ -710,7 +694,7 @@ class PdfGenerator():
                     pdf.results(
                         [
                             _('Party'),
-                            _('Mandates'),
+                            label('mandates'),
                             _('single_votes'),
                             _('single_votes'),
                             'Δ {}'.format(years[0]),
@@ -729,7 +713,7 @@ class PdfGenerator():
                     pdf.results(
                         [
                             _('Party'),
-                            _('Mandates'),
+                            label('mandates'),
                             _('single_votes'),
                             _('single_votes'),
                         ],
@@ -813,10 +797,7 @@ class PdfGenerator():
                         answer = _(
                             'Tie breaker in favor of the counter proposal'
                         )
-        if completed:
-            pdf.p(pdf.translate(answer))
-        else:
-            pdf.h3(pdf.translate(answer))
+        pdf.p(pdf.translate(answer))
         pdf.spacer()
 
         ballots = ((None, vote.proposal),)
@@ -831,7 +812,7 @@ class PdfGenerator():
             subtitle = pdf.h2
             if title:
                 subtitle = pdf.h3
-                detail = ballot.get_title(locale, self.default_locale)
+                detail = ballot.title
                 if detail:
                     pdf.h2('{}: {}'.format(pdf.translate(title), detail))
                 else:
@@ -862,8 +843,8 @@ class PdfGenerator():
                         pdf.translate(_('Yes %')).replace('%', '').strip(),
                         pdf.translate(_('No %')).replace('%', '').strip(),
                         '{} / {}'.format(
-                            pdf.translate(_('Empty')),
-                            pdf.translate(_('Invalid'))
+                            pdf.translate(_('Empty votes')),
+                            pdf.translate(_('Invalid votes'))
                         ),
                     ],
                     [
@@ -886,9 +867,8 @@ class PdfGenerator():
             else:
 
                 # Entities
-                if principal.has_districts:
-                    subtitle(principal.label('entities'))
-                    pdf.spacer()
+                subtitle(principal.label('entities'))
+                pdf.spacer()
 
                 if not principal.has_districts:
                     pdf.results(
@@ -913,32 +893,6 @@ class PdfGenerator():
                         pdf.style.table_results_2
                     )
                     pdf.pagebreak()
-                    pdf.results(
-                        [
-                            principal.label('entity'),
-                            _('Empty'),
-                            _('Invalid'),
-                            pdf.translate(_('Yes %')).replace('%', '').strip(),
-                            pdf.translate(_('No %')).replace('%', '').strip(),
-                        ],
-                        [[
-                            format_name(result),
-                            result.empty or '0',
-                            result.invalid or '0',
-                            result.yeas or '0',
-                            result.nays or '0',
-                        ] for result in ballot.results] + [[
-                            pdf.translate(_('Total')),
-                            ballot.empty or '0',
-                            ballot.invalid or '0',
-                            ballot.yeas or '0',
-                            ballot.nays or '0',
-                        ]],
-                        [None, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm],
-                        pdf.style.table_results_1
-                    )
-                    pdf.pagebreak()
-
                 else:
                     pdf.results(
                         [
@@ -965,42 +919,6 @@ class PdfGenerator():
                         pdf.style.table_results_2
                     )
                     pdf.pagebreak()
-                    pdf.results(
-                        [
-                            principal.label('entity'),
-                            principal.label('district'),
-                            _('Empty'),
-                            _('Invalid'),
-                            pdf.translate(_('Yes %')).replace('%', '').strip(),
-                            pdf.translate(_('No %')).replace('%', '').strip(),
-                        ],
-                        [[
-                            format_name(result),
-                            result.district,
-                            result.empty or '0',
-                            result.invalid or '0',
-                            result.yeas or '0',
-                            result.nays or '0',
-                        ] for result in ballot.results] + [[
-                            pdf.translate(_('Total')),
-                            '',
-                            ballot.empty or '0',
-                            ballot.invalid or '0',
-                            ballot.yeas or '0',
-                            ballot.nays or '0',
-                        ]],
-                        [
-                            None,
-                            None,
-                            2.3 * cm,
-                            2.3 * cm,
-                            2.0 * cm,
-                            2.0 * cm
-                        ],
-                        pdf.style.table_results_1
-                    )
-                    pdf.pagebreak()
-
                 if principal.is_year_available(vote.date.year):
                     pdf.pdf(
                         self.renderer.get_entities_map(ballot, 'pdf', locale),
@@ -1033,31 +951,6 @@ class PdfGenerator():
                         [None, 2.3 * cm, 2 * cm, 2 * cm],
                         pdf.style.table_results_2
                     )
-                    pdf.spacer()
-                    pdf.results(
-                        [
-                            principal.label('district'),
-                            _('Empty'),
-                            _('Invalid'),
-                            pdf.translate(_('Yes %')).replace('%', '').strip(),
-                            pdf.translate(_('No %')).replace('%', '').strip(),
-                        ],
-                        [[
-                            format_name(result),
-                            result.empty or '0',
-                            result.invalid or '0',
-                            result.yeas or '0',
-                            result.nays or '0',
-                        ] for result in ballot.results_by_district] + [[
-                            pdf.translate(_('Total')),
-                            ballot.empty or '0',
-                            ballot.invalid or '0',
-                            ballot.yeas or '0',
-                            ballot.nays or '0',
-                        ]],
-                        [None, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm],
-                        pdf.style.table_results_1
-                    )
                     pdf.pagebreak()
                     if principal.is_year_available(vote.date.year):
                         pdf.pdf(
@@ -1067,6 +960,49 @@ class PdfGenerator():
                             0.8
                         )
                         pdf.pagebreak()
+
+                # Statistics
+                subtitle(_('Statistics'))
+                pdf.spacer()
+                pdf.results(
+                    [
+                        principal.label('entity'),
+                        _('eligible_voters_vote'),
+                        _('Cast Ballots'),
+                        _('Empty votes'),
+                        _('Invalid votes'),
+                        pdf.translate(_('Yeas')).replace('-', '- '),
+                        pdf.translate(_('Nays')).replace('-', '- '),
+                    ],
+                    [[
+                        format_name(result),
+                        result.eligible_voters or '0',
+                        result.cast_ballots or '0',
+                        result.empty or '0',
+                        result.invalid or '0',
+                        result.yeas or '0',
+                        result.nays or '0',
+                    ] for result in ballot.results] + [[
+                        pdf.translate(_('Total')),
+                        ballot.eligible_voters or '0',
+                        ballot.cast_ballots or '0',
+                        ballot.empty or '0',
+                        ballot.invalid or '0',
+                        ballot.yeas or '0',
+                        ballot.nays or '0',
+                    ]],
+                    [
+                        None,
+                        2.2 * cm,
+                        2.5 * cm,
+                        2.2 * cm,
+                        2.2 * cm,
+                        1.8 * cm,
+                        2.0 * cm
+                    ],
+                    pdf.style.table_results_1
+                )
+                pdf.pagebreak()
 
     def create_pdfs(self):
         """ Generates all PDFs for the given application.

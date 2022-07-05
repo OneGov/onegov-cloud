@@ -1,10 +1,10 @@
 from collections import OrderedDict
-from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
@@ -29,7 +29,7 @@ from sqlalchemy.orm import relationship
 
 class Election(Base, ContentMixin, LastModifiedMixin,
                DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
-               DerivedAttributesMixin):
+               DerivedAttributesMixin, ExplanationsPdfMixin):
 
     __tablename__ = 'elections'
 
@@ -283,7 +283,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             ElectionResult.election_id == self.id
         ).delete()
 
-    def export(self):
+    def export(self, locales):
         """ Returns all data connected to this election as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -328,6 +328,8 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             Candidate.candidate_id,
             Candidate.elected,
             Candidate.party,
+            Candidate.gender,
+            Candidate.year_of_birth,
         )
         results = results.outerjoin(CandidateResult.candidate)
         results = results.outerjoin(CandidateResult.election_result)
@@ -343,35 +345,38 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         rows = []
         for result in results:
             row = OrderedDict()
-            for locale in election_day_i18n_used_locales:
-                title = result[1] and result[1].get(locale) or ''
+            translations = result.title_translations or {}
+            for locale in locales:
+                title = translations.get(locale, '') or ''
                 row[f'election_title_{locale}'] = title.strip()
-            row['election_date'] = result[2].isoformat()
-            row['election_domain'] = result[3]
-            row['election_type'] = result[4]
-            row['election_mandates'] = result[5]
-            row['election_absolute_majority'] = result[6]
-            row['election_status'] = result[7] or 'unknown'
-            row['entity_superregion'] = result[8] or ''
-            row['entity_district'] = result[9] or ''
-            row['entity_name'] = result[10]
-            row['entity_id'] = result[11]
-            row['entity_counted'] = result[12]
-            row['entity_eligible_voters'] = result[13]
-            row['entity_received_ballots'] = result[14]
-            row['entity_blank_ballots'] = result[15]
-            row['entity_invalid_ballots'] = result[16]
-            row['entity_unaccounted_ballots'] = result[17]
-            row['entity_accounted_ballots'] = result[18]
-            row['entity_blank_votes'] = result[19]
-            row['entity_invalid_votes'] = result[20]
-            row['entity_accounted_votes'] = result[21]
-            row['candidate_family_name'] = result[22]
-            row['candidate_first_name'] = result[23]
-            row['candidate_id'] = result[24]
-            row['candidate_elected'] = result[25]
-            row['candidate_party'] = result[26]
-            row['candidate_votes'] = result[0]
+            row['election_date'] = result.date.isoformat()
+            row['election_domain'] = result.domain
+            row['election_type'] = result.type
+            row['election_mandates'] = result.number_of_mandates
+            row['election_absolute_majority'] = result.absolute_majority
+            row['election_status'] = result.status or 'unknown'
+            row['entity_superregion'] = result.superregion or ''
+            row['entity_district'] = result.district or ''
+            row['entity_name'] = result.name
+            row['entity_id'] = result.entity_id
+            row['entity_counted'] = result.counted
+            row['entity_eligible_voters'] = result.eligible_voters
+            row['entity_received_ballots'] = result.received_ballots
+            row['entity_blank_ballots'] = result.blank_ballots
+            row['entity_invalid_ballots'] = result.invalid_ballots
+            row['entity_unaccounted_ballots'] = result.unaccounted_ballots
+            row['entity_accounted_ballots'] = result.accounted_ballots
+            row['entity_blank_votes'] = result.blank_votes
+            row['entity_invalid_votes'] = result.invalid_votes
+            row['entity_accounted_votes'] = result.accounted_votes
+            row['candidate_family_name'] = result.family_name
+            row['candidate_first_name'] = result.first_name
+            row['candidate_id'] = result.candidate_id
+            row['candidate_elected'] = result.elected
+            row['candidate_party'] = result.party
+            row['candidate_gender'] = result.gender or ''
+            row['candidate_year_of_birth'] = result.year_of_birth or ''
+            row['candidate_votes'] = result.votes
             rows.append(row)
 
         return rows

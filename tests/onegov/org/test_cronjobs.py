@@ -16,64 +16,57 @@ from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
 
 
+class EchoTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'EHO'}
+    es_type_name = 'echo_tickets'
+
+
+class EchoHandler(Handler):
+
+    handler_title = "Echo"
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def email(self):
+        return self.data.get('email')
+
+    @property
+    def title(self):
+        return self.data.get('title')
+
+    @property
+    def subtitle(self):
+        return self.data.get('subtitle')
+
+    @property
+    def group(self):
+        return self.data.get('group')
+
+    def get_summary(self, request):
+        return self.data.get('summary')
+
+    def get_links(self, request):
+        return self.data.get('links')
+
+
 def register_echo_handler(handlers):
-
-    class EchoTicket(Ticket):
-        __mapper_args__ = {'polymorphic_identity': 'EHO'}
-        es_type_name = 'echo_tickets'
-
-    @handlers.registered_handler('EHO')
-    class EchoHandler(Handler):
-
-        handler_title = "Echo"
-
-        @property
-        def deleted(self):
-            return False
-
-        @property
-        def email(self):
-            return self.data.get('email')
-
-        @property
-        def title(self):
-            return self.data.get('title')
-
-        @property
-        def subtitle(self):
-            return self.data.get('subtitle')
-
-        @property
-        def group(self):
-            return self.data.get('group')
-
-        def get_summary(self, request):
-            return self.data.get('summary')
-
-        def get_links(self, request):
-            return self.data.get('links')
+    handlers.register('EHO', EchoHandler)
 
 
-def test_ticket_statistics(org_app, handlers):
+def test_daily_ticket_statistics(org_app, handlers):
     register_echo_handler(handlers)
 
     client = Client(org_app)
 
-    job = get_cronjob_by_name(org_app, 'ticket_statistics')
+    job = get_cronjob_by_name(org_app, 'daily_ticket_statistics')
     job.app = org_app
 
     url = get_cronjob_url(job)
 
     tz = ensure_timezone('Europe/Zurich')
-
-    assert len(os.listdir(client.app.maildir)) == 0
-
-    # do not run on the weekends
-    with freeze_time(datetime(2016, 1, 2, tzinfo=tz)):
-        client.get(url)
-
-    with freeze_time(datetime(2016, 1, 3, tzinfo=tz)):
-        client.get(url)
 
     assert len(os.listdir(client.app.maildir)) == 0
 
@@ -140,7 +133,7 @@ def test_ticket_statistics(org_app, handlers):
 
     users = UserCollection(session).query().all()
     user = users[0]
-    users[1].data = {'daily_ticket_statistics': False}
+    users[0].data = {'ticket_statistics': 'daily'}
 
     for ticket in tickets:
         ticket.created = datetime(2016, 1, 2, 10, tzinfo=tz)
@@ -172,13 +165,321 @@ def test_ticket_statistics(org_app, handlers):
     assert "6 Tickets wurden eröffnet." in txt
     assert "2 Tickets wurden angenommen." in txt
     assert "3 Tickets wurden geschlossen." in txt
-    assert "Zur Zeit ist 1 Ticket offen" in txt
-    assert "2 Tickets sind in Bearbeitung" in txt
+    assert "Zur Zeit ist 1 Ticket " in txt
+    assert "/tickets/ALL/open?page=0" in txt
+    assert "2 Tickets sind " in txt
+    assert "/tickets/ALL/pending?page=0" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
     assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
     assert unsubscribe in txt
+
+    # do not run on the weekends
+    with freeze_time(datetime(2016, 1, 2, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 1, 3, tzinfo=tz)):
+        client.get(url)
+
+    # no additional mails have been sent
+    assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_weekly_ticket_statistics(org_app, handlers):
+    register_echo_handler(handlers)
+
+    client = Client(org_app)
+
+    job = get_cronjob_by_name(org_app, 'weekly_ticket_statistics')
+    job.app = org_app
+
+    url = get_cronjob_url(job)
+
+    tz = ensure_timezone('Europe/Zurich')
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+
+    session = org_app.session()
+    collection = TicketCollection(session)
+
+    tickets = [
+        collection.open_ticket(
+            handler_id='1',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 5, 10, tzinfo=tz),
+        ),
+        collection.open_ticket(
+            handler_id='2',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 6, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='3',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 7, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='4',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 8, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='5',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 9, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='6',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 10, 10, tzinfo=tz)
+        )
+    ]
+
+    # those will be ignored as they are inactive or not editors/admins
+    request = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+
+    users = UserCollection(session).query().all()
+    user = users[0]
+    users[1].data = {'ticket_statistics': 'never'}
+
+    for index, ticket in enumerate(tickets):
+        ticket.created = datetime(2016, 1, 5 + index, 10, tzinfo=tz)
+
+    for pending in tickets[1:3]:
+        pending.accept_ticket(user)
+        pending.modified = datetime(2016, 1, 9, 10, tzinfo=tz)
+
+    for closed in tickets[3:6]:
+        closed.accept_ticket(user)
+        closed.close_ticket()
+        closed.modified = datetime(2016, 1, 10, 10, tzinfo=tz)
+
+    transaction.commit()
+
+    with freeze_time(datetime(2016, 1, 11, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'List-Unsubscribe' in headers
+    assert 'List-Unsubscribe-Post' in headers
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
+    assert message['Subject'] == 'Govikon OneGov Cloud Status'
+    txt = message['TextBody']
+    assert "Folgendes ist während der letzten Woche auf der Govikon" in txt
+    assert "6 Tickets wurden eröffnet." in txt
+    assert "2 Tickets wurden angenommen." in txt
+    assert "3 Tickets wurden geschlossen." in txt
+    assert "Zur Zeit ist 1 Ticket " in txt
+    assert "/tickets/ALL/open?page=0" in txt
+    assert "2 Tickets sind " in txt
+    assert "/tickets/ALL/pending?page=0" in txt
+    assert "Wir wünschen Ihnen eine schöne Woche!" in txt
+    assert "Das OneGov Cloud Team" in txt
+    assert "/unsubscribe?token=" in txt
+    assert "abmelden" in txt
+    assert unsubscribe in txt
+
+    # we only run on mondays
+    with freeze_time(datetime(2016, 1, 5, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 1, 6, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 1, 7, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 1, 8, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 1, 9, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 1, 10, tzinfo=tz)):
+        client.get(url)
+
+    # no additional mails have been sent
+    assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_monthly_ticket_statistics(org_app, handlers):
+    register_echo_handler(handlers)
+
+    client = Client(org_app)
+
+    job = get_cronjob_by_name(org_app, 'monthly_ticket_statistics')
+    job.app = org_app
+
+    url = get_cronjob_url(job)
+
+    tz = ensure_timezone('Europe/Zurich')
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+
+    session = org_app.session()
+    collection = TicketCollection(session)
+
+    tickets = [
+        collection.open_ticket(
+            handler_id='1',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 4, 10, tzinfo=tz),
+        ),
+        collection.open_ticket(
+            handler_id='2',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 9, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='3',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 14, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='4',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 19, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='5',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 24, 10, tzinfo=tz)
+        ),
+        collection.open_ticket(
+            handler_id='6',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 29, 10, tzinfo=tz)
+        )
+    ]
+
+    # those will be ignored as they are inactive or not editors/admins
+    request = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+
+    users = UserCollection(session).query().all()
+    user = users[0]
+    users[0].data = {'ticket_statistics': 'monthly'}
+
+    for index, ticket in enumerate(tickets):
+        ticket.created = datetime(2016, 1, 4 + index * 5, 10, tzinfo=tz)
+
+    for pending in tickets[2:3]:
+        pending.accept_ticket(user)
+        pending.modified = datetime(2016, 1, 22, 10, tzinfo=tz)
+
+    for closed in tickets[3:6]:
+        closed.accept_ticket(user)
+        closed.close_ticket()
+        closed.modified = datetime(2016, 1, 31, 10, tzinfo=tz)
+
+    transaction.commit()
+
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'List-Unsubscribe' in headers
+    assert 'List-Unsubscribe-Post' in headers
+    unsubscribe = headers['List-Unsubscribe'].strip('<>')
+    assert message['Subject'] == 'Govikon OneGov Cloud Status'
+    txt = message['TextBody']
+    assert "Folgendes ist während des letzten Monats auf der Govikon" in txt
+    assert "6 Tickets wurden eröffnet." in txt
+    assert "1 Ticket wurde angenommen." in txt
+    assert "3 Tickets wurden geschlossen." in txt
+    assert "Zur Zeit sind 2 Tickets " in txt
+    assert "/tickets/ALL/open?page=0" in txt
+    assert "1 Ticket ist " in txt
+    assert "/tickets/ALL/pending?page=0" in txt
+    assert "Wir wünschen Ihnen eine schöne Woche!" in txt
+    assert "Das OneGov Cloud Team" in txt
+    assert "/unsubscribe?token=" in txt
+    assert "abmelden" in txt
+    assert unsubscribe in txt
+
+    # we only run on first monday of the month
+    with freeze_time(datetime(2016, 2, 2, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 3, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 4, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 5, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 6, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 7, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 8, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 15, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 22, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 29, tzinfo=tz)):
+        client.get(url)
+
+    # no additional mails have been sent
+    assert len(os.listdir(client.app.maildir)) == 1
 
 
 def test_daily_reservation_overview(org_app):

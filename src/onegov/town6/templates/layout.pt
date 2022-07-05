@@ -139,7 +139,9 @@
                             <div class="grid-container navigation">
                                 <div class="grid-x">
                                     <div class="large-2 small-2 cell">
-                                        <button data-toggle="offCanvas"><i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span></button>
+                                        <button tal:condition="layout.root_pages" data-toggle="offCanvas">
+                                            <i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span>
+                                        </button>
                                     </div>
                                     <div class="large-8 small-8 cell middle">
                                         <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
@@ -218,7 +220,7 @@
                                 <div class="grid-container">
                                     <div class="grid-x grid-padding-x grid-padding-y">
                                         <div class="cell small-12">
-                                            <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners"/>
+                                            <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners; subpage layout.show_partners"/>
                                         </div>
                                     </div>
                                 </div>

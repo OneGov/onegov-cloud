@@ -5,6 +5,9 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
 from re import findall
 from wtforms import BooleanField
 from wtforms import RadioField
@@ -139,6 +142,14 @@ class ElectionCompoundForm(Form):
         fieldset=_("Related link"),
         render_kw={'lang': 'rm'}
     )
+    explanations_pdf = UploadField(
+        label=_("Explanations (PDF)"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024)
+        ],
+        fieldset=_("Related link")
+    )
 
     pukelsheim = BooleanField(
         label=_("Doppelter Pukelsheim"),
@@ -174,18 +185,6 @@ class ElectionCompoundForm(Form):
         fieldset=_("Views"),
         render_kw=dict(force_simple=True),
         depends_on=('pukelsheim', 'y'),
-    )
-
-    show_lists = BooleanField(
-        label=_("Lists"),
-        description=_(
-            "Shows a tab with aggregated list results over all elections. "
-            "Only useful if the lists correspond to the list groups. Only if "
-            "Doppelter Pukelsheim. Always rounded."
-        ),
-        fieldset=_("Views"),
-        depends_on=('pukelsheim', 'y'),
-        render_kw=dict(force_simple=True)
     )
 
     show_party_strengths = BooleanField(
@@ -317,7 +316,6 @@ class ElectionCompoundForm(Form):
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
         model.show_list_groups = self.show_list_groups.data
-        model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
         model.pukelsheim = self.pukelsheim.data
@@ -366,6 +364,15 @@ class ElectionCompoundForm(Form):
             link_labels['rm_CH'] = self.related_link_label_rm.data
         model.related_link_label = link_labels
 
+        action = getattr(self.explanations_pdf, 'action', '')
+        if action == 'delete':
+            del model.explanations_pdf
+        if action == 'replace' and self.explanations_pdf.data:
+            model.explanations_pdf = (
+                self.explanations_pdf.raw_data[-1].file,
+                self.explanations_pdf.raw_data[-1].filename,
+            )
+
         model.colors = self.parse_colors(self.colors.data)
 
     def apply_model(self, model):
@@ -381,6 +388,14 @@ class ElectionCompoundForm(Form):
         self.related_link_label_it.data = link_labels.get('it_CH', '')
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
+        file = model.explanations_pdf
+        if file:
+            self.explanations_pdf.data = {
+                'filename': file.reference.filename,
+                'size': file.reference.file.content_length,
+                'mimetype': file.reference.content_type
+            }
+
         self.domain.data = model.domain
         self.domain_elections.data = model.domain_elections
         self.date.data = model.date
@@ -392,7 +407,6 @@ class ElectionCompoundForm(Form):
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.show_list_groups.data = model.show_list_groups
-        self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
         self.region_elections.data = []

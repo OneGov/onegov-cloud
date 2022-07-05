@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-01 13:21+0100\n"
+"POT-Creation-Date: 2022-05-24 15:51+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -386,6 +386,18 @@ msgstr "Soumis"
 
 msgid "Published"
 msgstr "Publié"
+
+msgid "Daily"
+msgstr "Quotidiennement"
+
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+msgid "Monthly"
+msgstr "Mensuel"
+
+msgid "Never"
+msgstr "Jamais"
 
 msgid "Mr."
 msgstr "M"
@@ -1194,11 +1206,20 @@ msgstr ""
 "Il n'est pas possible de définir un temps de transfert vu que les "
 "participant·e·s sont limité·e·s à une activité par jour."
 
-msgid "Send a daily status e-mail."
-msgstr "Envoyez un e-mail de suivi quotidien."
+msgid "Send a periodic status e-mail."
+msgstr "Envoyer un e-mail d'état périodique."
 
 msgid "General"
 msgstr "Général"
+
+msgid "Daily (exluding the weekend)"
+msgstr "Quotidiennement (sauf le week-end)"
+
+msgid "Weekly (on mondays)"
+msgstr "Hebdomadaire (le lundi)"
+
+msgid "Monthly (on first monday of the month)"
+msgstr "Mensuel (le premier lundi du mois)"
 
 msgid "Salutation"
 msgstr "Civilité"
@@ -1415,6 +1436,9 @@ msgstr "S'inscrire comme bénévole"
 
 msgid "Register as Volunteer"
 msgstr "Inscrivez-vous comme bénévole"
+
+msgid "Sort"
+msgstr ""
 
 msgid "Half day"
 msgstr "Demi-journée"
@@ -2042,6 +2066,9 @@ msgstr ""
 "souhaits émis (sans garantie). Sans liste de souhaits l'attribution sera "
 "totalement aléatoire."
 
+msgid "Each child can be registered for up to ${count} activities."
+msgstr "Chaque enfant peut être inscrit à jusqu'à ${count} activités."
+
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
@@ -2470,6 +2497,9 @@ msgstr "L'offre a été refusée"
 
 msgid "Your ticket has been opened"
 msgstr "Votre ticket a été ouvert"
+
+msgid "New ticket"
+msgstr ""
 
 msgid "Thank you for your proposal!"
 msgstr "Merci pour votre proposition !"

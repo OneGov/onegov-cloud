@@ -431,7 +431,6 @@ def test_vote_turnout(session):
 
     session.flush()
     assert vote.counted_eligible_voters == vote.eligible_voters
-    assert vote.counted_cast_ballots == 10
     assert vote.turnout == 10
     assert vote.proposal.turnout == 10
 
@@ -730,7 +729,7 @@ def test_vote_export(session):
     session.add(vote)
     session.flush()
 
-    assert vote.export() == []
+    assert vote.export(['de_CH']) == []
 
     vote.ballots.append(Ballot(type='proposal'))
     vote.ballots.append(
@@ -781,9 +780,10 @@ def test_vote_export(session):
 
     session.flush()
 
-    assert vote.export() == [
+    assert vote.export(['de_CH', 'fr_CH', 'it_CH']) == [
         {
             'title_de_CH': "Abstimmung",
+            'title_fr_CH': "",
             'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
@@ -802,6 +802,7 @@ def test_vote_export(session):
         },
         {
             'title_de_CH': "Abstimmung",
+            'title_fr_CH': "",
             'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
@@ -820,6 +821,7 @@ def test_vote_export(session):
         },
         {
             'title_de_CH': "Gegenvorschlag",
+            'title_fr_CH': "",
             'title_it_CH': "Controprogetto",
             'date': "2015-06-14",
             'shortcode': "FOO",
@@ -1128,3 +1130,24 @@ def test_vote_rename(session):
     session.flush()
     assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vote'
     assert vote.ballots.count() == 2
+
+
+def test_vote_attachments(test_app, explanations_pdf):
+    models = tuple(
+        cls(
+            title="Universal Healthcare",
+            domain='federation',
+            date=date(2015, 6, 14)
+        ) for cls in (Vote, ComplexVote)
+    )
+
+    for model in models:
+        assert model.explanations_pdf is None
+        del model.explanations_pdf
+        model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+        assert model.explanations_pdf.name == 'explanations_pdf'
+        assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+        assert model.explanations_pdf.reference.content_type == \
+            'application/pdf'
+        del model.explanations_pdf
+        assert model.explanations_pdf is None

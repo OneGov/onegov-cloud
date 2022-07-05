@@ -390,7 +390,7 @@ def test_signature_workflow(browser, temporary_path, org_app):
 
     # show the details
     browser.find_by_css('.upload-filelist .untoggled').click()
-    assert browser.is_text_present("Unsigniert")
+    assert browser.is_text_present("Ohne digitales Siegel")
 
     # try to sign the pdf (this won't work in this test-environment due to
     # it being in a different process, but we should see the error handling)
@@ -418,4 +418,4 @@ def test_signature_workflow(browser, temporary_path, org_app):
     browser.find_by_css('.untoggled').click()
 
     assert browser.is_text_present('foo@example.org')
-    assert browser.is_text_present('Digital signiert')
+    assert browser.is_text_present('Digitales Siegel angewendet')

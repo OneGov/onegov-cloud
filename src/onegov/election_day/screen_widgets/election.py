@@ -17,6 +17,7 @@ class ElectionCandidatesTableWidget(ModelBoundWidget):
             <div class="{@class}" tal:define="lists '{@lists}'">
                 <tal:block
                     metal:use-macro="layout.macros['election-candidates-table']"
+                    tal:define="show_percentage (model.type != 'proporz')"
                     />
             </div>
         </xsl:template>
@@ -52,7 +53,9 @@ class ElectionCandidatesByEntityTableWidget(ModelBoundWidget):
 
     def get_variables(self, layout):
         model = self.model or layout.model
-        candidates_by_entites = get_candidates_results_by_entity(model)
+        candidates_by_entites = get_candidates_results_by_entity(
+            model, sort_by_votes=True
+        )
         return {
             'election': model,
             'candidates_by_entites': candidates_by_entites,
@@ -96,7 +99,9 @@ class ElectionCandidatesChartWidget(ChartWidget):
             <div class="{@class}"
                  tal:define="limit '0{@limit}';
                              lists '{@lists}';
-                             elected '{@elected}'">
+                             elected '{@elected}';
+                             sort_by_lists '{@sort-by-lists}';
+                             ">
                 <tal:block
                     metal:use-macro="layout.macros['candidates-chart']"
                     />
@@ -104,7 +109,8 @@ class ElectionCandidatesChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = (
-        '<election-candidates-chart limit="" lists="," elected="" class=""/>'
+        '<election-candidates-chart limit="" lists="," sort-by-lists=""'
+        ' elected="" class=""/>'
     )
 
 
@@ -117,12 +123,101 @@ class ElectionListsChartWidget(ChartWidget):
     template = """
         <xsl:template match="election-lists-chart">
             <div class="{@class}"
-                 tal:define="limit '0{@limit}'; names '{@names}'"
-                 >
+                 tal:define="limit '0{@limit}';
+                             names '{@names}';
+                             sort_by_names '{@sort-by-names}'
+                             ">
                 <tal:block
                     metal:use-macro="layout.macros['lists-chart']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-lists-chart limit="" names="," class=""/>'
+    usage = (
+        '<election-lists-chart limit="" names="," sort-by-names=""'
+        ' class=""/>'
+    )
+
+
+@ElectionDayApp.screen_widget(
+    tag='allocated-mandates',
+    category='election'
+)
+class AllocatedMandatesWidget(ModelBoundWidget):
+    tag = 'allocated-mandates'
+    template = """
+        <xsl:template match="allocated-mandates">
+            <span class="{@class}">
+                ${layout.format_number(model.allocated_mandates)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<allocated-mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='number-of-mandates',
+    category='election'
+)
+class NumberOfMandatesWidget(ModelBoundWidget):
+    tag = 'number-of-mandates'
+    template = """
+        <xsl:template match="number-of-mandates">
+            <span class="{@class}">
+                ${layout.format_number(model.number_of_mandates)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<number-of-mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='mandates',
+    category='election'
+)
+class MandatesWidget(ModelBoundWidget):
+    tag = 'mandates'
+    template = """
+        <xsl:template match="mandates">
+            <span class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['progress']"
+                    tal:define="progress (model.allocated_mandates,\
+                                            model.number_of_mandates)"
+                    />
+            </span>
+        </xsl:template>
+    """
+    usage = '<mandates class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-turnout',
+    category='election'
+)
+class ElectionTurnoutWidget(ModelBoundWidget):
+    tag = 'election-turnout'
+    template = """
+        <xsl:template match="election-turnout">
+            <span class="{@class}">
+                ${'{0:.2f}'.format(model.turnout)} %
+            </span>
+        </xsl:template>
+    """
+    usage = '<election-turnout class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='absolute-majority',
+    category='majorz_election'
+)
+class AbsoluteMajorityWidget(ModelBoundWidget):
+    tag = 'absolute-majority'
+    template = """
+        <xsl:template match="absolute-majority">
+            <span class="{@class}">
+                ${layout.format_number(model.absolute_majority or 0)}
+            </span>
+        </xsl:template>
+    """
+    usage = '<absolute-majority class=""/>'

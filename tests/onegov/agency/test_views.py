@@ -593,8 +593,8 @@ def test_view_mutations(client):
 
     # Deleted content
     client.login_admin()
-    agency.click("Löschen")
-    person.click("Löschen")
+    client.get(agency.request.url).click("Löschen")
+    client.get(person.request.url).click("Löschen")
 
     manage = client.get(agency_ticket_number)
     assert "Der hinterlegte Datensatz wurde entfernt." in manage
@@ -779,7 +779,6 @@ def test_search_recently_published_object(client_with_es):
     assert 'Nick' in anom.get('/search?q=Anesthetist')
 
     # Unpublish
-    session = client.app.session()
     session.query(ExtendedPerson).one().publication_start = None
     session.query(ExtendedPerson).one().publication_end = then
     session.query(ExtendedAgencyMembership).one().publication_start = None

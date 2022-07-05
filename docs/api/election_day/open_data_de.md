@@ -70,11 +70,13 @@ Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Fo
 
 ### Rohdaten
 
+#### Kandidierendenresultate
+
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
-Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+Die Rohdaten der Kandidierenden sind in den folgenden Formaten verfügbar:
 
 Format|URL
 ---|---
@@ -115,30 +117,42 @@ Name|Beschreibung
 `candidate_first_name`|Der Vorname des Kandidierenden.
 `candidate_id`|Die ID des Kandidierenden.
 `candidate_elected`|Wahr, falls der Kandidierenden gewählt wurde.
+`candidate_party`|Der Name der Partei.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
 `panachage_votes_from_list_XX`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 
-### Parteiresultate
+#### Parteiresultate
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-Die Rohdaten sind als CSV verfügbar. Die folgenden Felder sind enthalten:
+Die Rohdaten der Parteien sind in den folgenden Formaten verfügbar:
+
+Format|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+Die folgenden Felder sind in allen Formaten enthalten:
+
 
 Name|Description
 ---|---
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
-`total_voters_count`|Die Gesamtzahl kumulierter Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
-`name`|Der Name der Partei.
+`name`|Der Name der Partei in der Standardsprache.
+`name_{locale}`|Übersetzter Name der Partei, z. B. `name_de_ch` für den deutschen Namen.
 `id`|ID der Partei (beliebige Zahl).
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
+`voters_count_percentage`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
 
 3 Abstimmungsresultate

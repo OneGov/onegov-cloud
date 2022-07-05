@@ -339,6 +339,7 @@ $globals-height: 2.5rem;
     .management::before { @include icon('\f013'); }
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon('\f016'); }
+    .text-modules::before { @include icon('\f249'); }
     .settings::before { @include icon('\f1de'); }
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
@@ -483,7 +484,7 @@ del {
 */
 .blank-label {
     @include label($bg: $white);
-    border: 1px solid $gray;
+    border: 1px solid #cbcccc;
     font-size: .8rem;
     margin: 0 4px 7px 0;
 
@@ -1182,13 +1183,29 @@ dl.field-display > dt {
         font-weight: bold;
     }
 
-    .list-lead {
+    .list-lead,
+    .list-hint {
         margin-bottom: .2em;
         max-width: $max-line-width;
 
         em {
             font-style: normal;
             font-weight: bold;
+        }
+    }
+
+    .list-hint {
+        border-bottom: 0 !important;
+        border-top: 1px solid #e0e3e5;
+
+        & > div {
+            &.hint-stop::before {
+                color: #b2232f;
+            }
+
+            &::before {
+                margin-right: .5rem;
+            }
         }
     }
 }
@@ -1572,6 +1589,7 @@ $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $new-stripe-connect-icon: '\f1f5';
 $new-user-icon: '\f234';
+$new-text-module-icon: '\f24a';
 $paste-link-icon: '\f0ea';
 $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
@@ -1699,6 +1717,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-room::before { @include icon($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon($new-user-icon); }
+    .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }
@@ -6093,24 +6112,39 @@ h2 + div.timeline {
         @include icon('\f023');
         color: $red-dark;
     }
+
+    input[value="member"] + label::before {
+        @include icon('\f0c0');
+        color: $blue-dark;
+    }
+}
+
+
+.secret-hint::before,
+.private-hint::before,
+.member-hint::before,
+.unpublished-hint::before {
+    font-style: normal;
 }
 
 .secret-hint::before {
     @include icon('\f21b');
     color: $yellow-dark;
-    font-style: normal;
 }
 
 .private-hint::before {
     @include icon('\f023');
     color: $red-dark;
-    font-style: normal;
+}
+
+.member-hint::before {
+    @include icon('\f0c0');
+    color: $blue-dark;
 }
 
 .unpublished-hint::before {
     @include icon('\f070');
     color: $orange-dark;
-    font-style: normal;
 }
 
 /*
@@ -6333,4 +6367,18 @@ $pageref-color-hover: $iron;
             width: 1.5ex;
         }
     }
+}
+
+/*
+    External links
+*/
+a > i.fa-external-link-alt {
+    margin-left: .3rem;
+}
+
+/*
+    Accessibility
+*/
+.visually-hidden {
+    @include element-invisible;
 }

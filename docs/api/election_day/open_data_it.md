@@ -70,11 +70,13 @@ Rimanda i dati della visualizzazione principale in forma strutturata.
 
 ### Dati grezzi
 
+#### Risultati dei candidati
+
 ```
-URL: /election/{id}/{data-format}
+URL: /election/{id}/data-{format}
 ```
 
-I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+I dati grezzi dei candidati sono disponibili nei formati seguenti:
 
 Formato|URL
 ---|---
@@ -115,30 +117,41 @@ Nome|Descrizione
 `candidate_first_name`|Nome del candidato.
 `candidate_id`|L'identificativo del candidato.
 `candidate_elected`|Vero se il candidato è stato eletto.
+`candidate_party`|Il nome del partito.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
 `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 I comuni non ancora contati non sono inclusi.
 
-### Risultati dei partiti
+#### Risultati dei partiti
 
 ```
-URL: /election/{id}/{data-parties}
+URL: /election/{id}/data-parties-{format}
 ```
 
-I dati grezzi sono disponibili come CSV. Sono inclusi i seguenti campi:
+I dati grezzi dei partiti sono disponibili nei formati seguenti:
+
+Formato|URL
+---|---
+JSON|`/data-parties-json`
+CSV|`/data-parties-csv`
+
+I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
-`total_voters_count`|Il numero totale di voti cumulativi per il numero totale di mandati per elezione, solo per i composti elettorali.
-`name`|Il nome del partito.
+`name`|Il nome del partito nella lingua definita come standard.
+`name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco.
 `id`|ID del partito.
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+`voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 `panachage_votes_from_{XX}`|Il numero di voti che i partito ha ottenuto dal partito con `id = XX`. Un `id`con il valore `999` segna i voti dalla lista vuota.
 
 3 Risultati della votazione

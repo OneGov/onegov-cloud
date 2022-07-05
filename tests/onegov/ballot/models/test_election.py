@@ -503,6 +503,8 @@ def test_election_export(session):
         family_name='Quimby',
         first_name='Joe',
         party='Republican Party',
+        gender='male',
+        year_of_birth=1970
     )
     candidate_2 = Candidate(
         id=uuid4(),
@@ -518,7 +520,7 @@ def test_election_export(session):
     session.add(election)
     session.flush()
 
-    assert election.export() == []
+    assert election.export(['de_CH']) == []
 
     election_result = ElectionResult(
         name='name',
@@ -548,13 +550,12 @@ def test_election_export(session):
 
     session.flush()
 
-    exports = election.export()\
+    export = election.export(['de_CH', 'fr_CH', 'it_CH'])
 
-    assert exports[0] == {
+    assert export[0] == {
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -580,13 +581,14 @@ def test_election_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111,
     }
-    assert exports[1] == {
+    assert export[1] == {
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -612,6 +614,8 @@ def test_election_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
     }
 
@@ -840,3 +844,20 @@ def test_election_rename(session):
 
     session.query(Candidate).one().election_id == 'elerction'
     session.query(ElectionResult).one().election_id == 'elerction'
+
+
+def test_election_attachments(test_app, explanations_pdf):
+    model = Election(
+        title='Election',
+        domain='canton',
+        date=date(2017, 1, 1),
+    )
+
+    assert model.explanations_pdf is None
+    del model.explanations_pdf
+    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    assert model.explanations_pdf.name == 'explanations_pdf'
+    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
+    assert model.explanations_pdf.reference.content_type == 'application/pdf'
+    del model.explanations_pdf
+    assert model.explanations_pdf is None

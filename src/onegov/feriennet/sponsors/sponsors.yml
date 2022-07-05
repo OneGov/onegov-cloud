@@ -10,7 +10,12 @@
 #   kept while the banner shrinks
 # - Any value may be translated by using a de/fr/it dictionary instead of the
 #   actual values. See examples below.
+# - Entries without logo_url and just for banners need to be added below
+#   entries with logo_url
 #
+
+
+# Entries with logo_url
 
 - name: CONCORDIA
   logo_url:
@@ -59,3 +64,70 @@
   width: 200px
   height: 46px
   top: -7px
+
+
+
+# Entries with banners only
+
+- name: ProJuventute
+  banners:
+    bookings:
+      src:
+        de: sponsors/projuventute-banner-handy.jpeg
+        fr:
+        it:
+      url:
+        de: 'https://www.projuventute.ch/de/eltern/medien-internet/handy-ab-wann?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Handy'
+        fr:
+        it:
+    invoices:
+      src:
+        de: sponsors/projuventute-banner-handy.jpeg
+        fr:
+        it:
+      url:
+        de: 'https://www.projuventute.ch/de/eltern/medien-internet/handy-ab-wann?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Handy'
+        fr:
+        it:
+
+- name: ProJuventute
+  banners:
+    bookings:
+      src:
+        de: sponsors/projuventute-banner-freizeitaktivitaeten.jpeg
+        fr:
+        it:
+      url:
+        de: 'https://www.projuventute.ch/de/eltern/schule-ausbildung/freizeitaktivitaeten-ideen?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Freizeit'
+        fr:
+        it:
+    invoices:
+      src:
+        de: sponsors/projuventute-banner-freizeitaktivitaeten.jpeg
+        fr:
+        it:
+      url:
+        de: 'https://www.projuventute.ch/de/eltern/schule-ausbildung/freizeitaktivitaeten-ideen?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Freizeit'
+        fr:
+        it:
+
+- name: ProJuventute
+  banners:
+    bookings:
+      src:
+        de: sponsors/projuventute-banner-resilienz.jpeg
+        fr:
+        it:
+      url:
+        de: 'https://www.projuventute.ch/de/eltern/entwicklung-gesundheit/resilienz-bei-kindern?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Resilienz'
+        fr:
+        it:
+    invoices:
+      src:
+        de: sponsors/projuventute-banner-resilienz.jpeg
+        fr:
+        it:
+      url:
+        de: 'https://www.projuventute.ch/de/eltern/entwicklung-gesundheit/resilienz-bei-kindern?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Resilienz'
+        fr:
+        it:

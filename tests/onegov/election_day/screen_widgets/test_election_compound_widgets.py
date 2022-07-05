@@ -1,5 +1,6 @@
 from chameleon import PageTemplate
 from datetime import date
+from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import ElectionCompound
 from onegov.core.widgets import inject_variables
@@ -12,11 +13,12 @@ from onegov.election_day.screen_widgets import (
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
-    ElectionCompoundListsChartWidget,
-    ElectionCompoundListsTableWidget,
+    LastResultChangeWidget,
+    NumberOfCountedEntitiesWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
+    TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
 
@@ -40,21 +42,19 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
                 <election-compound-districts-table class="my-class-5"/>
             </column>
             <column span="1">
-                <election-compound-lists-table class="my-class-6"
-                    names="GRÜ   ,  FDP_J     "/>
-            </column>
-            <column span="1">
-                <election-compound-lists-chart class="my-class-7"/>
-            </column>
-            <column span="1">
-                <election-compound-lists-chart class="my-class-8" limit="2"
-                    names="a,b"/>
-            </column>
-            <column span="1">
                 <election-compound-list-groups-table class="my-class-9"/>
             </column>
             <column span="1">
                 <election-compound-list-groups-chart class="my-class-a"/>
+            </column>
+            <column span="1">
+                <number-of-counted-entities class="my-class-b"/>
+            </column>
+            <column span="1">
+                <total-entities class="my-class-c"/>
+            </column>
+            <column span="1">
+                <last-result-change class="my-class-d"/>
             </column>
         </row>
     """
@@ -62,12 +62,13 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         RowWidget(),
         ColumnWidget(),
         CountedEntitiesWidget(),
+        LastResultChangeWidget(),
+        NumberOfCountedEntitiesWidget(),
         ProgressWidget(),
         TitleWidget(),
+        TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsTableWidget(),
-        ElectionCompoundListsChartWidget(),
-        ElectionCompoundListsTableWidget(),
         ElectionCompoundListGroupsChartWidget(),
         ElectionCompoundListGroupsTableWidget(),
     ]
@@ -96,7 +97,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'entities': '',
         'groups': [],
         'layout': layout,
-        'lists': [],
         'model': model,
         'request': request
     }
@@ -111,42 +111,46 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'my-class-3' in result
     assert 'my-class-4' in result
     assert 'my-class-5' in result
-    assert 'my-class-6' in result
-    assert 'my-class-7' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result
 
     # Add intermediate results
-    election_1, errors = import_test_datasets(
-        'internal',
-        'election',
-        'sg',
-        'district',
-        'proporz',
-        date_=date(2020, 3, 8),
-        number_of_mandates=17,
-        domain_segment='Rheintal',
-        dataset_name='kantonsratswahl-2020-wahlkreis-rheintal-intermediate',
-        app_session=session
-    )
-    assert not errors
-    election_2, errors = import_test_datasets(
-        'internal',
-        'election',
-        'sg',
-        'district',
-        'proporz',
-        date_=date(2020, 3, 8),
-        number_of_mandates=10,
-        domain_segment='Rorschach',
-        dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
-        app_session=session
-    )
-    assert not errors
-    session.add(election_1)
-    session.add(election_2)
-    model.elections = [election_1, election_2]
-    session.flush()
+    with freeze_time('2022-01-01 12:00'):
+        election_1, errors = import_test_datasets(
+            'internal',
+            'election',
+            'sg',
+            'district',
+            'proporz',
+            date_=date(2020, 3, 8),
+            number_of_mandates=17,
+            domain_segment='Rheintal',
+            dataset_name=(
+                'kantonsratswahl-2020-wahlkreis-rheintal-intermediate'
+            ),
+            app_session=session
+        )
+        assert not errors
+        election_2, errors = import_test_datasets(
+            'internal',
+            'election',
+            'sg',
+            'district',
+            'proporz',
+            date_=date(2020, 3, 8),
+            number_of_mandates=10,
+            domain_segment='Rorschach',
+            dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
+            app_session=session
+        )
+        assert not errors
+        session.add(election_1)
+        session.add(election_2)
+        model.elections = [election_1, election_2]
+        session.flush()
 
     layout = ElectionCompoundLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -194,16 +198,6 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'entities': '',
         'groups': [],
         'layout': layout,
-        'lists': [
-            ('SVP', 9, 2702),
-            ('CVP', 6, 2399),
-            ('FDP', 5, 1780),
-            ('SP', 4, 1567),
-            ('GRÜ', 2, 841),
-            ('GLP', 1, 652),
-            ('EVP', 0, 283),
-            ('FDP_J', 0, 140)
-        ],
         'model': model,
         'request': request
     }
@@ -222,55 +216,49 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '9 of 9' in result
     assert '0 of 17' in result
     assert '1 of 13' in result
-    assert 'election-compound-lists-table' in result
-    assert 'data-text="31515"' not in result
-    assert 'data-text="841"' in result
-    assert 'data-text="140"' in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
-    ) in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
-    ) in result
+    assert '0' in result
+    assert '2' in result
+    assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
     assert 'my-class-4' in result
     assert 'my-class-5' in result
-    assert 'my-class-6' in result
-    assert 'my-class-7' in result
-    assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result
 
     # Add final results
-    election_1, errors = import_test_datasets(
-        'internal',
-        'election',
-        'sg',
-        'district',
-        'proporz',
-        date_=date(2020, 3, 8),
-        domain_segment='Rheintal',
-        number_of_mandates=17,
-        dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
-        app_session=session
-    )
-    assert not errors
-    errors = import_test_datasets(
-        'internal',
-        'parties',
-        'sg',
-        'district',
-        'proporz',
-        election=model,
-        dataset_name='kantonsratswahl-2020-parteien',
-    )
-    assert not errors
-    session.add(election_1)
-    model.elections = [election_1, election_2]
-    model.manually_completed = True
-    session.flush()
+    with freeze_time('2022-01-02 12:00'):
+        election_1, errors = import_test_datasets(
+            'internal',
+            'election',
+            'sg',
+            'district',
+            'proporz',
+            date_=date(2020, 3, 8),
+            domain_segment='Rheintal',
+            number_of_mandates=17,
+            dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
+            app_session=session
+        )
+        assert not errors
+        errors = import_test_datasets(
+            'internal',
+            'parties',
+            'sg',
+            'district',
+            'proporz',
+            election=model,
+            dataset_name='kantonsratswahl-2020-parteien',
+        )
+        assert not errors
+        session.add(election_1)
+        model.elections = [election_1, election_2]
+        model.manually_completed = True
+        session.flush()
 
     layout = ElectionCompoundLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -326,22 +314,12 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             ('SVP', 4128, 35),
             ('CVP', 3487, 27),
             ('FDP', 2894, 22),
+            ('SP', 2481, 6),
             ('GRÜ', 1424, 9),
             ('GLP', 1165, 6),
-            ('SP', 2481, 6),
             ('EVP', 369, 2)
         ],
         'layout': layout,
-        'lists': [
-            ('SVP', 9, 5973),
-            ('CVP', 6, 4911),
-            ('FDP', 5, 3874),
-            ('SP', 4, 2737),
-            ('GRÜ', 2, 1705),
-            ('GLP', 1, 1412),
-            ('EVP', 0, 283),
-            ('FDP_J', 0, 140)
-        ],
         'model': model,
         'request': request
     }
@@ -356,25 +334,18 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '9 of 9' in result
     assert '17 of 17' in result
     assert '13 of 13' in result
-    assert 'election-compound-lists-table' in result
-    assert 'data-text="87135"' not in result
-    assert 'data-text="1705"' not in result  # voters_count hidden
-    assert 'data-text="140"' not in result  # voters_count hidden
     assert 'data-text="3487.00"' in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=0&amp;names="'
-    ) in result
-    assert (
-        'data-dataurl="ElectionCompound/lists-data?limit=02&amp;names=a,b"'
-    ) in result
     assert 'data-dataurl="ElectionCompound/list-groups-data"' in result
+    assert '2' in result
+    assert '2' in result
+    assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
     assert 'my-class-4' in result
     assert 'my-class-5' in result
-    assert 'my-class-6' in result
-    assert 'my-class-7' in result
-    assert 'my-class-8' in result
     assert 'my-class-9' in result
     assert 'my-class-a' in result
+    assert 'my-class-b' in result
+    assert 'my-class-c' in result
+    assert 'my-class-d' in result

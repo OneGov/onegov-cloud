@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
@@ -39,12 +40,14 @@ def test_election_utils_majorz(import_test_datasets, session):
 
     # get_candidates_results
     assert tuple(get_candidates_results(election, session)) == (
-        (('Hegglin', 'Peter', True, 'CVP', 24132, None, None),
-         ('Eder', 'Joachim', True, 'FDP', 23620, None, None),
-         ('Brandenberg', 'Manuel', False, 'SVP', 10997, None, None),
-         ('Gysel', 'Barbara', False, 'SP', 6612, None, None),
-         ('Lustenberger', 'Andreas', False, 'ALG', 5691, None, None),
-         ('Thöni', 'Stefan', False, 'Piraten', 1709, None, None))
+        ('Hegglin', 'Peter', True, 'CVP', 24132, Decimal('62.3'), None, None),
+        ('Eder', 'Joachim', True, 'FDP', 23620, Decimal('61.0'), None, None),
+        ('Brandenberg', 'Manuel', False, 'SVP', 10997, Decimal('28.4'), None,
+         None),
+        ('Gysel', 'Barbara', False, 'SP', 6612, Decimal('17.1'), None, None),
+        ('Lustenberger', 'Andreas', False, 'ALG', 5691, Decimal('14.7'), None,
+         None),
+        ('Thöni', 'Stefan', False, 'Piraten', 1709, Decimal('4.4'), None, None)
     )
 
     # get_candidates_data
@@ -117,6 +120,18 @@ def test_election_utils_majorz(import_test_datasets, session):
         'title': 'majorz_internal_staenderatswahl-2015-parties',
         'results': expected[3:5],
     }
+    assert get_candidates_data(election, lists=['ALG', 'SP'],
+                               sort_by_lists=True) == {
+        'majority': 18191,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': list(reversed(expected[3:5]))
+    }
+    assert get_candidates_data(election, lists=['FDP', 'CVP', 'SP'],
+                               sort_by_lists=True, elected=True) == {
+        'majority': 18191,
+        'title': 'majorz_internal_staenderatswahl-2015-parties',
+        'results': list(reversed(expected[0:2])),
+    }
     assert get_candidates_data(election, elected=True) == {
         'majority': 18191,
         'title': 'majorz_internal_staenderatswahl-2015-parties',
@@ -158,6 +173,7 @@ def test_election_utils_majorz(import_test_datasets, session):
 
     # get_candidates_results_by_entity
     candidates, entities = get_candidates_results_by_entity(election)
+    candidates = [candidate[1:] for candidate in candidates]
     assert candidates == [
         ('Brandenberg', 'Manuel', 10997),
         ('Eder', 'Joachim', 23620),
@@ -257,6 +273,27 @@ def test_election_utils_majorz(import_test_datasets, session):
         ])
     ]
 
+    candidates, entities = get_candidates_results_by_entity(
+        election, sort_by_votes=True
+    )
+    candidates = [candidate[1:] for candidate in candidates]
+    assert candidates == [
+        ('Hegglin', 'Peter', 24132),
+        ('Eder', 'Joachim', 23620),
+        ('Brandenberg', 'Manuel', 10997),
+        ('Gysel', 'Barbara', 6612),
+        ('Lustenberger', 'Andreas', 5691),
+        ('Thöni', 'Stefan', 1709)
+    ]
+    assert entities[0][1] == [
+        ('Baar', 'Hegglin', 'Peter', 4207),
+        ('Baar', 'Eder', 'Joachim', 4237),
+        ('Baar', 'Brandenberg', 'Manuel', 2100),
+        ('Baar', 'Gysel', 'Barbara', 1264),
+        ('Baar', 'Lustenberger', 'Andreas', 1269),
+        ('Baar', 'Thöni', 'Stefan', 320)
+    ]
+
 
 def test_election_utils_proporz(import_test_datasets, session):
     election, errors = import_test_datasets(
@@ -279,56 +316,56 @@ def test_election_utils_proporz(import_test_datasets, session):
 
     # get_candidates_results
     assert tuple(get_candidates_results(election, session)) == (
-        ('Lustenberger', 'Andreas', False, '', 3240, 'ALG', '1'),
-        ('Estermann', 'Astrid', False, '', 1327, 'ALG', '1'),
-        ('Schriber-Neiger', 'Hanni', False, '', 1206, 'ALG', '1'),
-        ('Schuler', 'Hubert', False, '', 3859, 'SP', '10'),
-        ('Bürgi Dellsperger', 'Christina', False, '', 2987, 'SP', '10'),
-        ('Sivaganesan', 'Rupan', False, '', 1874, 'SP', '10'),
-        ('Hutter Elsener', 'Simone', False, '', 929, 'SP Frauen', '11'),
-        ('Hug', 'Malaika', False, '', 684, 'SP Frauen', '11'),
-        ('Mäder Beglinger', 'Anne', False, '', 561, 'SP Frauen', '11'),
-        ('Spescha', 'Anna', False, '', 555, 'SP Juso', '12'),
-        ('Krasnici', 'Denis', False, '', 550, 'SP Juso', '12'),
-        ('Koepfli', 'Virginia', False, '', 218, 'SP Juso', '12'),
-        ('Dzaferi', 'Zari', False, '', 2303, 'SP Männer', '13'),
-        ('Suter', 'Guido', False, '', 545, 'SP Männer', '13'),
-        ('Freimann', 'Fabian', False, '', 394, 'SP Männer', '13'),
-        ('Coralic', 'Fadila', False, '', 144, 'SP Migrant.', '14'),
-        ('Sönmez', 'Sehriban', False, '', 117, 'SP Migrant.', '14'),
-        ('Simsek', 'Deniz', False, '', 82, 'SP Migrant.', '14'),
-        ('Aeschi', 'Thomas', True, '', 17034, 'SVP', '15'),
-        ('Werner', 'Thomas', False, '', 7206, 'SVP', '15'),
-        ('Villiger', 'Thomas', False, '', 5629, 'SVP', '15'),
-        ('Pfisterer', 'Luc', False, '', 269, 'SVP Int.', '16'),
-        ('Bucher', 'Rinaldo', False, '', 168, 'SVP Int.', '16'),
-        ('Hornickel', 'Alexander', False, '', 132, 'SVP Int.', '16'),
-        ('Risi', 'Adrian', False, '', 2607, 'SVP WuG', '17'),
-        ('Brunner', 'Philip C.', False, '', 1159, 'SVP WuG', '17'),
-        ('Gertsch', 'Beat', False, '', 607, 'SVP WuG', '17'),
-        ('Widmer', 'Fabienne', False, '', 345, 'ALG Junge', '2'),
-        ('Gut', 'Christina', False, '', 235, 'ALG Junge', '2'),
-        ('Perucchi', 'Alessandro', False, '', 222, 'ALG Junge', '2'),
-        ('Odermatt', 'Anastas', False, '', 637, 'ALG Bildung', '3'),
-        ('Haas', 'Esther', False, '', 559, 'ALG Bildung', '3'),
-        ('Zimmermann Gibson', 'Tabea', False, '', 490, 'ALG Bildung', '3'),
-        ('Pfister', 'Gerhard', True, '', 16134, 'CVP', '4'),
-        ('Barmet-Schelbert', 'Monika', False, '', 4093, 'CVP', '4'),
-        ('Hausheer', 'Andreas', False, '', 3606, 'CVP', '4'),
-        ('Bieri', 'Anna', False, '', 3908, 'CVP Junge', '5'),
-        ('Iten', 'Christoph', False, '', 1394, 'CVP Junge', '5'),
-        ('Kremmel', 'Corina', False, '', 1163, 'CVP Junge', '5'),
-        ('Pezzatti', 'Bruno', True, '', 10174, 'FDP Ost', '6'),
-        ('Ingold', 'Gabriela', False, '', 3637, 'FDP Ost', '6'),
-        ('Mollet', 'Patrick', False, '', 2190, 'FDP Ost', '6'),
-        ('Grüter', 'Arno', False, '', 1706, 'FDP West', '7'),
-        ('Gygli', 'Daniel', False, '', 1378, 'FDP West', '7'),
-        ('Siegrist', 'Birgitt', False, '', 1142, 'FDP West', '7'),
-        ('Stadlin', 'Daniel', False, '', 1823, 'glp', '8'),
-        ('Kottelat Schloesing', 'Michèle', False, '', 1256, 'glp', '8'),
-        ('Soltermann', 'Claus', False, '', 1043, 'glp', '8'),
-        ('Mauchle', 'Florian', False, '', 629, 'Piraten', '9'),
-        ('Thöni', 'Stefan', False, '', 488, 'Piraten', '9')
+        ('Lustenberger', 'Andreas', False, '', 3240, 0, 'ALG', '1'),
+        ('Estermann', 'Astrid', False, '', 1327, 0, 'ALG', '1'),
+        ('Schriber-Neiger', 'Hanni', False, '', 1206, 0, 'ALG', '1'),
+        ('Schuler', 'Hubert', False, '', 3859, 0, 'SP', '10'),
+        ('Bürgi Dellsperger', 'Christina', False, '', 2987, 0, 'SP', '10'),
+        ('Sivaganesan', 'Rupan', False, '', 1874, 0, 'SP', '10'),
+        ('Hutter Elsener', 'Simone', False, '', 929, 0, 'SP Frauen', '11'),
+        ('Hug', 'Malaika', False, '', 684, 0, 'SP Frauen', '11'),
+        ('Mäder Beglinger', 'Anne', False, '', 561, 0, 'SP Frauen', '11'),
+        ('Spescha', 'Anna', False, '', 555, 0, 'SP Juso', '12'),
+        ('Krasnici', 'Denis', False, '', 550, 0, 'SP Juso', '12'),
+        ('Koepfli', 'Virginia', False, '', 218, 0, 'SP Juso', '12'),
+        ('Dzaferi', 'Zari', False, '', 2303, 0, 'SP Männer', '13'),
+        ('Suter', 'Guido', False, '', 545, 0, 'SP Männer', '13'),
+        ('Freimann', 'Fabian', False, '', 394, 0, 'SP Männer', '13'),
+        ('Coralic', 'Fadila', False, '', 144, 0, 'SP Migrant.', '14'),
+        ('Sönmez', 'Sehriban', False, '', 117, 0, 'SP Migrant.', '14'),
+        ('Simsek', 'Deniz', False, '', 82, 0, 'SP Migrant.', '14'),
+        ('Aeschi', 'Thomas', True, '', 17034, 0, 'SVP', '15'),
+        ('Werner', 'Thomas', False, '', 7206, 0, 'SVP', '15'),
+        ('Villiger', 'Thomas', False, '', 5629, 0, 'SVP', '15'),
+        ('Pfisterer', 'Luc', False, '', 269, 0, 'SVP Int.', '16'),
+        ('Bucher', 'Rinaldo', False, '', 168, 0, 'SVP Int.', '16'),
+        ('Hornickel', 'Alexander', False, '', 132, 0, 'SVP Int.', '16'),
+        ('Risi', 'Adrian', False, '', 2607, 0, 'SVP WuG', '17'),
+        ('Brunner', 'Philip C.', False, '', 1159, 0, 'SVP WuG', '17'),
+        ('Gertsch', 'Beat', False, '', 607, 0, 'SVP WuG', '17'),
+        ('Widmer', 'Fabienne', False, '', 345, 0, 'ALG Junge', '2'),
+        ('Gut', 'Christina', False, '', 235, 0, 'ALG Junge', '2'),
+        ('Perucchi', 'Alessandro', False, '', 222, 0, 'ALG Junge', '2'),
+        ('Odermatt', 'Anastas', False, '', 637, 0, 'ALG Bildung', '3'),
+        ('Haas', 'Esther', False, '', 559, 0, 'ALG Bildung', '3'),
+        ('Zimmermann Gibson', 'Tabea', False, '', 490, 0, 'ALG Bildung', '3'),
+        ('Pfister', 'Gerhard', True, '', 16134, 0, 'CVP', '4'),
+        ('Barmet-Schelbert', 'Monika', False, '', 4093, 0, 'CVP', '4'),
+        ('Hausheer', 'Andreas', False, '', 3606, 0, 'CVP', '4'),
+        ('Bieri', 'Anna', False, '', 3908, 0, 'CVP Junge', '5'),
+        ('Iten', 'Christoph', False, '', 1394, 0, 'CVP Junge', '5'),
+        ('Kremmel', 'Corina', False, '', 1163, 0, 'CVP Junge', '5'),
+        ('Pezzatti', 'Bruno', True, '', 10174, 0, 'FDP Ost', '6'),
+        ('Ingold', 'Gabriela', False, '', 3637, 0, 'FDP Ost', '6'),
+        ('Mollet', 'Patrick', False, '', 2190, 0, 'FDP Ost', '6'),
+        ('Grüter', 'Arno', False, '', 1706, 0, 'FDP West', '7'),
+        ('Gygli', 'Daniel', False, '', 1378, 0, 'FDP West', '7'),
+        ('Siegrist', 'Birgitt', False, '', 1142, 0, 'FDP West', '7'),
+        ('Stadlin', 'Daniel', False, '', 1823, 0, 'glp', '8'),
+        ('Kottelat Schloesing', 'Michèle', False, '', 1256, 0, 'glp', '8'),
+        ('Soltermann', 'Claus', False, '', 1043, 0, 'glp', '8'),
+        ('Mauchle', 'Florian', False, '', 629, 0, 'Piraten', '9'),
+        ('Thöni', 'Stefan', False, '', 488, 0, 'Piraten', '9')
     )
 
     # get_candidates_data
@@ -383,6 +420,12 @@ def test_election_utils_proporz(import_test_datasets, session):
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': expected[1:],
     }
+    assert get_candidates_data(election, lists=['FDP Ost', 'CVP'],
+                               sort_by_lists=True) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': list(reversed(expected[1:])),
+    }
     assert len(get_candidates_data(election, elected=False)['results']) == 50
     assert get_candidates_data(election, limit=1,
                                lists=['FDP Ost', 'CVP', 'GLP']) == {
@@ -408,6 +451,37 @@ def test_election_utils_proporz(import_test_datasets, session):
                 'value': 4093
             }
         ]
+    }
+    assert get_candidates_data(election, lists=['FDP Ost', 'CVP'],
+                               sort_by_lists=True, elected=False, limit=4) == {
+        'majority': 0,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [
+            {
+                'class': 'active',
+                'color': '#999',
+                'text': 'Pezzatti Bruno',
+                'value': 10174
+            },
+            {
+                'class': 'inactive',
+                'color': '#999',
+                'text': 'Ingold Gabriela',
+                'value': 3637
+            },
+            {
+                'class': 'inactive',
+                'color': '#999',
+                'text': 'Mollet Patrick',
+                'value': 2190
+            },
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'text': 'Pfister Gerhard',
+                'value': 16134
+            }
+        ],
     }
 
     # get_list_results
@@ -606,6 +680,12 @@ def test_election_utils_proporz(import_test_datasets, session):
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': [e for e in expected if e['text'] in names][:2],
     }
+    names = ['SP Juso', 'SP Frauen', 'SP Männer']
+    assert get_lists_data(election, names=names, sort_by_names=True) == {
+        'majority': None,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': list(reversed([e for e in expected if e['text'] in names])),
+    }
 
 
 def test_election_utils_parties(import_test_datasets, session):
@@ -635,84 +715,96 @@ def test_election_utils_parties(import_test_datasets, session):
     years, parties = get_party_results(election)
     assert years == ['2011', '2015']
     assert parties == {
-        'AL': {
+        '0': {
             '2011': {
+                'name': 'AL',
                 'color': '#a74c97',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 154, 'total': 17972}
             },
             '2015': {
+                'name': 'AL',
                 'color': '#a74c97',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 72, 'total': 8352}
             }
         },
-        'CVP': {
+        '1': {
             '2011': {
+                'name': 'CVP',
                 'color': '#ff6300',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 243, 'total': 28413}
             },
             '2015': {
+                'name': 'CVP',
                 'color': '#ff6300',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 264, 'total': 30856}
             }
         },
-        'FDP': {
+        '2': {
             '2011': {
+                'name': 'FDP',
                 'color': '#4068c8',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 192, 'total': 22494}
             },
             '2015': {
+                'name': 'FDP',
                 'color': '#4068c8',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 176, 'total': 20584}
             }
         },
-        'GLP': {
+        '3': {
             '2011': {
+                'name': 'GLP',
                 'color': '#aeca00',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 68, 'total': 7943}
             },
             '2015': {
+                'name': 'GLP',
                 'color': '#aeca00',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 36, 'total': 4178}
             }
         },
-        'SP': {
+        '4': {
             '2011': {
+                'name': 'SP',
                 'color': '#db3c27',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 53, 'total': 6167}
             },
             '2015': {
+                'name': 'SP',
                 'color': '#db3c27',
                 'mandates': 0,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 138, 'total': 16048}
             }
         },
-        'SVP': {
+        '5': {
             '2011': {
+                'name': 'SVP',
                 'color': '#3f841a',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},
                 'votes': {'permille': 283, 'total': 33116}
             },
             '2015': {
+                'name': 'SVP',
                 'color': '#3f841a',
                 'mandates': 1,
                 'voters_count': {'permille': 0, 'total': 0},

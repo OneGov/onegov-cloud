@@ -37,7 +37,7 @@ def view_election_data_as_json(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'data': self.export(),
+        'data': self.export(sorted(request.app.locales)),
         'name': normalize_for_url(self.title)
     }
 
@@ -52,12 +52,36 @@ def view_election_data_as_csv(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'data': self.export(),
+        'data': self.export(sorted(request.app.locales)),
         'name': normalize_for_url(self.title)
     }
 
 
-@ElectionDayApp.csv_file(model=Election, name='data-parties')
+@ElectionDayApp.json_file(model=Election, name='data-parties-json')
+def view_election_parties_data_as_json(self, request):
+
+    """ View the raw parties data as JSON. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
+    return {
+        'data': self.export_parties(
+            locales=sorted(request.app.locales),
+            default_locale=request.app.default_locale,
+            json_serializable=True
+        ),
+        'name': normalize_for_url(
+            '{}-{}'.format(
+                self.title,
+                request.translate(_("Parties")).lower()
+            )
+        )
+    }
+
+
+@ElectionDayApp.csv_file(model=Election, name='data-parties-csv')
 def view_election_parties_data_as_csv(self, request):
 
     """ View the raw parties data as CSV. """
@@ -67,7 +91,10 @@ def view_election_parties_data_as_csv(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'data': self.export_parties(),
+        'data': self.export_parties(
+            locales=sorted(request.app.locales),
+            default_locale=request.app.default_locale,
+        ),
         'name': normalize_for_url(
             '{}-{}'.format(
                 self.title,

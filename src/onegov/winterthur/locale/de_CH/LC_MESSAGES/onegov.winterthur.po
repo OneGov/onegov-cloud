@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-05-26 11:35+0200\n"
+"POT-Creation-Date: 2022-04-06 15:48+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -101,9 +101,6 @@ msgstr "Personal Bereitschaft"
 
 msgid "Civil Defence involvement"
 msgstr "Beteiligung Zivilschutz"
-
-msgid "This field is required."
-msgstr ""
 
 msgid "Mission count must be one for single mission"
 msgstr "Die Anzahl Einsätze muss 1 sein bei normalen Einsätzen"
@@ -288,9 +285,6 @@ msgstr "Total Einsätze im Jahr ${year}"
 msgid "Duration"
 msgstr "Dauer"
 
-msgid "# Missions"
-msgstr "# Einsätze"
-
 msgid "Pictures"
 msgstr "Fotos"
 
@@ -347,6 +341,9 @@ msgstr "Stadtkreis"
 
 msgid "Neighbourhood"
 msgstr "Quartier"
+
+msgid "Last updated:"
+msgstr "Zuletzt aktualisiert:"
 
 msgid "Search streets"
 msgstr "Strassen suchen"
@@ -455,3 +452,6 @@ msgstr "Strassenverzeichnis"
 
 msgid "The streets directory has been updated"
 msgstr "Das Strassenverzeichnis wurde aktualisiert"
+
+#~ msgid "# Missions"
+#~ msgstr "# Einsätze"

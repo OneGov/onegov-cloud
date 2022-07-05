@@ -57,8 +57,8 @@ Base = declarative_base(cls=ModelBase)
 #: A translation hybrid integrated with OneGov Core. See also:
 #: http://sqlalchemy-utils.readthedocs.org/en/latest/internationalization.html
 translation_hybrid = TranslationHybrid(
-    current_locale=lambda obj: obj.session_manager.current_locale,
-    default_locale=lambda obj: obj.session_manager.default_locale,
+    current_locale=lambda: SessionManager.get_active().current_locale,
+    default_locale=lambda: SessionManager.get_active().default_locale,
 )
 
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-01 13:21+0100\n"
+"POT-Creation-Date: 2022-05-24 15:51+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -384,6 +384,18 @@ msgstr "Beantragt"
 
 msgid "Published"
 msgstr "Veröffentlicht"
+
+msgid "Daily"
+msgstr "Täglich"
+
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+msgid "Monthly"
+msgstr "Monatlich"
+
+msgid "Never"
+msgstr "Nie"
 
 msgid "Mr."
 msgstr "Herr"
@@ -1183,11 +1195,20 @@ msgstr ""
 "Es ist nicht möglich eine Blockzeit zu erfassen wenn Teilnehmende auf ein "
 "Angebot pro Tag beschränkt sind."
 
-msgid "Send a daily status e-mail."
-msgstr "Ein tägliches Status E-Mail senden."
+msgid "Send a periodic status e-mail."
+msgstr "Ein periodisches Status E-Mail senden."
 
 msgid "General"
 msgstr "Allgemein"
+
+msgid "Daily (exluding the weekend)"
+msgstr "Täglich (abgesehen vom Wochenende)"
+
+msgid "Weekly (on mondays)"
+msgstr "Wöchentlich (am Montag)"
+
+msgid "Monthly (on first monday of the month)"
+msgstr "Monatlich (am ersten Montag des Monats)"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -1406,6 +1427,9 @@ msgstr "Helfen Sie mit"
 
 msgid "Register as Volunteer"
 msgstr "Registration als Hilfsperson"
+
+msgid "Sort"
+msgstr ""
 
 msgid "Half day"
 msgstr "Halbtägig"
@@ -2028,6 +2052,9 @@ msgstr ""
 "Teilnehmende werden in bis zu ${count} Angebot(e) eingeteilt. Für eine gute "
 "Zuteilung können Sie sich jedoch für mehr als ${count} Angebot(e) anmelden."
 
+msgid "Each child can be registered for up to ${count} activities."
+msgstr "Teilnehmende können für bis zu ${count} Angebot(e) angemeldet werden."
+
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
@@ -2454,6 +2481,9 @@ msgstr "Das Angebot wurde verworfen"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
+
+msgid "New ticket"
+msgstr ""
 
 msgid "Thank you for your proposal!"
 msgstr "Vielen Dank für Ihren Antrag!"
@@ -3028,3 +3058,6 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Each child can register for up to ${count} activities."
+#~ msgstr "Jedes Kind kann sich für bis zu 12 Angebote anmelden."

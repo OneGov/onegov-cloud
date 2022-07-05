@@ -60,6 +60,11 @@ def test_access_extension():
 
     assert form.access.data == 'private'
 
+    form.access.data = 'member'
+    form.populate_obj(topic)
+
+    assert topic.access == 'member'
+
 
 def test_person_link_extension():
 

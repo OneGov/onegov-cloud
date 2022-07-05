@@ -1,5 +1,6 @@
 from base64 import b64encode
 from io import StringIO
+from onegov.feriennet import log
 from qrbill.bill import QRBill, IBAN_ALLOWED_COUNTRIES, QR_IID
 from stdnum import iban
 
@@ -46,14 +47,14 @@ def generate_qr_bill(schema, request, user, invoice):
 
     # Reference number
     invoice_bucket = request.app.invoice_bucket()
-    ref_number = None
-    extra_infos = None
+    reference_number = None
+    additional_information = None
     if schema == 'feriennet-v1':
-        extra_infos = invoice.readable_by_bucket(invoice_bucket)
+        additional_information = invoice.readable_by_bucket(invoice_bucket)
     else:
         if not qr_iban(account):
             return None
-        ref_number = invoice.readable_by_bucket(invoice_bucket)
+        reference_number = invoice.readable_by_bucket(invoice_bucket)
 
     # Creditor (mandatory)
     beneficiary = request.app.org.meta.get('bank_beneficiary', None)
@@ -71,6 +72,7 @@ def generate_qr_bill(schema, request, user, invoice):
         'city': user.data.get('place', None),
     }
     if not debtor['name'] or not debtor['pcode'] or not debtor['city']:
+        log.error('Not enough debtor information for qr bill: {user.realname}')
         return None
 
     # Language
@@ -79,15 +81,19 @@ def generate_qr_bill(schema, request, user, invoice):
     )
 
     # Create bill
-    bill = QRBill(
-        account=account,
-        creditor=creditor,
-        debtor=debtor,
-        amount='{:.2f}'.format(invoice.outstanding_amount),
-        ref_number=ref_number,
-        extra_infos=extra_infos,
-        language=language,
-    )
+    try:
+        bill = QRBill(
+            account=account,
+            creditor=creditor,
+            debtor=debtor,
+            amount='{:.2f}'.format(invoice.outstanding_amount),
+            reference_number=reference_number,
+            additional_information=additional_information,
+            language=language,
+        )
+    except Exception as e:
+        log.exception(e)
+        return None
 
     # Save as SVG
     svg = StringIO()

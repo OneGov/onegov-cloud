@@ -112,16 +112,26 @@ def add_proporz_election(session, year=2015):
     election.lists.append(list_3)
 
     election.party_results.append(
-        PartyResult(name='Party 1', number_of_mandates=1, votes=10)
+        PartyResult(
+            name_translations={'de_CH': 'Party 1'},
+            party_id='0',
+            number_of_mandates=1,
+            votes=10
+        )
     )
     election.party_results.append(
-        PartyResult(name='Party 2', number_of_mandates=1, votes=20)
+        PartyResult(
+            name_translations={'de_CH': 'Party 2'},
+            party_id='1',
+            number_of_mandates=1,
+            votes=20
+        )
     )
     election.panachage_results.append(
-        PanachageResult(source='Party 1', target='Party 2', votes=12)
+        PanachageResult(source='0', target='1', votes=12)
     )
     election.panachage_results.append(
-        PanachageResult(source='Party 2', target='Party 1', votes=21)
+        PanachageResult(source='1', target='0', votes=21)
     )
 
     list_1.panachage_results.append(
@@ -238,19 +248,27 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
 
     compound.party_results.append(
         PartyResult(
-            year=year, name='Party 1', number_of_mandates=1, votes=10
+            name_translations={'de_CH': 'Party 1'},
+            year=year,
+            party_id='0',
+            number_of_mandates=1,
+            votes=10
         )
     )
     compound.party_results.append(
         PartyResult(
-            year=year, name='Party 2', number_of_mandates=1, votes=20
+            name_translations={'de_CH': 'Party 2'},
+            year=year,
+            party_id='1',
+            number_of_mandates=1,
+            votes=20
         )
     )
     compound.panachage_results.append(
-        PanachageResult(source='Party 1', target='Party 2', votes=12)
+        PanachageResult(source='0', target='1', votes=12)
     )
     compound.panachage_results.append(
-        PanachageResult(source='Party 2', target='Party 1', votes=21)
+        PanachageResult(source='1', target='0', votes=21)
     )
 
     return compound
