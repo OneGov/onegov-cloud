@@ -117,6 +117,8 @@ Nome|Descrizione
 `candidate_first_name`|Nome del candidato.
 `candidate_id`|L'identificativo del candidato.
 `candidate_elected`|Vero se il candidato è stato eletto.
+`candidate_party`|Il nome del partito.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
 `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 

@@ -116,6 +116,8 @@ Name|Description
 `candidate_first_name`|The first name of the candidate.
 `candidate_id`|The ID of the candidate.
 `candidate_elected`|True if the candidate has been elected.
+`candidate_party`|The name of the party.
+`candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
 `candidate_votes`|The number of votes this candidate got.
 `panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 

@@ -7,6 +7,7 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from onegov.election_day.formats.common import validate_gender
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.mappings import INTERNAL_MAJORZ_HEADERS
 from sqlalchemy.orm import object_session
@@ -89,10 +90,10 @@ def parse_candidate(line, errors, election_id):
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
         party = line.candidate_party
+        gender = validate_gender(line)
 
     except ValueError as e:
         errors.append(e.args[0])
-
     except Exception:
         errors.append(_("Invalid candidate values"))
     else:
@@ -103,7 +104,8 @@ def parse_candidate(line, errors, election_id):
             family_name=family_name,
             first_name=first_name,
             elected=elected,
-            party=party
+            party=party,
+            gender=gender
         )
 
 

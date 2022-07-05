@@ -634,3 +634,17 @@ def remove_obsolete_party_names(context):
         context.operations.alter_column(
             'party_results', 'party_id', nullable=False
         )
+
+
+@upgrade_task('Add gender column')
+def add_gender_column(context):
+    if not context.has_column('candidates', 'gender'):
+        context.operations.add_column(
+            'candidates',
+            Column(
+                'gender',
+                Enum('male', 'female', 'undetermined',
+                     name='candidate_gender'),
+                nullable=True
+            )
+        )
