@@ -91,6 +91,9 @@ def parse_candidate(line, errors, election_id):
         elected = str(line.candidate_elected or '').lower() == 'true'
         party = line.candidate_party
         gender = validate_gender(line)
+        year_of_birth = validate_integer(
+            line, 'candidate_year_of_birth', optional=True, default=None
+        )
 
     except ValueError as e:
         errors.append(e.args[0])
@@ -105,7 +108,8 @@ def parse_candidate(line, errors, election_id):
             first_name=first_name,
             elected=elected,
             party=party,
-            gender=gender
+            gender=gender,
+            year_of_birth=year_of_birth
         )
 
 

@@ -648,3 +648,12 @@ def add_gender_column(context):
                 nullable=True
             )
         )
+
+
+@upgrade_task('Add year of birth column')
+def add_year_of_birth_column(context):
+    if not context.has_column('candidates', 'year_of_birth'):
+        context.operations.add_column(
+            'candidates',
+            Column('year_of_birth', Integer(), nullable=True)
+        )

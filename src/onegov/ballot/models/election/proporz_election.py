@@ -209,6 +209,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             Candidate.elected,
             Candidate.party,
             Candidate.gender,
+            Candidate.year_of_birth,
         )
         results = results.outerjoin(CandidateResult.candidate)
         results = results.outerjoin(CandidateResult.election_result)
@@ -319,6 +320,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             row['candidate_elected'] = result.elected
             row['candidate_party'] = result.party
             row['candidate_gender'] = result.gender or ''
+            row['candidate_year_of_birth'] = result.year_of_birth or ''
             row['candidate_votes'] = result.votes
             for target_id in panachage_lists:
                 key = f'panachage_votes_from_list_{target_id}'
