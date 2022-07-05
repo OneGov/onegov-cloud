@@ -43,6 +43,7 @@ def majorz_election():
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male'
         )
     )
     election.candidates.append(
@@ -139,6 +140,7 @@ def proporz_election(
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male'
         )
     )
     election.candidates.append(
@@ -501,6 +503,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
         'candidate_votes': 111
     }
     assert export[1] == {
@@ -537,6 +540,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
         'candidate_votes': 520
     }
 
@@ -584,6 +588,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
         'candidate_votes': 111,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': None,
@@ -630,6 +635,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
         'candidate_votes': 520,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': 12,
@@ -670,6 +676,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
         'candidate_votes': 111
     }
 
@@ -707,6 +714,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
         'candidate_votes': 520
     }
 

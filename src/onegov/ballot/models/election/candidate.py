@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Boolean
 from sqlalchemy import Column
+from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
@@ -34,6 +35,12 @@ class Candidate(Base, TimestampMixin):
 
     #: True if the candidate is elected
     elected = Column(Boolean, nullable=False)
+
+    #: the gender
+    gender = Column(
+        Enum('male', 'female', 'undetermined', name='candidate_gender'),
+        nullable=True
+    )
 
     #: the election this candidate belongs to
     election_id = Column(

@@ -689,6 +689,7 @@ def test_proporz_election_export(session):
         family_name='Quimby',
         first_name='Joe',
         party='Republican Party',
+        gender='male'
     )
     candidate_2 = Candidate(
         id=uuid4(),
@@ -792,6 +793,7 @@ def test_proporz_election_export(session):
             'candidate_id': '2',
             'candidate_elected': False,
             'candidate_party': 'Democratic Party',
+            'candidate_gender': '',
             'candidate_votes': 111,
             'panachage_votes_from_list_1': None,
             'panachage_votes_from_list_2': None,
@@ -831,6 +833,7 @@ def test_proporz_election_export(session):
             'candidate_id': '1',
             'candidate_elected': True,
             'candidate_party': 'Republican Party',
+            'candidate_gender': 'male',
             'candidate_votes': 520,
             'panachage_votes_from_list_1': None,
             'panachage_votes_from_list_2': 12,
