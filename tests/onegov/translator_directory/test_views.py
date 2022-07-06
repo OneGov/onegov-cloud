@@ -680,9 +680,7 @@ def test_view_translator_mutation(client):
     page.form['operation_comments'] = 'No operation comments'
     page.form['confirm_name_reveal'] = False
     page.form['date_of_application'] = '2020-01-01'
-    page.form['date_of_decision'] = '2020-02-02'
     page.form['current_profession'] = 'Bäcker'
-    page.form['proof_of_preconditions'] = 'None'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
     page.form['certificates_ids'] = cert_ids[0:1]
