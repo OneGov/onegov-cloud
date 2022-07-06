@@ -16,9 +16,10 @@ from onegov.translator_directory.models.certificate import \
 
 from onegov.translator_directory.models.language import \
     mother_tongue_association_table, spoken_association_table, \
-    written_association_table
+    written_association_table, monitoring_association_table
 
 
+# todo: remove me!?
 class ESMixin(ORMSearchable):
 
     es_properties = {
@@ -128,6 +129,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     )
     written_languages = relationship(
         "Language", secondary=written_association_table, backref='writers')
+    monitoring_languages = relationship(
+        "Language", secondary=monitoring_association_table, backref='monitors')
 
     # Nachweis der Voraussetzungen
     proof_of_preconditions = Column(Text)

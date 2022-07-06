@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-06 09:48+0200\n"
+"POT-Creation-Date: 2022-07-06 14:13+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -513,6 +513,9 @@ msgstr "Bewerbung Datum"
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
+msgid "Monitoring languages"
+msgstr "Arbeitssprache - Kommunikationsüberwachung"
+
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
 
@@ -701,6 +704,9 @@ msgstr "Sprechende"
 
 msgid "Writers"
 msgstr "Schreibende"
+
+msgid "Monitors"
+msgstr "Überwachende"
 
 msgid "Administrator"
 msgstr "Administrator"

@@ -271,6 +271,14 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         choices=[]
     )
 
+    monitoring_languages_ids = ChosenSelectMultipleField(
+        label=_('Monitoring languages'),
+        description=_('Mention only languages with level C2.'),
+        fieldset=_('Language training - Expertise'),
+        validators=[StrictOptional()],
+        choices=[]
+    )
+
     expertise_professional_guilds = ChosenSelectMultipleField(
         label=_('Expertise by professional guild'),
         fieldset=_('Qualifications'),
@@ -551,6 +559,11 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         languages = LanguageCollection(self.request.session)
         return languages.by_ids(self.written_languages_ids.data)
 
+    @property
+    def monitoring_languages(self):
+        languages = LanguageCollection(self.request.session)
+        return languages.by_ids(self.monitoring_languages_ids.data)
+
     def on_request(self):
         self.request.include('tags-input')
 
@@ -558,6 +571,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
+        self.monitoring_languages_ids.choices = self.language_choices
         self.expertise_professional_guilds.choices = \
             self.expertise_professional_guilds_choices
         self.expertise_interpreting_types.choices = \
@@ -603,6 +617,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         result['mother_tongues'] = self.mother_tongues
         result['spoken_languages'] = self.spoken_languages
         result['written_languages'] = self.written_languages
+        result['monitoring_languages'] = self.monitoring_languages
         result['date_of_application'] = date.today()
         result['admission'] = 'uncertified'
 

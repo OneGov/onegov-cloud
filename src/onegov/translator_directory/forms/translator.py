@@ -1,35 +1,53 @@
 import re
 
 from cached_property import cached_property
-from wtforms import SelectField, StringField, BooleanField, TextAreaField, \
-    RadioField, FloatField
-from wtforms.fields.html5 import DateField, EmailField, IntegerField
-from wtforms.validators import (
-    InputRequired, Email, Optional, ValidationError, Length
-)
-
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField, MultiCheckboxField, \
-    TagsField
-
-from onegov.form.validators import ValidPhoneNumber, \
-    ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
+from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TagsField
+from onegov.form.validators import Stdnum
+from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidSwissSocialSecurityNumber
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import order_cols, \
+from onegov.translator_directory.collections.translator import order_cols
+from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.constants import (
-    full_text_max_chars, GENDERS, ADMISSIONS,
-    INTERPRETING_TYPES, PROFESSIONAL_GUILDS
-)
+from onegov.translator_directory.constants import ADMISSIONS
+from onegov.translator_directory.constants import full_text_max_chars
+from onegov.translator_directory.constants import GENDERS
+from onegov.translator_directory.constants import INTERPRETING_TYPES
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
 from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
-from onegov.translator_directory.models.translator import Translator, \
-    mother_tongue_association_table, \
-    spoken_association_table, written_association_table, \
+from onegov.translator_directory.models.translator import \
     certificate_association_table
+from onegov.translator_directory.models.translator import \
+    monitoring_association_table
+from onegov.translator_directory.models.translator import \
+    mother_tongue_association_table
+from onegov.translator_directory.models.translator import \
+    spoken_association_table
+from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.models.translator import \
+    written_association_table
+from wtforms import BooleanField
+from wtforms import FloatField
+from wtforms import RadioField
+from wtforms import SelectField
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import IntegerField
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import Length
+from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 class FormChoicesMixin:
@@ -277,6 +295,12 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         choices=[]
     )
 
+    monitoring_languages_ids = ChosenSelectMultipleField(
+        label=_('Monitoring languages'),
+        validators=[StrictOptional()],
+        choices=[]
+    )
+
     expertise_professional_guilds = MultiCheckboxField(
         label=_('Expertise by professional guild'),
         choices=[
@@ -349,10 +373,15 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     def written_languages(self):
         return self.lang_collection.by_ids(self.written_languages_ids.data)
 
+    @property
+    def monitoring_languages(self):
+        return self.lang_collection.by_ids(self.monitoring_languages_ids.data)
+
     special_fields = {
         'mother_tongues_ids': mother_tongue_association_table,
         'spoken_languages_ids': spoken_association_table,
         'written_languages_ids': written_association_table,
+        'monitoring_languages_ids': monitoring_association_table,
         'certificates_ids': certificate_association_table
     }
 
@@ -364,6 +393,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
+        self.monitoring_languages_ids.choices = self.language_choices
         self.certificates_ids.choices = self.certificate_choices
         self.hide(self.drive_distance)
 
@@ -377,6 +407,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         data['mother_tongues'] = self.mother_tongues
         data['spoken_languages'] = self.spoken_languages
         data['written_languages'] = self.written_languages
+        data['monitoring_languages'] = self.monitoring_languages
         data['certificates'] = self.certificates
         return data
 
@@ -445,6 +476,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         self.update_association(model, 'mother_tongues', '_ids')
         self.update_association(model, 'spoken_languages', '_ids')
         self.update_association(model, 'written_languages', '_ids')
+        self.update_association(model, 'monitoring_languages', '_ids')
         self.update_association(model, 'certificates', '_ids')
 
         model.expertise_professional_guilds = \

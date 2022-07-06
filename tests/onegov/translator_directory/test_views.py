@@ -450,6 +450,7 @@ def test_view_export_translators(client):
     data = copy.deepcopy(translator_data)
     data['spoken_languages'] = [languages[0]]
     data['written_languages'] = [languages[1]]
+    data['monitoring_languages'] = [languages[2]]
     data['expertise_professional_guilds'] = ['economy']
     data['expertise_professional_guilds_other'] = ['Psychologie', 'Religion']
     data['expertise_interpreting_types'] = ['simultaneous', 'whisper']
@@ -493,13 +494,14 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 29).value == None
     assert sheet.cell(2, 30).value == 'German'
     assert sheet.cell(2, 31).value == 'French'
-    assert sheet.cell(2, 32).value == 'Wirtschaft|Psychologie|Religion'
-    assert sheet.cell(2, 33).value == 'Simultandolmetschen|Flüsterdolmetschen'
-    assert sheet.cell(2, 34).value == 'all okay'
-    assert sheet.cell(2, 35).value == 'Some ref'
-    assert sheet.cell(2, 36).value == 0
-    assert sheet.cell(2, 37).value == None
+    assert sheet.cell(2, 32).value == 'Italian'
+    assert sheet.cell(2, 33).value == 'Wirtschaft|Psychologie|Religion'
+    assert sheet.cell(2, 34).value == 'Simultandolmetschen|Flüsterdolmetschen'
+    assert sheet.cell(2, 35).value == 'all okay'
+    assert sheet.cell(2, 36).value == 'Some ref'
+    assert sheet.cell(2, 37).value == 0
     assert sheet.cell(2, 38).value == None
+    assert sheet.cell(2, 39).value == None
 
 
 def test_file_security(client):
@@ -661,6 +663,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223346'
     page.form['availability'] = 'Always'
     page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
     page.form.get('expertise_professional_guilds', index=0).checked = True
     page.form['expertise_professional_guilds_other'] = ['Psychologie']
     page.form.get('expertise_interpreting_types', index=0).checked = True
@@ -675,8 +680,6 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = False
     page.form['date_of_application'] = '2020-01-01'
     page.form['date_of_decision'] = '2020-02-02'
-    page.form['spoken_languages_ids'] = language_ids[1:2]
-    page.form['written_languages_ids'] = language_ids[2:3]
     page.form['proof_of_preconditions'] = 'None'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
@@ -726,6 +729,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
     page.form['mother_tongues'] = language_ids[1:3]
+    page.form['spoken_languages'] = language_ids[0:2]
+    page.form['written_languages'] = language_ids[2:4]
+    page.form['monitoring_languages'] = language_ids[0:4]
     page.form['expertise_interpreting_types'].select_multiple([
         'consecutive', 'negotiation'
     ])
@@ -770,6 +776,12 @@ def test_view_translator_mutation(client):
     assert 'Telefon Geschäft: +41412223349' in page
     assert 'Erreich- und Verfügbarkeit: Nie' in page
     assert 'Muttersprachen: French, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert (
+        'Arbeitssprache - Kommunikationsüberwachung: '
+        'Arabic, French, German, Italian'
+    ) in page
     assert (
         'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
         'Verhandlungsdolmetschen'
@@ -810,6 +822,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
     page.form['mother_tongues'] = language_ids[1:3]
+    page.form['spoken_languages'] = language_ids[0:2]
+    page.form['written_languages'] = language_ids[2:4]
+    page.form['monitoring_languages'] = language_ids[0:4]
     page.form['expertise_interpreting_types'].select_multiple([
         'consecutive', 'negotiation'
     ])
@@ -860,6 +875,12 @@ def test_view_translator_mutation(client):
     assert 'Telefon Geschäft: +41412223349' in page
     assert 'Erreich- und Verfügbarkeit: Nie' in page
     assert 'Muttersprachen: French, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert (
+        'Arbeitssprache - Kommunikationsüberwachung: '
+        'Arabic, French, German, Italian'
+    ) in page
     assert (
         'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
         'Verhandlungsdolmetschen'
@@ -905,6 +926,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
     page.form['mother_tongues'] = language_ids[1:3]
+    page.form['spoken_languages'] = language_ids[0:2]
+    page.form['written_languages'] = language_ids[2:4]
+    page.form['monitoring_languages'] = language_ids[0:4]
     page.form['expertise_interpreting_types'].select_multiple([
         'consecutive', 'negotiation'
     ])
@@ -923,8 +947,6 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = True
     page.form['date_of_application'] = '2021-01-01'
     page.form['date_of_decision'] = '2021-02-02'
-    page.form['spoken_languages'] = language_ids[0:2]
-    page.form['written_languages'] = language_ids[2:4]
     page.form['proof_of_preconditions'] = 'Keine'
     page.form['agency_references'] = 'Kanton LU'
     page.form['education_as_interpreter'] = True
@@ -967,6 +989,14 @@ def test_view_translator_mutation(client):
     assert 'Telefon Geschäft: +41412223349' in page
     assert 'Erreich- und Verfügbarkeit: Nie' in page
     assert 'Muttersprachen: French, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert (
+        'Arbeitssprache - Kommunikationsüberwachung: '
+        'Arabic, French, German, Italian'
+    ) in page
     assert (
         'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
         'Verhandlungsdolmetschen'
@@ -984,8 +1014,6 @@ def test_view_translator_mutation(client):
     assert 'Zustimmung Namensbekanntgabe: Ja' in page
     assert 'Bewerbung Datum: 2021-01-01' in page
     assert 'Entscheid Datum: 2021-02-02' in page
-    assert 'Arbeitssprache - Wort: French, German' in page
-    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
     assert 'Nachweis der Voraussetzung: Keine' in page
     assert 'Referenzen Behörden: Kanton LU' in page
     assert 'Ausbildung Dolmetscher: Ja' in page
@@ -993,7 +1021,7 @@ def test_view_translator_mutation(client):
     assert 'Bemerkungen: Kein Kommentar' in page
 
     page = page.click('Vorgeschlagene Änderungen übernehmen')
-    page.form.get('changes', index=37).checked = False
+    page.form.get('changes', index=38).checked = False
     page = page.form.submit().follow()
     assert (
         'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
@@ -1009,6 +1037,7 @@ def test_view_translator_mutation(client):
         'Besondere Hinweise Einsatzm\\u00f6glichkeiten, '
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
         'Muttersprachen, Arbeitssprache - Wort, Arbeitssprache - Schrift, '
+        'Arbeitssprache - Kommunikations\\u00fcberwachung, '
         'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page
@@ -1036,7 +1065,9 @@ def test_view_translator_mutation(client):
     assert '+41412223348' in page
     assert '+41412223349' in page
     assert 'Nie' in page
+    assert 'Arabic' in page
     assert 'French' in page
+    assert 'German' in page
     assert 'Italian' in page
     assert 'Konsektutivdolmetschen' in page
     assert 'Verhandlungsdolmetschen' in page
@@ -1114,6 +1145,7 @@ def test_view_accreditation(client):
         page.form['mother_tongues_ids'] = language_ids[0:1]
         page.form['spoken_languages_ids'] = language_ids[1:2]
         page.form['written_languages_ids'] = language_ids[2:3]
+        page.form['monitoring_languages_ids'] = language_ids[3:4]
         page.form['expertise_interpreting_types'].select_multiple([
             'consecutive', 'negotiation'
         ])
@@ -1184,6 +1216,7 @@ def test_view_accreditation(client):
         assert 'German' in page
         assert 'French' in page
         assert 'Italian' in page
+        assert 'Arabic' in page
         assert 'Wirtschaft' in page
         assert 'Kunst und Freizeit' in page
         assert 'Psychologie' in page

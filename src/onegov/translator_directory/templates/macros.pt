@@ -175,6 +175,13 @@
                     ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
                 </span>
             </dd>
+
+            <dt i18n:translate>Monitoring languages</dt>
+            <dd>
+                <span tal:repeat="lang translator.monitoring_languages" tal:attributes="class layout.color_class(lang.monitors_count)">
+                    ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                </span>
+            </dd>
         </dl>
 
         <h3 i18n:translate>Qualifications</h3>

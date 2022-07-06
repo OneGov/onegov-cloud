@@ -62,9 +62,10 @@ def import_languages(csvfile, session):
 
     for line in csvfile.lines:
 
-        add_languages(line.muttersprache)
-        add_languages(line.sprachen_wort)
-        add_languages(line.sprachen_schrift)
+        add_languages(line.muttersprachen)
+        add_languages(line.arbeitssprache___wort)
+        add_languages(line.arbeitssprache___schrift)
+        add_languages(line.arbeitssprache___kommunikationsuberwachung)
 
     session.bulk_insert_mappings(
         Language, ({'name': name} for name in all_languages)
@@ -206,13 +207,22 @@ def import_translators(csvfile, session):
         trs.operation_comments = line.besondere_hinweise_einsatzmoglichkeiten
 
         trs.mother_tongues = get_languages(
-            tuple(parse_language_field(line.muttersprache)), session
+            tuple(parse_language_field(line.muttersprachen)),
+            session
         )
         trs.spoken_languages = get_languages(
-            tuple(parse_language_field(line.sprachen_wort)), session)
-
+            tuple(parse_language_field(line.arbeitssprache___wort)),
+            session
+        )
         trs.written_languages = get_languages(
-            tuple(parse_language_field(line.sprachen_wort)), session
+            tuple(parse_language_field(line.arbeitssprache___schrift)),
+            session
+        )
+        trs.monitoring_languages = get_languages(
+            tuple(parse_language_field(
+                line.arbeitssprache___kommunikationsuberwachung
+            )),
+            session
         )
         trs.imported = True
 
