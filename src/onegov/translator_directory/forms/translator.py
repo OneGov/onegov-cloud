@@ -301,6 +301,10 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         choices=[]
     )
 
+    current_profession = StringField(
+        label=_('Current professional activity')
+    )
+
     expertise_professional_guilds = MultiCheckboxField(
         label=_('Expertise by professional guild'),
         choices=[
@@ -470,6 +474,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.education_as_interpreter = self.education_as_interpreter.data
         model.comments = self.comments.data or None
         model.for_admins_only = self.for_admins_only.data
+        model.current_profession = self.current_profession.data
         model.operation_comments = self.operation_comments.data or None
         model.coordinates = self.coordinates.data
 

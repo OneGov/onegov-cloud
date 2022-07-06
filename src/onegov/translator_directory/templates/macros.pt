@@ -147,7 +147,7 @@
             <dd>${ticket_data.get('learned_profession')}</dd>
 
             <dt i18n:translate>Current professional activity</dt>
-            <dd>${ticket_data.get('current_profession')}</dd>
+            <dd>${translator.current_profession}</dd>
 
             <dt i18n:translate>Education as interpreter</dt>
             <dd class="education-as-interpreter">${layout.format_boolean(translator.education_as_interpreter)}</dd>

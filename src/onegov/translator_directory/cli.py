@@ -224,6 +224,7 @@ def import_translators(csvfile, session):
             )),
             session
         )
+        trs.current_profession = line.aktuelle_berufliche_tatigkeit
         trs.imported = True
 
         session.add(trs)

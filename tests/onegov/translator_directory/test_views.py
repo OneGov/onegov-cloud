@@ -495,13 +495,14 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 30).value == 'German'
     assert sheet.cell(2, 31).value == 'French'
     assert sheet.cell(2, 32).value == 'Italian'
-    assert sheet.cell(2, 33).value == 'Wirtschaft|Psychologie|Religion'
-    assert sheet.cell(2, 34).value == 'Simultandolmetschen|Flüsterdolmetschen'
-    assert sheet.cell(2, 35).value == 'all okay'
-    assert sheet.cell(2, 36).value == 'Some ref'
-    assert sheet.cell(2, 37).value == 0
-    assert sheet.cell(2, 38).value == None
+    assert sheet.cell(2, 33).value == 'baker'
+    assert sheet.cell(2, 34).value == 'Wirtschaft|Psychologie|Religion'
+    assert sheet.cell(2, 35).value == 'Simultandolmetschen|Flüsterdolmetschen'
+    assert sheet.cell(2, 36).value == 'all okay'
+    assert sheet.cell(2, 37).value == 'Some ref'
+    assert sheet.cell(2, 38).value == 0
     assert sheet.cell(2, 39).value == None
+    assert sheet.cell(2, 40).value == None
 
 
 def test_file_security(client):
@@ -680,6 +681,7 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = False
     page.form['date_of_application'] = '2020-01-01'
     page.form['date_of_decision'] = '2020-02-02'
+    page.form['current_profession'] = 'Bäcker'
     page.form['proof_of_preconditions'] = 'None'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
@@ -947,6 +949,7 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = True
     page.form['date_of_application'] = '2021-01-01'
     page.form['date_of_decision'] = '2021-02-02'
+    page.form['current_profession'] = 'Bauarbeiter'
     page.form['proof_of_preconditions'] = 'Keine'
     page.form['agency_references'] = 'Kanton LU'
     page.form['education_as_interpreter'] = True
@@ -1014,6 +1017,7 @@ def test_view_translator_mutation(client):
     assert 'Zustimmung Namensbekanntgabe: Ja' in page
     assert 'Bewerbung Datum: 2021-01-01' in page
     assert 'Entscheid Datum: 2021-02-02' in page
+    assert 'Aktuelle berufliche Tatigkeit: Bauarbeiter' in page
     assert 'Nachweis der Voraussetzung: Keine' in page
     assert 'Referenzen Behörden: Kanton LU' in page
     assert 'Ausbildung Dolmetscher: Ja' in page
@@ -1021,7 +1025,7 @@ def test_view_translator_mutation(client):
     assert 'Bemerkungen: Kein Kommentar' in page
 
     page = page.click('Vorgeschlagene Änderungen übernehmen')
-    page.form.get('changes', index=38).checked = False
+    page.form.get('changes', index=39).checked = False
     page = page.form.submit().follow()
     assert (
         'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
@@ -1038,6 +1042,7 @@ def test_view_translator_mutation(client):
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
         'Muttersprachen, Arbeitssprache - Wort, Arbeitssprache - Schrift, '
         'Arbeitssprache - Kommunikations\\u00fcberwachung, '
+        'Aktuelle berufliche Tatigkeit, '
         'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page
@@ -1087,6 +1092,7 @@ def test_view_translator_mutation(client):
     assert 'German' in page
     assert 'Arabic' in page
     assert 'Italian' in page
+    assert 'Bauarbeiter' in page
     assert 'Keine' in page
     assert 'Kanton LU' in page
     assert 'Ja' in page
