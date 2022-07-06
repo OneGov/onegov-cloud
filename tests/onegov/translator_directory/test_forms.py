@@ -17,7 +17,7 @@ class DummyPostData(dict):
         return v
 
 
-def test_translator_mutation_form_on(translator_app):
+def test_translator_mutation_form(translator_app):
     session = translator_app.session()
     certificates = create_certificates(session)
     languages = create_languages(session)
@@ -265,7 +265,7 @@ def test_translator_mutation_form_on(translator_app):
     form.model.coordinates = Coordinates()
     assert not form.validate()
     assert form.errors == {
-        'drive_distance': [
+        'coordinates': [
             'Home location is not configured. Please complete location '
             'settings first'
         ]

@@ -365,6 +365,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
         self.certificates_ids.choices = self.certificate_choices
+        self.hide(self.drive_distance)
 
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""

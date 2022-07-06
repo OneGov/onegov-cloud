@@ -73,6 +73,8 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         self.written_languages.choices = self.language_choices.copy()
         self.certificates.choices = self.certificate_choices.copy()
 
+        self.hide(self.drive_distance)
+
         layout = DefaultLayout(self.model, self.request)
         for name, field in self.proposal_fields.items():
             if not layout.show(name):
@@ -231,26 +233,22 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     address = StringField(
         label=_('Street and house number'),
         fieldset=_('Proposed changes'),
-        render_kw={'readonly': True}
     )
 
     zip_code = StringField(
         label=_('Zip Code'),
         fieldset=_('Proposed changes'),
-        render_kw={'readonly': True}
     )
 
     city = StringField(
         label=_('City'),
         fieldset=_('Proposed changes'),
-        render_kw={'readonly': True}
     )
 
     drive_distance = FloatField(
         label=_('Drive distance (km)'),
         fieldset=_('Proposed changes'),
         validators=[Optional()],
-        render_kw={'readonly': True}
     )
 
     social_sec_number = StringField(
