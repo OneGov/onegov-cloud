@@ -122,6 +122,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     monitoring_languages = relationship(
         "Language", secondary=monitoring_association_table, backref='monitors')
 
+    current_profession = Column(Text)
+
     # Nachweis der Voraussetzungen
     proof_of_preconditions = Column(Text)
 

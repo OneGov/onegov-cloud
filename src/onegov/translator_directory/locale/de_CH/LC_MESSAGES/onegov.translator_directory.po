@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-06 10:39+0200\n"
+"POT-Creation-Date: 2022-07-06 14:54+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -312,6 +312,9 @@ msgstr "Arbeitssprache - Wort"
 msgid "Written languages"
 msgstr "Arbeitssprache - Schrift"
 
+msgid "Monitoring languages"
+msgstr "Arbeitssprache - Kommunikationsüberwachung"
+
 msgid "Expertise by professional guild"
 msgstr "Fachkenntnisse nach Berufssparte"
 
@@ -368,9 +371,6 @@ msgstr "Zulassung ins Verzeichnis"
 
 msgid "Language training and expertise"
 msgstr "Sprachausbildung und Expertise"
-
-msgid "Monitoring languages"
-msgstr "Arbeitssprache - Kommunikationsüberwachung"
 
 msgid "Hidden"
 msgstr "Versteckt"
@@ -527,6 +527,9 @@ msgstr "Vorgeschlagene Änderungen übernommen"
 
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
+
+msgid "Current professional activity"
+msgstr "Aktuelle berufliche Tatigkeit"
 
 msgid "Certificates"
 msgstr "Zertifikate"
