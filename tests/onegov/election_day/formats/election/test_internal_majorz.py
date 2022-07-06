@@ -297,6 +297,7 @@ def test_import_internal_majorz_invalid_values(session):
                     'entity_id',
                     'entity_counted',
                     'entity_eligible_voters',
+                    'entity_expats',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -317,6 +318,7 @@ def test_import_internal_majorz_invalid_values(session):
                     'xxx',  # entity_id
                     'xxx',  # entity_counted
                     'xxx',  # entity_eligible_voters
+                    '',  # entity_expats
                     'xxx',  # entity_received_ballots
                     'xxx',  # entity_blank_ballots
                     'xxx',  # entity_invalid_ballots
@@ -337,6 +339,7 @@ def test_import_internal_majorz_invalid_values(session):
                     '1234',  # entity_id
                     'True',  # entity_counted
                     '100',  # entity_eligible_voters
+                    '30',  # entity_expats
                     '10',  # entity_received_ballots
                     '0',  # entity_blank_ballots
                     '0',  # entity_invalid_ballots
@@ -357,6 +360,7 @@ def test_import_internal_majorz_invalid_values(session):
                     '3251',  # entity_id
                     'True',  # entity_counted
                     '100',  # entity_eligible_voters
+                    'xxx',  # entity_expats
                     '10',  # entity_received_ballots
                     '0',  # entity_blank_ballots
                     '0',  # entity_invalid_ballots
@@ -383,7 +387,8 @@ def test_import_internal_majorz_invalid_values(session):
         (2, 'Invalid status'),
         (3, '1234 is unknown'),
         (3, 'Invalid gender: xxx'),
-        (4, 'Invalid integer: candidate_year_of_birth')
+        (4, 'Invalid integer: candidate_year_of_birth'),
+        (4, 'Invalid integer: entity_expats'),
     ]
 
 
@@ -715,6 +720,7 @@ def test_import_internal_majorz_optional_columns(session):
                     'entity_id',
                     'entity_counted',
                     'entity_eligible_voters',
+                    'entity_expats',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -735,6 +741,7 @@ def test_import_internal_majorz_optional_columns(session):
                     '1701',  # entity_id
                     'True',  # entity_counted
                     '111',  # entity_eligible_voters
+                    '30',  # entity_expats
                     '11',  # entity_received_ballots
                     '1',  # entity_blank_ballots
                     '1',  # entity_invalid_ballots
@@ -756,3 +763,4 @@ def test_import_internal_majorz_optional_columns(session):
     candidate = election.candidates.one()
     assert candidate.gender == 'female'
     assert candidate.year_of_birth == 1970
+    assert election.results.filter_by(entity_id='1701').one().expats == 30

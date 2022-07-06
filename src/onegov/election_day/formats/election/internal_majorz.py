@@ -38,6 +38,9 @@ def parse_election_result(line, errors, entities, election, principal):
         entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
         eligible_voters = validate_integer(line, 'entity_eligible_voters')
+        expats = validate_integer(
+            line, 'entity_expats', optional=True, default=None
+        )
         received_ballots = validate_integer(line, 'entity_received_ballots')
         blank_ballots = validate_integer(line, 'entity_blank_ballots')
         invalid_ballots = validate_integer(line, 'entity_invalid_ballots')
@@ -75,6 +78,7 @@ def parse_election_result(line, errors, entities, election, principal):
                     entity_id=entity_id,
                     counted=counted,
                     eligible_voters=eligible_voters,
+                    expats=expats,
                     received_ballots=received_ballots,
                     blank_ballots=blank_ballots,
                     invalid_ballots=invalid_ballots,

@@ -99,6 +99,7 @@ Nom|Description
 `entity_district`|La circonscription de la municipalité.
 `entity_counted`|`True` si le résultat a été compté.
 `entity_eligible_voters`|Le nombre de personnes éligible à voter pour cette municipalité.
+`entity_expats`|Nombre d'expatriés pour cette municipalité.
 `entity_received_ballots`|Le nombre de bulletins de vote reçus pour cette municipalité.
 `entity_blank_ballots`|Le nombre de bulletins blancs pour cette municipalité.
 `entity_invalid_ballots`|Le nombre de bulletins nuls pour cette municipalité.
@@ -189,11 +190,12 @@ Nom|Description
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
 `entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
-`entity_name`|Le nom de la municipalité.
-`entity_district`|La circonscription de la municipalité.
+`name`|Le nom de la municipalité.
+`district`|La circonscription de la municipalité.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 `yeas`|Nombre de votes oui
 `nays`|Nombre de votes non
 `invalid`|Nombre de votes invalides.
 `empty`|Nombre de votes blancs
 `eligible_voters`|Nombre de personne aptes à voter.
+`expats`|Nombre d'expatriés.
