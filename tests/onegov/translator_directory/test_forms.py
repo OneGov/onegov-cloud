@@ -33,7 +33,7 @@ def test_translator_mutation_form_on(translator_app):
         drive_distance=1.1,
         expertise_professional_guilds=['economy', 'military'],
         expertise_professional_guilds_other=['Psychology'],
-        expertise_interpreting_types=['whisper', 'written'],
+        expertise_interpreting_types=['whisper', 'negotiation'],
         gender='M',
         iban='CH9300762011623852957',
         operation_comments='Some comment',
@@ -98,7 +98,7 @@ def test_translator_mutation_form_on(translator_app):
     assert form.expertise_professional_guilds_other.long_description == \
         'Psychology'
     assert form.expertise_interpreting_types.long_description == \
-        '_Whisper interpreting, _Written translations'
+        '_Whisper interpreting, _Negotiation interpreting'
     assert form.proof_of_preconditions.long_description == 'all okay'
     assert form.agency_references.long_description == 'Some ref'
     assert form.education_as_interpreter.long_description == '_No'
@@ -240,7 +240,7 @@ def test_translator_mutation_form_on(translator_app):
         'written_languages': [str(x.id) for x in languages[2:4]],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'proof_of_preconditions': 'all okay',
         'agency_references': 'Some ref',
         'education_as_interpreter': False,
@@ -303,7 +303,7 @@ def test_translator_mutation_form_on(translator_app):
         'written_languages': [str(x.id) for x in languages[2:4]],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'proof_of_preconditions': 'all okay',
         'agency_references': 'Some ref',
         'education_as_interpreter': False,
