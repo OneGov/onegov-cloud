@@ -37,6 +37,8 @@ from xlsxwriter import Workbook
 )
 def add_new_translator(self, request, form):
 
+    form.delete_field('date_of_decision')
+
     if form.submitted(request):
         data = form.get_useful_data()
         translator = self.add(**data)
