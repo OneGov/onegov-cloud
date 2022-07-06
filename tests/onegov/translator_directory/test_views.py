@@ -668,7 +668,6 @@ def test_view_translator_mutation(client):
     page.form['spoken_languages_ids'] = language_ids[1:2]
     page.form['written_languages_ids'] = language_ids[2:3]
     page.form['current_profession'] = 'Bäcker'
-    page.form['proof_of_preconditions'] = 'None'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
     page.form['certificates_ids'] = cert_ids[0:1]
