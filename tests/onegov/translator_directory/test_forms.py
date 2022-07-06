@@ -17,7 +17,7 @@ class DummyPostData(dict):
         return v
 
 
-def test_translator_mutation_form_on(translator_app):
+def test_translator_mutation_form(translator_app):
     session = translator_app.session()
     certificates = create_certificates(session)
     languages = create_languages(session)
@@ -33,7 +33,7 @@ def test_translator_mutation_form_on(translator_app):
         drive_distance=1.1,
         expertise_professional_guilds=['economy', 'military'],
         expertise_professional_guilds_other=['Psychology'],
-        expertise_interpreting_types=['whisper', 'written'],
+        expertise_interpreting_types=['whisper', 'negotiation'],
         gender='M',
         iban='CH9300762011623852957',
         operation_comments='Some comment',
@@ -43,6 +43,7 @@ def test_translator_mutation_form_on(translator_app):
     translator.mother_tongues = languages[0:2]
     translator.spoken_languages = languages[1:3]
     translator.written_languages = languages[2:4]
+    translator.monitoring_languages = languages[3:4]
     translator.coordinates = Coordinates(1, 2, 12)
 
     request = Bunch(
@@ -93,12 +94,13 @@ def test_translator_mutation_form_on(translator_app):
     assert form.mother_tongues.long_description == '_German, _French'
     assert form.spoken_languages.long_description == '_French, _Italian'
     assert form.written_languages.long_description == '_Italian, _Arabic'
+    assert form.monitoring_languages.long_description == '_Arabic'
     assert form.expertise_professional_guilds.long_description == \
         '_Economy, _Military'
     assert form.expertise_professional_guilds_other.long_description == \
         'Psychology'
     assert form.expertise_interpreting_types.long_description == \
-        '_Whisper interpreting, _Written translations'
+        '_Whisper interpreting, _Negotiation interpreting'
     assert form.proof_of_preconditions.long_description == 'all okay'
     assert form.agency_references.long_description == 'Some ref'
     assert form.education_as_interpreter.long_description == '_No'
@@ -114,6 +116,7 @@ def test_translator_mutation_form_on(translator_app):
     assert form.mother_tongues.choices[0] == ('', '_')
     assert form.spoken_languages.choices[0] == ('', '_')
     assert form.written_languages.choices[0] == ('', '_')
+    assert form.monitoring_languages.choices[0] == ('', '_')
     assert form.expertise_professional_guilds.choices[0] == ('', '_')
     assert form.expertise_interpreting_types.choices[0] == ('', '_')
     assert form.education_as_interpreter.choices[0] == ('', '_')
@@ -128,6 +131,7 @@ def test_translator_mutation_form_on(translator_app):
     assert form.mother_tongues.choices[1][1] == '_Arabic'
     assert form.spoken_languages.choices[1][1] == '_Arabic'
     assert form.written_languages.choices[1][1] == '_Arabic'
+    assert form.monitoring_languages.choices[1][1] == '_Arabic'
     assert form.expertise_professional_guilds.choices[1][1] == \
         '_Nutrition and agriculture'
     assert form.expertise_interpreting_types.choices[1][1] == \
@@ -142,8 +146,8 @@ def test_translator_mutation_form_on(translator_app):
     form.request.is_admin = False
     form.request.is_translator = True
     form.on_request()
-    assert len(form._fields) == 39
-    assert len(form.proposal_fields) == 38
+    assert len(form._fields) == 40
+    assert len(form.proposal_fields) == 39
 
     form = TranslatorMutationForm()
     form.model = translator
@@ -151,14 +155,12 @@ def test_translator_mutation_form_on(translator_app):
     form.request.is_translator = False
     form.request.is_editor = True
     form.on_request()
-    assert len(form._fields) == 28
-    assert len(form.proposal_fields) == 27
+    assert len(form._fields) == 31
+    assert len(form.proposal_fields) == 30
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
     assert form.date_of_application is None
     assert form.date_of_decision is None
-    assert form.spoken_languages is None
-    assert form.written_languages is None
     assert form.proof_of_preconditions is None
     assert form.agency_references is None
     assert form.education_as_interpreter is None
@@ -171,14 +173,12 @@ def test_translator_mutation_form_on(translator_app):
     form.request.is_editor = False
     form.request.is_member = True
     form.on_request()
-    assert len(form._fields) == 23
-    assert len(form.proposal_fields) == 22
+    assert len(form._fields) == 26
+    assert len(form.proposal_fields) == 25
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
     assert form.date_of_application is None
     assert form.date_of_decision is None
-    assert form.spoken_languages is None
-    assert form.written_languages is None
     assert form.proof_of_preconditions is None
     assert form.agency_references is None
     assert form.education_as_interpreter is None
@@ -238,9 +238,10 @@ def test_translator_mutation_form_on(translator_app):
         'mother_tongues': [str(x.id) for x in languages[0:2]],
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
+        'monitoring_languages': [str(x.id) for x in languages[3:4]],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'proof_of_preconditions': 'all okay',
         'agency_references': 'Some ref',
         'education_as_interpreter': False,
@@ -265,7 +266,7 @@ def test_translator_mutation_form_on(translator_app):
     form.model.coordinates = Coordinates()
     assert not form.validate()
     assert form.errors == {
-        'drive_distance': [
+        'coordinates': [
             'Home location is not configured. Please complete location '
             'settings first'
         ]
@@ -301,9 +302,10 @@ def test_translator_mutation_form_on(translator_app):
         'mother_tongues': [str(x.id) for x in languages[0:2]],
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
+        'monitoring_languages': [str(x.id) for x in languages[3:4]],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'proof_of_preconditions': 'all okay',
         'agency_references': 'Some ref',
         'education_as_interpreter': False,

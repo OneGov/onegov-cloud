@@ -81,6 +81,7 @@ Nom|Description
 `invalid`|Nombre de votes invalides.
 `empty`|Nombre de votes blancs
 `eligible_voters`|Nombre de personne aptes à voter.
+`expats`|Nombre d'expatriés. Facultatif.
 
 
 #### Résultats temporaires

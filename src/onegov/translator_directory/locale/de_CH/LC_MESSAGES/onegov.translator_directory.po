@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-12 07:27+0200\n"
+"POT-Creation-Date: 2022-07-06 10:39+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,13 +14,13 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 
 msgid "uncertified"
-msgstr "nicht zertifiziert / Einsatz Dringlichkeit"
+msgstr "nicht akkreditiert / Einsatz Dringlichkeit"
 
 msgid "in progress"
 msgstr "im Zulassungsverfahren"
 
 msgid "certified"
-msgstr "zertifiziert"
+msgstr "akkreditiert"
 
 msgid "masculin"
 msgstr "Männlich"
@@ -78,12 +78,6 @@ msgstr "Verhandlungsdolmetschen"
 
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
-
-msgid "Telephone interpreting"
-msgstr "Telefondolmetschen"
-
-msgid "Written translations"
-msgstr "Schriftliche Übersetzungen"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -313,10 +307,10 @@ msgid "Mother tongues"
 msgstr "Muttersprachen"
 
 msgid "Spoken languages"
-msgstr "Sprachen Wort"
+msgstr "Arbeitssprache - Wort"
 
 msgid "Written languages"
-msgstr "Sprachen Schrift"
+msgstr "Arbeitssprache - Schrift"
 
 msgid "Expertise by professional guild"
 msgstr "Fachkenntnisse nach Berufssparte"
@@ -374,6 +368,9 @@ msgstr "Zulassung ins Verzeichnis"
 
 msgid "Language training and expertise"
 msgstr "Sprachausbildung und Expertise"
+
+msgid "Monitoring languages"
+msgstr "Arbeitssprache - Kommunikationsüberwachung"
 
 msgid "Hidden"
 msgstr "Versteckt"
@@ -506,6 +503,9 @@ msgstr "Sprechende"
 
 msgid "Writers"
 msgstr "Schreibende"
+
+msgid "Monitors"
+msgstr "Überwachende"
 
 msgid "Administrator"
 msgstr "Administrator"

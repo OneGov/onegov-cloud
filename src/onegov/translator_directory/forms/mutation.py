@@ -71,7 +71,10 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         self.mother_tongues.choices = self.language_choices.copy()
         self.spoken_languages.choices = self.language_choices.copy()
         self.written_languages.choices = self.language_choices.copy()
+        self.monitoring_languages.choices = self.language_choices.copy()
         self.certificates.choices = self.certificate_choices.copy()
+
+        self.hide(self.drive_distance)
 
         layout = DefaultLayout(self.model, self.request)
         for name, field in self.proposal_fields.items():
@@ -128,7 +131,8 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         def has_changed(name, value):
             old = getattr(self.model, name)
             if name in ('mother_tongues', 'spoken_languages',
-                        'written_languages', 'certificates'):
+                        'written_languages', 'monitoring_languages',
+                        'certificates'):
                 old = [str(x.id) for x in getattr(self.model, name, [])]
             return value != old
 
@@ -231,26 +235,22 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     address = StringField(
         label=_('Street and house number'),
         fieldset=_('Proposed changes'),
-        render_kw={'readonly': True}
     )
 
     zip_code = StringField(
         label=_('Zip Code'),
         fieldset=_('Proposed changes'),
-        render_kw={'readonly': True}
     )
 
     city = StringField(
         label=_('City'),
         fieldset=_('Proposed changes'),
-        render_kw={'readonly': True}
     )
 
     drive_distance = FloatField(
         label=_('Drive distance (km)'),
         fieldset=_('Proposed changes'),
         validators=[Optional()],
-        render_kw={'readonly': True}
     )
 
     social_sec_number = StringField(
@@ -344,6 +344,13 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     written_languages = ChosenSelectMultipleField(
         label=_('Written languages'),
+        fieldset=_('Proposed changes'),
+        choices=[],
+        validators=[Optional()],
+    )
+
+    monitoring_languages = ChosenSelectMultipleField(
+        label=_('Monitoring languages'),
         fieldset=_('Proposed changes'),
         choices=[],
         validators=[Optional()],
