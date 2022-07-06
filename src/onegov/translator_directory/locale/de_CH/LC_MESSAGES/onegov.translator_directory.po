@@ -14,13 +14,13 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 
 msgid "uncertified"
-msgstr "nicht zertifiziert / Einsatz Dringlichkeit"
+msgstr "nicht akkreditiert / Einsatz Dringlichkeit"
 
 msgid "in progress"
 msgstr "im Zulassungsverfahren"
 
 msgid "certified"
-msgstr "zertifiziert"
+msgstr "akkreditiert"
 
 msgid "masculin"
 msgstr "Männlich"
@@ -313,10 +313,10 @@ msgid "Mother tongues"
 msgstr "Muttersprachen"
 
 msgid "Spoken languages"
-msgstr "Sprachen Wort"
+msgstr "Arbeitssprache - Wort"
 
 msgid "Written languages"
-msgstr "Sprachen Schrift"
+msgstr "Arbeitssprache - Schrift"
 
 msgid "Expertise by professional guild"
 msgstr "Fachkenntnisse nach Berufssparte"
