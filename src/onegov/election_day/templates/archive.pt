@@ -138,12 +138,19 @@
                                     <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
                                         <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
                                     </th>
-                                    <td tal:condition="vote.progress[0]">
-                                        <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)"></div>
-                                    </td>
-                                    <td tal:condition="not vote.progress[0]" colspan="5" class="right-aligned no-results" i18n:translate="">    
-                                        No results yet
-                                    </td>    
+                                    <tal:block tal:switch="votes_started">
+                                        <tal:block tal:case="True">
+                                            <td tal:condition="vote.progress[0]">
+                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
+                                            </td>
+                                            <td class="right-aligned" colspan="5" tal:condition="not vote.progress[0]" i18n:translate>
+                                                No results yet
+                                            </td>
+                                        </tal:block>    
+                                        <td tal:case="False" class="no-results" i18n:translate>    
+                                            No results yet
+                                        </td>    
+                                    </tal:block>    
                                     <td class="right-aligned" tal:condition="vote.progress[0]">
                                             ${layout.format_number(vote.display_yeas_percentage(request))}
                                     </td>
