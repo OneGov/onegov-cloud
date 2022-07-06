@@ -1,36 +1,38 @@
-from onegov.core.security import Private
+import base64
+
+from onegov.core.security import Public
 from onegov.winterthur import WinterthurApp
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.org.layout import GeneralFileCollectionLayout
-
-# from onegov.file.utils import extension_for_content_type
 
 
 @WinterthurApp.html(
     model=GeneralFileCollection,
     name='shift-schedule',
-    permission=Private,
+    permission=Public,
     template='shift_schedule.pt'
 )
 def view_shift_schedule(self, request, layout=None):
     layout = layout or GeneralFileCollectionLayout(self, request)
     session = request.session
-    # extension = extension_for_content_type(
-    #     file.content_type,
-    #     file.name
-    # )
+    file_link = ""
 
     files = GeneralFileCollection(session).query().order_by(
         GeneralFile.created
-    )
+    ).filter(GeneralFile.published)
     files = files.all()
-    file = files[-1]
+    if files:
+        file = files[-1]
+
+        if file.claimed_extension == 'pdf':
+            img_buffer = request.app.get_shift_schedule_image(file)
+            str_equivalent_image = base64.b64encode(img_buffer.getvalue(
+            )).decode()
+            file_link = f'data:image/png;base64,{str_equivalent_image}'
 
     return {
         'title': "Schichtplan",
         'layout': layout,
-        'file': file,
-        'extension': file.claimed_extension,
-        'count': len(files),
+        'file_path': file_link,
         'model': self
     }

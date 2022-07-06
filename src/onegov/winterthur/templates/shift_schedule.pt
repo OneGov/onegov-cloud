@@ -4,8 +4,8 @@
     </tal:b>
 
     <tal:b metal:fill-slot="content">
-        <div tal:condition="extension == 'pdf'" class="text-center">
-            <img src="${request.link(file, name='medium')}">
+        <div tal:condition="file_path" class="text-center">
+            <img src="${file_path}">
         </div>
     </tal:b>
 </div>
