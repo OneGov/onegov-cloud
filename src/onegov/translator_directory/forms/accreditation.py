@@ -213,18 +213,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         validators=[InputRequired()],
     )
 
-    availability_has_restriction = BooleanField(
-        label=_('Restriction regarding availability'),
-        fieldset=_('Contact'),
-        default=False
-    )
-
-    availability_restriction = StringField(
-        label=_('Restriction'),
-        fieldset=_('Contact'),
-        depends_on=('availability_has_restriction', 'y'),
-    )
-
     confirm_name_reveal = BooleanField(
         label=_(
             'Do you agree to the disclosure of your name to other persons '
@@ -310,7 +298,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         fieldset=_('References'),
     )
 
-    admission = BooleanField(
+    admission_course_completed = BooleanField(
         label=_(
             'Admission course of the high court of the Canton of Zurich '
             'available'
@@ -326,7 +314,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ),
         fieldset=_('Admission course'),
         default=False,
-        depends_on=('admission', '!y'),
+        depends_on=('admission_course_completed', '!y'),
     )
 
     admission_hint = PanelField(
@@ -339,7 +327,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ),
         kind='',
         fieldset=_('Admission course'),
-        depends_on=('admission', '!y'),
+        depends_on=('admission_course_completed', '!y'),
     )
 
     documents_hint = PanelField(
@@ -511,6 +499,18 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 _('Please confirm the correctness of the above data.')
             )
 
+    def ensure_at_least_on_phone_number(self):
+        if not any((
+            self.tel_private.data,
+            self.tel_office.data,
+            self.tel_mobile.data
+        )):
+            error = _('Please provide at least one phone number.')
+            self.tel_private.errors.append(error)
+            self.tel_office.errors.append(error)
+            self.tel_mobile.errors.append(error)
+            return False
+
     @cached_property
     def gender_choices(self):
         return tuple(
@@ -605,8 +605,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         result['spoken_languages'] = self.spoken_languages
         result['written_languages'] = self.written_languages
         result['date_of_application'] = date.today()
-        result['admission'] = 'certificed' if data.get('admission') else \
-            'uncertified'
+        result['admission'] = 'uncertified'
 
         return result
 
@@ -633,9 +632,9 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             as_file(self.social_security_card, 'Antrag'),
             as_file(self.passport, 'Antrag'),
             as_file(self.passport_photo, 'Antrag'),
-            as_file(self.debt_collection_register_extract, 'Antrag'),
-            as_file(self.criminal_register_extract, 'Antrag'),
-            as_file(self.certificate_of_capability, 'Antrag'),
+            as_file(self.debt_collection_register_extract, 'Abklärungen'),
+            as_file(self.criminal_register_extract, 'Abklärungen'),
+            as_file(self.certificate_of_capability, 'Abklärungen'),
         ]
 
     def get_ticket_data(self):
@@ -644,10 +643,9 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             key: data.get(key) for key in (
                 'hometown',
                 'marital_status',
-                'availability_has_restriction',
-                'availability_restriction',
                 'learned_profession',
                 'current_profession',
+                'admission_course_completed',
                 'admission_course_agreement',
                 'remarks',
             )

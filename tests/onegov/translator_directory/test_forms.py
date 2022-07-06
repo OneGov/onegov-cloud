@@ -338,15 +338,8 @@ def test_accreditation_form(translator_app):
     create_translator(translator_app)
 
     request = Bunch(
-        # todo: remove unused attributes
         app=translator_app,
         session=session,
-        locale='de_CH',
-        is_manager=True,
-        is_admin=True,
-        is_editor=False,
-        is_member=False,
-        is_translator=False,
         include=lambda x: x,
         translate=lambda x: f'_{x}'
     )
@@ -382,6 +375,15 @@ def test_accreditation_form(translator_app):
     assert form.errors['email'] == [
         'A translator with this email already exists'
     ]
+    assert form.errors['tel_mobile'] == [
+        'Please provide at least one phone number.'
+    ]
+    assert form.errors['tel_office'] == [
+        'Please provide at least one phone number.'
+    ]
+    assert form.errors['tel_private'] == [
+        'Please provide at least one phone number.'
+    ]
 
     # Test get data
     form = RequestAccreditationForm(DummyPostData({
@@ -409,8 +411,6 @@ def test_accreditation_form(translator_app):
         'tel_office': '041 444 44 44',
         'tel_mobile': '079 000 00 00',
         'availability': '24h',
-        'availability_has_restriction': True,
-        'availability_restriction': 'Only weekdays',
         'confirm_name_reveal': True,
         'learned_profession': 'Baker',
         'current_profession': 'Reporter',
@@ -422,7 +422,7 @@ def test_accreditation_form(translator_app):
         'expertise_professional_guilds_other': ['Psychology'],
         'expertise_interpreting_types': ['whisper', 'written'],
         'agency_references': 'Some ref',
-        'admission': False,
+        'admission_course_completed': False,
         'admission_course_agreement': True,
         'declaration_of_authorization': create_file('1.pdf'),
         'letter_of_motivation': create_file('2.pdf'),
@@ -491,22 +491,30 @@ def test_accreditation_form(translator_app):
         ('Antrag', '_Resume.pdf', '3.pdf'),
         ('Diplome und Zertifikate', '_Certificates.pdf', '4.pdf'),
         ('Antrag', '_Social security card.pdf', '5.pdf'),
-        ('Antrag', '_Identity card, passport or foreigner identity card.pdf',
-         '6.pdf'),
+        (
+            'Antrag',
+            '_Identity card, passport or foreigner identity card.pdf',
+            '6.pdf'
+        ),
         ('Antrag', '_Current passport photo.pdf', '7.pdf'),
-        ('Antrag', '_Current extract from the debt collection register.pdf',
-         '8.pdf'),
-        ('Antrag', '_Current extract from the Central Criminal Register.pdf',
-         '9.pdf'),
-        ('Antrag', '_Certificate of Capability.pdf', 'A.pdf'),
+        (
+            'Abklärungen',
+            '_Current extract from the debt collection register.pdf',
+            '8.pdf'
+        ),
+        (
+            'Abklärungen',
+            '_Current extract from the Central Criminal Register.pdf',
+            '9.pdf'
+        ),
+        ('Abklärungen', '_Certificate of Capability.pdf', 'A.pdf'),
     }
     assert form.get_ticket_data() == {
         'hometown': 'Zug',
         'marital_status': 'married',
-        'availability_has_restriction': True,
-        'availability_restriction': 'Only weekdays',
         'learned_profession': 'Baker',
         'current_profession': 'Reporter',
+        'admission_course_completed': False,
         'admission_course_agreement': True,
         'remarks': 'Some remarks',
     }

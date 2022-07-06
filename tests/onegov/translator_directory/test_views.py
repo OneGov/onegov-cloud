@@ -1107,8 +1107,6 @@ def test_view_accreditation(client):
         page.form['tel_office'] = '041 444 44 44'
         page.form['tel_mobile'] = '079 000 00 00'
         page.form['availability'] = '24h'
-        page.form['availability_has_restriction'] = True
-        page.form['availability_restriction'] = 'Only weekdays'
         page.form['confirm_name_reveal'] = True
         page.form['learned_profession'] = 'Baker'
         page.form['current_profession'] = 'Reporter'
@@ -1124,7 +1122,7 @@ def test_view_accreditation(client):
         ])
         page.form['expertise_professional_guilds_other'] = ['Psychologie']
         page.form['agency_references'] = 'Some ref'
-        page.form['admission'] = False
+        page.form['admission_course_completed'] = False
         page.form['admission_course_agreement'] = True
         page.form['declaration_of_authorization'] = upload_pdf('1.pdf')
         page.form['letter_of_motivation'] = upload_pdf('2.pdf')
@@ -1179,8 +1177,6 @@ def test_view_accreditation(client):
         assert '041 444 44 44' in page
         assert '079 000 00 00' in page
         assert '24h' in page
-        assert '"availability-has-restriction">Ja' in page
-        assert 'Only weekdays' in page
         assert '"confirm-name-reveal">Ja' in page
         assert 'Baker' in page
         assert 'Reporter' in page
@@ -1194,7 +1190,7 @@ def test_view_accreditation(client):
         assert 'Konsektutivdolmetschen' in page
         assert 'Verhandlungsdolmetschen' in page
         assert 'Some ref' in page
-        assert 'nicht zertifiziert / Einsatz Dringlichkeit' in page
+        assert '"admission-course-completed">Nein' in page
         assert '"admission-course-agreement">Ja' in page
         assert 'Some remarks' in page
 

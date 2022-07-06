@@ -133,12 +133,6 @@
 
             <dt i18n:translate>Availability</dt>
             <dd>${translator.availability}</dd>
-
-            <dt i18n:translate>Restriction regarding availability</dt>
-            <dd class="availability-has-restriction">${layout.format_boolean(ticket_data.get('availability_has_restriction'))}</dd>
-
-            <dt i18n:translate>Restriction</dt>
-            <dd>${ticket_data.get('availability_restriction')}</dd>
         </dl>
 
         <h3 i18n:translate>Legal</h3>
@@ -205,7 +199,9 @@
         <h3 i18n:translate>Admission course</h3>
         <dl class="accreditation">
             <dt i18n:translate>Admission</dt>
-            <dd>${layout.format_admission(translator.admission)}</dd>
+
+            <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
+            <dd class="admission-course-completed">${layout.format_boolean(ticket_data.get('admission_course_completed'))}</dd>
 
             <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
             <dd class="admission-course-agreement">${layout.format_boolean(ticket_data.get('admission_course_agreement'))}</dd>

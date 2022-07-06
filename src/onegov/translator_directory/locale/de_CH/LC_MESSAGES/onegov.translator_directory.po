@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-03 09:21+0200\n"
+"POT-Creation-Date: 2022-07-06 07:01+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -233,12 +233,6 @@ msgstr "Telefon Mobile"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
-msgid "Restriction regarding availability"
-msgstr "Einschränkungen bezüglich Verfügbarkeit"
-
-msgid "Restriction"
-msgstr "Einschränkungen"
-
 msgid ""
 "Do you agree to the disclosure of your name to other persons and authorities "
 "within and outside the Canton of Zug?"
@@ -409,6 +403,9 @@ msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 
 msgid "Please confirm the correctness of the above data."
 msgstr "Bitte bestätigen Sie die Richtigkeit der vorstehenden Daten."
+
+msgid "Please provide at least one phone number."
+msgstr "Bitte geben Sie mindestens eine Telefonnummer an."
 
 msgid "Create a user account and publish the translator."
 msgstr "Benutzerkonto erstellen und Übersetzereintrag veröffentlichen."
