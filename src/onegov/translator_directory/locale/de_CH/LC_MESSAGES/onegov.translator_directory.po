@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-06 07:01+0200\n"
+"POT-Creation-Date: 2022-07-06 09:48+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,13 +14,13 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 
 msgid "uncertified"
-msgstr "nicht zertifiziert / Einsatz Dringlichkeit"
+msgstr "nicht akkreditiert / Einsatz Dringlichkeit"
 
 msgid "in progress"
 msgstr "im Zulassungsverfahren"
 
 msgid "certified"
-msgstr "zertifiziert"
+msgstr "akkreditiert"
 
 msgid "masculin"
 msgstr "Männlich"
@@ -78,12 +78,6 @@ msgstr "Verhandlungsdolmetschen"
 
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
-
-msgid "Telephone interpreting"
-msgstr "Telefondolmetschen"
-
-msgid "Written translations"
-msgstr "Schriftliche Übersetzungen"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -268,14 +262,14 @@ msgid "Mother tongues"
 msgstr "Muttersprachen"
 
 msgid "Spoken languages"
-msgstr "Sprachen Wort"
+msgstr "Arbeitssprache - Wort"
 
 msgid "Mention only languages with level C2."
 msgstr ""
 "Erwähnen Sie nur Ihre Übersetzungssprachen mit Voraussetzung Niveau C2."
 
 msgid "Written languages"
-msgstr "Sprachen Schrift"
+msgstr "Arbeitssprache - Schrift"
 
 msgid "Expertise by professional guild"
 msgstr "Fachkenntnisse nach Berufssparte"

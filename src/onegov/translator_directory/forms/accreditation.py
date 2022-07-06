@@ -102,21 +102,18 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     address = StringField(
         label=_('Street and house number'),
         fieldset=_('Personal Information'),
-        render_kw={'readonly': True},
         validators=[InputRequired()],
     )
 
     zip_code = StringField(
         label=_('Zip Code'),
         fieldset=_('Personal Information'),
-        render_kw={'readonly': True},
         validators=[InputRequired()],
     )
 
     city = StringField(
         label=_('City'),
         fieldset=_('Personal Information'),
-        render_kw={'readonly': True},
         validators=[InputRequired()],
     )
 
@@ -124,7 +121,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         label=_('Drive distance (km)'),
         fieldset=_('Personal Information'),
         validators=[Optional()],
-        render_kw={'readonly': True},
     )
 
     withholding_tax = BooleanField(
@@ -557,6 +553,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     def on_request(self):
         self.request.include('tags-input')
+
         self.gender.choices = self.gender_choices
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
@@ -565,6 +562,8 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             self.expertise_professional_guilds_choices
         self.expertise_interpreting_types.choices = \
             self.expertise_interpreting_types_choices
+
+        self.hide(self.drive_distance)
 
     def get_translator_data(self):
         data = self.get_useful_data()

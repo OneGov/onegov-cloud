@@ -120,7 +120,7 @@ def test_view_translator(client):
         for dl in page.pyquery('dl')
     }
     assert values['Personal Nr.'] == '978654'
-    assert values['Zulassung'] == 'nicht zertifiziert / Einsatz Dringlichkeit'
+    assert values['Zulassung'] == 'nicht akkreditiert / Einsatz Dringlichkeit'
     assert values['Quellensteuer'] == 'Nein'
     assert values['Selbständig'] == 'Nein'
     assert values['Geschlecht'] == 'Männlich'
@@ -135,9 +135,9 @@ def test_view_translator(client):
     assert 'Ernährung' in values['Fachkenntnisse nach Berufssparte']
     assert 'Psychologie' in values['Fachkenntnisse nach Berufssparte']
     assert values['Muttersprachen'] == language_names[3]
-    assert language_names[0] in values['Sprachen Wort']
-    assert language_names[1] in values['Sprachen Wort']
-    assert values['Sprachen Schrift'] == language_names[2]
+    assert language_names[0] in values['Arbeitssprache - Wort']
+    assert language_names[1] in values['Arbeitssprache - Wort']
+    assert values['Arbeitssprache - Schrift'] == language_names[2]
     assert values['Referenzen Behörden'] == 'All okay'
     assert values['Ausbildung Dolmetscher'] == 'Nein'
     assert values['Versteckt'] == 'Nein'
@@ -303,8 +303,8 @@ def test_view_translator(client):
     assert values['Wegberechnung'] == f'{round(new_drive_distance, 1)} km'
     assert values['Zulassung'] == 'im Zulassungsverfahren'
     assert values['Muttersprachen'] == language_names[1]
-    assert values['Sprachen Wort'] == language_names[2]
-    assert values['Sprachen Schrift'] == language_names[3]
+    assert values['Arbeitssprache - Wort'] == language_names[2]
+    assert values['Arbeitssprache - Schrift'] == language_names[3]
     assert values['Zertifikate'] == cert_names[1]
 
     # test user account updated
@@ -462,7 +462,7 @@ def test_view_export_translators(client):
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.cell(2, 1).value == 1234
     assert sheet.cell(2, 2).value == (
-        'nicht zertifiziert / Einsatz Dringlichkeit'
+        'nicht akkreditiert / Einsatz Dringlichkeit'
     )
     assert sheet.cell(2, 3).value == 0
     assert sheet.cell(2, 4).value == 0
@@ -984,8 +984,8 @@ def test_view_translator_mutation(client):
     assert 'Zustimmung Namensbekanntgabe: Ja' in page
     assert 'Bewerbung Datum: 2021-01-01' in page
     assert 'Entscheid Datum: 2021-02-02' in page
-    assert 'Sprachen Wort: French, German' in page
-    assert 'Sprachen Schrift: Arabic, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
     assert 'Nachweis der Voraussetzung: Keine' in page
     assert 'Referenzen Behörden: Kanton LU' in page
     assert 'Ausbildung Dolmetscher: Ja' in page
@@ -1008,7 +1008,7 @@ def test_view_translator_mutation(client):
         'Fachkenntnisse nach Berufssparte: andere, '
         'Besondere Hinweise Einsatzm\\u00f6glichkeiten, '
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
-        'Muttersprachen, Sprachen Wort, Sprachen Schrift, '
+        'Muttersprachen, Arbeitssprache - Wort, Arbeitssprache - Schrift, '
         'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page

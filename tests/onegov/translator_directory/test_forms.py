@@ -53,7 +53,7 @@ def test_translator_mutation_form(translator_app):
         drive_distance=1.1,
         expertise_professional_guilds=['economy', 'military'],
         expertise_professional_guilds_other=['Psychology'],
-        expertise_interpreting_types=['whisper', 'written'],
+        expertise_interpreting_types=['whisper', 'negotiation'],
         gender='M',
         iban='CH9300762011623852957',
         operation_comments='Some comment',
@@ -118,7 +118,7 @@ def test_translator_mutation_form(translator_app):
     assert form.expertise_professional_guilds_other.long_description == \
         'Psychology'
     assert form.expertise_interpreting_types.long_description == \
-        '_Whisper interpreting, _Written translations'
+        '_Whisper interpreting, _Negotiation interpreting'
     assert form.proof_of_preconditions.long_description == 'all okay'
     assert form.agency_references.long_description == 'Some ref'
     assert form.education_as_interpreter.long_description == '_No'
@@ -260,7 +260,7 @@ def test_translator_mutation_form(translator_app):
         'written_languages': [str(x.id) for x in languages[2:4]],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'proof_of_preconditions': 'all okay',
         'agency_references': 'Some ref',
         'education_as_interpreter': False,
@@ -285,7 +285,7 @@ def test_translator_mutation_form(translator_app):
     form.model.coordinates = Coordinates()
     assert not form.validate()
     assert form.errors == {
-        'drive_distance': [
+        'coordinates': [
             'Home location is not configured. Please complete location '
             'settings first'
         ]
@@ -323,7 +323,7 @@ def test_translator_mutation_form(translator_app):
         'written_languages': [str(x.id) for x in languages[2:4]],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'proof_of_preconditions': 'all okay',
         'agency_references': 'Some ref',
         'education_as_interpreter': False,
@@ -355,7 +355,7 @@ def test_accreditation_form(translator_app):
     assert 'German' in dict(form.written_languages_ids.choices).values()
     assert '_Military' in \
         dict(form.expertise_professional_guilds.choices).values()
-    assert '_Written translations' in \
+    assert '_Negotiation interpreting' in \
         dict(form.expertise_interpreting_types.choices).values()
 
     # Test validation
@@ -420,7 +420,7 @@ def test_accreditation_form(translator_app):
         'written_languages_ids': [str(languages[2].id)],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'agency_references': 'Some ref',
         'admission_course_completed': False,
         'admission_course_agreement': True,
@@ -441,7 +441,7 @@ def test_accreditation_form(translator_app):
     form.on_request()
     assert not form.validate()
     assert form.errors == {
-        'drive_distance': [
+        'coordinates': [
             'Home location is not configured. Please complete location '
             'settings first'
         ]
@@ -478,7 +478,7 @@ def test_accreditation_form(translator_app):
         'written_languages': [languages[2]],
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
-        'expertise_interpreting_types': ['whisper', 'written'],
+        'expertise_interpreting_types': ['whisper', 'negotiation'],
         'agency_references': 'Some ref',
         'admission': 'uncertified',
         'date_of_application': date.today()

@@ -30,7 +30,7 @@ class DrivingDistanceMixin:
             return coordinate.lat, coordinate.lon
 
         if not self.request.app.coordinates:
-            self.drive_distance.errors.append(
+            self.coordinates.errors.append(
                 _("Home location is not configured. "
                   "Please complete location settings first")
             )
@@ -43,12 +43,12 @@ class DrivingDistanceMixin:
 
         if response.status_code == 422:
             message = response.json()['message']
-            self.drive_distance.errors.append(message)
+            self.coordinates.errors.append(message)
             log.warning(f'ensure_update_driving_distance: {message}')
             return False
 
         if response.status_code != 200:
-            self.drive_distance.errors.append(
+            self.coordinates.errors.append(
                 _('Error in requesting directions from Mapbox (${status})',
                   mapping={'status': response.status_code})
             )
@@ -61,13 +61,13 @@ class DrivingDistanceMixin:
         data = response.json()
 
         if data['code'] == 'NoRoute':
-            self.drive_distance.errors.append(
+            self.coordinates.errors.append(
                 _('Could not find a route. Check the address again')
             )
             return False
 
         if data['code'] == 'NoSegment':
-            self.drive_distance.errors.append(
+            self.coordinates.errors.append(
                 _('Check if the location of the translator is near a road')
             )
             return False

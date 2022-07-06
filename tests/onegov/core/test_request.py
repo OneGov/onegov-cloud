@@ -161,7 +161,7 @@ def test_has_permission(redis_url):
 
         user = request.params.get('user')
         if user:
-            user = Bunch(id=user, group_id=None, role=None)
+            user = Bunch(username=user, group_id=None, role=None)
 
         if request.has_permission(self, permission, user):
             return 'true'

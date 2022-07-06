@@ -114,6 +114,7 @@ def test_import_internal_vote_invalid_values(session):
                     'invalid',
                     'empty',
                     'eligible_voters',
+                    'expats',
                 )),
                 ','.join((
                     'xxx',  # status
@@ -125,6 +126,7 @@ def test_import_internal_vote_invalid_values(session):
                     'xxx',  # invalid
                     'xxx',  # empty
                     'xxx',  # eligible_voters
+                    'xxx',  # expats
                 )),
                 ','.join((
                     'unknown',  # status
@@ -136,6 +138,7 @@ def test_import_internal_vote_invalid_values(session):
                     '1',  # invalid
                     '1',  # empty
                     '0',  # eligible_voters
+                    '0',  # expats
                 )),
                 ','.join((
                     'unknown',  # status
@@ -147,6 +150,7 @@ def test_import_internal_vote_invalid_values(session):
                     '1',  # invalid
                     '1',  # empty
                     '100',  # eligible_voters
+                    '100',  # expats
                 )),
                 ','.join((
                     'unknown',  # status
@@ -158,6 +162,7 @@ def test_import_internal_vote_invalid_values(session):
                     '1',  # invalid
                     '1',  # empty
                     '100',  # eligible_voters
+                    '',  # expats
                 )),
             ))
         ).encode('utf-8')),
@@ -165,12 +170,12 @@ def test_import_internal_vote_invalid_values(session):
     )
 
     errors = sorted(set([(e.line, e.error.interpolate()) for e in errors]))
-    print(errors)
     assert errors == [
         (2, 'Invalid ballot type'),
         (2, 'Invalid integer: eligible_voters'),
         (2, 'Invalid integer: empty'),
         (2, 'Invalid integer: entity_id'),
+        (2, 'Invalid integer: expats'),
         (2, 'Invalid integer: invalid'),
         (2, 'Invalid integer: nays'),
         (2, 'Invalid integer: yeas'),
@@ -346,3 +351,47 @@ def test_import_internal_vote_temporary_results(session):
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
     ) == [1702, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+
+
+def test_import_internal_vote_optional_columns(session):
+    session.add(
+        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+    principal = Canton(canton='zg')
+
+    errors = import_vote_internal(
+        vote, principal,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'status',
+                    'type',
+                    'entity_id',
+                    'counted',
+                    'yeas',
+                    'nays',
+                    'invalid',
+                    'empty',
+                    'eligible_voters',
+                    'expats',
+                )),
+                ','.join((
+                    'unknown',  # status
+                    'proposal',  # type
+                    '1701',  # entity_id
+                    'true',  # counted
+                    '20',  # yeas
+                    '10',  # nays
+                    '0',  # invalid
+                    '0',  # empty
+                    '100',  # eligible_voters
+                    '30',  # expats
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    assert not errors
+    assert vote.proposal.results.filter_by(entity_id='1701').one().expats == 30

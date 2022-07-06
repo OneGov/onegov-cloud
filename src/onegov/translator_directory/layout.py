@@ -68,7 +68,9 @@ class DefaultLayout(BaseLayout):
         return key
 
     def format_interpreting_type(self, key):
-        return self.request.translate(INTERPRETING_TYPES[key])
+        if key in INTERPRETING_TYPES:
+            return self.request.translate(INTERPRETING_TYPES[key])
+        return key
 
 
 class TranslatorLayout(DefaultLayout):
