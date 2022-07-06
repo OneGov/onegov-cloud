@@ -19,6 +19,7 @@
                                     <th i18n:translate="">Native speakers</th>
                                     <th i18n:translate="">Speakers</th>
                                     <th i18n:translate="">Writers</th>
+                                    <th i18n:translate="">Monitors</th>
                                 </thead>
                                 <tbody>
                                     <tr tal:repeat="language languages">
@@ -26,6 +27,7 @@
                                         <td>${language.native_speakers_count}</td>
                                         <td>${language.speakers_count}</td>
                                         <td>${language.writers_count}</td>
+                                        <td>${language.monitors_count}</td>
                                     </tr>
                                 </tbody>
                             </table>

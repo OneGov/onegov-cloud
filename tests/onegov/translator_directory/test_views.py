@@ -438,6 +438,7 @@ def test_view_export_translators(client):
     data = copy.deepcopy(translator_data)
     data['spoken_languages'] = [languages[0]]
     data['written_languages'] = [languages[1]]
+    data['monitoring_languages'] = [languages[2]]
     data['expertise_professional_guilds'] = ['economy']
     data['expertise_professional_guilds_other'] = ['Psychologie', 'Religion']
     data['expertise_interpreting_types'] = ['simultaneous', 'whisper']
@@ -481,13 +482,14 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 29).value == None
     assert sheet.cell(2, 30).value == 'German'
     assert sheet.cell(2, 31).value == 'French'
-    assert sheet.cell(2, 32).value == 'Wirtschaft|Psychologie|Religion'
-    assert sheet.cell(2, 33).value == 'Simultandolmetschen|Flüsterdolmetschen'
-    assert sheet.cell(2, 34).value == 'all okay'
-    assert sheet.cell(2, 35).value == 'Some ref'
-    assert sheet.cell(2, 36).value == 0
-    assert sheet.cell(2, 37).value == None
+    assert sheet.cell(2, 32).value == 'Italian'
+    assert sheet.cell(2, 33).value == 'Wirtschaft|Psychologie|Religion'
+    assert sheet.cell(2, 34).value == 'Simultandolmetschen|Flüsterdolmetschen'
+    assert sheet.cell(2, 35).value == 'all okay'
+    assert sheet.cell(2, 36).value == 'Some ref'
+    assert sheet.cell(2, 37).value == 0
     assert sheet.cell(2, 38).value == None
+    assert sheet.cell(2, 39).value == None
 
 
 def test_file_security(client):

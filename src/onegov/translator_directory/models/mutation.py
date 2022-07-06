@@ -107,6 +107,7 @@ class TranslatorMutation:
             'mother_tongues': LANGUAGES,
             'spoken_languages': LANGUAGES,
             'written_languages': LANGUAGES,
+            'monitoring_languages': LANGUAGES,
             'certificates': CERTIFICATES
         }
 
@@ -146,6 +147,7 @@ class TranslatorMutation:
             'mother_tongues': _('Mother tongues'),
             'spoken_languages': _('Spoken languages'),
             'written_languages': _('Written languages'),
+            'monitoring_languages': _('Monitoring languages'),
             'expertise_professional_guilds': _(
                 'Expertise by professional guild'
             ),
@@ -168,7 +170,8 @@ class TranslatorMutation:
             if item in self.changes:
                 changes = self.changes[item]
                 if item in (
-                    'mother_tongues', 'spoken_languages', 'written_languages'
+                    'mother_tongues', 'spoken_languages', 'written_languages',
+                    'monitoring_languages'
                 ):
                     changes = self.language_collection.by_ids(changes)
                 if item == 'certificates':
