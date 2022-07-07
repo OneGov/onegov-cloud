@@ -518,9 +518,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     def linkify(self, text):
-        # translate the text before applying linkify if it's a 
-        # translation string
         if isinstance(text, TranslationString):
+            # translate the text before applying linkify if it's a
+            # translation string
             text = self.request.translate(text)
         return linkify(text).replace('\n', '<br>') if text else text
 
