@@ -2,7 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sqlalchemy import Column, Boolean, Text
+from sqlalchemy import Column, Boolean
 
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
