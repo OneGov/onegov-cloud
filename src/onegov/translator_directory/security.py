@@ -119,10 +119,13 @@ def restrict_ticket(app, identity, model, permission):
 @TranslatorDirectoryApp.permission_rule(
     model=Ticket, permission=object, identity=None)
 def restrict_ticket_anon(app, identity, model, permission):
-    if permission == Public and isinstance(model, AccreditationTicket):
-        return True
-
     return False
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=AccreditationTicket, permission=object, identity=None)
+def restrict_accreditation_ticket_anon(app, identity, model, permission):
+    return permission == Public
 
 
 @TranslatorDirectoryApp.permission_rule(
