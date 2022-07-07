@@ -59,6 +59,7 @@ from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
+from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -314,6 +315,11 @@ def get_ticket_note(app, id):
 @OrgApp.path(model=ResourceCollection, path='/resources')
 def get_resources(app):
     return app.libres_resources
+
+
+@OrgApp.path(model=FindYourSpotCollection, path='/find-your-spot')
+def get_find_my_spot(app, group=None):
+    return FindYourSpotCollection(app.libres_context, group=group)
 
 
 @OrgApp.path(model=Resource, path='/resource/{name}', converters=dict(

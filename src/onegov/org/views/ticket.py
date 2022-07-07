@@ -15,12 +15,14 @@ from onegov.org.forms import InternalTicketChatMessageForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
+from onegov.org.layout import FindYourSpotLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
+from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
@@ -30,6 +32,7 @@ from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
 from sqlalchemy import select
+from webob import exc
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -882,4 +885,28 @@ def view_archived_tickets(self, request, layout=None):
         'handler': handler,
         'owner': owner,
         'action_link': action_link
+    }
+
+
+@OrgApp.html(model=FindYourSpotCollection, name='tickets',
+             template='pending_tickets.pt', permission=Public)
+def view_pending_tickets(self, request, layout=None):
+    pending = request.browser_session.get('reservation_tickets', {})
+    ticket_ids = pending.get(self.group or '', [])
+    if not ticket_ids:
+        raise exc.HTTPForbidden()
+
+    # nocheckin
+    ticket_ids = [t.id if isinstance(t, Ticket) else t for t in ticket_ids]
+    pending[self.group] = ticket_ids
+    request.browser_session.reservation_tickets = pending
+
+    query = request.session.query(Ticket)
+    query = query.filter(Ticket.id.in_(ticket_ids))
+    tickets = query.all()
+
+    return {
+        'title': _("Submitted Requests"),
+        'layout': layout or FindYourSpotLayout(self, request),
+        'tickets': tickets,
     }

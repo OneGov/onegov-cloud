@@ -3,9 +3,9 @@ import morepath
 import sedate
 
 from collections import OrderedDict, namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
-from itertools import groupby
+from itertools import groupby, islice
 from morepath.request import Response
 from onegov.core.security import Public, Private
 from onegov.core.utils import module_path
@@ -16,13 +16,17 @@ from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.org import _, OrgApp, utils
 from onegov.org.elements import Link
 from onegov.org.forms import (
-    ResourceForm, ResourceCleanupForm, ResourceExportForm
+    FindYourSpotForm, ResourceForm, ResourceCleanupForm, ResourceExportForm
 )
-from onegov.org.layout import ResourcesLayout, ResourceLayout
-from onegov.org.models.resource import DaypassResource, RoomResource, \
-    ItemResource
+from onegov.org.layout import (
+    FindYourSpotLayout, ResourcesLayout, ResourceLayout
+)
+from onegov.org.models.resource import (
+    DaypassResource, FindYourSpotCollection, RoomResource, ItemResource
+)
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.ticket import Ticket, TicketCollection
+from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, select
@@ -74,15 +78,179 @@ def get_resource_form(self, request, type=None):
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request, layout=None):
+    default_group = request.translate(_("General"))
+    grouped = group_by_column(
+        request=request,
+        query=self.query(),
+        default_group=default_group,
+        group_column=Resource.group,
+        sort_column=Resource.title
+    )
+
+    def contains_at_least_one_room(resources):
+        for resource in resources:
+            if resource.type == 'room':
+                return True
+        return False
+
+    for group, entries in grouped.items():
+        # don't include find-your-spot link for categories with
+        # no rooms
+        if not contains_at_least_one_room(entries):
+            continue
+
+        entries.insert(0, FindYourSpotCollection(
+            request.app.libres_context,
+            group=None if group == default_group else group
+        ))
+
     return {
         'title': _("Reservations"),
-        'resources': group_by_column(
-            request=request,
-            query=self.query(),
-            group_column=Resource.group,
-            sort_column=Resource.title
-        ),
+        'resources': grouped,
         'layout': layout or ResourcesLayout(self, request)
+    }
+
+
+@OrgApp.form(model=FindYourSpotCollection, template='find_your_spot.pt',
+             permission=Public, form=FindYourSpotForm)
+def view_find_your_spot(self, request, form, layout=None):
+    # HACK: Focus results
+    form.action += '#results'
+    room_slots = None
+    rooms = sorted(
+        request.exclude_invisible(self.query()),
+        key=attrgetter('title')
+    )
+    if not rooms:
+        # we'll treat categories without rooms as non-existant
+        raise exc.HTTPNotFound()
+
+    form.apply_rooms(rooms)
+    if form.submitted(request):
+        room_slots = {}
+        if form.rooms:
+            # filter rooms according to the form selection
+            rooms = [room for room in rooms if room.id in form.rooms.data]
+
+        whole_day = form.whole_day.data
+        start_time = form.start_time.data
+        end_time = form.end_time.data
+        start = datetime.combine(form.start.data, start_time)
+        end = datetime.combine(form.end.data, end_time)
+        # FIXME: we probably should coerce the value to int in the form
+        #        itself, the only reason we don't do that currently is
+        #        that probably the person before me didn't know about
+        #        WTForm's coerce argument
+        days = [int(d) for d in form.weekdays.data]
+        for room in rooms:
+            room.bind_to_libres_context(request.app.libres_context)
+            for allocation in room.scheduler.search_allocations(
+                    start, end, days=days, whole_day=whole_day, strict=True):
+
+                date = allocation.display_start().date()
+                if form.is_excluded(date):
+                    # TODO: Do we want to show excluded dates?
+                    continue
+
+                slots = room_slots.setdefault(date, {}).setdefault(room.id, [])
+                target_start, target_end = sedate.get_date_range(
+                    allocation.display_start(),
+                    start_time,
+                    end_time
+                )
+                if not allocation.partly_available:
+                    quota_left = allocation.quota_left
+                    slots.append(utils.FindYourSpotEventInfo(
+                        allocation,
+                        None,  # won't be displayed
+                        quota_left / allocation.quota,
+                        quota_left,
+                        request
+                    ))
+                    continue
+                elif whole_day == 'yes':
+                    # a room that is partly available should never
+                    # have its quota set to higher than 1!
+                    assert allocation.quota == 1
+                    availability = allocation.availability
+                    slots.append(utils.FindYourSpotEventInfo(
+                        allocation,
+                        None,  # won't be displayed
+                        availability,
+                        1 if availability >= 5.0 else 0,
+                        request
+                    ))
+                    continue
+
+                free = allocation.free_slots(target_start, target_end)
+                if not free:
+                    slots.append(utils.FindYourSpotEventInfo(
+                        allocation,
+                        None,  # won't be displayed
+                        0,
+                        0,
+                        request
+                    ))
+                    continue
+
+                target_range = (target_end - target_start)
+                slot_start, slot_end = free[0]
+                slot_end += time.resolution
+                for next_slot_start, next_slot_end in islice(free, 1, None):
+                    if slot_end != next_slot_start:
+                        availability = (slot_end - slot_start) / target_range
+                        availability *= 100.0
+                        slots.append(utils.FindYourSpotEventInfo(
+                            allocation,
+                            (sedate.to_timezone(
+                                slot_start, allocation.timezone),
+                                sedate.to_timezone(
+                                    slot_end, allocation.timezone)),
+                            availability,
+                            1 if availability >= 5.0 else 0,
+                            request
+                        ))
+                        slot_start = next_slot_start
+
+                    # expand slot end
+                    slot_end = next_slot_end + time.resolution
+
+                # add final slot
+                availability = (slot_end - slot_start) / target_range
+                availability *= 100.0
+                slots.append(utils.FindYourSpotEventInfo(
+                    allocation,
+                    (sedate.to_timezone(slot_start, allocation.timezone),
+                     sedate.to_timezone(slot_end, allocation.timezone)),
+                    availability,
+                    1 if availability >= 5.0 else 0,
+                    request
+                ))
+
+    if room_slots:
+        request.include('reservationlist')
+
+    return {
+        'title': _("Find Your Spot"),
+        'form': form,
+        'rooms': rooms,
+        'room_slots': room_slots,
+        'layout': layout or FindYourSpotLayout(self, request)
+    }
+
+
+@OrgApp.json(model=FindYourSpotCollection, name='reservations',
+             permission=Public)
+def get_find_your_spot_reservations(self, request):
+    return {
+        'reservations': sorted(
+            (utils.ReservationInfo(resource, reservation, request).as_dict()
+                for resource in request.exclude_invisible(self.query())
+                for reservation in resource.bound_reservations(request)),
+            key=itemgetter('date')
+        ),
+        # no predictions in the list
+        'prediction': None
     }
 
 
