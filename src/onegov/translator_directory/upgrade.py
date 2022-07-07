@@ -4,7 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import Column, Boolean, Enum, Text
+from sqlalchemy import Column, Boolean, Enum
 
 
 @upgrade_task('Change withholding tax column to boolean')
