@@ -40,7 +40,7 @@ editor_can_see = member_can_see + (
 )
 
 translator_can_see = editor_can_see + (
-    'current_profession',
+    'occupation',
     'operation_comments',
     'confirm_name_reveal',
     'date_of_application',
@@ -89,7 +89,7 @@ field_order = (
     'spoken_languages',
     'written_languages',
     'monitoring_languages',
-    'current_profession',
+    'occupation',
     'proof_of_preconditions',
     'agency_references',
     'education_as_interpreter',

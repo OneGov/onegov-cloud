@@ -115,7 +115,7 @@ def test_translator_mutation_form(translator_app):
     assert form.spoken_languages.long_description == '_French, _Italian'
     assert form.written_languages.long_description == '_Italian, _Arabic'
     assert form.monitoring_languages.long_description == '_Arabic'
-    assert form.current_profession.long_description == 'baker'
+    assert form.occupation.long_description == 'baker'
     assert form.expertise_professional_guilds.long_description == \
         '_Economy, _Military'
     assert form.expertise_professional_guilds_other.long_description == \
@@ -260,7 +260,7 @@ def test_translator_mutation_form(translator_app):
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
         'monitoring_languages': [str(x.id) for x in languages[3:4]],
-        'current_profession': 'baker',
+        'occupation': 'baker',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
         'expertise_interpreting_types': ['whisper', 'negotiation'],
@@ -325,7 +325,7 @@ def test_translator_mutation_form(translator_app):
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
         'monitoring_languages': [str(x.id) for x in languages[3:4]],
-        'current_profession': 'baker',
+        'occupation': 'baker',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
         'expertise_interpreting_types': ['whisper', 'negotiation'],
@@ -418,8 +418,8 @@ def test_accreditation_form(translator_app):
         'tel_mobile': '079 000 00 00',
         'availability': '24h',
         'confirm_name_reveal': True,
-        'learned_profession': 'Baker',
-        'current_profession': 'Reporter',
+        'profession': 'Baker',
+        'occupation': 'Reporter',
         'education_as_interpreter': False,
         'mother_tongues_ids': [str(languages[0].id)],
         'spoken_languages_ids': [str(languages[1].id)],
@@ -484,7 +484,7 @@ def test_accreditation_form(translator_app):
         'spoken_languages': [languages[1]],
         'written_languages': [languages[2]],
         'monitoring_languages': [languages[3]],
-        'current_profession': 'Reporter',
+        'occupation': 'Reporter',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
         'expertise_interpreting_types': ['whisper', 'negotiation'],
@@ -521,7 +521,7 @@ def test_accreditation_form(translator_app):
     assert form.get_ticket_data() == {
         'hometown': 'Zug',
         'marital_status': 'married',
-        'learned_profession': 'Baker',
+        'profession': 'Baker',
         'admission_course_completed': False,
         'admission_course_agreement': True,
         'remarks': 'Some remarks',

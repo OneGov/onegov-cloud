@@ -71,17 +71,6 @@ def add_unique_constraint_to_translator_email(context):
         )
 
 
-@upgrade_task('Add current proffesion column')
-def add_current_profession_column(context):
-    if not context.has_table('translators'):
-        return
-    if not context.has_column('translators', 'current_profession'):
-        context.operations.add_column(
-            'translators',
-            Column('current_profession', Text),
-        )
-
-
 @upgrade_task('Add translator type')
 def add_translator_type(context):
     if not context.has_column('translators', 'state'):

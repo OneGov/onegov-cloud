@@ -144,10 +144,10 @@
         <h3 i18n:translate>Training</h3>
         <dl class="accreditation">
             <dt i18n:translate>Learned profession</dt>
-            <dd>${ticket_data.get('learned_profession')}</dd>
+            <dd>${ticket_data.get('profession')}</dd>
 
             <dt i18n:translate>Current professional activity</dt>
-            <dd>${translator.current_profession}</dd>
+            <dd>${translator.occupation}</dd>
 
             <dt i18n:translate>Education as interpreter</dt>
             <dd class="education-as-interpreter">${layout.format_boolean(translator.education_as_interpreter)}</dd>

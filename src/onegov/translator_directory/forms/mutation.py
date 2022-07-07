@@ -356,7 +356,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         validators=[Optional()],
     )
 
-    current_profession = StringField(
+    occupation = StringField(
         label=_('Current professional activity'),
         fieldset=_('Proposed changes'),
     )

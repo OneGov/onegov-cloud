@@ -217,13 +217,13 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         fieldset=_('Legal')
     )
 
-    learned_profession = StringField(
+    profession = StringField(
         label=_('Learned profession'),
         fieldset=_('Training'),
         validators=[InputRequired()],
     )
 
-    current_profession = StringField(
+    occupation = StringField(
         label=_('Current professional activity'),
         fieldset=_('Training'),
         validators=[InputRequired()],
@@ -607,7 +607,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'availability',
                 'confirm_name_reveal',
                 'education_as_interpreter',
-                'current_profession',
+                'occupation',
                 'expertise_professional_guilds',
                 'expertise_professional_guilds_other',
                 'expertise_interpreting_types',
@@ -658,7 +658,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             key: data.get(key) for key in (
                 'hometown',
                 'marital_status',
-                'learned_profession',
+                'profession',
                 'admission_course_completed',
                 'admission_course_agreement',
                 'remarks',

@@ -680,7 +680,7 @@ def test_view_translator_mutation(client):
     page.form['operation_comments'] = 'No operation comments'
     page.form['confirm_name_reveal'] = False
     page.form['date_of_application'] = '2020-01-01'
-    page.form['current_profession'] = 'Bäcker'
+    page.form['occupation'] = 'Bäcker'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
     page.form['certificates_ids'] = cert_ids[0:1]
@@ -947,7 +947,7 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = True
     page.form['date_of_application'] = '2021-01-01'
     page.form['date_of_decision'] = '2021-02-02'
-    page.form['current_profession'] = 'Bauarbeiter'
+    page.form['occupation'] = 'Bauarbeiter'
     page.form['proof_of_preconditions'] = 'Keine'
     page.form['agency_references'] = 'Kanton LU'
     page.form['education_as_interpreter'] = True
@@ -1143,8 +1143,8 @@ def test_view_accreditation(client):
         page.form['tel_mobile'] = '079 000 00 00'
         page.form['availability'] = '24h'
         page.form['confirm_name_reveal'] = True
-        page.form['learned_profession'] = 'Baker'
-        page.form['current_profession'] = 'Reporter'
+        page.form['profession'] = 'Baker'
+        page.form['occupation'] = 'Reporter'
         page.form['education_as_interpreter'] = False
         page.form['mother_tongues_ids'] = language_ids[0:1]
         page.form['spoken_languages_ids'] = language_ids[1:2]
