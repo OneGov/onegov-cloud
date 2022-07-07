@@ -32,7 +32,7 @@ translator_data = dict(
     tel_office='041 444 44 44',
     tel_private=None,
     availability='always',
-    current_profession='baker',
+    occupation='baker',
     operation_comments='',
     confirm_name_reveal=None,
     date_of_application=date.today() - timedelta(days=100),

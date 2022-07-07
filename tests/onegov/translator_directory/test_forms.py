@@ -95,7 +95,7 @@ def test_translator_mutation_form(translator_app):
     assert form.spoken_languages.long_description == '_French, _Italian'
     assert form.written_languages.long_description == '_Italian, _Arabic'
     assert form.monitoring_languages.long_description == '_Arabic'
-    assert form.current_profession.long_description == 'baker'
+    assert form.occupation.long_description == 'baker'
     assert form.expertise_professional_guilds.long_description == \
         '_Economy, _Military'
     assert form.expertise_professional_guilds_other.long_description == \
@@ -240,7 +240,7 @@ def test_translator_mutation_form(translator_app):
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
         'monitoring_languages': [str(x.id) for x in languages[3:4]],
-        'current_profession': 'baker',
+        'occupation': 'baker',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
         'expertise_interpreting_types': ['whisper', 'negotiation'],
@@ -305,7 +305,7 @@ def test_translator_mutation_form(translator_app):
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
         'monitoring_languages': [str(x.id) for x in languages[3:4]],
-        'current_profession': 'baker',
+        'occupation': 'baker',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
         'expertise_interpreting_types': ['whisper', 'negotiation'],

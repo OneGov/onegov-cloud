@@ -152,9 +152,9 @@
                                     </span>
                                 </dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.current_profession and layout.show('current_profession')">
+                            <dl class="field-display" tal:condition="model.occupation and layout.show('occupation')">
                                 <dt i18n:translate>Current professional activity</dt>
-                                <dd >${model.current_profession}</dd>
+                                <dd >${model.occupation}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
                                 <dt i18n:translate>Proof of preconditions</dt>

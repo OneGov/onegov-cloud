@@ -224,7 +224,7 @@ def export_translator_directory(self, request):
             format_languages(trs.spoken_languages),
             format_languages(trs.written_languages),
             format_languages(trs.monitoring_languages),
-            trs.current_profession or '',
+            trs.occupation or '',
             format_guilds(trs.expertise_professional_guilds_all),
             format_interpreting_types(trs.expertise_interpreting_types),
             trs.proof_of_preconditions or '',

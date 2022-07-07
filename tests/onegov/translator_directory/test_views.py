@@ -667,7 +667,7 @@ def test_view_translator_mutation(client):
     page.form['date_of_application'] = '2020-01-01'
     page.form['spoken_languages_ids'] = language_ids[1:2]
     page.form['written_languages_ids'] = language_ids[2:3]
-    page.form['current_profession'] = 'Bäcker'
+    page.form['occupation'] = 'Bäcker'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
     page.form['certificates_ids'] = cert_ids[0:1]
@@ -899,7 +899,7 @@ def test_view_translator_mutation(client):
     page.form['date_of_decision'] = '2021-02-02'
     page.form['spoken_languages'] = language_ids[0:2]
     page.form['written_languages'] = language_ids[2:4]
-    page.form['current_profession'] = 'Bauarbeiter'
+    page.form['occupation'] = 'Bauarbeiter'
     page.form['proof_of_preconditions'] = 'Keine'
     page.form['agency_references'] = 'Kanton LU'
     page.form['education_as_interpreter'] = True
