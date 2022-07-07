@@ -5,6 +5,7 @@ from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.org.models import Organisation
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
@@ -458,3 +459,63 @@ class AddLanguageLayout(LanguageLayout):
     @property
     def editbar_links(self):
         return []
+
+
+class AccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.link(self.model.ticket)
+            )
+        )
+        return links
+
+
+class RequestAccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.class_link(
+                    Organisation, name='request-accreditation'
+                )
+            )
+        )
+        return links
+
+
+class GrantAccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.link(self.model.ticket)
+            )
+        )
+        links.append(Link(_('Grant accreditation')))
+        return links
+
+
+class RefuseAccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.link(self.model.ticket)
+            )
+        )
+        links.append(Link(_('Refuse accreditation')))
+        return links

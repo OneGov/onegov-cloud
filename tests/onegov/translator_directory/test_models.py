@@ -1,17 +1,20 @@
 from datetime import date
+from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.gis import Coordinates
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.ticket import \
     TranslatorMutationTicket
+from onegov.translator_directory.models.translator import Translator
 from onegov.user import User
 from onegov.user import UserCollection
-from onegov.translator_directory.models.translator import Translator
 from tests.onegov.translator_directory.shared import create_certificates
 from tests.onegov.translator_directory.shared import create_languages
+from tests.onegov.translator_directory.shared import create_translator
 from tests.onegov.translator_directory.shared import translator_data
 
 
@@ -24,6 +27,7 @@ def test_translator_model(translator_app):
     translator = translators.add(**translator_data, mother_tongues=[langs[0]])
     assert not translator.files
 
+    assert translator.state == 'published'
     assert translator.mother_tongues
     assert not translator.spoken_languages
     assert not translator.written_languages
@@ -410,3 +414,48 @@ def test_translator_mutation(session):
     session.expire_all()
     assert translator.first_name == 'First Name'
     assert translator.last_name == 'Last Name'
+
+
+def test_accreditation(translator_app):
+    session = translator_app.session()
+    translator = create_translator(translator_app, state='proposed')
+    ticket = AccreditationTicket(
+        number='AKK-1000-0000',
+        title='AKK-1000-0000',
+        group='AKK-1000-0000',
+        handler_id='1',
+        handler_data={
+            'handler_data': {
+                'id': str(translator.id),
+                'submitter_email': 'translator@example.org',
+                'hometown': 'Luzern'
+            }
+        }
+    )
+    session.add(ticket)
+    session.flush()
+    accreditation = ticket.handler.accreditation
+
+    assert translator.state == 'proposed'
+    assert ticket.handler.translator == translator
+    assert not ticket.handler.deleted
+    assert ticket.handler.email == 'translator@example.org'
+    assert ticket.handler.state is None
+    assert ticket.handler.title == 'Benito, Hugo'
+    assert ticket.handler.subtitle == 'Request Accreditation'
+    assert ticket.handler.group == 'Accreditation'
+    assert accreditation.target == translator
+    assert accreditation.ticket == ticket
+
+    with freeze_time('2026-01-01') as today:
+        accreditation.grant()
+        assert ticket.handler.state == 'granted'
+        assert translator.state == 'published'
+        assert translator.date_of_decision == today().date()
+        assert session.query(Translator).count() == 1
+
+    with freeze_time('2025-01-01') as today:
+        accreditation.refuse()
+        assert ticket.handler.state == 'refused'
+        assert session.query(Translator).count() == 0
+        assert ticket.handler.deleted

@@ -45,6 +45,16 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    state = Column(
+        Enum(
+            'proposed',
+            'published',
+            name='translator_state'
+        ),
+        nullable=False,
+        default='published'
+    )
+
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
 

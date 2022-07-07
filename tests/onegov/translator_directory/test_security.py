@@ -20,6 +20,9 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
 from onegov.translator_directory.models.language import Language
+from onegov.translator_directory.models.accreditation import Accreditation
+from onegov.translator_directory.models.mutation import TranslatorMutation
+from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.ticket import TranslatorMutationTicket
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.models.voucher import TranslatorVoucherFile
@@ -267,6 +270,15 @@ def test_security_permissions(translator_app):
     assert_no_access(users['anonymous'], model)  # restricted
     assert_no_access(None, model)
 
+    # AccreditationTicket
+    model = AccreditationTicket(handler_code='AKK')
+    assert_admin(users['admin'], model)
+    assert_anonymous(users['editor'], model)  # restricted
+    assert_anonymous(users['member'], model)  # restricted
+    assert_anonymous(users['translator'], model)  # restricted
+    assert_anonymous(users['anonymous'], model)  # restricted
+    assert_anonymous(None, model)
+
     # TranslatorMutationTicket
     model = TranslatorMutationTicket(
         handler_code='TRN',
@@ -314,3 +326,21 @@ def test_security_permissions(translator_app):
     assert_anonymous(users['translator'], model)  # elevated
     assert_no_access(users['anonymous'], model)  # restricted
     assert_no_access(None, model)
+
+    # Accreditation
+    model = Accreditation(None, None, None)
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
+    assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
+
+    # TranslatorMutation
+    model = TranslatorMutation(None, None, None)
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
+    assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)

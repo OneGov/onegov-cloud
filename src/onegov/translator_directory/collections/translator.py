@@ -28,7 +28,8 @@ class TranslatorCollection(GenericCollection, Pagination):
             user_role=None,
             search=None,
             guilds=None,
-            interpret_types=None
+            interpret_types=None,
+            state='published'
     ):
         super().__init__(app.session())
         self.app = app
@@ -37,6 +38,7 @@ class TranslatorCollection(GenericCollection, Pagination):
         self.search = self.truncate(search, maxchars=full_text_max_chars)
         self.guilds = guilds or []
         self.interpret_types = interpret_types or []
+        self.state = state
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
@@ -66,11 +68,12 @@ class TranslatorCollection(GenericCollection, Pagination):
             self.interpret_types == other.interpret_types
         ))
 
-    def add(self, **kwargs):
+    def add(self, update_user=True, **kwargs):
         coordinates = kwargs.pop('coordinates', Coordinates())
         item = super().add(**kwargs)
         item.coordinates = coordinates
-        self.update_user(item, item.email)
+        if update_user:
+            self.update_user(item, item.email)
         self.session.flush()
         return item
 
@@ -231,8 +234,10 @@ class TranslatorCollection(GenericCollection, Pagination):
 
     def query(self):
         query = super().query()
+
         if self.spoken_langs:
             query = query.filter(and_(*self.by_spoken_lang_expression))
+
         if self.written_langs:
             query = query.filter(and_(*self.by_written_lang_expression))
 
@@ -247,6 +252,9 @@ class TranslatorCollection(GenericCollection, Pagination):
 
         if self.guilds:
             query = query.filter(and_(*self.by_professional_guilds_expression))
+
+        if self.state:
+            query = query.filter(Translator.state == self.state)
 
         query = query.order_by(self.order_expression)
         return query

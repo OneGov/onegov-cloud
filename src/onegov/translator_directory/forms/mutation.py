@@ -371,7 +371,6 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     expertise_professional_guilds_other = TagsField(
         label=_('Expertise by professional guild: other'),
         fieldset=_('Proposed changes'),
-        render_kw={'show_help': True}
     )
 
     expertise_interpreting_types = ChosenSelectMultipleField(

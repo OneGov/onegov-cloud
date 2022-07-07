@@ -9,6 +9,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.models.translator import GENDERS
 
 translator_data = dict(
+    state='published',
     pers_id=1234,
     first_name='Hugo',
     last_name='Benito',

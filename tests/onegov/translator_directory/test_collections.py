@@ -70,6 +70,12 @@ def test_translator_collection_search(translator_app):
     translators.guilds = ['Geologie']
     assert translators.query().all() == [mary]
 
+    # state
+    seba.state = 'proposed'
+    translators.guilds = []
+    translators.state = 'proposed'
+    assert translators.query().all() == [seba]
+
 
 def test_translator_collection(translator_app):
     session = translator_app.session()
@@ -155,10 +161,13 @@ def test_translator_collection_update(translator_app):
     # Create
     translator_a = collection.add(first_name='A', last_name='A', email=None)
     translator_b = collection.add(first_name='B', last_name='B', email='b@b.b')
+    translator_x = collection.add(first_name='C', last_name='C', email='x@x.x',
+                                  update_user=False)
     assert not translator_a.user
     assert translator_b.user.username == 'b@b.b'
     assert translator_b.user.role == 'translator'
     assert translator_b.user.active
+    assert not translator_x.user
 
     # Correct role and state
     translator_b.user.active = False
