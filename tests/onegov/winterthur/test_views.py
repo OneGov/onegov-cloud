@@ -1,10 +1,13 @@
 import transaction
 
-from sedate import utcnow
-from freezegun import freeze_time
 from datetime import timedelta
+from freezegun import freeze_time
+from io import BytesIO
+from mock import patch
 from onegov.winterthur.collections import AddressCollection
+from sedate import utcnow
 from tests.shared import Client as BaseClient
+from webtest import Upload
 
 
 class Client(BaseClient):
@@ -56,3 +59,21 @@ def test_view_addresses_update_info(
     with freeze_time(utcnow() + timedelta(days=2)):
         page = client.get('/streets')
         assert "failed" in page
+
+
+def test_view_shift_schedule(winterthur_app):
+    client = Client(winterthur_app)
+    client.login_admin()
+
+    page = client.get('/files/shift-schedule')
+    assert 'img' not in page
+
+    with patch('onegov.winterthur.app.WinterthurApp.get_shift_schedule_image',
+               return_value=BytesIO()):
+
+        page = client.get('/files')
+        page.form['file'] = Upload('Test2.pdf', b'File content.')
+        page.form.submit()
+
+        page = client.get('/files/shift-schedule')
+        assert 'img' in page
