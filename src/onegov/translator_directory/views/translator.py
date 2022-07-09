@@ -37,6 +37,10 @@ from xlsxwriter import Workbook
 )
 def add_new_translator(self, request, form):
 
+    form.delete_field('date_of_decision')
+    form.delete_field('for_admins_only')
+    form.delete_field('proof_of_preconditions')
+
     if form.submitted(request):
         data = form.get_useful_data()
         translator = self.add(**data)
@@ -174,6 +178,8 @@ def export_translator_directory(self, request):
         request.translate(_("Mother tongues")),
         request.translate(_("Spoken languages")),
         request.translate(_("Written languages")),
+        request.translate(_("Monitoring languages")),
+        request.translate(_("Current professional activity")),
         request.translate(_("Expertise by professional guild")),
         request.translate(_("Expertise by interpreting type")),
         request.translate(_("Proof of preconditions")),
@@ -217,6 +223,8 @@ def export_translator_directory(self, request):
             format_languages(trs.mother_tongues),
             format_languages(trs.spoken_languages),
             format_languages(trs.written_languages),
+            format_languages(trs.monitoring_languages),
+            trs.occupation or '',
             format_guilds(trs.expertise_professional_guilds_all),
             format_interpreting_types(trs.expertise_interpreting_types),
             trs.proof_of_preconditions or '',

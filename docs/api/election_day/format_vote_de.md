@@ -81,6 +81,7 @@ Name|Beschreibung
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
+`expats`|Anzahl Auslandschweizer. Optional.
 
 
 #### Temporäre Resultate
@@ -140,8 +141,7 @@ Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschi
 In der Format-Spezifikation der Datei `SG_Geschaefte.csv` befinden sich folgende Spalten:
 
 - `Ausmittlungsstand`: Wird vom Benutzer am Wabsti-Client ausgelöst für die gesamte Datenlieferung
-- `AnzGdePendent`: Indikator, ob die Einzelwahl abgeschlossen ist, auch wenn mehrere Wahlen in der Datenlierung sind. 
+- `AnzGdePendent`: Indikator, ob die Einzelwahl abgeschlossen ist, auch wenn mehrere Wahlen in der Datenlierung sind.
 
 Seit 2020 wird `AnzGdePendent` statt `Ausmittlungsstand` dazu verwendet, um den Status der Gesamtwahl zu setzen.
-Der Status ist `final` wenn `AnzGdePendent = 0` ist. 
- 
+Der Status ist `final` wenn `AnzGdePendent = 0` ist.

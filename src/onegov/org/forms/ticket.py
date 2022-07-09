@@ -95,5 +95,8 @@ class TicketAssignmentForm(Form):
                 else user.title
             )
             for user in UserCollection(self.request.session).query()
-            if self.request.has_permission(self.model, Private, user)
+            if (
+                self.request.has_permission(self.model, Private, user)
+                and user.active == True
+            )
         ]

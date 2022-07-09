@@ -1,44 +1,63 @@
 from datetime import date
+from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.gis import Coordinates
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.ticket import \
     TranslatorMutationTicket
+from onegov.translator_directory.models.translator import Translator
 from onegov.user import User
 from onegov.user import UserCollection
-from onegov.translator_directory.models.translator import Translator
 from tests.onegov.translator_directory.shared import create_certificates
 from tests.onegov.translator_directory.shared import create_languages
+from tests.onegov.translator_directory.shared import create_translator
 from tests.onegov.translator_directory.shared import translator_data
 
 
-def test_translator(translator_app):
+def test_translator_model(translator_app):
     session = translator_app.session()
     langs = create_languages(session)
     assert all((lang.deletable for lang in langs))
 
     translators = TranslatorCollection(translator_app)
     translator = translators.add(**translator_data, mother_tongues=[langs[0]])
+    assert not translator.files
 
+    assert translator.state == 'published'
     assert translator.mother_tongues
     assert not translator.spoken_languages
-    spoken = langs[0]
+    assert not translator.written_languages
+    assert not translator.monitoring_languages
+
+    native = langs[0]
+    assert native.mother_tongues == [translator]
+    assert native.native_speakers_count == 1
+    assert not native.deletable
+
+    spoken = langs[1]
     translator.spoken_languages.append(spoken)
     assert translator.spoken_languages
     assert spoken.speakers == [translator]
     assert spoken.speakers_count == 1
     assert not spoken.deletable
 
-    written = langs[1]
+    written = langs[2]
     translator.written_languages.append(written)
     assert written.writers == [translator]
     assert written.writers_count == 1
     assert translator.written_languages == [written]
-    assert not translator.files
     assert not written.deletable
+
+    monitoring = langs[3]
+    translator.monitoring_languages.append(monitoring)
+    assert monitoring.monitors == [translator]
+    assert monitoring.monitors_count == 1
+    assert translator.monitoring_languages == [monitoring]
+    assert not monitoring.deletable
 
     cert = LanguageCertificateCollection(session).add(name='TestCert')
     translator.certificates.append(cert)
@@ -163,6 +182,7 @@ def test_translator_mutation(session):
         'mother_tongues': [str(l.id) for l in languages[2:3]],
         'spoken_languages': [],
         'written_languages': [str(l.id) for l in languages[1:2]],
+        'monitoring_languages': [str(l.id) for l in languages[0:1]],
         'expertise_professional_guilds': (
             'internation_relations',
             'law_insurance'
@@ -327,6 +347,11 @@ def test_translator_mutation(session):
             '_French',
             [str(l.id) for l in languages[1:2]]
         ),
+        'monitoring_languages': (
+            '_Monitoring languages',
+            '_German',
+            [str(l.id) for l in languages[0:1]]
+        ),
         'zip_code': ('_Zip Code', '8000', '8000')
     }
 
@@ -368,6 +393,7 @@ def test_translator_mutation(session):
     assert translator.mother_tongues == languages[2:3]
     assert translator.spoken_languages == []
     assert translator.written_languages == languages[1:2]
+    assert translator.monitoring_languages == languages[0:1]
     assert translator.expertise_professional_guilds == [
         'internation_relations',
         'law_insurance'
@@ -388,3 +414,48 @@ def test_translator_mutation(session):
     session.expire_all()
     assert translator.first_name == 'First Name'
     assert translator.last_name == 'Last Name'
+
+
+def test_accreditation(translator_app):
+    session = translator_app.session()
+    translator = create_translator(translator_app, state='proposed')
+    ticket = AccreditationTicket(
+        number='AKK-1000-0000',
+        title='AKK-1000-0000',
+        group='AKK-1000-0000',
+        handler_id='1',
+        handler_data={
+            'handler_data': {
+                'id': str(translator.id),
+                'submitter_email': 'translator@example.org',
+                'hometown': 'Luzern'
+            }
+        }
+    )
+    session.add(ticket)
+    session.flush()
+    accreditation = ticket.handler.accreditation
+
+    assert translator.state == 'proposed'
+    assert ticket.handler.translator == translator
+    assert not ticket.handler.deleted
+    assert ticket.handler.email == 'translator@example.org'
+    assert ticket.handler.state is None
+    assert ticket.handler.title == 'Benito, Hugo'
+    assert ticket.handler.subtitle == 'Request Accreditation'
+    assert ticket.handler.group == 'Accreditation'
+    assert accreditation.target == translator
+    assert accreditation.ticket == ticket
+
+    with freeze_time('2026-01-01') as today:
+        accreditation.grant()
+        assert ticket.handler.state == 'granted'
+        assert translator.state == 'published'
+        assert translator.date_of_decision == today().date()
+        assert session.query(Translator).count() == 1
+
+    with freeze_time('2025-01-01') as today:
+        accreditation.refuse()
+        assert ticket.handler.state == 'refused'
+        assert session.query(Translator).count() == 0
+        assert ticket.handler.deleted

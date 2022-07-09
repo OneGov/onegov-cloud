@@ -634,3 +634,36 @@ def remove_obsolete_party_names(context):
         context.operations.alter_column(
             'party_results', 'party_id', nullable=False
         )
+
+
+@upgrade_task('Add gender column')
+def add_gender_column(context):
+    if not context.has_column('candidates', 'gender'):
+        context.operations.add_column(
+            'candidates',
+            Column(
+                'gender',
+                Enum('male', 'female', 'undetermined',
+                     name='candidate_gender'),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task('Add year of birth column')
+def add_year_of_birth_column(context):
+    if not context.has_column('candidates', 'year_of_birth'):
+        context.operations.add_column(
+            'candidates',
+            Column('year_of_birth', Integer(), nullable=True)
+        )
+
+
+@upgrade_task('Add exapts columns')
+def add_exapts_columns(context):
+    for table in ('election_results', 'ballot_results'):
+        if not context.has_column(table, 'expats'):
+            context.operations.add_column(
+                table,
+                Column('expats', Integer(), nullable=True)
+            )
