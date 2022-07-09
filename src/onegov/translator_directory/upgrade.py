@@ -73,18 +73,16 @@ def add_unique_constraint_to_translator_email(context):
 
 @upgrade_task('Add translator type')
 def add_translator_type(context):
+    if not context.has_table('translators'):
+        return
     if not context.has_column('translators', 'state'):
+        state = Enum('proposed', 'published', name='translator_state')
+        try:
+            state.create(context.operations.get_bind())
+        except Exception:
+            pass
         context.add_column_with_defaults(
             table='translators',
-            column=Column(
-                'state',
-                Enum(
-                    'proposed',
-                    'published',
-                    name='translator_state'
-                ),
-                nullable=False,
-                default='published'
-            ),
+            column=Column('state', state, nullable=False, default='published'),
             default=lambda x: 'published'
         )
