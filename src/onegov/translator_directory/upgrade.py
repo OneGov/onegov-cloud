@@ -77,10 +77,8 @@ def add_translator_type(context):
         return
     if not context.has_column('translators', 'state'):
         state = Enum('proposed', 'published', name='translator_state')
-        try:
+        if not context.has_enum('translator_state'):
             state.create(context.operations.get_bind())
-        except Exception:
-            pass
         context.add_column_with_defaults(
             table='translators',
             column=Column('state', state, nullable=False, default='published'),

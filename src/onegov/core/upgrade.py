@@ -413,6 +413,18 @@ class UpgradeContext(object):
             table, schema=self.schema
         )}
 
+    def has_enum(self, enum):
+        return self.session.execute(f"""
+            SELECT EXISTS (
+                SELECT 1 FROM pg_type
+                WHERE typname = '{enum}'
+                  and typnamespace = (
+                    SELECT oid FROM pg_namespace
+                    WHERE nspname = '{self.schema}'
+                  )
+            )
+        """)
+
     def has_table(self, table):
         inspector = Inspector(self.operations_connection)
         return table in inspector.get_table_names(schema=self.schema)
