@@ -423,7 +423,7 @@ class UpgradeContext(object):
                     WHERE nspname = '{self.schema}'
                   )
             )
-        """)
+        """).scalar()
 
     def has_table(self, table):
         inspector = Inspector(self.operations_connection)
