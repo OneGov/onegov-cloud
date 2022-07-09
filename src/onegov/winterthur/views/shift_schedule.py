@@ -1,9 +1,11 @@
 import base64
 
+from onegov.core.orm.types import JSON
 from onegov.core.security import Public
-from onegov.winterthur import WinterthurApp
-from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.org.layout import GeneralFileCollectionLayout
+from onegov.org.models import GeneralFileCollection, GeneralFile
+from onegov.winterthur import WinterthurApp
+from sqlalchemy import cast
 
 
 @WinterthurApp.html(
@@ -12,27 +14,24 @@ from onegov.org.layout import GeneralFileCollectionLayout
     permission=Public,
     template='shift_schedule.pt'
 )
-def view_shift_schedule(self, request, layout=None):
-    layout = layout or GeneralFileCollectionLayout(self, request)
-    session = request.session
-    file_link = ""
+def view_shift_schedule(self, request):
 
-    files = GeneralFileCollection(session).query().order_by(
-        GeneralFile.created
-    ).filter(GeneralFile.published)
-    files = files.all()
-    if files:
-        file = files[-1]
+    query = self.query().filter(
+        GeneralFile.published.is_(True),
+        cast(GeneralFile.reference, JSON)['content_type'] == 'application/pdf'
+    )
+    query = query.order_by(GeneralFile.created.desc())
+    file = query.first()
 
-        if file.claimed_extension == 'pdf':
-            img_buffer = request.app.get_shift_schedule_image(file)
-            str_equivalent_image = base64.b64encode(img_buffer.getvalue(
-            )).decode()
-            file_link = f'data:image/png;base64,{str_equivalent_image}'
+    image = ''
+    if file:
+        image = request.app.get_shift_schedule_image(file)
+        image = base64.b64encode(image.getvalue()).decode()
+        image = f'data:image/png;base64,{image}'
 
     return {
         'title': "Schichtplan",
-        'layout': layout,
-        'file_path': file_link,
+        'layout': GeneralFileCollectionLayout(self, request),
+        'image': image,
         'model': self
     }
