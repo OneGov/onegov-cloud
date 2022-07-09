@@ -1,8 +1,22 @@
 # Changes
 
+## 2022.36
+
+`2022-07-09` | [1de8d90f39...dd767a7f1e](https://github.com/OneGov/onegov-cloud/compare/1de8d90f39^...dd767a7f1e)
+
+### Core
+
+##### Add function to check if an enum exists.
+
+`Feature` | [542436165a](https://github.com/onegov/onegov-cloud/commit/542436165aedc25e0c724cf6703bf4544b8b40fb)
+
+##### Fix result of enum_exists.
+
+`Bugfix` | [dd767a7f1e](https://github.com/onegov/onegov-cloud/commit/dd767a7f1ebca0a0302c4149a7729a901ca52fee)
+
 ## 2022.35
 
-`2022-07-09` | [2e71bf09b2...56863a3141](https://github.com/OneGov/onegov-cloud/compare/2e71bf09b2^...56863a3141)
+`2022-07-09` | [2e71bf09b2...60f18c065e](https://github.com/OneGov/onegov-cloud/compare/2e71bf09b2^...60f18c065e)
 
 ### Activity
 
@@ -1905,34 +1919,4 @@ Addionally, store text extracts per file.
 ##### Add blank lines between recommendations.
 
 `Feature` | [SWI-19](https://linear.app/swissvotes/issue/SWI-19) | [04a03e5df1](https://github.com/onegov/onegov-cloud/commit/04a03e5df14c25b541933783e26be7e3eeed23ff)
-
-## 2021.87
-
-`2021-11-01` | [4a1d5d96e7...e9d1328651](https://github.com/OneGov/onegov-cloud/compare/4a1d5d96e7^...e9d1328651)
-
-### Feriennet
-
-##### Update Italian translations.
-
-`Other` | [PRO-805](https://linear.app/projuventute/issue/PRO-805) | [4a1d5d96e7](https://github.com/onegov/onegov-cloud/commit/4a1d5d96e7bc4d4dd1b46dfeb246cd9a9fd3285f)
-
-### Org
-
-##### Add ticket pickup hint.
-
-`Feature` | [OGC-103](https://linear.app/onegovcloud/issue/OGC-103) | [c0dbb1cedb](https://github.com/onegov/onegov-cloud/commit/c0dbb1cedb17848c0b44e90f5064e6f4923a8f2d)
-
-##### Add import for events.
-
-`Feature` | [OGC-88](https://linear.app/onegovcloud/issue/OGC-88) | [9fad3a64a1](https://github.com/onegov/onegov-cloud/commit/9fad3a64a1ced1292493e384637bd9aacd14a6e0)
-
-### Town6
-
-##### Improve focus widgets.
-
-`Other` | [OGC-86](https://linear.app/onegovcloud/issue/OGC-86) | [a08eb1021c](https://github.com/onegov/onegov-cloud/commit/a08eb1021cf17a774e21163260c4ba0a30056a58)
-
-##### Fix homepage tiles layout.
-
-`Bugfix` | [OGC-115](https://linear.app/onegovcloud/issue/OGC-115) | [b82085deef](https://github.com/onegov/onegov-cloud/commit/b82085deefbd62ee7021063720564e39b5d09070)
 
