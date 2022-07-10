@@ -1,8 +1,18 @@
 # Changes
 
+## 2022.37
+
+`2022-07-10` | [230fbfbab3...230fbfbab3](https://github.com/OneGov/onegov-cloud/compare/230fbfbab3^...230fbfbab3)
+
+### Winterthur
+
+##### Fixes shift schedule image path colliding with cached files.
+
+`Bugfix` | [OGC-447](https://linear.app/onegovcloud/issue/OGC-447) | [230fbfbab3](https://github.com/onegov/onegov-cloud/commit/230fbfbab3b96de35609edd9083e313547760892)
+
 ## 2022.36
 
-`2022-07-09` | [1de8d90f39...dd767a7f1e](https://github.com/OneGov/onegov-cloud/compare/1de8d90f39^...dd767a7f1e)
+`2022-07-09` | [1de8d90f39...8cde20cbf7](https://github.com/OneGov/onegov-cloud/compare/1de8d90f39^...8cde20cbf7)
 
 ### Core
 
@@ -1899,24 +1909,4 @@ Addionally, store text extracts per file.
 ##### Add link on whole focus widget.
 
 `Other` | [OGC-122](https://linear.app/onegovcloud/issue/OGC-122) | [896ee5bdf0](https://github.com/onegov/onegov-cloud/commit/896ee5bdf0d73e80ab4c731d0057d3321a3aab94)
-
-## 2021.88
-
-`2021-11-01` | [2cb5fe49f8...246345e7b7](https://github.com/OneGov/onegov-cloud/compare/2cb5fe49f8^...246345e7b7)
-
-### Org
-
-##### Fix event import date/time parsing.
-
-`Bugfix` | [OGC_88](#OGC_88) | [dd73a9d6c6](https://github.com/onegov/onegov-cloud/commit/dd73a9d6c681fc73e6dd3d3b0217c2094b34d9aa)
-
-### Swissvotes
-
-##### Add post-vote poll dataset hint.
-
-`Feature` | [SWI-19](https://linear.app/swissvotes/issue/SWI-19) | [2cb5fe49f8](https://github.com/onegov/onegov-cloud/commit/2cb5fe49f8f2be2e1d84c582b4c6cbf0900326aa)
-
-##### Add blank lines between recommendations.
-
-`Feature` | [SWI-19](https://linear.app/swissvotes/issue/SWI-19) | [04a03e5df1](https://github.com/onegov/onegov-cloud/commit/04a03e5df14c25b541933783e26be7e3eeed23ff)
 
