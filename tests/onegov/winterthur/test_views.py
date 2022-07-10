@@ -87,7 +87,7 @@ def test_view_shift_schedule(winterthur_app):
     client.login_admin()
 
     # No file yet
-    assert not client.get('/files/shift-schedule').pyquery(
+    assert not client.get('/shift-schedule').pyquery(
         'img.shift-schedule'
     )
     assert not winterthur_app.filestorage.listdir('')
@@ -108,7 +108,7 @@ def test_view_shift_schedule(winterthur_app):
     assert 'Öffentlich' not in page
     assert 'Privat' in page
 
-    assert not client.get('/files/shift-schedule').pyquery(
+    assert not client.get('/shift-schedule').pyquery(
         'img.shift-schedule'
     )
     assert not winterthur_app.filestorage.listdir('')
@@ -122,7 +122,7 @@ def test_view_shift_schedule(winterthur_app):
     with freeze_time('2020-01-01'):
         with patch('onegov.winterthur.app.subprocess') as subprocess:
             subprocess.run = partial(run, b'ABC')
-            image = client.get('/files/shift-schedule').pyquery(
+            image = client.get('/shift-schedule').pyquery(
                 'img.shift-schedule'
             )[0]
             assert 'QUJD' in image.attrib['src']
@@ -139,7 +139,7 @@ def test_view_shift_schedule(winterthur_app):
 
     with patch('onegov.winterthur.app.subprocess') as subprocess:
         subprocess.run = partial(run, b'XYZ')
-        image = client.get('/files/shift-schedule').pyquery(
+        image = client.get('/shift-schedule').pyquery(
             'img.shift-schedule'
         )[0]
         assert 'WFla' in image.attrib['src']
@@ -155,7 +155,7 @@ def test_view_shift_schedule(winterthur_app):
         page = page.form.submit()
         assert '01.01.2023 01:00' in client.get('/files')
 
-        image = client.get('/files/shift-schedule').pyquery(
+        image = client.get('/shift-schedule').pyquery(
             'img.shift-schedule'
         )[0]
         assert 'WFla' in image.attrib['src']

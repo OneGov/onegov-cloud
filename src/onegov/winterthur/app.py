@@ -4,15 +4,18 @@ import subprocess
 from cached_property import cached_property
 from io import BytesIO
 from onegov.core import utils
+from onegov.core.orm.types import JSON
 from onegov.core.static import StaticFile
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.winterthur.initial_content import create_new_organisation
 from onegov.winterthur.roadwork import RoadworkClient
 from onegov.winterthur.roadwork import RoadworkConfig
 from onegov.winterthur.theme import WinterthurTheme
 from pathlib import Path
+from sqlalchemy import cast
 from tempfile import TemporaryDirectory
 
 
@@ -77,7 +80,7 @@ class WinterthurApp(OrgApp):
     def static_file(self, path):
         return StaticFile(path, version=self.version)
 
-    def get_shift_schedule_image(self, file):
+    def get_shift_schedule_image(self):
         """ Gets or creates an image of the latest public pdf.
 
         We store the image using the last modified timestamp - this way, we
@@ -85,6 +88,17 @@ class WinterthurApp(OrgApp):
         images of shift schedules.
 
         """
+
+        query = GeneralFileCollection(self.session()).query().filter(
+            GeneralFile.published.is_(True),
+            cast(GeneralFile.reference, JSON)['content_type']
+            == 'application/pdf'
+        )
+        query = query.order_by(GeneralFile.created.desc())
+        file = query.first()
+
+        if not file:
+            return
 
         upload_time = file.created.timestamp()
         filename = f'shift-schedule-{upload_time}.png'
