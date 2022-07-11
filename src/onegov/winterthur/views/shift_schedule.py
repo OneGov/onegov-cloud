@@ -3,7 +3,7 @@ import base64
 from onegov.core.security import Public
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Organisation
-from onegov.winterthur import WinterthurApp
+from onegov.winterthur import WinterthurApp, _
 
 
 @WinterthurApp.html(
@@ -20,7 +20,7 @@ def view_shift_schedule(self, request):
         image = f'data:image/png;base64,{image}'
 
     return {
-        'title': "Schichtplan",
+        'title': _('Shift schedule'),
         'layout': DefaultLayout(self, request),
         'image': image,
         'model': self
