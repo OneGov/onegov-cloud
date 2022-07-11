@@ -391,6 +391,29 @@
         </tal:block>
 </metal:election-connections-table>
 
+<metal:election-compound-seat-allocation-table define-macro="election-compound-seat-allocation-table" i18n:domain="onegov.election_day">
+    <table
+        class="results tablesaw sortable"
+        data-tablesaw-mode="columntoggle"
+        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+        data-tablesaw-minimap=""
+        >
+        <thead>
+            <tr>
+                <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
+                <th tal:repeat="year years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
+            </tr>
+        </thead>
+        <tbody tal:define="current_year python: years[-1]">
+            <tr tal:repeat="party parties">
+                <td>${parties[party][current_year]['name']}</td>
+                <td tal:repeat="year years" class="right-aligned">${parties[party][year]['mandates']}</td>
+            </tr>
+        </tbody>
+    </table>
+</metal:election-compound-seat-allocation-table>
+
+
 <metal:election-compound-districts-table define-macro="election-compound-districts-table" i18n:domain="onegov.election_day">
     <table
         class="election-compound-districts-table results tablesaw sortable"
@@ -740,18 +763,38 @@
     </tal:block>
 </metal:list-groups-chart i18n:domain="onegov.election_day">
 
+<metal:seat-allocation-chart define-macro="seat-allocation-chart" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="embed">
+        <div class="grouped-bar-chart"
+            i18n:attributes="data-embed-link"
+            data-dataurl="${request.link(model, name='seat-allocation-data')}"
+            data-show-back="false"
+            data-embed-link="Embed diagram"
+            data-embed-source="${request.link(model, name='seat-allocation-chart')}">
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not: embed">
+        <div class="grouped-bar-chart"
+            data-dataurl="${request.link(model, name='seat-allocation-data')}"
+            data-show-back="false">
+        </div>
+    </tal:block>
+</metal:seat-allocation-chart i18n:domain="onegov.election_day">
+
 <metal:party-strengths-chart define-macro="party-strengths-chart" i18n:domain="onegov.election_day">
     <tal:block tal:condition="embed">
         <div class="grouped-bar-chart"
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='party-strengths-data')}"
+            data-show-back="true"
             data-embed-link="Embed diagram"
             data-embed-source="${request.link(model, name='party-strengths-chart')}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
         <div class="grouped-bar-chart"
-            data-dataurl="${request.link(model, name='party-strengths-data')}">
+            data-dataurl="${request.link(model, name='party-strengths-data')}"
+            data-show-back="true">
         </div>
     </tal:block>
 </metal:party-strengths-chart i18n:domain="onegov.election_day">
@@ -1238,6 +1281,16 @@
         };
     </script>
 </metal:tablesaw_translations>
+
+<metal:seat_allocation_figure define-macro="seat_allocation_figure" i18n:domain="onegov.election_day">
+    <figure>
+        <tal:block metal:use-macro="layout.macros['seat-allocation-chart']" tal:define="embed True"/>
+        <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
+            <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+        </a>
+    </figure>
+</metal:seat_allocation_figure>
+
 
 <metal:party_strengths_figure define-macro="party_strengths_figure" i18n:domain="onegov.election_day">
     <figure>

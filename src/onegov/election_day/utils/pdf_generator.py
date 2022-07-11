@@ -557,6 +557,33 @@ class PdfGenerator():
         pdf.spacer()
         pdf.spacer()
 
+        # Seat allocation
+        chart = self.renderer.get_seat_allocation_chart(compound, 'pdf')
+        if compound.show_seat_allocation and chart:
+            pdf.h2(_('Seat allocation'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            years, parties = get_party_results(compound)
+            years = years[:2]
+            if years:
+                current_year = years[-1]
+                pdf.results(
+                    [
+                        _('Party'),
+                        *years,
+                    ],
+                    [[
+                        parties[party][current_year]['name'],
+                        *[
+                            parties[party][year]['mandates'] or '0'
+                            for year in years
+                        ]
+                    ] for party in parties],
+                    [None, 2 * cm, 2 * cm, 2 * cm],
+                    pdf.style.table_results_1
+                )
+            pdf.pagebreak()
+
         # Superregions
         if has_superregions:
             superregions = get_superregions(compound, principal)

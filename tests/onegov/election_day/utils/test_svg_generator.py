@@ -130,12 +130,12 @@ def test_create_svgs(election_day_app_gr):
             assert majorz.last_result_change is None  # used later
 
         # generate
-        assert generator.create_svgs() == (64, 0)
-        assert len(fs.listdir('svg')) == 64
+        assert generator.create_svgs() == (68, 0)
+        assert len(fs.listdir('svg')) == 68
 
         # don't recreate
         assert generator.create_svgs() == (0, 0)
-        assert len(fs.listdir('svg')) == 64
+        assert len(fs.listdir('svg')) == 68
 
         # remove foreign files
         fs.touch('svg/somefile')
@@ -143,7 +143,7 @@ def test_create_svgs(election_day_app_gr):
         fs.touch('svg/.somefile')
 
         assert generator.create_svgs() == (0, 3)
-        assert len(fs.listdir('svg')) == 64
+        assert len(fs.listdir('svg')) == 68
 
         # remove obsolete
         session.delete(vote)
@@ -151,7 +151,7 @@ def test_create_svgs(election_day_app_gr):
         session.delete(compound)
         session.flush()
 
-        assert generator.create_svgs() == (0, 60)
+        assert generator.create_svgs() == (0, 64)
         assert len(fs.listdir('svg')) == 4
 
         # recreate after changes

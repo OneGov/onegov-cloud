@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"POT-Creation-Date: 2022-07-11 15:19+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -94,6 +94,10 @@ msgstr ""
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Betg alfanumeric: ${col}"
+
+#, python-format
+msgid "Invalid gender: ${value}"
+msgstr ""
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -429,6 +433,17 @@ msgstr "Dumber d'electurs exact"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
 
+msgid "Seat allocation"
+msgstr ""
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+
+msgid "Views"
+msgstr "Vistas"
+
 msgid "List groups"
 msgstr "Gruppas da glistas"
 
@@ -438,21 +453,6 @@ msgid ""
 msgstr ""
 "Mussa ina carta da register cun resultats da gruppas da glistas. Pretenda "
 "resultats da partidas cun cifras electoralas. Mo en cas dal Pukelsheim dubel."
-
-msgid "Views"
-msgstr "Vistas"
-
-msgid "Lists"
-msgstr "Glistas"
-
-msgid ""
-"Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-"Always rounded."
-msgstr ""
-"Mussa ina carta da register cun resultats da glistas agregads per tut las "
-"elecziuns. Mo raschunaivel, sche las glistas correspundan a las gruppas da "
-"glistas. Mo en cas dal Pukelsheim dubel."
 
 msgid "Party strengths"
 msgstr "Forza da las partidas"
@@ -595,6 +595,9 @@ msgstr "Titel da la cuntraproposta"
 
 msgid "Title of the tie breaker"
 msgstr "Titel da la dumonda decisiva"
+
+msgid "Lists"
+msgstr "Glistas"
 
 msgid "Candidates"
 msgstr "Candidatas e candidats"
@@ -844,9 +847,6 @@ msgstr ""
 "mintgamai divididas tras il dumber da sezs ch'èn d'occupar en il circul "
 "electoral respectiv. Il resultat da quai è il dumber d'electurs."
 
-msgid "Voters count"
-msgstr "Cifra electorala"
-
 msgid "The file is invalid."
 msgstr "La datoteca è nunvalaivla."
 
@@ -1009,6 +1009,9 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
 msgstr "Gruppa da glista"
+
+msgid "Voters count"
+msgstr "Cifra electorala"
 
 msgid "Embed diagram"
 msgstr "Integrar diagram"
@@ -1705,3 +1708,12 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid ""
+#~ "Shows a tab with aggregated list results over all elections. Only useful "
+#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+#~ "Always rounded."
+#~ msgstr ""
+#~ "Mussa ina carta da register cun resultats da glistas agregads per tut las "
+#~ "elecziuns. Mo raschunaivel, sche las glistas correspundan a las gruppas "
+#~ "da glistas. Mo en cas dal Pukelsheim dubel."
