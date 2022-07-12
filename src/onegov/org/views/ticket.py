@@ -896,11 +896,6 @@ def view_pending_tickets(self, request, layout=None):
     if not ticket_ids:
         raise exc.HTTPForbidden()
 
-    # nocheckin
-    ticket_ids = [t.id if isinstance(t, Ticket) else t for t in ticket_ids]
-    pending[self.group] = ticket_ids
-    request.browser_session.reservation_tickets = pending
-
     query = request.session.query(Ticket)
     query = query.filter(Ticket.id.in_(ticket_ids))
     tickets = query.all()

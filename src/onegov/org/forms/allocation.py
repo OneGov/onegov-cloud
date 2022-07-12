@@ -255,7 +255,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     def on_request(self):
         if not self.request.app.org.holidays:
             self.delete_field('on_holidays')
-        if not self.request.app.org.school_holidays:
+        if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
 
     def ensure_start_before_end(self):
@@ -283,7 +283,7 @@ class AllocationForm(Form, AllocationFormHelpers):
 
         return self.request.app.org.holidays
 
-    @property
+    @cached_property
     def ranged_exceptions(self):
         if not hasattr(self, 'request'):
             return ()
@@ -294,7 +294,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         if self.during_school_holidays.data == 'yes':
             return ()
 
-        return self.request.app.org.school_holidays
+        return tuple(self.request.app.org.school_holidays)
 
     def is_excluded(self, dt):
         date = dt.date()

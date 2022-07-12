@@ -88,7 +88,7 @@ class FindYourSpotForm(Form):
     def on_request(self):
         if not self.request.app.org.holidays:
             self.delete_field('on_holidays')
-        if not self.request.app.org.school_holidays:
+        if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
         if not self.request.POST:
             # by default search one week from now
@@ -124,7 +124,7 @@ class FindYourSpotForm(Form):
         if start and end:
             if (start.hour > end.hour
                 or (start.hour == end.hour
-                    and start.minute > end.minute)):
+                    and start.minute >= end.minute)):
                 self.from_time.errors.append(_("Start time before end time"))
                 return False
 
@@ -141,7 +141,7 @@ class FindYourSpotForm(Form):
 
         return self.request.app.org.holidays
 
-    @property
+    @cached_property
     def ranged_exceptions(self):
         if not hasattr(self, 'request'):
             return ()
@@ -152,7 +152,7 @@ class FindYourSpotForm(Form):
         if self.during_school_holidays.data == 'yes':
             return ()
 
-        return self.request.app.org.school_holidays
+        return tuple(self.request.app.org.school_holidays)
 
     def is_excluded(self, date):
         if date in self.exceptions:
