@@ -53,6 +53,7 @@ from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from sedate import to_timezone
+from translationstring import TranslationString
 
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
@@ -517,6 +518,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     def linkify(self, text):
+        if isinstance(text, TranslationString):
+            # translate the text before applying linkify if it's a
+            # translation string
+            text = self.request.translate(text)
         return linkify(text).replace('\n', '<br>') if text else text
 
     def linkify_field(self, field, rendered):
@@ -1328,6 +1333,23 @@ class ResourcesLayout(DefaultLayout):
                     ]
                 ),
             ]
+
+
+class FindYourSpotLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(
+                _("Homepage"), self.homepage_url
+            ),
+            Link(
+                _("Reservations"), self.request.class_link(ResourceCollection)
+            ),
+            Link(
+                _("Find Your Spot"), self.request.link(self.model)
+            )
+        ]
 
 
 class ResourceRecipientsLayout(DefaultLayout):

@@ -191,6 +191,12 @@ class Organisation(Base, TimestampMixin):
         )
 
     @property
+    def has_school_holidays(self):
+        """ Returns whether any school holidays have been configured
+        """
+        return bool(self.holiday_settings.get('school', ()))
+
+    @property
     def school_holidays(self):
         """ Returns an iterable that yields date pairs of start
         and end dates of school holidays
