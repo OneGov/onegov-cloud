@@ -135,19 +135,13 @@ def view_find_your_spot(self, request, form, layout=None):
         end_time = form.end_time.data
         start = datetime.combine(form.start.data, start_time)
         end = datetime.combine(form.end.data, end_time)
-        # FIXME: we probably should coerce the value to int in the form
-        #        itself, the only reason we don't do that currently is
-        #        that probably the person before me didn't know about
-        #        WTForm's coerce argument. Then we can also move the
-        #        weekday check into form.is_excluded
-        days = tuple(int(d) for d in form.weekdays.data)
 
         def included_dates():
             # yields all the dates that should be part of our result set
             current = start.date()
             max_date = end.date()
             while current <= max_date:
-                if current.weekday() in days and not form.is_excluded(current):
+                if not form.is_excluded(current):
                     yield current
                 current += timedelta(days=1)
 
@@ -159,7 +153,7 @@ def view_find_your_spot(self, request, form, layout=None):
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
             for allocation in room.scheduler.search_allocations(
-                    start, end, days=days, strict=True):
+                    start, end, days=form.weekdays.data, strict=True):
 
                 date = allocation.display_start().date()
                 if date not in room_slots:

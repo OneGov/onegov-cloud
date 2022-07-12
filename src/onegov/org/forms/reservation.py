@@ -61,6 +61,7 @@ class FindYourSpotForm(Form):
     weekdays = MultiCheckboxField(
         label=_("Weekdays"),
         choices=WEEKDAYS,
+        coerce=int,
         default=[v for v, l in WEEKDAYS[:5]],
         validators=[InputRequired()],
         render_kw={
@@ -155,6 +156,10 @@ class FindYourSpotForm(Form):
 
     def is_excluded(self, date):
         if date in self.exceptions:
+            return True
+
+        # weekdays is required so we don't need to handle None
+        if date.weekday() not in self.weekdays.data:
             return True
 
         for start, end in self.ranged_exceptions:

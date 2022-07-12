@@ -15,13 +15,13 @@ from onegov.form.fields import TimeField
 
 
 WEEKDAYS = (
-    (str(MO.weekday), _("Mo")),
-    (str(TU.weekday), _("Tu")),
-    (str(WE.weekday), _("We")),
-    (str(TH.weekday), _("Th")),
-    (str(FR.weekday), _("Fr")),
-    (str(SA.weekday), _("Sa")),
-    (str(SU.weekday), _("Su")),
+    (MO.weekday, _("Mo")),
+    (TU.weekday, _("Tu")),
+    (WE.weekday, _("We")),
+    (TH.weekday, _("Th")),
+    (FR.weekday, _("Fr")),
+    (SA.weekday, _("Sa")),
+    (SU.weekday, _("Su")),
 )
 
 
@@ -215,6 +215,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     except_for = MultiCheckboxField(
         label=_("Except for"),
         choices=WEEKDAYS,
+        coerce=int,
         render_kw={
             'prefix_label': False,
             'class_': 'oneline-checkboxes'
@@ -267,7 +268,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     def weekdays(self):
         """ The rrule weekdays derived from the except_for field. """
         exceptions = {x for x in (self.except_for.data or tuple())}
-        return [int(d[0]) for d in WEEKDAYS if d[0] not in exceptions]
+        return [d[0] for d in WEEKDAYS if d[0] not in exceptions]
 
     @cached_property
     def exceptions(self):
