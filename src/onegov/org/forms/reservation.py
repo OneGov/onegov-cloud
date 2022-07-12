@@ -36,26 +36,16 @@ class FindYourSpotForm(Form):
         label=_("Until"),
         validators=[InputRequired()])
 
-    whole_day = RadioField(
-        label=_("Whole day"),
-        choices=(
-            ('yes', _("Yes")),
-            ('any', _("No"))
-        ),
-        default='any')
-
     start_time = TimeField(
         label=_("Start"),
         description=_("HH:MM"),
         default=time(7),
-        depends_on=('whole_day', 'any'),
         validators=[DataRequired()])
 
     end_time = TimeField(
         label=_("End"),
         description=_("HH:MM"),
         default=time(22),
-        depends_on=('whole_day', 'any'),
         validators=[DataRequired()])
 
     rooms = MultiCheckboxField(

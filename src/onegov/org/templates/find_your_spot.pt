@@ -12,7 +12,7 @@
             <a id="results"></a>
             <h2 i18n:translate>All dates</h2>
             <div class="reservation-list"
-                data-whole-day="${'true' if form.whole_day.data == 'yes' else 'false'}"
+                data-whole-day="false"
                 data-reservations="${request.link(layout.model, name='reservations')}"
                 data-reservationform="${request.link(layout.model, name='form')}">
                 <table>

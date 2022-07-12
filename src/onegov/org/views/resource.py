@@ -127,12 +127,10 @@ def view_find_your_spot(self, request, form, layout=None):
 
     form.apply_rooms(rooms)
     if form.submitted(request):
-        room_slots = {}
         if form.rooms:
             # filter rooms according to the form selection
             rooms = [room for room in rooms if room.id in form.rooms.data]
 
-        whole_day = form.whole_day.data
         start_time = form.start_time.data
         end_time = form.end_time.data
         start = datetime.combine(form.start.data, start_time)
@@ -140,19 +138,34 @@ def view_find_your_spot(self, request, form, layout=None):
         # FIXME: we probably should coerce the value to int in the form
         #        itself, the only reason we don't do that currently is
         #        that probably the person before me didn't know about
-        #        WTForm's coerce argument
-        days = [int(d) for d in form.weekdays.data]
+        #        WTForm's coerce argument. Then we can also move the
+        #        weekday check into form.is_excluded
+        days = tuple(int(d) for d in form.weekdays.data)
+
+        def included_dates():
+            # yields all the dates that should be part of our result set
+            current = start.date()
+            max_date = end.date()
+            while current <= max_date:
+                if current.weekday() in days and not form.is_excluded(current):
+                    yield current
+                current += timedelta(days=1)
+
+        # initialize the room slots with all the included dates and rooms
+        room_slots = {
+            d: {room.id: [] for room in rooms}
+            for d in included_dates()
+        }
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
             for allocation in room.scheduler.search_allocations(
-                    start, end, days=days, whole_day=whole_day, strict=True):
+                    start, end, days=days, strict=True):
 
                 date = allocation.display_start().date()
-                if form.is_excluded(date):
-                    # TODO: Do we want to show excluded dates?
+                if date not in room_slots:
                     continue
 
-                slots = room_slots.setdefault(date, {}).setdefault(room.id, [])
+                slots = room_slots[date][room.id]
                 target_start, target_end = sedate.get_date_range(
                     allocation.display_start(),
                     start_time,
@@ -168,29 +181,9 @@ def view_find_your_spot(self, request, form, layout=None):
                         request
                     ))
                     continue
-                elif whole_day == 'yes':
-                    # a room that is partly available should never
-                    # have its quota set to higher than 1!
-                    assert allocation.quota == 1
-                    availability = allocation.availability
-                    slots.append(utils.FindYourSpotEventInfo(
-                        allocation,
-                        None,  # won't be displayed
-                        availability,
-                        1 if availability >= 5.0 else 0,
-                        request
-                    ))
-                    continue
 
                 free = allocation.free_slots(target_start, target_end)
                 if not free:
-                    slots.append(utils.FindYourSpotEventInfo(
-                        allocation,
-                        None,  # won't be displayed
-                        0,
-                        0,
-                        request
-                    ))
                     continue
 
                 target_range = (target_end - target_start)
