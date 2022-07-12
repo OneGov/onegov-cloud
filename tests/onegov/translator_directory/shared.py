@@ -9,6 +9,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.models.translator import GENDERS
 
 translator_data = dict(
+    state='published',
     pers_id=1234,
     first_name='Hugo',
     last_name='Benito',
@@ -32,6 +33,7 @@ translator_data = dict(
     tel_office='041 444 44 44',
     tel_private=None,
     availability='always',
+    occupation='baker',
     operation_comments='',
     confirm_name_reveal=None,
     date_of_application=date.today() - timedelta(days=100),

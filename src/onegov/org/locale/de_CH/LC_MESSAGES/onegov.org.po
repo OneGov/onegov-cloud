@@ -1437,7 +1437,7 @@ msgstr ""
 
 msgid "Accept request and close ticket automatically for these user roles"
 msgstr ""
-"Akzeptiere und schliesse Tickets automatisch für diese Benutezer-Rollen"
+"Akzeptiere und schliesse Tickets automatisch für diese Benutzer-Rollen"
 
 msgid "User used to auto-accept tickets"
 msgstr "Benutzer für das automatische Akzeptieren von Tickets"

@@ -43,6 +43,8 @@ def majorz_election():
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male',
+            year_of_birth=1970
         )
     )
     election.candidates.append(
@@ -62,6 +64,7 @@ def majorz_election():
         entity_id=1,
         counted=True,
         eligible_voters=1000,
+        expats=35,
         received_ballots=500,
         blank_ballots=10,
         invalid_ballots=5,
@@ -139,6 +142,8 @@ def proporz_election(
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male',
+            year_of_birth=1970
         )
     )
     election.candidates.append(
@@ -159,6 +164,7 @@ def proporz_election(
         entity_id=1,
         counted=True,
         eligible_voters=1000,
+        expats=35,
         received_ballots=500,
         blank_ballots=10,
         invalid_ballots=5,
@@ -488,6 +494,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -501,6 +508,8 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111
     }
     assert export[1] == {
@@ -524,6 +533,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -537,6 +547,8 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520
     }
 
@@ -565,6 +577,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -584,6 +597,8 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': None,
@@ -611,6 +626,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -630,6 +646,8 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': 12,
@@ -657,6 +675,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -670,6 +689,8 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111
     }
 
@@ -694,6 +715,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -707,6 +729,8 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520
     }
 

@@ -82,6 +82,7 @@ Name|Description
 `invalid`|The number of spoilt votes.
 `empty`|The number of blank votes.
 `eligible_voters`|The number of persons eligible to vote.
+`expats`|Number of expats. Optional.
 
 #### Temporary results
 

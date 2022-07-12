@@ -22,8 +22,9 @@ member_can_see = (
     'tel_office',
     'availability',
     'mother_tongues',
-    'languages_written',
-    'languages_spoken',
+    'spoken_languages',
+    'written_languages',
+    'monitoring_languages',
     'expertise_interpreting_types',
     'expertise_professional_guilds',
     'expertise_professional_guilds_other',
@@ -39,12 +40,11 @@ editor_can_see = member_can_see + (
 )
 
 translator_can_see = editor_can_see + (
+    'occupation',
     'operation_comments',
     'confirm_name_reveal',
     'date_of_application',
     'date_of_decision',
-    'spoken_languages',
-    'written_languages',
     'proof_of_preconditions',
     'agency_references',
     'education_as_interpreter',
@@ -88,6 +88,8 @@ field_order = (
     'mother_tongues',
     'spoken_languages',
     'written_languages',
+    'monitoring_languages',
+    'occupation',
     'proof_of_preconditions',
     'agency_references',
     'education_as_interpreter',
@@ -127,6 +129,4 @@ INTERPRETING_TYPES = {
     'consecutive': _('Consecutive interpreting'),
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
-    'telephone': _('Telephone interpreting'),
-    'written': _('Written translations')
 }

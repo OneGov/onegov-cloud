@@ -98,6 +98,7 @@ Name|Description
 `entity_district`|The district of the municipality.
 `entity_counted`|`True` if the result was counted.
 `entity_eligible_voters`|The number of people eligible to vote for this municipality.
+`entity_expats`|Number of expats for this municipality.
 `entity_received_ballots`|The number of received ballots for this municipality.
 `entity_blank_ballots`|The number of blank ballots for this municipality.
 `entity_invalid_ballots`|The number of invalid ballots for this municipality.
@@ -116,6 +117,9 @@ Name|Description
 `candidate_first_name`|The first name of the candidate.
 `candidate_id`|The ID of the candidate.
 `candidate_elected`|True if the candidate has been elected.
+`candidate_party`|The name of the party.
+`candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
+`candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
 `panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
@@ -193,3 +197,4 @@ Name|Description
 `invalid`|The number of invalid votes.
 `empty`|The number of empty votes.
 `eligible_voters`|The number of people eligible to vote.
+`expats`|Number of expats.

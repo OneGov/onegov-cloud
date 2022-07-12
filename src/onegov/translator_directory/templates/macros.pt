@@ -50,5 +50,188 @@
         </dl>
     </metal:display_translator_mutation>
 
+    <metal:display_accreditation define-macro="display_accreditation" i18n:domain="onegov.translator_directory">
+        <h2 i18n:translate>Accreditation</h2>
+
+        <h3 i18n:translate>Personal Information</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Last name</dt>
+            <dd>${translator.last_name}</dd>
+
+            <dt i18n:translate>First name</dt>
+            <dd>${translator.first_name}</dd>
+
+            <dt i18n:translate>Gender</dt>
+            <dd>${layout.format_gender(translator.gender)}</dd>
+
+            <dt i18n:translate>Date of birth</dt>
+            <dd>${layout.format_date(translator.date_of_birth, 'date')}</dd>
+
+            <dt i18n:translate>Hometown</dt>
+            <dd>${ticket_data.get('hometown')}</dd>
+
+            <dt i18n:translate>Nationality</dt>
+            <dd>${translator.nationality}</dd>
+
+            <dt i18n:translate>Marital status</dt>
+            <dd>${ticket_data.get('marital_status')}</dd>
+
+            <dt i18n:translate>Coordinates</dt>
+            <dd>${translator.coordinates.lat}, ${translator.coordinates.lon} </dd>
+            <div tal:condition="translator.coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${translator.coordinates.lat}" data-lon="${translator.coordinates.lon}" data-zoom="${translator.coordinates.zoom}" />
+
+            <dt i18n:translate>Address</dt>
+            <dd>${translator.address}</dd>
+
+            <dt i18n:translate>Zip Code</dt>
+            <dd>${translator.zip_code}</dd>
+
+            <dt i18n:translate>City</dt>
+            <dd>${translator.city}</dd>
+
+            <dt i18n:translate>Drive distance</dt>
+            <dd>${layout.format_drive_distance(translator.drive_distance)}</dd>
+
+            <dt i18n:translate>Withholding tax</dt>
+            <dd class="withholding-tax">${layout.format_boolean(translator.withholding_tax)}</dd>
+
+            <dt i18n:translate>Self-employed</dt>
+            <dd class="self-employed">${layout.format_boolean(translator.self_employed)}</dd>
+        </dl>
+
+        <h3 i18n:translate>Identification / Bank details</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Swiss social security number</dt>
+            <dd>${translator.social_sec_number}</dd>
+
+            <dt i18n:translate>Bank name</dt>
+            <dd>${translator.bank_name}</dd>
+
+            <dt i18n:translate>Bank address</dt>
+            <dd>${translator.bank_address}</dd>
+
+            <dt i18n:translate>IBAN</dt>
+            <dd>${translator.iban}</dd>
+
+            <dt i18n:translate>Account owner</dt>
+            <dd>${translator.account_owner}</dd>
+        </dl>
+
+        <h3 i18n:translate>Contact</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Email</dt>
+            <dd tal:content="structure layout.linkify(translator.email)"></dd>
+
+            <dt i18n:translate>Private Phone Number</dt>
+            <dd tal:content="structure layout.linkify(translator.tel_private)"></dd>
+
+            <dt i18n:translate>Mobile Phone Number</dt>
+            <dd tal:content="structure layout.linkify(translator.tel_mobile)"></dd>
+
+            <dt i18n:translate>Office Phone Number</dt>
+            <dd tal:content="structure layout.linkify(translator.tel_office)"></dd>
+
+            <dt i18n:translate>Availability</dt>
+            <dd>${translator.availability}</dd>
+        </dl>
+
+        <h3 i18n:translate>Legal</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Name revealing confirmation</dt>
+            <dd class="confirm-name-reveal">${layout.format_boolean(translator.confirm_name_reveal)}</dd>
+        </dl>
+
+        <h3 i18n:translate>Training</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Learned profession</dt>
+            <dd>${ticket_data.get('profession')}</dd>
+
+            <dt i18n:translate>Current professional activity</dt>
+            <dd>${translator.occupation}</dd>
+
+            <dt i18n:translate>Education as interpreter</dt>
+            <dd class="education-as-interpreter">${layout.format_boolean(translator.education_as_interpreter)}</dd>
+        </dl>
+
+        <h3 i18n:translate>Language training - Expertise</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Mother tongues</dt>
+            <dd>
+                <span tal:repeat="lang translator.mother_tongues" tal:attributes="class layout.color_class(lang.native_speakers_count)">
+                    ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                </span>
+            </dd>
+
+            <dt i18n:translate>Spoken languages</dt>
+            <dd>
+                <span tal:repeat="lang translator.spoken_languages" tal:attributes="class layout.color_class(lang.speakers_count)">
+                    ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                </span>
+            </dd>
+
+            <dt i18n:translate>Written languages</dt>
+            <dd>
+                <span tal:repeat="lang translator.written_languages" tal:attributes="class layout.color_class(lang.writers_count)">
+                    ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                </span>
+            </dd>
+
+            <dt i18n:translate>Monitoring languages</dt>
+            <dd>
+                <span tal:repeat="lang translator.monitoring_languages" tal:attributes="class layout.color_class(lang.monitors_count)">
+                    ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                </span>
+            </dd>
+        </dl>
+
+        <h3 i18n:translate>Qualifications</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Expertise by professional guild</dt>
+            <dd>
+                <tal:b tal:repeat="expertise translator.expertise_professional_guilds_all">${layout.format_prof_guild(expertise)}<br></tal:b>
+            </dd>
+
+            <dt i18n:translate>Expertise by interpreting type</dt>
+            <dd>
+                <tal:b tal:repeat="expertise translator.expertise_interpreting_types">${layout.format_interpreting_type(expertise)}<br></tal:b>
+            </dd>
+        </dl>
+
+        <h3 i18n:translate>References</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Agency references</dt>
+            <dd>${translator.agency_references}</dd>
+        </dl>
+
+        <h3 i18n:translate>Admission course</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Admission</dt>
+
+            <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
+            <dd class="admission-course-completed">${layout.format_boolean(ticket_data.get('admission_course_completed'))}</dd>
+
+            <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
+            <dd class="admission-course-agreement">${layout.format_boolean(ticket_data.get('admission_course_agreement'))}</dd>
+        </dl>
+
+        <h3 i18n:translate>Documents</h3>
+        <dl class="accreditation">
+            <dt i18n:translate style='display: None;'>Documents</dt>
+            <dd>
+                <ul tal:condition="translator.files">
+                    <li tal:repeat="file translator.files">
+                        <a href="${request.link(file)}">${file.name}</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+
+        <h3 i18n:translate>Submission</h3>
+        <dl class="accreditation">
+            <dt i18n:translate>Remarks</dt>
+            <dd>${ticket_data.get('remarks')}</dd>
+        </dl>
+    </metal:display_accreditation>
+
 
 </body>

@@ -69,6 +69,7 @@ Name|Description
 `entity_id`|BFS number of the municipality. A value of `0` can be used for expats.
 `entity_counted`|`True` if the result was counted.
 `entity_eligible_voters`|Number of persons entitled to vote in municipality.
+`entity_expats`|Number of expats in the unit. Optional.
 `entity_received_ballots`|Number of submitted ballots in municipality.
 `entity_blank_ballots`|Number empty ballots in municipality.
 `entity_invalid_ballots`|Number invalid ballots in municipality.
@@ -85,6 +86,8 @@ Name|Description
 `candidate_first_name`|First name of the candidate.
 `candidate_elected`|True, if the candidate was elected.
 `candidate_party`|The name of the party.
+`candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`. Optional.
+`candidate_year_of_birth`|The year of the candidate. Optional.
 `candidate_votes`|Number of candidate votes in municipality.
 
 #### Panachage results

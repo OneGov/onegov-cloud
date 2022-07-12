@@ -1,8 +1,138 @@
 # Changes
 
+## 2022.37
+
+`2022-07-10` | [230fbfbab3...230fbfbab3](https://github.com/OneGov/onegov-cloud/compare/230fbfbab3^...230fbfbab3)
+
+### Winterthur
+
+##### Fixes shift schedule image path colliding with cached files.
+
+`Bugfix` | [OGC-447](https://linear.app/onegovcloud/issue/OGC-447) | [230fbfbab3](https://github.com/onegov/onegov-cloud/commit/230fbfbab3b96de35609edd9083e313547760892)
+
+## 2022.36
+
+`2022-07-09` | [1de8d90f39...8cde20cbf7](https://github.com/OneGov/onegov-cloud/compare/1de8d90f39^...8cde20cbf7)
+
+### Core
+
+##### Add function to check if an enum exists.
+
+`Feature` | [542436165a](https://github.com/onegov/onegov-cloud/commit/542436165aedc25e0c724cf6703bf4544b8b40fb)
+
+##### Fix result of enum_exists.
+
+`Bugfix` | [dd767a7f1e](https://github.com/onegov/onegov-cloud/commit/dd767a7f1ebca0a0302c4149a7729a901ca52fee)
+
+## 2022.35
+
+`2022-07-09` | [2e71bf09b2...60f18c065e](https://github.com/OneGov/onegov-cloud/compare/2e71bf09b2^...60f18c065e)
+
+### Activity
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [97cbf7747a](https://github.com/onegov/onegov-cloud/commit/97cbf7747a0979419227f59b360408a0060249d1)
+
+### Election Day
+
+##### Cleanup party name translation migrations.
+
+`Feature` | [OGC-471](https://linear.app/onegovcloud/issue/OGC-471) | [1314183b38](https://github.com/onegov/onegov-cloud/commit/1314183b38ffa02e6fe84b484c67b70d11abf35f)
+
+##### Add test to check for orphaned party results.
+
+`Feature` | [OGC-494](https://linear.app/onegovcloud/issue/OGC-494) | [261735ad69](https://github.com/onegov/onegov-cloud/commit/261735ad69fa0f489c28d1bb89cbee3203f97a0d)
+
+##### Add gender to candidates.
+
+`Feature` | [OGC-489](https://linear.app/onegovcloud/issue/OGC-489) | [cf8397c303](https://github.com/onegov/onegov-cloud/commit/cf8397c303722e6a9145ba79593957e37ed5b13a)
+
+##### Add year of birth to candidates.
+
+`Feature` | [OGC-489](https://linear.app/onegovcloud/issue/OGC-489) | [bee734bc9e](https://github.com/onegov/onegov-cloud/commit/bee734bc9ed788d86da207cd28948bc3906e5e00)
+
+##### Add expats to ballot and election results.
+
+`Feature` | [OGC-394](https://linear.app/onegovcloud/issue/OGC-394) | [bef115bd9d](https://github.com/onegov/onegov-cloud/commit/bef115bd9de48b36989389c04bb54ceba2b9cc95)
+
+##### Remove election compound lists view.
+
+`Bugfix` | [OGC-495](https://linear.app/onegovcloud/issue/OGC-495) | [1ff774b7e9](https://github.com/onegov/onegov-cloud/commit/1ff774b7e920f6b688c731f397b1f5313a07cfc0)
+
+##### Remove election compound lists view.
+
+`Bugfix` | [OGC-495](https://linear.app/onegovcloud/issue/OGC-495) | [1029bd7432](https://github.com/onegov/onegov-cloud/commit/1029bd74321fb7495eee97431bddac7c78e66298)
+
+### Feriennet
+
+##### Also return activities for periods in payment phase in JSON.
+
+`Bugfix` | [PRO-991](https://linear.app/projuventute/issue/PRO-991) | [63b5157779](https://github.com/onegov/onegov-cloud/commit/63b5157779c2d55d2e6cbf6d38db7e06bf009836)
+
+### Org
+
+##### Allows auto-accepting tickets for specific user roles
+
+`Feature` | [OGC-481](https://linear.app/onegovcloud/issue/OGC-481) | [2e71bf09b2](https://github.com/onegov/onegov-cloud/commit/2e71bf09b20ce241ed66d2c6dfc14dae24d45f7b)
+
+##### Activates date navigation and week numbers for room reservations
+
+`Feature` | [OGC-334](https://linear.app/onegovcloud/issue/OGC-334) | [d8233e81d7](https://github.com/onegov/onegov-cloud/commit/d8233e81d74d02befb1c2362df825a96307341f6)
+
+##### Fixes warning in cronjob tests.
+
+`Bugfix` | [7a19572b62](https://github.com/onegov/onegov-cloud/commit/7a19572b62f99cadfc08ba5893e90e0833c04978)
+
+##### Fix anchor position for category links
+
+`Bugfix` | [OGC-460](https://linear.app/onegovcloud/issue/OGC-460) | [c295a89b61](https://github.com/onegov/onegov-cloud/commit/c295a89b61c92838e9c94e8424111155115a94dd)
+
+##### Fix assign ticket function
+
+Excluded inactive users from choices, listed non-admin users with ticket-rights
+
+`Bugfix` | [OGC-428](https://linear.app/onegovcloud/issue/OGC-428) | [dbc8b4f511](https://github.com/onegov/onegov-cloud/commit/dbc8b4f511d67023c5323bcfbb7e232cdce6a270)
+
+### Pay
+
+##### Fixes stripe public identity if business name is missing.
+
+`Bugfix` | [PRO-1050](https://linear.app/projuventute/issue/PRO-1050) | [35cf745058](https://github.com/onegov/onegov-cloud/commit/35cf7450581b8518897f638ebcfc46a9c05baeb6)
+
+### People
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [dbab1c0e98](https://github.com/onegov/onegov-cloud/commit/dbab1c0e98a04f4181be0cb92e7887db5450f4b5)
+
+### Recipient
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [bc0d39c3b3](https://github.com/onegov/onegov-cloud/commit/bc0d39c3b3263692ba7176ee2bbf305946608209)
+
+### Reservation
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [005550581d](https://github.com/onegov/onegov-cloud/commit/005550581d5310eecd0a62b55ea04907eb1f8fb9)
+
+### User
+
+##### Improve compatibility with SQLAlchemy 1.4.
+
+`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [c2cae6a465](https://github.com/onegov/onegov-cloud/commit/c2cae6a4654f8718f87329472a55f84f0046d136)
+
+### Winterthur
+
+##### Add schichtplan image.
+
+`Feature` | [OGC-447](https://linear.app/onegovcloud/issue/OGC-447) | [56863a3141](https://github.com/onegov/onegov-cloud/commit/56863a3141ea8cf3ce4272ad795bb813c1eecf05)
+
 ## 2022.34
 
-`2022-06-29` | [2087d4d1d8...df9b976f13](https://github.com/OneGov/onegov-cloud/compare/2087d4d1d8^...df9b976f13)
+`2022-06-29` | [2087d4d1d8...914b428fee](https://github.com/OneGov/onegov-cloud/compare/2087d4d1d8^...914b428fee)
 
 ### Ballot
 
@@ -1779,64 +1909,4 @@ Addionally, store text extracts per file.
 ##### Add link on whole focus widget.
 
 `Other` | [OGC-122](https://linear.app/onegovcloud/issue/OGC-122) | [896ee5bdf0](https://github.com/onegov/onegov-cloud/commit/896ee5bdf0d73e80ab4c731d0057d3321a3aab94)
-
-## 2021.88
-
-`2021-11-01` | [2cb5fe49f8...246345e7b7](https://github.com/OneGov/onegov-cloud/compare/2cb5fe49f8^...246345e7b7)
-
-### Org
-
-##### Fix event import date/time parsing.
-
-`Bugfix` | [OGC_88](#OGC_88) | [dd73a9d6c6](https://github.com/onegov/onegov-cloud/commit/dd73a9d6c681fc73e6dd3d3b0217c2094b34d9aa)
-
-### Swissvotes
-
-##### Add post-vote poll dataset hint.
-
-`Feature` | [SWI-19](https://linear.app/swissvotes/issue/SWI-19) | [2cb5fe49f8](https://github.com/onegov/onegov-cloud/commit/2cb5fe49f8f2be2e1d84c582b4c6cbf0900326aa)
-
-##### Add blank lines between recommendations.
-
-`Feature` | [SWI-19](https://linear.app/swissvotes/issue/SWI-19) | [04a03e5df1](https://github.com/onegov/onegov-cloud/commit/04a03e5df14c25b541933783e26be7e3eeed23ff)
-
-## 2021.87
-
-`2021-11-01` | [4a1d5d96e7...e9d1328651](https://github.com/OneGov/onegov-cloud/compare/4a1d5d96e7^...e9d1328651)
-
-### Feriennet
-
-##### Update Italian translations.
-
-`Other` | [PRO-805](https://linear.app/projuventute/issue/PRO-805) | [4a1d5d96e7](https://github.com/onegov/onegov-cloud/commit/4a1d5d96e7bc4d4dd1b46dfeb246cd9a9fd3285f)
-
-### Org
-
-##### Add ticket pickup hint.
-
-`Feature` | [OGC-103](https://linear.app/onegovcloud/issue/OGC-103) | [c0dbb1cedb](https://github.com/onegov/onegov-cloud/commit/c0dbb1cedb17848c0b44e90f5064e6f4923a8f2d)
-
-##### Add import for events.
-
-`Feature` | [OGC-88](https://linear.app/onegovcloud/issue/OGC-88) | [9fad3a64a1](https://github.com/onegov/onegov-cloud/commit/9fad3a64a1ced1292493e384637bd9aacd14a6e0)
-
-### Town6
-
-##### Improve focus widgets.
-
-`Other` | [OGC-86](https://linear.app/onegovcloud/issue/OGC-86) | [a08eb1021c](https://github.com/onegov/onegov-cloud/commit/a08eb1021cf17a774e21163260c4ba0a30056a58)
-
-##### Fix homepage tiles layout.
-
-`Bugfix` | [OGC-115](https://linear.app/onegovcloud/issue/OGC-115) | [b82085deef](https://github.com/onegov/onegov-cloud/commit/b82085deefbd62ee7021063720564e39b5d09070)
-
-## 2021.86
-
-`2021-10-26` | [fdc1567f8b...3f171e8f67](https://github.com/OneGov/onegov-cloud/compare/fdc1567f8b^...3f171e8f67)
-
-### Feriennet
-
-##### Add experimental support for QR-bills.
-
-`Feature` | [PRO-667](https://linear.app/projuventute/issue/PRO-667) | [fdc1567f8b](https://github.com/onegov/onegov-cloud/commit/fdc1567f8becdf25e65a2d3674b738b32782eea7)
 

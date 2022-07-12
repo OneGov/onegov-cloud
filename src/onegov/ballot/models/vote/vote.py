@@ -305,6 +305,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
                 row['invalid'] = result.invalid
                 row['empty'] = result.empty
                 row['eligible_voters'] = result.eligible_voters
+                row['expats'] = result.expats or ''
 
                 rows.append(row)
 

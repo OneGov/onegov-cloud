@@ -99,7 +99,15 @@ def import_vote_internal(vote, principal, file, mimetype):
         except ValueError as e:
             line_errors.append(e.args[0])
 
-        # the empty votes
+        # the expats
+        try:
+            expats = validate_integer(
+                line, 'expats', optional=True, default=None
+            )
+        except ValueError as e:
+            line_errors.append(e.args[0])
+
+        # the expats
         try:
             empty = validate_integer(line, 'empty')
         except ValueError as e:
@@ -139,6 +147,7 @@ def import_vote_internal(vote, principal, file, mimetype):
                     yeas=yeas,
                     nays=nays,
                     eligible_voters=eligible_voters,
+                    expats=expats,
                     entity_id=entity_id,
                     empty=empty,
                     invalid=invalid
