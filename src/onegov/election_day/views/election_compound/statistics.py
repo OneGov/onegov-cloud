@@ -3,6 +3,9 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils.election_compound import \
+    get_candidate_statistics
+from onegov.election_day.utils.election_compound import get_elected_candidates
 
 
 @ElectionDayApp.html(
@@ -15,8 +18,12 @@ def view_election_statistics(self, request):
 
     """" The main view. """
 
+    elected_candidates = get_elected_candidates(self, request.session).all()
+    candidate_statistics = get_candidate_statistics(elected_candidates)
+
     return {
         'election_compound': self,
+        'candidate_statistics': candidate_statistics,
         'layout': ElectionCompoundLayout(self, request, 'statistics')
     }
 

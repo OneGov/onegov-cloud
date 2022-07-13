@@ -12,6 +12,7 @@ from onegov.election_day.utils.parties import get_party_results_deltas
 
 
 # todo: test superregions with a BL dataset
+# todo: test candidate genders and year of birth with ZG dataset
 
 
 def test_election_utils_compound(import_test_datasets, election_day_app_sg):
@@ -76,34 +77,36 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
             'votes': 0
         }
     }
+    id_1 = election_1.id
+    id_2 = election_2.id
     assert get_elected_candidates(election_compound, session).all() == [
-        ('Bruss-Schmidheiny', 'Carmen', '', 'SVP', '01', election_1.id),
-        ('Eugster', 'Thomas', '', 'SVP', '01', election_1.id),
-        ('Freund', 'Walter', '', 'SVP', '01', election_1.id),
-        ('Götte', 'Michael', '', 'SVP', '01', election_2.id),
-        ('Kuster', 'Peter', '', 'SVP', '01', election_1.id),
-        ('Luterbacher', 'Mäge', '', 'SVP', '01', election_2.id),
-        ('Wasserfallen', 'Sandro', '', 'SVP', '01', election_2.id),
-        ('Willi', 'Christian', '', 'SVP', '01', election_1.id),
-        ('Wüst', 'Markus', '', 'SVP', '01', election_1.id),
-        ('Broger', 'Andreas', '', 'CVP', '02', election_1.id),
-        ('Dürr', 'Patrick', '', 'CVP', '02', election_1.id),
-        ('Hess', 'Sandro', '', 'CVP', '02', election_1.id),
-        ('Schöbi', 'Michael', '', 'CVP', '02', election_1.id),
-        ('Frei', 'Raphael', '', 'FDP', '02a', election_2.id),
-        ('Raths', 'Robert', '', 'FDP', '02a', election_2.id),
-        ('Britschgi', 'Stefan', '', 'FDP', '03', election_1.id),
-        ('Graf', 'Claudia', '', 'FDP', '03', election_1.id),
-        ('Huber', 'Rolf', '', 'FDP', '03', election_1.id),
-        ('Bucher', 'Laura', '', 'SP', '04', election_1.id),
-        ('Gemperli', 'Dominik', '', 'CVP', '04', election_2.id),
-        ('Krempl-Gnädinger', 'Luzia', '', 'CVP', '04', election_2.id),
-        ('Maurer', 'Remo', '', 'SP', '04', election_1.id),
-        ('Etterlin', 'Guido', '', 'SP', '05', election_2.id),
-        ('Gschwend', 'Meinrad', '', 'GRÜ', '05', election_1.id),
-        ('Schöb', 'Andrea', '', 'SP', '05', election_2.id),
-        ('Losa', 'Jeannette', '', 'GRÜ', '06', election_2.id),
-        ('Mattle', 'Ruedi', '', 'GLP', '06', election_1.id)
+        ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', id_1),
+        ('Eugster', 'Thomas', '', None, None, 'SVP', '01', id_1),
+        ('Freund', 'Walter', '', None, None, 'SVP', '01', id_1),
+        ('Götte', 'Michael', '', None, None, 'SVP', '01', id_2),
+        ('Kuster', 'Peter', '', None, None, 'SVP', '01', id_1),
+        ('Luterbacher', 'Mäge', '', None, None, 'SVP', '01', id_2),
+        ('Wasserfallen', 'Sandro', '', None, None, 'SVP', '01', id_2),
+        ('Willi', 'Christian', '', None, None, 'SVP', '01', id_1),
+        ('Wüst', 'Markus', '', None, None, 'SVP', '01', id_1),
+        ('Broger', 'Andreas', '', None, None, 'CVP', '02', id_1),
+        ('Dürr', 'Patrick', '', None, None, 'CVP', '02', id_1),
+        ('Hess', 'Sandro', '', None, None, 'CVP', '02', id_1),
+        ('Schöbi', 'Michael', '', None, None, 'CVP', '02', id_1),
+        ('Frei', 'Raphael', '', None, None, 'FDP', '02a', id_2),
+        ('Raths', 'Robert', '', None, None, 'FDP', '02a', id_2),
+        ('Britschgi', 'Stefan', '', None, None, 'FDP', '03', id_1),
+        ('Graf', 'Claudia', '', None, None, 'FDP', '03', id_1),
+        ('Huber', 'Rolf', '', None, None, 'FDP', '03', id_1),
+        ('Bucher', 'Laura', '', None, None, 'SP', '04', id_1),
+        ('Gemperli', 'Dominik', '', None, None, 'CVP', '04', id_2),
+        ('Krempl-Gnädinger', 'Luzia', '', None, None, 'CVP', '04', id_2),
+        ('Maurer', 'Remo', '', None, None, 'SP', '04', id_1),
+        ('Etterlin', 'Guido', '', None, None, 'SP', '05', id_2),
+        ('Gschwend', 'Meinrad', '', None, None, 'GRÜ', '05', id_1),
+        ('Schöb', 'Andrea', '', None, None, 'SP', '05', id_2),
+        ('Losa', 'Jeannette', '', None, None, 'GRÜ', '06', id_2),
+        ('Mattle', 'Ruedi', '', None, None, 'GLP', '06', id_1)
     ]
 
     # Add final results

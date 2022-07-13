@@ -626,10 +626,10 @@ class PdfGenerator():
                     label('district'),
                 ],
                 [[
-                    '{} {}'.format(r[0], r[1]),
-                    r[3],
-                    districts.get(r[5], ('', ''))[1],
-                    districts.get(r[5], ('', ''))[0],
+                    '{} {}'.format(r.family_name, r.first_name),
+                    r.list,
+                    districts.get(r.election_id, ('', ''))[1],
+                    districts.get(r.election_id, ('', ''))[0],
                 ] for r in get_elected_candidates(compound, self.session)],
                 [None, None, 2 * cm, 2 * cm],
                 pdf.style.table_results_3
@@ -642,9 +642,9 @@ class PdfGenerator():
                     label('district'),
                 ],
                 [[
-                    '{} {}'.format(r[0], r[1]),
-                    r[3],
-                    districts.get(r[5], ('', ''))[0]
+                    '{} {}'.format(r.family_name, r.first_name),
+                    r.list,
+                    districts.get(r.election_id, ('', ''))[0]
                 ] for r in get_elected_candidates(compound, self.session)],
                 [None, None, 2 * cm],
                 pdf.style.table_results_2
