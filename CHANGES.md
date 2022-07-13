@@ -1,8 +1,28 @@
 # Changes
 
+## 2022.38
+
+`2022-07-13` | [489484c4d7...87243827ad](https://github.com/OneGov/onegov-cloud/compare/489484c4d7^...87243827ad)
+
+### Org
+
+##### Add find your spot to search across all rooms in a category
+
+`Feature` | [OGC-328](https://linear.app/onegovcloud/issue/OGC-328) | [87243827ad](https://github.com/onegov/onegov-cloud/commit/87243827ad0dcc655921580d0aa583742a098467)
+
+##### Fixes typo in translation
+
+`Bugfix` | [27b9816e79](https://github.com/onegov/onegov-cloud/commit/27b9816e79b512086c565200dfa94509b4676474)
+
+### Winterthur
+
+##### Fixes title not using translations.
+
+`Bugfix` | [OGC-447](https://linear.app/onegovcloud/issue/OGC-447) | [489484c4d7](https://github.com/onegov/onegov-cloud/commit/489484c4d7fd58f90348ba15314c758456f70b16)
+
 ## 2022.37
 
-`2022-07-10` | [230fbfbab3...230fbfbab3](https://github.com/OneGov/onegov-cloud/compare/230fbfbab3^...230fbfbab3)
+`2022-07-10` | [230fbfbab3...fd6a1c15cc](https://github.com/OneGov/onegov-cloud/compare/230fbfbab3^...fd6a1c15cc)
 
 ### Winterthur
 
@@ -1859,54 +1879,4 @@ Addionally, store text extracts per file.
 ##### Adjust brief description link.
 
 `Other` | [SWI-17](https://linear.app/swissvotes/issue/SWI-17) | [8e53278631](https://github.com/onegov/onegov-cloud/commit/8e5327863182748bb85ddb0750ed5fd7b79738b5)
-
-## 2021.89
-
-`2021-11-11` | [927e7222f1...b4ee607625](https://github.com/OneGov/onegov-cloud/compare/927e7222f1^...b4ee607625)
-
-### Feriennet
-
-##### Fix translation.
-
-`Bugfix` | [PRO-945](https://linear.app/projuventute/issue/PRO-945) | [09c8777fbe](https://github.com/onegov/onegov-cloud/commit/09c8777fbe1f86a63c200ef75bae695e8d584fc1)
-
-##### Fix Italian translations.
-
-`Bugfix` | [PRO-970](https://linear.app/projuventute/issue/PRO-970) | [4591feb5e3](https://github.com/onegov/onegov-cloud/commit/4591feb5e3de3db567199f4991bdef587ed5ba1c)
-
-### Ferriennet
-
-##### Add translations for QR bills.
-
-`Other` | [PRO-667](https://linear.app/projuventute/issue/PRO-667) | [ea9f02fccf](https://github.com/onegov/onegov-cloud/commit/ea9f02fccf4026d386daad32ab3bcbb1d6de1182)
-
-### Org
-
-##### Fix typo.
-
-`Bugfix` | [OGC-126](https://linear.app/onegovcloud/issue/OGC-126) | [98b76b76bf](https://github.com/onegov/onegov-cloud/commit/98b76b76bf2328cbe952e47c1171400de499f7e4)
-
-### Swissvotes
-
-##### Add title column for brief description.
-
-`Feature` | [SWI-17](https://linear.app/swissvotes/issue/SWI-17) | [4e9f0efd53](https://github.com/onegov/onegov-cloud/commit/4e9f0efd533f8943231783394b94c7ed95f16e7f)
-
-##### Add additional links.
-
-`Feature` | [0125ce4521](https://github.com/onegov/onegov-cloud/commit/0125ce4521461a44782def2c7cef723f1a830a8b)
-
-##### Drop unused columns.
-
-`Other` | [SWI-29](https://linear.app/swissvotes/issue/SWI-29) | [f9846c8cf0](https://github.com/onegov/onegov-cloud/commit/f9846c8cf0bfee70c6f499a0748f85697265d6a8)
-
-### Town6
-
-##### Remove slider controls for less than 2 images.
-
-`Feature` | [OGC-118](https://linear.app/onegovcloud/issue/OGC-118) | [d455670454](https://github.com/onegov/onegov-cloud/commit/d45567045442bbdca53febb1756bfd78fd7f8452)
-
-##### Add link on whole focus widget.
-
-`Other` | [OGC-122](https://linear.app/onegovcloud/issue/OGC-122) | [896ee5bdf0](https://github.com/onegov/onegov-cloud/commit/896ee5bdf0d73e80ab4c731d0057d3321a3aab94)
 
