@@ -430,7 +430,7 @@ msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mostra il numero di elettori esatto anziché i valori arrotondati."
 
 msgid "Seat allocation"
-msgstr ""
+msgstr "Ripartizione dei seggi"
 
 msgid ""
 "Shows a tab with the comparison of seat allocation as a bar chart. Requires "

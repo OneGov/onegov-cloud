@@ -434,7 +434,7 @@ msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
 
 msgid "Seat allocation"
-msgstr ""
+msgstr Repartiziun dals sezs"
 
 msgid ""
 "Shows a tab with the comparison of seat allocation as a bar chart. Requires "
