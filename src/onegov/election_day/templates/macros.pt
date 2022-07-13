@@ -404,8 +404,8 @@
                 <th tal:repeat="year years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
             </tr>
         </thead>
-        <tbody tal:define="current_year python: years[-1]">
-            <tr tal:repeat="party parties">
+        <tbody tal:condition="years">
+            <tr tal:repeat="party parties" tal:define="current_year python: years[-1]">
                 <td>${parties[party][current_year]['name']}</td>
                 <td tal:repeat="year years" class="right-aligned">${parties[party][year]['mandates']}</td>
             </tr>
