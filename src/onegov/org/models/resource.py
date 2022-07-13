@@ -7,17 +7,40 @@ from libres.db.models import ReservedSlot
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
+from onegov.org import _
 from onegov.org.models.extensions import ContactExtension, \
     ResourceValidationExtension
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
-from onegov.reservation import Resource, Reservation
+from onegov.reservation import Resource, ResourceCollection, Reservation
 from onegov.search import SearchableContent
 from onegov.ticket import Ticket
 from sqlalchemy.orm import undefer
 from sqlalchemy.sql.expression import cast
 from uuid import uuid4, uuid5
+
+
+class FindYourSpotCollection(ResourceCollection):
+
+    def __init__(self, libres_context, group):
+        super().__init__(libres_context)
+        self.group = group
+
+    @property
+    def title(self):
+        return _("Find Your Spot")
+
+    @property
+    def meta(self):
+        return {'lead': _("Search for available dates")}
+
+    def query(self):
+        query = self.session.query(Resource)
+        # we only support find-your-spot for rooms for now
+        query = query.filter(Resource.type == 'room')
+        query = query.filter(Resource.group == (self.group or ''))
+        return query
 
 
 class SharedMethods(object):

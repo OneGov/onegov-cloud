@@ -1,18 +1,21 @@
 from onegov.core.security import Public, Private
-from onegov.org.views.ticket import view_ticket, handle_new_note, \
-    handle_edit_note, message_to_submitter, view_ticket_status, view_tickets, \
-    view_archived_tickets, assign_ticket
+from onegov.org.views.ticket import (
+    view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
+    view_ticket_status, view_tickets, view_archived_tickets,
+    view_pending_tickets, assign_ticket)
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import TicketNoteForm, TicketAssignmentForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import InternalTicketChatMessageForm
 from onegov.org.models import TicketNote
+from onegov.org.models.resource import FindYourSpotCollection
 from onegov.town6 import _
 from onegov.ticket import Ticket
 from onegov.ticket.collection import TicketCollection
-from onegov.town6.layout import TicketLayout, TicketNoteLayout, \
-    TicketChatMessageLayout, TicketsLayout
+from onegov.town6.layout import (
+    FindYourSpotLayout, TicketLayout, TicketNoteLayout,
+    TicketChatMessageLayout, TicketsLayout)
 
 
 @TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -73,3 +76,10 @@ def town_view_tickets(self, request):
               permission=Private)
 def town_view_archived_tickets(self, request):
     return view_archived_tickets(self, request, TicketsLayout(self, request))
+
+
+@TownApp.html(model=FindYourSpotCollection, name='tickets',
+              template='pending_tickets.pt', permission=Public)
+def town_view_pending_tickets(self, request):
+    return view_pending_tickets(
+        self, request, FindYourSpotLayout(self, request))

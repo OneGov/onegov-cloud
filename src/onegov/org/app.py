@@ -421,6 +421,12 @@ def get_fullcalendar_asset():
     yield 'reservationcalendar_custom.js'
 
 
+@OrgApp.webasset('reservationlist')
+def get_reservation_list_asset():
+    yield 'reservationlist.jsx'
+    yield 'reservationlist_custom.js'
+
+
 @OrgApp.webasset('code_editor')
 def get_code_editor_asset():
     yield 'ace.js'

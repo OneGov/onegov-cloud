@@ -17,6 +17,7 @@ from onegov.org.forms.newsletter import NewsletterSendForm
 from onegov.org.forms.newsletter import NewsletterTestForm
 from onegov.org.forms.page import LinkForm, PageForm
 from onegov.org.forms.person import PersonForm
+from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import ReservationForm
 from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
@@ -52,6 +53,7 @@ __all__ = [
     'EventForm',
     'EventImportForm',
     'ExportForm',
+    'FindYourSpotForm',
     'FooterSettingsForm',
     'FormDefinitionForm',
     'FormRegistrationWindowForm',

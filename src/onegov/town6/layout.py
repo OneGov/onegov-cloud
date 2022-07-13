@@ -909,6 +909,23 @@ class ResourcesLayout(DefaultLayout):
             ]
 
 
+class FindYourSpotLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(
+                _("Homepage"), self.homepage_url
+            ),
+            Link(
+                _("Reservations"), self.request.class_link(ResourceCollection)
+            ),
+            Link(
+                _("Find Your Spot"), self.request.link(self.model)
+            )
+        ]
+
+
 class ResourceRecipientsLayout(DefaultLayout):
 
     @cached_property
