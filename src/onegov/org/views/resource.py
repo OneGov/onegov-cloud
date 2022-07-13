@@ -152,8 +152,9 @@ def view_find_your_spot(self, request, form, layout=None):
         }
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
-            for allocation in room.scheduler.search_allocations(
-                    start, end, days=form.weekdays.data, strict=True):
+            for allocation in request.exclude_invisible(
+                    room.scheduler.search_allocations(
+                        start, end, days=form.weekdays.data, strict=True)):
 
                 date = allocation.display_start().date()
                 if date not in room_slots:
