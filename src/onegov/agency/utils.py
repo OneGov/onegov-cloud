@@ -29,6 +29,17 @@ def emails_for_new_ticket(model, request):
         seen.add(address.addr_spec)
         yield address
 
+    # we need to match the access permission behavior of the tickets
+    # so we can figure out if a group filter needs to be applied
+    # we do this by getting the relevant list of groupids, if there
+    # is no relevant list groupids will be None, and we don't need
+    # to filter the groups at all.
+    permissions = request.app.ticket_permissions.get(handler_code, {})
+    if hasattr(model, 'group') and model.group in permissions:
+        groupids = permissions[model.group]
+    else:
+        groupids = permissions.get(None)
+
     # we try to minimize the amount of e-mail address parsing we
     # perform by de-duplicating the raw usernames as we get them
     for agency in agencies:
@@ -42,16 +53,14 @@ def emails_for_new_ticket(model, request):
                 continue
 
             # if the group does not have permission to manage this
-            # handler_code, then we can skip it
-            if not any(permission.handler_code == handler_code
-                       for permission in group.ticket_permissions):
+            # type of ticket then we need to skip it
+            if groupids is not None and group.id.hex not in groupids:
                 continue
 
             # if the group does not have immediate notification
             # turned on, then skip it
             if not group.meta:
                 continue
-
             if group.meta.get('immediate_notification') != 'yes':
                 continue
 
