@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-08-17 15:33+0200\n"
+"POT-Creation-Date: 2022-07-14 16:35+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -175,6 +175,15 @@ msgstr "Adresse"
 
 msgid "Notes"
 msgstr "Bemerkungen"
+
+msgid "Immediate e-mail notification to members upon ticket submission"
+msgstr "Unmittelbare E-Mail-Benachrichtigung an Mitglieder bei Ticketeingang"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
 
 msgid "People with memberships can't be deleted"
 msgstr "Personen mit Mitgliedschaften können nicht gelöscht werden"
@@ -374,6 +383,9 @@ msgstr ""
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
+
+msgid "New ticket"
+msgstr ""
 
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
