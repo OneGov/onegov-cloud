@@ -58,7 +58,7 @@ def view_allocations_json(self, request):
     # but only return the master allocations
     return tuple(
         e.as_dict() for e in utils.AllocationEventInfo.from_allocations(
-            request, self.scheduler, tuple(query)
+            request, self, tuple(query)
         )
     )
 

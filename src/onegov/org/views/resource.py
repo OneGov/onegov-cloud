@@ -7,7 +7,7 @@ from datetime import datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
 from morepath.request import Response
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
@@ -473,17 +473,22 @@ def get_date_range(resource, params):
     return sedate.align_range_to_day(start, end, resource.timezone)
 
 
-@OrgApp.html(model=Resource, permission=Private, name='occupancy',
+@OrgApp.html(model=Resource, permission=Personal, name='occupancy',
              template='resource_occupancy.pt')
 def view_occupancy(self, request, layout=None):
+    # for members check if they're actually allowed to see this
+    if request.has_role('member') and not self.occupancy_is_visible_to_members:
+        raise exc.HTTPForbidden()
 
     # infer the default start/end date from the calendar view parameters
     start, end = get_date_range(self, request.params)
 
-    query = self.reservations_with_tickets_query(start, end)
+    # include pending reservations
+    query = self.reservations_with_tickets_query(
+        start, end, exclude_pending=False)
     query = query.with_entities(
         Reservation.start, Reservation.end, Reservation.quota,
-        Ticket.subtitle, Ticket.id
+        Reservation.data, Ticket.subtitle, Ticket.id
     )
 
     def group_key(record):
@@ -491,24 +496,28 @@ def view_occupancy(self, request, layout=None):
 
     occupancy = OrderedDict()
     grouped = groupby(query.all(), group_key)
-    Entry = namedtuple('Entry', ('start', 'end', 'title', 'quota', 'url'))
+    Entry = namedtuple(
+        'Entry', ('start', 'end', 'title', 'quota', 'pending', 'url'))
     count = 0
+    pending_count = 0
 
     for date, records in grouped:
         occupancy[date] = tuple(
             Entry(
-                start=sedate.to_timezone(r[0], self.timezone),
+                start=sedate.to_timezone(start, self.timezone),
                 end=sedate.to_timezone(
-                    r[1] + timedelta(microseconds=1), self.timezone),
-                quota=r[2],
-                title=r[3],
+                    end + timedelta(microseconds=1), self.timezone),
+                quota=quota,
+                title=title,
+                pending=not data or not data.get('accepted'),
                 url=request.class_link(Ticket, {
                     'handler_code': 'RSV',
-                    'id': r[4]
+                    'id': ticket_id
                 })
-            ) for r in records
+            ) for start, end, quota, data, title, ticket_id in records
         )
         count += len(occupancy[date])
+        pending_count += sum(1 for entry in occupancy[date] if entry.pending)
 
     layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
@@ -526,6 +535,7 @@ def view_occupancy(self, request, layout=None):
         'start': sedate.to_timezone(start, self.timezone).date(),
         'end': sedate.to_timezone(end, self.timezone).date(),
         'count': count,
+        'pending_count': pending_count,
         'utilisation': utilisation
     }
 

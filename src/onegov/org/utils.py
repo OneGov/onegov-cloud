@@ -15,6 +15,7 @@ from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
+from onegov.reservation import Resource
 from onegov.ticket import TicketCollection
 from operator import attrgetter
 from purl import URL
@@ -327,18 +328,21 @@ class ReservationInfo(object):
 
 class AllocationEventInfo:
 
-    __slots__ = ['allocation', 'availability', 'request', 'translate']
+    __slots__ = ('resource', 'allocation', 'availability', 'request',
+                 'translate')
 
-    def __init__(self, allocation, availability, request):
+    def __init__(self, resource, allocation, availability, request):
+        self.resource = resource
         self.allocation = allocation
         self.availability = availability
         self.request = request
         self.translate = request.translate
 
     @classmethod
-    def from_allocations(cls, request, scheduler, allocations):
+    def from_allocations(cls, request, resource, allocations):
         events = []
 
+        scheduler = resource.scheduler
         allocations = request.exclude_invisible(allocations)
 
         for key, group in groupby(allocations, key=attrgetter('_start')):
@@ -351,6 +355,7 @@ class AllocationEventInfo:
                 if allocation.is_master:
                     events.append(
                         cls(
+                            resource,
                             allocation,
                             availability,
                             request
@@ -441,6 +446,18 @@ class AllocationEventInfo:
                 yield 'event-unavailable'
 
     @property
+    def occupancy_link(self):
+        return self.request.class_link(
+            Resource,
+            {
+                'name': self.resource.name,
+                'date': self.allocation.start,
+                'view': 'agendaDay'
+            },
+            name='occupancy'
+        )
+
+    @property
     def event_actions(self):
         if self.request.is_manager:
             yield Link(
@@ -469,6 +486,11 @@ class AllocationEventInfo:
                     yes_button_text=_("Delete allocation")
                 )
             else:
+                yield Link(
+                    _("Occupancy"),
+                    self.occupancy_link
+                )
+
                 yield DeleteLink(
                     _("Delete"),
                     self.request.link(self.allocation),
@@ -480,6 +502,12 @@ class AllocationEventInfo:
                         "To delete this allocation, all existing reservations "
                         "need to be cancelled first."
                     )
+                )
+        elif self.availability < 100.0 and self.request.has_role('member'):
+            if self.resource.occupancy_is_visible_to_members:
+                yield Link(
+                    _("Occupancy"),
+                    self.occupancy_link
                 )
 
     def as_dict(self):
