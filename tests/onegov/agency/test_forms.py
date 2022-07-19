@@ -434,21 +434,26 @@ def test_user_group_form(session):
     assert form.name.data == 'A'
     assert form.users.data == []
     assert form.agencies.data == []
+    assert form.immediate_notification.data == 'no'
 
     form.name.data = 'A/B'
     form.users.data = [str(user_a.id), str(user_b.id)]
     form.agencies.data = [str(agency_a.id), str(agency_b.id)]
+    form.immediate_notification.data = 'yes'
     form.update_model(group)
     assert group.users.count() == 2
     assert group.role_mappings.count() == 2
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is False
+    assert isinstance(group.meta, dict)
+    assert group.meta['immediate_notification'] == 'yes'
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
     assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
     assert set(form.agencies.data) == {str(agency_a.id), str(agency_b.id)}
+    assert form.immediate_notification.data == 'yes'
 
     user_a.logout_all_sessions.reset_mock()
     user_b.logout_all_sessions.reset_mock()
@@ -457,9 +462,11 @@ def test_user_group_form(session):
     form.name.data = 'A.1'
     form.users.data = [str(user_c.id)]
     form.agencies.data = [str(agency_a_1.id)]
+    form.immediate_notification.data = 'no'
     form.update_model(group)
     assert group.users.one() == user_c
     assert group.role_mappings.one().content_id == str(agency_a_1.id)
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is True
+    assert group.meta['immediate_notification'] == 'no'
