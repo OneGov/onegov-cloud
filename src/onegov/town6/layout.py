@@ -1077,6 +1077,16 @@ class ResourceLayout(DefaultLayout):
                     attrs={'class': 'rule-link'}
                 )
             ]
+        elif self.request.has_role('member'):
+            if self.model.occupancy_is_visible_to_members:
+                return [
+                    Link(
+                        text=_("Occupancy"),
+                        url=self.request.link(self.model, 'occupancy'),
+                        attrs={
+                            'class': ('occupancy-link', 'calendar-dependent')}
+                    )
+                ]
 
 
 @step_sequences.registered_step(

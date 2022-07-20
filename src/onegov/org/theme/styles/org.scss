@@ -5887,6 +5887,19 @@ h2 + div.timeline {
 }
 
 /*
+    Reservation
+*/
+
+.reservation-pending {
+    color: #999;
+
+    .has-tip {
+        font-size: .8rem;
+        vertical-align: text-bottom;
+    }
+}
+
+/*
     Ticket panels
 */
 .ticket-panel {
