@@ -1161,6 +1161,34 @@ def test_occupancy_view(client):
     assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
 
 
+def test_occupancy_view_member_access(client):
+
+    # setup a resource that's visible to members
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'test'
+    new.form['access'] = 'member'
+    new.form.submit().follow()
+
+    # by default members aren't allowed to view occupancy
+    client.login_member()
+    occupancy = client.get('/resource/test/occupancy', expect_errors=True)
+    assert occupancy.status_code == 403
+
+    # but if we explicitly enable it on the resource
+    client.login_admin()
+    edit = client.get('/resource/test/edit')
+    edit.form['occupancy_is_visible_to_members'] = True
+    edit.form.submit().maybe_follow()
+
+    # now members should be able to access it
+    client.login_member()
+    occupancy = client.get('/resource/test/occupancy')
+    assert occupancy.status_code == 200
+
+
 @freeze_time("2015-08-28", tick=True)
 def test_reservation_export_view(client):
 
