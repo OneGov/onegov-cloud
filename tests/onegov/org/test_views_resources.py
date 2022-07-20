@@ -747,7 +747,7 @@ def test_reserve_allocation(client):
     assert len(slots.json) == 1
 
     with pytest.raises(AffectedReservationError):
-        client.delete(client.extract_href(slots.json[0]['actions'][2]))
+        client.delete(client.extract_href(slots.json[0]['actions'][3]))
 
     # open the created ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
@@ -1148,14 +1148,17 @@ def test_occupancy_view(client):
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
-    # at this point, the reservation won't show up in the occupancy view
+    # at this point, the reservation will show up, but it should be
+    # marked pending
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 0
+    assert len(occupancy.pyquery('.occupancy-block')) == 1
+    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
 
     # ..until we accept it
     ticket.click('Alle Reservationen annehmen')
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
+    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
 
 
 @freeze_time("2015-08-28", tick=True)
