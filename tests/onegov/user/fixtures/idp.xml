@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<md:EntityDescriptor entityID="https://testidp.zg.ch" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata">
+    <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:KeyDescriptor>
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                <ds:X509Data>
+                    <ds:X509Certificate>MIIDkDCCAnigAwIBAgIBATANBgkqhkiG9w0BAQsFADBTMQswCQYDVQQGEwJDSDEMMAoGA1UECBMDWnVnMQwwCgYDVQQHEwNadWcxDDAKBgNVBAsTA0FJTzEaMBgGA1UEAxMRc2VzLXRlc3RpZHAuemcuY2gwHhcNMjAwOTI4MTYyNTAwWhcNMzAwOTI4MTYyNTAwWjBTMQswCQYDVQQGEwJDSDEMMAoGA1UECBMDWnVnMQwwCgYDVQQHEwNadWcxDDAKBgNVBAsTA0FJTzEaMBgGA1UEAxMRc2VzLXRlc3RpZHAuemcuY2gwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDSc3draaxQ0aLTqE8eruTLW0anSY6mUz2XFAjJnj2vpBqF963ZRW9LlI1u1GL86Q4U2kHzCkzVbjamfy7vppf2YQMGaIt3ZJZ7DkSutfnz5ygqtpb+GkNbV7ny0OqpuSIZSnaT94RzjPEeP51N9u8KuEY0XnvSA7bjJEgbYlbPobtr7VSacM2bM3JqT4hHUkSjHcaYD9pcRNkSekpFBJ9l3QrgxzWTZt/pUahjedb7OoArgmecHwhrHCFTcWlXAvFKshenUZyPfDGoriZLkrFkVirQQg1OZkRRdfV9fho3o0fxx5RbKTL0x/LiOlYX43yn8IZV1skFsCD2lsIDNkfTAgMBAAGjbzBtMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFBzrH1+7m/Hp0kowElzLRAuWcL03MAsGA1UdDwQEAwIF4DARBglghkgBhvhCAQEEBAMCBkAwHgYJYIZIAYb4QgENBBEWD3hjYSBjZXJ0aWZpY2F0ZTANBgkqhkiG9w0BAQsFAAOCAQEAkF+5VP1wlwKXvf1yMQWOFgZp4D+PrODeTJrdqba86/EzBPnprGM11qF8Exx+bivHbb0KHSLKsZoQlHi8SYbxvaCxIpWuq0cPWNjJZ3H9hCxlFZssdyVrMw2ClVo5+zh9c5ZKqRhRL2AxvQomuTOY1dPtaTdUHYy4ghvGe0pRWkA3yGMVcMdewszODeSllPHEWkQF+1vYaQfBo3hG+6Lo1mMH0iD0w7aJ0PdnnZJVCSbNkyaefyLgpyvsJZZrstqAD7a84NGRbQzMJLzTA2i0DDi4m/3KozCbqUQQP0q/1ns6NVU2vQWnX4gBxHgJJ8jH/kqQeIyvL0YwJShG0ij7vg==</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </md:KeyDescriptor>
+        <md:SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://testidp.zg.ch/login/sls/slo"/>
+        <md:SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://testidp.zg.ch/login/sls/slo"/>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+        <md:SingleSignOnService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://testidp.zg.ch/login/sls/auth"/>
+        <md:SingleSignOnService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://testidp.zg.ch/login/sls/auth"/>
+    </md:IDPSSODescriptor>
+</md:EntityDescriptor>
