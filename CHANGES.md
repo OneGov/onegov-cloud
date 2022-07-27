@@ -1,8 +1,18 @@
 # Changes
 
+## 2022.40
+
+`2022-07-27` | [373f3fe922...373f3fe922](https://github.com/OneGov/onegov-cloud/compare/373f3fe922^...373f3fe922)
+
+### User
+
+##### Adds SAML2 authentication provider
+
+`Feature` | [OGC-430](https://linear.app/onegovcloud/issue/OGC-430) | [373f3fe922](https://github.com/onegov/onegov-cloud/commit/373f3fe9224ddac7a031593a35deb31c270fe808)
+
 ## 2022.39
 
-`2022-07-20` | [7f482cb1e0...c1cc1f4f4e](https://github.com/OneGov/onegov-cloud/compare/7f482cb1e0^...c1cc1f4f4e)
+`2022-07-20` | [7f482cb1e0...3914d75524](https://github.com/OneGov/onegov-cloud/compare/7f482cb1e0^...3914d75524)
 
 ### Agency
 
@@ -1843,26 +1853,4 @@ Addionally, store text extracts per file.
 ##### Update display format of brief description title.
 
 `Other` | [SWI-17](https://linear.app/swissvotes/issue/SWI-17) | [621927d18a](https://github.com/onegov/onegov-cloud/commit/621927d18a500d316094994b23411addc2fc0704)
-
-## 2021.91
-
-`2021-11-18` | [cfd18ef3a0...b346914d99](https://github.com/OneGov/onegov-cloud/compare/cfd18ef3a0^...b346914d99)
-
-### Org
-
-##### Fix typo
-
-`Other` | [OGC-126](https://linear.app/onegovcloud/issue/OGC-126) | [a5f96aa73b](https://github.com/onegov/onegov-cloud/commit/a5f96aa73b2c1cb6830c159b54dfc781b75fef0a)
-
-### Swissvotes
-
-##### Add additional campaign material.
-
-`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [e64ae929a8](https://github.com/onegov/onegov-cloud/commit/e64ae929a80fbcead446273a2443b04b9ab75f75)
-
-### Town6
-
-##### Improve footer logo spacing.
-
-`Other` | [OGC-124](https://linear.app/onegovcloud/issue/OGC-124) | [34e115b8ed](https://github.com/onegov/onegov-cloud/commit/34e115b8ed4ab11a0a30c4c285503ecd43c18c6f)
 
