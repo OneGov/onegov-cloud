@@ -119,14 +119,14 @@ dependencies:
 
 #### MacOS
 ```shell
-brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv
+brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv libxmlsec1
 ```
 
 #### Ubuntu
 ```shell
-sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev
-libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev
-libpoppler-cpp-dev pv libzbar0 openssl libssl-dev
+sudo apt-get install libcurl4-openssl-dev libffi-dev libjpeg-dev libpq-dev \
+libxml2-dev libxslt1-dev zlib1g-dev libev-dev libgnutls28-dev libkrb5-dev \
+libpoppler-cpp-dev pv libzbar0 openssl libssl-dev libxmlsec1 libxmlsec1-openssl
 ```
 
 ## Installation

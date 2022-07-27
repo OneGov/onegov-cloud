@@ -1,9 +1,9 @@
 """ The authentication views. """
 
-from onegov.core.security import Public, Personal
+from onegov.core.security import Public
 from onegov.org.views.auth import (
-    handle_login, handle_registration, do_logout,
-    handle_password_reset_request, handle_password_reset
+    handle_login, handle_registration, handle_password_reset,
+    handle_password_reset_request
 )
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
@@ -29,11 +29,6 @@ def town_handle_login(self, request, form):
 def town_handle_registration(self, request, form):
     return handle_registration(
         self, request, form, DefaultLayout(self, request))
-
-
-@TownApp.html(model=Auth, name='logout', permission=Personal)
-def view_logout(self, request):
-    return do_logout(self, request)
 
 
 @TownApp.form(model=Auth, name='request-password', template='form.pt',
