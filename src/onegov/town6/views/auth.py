@@ -2,7 +2,7 @@
 
 from onegov.core.security import Public
 from onegov.org.views.auth import (
-    handle_login, handle_registration, handle_password_reset, 
+    handle_login, handle_registration, handle_password_reset,
     handle_password_reset_request
 )
 from onegov.town6 import TownApp

@@ -205,7 +205,7 @@ class SAML2Client():
                     f'SAML2 config error: {str(e)}')
         return conn
 
-    def get_name_id(self, user):  
+    def get_name_id(self, user):
         if user and user.data:
             return user.data.get('saml2_transient_id')
 
