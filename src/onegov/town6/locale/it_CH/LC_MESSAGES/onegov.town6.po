@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-07-19 16:31+0200\n"
+"POT-Creation-Date: 2022-08-02 11:39+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -643,9 +643,6 @@ msgstr "Questo album non contiene ancora nessuna immagine."
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
-msgid "Search"
-msgstr "Cerca"
-
 #, fuzzy
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
@@ -655,6 +652,12 @@ msgstr "Torna alla pagina principale"
 
 msgid "Logo"
 msgstr "Logo"
+
+msgid "Search term"
+msgstr "Termine di ricerca"
+
+msgid "Perform Search"
+msgstr "Ricerca"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
@@ -1685,6 +1688,9 @@ msgid ""
 msgstr ""
 "La ricerca non è attualmente disponibile a causa di difficoltà tecniche. Ci "
 "scusiamo dell'inconveniente, riprova più tardi."
+
+msgid "Search"
+msgstr "Cerca"
 
 msgid "Select the images that should be shown inside this album."
 msgstr ""

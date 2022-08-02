@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-07-19 16:31+0200\n"
+"POT-Creation-Date: 2022-08-02 11:39+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -650,9 +650,6 @@ msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 
-msgid "Search"
-msgstr "Suche"
-
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
 
@@ -661,6 +658,12 @@ msgstr "Zurück zur Startseite"
 
 msgid "Logo"
 msgstr "Logo"
+
+msgid "Search term"
+msgstr "Suchbegriff"
+
+msgid "Perform Search"
+msgstr "Suchen"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -1691,6 +1694,9 @@ msgstr ""
 "Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
 "Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später "
 "wieder."
+
+msgid "Search"
+msgstr "Suche"
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
