@@ -298,7 +298,7 @@ $transition-duration: .1s;
 
     .typeahead {
         position: absolute;
-        bottom: 0;
+        top: 50%;
     }
 
     .input-group-field:not(:focus) + .typeahead {
@@ -332,9 +332,10 @@ $transition-duration: .1s;
 
     .accordion-content {
         left: 0;
-        margin-top: 2rem;
         position: absolute;
+        top: 100%;
         width: 100%;
+        z-index: 1;
     }
 }
 

@@ -134,3 +134,12 @@ def test_announcement(client):
         f'<div id="announcement" style="color: {color}; '
         f'background-color: {bg_color};">'
     ) in page
+
+
+def test_search_in_header(client_with_es):
+    # Use search in header
+    page = client_with_es.get("/")
+    assert "Suchbegriff" in page
+    page.form['q'] = 'aktuell'
+    page = page.form.submit()
+    assert "Aktuelles" in page

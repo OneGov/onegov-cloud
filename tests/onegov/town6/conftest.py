@@ -84,8 +84,16 @@ def es_town_app(request):
     yield create_town_app(request, use_elasticsearch=True)
 
 
-def create_town_app(request, use_elasticsearch):
-    app = create_app(TownApp, request, use_elasticsearch=False)
+@pytest.fixture(scope='function')
+def client_with_es(es_town_app):
+    client = Client(es_town_app)
+    client.skip_first_form = True
+    client.use_intercooler = True
+    return client
+
+
+def create_town_app(request, use_elasticsearch=False):
+    app = create_app(TownApp, request, use_elasticsearch)
     app.configure_payment_providers(**{
         'payment_providers_enabled': True,
         'payment_provider_defaults': {
