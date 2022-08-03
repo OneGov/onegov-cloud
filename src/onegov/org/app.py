@@ -160,9 +160,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return PublicationCollection(self.session()).query().count()
 
     def prepare_email(self, reply_to=None, **kwargs):
-        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`, setting
-        the reply_to address by using the reply address from the organisation
-        settings.
+        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`,
+        setting the reply_to address by using the reply address from the
+        organisation settings.
 
         """
         category = kwargs.get('category', 'marketing')
@@ -325,6 +325,8 @@ def org_content_security_policy():
     policy.connect_src.add('https://sentry.io')
     policy.connect_src.add('https://*.google-analytics.com')
     policy.connect_src.add('https://stats.g.doubleclick.net')
+    policy.connect_src.add('https://map.geo.bs.ch')
+    policy.connect_src.add('https://wmts.geo.bs.ch')
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
     policy.connect_src.add('https://stats.seantis.ch')
