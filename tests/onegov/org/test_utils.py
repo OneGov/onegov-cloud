@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from functools import partial
 from onegov.org import utils
 from pytz import timezone
 
@@ -120,15 +119,37 @@ def test_predict_next_daterange_dst_st_transitions():
         dt = datetime(*args, tzinfo=None)
         return tz_ch.localize(dt, is_dst=is_dst)
 
-    # DST -> ST on border-time
+    # DST -> ST both times abiguous
     assert utils.predict_next_daterange((
-        (dt_ch(2022, 10, 9, 2), dt_ch(2022, 10, 9, 3)),
-        (dt_ch(2022, 10, 16, 2), dt_ch(2022, 10, 16, 3)),
-        (dt_ch(2022, 10, 23, 2), dt_ch(2022, 10, 23, 3)),
+        (dt_ch(2022, 10, 9, 2), dt_ch(2022, 10, 9, 2, 30)),
+        (dt_ch(2022, 10, 16, 2), dt_ch(2022, 10, 16, 2, 30)),
+        (dt_ch(2022, 10, 23, 2), dt_ch(2022, 10, 23, 2, 30)),
     )) == (
-        # we expect the start to be in DST and the end to be in ST
-        dt_ch(2022, 10, 30, 2, is_dst=True),
-        dt_ch(2022, 10, 30, 3, is_dst=False)
+        # we expect the start and end to both be in ST
+        dt_ch(2022, 10, 30, 2, is_dst=False),
+        dt_ch(2022, 10, 30, 2, 30, is_dst=False)
+    )
+
+    # DST -> ST start time ambiguous
+    assert utils.predict_next_daterange((
+        (dt_ch(2022, 10, 9, 2), dt_ch(2022, 10, 9, 4)),
+        (dt_ch(2022, 10, 16, 2), dt_ch(2022, 10, 16, 4)),
+        (dt_ch(2022, 10, 23, 2), dt_ch(2022, 10, 23, 4)),
+    )) == (
+        # we expect the start to be in ST
+        dt_ch(2022, 10, 30, 2, is_dst=False),
+        dt_ch(2022, 10, 30, 4)
+    )
+
+    # DST -> ST end time ambiguous
+    assert utils.predict_next_daterange((
+        (dt_ch(2022, 10, 9, 1), dt_ch(2022, 10, 9, 2)),
+        (dt_ch(2022, 10, 16, 1), dt_ch(2022, 10, 16, 2)),
+        (dt_ch(2022, 10, 23, 1), dt_ch(2022, 10, 23, 2)),
+    )) == (
+        # we expect the end to be in ST
+        dt_ch(2022, 10, 30, 1),
+        dt_ch(2022, 10, 30, 2, is_dst=False)
     )
 
     # DST -> ST some other time
@@ -138,7 +159,7 @@ def test_predict_next_daterange_dst_st_transitions():
         (dt_ch(2022, 10, 23, 10), dt_ch(2022, 10, 23, 12)),
     )) == (dt_ch(2022, 10, 30, 10), dt_ch(2022, 10, 30, 12))
 
-    # ST -> DST on border-time (should not yield a suggestion)
+    # ST -> DST start time doesn't exist (no suggestion)
     assert utils.predict_next_daterange((
         (dt_ch(2022, 3, 6, 2), dt_ch(2022, 3, 6, 3)),
         (dt_ch(2022, 3, 13, 2), dt_ch(2022, 3, 13, 3)),

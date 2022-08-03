@@ -732,8 +732,9 @@ def predict_next_daterange(dateranges, min_probability=0.8, tzinfo=None):
             tzinfo = last_end.tzinfo
 
     if tzinfo is not None:
-        # we strip the tzinfo on the input dateranges so calculations
-        # won't have different results in summer vs. standard time
+        # if we did get a tz aware datetime then we need to strip
+        # the tzinfo on the input dateranges so calculations won't
+        # have different results in summer vs. standard time
         dateranges = [
             (s.replace(tzinfo=None), e.replace(tzinfo=None))
             for s, e in dateranges
@@ -768,14 +769,9 @@ def predict_next_daterange(dateranges, min_probability=0.8, tzinfo=None):
             # in this case we don't make a suggestion (because we can't)
             return None
         except pytz.AmbiguousTimeError:
-            # while we do generate a valid suggestion in this case
-            # it won't currently be reserved correctly, so follow-up
-            # reservations will be incorrect. this would need to be
-            # handled in the reservation logic, since for reserving
-            # only a start and end time is supplied (the date is implicit)
-            # but we do it anyways to be good citizens, so if we ever
-            # do reserve it correctly, we already do the "right" thing here
-            return (tzinfo.localize(start, is_dst=True),
+            # we treat ambiguous times as standard time always, in the
+            # calendar it shouldn't make a visual difference anyways
+            return (tzinfo.localize(start, is_dst=False),
                     tzinfo.localize(end, is_dst=False))
 
     return predict_next_value(
