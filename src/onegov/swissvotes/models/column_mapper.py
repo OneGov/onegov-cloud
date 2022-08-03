@@ -695,7 +695,8 @@ class ColumnMapperDataset(object):
 
 
 class ColumnMapperMetadata(object):
-    """ Defines the columns used for the metadata and provides helper functions.
+    """ Defines the columns used for the metadata and provides helper
+    functions.
 
     Typically, you want to iterate over all attributes of a vote (``columns``,
     ``items``, ``get_values``, ``get_items``) and set/get them (``set_value``,
