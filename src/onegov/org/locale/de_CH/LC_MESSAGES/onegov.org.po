@@ -1785,7 +1785,7 @@ msgid "External resource link"
 msgstr "Externer Reservationslink"
 
 msgid "New external resource"
-msgstr "Neue Externe Reservation"
+msgstr "Neue externe Reservation"
 
 msgid "Notifications"
 msgstr "Mitteilungen"
