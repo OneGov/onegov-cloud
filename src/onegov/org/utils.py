@@ -1,6 +1,7 @@
 import colorsys
 import re
 import sedate
+import pytz
 
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
@@ -712,7 +713,7 @@ def show_libres_error(e, request):
     request.alert(get_libres_error(e, request))
 
 
-def predict_next_daterange(dateranges, min_probability=0.8):
+def predict_next_daterange(dateranges, min_probability=0.8, tzinfo=None):
     """ Takes a list of dateranges (start, end) and tries to predict the next
     daterange in the list.
 
@@ -720,11 +721,68 @@ def predict_next_daterange(dateranges, min_probability=0.8):
 
     """
 
+    if not dateranges:
+        return None
+
+    if tzinfo is None:
+        # we remember the original tzinfo of the final date
+        # since that is the one we will need to transform back
+        last_end = dateranges[-1][1]
+        if hasattr(last_end, 'tzinfo'):
+            tzinfo = last_end.tzinfo
+
+    if tzinfo is not None:
+        # we strip the tzinfo on the input dateranges so calculations
+        # won't have different results in summer vs. standard time
+        dateranges = [
+            (s.replace(tzinfo=None), e.replace(tzinfo=None))
+            for s, e in dateranges
+        ]
+
+    def add_delta(time_range, delta):
+        start, end = time_range
+
+        # after calculating the tz-naive suggestion we need to
+        # add the original tzinfo back, but handle DST <-> ST
+        # transitions correctly
+        start += delta
+        end += delta
+
+        if tzinfo is None:
+            # we never were localized to begin with so just return
+            return start, end
+
+        # if we didn't get a pytz tzinfo we just add it back and
+        # hope it does the correct thing (it probably won't) but
+        # at that point it is no longer our responsibility
+        if not hasattr(tzinfo, 'localize'):
+            return start.replace(tzinfo=tzinfo), end.replace(tzinfo=tzinfo)
+
+        try:
+            # try to return the localized daterange without worrying
+            # about DST and ST, pytz will throw an exception if we
+            # use an ambiguous or non-existent time
+            return (tzinfo.localize(start, is_dst=None),
+                    tzinfo.localize(end, is_dst=None))
+        except pytz.NonExistentTimeError:
+            # in this case we don't make a suggestion (because we can't)
+            return None
+        except pytz.AmbiguousTimeError:
+            # while we do generate a valid suggestion in this case
+            # it won't currently be reserved correctly, so follow-up
+            # reservations will be incorrect. this would need to be
+            # handled in the reservation logic, since for reserving
+            # only a start and end time is supplied (the date is implicit)
+            # but we do it anyways to be good citizens, so if we ever
+            # do reserve it correctly, we already do the "right" thing here
+            return (tzinfo.localize(start, is_dst=True),
+                    tzinfo.localize(end, is_dst=False))
+
     return predict_next_value(
         values=dateranges,
         min_probability=min_probability,
         compute_delta=lambda x, y: y[0] - x[0],
-        add_delta=lambda x, d: (x[0] + d, x[1] + d)
+        add_delta=add_delta
     )
 
 

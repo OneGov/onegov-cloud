@@ -1,5 +1,7 @@
 from datetime import date, datetime
+from functools import partial
 from onegov.org import utils
+from pytz import timezone
 
 
 def test_annotate_html():
@@ -108,3 +110,44 @@ def test_predict_next_daterange():
         (datetime(2017, 1, 3, 10), datetime(2017, 1, 3, 12)),
         (datetime(2017, 1, 5, 10), datetime(2017, 1, 5, 12)),
     )) == (datetime(2017, 1, 7, 10), datetime(2017, 1, 7, 12))
+
+
+def test_predict_next_daterange_dst_st_transitions():
+    tz_ch = timezone('Europe/Zurich')
+
+    def dt_ch(*args, is_dst=None):
+        # None -> not ambiguous, pick for me
+        dt = datetime(*args, tzinfo=None)
+        return tz_ch.localize(dt, is_dst=is_dst)
+
+    # DST -> ST on border-time
+    assert utils.predict_next_daterange((
+        (dt_ch(2022, 10, 9, 2), dt_ch(2022, 10, 9, 3)),
+        (dt_ch(2022, 10, 16, 2), dt_ch(2022, 10, 16, 3)),
+        (dt_ch(2022, 10, 23, 2), dt_ch(2022, 10, 23, 3)),
+    )) == (
+        # we expect the start to be in DST and the end to be in ST
+        dt_ch(2022, 10, 30, 2, is_dst=True),
+        dt_ch(2022, 10, 30, 3, is_dst=False)
+    )
+
+    # DST -> ST some other time
+    assert utils.predict_next_daterange((
+        (dt_ch(2022, 10, 9, 10), dt_ch(2022, 10, 9, 12)),
+        (dt_ch(2022, 10, 16, 10), dt_ch(2022, 10, 16, 12)),
+        (dt_ch(2022, 10, 23, 10), dt_ch(2022, 10, 23, 12)),
+    )) == (dt_ch(2022, 10, 30, 10), dt_ch(2022, 10, 30, 12))
+
+    # ST -> DST on border-time (should not yield a suggestion)
+    assert utils.predict_next_daterange((
+        (dt_ch(2022, 3, 6, 2), dt_ch(2022, 3, 6, 3)),
+        (dt_ch(2022, 3, 13, 2), dt_ch(2022, 3, 13, 3)),
+        (dt_ch(2022, 3, 20, 2), dt_ch(2022, 3, 20, 3)),
+    )) is None
+
+    # ST -> DST some other time
+    assert utils.predict_next_daterange((
+        (dt_ch(2022, 3, 6, 10), dt_ch(2022, 3, 6, 12)),
+        (dt_ch(2022, 3, 13, 10), dt_ch(2022, 3, 13, 12)),
+        (dt_ch(2022, 3, 20, 10), dt_ch(2022, 3, 20, 12)),
+    )) == (dt_ch(2022, 3, 27, 10), dt_ch(2022, 3, 27, 12))
