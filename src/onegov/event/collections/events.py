@@ -326,7 +326,7 @@ class EventCollection(Pagination):
                 end = start + duration
 
             if not start or not end:
-                raise(ValueError("Invalid date"))
+                raise (ValueError("Invalid date"))
 
             recurrence = vevent.get('rrule', '')
             if recurrence:
