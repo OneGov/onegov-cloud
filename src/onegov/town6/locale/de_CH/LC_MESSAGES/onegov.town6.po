@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-06-29 07:27+0200\n"
+"POT-Creation-Date: 2022-07-19 16:31+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -257,6 +257,9 @@ msgstr "Externer Reservationslink"
 
 msgid "New external resource"
 msgstr "Neue externe Reservation"
+
+msgid "Find Your Spot"
+msgstr "Terminsuche"
 
 msgid "Notifications"
 msgstr "Mitteilungen"
@@ -1664,6 +1667,12 @@ msgstr ""
 msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
 "Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
+
+msgid "Reservation is pending approval"
+msgstr "Diese Reservation wurde noch nicht akzeptiert"
+
+msgid "(${num_pending} pending approval)"
+msgstr "(${num_pending} noch nicht akzeptiert)"
 
 msgid "Utilised"
 msgstr "Ausgelastet"

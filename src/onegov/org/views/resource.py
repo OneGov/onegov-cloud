@@ -4,11 +4,11 @@ import sedate
 import collections
 
 from collections import OrderedDict, namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
-from itertools import groupby
+from itertools import groupby, islice
 from morepath.request import Response
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
@@ -17,15 +17,19 @@ from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.org import _, OrgApp, utils
 from onegov.org.elements import Link
 from onegov.org.forms import (
-    ResourceForm, ResourceCleanupForm, ResourceExportForm
+    FindYourSpotForm, ResourceForm, ResourceCleanupForm, ResourceExportForm
 )
-from onegov.org.layout import ResourcesLayout, ResourceLayout
+from onegov.org.layout import (
+    FindYourSpotLayout, ResourcesLayout, ResourceLayout
+)
+from onegov.org.models.resource import (
+    DaypassResource, FindYourSpotCollection, RoomResource, ItemResource
+)
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
-from onegov.org.models.resource import DaypassResource, RoomResource, \
-    ItemResource
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.ticket import Ticket, TicketCollection
+from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, select
@@ -89,7 +93,6 @@ def get_resource_form(self, request, type=None):
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request, layout=None):
-
     resources = group_by_column(
         request=request,
         query=self.query(),
@@ -148,6 +151,137 @@ def view_resources(self, request, layout=None):
         'edit_link': edit_link,
         'external_link': external_link,
         'lead_func': lead_func,
+    }
+
+
+@OrgApp.form(model=FindYourSpotCollection, template='find_your_spot.pt',
+             permission=Public, form=FindYourSpotForm)
+def view_find_your_spot(self, request, form, layout=None):
+    # HACK: Focus results
+    form.action += '#results'
+    room_slots = None
+    rooms = sorted(
+        request.exclude_invisible(self.query()),
+        key=attrgetter('title')
+    )
+    if not rooms:
+        # we'll treat categories without rooms as non-existant
+        raise exc.HTTPNotFound()
+
+    form.apply_rooms(rooms)
+    if form.submitted(request):
+        if form.rooms:
+            # filter rooms according to the form selection
+            rooms = [room for room in rooms if room.id in form.rooms.data]
+
+        start_time = form.start_time.data
+        end_time = form.end_time.data
+        start = datetime.combine(form.start.data, start_time)
+        end = datetime.combine(form.end.data, end_time)
+
+        def included_dates():
+            # yields all the dates that should be part of our result set
+            current = start.date()
+            max_date = end.date()
+            while current <= max_date:
+                if not form.is_excluded(current):
+                    yield current
+                current += timedelta(days=1)
+
+        # initialize the room slots with all the included dates and rooms
+        room_slots = {
+            d: {room.id: [] for room in rooms}
+            for d in included_dates()
+        }
+        for room in rooms:
+            room.bind_to_libres_context(request.app.libres_context)
+            for allocation in request.exclude_invisible(
+                    room.scheduler.search_allocations(
+                        start, end, days=form.weekdays.data, strict=True)):
+
+                date = allocation.display_start().date()
+                if date not in room_slots:
+                    continue
+
+                slots = room_slots[date][room.id]
+                target_start, target_end = sedate.get_date_range(
+                    allocation.display_start(),
+                    start_time,
+                    end_time
+                )
+                if not allocation.partly_available:
+                    quota_left = allocation.quota_left
+                    slots.append(utils.FindYourSpotEventInfo(
+                        allocation,
+                        None,  # won't be displayed
+                        quota_left / allocation.quota,
+                        quota_left,
+                        request
+                    ))
+                    continue
+
+                free = allocation.free_slots(target_start, target_end)
+                if not free:
+                    continue
+
+                target_range = (target_end - target_start)
+                slot_start, slot_end = free[0]
+                slot_end += time.resolution
+                for next_slot_start, next_slot_end in islice(free, 1, None):
+                    if slot_end != next_slot_start:
+                        availability = (slot_end - slot_start) / target_range
+                        availability *= 100.0
+                        slots.append(utils.FindYourSpotEventInfo(
+                            allocation,
+                            (sedate.to_timezone(
+                                slot_start, allocation.timezone),
+                                sedate.to_timezone(
+                                    slot_end, allocation.timezone)),
+                            availability,
+                            1 if availability >= 5.0 else 0,
+                            request
+                        ))
+                        slot_start = next_slot_start
+
+                    # expand slot end
+                    slot_end = next_slot_end + time.resolution
+
+                # add final slot
+                availability = (slot_end - slot_start) / target_range
+                availability *= 100.0
+                slots.append(utils.FindYourSpotEventInfo(
+                    allocation,
+                    (sedate.to_timezone(slot_start, allocation.timezone),
+                     sedate.to_timezone(slot_end, allocation.timezone)),
+                    availability,
+                    1 if availability >= 5.0 else 0,
+                    request
+                ))
+
+    if room_slots:
+        request.include('reservationlist')
+
+    return {
+        'title': _("Find Your Spot"),
+        'form': form,
+        'rooms': rooms,
+        'room_slots': room_slots,
+        'layout': layout or FindYourSpotLayout(self, request)
+    }
+
+
+@OrgApp.json(model=FindYourSpotCollection, name='reservations',
+             permission=Public)
+def get_find_your_spot_reservations(self, request):
+    return {
+        'reservations': sorted(
+            (utils.ReservationInfo(resource, reservation, request).as_dict()
+                for resource in request.exclude_invisible(self.query())
+                for reservation in resource.bound_reservations(request)),
+            key=itemgetter('date')
+        ),
+        # no predictions in the list
+        'prediction': None
     }
 
 
@@ -382,17 +516,22 @@ def get_date_range(resource, params):
     return sedate.align_range_to_day(start, end, resource.timezone)
 
 
-@OrgApp.html(model=Resource, permission=Private, name='occupancy',
+@OrgApp.html(model=Resource, permission=Personal, name='occupancy',
              template='resource_occupancy.pt')
 def view_occupancy(self, request, layout=None):
+    # for members check if they're actually allowed to see this
+    if request.has_role('member') and not self.occupancy_is_visible_to_members:
+        raise exc.HTTPForbidden()
 
     # infer the default start/end date from the calendar view parameters
     start, end = get_date_range(self, request.params)
 
-    query = self.reservations_with_tickets_query(start, end)
+    # include pending reservations
+    query = self.reservations_with_tickets_query(
+        start, end, exclude_pending=False)
     query = query.with_entities(
         Reservation.start, Reservation.end, Reservation.quota,
-        Ticket.subtitle, Ticket.id
+        Reservation.data, Ticket.subtitle, Ticket.id
     )
 
     def group_key(record):
@@ -400,24 +539,28 @@ def view_occupancy(self, request, layout=None):
 
     occupancy = OrderedDict()
     grouped = groupby(query.all(), group_key)
-    Entry = namedtuple('Entry', ('start', 'end', 'title', 'quota', 'url'))
+    Entry = namedtuple(
+        'Entry', ('start', 'end', 'title', 'quota', 'pending', 'url'))
     count = 0
+    pending_count = 0
 
     for date, records in grouped:
         occupancy[date] = tuple(
             Entry(
-                start=sedate.to_timezone(r[0], self.timezone),
+                start=sedate.to_timezone(start, self.timezone),
                 end=sedate.to_timezone(
-                    r[1] + timedelta(microseconds=1), self.timezone),
-                quota=r[2],
-                title=r[3],
+                    end + timedelta(microseconds=1), self.timezone),
+                quota=quota,
+                title=title,
+                pending=not data or not data.get('accepted'),
                 url=request.class_link(Ticket, {
                     'handler_code': 'RSV',
-                    'id': r[4]
+                    'id': ticket_id
                 })
-            ) for r in records
+            ) for start, end, quota, data, title, ticket_id in records
         )
         count += len(occupancy[date])
+        pending_count += sum(1 for entry in occupancy[date] if entry.pending)
 
     layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
@@ -435,6 +578,7 @@ def view_occupancy(self, request, layout=None):
         'start': sedate.to_timezone(start, self.timezone).date(),
         'end': sedate.to_timezone(end, self.timezone).date(),
         'count': count,
+        'pending_count': pending_count,
         'utilisation': utilisation
     }
 

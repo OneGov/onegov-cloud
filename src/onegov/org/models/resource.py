@@ -7,12 +7,13 @@ from libres.db.models import ReservedSlot
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
+from onegov.org import _
 from onegov.org.models.extensions import ContactExtension, \
     ResourceValidationExtension
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
-from onegov.reservation import Resource, Reservation
+from onegov.reservation import Resource, ResourceCollection, Reservation
 from onegov.search import SearchableContent
 from onegov.ticket import Ticket
 from sqlalchemy.orm import undefer
@@ -20,10 +21,33 @@ from sqlalchemy.sql.expression import cast
 from uuid import uuid4, uuid5
 
 
+class FindYourSpotCollection(ResourceCollection):
+
+    def __init__(self, libres_context, group):
+        super().__init__(libres_context)
+        self.group = group
+
+    @property
+    def title(self):
+        return _("Find Your Spot")
+
+    @property
+    def meta(self):
+        return {'lead': _("Search for available dates")}
+
+    def query(self):
+        query = self.session.query(Resource)
+        # we only support find-your-spot for rooms for now
+        query = query.filter(Resource.type == 'room')
+        query = query.filter(Resource.group == (self.group or ''))
+        return query
+
+
 class SharedMethods(object):
 
     lead = meta_property()
     text = content_property()
+    occupancy_is_visible_to_members = meta_property()
 
     @property
     def deletable(self):
@@ -107,7 +131,8 @@ class SharedMethods(object):
 
         return uuid5(self.id, request.browser_session.libres_session_id.hex)
 
-    def reservations_with_tickets_query(self, start=None, end=None):
+    def reservations_with_tickets_query(
+            self, start=None, end=None, exclude_pending=True):
         """ Returns a query which joins this resource's reservations between
         start and end with the tickets table.
 
@@ -124,7 +149,8 @@ class SharedMethods(object):
         query = query.order_by(Reservation.start)
         query = query.order_by(Ticket.subtitle)
         query = query.filter(Reservation.status == 'approved')
-        query = query.filter(Reservation.data != None)
+        if exclude_pending:
+            query = query.filter(Reservation.data != None)
 
         return query
 

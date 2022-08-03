@@ -8,6 +8,7 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.ticket import TranslatorMutationTicket
 from onegov.user import Auth
 
@@ -119,6 +120,21 @@ def restrict_ticket(app, identity, model, permission):
     model=Ticket, permission=object, identity=None)
 def restrict_ticket_anon(app, identity, model, permission):
     return False
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=AccreditationTicket, permission=object, identity=None)
+def restrict_accreditation_ticket_anon(app, identity, model, permission):
+    return permission == Public
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=AccreditationTicket, permission=object)
+def restrict_accreditation_ticket(app, identity, model, permission):
+    if permission == Public:
+        return True
+
+    return identity.role == 'admin'
 
 
 @TranslatorDirectoryApp.permission_rule(

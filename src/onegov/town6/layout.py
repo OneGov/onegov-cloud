@@ -932,6 +932,23 @@ class ResourcesLayout(DefaultLayout):
             ]
 
 
+class FindYourSpotLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(
+                _("Homepage"), self.homepage_url
+            ),
+            Link(
+                _("Reservations"), self.request.class_link(ResourceCollection)
+            ),
+            Link(
+                _("Find Your Spot"), self.request.link(self.model)
+            )
+        ]
+
+
 class ResourceRecipientsLayout(DefaultLayout):
 
     @cached_property
@@ -1083,6 +1100,16 @@ class ResourceLayout(DefaultLayout):
                     attrs={'class': 'rule-link'}
                 )
             ]
+        elif self.request.has_role('member'):
+            if self.model.occupancy_is_visible_to_members:
+                return [
+                    Link(
+                        text=_("Occupancy"),
+                        url=self.request.link(self.model, 'occupancy'),
+                        attrs={
+                            'class': ('occupancy-link', 'calendar-dependent')}
+                    )
+                ]
 
 
 @step_sequences.registered_step(
@@ -2324,7 +2351,7 @@ class HomepageLayout(DefaultLayout):
     @property
     def editbar_links(self):
         if self.request.is_manager:
-            return[
+            return [
                 Link(
                     _("Edit"),
                     self.request.link(self.model, 'homepage-settings'),

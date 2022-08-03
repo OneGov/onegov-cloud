@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-06-29 07:27+0200\n"
+"POT-Creation-Date: 2022-07-19 16:31+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -250,6 +250,9 @@ msgstr "Link a risorse esterne"
 
 msgid "New external resource"
 msgstr "Nuova risorsa esterna"
+
+msgid "Find Your Spot"
+msgstr "Cerca le date"
 
 #, fuzzy
 msgid "Notifications"
@@ -1659,6 +1662,12 @@ msgstr ""
 msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
 "Rimuove tutte le allocazioni non riservate tra la data di inizio e di fine."
+
+msgid "Reservation is pending approval"
+msgstr "La prenotazione è in attesa di approvazione"
+
+msgid "(${num_pending} pending approval)"
+msgstr "(${num_pending} in attesa di approvazione)"
 
 msgid "Utilised"
 msgstr "Utilizzato"

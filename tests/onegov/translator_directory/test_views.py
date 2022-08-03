@@ -5,6 +5,7 @@ import transaction
 from datetime import datetime
 from io import BytesIO
 from onegov.gis import Coordinates
+from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
@@ -25,6 +26,17 @@ class FakeResponse:
 
     def json(self):
         return self.json_data
+
+
+def upload_pdf(filename):
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_report()
+    pdf.p(filename)
+    pdf.generate()
+    file.seek(0)
+
+    return Upload(filename, file.read(), 'application/pdf')
 
 
 def test_view_translator(client):
@@ -108,7 +120,7 @@ def test_view_translator(client):
         for dl in page.pyquery('dl')
     }
     assert values['Personal Nr.'] == '978654'
-    assert values['Zulassung'] == 'nicht zertifiziert / Einsatz Dringlichkeit'
+    assert values['Zulassung'] == 'nicht akkreditiert / Einsatz Dringlichkeit'
     assert values['Quellensteuer'] == 'Nein'
     assert values['Selbständig'] == 'Nein'
     assert values['Geschlecht'] == 'Männlich'
@@ -123,9 +135,9 @@ def test_view_translator(client):
     assert 'Ernährung' in values['Fachkenntnisse nach Berufssparte']
     assert 'Psychologie' in values['Fachkenntnisse nach Berufssparte']
     assert values['Muttersprachen'] == language_names[3]
-    assert language_names[0] in values['Sprachen Wort']
-    assert language_names[1] in values['Sprachen Wort']
-    assert values['Sprachen Schrift'] == language_names[2]
+    assert language_names[0] in values['Arbeitssprache - Wort']
+    assert language_names[1] in values['Arbeitssprache - Wort']
+    assert values['Arbeitssprache - Schrift'] == language_names[2]
     assert values['Referenzen Behörden'] == 'All okay'
     assert values['Ausbildung Dolmetscher'] == 'Nein'
     assert values['Versteckt'] == 'Nein'
@@ -137,7 +149,7 @@ def test_view_translator(client):
     assert user.active is True
     assert user.role == 'translator'
 
-    mail = client.get_email(0)
+    mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'test@test.com'
     assert mail['Subject'] == 'Ein Konto wurde für Sie erstellt'
 
@@ -291,8 +303,8 @@ def test_view_translator(client):
     assert values['Wegberechnung'] == f'{round(new_drive_distance, 1)} km'
     assert values['Zulassung'] == 'im Zulassungsverfahren'
     assert values['Muttersprachen'] == language_names[1]
-    assert values['Sprachen Wort'] == language_names[2]
-    assert values['Sprachen Schrift'] == language_names[3]
+    assert values['Arbeitssprache - Wort'] == language_names[2]
+    assert values['Arbeitssprache - Schrift'] == language_names[3]
     assert values['Zertifikate'] == cert_names[1]
 
     # test user account updated
@@ -438,6 +450,7 @@ def test_view_export_translators(client):
     data = copy.deepcopy(translator_data)
     data['spoken_languages'] = [languages[0]]
     data['written_languages'] = [languages[1]]
+    data['monitoring_languages'] = [languages[2]]
     data['expertise_professional_guilds'] = ['economy']
     data['expertise_professional_guilds_other'] = ['Psychologie', 'Religion']
     data['expertise_interpreting_types'] = ['simultaneous', 'whisper']
@@ -450,7 +463,7 @@ def test_view_export_translators(client):
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.cell(2, 1).value == 1234
     assert sheet.cell(2, 2).value == (
-        'nicht zertifiziert / Einsatz Dringlichkeit'
+        'nicht akkreditiert / Einsatz Dringlichkeit'
     )
     assert sheet.cell(2, 3).value == 0
     assert sheet.cell(2, 4).value == 0
@@ -481,13 +494,15 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 29).value == None
     assert sheet.cell(2, 30).value == 'German'
     assert sheet.cell(2, 31).value == 'French'
-    assert sheet.cell(2, 32).value == 'Wirtschaft|Psychologie|Religion'
-    assert sheet.cell(2, 33).value == 'Simultandolmetschen|Flüsterdolmetschen'
-    assert sheet.cell(2, 34).value == 'all okay'
-    assert sheet.cell(2, 35).value == 'Some ref'
-    assert sheet.cell(2, 36).value == 0
-    assert sheet.cell(2, 37).value == None
-    assert sheet.cell(2, 38).value == None
+    assert sheet.cell(2, 32).value == 'Italian'
+    assert sheet.cell(2, 33).value == 'baker'
+    assert sheet.cell(2, 34).value == 'Wirtschaft|Psychologie|Religion'
+    assert sheet.cell(2, 35).value == 'Simultandolmetschen|Flüsterdolmetschen'
+    assert sheet.cell(2, 36).value == 'all okay'
+    assert sheet.cell(2, 37).value == 'Some ref'
+    assert sheet.cell(2, 38).value == 0
+    assert sheet.cell(2, 39).value == None
+    assert sheet.cell(2, 40).value == None
 
 
 def test_file_security(client):
@@ -566,7 +581,7 @@ def test_view_redirects(client):
     translator_url = page.request.url
     client.logout()
 
-    mail = client.get_email(0)['TextBody']
+    mail = client.get_email(0, flush_queue=True)['TextBody']
     reset_password_url = re.search(
         r'(http://localhost/auth/reset-password[^)]+)', mail
     ).group()
@@ -649,6 +664,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223346'
     page.form['availability'] = 'Always'
     page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
     page.form.get('expertise_professional_guilds', index=0).checked = True
     page.form['expertise_professional_guilds_other'] = ['Psychologie']
     page.form.get('expertise_interpreting_types', index=0).checked = True
@@ -662,10 +680,7 @@ def test_view_translator_mutation(client):
     page.form['operation_comments'] = 'No operation comments'
     page.form['confirm_name_reveal'] = False
     page.form['date_of_application'] = '2020-01-01'
-    page.form['date_of_decision'] = '2020-02-02'
-    page.form['spoken_languages_ids'] = language_ids[1:2]
-    page.form['written_languages_ids'] = language_ids[2:3]
-    page.form['proof_of_preconditions'] = 'None'
+    page.form['occupation'] = 'Bäcker'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
     page.form['certificates_ids'] = cert_ids[0:1]
@@ -682,7 +697,7 @@ def test_view_translator_mutation(client):
     client.logout()
     reset_password_url = re.search(
         r'(http://localhost/auth/reset-password[^)]+)',
-        client.get_email(0)['TextBody']
+        client.get_email(0, flush_queue=True)['TextBody']
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'test@test.com'
@@ -714,6 +729,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
     page.form['mother_tongues'] = language_ids[1:3]
+    page.form['spoken_languages'] = language_ids[0:2]
+    page.form['written_languages'] = language_ids[2:4]
+    page.form['monitoring_languages'] = language_ids[0:4]
     page.form['expertise_interpreting_types'].select_multiple([
         'consecutive', 'negotiation'
     ])
@@ -730,6 +748,10 @@ def test_view_translator_mutation(client):
     ):
         page = page.form.submit().follow()
         assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'member@example.org'
+    assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
     client.logout()
     client.login_admin()
@@ -754,6 +776,12 @@ def test_view_translator_mutation(client):
     assert 'Telefon Geschäft: +41412223349' in page
     assert 'Erreich- und Verfügbarkeit: Nie' in page
     assert 'Muttersprachen: French, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert (
+        'Arbeitssprache - Kommunikationsüberwachung: '
+        'Arabic, French, German, Italian'
+    ) in page
     assert (
         'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
         'Verhandlungsdolmetschen'
@@ -763,6 +791,10 @@ def test_view_translator_mutation(client):
     ) in page
     assert 'Fachkenntnisse nach Berufssparte: andere: Exorzismus' in page
     page.click('Ticket abschliessen')
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'member@example.org'
+    assert 'Bob, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
     # Report change as editor
     client.logout()
@@ -790,6 +822,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
     page.form['mother_tongues'] = language_ids[1:3]
+    page.form['spoken_languages'] = language_ids[0:2]
+    page.form['written_languages'] = language_ids[2:4]
+    page.form['monitoring_languages'] = language_ids[0:4]
     page.form['expertise_interpreting_types'].select_multiple([
         'consecutive', 'negotiation'
     ])
@@ -812,6 +847,10 @@ def test_view_translator_mutation(client):
     ):
         page = page.form.submit().follow()
         assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'editor@example.org'
+    assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
     client.logout()
     client.login_admin()
@@ -836,6 +875,12 @@ def test_view_translator_mutation(client):
     assert 'Telefon Geschäft: +41412223349' in page
     assert 'Erreich- und Verfügbarkeit: Nie' in page
     assert 'Muttersprachen: French, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert (
+        'Arbeitssprache - Kommunikationsüberwachung: '
+        'Arabic, French, German, Italian'
+    ) in page
     assert (
         'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
         'Verhandlungsdolmetschen'
@@ -850,6 +895,10 @@ def test_view_translator_mutation(client):
     assert 'Bank Konto lautend auf: Aunt Anny' in page
     assert 'IBAN: CH5604835012345678009' in page
     page.click('Ticket abschliessen')
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'editor@example.org'
+    assert 'Bob, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
     # Report change as translator
     client.logout()
@@ -877,6 +926,9 @@ def test_view_translator_mutation(client):
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
     page.form['mother_tongues'] = language_ids[1:3]
+    page.form['spoken_languages'] = language_ids[0:2]
+    page.form['written_languages'] = language_ids[2:4]
+    page.form['monitoring_languages'] = language_ids[0:4]
     page.form['expertise_interpreting_types'].select_multiple([
         'consecutive', 'negotiation'
     ])
@@ -895,8 +947,7 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = True
     page.form['date_of_application'] = '2021-01-01'
     page.form['date_of_decision'] = '2021-02-02'
-    page.form['spoken_languages'] = language_ids[0:2]
-    page.form['written_languages'] = language_ids[2:4]
+    page.form['occupation'] = 'Bauarbeiter'
     page.form['proof_of_preconditions'] = 'Keine'
     page.form['agency_references'] = 'Kanton LU'
     page.form['education_as_interpreter'] = True
@@ -911,6 +962,10 @@ def test_view_translator_mutation(client):
     ):
         page = page.form.submit().follow()
         assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'test@test.com'
+    assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
     client.logout()
     client.login_admin()
@@ -935,6 +990,14 @@ def test_view_translator_mutation(client):
     assert 'Telefon Geschäft: +41412223349' in page
     assert 'Erreich- und Verfügbarkeit: Nie' in page
     assert 'Muttersprachen: French, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert 'Arbeitssprache - Wort: French, German' in page
+    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
+    assert (
+        'Arbeitssprache - Kommunikationsüberwachung: '
+        'Arabic, French, German, Italian'
+    ) in page
     assert (
         'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
         'Verhandlungsdolmetschen'
@@ -952,8 +1015,7 @@ def test_view_translator_mutation(client):
     assert 'Zustimmung Namensbekanntgabe: Ja' in page
     assert 'Bewerbung Datum: 2021-01-01' in page
     assert 'Entscheid Datum: 2021-02-02' in page
-    assert 'Sprachen Wort: French, German' in page
-    assert 'Sprachen Schrift: Arabic, Italian' in page
+    assert 'Aktuelle berufliche Tatigkeit: Bauarbeiter' in page
     assert 'Nachweis der Voraussetzung: Keine' in page
     assert 'Referenzen Behörden: Kanton LU' in page
     assert 'Ausbildung Dolmetscher: Ja' in page
@@ -961,7 +1023,7 @@ def test_view_translator_mutation(client):
     assert 'Bemerkungen: Kein Kommentar' in page
 
     page = page.click('Vorgeschlagene Änderungen übernehmen')
-    page.form.get('changes', index=37).checked = False
+    page.form.get('changes', index=39).checked = False
     page = page.form.submit().follow()
     assert (
         'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
@@ -976,11 +1038,19 @@ def test_view_translator_mutation(client):
         'Fachkenntnisse nach Berufssparte: andere, '
         'Besondere Hinweise Einsatzm\\u00f6glichkeiten, '
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
-        'Muttersprachen, Sprachen Wort, Sprachen Schrift, '
+        'Muttersprachen, Arbeitssprache - Wort, Arbeitssprache - Schrift, '
+        'Arbeitssprache - Kommunikations\\u00fcberwachung, '
+        'Aktuelle berufliche Tatigkeit, '
         'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page
-    page = page.click('Anny, Aunt', index=0)
+    page.click('Ticket abschliessen')
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'test@test.com'
+    assert 'Anny, Aunt: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+
+    page = client.get('/').follow().click('Aunt Anny')
     assert 'Aunt' in page
     assert 'Anny' in page
     assert '123456' in page
@@ -998,7 +1068,9 @@ def test_view_translator_mutation(client):
     assert '+41412223348' in page
     assert '+41412223349' in page
     assert 'Nie' in page
+    assert 'Arabic' in page
     assert 'French' in page
+    assert 'German' in page
     assert 'Italian' in page
     assert 'Konsektutivdolmetschen' in page
     assert 'Verhandlungsdolmetschen' in page
@@ -1018,9 +1090,217 @@ def test_view_translator_mutation(client):
     assert 'German' in page
     assert 'Arabic' in page
     assert 'Italian' in page
+    assert 'Bauarbeiter' in page
     assert 'Keine' in page
     assert 'Kanton LU' in page
     assert 'Ja' in page
     assert 'BBBB' in page
     assert 'CCCC' in page
     assert 'Kein Kommentar' not in page
+
+
+def test_view_accreditation(client):
+    session = client.app.session()
+    language_ids = [str(lang.id) for lang in create_languages(session)]
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    settings.form.submit()
+
+    def request_accreditation():
+        client.logout()
+
+        page = client.get('/request-accreditation')
+        page.form['last_name'] = 'Benito'
+        page.form['first_name'] = 'Hugo'
+        page.form['gender'] = 'M'
+        page.form['date_of_birth'] = '1970-01-01'
+        page.form['hometown'] = 'Zug'
+        page.form['nationality'] = 'CH'
+        page.form['marital_status'] = 'married'
+        page.form['coordinates'] = encode_map_value({
+            'lat': 1, 'lon': 2, 'zoom': 12
+        })
+        page.form['address'] = 'Downing Street 5'
+        page.form['zip_code'] = '4000'
+        page.form['city'] = 'Luzern'
+        page.form['drive_distance'] = '1.1'
+        page.form['withholding_tax'] = False
+        page.form['self_employed'] = False
+        page.form['social_sec_number'] = '756.1234.4568.90'
+        page.form['bank_name'] = 'R-BS'
+        page.form['bank_address'] = 'Bullstreet 5'
+        page.form['account_owner'] = 'Hugo Benito'
+        page.form['iban'] = 'CH9300762011623852957'
+        page.form['email'] = 'hugo.benito@translators.com'
+        page.form['tel_private'] = '041 444 44 45'
+        page.form['tel_office'] = '041 444 44 44'
+        page.form['tel_mobile'] = '079 000 00 00'
+        page.form['availability'] = '24h'
+        page.form['confirm_name_reveal'] = True
+        page.form['profession'] = 'Baker'
+        page.form['occupation'] = 'Reporter'
+        page.form['education_as_interpreter'] = False
+        page.form['mother_tongues_ids'] = language_ids[0:1]
+        page.form['spoken_languages_ids'] = language_ids[1:2]
+        page.form['written_languages_ids'] = language_ids[2:3]
+        page.form['monitoring_languages_ids'] = language_ids[3:4]
+        page.form['expertise_interpreting_types'].select_multiple([
+            'consecutive', 'negotiation'
+        ])
+        page.form['expertise_professional_guilds'].select_multiple([
+            'economy', 'art_leisure'
+        ])
+        page.form['expertise_professional_guilds_other'] = ['Psychologie']
+        page.form['agency_references'] = 'Some ref'
+        page.form['admission_course_completed'] = False
+        page.form['admission_course_agreement'] = True
+        page.form['declaration_of_authorization'] = upload_pdf('1.pdf')
+        page.form['letter_of_motivation'] = upload_pdf('2.pdf')
+        page.form['resume'] = upload_pdf('3.pdf')
+        page.form['certificates'] = upload_pdf('4.pdf')
+        page.form['social_security_card'] = upload_pdf('5.pdf')
+        page.form['passport'] = upload_pdf('6.pdf')
+        page.form['passport_photo'] = upload_pdf('7.pdf')
+        page.form['debt_collection_register_extract'] = upload_pdf('8.pdf')
+        page.form['criminal_register_extract'] = upload_pdf('9.pdf')
+        page.form['certificate_of_capability'] = upload_pdf('A.pdf')
+        page.form['remarks'] = 'Some remarks'
+        page.form['confirm_submission'] = True
+
+        with mock.patch(
+                'onegov.gis.utils.MapboxRequests.directions',
+                return_value=FakeResponse({
+                    'code': 'Ok',
+                    'routes': [{'distance': 2000}]
+                })
+        ):
+            page = page.form.submit().follow()
+            assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+        mail = client.get_email(0, flush_queue=True)
+        assert mail['To'] == 'hugo.benito@translators.com'
+        assert 'Benito, Hugo: Ihr Ticket wurde eröffnet' in mail['Subject']
+
+        client.login_admin()
+        page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+        assert 'Benito' in page
+        assert 'Hugo' in page
+        assert 'Männlich' in page
+        assert '01.01.1970' in page
+        assert 'Zug' in page
+        assert 'CH' in page
+        assert 'married' in page
+        assert '2.0 km' in page
+        assert 'Downing Street 5' in page
+        assert '4000' in page
+        assert 'Luzern' in page
+        assert '1.1' in page
+        assert '"withholding-tax">Nein' in page
+        assert '"self-employed">Nein' in page
+        assert '756.1234.4568.90' in page
+        assert 'R-BS' in page
+        assert 'Bullstreet 5' in page
+        assert 'Hugo Benito' in page
+        assert 'CH9300762011623852957' in page
+        assert 'hugo.benito@translators.com' in page
+        assert '041 444 44 45' in page
+        assert '041 444 44 44' in page
+        assert '079 000 00 00' in page
+        assert '24h' in page
+        assert '"confirm-name-reveal">Ja' in page
+        assert 'Baker' in page
+        assert 'Reporter' in page
+        assert '"education-as-interpreter">Nein' in page
+        assert 'German' in page
+        assert 'French' in page
+        assert 'Italian' in page
+        assert 'Arabic' in page
+        assert 'Wirtschaft' in page
+        assert 'Kunst und Freizeit' in page
+        assert 'Psychologie' in page
+        assert 'Konsektutivdolmetschen' in page
+        assert 'Verhandlungsdolmetschen' in page
+        assert 'Some ref' in page
+        assert '"admission-course-completed">Nein' in page
+        assert '"admission-course-agreement">Ja' in page
+        assert 'Some remarks' in page
+
+        def check_pdf(filename, link):
+            headers = dict(page.click(link, index=0).headers)
+            assert filename in headers['Content-Disposition']
+            assert headers['Content-Type'] == 'application/pdf'
+
+        check_pdf('1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+        check_pdf('2.pdf', 'Kurzes Motivationsschreiben.pdf')
+        check_pdf('3.pdf', 'Lebenslauf.pdf')
+        check_pdf('4.pdf', 'Zertifikate.pdf')
+        check_pdf('5.pdf', 'AHV-Ausweis.pdf')
+        check_pdf('6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
+        check_pdf('7.pdf', 'Aktuelles Passfoto.pdf')
+        check_pdf('8.pdf', 'Aktueller Auszug aus dem Betreibungsregister.pdf')
+        check_pdf('9.pdf', 'Aktueller Auszug aus dem Zentralstrafregister.pdf')
+        check_pdf('A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+
+        return page
+
+    # Request accredtitation
+    page = request_accreditation()
+
+    # Refuse accreditation
+    page = page.click('Akkreditierung verweigern').form.submit().follow()
+    assert 'Der hinterlegte Datensatz wurde entfernt' in page
+
+    page.click('Ticket abschliessen')
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'hugo.benito@translators.com'
+    assert 'Benito, Hugo: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+
+    # Request accredtitation
+    page = request_accreditation()
+
+    # Grant accreditation
+    page = page.click('Akkreditierung erteilen').form.submit().follow()
+    assert 'Akkreditierung erteilt' in page
+    assert 'Aktivierungs-Email verschickt' in page
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'hugo.benito@translators.com'
+    assert mail['Subject'] == 'Ein Konto wurde für Sie erstellt'
+
+    reset_password_url = re.search(
+        r'(http://localhost/auth/reset-password[^)]+)',
+        mail['TextBody']
+    ).group()
+
+    page.click('Ticket abschliessen')
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'hugo.benito@translators.com'
+    assert 'Benito, Hugo: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+
+    page = client.get('/').follow()
+    assert 'hugo.benito@translators.com' in page
+
+    page = page.click('Hugo Benito')
+    assert 'Benito, Hugo' in page
+    assert '756.1234.4568.90' in page
+
+    client.logout()
+
+    # Login as translator
+    page = client.get(reset_password_url)
+    page.form['email'] = 'hugo.benito@translators.com'
+    page.form['password'] = 'p@ssw0rd'
+    page.form.submit()
+
+    page = client.login('hugo.benito@translators.com', 'p@ssw0rd', None)
+    page = page.maybe_follow()
+    assert 'Benito, Hugo' in page
+    assert '756.1234.4568.90' in page

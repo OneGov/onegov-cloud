@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-06-12 07:27+0200\n"
+"POT-Creation-Date: 2022-07-06 14:54+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,13 +14,13 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 
 msgid "uncertified"
-msgstr "nicht zertifiziert / Einsatz Dringlichkeit"
+msgstr "nicht akkreditiert / Einsatz Dringlichkeit"
 
 msgid "in progress"
 msgstr "im Zulassungsverfahren"
 
 msgid "certified"
-msgstr "zertifiziert"
+msgstr "akkreditiert"
 
 msgid "masculin"
 msgstr "Männlich"
@@ -79,12 +79,6 @@ msgstr "Verhandlungsdolmetschen"
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
 
-msgid "Telephone interpreting"
-msgstr "Telefondolmetschen"
-
-msgid "Written translations"
-msgstr "Schriftliche Übersetzungen"
-
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -132,6 +126,286 @@ msgstr "Persönliche Informationen"
 
 msgid "Languages"
 msgstr "Sprachen"
+
+msgid ""
+"Make sure you have all information and scans of the required documents "
+"before starting to fill out the form!"
+msgstr ""
+"Vergewissern Sie sich, dass Sie alle Informationen und Dokumente gescannt "
+"haben, bevor Sie mit dem Ausfüllen des Formulars beginnen!"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Hometown"
+msgstr "Heimartort"
+
+msgid "Nationality"
+msgstr "Nationalität"
+
+msgid "Marital status"
+msgstr "Zivilstand"
+
+msgid "Location"
+msgstr "Standort"
+
+msgid ""
+"Search for the exact address to set a marker. The address fields beneath are "
+"filled out automatically."
+msgstr ""
+"Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. Die Address-"
+"Felder unterhalb werden automatisch ausgefüllt."
+
+msgid "Street and house number"
+msgstr "Strasse und Hausnummer"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
+
+msgid "Drive distance (km)"
+msgstr "Fahrdistanz (km)"
+
+msgid "Withholding tax"
+msgstr "Quellensteuer"
+
+msgid "Self-employed"
+msgstr "Selbständig"
+
+msgid "Swiss social security number"
+msgstr "AHV-Nr."
+
+msgid "Identification / Bank details"
+msgstr "Identifikation / Bankverbindung"
+
+msgid "Bank name"
+msgstr "Bank Name"
+
+msgid "Bank address"
+msgstr "Bank Adresse"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "Account owner"
+msgstr "Bank Konto lautend auf"
+
+msgid ""
+"Attention: It must be ensured that no one other than the applicant can take "
+"note of the information transmitted with the following contact details!"
+msgstr ""
+"Achtung: Es muss gewährleistet sein, dass bei den nachfolgenden "
+"Kontaktangaben niemand ausser der Antragstellerin bzw. dem Antragsteller von "
+"übermittelten Informationen Kenntnis nehmen kann!"
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Private Phone Number"
+msgstr "Telefon Privat"
+
+msgid "Office Phone Number"
+msgstr "Telefon Geschäft"
+
+msgid "Mobile Number"
+msgstr "Telefon Mobile"
+
+msgid "Availability"
+msgstr "Erreich- und Verfügbarkeit"
+
+msgid ""
+"Do you agree to the disclosure of your name to other persons and authorities "
+"within and outside the Canton of Zug?"
+msgstr ""
+"Stimmen Sie der Namensbekanntgabe gegenüber anderen Personen und Behörden "
+"inner- und ausserhalb des Kantons Zug zu?"
+
+msgid "Legal"
+msgstr "Rechtliches"
+
+msgid "Learned profession"
+msgstr "Erlernter Beruf"
+
+msgid "Training"
+msgstr "Ausbildung"
+
+msgid "Current professional activity"
+msgstr "Aktuelle berufliche Tatigkeit"
+
+msgid "Interpreter education with degree"
+msgstr "Dolmetscher-Ausbildung mit Abschluss"
+
+msgid "I apply for accreditation for the following working languages."
+msgstr "Ich beantrage die Akkreditierung für folgende Arbeitssprachen"
+
+msgid "Language training - Expertise"
+msgstr "Sprachausbildung – Expertise"
+
+msgid "German C2 is a prerequisite."
+msgstr "Deutsch C2 ist Voraussetzung."
+
+msgid "Mother tongues"
+msgstr "Muttersprachen"
+
+msgid "Spoken languages"
+msgstr "Arbeitssprache - Wort"
+
+msgid "Mention only languages with level C2."
+msgstr ""
+"Erwähnen Sie nur Ihre Übersetzungssprachen mit Voraussetzung Niveau C2."
+
+msgid "Written languages"
+msgstr "Arbeitssprache - Schrift"
+
+msgid "Expertise by professional guild"
+msgstr "Fachkenntnisse nach Berufssparte"
+
+msgid "Qualifications"
+msgstr "Qualifikation"
+
+msgid "Expertise by professional guild: other"
+msgstr "Fachkenntnisse nach Berufssparte: andere"
+
+msgid "Comma-separated listing"
+msgstr "Kommagetrennte Auflistung"
+
+msgid "Expertise by interpreting type"
+msgstr "Fachkenntnisse nach Dolmetscherart"
+
+msgid "Authorities and courts"
+msgstr "Behörden und Gerichte"
+
+msgid "References"
+msgstr "Referenzen"
+
+msgid "Admission course of the high court of the Canton of Zurich available"
+msgstr "Zulassungskurs – Obergericht ZH vorhanden"
+
+msgid "Admission course"
+msgstr "Zulassungskurs"
+
+msgid ""
+"I agree to attend the admission course of the high court of the Canton of "
+"Zürich at my own expense CHF 1'100.00."
+msgstr ""
+"Ich erkläre mich bereit, den Zulassungskurs des Obergerichts des Kantons "
+"Zürich auf eigenen Kosten CHF 1'100.00 zu absolvieren."
+
+msgid ""
+"If a German C2 certificate is required, an additional CHF 100.00 will be "
+"charged. The admission course is a basic requirement for an application. "
+"Administration is carried out by the Translation Coordination Office of the "
+"Zug authorities and courts."
+msgstr ""
+"Ist ein Deutschnachweis C2 zu erbringen, fallen zusätzlich CHF 100.00 an. "
+"Der Zulassungskurs ist Grundvoraussetzung für eine Bewerbung. Die "
+"Administration erfolgt durch die Koordinationsstelle Übersetzungswesen der "
+"Zuger Behörden und Gerichte."
+
+msgid ""
+"In order for your application for inclusion in the directory to be "
+"processed, a complete application must be submitted. This includes the "
+"following documents:"
+msgstr ""
+"Damit Ihr Antrag um Aufnahme in das Übersetzendenverzeichnis bearbeitet "
+"werden kann, ist ein vollständiger Antrag einzureichen. Dazu gehören "
+"folgende Unterlagen:"
+
+msgid "Documents"
+msgstr "Dokumente"
+
+msgid "Signed declaration of authorization (PDF)"
+msgstr "Unterschriebene Ermächtigunserklärung (PDF)"
+
+msgid "Short letter of motivation (PDF)"
+msgstr "Kurzes Motivationsschreiben (PDF)"
+
+msgid "Resume (PDF)"
+msgstr "Lebenslauf (PDF)"
+
+msgid "Certificates (PDF)"
+msgstr "Zertifikate (PDF)"
+
+msgid ""
+"For the last five years. Language proficiency certificates level C2 are "
+"mandatory for non-native speakers."
+msgstr ""
+"Rückwirkend 5 Jahre. Sprachzertifikate Niveau C2 bei nicht Muttersprachen "
+"zwingend erforderlich."
+
+msgid "Social security card (PDF)"
+msgstr "AHV-Ausweis (PDF)"
+
+msgid "Identity card, passport or foreigner identity card (PDF)"
+msgstr "ID, Pass oder Ausländerausweis (PDF)"
+
+msgid "Current passport photo (PDF)"
+msgstr "Aktuelles Passfoto (PDF)"
+
+msgid "Current extract from the debt collection register (PDF)"
+msgstr "Aktueller Auszug aus dem Betreibungsregister (PDF)"
+
+msgid "Maximum 6 months since issue."
+msgstr "Maximal 6 Monate seit Ausstellung."
+
+msgid "Current extract from the Central Criminal Register (PDF)"
+msgstr "Aktueller Auszug aus dem Zentralstrafregister (PDF)"
+
+msgid ""
+"Maximum 6 months since issue. Online order at www.strafregister.admin.ch"
+msgstr ""
+"Max. 6 Monate seit Ausstellung. Online-Bestellung unter www.strafregister."
+"admin.ch"
+
+msgid "Certificate of Capability (PDF)"
+msgstr "Handlungsfähigkeitszeugnis (PDF)"
+
+msgid "Available from the municipal or city administration."
+msgstr "Erhältlich bei der Gemeinde- oder Stadtverwaltung."
+
+msgid "Your data will be treated with strict confidentiality."
+msgstr "Ihre Daten werden streng vertraulich behandelt."
+
+msgid "Submission"
+msgstr "Einreichung"
+
+msgid "Remarks"
+msgstr "Anmerkungen"
+
+msgid "By submitting, I confirm the correctness of the above data."
+msgstr "Mit dem Absenden bestätige ich die Richtigkeit der vorstehenden Daten."
+
+msgid "Zip code must consist of 4 digits"
+msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
+
+msgid "A translator with this email already exists"
+msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
+
+msgid "Please confirm the correctness of the above data."
+msgstr "Bitte bestätigen Sie die Richtigkeit der vorstehenden Daten."
+
+msgid "Please provide at least one phone number."
+msgstr "Bitte geben Sie mindestens eine Telefonnummer an."
+
+msgid "Create a user account and publish the translator."
+msgstr "Benutzerkonto erstellen und Übersetzereintrag veröffentlichen."
+
+msgid "Delete all related data."
+msgstr "Alle zugehörigen Daten löschen."
 
 msgid "Name"
 msgstr "Name"
@@ -218,84 +492,14 @@ msgstr "Ihre Nachricht"
 msgid "Message"
 msgstr "Nachricht"
 
-msgid "First name"
-msgstr "Vorname"
-
 msgid "Proposed changes"
 msgstr "Vorgeschlagene Änderungen"
-
-msgid "Last name"
-msgstr "Nachname"
 
 msgid "Personal ID"
 msgstr "Personal Nr."
 
 msgid "Admission"
 msgstr "Zulassung"
-
-msgid "Withholding tax"
-msgstr "Quellensteuer"
-
-msgid "Self-employed"
-msgstr "Selbständig"
-
-msgid "Gender"
-msgstr "Geschlecht"
-
-msgid "Date of birth"
-msgstr "Geburtsdatum"
-
-msgid "Nationality"
-msgstr "Nationalität"
-
-msgid "Location"
-msgstr "Standort"
-
-msgid ""
-"Search for the exact address to set a marker. The address fields beneath are "
-"filled out automatically."
-msgstr ""
-"Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. Die Address-"
-"Felder unterhalb werden automatisch ausgefüllt."
-
-msgid "Street and house number"
-msgstr "Strasse und Hausnummer"
-
-msgid "Zip Code"
-msgstr "PLZ"
-
-msgid "City"
-msgstr "Ort"
-
-msgid "Drive distance (km)"
-msgstr "Fahrdistanz (km)"
-
-msgid "Swiss social security number"
-msgstr "AHV-Nr."
-
-msgid "Bank name"
-msgstr "Bank Name"
-
-msgid "Bank address"
-msgstr "Bank Adresse"
-
-msgid "Account owner"
-msgstr "Bank Konto lautend auf"
-
-msgid "IBAN"
-msgstr ""
-
-msgid "Mobile Number"
-msgstr "Telefon Mobile"
-
-msgid "Private Phone Number"
-msgstr "Telefon Privat"
-
-msgid "Office Phone Number"
-msgstr "Telefon Geschäft"
-
-msgid "Availability"
-msgstr "Erreich- und Verfügbarkeit"
 
 msgid "Comments on possible field of application"
 msgstr "Besondere Hinweise Einsatzmöglichkeiten"
@@ -309,23 +513,8 @@ msgstr "Bewerbung Datum"
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
-msgid "Mother tongues"
-msgstr "Muttersprachen"
-
-msgid "Spoken languages"
-msgstr "Sprachen Wort"
-
-msgid "Written languages"
-msgstr "Sprachen Schrift"
-
-msgid "Expertise by professional guild"
-msgstr "Fachkenntnisse nach Berufssparte"
-
-msgid "Expertise by professional guild: other"
-msgstr "Fachkenntnisse nach Berufssparte: andere"
-
-msgid "Expertise by interpreting type"
-msgstr "Fachkenntnisse nach Dolmetscherart"
+msgid "Monitoring languages"
+msgstr "Arbeitssprache - Kommunikationsüberwachung"
 
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
@@ -357,9 +546,6 @@ msgstr "Anschrift"
 msgid "Identification / bank account"
 msgstr "Identifikation / Bankverbindung"
 
-msgid "Email"
-msgstr "E-Mail"
-
 msgid "Contact information"
 msgstr "Kontakt"
 
@@ -377,12 +563,6 @@ msgstr "Sprachausbildung und Expertise"
 
 msgid "Hidden"
 msgstr "Versteckt"
-
-msgid "Zip code must consist of 4 digits"
-msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
-
-msgid "A translator with this email already exists"
-msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -438,9 +618,6 @@ msgstr "Übersetzer/in löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "Documents"
-msgstr "Dokumente"
-
 msgid "Report change"
 msgstr "Mutation melden"
 
@@ -468,8 +645,29 @@ msgstr "Wollen Sie diese Sprache wirklich löschen?"
 msgid "Delete language"
 msgstr "Sprache löschen"
 
+msgid "Accreditation"
+msgstr "Akkreditierung"
+
+msgid "Grant accreditation"
+msgstr "Akkreditierung erteilen"
+
+msgid "Refuse accreditation"
+msgstr "Akkreditierung verweigern"
+
 msgid "Mutation"
 msgstr "Mutation"
+
+msgid "Accreditations"
+msgstr "Akkreditierungen"
+
+msgid "Request Accreditation"
+msgstr "Akkreditierung beantragen"
+
+msgid "Edit documents"
+msgstr "Dokumente bearbeiten"
+
+msgid "Advanced"
+msgstr "Erweitert"
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -507,6 +705,9 @@ msgstr "Sprechende"
 msgid "Writers"
 msgstr "Schreibende"
 
+msgid "Monitors"
+msgstr "Überwachende"
+
 msgid "Administrator"
 msgstr "Administrator"
 
@@ -522,11 +723,23 @@ msgstr "Mitglieder"
 msgid "Mutation report"
 msgstr "Mutationsmeldung"
 
-msgid "Proposed changes applied"
-msgstr "Vorgeschlagene Änderungen übernommen"
+msgid "Coordinates"
+msgstr "Koordinaten"
 
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
+
+msgid "Accreditation granted."
+msgstr "Akkreditierung erteilt."
+
+msgid "Accreditation refused."
+msgstr "Akkreditierung verweigert."
+
+msgid "Proposed changes applied"
+msgstr "Vorgeschlagene Änderungen übernommen"
+
+msgid "This translator is in the accreditation process!"
+msgstr "Dieser Übersetzer ist im Akkreditierungsverfahren!"
 
 msgid "Certificates"
 msgstr "Zertifikate"
@@ -536,6 +749,28 @@ msgstr "Benutzer"
 
 msgid "Phone numbers"
 msgstr "Telefonischer Kontakt"
+
+msgid "Your ticket has been opened"
+msgstr "Ihr Ticket wurde eröffnet"
+
+msgid "New ticket"
+msgstr "Neues Ticket"
+
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"
+
+msgid ""
+"Application for accreditation as interpreter for the authorities and courts "
+"of the Canton of Zug"
+msgstr ""
+"Antrag auf Akkreditierung als Dolmetscher/in für die Zuger Behörden und "
+"Gerichte"
+
+msgid "An account was created for you"
+msgstr "Ein Konto wurde für Sie erstellt"
+
+msgid "Activation E-Mail sent"
+msgstr "Aktivierungs-Email verschickt"
 
 #, python-format
 msgid "Added language ${name}"
@@ -563,12 +798,6 @@ msgstr "Ihre Änderungen wurden gespeichert"
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
-msgid "An account was created for you"
-msgstr "Ein Konto wurde für Sie erstellt"
-
-msgid "Activation E-Mail sent"
-msgstr "Aktivierungs-Email verschickt"
-
 msgid "Submit Search"
 msgstr "Suchen"
 
@@ -583,12 +812,3 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Addresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
-
-msgid "Your ticket has been opened"
-msgstr "Ihr Ticket wurde eröffnet"
-
-msgid "New ticket"
-msgstr "Neues Ticket"
-
-msgid "Thank you for your submission!"
-msgstr "Vielen Dank für Ihre Eingabe!"

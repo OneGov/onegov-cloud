@@ -15,6 +15,7 @@ from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
+from onegov.reservation import Resource
 from onegov.ticket import TicketCollection
 from operator import attrgetter
 from purl import URL
@@ -314,6 +315,7 @@ class ReservationInfo(object):
 
     def as_dict(self):
         return {
+            'resource': self.resource.name,
             'date': self.date,
             'time': self.time,
             'delete': self.delete_link,
@@ -324,20 +326,23 @@ class ReservationInfo(object):
         }
 
 
-class AllocationEventInfo(object):
+class AllocationEventInfo:
 
-    __slots__ = ['allocation', 'availability', 'request', 'translate']
+    __slots__ = ('resource', 'allocation', 'availability', 'request',
+                 'translate')
 
-    def __init__(self, allocation, availability, request):
+    def __init__(self, resource, allocation, availability, request):
+        self.resource = resource
         self.allocation = allocation
         self.availability = availability
         self.request = request
         self.translate = request.translate
 
     @classmethod
-    def from_allocations(cls, request, scheduler, allocations):
+    def from_allocations(cls, request, resource, allocations):
         events = []
 
+        scheduler = resource.scheduler
         allocations = request.exclude_invisible(allocations)
 
         for key, group in groupby(allocations, key=attrgetter('_start')):
@@ -350,6 +355,7 @@ class AllocationEventInfo(object):
                 if allocation.is_master:
                     events.append(
                         cls(
+                            resource,
                             allocation,
                             availability,
                             request
@@ -440,6 +446,18 @@ class AllocationEventInfo(object):
                 yield 'event-unavailable'
 
     @property
+    def occupancy_link(self):
+        return self.request.class_link(
+            Resource,
+            {
+                'name': self.resource.name,
+                'date': self.allocation.start,
+                'view': 'agendaDay'
+            },
+            name='occupancy'
+        )
+
+    @property
     def event_actions(self):
         if self.request.is_manager:
             yield Link(
@@ -468,6 +486,11 @@ class AllocationEventInfo(object):
                     yes_button_text=_("Delete allocation")
                 )
             else:
+                yield Link(
+                    _("Occupancy"),
+                    self.occupancy_link
+                )
+
                 yield DeleteLink(
                     _("Delete"),
                     self.request.link(self.allocation),
@@ -479,6 +502,12 @@ class AllocationEventInfo(object):
                         "To delete this allocation, all existing reservations "
                         "need to be cancelled first."
                     )
+                )
+        elif self.availability < 100.0 and self.request.has_role('member'):
+            if self.resource.occupancy_is_visible_to_members:
+                yield Link(
+                    _("Occupancy"),
+                    self.occupancy_link
                 )
 
     def as_dict(self):
@@ -500,6 +529,117 @@ class AllocationEventInfo(object):
             'editurl': self.request.link(self.allocation, name='edit'),
             'reserveurl': self.request.link(self.allocation, name='reserve')
         }
+
+
+class FindYourSpotEventInfo:
+
+    __slots__ = ('allocation', 'slot_time', 'availability', 'quota_left',
+                 'request', 'translate')
+
+    def __init__(self, allocation, slot_time, availability, quota_left,
+                 request):
+        self.allocation = allocation
+        self.slot_time = slot_time
+        self.availability = availability
+        self.quota_left = quota_left
+        self.request = request
+        self.translate = request.translate
+
+    @property
+    def event_start(self):
+        if self.slot_time and self.allocation.partly_available:
+            return self.slot_time[0].isoformat()
+        return self.allocation.display_start().isoformat()
+
+    @property
+    def event_end(self):
+        if self.slot_time and self.allocation.partly_available:
+            return self.slot_time[1].isoformat()
+        return self.allocation.display_end().isoformat()
+
+    @property
+    def event_time(self):
+        if self.slot_time and self.allocation.partly_available:
+            return render_time_range(*self.slot_time)
+
+        if self.allocation.whole_day:
+            return self.translate(_("Whole day"))
+        else:
+            return render_time_range(
+                self.allocation.display_start(),
+                self.allocation.display_end()
+            )
+
+    @property
+    def quota(self):
+        return self.allocation.quota
+
+    @property
+    def whole_day(self):
+        if self.allocation.whole_day:
+            return 'true'
+        else:
+            return 'false'
+
+    @property
+    def partly_available(self):
+        if self.allocation.partly_available:
+            return 'true'
+        else:
+            return 'false'
+
+    @property
+    def available(self):
+        if self.allocation.partly_available:
+            available = self.translate(_("${percent}% Available", mapping={
+                'percent': int(self.availability)
+            }))
+        else:
+
+            quota = self.quota
+            quota_left = self.quota_left
+
+            if quota == 1:
+                if quota_left:
+                    available = self.translate(_("Available"))
+                else:
+                    available = self.translate(_("Unavailable"))
+            else:
+                available = self.translate(
+                    _("${num} Available", mapping={
+                        'num': quota_left
+                    })
+                )
+
+        return available
+
+    @property
+    def event_classes(self):
+        if self.allocation.end < sedate.utcnow():
+            yield 'event-in-past'
+
+        if self.quota > 1:
+            if self.quota_left == self.quota:
+                yield 'event-available'
+            elif self.quota_left > 0:
+                yield 'event-partly-available'
+            else:
+                yield 'event-unavailable'
+        else:
+            if self.availability >= 100.0:
+                yield 'event-available'
+            elif self.availability >= 5.0:
+                yield 'event-partly-available'
+            else:
+                yield 'event-unavailable'
+
+    @property
+    def css_class(self):
+        return ' '.join(self.event_classes)
+
+    @property
+    def reserveurl(self):
+        return self.request.link(self.allocation, 'reserve')
 
 
 libres_error_messages = {

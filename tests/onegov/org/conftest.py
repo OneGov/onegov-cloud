@@ -327,9 +327,10 @@ class Scenario(BaseScenario):
 
     def add_form_submission(self, definition=None, user=None,
                             window_id=None, **kwargs):
-        """ Create a form submission for the definition definition. Only supports
-         adding submission for existing definitions. And we dont care about the
-          submission content. """
+        """ Create a form submission for the definition definition. Only
+        supports adding submission for existing definitions. And we dont
+        care about the submission content.
+        """
         if not definition:
             definition = self.latest_form
         assert definition

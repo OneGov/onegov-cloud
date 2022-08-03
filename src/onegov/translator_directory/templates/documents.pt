@@ -12,7 +12,7 @@
 
                         <select name="category" id="select-category" onchange="location = this.value;">
                              <tal:b tal:repeat="category categories">
-                                 <option tal:attributes="value layout.link_for(category); selected request.url == layout.link_for(category)">${category}</option>
+                                 <option tal:attributes="value layout.link_for(category); selected category == model.category">${category}</option>
                              </tal:b>
 
                         </select>

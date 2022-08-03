@@ -101,6 +101,7 @@ Num|Descripziun
 `entity_district`|Circul electoral/district/regiun da la vischnanca.
 `entity_counted`|`True`, sch'il resultat è vegnì eruì.
 `entity_eligible_voters`|Il dumber da las votantas e dals votants da la vischnanca/dal lieu.
+`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu.
 `entity_blank_ballots`|Il dumber dals cedels electorals vids da la vischnanca/dal lieu.
 `entity_invalid_ballots`|Il dumber dals cedels electorals nunvalaivels da la vischnanca/dal lieu.
@@ -192,6 +193,7 @@ Num|Descripziun
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
 `entity_name`|Il num da la vischnanca/dal lieu.
 `entity_district`|Circul electoral/district/regiun da la vischnanca.
+`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 `yeas`|Il dumber da las vuschs affirmativas
 `nays`|Il dumber da las vuschs negativas

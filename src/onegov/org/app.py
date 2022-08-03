@@ -160,9 +160,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return PublicationCollection(self.session()).query().count()
 
     def prepare_email(self, reply_to=None, **kwargs):
-        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`, setting
-        the reply_to address by using the reply address from the organisation
-        settings.
+        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`,
+        setting  the reply_to address by using the reply address from
+        the organisation settings.
 
         """
         category = kwargs.get('category', 'marketing')
@@ -419,6 +419,12 @@ def get_fullcalendar_asset():
     yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@OrgApp.webasset('reservationlist')
+def get_reservation_list_asset():
+    yield 'reservationlist.jsx'
+    yield 'reservationlist_custom.js'
 
 
 @OrgApp.webasset('code_editor')

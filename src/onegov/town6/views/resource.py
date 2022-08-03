@@ -1,21 +1,35 @@
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Personal
 
-from onegov.org.views.resource import view_resources, get_room_form, \
-    get_daypass_form, handle_new_room, handle_new_daypass, \
-    get_resource_form, handle_edit_resource, view_resource, \
-    handle_cleanup_allocations, view_occupancy, \
-    view_resource_subscribe, view_export, get_item_form, \
+from onegov.org.views.resource import (
+    view_resources, view_find_your_spot, get_room_form,
+    get_daypass_form, handle_new_room, handle_new_daypass,
+    get_resource_form, handle_edit_resource, view_resource,
+    handle_cleanup_allocations, view_occupancy,
+    view_resource_subscribe, view_export, get_item_form,
     handle_new_resource_item
+)
 from onegov.reservation import ResourceCollection, Resource
 from onegov.town6 import TownApp
-from onegov.org.forms import ResourceCleanupForm, ResourceExportForm
-from onegov.town6.layout import ResourcesLayout, ResourceLayout
+from onegov.org.forms import (
+    FindYourSpotForm, ResourceCleanupForm, ResourceExportForm
+)
+from onegov.org.models.resource import FindYourSpotCollection
+from onegov.town6.layout import (
+    FindYourSpotLayout, ResourcesLayout, ResourceLayout
+)
 
 
 @TownApp.html(model=ResourceCollection, template='resources.pt',
               permission=Public)
 def town_view_resources(self, request):
     return view_resources(self, request, ResourcesLayout(self, request))
+
+
+@TownApp.form(model=FindYourSpotCollection, template='find_your_spot.pt',
+              permission=Public, form=FindYourSpotForm)
+def town_view_find_your_spot(self, request, form):
+    return view_find_your_spot(
+        self, request, form, FindYourSpotLayout(self, request))
 
 
 @TownApp.form(model=ResourceCollection, name='new-room',
@@ -57,7 +71,7 @@ def town_handle_cleanup_allocations(self, request, form):
         self, request, form, ResourceLayout(self, request))
 
 
-@TownApp.html(model=Resource, permission=Private, name='occupancy',
+@TownApp.html(model=Resource, permission=Personal, name='occupancy',
               template='resource_occupancy.pt')
 def town_view_occupancy(self, request):
     return view_occupancy(self, request, ResourceLayout(self, request))

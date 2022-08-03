@@ -996,6 +996,15 @@ msgstr "Notizen"
 msgid "Public extra information about this person"
 msgstr "Öffentliche Extra Informationen zu dieser Person"
 
+msgid "Rooms"
+msgstr "Räume"
+
+msgid "Weekdays"
+msgstr "Wochentage"
+
+msgid "Start date in past"
+msgstr "Startdatum in der Vergangenheit"
+
 msgid "Describes what this reservation resource is about"
 msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
@@ -1427,8 +1436,7 @@ msgstr ""
 "antragstellenden Person keine Nachrichten mehr gesendet werden können."
 
 msgid "Accept request and close ticket automatically for these user roles"
-msgstr ""
-"Akzeptiere und schliesse Tickets automatisch für diese Benutezer-Rollen"
+msgstr "Akzeptiere und schliesse Tickets automatisch für diese Benutzer-Rollen"
 
 msgid "User used to auto-accept tickets"
 msgstr "Benutzer für das automatische Akzeptieren von Tickets"
@@ -1787,6 +1795,9 @@ msgstr "Externer Reservationslink"
 msgid "New external resource"
 msgstr "Neue externe Reservation"
 
+msgid "Find Your Spot"
+msgstr "Terminsuche"
+
 msgid "Notifications"
 msgstr "Mitteilungen"
 
@@ -1986,6 +1997,19 @@ msgstr "Ihre Eingabe wurde abgelehnt"
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
 
+msgid "Members may view occupancy"
+msgstr "Mitglieder dürfen Belegung einsehen"
+
+msgid ""
+"The occupancy view shows the e-mail addresses submitted with the "
+"reservations, so we only recommend enabling this for internal resources "
+"unless all members are sworn to uphold data privacy."
+msgstr ""
+"In der Belegungsansicht werden die mit den Reservationen eingegebenen E-Mail-"
+"Adressen angezeigt. Wir empfehlen daher, diese Funktion nur für interne "
+"Ressourcen zu aktivieren, es sei denn, alle Mitglieder sind auf die Wahrung "
+"des Datenschutzes eingeschworen."
+
 msgid "Visible on homepage"
 msgstr "Auf der Startseite anzeigen"
 
@@ -2039,6 +2063,9 @@ msgstr "Notiz löschen"
 
 msgid "Always visible on homepage"
 msgstr "Immer auf der Startseite anzeigen"
+
+msgid "Search for available dates"
+msgstr "Nach verfügbaren Terminen suchen"
 
 msgid "Aargau"
 msgstr "Aargau"
@@ -2558,6 +2585,15 @@ msgstr "Alle Dateien"
 msgid "No files uploaded yet"
 msgstr "Noch keine Dateien hochgeladen"
 
+msgid "All dates"
+msgstr "Alle Termine"
+
+msgid "Unavailable"
+msgstr "Besetzt"
+
+msgid "No dates found"
+msgstr "Keine Termine gefunden"
+
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Ihnen fehlt die nötige Berechtigung um diese Seite zu öffnen."
 
@@ -2724,9 +2760,6 @@ msgstr "Datum und Zeit"
 
 msgid "Recurrence"
 msgstr "Wiederholungen"
-
-msgid "All dates"
-msgstr "Alle Termine"
 
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
@@ -3440,6 +3473,18 @@ msgstr "Gebühr:"
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
 
+msgid ""
+"The following requests have been submitted. To see the state of process you "
+"may return to the invidual request's page at any time. All information on "
+"this page has been sent to your e-mail address."
+msgstr ""
+"Die folgenden Anfragen wurden eingereicht. Sie können jederzeit zu den "
+"Seiten der einzelnen Anfragen zurückzukehren um den Status abzufragen. Alle "
+"Informationen auf dieser Seite wurden an Ihre E-Mail Adresse gesendet."
+
+msgid "Request Reference"
+msgstr "Referenz Anfrage"
+
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
@@ -3528,6 +3573,12 @@ msgstr ""
 msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
 "Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
+
+msgid "Reservation is pending approval"
+msgstr "Diese Reservation wurde noch nicht akzeptiert"
+
+msgid "(${num_pending} pending approval)"
+msgstr "(${num_pending} noch nicht akzeptiert)"
 
 msgid "Utilised"
 msgstr "Ausgelastet"
@@ -3675,9 +3726,6 @@ msgstr ""
 "Notizen sind privat und werden nur angemeldeten Benutzern angezeigt. E-Mail "
 "Adressen und Links werden klickbar gemacht."
 
-msgid "Request Reference"
-msgstr "Referenz Anfrage"
-
 msgid "Would you like to make corrections to the event?"
 msgstr "Möchten Sie Korrekturen an der Veranstaltung vornehmen?"
 
@@ -3763,9 +3811,6 @@ msgstr "${percent}% Verfügbar"
 
 msgid "Available"
 msgstr "Verfügbar"
-
-msgid "Unavailable"
-msgstr "Besetzt"
 
 #, python-format
 msgid "${num} Available"
@@ -4556,6 +4601,14 @@ msgstr "Bestätigen Sie Ihre Reservation"
 msgid "Thank you for your reservation!"
 msgstr "Vielen Dank für Ihre Reservation!"
 
+#, python-format
+msgid ""
+"Your reservation for ${room} has been submitted. Please continue with your "
+"reservation for ${next_room}."
+msgstr ""
+"Ihre Reservation für ${room} wurde eingereicht. Bitte fahren Sie fort mit "
+"Ihrer Reservation für ${next_room}."
+
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"
 
@@ -4879,6 +4932,9 @@ msgstr "Alle Tickets"
 
 msgid "All Users"
 msgstr "Alle Benutzer"
+
+msgid "Submitted Requests"
+msgstr "Eingereichte Anfragen"
 
 msgid "Added a new user group"
 msgstr "Benutzergruppe hinzugefügt"

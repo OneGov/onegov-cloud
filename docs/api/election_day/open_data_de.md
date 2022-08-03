@@ -99,6 +99,7 @@ Name|Beschreibung
 `entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
+`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Die Anzahl leerer Stimmzettel der Gemeinde.
 `entity_invalid_ballots`|Die Anzahl ungültiger Stimmzettel der Gemeinde.
@@ -190,11 +191,12 @@ Name|Beschreibung
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
-`entity_name`|Der Name der Gemeinde.
-`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
+`name`|Der Name der Gemeinde.
+`district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `counted`|Wahr, wenn das Resultat ausgezählt wurde. Falsch, wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja-Stimmen
 `nays`|Die Anzahl Nein-Stimmen
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
+`expats`|Anzahl Auslandschweizer der Gemeinde.
