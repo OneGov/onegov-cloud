@@ -7,6 +7,7 @@ from onegov.core.orm.mixins import ContentMixin, \
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection
+from onegov.reservation import ResourceCollection
 from onegov.org.models import AccessExtension
 from onegov.search import SearchableContent
 from sqlalchemy import Column, Text
@@ -51,15 +52,17 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
 class ExternalLinkCollection(GenericCollection):
 
-    supported_collections = (
-        FormCollection,
-    )
+    supported_collections = {
+        'form': FormCollection,
+        'resource': ResourceCollection
+    }
 
     def __init__(
-            self, session, member_of=None, group=None):
+            self, session, member_of=None, group=None, type=None):
         super().__init__(session)
         self.member_of = member_of
         self.group = group
+        self.type = type
 
     @staticmethod
     def translatable_name(model_class):
@@ -69,16 +72,21 @@ class ExternalLinkCollection(GenericCollection):
         name = name.replace('collection', '').rstrip('s')
         return f'{name.capitalize()}s'
 
-    @classmethod
-    def form_choices(cls):
-        return tuple(
-            (m.__name__, cls.translatable_name(m))
-            for m in cls.supported_collections
-        )
+    def form_choices(self):
+        if self.type in self.supported_collections:
+            collection = self.supported_collections[self.type]
+            return (
+                (collection.__name__, self.translatable_name(collection)),
+            )
+        else:
+            return tuple(
+                (m.__name__, self.translatable_name(m))
+                for m in self.supported_collections.values()
+            )
 
     @classmethod
     def collection_by_name(cls):
-        return {m.__name__: m for m in cls.supported_collections}
+        return {m.__name__: m for m in cls.supported_collections.values()}
 
     @property
     def model_class(self):
@@ -101,5 +109,5 @@ class ExternalLinkCollection(GenericCollection):
         """ It would be better to use the tablename, but the collections do
         not always implement the property model_class. """
 
-        assert model_class in cls.supported_collections, model_class.__name__
+        assert model_class in cls.supported_collections.values()
         return cls(session, member_of=model_class.__name__, **kwargs)
