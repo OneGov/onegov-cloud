@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-08-03 12:02+0200\n"
+"POT-Creation-Date: 2022-08-03 15:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4584,6 +4584,13 @@ msgstr "Novembre"
 
 msgid "December"
 msgstr "Dicembre"
+
+msgid ""
+"The selected time does not exist on this date due to the switch from "
+"standard time to daylight saving time."
+msgstr ""
+"In questa data, l'ora selezionata non esiste a causa del passaggio dall'ora "
+"solare all'ora legale."
 
 msgid "hour"
 msgstr "ora"
