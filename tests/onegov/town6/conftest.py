@@ -14,7 +14,7 @@ from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 2
     use_intercooler = True
 
     def bound_reserve(self, allocation):
@@ -87,7 +87,7 @@ def es_town_app(request):
 @pytest.fixture(scope='function')
 def client_with_es(es_town_app):
     client = Client(es_town_app)
-    client.skip_first_form = True
+    client.skip_n_forms = 1
     client.use_intercooler = True
     return client
 

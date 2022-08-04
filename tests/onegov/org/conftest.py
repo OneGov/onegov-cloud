@@ -51,7 +51,7 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 1
     use_intercooler = True
 
     def bound_reserve(self, allocation):
