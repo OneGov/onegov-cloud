@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-07 14:50+0200\n"
+"POT-Creation-Date: 2022-08-03 15:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1794,6 +1794,12 @@ msgstr "Espace"
 msgid "Resource Item"
 msgstr "Article"
 
+msgid "External resource link"
+msgstr "Lien de ressource externe"
+
+msgid "New external resource"
+msgstr "Nouvelle ressource externe"
+
 msgid "Find Your Spot"
 msgstr "Rechercher les dates"
 
@@ -1993,6 +1999,19 @@ msgstr "Votre proposition de répertoire a été rejetée"
 
 msgid "Through URL only (not listed)"
 msgstr "Via URL uniquement (non répertorié)"
+
+msgid "Members may view occupancy"
+msgstr "Les membres peuvent voir l'occupation "
+
+msgid ""
+"The occupancy view shows the e-mail addresses submitted with the "
+"reservations, so we only recommend enabling this for internal resources "
+"unless all members are sworn to uphold data privacy."
+msgstr ""
+"L'affichage de l'occupation indique les adresses électroniques soumises avec"
+" les réservations. Nous vous recommandons donc de ne l'activer que pour les "
+"ressources internes, à moins que tous les membres ne soient tenus de "
+"respecter la confidentialité des données."
 
 msgid "Visible on homepage"
 msgstr "Visible sur la page d'accueil"
@@ -2274,8 +2293,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3465,9 +3484,9 @@ msgid ""
 "may return to the invidual request's page at any time. All information on "
 "this page has been sent to your e-mail address."
 msgstr ""
-"Les demandes suivantes ont été soumises. Pour voir l'état du processus, vous "
-"pouvez revenir à tout moment sur la page de la demande individuelle. Toutes "
-"les informations sur cette page ont été envoyées à votre adresse e-mail."
+"Les demandes suivantes ont été soumises. Pour voir l'état du processus, vous"
+" pouvez revenir à tout moment sur la page de la demande individuelle. Toutes"
+" les informations sur cette page ont été envoyées à votre adresse e-mail."
 
 msgid "Request Reference"
 msgstr "Référence"
@@ -3567,6 +3586,12 @@ msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
 "Supprime toutes les allocation non réservées entre la date de début et de "
 "fin."
+
+msgid "Reservation is pending approval"
+msgstr "La réservation est en attente d'approbation"
+
+msgid "(${num_pending} pending approval)"
+msgstr "(${num_pending} en attente d'approbation)"
 
 msgid "Utilised"
 msgstr "Utilisé"
@@ -4188,8 +4213,8 @@ msgstr "Accès refusé"
 msgid "Not Found"
 msgstr "Pas trouvé"
 
-msgid "Added a new external form"
-msgstr "A ajouté un nouveau formulaire externe"
+msgid "Added a new external link"
+msgstr "A ajouté un nouveau lien externe"
 
 msgid "New external link"
 msgstr "Noveau lien externe"
@@ -4566,6 +4591,13 @@ msgstr "Novembre"
 msgid "December"
 msgstr "Décembre"
 
+msgid ""
+"The selected time does not exist on this date due to the switch from "
+"standard time to daylight saving time."
+msgstr ""
+"L'heure sélectionnée n'existe pas à cette date en raison du passage de "
+"l'heure normale à l'heure d'été."
+
 msgid "hour"
 msgstr "heure"
 
@@ -4665,6 +4697,9 @@ msgstr "Nouveau article ajouté"
 
 msgid "New Item"
 msgstr "Nouveau article"
+
+msgid "Edit resource"
+msgstr ""
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"

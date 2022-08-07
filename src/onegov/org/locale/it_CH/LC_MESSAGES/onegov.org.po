@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-07-07 14:50+0200\n"
+"POT-Creation-Date: 2022-08-03 15:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1802,6 +1802,12 @@ msgstr "Camera"
 msgid "Resource Item"
 msgstr "Elemento risorsa"
 
+msgid "External resource link"
+msgstr "Link a risorse esterne"
+
+msgid "New external resource"
+msgstr "Nuova risorsa esterna"
+
 msgid "Find Your Spot"
 msgstr "Cerca le date"
 
@@ -2001,6 +2007,19 @@ msgstr "L'invio della cartella è stato rifiutato"
 
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
+
+msgid "Members may view occupancy"
+msgstr "I membri possono visualizzare l'occupazione"
+
+msgid ""
+"The occupancy view shows the e-mail addresses submitted with the "
+"reservations, so we only recommend enabling this for internal resources "
+"unless all members are sworn to uphold data privacy."
+msgstr ""
+"La visualizzazione dell'occupazione mostra gli indirizzi e-mail inviati con "
+"le prenotazioni, pertanto si consiglia di attivarla solo per le risorse "
+"interne, a meno che tutti i membri non abbiano giurato di rispettare la "
+"privacy dei dati."
 
 msgid "Visible on homepage"
 msgstr "Visibile sulla pagina principale"
@@ -2282,8 +2301,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3457,10 +3476,10 @@ msgid ""
 "may return to the invidual request's page at any time. All information on "
 "this page has been sent to your e-mail address."
 msgstr ""
-"Sono state inviate le seguenti richieste. Per vedere lo stato dell'iter puoi "
-"tornare in qualsiasi momento alla pagina della singola richiesta. Tutte le "
-"informazioni presenti in questa pagina sono state inviate al tuo indirizzo e-"
-"mail."
+"Sono state inviate le seguenti richieste. Per vedere lo stato dell'iter puoi"
+" tornare in qualsiasi momento alla pagina della singola richiesta. Tutte le "
+"informazioni presenti in questa pagina sono state inviate al tuo indirizzo "
+"e-mail."
 
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"
@@ -3558,6 +3577,12 @@ msgstr ""
 msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
 "Rimuove tutte le allocazioni non riservate tra la data di inizio e di fine."
+
+msgid "Reservation is pending approval"
+msgstr "La prenotazione è in attesa di approvazione"
+
+msgid "(${num_pending} pending approval)"
+msgstr "(${num_pending} in attesa di approvazione)"
 
 msgid "Utilised"
 msgstr "Utilizzato"
@@ -4178,8 +4203,8 @@ msgstr "Accesso negato"
 msgid "Not Found"
 msgstr "Non trovato"
 
-msgid "Added a new external form"
-msgstr "Aggiunto un nuovo modulo esterno"
+msgid "Added a new external link"
+msgstr "Aggiunto un nuovo link esterno"
 
 msgid "New external link"
 msgstr "Nuovo collegamento esterno"
@@ -4560,6 +4585,13 @@ msgstr "Novembre"
 msgid "December"
 msgstr "Dicembre"
 
+msgid ""
+"The selected time does not exist on this date due to the switch from "
+"standard time to daylight saving time."
+msgstr ""
+"In questa data, l'ora selezionata non esiste a causa del passaggio dall'ora "
+"solare all'ora legale."
+
 msgid "hour"
 msgstr "ora"
 
@@ -4659,6 +4691,9 @@ msgstr "Aggiunto un nuovo elemento"
 
 msgid "New Item"
 msgstr "Nuovo elemento"
+
+msgid "Edit resource"
+msgstr ""
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"

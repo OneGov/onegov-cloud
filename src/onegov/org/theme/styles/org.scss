@@ -1572,6 +1572,7 @@ $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f145';
 $new-daily-item-icon: '\f02d';
+$new-resource-link-icon: '\f0c1';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
@@ -1733,6 +1734,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
+    .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
 }
@@ -5883,6 +5885,19 @@ h2 + div.timeline {
         position: absolute;
         right: .5rem;
         top: .275rem;
+    }
+}
+
+/*
+    Reservation
+*/
+
+.reservation-pending {
+    color: #999;
+
+    .has-tip {
+        font-size: .8rem;
+        vertical-align: text-bottom;
     }
 }
 

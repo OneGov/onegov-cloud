@@ -1,6 +1,7 @@
 import colorsys
 import re
 import sedate
+import pytz
 
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
@@ -15,6 +16,7 @@ from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
+from onegov.reservation import Resource
 from onegov.ticket import TicketCollection
 from operator import attrgetter
 from purl import URL
@@ -327,18 +329,21 @@ class ReservationInfo(object):
 
 class AllocationEventInfo:
 
-    __slots__ = ['allocation', 'availability', 'request', 'translate']
+    __slots__ = ('resource', 'allocation', 'availability', 'request',
+                 'translate')
 
-    def __init__(self, allocation, availability, request):
+    def __init__(self, resource, allocation, availability, request):
+        self.resource = resource
         self.allocation = allocation
         self.availability = availability
         self.request = request
         self.translate = request.translate
 
     @classmethod
-    def from_allocations(cls, request, scheduler, allocations):
+    def from_allocations(cls, request, resource, allocations):
         events = []
 
+        scheduler = resource.scheduler
         allocations = request.exclude_invisible(allocations)
 
         for key, group in groupby(allocations, key=attrgetter('_start')):
@@ -351,6 +356,7 @@ class AllocationEventInfo:
                 if allocation.is_master:
                     events.append(
                         cls(
+                            resource,
                             allocation,
                             availability,
                             request
@@ -441,6 +447,18 @@ class AllocationEventInfo:
                 yield 'event-unavailable'
 
     @property
+    def occupancy_link(self):
+        return self.request.class_link(
+            Resource,
+            {
+                'name': self.resource.name,
+                'date': self.allocation.start,
+                'view': 'agendaDay'
+            },
+            name='occupancy'
+        )
+
+    @property
     def event_actions(self):
         if self.request.is_manager:
             yield Link(
@@ -469,6 +487,11 @@ class AllocationEventInfo:
                     yes_button_text=_("Delete allocation")
                 )
             else:
+                yield Link(
+                    _("Occupancy"),
+                    self.occupancy_link
+                )
+
                 yield DeleteLink(
                     _("Delete"),
                     self.request.link(self.allocation),
@@ -480,6 +503,12 @@ class AllocationEventInfo:
                         "To delete this allocation, all existing reservations "
                         "need to be cancelled first."
                     )
+                )
+        elif self.availability < 100.0 and self.request.has_role('member'):
+            if self.resource.occupancy_is_visible_to_members:
+                yield Link(
+                    _("Occupancy"),
+                    self.occupancy_link
                 )
 
     def as_dict(self):
@@ -684,7 +713,7 @@ def show_libres_error(e, request):
     request.alert(get_libres_error(e, request))
 
 
-def predict_next_daterange(dateranges, min_probability=0.8):
+def predict_next_daterange(dateranges, min_probability=0.8, tzinfo=None):
     """ Takes a list of dateranges (start, end) and tries to predict the next
     daterange in the list.
 
@@ -692,11 +721,64 @@ def predict_next_daterange(dateranges, min_probability=0.8):
 
     """
 
+    if not dateranges:
+        return None
+
+    if tzinfo is None:
+        # we remember the original tzinfo of the final date
+        # since that is the one we will need to transform back
+        last_end = dateranges[-1][1]
+        if hasattr(last_end, 'tzinfo'):
+            tzinfo = last_end.tzinfo
+
+    if tzinfo is not None:
+        # if we did get a tz aware datetime then we need to strip
+        # the tzinfo on the input dateranges so calculations won't
+        # have different results in summer vs. standard time
+        dateranges = [
+            (s.replace(tzinfo=None), e.replace(tzinfo=None))
+            for s, e in dateranges
+        ]
+
+    def add_delta(time_range, delta):
+        start, end = time_range
+
+        # after calculating the tz-naive suggestion we need to
+        # add the original tzinfo back, but handle DST <-> ST
+        # transitions correctly
+        start += delta
+        end += delta
+
+        if tzinfo is None:
+            # we never were localized to begin with so just return
+            return start, end
+
+        # if we didn't get a pytz tzinfo we just add it back and
+        # hope it does the correct thing (it probably won't) but
+        # at that point it is no longer our responsibility
+        if not hasattr(tzinfo, 'localize'):
+            return start.replace(tzinfo=tzinfo), end.replace(tzinfo=tzinfo)
+
+        try:
+            # try to return the localized daterange without worrying
+            # about DST and ST, pytz will throw an exception if we
+            # use an ambiguous or non-existent time
+            return (tzinfo.localize(start, is_dst=None),
+                    tzinfo.localize(end, is_dst=None))
+        except pytz.NonExistentTimeError:
+            # in this case we don't make a suggestion (because we can't)
+            return None
+        except pytz.AmbiguousTimeError:
+            # we treat ambiguous times as standard time always, in the
+            # calendar it shouldn't make a visual difference anyways
+            return (tzinfo.localize(start, is_dst=False),
+                    tzinfo.localize(end, is_dst=False))
+
     return predict_next_value(
         values=dateranges,
         min_probability=min_probability,
         compute_delta=lambda x, y: y[0] - x[0],
-        add_delta=lambda x, d: (x[0] + d, x[1] + d)
+        add_delta=add_delta
     )
 
 

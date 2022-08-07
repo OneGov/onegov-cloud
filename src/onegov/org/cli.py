@@ -1247,7 +1247,7 @@ def fetch(group_context, source, tag, location, create_tickets,
 
         except Exception as e:
             log.error("Error fetching events", exc_info=True)
-            raise(e)
+            raise (e)
 
     return _fetch
 

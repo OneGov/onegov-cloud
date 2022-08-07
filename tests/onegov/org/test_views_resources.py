@@ -747,7 +747,7 @@ def test_reserve_allocation(client):
     assert len(slots.json) == 1
 
     with pytest.raises(AffectedReservationError):
-        client.delete(client.extract_href(slots.json[0]['actions'][2]))
+        client.delete(client.extract_href(slots.json[0]['actions'][3]))
 
     # open the created ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
@@ -886,6 +886,62 @@ def test_reserve_no_definition_pick_up_hint(client):
 
     assert 'RSV-' in ticket.text
     assert len(os.listdir(client.app.maildir)) == 1
+
+
+@freeze_time("2022-10-30", tick=True)
+def test_reserve_allocation_dst_to_st_transition(client):
+
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2022, 10, 30, 0), datetime(2022, 10, 30, 10)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('02:00', '03:00').json == {'success': True}
+
+    # see if the reservation was created correctly
+    url = '/resource/tageskarte/reservations?start=2022-10-30&end=2022-10-30'
+    reservations = client.get(url).json
+
+    assert len(reservations['reservations']) == 1
+    reservation = reservations['reservations'][0]
+    assert reservation['time'] == '02:00 - 03:00'
+    # for this ambiguous time we should get ST and not DST
+    assert reservation['date'] == '2022-10-30T02:00:00+01:00'
+
+
+@freeze_time("2022-03-27", tick=True)
+def test_reserve_allocation_st_to_dst_transition(client):
+
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2022, 3, 27, 0), datetime(2022, 3, 27, 10)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('02:00', '03:00').json == {
+        'message': "Die ausgewählte Zeit existiert nicht an diesem Datum "
+                   "aufgrund der Sommerzeitumstellung.",
+        'success': False
+    }
 
 
 def test_reserve_in_past(client):
@@ -1148,14 +1204,45 @@ def test_occupancy_view(client):
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
-    # at this point, the reservation won't show up in the occupancy view
+    # at this point, the reservation will show up, but it should be
+    # marked pending
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 0
+    assert len(occupancy.pyquery('.occupancy-block')) == 1
+    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
 
     # ..until we accept it
     ticket.click('Alle Reservationen annehmen')
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
+    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
+
+
+def test_occupancy_view_member_access(client):
+
+    # setup a resource that's visible to members
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'test'
+    new.form['access'] = 'member'
+    new.form.submit().follow()
+
+    # by default members aren't allowed to view occupancy
+    client.login_member()
+    occupancy = client.get('/resource/test/occupancy', expect_errors=True)
+    assert occupancy.status_code == 403
+
+    # but if we explicitly enable it on the resource
+    client.login_admin()
+    edit = client.get('/resource/test/edit')
+    edit.form['occupancy_is_visible_to_members'] = True
+    edit.form.submit().maybe_follow()
+
+    # now members should be able to access it
+    client.login_member()
+    occupancy = client.get('/resource/test/occupancy')
+    assert occupancy.status_code == 200
 
 
 @freeze_time("2015-08-28", tick=True)

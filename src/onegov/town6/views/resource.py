@@ -1,4 +1,4 @@
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Personal
 
 from onegov.org.views.resource import (
     view_resources, view_find_your_spot, get_room_form,
@@ -71,7 +71,7 @@ def town_handle_cleanup_allocations(self, request, form):
         self, request, form, ResourceLayout(self, request))
 
 
-@TownApp.html(model=Resource, permission=Private, name='occupancy',
+@TownApp.html(model=Resource, permission=Personal, name='occupancy',
               template='resource_occupancy.pt')
 def town_view_occupancy(self, request):
     return view_occupancy(self, request, ResourceLayout(self, request))
