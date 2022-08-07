@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"POT-Creation-Date: 2022-08-07 10:20+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -94,6 +94,10 @@ msgstr ""
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Nicht alphanumerisch: ${col}"
+
+#, python-format
+msgid "Invalid gender: ${value}"
+msgstr "Ungültiges Geschlecht: ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -440,18 +444,6 @@ msgstr ""
 msgid "Views"
 msgstr "Ansichten"
 
-msgid "Lists"
-msgstr "Listen"
-
-msgid ""
-"Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-"Always rounded."
-msgstr ""
-"Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle Wahlen. "
-"Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur falls "
-"Doppelter Pukelsheim. Immer gerundet."
-
 msgid "Party strengths"
 msgstr "Parteistärken"
 
@@ -592,6 +584,9 @@ msgstr "Titel des Gegenentwurfs"
 
 msgid "Title of the tie breaker"
 msgstr "Titel der Stichfrage"
+
+msgid "Lists"
+msgstr "Listen"
 
 msgid "Candidates"
 msgstr "Kandidierende"
@@ -840,9 +835,6 @@ msgstr ""
 "Partei jeweils durch die Anzahl der zu vergebenden Sitze im entsprechenden "
 "Wahlkreis geteilt. Das Ergebnis davon ist die Wählerzahl."
 
-msgid "Voters count"
-msgstr "Wählerzahl"
-
 msgid "The file is invalid."
 msgstr "Die Datei ist ungültig."
 
@@ -880,6 +872,15 @@ msgstr "Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
+
+msgid "female"
+msgstr "weiblich"
+
+msgid "male"
+msgstr "männlich"
+
+msgid "undetermined"
+msgstr "unbestimmt"
 
 msgid "Actions"
 msgstr "Aktionen"
@@ -1004,6 +1005,9 @@ msgstr "Nur gewählte Kandidierende"
 
 msgid "List group"
 msgstr "Listengruppe"
+
+msgid "Voters count"
+msgstr "Wählerzahl"
 
 msgid "Embed diagram"
 msgstr "Diagramm einbetten"
@@ -1166,6 +1170,15 @@ msgstr ""
 "Panaschieren. Auf der linken Seite sind die unveränderten Stimmen inklusive "
 "Blankoliste, auf der rechten Seite die panaschierten Stimmen. Die Breite der "
 "Balken und der Verbindungen ist proportional zu den Stimmen."
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "Count"
+msgstr "Anzahl"
+
+msgid "Average age"
+msgstr "Durchschnittsalter"
 
 msgid "View all details online"
 msgstr "Alle Details online ansehen"

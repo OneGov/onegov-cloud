@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"POT-Creation-Date: 2022-08-07 10:20+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -94,6 +94,10 @@ msgstr ""
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Betg alfanumeric: ${col}"
+
+#, python-format
+msgid "Invalid gender: ${value}"
+msgstr ""
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -442,18 +446,6 @@ msgstr ""
 msgid "Views"
 msgstr "Vistas"
 
-msgid "Lists"
-msgstr "Glistas"
-
-msgid ""
-"Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-"Always rounded."
-msgstr ""
-"Mussa ina carta da register cun resultats da glistas agregads per tut las "
-"elecziuns. Mo raschunaivel, sche las glistas correspundan a las gruppas da "
-"glistas. Mo en cas dal Pukelsheim dubel."
-
 msgid "Party strengths"
 msgstr "Forza da las partidas"
 
@@ -595,6 +587,9 @@ msgstr "Titel da la cuntraproposta"
 
 msgid "Title of the tie breaker"
 msgstr "Titel da la dumonda decisiva"
+
+msgid "Lists"
+msgstr "Glistas"
 
 msgid "Candidates"
 msgstr "Candidatas e candidats"
@@ -844,9 +839,6 @@ msgstr ""
 "mintgamai divididas tras il dumber da sezs ch'èn d'occupar en il circul "
 "electoral respectiv. Il resultat da quai è il dumber d'electurs."
 
-msgid "Voters count"
-msgstr "Cifra electorala"
-
 msgid "The file is invalid."
 msgstr "La datoteca è nunvalaivla."
 
@@ -885,6 +877,15 @@ msgstr "Emblidà il pled-clav?"
 
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
+
+msgid "female"
+msgstr ""
+
+msgid "male"
+msgstr ""
+
+msgid "undetermined"
+msgstr ""
 
 msgid "Actions"
 msgstr "Acziuns"
@@ -1009,6 +1010,9 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List group"
 msgstr "Gruppa da glista"
+
+msgid "Voters count"
+msgstr "Cifra electorala"
 
 msgid "Embed diagram"
 msgstr "Integrar diagram"
@@ -1177,6 +1181,15 @@ msgstr ""
 "midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
 "vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
 "proporziunala a las vuschs."
+
+msgid "Gender"
+msgstr ""
+
+msgid "Count"
+msgstr ""
+
+msgid "Average age"
+msgstr ""
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"

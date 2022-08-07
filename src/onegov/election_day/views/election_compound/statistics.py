@@ -19,7 +19,7 @@ def view_election_statistics(self, request):
     """" The main view. """
 
     elected_candidates = get_elected_candidates(self, request.session).all()
-    candidate_statistics = get_candidate_statistics(elected_candidates)
+    candidate_statistics = get_candidate_statistics(self, elected_candidates)
 
     return {
         'election_compound': self,

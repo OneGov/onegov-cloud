@@ -1,4 +1,3 @@
-from datetime import date
 from onegov.ballot import Candidate
 from onegov.ballot import Election
 from onegov.ballot import List
@@ -35,13 +34,13 @@ def get_elected_candidates(election_compound, session):
     return elected
 
 
-def get_candidate_statistics(elected_candidates):
+def get_candidate_statistics(election_compound, elected_candidates):
 
-    year = date.today().year
+    year = election_compound.date.year
 
     def statistics(values):
         age = [value[1] for value in values]
-        age = None if not age or None in age else mean([v - year for v in age])
+        age = None if not age or None in age else mean([year - v for v in age])
         return {'count': len(values), 'age': age}
 
     values = [

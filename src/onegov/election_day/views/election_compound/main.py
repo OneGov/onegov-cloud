@@ -53,6 +53,7 @@ def view_election_compound_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
+    session = request.app.session()
     embed = {'districts-map': request.link(self, 'districts-map')}
     media = {'charts': {}}
     layout = ElectionCompoundLayout(self, request)
@@ -67,10 +68,8 @@ def view_election_compound_json(self, request):
         if layout.svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 
-    elected_candidates = get_elected_candidates(
-        self, request.app.session()
-    ).all()
-    candidate_statistics = get_candidate_statistics(elected_candidates)
+    elected_candidates = get_elected_candidates(self, session).all()
+    candidate_statistics = get_candidate_statistics(self, elected_candidates)
     districts = {
         election.id: {
             'name': election.domain_segment,

@@ -912,6 +912,14 @@ ul.pagination li.last {
     }
 }
 
+/*
+    Content
+*/
+.content .columns {
+    h3:not(:first-of-type) {
+        margin-top: 3rem;
+    }
+}
 
 /*
     Related Links

@@ -7,9 +7,9 @@
 
 <metal:gender-singular define-macro="gender-singular" i18n:domain="onegov.election_day">
     <tal:b switch="gender">
-        <tal:b case="'female'" i18n:translate>Female</tal:b>
-        <tal:b case="'male'" i18n:translate>Male</tal:b>
-        <tal:b case="'undetermined'" i18n:translate>Undetermined</tal:b>
+        <tal:b case="'female'" i18n:translate>female</tal:b>
+        <tal:b case="'male'" i18n:translate>male</tal:b>
+        <tal:b case="'undetermined'" i18n:translate>undetermined</tal:b>
     </tal:b>
 </metal:gender-singular>
 
@@ -1329,7 +1329,7 @@
 </metal:parties_panachage_figure>
 
 <metal:candidate-statistics define-macro="candidate-statistics" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="len(candidate_statistics)>1">
+    <tal:block tal:condition="len(candidate_statistics)>2">
         <h3 i18n:translate="">Elected candidates</h3>
         <table
             class="statistics tablesaw sortable"
@@ -1341,7 +1341,7 @@
                 <tr>
                     <th data-tablesaw-priority="persist" i18n:translate="">Gender</th>
                     <th data-tablesaw-priority="persist" class="right-aligned" i18n:translate="">Count</th>
-                    <th data-tablesaw-priority="persist" class="right-aligned" i18n:translate="">Mean age</th>
+                    <th data-tablesaw-priority="persist" class="right-aligned" i18n:translate="">Average age</th>
                 </tr>
             </thead>
             <tbody>
@@ -1357,11 +1357,11 @@
                 <tr class="total">
                     <td i18n:translate>Total</td>
                     <td class="right-aligned">${candidate_statistics['total']['count']}</td>
-                    <td class="right-aligned">${candidate_statistics['total']['age']}</td>
+                    <td class="right-aligned">${layout.format_number(candidate_statistics['total']['age'], 0)}</td>
                 </tr>
             </tfoot>
         </table>
-    <tal:block>
+    </tal:block>
 </metal:candidate-statistics>
 
 <metal:mail_election_compound_result define-macro="mail_election_compound_result" i18n:domain="onegov.election_day">
