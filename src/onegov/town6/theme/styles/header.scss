@@ -24,6 +24,7 @@ $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f3ff';
 $new-daily-item-icon: '\f518';
+$new-resource-link-icon: '\f0c1';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f1fa';
@@ -381,6 +382,7 @@ $editbar-fg-color-active: $white;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
+    .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
 }

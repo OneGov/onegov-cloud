@@ -4,12 +4,13 @@ from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
-from onegov.org.forms.extensions import CoordinatesFormExtension, \
-    PublicationFormExtension
+from onegov.org.forms import ResourceForm
+from onegov.org.forms.extensions import (
+    CoordinatesFormExtension, PublicationFormExtension)
 from onegov.people import Person, PersonCollection
 from sqlalchemy.orm import object_session
-from wtforms import BooleanField, RadioField, StringField, TextAreaField, \
-    ValidationError
+from wtforms import (
+    BooleanField, RadioField, StringField, TextAreaField, ValidationError)
 
 from onegov.reservation import Resource
 
@@ -73,8 +74,8 @@ class AccessExtension(ContentExtension):
 
     def extend_form(self, form_class, request):
 
-        class AccessForm(form_class):
-            access = RadioField(
+        fields = {
+            'access': RadioField(
                 label=_("Access"),
                 choices=(
                     ('public', _("Public")),
@@ -85,8 +86,26 @@ class AccessExtension(ContentExtension):
                 default='public',
                 fieldset=_("Security")
             )
+        }
 
-        return AccessForm
+        # FIXME: This is a bit janky, but since this field depends
+        #        on this form extension field, there's unfortunately
+        #        not a better place for it...
+        if issubclass(form_class, ResourceForm):
+            fields['occupancy_is_visible_to_members'] = BooleanField(
+                label=_("Members may view occupancy"),
+                description=_(
+                    "The occupancy view shows the e-mail addresses "
+                    "submitted with the reservations, so we only "
+                    "recommend enabling this for internal resources "
+                    "unless all members are sworn to uphold data privacy."
+                ),
+                default=None,
+                depends_on=('access', '!private'),
+                fieldset=_("Security")
+            )
+
+        return type('AccessForm', (form_class, ), fields)
 
 
 class CoordinatesExtension(ContentExtension, CoordinatesMixin):

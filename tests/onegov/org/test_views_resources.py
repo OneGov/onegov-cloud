@@ -108,6 +108,93 @@ def test_resources(client):
     assert client.delete(delete_link, status=200)
 
 
+@freeze_time("2020-01-01", tick=True)
+def test_find_your_spot(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting 1'
+    new.form['group'] = 'Meeting Rooms'
+    new.form.submit().follow()
+
+    # with only one room in the group there should be no room filter
+    find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
+    assert 'Räume' not in find_your_spot
+    assert 'An Feiertagen' not in find_your_spot
+    assert 'Während Schulferien' not in find_your_spot
+
+    new.form['title'] = 'Meeting 2'
+    new.form['group'] = 'Meeting Rooms'
+    new.form.submit().follow()
+
+    find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
+    assert 'Räume' in find_your_spot
+    assert 'An Feiertagen' not in find_your_spot
+    assert 'Während Schulferien' not in find_your_spot
+
+    # enable holidays
+    page = client.get('/holiday-settings')
+    page.select_checkbox('cantonal_holidays', "Zürich")
+    page.form.submit()
+
+    find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
+    assert 'Räume' in find_your_spot
+    assert 'An Feiertagen' in find_your_spot
+    assert 'Während Schulferien' not in find_your_spot
+
+    # enable school holidays
+    page = client.get('/holiday-settings')
+    page.form['school_holidays'] = '02.01.2020 - 03.01.2020'
+    page.form.submit()
+
+    find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
+    assert 'Räume' in find_your_spot
+    assert 'An Feiertagen' in find_your_spot
+    assert 'Während Schulferien' in find_your_spot
+    find_your_spot.form['start'] = '2020-01-01'
+    find_your_spot.form['end'] = '2020-01-06'
+    result = find_your_spot.form.submit()
+
+    # the result should skip holidays, i.e. new years day
+    # and the user defined holidays from 2nd to 3th of January
+    # but then also the weekend of the 4th and 5th of January
+    assert '01.01.2020' not in result
+    assert '02.01.2020' not in result
+    assert '03.01.2020' not in result
+    assert '04.01.2020' not in result
+    assert '05.01.2020' not in result
+    assert '06.01.2020' in result
+
+    find_your_spot.select_checkbox('weekdays', 'Sa')
+    find_your_spot.select_checkbox('weekdays', 'So')
+    result = find_your_spot.form.submit()
+    assert '01.01.2020' not in result
+    assert '02.01.2020' not in result
+    assert '03.01.2020' not in result
+    assert '04.01.2020' in result
+    assert '05.01.2020' in result
+    assert '06.01.2020' in result
+
+    find_your_spot.form['on_holidays'] = 'yes'
+    result = find_your_spot.form.submit()
+    assert '01.01.2020' in result
+    assert '02.01.2020' not in result
+    assert '03.01.2020' not in result
+    assert '04.01.2020' in result
+    assert '05.01.2020' in result
+    assert '06.01.2020' in result
+
+    find_your_spot.form['during_school_holidays'] = 'yes'
+    result = find_your_spot.form.submit()
+    assert '01.01.2020' in result
+    assert '02.01.2020' in result
+    assert '03.01.2020' in result
+    assert '04.01.2020' in result
+    assert '05.01.2020' in result
+    assert '06.01.2020' in result
+
+
 def add_reservation(
         resource,
         client,
@@ -660,7 +747,7 @@ def test_reserve_allocation(client):
     assert len(slots.json) == 1
 
     with pytest.raises(AffectedReservationError):
-        client.delete(client.extract_href(slots.json[0]['actions'][2]))
+        client.delete(client.extract_href(slots.json[0]['actions'][3]))
 
     # open the created ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
@@ -799,6 +886,62 @@ def test_reserve_no_definition_pick_up_hint(client):
 
     assert 'RSV-' in ticket.text
     assert len(os.listdir(client.app.maildir)) == 1
+
+
+@freeze_time("2022-10-30", tick=True)
+def test_reserve_allocation_dst_to_st_transition(client):
+
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2022, 10, 30, 0), datetime(2022, 10, 30, 10)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('02:00', '03:00').json == {'success': True}
+
+    # see if the reservation was created correctly
+    url = '/resource/tageskarte/reservations?start=2022-10-30&end=2022-10-30'
+    reservations = client.get(url).json
+
+    assert len(reservations['reservations']) == 1
+    reservation = reservations['reservations'][0]
+    assert reservation['time'] == '02:00 - 03:00'
+    # for this ambiguous time we should get ST and not DST
+    assert reservation['date'] == '2022-10-30T02:00:00+01:00'
+
+
+@freeze_time("2022-03-27", tick=True)
+def test_reserve_allocation_st_to_dst_transition(client):
+
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2022, 3, 27, 0), datetime(2022, 3, 27, 10)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('02:00', '03:00').json == {
+        'message': "Die ausgewählte Zeit existiert nicht an diesem Datum "
+                   "aufgrund der Sommerzeitumstellung.",
+        'success': False
+    }
 
 
 def test_reserve_in_past(client):
@@ -1061,14 +1204,45 @@ def test_occupancy_view(client):
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
-    # at this point, the reservation won't show up in the occupancy view
+    # at this point, the reservation will show up, but it should be
+    # marked pending
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 0
+    assert len(occupancy.pyquery('.occupancy-block')) == 1
+    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
 
     # ..until we accept it
     ticket.click('Alle Reservationen annehmen')
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
+    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
+
+
+def test_occupancy_view_member_access(client):
+
+    # setup a resource that's visible to members
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'test'
+    new.form['access'] = 'member'
+    new.form.submit().follow()
+
+    # by default members aren't allowed to view occupancy
+    client.login_member()
+    occupancy = client.get('/resource/test/occupancy', expect_errors=True)
+    assert occupancy.status_code == 403
+
+    # but if we explicitly enable it on the resource
+    client.login_admin()
+    edit = client.get('/resource/test/edit')
+    edit.form['occupancy_is_visible_to_members'] = True
+    edit.form.submit().maybe_follow()
+
+    # now members should be able to access it
+    client.login_member()
+    occupancy = client.get('/resource/test/occupancy')
+    assert occupancy.status_code == 200
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -1161,12 +1335,27 @@ def test_reserve_session_separation(client):
         result = c2.get('/resource/{}/reservations'.format(room)).json
         assert len(result['reservations']) == 1
 
+    # check combined reservations for rooms without a group
+    result = c1.get('/find-your-spot/reservations').json
+    assert len(result['reservations']) == 2
+    assert result['reservations'][0]['resource'] == 'meeting-room'
+    assert result['reservations'][1]['resource'] == 'gym'
+
+    result = c2.get('/find-your-spot/reservations').json
+    assert len(result['reservations']) == 2
+    assert result['reservations'][0]['resource'] == 'meeting-room'
+    assert result['reservations'][1]['resource'] == 'gym'
+
     formular = c1.get('/resource/meeting-room/form')
     formular.form['email'] = 'info@example.org'
     formular.form.submit()
 
+    # we should get the same formular by following the group link
+    group_formular = c1.get('/find-your-spot/form').follow()
+    assert 'meeting-room' in group_formular
+
     # make sure if we confirm one reservation, only one will be written
-    formular.form.submit().follow().form.submit().follow()
+    next_form = formular.form.submit().follow().form.submit().follow()
 
     resource = client.app.libres_resources.by_name('meeting-room')
     assert resource.scheduler.managed_reserved_slots().count() == 1
@@ -1182,6 +1371,29 @@ def test_reserve_session_separation(client):
 
     result = c2.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
+
+    # next_formul should now be gym, since we had another pending
+    # reservation in the same group (no group i.e. general)
+    assert 'Bitte fahren Sie fort mit Ihrer Reservation für gym' in next_form
+    # but e-mail shoud be pre-filled so we can just submit twice to reserve
+    tickets = next_form.form.submit().follow().form.submit().follow()
+
+    result = c1.get('/resource/meeting-room/reservations').json
+    assert len(result['reservations']) == 0
+
+    result = c1.get('/resource/gym/reservations').json
+    assert len(result['reservations']) == 0
+
+    result = c2.get('/resource/meeting-room/reservations').json
+    assert len(result['reservations']) == 1
+
+    result = c2.get('/resource/gym/reservations').json
+    assert len(result['reservations']) == 1
+
+    # we should have a ticket for each room we reserved
+    assert 'Eingereichte Anfragen' in tickets
+    assert 'meeting-room' in tickets
+    assert 'gym' in tickets
 
 
 def test_reserve_reservation_prediction(client):

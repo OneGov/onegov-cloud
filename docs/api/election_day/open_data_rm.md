@@ -101,6 +101,7 @@ Num|Descripziun
 `entity_district`|Circul electoral/district/regiun da la vischnanca.
 `entity_counted`|`True`, sch'il resultat è vegnì eruì.
 `entity_eligible_voters`|Il dumber da las votantas e dals votants da la vischnanca/dal lieu.
+`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu.
 `entity_blank_ballots`|Il dumber dals cedels electorals vids da la vischnanca/dal lieu.
 `entity_invalid_ballots`|Il dumber dals cedels electorals nunvalaivels da la vischnanca/dal lieu.
@@ -119,6 +120,9 @@ Num|Descripziun
 `candidate_first_name`|Il prenum da la persuna che candidescha.
 `candidate_id`|La ID da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
+`candidate_party`|Il num da la partida.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
 `panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
@@ -189,6 +193,7 @@ Num|Descripziun
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
 `entity_name`|Il num da la vischnanca/dal lieu.
 `entity_district`|Circul electoral/district/regiun da la vischnanca.
+`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 `yeas`|Il dumber da las vuschs affirmativas
 `nays`|Il dumber da las vuschs negativas

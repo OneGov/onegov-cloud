@@ -3,6 +3,8 @@ import pytest
 
 from tempfile import NamedTemporaryFile
 
+from onegov.core.utils import module_path
+
 
 @pytest.fixture(scope='session')
 def keytab():
@@ -32,3 +34,8 @@ def keytab():
         f.flush()
 
         yield f.name
+
+
+@pytest.fixture(scope='session')
+def idp_metadata():
+    return module_path('tests.onegov.user', '/fixtures/idp.xml')

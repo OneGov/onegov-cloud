@@ -436,6 +436,6 @@ def import_guidle(group_context, url, tagmap, clear):
             )
         except Exception as e:
             log.error("Error importing events", exc_info=True)
-            raise(e)
+            raise (e)
 
     return _import_guidle

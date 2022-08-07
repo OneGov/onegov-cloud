@@ -122,6 +122,7 @@ setup(
         'pyquery',
         'qrbill',
         'qrcode',
+        'pysaml2',
         'python-dateutil',
         'python-magic',
         'python-stdnum',

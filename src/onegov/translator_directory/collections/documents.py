@@ -45,7 +45,7 @@ class TranslatorDocumentCollection(FileCollection):
 
     @property
     def files_by_category(self):
-        files = self.translator.files
+        files = sorted(self.translator.files, key=lambda f: f.note or '')
         return tuple(
             (category, tuple(files))
             for category, files in groupby(files, key=lambda f: f.note)

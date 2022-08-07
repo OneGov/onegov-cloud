@@ -1572,6 +1572,7 @@ $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f145';
 $new-daily-item-icon: '\f02d';
+$new-resource-link-icon: '\f0c1';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
@@ -1733,6 +1734,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
+    .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
 }
@@ -4033,7 +4035,7 @@ ul.search-results {
         width: 20%;
     }
 
-    .fc-view-container {
+    .fc-view-container, .reservation-list {
         display: inline-block;
         float: left;
         width: 80%;
@@ -4049,7 +4051,7 @@ ul.search-results {
         }
     }
 
-    .fc-view-container {
+    .fc-view-container, .reservation-list {
         width: 75%;
     }
 }
@@ -4061,7 +4063,7 @@ ul.search-results {
         width: 100%;
     }
 
-    .fc-view-container {
+    .fc-view-container, .reservation-list {
         display: block;
         width: 100%;
     }
@@ -5887,6 +5889,19 @@ h2 + div.timeline {
 }
 
 /*
+    Reservation
+*/
+
+.reservation-pending {
+    color: #999;
+
+    .has-tip {
+        font-size: .8rem;
+        vertical-align: text-bottom;
+    }
+}
+
+/*
     Ticket panels
 */
 .ticket-panel {
@@ -6381,4 +6396,98 @@ a > i.fa-external-link-alt {
 */
 .visually-hidden {
     @include element-invisible;
+}
+
+/*
+    Reservation list
+*/
+a#results {
+    display: block;
+    position: relative;
+    top: -7rem;
+    visibility: hidden;
+}
+
+.reservation-list {
+
+    position: relative;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    /* HACK: Overflow clipping is broken in Chromium when scrolling
+             for all the not-selected events due to the use of opacity
+             and/or filter. So we use a filter on the container element
+             to fix this. This is dumb, but this bug has been around for
+             almost a decade and still hasn't been fixed... */
+    filter: blur(0);
+
+    table {
+        margin-bottom: 0;
+
+        tr {
+            scroll-snap-margin-top: 7rem;
+            scroll-margin-top: 7rem;
+        }
+
+        th:first-child {
+            background-color: #fff;
+            position: sticky;
+            left: 0;
+            width: 0;
+            white-space: nowrap;
+            text-align: center;
+            z-index: 1;
+        }
+
+        thead th:first-child {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:nth-child(even) th:first-child {
+            background-color: #f2f2f2;
+        }
+
+        .event {
+            color: #fff;
+            border: 0;
+            border-radius: 2px;
+            margin-bottom: 2px;
+            padding: 2px 4px;
+            white-space: nowrap;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            &.selected {
+                cursor: default;
+                background-image: repeating-linear-gradient(
+                    45deg,
+                    rgba($steel, .25),
+                    rgba($steel, .25) 10px,
+                    rgba($iron, .25) 10px,
+                    rgba($iron, .25) 20px
+                );
+            }
+
+            &.not-selected:not(:hover) {
+                opacity: .75;
+                filter: grayscale(.75);
+            }
+        }
+
+        .event-unavailable {
+            cursor: not-allowed;
+            background-color: $red;
+        }
+
+        .event-partly-available {
+            cursor: pointer;
+            background-color: $orange;
+        }
+
+        .event-available {
+            cursor: pointer;
+            background-color: $green;
+        }
+    }
 }

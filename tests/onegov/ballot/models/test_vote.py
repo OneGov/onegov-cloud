@@ -760,6 +760,7 @@ def test_vote_export(session):
             invalid=5,
             empty=10,
             eligible_voters=150,
+            expats=30,
             entity_id=1,
         )
     )
@@ -798,7 +799,8 @@ def test_vote_export(session):
             'nays': 0,
             'invalid': 0,
             'empty': 0,
-            'eligible_voters': 0
+            'eligible_voters': 0,
+            'expats': ''
         },
         {
             'title_de_CH': "Abstimmung",
@@ -818,6 +820,7 @@ def test_vote_export(session):
             'invalid': 5,
             'empty': 10,
             'eligible_voters': 150,
+            'expats': 30,
         },
         {
             'title_de_CH': "Gegenvorschlag",
@@ -836,7 +839,8 @@ def test_vote_export(session):
             'nays': 0,
             'invalid': 0,
             'empty': 0,
-            'eligible_voters': 0
+            'eligible_voters': 0,
+            'expats': ''
         }
     ]
 

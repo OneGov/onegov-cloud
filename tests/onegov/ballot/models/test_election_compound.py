@@ -43,6 +43,8 @@ def majorz_election():
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male',
+            year_of_birth=1970
         )
     )
     election.candidates.append(
@@ -62,6 +64,7 @@ def majorz_election():
         entity_id=1,
         counted=True,
         eligible_voters=1000,
+        expats=35,
         received_ballots=500,
         blank_ballots=10,
         invalid_ballots=5,
@@ -139,6 +142,8 @@ def proporz_election(
             family_name='Quimby',
             first_name='Joe',
             party='Republican Party',
+            gender='male',
+            year_of_birth=1970
         )
     )
     election.candidates.append(
@@ -159,6 +164,7 @@ def proporz_election(
         entity_id=1,
         counted=True,
         eligible_voters=1000,
+        expats=35,
         received_ballots=500,
         blank_ballots=10,
         invalid_ballots=5,
@@ -488,6 +494,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -501,6 +508,8 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111
     }
     assert export[1] == {
@@ -524,6 +533,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -537,6 +547,8 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520
     }
 
@@ -565,6 +577,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -584,6 +597,8 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': None,
@@ -611,6 +626,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -630,6 +646,8 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
         'panachage_votes_from_list_1': None,
         'panachage_votes_from_list_2': 12,
@@ -657,6 +675,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -670,6 +689,8 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111
     }
 
@@ -694,6 +715,7 @@ def test_election_compound_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -707,6 +729,8 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520
     }
 
@@ -1079,123 +1103,6 @@ def test_election_compound_supersegment_progress(session):
     assert elections[3].completed is False
     assert election_compound.completed is False
     assert election_compound.progress == (1, 3)
-
-
-def test_election_compound_list_results(session):
-    election_compound = ElectionCompound(
-        title='Elections',
-        domain='canton',
-        date=date(2015, 6, 14),
-    )
-    session.add(election_compound)
-    session.flush()
-
-    assert election_compound.get_list_results() == []
-    elections = [
-        proporz_election(id='1', number_of_mandates=1),
-        proporz_election(id='2', number_of_mandates=2),
-        proporz_election(id='3', number_of_mandates=3)
-    ]
-    for election in elections:
-        session.add(election)
-    election_compound.elections = elections
-    session.flush()
-
-    # Not Doppelter Pukelsheim
-    assert election_compound.get_list_results() == []
-
-    # Doppelter Pukelsheim with manual completion
-    election_compound.pukelsheim = True
-    election_compound.completes_manually = True
-    election_compound.manually_completed = False
-    assert election_compound.get_list_results() == [
-        ('Quimby Again!', 3, 953),  # 520 / 1 + 520 / 2 + 520 / 3
-        ('Kwik-E-Major', 0, 204)  # 111 / 1 + 111/2 + 111/3
-    ]
-
-    # Add another list
-    list_id = uuid4()
-    list_ = List(
-        id=list_id,
-        list_id='3',
-        number_of_mandates=5,
-        name='Burns burns!',
-    )
-    list_result = ListResult(
-        list_id=list_id,
-        votes=200
-    )
-    election_result = ElectionResult(
-        name='name',
-        entity_id=1,
-        counted=True,
-    )
-    election_result.list_results.append(list_result)
-    elections[0].lists.append(list_)
-    elections[0].results.append(election_result)
-    session.flush()
-
-    assert election_compound.get_list_results() == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)  # 200 + 0 / 2 + 0 / 3
-    ]
-
-    # Test optional parameters
-    # ... limit
-    assert election_compound.get_list_results(limit=0) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=None) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=-5) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(limit=2) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-    ]
-
-    # ... names
-    assert election_compound.get_list_results(names=[]) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(names=None) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-        ('Burns burns!', 5, 200)
-    ]
-    assert election_compound.get_list_results(
-        names=['Quimby Again!', 'Kwik-E-Major', 'All others']
-    ) == [
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204),
-    ]
-
-    # ... manually completed
-    election_compound.manually_completed = True
-    assert election_compound.get_list_results() == [
-        ('Burns burns!', 5, 200),
-        ('Quimby Again!', 3, 953),
-        ('Kwik-E-Major', 0, 204)
-    ]
-
-    # ... limit & names & order_by
-    assert election_compound.get_list_results(
-        limit=1,
-        names=['Quimby Again!'],
-    ) == [
-        ('Quimby Again!', 3, 953),
-    ]
 
 
 def test_election_compound_attachments(test_app, explanations_pdf):

@@ -97,6 +97,10 @@ body {
     width: 100%;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 .off-canvas-content {
     display: flex;
     flex-direction: column;

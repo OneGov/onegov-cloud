@@ -677,26 +677,6 @@ class PdfGenerator():
             )
             pdf.pagebreak()
 
-        # Lists
-        chart = self.renderer.get_lists_chart(compound, 'pdf')
-        if compound.show_lists and chart:
-            pdf.h2(_('Lists'))
-            pdf.pdf(chart)
-            pdf.spacer()
-            pdf.results(
-                [
-                    _('List'),
-                    label('mandates'),
-                ],
-                [[
-                    r.name,
-                    r.number_of_mandates
-                ] for r in get_list_groups(compound)],
-                [None, 2 * cm, 2 * cm],
-                pdf.style.table_results_2
-            )
-            pdf.pagebreak()
-
         # Parties
         chart = self.renderer.get_party_strengths_chart(compound, 'pdf')
         if compound.show_party_strengths and chart:

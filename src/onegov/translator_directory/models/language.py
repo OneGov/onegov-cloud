@@ -29,6 +29,17 @@ written_association_table = Table(
     Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
 )
 
+monitoring_association_table = Table(
+    'monitoring_lang_association',
+    Base.metadata,
+    Column(
+        'translator_id',
+        UUID,
+        ForeignKey('translators.id'),
+        nullable=False),
+    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
+)
+
 mother_tongue_association_table = Table(
     'mother_tongue_association',
     Base.metadata,
@@ -65,8 +76,13 @@ class Language(Base):
             written_association_table).filter_by(lang_id=self.id).count()
 
     @property
+    def monitors_count(self):
+        session = object_session(self)
+        return session.query(
+            monitoring_association_table).filter_by(lang_id=self.id).count()
+
+    @property
     def native_speakers_count(self):
-        """Having it as mother tongue..."""
         session = object_session(self)
         return session.query(
             mother_tongue_association_table).filter_by(lang_id=self.id).count()
@@ -77,4 +93,5 @@ class Language(Base):
             self.speakers_count
             + self.writers_count
             + self.native_speakers_count
+            + self.monitors_count
         ) == 0

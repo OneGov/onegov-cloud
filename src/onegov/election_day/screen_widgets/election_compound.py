@@ -3,7 +3,6 @@ from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
-from onegov.election_day.utils.election_compound import get_list_results
 
 
 @ElectionDayApp.screen_widget(
@@ -66,32 +65,6 @@ class ElectionCompoundListGroupsTableWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='election-compound-lists-table',
-    category='election_compound'
-)
-class ElectionCompoundListsTableWidget(ModelBoundWidget):
-    tag = 'election-compound-lists-table'
-    template = """
-        <xsl:template match="election-compound-lists-table">
-            <div class="{@class}" tal:define="names '{@names}'">
-                <tal:block
-                    metal:use-macro="layout.macros['election-compound-lists-table']"
-                    />
-            </div>
-        </xsl:template>
-    """
-    usage = '<election-compound-lists-table class="" names=","/>'
-
-    def get_variables(self, layout):
-        model = self.model or layout.model
-        lists = get_list_results(model)
-        return {
-            'election': model,
-            'lists': lists
-        }
-
-
-@ElectionDayApp.screen_widget(
     tag='election-compound-districts-table',
     category='election_compound'
 )
@@ -112,7 +85,6 @@ class ElectionCompoundDistrictsTableWidget(ModelBoundWidget):
         model = self.model or layout.model
         return {
             'election_compound': model,
-            'lists': get_list_results(model)
         }
 
 
@@ -134,23 +106,3 @@ class ElectionCompoundListGroupsChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = '<election-compound-list-groups-chart class=""/>'
-
-
-@ElectionDayApp.screen_widget(
-    tag='election-compound-lists-chart',
-    category='election_compound'
-)
-class ElectionCompoundListsChartWidget(ChartWidget):
-    tag = 'election-compound-lists-chart'
-    template = """
-        <xsl:template match="election-compound-lists-chart">
-            <div class="{@class}"
-                 tal:define="limit '0{@limit}'; names '{@names}'"
-                 >
-                <tal:block
-                    metal:use-macro="layout.macros['lists-chart']"
-                    />
-            </div>
-        </xsl:template>
-    """
-    usage = '<election-compound-lists-chart limit="" names="," class=""/>'
