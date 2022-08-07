@@ -1,3 +1,4 @@
+import calendar
 import time
 
 from abc import ABCMeta, abstractmethod
@@ -9,11 +10,13 @@ from sedate import utcnow
 
 from onegov.core.crypto import random_token
 from onegov.core.utils import rchop
-from onegov.user import _, log, UserCollection, Auth
+from onegov.user import _, log, UserCollection
 from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.clients.msal import MSALConnections
+from onegov.user.auth.clients.saml2 import SAML2Connections
 from onegov.user.models.user import User
+from saml2.ident import code
 from translationstring import TranslationString
 from typing import Dict
 from typing import Optional
@@ -646,10 +649,19 @@ class OauthProvider(SeparateAuthenticationProvider):
     """
 
     @abstractmethod
-    def logout_url(self, request):
+    def logout_url(self, request, user):
         """ Returns the tenant or app specific logout url to the authentication
         endpoint in a consistent manner.
-         """
+        """
+
+    @abstractmethod
+    def applies_to(self, request, user):
+        """ Returns whether or not this provider applies to this user, i.e.
+        whether the active session was created by this provider previously
+        and thus should also be in charge of further interactions with the
+        provider, such as a global logout. The global session may expire
+        before ours, so this would be one place to check for that.
+        """
 
     @abstractmethod
     def request_authorisation(self, request):
@@ -664,11 +676,14 @@ class OauthProvider(SeparateAuthenticationProvider):
         to redirect the user to the auth provider.
         """
 
-    @staticmethod
-    def logout_redirect_uri(request):
+    def logout_redirect_uri(self, request):
         """This url usually has to be registered with the OAuth Provider.
         Should not contain any query parameters. """
-        return request.class_link(Auth, name='logout')
+        return request.class_link(
+            AuthenticationProvider,
+            {'name': self.metadata.name},
+            name='logout'
+        )
 
     def redirect_uri(self, request):
         """Returns the redirect uri in a consistent manner
@@ -740,7 +755,11 @@ class AzureADProvider(
     def button_text(self, request):
         return _("Login with Microsoft")
 
-    def logout_url(self, request):
+    def applies_to(self, request, user):
+        # global logout is deactivated for AzureAD currently
+        return False
+
+    def logout_url(self, request, user):
         client = self.tenants.client(request.app)
         return client.logout_url(self.logout_redirect_uri(request))
 
@@ -908,6 +927,225 @@ class AzureADProvider(
 
         # We set the path we wanted to go when starting the oauth flow
         self.to = request.browser_session.pop('login_to', '/')
+
+        return Success(user, _("Successfully logged in as «${user}»", mapping={
+            'user': user.username
+        }))
+
+    def available(self, app):
+        return self.tenants.client(app) and True or False
+
+
+@attrs(auto_attribs=True)
+class SAML2Provider(
+    OauthProvider,
+    metadata=ProviderMetadata(name='saml2', title=_("SAML2"))
+):
+    """
+    Authenticates and authorizes a user on SAML2 IDP
+    """
+
+    # saml2 instances by tenant
+    tenants: SAML2Connections = attrib()
+
+    # Roles configuration
+    roles: RolesMapping = attrib()
+
+    # Custom hint to be shown in the login view
+    custom_hint: str = ''
+
+    @classmethod
+    def configure(cls, **cfg):
+
+        if not cfg:
+            return None
+
+        return cls(
+            tenants=SAML2Connections.from_cfg(cfg.get('tenants')),
+            custom_hint=cfg.get('hint', None),
+            roles=RolesMapping(cfg.get('roles', {
+                '__default__': {
+                    'admins': 'admins',
+                    'editors': 'editors',
+                    'members': 'members'
+                }
+            }))
+        )
+
+    def button_text(self, request):
+        client = self.tenants.client(request.app)
+        return client.button_text
+
+    def applies_to(self, request, user):
+
+        data = user.data or {}
+        if 'saml2_transient_id' not in data:
+            return False
+
+        # if the source isn't what we expect then it doesn't apply
+        client = self.tenants.client(request.app)
+        if client.treat_as_ldap:
+            if user.source != 'ldap':
+                return False
+        elif user.source != 'saml2':
+            return False
+
+        nooa = data.get('saml2_not_on_or_after', -1)
+        if nooa < 0:
+            # this means no session was created
+            return False
+        elif nooa == 0:
+            # no expiration was defined on the session
+            return True
+
+        # this is a bit suspect, but it's what PySAML2 does
+        # technically int(time.time()) should do the exact same
+        return nooa > calendar.timegm(time.gmtime())
+
+    def logout_url(self, request, user):
+        client = self.tenants.client(request.app)
+        logout_url = client.logout_url(self, request, user)
+        if not logout_url:
+            # in this case we bail to the redirect url to finish logout
+            return self.logout_redirect_uri(request)
+        return logout_url
+
+    def authenticate_request(self, request):
+        """
+        Returns a redirect response or a Conclusion
+
+        Parameters of the original request are kept for when external services
+        call back.
+        """
+
+        app = request.app
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if not roles:
+            # Considered as a misconfiguration of the app
+            log.error(f"No role map for {app.application_id}")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not client:
+            # Considered as a misconfiguration of the app
+            log.error(f'No saml2 client found for '
+                      f'{app.application_id} or {app.namespace}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        # currently we only support redirect binding
+        conn = client.connection(self, request)
+        session_id, request_info = conn.prepare_for_authenticate()
+
+        # remember this session
+        sessions = client.get_sessions(app)
+        sessions[session_id] = request.url
+
+        # remember where we need to redirect to
+        redirects = client.get_redirects(app)
+        redirects[session_id] = self.to
+
+        # since prepare_for_authenticate() needs to support other
+        # bindings as well, the request_info ends up being overly
+        # complex. We only care about the Location header
+        headers = {k.lower(): v for k, v in request_info['headers']}
+        auth_url = headers['location']
+
+        return morepath.redirect(auth_url)
+
+    def request_authorisation(self, request):
+        """
+        Returns a webob Response or a Conclusion.
+        """
+
+        app = request.app
+
+        client = self.tenants.client(app)
+        roles = self.roles.app_specific(app)
+
+        if 'SAMLResponse' not in request.params:
+            log.warning('SAMLResponse missing from authorisation request')
+            return Failure(_('Authorisation failed due to an error'))
+
+        try:
+            conn = client.connection(self, request)
+            conv_info = {
+                'remote_addr': request.remote_addr,
+                'request_uri': request.url,
+                'entity_id': conn.config.entityid,
+                'endpoints': conn.config.getattr('endpoints', 'sp')
+            }
+            sessions = client.get_sessions(request.app)
+            response = conn.parse_authn_request_response(
+                request.params['SAMLResponse'],
+                client.get_binding(request),
+                sessions,
+                # TODO: outstanding certs?
+                conv_info=conv_info
+            )
+            # remove the session to prevent playback attacks
+            session_id = response.session_id()
+            del sessions[session_id]
+        except Exception as exception:
+            log.warning(f'SAML2 authorization error: {exception}')
+            return Failure(_('Authorisation failed due to an error'))
+
+        # What we get here is defined by the IdP, so it could be
+        # an email or a persistent ID, but we don't really care
+        # since we can't make any assumptions we treat it like
+        # a transient id that will change on every log in
+        transient_id = response.name_id
+        nooa = response.session_not_on_or_after
+        ava = response.ava
+        source_id = ava.get(client.attributes.source_id, [None])[0]
+        username = ava.get(client.attributes.username, [None])[0]
+        first_name = ava.get(client.attributes.first_name, [None])[0]
+        last_name = ava.get(client.attributes.last_name, [None])[0]
+        groups = ava.get(client.attributes.groups)
+
+        if not username:
+            log.info("No username found in authorisation step")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not source_id:
+            log.info(f"No source_id found for {username}")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if not groups:
+            log.info(f"No groups found for {username}")
+            return Failure(_("Can't login because your user has no groups. "
+                             "Contact your SAML2 system administrator"))
+
+        role = self.roles.match(roles, groups)
+
+        if not role:
+            log.info(f"No authorized group for {username}, "
+                     f"having groups: {', '.join(groups)}")
+            return Failure(_('Authorisation failed due to an error'))
+
+        if first_name and last_name:
+            realname = f'{first_name} {last_name}'
+        else:
+            realname = None
+
+        user = ensure_user(
+            source='ldap' if client.treat_as_ldap else self.name,
+            source_id=source_id,
+            session=request.session,
+            username=username,
+            role=role,
+            realname=realname
+        )
+
+        # remember the transient id
+        data = user.data or {}
+        data['saml2_transient_id'] = code(transient_id)
+        data['saml2_not_on_or_after'] = nooa
+        user.data = data
+
+        # We set the path we wanted to go when starting the oauth flow
+        redirects = client.get_redirects(request.app)
+        self.to = redirects.pop(session_id, '/')
 
         return Success(user, _("Successfully logged in as «${user}»", mapping={
             'user': user.username

@@ -1,13 +1,14 @@
 import icalendar
 import morepath
 import sedate
+import collections
 
 from collections import OrderedDict, namedtuple
 from datetime import datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
 from morepath.request import Response
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
@@ -24,6 +25,8 @@ from onegov.org.layout import (
 from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource
 )
+from onegov.org.models.external_link import ExternalLinkCollection, \
+    ExternalLink
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.ticket import Ticket, TicketCollection
 from operator import attrgetter, itemgetter
@@ -53,6 +56,18 @@ RESOURCE_TYPES = {
 }
 
 
+def combine_grouped(items, external_links, sort=None):
+    for key, values in external_links.items():
+        if key not in items:
+            items[key] = values
+        else:
+            if sort:
+                items[key] = sorted(items[key] + values, key=sort)
+            else:
+                items[key] += values
+    return collections.OrderedDict(sorted(items.items()))
+
+
 def get_daypass_form(self, request):
     return get_resource_form(self, request, 'daypass')
 
@@ -78,36 +93,64 @@ def get_resource_form(self, request, type=None):
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request, layout=None):
-    default_group = request.translate(_("General"))
-    grouped = group_by_column(
+    resources = group_by_column(
         request=request,
         query=self.query(),
-        default_group=default_group,
         group_column=Resource.group,
         sort_column=Resource.title
     )
 
-    def contains_at_least_one_room(resources):
-        for resource in resources:
-            if resource.type == 'room':
-                return True
-        return False
+    ext_resources = group_by_column(
+        request,
+        query=ExternalLinkCollection.for_model(
+            request.session, ResourceCollection
+        ).query(),
+        group_column=ExternalLink.group,
+        sort_column=ExternalLink.order
+    )
 
-    for group, entries in grouped.items():
-        # don't include find-your-spot link for categories with
-        # no rooms
-        if not contains_at_least_one_room(entries):
-            continue
+    def link_func(model):
+        if isinstance(model, ExternalLink):
+            return model.url
+        return request.link(model)
 
-        entries.insert(0, FindYourSpotCollection(
-            request.app.libres_context,
-            group=None if group == default_group else group
-        ))
+    def edit_link(model):
+        if isinstance(model, ExternalLink) and request.is_manager:
+            title = request.translate(_("Edit resource"))
+            to = request.class_link(ResourceCollection)
+            return request.link(
+                model,
+                query_params={'title': title, 'to': to},
+                name='edit'
+            )
+
+    def external_link(model):
+        if isinstance(model, ExternalLink):
+            title = request.translate(_("Edit resource"))
+            to = request.class_link(ResourceCollection)
+            return request.link(
+                model,
+                query_params={'title': title, 'to': to},
+                name='edit'
+            )
+
+    def lead_func(model):
+        lead = model.meta.get('lead')
+        if not lead:
+            lead = ''
+        lead = layout.linkify(lead)
+        return lead
 
     return {
         'title': _("Reservations"),
-        'resources': grouped,
-        'layout': layout or ResourcesLayout(self, request)
+        'resources': combine_grouped(
+            resources, ext_resources, sort=lambda x: x.title
+        ),
+        'layout': layout or ResourcesLayout(self, request),
+        'link_func': link_func,
+        'edit_link': edit_link,
+        'external_link': external_link,
+        'lead_func': lead_func,
     }
 
 
@@ -152,8 +195,9 @@ def view_find_your_spot(self, request, form, layout=None):
         }
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
-            for allocation in room.scheduler.search_allocations(
-                    start, end, days=form.weekdays.data, strict=True):
+            for allocation in request.exclude_invisible(
+                    room.scheduler.search_allocations(
+                        start, end, days=form.weekdays.data, strict=True)):
 
                 date = allocation.display_start().date()
                 if date not in room_slots:
@@ -472,17 +516,22 @@ def get_date_range(resource, params):
     return sedate.align_range_to_day(start, end, resource.timezone)
 
 
-@OrgApp.html(model=Resource, permission=Private, name='occupancy',
+@OrgApp.html(model=Resource, permission=Personal, name='occupancy',
              template='resource_occupancy.pt')
 def view_occupancy(self, request, layout=None):
+    # for members check if they're actually allowed to see this
+    if request.has_role('member') and not self.occupancy_is_visible_to_members:
+        raise exc.HTTPForbidden()
 
     # infer the default start/end date from the calendar view parameters
     start, end = get_date_range(self, request.params)
 
-    query = self.reservations_with_tickets_query(start, end)
+    # include pending reservations
+    query = self.reservations_with_tickets_query(
+        start, end, exclude_pending=False)
     query = query.with_entities(
         Reservation.start, Reservation.end, Reservation.quota,
-        Ticket.subtitle, Ticket.id
+        Reservation.data, Ticket.subtitle, Ticket.id
     )
 
     def group_key(record):
@@ -490,24 +539,28 @@ def view_occupancy(self, request, layout=None):
 
     occupancy = OrderedDict()
     grouped = groupby(query.all(), group_key)
-    Entry = namedtuple('Entry', ('start', 'end', 'title', 'quota', 'url'))
+    Entry = namedtuple(
+        'Entry', ('start', 'end', 'title', 'quota', 'pending', 'url'))
     count = 0
+    pending_count = 0
 
     for date, records in grouped:
         occupancy[date] = tuple(
             Entry(
-                start=sedate.to_timezone(r[0], self.timezone),
+                start=sedate.to_timezone(start, self.timezone),
                 end=sedate.to_timezone(
-                    r[1] + timedelta(microseconds=1), self.timezone),
-                quota=r[2],
-                title=r[3],
+                    end + timedelta(microseconds=1), self.timezone),
+                quota=quota,
+                title=title,
+                pending=not data or not data.get('accepted'),
                 url=request.class_link(Ticket, {
                     'handler_code': 'RSV',
-                    'id': r[4]
+                    'id': ticket_id
                 })
-            ) for r in records
+            ) for start, end, quota, data, title, ticket_id in records
         )
         count += len(occupancy[date])
+        pending_count += sum(1 for entry in occupancy[date] if entry.pending)
 
     layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
@@ -525,6 +578,7 @@ def view_occupancy(self, request, layout=None):
         'start': sedate.to_timezone(start, self.timezone).date(),
         'end': sedate.to_timezone(end, self.timezone).date(),
         'count': count,
+        'pending_count': pending_count,
         'utilisation': utilisation
     }
 

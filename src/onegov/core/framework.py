@@ -595,8 +595,8 @@ class Framework(
         return self.send_email(*args, **kwargs)
 
     def send_marketing_email_batch(self, prepared_emails):
-        """ Sends an e-mail batch categorised as marketing. This includes but is not
-        limited to:
+        """ Sends an e-mail batch categorised as marketing. This includes but
+        is not limited to:
 
             * Announcements
             * Newsletters

@@ -326,6 +326,15 @@
                 </ul>
             </dd>
         </div>
+        <div>
+            <dt i18n:translate>Immediate e-mail notification to members upon ticket submission</dt>
+            <dd>
+                <tal:b tal:switch="usergroup.meta and usergroup.meta.get('immediate_notification') or 'no'">
+                    <tal:b tal:case="'yes'" i18n:translate>Yes</tal:b>
+                    <tal:b tal:case="'no'" i18n:translate>No</tal:b>
+                </tal:b>
+            </dd>
+        </div>
     </metal:b>
 
 </body>

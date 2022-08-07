@@ -118,14 +118,14 @@ class FindYourSpotForm(Form):
                 self.start.errors.append(_("Start date before end date"))
                 return False
 
-    def ensure_from_time_before_to_time(self):
+    def ensure_start_time_before_end_time(self):
         start = self.start_time.data
         end = self.end_time.data
         if start and end:
             if (start.hour > end.hour
                 or (start.hour == end.hour
                     and start.minute >= end.minute)):
-                self.from_time.errors.append(_("Start time before end time"))
+                self.start_time.errors.append(_("Start time before end time"))
                 return False
 
     @cached_property
