@@ -9,6 +9,8 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
+from onegov.election_day.utils.election_compound import \
+    get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_superregions
@@ -533,6 +535,17 @@ class PdfGenerator():
                     return _("Municipalities")
             return principal.label(value)
 
+        def format_gender(value):
+            result = _('undetermined')
+            if value == 'female':
+                result = _('female')
+            if value == 'male':
+                result = _('male')
+            return pdf.translate(result)
+
+        def format_int(value):
+            return f'{value or 0:.0f}'
+
         districts = {
             election.id: (
                 election.domain_segment,
@@ -639,6 +652,7 @@ class PdfGenerator():
         pdf.pagebreak()
 
         # Elected candidates
+        elected_candidates = get_elected_candidates(compound, self.session)
         pdf.h2(_('Elected candidates'))
         pdf.spacer()
         if has_superregions:
@@ -654,7 +668,7 @@ class PdfGenerator():
                     r.list,
                     districts.get(r.election_id, ('', ''))[1],
                     districts.get(r.election_id, ('', ''))[0],
-                ] for r in get_elected_candidates(compound, self.session)],
+                ] for r in elected_candidates],
                 [None, None, 2 * cm, 2 * cm],
                 pdf.style.table_results_3
             )
@@ -804,7 +818,6 @@ class PdfGenerator():
                 [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
                 pdf.style.table_results_2
             )
-            pdf.pagebreak()
         else:
             pdf.results(
                 [
@@ -841,7 +854,34 @@ class PdfGenerator():
                 [None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
                 pdf.style.table_results_1
             )
-            pdf.pagebreak()
+        candidate_statistics = get_candidate_statistics(
+            compound, elected_candidates
+        )
+        if candidate_statistics:
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('Elected candidates'),
+                    _('Count'),
+                    _('Average age'),
+                ],
+                [
+                    [
+                        format_gender(gender),
+                        format_int(candidate_statistics[gender]['count']),
+                        format_int(candidate_statistics[gender]['age']),
+                    ]
+                    for gender in sorted(candidate_statistics)
+                    if gender != 'total'
+                ] + [[
+                    _('Total'),
+                    format_int(candidate_statistics['total']['count']),
+                    format_int(candidate_statistics['total']['age']),
+                ]],
+                [None, 2 * cm, 4 * cm],
+                pdf.style.table_results_1
+            )
+        pdf.pagebreak()
 
     def add_vote(self, principal, vote, pdf, locale):
         completed = vote.completed

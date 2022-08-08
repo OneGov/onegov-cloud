@@ -124,7 +124,7 @@ html {
         display: flex;
         flex-direction: row-reverse;
         height: 1.7rem;
-
+        margin-bottom: 0;
     }
 }
 
@@ -913,15 +913,6 @@ ul.pagination li.last {
 }
 
 /*
-    Content
-*/
-.content .columns {
-    h3:not(:first-of-type) {
-        margin-top: 3rem;
-    }
-}
-
-/*
     Related Links
 */
 .row.related {
@@ -929,6 +920,7 @@ ul.pagination li.last {
 }
 
 .related-link {
+    display: block;
     word-break: break-all;
 }
 
@@ -949,6 +941,15 @@ ul.pagination li.last {
         margin: 0 0 1.5rem;
     }
 }
+
+
+/*
+    Embedd Widget
+*/
+.embedded-widget {
+    margin-bottom: 2rem;
+}
+
 
 /*
     Open Data

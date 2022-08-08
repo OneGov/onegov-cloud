@@ -1000,24 +1000,22 @@
 </metal:fields>
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
-    <div class="row related" tal:condition="layout.related_link or layout.explanations_pdf">
-        <div class="columns small-12" tal:define="explanations_pdf layout.explanations_pdf;
-                                                  upper_apportionment_pdf getattr(layout.model, 'upper_apportionment_pdf', None);
-                                                  lower_apportionment_pdf getattr(layout.model, 'lower_apportionment_pdf', None)">
-            <h2 i18n:translate="">Related link</h2>
-            <p tal:condition="explanations_pdf or upper_apportionment_pdf or lower_apportionment_pdf">
-                <a tal:condition="layout.explanations_pdf" href="${request.link(layout.explanations_pdf)}" class="related-link" i18n:translate="">Explanations (PDF)</a><br>
-                <a tal:condition="upper_apportionment_pdf" href="${request.link(upper_apportionment_pdf)}" class="related-link" i18n:translate="">Upper apportionment (PDF)</a><br>
-                <a tal:condition="lower_apportionment_pdf" href="${request.link(lower_apportionment_pdf)}" class="related-link" i18n:translate="">Lower apportionment (PDF)</a><br>
-            </p>
-            <p tal:condition="layout.related_link and layout.related_link_label">
-                <a href="${layout.related_link}" class="related-link">${layout.related_link_label}</a>
-            </p>
-            <p tal:condition="layout.related_link and not layout.related_link_label">
-                <a href="${layout.related_link}" class="related-link">${layout.related_link}</a>
-            </p>
+    <tal:block tal:define="explanations_pdf layout.explanations_pdf;
+                           upper_apportionment_pdf getattr(layout.model, 'upper_apportionment_pdf', None);
+                           lower_apportionment_pdf getattr(layout.model, 'lower_apportionment_pdf', None)">
+        <div class="row related" tal:condition="layout.related_link or explanations_pdf or upper_apportionment_pdf or lower_apportionment_pdf">
+            <div class="columns small-12">
+                <h2 i18n:translate="">Related link</h2>
+                <p>
+                    <a tal:condition="layout.explanations_pdf" href="${request.link(layout.explanations_pdf)}" class="related-link" i18n:translate="">Explanations (PDF)</a>
+                    <a tal:condition="upper_apportionment_pdf" href="${request.link(upper_apportionment_pdf)}" class="related-link" i18n:translate="">Upper apportionment (PDF)</a>
+                    <a tal:condition="lower_apportionment_pdf" href="${request.link(lower_apportionment_pdf)}" class="related-link" i18n:translate="">Lower apportionment (PDF)</a>
+                    <a tal:condition="layout.related_link and layout.related_link_label" href="${layout.related_link}" class="related-link">${layout.related_link_label}</a>
+                    <a tal:condition="layout.related_link and not layout.related_link_label" href="${layout.related_link}" class="related-link">${layout.related_link}</a>
+                </p>
+            </div>
         </div>
-    </div>
+    </tal:block>
 </metal:related_link>
 
 <metal:related_elections define-macro="related_elections" i18n:domain="onegov.election_day">
@@ -1429,8 +1427,7 @@
 </metal:parties_panachage_figure>
 
 <metal:candidate-statistics define-macro="candidate-statistics" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="len(candidate_statistics)>2">
-        <h3 i18n:translate="">Elected candidates</h3>
+    <div class="candidate-statistics" tal:condition="candidate_statistics">
         <table
             class="statistics tablesaw sortable"
             data-tablesaw-mode="columntoggle"
@@ -1439,7 +1436,7 @@
             >
             <thead>
                 <tr>
-                    <th data-tablesaw-priority="persist" i18n:translate="">Gender</th>
+                    <th data-tablesaw-priority="persist" i18n:translate="">Elected candidates</th>
                     <th data-tablesaw-priority="persist" class="right-aligned" i18n:translate="">Count</th>
                     <th data-tablesaw-priority="persist" class="right-aligned" i18n:translate="">Average age</th>
                 </tr>
@@ -1461,7 +1458,7 @@
                 </tr>
             </tfoot>
         </table>
-    </tal:block>
+    </div>
 </metal:candidate-statistics>
 
 <metal:mail_election_compound_result define-macro="mail_election_compound_result" i18n:domain="onegov.election_day">

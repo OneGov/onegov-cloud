@@ -53,4 +53,7 @@ def get_candidate_statistics(election_compound, elected_candidates):
     values = dict(groupbylist(values, key=lambda x: x[0]))
     result.update({gender: statistics(values[gender]) for gender in values})
 
-    return result
+    if set(result) - {'total', 'undetermined'}:
+        return result
+
+    return {}
