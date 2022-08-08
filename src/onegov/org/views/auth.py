@@ -202,22 +202,21 @@ def do_logout_with_external_provider(self, request):
     if isinstance(self.app, UserApp) and user.source:
         for provider in self.app.providers:
             if isinstance(provider, OauthProvider):
-                if request.url == provider.logout_redirect_uri(request):
-                    return do_logout(
-                        self,
-                        request,
-                        to=request.browser_session.pop('logout_to', '/')
-                    )
+                # skip provider if there is no active session with the
+                # external provider
+                if not provider.applies_to(request, user):
+                    continue
+
                 request.browser_session['logout_to'] = self.to
-                return morepath.redirect(provider.logout_url(request))
+                return morepath.redirect(provider.logout_url(request, user))
+
+    return do_logout(self, request)
 
 
 @OrgApp.html(model=Auth, name='logout', permission=Personal)
 def view_logout(self, request):
-    """ Handles the logout requests. We do not logout over external auth
-    providers, since we anyway have like a hybrid login (using id_token to
-    establish our own login session with different expiration). """
-    return do_logout(self, request)
+    """ Handles the logout requests """
+    return do_logout_with_external_provider(self, request)
 
 
 @OrgApp.form(model=Auth, name='request-password', template='form.pt',

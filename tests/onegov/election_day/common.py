@@ -507,6 +507,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
     new.form['completes_manually'] = completes_manually
     new.form['voters_counts'] = voters_counts
     new.form['exact_voters_counts'] = exact_voters_counts
+    new.form['show_seat_allocation'] = True
     new.form['show_list_groups'] = True
     new.form['show_party_strengths'] = True
     new.form['show_party_panachage'] = True

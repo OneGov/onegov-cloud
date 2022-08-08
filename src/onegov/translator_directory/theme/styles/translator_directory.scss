@@ -113,6 +113,10 @@ table.translator-documents {
     }
 }
 
+.field-type-coordinatesfield .long-field-help {
+    @include panel($callout-panel-bg);
+}
+
 .hints .hint {
     font-size: 1em;
 

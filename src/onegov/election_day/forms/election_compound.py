@@ -176,6 +176,16 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    show_seat_allocation = BooleanField(
+        label=_("Seat allocation"),
+        description=_(
+            "Shows a tab with the comparison of seat allocation as a bar "
+            "chart. Requires party results."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True),
+    )
+
     show_list_groups = BooleanField(
         label=_("List groups"),
         description=_(
@@ -315,6 +325,7 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        model.show_seat_allocation = self.show_seat_allocation.data
         model.show_list_groups = self.show_list_groups.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
@@ -406,6 +417,7 @@ class ElectionCompoundForm(Form):
         self.manually_completed.data = model.manually_completed
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
+        self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage

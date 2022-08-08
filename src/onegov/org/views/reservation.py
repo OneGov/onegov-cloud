@@ -1,8 +1,9 @@
 import morepath
+import pytz
 import sedate
 import transaction
 
-from datetime import time, timedelta
+from datetime import datetime, time, timedelta
 from dill import pickles
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
@@ -17,6 +18,7 @@ from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     TicketMessage, TicketChatMessage, ReservationMessage)
+from onegov.org.models.resource import FindYourSpotCollection
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
 from purl import URL
@@ -104,9 +106,42 @@ def reserve_allocation(self, request):
             start = sedate.parse_time(start)
             end = sedate.parse_time(end)
 
-        start, end = sedate.get_date_range(
-            sedate.to_timezone(self.start, self.timezone), start, end
-        )
+        # FIXME: We should change this back to sedate.get_date_range
+        #        once sedate has been patched to handle DST <-> ST
+        #        transitions correctly, although once we patch it
+        #        we probably need to catch NonExistentTimeError so
+        #        we can respond to it with the below new error message
+        # start, end = sedate.get_date_range(
+        #     sedate.to_timezone(self.start, self.timezone), start, end
+        # )
+
+        # first create tz naive datetimes for start and end
+        day = self.display_start().date()
+        start = datetime.combine(day, start, tzinfo=None)
+        end = datetime.combine(day, end, tzinfo=None)
+
+        # use pytz.localize to handle non-existent/ambiguous times
+        tzinfo = sedate.ensure_timezone(self.timezone)
+        try:
+            start = tzinfo.localize(start, is_dst=None)
+            end = tzinfo.localize(end, is_dst=None)
+        except pytz.NonExistentTimeError:
+            # there's no graceful solution here, so we should return an
+            # error. Eventually we should probably mark non-existent time
+            # ranges in the calendar, so they can't be reserved
+            err = request.translate(_(
+                "The selected time does not exist on this date due to "
+                "the switch from standard time to daylight saving time."
+            ))
+            return respond_with_error(request, err)
+        except pytz.AmbiguousTimeError:
+            # we treat ambiguous times as standard time always, to make
+            # our lifes easier. On the calendar you can't distinguish
+            # between DST and ST during that time interval anyways, so
+            # it should make no difference what we pick here, we just
+            # need to be consistent
+            start = tzinfo.localize(start, is_dst=False)
+            end = tzinfo.localize(end, is_dst=False)
     else:
         start, end = self.start, self.end
 
@@ -321,6 +356,42 @@ def handle_reservation_form(self, request, form, layout=None):
     }
 
 
+def get_next_resource_context(reservations):
+    # pick the resource with the most reservations, but if there
+    # is a tie, pick the one with the earliest reservation
+    selected = None
+    for item in reservations.items():
+        if selected is None:
+            selected = item
+            continue
+
+        max_len = len(selected[1])
+        cur_len = len(item[1])
+        if cur_len > max_len:
+            selected = item
+        elif cur_len == max_len:
+            if selected[1][0].start > item[1][0].start:
+                selected = item
+    return selected[0]
+
+
+@OrgApp.view(model=FindYourSpotCollection, name='form', permission=Public)
+def handle_find_your_spot_reservation_form(self, request):
+    """ This is a convenience view that redirects to the appropriate
+    resource specific reservation form.
+
+    """
+    reservations = {
+        resource: bound
+        for resource in request.exclude_invisible(self.query())
+        if (bound := [r for r in resource.bound_reservations(request)])}
+
+    assert_access_only_if_there_are_reservations(reservations)
+
+    resource = get_next_resource_context(reservations)
+    return morepath.redirect(request.link(resource, 'form'))
+
+
 def blocked_by_zipcode(request, resource, form, reservations):
     """ Returns a dict of reservation ids that are blocked by zipcode, with
     the value set to the date it will be available.
@@ -492,9 +563,44 @@ def finalize_reservation(self, request):
             else:
                 close_ticket(ticket, request.auto_accept_user, request)
 
-        request.success(_("Thank you for your reservation!"))
+        collection = FindYourSpotCollection(
+            request.app.libres_context, self.group)
+        pending = {
+            resource: bound
+            for resource in request.exclude_invisible(collection.query())
+            if (bound := [r for r in resource.bound_reservations(request)])}
 
-        return morepath.redirect(request.link(ticket, 'status'))
+        # by default we will redirect to the created ticket
+        message = _("Thank you for your reservation!")
+        url = request.link(ticket, 'status')
+
+        # retrieve remembered tickets
+        tickets = request.browser_session.get('reservation_tickets', {})
+
+        # continue to the next resource in this group with pending reservations
+        if pending:
+            resource = get_next_resource_context(pending)
+
+            # remember ticket so we can show them all at the end
+            tickets.setdefault(self.group, []).append(str(ticket.id))
+            request.browser_session.reservation_tickets = tickets
+
+            message = _(
+                "Your reservation for ${room} has been submitted. "
+                "Please continue with your reservation for ${next_room}.",
+                mapping={'room': self.title, 'next_room': resource.title})
+            url = request.link(resource, 'form')
+
+        # if we remembered tickets for this group that means
+        # we never showed them so now we need to show them all
+        elif self.group in tickets:
+            tickets[self.group].append(ticket.id)
+            request.browser_session.reservation_tickets = tickets
+            url = request.link(collection, 'tickets')
+
+        request.success(message)
+
+        return morepath.redirect(url)
 
 
 @OrgApp.view(model=Reservation, name='accept', permission=Private)

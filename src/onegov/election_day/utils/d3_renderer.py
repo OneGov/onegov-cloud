@@ -160,13 +160,26 @@ class D3Renderer():
                 )
         return (chart, data) if return_data else chart
 
+    def get_seat_allocation_chart(self, item, fmt, return_data=False):
+        chart = None
+        data = None
+        if isinstance(item, (Election, ElectionCompound)):
+            data = get_party_results_data(item)
+            if data and data.get('results'):
+                chart = self.get_chart(
+                    'grouped', fmt, data, params={'showBack': False}
+                )
+        return (chart, data) if return_data else chart
+
     def get_party_strengths_chart(self, item, fmt, return_data=False):
         chart = None
         data = None
         if isinstance(item, (Election, ElectionCompound)):
             data = get_party_results_data(item)
             if data and data.get('results'):
-                chart = self.get_chart('grouped', fmt, data)
+                chart = self.get_chart(
+                    'grouped', fmt, data, params={'showBack': False}
+                )
         return (chart, data) if return_data else chart
 
     def get_lists_panachage_chart(self, item, fmt, return_data=False):

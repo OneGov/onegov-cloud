@@ -356,6 +356,11 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         validators=[Optional()],
     )
 
+    occupation = StringField(
+        label=_('Current professional activity'),
+        fieldset=_('Proposed changes'),
+    )
+
     expertise_professional_guilds = ChosenSelectMultipleField(
         label=_('Expertise by professional guild'),
         fieldset=_('Proposed changes'),
@@ -366,7 +371,6 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     expertise_professional_guilds_other = TagsField(
         label=_('Expertise by professional guild: other'),
         fieldset=_('Proposed changes'),
-        render_kw={'show_help': True}
     )
 
     expertise_interpreting_types = ChosenSelectMultipleField(

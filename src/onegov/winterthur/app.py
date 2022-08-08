@@ -1,15 +1,22 @@
 import re
+import subprocess
 
 from cached_property import cached_property
+from io import BytesIO
 from onegov.core import utils
+from onegov.core.orm.types import JSON
 from onegov.core.static import StaticFile
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.winterthur.initial_content import create_new_organisation
 from onegov.winterthur.roadwork import RoadworkClient
 from onegov.winterthur.roadwork import RoadworkConfig
 from onegov.winterthur.theme import WinterthurTheme
+from pathlib import Path
+from sqlalchemy import cast
+from tempfile import TemporaryDirectory
 
 
 class WinterthurApp(OrgApp):
@@ -72,6 +79,79 @@ class WinterthurApp(OrgApp):
 
     def static_file(self, path):
         return StaticFile(path, version=self.version)
+
+    def get_shift_schedule_image(self):
+        """ Gets or creates an image of the latest public pdf.
+
+        We store the image using the last modified timestamp - this way, we
+        have a version of past images. Note that we don't delete any old
+        images of shift schedules.
+
+        """
+
+        query = GeneralFileCollection(self.session()).query().filter(
+            GeneralFile.published.is_(True),
+            cast(GeneralFile.reference, JSON)['content_type']
+            == 'application/pdf'
+        )
+        query = query.order_by(GeneralFile.created.desc())
+        file = query.first()
+
+        if not file:
+            return
+
+        upload_time = file.created.timestamp()
+        filename = f'shift-schedule-{upload_time}.png'
+
+        if not self.filestorage.exists(filename):
+            with TemporaryDirectory() as directory:
+                path = Path(directory)
+
+                with (path / 'input.pdf').open('wb') as pdf:
+                    pdf.write(file.reference.file.read())
+
+                process = subprocess.run((
+                    'gs',
+
+                    # disable read/writes outside of the given files
+                    '-dSAFER',
+                    '-dPARANOIDSAFER',
+
+                    # do not block for any reason
+                    '-dBATCH',
+                    '-dNOPAUSE',
+                    '-dNOPROMPT',
+
+                    # limit output messages
+                    '-dQUIET',
+                    '-sstdout=/dev/null',
+
+                    # format the page for thumbnails
+                    '-dPDFFitPage',
+
+                    # render in high resolution before downscaling to 300 dpi
+                    f'-r{300}',
+                    f'-dDownScaleFactor={1}',
+
+                    # only use the first page
+                    '-dLastPage=1',
+
+                    # output to png
+                    '-sDEVICE=png16m',
+                    f'-sOutputFile={path / "preview.png"}',
+
+                    # from pdf
+                    str(path / 'input.pdf')
+                ))
+
+                process.check_returncode()
+
+                with (path / 'preview.png').open('rb') as input:
+                    with self.filestorage.open(filename, 'wb') as output:
+                        output.write(input.read())
+
+        with self.filestorage.open(filename, 'rb') as input:
+            return BytesIO(input.read())
 
 
 @WinterthurApp.tween_factory()

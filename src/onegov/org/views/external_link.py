@@ -22,7 +22,7 @@ def get_external_link_form(model, request):
 def handle_new_external_link(self, request, form, layout=None):
     if form.submitted(request):
         external_link = self.add_by_form(form)
-        request.success(_("Added a new external form"))
+        request.success(_("Added a new external link"))
         return redirect(request.class_link(
             ExternalLinkCollection.target(external_link)
         ))

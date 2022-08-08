@@ -148,6 +148,7 @@ class TranslatorMutation:
             'spoken_languages': _('Spoken languages'),
             'written_languages': _('Written languages'),
             'monitoring_languages': _('Monitoring languages'),
+            'occupation': _('Current professional activity'),
             'expertise_professional_guilds': _(
                 'Expertise by professional guild'
             ),

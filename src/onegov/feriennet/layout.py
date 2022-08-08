@@ -810,7 +810,7 @@ class HomepageLayout(DefaultLayout):
     @property
     def editbar_links(self):
         if self.request.is_manager:
-            return[
+            return [
                 Link(
                     _("Sort"),
                     self.request.link(self.model, 'sort'),
