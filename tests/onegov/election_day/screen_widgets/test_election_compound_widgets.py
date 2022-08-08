@@ -1,5 +1,6 @@
 from chameleon import PageTemplate
 from datetime import date
+from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import ElectionCompound
@@ -13,6 +14,8 @@ from onegov.election_day.screen_widgets import (
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
+    ElectionCompoundSeatAllocationChartWidget,
+    ElectionCompoundSeatAllocationTableWidget,
     LastResultChangeWidget,
     NumberOfCountedEntitiesWidget,
     ProgressWidget,
@@ -27,35 +30,49 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     structure = """
         <row>
             <column span="1">
-                <title class="my-class-1"/>
+                <title class="class-for-title"/>
             </column>
             <column span="1">
-                <progress class="my-class-2"/>
+                <progress class="class-for-progress"/>
             </column>
             <column span="1">
-                <counted-entities class="my-class-3"/>
+                <counted-entities class="class-for-counted-entities"/>
             </column>
             <column span="1">
-                <election-compound-candidates-table class="my-class-4"/>
+                <election-compound-candidates-table
+                 class="class-for-candidates-table"/>
             </column>
             <column span="1">
-                <election-compound-districts-table class="my-class-5"/>
+                <election-compound-districts-table
+                 class="class-for-districts-table"/>
             </column>
             <column span="1">
-                <election-compound-list-groups-table class="my-class-9"/>
+                <election-compound-list-groups-table
+                 class="class-for-list-groups-table"/>
             </column>
             <column span="1">
-                <election-compound-list-groups-chart class="my-class-a"/>
+                <election-compound-list-groups-chart
+                 class="class-for-list-groups-chart"/>
             </column>
             <column span="1">
-                <number-of-counted-entities class="my-class-b"/>
+                <number-of-counted-entities
+                 class="class-for-number-of-counted-entities"/>
             </column>
             <column span="1">
-                <total-entities class="my-class-c"/>
+                <total-entities class="class-for-total-entities"/>
             </column>
             <column span="1">
-                <last-result-change class="my-class-d"/>
+                <last-result-change class="class-for-last-result-change"/>
             </column>
+            <column span="1">
+                <election-compound-seat-allocation-table
+                 class="class-for-seat-allocation-table"/>
+            </column>
+            <column span="1">
+                <election-compound-seat-allocation-chart
+                 class="class-for-seat-allocation-chart"/>
+            </column>
+
         </row>
     """
     widgets = [
@@ -71,6 +88,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundListGroupsChartWidget(),
         ElectionCompoundListGroupsTableWidget(),
+        ElectionCompoundSeatAllocationChartWidget(),
+        ElectionCompoundSeatAllocationTableWidget(),
     ]
 
     # Empty
@@ -98,7 +117,9 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'request': request
+        'parties': {},
+        'request': request,
+        'years': []
     }
 
     result = transform_structure(widgets, structure)
@@ -106,16 +127,18 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     etree.fromstring(result.encode('utf-8'))
 
     assert '>Compound</span>' in result
-    assert 'my-class-1' in result
-    assert 'my-class-2' in result
-    assert 'my-class-3' in result
-    assert 'my-class-4' in result
-    assert 'my-class-5' in result
-    assert 'my-class-9' in result
-    assert 'my-class-a' in result
-    assert 'my-class-b' in result
-    assert 'my-class-c' in result
-    assert 'my-class-d' in result
+    assert 'class-for-title' in result
+    assert 'class-for-progress' in result
+    assert 'class-for-counted-entities' in result
+    assert 'class-for-candidates-table' in result
+    assert 'class-for-districts-table' in result
+    assert 'class-for-list-groups-table' in result
+    assert 'class-for-list-groups-chart' in result
+    assert 'class-for-number-of-counted-entities' in result
+    assert 'class-for-total-entities' in result
+    assert 'class-for-last-result-change' in result
+    assert 'class-for-seat-allocation-table' in result
+    assert 'class-for-seat-allocation-chart' in result
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
@@ -199,7 +222,9 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'request': request
+        'parties': {},
+        'request': request,
+        'years': []
     }
 
     result = transform_structure(widgets, structure)
@@ -219,16 +244,18 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '0' in result
     assert '2' in result
     assert '01.01.2022' in result
-    assert 'my-class-1' in result
-    assert 'my-class-2' in result
-    assert 'my-class-3' in result
-    assert 'my-class-4' in result
-    assert 'my-class-5' in result
-    assert 'my-class-9' in result
-    assert 'my-class-a' in result
-    assert 'my-class-b' in result
-    assert 'my-class-c' in result
-    assert 'my-class-d' in result
+    assert 'class-for-title' in result
+    assert 'class-for-progress' in result
+    assert 'class-for-counted-entities' in result
+    assert 'class-for-candidates-table' in result
+    assert 'class-for-districts-table' in result
+    assert 'class-for-list-groups-table' in result
+    assert 'class-for-list-groups-chart' in result
+    assert 'class-for-number-of-counted-entities' in result
+    assert 'class-for-total-entities' in result
+    assert 'class-for-last-result-change' in result
+    assert 'class-for-seat-allocation-table' in result
+    assert 'class-for-seat-allocation-chart' in result
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
@@ -321,7 +348,94 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ],
         'layout': layout,
         'model': model,
-        'request': request
+        'parties': {
+            '0': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 27,
+                    'name': 'CVP',
+                    'voters_count': {
+                        'permille': Decimal('218.60'),
+                        'total': Decimal('3487.00')
+                    },
+                    'votes': {'permille': 219, 'total': 373080}
+                }
+            },
+            '1': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 2,
+                    'name': 'EVP',
+                    'voters_count': {
+                        'permille': Decimal('23.10'),
+                        'total': Decimal('369.00')
+                    },
+                    'votes': {'permille': 23, 'total': 39526}
+                }
+            },
+            '2': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 22,
+                    'name': 'FDP',
+                    'voters_count': {
+                        'permille': Decimal('181.50'),
+                        'total': Decimal('2894.00')
+                    },
+                    'votes': {'permille': 181, 'total': 309635}
+                }
+            },
+            '3': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 6,
+                    'name': 'GLP',
+                    'voters_count': {
+                        'permille': Decimal('73.00'),
+                        'total': Decimal('1165.00')
+                    },
+                    'votes': {'permille': 73, 'total': 124660}
+                }
+            },
+            '4': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 9,
+                    'name': 'GRÜ',
+                    'voters_count': {
+                        'permille': Decimal('89.30'),
+                        'total': Decimal('1424.00')
+                    },
+                    'votes': {'permille': 89, 'total': 152405}
+                }
+            },
+            '5': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 6,
+                    'name': 'SP',
+                    'voters_count': {
+                        'permille': Decimal('155.60'),
+                        'total': Decimal('2481.00')
+                    },
+                    'votes': {'permille': 156, 'total': 265457}
+                }
+            },
+            '6': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 35,
+                    'name': 'SVP',
+                    'voters_count': {
+                        'permille': Decimal('258.80'),
+                        'total': Decimal('4128.00')
+                    },
+                    'votes': {'permille': 259, 'total': 441744}
+                }
+            }
+        },
+        'request': request,
+        'years': ['2020']
     }
 
     assert '>Compound</span>' in result
@@ -339,13 +453,15 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '2' in result
     assert '2' in result
     assert '02.01.2022' in result
-    assert 'my-class-1' in result
-    assert 'my-class-2' in result
-    assert 'my-class-3' in result
-    assert 'my-class-4' in result
-    assert 'my-class-5' in result
-    assert 'my-class-9' in result
-    assert 'my-class-a' in result
-    assert 'my-class-b' in result
-    assert 'my-class-c' in result
-    assert 'my-class-d' in result
+    assert 'class-for-title' in result
+    assert 'class-for-progress' in result
+    assert 'class-for-counted-entities' in result
+    assert 'class-for-candidates-table' in result
+    assert 'class-for-districts-table' in result
+    assert 'class-for-list-groups-table' in result
+    assert 'class-for-list-groups-chart' in result
+    assert 'class-for-number-of-counted-entities' in result
+    assert 'class-for-total-entities' in result
+    assert 'class-for-last-result-change' in result
+    assert 'class-for-seat-allocation-table' in result
+    assert 'class-for-seat-allocation-chart' in result

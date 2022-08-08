@@ -520,9 +520,6 @@ class PdfGenerator():
 
     def add_election_compound(self, principal, compound, pdf):
 
-        def format_name(item):
-            return item.name if item.entity_id else pdf.translate(_("Expats"))
-
         def label(value):
             if value == 'district':
                 if compound.domain_elections == 'region':
@@ -556,6 +553,33 @@ class PdfGenerator():
         )
         pdf.spacer()
         pdf.spacer()
+
+        # Seat allocation
+        chart = self.renderer.get_seat_allocation_chart(compound, 'pdf')
+        if compound.show_seat_allocation and chart:
+            pdf.h2(_('Seat allocation'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            years, parties = get_party_results(compound)
+            years = years[:2]
+            if years:
+                current_year = years[-1]
+                pdf.results(
+                    [
+                        _('Party'),
+                        *years,
+                    ],
+                    [[
+                        parties[party][current_year]['name'],
+                        *[
+                            parties[party][year]['mandates'] or '0'
+                            for year in years
+                        ]
+                    ] for party in parties],
+                    [None, 2 * cm, 2 * cm, 2 * cm],
+                    pdf.style.table_results_1
+                )
+            pdf.pagebreak()
 
         # Superregions
         if has_superregions:
@@ -735,6 +759,88 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_panachage'))
             pdf.spacer()
+            pdf.pagebreak()
+
+        # Statistics
+        pdf.h2(_('Election statistics'))
+        results = compound.results
+        if has_superregions:
+            pdf.results(
+                [
+                    label('district'),
+                    label('superregion'),
+                    _('Turnout'),
+                    _('eligible Voters'),
+                    _('Accounted Votes'),
+                ],
+                [[
+                    result.domain_segment,
+                    result.domain_supersegment,
+                    '{0:.2f} %'.format(result.turnout),
+                    result.eligible_voters,
+                    result.accounted_votes,
+                ] for result in results],
+                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.spacer()
+            pdf.results(
+                [
+                    label('district'),
+                    label('superregion'),
+                    _('Received Ballots'),
+                    _('Accounted Ballots'),
+                    _('Blank Ballots'),
+                    _('Invalid Ballots'),
+                ],
+                [[
+                    result.domain_segment,
+                    result.domain_supersegment,
+                    result.received_ballots or '0',
+                    result.accounted_ballots or '0',
+                    result.blank_ballots or '0',
+                    result.invalid_ballots or '0',
+                ] for result in results],
+                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.pagebreak()
+        else:
+            pdf.results(
+                [
+                    label('district'),
+                    _('Turnout'),
+                    _('eligible Voters'),
+                    _('Accounted Votes'),
+                ],
+                [[
+                    result.domain_segment,
+                    '{0:.2f} %'.format(result.turnout),
+                    result.eligible_voters,
+                    result.accounted_votes,
+                ] for result in results],
+                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_1
+            )
+            pdf.spacer()
+            pdf.results(
+                [
+                    label('district'),
+                    _('Received Ballots'),
+                    _('Accounted Ballots'),
+                    _('Blank Ballots'),
+                    _('Invalid Ballots'),
+                ],
+                [[
+                    result.domain_segment,
+                    result.received_ballots or '0',
+                    result.accounted_ballots or '0',
+                    result.blank_ballots or '0',
+                    result.invalid_ballots or '0',
+                ] for result in results],
+                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_1
+            )
             pdf.pagebreak()
 
     def add_vote(self, principal, vote, pdf, locale):

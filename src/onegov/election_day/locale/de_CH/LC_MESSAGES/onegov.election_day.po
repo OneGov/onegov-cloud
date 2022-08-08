@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-07 10:20+0200\n"
+"POT-Creation-Date: 2022-08-08 12:01+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 msgid "The final results are available"
 msgstr "Die Schlussresultate sind verfügbar"
@@ -431,6 +431,19 @@ msgstr "Exakte Wählerzahlen"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Zeigt exakte Wählerzahlen anstelle von gerundeten Werten."
 
+msgid "Seat allocation"
+msgstr "Sitzverteilung"
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+"Zeigt eine Registerkarte mit der Sitzverteilung in Form eines "
+"Balkendiagramms an. Erfordert Parteiergebnisse."
+
+msgid "Views"
+msgstr "Ansichten"
+
 msgid "List groups"
 msgstr "Listengruppen"
 
@@ -440,9 +453,6 @@ msgid ""
 msgstr ""
 "Zeigt eine Registerkarte mit Listengruppenergebnissen an. Erfordert "
 "Parteiergebnisse mit Wählerzahlen. Nur falls Doppelter Pukelsheim."
-
-msgid "Views"
-msgstr "Ansichten"
 
 msgid "Party strengths"
 msgstr "Parteistärken"
@@ -958,6 +968,9 @@ msgstr "Unterlistenverbindung"
 msgid "Subtotal"
 msgstr "Zwischensumme"
 
+msgid "Party"
+msgstr "Partei"
+
 msgid "eligible Voters"
 msgstr "Wahlberechtigte"
 
@@ -981,9 +994,6 @@ msgstr "Wahlbeteiligung"
 
 msgid "Candidate"
 msgstr "Kandidierende"
-
-msgid "Party"
-msgstr "Partei"
 
 msgid "List"
 msgstr "Liste"
@@ -1700,3 +1710,12 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid ""
+#~ "Shows a tab with aggregated list results over all elections. Only useful "
+#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+#~ "Always rounded."
+#~ msgstr ""
+#~ "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle "
+#~ "Wahlen. Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur "
+#~ "falls Doppelter Pukelsheim. Immer gerundet."

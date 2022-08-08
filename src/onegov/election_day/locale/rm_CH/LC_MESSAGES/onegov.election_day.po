@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-07 10:20+0200\n"
+"POT-Creation-Date: 2022-08-08 12:01+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -433,6 +433,17 @@ msgstr "Dumber d'electurs exact"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
 
+msgid "Seat allocation"
+msgstr "Repartiziun dals sezs"
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+
+msgid "Views"
+msgstr "Vistas"
+
 msgid "List groups"
 msgstr "Gruppas da glistas"
 
@@ -442,9 +453,6 @@ msgid ""
 msgstr ""
 "Mussa ina carta da register cun resultats da gruppas da glistas. Pretenda "
 "resultats da partidas cun cifras electoralas. Mo en cas dal Pukelsheim dubel."
-
-msgid "Views"
-msgstr "Vistas"
 
 msgid "Party strengths"
 msgstr "Forza da las partidas"
@@ -963,6 +971,9 @@ msgstr "Sutcolliaziun da glistas"
 msgid "Subtotal"
 msgstr "Summa intermediara"
 
+msgid "Party"
+msgstr "Partida"
+
 msgid "eligible Voters"
 msgstr "Persunas cun dretg d’eleger"
 
@@ -986,9 +997,6 @@ msgstr "Participaziun a las elecziuns"
 
 msgid "Candidate"
 msgstr "Persuna che candidescha"
-
-msgid "Party"
-msgstr "Partida"
 
 msgid "List"
 msgstr "Glista"
@@ -1718,3 +1726,12 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid ""
+#~ "Shows a tab with aggregated list results over all elections. Only useful "
+#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+#~ "Always rounded."
+#~ msgstr ""
+#~ "Mussa ina carta da register cun resultats da glistas agregads per tut las "
+#~ "elecziuns. Mo raschunaivel, sche las glistas correspundan a las gruppas "
+#~ "da glistas. Mo en cas dal Pukelsheim dubel."

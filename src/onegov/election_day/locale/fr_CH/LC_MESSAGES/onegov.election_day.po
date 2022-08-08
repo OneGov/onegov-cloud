@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-07 10:20+0200\n"
+"POT-Creation-Date: 2022-08-08 12:01+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -430,6 +430,19 @@ msgstr "Nombres de votants exacts"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Affiche le nombre exact de votants au lieu des valeurs arrondies."
 
+msgid "Seat allocation"
+msgstr "Attribution des sièges"
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+"Affiche un onglet avec la comparaison de l'attribution des sièges sous forme "
+"de graphique à barres. Nécessite les résultats des partis."
+
+msgid "Views"
+msgstr "Vues"
+
 msgid "List groups"
 msgstr "Groupes de listes"
 
@@ -440,9 +453,6 @@ msgstr ""
 "Affiche un onglet avec les résultats du groupe de liste. Requiert les "
 "résultats des partis avec le nombre de votants. Uniquement pour Doppelter "
 "Pukelsheim."
-
-msgid "Views"
-msgstr "Vues"
 
 msgid "Party strengths"
 msgstr "Force des partis"
@@ -959,6 +969,9 @@ msgstr "Connexion de sous-listes"
 msgid "Subtotal"
 msgstr "Sous-total"
 
+msgid "Party"
+msgstr "Parti"
+
 msgid "eligible Voters"
 msgstr "Electeurs"
 
@@ -982,9 +995,6 @@ msgstr "Participation électorale"
 
 msgid "Candidate"
 msgstr "Candidat"
-
-msgid "Party"
-msgstr "Parti"
 
 msgid "List"
 msgstr "Liste"
@@ -1707,3 +1717,12 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid ""
+#~ "Shows a tab with aggregated list results over all elections. Only useful "
+#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+#~ "Always rounded."
+#~ msgstr ""
+#~ "Affiche un onglet avec les résultats agrégés des listes pour toutes les "
+#~ "élections. Seulement utile si les listes correspondent aux groupes de "
+#~ "listes. Uniquement pour Doppelter Pukelsheim. Toujours arrondis."

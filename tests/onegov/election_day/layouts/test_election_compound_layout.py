@@ -20,6 +20,7 @@ def test_election_compound_layout_general(session):
     request = DummyRequest()
     layout = ElectionCompoundLayout(compound, request)
     assert layout.all_tabs == (
+        'seat-allocation',
         'list-groups',
         'superregions',
         'districts',
@@ -31,6 +32,7 @@ def test_election_compound_layout_general(session):
     )
     assert layout.title() == ''
     assert layout.title('undefined') == ''
+    assert layout.title('seat-allocation') == 'Seat allocation'
     assert layout.title('list-groups') == 'List groups'
     assert layout.title('superregions') == '__superregions'
     assert layout.title('districts') == '__districts'
@@ -87,6 +89,11 @@ def test_election_compound_layout_general(session):
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/superregions'
 
+    compound.show_seat_allocation = True
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.main_view == 'ElectionCompound/seat-allocation'
+
+    compound.show_seat_allocation = False
     compound.pukelsheim = True
     compound.show_list_groups = True
     layout = ElectionCompoundLayout(compound, request)
@@ -120,6 +127,12 @@ def test_election_compound_layout_general(session):
         assert layout.svg_path == f'svg/elections-{ts}.None.de.svg'
         assert layout.svg_link == 'ElectionCompound/None-svg'
         assert layout.svg_name == 'electioncompound.svg'
+
+        layout = ElectionCompoundLayout(compound, request, 'seat-allocation')
+        assert layout.pdf_path == f'pdf/elections-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/elections-{ts}.seat-allocation.de.svg'
+        assert layout.svg_link == 'ElectionCompound/seat-allocation-svg'
+        assert layout.svg_name == 'electioncompound-seat-allocation.svg'
 
         layout = ElectionCompoundLayout(compound, request, 'list-groups')
         assert layout.pdf_path == f'pdf/elections-{ts}.de.pdf'
@@ -210,10 +223,12 @@ def test_election_compound_layout_menu(session):
     request.app.principal.has_superregions = True
     compound.domain_elections = 'region'
     compound.pukelsheim = True
+    compound.show_seat_allocation = True
     compound.show_list_groups = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
     assert ElectionCompoundLayout(compound, request).menu == [
+        ('Seat allocation', 'ElectionCompound/seat-allocation', False, []),
         ('List groups', 'ElectionCompound/list-groups', False, []),
         ('__superregions', 'ElectionCompound/superregions', False, []),
         ('__regions', 'ElectionCompound/districts', False, []),
@@ -227,6 +242,7 @@ def test_election_compound_layout_menu(session):
 
 def test_election_compound_layout_table_links():
     for tab, expected in (
+        ('seat-allocation', 'ElectionCompound/seat-allocation-table'),
         ('list-groups', 'ElectionCompound/list-groups-table'),
         ('superregions', 'ElectionCompound/superregions-table'),
         ('districts', 'ElectionCompound/districts-table'),
