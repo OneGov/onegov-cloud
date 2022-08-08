@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-11 15:19+0200\n"
+"POT-Creation-Date: 2022-08-08 10:22+0200\n"
 "PO-Revision-Date: 2022-07-11 15:13+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -408,6 +408,12 @@ msgstr "Abschluss"
 
 msgid "Completed"
 msgstr "Abgeschlossen"
+
+msgid "Upper apportionment (PDF)"
+msgstr "Oberzuteilung (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Unterzuteilung (PDF)"
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
@@ -959,6 +965,9 @@ msgstr "Unterlistenverbindung"
 msgid "Subtotal"
 msgstr "Zwischensumme"
 
+msgid "Party"
+msgstr "Partei"
+
 msgid "eligible Voters"
 msgstr "Wahlberechtigte"
 
@@ -982,9 +991,6 @@ msgstr "Wahlbeteiligung"
 
 msgid "Candidate"
 msgstr "Kandidierende"
-
-msgid "Party"
-msgstr "Partei"
 
 msgid "List"
 msgstr "Liste"
