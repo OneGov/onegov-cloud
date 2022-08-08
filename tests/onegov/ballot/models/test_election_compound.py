@@ -1197,7 +1197,10 @@ def test_election_compound_supersegment_progress(session):
     assert election_compound.progress == (1, 3)
 
 
-def test_election_compound_attachments(test_app, explanations_pdf):
+def test_election_compound_attachments(
+    test_app, explanations_pdf, upper_apportionment_pdf,
+    lower_apportionment_pdf
+):
     model = ElectionCompound(
         title='Legislative Elections',
         domain='canton',
@@ -1205,10 +1208,35 @@ def test_election_compound_attachments(test_app, explanations_pdf):
     )
 
     assert model.explanations_pdf is None
+    assert model.upper_apportionment_pdf is None
+    assert model.lower_apportionment_pdf is None
+
     del model.explanations_pdf
-    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
-    assert model.explanations_pdf.name == 'explanations_pdf'
-    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
-    assert model.explanations_pdf.reference.content_type == 'application/pdf'
+    del model.upper_apportionment_pdf
+    del model.lower_apportionment_pdf
+
+    model.explanations_pdf = (explanations_pdf, 'e.pdf')
+    file = model.explanations_pdf
+    assert file.name == 'explanations_pdf'
+    assert file.reference.filename == 'e.pdf'
+    assert file.reference.content_type == 'application/pdf'
+
+    model.upper_apportionment_pdf = (upper_apportionment_pdf, 'u.pdf')
+    file = model.upper_apportionment_pdf
+    assert file.name == 'upper_apportionment_pdf'
+    assert file.reference.filename == 'u.pdf'
+    assert file.reference.content_type == 'application/pdf'
+
+    model.lower_apportionment_pdf = (lower_apportionment_pdf, 'l.pdf')
+    file = model.lower_apportionment_pdf
+    assert file.name == 'lower_apportionment_pdf'
+    assert file.reference.filename == 'l.pdf'
+    assert file.reference.content_type == 'application/pdf'
+
     del model.explanations_pdf
+    del model.upper_apportionment_pdf
+    del model.lower_apportionment_pdf
+
     assert model.explanations_pdf is None
+    assert model.upper_apportionment_pdf is None
+    assert model.lower_apportionment_pdf is None

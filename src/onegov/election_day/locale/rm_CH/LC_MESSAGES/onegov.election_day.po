@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-11 15:19+0200\n"
+"POT-Creation-Date: 2022-08-08 10:22+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -409,6 +409,12 @@ msgstr "Terminaziun"
 msgid "Completed"
 msgstr "Terminà"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Attribuziun superiura (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Sutattribuziun (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
@@ -434,7 +440,7 @@ msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
 
 msgid "Seat allocation"
-msgstr Repartiziun dals sezs"
+msgstr "Repartiziun dals sezs"
 
 msgid ""
 "Shows a tab with the comparison of seat allocation as a bar chart. Requires "
@@ -962,6 +968,9 @@ msgstr "Sutcolliaziun da glistas"
 msgid "Subtotal"
 msgstr "Summa intermediara"
 
+msgid "Party"
+msgstr "Partida"
+
 msgid "eligible Voters"
 msgstr "Persunas cun dretg d’eleger"
 
@@ -985,9 +994,6 @@ msgstr "Participaziun a las elecziuns"
 
 msgid "Candidate"
 msgstr "Persuna che candidescha"
-
-msgid "Party"
-msgstr "Partida"
 
 msgid "List"
 msgstr "Glista"
