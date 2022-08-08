@@ -138,7 +138,8 @@ def test_announcement(client):
 
 def test_search_in_header(client_with_es):
     page = client_with_es.get("/")
+    client_with_es.app.es_client.indices.refresh(index='_all')
     assert "Suchbegriff" in page
     page.form['q'] = 'aktuell'
     page = page.form.submit()
-    assert "Aktuelles" in page
+    assert "search-result-news" in page
