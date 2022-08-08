@@ -4,6 +4,7 @@ from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
+from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -280,6 +281,12 @@ class ElectionCompound(
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
     related_link_label = meta_property('related_link_label')
+
+    #: additional file in case of Doppelter Pukelsheim
+    upper_apportionment_pdf = named_file()
+
+    #: additional file in case of Doppelter Pukelsheim
+    lower_apportionment_pdf = named_file()
 
     #: may be used to enable/disable the visibility of the seat allocation
     show_seat_allocation = meta_property('show_seat_allocation')

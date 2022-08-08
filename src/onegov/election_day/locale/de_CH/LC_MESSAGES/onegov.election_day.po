@@ -409,6 +409,12 @@ msgstr "Abschluss"
 msgid "Completed"
 msgstr "Abgeschlossen"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Oberzuteilung (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Unterzuteilung (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 

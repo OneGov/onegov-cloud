@@ -406,6 +406,12 @@ msgstr "Conclusione"
 msgid "Completed"
 msgstr "Completato"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Sovraripartizione (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Sottoripartizione (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 

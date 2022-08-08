@@ -409,6 +409,12 @@ msgstr "Terminaziun"
 msgid "Completed"
 msgstr "Terminà"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Attribuziun superiura (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Sutattribuziun (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 

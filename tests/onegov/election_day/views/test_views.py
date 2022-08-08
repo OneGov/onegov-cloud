@@ -534,7 +534,10 @@ def test_view_custom_css(election_day_app_zg):
     assert '<style>tr { display: none }</style>' in client.get('/')
 
 
-def test_view_attachments(election_day_app_gr, explanations_pdf):
+def test_view_attachments(
+    election_day_app_gr, explanations_pdf, upper_apportionment_pdf,
+    lower_apportionment_pdf
+):
     content = explanations_pdf.read()
 
     client = Client(election_day_app_gr)
@@ -591,10 +594,32 @@ def test_view_attachments(election_day_app_gr, explanations_pdf):
         content,
         'application/pdf'
     )
+    new.form['upper_apportionment_pdf'] = Upload(
+        'Oberzuteilung.pdf',
+        upper_apportionment_pdf.read(),
+        'application/pdf'
+    )
+    new.form['lower_apportionment_pdf'] = Upload(
+        'Unterzuteilung.pdf',
+        lower_apportionment_pdf.read(),
+        'application/pdf'
+    )
     new.form.submit().follow()
 
     page = client.get('/elections/elections').follow()
-    page = page.click('(PDF)')
+    page = page.click('Erläuterungen')
     assert page.headers['Content-Type'] == 'application/pdf'
     assert page.headers['Content-Length']
     assert 'Erlauterungen.pdf' in page.headers['Content-Disposition']
+
+    page = client.get('/elections/elections').follow()
+    page = page.click('Oberzuteilung')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'Oberzuteilung.pdf' in page.headers['Content-Disposition']
+
+    page = client.get('/elections/elections').follow()
+    page = page.click('Unterzuteilung')
+    assert page.headers['Content-Type'] == 'application/pdf'
+    assert page.headers['Content-Length']
+    assert 'Unterzuteilung.pdf' in page.headers['Content-Disposition']

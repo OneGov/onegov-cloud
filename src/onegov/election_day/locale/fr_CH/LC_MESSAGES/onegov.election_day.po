@@ -407,6 +407,12 @@ msgstr "Achèvement"
 msgid "Completed"
 msgstr "Complété"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Répartition haute (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Répartition basse (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
