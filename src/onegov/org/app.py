@@ -318,7 +318,7 @@ def org_content_security_policy():
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
     policy.child_src.add('https://checkout.stripe.com')
-    policy.child_src.add('https://onegov-livechat.herokuapp.com')
+    policy.child_src.add('https://map.geo.admin.ch')
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
