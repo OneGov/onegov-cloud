@@ -1,5 +1,6 @@
 import onegov.core
 import onegov.org
+from pytest import mark
 from tests.shared import utils
 
 
@@ -136,6 +137,7 @@ def test_announcement(client):
     ) in page
 
 
+@mark.flaky(reruns=3)
 def test_search_in_header(client_with_es):
     page = client_with_es.get("/")
     client_with_es.app.es_client.indices.refresh(index='_all')
