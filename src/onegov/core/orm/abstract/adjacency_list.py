@@ -373,12 +373,15 @@ class AdjacencyListCollection(object):
 
         return name
 
-    def add(self, parent, title, name=None, type='generic', **kwargs):
+    def add(self, parent, title, name=None, type=None, **kwargs):
         """ Adds a child to the given parent. """
 
         name = name or self.get_unique_child_name(title, parent)
 
-        child_class = self.__listclass__.get_polymorphic_class(type)
+        if type is not None:
+            child_class = self.__listclass__.get_polymorphic_class(type)
+        else:
+            child_class = self.__listclass__
 
         child = child_class(parent=parent, title=title, name=name, **kwargs)
 
