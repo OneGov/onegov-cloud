@@ -47,11 +47,9 @@ class ElectionCompoundLayout(DetailLayout):
             'data'
         )
 
-    @property
+    @cached_property
     def results(self):
-        for e in self.model.elections:
-            for result in e.results:
-                yield result
+        return self.model.results
 
     @cached_property
     def has_districts(self):
