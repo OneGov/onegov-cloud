@@ -524,6 +524,49 @@
     </table>
 </metal:election-statistics-table>
 
+<metal:election-compound-statistics-table define-macro="election-compound-statistics-table" i18n:domain="onegov.election_day">
+    <table
+    class="results tablesaw sortable"
+    data-tablesaw-mode="columntoggle"
+    data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+    data-tablesaw-minimap=""
+    >
+        <thead>
+            <tr>
+                <th data-tablesaw-priority="persist" i18n:translate="" class="column-district left-aligned">${layout.label('district')}</th>
+                <th data-tablesaw-priority="0" i18n:translate="" class="column-superregion left-aligned" tal:condition="layout.has_superregions" data-sorter="false">${layout.label('superregion')}</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
+                <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Blank Ballots</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Invalid Ballots</th>
+                <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Accounted Votes</th>
+                <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned" tal:condition="layout.completed">Turnout</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="result layout.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
+                <tal:block condition="not: result.counted">
+                    <td class="column-district left-aligned">${result.domain_segment}</td>
+                    <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${result.domain_supersegment}</td>
+                    <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
+                </tal:block>
+                <tal:block condition="result.counted">
+                    <td class="column-district left-aligned">${result.domain_segment}</td>
+                    <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${result.domain_supersegment}</td>
+                    <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
+                    <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
+                    <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
+                    <td class="right-aligned" data-text="${result.blank_ballots}">${layout.format_number(result.blank_ballots)}</td>
+                    <td class="right-aligned" data-text="${result.invalid_ballots}">${layout.format_number(result.invalid_ballots)}</td>
+                    <td class="right-aligned" data-text="${result.accounted_votes}">${layout.format_number(result.accounted_votes)}</td>
+                    <td class="right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(result.turnout)} %</td>
+                </tal:block>
+            </tr>
+        </tbody>
+    </table>
+</metal:election-compound-statistics-table>
+
 <metal:election-compound-candidates-table define-macro="election-compound-candidates-table" i18n:domain="onegov.election_day">
     <table
         class="election-compound-candidates-table results tablesaw sortable"

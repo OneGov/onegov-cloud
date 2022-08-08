@@ -72,7 +72,7 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_bl.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 7
+            assert len(PdfReader(f, decompress=False).pages) == 8
 
     # with superregions
     compound.domain_elections = 'region'
@@ -80,7 +80,7 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_bl.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 8
+            assert len(PdfReader(f, decompress=False).pages) == 9
 
 
 def test_generate_pdf_vote(session, election_day_app_zg):
