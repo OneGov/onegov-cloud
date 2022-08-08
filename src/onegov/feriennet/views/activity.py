@@ -482,38 +482,40 @@ def view_activities_as_json(self, request):
 
     provider = request.app.org.title
 
-    wish_start = None
-    wish_end = None
-    if active_period.prebooking_start != active_period.booking_start:
-        wish_start = active_period.prebooking_start.isoformat()
-    if active_period.prebooking_end != active_period.booking_start:
-        wish_end = active_period.prebooking_end.isoformat()
+    if active_period:
+        wish_start = None
+        wish_end = None
+        if active_period.confirmable:
+            wish_start = active_period.prebooking_start.isoformat()
+            wish_end = active_period.prebooking_end.isoformat()
 
-    return {
-        'period_name': active_period.title,
-        'wish_phase_start': wish_start,
-        'wish_phase_end': wish_end,
-        'booking_phase_start': active_period.booking_start.isoformat(),
-        'booking_phase_end': active_period.booking_end.isoformat(),
-        'deadline_days': active_period.deadline_days,
-        'activities': [
-            {
-                'provider': provider,
-                'url': request.link(activity),
-                'title': activity.title,
-                'lead': (activity.meta or {}).get('lead', ''),
-                'image': image(activity),
-                'age': age(activity),
-                'cost': cost(activity),
-                'spots': activity_spots(activity, request),
-                'dates': dates(activity),
-                'location': activity.location,
-                'zip_code': zip_code(activity),
-                'coordinate': coordinates(activity),
-                'tags': tags(activity),
-            } for activity in self.batch
-        ]
-    }
+        return {
+            'period_name': active_period.title,
+            'wish_phase_start': wish_start,
+            'wish_phase_end': wish_end,
+            'booking_phase_start': active_period.booking_start.isoformat(),
+            'booking_phase_end': active_period.booking_end.isoformat(),
+            'deadline_days': active_period.deadline_days,
+            'activities': [
+                {
+                    'provider': provider,
+                    'url': request.link(activity),
+                    'title': activity.title,
+                    'lead': (activity.meta or {}).get('lead', ''),
+                    'image': image(activity),
+                    'age': age(activity),
+                    'cost': cost(activity),
+                    'spots': activity_spots(activity, request),
+                    'dates': dates(activity),
+                    'location': activity.location,
+                    'zip_code': zip_code(activity),
+                    'coordinate': coordinates(activity),
+                    'tags': tags(activity),
+                } for activity in self.batch
+            ]
+        }
+    else:
+        return {}
 
 
 @FeriennetApp.html(
