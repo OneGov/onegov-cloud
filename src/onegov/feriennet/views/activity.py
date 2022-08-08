@@ -428,13 +428,9 @@ def view_activities(self, request):
 )
 def view_activities_as_json(self, request):
 
-    active_period = None
-    for period in request.app.periods:
-        if period.active:
-            active_period = period
-            break
-    if not active_period:
-        return []
+    self.filter.states = {'accepted'}
+
+    active_period = request.app.active_period
 
     def image(activity):
         url = (activity.meta or {}).get('thumbnail')
