@@ -411,6 +411,9 @@ msgstr "Neue Person"
 msgid "PDF Layout"
 msgstr "PDF Layout"
 
+msgid "PDF Design"
+msgstr "PDF Design"
+
 msgid "Layout"
 msgstr "Layout"
 
