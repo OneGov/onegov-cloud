@@ -245,6 +245,12 @@ msgstr "Biglietto giornaliero"
 msgid "Resource Item"
 msgstr "Elemento risorsa"
 
+msgid "External resource link"
+msgstr "Link a risorse esterne"
+
+msgid "New external resource"
+msgstr "Nuova risorsa esterna"
+
 msgid "Find Your Spot"
 msgstr "Cerca le date"
 

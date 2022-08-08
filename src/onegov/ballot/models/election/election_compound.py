@@ -260,6 +260,9 @@ class ElectionCompound(
     related_link = meta_property('related_link')
     related_link_label = meta_property('related_link_label')
 
+    #: may be used to enable/disable the visibility of the seat allocation
+    show_seat_allocation = meta_property('show_seat_allocation')
+
     #: may be used to enable/disable the visibility of the list groups
     show_list_groups = meta_property('show_list_groups')
 

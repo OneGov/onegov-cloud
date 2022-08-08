@@ -252,6 +252,12 @@ msgstr "Tageskarte"
 msgid "Resource Item"
 msgstr "Gegenstand"
 
+msgid "External resource link"
+msgstr "Externer Reservationslink"
+
+msgid "New external resource"
+msgstr "Neue externe Reservation"
+
 msgid "Find Your Spot"
 msgstr "Terminsuche"
 

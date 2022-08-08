@@ -432,6 +432,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<election-compound-districts-table class=""/>\n'
         '<election-compound-list-groups-chart class=""/>\n'
         '<election-compound-list-groups-table class="" />\n'
+        '<election-compound-seat-allocation-chart class=""/>\n'
+        '<election-compound-seat-allocation-table class=""/>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'

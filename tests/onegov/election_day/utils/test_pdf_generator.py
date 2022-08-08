@@ -65,13 +65,14 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
     election = add_proporz_election(session)
     compound = add_election_compound(session, elections=[election])
     compound.pukelsheim = True
+    compound.show_seat_allocation = True
     compound.show_list_groups = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_bl.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 5
+            assert len(PdfReader(f, decompress=False).pages) == 7
 
     # with superregions
     compound.domain_elections = 'region'
@@ -79,7 +80,7 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_bl.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 6
+            assert len(PdfReader(f, decompress=False).pages) == 8
 
 
 def test_generate_pdf_vote(session, election_day_app_zg):

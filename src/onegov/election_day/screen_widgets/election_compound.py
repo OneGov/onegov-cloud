@@ -3,6 +3,34 @@ from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
+from onegov.election_day.utils.parties import get_party_results
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-seat-allocation-table',
+    category='election_compound'
+)
+class ElectionCompoundSeatAllocationTableWidget(ModelBoundWidget):
+    tag = 'election-compound-seat-allocation-table'
+    template = """
+        <xsl:template match="election-compound-seat-allocation-table">
+            <div class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['election-compound-seat-allocation-table']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-compound-seat-allocation-table class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        years, parties = get_party_results(model)
+        return {
+            'election_compound': model,
+            'years': years[:2],
+            'parties': parties,
+        }
 
 
 @ElectionDayApp.screen_widget(
@@ -106,3 +134,21 @@ class ElectionCompoundListGroupsChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = '<election-compound-list-groups-chart class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-seat-allocation-chart',
+    category='election_compound'
+)
+class ElectionCompoundSeatAllocationChartWidget(ChartWidget):
+    tag = 'election-compound-seat-allocation-chart'
+    template = """
+        <xsl:template match="election-compound-seat-allocation-chart">
+            <div class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['seat-allocation-chart']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-compound-seat-allocation-chart class=""/>'

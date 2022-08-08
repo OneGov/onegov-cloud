@@ -143,3 +143,30 @@ def test_search_in_header(client_with_es):
     page.form['q'] = 'aktuell'
     page = page.form.submit()
     assert "search-result-news" in page
+
+
+def test_create_external_link(client):
+    client.login_admin()
+    resources = client.get('/resources')
+    forms = client.get('/forms')
+
+    # Create new external resource
+    resource = resources.click('Externer Reservationslink')
+    resource.form['title'] = 'Room 12b'
+    resource.form['lead'] = 'It is a very beautiful room.'
+    resource.form['url'] = 'https://seantis.ch'
+    resources = resource.form.submit().follow()
+
+    # Create new external form
+    form = forms.click('Externes Formular')
+    form.form['title'] = 'Birth certificate request'
+    form.form['lead'] = 'This is an important form.'
+    form.form['url'] = 'https://seantis.ch'
+    forms = form.form.submit().follow()
+
+    # Check if the new external links are where they belong
+    assert 'Room 12b' in resources
+    assert 'Room 12b' not in forms
+
+    assert 'Birth certificate request' in forms
+    assert 'Birth certificate request' not in resources
