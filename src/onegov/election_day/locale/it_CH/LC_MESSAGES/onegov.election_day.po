@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"POT-Creation-Date: 2022-07-11 15:19+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -93,6 +93,10 @@ msgstr ""
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Non alfanumerico: ${col}"
+
+#, python-format
+msgid "Invalid gender: ${value}"
+msgstr ""
 
 msgid "This format does not support separate results for expats"
 msgstr "Questo formato non supporta risultati separati per gli espatriati"
@@ -425,6 +429,17 @@ msgstr "Numero di elettori esatto"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mostra il numero di elettori esatto anziché i valori arrotondati."
 
+msgid "Seat allocation"
+msgstr "Ripartizione dei seggi"
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+
+msgid "Views"
+msgstr "Visualizzazioni"
+
 msgid "List groups"
 msgstr "Gruppi di liste"
 
@@ -434,21 +449,6 @@ msgid ""
 msgstr ""
 "Mostra una scheda con i risultati del gruppo di liste. Richiede i risultati "
 "del partito con il conteggio dei votanti. Solo per Doppelter Pukelsheim."
-
-msgid "Views"
-msgstr "Visualizzazioni"
-
-msgid "Lists"
-msgstr "Liste"
-
-msgid ""
-"Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-"Always rounded."
-msgstr ""
-"Mostra una scheda con i risultati delle liste aggregate su tutte le "
-"elezioni. Utile solo se le liste corrispondono ai gruppi di liste. Solo per "
-"Doppelter Pukelsheim. Sempre arrotondato."
 
 msgid "Party strengths"
 msgstr "Forza dei partiti"
@@ -587,6 +587,9 @@ msgstr "Titolo dello controprogetto"
 
 msgid "Title of the tie breaker"
 msgstr "Titolo dello spareggio"
+
+msgid "Lists"
+msgstr "Liste"
 
 msgid "Candidates"
 msgstr "Candidati"
@@ -835,9 +838,6 @@ msgstr ""
 "corrispondente circondario elettorale. Il risultato di questo calcolo è il "
 "numero di elettori."
 
-msgid "Voters count"
-msgstr "Numero di elettori"
-
 msgid "The file is invalid."
 msgstr "Il file non è valido."
 
@@ -999,6 +999,9 @@ msgstr "Solo i candidati eletti"
 
 msgid "List group"
 msgstr "Gruppo di liste"
+
+msgid "Voters count"
+msgstr "Numero di elettori"
 
 msgid "Embed diagram"
 msgstr "Incorpora il diagramma"
@@ -1686,3 +1689,12 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid ""
+#~ "Shows a tab with aggregated list results over all elections. Only useful "
+#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
+#~ "Always rounded."
+#~ msgstr ""
+#~ "Mostra una scheda con i risultati delle liste aggregate su tutte le "
+#~ "elezioni. Utile solo se le liste corrispondono ai gruppi di liste. Solo "
+#~ "per Doppelter Pukelsheim. Sempre arrotondato."

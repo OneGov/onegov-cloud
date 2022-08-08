@@ -47,9 +47,11 @@ var initSankeyChart = function(el) {
 var initGroupedChart = function(el) {
     var dataurl = $(el).data('dataurl');
     $.ajax({ url: dataurl }).done(function(data) {
+        var showBack = $(el).data('show-back');
         var chart = groupedChart({
             data: data,
-            interactive: true
+            interactive: true,
+            showBack: showBack
         })(el);
 
         var embedLink = $(el).data('embed-link');

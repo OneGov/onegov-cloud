@@ -250,6 +250,12 @@ msgstr "Carte journalière"
 msgid "Resource Item"
 msgstr "Article"
 
+msgid "External resource link"
+msgstr "Lien de ressource externe"
+
+msgid "New external resource"
+msgstr "Nouvelle ressource externe"
+
 msgid "Find Your Spot"
 msgstr "Rechercher les dates"
 

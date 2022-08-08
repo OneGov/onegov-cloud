@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-19 16:17+0200\n"
+"POT-Creation-Date: 2022-08-03 15:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1789,6 +1789,12 @@ msgstr "Raum"
 msgid "Resource Item"
 msgstr "Gegenstand"
 
+msgid "External resource link"
+msgstr "Externer Reservationslink"
+
+msgid "New external resource"
+msgstr "Neue externe Reservation"
+
 msgid "Find Your Spot"
 msgstr "Terminsuche"
 
@@ -2284,8 +2290,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4189,8 +4195,8 @@ msgstr "Zugriff verweigert"
 msgid "Not Found"
 msgstr "Seite nicht gefunden"
 
-msgid "Added a new external form"
-msgstr "Neues externes Formular hinzugefügt"
+msgid "Added a new external link"
+msgstr "Neue externe Verknüpfung hinzugefügt"
 
 msgid "New external link"
 msgstr "Neue externe Verknüpfung"
@@ -4563,6 +4569,13 @@ msgstr "November"
 msgid "December"
 msgstr "Dezember"
 
+msgid ""
+"The selected time does not exist on this date due to the switch from "
+"standard time to daylight saving time."
+msgstr ""
+"Die ausgewählte Zeit existiert nicht an diesem Datum aufgrund der "
+"Sommerzeitumstellung."
+
 msgid "hour"
 msgstr "Stunde"
 
@@ -4662,6 +4675,9 @@ msgstr "Neuen Gegenstand hinzugefügt"
 
 msgid "New Item"
 msgstr "Neuer Gegenstand"
+
+msgid "Edit resource"
+msgstr ""
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"

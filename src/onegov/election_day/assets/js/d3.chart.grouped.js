@@ -24,6 +24,7 @@
             colorInactive: '#999'
         };
         var interactive = false;
+        var showBack = true;
 
         if (params) {
             if ('data' in params) data = params.data;
@@ -32,6 +33,7 @@
             if ('width' in params) width = params.width - margin.left - margin.right;
             if ('options' in params) options = params.options;
             if ('interactive' in params) interactive = params.interactive;
+            if ('showBack' in params) showBack = params.showBack;
         }
 
         var updateScales = function(scale) {
@@ -134,55 +136,59 @@
                         .style('text-anchor', 'start');
 
                     // ... back
-                    axis.back = canvas.append('g')
-                        .attr('class', 'axis back')
-                        .attr('transform', function(d) {
-                            return 'translate(' + (width - options.tickWidth) + ',0)';
-                        });
-                    axis.back.append('polyline')
-                        .style('stroke', '#000')
-                        .style('fill', 'none')
-                        .attr(
-                            'points',
-                            '1,1 '+
-                            options.tickWidth + ',1 '+
-                            options.tickWidth + ',' + (height - options.axisHeight) + ', ' +
-                            '1,' + (height - options.axisHeight)
-                        );
-                    axis.back.append('text')
-                        .text(data.maximum.back + data.axis_units.back)
-                        .attr('x', -2 * options.tickWidth)
-                        .attr('y', options.fontSize)
-                        .style('font-size', options.fontSize)
-                        .style('font-family', options.fontFamily)
-                        .style('text-anchor', 'end');
+                    if (showBack) {
+                        axis.back = canvas.append('g')
+                            .attr('class', 'axis back')
+                            .attr('transform', function(d) {
+                                return 'translate(' + (width - options.tickWidth) + ',0)';
+                            });
+                        axis.back.append('polyline')
+                            .style('stroke', '#000')
+                            .style('fill', 'none')
+                            .attr(
+                                'points',
+                                '1,1 '+
+                                options.tickWidth + ',1 '+
+                                options.tickWidth + ',' + (height - options.axisHeight) + ', ' +
+                                '1,' + (height - options.axisHeight)
+                            );
+                        axis.back.append('text')
+                            .text(data.maximum.back + data.axis_units.back)
+                            .attr('x', -2 * options.tickWidth)
+                            .attr('y', options.fontSize)
+                            .style('font-size', options.fontSize)
+                            .style('font-family', options.fontFamily)
+                            .style('text-anchor', 'end');
+                    }
 
                     axis.all = canvas.selectAll('.axis');
 
                     // Add the bars
                     // ... back
-                    bar.back = canvas.selectAll('.back-bar')
-                        .data(data.results)
-                        .enter().append('g')
-                        .attr('class', 'bar back')
-                        .attr('transform', function(d) {
-                            return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
-                        })
-                        .attr('visibility', function(d) {
-                            return (scale.simple && !d.active) ? 'hidden' : 'visible';
-                        });
-                    bar.back.append('rect')
-                        .attr('width', options.barInnerWidth)
-                        .attr('height', function(d) {
-                            return height - options.axisHeight - scale.y.back(d.value.back) + 1;
-                        })
-                        .style('fill', function(d) {
-                            if (d.color) return d.color;
-                            return d.active ? options.colorActive : options.colorInactive;
-                        })
-                        .style('fill-opacity', function(d) {
-                            if (d.color && !d.active) return 0.3;
-                        });
+                    if (showBack) {
+                        bar.back = canvas.selectAll('.back-bar')
+                            .data(data.results)
+                            .enter().append('g')
+                            .attr('class', 'bar back')
+                            .attr('transform', function(d) {
+                                return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
+                            })
+                            .attr('visibility', function(d) {
+                                return (scale.simple && !d.active) ? 'hidden' : 'visible';
+                            });
+                        bar.back.append('rect')
+                            .attr('width', options.barInnerWidth)
+                            .attr('height', function(d) {
+                                return height - options.axisHeight - scale.y.back(d.value.back) + 1;
+                            })
+                            .style('fill', function(d) {
+                                if (d.color) return d.color;
+                                return d.active ? options.colorActive : options.colorInactive;
+                            })
+                            .style('fill-opacity', function(d) {
+                                if (d.color && !d.active) return 0.3;
+                            });
+                    }
 
                     // ... front
                     bar.front = canvas.selectAll('.front-bar')
@@ -200,7 +206,14 @@
                         .attr('height', function(d) {
                             return height - options.axisHeight - scale.y.front(d.value.front) + 1;
                         })
-                        .attr('fill-opacity', 0.0)
+                        .style('fill', function(d) {
+                            if (d.color) return d.color;
+                            return d.active ? options.colorActive : options.colorInactive;
+                        })
+                        .attr('fill-opacity', function(d) {
+                            if (showBack) return 0.0;
+                            if (d.color && !d.active) return 0.3;
+                        })
                         .attr('stroke', '#000')
                         .attr('stroke-dasharray', function(d) {
                             return d.active ? 'initial' : '2 2';
@@ -230,9 +243,13 @@
                     bar.all = canvas.selectAll('.bar');
                     bar.all.append('title')
                         .text(function(d) {
-                            return d.group + ' (' + d.item + '): ' +
-                                d.value.front + data.axis_units.front + ' / ' +
-                                d.value.back  + data.axis_units.back;
+                            var title = d.group + ' (' + d.item + '): ' +
+                                d.value.front + data.axis_units.front;
+                            if (showBack) {
+                                title = title + ' / ' +
+                                   d.value.back  + data.axis_units.back;
+                            }
+                            return title
                         });
 
                     // Add fading effects
@@ -264,18 +281,20 @@
                         });
 
                         // ... on y axis
-                        axis.front.on('mouseover', function(d) {
-                            bar.back
+                        if (axis.back) {
+                            axis.front.on('mouseover', function(d) {
+                                bar.back
+                                    .transition()
+                                    .duration(700)
+                            		    .style('opacity', 0.1);
+                            });
+                            axis.back.on('mouseover', function(d) {
+                                bar.front
                                 .transition()
                                 .duration(700)
-                        		    .style('opacity', 0.1);
-                        });
-                        axis.back.on('mouseover', function(d) {
-                            bar.front
-                                .transition()
-                                .duration(700)
-                        		    .style('opacity', 0.1);
-                        });
+                                .style('opacity', 0.1);
+                            });
+                        }
                         axis.all.on('mouseout', function(d) {
                             bar.all.transition()
                                 .duration(700)
@@ -294,22 +313,28 @@
                                 bar.front.attr('visibility', function(d) {
                                     return (scale.simple && !d.active) ? 'hidden' : 'visible';
                                 });
-                                bar.back.attr('visibility', function(d) {
-                                    return (scale.simple && !d.active) ? 'hidden' : 'visible';
-                                });
+                                if (bar.back) {
+                                    bar.back.attr('visibility', function(d) {
+                                        return (scale.simple && !d.active) ? 'hidden' : 'visible';
+                                    });
+                                }
 
                                 label.attr('transform', function(d) {
                                     return 'translate(' + scale.x(d) + ',' + height + ')';
                                 });
-                                axis.back.attr('transform', function(d) {
-                                    return 'translate(' + (width - options.tickWidth) + ',0)';
-                                });
+                                if (axis.back) {
+                                    axis.back.attr('transform', function(d) {
+                                        return 'translate(' + (width - options.tickWidth) + ',0)';
+                                    });
+                                }
                                 bar.front.attr('transform', function(d) {
                                     return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.front(d.value.front) + ')';
                                 });
-                                bar.back.attr('transform', function(d) {
-                                    return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
-                                });
+                                if (bar.back) {
+                                    bar.back.attr('transform', function(d) {
+                                        return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
+                                    });
+                                }
                             }
                         });
                     }

@@ -1,7 +1,7 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
     <tal:block metal:fill-slot="title">${election_compound.title} - ${request.app.principal.name}</tal:block>
     <tal:block metal:fill-slot="before-content">
-        <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound"/>
+        <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound" />
     </tal:block>
     <tal:block metal:fill-slot="content">
 
@@ -16,13 +16,18 @@
 
             <div metal:use-macro="layout.macros['election_compound_factoids']" />
 
-            <div metal:use-macro="layout.macros['tab_menu']"/>
+            <div metal:use-macro="layout.macros['tab_menu']" />
 
             <h3 tal:content="layout.title()" />
 
-            <tal:block metal:use-macro="layout.macros['election-compound-statistics-table']"/>
-            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link" />
+            <div class="row">
+                <div class="small-12 small-centered large-10 columns">
+                    <figure metal:use-macro="layout.macros['seat_allocation_figure']" tal:define="model election_compound"/>
+                </div>
+            </div>
 
+            <div metal:use-macro="layout.macros['election-compound-seat-allocation-table']"/>
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link" />
 
         </tal:block>
 

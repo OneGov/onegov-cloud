@@ -298,6 +298,6 @@ class ElectionLayout(DetailLayout):
             for association in self.model.related_elections
         ]
 
-    @property
+    @cached_property
     def results(self):
         return self.model.results
