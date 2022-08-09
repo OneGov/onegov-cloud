@@ -78,3 +78,21 @@ def test_services_widget(town_app):
     assert 'link services_panel.links' in result
     assert 'tal:define="icon \'\'' in result
     assert 'tal:define="icon \'address-book\'' in result
+
+
+def test_text_widgets(town_app):
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+    structure = """
+            <title>A h3 title</title>
+            <text>Normal text</text>
+
+    """
+    result = transform_structure(widgets, structure)
+    assert '<h3 class="">A h3 title</h3>' in result
+    assert '<p class="homepage-text">Normal text</p>' in result
