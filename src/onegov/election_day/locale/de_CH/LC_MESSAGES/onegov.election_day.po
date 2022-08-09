@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-08 10:22+0200\n"
-"PO-Revision-Date: 2022-07-11 15:13+0200\n"
+"POT-Creation-Date: 2022-08-08 14:50+0200\n"
+"PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -97,7 +97,7 @@ msgstr "Nicht alphanumerisch: ${col}"
 
 #, python-format
 msgid "Invalid gender: ${value}"
-msgstr ""
+msgstr "Ungültiges Geschlecht: ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -889,6 +889,15 @@ msgstr "Passwort vergessen?"
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
+msgid "female"
+msgstr "weiblich"
+
+msgid "male"
+msgstr "männlich"
+
+msgid "undetermined"
+msgstr "unbestimmt"
+
 msgid "Actions"
 msgstr "Aktionen"
 
@@ -1177,6 +1186,12 @@ msgstr ""
 "Panaschieren. Auf der linken Seite sind die unveränderten Stimmen inklusive "
 "Blankoliste, auf der rechten Seite die panaschierten Stimmen. Die Breite der "
 "Balken und der Verbindungen ist proportional zu den Stimmen."
+
+msgid "Count"
+msgstr "Anzahl"
+
+msgid "Average age"
+msgstr "Durchschnittsalter"
 
 msgid "View all details online"
 msgstr "Alle Details online ansehen"
@@ -1698,12 +1713,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid ""
-#~ "Shows a tab with aggregated list results over all elections. Only useful "
-#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-#~ "Always rounded."
-#~ msgstr ""
-#~ "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle "
-#~ "Wahlen. Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur "
-#~ "falls Doppelter Pukelsheim. Immer gerundet."
