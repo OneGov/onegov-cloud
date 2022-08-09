@@ -23,7 +23,7 @@ def test_article(session):
     assert not isinstance(page, Article)
 
     with pytest.raises(AssertionError) as assertion_info:
-        page = pages.add(parent=root, title='Test', type='generic')
+        page = pages.add(parent=root, title='Test', type='undefined')
 
     assert "No such polymorphic_identity" in str(assertion_info.value)
 

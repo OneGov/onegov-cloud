@@ -39,7 +39,7 @@ def test_add(session):
     assert list(adam.ancestors) == []
     assert adam.path == 'adam'
     assert adam.absorb == 'adam'
-    assert adam.type is None
+    assert adam.type == 'generic'
 
     child = family.add(parent=adam, title='Cain')
 
