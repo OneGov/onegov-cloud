@@ -13,7 +13,7 @@ from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 1
     use_intercooler = True
 
     def fill_out_profile(self, first_name="Scrooge", last_name="McDuck"):

@@ -1,5 +1,6 @@
 import onegov.core
 import onegov.org
+from pytest import mark
 from tests.shared import utils
 
 
@@ -134,6 +135,16 @@ def test_announcement(client):
         f'<div id="announcement" style="color: {color}; '
         f'background-color: {bg_color};">'
     ) in page
+
+
+@mark.flaky(reruns=3)
+def test_search_in_header(client_with_es):
+    page = client_with_es.get("/")
+    client_with_es.app.es_client.indices.refresh(index='_all')
+    assert "Suchbegriff" in page
+    page.form['q'] = 'aktuell'
+    page = page.form.submit()
+    assert "search-result-news" in page
 
 
 def test_create_external_link(client):

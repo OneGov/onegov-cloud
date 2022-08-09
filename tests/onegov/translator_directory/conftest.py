@@ -13,7 +13,7 @@ from onegov.core.crypto import hash_password
 class Client(BaseClient):
 
     use_intercooler = True
-    skip_first_form = True
+    skip_n_forms = 1
 
     def login_member(self, to=None):
         return self.login('member@example.org', 'hunter2', to)
