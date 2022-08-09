@@ -97,7 +97,10 @@ def view_agency(self, request):
     return {
         'title': self.title,
         'agency': self,
-        'layout': AgencyLayout(self, request)
+        'layout': AgencyLayout(self, request),
+        'map': request.app.agency_map_class.map_html_string(
+            'Marktplatz 9, 4001 Basel'
+        )
     }
 
 
