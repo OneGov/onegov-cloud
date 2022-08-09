@@ -1,6 +1,8 @@
 from datetime import date
 from decimal import Decimal
 from onegov.ballot import ElectionCompound
+from onegov.election_day.utils.election_compound import \
+    get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_districts_data
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
@@ -12,7 +14,6 @@ from onegov.election_day.utils.parties import get_party_results_deltas
 
 
 # todo: test superregions with a BL dataset
-# todo: test candidate genders and year of birth with ZG dataset
 
 
 def test_election_utils_compound(import_test_datasets, election_day_app_sg):
@@ -29,6 +30,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
 
     assert get_districts_data(election_compound, principal) == {}
     assert get_elected_candidates(election_compound, session).all() == []
+    assert get_candidate_statistics(election_compound) == {}
 
     # Add intermediate results
     election_1, errors = import_test_datasets(
@@ -108,6 +110,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
         ('Losa', 'Jeannette', '', None, None, 'GRÜ', '06', id_2),
         ('Mattle', 'Ruedi', '', None, None, 'GLP', '06', id_1)
     ]
+    assert get_candidate_statistics(election_compound) == {}
 
     # Add final results
     election_1, errors = import_test_datasets(
@@ -572,3 +575,49 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 
     data = get_party_results_data(election_compound)
     assert data['results'][0]['value']['back'] == 13.8
+
+
+def test_election_utils_candidate_statistics(
+    import_test_datasets, election_day_app_zg
+):
+    election_compound, errors = import_test_datasets(
+        api_format='internal',
+        model='election_compound',
+        principal='zg',
+        domain='municipality',
+        domain_segment=(
+            'Baar',
+            'Cham',
+            'Hünenberg',
+            'Menzingen',
+            'Neuheim',
+            'Oberägeri',
+            'Risch',
+            'Steinhausen',
+            'Unterägeri',
+            'Walchwil',
+            'Zug',
+        ),
+        number_of_mandates=(
+            15,
+            10,
+            6,
+            3,
+            2,
+            4,
+            7,
+            6,
+            6,
+            2,
+            19,
+        ),
+        date_=date(2022, 10, 2),
+        dataset_name='kantonsratswahl-2022'
+    )
+
+    assert not errors
+    assert get_candidate_statistics(election_compound) == {
+        'total': {'count': 74, 'age': 55},
+        'female': {'count': 23, 'age': 52},
+        'male': {'count': 51, 'age': 56}
+    }

@@ -2,6 +2,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import Election
 from onegov.ballot import List
 from onegov.core.utils import groupbylist
+from sqlalchemy.orm import object_session
 from statistics import mean
 
 
@@ -34,14 +35,21 @@ def get_elected_candidates(election_compound, session):
     return elected
 
 
-def get_candidate_statistics(election_compound, elected_candidates):
+def get_candidate_statistics(election_compound, elected_candidates=None):
+
+    if elected_candidates is None:
+        session = object_session(election_compound)
+        elected_candidates = get_elected_candidates(election_compound, session)
 
     year = election_compound.date.year
 
     def statistics(values):
         age = [value[1] for value in values]
         age = None if not age or None in age else mean([year - v for v in age])
-        return {'count': len(values), 'age': age}
+        return {
+            'count': len(values),
+            'age': round(age) if age is not None else age
+        }
 
     values = [
         (candidate.gender or 'undetermined', candidate.year_of_birth)

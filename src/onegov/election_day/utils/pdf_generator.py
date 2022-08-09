@@ -543,9 +543,6 @@ class PdfGenerator():
                 result = _('male')
             return pdf.translate(result)
 
-        def format_int(value):
-            return f'{value or 0:.0f}'
-
         districts = {
             election.id: (
                 election.domain_segment,
@@ -868,15 +865,15 @@ class PdfGenerator():
                 [
                     [
                         format_gender(gender),
-                        format_int(candidate_statistics[gender]['count']),
-                        format_int(candidate_statistics[gender]['age']),
+                        candidate_statistics[gender]['count'],
+                        candidate_statistics[gender]['age'],
                     ]
                     for gender in sorted(candidate_statistics)
                     if gender != 'total'
                 ] + [[
                     _('Total'),
-                    format_int(candidate_statistics['total']['count']),
-                    format_int(candidate_statistics['total']['age']),
+                    candidate_statistics['total']['count'],
+                    candidate_statistics['total']['age'],
                 ]],
                 [None, 2 * cm, 4 * cm],
                 pdf.style.table_results_1

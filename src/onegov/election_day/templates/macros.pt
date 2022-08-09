@@ -1446,7 +1446,7 @@
                     <tr tal:condition="gender != 'total'">
                         <td><metal:b use-macro="layout.macros['gender-singular']"/></td>
                         <td class="right-aligned">${candidate_statistics[gender]['count']}</td>
-                        <td class="right-aligned">${layout.format_number(candidate_statistics[gender]['age'], 0)}</td>
+                        <td class="right-aligned">${candidate_statistics[gender]['age']}</td>
                     </tr>
                 </tal:block>
             </tbody>
@@ -1454,7 +1454,7 @@
                 <tr class="total">
                     <td i18n:translate>Total</td>
                     <td class="right-aligned">${candidate_statistics['total']['count']}</td>
-                    <td class="right-aligned">${layout.format_number(candidate_statistics['total']['age'], 0)}</td>
+                    <td class="right-aligned">${candidate_statistics['total']['age']}</td>
                 </tr>
             </tfoot>
         </table>
