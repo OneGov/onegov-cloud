@@ -6,6 +6,8 @@ from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.people import Agency
+from sqlalchemy import Column
+from sqlalchemy import Text
 
 
 @upgrade_task("Add default values for page breaks of PDFs")
@@ -28,3 +30,11 @@ def convert_agency_portrait_to_html(context):
         for agency in session.query(Agency).all():
             agency.portrait = '<p>{}</p>'.format(
                 linkify(agency.portrait).replace('\n', '<br>'))
+
+
+@upgrade_task('Add address column to agency')
+def add_address_column_to_agency(context):
+    if not context.has_column('agencies', 'address'):
+        context.operations.add_column('agencies', Column(
+            'address', Text, nullable=True
+        ))

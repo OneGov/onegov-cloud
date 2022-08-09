@@ -43,6 +43,11 @@ class ExtendedAgencyForm(Form):
         ]
     )
 
+    address = StringField(
+        label=_("Address"),
+        description=_("Musterstrasse 1, 0000 Ort")
+    )
+
     export_fields = MultiCheckboxField(
         label=_("Fields to include for each membership"),
         choices=[
@@ -90,6 +95,7 @@ class ExtendedAgencyForm(Form):
         if self.organigram.action == 'replace':
             if self.organigram.data:
                 model.organigram_file = self.organigram.raw_data[-1].file
+        model.address = self.address.data
         if hasattr(self, 'access'):
             model.access = self.access.data
         if hasattr(self, 'publication_start'):
@@ -116,6 +122,7 @@ class ExtendedAgencyForm(Form):
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
+        self.address.data = model.address
         if hasattr(self, 'access'):
             self.access.data = model.access
         if hasattr(self, 'publication_start'):

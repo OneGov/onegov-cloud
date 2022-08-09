@@ -94,13 +94,15 @@ def view_agencies_sort(self, request):
 )
 def view_agency(self, request):
 
+    map = ""
+    if self.address:
+        map = request.app.agency_map_class.map_html_string(self.address)
+
     return {
         'title': self.title,
         'agency': self,
         'layout': AgencyLayout(self, request),
-        'map': request.app.agency_map_class.map_html_string(
-            'Marktplatz 9, 4001 Basel'
-        )
+        'map': map
     }
 
 

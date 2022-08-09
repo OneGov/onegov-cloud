@@ -26,7 +26,7 @@ class AgencyMapBs():
 
     def get_position(address):
         api = ("https://search.geo.bs.ch/search?partitionlimit=10"
-               "&maxresults=90&outputformat=centroid&term=")
+               "&maxresults=1&outputformat=centroid&term=")
         response = requests.get(f"{api}{address}")
         if response.status_code == 200:
             pos = response.json()[0]['geom']
@@ -48,12 +48,7 @@ class AgencyMapBs():
                         center: [{AgencyMapBs.get_position(address)[0]},
                         {AgencyMapBs.get_position(address)[1]}]
                     }});
-                    map.addMarker({{
-                        position: [{AgencyMapBs.get_position(address)[0]},
-                        {AgencyMapBs.get_position(address)[1]}],
-                        size: [14, 14],
-                        icon: 'https://map.geo.bs.ch//static-ngeo/api/apihelp/img/info.png'
-                    }});
+                    map.addMarker();
                 }};
             </script>
             <div class="agency-map" id='map'></div>

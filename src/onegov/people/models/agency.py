@@ -50,6 +50,8 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: describes the agency
     portrait = Column(Text, nullable=True)
 
+    address = Column(Text, nullable=True)
+
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
