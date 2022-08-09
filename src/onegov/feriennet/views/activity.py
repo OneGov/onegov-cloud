@@ -2,6 +2,7 @@ import sedate
 
 from datetime import date, timedelta
 from itertools import groupby
+from onegov.activity import Activity
 from onegov.activity import Booking
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
@@ -32,6 +33,8 @@ from re import search
 from sedate import dtrange, overlaps
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import undefer
 from webob import exc
 
 
@@ -511,7 +514,9 @@ def view_activities_as_json(self, request):
                     'zip_code': zip_code(activity),
                     'coordinate': coordinates(activity),
                     'tags': tags(activity),
-                } for activity in self.batch
+                } for activity in self.query().options(
+                    joinedload(Activity.occasions),
+                    undefer(Activity.content))
             ]
         }
     else:
