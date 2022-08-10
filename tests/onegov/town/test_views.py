@@ -62,7 +62,7 @@ def test_view_occurrences_on_startpage(town_app):
 
 def test_pages_on_homepage(es_town_app):
     client = Client(es_town_app)
-    client.skip_first_form = True
+    client.skip_n_forms = 1
     client.login_editor()
 
     new_page = client.get('/topics/bildung-gesellschaft').click('Thema')

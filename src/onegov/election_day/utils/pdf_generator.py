@@ -9,6 +9,8 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
+from onegov.election_day.utils.election_compound import \
+    get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_superregions
@@ -520,9 +522,6 @@ class PdfGenerator():
 
     def add_election_compound(self, principal, compound, pdf):
 
-        def format_name(item):
-            return item.name if item.entity_id else pdf.translate(_("Expats"))
-
         def label(value):
             if value == 'district':
                 if compound.domain_elections == 'region':
@@ -535,6 +534,14 @@ class PdfGenerator():
                 if compound.domain_elections == 'municipality':
                     return _("Municipalities")
             return principal.label(value)
+
+        def format_gender(value):
+            result = _('undetermined')
+            if value == 'female':
+                result = _('female')
+            if value == 'male':
+                result = _('male')
+            return pdf.translate(result)
 
         districts = {
             election.id: (
@@ -556,6 +563,33 @@ class PdfGenerator():
         )
         pdf.spacer()
         pdf.spacer()
+
+        # Seat allocation
+        chart = self.renderer.get_seat_allocation_chart(compound, 'pdf')
+        if compound.show_seat_allocation and chart:
+            pdf.h2(_('Seat allocation'))
+            pdf.pdf(chart)
+            pdf.spacer()
+            years, parties = get_party_results(compound)
+            years = years[:2]
+            if years:
+                current_year = years[-1]
+                pdf.results(
+                    [
+                        _('Party'),
+                        *years,
+                    ],
+                    [[
+                        parties[party][current_year]['name'],
+                        *[
+                            parties[party][year]['mandates'] or '0'
+                            for year in years
+                        ]
+                    ] for party in parties],
+                    [None, 2 * cm, 2 * cm, 2 * cm],
+                    pdf.style.table_results_1
+                )
+            pdf.pagebreak()
 
         # Superregions
         if has_superregions:
@@ -615,6 +649,7 @@ class PdfGenerator():
         pdf.pagebreak()
 
         # Elected candidates
+        elected_candidates = get_elected_candidates(compound, self.session)
         pdf.h2(_('Elected candidates'))
         pdf.spacer()
         if has_superregions:
@@ -626,11 +661,11 @@ class PdfGenerator():
                     label('district'),
                 ],
                 [[
-                    '{} {}'.format(r[0], r[1]),
-                    r[3],
-                    districts.get(r[5], ('', ''))[1],
-                    districts.get(r[5], ('', ''))[0],
-                ] for r in get_elected_candidates(compound, self.session)],
+                    '{} {}'.format(r.family_name, r.first_name),
+                    r.list,
+                    districts.get(r.election_id, ('', ''))[1],
+                    districts.get(r.election_id, ('', ''))[0],
+                ] for r in elected_candidates],
                 [None, None, 2 * cm, 2 * cm],
                 pdf.style.table_results_3
             )
@@ -642,9 +677,9 @@ class PdfGenerator():
                     label('district'),
                 ],
                 [[
-                    '{} {}'.format(r[0], r[1]),
-                    r[3],
-                    districts.get(r[5], ('', ''))[0]
+                    '{} {}'.format(r.family_name, r.first_name),
+                    r.list,
+                    districts.get(r.election_id, ('', ''))[0]
                 ] for r in get_elected_candidates(compound, self.session)],
                 [None, None, 2 * cm],
                 pdf.style.table_results_2
@@ -736,6 +771,114 @@ class PdfGenerator():
             pdf.figcaption(_('figcaption_panachage'))
             pdf.spacer()
             pdf.pagebreak()
+
+        # Statistics
+        pdf.h2(_('Election statistics'))
+        results = compound.results
+        if has_superregions:
+            pdf.results(
+                [
+                    label('district'),
+                    label('superregion'),
+                    _('Turnout'),
+                    _('eligible Voters'),
+                    _('Accounted Votes'),
+                ],
+                [[
+                    result.domain_segment,
+                    result.domain_supersegment,
+                    '{0:.2f} %'.format(result.turnout),
+                    result.eligible_voters,
+                    result.accounted_votes,
+                ] for result in results],
+                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_2
+            )
+            pdf.spacer()
+            pdf.results(
+                [
+                    label('district'),
+                    label('superregion'),
+                    _('Received Ballots'),
+                    _('Accounted Ballots'),
+                    _('Blank Ballots'),
+                    _('Invalid Ballots'),
+                ],
+                [[
+                    result.domain_segment,
+                    result.domain_supersegment,
+                    result.received_ballots or '0',
+                    result.accounted_ballots or '0',
+                    result.blank_ballots or '0',
+                    result.invalid_ballots or '0',
+                ] for result in results],
+                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_2
+            )
+        else:
+            pdf.results(
+                [
+                    label('district'),
+                    _('Turnout'),
+                    _('eligible Voters'),
+                    _('Accounted Votes'),
+                ],
+                [[
+                    result.domain_segment,
+                    '{0:.2f} %'.format(result.turnout),
+                    result.eligible_voters,
+                    result.accounted_votes,
+                ] for result in results],
+                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_1
+            )
+            pdf.spacer()
+            pdf.results(
+                [
+                    label('district'),
+                    _('Received Ballots'),
+                    _('Accounted Ballots'),
+                    _('Blank Ballots'),
+                    _('Invalid Ballots'),
+                ],
+                [[
+                    result.domain_segment,
+                    result.received_ballots or '0',
+                    result.accounted_ballots or '0',
+                    result.blank_ballots or '0',
+                    result.invalid_ballots or '0',
+                ] for result in results],
+                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                pdf.style.table_results_1
+            )
+        candidate_statistics = get_candidate_statistics(
+            compound, elected_candidates
+        )
+        if candidate_statistics:
+            pdf.spacer()
+            pdf.results(
+                [
+                    _('Elected candidates'),
+                    _('Count'),
+                    _('Average age'),
+                ],
+                [
+                    [
+                        format_gender(gender),
+                        candidate_statistics[gender]['count'],
+                        candidate_statistics[gender]['age'],
+                    ]
+                    for gender in sorted(candidate_statistics)
+                    if gender != 'total'
+                ] + [[
+                    _('Total'),
+                    candidate_statistics['total']['count'],
+                    candidate_statistics['total']['age'],
+                ]],
+                [None, 2 * cm, 4 * cm],
+                pdf.style.table_results_1
+            )
+        pdf.pagebreak()
 
     def add_vote(self, principal, vote, pdf, locale):
         completed = vote.completed

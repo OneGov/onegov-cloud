@@ -169,6 +169,11 @@ def test_d3_renderer_get_charts(election_day_app_zg):
     assert d3.get_connections_chart(vote, 'svg') is None
     assert d3.get_connections_chart(vote.proposal, 'svg') is None
 
+    assert d3.get_seat_allocation_chart(election, 'svg') is None
+    assert d3.get_seat_allocation_chart(compound, 'svg') is None
+    assert d3.get_seat_allocation_chart(vote, 'svg') is None
+    assert d3.get_seat_allocation_chart(vote.proposal, 'svg') is None
+
     assert d3.get_party_strengths_chart(election, 'svg') is None
     assert d3.get_party_strengths_chart(compound, 'svg') is None
     assert d3.get_party_strengths_chart(vote, 'svg') is None

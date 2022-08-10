@@ -361,6 +361,94 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert 'BDP' in results
 
 
+def test_view_election_compound_seat_allocation(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    create_election_compound(client, voters_counts=False)
+    upload_party_results(client, slug='elections/elections')
+
+    main = client.get('/elections/elections/seat-allocation')
+    assert '<h3>Sitzverteilung</h3>' in main
+
+    parties = client.get('/elections/elections/seat-allocation-data')
+    parties = parties.json
+    assert parties['groups'] == ['BDP', 'CVP', 'FDP']
+    assert parties['labels'] == ['2022']
+    assert parties['maximum']['front'] == 15
+    assert parties['results']
+
+    chart = client.get('/elections/elections/seat-allocation-chart')
+    assert chart.status_code == 200
+    assert '/elections/elections/seat-allocation-data' in chart
+
+    # Historical data with translations
+    csv_parties = (
+        'year,name,name_fr_ch,id,color,mandates,\r\n'
+        '2022,BDP,,1,#efb52c,0\r\n'
+        '2022,Die Mitte,Le Centre,2,#ff6300,1\r\n'
+        '2022,FDP,,3,#4068c8,2\r\n'
+        '2018,BDP,,1,#efb52c,3\r\n'
+        '2018,CVP,PDC,2,#ff6300,4\r\n'
+        '2018,FDP,,3,#4068c8,5\r\n'
+    ).encode('utf-8')
+
+    upload = client.get('/elections/elections/upload-party-results')
+    upload.form['parties'] = Upload('parties.csv', csv_parties, 'text/plain')
+    upload = upload.form.submit()
+    assert "erfolgreich hochgeladen" in upload
+
+    parties = client.get('/elections/elections/seat-allocation-data')
+    parties = parties.json
+    assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
+    assert parties['labels'] == ['2018', '2022']
+    assert parties['maximum']['front'] == 15
+    assert parties['results']
+
+    parties = {
+        '{}-{}'.format(party['item'], party['group']): party
+        for party in parties['results']
+    }
+    assert parties['2018-BDP']['color'] == '#efb52c'
+    assert parties['2022-BDP']['color'] == '#efb52c'
+    assert parties['2018-Die Mitte']['color'] == '#ff6300'
+    assert parties['2022-Die Mitte']['color'] == '#ff6300'
+    assert parties['2018-FDP']['color'] == '#4068c8'
+    assert parties['2022-FDP']['color'] == '#4068c8'
+
+    assert parties['2018-BDP']['active'] is False
+    assert parties['2018-Die Mitte']['active'] is False
+    assert parties['2018-FDP']['active'] is False
+    assert parties['2022-BDP']['active'] is True
+    assert parties['2022-Die Mitte']['active'] is True
+    assert parties['2022-FDP']['active'] is True
+
+    assert parties['2018-BDP']['value']['front'] == 3
+    assert parties['2018-Die Mitte']['value']['front'] == 4
+    assert parties['2018-FDP']['value']['front'] == 5
+    assert parties['2022-BDP']['value']['front'] == 0
+    assert parties['2022-Die Mitte']['value']['front'] == 1
+    assert parties['2022-FDP']['value']['front'] == 2
+
+    results = client.get('/elections/elections/seat-allocation').text
+    assert '>0<' in results
+    assert '>1<' in results
+    assert '>2<' in results
+    assert '>3<' in results
+    assert '>4<' in results
+    assert '>5<' in results
+
+    # translations
+    client.get('/locale/fr_CH')
+    parties = client.get('/elections/elections/seat-allocation-data')
+    parties = parties.json
+    assert parties['groups'] == ['BDP', 'Le Centre', 'FDP']
+    results = client.get('/elections/elections/seat-allocation').text
+    assert 'Le Centre' in results
+    assert 'BDP' in results
+
+
 def test_view_election_compound_list_groups(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -485,6 +573,23 @@ def test_view_election_compound_parties_panachage(election_day_app_gr):
     )))
 
 
+def test_view_election_compound_statistics(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_election_compound(client)
+
+    statistics = client.get('/elections/elections/statistics')
+    assert "Alvaschein" in statistics
+    assert "Belfort" in statistics
+    assert "Noch nicht ausgezählt" in statistics
+
+    assert "Gewählte Kandidierende" in statistics
+    assert "weiblich"
+    assert ">37<" in statistics
+
+
 def test_view_election_compound_json(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -527,6 +632,12 @@ def test_view_election_compound_json(election_day_app_gr):
             'party': ''
         }
     ]
+    assert data['candidate_statistics'] == {
+        'female': {'age': 32, 'count': 1},
+        'male': {'age': 42, 'count': 1},
+        'total': {'age': 37, 'count': 2}
+    }
+
     assert data['elections']
     assert data['last_modified']
     assert data['mandates'] == {'allocated': 0, 'total': 15}
