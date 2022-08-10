@@ -209,6 +209,7 @@ def view_find_your_spot(self, request, form, layout=None):
                     start_time,
                     end_time
                 )
+
                 if not allocation.partly_available:
                     quota_left = allocation.quota_left
                     slots.append(utils.FindYourSpotEventInfo(
@@ -219,11 +220,17 @@ def view_find_your_spot(self, request, form, layout=None):
                         request
                     ))
                     continue
+                elif target_start >= target_end:
+                    # this can happen for non-existent times, we
+                    # just treat it as not available in this case
+                    continue
 
                 free = allocation.free_slots(target_start, target_end)
                 if not free:
                     continue
 
+                # FIXME: The availability calculation should probably be
+                #        normalized when a daylight savings shift occurs
                 target_range = (target_end - target_start)
                 slot_start, slot_end = free[0]
                 slot_end += time.resolution
