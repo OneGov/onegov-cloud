@@ -184,7 +184,7 @@ def import_elections_internal(
         date_,
         domain_segment,
         dataset_name,
-        expats,
+        has_expats,
         election,
         municipality
 ):
@@ -239,7 +239,7 @@ def import_elections_internal(
                     domain=domain,
                     domain_segment=domain_segment,
                     type=election_type,
-                    expats=expats,
+                    has_expats=has_expats,
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(election)
@@ -302,7 +302,7 @@ def import_elections_wabstic(
         number,
         district,
         dataset_name,
-        expats,
+        has_expats,
         election,
         municipality
 
@@ -348,7 +348,7 @@ def import_elections_wabstic(
                     domain=domain,
                     domain_segment=domain_segment,
                     # type=election_type,
-                    expats=expats
+                    has_expats=has_expats
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(election)
@@ -400,7 +400,7 @@ def import_elections_wabsti(
         number,
         district,
         dataset_name,
-        expats,
+        has_expats,
         election,
         municipality
 
@@ -441,7 +441,7 @@ def import_elections_wabsti(
                     domain=domain,
                     domain_segment=domain_segment,
                     # type=election_type,
-                    expats=expats
+                    has_expats=has_expats
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(election)
@@ -518,7 +518,7 @@ def import_votes_internal(
         session,
         date_,
         dataset_name,
-        expats,
+        has_expats,
         vote,
         municipality
 ):
@@ -564,7 +564,7 @@ def import_votes_internal(
                     title=f'{vote_type}_{api}_{name}',
                     date=vote_date,
                     domain=domain,
-                    expats=expats,
+                    has_expats=has_expats,
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(vote)
@@ -585,7 +585,7 @@ def import_votes_wabsti(
         session,
         date_,
         dataset_name,
-        expats,
+        has_expats,
         vote,
         vote_number,
         municipality
@@ -623,7 +623,7 @@ def import_votes_wabsti(
                     title=f'{vote_type}_{api}_{name}',
                     date=election_date,
                     domain=domain,
-                    expats=expats,
+                    has_expats=has_expats,
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(vote)
@@ -658,7 +658,7 @@ def import_test_datasets(session):
             date_=None,
             domain_segment='',
             dataset_name=None,
-            expats=False,
+            has_expats=False,
             election=None,
             election_number='1',
             election_district=None,
@@ -697,7 +697,7 @@ def import_test_datasets(session):
                     date_=date_,
                     domain_segment=domain_segment,
                     dataset_name=dataset_name,
-                    expats=expats,
+                    has_expats=has_expats,
                     election=election,
                     municipality=municipality
                 )
@@ -712,7 +712,7 @@ def import_test_datasets(session):
                     date_=date_,
                     domain_segment=domain_segment,
                     dataset_name=dataset_name,
-                    expats=expats,
+                    has_expats=has_expats,
                     election=election,
                     number=election_number,
                     district=election_district,
@@ -729,7 +729,7 @@ def import_test_datasets(session):
                     date_=date_,
                     domain_segment=domain_segment,
                     dataset_name=dataset_name,
-                    expats=expats,
+                    has_expats=has_expats,
                     election=election,
                     number=election_number,
                     district=election_district,
@@ -753,7 +753,7 @@ def import_test_datasets(session):
                 app_session,
                 date_,
                 dataset_name,
-                expats,
+                has_expats,
                 vote,
                 municipality
             )
@@ -767,7 +767,7 @@ def import_test_datasets(session):
                 app_session,
                 date_,
                 dataset_name,
-                expats,
+                has_expats,
                 vote,
                 int(vote_number),
                 municipality
@@ -794,7 +794,7 @@ def majorz_election(import_test_datasets):
             number_of_mandates=2,
             date_=date(2015, 1, 1),
             dataset_name='majorz-election-gr',
-            expats=False,
+            has_expats=False,
             app_session=session
         )
     return _majorz_election

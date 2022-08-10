@@ -267,9 +267,9 @@ def test_import_internal_compound_expats(session):
 
     principal = Canton(canton='sg')
 
-    for expats in (False, True):
-        election_1.expats = expats
-        election_2.expats = expats
+    for has_expats in (False, True):
+        election_1.has_expats = has_expats
+        election_2.has_expats = has_expats
         for entity_id in (9170, 0):
             errors = import_election_compound_internal(
                 compound, principal,
@@ -326,7 +326,7 @@ def test_import_internal_compound_expats(session):
             )
             errors = [e.error.interpolate() for e in errors]
 
-            if expats:
+            if has_expats:
                 assert errors == [
                     'This format does not support separate results for expats'
                 ]

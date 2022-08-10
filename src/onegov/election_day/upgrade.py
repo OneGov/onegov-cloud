@@ -288,11 +288,11 @@ def enable_expats(context):
         ballot = vote.ballots.first()
         if ballot:
             if ballot.results.filter_by(entity_id=0).first():
-                vote.expats = True
+                vote.has_expats = True
 
     for election in context.session.query(Election):
         if election.results.filter_by(entity_id=0).first():
-            election.expats = True
+            election.has_expats = True
 
 
 @upgrade_task('Adds active column to subscriber')

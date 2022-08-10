@@ -198,11 +198,14 @@ table {
 
     thead {
         background: none;
-
     }
 
     th {
         border-bottom: 1px solid $aluminum;
+
+        &:not(:first-of-type) {
+            hyphens: auto;
+        }
     }
 
     tbody {

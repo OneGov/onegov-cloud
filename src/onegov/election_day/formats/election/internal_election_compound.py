@@ -17,14 +17,14 @@ def import_election_compound_internal(compound, principal, file, mimetype):
     """
     errors = []
     updated = []
-    expats = False
+    has_expats = False
     for election in compound.elections:
         election_errors = import_election_internal_proporz(
             election, principal, file, mimetype, ignore_extra=True
         )
 
         if election.results.filter_by(entity_id=0).first():
-            expats = True
+            has_expats = True
 
         if [str(e.error) for e in election_errors] == ['No data found']:
             continue
@@ -36,7 +36,7 @@ def import_election_compound_internal(compound, principal, file, mimetype):
         updated.append(election)
         errors.extend(election_errors)
 
-    if expats:
+    if has_expats:
         errors.append(
             FileImportError(_(
                 'This format does not support separate results for expats'

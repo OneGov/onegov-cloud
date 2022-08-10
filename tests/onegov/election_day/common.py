@@ -559,7 +559,7 @@ def upload_election_compound(client, create=True, canton='gr',
     return upload
 
 
-def import_wabstic_data(election, tar_file, principal, expats=False):
+def import_wabstic_data(election, tar_file, principal, has_expats=False):
     # The tar file contains a test dataset
 
     with tarfile.open(tar_file, 'r:gz') as f:
@@ -577,7 +577,7 @@ def import_wabstic_data(election, tar_file, principal, expats=False):
         regional_wp_wahl = f.extractfile('WP_Wahl.csv').read()
 
     # Test cantonal elections
-    election.expats = expats
+    election.has_expats = has_expats
 
     errors = import_election_wabstic_proporz(
         election, principal, '1', None,

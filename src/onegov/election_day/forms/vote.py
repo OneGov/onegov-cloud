@@ -33,7 +33,7 @@ class VoteForm(Form):
         ]
     )
 
-    expats = BooleanField(
+    has_expats = BooleanField(
         label=_("Expats"),
         render_kw=dict(force_simple=True)
     )
@@ -178,7 +178,7 @@ class VoteForm(Form):
     def update_model(self, model):
         model.date = self.date.data
         model.domain = self.domain.data
-        model.expats = self.expats.data
+        model.has_expats = self.has_expats.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
 
@@ -251,7 +251,7 @@ class VoteForm(Form):
 
         self.date.data = model.date
         self.domain.data = model.domain
-        self.expats.data = model.expats
+        self.has_expats.data = model.has_expats
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
 

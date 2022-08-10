@@ -928,7 +928,7 @@ msgstr "Total"
 #.
 #. Default: eligible Voters
 msgid "eligible_voters_vote"
-msgstr "Stimm&shy;berechtigte"
+msgstr "Stimmberechtigte"
 
 msgid "Cast Ballots"
 msgstr "Eingegangene Stimmzettel"

@@ -157,7 +157,7 @@ def import_election_wabstic_majorz(
                     _("${name} was found twice", mapping={'name': entity_id}))
 
             # Skip expats if not enabled
-            if entity_id == 0 and not election.expats:
+            if entity_id == 0 and not election.has_expats:
                 continue
 
         # Parse the eligible voters
@@ -312,7 +312,7 @@ def import_election_wabstic_majorz(
                 line_errors.append(
                     _("Candidate with id ${id} not in wm_kandidaten",
                       mapping={'id': candidate_id}))
-            if entity_id == 0 and not election.expats:
+            if entity_id == 0 and not election.has_expats:
                 # Skip expats if not enabled
                 continue
 
@@ -397,7 +397,7 @@ def import_election_wabstic_majorz(
     # Add the missing entities
     result_inserts = []
     remaining = set(entities.keys())
-    if election.expats:
+    if election.has_expats:
         remaining.add(0)
     remaining -= set(added_results.keys())
     for entity_id in remaining:
