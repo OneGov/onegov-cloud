@@ -20,7 +20,7 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
         number_of_mandates=3,
         date_=date(2015, 10, 18),
         dataset_name='nationalratswahlen-2015',
-        expats=False
+        has_expats=False
     )
     assert not errors
     assert election.last_result_change
@@ -361,8 +361,8 @@ def test_import_internal_proporz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for expats in (False, True):
-        election.expats = expats
+    for has_expats in (False, True):
+        election.has_expats = has_expats
         for entity_id in (9170, 0):
             errors = import_election_internal_proporz(
                 election, principal,
@@ -419,7 +419,7 @@ def test_import_internal_proporz_expats(session):
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
             result = election.results.filter_by(entity_id=0).first()
-            if expats:
+            if has_expats:
                 assert errors == []
                 assert result.invalid_votes == 1
             else:

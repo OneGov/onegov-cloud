@@ -239,8 +239,8 @@ def test_import_default_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
 
-    for expats in (False, True):
-        vote.expats = expats
+    for has_expats in (False, True):
+        vote.has_expats = has_expats
         errors = import_vote_default(
             vote, principal, 'proposal',
             BytesIO((
@@ -274,7 +274,7 @@ def test_import_default_vote_expats(session):
             'text/plain'
         )
         errors = [(e.line, e.error.interpolate()) for e in errors]
-        if expats:
+        if has_expats:
             assert errors == [(3, '0 was found twice')]
         else:
             assert errors == [(None, 'No data found')]
@@ -305,7 +305,7 @@ def test_import_default_vote_expats(session):
         )
         errors = [(e.line, e.error.interpolate()) for e in errors]
         result = vote.proposal.results.filter_by(entity_id=0).first()
-        if expats:
+        if has_expats:
             assert errors == []
             assert result.yeas == 20
         else:

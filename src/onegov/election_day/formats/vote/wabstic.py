@@ -124,7 +124,7 @@ def import_vote_wabstic(vote, principal, number, district,
                     _("${name} is unknown", mapping={'name': entity_id}))
 
         # Skip expats if not enabled
-        if entity_id == 0 and not vote.expats:
+        if entity_id == 0 and not vote.has_expats:
             continue
 
         # Check if the entity is counted
@@ -213,7 +213,7 @@ def import_vote_wabstic(vote, principal, number, district,
     # Add the missing entities
     for ballot_type in used_ballot_types:
         remaining = set(entities.keys())
-        if vote.expats:
+        if vote.has_expats:
             remaining.add(0)
         remaining -= set(r['entity_id'] for r in ballot_results[ballot_type])
         for entity_id in remaining:

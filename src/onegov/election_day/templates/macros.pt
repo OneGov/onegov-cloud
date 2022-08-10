@@ -246,12 +246,14 @@
         class="ballot-statistics-table results tablesaw sortable"
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-        data-tablesaw-minimap="">
+        data-tablesaw-minimap=""
+        tal:define="expats ballot.expats">
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
                 <th data-tablesaw-priority="0" i18n:translate="" class="column-district left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-empty right-aligned">eligible_voters_vote</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="column-empty right-aligned" tal:condition="expats">Expats</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="column-empty right-aligned">Cast Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-empty right-aligned">Empty votes</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-invalid right-aligned">Invalid votes</th>
@@ -269,6 +271,7 @@
                     <td class="column-entity">${layout.format_name(result)}</td>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.eligible_voters)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.empty}" tal:condition="expats">${layout.format_number(result.expats)}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.cast_ballots)}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
                     <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
@@ -281,6 +284,7 @@
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>
                 <td class="column-empty right-aligned">${layout.format_number(ballot.eligible_voters)}</td>
+                <td class="column-empty right-aligned" tal:condition="expats">${layout.format_number(expats)}</td>
                 <td class="column-empty right-aligned">${layout.format_number(ballot.cast_ballots)}</td>
                 <td class="column-empty right-aligned">${layout.format_number(ballot.empty)}</td>
                 <td class="column-invalid right-aligned">${layout.format_number(ballot.invalid)}</td>
@@ -480,6 +484,7 @@
     data-tablesaw-mode="columntoggle"
     data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
     data-tablesaw-minimap=""
+    tal:define="expats election.expats"
     >
         <thead>
             <tr>
@@ -487,6 +492,7 @@
                 <th data-tablesaw-priority="0" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.label('district')}</th>
                 <th data-tablesaw-priority="0" i18n:translate="" class="left-aligned" tal:condition="layout.has_superregions">${layout.label('superregion')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
+                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned" tal:condition="expats">Expats</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Blank Ballots</th>
@@ -507,6 +513,7 @@
                     <td tal:condition="layout.has_districts">${result.district}</td>
                     <td tal:condition="layout.has_superregions">${result.superregion}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
+                    <td class="right-aligned" data-text="${result.eligible_voters}" tal:condition="expats">${layout.format_number(result.expats)}</td>
                     <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
                     <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
                     <td class="right-aligned" data-text="${result.blank_ballots}">${layout.format_number(result.blank_ballots)}</td>
@@ -521,6 +528,7 @@
                 <td i18n:translate="">Total</td>
                 <td tal:condition="layout.has_districts"></td>
                 <td class="right-aligned">${layout.format_number(election.eligible_voters)}</td>
+                <td class="right-aligned" tal:condition="expats">${layout.format_number(election.expats)}</td>
                 <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
                 <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
                 <td class="right-aligned">${layout.format_number(election.blank_ballots)}</td>
@@ -538,12 +546,14 @@
     data-tablesaw-mode="columntoggle"
     data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
     data-tablesaw-minimap=""
+    tal:define="expats sum([r.expats for r in layout.results])"
     >
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-district left-aligned">${layout.label('district')}</th>
                 <th data-tablesaw-priority="0" i18n:translate="" class="column-superregion left-aligned" tal:condition="layout.has_superregions" data-sorter="false">${layout.label('superregion')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned" tal:condition="expats">Expats</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Blank Ballots</th>
@@ -563,6 +573,7 @@
                     <td class="column-district left-aligned">${result.domain_segment}</td>
                     <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${result.domain_supersegment}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
+                    <td class="right-aligned" data-text="${result.eligible_voters}" tal:condition="expats">${layout.format_number(result.expats)}</td>
                     <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
                     <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
                     <td class="right-aligned" data-text="${result.blank_ballots}">${layout.format_number(result.blank_ballots)}</td>
