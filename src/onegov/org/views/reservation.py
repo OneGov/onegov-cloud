@@ -3,7 +3,7 @@ import pytz
 import sedate
 import transaction
 
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
 from dill import pickles
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
