@@ -108,11 +108,24 @@ class Pdf(PdfBase):
             style=self.style.table_factoids
         )
 
-    def results(self, headers, values, spacing, style):
+    def results(self, head, body, spacing, foot=None, style=None, hide=None):
         """ Adds a table with results. """
 
-        self.table(
-            [[self.translate(header) for header in headers]] + values,
-            spacing,
-            style=style
-        )
+        assert not body or {len(column) for column in body} == {len(head)}
+        assert not foot or len(foot) == len(head)
+        assert not hide or len(hide) == len(head)
+
+        style = style or self.style.table_results_1
+
+        columns = [[self.translate(cell) for cell in head]] + body
+        if foot:
+            columns += [foot]
+        columns = [
+            [
+                str(cell) for index, cell in enumerate(column)
+                if hide is None or not hide[index]
+            ]
+            for column in columns
+        ]
+
+        self.table(columns, spacing, style=style)

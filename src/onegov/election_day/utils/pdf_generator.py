@@ -125,40 +125,34 @@ class PdfGenerator():
         if data and data.get('results'):
             pdf.h2(_('Candidates'))
             pdf.spacer()
-            if election.type == 'majorz':
-                pdf.results(
+            pdf.results(
+                head=[
+                    _('Candidate'),
+                    _('Party'),
+                    _('List'),
+                    _('Elected'),
+                ],
+                body=[
                     [
-                        _('Candidate'),
-                        _('Party'),
-                        _('Elected'),
-                    ],
-                    [[
                         '{} {}'.format(r[0], r[1]),
                         r[3],
-                        pdf.translate(_('Yes')) if r[2] else '',
-                    ] for r in get_candidates_results(
-                        election, self.session
-                    )],
-                    [None, None, 2 * cm],
-                    pdf.style.table_results_3
-                )
-            else:
-                pdf.results(
-                    [
-                        _('Candidate'),
-                        _('List'),
-                        _('Elected'),
-                    ],
-                    [[
-                        '{} {}'.format(r[0], r[1]),
                         r[5],
                         pdf.translate(_('Yes')) if r[2] else '',
-                    ] for r in get_candidates_results(
-                        election, self.session
-                    )],
-                    [None, None, 2 * cm],
-                    pdf.style.table_results_3
-                )
+                    ]
+                    for r in get_candidates_results(election, self.session)
+                ],
+                hide=[
+                    False,
+                    election.type != 'majorz',
+                    election.type == 'majorz',
+                    False
+                ],
+                spacing=[
+                    None,
+                    None,
+                    2 * cm
+                ]
+            )
             pdf.pagebreak()
 
     def add_election(self, principal, election, pdf):
@@ -201,13 +195,24 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.spacer()
             pdf.results(
-                [_('List'), principal.label('mandates'), _('single_votes')],
-                [
-                    [r['text'], r['value2'], r['value']]
+                head=[
+                    _('List'),
+                    principal.label('mandates'),
+                    _('single_votes')
+                ],
+                body=[
+                    [
+                        r['text'],
+                        r['value2'],
+                        r['value']
+                    ]
                     for r in data['results']
                 ],
-                [None, 2 * cm, 2 * cm],
-                pdf.style.table_results_1
+                spacing=[
+                    None,
+                    2 * cm,
+                    2 * cm
+                ],
             )
             pdf.pagebreak()
 
@@ -217,44 +222,38 @@ class PdfGenerator():
             pdf.h2(_('Candidates'))
             pdf.pdf(chart)
             pdf.spacer()
-            if majorz:
-                pdf.results(
+            pdf.results(
+                head=[
+                    _('Candidate'),
+                    _('Party'),
+                    _('List'),
+                    _('Elected'),
+                    _('single_votes')
+                ],
+                body=[
                     [
-                        _('Candidate'),
-                        _('Party'),
-                        _('Elected'),
-                        _('single_votes'),
-                    ],
-                    [[
-                        '{} {}'.format(r[0], r[1]),
-                        r[3],
-                        pdf.translate(_('Yes')) if r[2] else '',
-                        r[4],
-                    ] for r in get_candidates_results(
-                        election, self.session
-                    )],
-                    [None, 2 * cm, 2 * cm],
-                    pdf.style.table_results_2
-                )
-            else:
-                pdf.results(
-                    [
-                        _('Candidate'),
-                        _('List'),
-                        _('Elected'),
-                        _('single_votes'),
-                    ],
-                    [[
-                        '{} {}'.format(r[0], r[1]),
-                        r[5],
-                        pdf.translate(_('Yes')) if r[2] else '',
-                        r[4],
-                    ] for r in get_candidates_results(
-                        election, self.session
-                    )],
-                    [None, None, 2.3 * cm, 2 * cm],
-                    pdf.style.table_results_3
-                )
+                        '{} {}'.format(r.family_name, r.first_name),
+                        r.party,
+                        r.list_name,
+                        pdf.translate(_('Yes')) if r.elected else '',
+                        r.votes
+                    ]
+                    for r in get_candidates_results(election, self.session)
+                ],
+                hide=[
+                    False,
+                    not majorz,
+                    majorz,
+                    False,
+                    False
+                ],
+                spacing=[
+                    None,
+                    None,
+                    2 * cm,
+                    2 * cm
+                ],
+            )
             pdf.pagebreak()
 
         # Connections
@@ -325,42 +324,39 @@ class PdfGenerator():
                 election, years, parties
             )
             results = results[sorted(results.keys())[-1]]
-            if deltas:
-                pdf.results(
+            pdf.results(
+                head=[
+                    _('Party'),
+                    principal.label('mandates'),
+                    _('single_votes'),
+                    _('single_votes'),
+                    'Δ {}'.format(years[0]),
+                ],
+                body=[
                     [
-                        _('Party'),
-                        principal.label('mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                        'Δ {}'.format(years[0]),
-                    ],
-                    [[
                         r[0],
                         r[1],
                         r[3],
                         r[2],
-                        r[4],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
-            else:
-                pdf.results(
-                    [
-                        _('Party'),
-                        principal.label('mandates'),
-                        _('single_votes'),
-                        _('single_votes'),
-                    ],
-                    [[
-                        r[0],
-                        r[1],
-                        r[3],
-                        r[2],
-                    ] for r in results],
-                    [None, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
-                )
+                        r[4] if deltas else 0,
+                    ]
+                    for r in results
+                ],
+                hide=[
+                    False,
+                    False,
+                    False,
+                    False,
+                    not deltas
+                ],
+                spacing=[
+                    None,
+                    2 * cm,
+                    2 * cm,
+                    2 * cm,
+                    2 * cm
+                ],
+            )
             pdf.pagebreak()
 
         # Parties Panachage
@@ -387,110 +383,75 @@ class PdfGenerator():
         pdf.h2(_('Election statistics'))
         if not summarize:
             res = election.results.first()
-            pdf.table(
-                [[
-                    pdf.translate(_('Turnout')),
-                    '{0:.2f} %'.format(res.turnout)
-                ], [
-                    pdf.translate(_('eligible Voters')),
-                    res.eligible_voters
-                ], [
-                    pdf.translate(_('Accounted Votes')),
-                    res.accounted_votes
-                ], [
-                    pdf.translate(_('Received Ballots')),
-                    res.received_ballots or '0'
-                ], [
-                    pdf.translate(_('Accounted Ballots')),
-                    res.accounted_ballots or '0'
-                ], [
-                    pdf.translate(_('Blank Ballots')),
-                    res.blank_ballots or '0'
-                ], [
-                    pdf.translate(_('Invalid Ballots')),
-                    res.invalid_ballots or '0']
-                ],
-                'even'
-            )
-
-        elif not principal.has_districts or election.domain in (
-            'region', 'district', 'municipality', 'none'
-        ):
-            pdf.results(
-                [
-                    principal.label('entity'),
-                    _('Turnout'),
-                    _('eligible Voters'),
-                    _('Accounted Votes'),
-                ],
-                [[
-                    format_name(result),
-                    '{0:.2f} %'.format(result.turnout),
-                    result.eligible_voters,
-                    result.accounted_votes,
-                ] for result in election.results] + [[
-                    pdf.translate(_('Total')),
-                    '{0:.2f} %'.format(election.turnout),
-                    election.eligible_voters,
-                    election.accounted_votes,
-                ]],
-                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_1
-            )
-            pdf.spacer()
-            pdf.results(
-                [
-                    principal.label('entity'),
-                    _('Received Ballots'),
-                    _('Accounted Ballots'),
-                    _('Blank Ballots'),
-                    _('Invalid Ballots'),
-                ],
-                [[
-                    format_name(result),
-                    result.received_ballots or '0',
-                    result.accounted_ballots or '0',
-                    result.blank_ballots or '0',
-                    result.invalid_ballots or '0',
-                ] for result in election.results] + [[
-                    pdf.translate(_('Total')),
-                    election.received_ballots or '0',
-                    election.accounted_ballots or '0',
-                    election.blank_ballots or '0',
-                    election.invalid_ballots or '0',
-                ]],
-                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_1
-            )
-
+            t = pdf.translate
+            table = [
+                [t(_('Turnout')), '{0:.2f} %'.format(res.turnout)],
+                [t(_('eligible Voters')), res.eligible_voters],
+                [t(_('Expats')), res.expats],
+                [t(_('Accounted Votes')), res.accounted_votes],
+                [t(_('Received Ballots')), res.received_ballots or '0'],
+                [t(_('Accounted Ballots')), res.accounted_ballots or '0'],
+                [t(_('Blank Ballots')), res.blank_ballots or '0'],
+                [t(_('Invalid Ballots')), res.invalid_ballots or '0']
+            ]
+            if not election.expats:
+                del table[2]
+            pdf.table(table, 'even')
         else:
+            hide_districts = (
+                not principal.has_districts
+                or election.domain in (
+                    'region', 'district', 'municipality', 'none'
+                )
+            )
             pdf.results(
-                [
+                head=[
                     principal.label('entity'),
                     principal.label('district'),
                     _('Turnout'),
                     _('eligible Voters'),
+                    _('Expats'),
                     _('Accounted Votes'),
                 ],
-                [[
-                    format_name(result),
-                    result.district,
-                    '{0:.2f} %'.format(result.turnout),
-                    result.eligible_voters,
-                    result.accounted_votes,
-                ] for result in election.results] + [[
+                body=[
+                    [
+                        format_name(result),
+                        result.district,
+                        '{0:.2f} %'.format(result.turnout),
+                        result.eligible_voters,
+                        result.expats,
+                        result.accounted_votes,
+                    ]
+                    for result in election.results
+                ],
+                foot=[
                     pdf.translate(_('Total')),
                     '',
                     '{0:.2f} %'.format(election.turnout),
                     election.eligible_voters,
+                    election.expats,
                     election.accounted_votes,
-                ]],
-                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_1
+                ],
+                hide=[
+                    False,
+                    hide_districts,
+                    False,
+                    False,
+                    not election.expats,
+                    False
+                ],
+                spacing=[
+                    None,
+                    None,
+                    3 * cm,
+                    3 * cm,
+                    3 * cm,
+                    3 * cm
+                ],
             )
             pdf.spacer()
             pdf.results(
-                [
+                head=[
                     principal.label('entity'),
                     principal.label('district'),
                     _('Received Ballots'),
@@ -498,23 +459,41 @@ class PdfGenerator():
                     _('Blank Ballots'),
                     _('Invalid Ballots'),
                 ],
-                [[
-                    format_name(result),
-                    result.district,
-                    result.received_ballots or '0',
-                    result.accounted_ballots or '0',
-                    result.blank_ballots or '0',
-                    result.invalid_ballots or '0',
-                ] for result in election.results] + [[
+                body=[
+                    [
+                        format_name(result),
+                        result.district,
+                        result.received_ballots or '0',
+                        result.accounted_ballots or '0',
+                        result.blank_ballots or '0',
+                        result.invalid_ballots or '0',
+                    ]
+                    for result in election.results
+                ],
+                foot=[
                     pdf.translate(_('Total')),
                     '',
                     election.received_ballots or '0',
                     election.accounted_ballots or '0',
                     election.blank_ballots or '0',
                     election.invalid_ballots or '0',
-                ]],
-                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_1
+                ],
+                hide=[
+                    False,
+                    hide_districts,
+                    False,
+                    False,
+                    False,
+                    False
+                ],
+                spacing=[
+                    None,
+                    None,
+                    3 * cm,
+                    3 * cm,
+                    3 * cm,
+                    3 * cm
+                ],
             )
         pdf.pagebreak()
 
@@ -565,19 +544,26 @@ class PdfGenerator():
             if years:
                 current_year = years[-1]
                 pdf.results(
-                    [
+                    head=[
                         _('Party'),
                         *years,
                     ],
-                    [[
-                        parties[party][current_year]['name'],
-                        *[
-                            parties[party][year]['mandates'] or '0'
-                            for year in years
+                    body=[
+                        [
+                            parties[party][current_year]['name'],
+                            *[
+                                parties[party][year]['mandates'] or '0'
+                                for year in years
+                            ]
                         ]
-                    ] for party in parties],
-                    [None, 2 * cm, 2 * cm, 2 * cm],
-                    pdf.style.table_results_1
+                        for party in parties
+                    ],
+                    spacing=[
+                        None,
+                        2 * cm,
+                        2 * cm,
+                        2 * cm
+                    ]
                 )
             pdf.pagebreak()
 
@@ -587,92 +573,85 @@ class PdfGenerator():
             if superregions:
                 pdf.h2(label('superregions'))
                 pdf.results(
-                    [label('superregion'), label('mandates')],
-                    [
+                    head=[
+                        label('superregion'),
+                        label('mandates')
+                    ],
+                    body=[
                         [
                             name,
                             values['mandates']['allocated']
                         ]
                         for name, values in superregions.items()
                     ],
-                    [None, 2 * cm],
-                    pdf.style.table_results_1
+                    spacing=[
+                        None,
+                        2 * cm
+                    ],
                 )
                 pdf.pagebreak()
 
         # Districts
         pdf.h2(label('districts'))
-        if has_superregions:
-            pdf.results(
+        pdf.results(
+            head=[
+                label('district'),
+                label('superregion'),
+                label('mandates')
+            ],
+            body=[
                 [
-                    label('district'),
-                    label('superregion'),
-                    label('mandates')
-                ],
-                [
-                    [
-                        e.domain_segment,
-                        districts.get(e.id, ('', ''))[1],
-                        e.allocated_mandates
-                    ]
-                    for e in compound.elections
-                ],
-                [None, None, 2 * cm],
-                pdf.style.table_results_2
-            )
-        else:
-            pdf.results(
-                [
-                    label('district'),
-                    label('mandates')
-                ],
-                [
-                    [
-                        e.domain_segment,
-                        e.allocated_mandates
-                    ]
-                    for e in compound.elections
-                ],
-                [None, 2 * cm],
-                pdf.style.table_results_1
-            )
+                    e.domain_segment,
+                    districts.get(e.id, ('', ''))[1],
+                    e.allocated_mandates
+                ]
+                for e in compound.elections
+            ],
+            hide=[
+                False,
+                not has_superregions,
+                False
+            ],
+            spacing=[
+                None,
+                None,
+                2 * cm
+            ],
+        )
         pdf.pagebreak()
 
         # Elected candidates
         pdf.h2(_('Elected candidates'))
         pdf.spacer()
-        if has_superregions:
-            pdf.results(
+        pdf.results(
+            head=[
+                _('Candidate'),
+                _('List'),
+                label('superregion'),
+                label('district'),
+            ],
+            body=[
                 [
-                    _('Candidate'),
-                    _('List'),
-                    label('superregion'),
-                    label('district'),
-                ],
-                [[
-                    '{} {}'.format(r[0], r[1]),
-                    r[3],
-                    districts.get(r[5], ('', ''))[1],
-                    districts.get(r[5], ('', ''))[0],
-                ] for r in get_elected_candidates(compound, self.session)],
-                [None, None, 2 * cm, 2 * cm],
-                pdf.style.table_results_3
-            )
-        else:
-            pdf.results(
-                [
-                    _('Candidate'),
-                    _('List'),
-                    label('district'),
-                ],
-                [[
-                    '{} {}'.format(r[0], r[1]),
-                    r[3],
-                    districts.get(r[5], ('', ''))[0]
-                ] for r in get_elected_candidates(compound, self.session)],
-                [None, None, 2 * cm],
-                pdf.style.table_results_2
-            )
+                    '{} {}'.format(r.family_name, r.first_name),
+                    r.list,
+                    districts.get(r.election_id, ('', ''))[1],
+                    districts.get(r.election_id, ('', ''))[0],
+                ]
+                for r in get_elected_candidates(compound, self.session)
+            ],
+            hide=[
+                False,
+                False,
+                not has_superregions,
+                False
+            ],
+            spacing=[
+                None,
+                None,
+                None,
+                None
+            ],
+        )
         pdf.pagebreak()
 
         # List groups
@@ -686,18 +665,24 @@ class PdfGenerator():
             ))
             pdf.spacer()
             pdf.results(
-                [
+                head=[
                     _('List group'),
                     _('Voters count'),
                     label('mandates'),
                 ],
-                [[
-                    r.name,
-                    r.voters_count,
-                    r.number_of_mandates
-                ] for r in get_list_groups(compound)],
-                [None, 2 * cm, 2 * cm],
-                pdf.style.table_results_2
+                body=[
+                    [
+                        r.name,
+                        r.voters_count,
+                        r.number_of_mandates
+                    ]
+                    for r in get_list_groups(compound)
+                ],
+                spacing=[
+                    None,
+                    2 * cm,
+                    2 * cm
+                ],
             )
             pdf.pagebreak()
 
@@ -714,42 +699,39 @@ class PdfGenerator():
             )
             if results:
                 results = results[sorted(results.keys())[-1]]
-                if deltas:
-                    pdf.results(
+                pdf.results(
+                    head=[
+                        _('Party'),
+                        label('mandates'),
+                        _('single_votes'),
+                        _('single_votes'),
+                        'Δ {}'.format(years[0]),
+                    ],
+                    body=[
                         [
-                            _('Party'),
-                            label('mandates'),
-                            _('single_votes'),
-                            _('single_votes'),
-                            'Δ {}'.format(years[0]),
-                        ],
-                        [[
                             r[0],
                             r[1],
                             r[3],
                             r[2],
-                            r[4],
-                        ] for r in results],
-                        [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
-                        pdf.style.table_results_1
-                    )
-                else:
-                    pdf.results(
-                        [
-                            _('Party'),
-                            label('mandates'),
-                            _('single_votes'),
-                            _('single_votes'),
-                        ],
-                        [[
-                            r[0],
-                            r[1],
-                            r[3],
-                            r[2],
-                        ] for r in results],
-                        [None, 2 * cm, 2 * cm, 2 * cm],
-                        pdf.style.table_results_1
-                    )
+                            r[4] if deltas else 0,
+                        ]
+                        for r in results
+                    ],
+                    hide=[
+                        False,
+                        False,
+                        False,
+                        False,
+                        not deltas
+                    ],
+                    spacing=[
+                        None,
+                        2 * cm,
+                        2 * cm,
+                        2 * cm,
+                        2 * cm
+                    ],
+                )
             pdf.pagebreak()
 
         # Parties Panachage
@@ -764,84 +746,83 @@ class PdfGenerator():
         # Statistics
         pdf.h2(_('Election statistics'))
         results = compound.results
-        if has_superregions:
-            pdf.results(
+        # todo: expats
+        # if has_superregions:
+        pdf.results(
+            head=[
+                label('district'),
+                label('superregion'),
+                _('eligible Voters'),
+                _('Expats'),
+                _('Turnout'),
+                _('Accounted Votes'),
+            ],
+            body=[
                 [
-                    label('district'),
-                    label('superregion'),
-                    _('Turnout'),
-                    _('eligible Voters'),
-                    _('Accounted Votes'),
-                ],
-                [[
                     result.domain_segment,
                     result.domain_supersegment,
-                    '{0:.2f} %'.format(result.turnout),
                     result.eligible_voters,
+                    result.expats,
+                    '{0:.2f} %'.format(result.turnout),
                     result.accounted_votes,
-                ] for result in results],
-                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_2
-            )
-            pdf.spacer()
-            pdf.results(
+                ]
+                for result in results
+            ],
+            hide=[
+                False,
+                not has_superregions,
+                False,
+                not sum([result.expats for result in results]),
+                False,
+                False
+            ],
+            spacing=[
+                None,
+                None,
+                3 * cm,
+                3 * cm,
+                3 * cm,
+                3 * cm
+            ]
+        )
+        pdf.spacer()
+        pdf.results(
+            head=[
+                label('district'),
+                label('superregion'),
+                _('Received Ballots'),
+                _('Accounted Ballots'),
+                _('Blank Ballots'),
+                _('Invalid Ballots'),
+            ],
+            body=[
                 [
-                    label('district'),
-                    label('superregion'),
-                    _('Received Ballots'),
-                    _('Accounted Ballots'),
-                    _('Blank Ballots'),
-                    _('Invalid Ballots'),
-                ],
-                [[
                     result.domain_segment,
                     result.domain_supersegment,
                     result.received_ballots or '0',
                     result.accounted_ballots or '0',
                     result.blank_ballots or '0',
                     result.invalid_ballots or '0',
-                ] for result in results],
-                [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_2
-            )
-            pdf.pagebreak()
-        else:
-            pdf.results(
-                [
-                    label('district'),
-                    _('Turnout'),
-                    _('eligible Voters'),
-                    _('Accounted Votes'),
-                ],
-                [[
-                    result.domain_segment,
-                    '{0:.2f} %'.format(result.turnout),
-                    result.eligible_voters,
-                    result.accounted_votes,
-                ] for result in results],
-                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_1
-            )
-            pdf.spacer()
-            pdf.results(
-                [
-                    label('district'),
-                    _('Received Ballots'),
-                    _('Accounted Ballots'),
-                    _('Blank Ballots'),
-                    _('Invalid Ballots'),
-                ],
-                [[
-                    result.domain_segment,
-                    result.received_ballots or '0',
-                    result.accounted_ballots or '0',
-                    result.blank_ballots or '0',
-                    result.invalid_ballots or '0',
-                ] for result in results],
-                [None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
-                pdf.style.table_results_1
-            )
-            pdf.pagebreak()
+                ] for result in results
+            ],
+            hide=[
+                False,
+                not has_superregions,
+                False,
+                False,
+                False,
+                False
+            ],
+            spacing=[
+                None,
+                None,
+                3 * cm,
+                3 * cm,
+                3 * cm,
+                3 * cm
+            ],
+        )
+        pdf.pagebreak()
 
     def add_vote(self, principal, vote, pdf, locale):
         completed = vote.completed
@@ -976,55 +957,48 @@ class PdfGenerator():
                 subtitle(principal.label('entities'))
                 pdf.spacer()
 
-                if not principal.has_districts:
-                    pdf.results(
+                pdf.results(
+                    head=[
+                        principal.label('entity'),
+                        principal.label('district'),
+                        _('Result'),
+                        _('Yes %'),
+                        _('No %'),
+                    ],
+                    body=[
                         [
-                            principal.label('entity'),
-                            _('Result'),
-                            _('Yes %'),
-                            _('No %'),
-                        ],
-                        [[
-                            format_name(result),
-                            pdf.translate(format_accepted(result)),
-                            format_value(result, 'yeas_percentage'),
-                            format_value(result, 'nays_percentage'),
-                        ] for result in ballot.results] + [[
-                            pdf.translate(_('Total')),
-                            pdf.translate(format_accepted(ballot)),
-                            format_value(ballot, 'yeas_percentage'),
-                            format_value(ballot, 'nays_percentage'),
-                        ]],
-                        [None, 2.3 * cm, 2 * cm, 2 * cm],
-                        pdf.style.table_results_2
-                    )
-                    pdf.pagebreak()
-                else:
-                    pdf.results(
-                        [
-                            principal.label('entity'),
-                            principal.label('district'),
-                            _('Result'),
-                            _('Yes %'),
-                            _('No %'),
-                        ],
-                        [[
                             format_name(result),
                             result.district,
                             pdf.translate(format_accepted(result)),
                             format_value(result, 'yeas_percentage'),
                             format_value(result, 'nays_percentage'),
-                        ] for result in ballot.results] + [[
-                            pdf.translate(_('Total')),
-                            '',
-                            pdf.translate(format_accepted(ballot)),
-                            format_value(ballot, 'yeas_percentage'),
-                            format_value(ballot, 'nays_percentage'),
-                        ]],
-                        [None, None, 2.3 * cm, 2 * cm, 2 * cm],
-                        pdf.style.table_results_2
-                    )
-                    pdf.pagebreak()
+                        ]
+                        for result in ballot.results
+                    ],
+                    foot=[
+                        pdf.translate(_('Total')),
+                        '',
+                        pdf.translate(format_accepted(ballot)),
+                        format_value(ballot, 'yeas_percentage'),
+                        format_value(ballot, 'nays_percentage'),
+                    ],
+                    hide=[
+                        False,
+                        not principal.has_districts,
+                        False,
+                        False,
+                        False,
+                    ],
+                    spacing=[
+                        None,
+                        None,
+                        2.3 * cm,
+                        2 * cm,
+                        2 * cm
+                    ],
+                )
+                pdf.pagebreak()
+
                 if principal.is_year_available(vote.date.year):
                     pdf.pdf(
                         self.renderer.get_entities_map(ballot, 'pdf', locale),
@@ -1037,25 +1011,33 @@ class PdfGenerator():
                     subtitle(principal.label('districts'))
                     pdf.spacer()
                     pdf.results(
-                        [
+                        head=[
                             principal.label('district'),
                             _('Result'),
                             _('Yes %'),
                             _('No %'),
                         ],
-                        [[
-                            format_name(result),
-                            pdf.translate(format_accepted(result)),
-                            format_value(result, 'yeas_percentage'),
-                            format_value(result, 'nays_percentage'),
-                        ] for result in ballot.results_by_district] + [[
+                        body=[
+                            [
+                                format_name(result),
+                                pdf.translate(format_accepted(result)),
+                                format_value(result, 'yeas_percentage'),
+                                format_value(result, 'nays_percentage'),
+                            ]
+                            for result in ballot.results_by_district
+                        ],
+                        foot=[
                             pdf.translate(_('Total')),
                             pdf.translate(format_accepted(ballot)),
                             format_value(ballot, 'yeas_percentage'),
                             format_value(ballot, 'nays_percentage'),
-                        ]],
-                        [None, 2.3 * cm, 2 * cm, 2 * cm],
-                        pdf.style.table_results_2
+                        ],
+                        spacing=[
+                            None,
+                            2.3 * cm,
+                            2 * cm,
+                            2 * cm
+                        ],
                     )
                     pdf.pagebreak()
                     if principal.is_year_available(vote.date.year):
@@ -1071,43 +1053,97 @@ class PdfGenerator():
                 subtitle(_('Statistics'))
                 pdf.spacer()
                 pdf.results(
-                    [
+                    head=[
                         principal.label('entity'),
+                        principal.label('district'),
                         _('eligible_voters_vote'),
+                        _('Expats'),
                         _('Cast Ballots'),
+                        _('turnout_vote'),
+                    ],
+                    body=[
+                        [
+                            format_name(result),
+                            result.district,
+                            result.eligible_voters or '0',
+                            result.expats,
+                            result.cast_ballots or '0',
+                            '{0:.2f} %'.format(result.turnout),
+                        ]
+                        for result in ballot.results
+                    ],
+                    foot=[
+                        pdf.translate(_('Total')),
+                        '',
+                        ballot.eligible_voters or '0',
+                        ballot.expats,
+                        ballot.cast_ballots or '0',
+                        '{0:.2f} %'.format(ballot.turnout),
+                    ],
+                    hide=[
+                        False,
+                        not principal.has_districts,
+                        False,
+                        not ballot.expats,
+                        False,
+                        False,
+                    ],
+                    spacing=[
+                        None,
+                        None,
+                        3 * cm,
+                        3 * cm,
+                        3 * cm,
+                        3 * cm
+                    ]
+                )
+                pdf.spacer()
+                pdf.results(
+                    head=[
+                        principal.label('entity'),
+                        principal.label('district'),
                         _('Empty votes'),
                         _('Invalid votes'),
                         pdf.translate(_('Yeas')).replace('-', '- '),
                         pdf.translate(_('Nays')).replace('-', '- '),
                     ],
-                    [[
-                        format_name(result),
-                        result.eligible_voters or '0',
-                        result.cast_ballots or '0',
-                        result.empty or '0',
-                        result.invalid or '0',
-                        result.yeas or '0',
-                        result.nays or '0',
-                    ] for result in ballot.results] + [[
+                    body=[
+                        [
+                            format_name(result),
+                            result.district,
+                            result.empty or '0',
+                            result.invalid or '0',
+                            result.yeas or '0',
+                            result.nays or '0',
+                        ]
+                        for result in ballot.results
+                    ],
+                    foot=[
                         pdf.translate(_('Total')),
-                        ballot.eligible_voters or '0',
-                        ballot.cast_ballots or '0',
+                        '',
                         ballot.empty or '0',
                         ballot.invalid or '0',
                         ballot.yeas or '0',
                         ballot.nays or '0',
-                    ]],
-                    [
-                        None,
-                        2.2 * cm,
-                        2.5 * cm,
-                        2.2 * cm,
-                        2.2 * cm,
-                        1.8 * cm,
-                        2.0 * cm
                     ],
-                    pdf.style.table_results_1
+                    hide=[
+                        False,
+                        not principal.has_districts,
+                        False,
+                        False,
+                        False,
+                        False,
+                    ],
+                    spacing=[
+                        None,
+                        None,
+                        3 * cm,
+                        3 * cm,
+                        3 * cm,
+                        3 * cm
+                    ]
                 )
+
                 pdf.pagebreak()
 
     def create_pdfs(self):
