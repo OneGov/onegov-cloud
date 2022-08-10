@@ -147,11 +147,6 @@ class PdfGenerator():
                     election.type == 'majorz',
                     False
                 ],
-                spacing=[
-                    None,
-                    None,
-                    2 * cm
-                ]
             )
             pdf.pagebreak()
 
@@ -208,11 +203,6 @@ class PdfGenerator():
                     ]
                     for r in data['results']
                 ],
-                spacing=[
-                    None,
-                    2 * cm,
-                    2 * cm
-                ],
             )
             pdf.pagebreak()
 
@@ -246,12 +236,6 @@ class PdfGenerator():
                     majorz,
                     False,
                     False
-                ],
-                spacing=[
-                    None,
-                    None,
-                    2 * cm,
-                    2 * cm
                 ],
             )
             pdf.pagebreak()
@@ -303,7 +287,7 @@ class PdfGenerator():
             pdf.table(
                 table,
                 [None, 2 * cm, 2 * cm],
-                style=pdf.style.table_results_1 + tuple([
+                style=pdf.style.table_results + tuple([
                     ('TOPPADDING', (0, row), (-1, row), 15)
                     for row in spacers[:-1]
                 ])
@@ -348,13 +332,6 @@ class PdfGenerator():
                     False,
                     False,
                     not deltas
-                ],
-                spacing=[
-                    None,
-                    2 * cm,
-                    2 * cm,
-                    2 * cm,
-                    2 * cm
                 ],
             )
             pdf.pagebreak()
@@ -440,14 +417,6 @@ class PdfGenerator():
                     not election.expats,
                     False
                 ],
-                spacing=[
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None
-                ],
             )
             pdf.spacer()
             pdf.results(
@@ -485,14 +454,6 @@ class PdfGenerator():
                     False,
                     False,
                     False
-                ],
-                spacing=[
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
-                    None,
                 ],
             )
         pdf.pagebreak()
@@ -558,12 +519,6 @@ class PdfGenerator():
                         ]
                         for party in parties
                     ],
-                    spacing=[
-                        None,
-                        2 * cm,
-                        2 * cm,
-                        2 * cm
-                    ]
                 )
             pdf.pagebreak()
 
@@ -583,10 +538,6 @@ class PdfGenerator():
                             values['mandates']['allocated']
                         ]
                         for name, values in superregions.items()
-                    ],
-                    spacing=[
-                        None,
-                        2 * cm
                     ],
                 )
                 pdf.pagebreak()
@@ -611,11 +562,6 @@ class PdfGenerator():
                 False,
                 not has_superregions,
                 False
-            ],
-            spacing=[
-                None,
-                None,
-                2 * cm
             ],
         )
         pdf.pagebreak()
@@ -645,12 +591,6 @@ class PdfGenerator():
                 not has_superregions,
                 False
             ],
-            spacing=[
-                None,
-                None,
-                None,
-                None
-            ],
         )
         pdf.pagebreak()
 
@@ -677,11 +617,6 @@ class PdfGenerator():
                         r.number_of_mandates
                     ]
                     for r in get_list_groups(compound)
-                ],
-                spacing=[
-                    None,
-                    2 * cm,
-                    2 * cm
                 ],
             )
             pdf.pagebreak()
@@ -723,13 +658,6 @@ class PdfGenerator():
                         False,
                         False,
                         not deltas
-                    ],
-                    spacing=[
-                        None,
-                        2 * cm,
-                        2 * cm,
-                        2 * cm,
-                        2 * cm
                     ],
                 )
             pdf.pagebreak()
@@ -774,14 +702,6 @@ class PdfGenerator():
                 False,
                 False
             ],
-            spacing=[
-                None,
-                None,
-                None,
-                None,
-                None,
-                None
-            ]
         )
         pdf.spacer()
         pdf.results(
@@ -810,14 +730,6 @@ class PdfGenerator():
                 False,
                 False,
                 False
-            ],
-            spacing=[
-                None,
-                None,
-                None,
-                None,
-                None,
-                None
             ],
         )
         pdf.pagebreak()
@@ -987,13 +899,6 @@ class PdfGenerator():
                         False,
                         False,
                     ],
-                    spacing=[
-                        None,
-                        None,
-                        2.3 * cm,
-                        2 * cm,
-                        2 * cm
-                    ],
                 )
                 pdf.pagebreak()
 
@@ -1029,12 +934,6 @@ class PdfGenerator():
                             pdf.translate(format_accepted(ballot)),
                             format_value(ballot, 'yeas_percentage'),
                             format_value(ballot, 'nays_percentage'),
-                        ],
-                        spacing=[
-                            None,
-                            2.3 * cm,
-                            2 * cm,
-                            2 * cm
                         ],
                     )
                     pdf.pagebreak()
@@ -1086,14 +985,6 @@ class PdfGenerator():
                         False,
                         False,
                     ],
-                    spacing=[
-                        None,
-                        None,
-                        None,
-                        None,
-                        None,
-                        None
-                    ]
                 )
                 pdf.spacer()
                 pdf.results(
@@ -1132,14 +1023,6 @@ class PdfGenerator():
                         False,
                         False,
                     ],
-                    spacing=[
-                        None,
-                        None,
-                        None,
-                        None,
-                        None,
-                        None
-                    ]
                 )
 
                 pdf.pagebreak()
