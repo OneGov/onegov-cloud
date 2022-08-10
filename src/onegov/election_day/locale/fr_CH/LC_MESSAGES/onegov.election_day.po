@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-08 10:22+0200\n"
+"POT-Creation-Date: 2022-08-08 14:50+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -96,7 +96,7 @@ msgstr "Pas un alphanumerique: ${col}"
 
 #, python-format
 msgid "Invalid gender: ${value}"
-msgstr ""
+msgstr "Sexe non valide : ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -890,6 +890,15 @@ msgstr "Mot de passe oublié?"
 msgid "Reset password"
 msgstr "Réinitialiser mot de passe"
 
+msgid "female"
+msgstr "femelle"
+
+msgid "male"
+msgstr "homme"
+
+msgid "undetermined"
+msgstr "indéterminé"
+
 msgid "Actions"
 msgstr "Actions"
 
@@ -1181,6 +1190,12 @@ msgstr ""
 "aux votes inchangés (y compris la liste vierge), les barres du côté droit "
 "aux résultats finale. La largeur des barres et des connexions est "
 "proportionnelle aux votes."
+
+msgid "Count"
+msgstr "Compter"
+
+msgid "Average age"
+msgstr "Âge moyen"
 
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"
@@ -1705,12 +1720,3 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
-
-#~ msgid ""
-#~ "Shows a tab with aggregated list results over all elections. Only useful "
-#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-#~ "Always rounded."
-#~ msgstr ""
-#~ "Affiche un onglet avec les résultats agrégés des listes pour toutes les "
-#~ "élections. Seulement utile si les listes correspondent aux groupes de "
-#~ "listes. Uniquement pour Doppelter Pukelsheim. Toujours arrondis."

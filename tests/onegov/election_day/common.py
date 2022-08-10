@@ -97,6 +97,8 @@ PROPORZ_HEADER = (
     'candidate_elected,'
     'candidate_family_name,'
     'candidate_first_name,'
+    'candidate_gender,'
+    'candidate_year_of_birth,'
     'candidate_votes,'
     'candidate_party,'
     'panachage_votes_from_list_1,'
@@ -404,20 +406,20 @@ def upload_proporz_election(client, create=True, canton='gr',
     if canton == 'gr':
         csv += (
             f'{status},3506,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-            '101,False,Casanova,Angela,0,,0,1\n'
+            '101,False,Casanova,Angela,female,1970,0,,0,1\n'
         )
         csv += (
             f'{status},3506,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-            '201,False,Caluori,Corina,2,,2,0\n'
+            '201,False,Caluori,Corina,female,1960,2,,2,0\n'
         )
     elif canton == 'zg':
         csv += (
             f'{status},1711,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-            '101,False,Casanova,Angela,0,,0,1\n'
+            '101,False,Casanova,Angela,female,1970,0,,0,1\n'
         )
         csv += (
             f'{status},1711,True,56,32,1,0,1,2,2,CVP,1,2,0,5,'
-            '201,False,Caluori,Corina,2,,2,0\n'
+            '201,False,Caluori,Corina,female,1960,2,,2,0\n'
         )
 
     csv = csv.encode('utf-8')
@@ -538,15 +540,15 @@ def upload_election_compound(client, create=True, canton='gr',
     csv = PROPORZ_HEADER
     csv += (
         f'{status},{entities[canton][0]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-        f'101,False,Looser,Anna,0,,0,1\n'
+        f'101,False,Looser,Anna,female,1950,0,,0,1\n'
         f'{status},{entities[canton][0]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-        f'201,True,Winner,Carol,2,,2,0\n'
+        f'201,True,Winner,Carol,female,1990,2,,2,0\n'
     )
     csv += (
         f'{status},{entities[canton][1]},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-        f'101,True,Sieger,Hans,0,,0,1\n'
+        f'101,True,Sieger,Hans,male,1980,0,,0,1\n'
         f'{status},{entities[canton][1]},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-        f'201,False,Verlierer,Peter,2,,2,0\n'
+        f'201,False,Verlierer,Peter,male,1920,2,,2,0\n'
     )
     csv = csv.encode('utf-8')
 

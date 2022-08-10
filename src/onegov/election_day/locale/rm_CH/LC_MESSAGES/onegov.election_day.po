@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-08 10:22+0200\n"
+"POT-Creation-Date: 2022-08-08 14:50+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -892,6 +892,15 @@ msgstr "Emblidà il pled-clav?"
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
 
+msgid "female"
+msgstr ""
+
+msgid "male"
+msgstr ""
+
+msgid "undetermined"
+msgstr ""
+
 msgid "Actions"
 msgstr "Acziuns"
 
@@ -1186,6 +1195,12 @@ msgstr ""
 "midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
 "vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
 "proporziunala a las vuschs."
+
+msgid "Count"
+msgstr ""
+
+msgid "Average age"
+msgstr ""
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
@@ -1714,12 +1729,3 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
-
-#~ msgid ""
-#~ "Shows a tab with aggregated list results over all elections. Only useful "
-#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-#~ "Always rounded."
-#~ msgstr ""
-#~ "Mussa ina carta da register cun resultats da glistas agregads per tut las "
-#~ "elecziuns. Mo raschunaivel, sche las glistas correspundan a las gruppas "
-#~ "da glistas. Mo en cas dal Pukelsheim dubel."

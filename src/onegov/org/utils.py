@@ -348,9 +348,13 @@ class AllocationEventInfo:
 
         for key, group in groupby(allocations, key=attrgetter('_start')):
             grouped = tuple(group)
-            availability = scheduler.queries.availability_by_allocations(
-                grouped
-            )
+            if len(grouped) == 1 and grouped[0].partly_available:
+                # in this case we might need to normalize the availability
+                availability = grouped[0].normalized_availability
+            else:
+                availability = scheduler.queries.availability_by_allocations(
+                    grouped
+                )
 
             for allocation in grouped:
                 if allocation.is_master:

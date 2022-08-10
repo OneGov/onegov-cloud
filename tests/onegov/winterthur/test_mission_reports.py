@@ -8,7 +8,7 @@ from tests.shared import Client as BaseClient
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 1
 
 
 def test_mission_report_models(session):

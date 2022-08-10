@@ -124,7 +124,7 @@ html {
         display: flex;
         flex-direction: row-reverse;
         height: 1.7rem;
-
+        margin-bottom: 0;
     }
 }
 
@@ -339,6 +339,11 @@ table {
             td:nth-child(6) {
                 width: 10%;
             }
+
+            td.no-results {
+                text-align: right;
+                width: 50%;
+            }
         }
 
         &.election {
@@ -365,10 +370,20 @@ table {
 
         td,
         th {
+            padding-left: 0;
+            padding-right: 0;
             text-align: left;
         }
 
+        th {
+            border-bottom: 1px dashed #ddd;
+            border-top: 1px solid #ddd;
+            margin-top: 1rem;
+        }
+
         td {
+            border-bottom: 1px dashed #ddd;
+
             .tablesaw-cell-label {
                 color: $black;
                 font-weight: normal;
@@ -377,6 +392,10 @@ table {
             .tablesaw-cell-content {
                 float: right;
             }
+        }
+
+        td:last-child {
+            border-bottom: 0;
         }
 
         td:first-child {
@@ -393,6 +412,13 @@ table {
                 text-align: center;
                 width: 100%;
             }
+        }
+    }
+
+    th.right-aligned-small {
+        span, a {
+            float: right;
+            text-align: right;
         }
     }
 }
@@ -915,7 +941,6 @@ ul.pagination li.last {
     }
 }
 
-
 /*
     Related Links
 */
@@ -924,6 +949,7 @@ ul.pagination li.last {
 }
 
 .related-link {
+    display: block;
     word-break: break-all;
 }
 
@@ -944,6 +970,15 @@ ul.pagination li.last {
         margin: 0 0 1.5rem;
     }
 }
+
+
+/*
+    Embedd Widget
+*/
+.embedded-widget {
+    margin-bottom: 2rem;
+}
+
 
 /*
     Open Data

@@ -2929,7 +2929,7 @@ def test_view_qrbill(client, scenario):
 
 
 def test_activities_json(client, scenario):
-    scenario.add_period(confirmed=True)
+    scenario.add_period(title="Ferienpass 2022", confirmed=True)
     activity = scenario.add_activity(
         title='Backen',
         lead='Backen mit Johann.',
@@ -2952,31 +2952,39 @@ def test_activities_json(client, scenario):
     )
     scenario.commit()
 
-    assert client.get('/activities/json').json == [{
-        'age': {'min': 1, 'max': 15},
-        'coordinate': {'lat': 1.1, 'lon': 2.2},
-        'cost': {'min': 0.0, 'max': 100.0},
-        'dates': [
-            {
-                'start_date': start_date,
-                'start_time': '00:00:00',
-                'end_date': start_date,
-                'end_time': '01:00:00'
-            },
-            {
-                'start_date': start_date,
-                'start_time': '01:00:00',
-                'end_date': start_date,
-                'end_time': '02:00:00'
-            },
-        ],
-        'image': {'thumbnail': None, 'full': None},
-        'lead': 'Backen mit Johann.',
-        'location': 'Bäckerei Govikon, Rathausplatz, 4001 Govikon',
-        'provider': 'Govikon',
-        'spots': 15,
-        'tags': ['Abenteuer', 'Bauernhof', 'Halbtägig'],
-        'title': 'Backen',
-        'url': 'http://localhost/activity/backen',
-        'zip_code': 4001
-    }]
+    assert client.get('/activities/json').json == {
+        'period_name': 'Ferienpass 2022',
+        'wish_phase_start': scenario.date_offset(-1).isoformat(),
+        'wish_phase_end': date.today().isoformat(),
+        'booking_phase_start': date.today().isoformat(),
+        'booking_phase_end': scenario.date_offset(+10).isoformat(),
+        'deadline_days': None,
+        'activities': [{
+            'age': {'min': 1, 'max': 15},
+            'coordinate': {'lat': 1.1, 'lon': 2.2},
+            'cost': {'min': 0.0, 'max': 100.0},
+            'dates': [
+                {
+                    'start_date': start_date,
+                    'start_time': '00:00:00',
+                    'end_date': start_date,
+                    'end_time': '01:00:00'
+                },
+                {
+                    'start_date': start_date,
+                    'start_time': '01:00:00',
+                    'end_date': start_date,
+                    'end_time': '02:00:00'
+                },
+            ],
+            'image': {'thumbnail': None, 'full': None},
+            'lead': 'Backen mit Johann.',
+            'location': 'Bäckerei Govikon, Rathausplatz, 4001 Govikon',
+            'provider': 'Govikon',
+            'spots': 15,
+            'tags': ['Abenteuer', 'Bauernhof', 'Halbtägig'],
+            'title': 'Backen',
+            'url': 'http://localhost/activity/backen',
+            'zip_code': 4001
+        }]
+    }
