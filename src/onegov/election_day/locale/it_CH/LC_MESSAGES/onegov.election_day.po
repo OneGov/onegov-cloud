@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-08 14:50+0200\n"
+"POT-Creation-Date: 2022-08-10 16:20+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -772,6 +772,9 @@ msgstr "Scrutinati"
 msgid "Updated"
 msgstr "Aggiornato"
 
+msgid "No results yet"
+msgstr "Ancora nessun risultato"
+
 msgid "Result"
 msgstr "Risultato"
 
@@ -1042,9 +1045,6 @@ msgstr "Pagina successiva"
 msgid "You are here"
 msgstr "Tu sei qui"
 
-msgid "No results yet"
-msgstr "Ancora nessun risultato"
-
 msgid "Alerts"
 msgstr "Avvisi"
 
@@ -1110,6 +1110,9 @@ msgstr "Risultati dei candidati"
 
 msgid "The raw data of the candidates are available in the following formats:"
 msgstr "I dati grezzi dei candidati sono disponibili nei formati seguenti:"
+
+msgid "The raw data are available in the following formats:"
+msgstr "I dati grezzi sono disponibili nei formati seguenti:"
 
 msgid "The raw data of the parties are available in the following formats:"
 msgstr "I dati grezzi dei partiti sono disponibili nei formati seguenti:"
