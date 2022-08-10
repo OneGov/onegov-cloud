@@ -355,107 +355,88 @@ class PdfGenerator():
             pdf.pagebreak()
 
         # Statistics
-        summarize = election.results.count() != 1
-
         pdf.h2(_('Election statistics'))
-        if not summarize:
-            res = election.results.first()
-            t = pdf.translate
-            table = [
-                [t(_('Turnout')), '{0:.2f} %'.format(res.turnout)],
-                [t(_('eligible Voters')), res.eligible_voters],
-                [t(_('Expats')), res.expats],
-                [t(_('Accounted Votes')), res.accounted_votes],
-                [t(_('Received Ballots')), res.received_ballots or '0'],
-                [t(_('Accounted Ballots')), res.accounted_ballots or '0'],
-                [t(_('Blank Ballots')), res.blank_ballots or '0'],
-                [t(_('Invalid Ballots')), res.invalid_ballots or '0']
-            ]
-            if not election.expats:
-                del table[2]
-            pdf.table(table, 'even')
-        else:
-            hide_districts = (
-                not principal.has_districts
-                or election.domain in (
-                    'region', 'district', 'municipality', 'none'
-                )
+        hide_districts = (
+            not principal.has_districts
+            or election.domain in (
+                'region', 'district', 'municipality', 'none'
             )
-            pdf.results(
-                head=[
-                    principal.label('entity'),
-                    principal.label('district'),
-                    _('Turnout'),
-                    _('eligible Voters'),
-                    _('Expats'),
-                    _('Accounted Votes'),
-                ],
-                body=[
-                    [
-                        format_name(result),
-                        result.district,
-                        '{0:.2f} %'.format(result.turnout),
-                        result.eligible_voters,
-                        result.expats,
-                        result.accounted_votes,
-                    ]
-                    for result in election.results
-                ],
-                foot=[
-                    pdf.translate(_('Total')),
-                    '',
-                    '{0:.2f} %'.format(election.turnout),
-                    election.eligible_voters,
-                    election.expats,
-                    election.accounted_votes,
-                ],
-                hide=[
-                    False,
-                    hide_districts,
-                    False,
-                    False,
-                    not election.expats,
-                    False
-                ],
-            )
-            pdf.spacer()
-            pdf.results(
-                head=[
-                    principal.label('entity'),
-                    principal.label('district'),
-                    _('Received Ballots'),
-                    _('Accounted Ballots'),
-                    _('Blank Ballots'),
-                    _('Invalid Ballots'),
-                ],
-                body=[
-                    [
-                        format_name(result),
-                        result.district,
-                        result.received_ballots or '0',
-                        result.accounted_ballots or '0',
-                        result.blank_ballots or '0',
-                        result.invalid_ballots or '0',
-                    ]
-                    for result in election.results
-                ],
-                foot=[
-                    pdf.translate(_('Total')),
-                    '',
-                    election.received_ballots or '0',
-                    election.accounted_ballots or '0',
-                    election.blank_ballots or '0',
-                    election.invalid_ballots or '0',
-                ],
-                hide=[
-                    False,
-                    hide_districts,
-                    False,
-                    False,
-                    False,
-                    False
-                ],
-            )
+        )
+        pdf.results(
+            head=[
+                principal.label('entity'),
+                principal.label('district'),
+                _('Turnout'),
+                _('eligible Voters'),
+                _('Expats'),
+                _('Accounted Votes'),
+            ],
+            body=[
+                [
+                    format_name(result),
+                    result.district,
+                    '{0:.2f} %'.format(result.turnout),
+                    result.eligible_voters,
+                    result.expats,
+                    result.accounted_votes,
+                ]
+                for result in election.results
+            ],
+            foot=[
+                pdf.translate(_('Total')),
+                '',
+                '{0:.2f} %'.format(election.turnout),
+                election.eligible_voters,
+                election.expats,
+                election.accounted_votes,
+            ],
+            hide=[
+                False,
+                hide_districts,
+                False,
+                False,
+                not election.expats,
+                False
+            ],
+        )
+        pdf.spacer()
+        pdf.results(
+            head=[
+                principal.label('entity'),
+                principal.label('district'),
+                _('Received Ballots'),
+                _('Accounted Ballots'),
+                _('Blank Ballots'),
+                _('Invalid Ballots'),
+            ],
+            body=[
+                [
+                    format_name(result),
+                    result.district,
+                    result.received_ballots or '0',
+                    result.accounted_ballots or '0',
+                    result.blank_ballots or '0',
+                    result.invalid_ballots or '0',
+                ]
+                for result in election.results
+            ],
+            foot=[
+                pdf.translate(_('Total')),
+                '',
+                election.received_ballots or '0',
+                election.accounted_ballots or '0',
+                election.blank_ballots or '0',
+                election.invalid_ballots or '0',
+            ],
+            hide=[
+                False,
+                hide_districts,
+                False,
+                False,
+                False,
+                False
+            ],
+        )
         pdf.pagebreak()
 
     def add_election_compound(self, principal, compound, pdf):
@@ -760,8 +741,6 @@ class PdfGenerator():
                 return nan
             return fmt(getattr(result, attr))
 
-        summarize = vote.proposal.results.count() != 1
-
         # Answer
         answer = _('Rejected')
 
@@ -832,44 +811,58 @@ class PdfGenerator():
                 pdf.spacer()
                 pdf.spacer()
 
-            if not summarize:
-                # Only one entity
-                result = ballot.results.first()
-                pdf.factoids(
+            # Entities
+            subtitle(principal.label('entities'))
+            pdf.spacer()
+
+            pdf.results(
+                head=[
+                    principal.label('entity'),
+                    principal.label('district'),
+                    _('Result'),
+                    _('Yes %'),
+                    _('No %'),
+                ],
+                body=[
                     [
-                        pdf.translate(_('Yes %')).replace('%', '').strip(),
-                        pdf.translate(_('No %')).replace('%', '').strip(),
-                        '{} / {}'.format(
-                            pdf.translate(_('Empty votes')),
-                            pdf.translate(_('Invalid votes'))
-                        ),
-                    ],
-                    [
-                        '{} / {:.2f}%'.format(
-                            result.yeas or '0',
-                            result.yeas_percentage
-                        ) if completed else f'{nan} / {nan}',
-                        '{} / {:.2f}%'.format(
-                            result.nays or '0',
-                            result.nays_percentage
-                        ) if completed else f'{nan} / {nan}',
-                        '{} / {}'.format(
-                            result.empty or '0',
-                            result.invalid or '0',
-                        ) if completed else f'{nan} / {nan}'
-                    ],
+                        format_name(result),
+                        result.district,
+                        pdf.translate(format_accepted(result)),
+                        format_value(result, 'yeas_percentage'),
+                        format_value(result, 'nays_percentage'),
+                    ]
+                    for result in ballot.results
+                ],
+                foot=[
+                    pdf.translate(_('Total')),
+                    '',
+                    pdf.translate(format_accepted(ballot)),
+                    format_value(ballot, 'yeas_percentage'),
+                    format_value(ballot, 'nays_percentage'),
+                ],
+                hide=[
+                    False,
+                    not principal.has_districts,
+                    False,
+                    False,
+                    False,
+                ],
+            )
+            pdf.pagebreak()
+
+            if principal.is_year_available(vote.date.year):
+                pdf.pdf(
+                    self.renderer.get_entities_map(ballot, 'pdf', locale),
+                    0.8
                 )
                 pdf.pagebreak()
 
-            else:
-
-                # Entities
-                subtitle(principal.label('entities'))
+            # Districts
+            if principal.has_districts:
+                subtitle(principal.label('districts'))
                 pdf.spacer()
-
                 pdf.results(
                     head=[
-                        principal.label('entity'),
                         principal.label('district'),
                         _('Result'),
                         _('Yes %'),
@@ -878,154 +871,109 @@ class PdfGenerator():
                     body=[
                         [
                             format_name(result),
-                            result.district,
                             pdf.translate(format_accepted(result)),
                             format_value(result, 'yeas_percentage'),
                             format_value(result, 'nays_percentage'),
                         ]
-                        for result in ballot.results
+                        for result in ballot.results_by_district
                     ],
                     foot=[
                         pdf.translate(_('Total')),
-                        '',
                         pdf.translate(format_accepted(ballot)),
                         format_value(ballot, 'yeas_percentage'),
                         format_value(ballot, 'nays_percentage'),
                     ],
-                    hide=[
-                        False,
-                        not principal.has_districts,
-                        False,
-                        False,
-                        False,
-                    ],
                 )
                 pdf.pagebreak()
-
                 if principal.is_year_available(vote.date.year):
                     pdf.pdf(
-                        self.renderer.get_entities_map(ballot, 'pdf', locale),
+                        self.renderer.get_districts_map(
+                            ballot, 'pdf', locale
+                        ),
                         0.8
                     )
                     pdf.pagebreak()
 
-                # Districts
-                if principal.has_districts:
-                    subtitle(principal.label('districts'))
-                    pdf.spacer()
-                    pdf.results(
-                        head=[
-                            principal.label('district'),
-                            _('Result'),
-                            _('Yes %'),
-                            _('No %'),
-                        ],
-                        body=[
-                            [
-                                format_name(result),
-                                pdf.translate(format_accepted(result)),
-                                format_value(result, 'yeas_percentage'),
-                                format_value(result, 'nays_percentage'),
-                            ]
-                            for result in ballot.results_by_district
-                        ],
-                        foot=[
-                            pdf.translate(_('Total')),
-                            pdf.translate(format_accepted(ballot)),
-                            format_value(ballot, 'yeas_percentage'),
-                            format_value(ballot, 'nays_percentage'),
-                        ],
-                    )
-                    pdf.pagebreak()
-                    if principal.is_year_available(vote.date.year):
-                        pdf.pdf(
-                            self.renderer.get_districts_map(
-                                ballot, 'pdf', locale
-                            ),
-                            0.8
-                        )
-                        pdf.pagebreak()
+            # Statistics
+            subtitle(_('Statistics'))
+            pdf.spacer()
+            pdf.results(
+                head=[
+                    principal.label('entity'),
+                    principal.label('district'),
+                    _('eligible_voters_vote'),
+                    _('Expats'),
+                    _('Cast Ballots'),
+                    _('turnout_vote'),
+                ],
+                body=[
+                    [
+                        format_name(result),
+                        result.district,
+                        result.eligible_voters or '0',
+                        result.expats,
+                        result.cast_ballots or '0',
+                        '{0:.2f} %'.format(result.turnout),
+                    ]
+                    for result in ballot.results
+                ],
+                foot=[
+                    pdf.translate(_('Total')),
+                    '',
+                    ballot.eligible_voters or '0',
+                    ballot.expats,
+                    ballot.cast_ballots or '0',
+                    '{0:.2f} %'.format(ballot.turnout),
+                ],
+                hide=[
+                    False,
+                    not principal.has_districts,
+                    False,
+                    not ballot.expats,
+                    False,
+                    False,
+                ],
+            )
+            pdf.spacer()
+            pdf.results(
+                head=[
+                    principal.label('entity'),
+                    principal.label('district'),
+                    _('Empty votes'),
+                    _('Invalid votes'),
+                    pdf.translate(_('Yeas')).replace('-', '- '),
+                    pdf.translate(_('Nays')).replace('-', '- '),
+                ],
+                body=[
+                    [
+                        format_name(result),
+                        result.district,
+                        result.empty or '0',
+                        result.invalid or '0',
+                        result.yeas or '0',
+                        result.nays or '0',
+                    ]
+                    for result in ballot.results
+                ],
+                foot=[
+                    pdf.translate(_('Total')),
+                    '',
+                    ballot.empty or '0',
+                    ballot.invalid or '0',
+                    ballot.yeas or '0',
+                    ballot.nays or '0',
+                ],
+                hide=[
+                    False,
+                    not principal.has_districts,
+                    False,
+                    False,
+                    False,
+                    False,
+                ],
+            )
 
-                # Statistics
-                subtitle(_('Statistics'))
-                pdf.spacer()
-                pdf.results(
-                    head=[
-                        principal.label('entity'),
-                        principal.label('district'),
-                        _('eligible_voters_vote'),
-                        _('Expats'),
-                        _('Cast Ballots'),
-                        _('turnout_vote'),
-                    ],
-                    body=[
-                        [
-                            format_name(result),
-                            result.district,
-                            result.eligible_voters or '0',
-                            result.expats,
-                            result.cast_ballots or '0',
-                            '{0:.2f} %'.format(result.turnout),
-                        ]
-                        for result in ballot.results
-                    ],
-                    foot=[
-                        pdf.translate(_('Total')),
-                        '',
-                        ballot.eligible_voters or '0',
-                        ballot.expats,
-                        ballot.cast_ballots or '0',
-                        '{0:.2f} %'.format(ballot.turnout),
-                    ],
-                    hide=[
-                        False,
-                        not principal.has_districts,
-                        False,
-                        not ballot.expats,
-                        False,
-                        False,
-                    ],
-                )
-                pdf.spacer()
-                pdf.results(
-                    head=[
-                        principal.label('entity'),
-                        principal.label('district'),
-                        _('Empty votes'),
-                        _('Invalid votes'),
-                        pdf.translate(_('Yeas')).replace('-', '- '),
-                        pdf.translate(_('Nays')).replace('-', '- '),
-                    ],
-                    body=[
-                        [
-                            format_name(result),
-                            result.district,
-                            result.empty or '0',
-                            result.invalid or '0',
-                            result.yeas or '0',
-                            result.nays or '0',
-                        ]
-                        for result in ballot.results
-                    ],
-                    foot=[
-                        pdf.translate(_('Total')),
-                        '',
-                        ballot.empty or '0',
-                        ballot.invalid or '0',
-                        ballot.yeas or '0',
-                        ballot.nays or '0',
-                    ],
-                    hide=[
-                        False,
-                        not principal.has_districts,
-                        False,
-                        False,
-                        False,
-                        False,
-                    ],
-                )
-
-                pdf.pagebreak()
+            pdf.pagebreak()
 
     def create_pdfs(self):
         """ Generates all PDFs for the given application.
