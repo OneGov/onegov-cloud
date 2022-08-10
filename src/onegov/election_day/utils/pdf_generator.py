@@ -443,10 +443,10 @@ class PdfGenerator():
                 spacing=[
                     None,
                     None,
-                    3 * cm,
-                    3 * cm,
-                    3 * cm,
-                    3 * cm
+                    None,
+                    None,
+                    None,
+                    None
                 ],
             )
             pdf.spacer()
@@ -489,10 +489,10 @@ class PdfGenerator():
                 spacing=[
                     None,
                     None,
-                    3 * cm,
-                    3 * cm,
-                    3 * cm,
-                    3 * cm
+                    None,
+                    None,
+                    None,
+                    None,
                 ],
             )
         pdf.pagebreak()
@@ -746,8 +746,6 @@ class PdfGenerator():
         # Statistics
         pdf.h2(_('Election statistics'))
         results = compound.results
-        # todo: expats
-        # if has_superregions:
         pdf.results(
             head=[
                 label('district'),
@@ -779,10 +777,10 @@ class PdfGenerator():
             spacing=[
                 None,
                 None,
-                3 * cm,
-                3 * cm,
-                3 * cm,
-                3 * cm
+                None,
+                None,
+                None,
+                None
             ]
         )
         pdf.spacer()
@@ -816,10 +814,10 @@ class PdfGenerator():
             spacing=[
                 None,
                 None,
-                3 * cm,
-                3 * cm,
-                3 * cm,
-                3 * cm
+                None,
+                None,
+                None,
+                None
             ],
         )
         pdf.pagebreak()
@@ -1091,10 +1089,10 @@ class PdfGenerator():
                     spacing=[
                         None,
                         None,
-                        3 * cm,
-                        3 * cm,
-                        3 * cm,
-                        3 * cm
+                        None,
+                        None,
+                        None,
+                        None
                     ]
                 )
                 pdf.spacer()
@@ -1137,10 +1135,10 @@ class PdfGenerator():
                     spacing=[
                         None,
                         None,
-                        3 * cm,
-                        3 * cm,
-                        3 * cm,
-                        3 * cm
+                        None,
+                        None,
+                        None,
+                        None
                     ]
                 )
 
@@ -1184,7 +1182,7 @@ class PdfGenerator():
         # Generate the PDFs
         created = 0
         filenames = []
-        for locale in self.app.locales:
+        for locale in sorted(self.app.locales):
             for item in items:
                 filename = pdf_filename(item, locale)
                 filenames.append(filename)
