@@ -1313,6 +1313,14 @@
     </div>
 </metal:photoswipe>
 
+<metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
+    <div class="homepage-video">
+        <video autoplay loop muted>
+            <source src="${layout.org.homepage_video}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video> 
+    </div>
+</metal:autoplay_video>
 
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">

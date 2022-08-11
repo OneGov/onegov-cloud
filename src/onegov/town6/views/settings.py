@@ -84,6 +84,12 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             label=_("Number of events displayed on homepage")
         )
 
+        homepage_video = StringField(
+            label=_("Homepage video"),
+            fieldset=_("Video"),
+            render_kw={'class_': 'image-url'}
+        )
+
     return move_fields(
         form_class=merge_forms(
             homepage_settings_form or HomepageSettingsForm, CustomFieldsForm),
@@ -99,6 +105,7 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             'hide_publications',
             'event_limit_homepage',
             'news_limit_homepage',
+            'homepage_video',
         ),
         after='homepage_image_6'
     )
