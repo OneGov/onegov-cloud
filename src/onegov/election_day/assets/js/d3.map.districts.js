@@ -135,6 +135,9 @@
                         })
                         .html(function(d) {
                             var name = '<strong>' + d.key + '</strong>';
+                            if (d.value.mandates && d.value.progress) {
+                                return name + '<br><i class="fa fa fa-user"></i> ' + d.value.mandates + '<br><i class="fa fa-check"></i> ' + d.value.progress;
+                            }
                             if (d.value.counted) {
                                 var percentage =  Math.round(d.value.percentage * 100) / 100;
                                 if (hidePercentages) {
@@ -195,6 +198,11 @@
                         })
                         .on('mouseout.highlight', function() {
                             d3.select(this).classed('selected', false);
+                        })
+                        .on('click.highlight', function(d) {
+                            if (d.value.link && d.value.counted) {
+                                window.location = d.value.link;
+                            }
                         })
                         .on('click', tooltip.show);
                 }
